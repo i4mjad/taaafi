@@ -27,6 +27,9 @@ class _ContentPageState extends State<ContentPage> {
 
   List<String> selectedSubTypesList = [];
   List<String> selectedTypesList = [];
+  List<String> selectedLanuguagesList = [];
+
+  List<String> lanuguagesList = ["عربي", "English"];
 
   String fixArbicText(String currptedText) {
     String text = utf8.decode(currptedText.codeUnits);
@@ -189,11 +192,11 @@ class _ContentPageState extends State<ContentPage> {
                   border: Border.all(
                     color: (selectedSubTypesList.length > 0 ||
                             selectedSubTypesList.length > 0)
-                        ? primaryColor
+                        ? Colors.green
                         : primaryColor.withOpacity(0.3),
                     width: (selectedSubTypesList.length > 0 ||
                             selectedSubTypesList.length > 0)
-                        ? 2
+                        ? 1
                         : 0.5,
                   ),
                 ),
@@ -416,6 +419,59 @@ class _ContentPageState extends State<ContentPage> {
                       height: 12,
                     ),
                     Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          AppLocalizations.of(context)
+                              .translate('content-language'),
+                          style: kSubTitlesStyle,
+                        ),
+                      ],
+                    ),
+                    SizedBox(
+                      height: 12,
+                    ),
+                    Container(
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: ChipsChoice<String>.multiple(
+                              alignment: WrapAlignment.start,
+                              choiceStyle: C2ChoiceStyle(
+                                  labelStyle: kSubTitlesStyle.copyWith(
+                                      fontSize: 12,
+                                      height: 1,
+                                      color: primaryColor,
+                                      fontWeight: FontWeight.w400),
+                                  borderColor: primaryColor,
+                                  color: primaryColor),
+                              padding: EdgeInsets.all(0),
+                              value: selectedLanuguagesList,
+                              onChanged: (val) {
+                                modalSetState(
+                                    () => selectedLanuguagesList = val);
+                                setState(() => selectedLanuguagesList = val);
+                              },
+                              choiceItems: C2Choice.listFrom<String, String>(
+                                source: lanuguagesList,
+                                value: (i, v) => v,
+                                label: (i, v) => v,
+                                tooltip: (i, v) => v,
+                              ),
+                              wrapped: true,
+                              placeholderStyle: kSubTitlesStyle,
+                              textDirection: this.lang == "ar"
+                                  ? TextDirection.rtl
+                                  : TextDirection.ltr,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(
+                      height: 12,
+                    ),
+                    Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         GestureDetector(
@@ -461,6 +517,17 @@ class _ContentPageState extends State<ContentPage> {
     List<Content> results = [];
     if (value.isEmpty) {
       results = appContent;
+      if (value.isEmpty &&
+          (selectedTypesList.length > 0 ||
+              selectedSubTypesList.length > 0 ||
+              selectedLanuguagesList.length > 0)) {
+        results = appContent
+            .where((content) =>
+                selectedTypesList.contains(content.contentType) ||
+                selectedSubTypesList.contains(content.contentSubType) ||
+                selectedLanuguagesList.contains(content.contentLanguage))
+            .toList();
+      }
     } else {
       results = appContent
           .where((content) =>
@@ -469,7 +536,8 @@ class _ContentPageState extends State<ContentPage> {
                   content.contentType.toLowerCase().contains(value) ||
                   content.contentSubType.toLowerCase().contains(value)) &&
               (selectedTypesList.contains(content.contentType) ||
-                  selectedSubTypesList.contains(content.contentSubType)))
+                  selectedSubTypesList.contains(content.contentSubType) ||
+                  selectedLanuguagesList.contains(content.contentLanguage)))
           .toList();
     }
 
@@ -480,11 +548,15 @@ class _ContentPageState extends State<ContentPage> {
 
   void filtersService() {
     List<Content> results = [];
-    if (selectedSubTypesList.length != 0 || selectedTypesList.length != 0) {
+    if (selectedSubTypesList.length != 0 ||
+        selectedTypesList.length != 0 ||
+        selectedLanuguagesList.length != 0) {
       results = appContent
           .where((content) =>
                   (selectedTypesList.contains(content.contentType) ||
-                      selectedSubTypesList.contains(content.contentSubType))
+                      selectedSubTypesList.contains(content.contentSubType) ||
+                      selectedLanuguagesList.contains(content.contentLanguage))
+
               //here
               )
           .toList();
@@ -596,9 +668,7 @@ class ContentCard extends StatelessWidget {
                         decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(8),
                             color: Colors.green.withOpacity(0.2)),
-                        child: Text(
-                            AppLocalizations.of(context)
-                                .translate(content.contentType),
+                        child: Text(content.contentType,
                             style: kSubTitlesSubsStyle.copyWith(
                                 fontSize: 12, height: 1, color: Colors.green)),
                       ),
