@@ -187,8 +187,14 @@ class _ContentPageState extends State<ContentPage> {
                   color: Colors.white,
                   borderRadius: BorderRadius.all(Radius.circular(8)),
                   border: Border.all(
-                    color: primaryColor.withOpacity(0.3),
-                    width: 0.5,
+                    color: (selectedSubTypesList.length > 0 ||
+                            selectedSubTypesList.length > 0)
+                        ? primaryColor
+                        : primaryColor.withOpacity(0.3),
+                    width: (selectedSubTypesList.length > 0 ||
+                            selectedSubTypesList.length > 0)
+                        ? 2
+                        : 0.5,
                   ),
                 ),
                 child: Row(
@@ -200,37 +206,12 @@ class _ContentPageState extends State<ContentPage> {
                         _showFilters();
                       },
                       child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
                           Icon(Iconsax.document, size: 16, color: primaryColor),
-                          SizedBox(width: 4),
+                          SizedBox(width: 8),
                           Text(
                               AppLocalizations.of(context)
                                   .translate('search-filters'),
-                              style: kSubTitlesStyle.copyWith(
-                                  fontSize: 14,
-                                  height: 1,
-                                  fontWeight: FontWeight.w400)),
-                        ],
-                      ),
-                    ),
-                    VerticalDivider(),
-                    GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          selectedSubTypesList.clear();
-                          selectedTypesList.clear();
-                        });
-                      },
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          Icon(Iconsax.recovery_convert,
-                              size: 16, color: primaryColor),
-                          SizedBox(width: 4),
-                          Text(
-                              AppLocalizations.of(context)
-                                  .translate('reset-fillters'),
                               style: kSubTitlesStyle.copyWith(
                                   fontSize: 14,
                                   height: 1,
@@ -351,30 +332,38 @@ class _ContentPageState extends State<ContentPage> {
                       ],
                     ),
                     Container(
-                      child: ChipsChoice<String>.multiple(
-                        padding: EdgeInsets.all(0),
-                        value: selectedSubTypesList,
-                        choiceStyle: C2ChoiceStyle(
-                            labelStyle: kSubTitlesStyle.copyWith(
-                                fontSize: 16, height: 1, color: primaryColor),
-                            borderColor: primaryColor,
-                            color: primaryColor),
-                        choiceActiveStyle: C2ChoiceStyle(),
-                        onChanged: (val) {
-                          modalSetState(() => selectedSubTypesList = val);
-                          setState(() => selectedSubTypesList = val);
-                        },
-                        choiceItems: C2Choice.listFrom<String, String>(
-                          source: getContentSubTypes(),
-                          value: (i, v) => v,
-                          label: (i, v) => v,
-                          tooltip: (i, v) => v,
-                        ),
-                        wrapped: true,
-                        alignment: WrapAlignment.start,
-                        textDirection: this.lang == "ar"
-                            ? TextDirection.rtl
-                            : TextDirection.ltr,
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: ChipsChoice<String>.multiple(
+                              padding: EdgeInsets.all(0),
+                              value: selectedSubTypesList,
+                              choiceStyle: C2ChoiceStyle(
+                                  labelStyle: kSubTitlesStyle.copyWith(
+                                      fontSize: 12,
+                                      height: 1,
+                                      color: primaryColor,
+                                      fontWeight: FontWeight.w400),
+                                  borderColor: primaryColor,
+                                  color: primaryColor),
+                              choiceActiveStyle: C2ChoiceStyle(),
+                              onChanged: (val) {
+                                modalSetState(() => selectedSubTypesList = val);
+                                setState(() => selectedSubTypesList = val);
+                              },
+                              choiceItems: C2Choice.listFrom<String, String>(
+                                source: getContentSubTypes(),
+                                value: (i, v) => v,
+                                label: (i, v) => v,
+                                tooltip: (i, v) => v,
+                              ),
+                              wrapped: true,
+                              textDirection: this.lang == "ar"
+                                  ? TextDirection.rtl
+                                  : TextDirection.ltr,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                     Row(
@@ -388,30 +377,39 @@ class _ContentPageState extends State<ContentPage> {
                       ],
                     ),
                     Container(
-                      child: ChipsChoice<String>.multiple(
-                        alignment: WrapAlignment.center,
-                        choiceStyle: C2ChoiceStyle(
-                            labelStyle: kSubTitlesStyle.copyWith(
-                                fontSize: 16, height: 1, color: primaryColor),
-                            borderColor: primaryColor,
-                            color: primaryColor),
-                        padding: EdgeInsets.all(0),
-                        value: selectedTypesList,
-                        onChanged: (val) {
-                          modalSetState(() => selectedTypesList = val);
-                          setState(() => selectedTypesList = val);
-                        },
-                        choiceItems: C2Choice.listFrom<String, String>(
-                          source: getContentTypes(),
-                          value: (i, v) => v,
-                          label: (i, v) => v,
-                          tooltip: (i, v) => v,
-                        ),
-                        wrapped: true,
-                        placeholderStyle: kSubTitlesStyle,
-                        textDirection: this.lang == "ar"
-                            ? TextDirection.rtl
-                            : TextDirection.ltr,
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: ChipsChoice<String>.multiple(
+                              alignment: WrapAlignment.start,
+                              choiceStyle: C2ChoiceStyle(
+                                  labelStyle: kSubTitlesStyle.copyWith(
+                                      fontSize: 12,
+                                      height: 1,
+                                      color: primaryColor,
+                                      fontWeight: FontWeight.w400),
+                                  borderColor: primaryColor,
+                                  color: primaryColor),
+                              padding: EdgeInsets.all(0),
+                              value: selectedTypesList,
+                              onChanged: (val) {
+                                modalSetState(() => selectedTypesList = val);
+                                setState(() => selectedTypesList = val);
+                              },
+                              choiceItems: C2Choice.listFrom<String, String>(
+                                source: getContentTypes(),
+                                value: (i, v) => v,
+                                label: (i, v) => v,
+                                tooltip: (i, v) => v,
+                              ),
+                              wrapped: true,
+                              placeholderStyle: kSubTitlesStyle,
+                              textDirection: this.lang == "ar"
+                                  ? TextDirection.rtl
+                                  : TextDirection.ltr,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                     SizedBox(
@@ -426,7 +424,7 @@ class _ContentPageState extends State<ContentPage> {
                             Navigator.pop(context);
                           },
                           child: Container(
-                            width: MediaQuery.of(context).size.width * 0.42,
+                            width: MediaQuery.of(context).size.width - 40,
                             height: 50,
                             decoration: BoxDecoration(
                                 color: primaryColor,
@@ -448,29 +446,6 @@ class _ContentPageState extends State<ContentPage> {
                             ),
                           ),
                         ),
-                        Container(
-                          width: MediaQuery.of(context).size.width * 0.42,
-                          height: 50,
-                          decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(10.5),
-                              border:
-                                  Border.all(color: primaryColor, width: 0.25)),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                AppLocalizations.of(context)
-                                    .translate('cancel'),
-                                style: kSubTitlesStyle.copyWith(
-                                    color: primaryColor,
-                                    height: 1,
-                                    fontSize: 16),
-                              )
-                            ],
-                          ),
-                        ),
                       ],
                     ),
                     SizedBox(
@@ -484,18 +459,17 @@ class _ContentPageState extends State<ContentPage> {
 
   void filterSearchResults(String value) {
     List<Content> results = [];
-    if (value.isEmpty &&
-        (selectedTypesList.length != 0 || selectedSubTypesList.length != 0)) {
+    if (value.isEmpty) {
       results = appContent;
     } else {
-      for (var i in results) {
-        print(i.title);
-      }
       results = appContent
-          .where((content) => (content.title.toLowerCase().contains(value) ||
-              content.contentOwner.toLowerCase().contains(value) ||
-              content.contentType.toLowerCase().contains(value) ||
-              content.contentSubType.toLowerCase().contains(value)))
+          .where((content) =>
+              (content.title.toLowerCase().contains(value) ||
+                  content.contentOwner.toLowerCase().contains(value) ||
+                  content.contentType.toLowerCase().contains(value) ||
+                  content.contentSubType.toLowerCase().contains(value)) &&
+              (selectedTypesList.contains(content.contentType) ||
+                  selectedSubTypesList.contains(content.contentSubType)))
           .toList();
     }
 
@@ -506,7 +480,6 @@ class _ContentPageState extends State<ContentPage> {
 
   void filtersService() {
     List<Content> results = [];
-
     if (selectedSubTypesList.length != 0 || selectedTypesList.length != 0) {
       results = appContent
           .where((content) =>
@@ -515,6 +488,14 @@ class _ContentPageState extends State<ContentPage> {
               //here
               )
           .toList();
+    } else {
+      setState(() {
+        loadContent().then((value) {
+          setState(() {
+            fillteredAppContent = appContent;
+          });
+        });
+      });
     }
 
     setState(() {
