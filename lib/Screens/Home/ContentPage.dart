@@ -191,11 +191,13 @@ class _ContentPageState extends State<ContentPage> {
                   borderRadius: BorderRadius.all(Radius.circular(8)),
                   border: Border.all(
                     color: (selectedSubTypesList.length > 0 ||
-                            selectedSubTypesList.length > 0)
+                            selectedSubTypesList.length > 0 ||
+                            selectedLanuguagesList.length > 0)
                         ? Colors.green
                         : primaryColor.withOpacity(0.3),
                     width: (selectedSubTypesList.length > 0 ||
-                            selectedSubTypesList.length > 0)
+                            selectedSubTypesList.length > 0 ||
+                            selectedLanuguagesList.length > 0)
                         ? 1
                         : 0.5,
                   ),
