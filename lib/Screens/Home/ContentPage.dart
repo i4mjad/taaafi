@@ -431,7 +431,7 @@ class _ContentPageState extends State<ContentPage> {
                             decoration: BoxDecoration(
                                 color: primaryColor,
                                 borderRadius: BorderRadius.circular(10.5),
-                                border: Border.all(width: 0.3)),
+                                border: Border.all(width: 0.25)),
                             child: Row(
                               crossAxisAlignment: CrossAxisAlignment.center,
                               mainAxisAlignment: MainAxisAlignment.center,
