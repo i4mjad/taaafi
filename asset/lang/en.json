@@ -1,0 +1,123 @@
+{
+  "welcome": "Welcome!",
+  "home": "Home",
+  "community": "Community",
+  "daily-motivation": "Daily Motivation",
+  "porn-addiction-recovery": "Porn Addiction Recovery",
+  "porn-addiction-recovery-p": "Comprehansive content about NoFap (Available in Arabic only)",
+  "personal-data": "Community",
+
+
+  "articles": "Articles",
+  "videos": "Videos",
+  "books": "Books",
+  "blogs": "Blogs",
+
+  "Articles": "Articles",
+  "Videos": "Videos",
+  "Books": "Books",
+  "Blogs": "Blogs",
+
+  "user-name": "User Name",
+  "user-email": "User Email",
+  "follow-your-reboot": "Follow Your Reboot",
+  "follow-your-reboot-p": "Track your Nofap Journey",
+  "ta3afi-community": "Ta3afi Community",
+  "account": "Account",
+  "about": "About",
+  "log-out": "Log Out",
+
+  "current-streak": "Current Streak",
+  "free-relapse-days": "Days Without Relapses",
+  "free-porn-days": "Days Without Porn",
+  "free-mast-days":"Days Without Masturbation",
+  "dairies": "Dairies",
+  "daily-follow-up": "Daily Follow-up",
+  "reboot-calender": "Reboot Calender",
+  "relapses-by-day-of-week": "Relapses By Day-of-Week",
+  "streaks": "Streaks",
+
+  "today-is-last-relapse":"This day recorded as a Relapse, you can’t followup today",
+  "how-did-you-perform-in-this-day": "How was this day?",
+
+  "account-settings": "Account",
+  "app-settings": "Application Settings",
+  "user_name": "User Name",
+  "user_email": "User Email",
+  "registered-since": "Registered Since:",
+  "daily-notification-time": "Daily Reminder",
+  "delete-my-account": "Delete My Data",
+
+  "about-ta3afi": "Spreading awareness about the consequences of porn & masturbation addiction by providing helpful resources and tools to overcome the addiction.",
+  "version-number-ios": "v.4.0",
+  "version-number-android": "v.2.0",
+  "contact-us-through-this-channels": "For Any Concern, Please Contact:",
+  "support-app-development": "Support App Development",
+  "contact-us": "Reach Me",
+
+  "new-note": "New Note",
+  "ta3afi": "Reboot App",
+
+  "login": "Login",
+  "email": "Email",
+  "password": "Password",
+  "forget-password": "Forget Password",
+  "sign-up": "Sign Up",
+  "login-button": "Login",
+  "or-login-with": "Or Login With:",
+
+  "reset-your-password": "Reset Your Password",
+  "send-password-reset-email": "Send Password Reset Email",
+
+  "first-name": "First Name",
+  "last-name": "Last Name",
+  "repeat-password": "Repeat Password",
+
+  "search": "Search",
+  "loading": "Loading...",
+
+  "posted-at": "Posted at: ",
+  "share-app" : "We Need Your Feedback!",
+
+  "share-app-p" : "Help Us Improve Ta3afi",
+
+  "sat" : "Sat",
+  "sun" : "Sun",
+  "mon" : "Mon",
+  "tue" : "Tue",
+  "wed" : "Wed",
+  "thu" : "Thu",
+  "fri" : "Fri",
+
+  "developed-by" : "Developed By: Amjad AlSulimani",
+  "change-lang" : "Change Language",
+
+  "relapse": "Relapse",
+  "porn-only": "Watching Porn Without Masturbation",
+  "mast-only": "Masturbation Without Watching Porn",
+  "free-day": "Success Day!",
+
+  "Articles-Description" : "Our Team's Articals",
+  "Videos-Description" : "Videos to guide you",
+  "Books-Description" : "Books about the addiction",
+  "Blogs-Description" : "Articals to help you",
+
+  "delete-user-dialog-confirm-button" :"Confirm",
+  "delete-user-dialog-back-button" :"Back",
+  "delete-user-dialog-title" :"Account Data Reset",
+  "delete-user-dialog-content" :"Your data will NOT be able to restored, are you sure?",
+
+  "follow-up-dialog-yes-button": "Yes",
+  "follow-up-dialog-no-button": "No",
+  "follow-up-dialog-title": "Daily Follow up",
+  "follow-up-dialog-content": "Did you watched any porn today?",
+
+  "new-user-dialog-start-button": "Start",
+  "new-user-dialog-new-start-button": "New Beginning",
+  "new-user-dialog-hint-test-field": "Enter Current Streak",
+  "new-user-dialog-title": "Ongoing streak?",
+  "new-user-dialog-content": "If you've started before please enter your Current streak and click Start, if not, click New Beginning",
+
+  "my-profile": "My Profile"
+
+}

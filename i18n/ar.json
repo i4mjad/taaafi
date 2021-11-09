@@ -1,0 +1,121 @@
+{
+  "welcome": "مرحبًا بك!",
+  "home": "الرئيسية",
+  "community": "المجتمع",
+  "daily-motivation": "التحفيز اليومي",
+  "porn-addiction-recovery": "تعافي",
+  "porn-addiction-recovery-p": "محتوى مفيد للتعافي من إدمان الإباحية",
+
+  "articles": "مقالات",
+  "videos": "مقاطع مرئية",
+  "books": "كتب",
+  "blogs": "مدونات",
+
+  "Articles": "مقالات",
+  "Videos": "مقاطع مرئية",
+  "Books": "كتب",
+  "Blogs": "مدونات",
+
+  "user-name": "اسم المستخدم",
+  "user-email": "البريد الالكتروني",
+  "follow-your-reboot": "تابع تعافيك",
+  "follow-your-reboot-p": "تابع تعافيك بالأرقام ووثق الرحلة في مذكراتك",
+  "ta3afi-community": "مجتمع تعافي",
+  "account": "الحساب",
+  "about": "تعافي",
+  "log-out": "تسجيل الخروج",
+  "personal-data": "المجتمع",
+
+  "current-streak": "الفترة الحالية",
+  "free-relapse-days": "يوم بدون انتكاسة",
+  "free-porn-days": "يوم بدون أفلام إباحية",
+  "free-mast-days":"يوم بدون عادة سرية",
+  "dairies": "المذكرات",
+  "daily-follow-up": "المتابعة اليومية",
+  "reboot-calender": "تقويم التعافي",
+  "relapses-by-day-of-week": "الانتكاسات حسب أيام الأسبوع",
+  "streaks": "الفترات السابقة",
+
+  "today-is-last-relapse":"لقد تم تسجيل انتكاسة في هذا اليوم٬ لذلك المتابعة اليومية غير متاحة حتى اليوم التالي",
+  "how-did-you-perform-in-this-day": "كيف كان هذا اليوم بالنسبة لك؟",
+
+  "account-settings": "الحساب",
+  "app-settings": "التطبيق",
+  "user_name": "اسم المستخدم",
+  "user_email": "البريد الالكتروني",
+  "registered-since": "مسجل منذ:",
+  "daily-notification-time": "التذكير اليومي",
+  "delete-my-account": "إعادة تعيين بيانات الحساب",
+
+  "about-ta3afi": "تطبيق للتوعية بمخاطر المواد الإباحية وما يؤدي الإدمان عليها عن طريق تقديم محتوى وأدوات تساعد في حل المشكلة.",
+  "version-number-ios": "النسخة 4.0",
+  "version-number-android": "النسخة 2.0",
+  "contact-us-through-this-channels": "تواصل مع المطور",
+  "support-app-development": "ادعم تطوير التطبيق",
+  "contact-us": "تواصل معنا عبر المنصات التالية:",
+
+  "new-note": "ملاحظة جديدة",
+  "ta3afi": "تطبيق تعافي",
+
+  "login": "تسجيل الدخول",
+  "email": "البريد الالكتروني",
+  "password": "كلمة السر",
+  "forget-password": "نسيت كلمة السر؟",
+  "sign-up": "تسجيل حساب جديد",
+  "login-button": "تسجيل الدخول",
+  "or-login-with": "أو الدخول عن طريق:",
+
+  "reset-your-password": "إعادة تعيين كلمة السر",
+  "send-password-reset-email": "إرسال رابط استعادة كلمة السر",
+
+  "first-name": "الاسم الأول",
+  "last-name": "اسم العائلة",
+  "repeat-password": "إعادة إدخال كلمة السر",
+
+  "search": "ابحث عن محتوى",
+  "loading": "يتم الآن جلب المحتوى...",
+
+  "posted-at": "تم النشر في: ",
+  "share-app" : "رأيك يهمنا!",
+
+  "share-app-p" : "شاركنا اقتراحاتك، أو قصة نجاحك!",
+
+  "sat" : "السبت",
+  "sun" : "الأحد",
+  "mon" : "الاثنين",
+  "tue" : "الثلاثاء",
+  "wed" : "الأربعاء",
+  "thu" : "الخميس",
+  "fri" : "الجمعة",
+
+  "developed-by" : "تطوير: أمجد السليماني",
+  "change-lang" : "تغيير اللغة",
+
+  "relapse": "انتكاسة",
+  "porn-only": "مشاهدة إباحية بدون عادة سرية",
+  "mast-only": "عادة سرية بدون مشاهدة",
+  "free-day": "يوم يدون انتكاسة",
+
+  "Articles-Description" : "مقالات فريق تعافي",
+  "Videos-Description" : "مقاطع مرئية لإلهامك",
+  "Books-Description" : "كتب عن إدمان الإباحية",
+  "Blogs-Description" : "مقالات لإرشادك",
+
+  "delete-user-dialog-confirm-button" :"تأكيد",
+  "delete-user-dialog-back-button" :"العودة",
+  "delete-user-dialog-title" :"إعادة تعيين بيانات الحساب",
+  "delete-user-dialog-content" :"هذا الخيار سيقوم بمسح وتصفير بياناتك بالكامل، لن تتمكن من استعادة أي من البيانات المحذوفة، هل أنت متأكد؟",
+
+  "follow-up-dialog-yes-button": "نعم",
+  "follow-up-dialog-no-button": "لا",
+  "follow-up-dialog-title": "المتابعة اليومية",
+  "follow-up-dialog-content": "هل شاهدت أي مواد إباحية اليوم؟",
+
+  "new-user-dialog-start-button": "إبدأ",
+  "new-user-dialog-new-start-button": "بداية جديدة",
+  "new-user-dialog-hint-test-field": "أدخل المدة الحالية",
+  "new-user-dialog-title": "هل بدأت مسبقًا؟",
+  "new-user-dialog-content": "أدخل المدة الحالية إذا كنت بدأت مسبقًا، أو اضغط بداية جديدة للبدء إذا كنت ترغب بالبدء الآن",
+
+  "my-profile": "حسابي"
+}
