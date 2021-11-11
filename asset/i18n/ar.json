@@ -47,7 +47,7 @@
   "user_email": "البريد الالكتروني",
   "registered-since": "مسجل منذ:",
   "daily-notification-time": "التذكير اليومي",
-  "delete-my-account": "إعادة تعيين بيانات الحساب",
+  "delete-my-data": "إعادة تعيين بيانات الحساب",
 
   "about-ta3afi": "تطبيق للتوعية بمخاطر المواد الإباحية وما يؤدي الإدمان عليها عن طريق تقديم محتوى وأدوات تساعد في حل المشكلة.",
   "version-number-ios": "النسخة 4.0",
@@ -163,7 +163,9 @@
   "delete-my-data-warning" : "ملاحظة: لا يمكن التراجع بعد مسح البيانات",
 
   "new-begining" : "بداية جديدة",
-  "start-from-specific-date" : "ابدأ من تاريخ معين"
+  "start-from-specific-date" : "ابدأ من تاريخ معين",
+
+  "delete-my-account" : "حذف حسابي"
 
 
 

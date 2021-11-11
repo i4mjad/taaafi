@@ -313,7 +313,7 @@ class _AccountScreenState extends State<AccountScreen>
                       Flexible(
                           child: Text(
                         AppLocalizations.of(context)
-                            .translate('delete-my-account'),
+                            .translate('delete-my-data'),
                         style: kPageTitleStyle.copyWith(
                             fontSize: 24, color: primaryColor),
                       ))
@@ -557,7 +557,7 @@ class _AccountScreenState extends State<AccountScreen>
                   child: Column(
                     children: [
                       Padding(
-                        padding: EdgeInsets.only(top: 8.0, bottom: 8),
+                        padding: EdgeInsets.only(top: 4, bottom: 8),
                         child: GestureDetector(
                           onTap: () {
                             scheduleDailyNotification();
@@ -590,7 +590,7 @@ class _AccountScreenState extends State<AccountScreen>
                       ),
                       Divider(),
                       Padding(
-                        padding: EdgeInsets.only(top: 8.0, bottom: 8),
+                        padding: EdgeInsets.only(top: 8.0, bottom: 4),
                         child: GestureDetector(
                           onTap: () {
                             _changeLanguage();
@@ -643,7 +643,7 @@ class _AccountScreenState extends State<AccountScreen>
                   child: Column(
                     children: [
                       Padding(
-                        padding: EdgeInsets.only(top: 8.0, bottom: 8),
+                        padding: EdgeInsets.only(top: 4, bottom: 8),
                         child: GestureDetector(
                           onTap: () {
                             showDeleteSheet();
@@ -665,7 +665,7 @@ class _AccountScreenState extends State<AccountScreen>
                                 children: <Widget>[
                                   Text(
                                       AppLocalizations.of(context)
-                                          .translate('delete-my-account'),
+                                          .translate('delete-my-data'),
                                       style: kSubTitlesStyle.copyWith(
                                           fontSize: 17)),
                                 ],
@@ -676,7 +676,7 @@ class _AccountScreenState extends State<AccountScreen>
                       ),
                       Divider(),
                       Padding(
-                        padding: EdgeInsets.only(top: 8.0, bottom: 8),
+                        padding: EdgeInsets.only(top: 8.0, bottom: 4),
                         child: GestureDetector(
                           onTap: () {
                             context.read<AuthenticationService>().signOut();
@@ -689,7 +689,7 @@ class _AccountScreenState extends State<AccountScreen>
                                 child: Icon(
                                   Iconsax.user_remove,
                                   size: 28,
-                                  color: Colors.red,
+                                  color: Colors.grey,
                                 ),
                               ),
                               Column(
@@ -707,6 +707,42 @@ class _AccountScreenState extends State<AccountScreen>
                           ),
                         ),
                       ),
+                    ],
+                  ),
+                ),
+                SizedBox(
+                  height: 30,
+                ),
+                Container(
+                  padding: EdgeInsets.only(top: 12, bottom: 12),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    border: Border.all(
+                        width: 1, color: Colors.red.withOpacity(0.7)),
+                    borderRadius: BorderRadius.circular(12.5),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.only(left: 12, right: 12),
+                        child: Icon(
+                          Iconsax.trash,
+                          size: 26,
+                          color: Colors.red,
+                        ),
+                      ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Text(
+                              AppLocalizations.of(context)
+                                  .translate('delete-my-account'),
+                              style: kSubTitlesStyle.copyWith(
+                                  color: Colors.red, fontSize: 17)),
+                        ],
+                      )
                     ],
                   ),
                 ),

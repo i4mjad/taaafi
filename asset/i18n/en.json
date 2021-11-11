@@ -48,7 +48,7 @@
   "user_email": "User Email",
   "registered-since": "Registered Since:",
   "daily-notification-time": "Daily Reminder",
-  "delete-my-account": "Delete My Data",
+  "delete-my-data": "Delete My Data",
 
   "about-ta3afi": "Spreading awareness about the consequences of porn & masturbation addiction by providing helpful resources and tools to overcome the addiction.",
   "version-number-ios": "v.4.0",
@@ -166,7 +166,10 @@
   "delete-my-data-warning" : "WARNING: You can't undo this action after it's done.",
 
   "new-begining" : "New Beginning",
-  "start-from-specific-date" : "Specific Date"
+  "start-from-specific-date" : "Specific Date",
+
+  "delete-my-account" : "Delete My Account"
+
 
 
 
