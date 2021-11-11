@@ -471,7 +471,6 @@ class _AccountScreenState extends State<AccountScreen>
                     child: Padding(
                       padding: EdgeInsets.all(20.0),
                       child: Row(
-                        //mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           Icon(
@@ -713,37 +712,44 @@ class _AccountScreenState extends State<AccountScreen>
                 SizedBox(
                   height: 30,
                 ),
-                Container(
-                  padding: EdgeInsets.only(top: 12, bottom: 12),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    border: Border.all(
-                        width: 1, color: Colors.red.withOpacity(0.7)),
-                    borderRadius: BorderRadius.circular(12.5),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.only(left: 12, right: 12),
-                        child: Icon(
-                          Iconsax.trash,
-                          size: 26,
-                          color: Colors.red,
+                GestureDetector(
+                  onTap: () {
+                    _showDeleteUserBottomSheet();
+                  },
+                  child: Container(
+                    padding: EdgeInsets.only(top: 12, bottom: 12),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      border: Border.all(
+                          width: 1, color: Colors.red.withOpacity(0.7)),
+                      borderRadius: BorderRadius.circular(12.5),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: EdgeInsets.only(left: 12, right: 12),
+                          child: Icon(
+                            Iconsax.trash,
+                            size: 26,
+                            color: Colors.red,
+                          ),
                         ),
-                      ),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          Text(
-                              AppLocalizations.of(context)
-                                  .translate('delete-my-account'),
-                              style: kSubTitlesStyle.copyWith(
-                                  color: Colors.red, fontSize: 17)),
-                        ],
-                      )
-                    ],
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            Text(
+                                AppLocalizations.of(context)
+                                    .translate('delete-my-account'),
+                                style: kSubTitlesStyle.copyWith(
+                                    color: Colors.red,
+                                    fontSize: 17,
+                                    height: 1)),
+                          ],
+                        )
+                      ],
+                    ),
                   ),
                 ),
               ],
@@ -758,6 +764,89 @@ class _AccountScreenState extends State<AccountScreen>
 
     String _languageCode = await prefs.getString("languageCode");
     print(_languageCode);
+  }
+
+  _showDeleteUserBottomSheet() {
+    showModalBottomSheet(
+        context: context,
+        builder: (context) {
+          return Padding(
+              padding:
+                  EdgeInsets.only(left: 20.0, right: 20, top: 8, bottom: 8),
+              child: Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      height: 5,
+                      width: MediaQuery.of(context).size.width * 0.1,
+                      decoration: BoxDecoration(
+                          color: Colors.black12,
+                          borderRadius: BorderRadius.circular(50)),
+                    )
+                  ],
+                ),
+                SizedBox(
+                  height: 12,
+                ),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      height: 45,
+                      width: 45,
+                      decoration: BoxDecoration(
+                          color: Colors.red.withOpacity(0.3),
+                          borderRadius: BorderRadius.circular(50)),
+                      child: Center(
+                        child: Icon(
+                          Iconsax.trash,
+                          color: Colors.red,
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+                Container(
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Flexible(
+                          child: Text(
+                        AppLocalizations.of(context)
+                            .translate('delete-my-account'),
+                        style: kPageTitleStyle.copyWith(
+                            fontSize: 24, color: Colors.red),
+                      ))
+                    ],
+                  ),
+                ),
+                SizedBox(
+                  height: 8,
+                ),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Flexible(
+                        child: Text(
+                      "First provider is (${user.providerData[0].providerId ?? "Not Available"}) Second Provider is (${user.providerData[1].providerId ?? "Not Available"}) Third Provider is (${user.providerData[2].providerId ?? "Not Available"})",
+                      textAlign: TextAlign.center,
+                      style: kSubTitlesStyle.copyWith(
+                        fontSize: 17,
+                        color: Colors.black,
+                      ),
+                    ))
+                  ],
+                ),
+                SizedBox(
+                  height: 40,
+                ),
+              ]));
+        });
   }
 }
 
