@@ -238,7 +238,7 @@ class _AccountScreenState extends State<AccountScreen>
 
     // ignore: deprecated_member_use
     await flutterLocalNotificationsPlugin.showDailyAtTime(0, "المتابعة اليومية",
-        "لا تنس المتابعة اليومية :)", newTime, platformChannelSpecifics);
+        "لا تنس المتابعة اليومية", newTime, platformChannelSpecifics);
   }
 
   DateTime parseTime(dynamic date) {
@@ -329,7 +329,8 @@ class _AccountScreenState extends State<AccountScreen>
                     children: [
                       Flexible(
                         child: Text(
-                          "هل تريد إعادة تعيين البيانات بالكامل والبدء من الصفر أم تريد البدء من آخر انتكاسة؟",
+                          AppLocalizations.of(context)
+                              .translate('delete-my-data-p'),
                           textAlign: TextAlign.center,
                           style: kSubTitlesSubsStyle.copyWith(
                               fontSize: 14,
@@ -350,7 +351,8 @@ class _AccountScreenState extends State<AccountScreen>
                     children: [
                       Flexible(
                           child: Text(
-                        "ملاحظة: لا يمكن التراجع بعد مسح البيانات",
+                        AppLocalizations.of(context)
+                            .translate('delete-my-data-warning'),
                         style: kSubTitlesStyle.copyWith(
                             color: Colors.red,
                             fontSize: 12,
@@ -382,7 +384,8 @@ class _AccountScreenState extends State<AccountScreen>
                         ),
                         child: Center(
                           child: Text(
-                            "بداية من آخر انتكاسة",
+                            AppLocalizations.of(context)
+                                .translate('start-from-specific-date'),
                             style: kSubTitlesStyle.copyWith(
                                 color: Colors.white,
                                 fontSize: 16,
@@ -409,7 +412,8 @@ class _AccountScreenState extends State<AccountScreen>
                         ),
                         child: Center(
                           child: Text(
-                            "بداية جديدة",
+                            AppLocalizations.of(context)
+                                .translate('new-begining'),
                             style: kSubTitlesStyle.copyWith(
                                 color: Colors.white,
                                 fontWeight: FontWeight.w600,

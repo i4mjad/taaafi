@@ -160,7 +160,13 @@
 
   "7-days": "/ 7 Days",
   "28-days": "/ 28 Days",
-  "90-days": "/ 90 Days"
+  "90-days": "/ 90 Days",
+
+  "delete-my-data-p" : "Do you want to start from the beginning? or start from a specific date insted?",
+  "delete-my-data-warning" : "WARNING: You can't undo this action after it's done.",
+
+  "new-begining" : "New Beginning",
+  "start-from-specific-date" : "Specific Date"
 
 
 
