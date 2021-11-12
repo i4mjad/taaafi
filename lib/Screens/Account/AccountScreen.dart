@@ -11,6 +11,7 @@ import 'package:reboot_app_3/Localization.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:reboot_app_3/main.dart';
 import 'package:provider/provider.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:timezone/data/latest.dart' as tz;
 //import 'package:timezone/timezone.dart' as tz;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -463,26 +464,33 @@ class _AccountScreenState extends State<AccountScreen>
                 ),
                 Container(
                     width: MediaQuery.of(context).size.width - 40,
-                    height: MediaQuery.of(context).size.height * 0.175,
+                    height: MediaQuery.of(context).size.height * 0.275,
                     decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(15),
                         border: Border.all(color: Colors.black12)),
                     child: Padding(
                       padding: EdgeInsets.all(20.0),
-                      child: Row(
+                      child: Column(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          Icon(
-                            Iconsax.personalcard,
-                            size: 75,
-                            color: primaryColor,
+                          Container(
+                            padding: EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: primaryColor.withOpacity(0.2),
+                              borderRadius: BorderRadius.circular(50),
+                            ),
+                            child: Icon(
+                              Iconsax.personalcard,
+                              size: 40,
+                              color: primaryColor,
+                            ),
                           ),
                           SizedBox(
                             width: 20,
                           ),
                           Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.center,
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Text(
@@ -490,7 +498,7 @@ class _AccountScreenState extends State<AccountScreen>
                                     ? this.user.displayName
                                     : "",
                                 style: kPageTitleStyle.copyWith(
-                                  fontSize: 22,
+                                  fontSize: 18,
                                 ),
                               ),
                               SizedBox(
@@ -503,36 +511,90 @@ class _AccountScreenState extends State<AccountScreen>
                                   style: kSubTitlesSubsStyle.copyWith(
                                       color: Colors.grey)),
                               SizedBox(
-                                height: 2,
+                                height: 20,
                               ),
                               Row(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                mainAxisAlignment: MainAxisAlignment.center,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
                                 children: [
-                                  Text(
-                                    AppLocalizations.of(context)
-                                        .translate('registered-since'),
-                                    style: kSubTitlesSubsStyle.copyWith(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.normal,
-                                        color: Colors.grey[500]),
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        AppLocalizations.of(context)
+                                            .translate('registered-since'),
+                                        style: kSubTitlesSubsStyle.copyWith(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w600,
+                                            color: primaryColor),
+                                      ),
+                                      Text(
+                                        this.user.metadata.creationTime != null
+                                            ? this
+                                                .user
+                                                .metadata
+                                                .creationTime
+                                                .toString()
+                                                .substring(0, 10)
+                                            : '',
+                                        style: kSubTitlesSubsStyle.copyWith(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.normal,
+                                            color: Colors.grey[500]),
+                                      ),
+                                    ],
                                   ),
-                                  Text(
-                                    this.user.metadata.creationTime != null
-                                        ? this
-                                            .user
-                                            .metadata
-                                            .creationTime
-                                            .toString()
-                                            .substring(0, 10)
-                                        : '',
-                                    style: kSubTitlesSubsStyle.copyWith(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.normal,
-                                        color: Colors.grey[500]),
+                                  VerticalDivider(),
+                                  Column(
+                                    children: [
+                                      Text(
+                                        AppLocalizations.of(context)
+                                            .translate('last-signin'),
+                                        style: kSubTitlesSubsStyle.copyWith(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w600,
+                                            color: primaryColor),
+                                      ),
+                                      Text(
+                                        user.metadata.lastSignInTime != null
+                                            ? user.metadata.lastSignInTime
+                                                .toString()
+                                                .substring(0, 10)
+                                            : '',
+                                        style: kSubTitlesSubsStyle.copyWith(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.normal,
+                                            color: Colors.grey[500]),
+                                      ),
+                                    ],
+                                  ),
+                                  VerticalDivider(),
+                                  Column(
+                                    children: [
+                                      Text(
+                                        AppLocalizations.of(context)
+                                            .translate('signin-provider'),
+                                        style: kSubTitlesSubsStyle.copyWith(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w600,
+                                            color: primaryColor),
+                                      ),
+                                      Text(
+                                        user.providerData[0].providerId ==
+                                                "google.com"
+                                            ? "Google"
+                                            : "Apple",
+                                        style: kSubTitlesSubsStyle.copyWith(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.normal,
+                                            color: Colors.grey[500]),
+                                      ),
+                                    ],
                                   ),
                                 ],
-                              ),
+                              )
                             ],
                           ),
                         ],
@@ -706,51 +768,44 @@ class _AccountScreenState extends State<AccountScreen>
                           ),
                         ),
                       ),
+                      Divider(),
+                      Padding(
+                        padding: EdgeInsets.only(top: 8.0, bottom: 4),
+                        child: GestureDetector(
+                          onTap: () {
+                            _showDeleteUserBottomSheet();
+                          },
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Padding(
+                                padding: EdgeInsets.only(left: 12, right: 12),
+                                child: Icon(
+                                  Iconsax.trash,
+                                  size: 28,
+                                  color: Colors.red,
+                                ),
+                              ),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: <Widget>[
+                                  Text(
+                                      AppLocalizations.of(context)
+                                          .translate('delete-my-account'),
+                                      style: kSubTitlesStyle.copyWith(
+                                          fontSize: 17, color: Colors.red)),
+                                ],
+                              )
+                            ],
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                 ),
                 SizedBox(
                   height: 30,
-                ),
-                GestureDetector(
-                  onTap: () {
-                    _showDeleteUserBottomSheet();
-                  },
-                  child: Container(
-                    padding: EdgeInsets.only(top: 12, bottom: 12),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      border: Border.all(
-                          width: 1, color: Colors.red.withOpacity(0.7)),
-                      borderRadius: BorderRadius.circular(12.5),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Padding(
-                          padding: EdgeInsets.only(left: 12, right: 12),
-                          child: Icon(
-                            Iconsax.trash,
-                            size: 26,
-                            color: Colors.red,
-                          ),
-                        ),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            Text(
-                                AppLocalizations.of(context)
-                                    .translate('delete-my-account'),
-                                style: kSubTitlesStyle.copyWith(
-                                    color: Colors.red,
-                                    fontSize: 17,
-                                    height: 1)),
-                          ],
-                        )
-                      ],
-                    ),
-                  ),
                 ),
               ],
             ),
@@ -833,19 +888,97 @@ class _AccountScreenState extends State<AccountScreen>
                   children: [
                     Flexible(
                         child: Text(
-                      "First provider is (${user.providerData[0].providerId ?? "Not Available"}) Second Provider is (${user.providerData[1].providerId ?? "Not Available"}) Third Provider is (${user.providerData[2].providerId ?? "Not Available"})",
+                      AppLocalizations.of(context)
+                          .translate('delete-my-account-p'),
                       textAlign: TextAlign.center,
                       style: kSubTitlesStyle.copyWith(
-                        fontSize: 17,
-                        color: Colors.black,
-                      ),
+                          fontSize: 17,
+                          color: Colors.black.withOpacity(0.7),
+                          fontWeight: FontWeight.w400,
+                          height: 1.5),
                     ))
+                  ],
+                ),
+                SizedBox(
+                  height: 12,
+                ),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    SignInWithAppleButton(onPressed: () async {
+                      final appleIdCredential =
+                          await SignInWithApple.getAppleIDCredential(
+                        scopes: [
+                          AppleIDAuthorizationScopes.email,
+                          AppleIDAuthorizationScopes.fullName
+                        ],
+                      );
+                      final oAuthProvider = OAuthProvider('apple.com');
+                      final credential = oAuthProvider.credential(
+                        idToken: appleIdCredential.identityToken,
+                        accessToken: appleIdCredential.authorizationCode,
+                      );
+
+                      await FirebaseAuth.instance.currentUser
+                          .reauthenticateWithCredential(credential)
+                          .then((value) {
+                        Navigator.pop(context);
+                        _openDeleteAccountMessage();
+                      });
+                    }),
+                    SizedBox(
+                      height: 8,
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        context
+                            .read<AuthenticationService>()
+                            .reauthenticateWithsignInWithGoogle();
+                      },
+                      child: Container(
+                        width: MediaQuery.of(context).size.width - 40,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8),
+                          color: Colors.blueAccent,
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.login,
+                              color: Colors.white,
+                              size: 22,
+                            ),
+                            SizedBox(
+                              width: 8,
+                            ),
+                            Text(
+                              'Sign In With Google',
+                              style: kSubTitlesStyle.copyWith(
+                                  fontWeight: FontWeight.w400,
+                                  height: 1,
+                                  fontSize: 20,
+                                  color: Colors.white),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
                   ],
                 ),
                 SizedBox(
                   height: 40,
                 ),
               ]));
+        });
+  }
+
+  void _openDeleteAccountMessage() {
+    showModalBottomSheet(
+        context: context,
+        builder: (context) {
+          return Container();
         });
   }
 }

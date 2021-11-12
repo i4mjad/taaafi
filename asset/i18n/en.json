@@ -168,9 +168,11 @@
   "new-begining" : "New Beginning",
   "start-from-specific-date" : "Specific Date",
 
-  "delete-my-account" : "Delete My Account"
+  "delete-my-account" : "Delete My Account",
+  "delete-my-account-p" : "We're sorry to see you go. For security purposes, we need to re-authenticate you to be able to delete your account. Please select the provider you used to sign up",
 
-
+  "signin-provider": "Signed In with:",
+  "last-signin": "Last Sign in"
 
 
 }
