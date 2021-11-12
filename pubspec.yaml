@@ -79,9 +79,7 @@ flutter:
   uses-material-design: true
 
   assets:
-    - asset/illustrations/follow-your-reboot.svg
     - asset/illustrations/home-anumation.json
-    - asset/illustrations/about-app.svg
     - asset/illustrations/app-logo-about.svg
     - asset/i18n/en.json
     - asset/i18n/ar.json
