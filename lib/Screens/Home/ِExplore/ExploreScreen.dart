@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_html/flutter_html.dart';
+import 'package:flutter_html/style.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:reboot_app_3/Model/Articles.dart';
 import 'package:reboot_app_3/Model/Tutorial.dart';
@@ -43,18 +45,23 @@ class _ExploreScreenState extends State<ExploreScreen> {
         if (entry["_fl_meta_"]["schema"] == "posts") {
           final newArticale = new Article(
             entry["title"],
-            entry["date"],
+            entry["date"].toString().substring(0, 10),
             entry["author"],
-            entry["timeToRead"],
+            entry["timeToRead"].toString(),
             entry["postBody"],
           );
           articalsList.add(newArticale);
         } else {
-          print(2);
+          print(1);
+          final newTutorial = new Tutorial(
+            entry["title"],
+            entry["date"].toString().substring(0, 10),
+            entry["author"],
+            entry["body"],
+          );
+          tutorialsList.add(newTutorial);
         }
       }
-
-      print(data.size);
     });
   }
 
@@ -63,6 +70,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
     super.initState();
     getSelectedLocale();
     getArticles();
+    print(tutorialsList);
   }
 
   @override
@@ -154,33 +162,37 @@ class _ExploreScreenState extends State<ExploreScreen> {
               builder: (BuildContext context) {
                 if (tutorialsList.length == 0) {
                   return Center(
-                    child: CircularProgressIndicator(),
+                    child: CircularProgressIndicator(
+                      backgroundColor: primaryColor,
+                      strokeWidth: 3,
+                    ),
+                  );
+                } else {
+                  return Container(
+                    height: MediaQuery.of(context).size.height * 0.15,
+                    width: MediaQuery.of(context).size.width,
+                    child: Padding(
+                      padding: lang == 'ar'
+                          ? EdgeInsets.only(right: 20.0)
+                          : EdgeInsets.only(left: 20.0),
+                      child: Row(
+                        children: [
+                          Expanded(child: Builder(builder: (context) {
+                            return ListView.builder(
+                                scrollDirection: Axis.horizontal,
+                                itemCount: 4,
+                                itemBuilder: (BuildContext context, int index) {
+                                  return TutorialsCard(
+                                    lang: lang,
+                                    item: tutorialsList[index],
+                                  );
+                                });
+                          })),
+                        ],
+                      ),
+                    ),
                   );
                 }
-                return Container(
-                  height: MediaQuery.of(context).size.height * 0.15,
-                  width: MediaQuery.of(context).size.width,
-                  child: Padding(
-                    padding: lang == 'ar'
-                        ? EdgeInsets.only(right: 20.0)
-                        : EdgeInsets.only(left: 20.0),
-                    child: Row(
-                      children: [
-                        Expanded(child: Builder(builder: (context) {
-                          return ListView.builder(
-                              scrollDirection: Axis.horizontal,
-                              itemCount: 4,
-                              itemBuilder: (BuildContext context, int index) {
-                                return TutorialsCard(
-                                  lang: lang,
-                                  title: "عنوان الشرح رقم  ${index}",
-                                );
-                              });
-                        })),
-                      ],
-                    ),
-                  ),
-                );
               },
             ),
             GestureDetector(
@@ -227,28 +239,42 @@ class _ExploreScreenState extends State<ExploreScreen> {
               height: 12,
             ),
             //post widget
-            Container(
-              height: MediaQuery.of(context).size.height * 0.25,
-              width: MediaQuery.of(context).size.width,
-              child: Padding(
-                padding: EdgeInsets.only(right: 20, left: 20.0),
-                child: Column(
-                  children: [
-                    Expanded(child: Builder(builder: (context) {
-                      return ListView.builder(
-                          scrollDirection: Axis.vertical,
-                          padding: EdgeInsets.all(0),
-                          itemCount: 3,
-                          itemBuilder: (BuildContext context, int index) {
-                            return PostWidget(
-                              title: "عنوان المقال رقم  ${index}",
-                            );
-                          });
-                    })),
-                  ],
-                ),
-              ),
+            Builder(
+              builder: (BuildContext context) {
+                if (articalsList.length == 0) {
+                  return Center(
+                    child: CircularProgressIndicator(
+                      backgroundColor: primaryColor,
+                      strokeWidth: 1,
+                    ),
+                  );
+                } else {
+                  return Container(
+                    height: MediaQuery.of(context).size.height * 0.3,
+                    width: MediaQuery.of(context).size.width,
+                    child: Padding(
+                      padding: EdgeInsets.only(right: 20, left: 20.0),
+                      child: Column(
+                        children: [
+                          Expanded(child: Builder(builder: (context) {
+                            return ListView.builder(
+                                scrollDirection: Axis.vertical,
+                                padding: EdgeInsets.all(0),
+                                itemCount: 3,
+                                itemBuilder: (BuildContext context, int index) {
+                                  return PostWidget(
+                                    articale: articalsList[index],
+                                  );
+                                });
+                          })),
+                        ],
+                      ),
+                    ),
+                  );
+                }
+              },
             ),
+
             SizedBox(
               height: 20,
             ),
@@ -294,20 +320,18 @@ class TutorialsCard extends StatelessWidget {
   const TutorialsCard({
     Key key,
     @required this.lang,
-    @required this.title,
+    @required this.item,
   }) : super(key: key);
 
   final String lang;
-  final String title;
+  final Tutorial item;
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => TutorialPage(title: title)));
+        Navigator.push(context,
+            MaterialPageRoute(builder: (context) => TutorialPage(item: item)));
       },
       child: Padding(
         padding: lang != 'ar'
@@ -342,7 +366,7 @@ class TutorialsCard extends StatelessWidget {
                 alignment:
                     lang == 'ar' ? Alignment.centerRight : Alignment.centerLeft,
                 child: (Text(
-                  title,
+                  item.title,
                   style: kSubTitlesStyle.copyWith(
                       fontSize: 12, color: primaryColor),
                 )),
@@ -357,15 +381,19 @@ class TutorialsCard extends StatelessWidget {
 
 // ignore: must_be_immutable
 class PostWidget extends StatelessWidget {
-  String title;
-  PostWidget({Key key, this.title}) : super(key: key);
+  Article articale;
+  PostWidget({Key key, this.articale}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Navigator.push(context,
-            MaterialPageRoute(builder: (context) => ArticlePage(title: title)));
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => ArticlePage(
+                      articale: articale,
+                    )));
       },
       child: Container(
         padding: EdgeInsets.all(12),
@@ -397,7 +425,7 @@ class PostWidget extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              title,
+                              articale.title,
                               style: kSubTitlesStyle.copyWith(
                                   color: primaryColor,
                                   fontSize: 16,
@@ -409,16 +437,16 @@ class PostWidget extends StatelessWidget {
                             Row(
                               children: [
                                 Flexible(
-                                  child: Text(
-                                    "نص المقال نص المقال نص المقال نص المقال نص المقال نص المقال نص المقال نص المقال نص المقال نص المقال نص المقال نص المقال نص المقال "
-                                            .substring(0, 75) +
-                                        "...",
-                                    style: kSubTitlesStyle.copyWith(
-                                        color: Colors.black45,
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w400),
-                                  ),
-                                ),
+                                    child: Html(
+                                  data: articale.body.substring(0, 5) + "..." ??
+                                      articale.body,
+                                  style: {
+                                    "body": Style(
+                                        fontSize: FontSize(18.0),
+                                        fontWeight: FontWeight.w400,
+                                        fontFamily: "DINNextLTArabic"),
+                                  },
+                                )),
                               ],
                             ),
                           ]),

@@ -174,7 +174,8 @@
   "confirm-account-delete" : "تأكيد حذف الحساب",
   "confirm-account-delete-p" : "لا يمكن التراجع عن هذه الخطوة",
 
-  "delete-account-button" :"تأكيد الحذف"
+  "delete-account-button" :"تأكيد الحذف",
+  "minutes":"دقيقة/ دقائق"
 
 
 

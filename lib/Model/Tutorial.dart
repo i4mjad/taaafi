@@ -1,11 +1,11 @@
 class Tutorial {
 // ignore: non_constant_identifier_names
-  Tutorial({
+  Tutorial(
     this.title,
     this.postedAt,
     this.author,
     this.body,
-  });
+  );
 
   final String title;
   final String postedAt;

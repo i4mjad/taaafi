@@ -177,7 +177,8 @@
   "confirm-account-delete" : "Confirm Account Delete",
   "confirm-account-delete-p" : "ٌYou Can't restore anything after you confirm",
 
-  "delete-account-button" :"Confirm Delete"
+  "delete-account-button" :"Confirm Delete",
+  "minutes": "Minutes"
 
 
 }

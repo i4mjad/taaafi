@@ -1,14 +1,18 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_html/flutter_html.dart';
+import 'package:flutter_html/style.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:reboot_app_3/Localization.dart';
+import 'package:reboot_app_3/Model/Articles.dart';
 import 'package:reboot_app_3/Screens/Home/%D9%90Explore/ExploreScreen.dart';
 import 'package:reboot_app_3/Services/Constants.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 // ignore: must_be_immutable
 class ArticlePage extends StatefulWidget {
-  String title;
-  ArticlePage({Key key, this.title}) : super(key: key);
+  Article articale;
+  ArticlePage({Key key, this.articale}) : super(key: key);
 
   @override
   _ArticlePageState createState() => _ArticlePageState();
@@ -24,9 +28,6 @@ class _ArticlePageState extends State<ArticlePage> {
       lang = _languageCode;
     });
   }
-
-  String longText =
-      "هذا نص طويل جدا جدا لدرجة أنه يجب أن يتخطى حجم شاشة الجهاز الحالي. هذا نص طويل جدا جدا لدرجة أنه يجب أن يتخطى حجم شاشة الجهاز الحالي. هذا نص طويل جدا جدا لدرجة أنه يجب أن يتخطى حجم شاشة الجهاز الحالي. هذا نص طويل جدا جدا لدرجة أنه يجب أن يتخطى حجم شاشة الجهاز الحالي. هذا نص طويل جدا جدا لدرجة أنه يجب أن يتخطى حجم شاشة الجهاز الحالي. هذا نص طويل جدا جدا لدرجة أنه يجب أن يتخطى حجم شاشة الجهاز الحالي. هذا نص طويل جدا جدا لدرجة أنه يجب أن يتخطى حجم شاشة الجهاز الحالي. هذا نص طويل جدا جدا لدرجة أنه يجب أن يتخطى حجم شاشة الجهاز الحالي. هذا نص طويل جدا جدا لدرجة أنه يجب أن يتخطى حجم شاشة الجهاز الحالي. هذا نص طويل جدا جدا لدرجة أنه يجب أن يتخطى حجم شاشة الجهاز الحالي. هذا نص طويل جدا جدا لدرجة أنه يجب أن يتخطى حجم شاشة الجهاز الحالي. هذا نص طويل جدا جدا لدرجة أنه يجب أن يتخطى حجم شاشة الجهاز الحالي. هذا نص طويل جدا جدا لدرجة أنه يجب أن يتخطى حجم شاشة الجهاز الحالي. هذا نص طويل جدا جدا لدرجة أنه يجب أن يتخطى حجم شاشة الجهاز الحالي. هذا نص طويل جدا جدا لدرجة أنه يجب أن يتخطى حجم شاشة الجهاز الحالي. هذا نص طويل جدا جدا لدرجة أنه يجب أن يتخطى حجم شاشة الجهاز الحالي. هذا نص طويل جدا جدا لدرجة أنه يجب أن يتخطى حجم شاشة الجهاز الحالي. هذا نص طويل جدا جدا لدرجة أنه يجب أن يتخطى حجم شاشة الجهاز الحالي. هذا نص طويل جدا جدا لدرجة أنه يجب أن يتخطى حجم شاشة الجهاز الحالي. هذا نص طويل جدا جدا لدرجة أنه يجب أن يتخطى حجم شاشة الجهاز الحالي. هذا نص طويل جدا جدا لدرجة أنه يجب أن يتخطى حجم شاشة الجهاز الحالي. هذا نص طويل جدا جدا لدرجة أنه يجب أن يتخطى حجم شاشة الجهاز الحالي. هذا نص طويل جدا جدا لدرجة أنه يجب أن يتخطى حجم شاشة الجهاز الحالي. هذا نص طويل جدا جدا لدرجة أنه يجب أن يتخطى حجم شاشة الجهاز الحالي. هذا نص طويل جدا جدا لدرجة أنه يجب أن يتخطى حجم شاشة الجهاز الحالي. ";
 
   @override
   void initState() {
@@ -61,7 +62,7 @@ class _ArticlePageState extends State<ArticlePage> {
                       ),
                       SizedBox(height: 8),
                       Text(
-                        widget.title,
+                        widget.articale.title,
                         style:
                             kPageTitleStyle.copyWith(height: 1, fontSize: 28),
                       ),
@@ -101,7 +102,7 @@ class _ArticlePageState extends State<ArticlePage> {
                             SizedBox(
                               width: 4,
                             ),
-                            Text("03/04/2021",
+                            Text(widget.articale.postedAt,
                                 style: kSubTitlesSubsStyle.copyWith(
                                     fontSize: 10.5,
                                     height: 1,
@@ -127,7 +128,7 @@ class _ArticlePageState extends State<ArticlePage> {
                             SizedBox(
                               width: 4,
                             ),
-                            Text("أمجد السليماني",
+                            Text(widget.articale.author,
                                 style: kSubTitlesSubsStyle.copyWith(
                                     fontSize: 10.5,
                                     height: 1,
@@ -153,7 +154,10 @@ class _ArticlePageState extends State<ArticlePage> {
                             SizedBox(
                               width: 4,
                             ),
-                            Text("5 دقائق",
+                            Text(
+                                "${widget.articale.timeToRead} " +
+                                    AppLocalizations.of(context)
+                                        .translate("minutes"),
                                 style: kSubTitlesSubsStyle.copyWith(
                                     fontSize: 10.5,
                                     height: 1,
@@ -179,13 +183,14 @@ class _ArticlePageState extends State<ArticlePage> {
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
                           Flexible(
-                              child: Text(
-                            longText,
-                            style: kSubTitlesStyle.copyWith(
-                                color: Colors.black,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500,
-                                height: 1.5),
+                              child: Html(
+                            data: widget.articale.body,
+                            style: {
+                              "body": Style(
+                                  fontSize: FontSize(18.0),
+                                  fontWeight: FontWeight.w400,
+                                  fontFamily: "DINNextLTArabic"),
+                            },
                           ))
                         ],
                       ),

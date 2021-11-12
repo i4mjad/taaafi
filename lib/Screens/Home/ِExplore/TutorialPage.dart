@@ -1,27 +1,23 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_html/flutter_html.dart';
+import 'package:flutter_html/style.dart';
+import 'package:reboot_app_3/Model/Tutorial.dart';
 import 'package:reboot_app_3/Screens/Home/%D9%90Explore/ExploreScreen.dart';
 import 'package:reboot_app_3/Services/Constants.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-
-
 // ignore: must_be_immutable
 class TutorialPage extends StatefulWidget {
-  String title;
+  Tutorial item;
 
-  TutorialPage({
-    Key key,
-    this.title
-
-  }) : super(key: key);
+  TutorialPage({Key key, this.item}) : super(key: key);
 
   @override
   _TutorialPageState createState() => _TutorialPageState();
 }
 
 class _TutorialPageState extends State<TutorialPage> {
-
   String lang;
 
   void getSelectedLocale() async {
@@ -32,7 +28,8 @@ class _TutorialPageState extends State<TutorialPage> {
     });
   }
 
-  String longText = "هذا نص طويل جدا جدا لدرجة أنه يجب أن يتخطى حجم شاشة الجهاز الحالي. هذا نص طويل جدا جدا لدرجة أنه يجب أن يتخطى حجم شاشة الجهاز الحالي. هذا نص طويل جدا جدا لدرجة أنه يجب أن يتخطى حجم شاشة الجهاز الحالي. هذا نص طويل جدا جدا لدرجة أنه يجب أن يتخطى حجم شاشة الجهاز الحالي. هذا نص طويل جدا جدا لدرجة أنه يجب أن يتخطى حجم شاشة الجهاز الحالي. هذا نص طويل جدا جدا لدرجة أنه يجب أن يتخطى حجم شاشة الجهاز الحالي. هذا نص طويل جدا جدا لدرجة أنه يجب أن يتخطى حجم شاشة الجهاز الحالي. هذا نص طويل جدا جدا لدرجة أنه يجب أن يتخطى حجم شاشة الجهاز الحالي. هذا نص طويل جدا جدا لدرجة أنه يجب أن يتخطى حجم شاشة الجهاز الحالي. هذا نص طويل جدا جدا لدرجة أنه يجب أن يتخطى حجم شاشة الجهاز الحالي. هذا نص طويل جدا جدا لدرجة أنه يجب أن يتخطى حجم شاشة الجهاز الحالي. هذا نص طويل جدا جدا لدرجة أنه يجب أن يتخطى حجم شاشة الجهاز الحالي. هذا نص طويل جدا جدا لدرجة أنه يجب أن يتخطى حجم شاشة الجهاز الحالي. هذا نص طويل جدا جدا لدرجة أنه يجب أن يتخطى حجم شاشة الجهاز الحالي. هذا نص طويل جدا جدا لدرجة أنه يجب أن يتخطى حجم شاشة الجهاز الحالي. هذا نص طويل جدا جدا لدرجة أنه يجب أن يتخطى حجم شاشة الجهاز الحالي. هذا نص طويل جدا جدا لدرجة أنه يجب أن يتخطى حجم شاشة الجهاز الحالي. هذا نص طويل جدا جدا لدرجة أنه يجب أن يتخطى حجم شاشة الجهاز الحالي. هذا نص طويل جدا جدا لدرجة أنه يجب أن يتخطى حجم شاشة الجهاز الحالي. هذا نص طويل جدا جدا لدرجة أنه يجب أن يتخطى حجم شاشة الجهاز الحالي. هذا نص طويل جدا جدا لدرجة أنه يجب أن يتخطى حجم شاشة الجهاز الحالي. هذا نص طويل جدا جدا لدرجة أنه يجب أن يتخطى حجم شاشة الجهاز الحالي. هذا نص طويل جدا جدا لدرجة أنه يجب أن يتخطى حجم شاشة الجهاز الحالي. هذا نص طويل جدا جدا لدرجة أنه يجب أن يتخطى حجم شاشة الجهاز الحالي. ";
+  String longText =
+      "هذا نص طويل جدا جدا لدرجة أنه يجب أن يتخطى حجم شاشة الجهاز الحالي. هذا نص طويل جدا جدا لدرجة أنه يجب أن يتخطى حجم شاشة الجهاز الحالي. هذا نص طويل جدا جدا لدرجة أنه يجب أن يتخطى حجم شاشة الجهاز الحالي. هذا نص طويل جدا جدا لدرجة أنه يجب أن يتخطى حجم شاشة الجهاز الحالي. هذا نص طويل جدا جدا لدرجة أنه يجب أن يتخطى حجم شاشة الجهاز الحالي. هذا نص طويل جدا جدا لدرجة أنه يجب أن يتخطى حجم شاشة الجهاز الحالي. هذا نص طويل جدا جدا لدرجة أنه يجب أن يتخطى حجم شاشة الجهاز الحالي. هذا نص طويل جدا جدا لدرجة أنه يجب أن يتخطى حجم شاشة الجهاز الحالي. هذا نص طويل جدا جدا لدرجة أنه يجب أن يتخطى حجم شاشة الجهاز الحالي. هذا نص طويل جدا جدا لدرجة أنه يجب أن يتخطى حجم شاشة الجهاز الحالي. هذا نص طويل جدا جدا لدرجة أنه يجب أن يتخطى حجم شاشة الجهاز الحالي. هذا نص طويل جدا جدا لدرجة أنه يجب أن يتخطى حجم شاشة الجهاز الحالي. هذا نص طويل جدا جدا لدرجة أنه يجب أن يتخطى حجم شاشة الجهاز الحالي. هذا نص طويل جدا جدا لدرجة أنه يجب أن يتخطى حجم شاشة الجهاز الحالي. هذا نص طويل جدا جدا لدرجة أنه يجب أن يتخطى حجم شاشة الجهاز الحالي. هذا نص طويل جدا جدا لدرجة أنه يجب أن يتخطى حجم شاشة الجهاز الحالي. هذا نص طويل جدا جدا لدرجة أنه يجب أن يتخطى حجم شاشة الجهاز الحالي. هذا نص طويل جدا جدا لدرجة أنه يجب أن يتخطى حجم شاشة الجهاز الحالي. هذا نص طويل جدا جدا لدرجة أنه يجب أن يتخطى حجم شاشة الجهاز الحالي. هذا نص طويل جدا جدا لدرجة أنه يجب أن يتخطى حجم شاشة الجهاز الحالي. هذا نص طويل جدا جدا لدرجة أنه يجب أن يتخطى حجم شاشة الجهاز الحالي. هذا نص طويل جدا جدا لدرجة أنه يجب أن يتخطى حجم شاشة الجهاز الحالي. هذا نص طويل جدا جدا لدرجة أنه يجب أن يتخطى حجم شاشة الجهاز الحالي. هذا نص طويل جدا جدا لدرجة أنه يجب أن يتخطى حجم شاشة الجهاز الحالي. ";
 
   @override
   void initState() {
@@ -50,10 +47,8 @@ class _TutorialPageState extends State<TutorialPage> {
           children: [
             GestureDetector(
               onTap: () {
-                Navigator.pop(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => ExploreScreen()));
+                Navigator.pop(context,
+                    MaterialPageRoute(builder: (context) => ExploreScreen()));
               },
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -69,18 +64,24 @@ class _TutorialPageState extends State<TutorialPage> {
                       ),
                       SizedBox(height: 8),
                       Text(
-                        widget.title,
-                        style: kPageTitleStyle.copyWith(
-                            height: 1, fontSize: 28),
+                        widget.item.title,
+                        style:
+                            kPageTitleStyle.copyWith(height: 1, fontSize: 28),
                       ),
                     ],
                   ),
                 ],
               ),
             ),
-            SizedBox(height: 4,),
-            Divider(thickness: 0.75,),
-            SizedBox(height: 4,),
+            SizedBox(
+              height: 4,
+            ),
+            Divider(
+              thickness: 0.75,
+            ),
+            SizedBox(
+              height: 4,
+            ),
             Container(
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -91,34 +92,31 @@ class _TutorialPageState extends State<TutorialPage> {
                         padding: EdgeInsets.fromLTRB(12, 8, 12, 8),
                         decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(8),
-                            color: Colors.green.withOpacity(0.2)
-                        ),
-                        child: Text("03/04/2021", style: kSubTitlesSubsStyle.copyWith(
-                            fontSize: 12,
-                            height: 1,
-                            color: Colors.green
-                        )),
+                            color: Colors.green.withOpacity(0.2)),
+                        child: Text(widget.item.postedAt,
+                            style: kSubTitlesSubsStyle.copyWith(
+                                fontSize: 12, height: 1, color: Colors.green)),
                       ),
-                      SizedBox(width: 10,),
+                      SizedBox(
+                        width: 10,
+                      ),
                       Container(
                         padding: EdgeInsets.fromLTRB(12, 8, 12, 8),
                         decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(8),
-                            color: primaryColor.withAlpha(20)
-                        ),
-                        child: Text("فريق تعافي", style: kSubTitlesSubsStyle.copyWith(
-                            fontSize: 12,
-                            height: 1,
-                            color: primaryColor
-                        )),
+                            color: primaryColor.withAlpha(20)),
+                        child: Text(widget.item.author,
+                            style: kSubTitlesSubsStyle.copyWith(
+                                fontSize: 12, height: 1, color: primaryColor)),
                       )
                     ],
                   ),
-
                 ],
               ),
             ),
-            Divider(thickness: 0.75,),
+            Divider(
+              thickness: 0.75,
+            ),
             Expanded(
               child: SingleChildScrollView(
                 child: Column(
@@ -129,15 +127,12 @@ class _TutorialPageState extends State<TutorialPage> {
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
                           Flexible(
-                              child: Text(
-                                longText,
-                                style: kSubTitlesStyle.copyWith(
-                                    color: Colors.black,
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w500,
-                                height: 1.5
-                                ),
-                              ))
+                              child: Html(
+                            data: widget.item.body,
+                            style: {
+                              "body": Style(fontFamily: "DINNextLTArabic"),
+                            },
+                          ))
                         ],
                       ),
                     ),
@@ -145,8 +140,6 @@ class _TutorialPageState extends State<TutorialPage> {
                 ),
               ),
             ),
-
-
           ],
         ),
       ),
