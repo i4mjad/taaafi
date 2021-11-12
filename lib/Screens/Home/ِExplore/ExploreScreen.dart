@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:reboot_app_3/Model/Articles.dart';
+import 'package:reboot_app_3/Model/Tutorial.dart';
 import 'package:reboot_app_3/Screens/Home/%D9%90Explore/ExploreSearchScreen.dart';
 import 'package:reboot_app_3/Services/BottomNavbar.dart';
 import 'package:reboot_app_3/Services/Constants.dart';
@@ -20,7 +22,6 @@ class ExploreScreen extends StatefulWidget {
 
 class _ExploreScreenState extends State<ExploreScreen> {
   String lang;
-
   void getSelectedLocale() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String _languageCode = await prefs.getString("languageCode");
@@ -28,6 +29,9 @@ class _ExploreScreenState extends State<ExploreScreen> {
       lang = _languageCode;
     });
   }
+
+  List<Article> articals = [];
+  List<Tutorial> tutorials = [];
 
   @override
   void initState() {
@@ -83,9 +87,8 @@ class _ExploreScreenState extends State<ExploreScreen> {
                           Container(
                             padding: EdgeInsets.all(12),
                             decoration: BoxDecoration(
-                              color: seconderyColor,
-                              borderRadius: BorderRadius.circular(50)
-                            ),
+                                color: seconderyColor,
+                                borderRadius: BorderRadius.circular(50)),
                             child: Icon(
                               Iconsax.microscope,
                               size: 36,
@@ -137,8 +140,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
                           itemBuilder: (BuildContext context, int index) {
                             return TutorialsCard(
                               lang: lang,
-                              title:
-                                  "عنوان الشرح رقم  ${index}",
+                              title: "عنوان الشرح رقم  ${index}",
                             );
                           });
                     })),
@@ -194,8 +196,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
               height: MediaQuery.of(context).size.height * 0.25,
               width: MediaQuery.of(context).size.width,
               child: Padding(
-                padding:
-                     EdgeInsets.only(right: 20, left: 20.0),
+                padding: EdgeInsets.only(right: 20, left: 20.0),
                 child: Column(
                   children: [
                     Expanded(child: Builder(builder: (context) {
@@ -205,8 +206,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
                           itemCount: 3,
                           itemBuilder: (BuildContext context, int index) {
                             return PostWidget(
-                              title:
-                              "عنوان المقال رقم  ${index}",
+                              title: "عنوان المقال رقم  ${index}",
                             );
                           });
                     })),
@@ -268,13 +268,11 @@ class TutorialsCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: (){
-
+      onTap: () {
         Navigator.push(
             context,
             MaterialPageRoute(
                 builder: (context) => TutorialPage(title: title)));
-
       },
       child: Padding(
         padding: lang != 'ar'
@@ -282,35 +280,38 @@ class TutorialsCard extends StatelessWidget {
             : EdgeInsets.only(left: 20.0),
         child: Container(
           padding: EdgeInsets.all(12),
-          width: (MediaQuery.of(context).size.width - 40) / 3.5 - 4 ,
+          width: (MediaQuery.of(context).size.width - 40) / 3.5 - 4,
           decoration: BoxDecoration(
-            border: Border.all(color: primaryColor.withOpacity(0.3), width: 0.25),
+            border:
+                Border.all(color: primaryColor.withOpacity(0.3), width: 0.25),
             borderRadius: BorderRadius.circular(12.5),
             color: Colors.white,
           ),
           child: Column(
             children: [
               Align(
-                alignment:
-                    lang == 'ar' ? Alignment.topRight : Alignment.topLeft,
-                child: Container(
-                    padding: EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: seconderyColor,
-                      borderRadius: BorderRadius.circular(10.5)
-                    ),
-                    child: Icon(Iconsax.subtitle, color: Colors.black, size: 22,))
-              ),
+                  alignment:
+                      lang == 'ar' ? Alignment.topRight : Alignment.topLeft,
+                  child: Container(
+                      padding: EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                          color: seconderyColor,
+                          borderRadius: BorderRadius.circular(10.5)),
+                      child: Icon(
+                        Iconsax.subtitle,
+                        color: Colors.black,
+                        size: 22,
+                      ))),
               Spacer(),
               Align(
                 alignment:
                     lang == 'ar' ? Alignment.centerRight : Alignment.centerLeft,
                 child: (Text(
                   title,
-                  style: kSubTitlesStyle.copyWith(fontSize: 12, color: primaryColor),
+                  style: kSubTitlesStyle.copyWith(
+                      fontSize: 12, color: primaryColor),
                 )),
               ),
-
             ],
           ),
         ),
@@ -319,30 +320,17 @@ class TutorialsCard extends StatelessWidget {
   }
 }
 
-
-
-
-
-
 // ignore: must_be_immutable
 class PostWidget extends StatelessWidget {
-
   String title;
-   PostWidget({
-    Key key,
-    this.title
-  }) : super(key: key);
+  PostWidget({Key key, this.title}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-
     return GestureDetector(
-      onTap: (){
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => ArticlePage(title: title)));
-
+      onTap: () {
+        Navigator.push(context,
+            MaterialPageRoute(builder: (context) => ArticlePage(title: title)));
       },
       child: Container(
         padding: EdgeInsets.all(12),
@@ -350,64 +338,63 @@ class PostWidget extends StatelessWidget {
         decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(20),
             color: Colors.white,
-            border: Border.all(color: primaryColor.withOpacity(0.1))
-
-        ),
+            border: Border.all(color: primaryColor.withOpacity(0.1))),
         child: Column(
           children: [
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Expanded(
-                  child: Row(
-                      children: [
-                        Container(
-                            width: 50,
-                            height: 50,
-                            decoration: BoxDecoration(
-                                color: seconderyColor,
-                                borderRadius: BorderRadius.circular(12.5)
+                  child: Row(children: [
+                    Container(
+                        width: 50,
+                        height: 50,
+                        decoration: BoxDecoration(
+                            color: seconderyColor,
+                            borderRadius: BorderRadius.circular(12.5)),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(20),
+                          child: Icon(Iconsax.note_2),
+                        )),
+                    SizedBox(width: 10),
+                    Flexible(
+                      child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              title,
+                              style: kSubTitlesStyle.copyWith(
+                                  color: primaryColor,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500),
                             ),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(20),
-                              child: Icon(Iconsax.note_2),
-                            )
-                        ),
-                        SizedBox(width: 10),
-                        Flexible(
-                          child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                            SizedBox(
+                              height: 5,
+                            ),
+                            Row(
                               children: [
-                                Text(title, style: kSubTitlesStyle.copyWith(
-                                    color: primaryColor,
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w500),
+                                Flexible(
+                                  child: Text(
+                                    "نص المقال نص المقال نص المقال نص المقال نص المقال نص المقال نص المقال نص المقال نص المقال نص المقال نص المقال نص المقال نص المقال "
+                                            .substring(0, 75) +
+                                        "...",
+                                    style: kSubTitlesStyle.copyWith(
+                                        color: Colors.black45,
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w400),
+                                  ),
                                 ),
-                                SizedBox(height: 5,),
-                                Row(
-                                  children: [
-                                    Flexible(
-                                      child: Text("نص المقال نص المقال نص المقال نص المقال نص المقال نص المقال نص المقال نص المقال نص المقال نص المقال نص المقال نص المقال نص المقال ".substring(0,75) + "...",
-                                        style: kSubTitlesStyle.copyWith(
-                                            color: Colors.black45,
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w400),
-
-
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ]
-                          ),
-                        )
-                      ]
-                  ),
+                              ],
+                            ),
+                          ]),
+                    )
+                  ]),
                 ),
-
               ],
             ),
-            SizedBox(height: 20,),
+            SizedBox(
+              height: 20,
+            ),
             Container(
               padding: EdgeInsets.all(8),
               child: Row(
@@ -419,44 +406,56 @@ class PostWidget extends StatelessWidget {
                         padding: EdgeInsets.fromLTRB(12, 8, 12, 8),
                         decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(8),
-                            color: Color(0xFF045C44).withOpacity(0.15)
-                        ),
+                            color: Color(0xFF045C44).withOpacity(0.15)),
                         child: Row(
                           children: [
-                            Icon(Iconsax.calendar, size: 16, color: Color(0xFF045C44),),
-                            SizedBox(width: 4,),
-                            Text("03/04/2021", style: kSubTitlesSubsStyle.copyWith(
-                                fontSize: 10.5,
-                                height: 1,
-                                color: Color(0xFF045C44)
-                            )),
+                            Icon(
+                              Iconsax.calendar,
+                              size: 16,
+                              color: Color(0xFF045C44),
+                            ),
+                            SizedBox(
+                              width: 4,
+                            ),
+                            Text("03/04/2021",
+                                style: kSubTitlesSubsStyle.copyWith(
+                                    fontSize: 10.5,
+                                    height: 1,
+                                    color: Color(0xFF045C44))),
                           ],
                         ),
                       ),
-                      SizedBox(width: 10,),
+                      SizedBox(
+                        width: 10,
+                      ),
                       Container(
                         padding: EdgeInsets.fromLTRB(12, 8, 12, 8),
                         decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(8),
-                            color: Color(0xFF75372D).withAlpha(20)
-                        ),
+                            color: Color(0xFF75372D).withAlpha(20)),
                         child: Row(
                           children: [
-                            Icon(Iconsax.user_edit, size: 16, color: Color(0xFF75372D),),
-                            SizedBox(width: 4,),
-                            Text("أمجد السليماني", style: kSubTitlesSubsStyle.copyWith(
-                                fontSize: 10.5,
-                                height: 1,
-                                color: Color(0xFF75372D)
-                            )),
+                            Icon(
+                              Iconsax.user_edit,
+                              size: 16,
+                              color: Color(0xFF75372D),
+                            ),
+                            SizedBox(
+                              width: 4,
+                            ),
+                            Text("أمجد السليماني",
+                                style: kSubTitlesSubsStyle.copyWith(
+                                    fontSize: 10.5,
+                                    height: 1,
+                                    color: Color(0xFF75372D))),
                           ],
                         ),
                       ),
-                      SizedBox(width: 10,),
-
+                      SizedBox(
+                        width: 10,
+                      ),
                     ],
                   ),
-
                 ],
               ),
             )
@@ -466,4 +465,3 @@ class PostWidget extends StatelessWidget {
     );
   }
 }
-
