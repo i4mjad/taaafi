@@ -464,7 +464,7 @@ class _AccountScreenState extends State<AccountScreen>
                 ),
                 Container(
                     width: MediaQuery.of(context).size.width - 40,
-                    height: MediaQuery.of(context).size.height * 0.275,
+                    height: MediaQuery.of(context).size.height * 0.26,
                     decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(15),
@@ -933,7 +933,11 @@ class _AccountScreenState extends State<AccountScreen>
                       onTap: () {
                         context
                             .read<AuthenticationService>()
-                            .reauthenticateWithsignInWithGoogle();
+                            .reauthenticateWithsignInWithGoogle()
+                            .then((value) {
+                          Navigator.pop(context);
+                          _openDeleteAccountMessage();
+                        });
                       },
                       child: Container(
                         width: MediaQuery.of(context).size.width - 40,
@@ -978,7 +982,115 @@ class _AccountScreenState extends State<AccountScreen>
     showModalBottomSheet(
         context: context,
         builder: (context) {
-          return Container();
+          return Padding(
+              padding:
+                  EdgeInsets.only(left: 20.0, right: 20, top: 8, bottom: 8),
+              child: Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      height: 5,
+                      width: MediaQuery.of(context).size.width * 0.1,
+                      decoration: BoxDecoration(
+                          color: Colors.black12,
+                          borderRadius: BorderRadius.circular(50)),
+                    )
+                  ],
+                ),
+                SizedBox(
+                  height: 12,
+                ),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      height: 45,
+                      width: 45,
+                      decoration: BoxDecoration(
+                          color: Colors.red.withOpacity(0.3),
+                          borderRadius: BorderRadius.circular(50)),
+                      child: Center(
+                        child: Icon(
+                          Iconsax.trash,
+                          color: Colors.red,
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+                Container(
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Flexible(
+                          child: Text(
+                        AppLocalizations.of(context)
+                            .translate('confirm-account-delete'),
+                        style: kPageTitleStyle.copyWith(
+                            fontSize: 24, color: Colors.red),
+                      ))
+                    ],
+                  ),
+                ),
+                SizedBox(
+                  height: 8,
+                ),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Flexible(
+                        child: Text(
+                      AppLocalizations.of(context)
+                          .translate('confirm-account-delete-p'),
+                      textAlign: TextAlign.center,
+                      style: kSubTitlesStyle.copyWith(
+                          fontSize: 17,
+                          color: Colors.black.withOpacity(0.7),
+                          fontWeight: FontWeight.w400,
+                          height: 1.5),
+                    ))
+                  ],
+                ),
+                SizedBox(
+                  height: 30,
+                ),
+                GestureDetector(
+                  onTap: () {
+                    context
+                        .read<AuthenticationService>()
+                        .deleteAccount()
+                        .then((value) {
+                      Navigator.pop(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => LoginScreen()));
+                    });
+                  },
+                  child: Container(
+                    width: MediaQuery.of(context).size.width - 40,
+                    padding: EdgeInsets.symmetric(vertical: 12),
+                    decoration: BoxDecoration(
+                        color: Colors.red,
+                        borderRadius: BorderRadius.circular(12.5)),
+                    child: Row(
+                      children: [
+                        Text(
+                            AppLocalizations.of(context)
+                                .translate("delete-account-button"),
+                            style: kSubTitlesStyle.copyWith(
+                              fontSize: 20,
+                              color: Colors.red,
+                            ))
+                      ],
+                    ),
+                  ),
+                )
+              ]));
         });
   }
 }

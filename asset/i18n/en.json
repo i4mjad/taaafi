@@ -172,7 +172,12 @@
   "delete-my-account-p" : "We're sorry to see you go. For security purposes, we need to re-authenticate you to be able to delete your account. Please select the provider you used to sign up",
 
   "signin-provider": "Signed In with:",
-  "last-signin": "Last Sign in"
+  "last-signin": "Last Sign in",
+
+  "confirm-account-delete" : "Confirm Account Delete",
+  "confirm-account-delete-p" : "ٌYou Can't restore anything after you confirm",
+
+  "delete-account-button" :"Confirm Delete"
 
 
 }

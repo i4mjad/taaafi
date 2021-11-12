@@ -47,4 +47,16 @@ class AuthenticationService extends ChangeNotifier {
   Future<void> signOut() async {
     await _firebaseAuth.signOut();
   }
+
+  deleteAccount() async {
+    try {
+      await FirebaseAuth.instance.currentUser.delete();
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'requires-recent-login') {
+        print(
+            'The user must reauthenticate before this operation can be executed.');
+      }
+      print(e.code);
+    }
+  }
 }
