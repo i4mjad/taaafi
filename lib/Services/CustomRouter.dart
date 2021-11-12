@@ -8,7 +8,6 @@ import 'package:reboot_app_3/screens/auth/LoginPage.dart';
 
 import 'package:reboot_app_3/screens/FollowYourReboot/FollowYourRebootScreen.dart';
 import 'package:reboot_app_3/screens/Home/HomeScreen.dart';
-import 'package:reboot_app_3/screens/FollowYourReboot/Notes/NotesPage.dart';
 
 class CustomRouter {
   static Route<dynamic> allRoutes(RouteSettings settings) {
@@ -28,10 +27,7 @@ class CustomRouter {
       case loginRoute:
         return MaterialPageRoute(builder: (_) => LoginScreen());
       case communityPage:
-        return MaterialPageRoute(
-            builder: (_) => CommunityPage());
-      case notesPage:
-        return MaterialPageRoute(builder: (_) => NotesScreen());
+        return MaterialPageRoute(builder: (_) => CommunityPage());
     }
     return MaterialPageRoute(builder: (_) => Container());
   }

@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
@@ -30,13 +31,38 @@ class _ExploreScreenState extends State<ExploreScreen> {
     });
   }
 
-  List<Article> articals = [];
-  List<Tutorial> tutorials = [];
+  FirebaseFirestore database = FirebaseFirestore.instance;
+  List<Article> articalsList = [];
+  List<Tutorial> tutorialsList = [];
+
+  void getArticles() async {
+    final dataPath = database.collection("fl_content");
+
+    dataPath.snapshots().listen((data) {
+      for (var entry in data.docs) {
+        if (entry["_fl_meta_"]["schema"] == "posts") {
+          final newArticale = new Article(
+            entry["title"],
+            entry["date"],
+            entry["author"],
+            entry["timeToRead"],
+            entry["postBody"],
+          );
+          articalsList.add(newArticale);
+        } else {
+          print(2);
+        }
+      }
+
+      print(data.size);
+    });
+  }
 
   @override
   void initState() {
     super.initState();
     getSelectedLocale();
+    getArticles();
   }
 
   @override
@@ -124,29 +150,38 @@ class _ExploreScreenState extends State<ExploreScreen> {
               ),
             ),
 
-            Container(
-              height: MediaQuery.of(context).size.height * 0.15,
-              width: MediaQuery.of(context).size.width,
-              child: Padding(
-                padding: lang == 'ar'
-                    ? EdgeInsets.only(right: 20.0)
-                    : EdgeInsets.only(left: 20.0),
-                child: Row(
-                  children: [
-                    Expanded(child: Builder(builder: (context) {
-                      return ListView.builder(
-                          scrollDirection: Axis.horizontal,
-                          itemCount: 4,
-                          itemBuilder: (BuildContext context, int index) {
-                            return TutorialsCard(
-                              lang: lang,
-                              title: "عنوان الشرح رقم  ${index}",
-                            );
-                          });
-                    })),
-                  ],
-                ),
-              ),
+            Builder(
+              builder: (BuildContext context) {
+                if (tutorialsList.length == 0) {
+                  return Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }
+                return Container(
+                  height: MediaQuery.of(context).size.height * 0.15,
+                  width: MediaQuery.of(context).size.width,
+                  child: Padding(
+                    padding: lang == 'ar'
+                        ? EdgeInsets.only(right: 20.0)
+                        : EdgeInsets.only(left: 20.0),
+                    child: Row(
+                      children: [
+                        Expanded(child: Builder(builder: (context) {
+                          return ListView.builder(
+                              scrollDirection: Axis.horizontal,
+                              itemCount: 4,
+                              itemBuilder: (BuildContext context, int index) {
+                                return TutorialsCard(
+                                  lang: lang,
+                                  title: "عنوان الشرح رقم  ${index}",
+                                );
+                              });
+                        })),
+                      ],
+                    ),
+                  ),
+                );
+              },
             ),
             GestureDetector(
               onTap: () {
