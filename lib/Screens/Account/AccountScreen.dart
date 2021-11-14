@@ -34,6 +34,19 @@ class _AccountScreenState extends State<AccountScreen>
   String dailyNotification = "";
   String lastResetedDate = "";
 
+  DateTime selectedDate = DateTime.now();
+
+  _selectDate(BuildContext context) async {
+    final DateTime picked = await showDatePicker(
+        context: context,
+        initialDate: selectedDate,
+        firstDate: DateTime(2015, 8),
+        lastDate: DateTime(2101));
+    if (picked != null && picked.isBefore(DateTime.now())) {
+      deleteUserData(picked);
+    }
+  }
+
   void _changeLanguage() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     //String languageCode = await prefs.getString("languageCode");
@@ -155,7 +168,7 @@ class _AccountScreenState extends State<AccountScreen>
         });
   }
 
-  void deleteUserData() async {
+  void deleteUserData(DateTime date) async {
     // set up the button
     Widget yesButton = TextButton(
       child: Text(
@@ -165,11 +178,10 @@ class _AccountScreenState extends State<AccountScreen>
             color: Colors.deepOrangeAccent, fontSize: 18),
       ),
       onPressed: () {
-        database.collection("users").doc(user.uid).update({
-          "resetedDate": DateTime.now(),
-          "userPreviousStreak": 0,
-          "email": user.email
-        });
+        database
+            .collection("users")
+            .doc(user.uid)
+            .update({"resetedDate": date, "email": user.email});
 
         Navigator.pop(context);
       },
@@ -250,7 +262,7 @@ class _AccountScreenState extends State<AccountScreen>
     final userData = database.collection('users').doc('${user.uid}');
 
     userData.snapshots().listen((snapshot) async {
-      if (snapshot.data().containsValue("resetedDate")) {
+      if (snapshot.data().containsValue("resetedDate") != null) {
         final getDate = snapshot.get("resetedDate");
         final date = parseTime(getDate);
         final dateStr = date.toString().substring(0, 10);
@@ -372,6 +384,9 @@ class _AccountScreenState extends State<AccountScreen>
                     GestureDetector(
                       onTap: () async {
                         //start from last relapse
+                        _selectDate(context);
+                        //Navigator.pop(context);
+                        print("hello");
                       },
                       child: Container(
                         width: MediaQuery.of(context).size.width / 2.5,
@@ -399,7 +414,7 @@ class _AccountScreenState extends State<AccountScreen>
                     //New Beginning
                     GestureDetector(
                       onTap: () async {
-                        //New start
+                        deleteUserData(DateTime.now());
                       },
                       child: Container(
                         width: MediaQuery.of(context).size.width / 2.5,

@@ -312,6 +312,7 @@ class _FollowYourRebootScreenState extends State<FollowYourRebootScreen>
     final today = DateTime.now();
 
     var userPreviousStreak = 0;
+    final regDate = user.metadata.creationTime;
 
     oldRelapses.clear();
     for (var strDate in this.userRelapses) {
@@ -328,12 +329,10 @@ class _FollowYourRebootScreenState extends State<FollowYourRebootScreen>
       final date = DateTime.parse(strDate);
       oldMasts.add(date);
     }
-    final hio = this.userFirstDayRecorded;
-    final userFirstDate = this.userFirstDayRecorded;
 
-    print(userFirstDate);
-    print(userPreviousStreak);
-    print(hio);
+    final userFirstDate = resetDay != null
+        ? resetDay
+        : regDate.add(Duration(days: userPreviousStreak));
 
     List<DateTime> calculateDaysInterval(DateTime startDate, DateTime endDate) {
       List<DateTime> days = [];
@@ -347,6 +346,7 @@ class _FollowYourRebootScreenState extends State<FollowYourRebootScreen>
       final dateD = new DateTime(date.year, date.month, date.day);
 
       if (oldRelapses.contains(dateD)) {
+        print(dateD);
         daysArray.add(new Day(type: "Relapse", date: date, color: Colors.red));
       } else if (oldWatches.contains(dateD) && oldRelapses.contains(dateD)) {
         daysArray.add(
@@ -1690,7 +1690,7 @@ class _FollowYourRebootScreenState extends State<FollowYourRebootScreen>
           hintText: AppLocalizations.of(context)
               .translate('new-user-dialog-hint-test-field'),
           hintStyle: kSubTitlesStyle.copyWith(
-              fontSize: 16, color: Colors.grey, height: 3),
+              fontSize: 12, color: Colors.grey, height: 1),
           contentPadding: EdgeInsets.only(left: 12, right: 12),
         ));
 
