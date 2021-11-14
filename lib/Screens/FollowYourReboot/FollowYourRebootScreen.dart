@@ -310,7 +310,7 @@ class _FollowYourRebootScreenState extends State<FollowYourRebootScreen>
     var oldMasts = <DateTime>[];
 
     final today = DateTime.now();
-    final regDate = user.metadata.creationTime;
+
     var userPreviousStreak = 0;
 
     oldRelapses.clear();
@@ -328,10 +328,12 @@ class _FollowYourRebootScreenState extends State<FollowYourRebootScreen>
       final date = DateTime.parse(strDate);
       oldMasts.add(date);
     }
+    final hio = this.userFirstDayRecorded;
+    final userFirstDate = this.userFirstDayRecorded;
 
-    final userFirstDate = resetDay != null
-        ? resetDay
-        : regDate.add(Duration(days: userPreviousStreak));
+    print(userFirstDate);
+    print(userPreviousStreak);
+    print(hio);
 
     List<DateTime> calculateDaysInterval(DateTime startDate, DateTime endDate) {
       List<DateTime> days = [];
