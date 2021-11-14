@@ -4,8 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:purchases_flutter/object_wrappers.dart';
 import 'package:reboot_app_3/Services/Constants.dart';
 import 'package:reboot_app_3/Localization.dart';
+import 'package:reboot_app_3/Services/PaymentServices.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -102,10 +104,13 @@ class _AboutScreenState extends State<AboutScreen>
                                             40) *
                                         0.475,
                                     decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      borderRadius: BorderRadius.circular(12.5),
-                                        border: Border.all(color: primaryColor.withOpacity(0.5), width: 0.25)
-                                    ),
+                                        color: Colors.white,
+                                        borderRadius:
+                                            BorderRadius.circular(12.5),
+                                        border: Border.all(
+                                            color:
+                                                primaryColor.withOpacity(0.5),
+                                            width: 0.25)),
                                     child: Center(
                                       child: Text(
                                           AppLocalizations.of(context).translate(
@@ -118,8 +123,8 @@ class _AboutScreenState extends State<AboutScreen>
                                   ),
                                 ),
                                 GestureDetector(
-                                  onTap: () {
-                                    supportAppDevelopment();
+                                  onTap: () async {
+                                    fetchOffers();
                                   },
                                   child: Container(
                                     height: 55,
@@ -128,7 +133,9 @@ class _AboutScreenState extends State<AboutScreen>
                                         0.475,
                                     decoration: BoxDecoration(
                                       color: Colors.white,
-                                      border: Border.all(color: primaryColor.withOpacity(0.5), width: 0.25),
+                                      border: Border.all(
+                                          color: primaryColor.withOpacity(0.5),
+                                          width: 0.25),
                                       borderRadius: BorderRadius.circular(12.5),
                                     ),
                                     child: Center(
@@ -160,7 +167,13 @@ class _AboutScreenState extends State<AboutScreen>
     );
   }
 
-  supportAppDevelopment() async {
+  supportAppDevelopment(List<Package> offers) async {
+    // print(offers[0].identifier);
+    // print(offers[1].identifier);
+    // print(offers[2].identifier);
+    // print(offers[3].identifier);
+    // print(offers[4].identifier);
+
     showModalBottomSheet(
         context: context,
         builder: (context) {
@@ -245,7 +258,7 @@ class _AboutScreenState extends State<AboutScreen>
                   //small tip
                   GestureDetector(
                     onTap: () {
-                      print('Small Tip');
+                      PaymentServices.purchasePackage(offers[0]);
                     },
                     child: Container(
                       child: Column(
@@ -275,7 +288,9 @@ class _AboutScreenState extends State<AboutScreen>
                                   ],
                                 ),
                                 Spacer(),
-                                Text(lang != 'ar' ? '\u0024 0.99' : '0.99 \u0024')
+                                Text(lang != 'ar'
+                                    ? '\u0024 0.99'
+                                    : '0.99 \u0024')
                               ],
                             ),
                           )
@@ -286,10 +301,10 @@ class _AboutScreenState extends State<AboutScreen>
                   SizedBox(
                     height: 8,
                   ),
-                  //midumn tip
+                  //medium tip
                   GestureDetector(
                     onTap: () {
-                      print('Midumn Tip');
+                      PaymentServices.purchasePackage(offers[1]);
                     },
                     child: Container(
                       child: Column(
@@ -319,7 +334,9 @@ class _AboutScreenState extends State<AboutScreen>
                                   ],
                                 ),
                                 Spacer(),
-                                Text(lang != 'ar' ? '\u0024 2.99' : '2.99 \u0024')
+                                Text(lang != 'ar'
+                                    ? '\u0024 2.99'
+                                    : '2.99 \u0024')
                               ],
                             ),
                           )
@@ -333,7 +350,7 @@ class _AboutScreenState extends State<AboutScreen>
                   //high tip
                   GestureDetector(
                     onTap: () {
-                      print('High Tip');
+                      PaymentServices.purchasePackage(offers[2]);
                     },
                     child: Container(
                       child: Column(
@@ -363,7 +380,9 @@ class _AboutScreenState extends State<AboutScreen>
                                   ],
                                 ),
                                 Spacer(),
-                                Text(lang != 'ar' ? '\u0024 6.99' : '6.99 \u0024')
+                                Text(lang != 'ar'
+                                    ? '\u0024 6.99'
+                                    : '6.99 \u0024')
                               ],
                             ),
                           )
@@ -377,7 +396,7 @@ class _AboutScreenState extends State<AboutScreen>
                   //massive tip
                   GestureDetector(
                     onTap: () {
-                      print('Massive Tip');
+                      PaymentServices.purchasePackage(offers[3]);
                     },
                     child: Container(
                       child: Column(
@@ -407,7 +426,9 @@ class _AboutScreenState extends State<AboutScreen>
                                   ],
                                 ),
                                 Spacer(),
-                                Text(lang != 'ar' ? '\u0024 9.99' : '9.99 \u0024')
+                                Text(lang != 'ar'
+                                    ? '\u0024 9.99'
+                                    : '9.99 \u0024')
                               ],
                             ),
                           )
@@ -418,10 +439,10 @@ class _AboutScreenState extends State<AboutScreen>
                   SizedBox(
                     height: 8,
                   ),
-                  //subsctipob tip
+                  //subsctipon tip
                   GestureDetector(
                     onTap: () {
-                      print('Monthly Tip');
+                      PaymentServices.purchasePackage(offers[4]);
                     },
                     child: Container(
                       child: Column(
@@ -465,11 +486,35 @@ class _AboutScreenState extends State<AboutScreen>
                       ),
                     ),
                   ),
-                  SizedBox(height: 20,)
+                  SizedBox(
+                    height: 20,
+                  )
                 ],
               ),
             ),
           );
         });
+  }
+
+  Future fetchOffers() async {
+    final offerings = await PaymentServices.fetchOffers();
+
+    if (offerings == null) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text(
+          AppLocalizations.of(context).translate('no-donations-offer'),
+          style: kSubTitlesStyle.copyWith(
+              fontSize: 12, color: Colors.white, fontWeight: FontWeight.bold),
+        ),
+        duration: Duration(seconds: 2),
+      ));
+    } else {
+      final packages = offerings
+          .map((offer) => offer.availablePackages)
+          .expand((element) => element)
+          .toList();
+
+      supportAppDevelopment(packages);
+    }
   }
 }

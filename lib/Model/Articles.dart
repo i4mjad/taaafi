@@ -4,6 +4,7 @@ class Article {
     this.postedAt,
     this.author,
     this.timeToRead,
+    this.breif,
     this.body,
   );
 
@@ -11,5 +12,6 @@ class Article {
   final String postedAt;
   final String author;
   final String timeToRead;
+  final String breif;
   final String body;
 }

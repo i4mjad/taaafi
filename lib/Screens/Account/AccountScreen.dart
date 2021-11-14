@@ -1078,18 +1078,23 @@ class _AccountScreenState extends State<AccountScreen>
                         color: Colors.red,
                         borderRadius: BorderRadius.circular(12.5)),
                     child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
                             AppLocalizations.of(context)
                                 .translate("delete-account-button"),
                             style: kSubTitlesStyle.copyWith(
-                              fontSize: 20,
-                              color: Colors.red,
-                            ))
+                                fontSize: 18,
+                                color: Colors.white,
+                                fontWeight: FontWeight.w500))
                       ],
                     ),
                   ),
-                )
+                ),
+                SizedBox(
+                  height: 50,
+                ),
               ]));
         });
   }

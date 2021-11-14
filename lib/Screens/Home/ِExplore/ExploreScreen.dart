@@ -1,8 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_html/flutter_html.dart';
-import 'package:flutter_html/style.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:reboot_app_3/Model/Articles.dart';
 import 'package:reboot_app_3/Model/Tutorial.dart';
@@ -37,7 +35,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
   List<Article> articalsList = [];
   List<Tutorial> tutorialsList = [];
 
-  void getArticles() async {
+  void getContent() async {
     final dataPath = database.collection("fl_content");
 
     dataPath.snapshots().listen((data) {
@@ -48,6 +46,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
             entry["date"].toString().substring(0, 10),
             entry["author"],
             entry["timeToRead"].toString(),
+            entry["breif"],
             entry["postBody"],
           );
           articalsList.add(newArticale);
@@ -67,9 +66,9 @@ class _ExploreScreenState extends State<ExploreScreen> {
 
   @override
   void initState() {
+    getContent();
     super.initState();
     getSelectedLocale();
-    getArticles();
     print(tutorialsList);
   }
 
@@ -162,11 +161,10 @@ class _ExploreScreenState extends State<ExploreScreen> {
               builder: (BuildContext context) {
                 if (tutorialsList.length == 0) {
                   return Center(
-                    child: CircularProgressIndicator(
-                      backgroundColor: primaryColor,
-                      strokeWidth: 3,
-                    ),
-                  );
+                      child: Text(
+                    AppLocalizations.of(context).translate('loading'),
+                    style: kSubTitlesStyle,
+                  ));
                 } else {
                   return Container(
                     height: MediaQuery.of(context).size.height * 0.15,
@@ -243,30 +241,26 @@ class _ExploreScreenState extends State<ExploreScreen> {
               builder: (BuildContext context) {
                 if (articalsList.length == 0) {
                   return Center(
-                    child: CircularProgressIndicator(
-                      backgroundColor: primaryColor,
-                      strokeWidth: 1,
-                    ),
-                  );
+                      child: Text(
+                    AppLocalizations.of(context).translate('loading'),
+                    style: kSubTitlesStyle,
+                  ));
                 } else {
                   return Container(
-                    height: MediaQuery.of(context).size.height * 0.3,
                     width: MediaQuery.of(context).size.width,
                     child: Padding(
                       padding: EdgeInsets.only(right: 20, left: 20.0),
                       child: Column(
                         children: [
-                          Expanded(child: Builder(builder: (context) {
-                            return ListView.builder(
-                                scrollDirection: Axis.vertical,
-                                padding: EdgeInsets.all(0),
-                                itemCount: 3,
-                                itemBuilder: (BuildContext context, int index) {
-                                  return PostWidget(
-                                    articale: articalsList[index],
-                                  );
-                                });
-                          })),
+                          PostWidget(
+                            articale: articalsList[articalsList.length - 1],
+                          ),
+                          PostWidget(
+                            articale: articalsList[articalsList.length - 2],
+                          ),
+                          PostWidget(
+                            articale: articalsList[articalsList.length - 3],
+                          ),
                         ],
                       ),
                     ),
@@ -276,7 +270,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
             ),
 
             SizedBox(
-              height: 20,
+              height: 8,
             ),
             GestureDetector(
               onTap: () {
@@ -308,7 +302,10 @@ class _ExploreScreenState extends State<ExploreScreen> {
                   ),
                 ),
               ),
-            )
+            ),
+            SizedBox(
+              height: 20,
+            ),
           ],
         ),
       ),
@@ -437,16 +434,14 @@ class PostWidget extends StatelessWidget {
                             Row(
                               children: [
                                 Flexible(
-                                    child: Html(
-                                  data: articale.body.substring(0, 5) + "..." ??
-                                      articale.body,
-                                  style: {
-                                    "body": Style(
-                                        fontSize: FontSize(18.0),
-                                        fontWeight: FontWeight.w400,
-                                        fontFamily: "DINNextLTArabic"),
-                                  },
-                                )),
+                                  child: Text(
+                                    articale.breif,
+                                    style: kSubTitlesStyle.copyWith(
+                                        color: primaryColor,
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w400),
+                                  ),
+                                ),
                               ],
                             ),
                           ]),
@@ -480,7 +475,7 @@ class PostWidget extends StatelessWidget {
                             SizedBox(
                               width: 4,
                             ),
-                            Text("03/04/2021",
+                            Text(articale.postedAt,
                                 style: kSubTitlesSubsStyle.copyWith(
                                     fontSize: 10.5,
                                     height: 1,
@@ -506,7 +501,7 @@ class PostWidget extends StatelessWidget {
                             SizedBox(
                               width: 4,
                             ),
-                            Text("أمجد السليماني",
+                            Text(articale.author,
                                 style: kSubTitlesSubsStyle.copyWith(
                                     fontSize: 10.5,
                                     height: 1,

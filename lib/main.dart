@@ -10,6 +10,7 @@ import 'package:provider/provider.dart';
 import 'package:reboot_app_3/Auth/AuthenticationService.dart';
 import 'package:reboot_app_3/Services/CustomRouter.dart';
 import 'package:reboot_app_3/Localization.dart';
+import 'package:reboot_app_3/Services/PaymentServices.dart';
 import 'package:reboot_app_3/Services/RoutesName.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
@@ -24,6 +25,7 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await Firebase.initializeApp();
+  await PaymentServices.initPayment();
 
   var initializationSettingsAndroid = AndroidInitializationSettings('app_icon');
   var initializationSettingsiOS = IOSInitializationSettings(

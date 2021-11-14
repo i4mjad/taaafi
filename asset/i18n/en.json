@@ -178,7 +178,10 @@
   "confirm-account-delete-p" : "ٌYou Can't restore anything after you confirm",
 
   "delete-account-button" :"Confirm Delete",
-  "minutes": "Minutes"
+  "minutes": "Minutes",
+
+
+  "no-donations-offer" : "ُThere's somthing wrong, please try again"
 
 
 }
