@@ -263,7 +263,7 @@ class _AccountScreenState extends State<AccountScreen>
 
     userData.snapshots().listen((snapshot) async {
       if (snapshot.data().containsValue("resetedDate") != null) {
-        final getDate = snapshot.get("resetedDate");
+        final getDate = await snapshot.get("resetedDate");
         final date = parseTime(getDate);
         final dateStr = date.toString().substring(0, 10);
 

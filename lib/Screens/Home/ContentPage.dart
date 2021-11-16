@@ -54,6 +54,7 @@ class _ContentPageState extends State<ContentPage> {
         final fixedContent = Content(
           title: fixArbicText(temp.title),
           contentOwner: fixArbicText(temp.contentOwner),
+          contentLink: temp.contentLink,
           contentType: fixArbicText(temp.contentType),
           contentSubType: fixArbicText(temp.contentSubType),
           contentLanguage: fixArbicText(temp.contentLanguage),
@@ -183,34 +184,32 @@ class _ContentPageState extends State<ContentPage> {
               SizedBox(
                 height: 12,
               ),
-              Container(
-                width: MediaQuery.of(context).size.width - 40,
-                height: MediaQuery.of(context).size.height * 0.045,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.all(Radius.circular(8)),
-                  border: Border.all(
-                    color: (selectedSubTypesList.length > 0 ||
-                            selectedSubTypesList.length > 0 ||
-                            selectedLanuguagesList.length > 0)
-                        ? Colors.green
-                        : primaryColor.withOpacity(0.3),
-                    width: (selectedSubTypesList.length > 0 ||
-                            selectedSubTypesList.length > 0 ||
-                            selectedLanuguagesList.length > 0)
-                        ? 1
-                        : 0.5,
+              GestureDetector(
+                onTap: () => _showFilters(),
+                child: Container(
+                  width: MediaQuery.of(context).size.width - 40,
+                  height: MediaQuery.of(context).size.height * 0.045,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.all(Radius.circular(8)),
+                    border: Border.all(
+                      color: (selectedSubTypesList.length > 0 ||
+                              selectedSubTypesList.length > 0 ||
+                              selectedLanuguagesList.length > 0)
+                          ? Colors.greenAccent
+                          : primaryColor.withOpacity(0.3),
+                      width: (selectedSubTypesList.length > 0 ||
+                              selectedSubTypesList.length > 0 ||
+                              selectedLanuguagesList.length > 0)
+                          ? 1
+                          : 0.5,
+                    ),
                   ),
-                ),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        _showFilters();
-                      },
-                      child: Row(
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      Row(
                         children: [
                           Icon(Iconsax.document, size: 16, color: primaryColor),
                           SizedBox(width: 8),
@@ -223,8 +222,8 @@ class _ContentPageState extends State<ContentPage> {
                                   fontWeight: FontWeight.w400)),
                         ],
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
               Builder(
@@ -591,7 +590,9 @@ class ContentCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: () => launch(content.contentLink),
+      onTap: () {
+        launch(content.contentLink);
+      },
       child: Container(
         padding: EdgeInsets.all(12),
         margin: EdgeInsets.only(bottom: 15),

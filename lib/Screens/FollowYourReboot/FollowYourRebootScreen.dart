@@ -346,7 +346,6 @@ class _FollowYourRebootScreenState extends State<FollowYourRebootScreen>
       final dateD = new DateTime(date.year, date.month, date.day);
 
       if (oldRelapses.contains(dateD)) {
-        print(dateD);
         daysArray.add(new Day(type: "Relapse", date: date, color: Colors.red));
       } else if (oldWatches.contains(dateD) && oldRelapses.contains(dateD)) {
         daysArray.add(
@@ -1273,7 +1272,9 @@ class _FollowYourRebootScreenState extends State<FollowYourRebootScreen>
                                           children: [
                                             Flexible(
                                                 child: Text(
-                                              "هذه المعدلات بناء على مجموع الأيام منذ اليوم الأول الذي بدأت فيه وحتى اليوم",
+                                              AppLocalizations.of(context)
+                                                  .translate(
+                                                      "relapses-average-p"),
                                               textAlign: TextAlign.center,
                                               style: kSubTitlesStyle.copyWith(
                                                   color: Colors.brown,

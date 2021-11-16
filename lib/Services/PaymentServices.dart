@@ -17,7 +17,7 @@ class PaymentServices {
       return current == null ? [] : [current];
     } on PlatformException catch (e) {
       print(e.code);
-      print(e.message);
+
       return [];
     }
   }

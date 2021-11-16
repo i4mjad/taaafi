@@ -189,7 +189,7 @@ class _AboutScreenState extends State<AboutScreen>
                     children: [
                       Container(
                         height: 5,
-                        width: MediaQuery.of(context).size.width * 0.2,
+                        width: MediaQuery.of(context).size.width * 0.1,
                         decoration: BoxDecoration(
                             color: Colors.black12,
                             borderRadius: BorderRadius.circular(50)),

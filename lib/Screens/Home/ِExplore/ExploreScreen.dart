@@ -4,7 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:reboot_app_3/Model/Articles.dart';
 import 'package:reboot_app_3/Model/Tutorial.dart';
-import 'package:reboot_app_3/Screens/Home/%D9%90Explore/ExploreSearchScreen.dart';
+import 'package:reboot_app_3/Screens/Home/%D9%90Explore/ArticlesScreen.dart';
+import 'package:reboot_app_3/Screens/Home/%D9%90Explore/TutorialsList.dart';
 import 'package:reboot_app_3/Services/BottomNavbar.dart';
 import 'package:reboot_app_3/Services/Constants.dart';
 import 'package:flutter/foundation.dart';
@@ -35,10 +36,10 @@ class _ExploreScreenState extends State<ExploreScreen> {
   List<Article> articalsList = [];
   List<Tutorial> tutorialsList = [];
 
-  void getContent() async {
+  getAtricles() async {
     final dataPath = database.collection("fl_content");
-
-    dataPath.snapshots().listen((data) {
+    List<Article> _articles = [];
+    dataPath.snapshots().listen((data) async{
       for (var entry in data.docs) {
         if (entry["_fl_meta_"]["schema"] == "posts") {
           final newArticale = new Article(
@@ -49,27 +50,46 @@ class _ExploreScreenState extends State<ExploreScreen> {
             entry["breif"],
             entry["postBody"],
           );
-          articalsList.add(newArticale);
-        } else {
-          print(1);
+          _articles.add(newArticale);
+        }
+      }
+    });
+
+    setState(() {
+      articalsList = _articles;
+    });
+  }
+  getTutorials() async {
+    final dataPath = database.collection("fl_content");
+      List<Tutorial> _tutorials = [];
+    dataPath.snapshots().listen((data) async {
+
+      for (var entry in data.docs) {
+        if (entry["_fl_meta_"]["schema"] == "tutorials") {
+
           final newTutorial = new Tutorial(
             entry["title"],
             entry["date"].toString().substring(0, 10),
             entry["author"],
             entry["body"],
           );
-          tutorialsList.add(newTutorial);
+          _tutorials.add(newTutorial);
         }
       }
+    });
+
+    setState(() {
+      tutorialsList = _tutorials;
     });
   }
 
   @override
   void initState() {
-    getContent();
+    getTutorials();
+    getAtricles();
     super.initState();
     getSelectedLocale();
-    print(tutorialsList);
+
   }
 
   @override
@@ -132,14 +152,39 @@ class _ExploreScreenState extends State<ExploreScreen> {
                     ),
                     Padding(
                       padding: EdgeInsets.only(bottom: 12),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
+                      child: Column(
                         children: [
-                          Text(
-                            AppLocalizations.of(context).translate('explore'),
-                            style: kPageTitleStyle.copyWith(
-                                height: 1, fontSize: 28, color: Colors.white),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Text(
+                                AppLocalizations.of(context)
+                                    .translate('explore'),
+                                style: kPageTitleStyle.copyWith(
+                                    height: 1,
+                                    fontSize: 28,
+                                    color: Colors.white),
+                              ),
+                            ],
+                          ),
+                          SizedBox(
+                            height: 12,
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Text(
+                                AppLocalizations.of(context)
+                                    .translate('only-ar'),
+                                style: kPageTitleStyle.copyWith(
+                                    height: 1,
+                                    fontSize: 14,
+                                    color: Colors.white.withOpacity(0.7),
+                                    fontWeight: FontWeight.w500),
+                              ),
+                            ],
                           ),
                         ],
                       ),
@@ -150,16 +195,50 @@ class _ExploreScreenState extends State<ExploreScreen> {
             ),
             Padding(
               padding:
-                  EdgeInsets.only(right: 20.0, left: 20, top: 12, bottom: 12),
-              child: Text(
-                AppLocalizations.of(context).translate('tutorials'),
-                style: kSubTitlesStyle,
+                  EdgeInsets.only(right: 20.0, left: 20, top: 20, bottom: 12),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    AppLocalizations.of(context).translate('tutorials'),
+                    style: kSubTitlesStyle.copyWith(height: 1),
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => TutorialsScreen(
+                                  tutorialList: tutorialsList)));
+                    },
+                    child: Row(
+                      children: [
+                        Text(
+                          AppLocalizations.of(context)
+                              .translate('explore-tutorials'),
+                          style: kSubTitlesStyle.copyWith(
+                              fontSize: 16, height: 1, color: primaryColor),
+                        ),
+                        SizedBox(
+                          width: 2,
+                        ),
+                        Icon(
+                            lang != 'ar'
+                                ? Iconsax.arrow_right
+                                : Iconsax.arrow_square_left,
+                            size: 14,
+                            color: primaryColor),
+                      ],
+                    ),
+                  ),
+                ],
               ),
             ),
 
-            Builder(
-              builder: (BuildContext context) {
-                if (tutorialsList.length == 0) {
+            FutureBuilder(
+              future: getTutorials(),
+              builder: (BuildContext context, AsyncSnapshot snap) {
+                if (articalsList.length == 0) {
                   return Center(
                       child: Text(
                     AppLocalizations.of(context).translate('loading'),
@@ -193,52 +272,57 @@ class _ExploreScreenState extends State<ExploreScreen> {
                 }
               },
             ),
-            GestureDetector(
-              onTap: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => ExploreContentScreen(
-                            contentType: AppLocalizations.of(context)
-                                .translate('tutorials'))));
-              },
-              child: Padding(
-                padding: EdgeInsets.only(right: 20, left: 20, top: 12),
-                child: Container(
-                  width: MediaQuery.of(context).size.width - 40,
-                  height: 50,
-                  decoration: BoxDecoration(
-                      color: Colors.white,
-                      border: Border.all(
-                          color: primaryColor.withOpacity(0.5), width: 0.25),
-                      borderRadius: BorderRadius.circular(10.5)),
-                  child: Center(
-                    child: Text(
-                      AppLocalizations.of(context)
-                          .translate('explore-tutorials'),
-                      style: kSubTitlesStyle.copyWith(
-                          color: primaryColor, fontSize: 16),
-                    ),
-                  ),
-                ),
-              ),
-            ),
+
             SizedBox(
-              height: 12,
+              height: 20,
             ),
             Padding(
               padding: EdgeInsets.only(right: 20.0, left: 20),
-              child: Text(
-                AppLocalizations.of(context).translate('articles'),
-                style: kSubTitlesStyle,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    AppLocalizations.of(context).translate('articles'),
+                    style: kSubTitlesStyle.copyWith(height: 1),
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  ArticlesScreen(articlesList: articalsList)));
+                    },
+                    child: Row(
+                      children: [
+                        Text(
+                          AppLocalizations.of(context)
+                              .translate('explore-articles'),
+                          style: kSubTitlesStyle.copyWith(
+                              fontSize: 16, height: 1, color: primaryColor),
+                        ),
+                        SizedBox(
+                          width: 2,
+                        ),
+                        Icon(
+                            lang != 'ar'
+                                ? Iconsax.arrow_right
+                                : Iconsax.arrow_square_left,
+                            size: 14,
+                            color: primaryColor),
+                      ],
+                    ),
+                  ),
+                ],
               ),
             ),
             SizedBox(
               height: 12,
             ),
             //post widget
-            Builder(
-              builder: (BuildContext context) {
+            FutureBuilder(
+              future: getAtricles(),
+              builder: (BuildContext context, AsyncSnapshot snap) {
                 if (articalsList.length == 0) {
                   return Center(
                       child: Text(
@@ -268,40 +352,8 @@ class _ExploreScreenState extends State<ExploreScreen> {
                 }
               },
             ),
-
             SizedBox(
               height: 8,
-            ),
-            GestureDetector(
-              onTap: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => ExploreContentScreen(
-                            contentType: AppLocalizations.of(context)
-                                .translate('articles'))));
-              },
-              child: Padding(
-                padding: EdgeInsets.only(right: 20, left: 20),
-                child: Container(
-                  width: MediaQuery.of(context).size.width - 40,
-                  height: 50,
-                  decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                          begin: Alignment.bottomLeft,
-                          end: Alignment.topRight,
-                          colors: [primaryColor, accentColor]),
-                      borderRadius: BorderRadius.circular(12.5)),
-                  child: Center(
-                    child: Text(
-                      AppLocalizations.of(context)
-                          .translate('explore-articles'),
-                      style: kSubTitlesStyle.copyWith(
-                          color: seconderyColor, fontSize: 16),
-                    ),
-                  ),
-                ),
-              ),
             ),
             SizedBox(
               height: 20,

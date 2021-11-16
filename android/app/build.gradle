@@ -45,8 +45,9 @@ android {
 
         targetSdkVersion 30
         minSdkVersion 19
-        //build number : 27
-        versionCode 20027
+        //version number: 2.0.0
+        //build number : 30
+        versionCode 20030
         versionName "2.0.0"
 
         //multiDexEnabled true
@@ -62,8 +63,8 @@ android {
     }
 
     dependencies {
-        def billing_version = "4.0.0"
-        implementation "com.android.billingclient:billing-ktx:$billing_version"
+
+        implementation "com.android.billingclient:billing-ktx:4.0.0"
         implementation platform('com.google.firebase:firebase-bom:26.4.0')
         implementation 'com.google.firebase:firebase-messaging:23.0.0'
         implementation 'com.google.firebase:firebase-analytics'

@@ -2,7 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_html/style.dart';
-import 'package:iconsax/iconsax.dart';
 import 'package:reboot_app_3/Localization.dart';
 import 'package:reboot_app_3/Model/Articles.dart';
 import 'package:reboot_app_3/Screens/Home/%D9%90Explore/ExploreScreen.dart';
@@ -71,102 +70,67 @@ class _ArticlePageState extends State<ArticlePage> {
                 ],
               ),
             ),
-            SizedBox(
-              height: 4,
-            ),
             Divider(
               thickness: 0.75,
-            ),
-            SizedBox(
-              height: 4,
             ),
             Container(
               padding: EdgeInsets.all(8),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Row(
-                    children: [
-                      Container(
-                        padding: EdgeInsets.fromLTRB(12, 8, 12, 8),
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(8),
-                            color: Color(0xFF045C44).withOpacity(0.15)),
-                        child: Row(
-                          children: [
-                            Icon(
-                              Iconsax.calendar,
-                              size: 16,
-                              color: Color(0xFF045C44),
-                            ),
-                            SizedBox(
-                              width: 4,
-                            ),
-                            Text(widget.articale.postedAt,
-                                style: kSubTitlesSubsStyle.copyWith(
-                                    fontSize: 10.5,
-                                    height: 1,
-                                    color: Color(0xFF045C44))),
-                          ],
-                        ),
-                      ),
-                      SizedBox(
-                        width: 10,
-                      ),
-                      Container(
-                        padding: EdgeInsets.fromLTRB(12, 8, 12, 8),
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(8),
-                            color: Color(0xFF75372D).withAlpha(20)),
-                        child: Row(
-                          children: [
-                            Icon(
-                              Iconsax.user_edit,
-                              size: 16,
-                              color: Color(0xFF75372D),
-                            ),
-                            SizedBox(
-                              width: 4,
-                            ),
-                            Text(widget.articale.author,
-                                style: kSubTitlesSubsStyle.copyWith(
-                                    fontSize: 10.5,
-                                    height: 1,
-                                    color: Color(0xFF75372D))),
-                          ],
-                        ),
-                      ),
-                      SizedBox(
-                        width: 10,
-                      ),
-                      Container(
-                        padding: EdgeInsets.fromLTRB(12, 8, 12, 8),
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(8),
-                            color: primaryColor.withAlpha(20)),
-                        child: Row(
-                          children: [
-                            Icon(
-                              Iconsax.timer,
-                              size: 16,
-                              color: primaryColor,
-                            ),
-                            SizedBox(
-                              width: 4,
-                            ),
-                            Text(
-                                "${widget.articale.timeToRead} " +
-                                    AppLocalizations.of(context)
-                                        .translate("minutes"),
-                                style: kSubTitlesSubsStyle.copyWith(
-                                    fontSize: 10.5,
-                                    height: 1,
-                                    color: primaryColor)),
-                          ],
-                        ),
-                      )
-                    ],
+                  Container(
+                    padding: EdgeInsets.fromLTRB(12, 8, 12, 8),
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(8),
+                        color: Color(0xFF045C44).withOpacity(0.15)),
+                    child: Row(
+                      children: [
+                        Text(widget.articale.postedAt,
+                            style: kSubTitlesSubsStyle.copyWith(
+                                fontSize: 10.5,
+                                height: 1,
+                                color: Color(0xFF045C44))),
+                      ],
+                    ),
                   ),
+                  SizedBox(
+                    width: 10,
+                  ),
+                  Container(
+                    padding: EdgeInsets.fromLTRB(12, 8, 12, 8),
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(8),
+                        color: Color(0xFF75372D).withAlpha(20)),
+                    child: Row(
+                      children: [
+                        Text(widget.articale.author,
+                            style: kSubTitlesSubsStyle.copyWith(
+                                fontSize: 10.5,
+                                height: 1,
+                                color: Color(0xFF75372D))),
+                      ],
+                    ),
+                  ),
+                  SizedBox(
+                    width: 10,
+                  ),
+                  Container(
+                    padding: EdgeInsets.fromLTRB(12, 8, 12, 8),
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(8),
+                        color: primaryColor.withAlpha(20)),
+                    child: Row(
+                      children: [
+                        Text(
+                            "${widget.articale.timeToRead} " +
+                                AppLocalizations.of(context)
+                                    .translate("minutes"),
+                            style: kSubTitlesSubsStyle.copyWith(
+                                fontSize: 10.5,
+                                height: 1,
+                                color: primaryColor)),
+                      ],
+                    ),
+                  )
                 ],
               ),
             ),
