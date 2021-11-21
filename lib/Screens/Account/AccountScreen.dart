@@ -262,7 +262,7 @@ class _AccountScreenState extends State<AccountScreen>
     final userData = database.collection('users').doc('${user.uid}');
 
     userData.snapshots().listen((snapshot) async {
-      if (snapshot.data().containsValue("resetedDate") != null) {
+      if (snapshot.data().containsValue("resetedDate") != false) {
         final getDate = await snapshot.get("resetedDate");
         final date = parseTime(getDate);
         final dateStr = date.toString().substring(0, 10);
@@ -478,8 +478,8 @@ class _AccountScreenState extends State<AccountScreen>
                   height: 20,
                 ),
                 Container(
-                    width: MediaQuery.of(context).size.width - 40,
-                    height: MediaQuery.of(context).size.height * 0.26,
+
+                    padding: EdgeInsets.all(12),
                     decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(15),
@@ -502,7 +502,7 @@ class _AccountScreenState extends State<AccountScreen>
                             ),
                           ),
                           SizedBox(
-                            width: 20,
+                            width: 12,
                           ),
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.center,
@@ -526,15 +526,14 @@ class _AccountScreenState extends State<AccountScreen>
                                   style: kSubTitlesSubsStyle.copyWith(
                                       color: Colors.grey)),
                               SizedBox(
-                                height: 20,
+                                height: 12,
                               ),
                               Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceEvenly,
                                 children: [
                                   Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
+                                    crossAxisAlignment: CrossAxisAlignment.center,
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       Text(
@@ -561,7 +560,7 @@ class _AccountScreenState extends State<AccountScreen>
                                       ),
                                     ],
                                   ),
-                                  VerticalDivider(),
+
                                   Column(
                                     children: [
                                       Text(
@@ -585,7 +584,7 @@ class _AccountScreenState extends State<AccountScreen>
                                       ),
                                     ],
                                   ),
-                                  VerticalDivider(),
+
                                   Column(
                                     children: [
                                       Text(

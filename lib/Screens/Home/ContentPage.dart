@@ -91,7 +91,11 @@ class _ContentPageState extends State<ContentPage> {
   void initState() {
     super.initState();
     getSelectedLocale();
+
+    fillteredAppContent.clear();
+    appContent.clear();
     loadContent().then((value) {
+
       setState(() {
         fillteredAppContent = appContent;
       });
@@ -286,230 +290,227 @@ class _ContentPageState extends State<ContentPage> {
         builder: (_) => StatefulBuilder(
               builder: (modalContext, modalSetState) => Padding(
                 padding: EdgeInsets.fromLTRB(20, 8, 20, 8),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Container(
-                          height: 5,
-                          width: MediaQuery.of(context).size.width * 0.1,
-                          decoration: BoxDecoration(
-                              color: Colors.black12,
-                              borderRadius: BorderRadius.circular(50)),
-                        )
-                      ],
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          AppLocalizations.of(context)
-                              .translate('search-filters'),
-                          style: kPageTitleStyle.copyWith(fontSize: 22),
-                        ),
-                        GestureDetector(
-                          onTap: () {
-                            Navigator.pop(context);
-                          },
-                          child: Icon(
-                            CupertinoIcons.xmark_circle_fill,
-                            color: Colors.black26,
-                            size: 28,
-                          ),
-                        )
-                      ],
-                    ),
-                    SizedBox(
-                      height: 12,
-                    ),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          AppLocalizations.of(context)
-                              .translate('content-category'),
-                          style: kSubTitlesStyle,
-                        ),
-                      ],
-                    ),
-                    Container(
-                      child: Row(
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.max,
+                    children: <Widget>[
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Expanded(
-                            child: ChipsChoice<String>.multiple(
-                              padding: EdgeInsets.all(0),
-                              value: selectedSubTypesList,
-                              choiceStyle: C2ChoiceStyle(
-                                  labelStyle: kSubTitlesStyle.copyWith(
-                                      fontSize: 12,
-                                      height: 1,
-                                      color: primaryColor,
-                                      fontWeight: FontWeight.w400),
-                                  borderColor: primaryColor,
-                                  color: primaryColor),
-                              choiceActiveStyle: C2ChoiceStyle(),
-                              onChanged: (val) {
-                                modalSetState(() => selectedSubTypesList = val);
-                                setState(() => selectedSubTypesList = val);
-                              },
-                              choiceItems: C2Choice.listFrom<String, String>(
-                                source: getContentSubTypes(),
-                                value: (i, v) => v,
-                                label: (i, v) => v,
-                                tooltip: (i, v) => v,
-                              ),
-                              wrapped: true,
-                              textDirection: this.lang == "ar"
-                                  ? TextDirection.rtl
-                                  : TextDirection.ltr,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          AppLocalizations.of(context)
-                              .translate('content-type'),
-                          style: kSubTitlesStyle,
-                        ),
-                      ],
-                    ),
-                    Container(
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: ChipsChoice<String>.multiple(
-                              alignment: WrapAlignment.start,
-                              choiceStyle: C2ChoiceStyle(
-                                  labelStyle: kSubTitlesStyle.copyWith(
-                                      fontSize: 12,
-                                      height: 1,
-                                      color: primaryColor,
-                                      fontWeight: FontWeight.w400),
-                                  borderColor: primaryColor,
-                                  color: primaryColor),
-                              padding: EdgeInsets.all(0),
-                              value: selectedTypesList,
-                              onChanged: (val) {
-                                modalSetState(() => selectedTypesList = val);
-                                setState(() => selectedTypesList = val);
-                              },
-                              choiceItems: C2Choice.listFrom<String, String>(
-                                source: getContentTypes(),
-                                value: (i, v) => v,
-                                label: (i, v) => v,
-                                tooltip: (i, v) => v,
-                              ),
-                              wrapped: true,
-                              placeholderStyle: kSubTitlesStyle,
-                              textDirection: this.lang == "ar"
-                                  ? TextDirection.rtl
-                                  : TextDirection.ltr,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    SizedBox(
-                      height: 12,
-                    ),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          AppLocalizations.of(context)
-                              .translate('content-language'),
-                          style: kSubTitlesStyle,
-                        ),
-                      ],
-                    ),
-                    SizedBox(
-                      height: 12,
-                    ),
-                    Container(
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: ChipsChoice<String>.multiple(
-                              alignment: WrapAlignment.start,
-                              choiceStyle: C2ChoiceStyle(
-                                  labelStyle: kSubTitlesStyle.copyWith(
-                                      fontSize: 12,
-                                      height: 1,
-                                      color: primaryColor,
-                                      fontWeight: FontWeight.w400),
-                                  borderColor: primaryColor,
-                                  color: primaryColor),
-                              padding: EdgeInsets.all(0),
-                              value: selectedLanuguagesList,
-                              onChanged: (val) {
-                                modalSetState(
-                                    () => selectedLanuguagesList = val);
-                                setState(() => selectedLanuguagesList = val);
-                              },
-                              choiceItems: C2Choice.listFrom<String, String>(
-                                source: lanuguagesList,
-                                value: (i, v) => v,
-                                label: (i, v) => v,
-                                tooltip: (i, v) => v,
-                              ),
-                              wrapped: true,
-                              placeholderStyle: kSubTitlesStyle,
-                              textDirection: this.lang == "ar"
-                                  ? TextDirection.rtl
-                                  : TextDirection.ltr,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    SizedBox(
-                      height: 12,
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        GestureDetector(
-                          onTap: () {
-                            filtersService();
-                            Navigator.pop(context);
-                          },
-                          child: Container(
-                            width: MediaQuery.of(context).size.width - 40,
-                            height: 50,
+                          Container(
+                            height: 5,
+                            width: MediaQuery.of(context).size.width * 0.1,
                             decoration: BoxDecoration(
-                                color: primaryColor,
-                                borderRadius: BorderRadius.circular(10.5),
-                                border: Border.all(width: 0.25)),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
-                                  AppLocalizations.of(context)
-                                      .translate('apply-filters'),
-                                  style: kSubTitlesStyle.copyWith(
-                                      color: seconderyColor,
-                                      height: 1,
-                                      fontSize: 16),
-                                )
-                              ],
+                                color: Colors.black12,
+                                borderRadius: BorderRadius.circular(50)),
+                          )
+                        ],
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            AppLocalizations.of(context)
+                                .translate('search-filters'),
+                            style: kPageTitleStyle.copyWith(fontSize: 22),
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.pop(context);
+                            },
+                            child: Icon(
+                              CupertinoIcons.xmark_circle_fill,
+                              color: Colors.black26,
+                              size: 28,
+                            ),
+                          )
+                        ],
+                      ),
+                      SizedBox(
+                        height: 12,
+                      ),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            AppLocalizations.of(context)
+                                .translate('content-category'),
+                            style: kSubTitlesStyle.copyWith(fontSize: 16),
+                          ),
+                        ],
+                      ),
+                      Container(
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: ChipsChoice<String>.multiple(
+                                padding: EdgeInsets.all(0),
+                                value: selectedSubTypesList,
+                                choiceStyle: C2ChoiceStyle(
+                                    labelStyle: kSubTitlesStyle.copyWith(
+                                        fontSize: 12,
+                                        height: 1,
+                                        color: primaryColor,
+                                        fontWeight: FontWeight.w400),
+                                    borderColor: primaryColor,
+                                    color: primaryColor),
+                                choiceActiveStyle: C2ChoiceStyle(),
+                                onChanged: (val) {
+                                  modalSetState(() => selectedSubTypesList = val);
+                                  setState(() => selectedSubTypesList = val);
+                                },
+                                choiceItems: C2Choice.listFrom<String, String>(
+                                  source: getContentSubTypes(),
+                                  value: (i, v) => v,
+                                  label: (i, v) => v,
+                                  tooltip: (i, v) => v,
+                                ),
+                                wrapped: true,
+                                textDirection: this.lang == "ar"
+                                    ? TextDirection.rtl
+                                    : TextDirection.ltr,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            AppLocalizations.of(context)
+                                .translate('content-type'),
+                            style: kSubTitlesStyle.copyWith(fontSize: 16),
+                          ),
+                        ],
+                      ),
+                      Container(
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: ChipsChoice<String>.multiple(
+                                alignment: WrapAlignment.start,
+                                choiceStyle: C2ChoiceStyle(
+                                    labelStyle: kSubTitlesStyle.copyWith(
+                                        fontSize: 12,
+                                        height: 1,
+                                        color: primaryColor,
+                                        fontWeight: FontWeight.w400),
+                                    borderColor: primaryColor,
+                                    color: primaryColor),
+                                padding: EdgeInsets.all(0),
+                                value: selectedTypesList,
+                                onChanged: (val) {
+                                  modalSetState(() => selectedTypesList = val);
+                                  setState(() => selectedTypesList = val);
+                                },
+                                choiceItems: C2Choice.listFrom<String, String>(
+                                  source: getContentTypes(),
+                                  value: (i, v) => v,
+                                  label: (i, v) => v,
+                                  tooltip: (i, v) => v,
+                                ),
+                                wrapped: true,
+                                placeholderStyle: kSubTitlesStyle,
+                                textDirection: this.lang == "ar"
+                                    ? TextDirection.rtl
+                                    : TextDirection.ltr,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            AppLocalizations.of(context)
+                                .translate('content-language'),
+                            style: kSubTitlesStyle.copyWith(fontSize: 16),
+                          ),
+                        ],
+                      ),
+
+                      Container(
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: ChipsChoice<String>.multiple(
+                                alignment: WrapAlignment.start,
+                                choiceStyle: C2ChoiceStyle(
+                                    labelStyle: kSubTitlesStyle.copyWith(
+                                        fontSize: 12,
+                                        height: 1,
+                                        color: primaryColor,
+                                        fontWeight: FontWeight.w400),
+                                    borderColor: primaryColor,
+                                    color: primaryColor),
+                                padding: EdgeInsets.all(0),
+                                value: selectedLanuguagesList,
+                                onChanged: (val) {
+                                  modalSetState(
+                                          () => selectedLanuguagesList = val);
+                                  setState(() => selectedLanuguagesList = val);
+                                },
+                                choiceItems: C2Choice.listFrom<String, String>(
+                                  source: lanuguagesList,
+                                  value: (i, v) => v,
+                                  label: (i, v) => v,
+                                  tooltip: (i, v) => v,
+                                ),
+                                wrapped: true,
+                                placeholderStyle: kSubTitlesStyle,
+                                textDirection: this.lang == "ar"
+                                    ? TextDirection.rtl
+                                    : TextDirection.ltr,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      SizedBox(
+                        height: 12,
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          GestureDetector(
+                            onTap: () {
+                              filtersService();
+                              Navigator.pop(context);
+                            },
+                            child: Container(
+                              width: MediaQuery.of(context).size.width - 40,
+                              height: 50,
+                              decoration: BoxDecoration(
+                                  color: primaryColor,
+                                  borderRadius: BorderRadius.circular(10.5),
+                                  border: Border.all(width: 0.25)),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    AppLocalizations.of(context)
+                                        .translate('apply-filters'),
+                                    style: kSubTitlesStyle.copyWith(
+                                        color: seconderyColor,
+                                        height: 1,
+                                        fontSize: 16),
+                                  )
+                                ],
+                              ),
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(
-                      height: 20,
-                    )
-                  ],
-                ),
+                        ],
+                      ),
+                      SizedBox(
+                        height: 20,
+                      )
+                    ],
+                  ),
+                )
               ),
             ));
   }

@@ -8,15 +8,12 @@ import 'package:reboot_app_3/Screens/Home/%D9%90Explore/ExploreScreen.dart';
 import 'package:reboot_app_3/Screens/Home/%D9%90Explore/TutorialPage.dart';
 import 'package:reboot_app_3/Services/Constants.dart';
 import 'package:flutter/foundation.dart';
-import 'package:reboot_app_3/Services/ContentLoadServices.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../Localization.dart';
 
 class TutorialsScreen extends StatefulWidget {
-  const TutorialsScreen({
-    Key key,
-    @required this.tutorialList})
+  const TutorialsScreen({Key key, @required this.tutorialList})
       : super(key: key);
 
   final List<Tutorial> tutorialList;
@@ -44,7 +41,6 @@ class _TutorialsScreenState extends State<TutorialsScreen> {
 
   final TextEditingController searchTextEditor = TextEditingController();
 
-
   void getSelectedLocale() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String _languageCode = await prefs.getString("languageCode");
@@ -52,7 +48,6 @@ class _TutorialsScreenState extends State<TutorialsScreen> {
       lang = _languageCode;
     });
   }
-
 
   List<Tutorial> fillterdContentList = [];
   // ignore: unused_field
@@ -65,13 +60,9 @@ class _TutorialsScreenState extends State<TutorialsScreen> {
     super.initState();
     getSelectedLocale();
 
-
     setState(() {
       fillterdContentList = widget.tutorialList;
     });
-
-
-
   }
 
   @override
@@ -136,7 +127,7 @@ class _TutorialsScreenState extends State<TutorialsScreen> {
                       ),
                       border: InputBorder.none,
                       hintText:
-                      AppLocalizations.of(context).translate('search'),
+                          AppLocalizations.of(context).translate('search'),
                       hintStyle: kSubTitlesSubsStyle.copyWith(
                           fontSize: 14,
                           color: Colors.grey.withOpacity(0.8),
@@ -147,8 +138,9 @@ class _TutorialsScreenState extends State<TutorialsScreen> {
                       _debouncer.run(() {
                         setState(() {
                           fillterdContentList = widget.tutorialList
-                              .where((content) =>
-                                (content.title.toLowerCase().contains(value.toLowerCase())))
+                              .where((content) => (content.title
+                                  .toLowerCase()
+                                  .contains(value.toLowerCase())))
                               .toList();
                         });
                       });
@@ -158,9 +150,7 @@ class _TutorialsScreenState extends State<TutorialsScreen> {
               ],
             ),
           ),
-          SizedBox(
-            height: 12,
-          ),
+
           Expanded(
             child: Container(
               height: double.infinity,
@@ -193,8 +183,6 @@ class _TutorialsScreenState extends State<TutorialsScreen> {
       ),
     );
   }
-
-
 }
 
 class TutorialWidget extends StatelessWidget {
@@ -251,19 +239,7 @@ class TutorialWidget extends StatelessWidget {
                             SizedBox(
                               height: 5,
                             ),
-                            Row(
-                              children: [
-                                Flexible(
-                                  child: Text(
-                                    "articale.breif",
-                                    style: kSubTitlesStyle.copyWith(
-                                        color: primaryColor,
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w400),
-                                  ),
-                                ),
-                              ],
-                            ),
+
                           ]),
                     )
                   ]),

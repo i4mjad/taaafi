@@ -231,7 +231,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 children: [
                   Text(
                     AppLocalizations.of(context)
-                        .translate('porn-addiction-recovery'),
+                        .translate('nofap-content'),
                     style: kSubTitlesStyle,
                   ),
                 ],

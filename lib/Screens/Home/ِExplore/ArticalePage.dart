@@ -59,14 +59,22 @@ class _ArticlePageState extends State<ArticlePage> {
                             : CupertinoIcons.arrow_right_circle,
                         size: 28,
                       ),
-                      SizedBox(height: 8),
-                      Text(
-                        widget.articale.title,
-                        style:
-                            kPageTitleStyle.copyWith(height: 1, fontSize: 28),
-                      ),
                     ],
                   ),
+                ],
+              ),
+            ),
+            SizedBox(height: 8),
+            Container(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Flexible(
+                      child: Text(
+                        widget.articale.title,
+                        style: kPageTitleStyle.copyWith(height: 1, fontSize: 28),
+                      ))
                 ],
               ),
             ),

@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:reboot_app_3/Screens/Auth/LoginPage.dart';
+import 'package:reboot_app_3/Screens/FollowYourReboot/Notes/NotesPage.dart';
 import 'package:reboot_app_3/Services/BottomNavbar.dart';
 import 'package:reboot_app_3/Localization.dart';
 import 'package:reboot_app_3/Services/RoutesName.dart';
@@ -696,6 +697,36 @@ class _FollowYourRebootScreenState extends State<FollowYourRebootScreen>
                                 ),
                               ),
                               SizedBox(height: 8),
+                              GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => NotesScreen()));
+                                },
+                                child: Container(
+                                  width:
+                                      (MediaQuery.of(context).size.width - 40),
+                                  height: 50,
+                                  decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(10),
+                                      border: Border.all(color: primaryColor)),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        AppLocalizations.of(context)
+                                            .translate('dairies'),
+                                        style: kSubTitlesStyle.copyWith(
+                                            fontSize: 20,
+                                            color: primaryColor,
+                                            fontWeight: FontWeight.w400,
+                                            height: 1),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
                             ],
                           ),
                         ),
@@ -785,7 +816,7 @@ class _FollowYourRebootScreenState extends State<FollowYourRebootScreen>
                                 padding: EdgeInsets.all(20),
                                 width: MediaQuery.of(context).size.width - 40,
                                 height:
-                                    MediaQuery.of(context).size.height * 0.20,
+                                    MediaQuery.of(context).size.height * 0.225,
                                 decoration: BoxDecoration(
                                     color: accentColor.withOpacity(0.1),
                                     borderRadius: BorderRadius.circular(12.5)),
@@ -1134,10 +1165,10 @@ class _FollowYourRebootScreenState extends State<FollowYourRebootScreen>
                                 height: 12,
                               ),
                               Container(
-                                padding: EdgeInsets.all(12),
+                                padding: EdgeInsets.all(20),
                                 width: MediaQuery.of(context).size.width - 40,
                                 height:
-                                    MediaQuery.of(context).size.height * 0.235,
+                                    MediaQuery.of(context).size.height * 0.25,
                                 decoration: BoxDecoration(
                                   color: Colors.brown.withOpacity(0.3),
                                   borderRadius: BorderRadius.circular(12.5),
@@ -1175,9 +1206,6 @@ class _FollowYourRebootScreenState extends State<FollowYourRebootScreen>
                                         ),
                                       ],
                                     ),
-                                    SizedBox(
-                                      height: 8,
-                                    ),
                                     Row(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.center,
@@ -1194,7 +1222,7 @@ class _FollowYourRebootScreenState extends State<FollowYourRebootScreen>
                                                       .toString()
                                                   : "0.00",
                                               style: kSubTitlesStyle.copyWith(
-                                                  fontSize: 28,
+                                                  fontSize: 24,
                                                   color: Colors.brown,
                                                   fontWeight: FontWeight.w400),
                                             ),
@@ -1218,7 +1246,7 @@ class _FollowYourRebootScreenState extends State<FollowYourRebootScreen>
                                                       .toString()
                                                   : "0.00",
                                               style: kSubTitlesStyle.copyWith(
-                                                  fontSize: 28,
+                                                  fontSize: 24,
                                                   color: Colors.brown,
                                                   fontWeight: FontWeight.w400),
                                             ),
@@ -1242,7 +1270,7 @@ class _FollowYourRebootScreenState extends State<FollowYourRebootScreen>
                                                       .toString()
                                                   : "0.00",
                                               style: kSubTitlesStyle.copyWith(
-                                                  fontSize: 28,
+                                                  fontSize: 24,
                                                   color: Colors.brown,
                                                   fontWeight: FontWeight.w400),
                                             ),
@@ -1259,10 +1287,10 @@ class _FollowYourRebootScreenState extends State<FollowYourRebootScreen>
                                       ],
                                     ),
                                     SizedBox(
-                                      height: 8,
+                                      height: 4,
                                     ),
                                     Padding(
-                                      padding: EdgeInsets.all(8.0),
+                                      padding: EdgeInsets.all(4.0),
                                       child: Container(
                                         child: Row(
                                           crossAxisAlignment:
@@ -1279,7 +1307,7 @@ class _FollowYourRebootScreenState extends State<FollowYourRebootScreen>
                                               style: kSubTitlesStyle.copyWith(
                                                   color: Colors.brown,
                                                   fontSize: 12,
-                                                  fontWeight: FontWeight.w500),
+                                                  fontWeight: FontWeight.w400),
                                             ))
                                           ],
                                         ),

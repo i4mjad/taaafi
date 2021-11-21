@@ -6,7 +6,6 @@ import 'package:reboot_app_3/Model/Articles.dart';
 import 'package:reboot_app_3/Screens/Home/%D9%90Explore/ExploreScreen.dart';
 import 'package:reboot_app_3/Services/Constants.dart';
 import 'package:flutter/foundation.dart';
-import 'package:reboot_app_3/Services/ContentLoadServices.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../Localization.dart';
@@ -40,7 +39,6 @@ class _ArticlesScreenState extends State<ArticlesScreen> {
 
   final TextEditingController searchTextEditor = TextEditingController();
 
-
   void getSelectedLocale() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String _languageCode = await prefs.getString("languageCode");
@@ -48,7 +46,6 @@ class _ArticlesScreenState extends State<ArticlesScreen> {
       lang = _languageCode;
     });
   }
-
 
   List<Article> fillterdContentList = [];
   // ignore: unused_field
@@ -128,7 +125,7 @@ class _ArticlesScreenState extends State<ArticlesScreen> {
                       ),
                       border: InputBorder.none,
                       hintText:
-                      AppLocalizations.of(context).translate('search'),
+                          AppLocalizations.of(context).translate('search'),
                       hintStyle: kSubTitlesSubsStyle.copyWith(
                           fontSize: 14,
                           color: Colors.grey.withOpacity(0.8),
@@ -139,11 +136,12 @@ class _ArticlesScreenState extends State<ArticlesScreen> {
                       _debouncer.run(() {
                         setState(() {
                           fillterdContentList = widget.articlesList
-                              .where((content) =>
-                          (content.title.toLowerCase().contains(value.toLowerCase()) ||
-                          content.author.toLowerCase().contains(value.toLowerCase()))
-
-                          )
+                              .where((content) => (content.title
+                                      .toLowerCase()
+                                      .contains(value.toLowerCase()) ||
+                                  content.author
+                                      .toLowerCase()
+                                      .contains(value.toLowerCase())))
                               .toList();
                         });
                       });
@@ -153,15 +151,13 @@ class _ArticlesScreenState extends State<ArticlesScreen> {
               ],
             ),
           ),
-
           Expanded(
             child: Container(
               height: double.infinity,
               child: Column(
                 children: [
-                  Expanded(
-                      child: Builder(builder: (context) {
-                        return Padding(
+                  Expanded(child: Builder(builder: (context) {
+                    return Padding(
                       padding: EdgeInsets.only(
                         top: 20.0,
                       ),

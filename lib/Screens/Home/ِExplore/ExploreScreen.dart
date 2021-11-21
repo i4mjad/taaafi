@@ -85,11 +85,12 @@ class _ExploreScreenState extends State<ExploreScreen> {
 
   @override
   void initState() {
-    getTutorials();
-    getAtricles();
     super.initState();
     getSelectedLocale();
-
+    articalsList.clear();
+    tutorialsList.clear();
+    getTutorials();
+    getAtricles();
   }
 
   @override
@@ -246,7 +247,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
                   ));
                 } else {
                   return Container(
-                    height: MediaQuery.of(context).size.height * 0.15,
+                    height: MediaQuery.of(context).size.height * 0.20,
                     width: MediaQuery.of(context).size.width,
                     child: Padding(
                       padding: lang == 'ar'
@@ -388,7 +389,7 @@ class TutorialsCard extends StatelessWidget {
             : EdgeInsets.only(left: 20.0),
         child: Container(
           padding: EdgeInsets.all(12),
-          width: (MediaQuery.of(context).size.width - 40) / 3.5 - 4,
+          width: (MediaQuery.of(context).size.width - 40) / 3 - 4,
           decoration: BoxDecoration(
             border:
                 Border.all(color: primaryColor.withOpacity(0.3), width: 0.25),
@@ -401,7 +402,7 @@ class TutorialsCard extends StatelessWidget {
                   alignment:
                       lang == 'ar' ? Alignment.topRight : Alignment.topLeft,
                   child: Container(
-                      padding: EdgeInsets.all(8),
+                      padding: EdgeInsets.all(12),
                       decoration: BoxDecoration(
                           color: seconderyColor,
                           borderRadius: BorderRadius.circular(10.5)),
