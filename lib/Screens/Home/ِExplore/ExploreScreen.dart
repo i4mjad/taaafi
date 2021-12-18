@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
@@ -16,7 +15,13 @@ import 'ArticalePage.dart';
 import 'TutorialPage.dart';
 
 class ExploreScreen extends StatefulWidget {
-  const ExploreScreen({Key key}) : super(key: key);
+  List<Article> articalsList;
+  List<Tutorial> tutorialsList;
+  ExploreScreen({
+    Key key,
+    this.articalsList,
+    this.tutorialsList
+  }) : super(key: key);
 
   @override
   _ExploreScreenState createState() => _ExploreScreenState();
@@ -32,65 +37,13 @@ class _ExploreScreenState extends State<ExploreScreen> {
     });
   }
 
-  FirebaseFirestore database = FirebaseFirestore.instance;
-  List<Article> articalsList = [];
-  List<Tutorial> tutorialsList = [];
 
-  getAtricles() async {
-    final dataPath = database.collection("fl_content");
-    List<Article> _articles = [];
-    dataPath.snapshots().listen((data) async{
-      for (var entry in data.docs) {
-        if (entry["_fl_meta_"]["schema"] == "posts") {
-          final newArticale = new Article(
-            entry["title"],
-            entry["date"].toString().substring(0, 10),
-            entry["author"],
-            entry["timeToRead"].toString(),
-            entry["breif"],
-            entry["postBody"],
-          );
-          _articles.add(newArticale);
-        }
-      }
-    });
-
-    setState(() {
-      articalsList = _articles;
-    });
-  }
-  getTutorials() async {
-    final dataPath = database.collection("fl_content");
-      List<Tutorial> _tutorials = [];
-    dataPath.snapshots().listen((data) async {
-
-      for (var entry in data.docs) {
-        if (entry["_fl_meta_"]["schema"] == "tutorials") {
-
-          final newTutorial = new Tutorial(
-            entry["title"],
-            entry["date"].toString().substring(0, 10),
-            entry["author"],
-            entry["body"],
-          );
-          _tutorials.add(newTutorial);
-        }
-      }
-    });
-
-    setState(() {
-      tutorialsList = _tutorials;
-    });
-  }
 
   @override
   void initState() {
     super.initState();
     getSelectedLocale();
-    articalsList.clear();
-    tutorialsList.clear();
-    getTutorials();
-    getAtricles();
+
   }
 
   @override
@@ -210,7 +163,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
                           context,
                           MaterialPageRoute(
                               builder: (context) => TutorialsScreen(
-                                  tutorialList: tutorialsList)));
+                                  tutorialList: widget.tutorialsList)));
                     },
                     child: Row(
                       children: [
@@ -236,10 +189,9 @@ class _ExploreScreenState extends State<ExploreScreen> {
               ),
             ),
 
-            FutureBuilder(
-              future: getTutorials(),
-              builder: (BuildContext context, AsyncSnapshot snap) {
-                if (articalsList.length == 0) {
+            Builder(
+              builder: (BuildContext context) {
+                if (widget.articalsList.length == 0) {
                   return Center(
                       child: Text(
                     AppLocalizations.of(context).translate('loading'),
@@ -262,7 +214,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
                                 itemBuilder: (BuildContext context, int index) {
                                   return TutorialsCard(
                                     lang: lang,
-                                    item: tutorialsList[index],
+                                    item: widget.tutorialsList[index],
                                   );
                                 });
                           })),
@@ -271,7 +223,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
                     ),
                   );
                 }
-              },
+              }
             ),
 
             SizedBox(
@@ -292,7 +244,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
                           context,
                           MaterialPageRoute(
                               builder: (context) =>
-                                  ArticlesScreen(articlesList: articalsList)));
+                                  ArticlesScreen(articlesList: widget.articalsList)));
                     },
                     child: Row(
                       children: [
@@ -321,10 +273,9 @@ class _ExploreScreenState extends State<ExploreScreen> {
               height: 12,
             ),
             //post widget
-            FutureBuilder(
-              future: getAtricles(),
-              builder: (BuildContext context, AsyncSnapshot snap) {
-                if (articalsList.length == 0) {
+            Builder(
+              builder: (BuildContext context) {
+                if (widget.articalsList.length == 0) {
                   return Center(
                       child: Text(
                     AppLocalizations.of(context).translate('loading'),
@@ -338,13 +289,13 @@ class _ExploreScreenState extends State<ExploreScreen> {
                       child: Column(
                         children: [
                           PostWidget(
-                            articale: articalsList[articalsList.length - 1],
+                            articale: widget.articalsList[widget.articalsList.length - 1],
                           ),
                           PostWidget(
-                            articale: articalsList[articalsList.length - 2],
+                            articale: widget.articalsList[widget.articalsList.length - 2],
                           ),
                           PostWidget(
-                            articale: articalsList[articalsList.length - 3],
+                            articale: widget.articalsList[widget.articalsList.length - 3],
                           ),
                         ],
                       ),

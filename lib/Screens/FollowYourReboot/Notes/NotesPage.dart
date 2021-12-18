@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import 'package:reboot_app_3/screens/FollowYourReboot/Notes/AddNoteScreen.dart';
-import 'package:reboot_app_3/screens/FollowYourReboot/FollowYourRebootScreen.dart';
 
 import 'package:reboot_app_3/Localization.dart';
 

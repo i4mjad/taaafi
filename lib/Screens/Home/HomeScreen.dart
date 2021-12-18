@@ -1,9 +1,12 @@
 import 'dart:io';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:reboot_app_3/Localization.dart';
+import 'package:reboot_app_3/Model/Articles.dart';
+import 'package:reboot_app_3/Model/Tutorial.dart';
 import 'package:reboot_app_3/Screens/Home/%D9%90Explore/ExploreScreen.dart';
 import 'package:reboot_app_3/Screens/Home/CategoriesCard.dart';
 import 'package:reboot_app_3/Services/Constants.dart';
@@ -30,6 +33,52 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       lang = _languageCode;
     });
   }
+  FirebaseFirestore database = FirebaseFirestore.instance;
+
+  Future<List<Article>> getAtricles() async {
+    final dataPath = database.collection("fl_content");
+    List<Article> _articles = [];
+    dataPath.snapshots().listen((data) async{
+      for (var entry in data.docs) {
+        if (entry["_fl_meta_"]["schema"] == "posts") {
+          final newArticale = new Article(
+            entry["title"],
+            entry["date"].toString().substring(0, 10),
+            entry["author"],
+            entry["timeToRead"].toString(),
+            entry["breif"],
+            entry["postBody"],
+          );
+          _articles.add(newArticale);
+        }
+      }
+    });
+
+    return _articles;
+  }
+  Future<List<Tutorial>> getTutorials() async {
+    final dataPath = database.collection("fl_content");
+    List<Tutorial> _tutorials = [];
+    dataPath.snapshots().listen((data) async {
+
+      for (var entry in data.docs) {
+        if (entry["_fl_meta_"]["schema"] == "tutorials") {
+
+          final newTutorial = new Tutorial(
+            entry["title"],
+            entry["date"].toString().substring(0, 10),
+            entry["author"],
+            entry["body"],
+          );
+          _tutorials.add(newTutorial);
+        }
+      }
+    });
+
+    return _tutorials;
+  }
+
+
 
   @override
   void initState() {
@@ -90,11 +139,13 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   ),
                   SizedBox(height: 12),
                   GestureDetector(
-                    onTap: () {
+                    onTap: () async{
+                      var tutorialList = await getTutorials();
+                      var articalesList = await getAtricles();
                       Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => ExploreScreen()));
+                              builder: (context) => ExploreScreen(tutorialsList: tutorialList, articalsList: articalesList,)));
                     },
                     child: Container(
                       width: MediaQuery.of(context).size.width - 20,

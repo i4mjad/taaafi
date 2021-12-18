@@ -331,9 +331,7 @@ class _FollowYourRebootScreenState extends State<FollowYourRebootScreen>
       oldMasts.add(date);
     }
 
-    final userFirstDate = resetDay != null
-        ? resetDay
-        : regDate.add(Duration(days: userPreviousStreak));
+    final userFirstDate = resetDay != null ? resetDay: regDate.add(Duration(days: userPreviousStreak));
 
     List<DateTime> calculateDaysInterval(DateTime startDate, DateTime endDate) {
       List<DateTime> days = [];
@@ -348,13 +346,13 @@ class _FollowYourRebootScreenState extends State<FollowYourRebootScreen>
 
       if (oldRelapses.contains(dateD)) {
         daysArray.add(new Day(type: "Relapse", date: date, color: Colors.red));
-      } else if (oldWatches.contains(dateD) && oldRelapses.contains(dateD)) {
-        daysArray.add(
-            new Day(type: "Watching Porn", date: date, color: Colors.purple));
-      } else if (oldMasts.contains(dateD) && oldRelapses.contains(dateD)) {
+      } else if (oldWatches.contains(dateD) && !oldRelapses.contains(dateD)) {
+        daysArray.add(new Day(type: "Watching Porn", date: date, color: Colors.purple));
+      } else if (oldMasts.contains(dateD) && !oldRelapses.contains(dateD)) {
         daysArray.add(
             new Day(type: "Masturbating", date: date, color: Colors.orange));
-      } else {
+      }
+      else {
         daysArray
             .add(new Day(type: "Success", date: date, color: Colors.green));
       }
