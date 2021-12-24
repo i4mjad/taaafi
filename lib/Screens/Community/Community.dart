@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:reboot_app_3/Localization.dart';
 import 'package:reboot_app_3/Services/Constants.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 
 
@@ -79,8 +80,26 @@ class CommunityPage extends StatelessWidget {
                         ],
                       ),
                     ),
+                    SizedBox(height: 60,),
+                    InkWell(
+                      onTap: () => launch('mailto:ta3afiapp@gmail.com'),
+                      child: Container(
+                        padding: EdgeInsets.fromLTRB(28, 12, 28, 12),
+                        decoration: BoxDecoration(
+                            color: accentColor.withOpacity(0.15),
+                            borderRadius: BorderRadius.circular(10.5)
+                        ),
+                        child: Text(
+                          AppLocalizations.of(context).translate("share-suggestion"),
+                          style: kSubTitlesStyle.copyWith(
+                              color: accentColor,
+                              fontSize: 12,
+                              height: 1
+                          ),
+                        ),
+                      ),
+                    ),
                     SizedBox(height: 20,),
-
 
 
                   ]
