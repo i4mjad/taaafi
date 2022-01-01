@@ -437,56 +437,6 @@ class _AboutScreenState extends State<AboutScreen>
                     ),
                   ),
                   SizedBox(
-                    height: 8,
-                  ),
-                  //subsctipon tip
-                  GestureDetector(
-                    onTap: () {
-                      PaymentServices.purchasePackage(offers[4]);
-                    },
-                    child: Container(
-                      child: Column(
-                        children: [
-                          Container(
-                            padding: EdgeInsets.all(12),
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                  begin: Alignment.bottomLeft,
-                                  end: Alignment.topRight,
-                                  colors: [primaryColor, accentColor]),
-                              borderRadius: BorderRadius.circular(12.5),
-                            ),
-                            child: Row(
-                              children: [
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text("💚"),
-                                    SizedBox(
-                                      width: 8,
-                                    ),
-                                    Text(
-                                      AppLocalizations.of(context)
-                                          .translate('subscription-tip'),
-                                      style: kSubTitlesStyle.copyWith(
-                                          fontSize: 14, color: Colors.white),
-                                    )
-                                  ],
-                                ),
-                                Spacer(),
-                                Text(
-                                  lang != 'ar' ? '\u0024 4.99' : '4.99 \u0024',
-                                  style: TextStyle(color: Colors.white),
-                                )
-                              ],
-                            ),
-                          )
-                        ],
-                      ),
-                    ),
-                  ),
-                  SizedBox(
                     height: 20,
                   )
                 ],
