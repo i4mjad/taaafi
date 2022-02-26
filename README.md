@@ -1,4 +1,4 @@
-# ُTa3afi App
+# Ta3afi App
 
 Overcome the porn addiction
 
