@@ -200,12 +200,12 @@ class _ContentPageState extends State<ContentPage> {
                       color: (selectedSubTypesList.length > 0 ||
                               selectedSubTypesList.length > 0 ||
                               selectedLanuguagesList.length > 0)
-                          ? Colors.greenAccent
+                          ? Colors.green
                           : primaryColor.withOpacity(0.3),
                       width: (selectedSubTypesList.length > 0 ||
                               selectedSubTypesList.length > 0 ||
                               selectedLanuguagesList.length > 0)
-                          ? 1
+                          ? 0.75
                           : 0.5,
                     ),
                   ),
@@ -287,6 +287,7 @@ class _ContentPageState extends State<ContentPage> {
   void _showFilters() {
     showModalBottomSheet(
         context: context,
+        isScrollControlled: true,
         builder: (_) => StatefulBuilder(
               builder: (modalContext, modalSetState) => Padding(
                 padding: EdgeInsets.fromLTRB(20, 8, 20, 8),
@@ -349,7 +350,7 @@ class _ContentPageState extends State<ContentPage> {
                                 value: selectedSubTypesList,
                                 choiceStyle: C2ChoiceStyle(
                                     labelStyle: kSubTitlesStyle.copyWith(
-                                        fontSize: 12,
+                                        fontSize: 10.5,
                                         height: 1,
                                         color: primaryColor,
                                         fontWeight: FontWeight.w400),
@@ -393,7 +394,7 @@ class _ContentPageState extends State<ContentPage> {
                                 alignment: WrapAlignment.start,
                                 choiceStyle: C2ChoiceStyle(
                                     labelStyle: kSubTitlesStyle.copyWith(
-                                        fontSize: 12,
+                                        fontSize: 10.5,
                                         height: 1,
                                         color: primaryColor,
                                         fontWeight: FontWeight.w400),
@@ -440,7 +441,7 @@ class _ContentPageState extends State<ContentPage> {
                                 alignment: WrapAlignment.start,
                                 choiceStyle: C2ChoiceStyle(
                                     labelStyle: kSubTitlesStyle.copyWith(
-                                        fontSize: 12,
+                                        fontSize: 10.5,
                                         height: 1,
                                         color: primaryColor,
                                         fontWeight: FontWeight.w400),
@@ -665,40 +666,46 @@ class ContentCard extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Row(
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Container(
-                        padding: EdgeInsets.fromLTRB(12, 8, 12, 8),
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(8),
-                            color: Colors.green.withOpacity(0.2)),
-                        child: Text(content.contentType,
-                            style: kSubTitlesSubsStyle.copyWith(
-                                fontSize: 12, height: 1, color: Colors.green)),
+                      Row(
+                        children: [
+                          Icon(Iconsax.archive_book, size: 18, color: Colors.green,),
+                          SizedBox(width: 4,),
+                          Text(content.contentType,
+                              style: kSubTitlesSubsStyle.copyWith(
+                                  fontSize: 12, height: 1, color: Colors.green)),
+                        ],
                       ),
                       SizedBox(
-                        width: 10,
+                        height: 10,
                       ),
-                      Container(
-                        padding: EdgeInsets.fromLTRB(12, 8, 12, 8),
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(8),
-                            color: Colors.purple.withAlpha(20)),
-                        child: Text(content.contentSubType,
-                            style: kSubTitlesSubsStyle.copyWith(
-                                fontSize: 12, height: 1, color: Colors.purple)),
-                      )
+                      Row(
+                        children: [
+                          Icon(Iconsax.bill, size: 18, color: Colors.purple,),
+                          SizedBox(width: 4,),
+                          Text(content.contentSubType,
+                              style: kSubTitlesSubsStyle.copyWith(
+                                  fontSize: 12, height: 1, color: Colors.purple)),
+                        ],
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Row(
+                        children: [
+                          Icon(Iconsax.language_circle, size: 18, color: Colors.black,),
+                          SizedBox(width: 4,),
+                          Text(content.contentLanguage,
+                              style: kSubTitlesSubsStyle.copyWith(
+                                  fontSize: 12, height: 1, color: Colors.black)),
+                        ],
+                      ),
+
                     ],
                   ),
-                  Container(
-                    padding: EdgeInsets.fromLTRB(12, 8, 12, 8),
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(8),
-                        color: Colors.black12),
-                    child: Text(content.contentLanguage,
-                        style: kSubTitlesSubsStyle.copyWith(
-                            fontSize: 12, height: 1, color: Colors.black)),
-                  )
                 ],
               ),
             )
