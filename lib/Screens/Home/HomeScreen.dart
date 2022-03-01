@@ -7,7 +7,6 @@ import 'package:lottie/lottie.dart';
 import 'package:reboot_app_3/Localization.dart';
 import 'package:reboot_app_3/Model/Articles.dart';
 import 'package:reboot_app_3/Model/Tutorial.dart';
-import 'package:reboot_app_3/Screens/Home/%D9%90Explore/ExploreScreen.dart';
 import 'package:reboot_app_3/Screens/Home/CategoriesCard.dart';
 import 'package:reboot_app_3/Services/Constants.dart';
 import 'package:reboot_app_3/screens/FollowYourReboot/FollowYourRebootScreen.dart';
@@ -129,49 +128,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               ),
               SizedBox(
                 height: 20,
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    AppLocalizations.of(context).translate('explore'),
-                    style: kSubTitlesStyle,
-                  ),
-                  SizedBox(height: 12),
-                  GestureDetector(
-                    onTap: () async{
-                      var tutorialList = await getTutorials();
-                      var articalesList = await getAtricles();
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => ExploreScreen(tutorialsList: tutorialList, articalsList: articalesList,)));
-                    },
-                    child: Container(
-                      width: MediaQuery.of(context).size.width - 20,
-                      height: 75,
-                      decoration: BoxDecoration(
-                          color: Colors.white,
-                          border: Border.all(color: primaryColor.withOpacity(0.5), width: 0.25),
-                          borderRadius: BorderRadius.circular(12.5)),
-                      child: Center(
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              AppLocalizations.of(context)
-                                  .translate("explore-p"),
-                              style: kSubTitlesSubsStyle.copyWith(
-                                  height: 1.25,
-                                  color: primaryColor,
-                                  fontWeight: FontWeight.w500),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  )
-                ],
               ),
               SizedBox(
                 height: 20,
