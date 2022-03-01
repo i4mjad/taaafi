@@ -262,7 +262,8 @@ class _AccountScreenState extends State<AccountScreen>
     final userData = database.collection('users').doc('${user.uid}');
 
     userData.snapshots().listen((snapshot) async {
-      if (snapshot.data().containsValue("resetedDate") != false) {
+      final resetedDate = await snapshot.data().containsValue("resetedDate");
+      if ( resetedDate != false) {
         final getDate = await snapshot.get("resetedDate");
         final date = parseTime(getDate);
         final dateStr = date.toString().substring(0, 10);
