@@ -5,12 +5,6 @@ import 'package:reboot_app_3/Localization.dart';
 import 'package:reboot_app_3/Services/Constants.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-
-
-
-
-
-
 class CommunityPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
