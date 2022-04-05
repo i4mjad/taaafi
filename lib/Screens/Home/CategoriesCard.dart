@@ -1,10 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:reboot_app_3/Services/Constants.dart';
+import 'package:reboot_app_3/Screens/Ta3afiLiberary/Widgets/ContentPage.dart';
+import 'package:reboot_app_3/Shared/Constants.dart';
 
 import '../../Localization.dart';
-import 'ContentPage.dart';
 
 class CategoriesCards extends StatelessWidget {
   @override
@@ -60,7 +60,7 @@ class CategoriesCards extends StatelessWidget {
               GestureDetector(
                 onTap: () {
                   Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => ContentPage()));
+                      MaterialPageRoute(builder: (context) => ContentScreen()));
                 },
                 child: Container(
                     width: MediaQuery.of(context).size.width * 0.40,

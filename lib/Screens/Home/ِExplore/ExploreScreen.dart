@@ -5,8 +5,8 @@ import 'package:reboot_app_3/Model/Articles.dart';
 import 'package:reboot_app_3/Model/Tutorial.dart';
 import 'package:reboot_app_3/Screens/Home/%D9%90Explore/ArticlesScreen.dart';
 import 'package:reboot_app_3/Screens/Home/%D9%90Explore/TutorialsList.dart';
-import 'package:reboot_app_3/Services/BottomNavbar.dart';
-import 'package:reboot_app_3/Services/Constants.dart';
+import 'package:reboot_app_3/Shared/Components/BottomNavbar.dart';
+import 'package:reboot_app_3/Shared/Constants.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 

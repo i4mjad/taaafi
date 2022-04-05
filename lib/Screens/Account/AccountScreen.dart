@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:reboot_app_3/Auth/AuthenticationService.dart';
 import 'package:reboot_app_3/Screens/Auth/LoginPage.dart';
-import 'package:reboot_app_3/Services/Constants.dart';
+import 'package:reboot_app_3/Shared/Constants.dart';
 import 'package:reboot_app_3/Localization.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:reboot_app_3/main.dart';

@@ -4,7 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:reboot_app_3/Model/Articles.dart';
 import 'package:reboot_app_3/Screens/Home/%D9%90Explore/ExploreScreen.dart';
-import 'package:reboot_app_3/Services/Constants.dart';
+import 'package:reboot_app_3/Shared/Constants.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 

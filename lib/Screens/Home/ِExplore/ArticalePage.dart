@@ -5,7 +5,7 @@ import 'package:flutter_html/style.dart';
 import 'package:reboot_app_3/Localization.dart';
 import 'package:reboot_app_3/Model/Articles.dart';
 import 'package:reboot_app_3/Screens/Home/%D9%90Explore/ExploreScreen.dart';
-import 'package:reboot_app_3/Services/Constants.dart';
+import 'package:reboot_app_3/Shared/Constants.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 // ignore: must_be_immutable

@@ -5,7 +5,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:iconsax/iconsax.dart';
 
 import 'package:reboot_app_3/Auth/AuthenticationService.dart';
-import 'package:reboot_app_3/Services/Constants.dart';
+import 'package:reboot_app_3/Shared/Constants.dart';
 import 'package:reboot_app_3/Localization.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import '../../Auth/AuthenticationService.dart';

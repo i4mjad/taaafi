@@ -6,7 +6,7 @@ import 'package:iconsax/iconsax.dart';
 import 'package:reboot_app_3/Model/Tutorial.dart';
 import 'package:reboot_app_3/Screens/Home/%D9%90Explore/ExploreScreen.dart';
 import 'package:reboot_app_3/Screens/Home/%D9%90Explore/TutorialPage.dart';
-import 'package:reboot_app_3/Services/Constants.dart';
+import 'package:reboot_app_3/Shared/Constants.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 

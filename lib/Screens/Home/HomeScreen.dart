@@ -8,7 +8,7 @@ import 'package:reboot_app_3/Localization.dart';
 import 'package:reboot_app_3/Model/Articles.dart';
 import 'package:reboot_app_3/Model/Tutorial.dart';
 import 'package:reboot_app_3/Screens/Home/CategoriesCard.dart';
-import 'package:reboot_app_3/Services/Constants.dart';
+import 'package:reboot_app_3/Shared/Constants.dart';
 import 'package:reboot_app_3/screens/FollowYourReboot/FollowYourRebootScreen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../main.dart';

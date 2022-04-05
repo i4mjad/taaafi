@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:reboot_app_3/Services/Constants.dart';
+import 'package:reboot_app_3/Shared/Constants.dart';
 
 class ContentPost {
   ContentPost({

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:reboot_app_3/Screens/Community/Community.dart';
-import 'package:reboot_app_3/Services/BottomNavbar.dart';
+import 'package:reboot_app_3/Shared/Components/BottomNavbar.dart';
 import 'package:reboot_app_3/Services/RoutesName.dart';
 import 'package:reboot_app_3/screens/About/AboutScreen.dart';
 import 'package:reboot_app_3/screens/Account/AccountScreen.dart';

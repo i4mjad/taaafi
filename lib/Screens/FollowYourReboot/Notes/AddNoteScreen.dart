@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:reboot_app_3/Services/Constants.dart';
+import 'package:reboot_app_3/Shared/Constants.dart';
 import 'package:reboot_app_3/Localization.dart';
 import 'package:reboot_app_3/screens/FollowYourReboot/Notes/NotesPage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
