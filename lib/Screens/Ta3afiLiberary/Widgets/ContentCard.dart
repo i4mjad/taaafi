@@ -8,7 +8,7 @@ import 'package:reboot_app_3/Shared/Constants.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class ContentCard extends StatelessWidget {
-  Content content;
+  final Content content;
   ContentCard({Key key, this.content}) : super(key: key);
 
   String fixArbicText(String currptedText) {
@@ -99,11 +99,19 @@ class ContentCard extends StatelessWidget {
                     children: [
                       Row(
                         children: [
-                          Icon(Iconsax.archive_book, size: 18, color: Colors.green,),
-                          SizedBox(width: 4,),
+                          Icon(
+                            Iconsax.archive_book,
+                            size: 18,
+                            color: Colors.green,
+                          ),
+                          SizedBox(
+                            width: 4,
+                          ),
                           Text(content.contentType,
                               style: kSubTitlesSubsStyle.copyWith(
-                                  fontSize: 12, height: 1, color: Colors.green)),
+                                  fontSize: 12,
+                                  height: 1,
+                                  color: Colors.green)),
                         ],
                       ),
                       SizedBox(
@@ -111,11 +119,19 @@ class ContentCard extends StatelessWidget {
                       ),
                       Row(
                         children: [
-                          Icon(Iconsax.bill, size: 18, color: Colors.purple,),
-                          SizedBox(width: 4,),
+                          Icon(
+                            Iconsax.bill,
+                            size: 18,
+                            color: Colors.purple,
+                          ),
+                          SizedBox(
+                            width: 4,
+                          ),
                           Text(content.contentSubType,
                               style: kSubTitlesSubsStyle.copyWith(
-                                  fontSize: 12, height: 1, color: Colors.purple)),
+                                  fontSize: 12,
+                                  height: 1,
+                                  color: Colors.purple)),
                         ],
                       ),
                       SizedBox(
@@ -123,14 +139,21 @@ class ContentCard extends StatelessWidget {
                       ),
                       Row(
                         children: [
-                          Icon(Iconsax.language_circle, size: 18, color: Colors.black,),
-                          SizedBox(width: 4,),
+                          Icon(
+                            Iconsax.language_circle,
+                            size: 18,
+                            color: Colors.black,
+                          ),
+                          SizedBox(
+                            width: 4,
+                          ),
                           Text(content.contentLanguage,
                               style: kSubTitlesSubsStyle.copyWith(
-                                  fontSize: 12, height: 1, color: Colors.black)),
+                                  fontSize: 12,
+                                  height: 1,
+                                  color: Colors.black)),
                         ],
                       ),
-
                     ],
                   ),
                 ],

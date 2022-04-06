@@ -186,7 +186,7 @@ class _TutorialsScreenState extends State<TutorialsScreen> {
 }
 
 class TutorialWidget extends StatelessWidget {
-  Tutorial tutorial;
+  final Tutorial tutorial;
   TutorialWidget({Key key, this.tutorial}) : super(key: key);
 
   @override

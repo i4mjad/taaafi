@@ -15,8 +15,8 @@ import 'ArticalePage.dart';
 import 'TutorialPage.dart';
 
 class ExploreScreen extends StatefulWidget {
-  List<Article> articalsList;
-  List<Tutorial> tutorialsList;
+  final List<Article> articalsList;
+  final List<Tutorial> tutorialsList;
   ExploreScreen({
     Key key,
     this.articalsList,
