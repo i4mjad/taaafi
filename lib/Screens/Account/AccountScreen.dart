@@ -454,6 +454,7 @@ class _AccountScreenState extends State<AccountScreen>
   void initState() {
     super.initState();
     loadUserData();
+    
   }
 
   @override

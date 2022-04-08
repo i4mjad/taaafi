@@ -8,7 +8,7 @@ import 'package:reboot_app_3/Screens/Ta3afiLiberary/Services/ContentLoadServices
 import 'dart:convert' show utf8;
 import 'package:reboot_app_3/Shared/Components/BottomNavbar.dart';
 import 'package:reboot_app_3/Shared/Constants.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:reboot_app_3/Shared/LocalizationServices.dart';
 import 'package:chips_choice/chips_choice.dart';
 
 import 'ContentCard.dart';
@@ -36,15 +36,6 @@ class _ContentScreenState extends State<ContentScreen> {
   String fixArbicText(String currptedText) {
     String text = utf8.decode(currptedText.codeUnits);
     return text;
-  }
-
-  void getSelectedLocale() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-
-    String _languageCode = await prefs.getString("languageCode");
-    setState(() {
-      lang = _languageCode;
-    });
   }
 
   loadContent() async {
@@ -92,7 +83,11 @@ class _ContentScreenState extends State<ContentScreen> {
   @override
   void initState() {
     super.initState();
-    getSelectedLocale();
+    LocaleService.getSelectedLocale().then((value) {
+      setState(() {
+        lang = value;
+      });
+    });
 
     fillteredAppContent.clear();
     appContent.clear();

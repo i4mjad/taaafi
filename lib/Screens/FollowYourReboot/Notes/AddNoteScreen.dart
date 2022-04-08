@@ -4,9 +4,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:reboot_app_3/Shared/Constants.dart';
 import 'package:reboot_app_3/Localization.dart';
+import 'package:reboot_app_3/Shared/LocalizationServices.dart';
 import 'package:reboot_app_3/screens/FollowYourReboot/Notes/NotesPage.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
 
 class AddNoteScreen extends StatefulWidget {
   @override
@@ -21,21 +20,14 @@ class _AddNoteScreenState extends State<AddNoteScreen> {
   final user = FirebaseAuth.instance.currentUser;
   String lang;
 
-    void getSelectedLocale() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-
-    
-
-    String _languageCode = await prefs.getString("languageCode");
-    setState(() {
-      lang = _languageCode;
-    });
-  }
-
   @override
   void initState() {
     super.initState();
-    setState(() {});
+    LocaleService.getSelectedLocale().then((value) {
+      setState(() {
+        lang = value;
+      });
+    });
   }
 
   @override
@@ -68,7 +60,9 @@ class _AddNoteScreenState extends State<AddNoteScreen> {
                                     color: mainGrayColor,
                                   ),
                                   child: Icon(
-                                    lang != "ar" ? CupertinoIcons.arrow_left : CupertinoIcons.arrow_right,
+                                    lang != "ar"
+                                        ? CupertinoIcons.arrow_left
+                                        : CupertinoIcons.arrow_right,
                                     size: 20,
                                   ),
                                 ),

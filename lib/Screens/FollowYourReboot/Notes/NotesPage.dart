@@ -25,7 +25,6 @@ class _NotesScreenState extends State<NotesScreen> {
   @override
   void initState() {
     super.initState();
-    setState(() {});
   }
 
   @override

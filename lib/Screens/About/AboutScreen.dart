@@ -5,7 +5,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:reboot_app_3/Shared/Constants.dart';
 import 'package:reboot_app_3/Localization.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:reboot_app_3/Shared/LocalizationServices.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class AboutScreen extends StatefulWidget {
@@ -21,18 +21,14 @@ class _AboutScreenState extends State<AboutScreen>
     with TickerProviderStateMixin {
   String lang;
 
-  void getSelectedLocale() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String _languageCode = await prefs.getString("languageCode");
-    setState(() {
-      lang = _languageCode;
-    });
-  }
-
   @override
   void initState() {
     super.initState();
-    getSelectedLocale();
+    LocaleService.getSelectedLocale().then((value) {
+      setState(() {
+        lang = value;
+      });
+    });
   }
 
   @override
@@ -89,7 +85,6 @@ class _AboutScreenState extends State<AboutScreen>
                       crossAxisAlignment: CrossAxisAlignment.center,
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-
                         InkWell(
                           onTap: () => launch("https://www.i4mjad.com"),
                           child: Container(
@@ -97,11 +92,9 @@ class _AboutScreenState extends State<AboutScreen>
                             width: MediaQuery.of(context).size.width - 40,
                             decoration: BoxDecoration(
                                 color: Colors.white,
-                                borderRadius:
-                                    BorderRadius.circular(12.5),
+                                borderRadius: BorderRadius.circular(12.5),
                                 border: Border.all(
-                                    color:
-                                        primaryColor.withOpacity(0.5),
+                                    color: primaryColor.withOpacity(0.5),
                                     width: 0.25)),
                             child: Center(
                               child: Text(
@@ -110,22 +103,21 @@ class _AboutScreenState extends State<AboutScreen>
                                   style: kSubTitlesSubsStyle.copyWith(
                                       fontSize: 14,
                                       color: primaryColor,
-                                      height: 1)
-
-                              ),
+                                      height: 1)),
                             ),
                           ),
                         ),
-                        SizedBox(height: 12,),
+                        SizedBox(
+                          height: 12,
+                        ),
                         Text(
-                            lang == 'ar' ? 'إذا استفدت من التطبيق, اذكُر والدي - رحمه الله - بدعوة' : '',
+                            lang == 'ar'
+                                ? 'إذا استفدت من التطبيق, اذكُر والدي - رحمه الله - بدعوة'
+                                : '',
                             style: kSubTitlesSubsStyle.copyWith(
                                 fontSize: 12,
                                 color: accentColor.withOpacity(0.7),
-                                height: 1
-
-                            )
-                        ),
+                                height: 1)),
                       ],
                     ),
                   ],

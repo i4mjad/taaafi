@@ -9,6 +9,7 @@ import 'package:reboot_app_3/Model/Articles.dart';
 import 'package:reboot_app_3/Model/Tutorial.dart';
 import 'package:reboot_app_3/Screens/Home/CategoriesCard.dart';
 import 'package:reboot_app_3/Shared/Constants.dart';
+import 'package:reboot_app_3/Shared/LocalizationServices.dart';
 import 'package:reboot_app_3/screens/FollowYourReboot/FollowYourRebootScreen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../main.dart';
@@ -25,19 +26,12 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   String lang;
 
-  void getSelectedLocale() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String _languageCode = await prefs.getString("languageCode");
-    setState(() {
-      lang = _languageCode;
-    });
-  }
   FirebaseFirestore database = FirebaseFirestore.instance;
 
   Future<List<Article>> getAtricles() async {
     final dataPath = database.collection("fl_content");
     List<Article> _articles = [];
-    dataPath.snapshots().listen((data) async{
+    dataPath.snapshots().listen((data) async {
       for (var entry in data.docs) {
         if (entry["_fl_meta_"]["schema"] == "posts") {
           final newArticale = new Article(
@@ -55,14 +49,13 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
     return _articles;
   }
+
   Future<List<Tutorial>> getTutorials() async {
     final dataPath = database.collection("fl_content");
     List<Tutorial> _tutorials = [];
     dataPath.snapshots().listen((data) async {
-
       for (var entry in data.docs) {
         if (entry["_fl_meta_"]["schema"] == "tutorials") {
-
           final newTutorial = new Tutorial(
             entry["title"],
             entry["date"].toString().substring(0, 10),
@@ -77,12 +70,15 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     return _tutorials;
   }
 
-
-
   @override
   void initState() {
     super.initState();
-    getSelectedLocale();
+
+    LocaleService.getSelectedLocale().then((value) {
+      setState(() {
+        lang = value;
+      });
+    });
   }
 
   void dispose() {
@@ -112,16 +108,14 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                       _changeLanguage();
                     },
                     child: Container(
-                        padding: EdgeInsets.all(8),
-
-                        child: Center(
-                            child: Icon(
-                              Platform.isIOS != true ? Icons.settings : CupertinoIcons.settings,
-                              color: primaryColor,
-
-                            )
-                        ),
-
+                      padding: EdgeInsets.all(8),
+                      child: Center(
+                          child: Icon(
+                        Platform.isIOS != true
+                            ? Icons.settings
+                            : CupertinoIcons.settings,
+                        color: primaryColor,
+                      )),
                     ),
                   )
                 ],
@@ -237,8 +231,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Text(
-                    AppLocalizations.of(context)
-                        .translate('nofap-content'),
+                    AppLocalizations.of(context).translate('nofap-content'),
                     style: kSubTitlesStyle,
                   ),
                 ],

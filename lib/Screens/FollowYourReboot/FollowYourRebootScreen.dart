@@ -11,7 +11,7 @@ import 'package:reboot_app_3/Localization.dart';
 import 'package:reboot_app_3/Services/RoutesName.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:reboot_app_3/Shared/LocalizationServices.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 import 'package:reboot_app_3/Shared/Constants.dart';
 import 'package:intl/intl.dart';
@@ -43,15 +43,6 @@ class _FollowYourRebootScreenState extends State<FollowYourRebootScreen>
   var sidebarHidden = true;
 
   String lang;
-
-  void getSelectedLocale() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-
-    String _languageCode = await prefs.getString("languageCode");
-    setState(() {
-      lang = _languageCode;
-    });
-  }
 
   final oldDatabase = FirebaseDatabase.instance.reference();
   FirebaseFirestore database = FirebaseFirestore.instance;
@@ -331,7 +322,9 @@ class _FollowYourRebootScreenState extends State<FollowYourRebootScreen>
       oldMasts.add(date);
     }
 
-    final userFirstDate = resetDay != null ? resetDay: regDate.add(Duration(days: userPreviousStreak));
+    final userFirstDate = resetDay != null
+        ? resetDay
+        : regDate.add(Duration(days: userPreviousStreak));
 
     List<DateTime> calculateDaysInterval(DateTime startDate, DateTime endDate) {
       List<DateTime> days = [];
@@ -347,12 +340,12 @@ class _FollowYourRebootScreenState extends State<FollowYourRebootScreen>
       if (oldRelapses.contains(dateD)) {
         daysArray.add(new Day(type: "Relapse", date: date, color: Colors.red));
       } else if (oldWatches.contains(dateD) && !oldRelapses.contains(dateD)) {
-        daysArray.add(new Day(type: "Watching Porn", date: date, color: Colors.purple));
+        daysArray.add(
+            new Day(type: "Watching Porn", date: date, color: Colors.purple));
       } else if (oldMasts.contains(dateD) && !oldRelapses.contains(dateD)) {
         daysArray.add(
             new Day(type: "Masturbating", date: date, color: Colors.orange));
-      }
-      else {
+      } else {
         daysArray
             .add(new Day(type: "Success", date: date, color: Colors.green));
       }
@@ -474,12 +467,17 @@ class _FollowYourRebootScreenState extends State<FollowYourRebootScreen>
   @override
   void initState() {
     super.initState();
-    getSelectedLocale();
     getData();
     loadUserRelapces();
     loadUserNoPorn();
     loadUserNoMasts();
     dailyStatistics();
+
+    LocaleService.getSelectedLocale().then((value) {
+      setState(() {
+        lang = value;
+      });
+    });
   }
 
   @override

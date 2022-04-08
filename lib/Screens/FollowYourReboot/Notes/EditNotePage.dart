@@ -24,11 +24,9 @@ class _NoteScreenState extends State<NoteScreen> {
   void initState() {
     super.initState();
 
-
     setState(() {
       title.text = (widget.noteToEdit.data() as Map)['title'].toString();
       body.text = (widget.noteToEdit.data() as Map)['body'].toString();
-      
     });
   }
 
@@ -147,7 +145,9 @@ class _NoteScreenState extends State<NoteScreen> {
                             child: TextField(
                               controller: title,
                               style: kSubTitlesStyle.copyWith(
-                          fontSize: 14, height: 1, fontWeight: FontWeight.w400),
+                                  fontSize: 14,
+                                  height: 1,
+                                  fontWeight: FontWeight.w400),
                               decoration: InputDecoration(
                                 prefixIcon: Icon(
                                   CupertinoIcons.pen,
@@ -179,7 +179,9 @@ class _NoteScreenState extends State<NoteScreen> {
                                   child: TextField(
                                     controller: body,
                                     style: kSubTitlesStyle.copyWith(
-                          fontSize: 14, height: 1.3, fontWeight: FontWeight.w400),
+                                        fontSize: 14,
+                                        height: 1.3,
+                                        fontWeight: FontWeight.w400),
                                     maxLines: null,
                                     expands: true,
                                     decoration: InputDecoration(
