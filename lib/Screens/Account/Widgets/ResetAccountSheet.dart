@@ -8,6 +8,7 @@ import 'package:iconsax/iconsax.dart';
 import 'package:reboot_app_3/Localization.dart';
 import 'package:reboot_app_3/Shared/Constants.dart';
 
+//TODO The logic of reseting account data needed to be reviewed since the plan is to change the logic of FollowYourReboot
 class ResetAccountSheet {
 
   static void showResetSheet(BuildContext context) async {
