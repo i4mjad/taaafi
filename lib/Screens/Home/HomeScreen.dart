@@ -252,8 +252,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
   void _changeLanguage() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    //String languageCode = await prefs.getString("languageCode");
-
     showModalBottomSheet(
         context: context,
         builder: (context) {
