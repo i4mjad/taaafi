@@ -3,8 +3,9 @@ import 'package:reboot_app_3/Shared/Constants.dart';
 import 'package:reboot_app_3/main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+class ChangeLanguageWidget {
 
-   void changeLanguage(BuildContext context) async {
+   static void changeLanguage(BuildContext context) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     showModalBottomSheet(
         context: context,
@@ -122,3 +123,4 @@ import 'package:shared_preferences/shared_preferences.dart';
           );
         });
   }
+}
