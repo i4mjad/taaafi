@@ -22,36 +22,3 @@ class ContentServices {
     }
   }
 }
-
-
-
-
-
-
-
-// class BlogServices {
-//   static const String url = 'https://www.ta3afiapp.com/api/blog-data';
-
-//   static Future<List<BlogPost>> getBlogPosts() async {
-//     try {
-//       final response = await http.get(Uri.parse(url));
-//       if (response.statusCode == 200) {
-//         List<BlogPost> list = parseBlogPosts(response.body);
-//         return list;
-//       } else {
-//         throw Exception("Error");
-//       }
-//     } catch (e) {
-//       throw Exception(e.toString());
-//     }
-//   }
-
-//   static List<BlogPost> parseBlogPosts(String responseBody) {
-//     final parsed = json.decode(responseBody).cast<Map<String, dynamic>>();
-//     return parsed.map<BlogPost>((json) => BlogPost.fromJson(json)).toList();
-//   }
-// }
-
-
-
-
