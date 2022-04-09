@@ -3,14 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:reboot_app_3/Model/Articles.dart';
 import 'package:reboot_app_3/Model/Tutorial.dart';
-import 'package:reboot_app_3/Screens/Home/%D9%90Explore/ArticlesScreen.dart';
-import 'package:reboot_app_3/Screens/Home/%D9%90Explore/TutorialsList.dart';
+import 'package:reboot_app_3/Screens/Explore/ArticlesScreen.dart';
+import 'package:reboot_app_3/Screens/Explore/TutorialsList.dart';
+
 import 'package:reboot_app_3/Shared/Components/BottomNavbar.dart';
 import 'package:reboot_app_3/Shared/Constants.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../../Localization.dart';
+import '../../../Shared/Localization.dart';
 import 'ArticalePage.dart';
 import 'TutorialPage.dart';
 

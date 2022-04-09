@@ -4,13 +4,13 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:reboot_app_3/Model/Tutorial.dart';
-import 'package:reboot_app_3/Screens/Home/%D9%90Explore/ExploreScreen.dart';
-import 'package:reboot_app_3/Screens/Home/%D9%90Explore/TutorialPage.dart';
+import 'package:reboot_app_3/Screens/Explore/ExploreScreen.dart';
+import 'package:reboot_app_3/Screens/Explore/TutorialPage.dart';
 import 'package:reboot_app_3/Shared/Constants.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../../Localization.dart';
+import '../../../Shared/Localization.dart';
 
 class TutorialsScreen extends StatefulWidget {
   const TutorialsScreen({Key key, @required this.tutorialList})

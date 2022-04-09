@@ -2,22 +2,22 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_html/style.dart';
-import 'package:reboot_app_3/Localization.dart';
-import 'package:reboot_app_3/Model/Articles.dart';
-import 'package:reboot_app_3/Screens/Home/%D9%90Explore/ExploreScreen.dart';
+import 'package:reboot_app_3/Model/Tutorial.dart';
+import 'package:reboot_app_3/Screens/Explore/ExploreScreen.dart';
 import 'package:reboot_app_3/Shared/Constants.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 // ignore: must_be_immutable
-class ArticlePage extends StatefulWidget {
-  Article articale;
-  ArticlePage({Key key, this.articale}) : super(key: key);
+class TutorialPage extends StatefulWidget {
+  Tutorial item;
+
+  TutorialPage({Key key, this.item}) : super(key: key);
 
   @override
-  _ArticlePageState createState() => _ArticlePageState();
+  _TutorialPageState createState() => _TutorialPageState();
 }
 
-class _ArticlePageState extends State<ArticlePage> {
+class _TutorialPageState extends State<TutorialPage> {
   String lang;
 
   void getSelectedLocale() async {
@@ -27,6 +27,7 @@ class _ArticlePageState extends State<ArticlePage> {
       lang = _languageCode;
     });
   }
+
 
   @override
   void initState() {
@@ -64,7 +65,6 @@ class _ArticlePageState extends State<ArticlePage> {
                 ],
               ),
             ),
-            SizedBox(height: 8),
             Container(
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -72,73 +72,50 @@ class _ArticlePageState extends State<ArticlePage> {
                 children: [
                   Flexible(
                       child: Text(
-                        widget.articale.title,
+                        widget.item.title,
                         style: kPageTitleStyle.copyWith(height: 1, fontSize: 28),
                       ))
                 ],
               ),
             ),
+            SizedBox(
+              height: 4,
+            ),
             Divider(
               thickness: 0.75,
             ),
+            SizedBox(
+              height: 4,
+            ),
             Container(
-              padding: EdgeInsets.all(8),
               child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Container(
-                    padding: EdgeInsets.fromLTRB(12, 8, 12, 8),
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(8),
-                        color: Color(0xFF045C44).withOpacity(0.15)),
-                    child: Row(
-                      children: [
-                        Text(widget.articale.postedAt,
+                  Row(
+                    children: [
+                      Container(
+                        padding: EdgeInsets.fromLTRB(12, 8, 12, 8),
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(8),
+                            color: Colors.green.withOpacity(0.2)),
+                        child: Text(widget.item.postedAt,
                             style: kSubTitlesSubsStyle.copyWith(
-                                fontSize: 10.5,
-                                height: 1,
-                                color: Color(0xFF045C44))),
-                      ],
-                    ),
-                  ),
-                  SizedBox(
-                    width: 10,
-                  ),
-                  Container(
-                    padding: EdgeInsets.fromLTRB(12, 8, 12, 8),
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(8),
-                        color: Color(0xFF75372D).withAlpha(20)),
-                    child: Row(
-                      children: [
-                        Text(widget.articale.author,
+                                fontSize: 12, height: 1, color: Colors.green)),
+                      ),
+                      SizedBox(
+                        width: 10,
+                      ),
+                      Container(
+                        padding: EdgeInsets.fromLTRB(12, 8, 12, 8),
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(8),
+                            color: primaryColor.withAlpha(20)),
+                        child: Text(widget.item.author,
                             style: kSubTitlesSubsStyle.copyWith(
-                                fontSize: 10.5,
-                                height: 1,
-                                color: Color(0xFF75372D))),
-                      ],
-                    ),
+                                fontSize: 12, height: 1, color: primaryColor)),
+                      )
+                    ],
                   ),
-                  SizedBox(
-                    width: 10,
-                  ),
-                  Container(
-                    padding: EdgeInsets.fromLTRB(12, 8, 12, 8),
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(8),
-                        color: primaryColor.withAlpha(20)),
-                    child: Row(
-                      children: [
-                        Text(
-                            "${widget.articale.timeToRead} " +
-                                AppLocalizations.of(context)
-                                    .translate("minutes"),
-                            style: kSubTitlesSubsStyle.copyWith(
-                                fontSize: 10.5,
-                                height: 1,
-                                color: primaryColor)),
-                      ],
-                    ),
-                  )
                 ],
               ),
             ),
@@ -156,12 +133,9 @@ class _ArticlePageState extends State<ArticlePage> {
                         children: [
                           Flexible(
                               child: Html(
-                            data: widget.articale.body,
+                            data: widget.item.body,
                             style: {
-                              "body": Style(
-                                  fontSize: FontSize(18.0),
-                                  fontWeight: FontWeight.w400,
-                                  fontFamily: "DINNextLTArabic"),
+                              "body": Style(fontFamily: "DINNextLTArabic"),
                             },
                           ))
                         ],
