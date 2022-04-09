@@ -1,14 +1,12 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:reboot_app_3/Shared/Auth/AuthenticationService.dart';
 
-import 'package:reboot_app_3/Auth/AuthenticationService.dart';
 import 'package:reboot_app_3/Shared/Constants.dart';
 import 'package:reboot_app_3/Localization.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
-import '../../Auth/AuthenticationService.dart';
 
 import 'package:provider/provider.dart';
 
@@ -23,12 +21,6 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen>
     with TickerProviderStateMixin {
-  final TextEditingController emailController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
-
-  var sidebarHidden = true;
-
-
   @override
   void initState() {
     super.initState();
@@ -55,50 +47,48 @@ class _LoginScreenState extends State<LoginScreen>
                   Container(
                     padding: EdgeInsets.all(40),
                     decoration: BoxDecoration(
-                      color: primaryColor.withOpacity(0.2),
-                      borderRadius: BorderRadius.circular(150)
-                    ),
+                        color: primaryColor.withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(150)),
                     child: Icon(
                       Iconsax.user,
                       color: primaryColor,
                       size: 72,
                     ),
                   ),
-                  SizedBox(height: 8,),
+                  SizedBox(
+                    height: 8,
+                  ),
                   Row(
-
                     crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
                         AppLocalizations.of(context).translate('login'),
                         style: kPageTitleStyle.copyWith(
-                          fontSize: 32,
-                          color: primaryColor
-                        ),
+                            fontSize: 32, color: primaryColor),
                       ),
                     ],
                   ),
-
                   SizedBox(
                     height: 20,
                   ),
-          Container(
-        child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Flexible(
-                child: Text(
-                  AppLocalizations.of(context).translate("login-button-p"),
-                  style: kSubTitlesSubsStyle.copyWith(
-                      color: Colors.black45,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500),
-                ))
-          ],
-        ),
-    ),
+                  Container(
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Flexible(
+                            child: Text(
+                          AppLocalizations.of(context)
+                              .translate("login-button-p"),
+                          style: kSubTitlesSubsStyle.copyWith(
+                              color: Colors.black45,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500),
+                        ))
+                      ],
+                    ),
+                  ),
                   SizedBox(
                     height: 20,
                   ),
@@ -110,7 +100,6 @@ class _LoginScreenState extends State<LoginScreen>
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-
                   SignInWithAppleButton(onPressed: () async {
                     final appleIdCredential =
                         await SignInWithApple.getAppleIDCredential(
@@ -126,9 +115,7 @@ class _LoginScreenState extends State<LoginScreen>
                     );
                     await FirebaseAuth.instance
                         .signInWithCredential(credential)
-                        .then((value) {
-
-                    });
+                        .then((value) {});
                   }),
                   SizedBox(
                     height: 8,
@@ -174,47 +161,5 @@ class _LoginScreenState extends State<LoginScreen>
         ),
       ),
     ));
-  }
-}
-
-class GoogleSignInProvider extends ChangeNotifier {
-  final googleSignIn = GoogleSignIn();
-  bool _isSigningIn;
-
-  GoogleSignInProvider() {
-    _isSigningIn = false;
-  }
-
-  bool get isSigningIn => _isSigningIn;
-
-  set isSigningIn(bool isSigningIn) {
-    _isSigningIn = isSigningIn;
-    notifyListeners();
-  }
-
-  Future login() async {
-    isSigningIn = true;
-
-    final user = await googleSignIn.signIn();
-    if (user == null) {
-      isSigningIn = false;
-      return;
-    } else {
-      final googleAuth = await user.authentication;
-
-      final credential = GoogleAuthProvider.credential(
-        accessToken: googleAuth.accessToken,
-        idToken: googleAuth.idToken,
-      );
-
-      await FirebaseAuth.instance.signInWithCredential(credential);
-
-      isSigningIn = false;
-    }
-  }
-
-  void logout() async {
-    await googleSignIn.disconnect();
-    FirebaseAuth.instance.signOut();
   }
 }

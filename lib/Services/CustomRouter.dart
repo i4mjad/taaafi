@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:reboot_app_3/Screens/About/AboutScreen.dart';
+import 'package:reboot_app_3/Screens/Account/Widgets/AccountScreen.dart';
+import 'package:reboot_app_3/Screens/Auth/LoginPage.dart';
 import 'package:reboot_app_3/Screens/Community/Community.dart';
-import 'package:reboot_app_3/Shared/Components/BottomNavbar.dart';
 import 'package:reboot_app_3/Services/RoutesName.dart';
-import 'package:reboot_app_3/screens/About/AboutScreen.dart';
-import 'package:reboot_app_3/screens/Account/AccountScreen.dart';
-import 'package:reboot_app_3/screens/auth/LoginPage.dart';
+import 'package:reboot_app_3/Shared/Components/BottomNavbar.dart';
 
 import 'package:reboot_app_3/screens/FollowYourReboot/FollowYourRebootScreen.dart';
 import 'package:reboot_app_3/screens/Home/HomeScreen.dart';
