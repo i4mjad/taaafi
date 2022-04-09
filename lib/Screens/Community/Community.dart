@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:reboot_app_3/Localization.dart';
+import 'package:reboot_app_3/Shared/Localization.dart';
 import 'package:reboot_app_3/Shared/Constants.dart';
 import 'package:url_launcher/url_launcher.dart';
 

@@ -8,7 +8,7 @@ import 'package:reboot_app_3/Screens/Auth/LoginPage.dart';
 import 'package:reboot_app_3/Shared/Auth/AuthenticationService.dart';
 import 'package:reboot_app_3/Shared/Components/ChangeLocaleBottomSheet.dart';
 import 'package:reboot_app_3/Shared/Constants.dart';
-import 'package:reboot_app_3/Localization.dart';
+import 'package:reboot_app_3/Shared/Localization.dart';
 import 'package:provider/provider.dart';
 
 
@@ -110,7 +110,7 @@ class _AccountScreenState extends State<AccountScreen>
                         padding: EdgeInsets.only(top: 8.0, bottom: 4),
                         child: GestureDetector(
                           onTap: () {
-                            changeLanguage(context);
+                            ChangeLanguageWidget.changeLanguage(context);
                           },
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.start,

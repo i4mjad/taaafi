@@ -2,7 +2,7 @@ import 'dart:core';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:reboot_app_3/Localization.dart';
+import 'package:reboot_app_3/Shared/Localization.dart';
 import 'package:reboot_app_3/Screens/Ta3afiLiberary/Models/Content.dart';
 import 'package:reboot_app_3/Screens/Ta3afiLiberary/Services/ContentLoadServices.dart';
 import 'dart:convert' show utf8;

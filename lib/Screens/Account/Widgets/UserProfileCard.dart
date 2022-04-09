@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:reboot_app_3/Shared/Constants.dart';
 
-import '../../../Localization.dart';
+import '../../../Shared/Localization.dart';
 
 class UserProfileCard extends StatelessWidget {
 

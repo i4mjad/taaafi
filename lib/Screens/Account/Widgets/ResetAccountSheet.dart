@@ -5,7 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:reboot_app_3/Localization.dart';
+import 'package:reboot_app_3/Shared/Localization.dart';
 import 'package:reboot_app_3/Shared/Constants.dart';
 
 //TODO The logic of reseting account data needed to be reviewed since the plan is to change the logic of FollowYourReboot

@@ -6,7 +6,7 @@ import 'package:intl/intl.dart';
 
 import 'package:reboot_app_3/screens/FollowYourReboot/Notes/AddNoteScreen.dart';
 
-import 'package:reboot_app_3/Localization.dart';
+import 'package:reboot_app_3/Shared/Localization.dart';
 
 import 'package:reboot_app_3/Shared/Constants.dart';
 import 'EditNotePage.dart';

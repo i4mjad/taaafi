@@ -5,7 +5,7 @@ import 'package:reboot_app_3/Screens/Auth/LoginPage.dart';
 import 'package:reboot_app_3/Shared/Auth/AuthenticationService.dart';
 import 'package:reboot_app_3/Shared/Constants.dart';
 import 'package:provider/provider.dart';
-import '../../../Localization.dart';
+import '../../../Shared/Localization.dart';
 
 class DeleteAccountSheet {
   static void openDeleteAccountMessage(BuildContext context) {

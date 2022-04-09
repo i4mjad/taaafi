@@ -3,8 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:reboot_app_3/Screens/Ta3afiLiberary/Widgets/ContentPage.dart';
 import 'package:reboot_app_3/Shared/Constants.dart';
-
-import '../../Localization.dart';
+import 'package:reboot_app_3/Shared/Localization.dart';
 
 class CategoriesCards extends StatelessWidget {
   @override
