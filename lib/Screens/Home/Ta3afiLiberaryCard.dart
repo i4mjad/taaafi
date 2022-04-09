@@ -5,7 +5,7 @@ import 'package:reboot_app_3/Screens/Ta3afiLiberary/Widgets/ContentPage.dart';
 import 'package:reboot_app_3/Shared/Constants.dart';
 import 'package:reboot_app_3/Shared/Localization.dart';
 
-class CategoriesCards extends StatelessWidget {
+class Ta3afiLiberaryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
