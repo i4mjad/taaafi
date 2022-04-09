@@ -7,7 +7,7 @@ import 'package:iconsax/iconsax.dart';
 import 'package:reboot_app_3/Screens/Auth/LoginPage.dart';
 import 'package:reboot_app_3/Screens/FollowYourReboot/Notes/NotesPage.dart';
 import 'package:reboot_app_3/Shared/Components/BottomNavbar.dart';
-import 'package:reboot_app_3/Localization.dart';
+import 'package:reboot_app_3/Shared/Localization.dart';
 import 'package:reboot_app_3/Services/RoutesName.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
