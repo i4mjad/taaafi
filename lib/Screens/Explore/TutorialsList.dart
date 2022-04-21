@@ -8,9 +8,8 @@ import 'package:reboot_app_3/Screens/Explore/ExploreScreen.dart';
 import 'package:reboot_app_3/Screens/Explore/TutorialPage.dart';
 import 'package:reboot_app_3/Shared/Constants.dart';
 import 'package:flutter/foundation.dart';
+import 'package:reboot_app_3/Shared/Localization.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-import '../../../Shared/Localization.dart';
 
 class TutorialsScreen extends StatefulWidget {
   const TutorialsScreen({Key key, @required this.tutorialList})
@@ -150,7 +149,6 @@ class _TutorialsScreenState extends State<TutorialsScreen> {
               ],
             ),
           ),
-
           Expanded(
             child: Container(
               height: double.infinity,
@@ -239,7 +237,6 @@ class TutorialWidget extends StatelessWidget {
                             SizedBox(
                               height: 5,
                             ),
-
                           ]),
                     )
                   ]),

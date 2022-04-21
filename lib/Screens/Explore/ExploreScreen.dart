@@ -9,9 +9,9 @@ import 'package:reboot_app_3/Screens/Explore/TutorialsList.dart';
 import 'package:reboot_app_3/Shared/Components/BottomNavbar.dart';
 import 'package:reboot_app_3/Shared/Constants.dart';
 import 'package:flutter/foundation.dart';
+import 'package:reboot_app_3/Shared/Localization.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../../Shared/Localization.dart';
 import 'ArticalePage.dart';
 import 'TutorialPage.dart';
 

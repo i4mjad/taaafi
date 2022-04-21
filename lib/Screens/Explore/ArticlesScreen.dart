@@ -6,9 +6,8 @@ import 'package:reboot_app_3/Model/Articles.dart';
 import 'package:reboot_app_3/Screens/Explore/ExploreScreen.dart';
 import 'package:reboot_app_3/Shared/Constants.dart';
 import 'package:flutter/foundation.dart';
+import 'package:reboot_app_3/Shared/Localization.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-import '../../../Shared/Localization.dart';
 
 class ArticlesScreen extends StatefulWidget {
   const ArticlesScreen({Key key, @required this.articlesList})
