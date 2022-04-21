@@ -111,11 +111,11 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ListenableProvider<AuthenticationService>(
-            create: (_) => AuthenticationService(FirebaseAuth.instance)),
+        ListenableProvider<GoogleAuthenticationService>(
+            create: (_) => GoogleAuthenticationService(FirebaseAuth.instance)),
         StreamProvider(
             create: (context) =>
-                context.read<AuthenticationService>().authStateChanges),
+                context.read<GoogleAuthenticationService>().authStateChanges),
       ],
       child: MaterialApp(
         supportedLocales: [Locale('ar', ''), Locale('en', '')],

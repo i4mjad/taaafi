@@ -122,7 +122,7 @@ class _LoginScreenState extends State<LoginScreen>
                   ),
                   GestureDetector(
                     onTap: () {
-                      context.read<AuthenticationService>().signInWithGoogle();
+                      context.read<GoogleAuthenticationService>().signInWithGoogle();
                     },
                     child: Container(
                       width: MediaQuery.of(context).size.width - 40,

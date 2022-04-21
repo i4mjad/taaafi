@@ -197,7 +197,7 @@ class _AccountScreenState extends State<AccountScreen>
                         padding: EdgeInsets.only(top: 8.0, bottom: 4),
                         child: GestureDetector(
                           onTap: () {
-                            context.read<AuthenticationService>().signOut();
+                            context.read<GoogleAuthenticationService>().signOut();
                           },
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.start,

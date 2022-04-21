@@ -91,7 +91,7 @@ class DeleteAccountSheet {
                 ),
                 GestureDetector(
                   onTap: () {
-                    context.read<AuthenticationService>()
+                    context.read<GoogleAuthenticationService>()
                         .deleteAccount()
                         .then((value) {
                       Navigator.pop(
