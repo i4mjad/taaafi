@@ -6,20 +6,16 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
-import 'package:reboot_app_3/Shared/Localization.dart';
-import 'package:reboot_app_3/Screens/Account/Services/NotificationService.dart';
-import 'package:reboot_app_3/Services/RoutesName.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:reboot_app_3/shared/localization/localization.dart';
+import 'package:reboot_app_3/shared/services/auth_service.dart';
+import 'package:reboot_app_3/shared/services/notification_service.dart';
+import 'package:reboot_app_3/shared/services/routing/custom_router.dart';
+import 'package:reboot_app_3/shared/services/routing/routes_names.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 // ignore: unused_import
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
-
-import 'Services/CustomRouter.dart';
-import 'Shared/Auth/AuthenticationService.dart';
-
-
-
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -52,8 +48,8 @@ Future<void> main() async {
   RemoteMessage initialMessage =
       await FirebaseMessaging.instance.getInitialMessage();
 
-  await NotificationService.flutterLocalNotificationsPlugin.initialize(initializationSettings,
-      onSelectNotification: (String payload) async {
+  await NotificationService.flutterLocalNotificationsPlugin.initialize(
+      initializationSettings, onSelectNotification: (String payload) async {
     if (payload = null) {
       debugPrint('notification payload: ' + payload);
     }
@@ -98,8 +94,7 @@ class _MyAppState extends State<MyApp> {
       }); //your home page is loaded
     } else {
       //replace it with the login page
-      _locale = Locale("ar","");
-
+      _locale = Locale("ar", "");
     }
   }
 

@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:reboot_app_3/Shared/Constants.dart';
+import 'package:reboot_app_3/shared/constants/constants.dart';
 
 class Category {
   Category(

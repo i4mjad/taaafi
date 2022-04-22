@@ -2,13 +2,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:reboot_app_3/Screens/About/AboutScreen.dart';
-import 'package:reboot_app_3/Screens/Account/Widgets/AccountScreen.dart';
-import 'package:reboot_app_3/Shared/Constants.dart';
-import 'package:reboot_app_3/Shared/Localization.dart';
-
-import 'package:reboot_app_3/screens/Community/Community.dart';
-import 'package:reboot_app_3/screens/Home/HomeScreen.dart';
+import 'package:reboot_app_3/presentation/screens/about/about_screen.dart';
+import 'package:reboot_app_3/shared/constants/constants.dart';
+import 'package:reboot_app_3/presentation/Screens/account/account_screen.dart';
+import 'package:reboot_app_3/presentation/Screens/community/community_screen.dart';
+import 'package:reboot_app_3/presentation/Screens/home/home_screen.dart';
+import 'package:reboot_app_3/shared/localization/localization.dart';
 
 class NavigationBar extends StatefulWidget {
   @override

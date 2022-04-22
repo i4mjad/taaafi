@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:reboot_app_3/Shared/Constants.dart';
 import 'package:reboot_app_3/main.dart';
+import 'package:reboot_app_3/shared/constants/constants.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ChangeLanguageWidget {
