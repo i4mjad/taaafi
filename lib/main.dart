@@ -16,6 +16,7 @@ import 'package:reboot_app_3/shared/services/routing/routes_names.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 // ignore: unused_import
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -110,7 +111,7 @@ class _MyAppState extends State<MyApp> {
             create: (_) => GoogleAuthenticationService(FirebaseAuth.instance)),
         StreamProvider(
             create: (context) =>
-                context.read<GoogleAuthenticationService>().authStateChanges),
+                context.read<GoogleAuthenticationService>().authStateChanges, initialData: null,),
       ],
       child: MaterialApp(
         supportedLocales: [Locale('ar', ''), Locale('en', '')],
