@@ -6,6 +6,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:reboot_app_3/shared/constants/constants.dart';
+import 'package:reboot_app_3/shared/constants/textstyles_constants.dart';
 import 'package:reboot_app_3/shared/localization/localization.dart';
 
 //TODO The logic of reseting account data needed to be reviewed since the plan is to change the logic of FollowYourReboot

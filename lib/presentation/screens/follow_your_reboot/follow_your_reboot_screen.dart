@@ -9,6 +9,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:reboot_app_3/presentation/Screens/auth/login_screen.dart';
 import 'package:reboot_app_3/shared/constants/constants.dart';
+import 'package:reboot_app_3/shared/constants/textstyles_constants.dart';
 import 'package:reboot_app_3/shared/localization/localization.dart';
 import 'package:reboot_app_3/shared/localization/localization_services.dart';
 import 'package:reboot_app_3/shared/services/routing/routes_names.dart';

@@ -8,6 +8,7 @@ import 'package:reboot_app_3/Shared/Components/ChangeLocaleBottomSheet.dart';
 import 'package:reboot_app_3/presentation/Screens/ta3afi_liberary/widgets/content_screen.dart';
 import 'package:reboot_app_3/presentation/screens/follow_your_reboot/follow_your_reboot_screen.dart';
 import 'package:reboot_app_3/shared/constants/constants.dart';
+import 'package:reboot_app_3/shared/constants/textstyles_constants.dart';
 import 'package:reboot_app_3/shared/localization/localization.dart';
 import 'package:reboot_app_3/shared/localization/localization_services.dart';
 
@@ -119,9 +120,7 @@ class TobBar extends StatelessWidget {
             padding: EdgeInsets.all(8),
             child: Center(
                 child: Icon(
-              Platform.isIOS != true
-                  ? Icons.settings
-                  : CupertinoIcons.settings,
+              Platform.isIOS != true ? Icons.settings : CupertinoIcons.settings,
               color: primaryColor,
             )),
           ),
@@ -272,22 +271,17 @@ class FollowYouRebootHero extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Container(
-                          width:
-                          MediaQuery.of(context).size.width /
-                              2,
+                          width: MediaQuery.of(context).size.width / 2,
                           padding: EdgeInsets.all(12),
                           decoration: BoxDecoration(
                               color: accentColor,
-                              borderRadius:
-                              BorderRadius.circular(12.5)),
+                              borderRadius: BorderRadius.circular(12.5)),
                           child: Row(
-                            mainAxisAlignment:
-                            MainAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Text(
                                 AppLocalizations.of(context)
-                                    .translate(
-                                    'follow-your-reboot'),
+                                    .translate('follow-your-reboot'),
                                 style: kPageTitleStyle.copyWith(
                                     fontSize: 18,
                                     color: seconderyColor,

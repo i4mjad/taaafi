@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:provider/provider.dart';
 import 'package:reboot_app_3/presentation/Screens/auth/login_screen.dart';
-import 'package:reboot_app_3/shared/constants/constants.dart';
+import 'package:reboot_app_3/shared/constants/textstyles_constants.dart';
 import 'package:reboot_app_3/shared/localization/localization.dart';
 import 'package:reboot_app_3/shared/services/auth_service.dart';
 
