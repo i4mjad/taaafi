@@ -5,33 +5,33 @@ import 'package:flutter/material.dart';
 import 'constants.dart';
 
 var kPageTitleStyle = TextStyle(
-  fontSize: 38.0,
-  fontWeight: FontWeight.w700,
-  color: Colors.black,
-  fontFamily: 'DINNextLTArabic',
-  decoration: TextDecoration.none,
-);
+    fontSize: 38.0,
+    fontWeight: FontWeight.w700,
+    color: Colors.black,
+    fontFamily: 'IBMArabic',
+    decoration: TextDecoration.none,
+    height: 1);
 
 var kSubTitlesStyle = TextStyle(
-  fontSize: 20,
-  fontWeight: FontWeight.w600,
-  color: Colors.black,
-  fontFamily: 'DINNextLTArabic',
-  decoration: TextDecoration.none,
-);
+    fontSize: 20,
+    fontWeight: FontWeight.w600,
+    color: Colors.black,
+    fontFamily: 'IBMArabic',
+    decoration: TextDecoration.none,
+    height: 1);
 
 var kSubTitlesSubsStyle = TextStyle(
-  fontSize: 15.0,
-  fontWeight: FontWeight.w400,
-  color: Colors.grey,
-  fontFamily: 'DINNextLTArabic',
-  decoration: TextDecoration.none,
-);
+    fontSize: 15.0,
+    fontWeight: FontWeight.w400,
+    color: Colors.grey,
+    fontFamily: 'IBMArabic',
+    decoration: TextDecoration.none,
+    height: 1);
 
 var kSearchTextStyle = TextStyle(
   fontSize: 13.0,
   color: kPrimaryLabelColor,
   fontWeight: FontWeight.w500,
-  fontFamily: 'DINNextLTArabic',
+  fontFamily: 'IBMArabic',
   decoration: TextDecoration.none,
 );
