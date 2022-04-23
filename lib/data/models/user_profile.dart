@@ -4,10 +4,10 @@ class FollowUpData {
   List<String> pornWithoutMasterbation;
   List<String> masterbationWithoutPorn;
 
-  FollowUpData.fromMap(Map<String, dynamic> json) {
-    startingDate = json['startingDate'];
-    relapses = json['userRelapses'];
-    pornWithoutMasterbation = json['userWatchingWithoutMasturbating'];
-    masterbationWithoutPorn = json['userMasturbatingWithoutWatching'];
+  FollowUpData.fromSnapshot(Map<String, dynamic> snapshot) {
+    startingDate = snapshot['startingDate'];
+    relapses = snapshot['userRelapses'];
+    pornWithoutMasterbation = snapshot['userWatchingWithoutMasturbating'];
+    masterbationWithoutPorn = snapshot['userMasturbatingWithoutWatching'];
   }
 }
