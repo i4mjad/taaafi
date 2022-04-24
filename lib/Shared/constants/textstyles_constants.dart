@@ -35,3 +35,52 @@ var kSearchTextStyle = TextStyle(
   fontFamily: 'IBMArabic',
   decoration: TextDecoration.none,
 );
+
+var kDisplayStyle = TextStyle(
+    fontSize: 42.0,
+    fontWeight: FontWeight.w200,
+    fontFamily: 'IBMArabic',
+    decoration: TextDecoration.none,
+    height: 1);
+
+var kHeaderStyle = TextStyle(
+    fontSize: 34.0,
+    fontWeight: FontWeight.w700,
+    fontFamily: 'IBMArabic',
+    decoration: TextDecoration.none,
+    height: 1);
+
+var kTitlePrimeryStyle = TextStyle(
+    fontSize: 28.0,
+    fontWeight: FontWeight.w400,
+    fontFamily: 'IBMArabic',
+    decoration: TextDecoration.none,
+    height: 1);
+
+var kTitleSeconderyStyle = TextStyle(
+    fontSize: 22.0,
+    fontWeight: FontWeight.w400,
+    fontFamily: 'IBMArabic',
+    decoration: TextDecoration.none,
+    height: 1);
+
+var kHeadlineStyle = TextStyle(
+    fontSize: 20.0,
+    fontWeight: FontWeight.w300,
+    fontFamily: 'IBMArabic',
+    decoration: TextDecoration.none,
+    height: 1);
+
+var kBodyStyle = TextStyle(
+    fontSize: 14.0,
+    fontWeight: FontWeight.w300,
+    fontFamily: 'IBMArabic',
+    decoration: TextDecoration.none,
+    height: 1);
+
+var kCaptionStyle = TextStyle(
+    fontSize: 12.0,
+    fontWeight: FontWeight.w300,
+    fontFamily: 'IBMArabic',
+    decoration: TextDecoration.none,
+    height: 1);
