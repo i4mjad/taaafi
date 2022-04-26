@@ -110,8 +110,10 @@ class _MyAppState extends State<MyApp> {
         ListenableProvider<GoogleAuthenticationService>(
             create: (_) => GoogleAuthenticationService(FirebaseAuth.instance)),
         StreamProvider(
-            create: (context) =>
-                context.read<GoogleAuthenticationService>().authStateChanges, initialData: null,),
+          create: (context) =>
+              context.read<GoogleAuthenticationService>().authStateChanges,
+          initialData: null,
+        ),
       ],
       child: MaterialApp(
         supportedLocales: [Locale('ar', ''), Locale('en', '')],
