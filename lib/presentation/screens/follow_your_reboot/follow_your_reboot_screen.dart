@@ -593,24 +593,7 @@ class _FollowYourRebootScreenState extends State<FollowYourRebootScreen>
                           Builder(
                             builder: (BuildContext context) {
                               if (userRelapses.length == 0) {
-                                return Container(
-                                  padding: EdgeInsets.all(20),
-                                  width: MediaQuery.of(context).size.width,
-                                  height:
-                                      MediaQuery.of(context).size.height * 0.10,
-                                  decoration: BoxDecoration(
-                                      color: Colors.green.withOpacity(0.2),
-                                      borderRadius:
-                                          BorderRadius.circular(12.5)),
-                                  child: Center(
-                                    child: Text(
-                                      AppLocalizations.of(context)
-                                          .translate("no-relapses"),
-                                      style: kSubTitlesStyle.copyWith(
-                                          color: Colors.green, fontSize: 18),
-                                    ),
-                                  ),
-                                );
+                                return NoRelapses();
                               } else {
                                 return Container(
                                   padding: EdgeInsets.all(20),
@@ -816,22 +799,7 @@ class _FollowYourRebootScreenState extends State<FollowYourRebootScreen>
                       Builder(
                         builder: (BuildContext context) {
                           if (userRelapses.length == 0) {
-                            return Container(
-                              padding: EdgeInsets.all(20),
-                              width: MediaQuery.of(context).size.width,
-                              height: MediaQuery.of(context).size.height * 0.10,
-                              decoration: BoxDecoration(
-                                  color: Colors.green.withOpacity(0.2),
-                                  borderRadius: BorderRadius.circular(12.5)),
-                              child: Center(
-                                child: Text(
-                                  AppLocalizations.of(context)
-                                      .translate("no-relapses"),
-                                  style: kSubTitlesStyle.copyWith(
-                                      color: Colors.green, fontSize: 18),
-                                ),
-                              ),
-                            );
+                            return NoRelapses();
                           } else {
                             return Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -1677,6 +1645,30 @@ class _FollowYourRebootScreenState extends State<FollowYourRebootScreen>
       builder: (BuildContext context) {
         return alert;
       },
+    );
+  }
+}
+
+class NoRelapses extends StatelessWidget {
+  const NoRelapses({
+    Key key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.all(20),
+      width: MediaQuery.of(context).size.width,
+      height: MediaQuery.of(context).size.height * 0.10,
+      decoration: BoxDecoration(
+          color: Colors.green.withOpacity(0.2),
+          borderRadius: BorderRadius.circular(12.5)),
+      child: Center(
+        child: Text(
+          AppLocalizations.of(context).translate("no-relapses"),
+          style: kSubTitlesStyle.copyWith(color: Colors.green, fontSize: 18),
+        ),
+      ),
     );
   }
 }
