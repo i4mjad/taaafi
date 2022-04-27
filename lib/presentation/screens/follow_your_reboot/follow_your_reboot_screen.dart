@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:reboot_app_3/Model/Relapse.dart';
 import 'package:reboot_app_3/presentation/Screens/auth/login_screen.dart';
 //import 'package:reboot_app_3/presentation/screens/follow_your_reboot/follow_up_section.dart';
 import 'package:reboot_app_3/shared/components/bottom_navbar.dart';
@@ -15,18 +16,11 @@ import 'package:reboot_app_3/shared/services/routing/routes_names.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'calender/calender_data_model.dart';
+import 'day_of_week_relapses/day_of_week_relapses_widget.dart';
 import 'follow_your_reboot_services.dart';
 import 'follow_your_reboot_widgets.dart';
-import 'notes/calender/calender_data_model.dart';
 import 'notes/notes_screen.dart';
-
-class Day {
-  String type;
-  DateTime date;
-  MaterialColor color;
-
-  Day({this.type, this.date, this.color});
-}
 
 class FollowYourRebootScreen extends StatefulWidget {
   const FollowYourRebootScreen({
@@ -60,7 +54,6 @@ class _FollowYourRebootScreenState extends State<FollowYourRebootScreen>
   var userMasturbatingWithoutWatching = [];
 
   var userFirstDayRecorded;
-  var hasOldData = false;
 
   var satRelapses = "";
   var sunRelapses = "";
@@ -98,7 +91,7 @@ class _FollowYourRebootScreenState extends State<FollowYourRebootScreen>
             }
           });
 
-          dailyStatistics();
+          dailyStatistics(this.userRelapses);
 
           final today = DateTime.now();
           final regDate = user.metadata.creationTime;
@@ -178,7 +171,7 @@ class _FollowYourRebootScreenState extends State<FollowYourRebootScreen>
             snapshot.get("userPreviousStreak") == null)) {
           performNewUserDialog();
         } else {
-          if (hasOldData == false && snapshot.exists == false) {
+          if (snapshot.exists == false) {
             performNewUserDialog();
           }
         }
@@ -353,7 +346,7 @@ class _FollowYourRebootScreenState extends State<FollowYourRebootScreen>
     return daysArray;
   }
 
-  dailyStatistics() async {
+  DayOfWeekRelapses dailyStatistics(List<dynamic> userRelapses) {
     var sat = [];
     var sun = [];
     var mon = [];
@@ -390,15 +383,10 @@ class _FollowYourRebootScreenState extends State<FollowYourRebootScreen>
     final wedLength = (wed.length).toString();
     final thuLength = (thu.length).toString();
     final friLength = (fri.length).toString();
-    setState(() {
-      satRelapses = satLength;
-      sunRelapses = sunLength;
-      monRelapses = monLength;
-      tueRelapses = tueLength;
-      wedRelapses = wedLength;
-      thuRelapses = thuLength;
-      friRelapses = friLength;
-    });
+
+    final dayOfWeekRelapses = DayOfWeekRelapses(satLength, sunLength, monLength,
+        tueLength, wedLength, thuLength, friLength);
+    return dayOfWeekRelapses;
   }
 
   List<int> generalStatistics() {
@@ -466,7 +454,6 @@ class _FollowYourRebootScreenState extends State<FollowYourRebootScreen>
     loadUserRelapces();
     loadUserNoPorn();
     loadUserNoMasts();
-    dailyStatistics();
 
     LocaleService.getSelectedLocale().then((value) {
       setState(() {
@@ -595,194 +582,8 @@ class _FollowYourRebootScreenState extends State<FollowYourRebootScreen>
                               if (userRelapses.length == 0) {
                                 return NoRelapses();
                               } else {
-                                return Container(
-                                  padding: EdgeInsets.all(20),
-                                  width: MediaQuery.of(context).size.width,
-                                  height: MediaQuery.of(context).size.height *
-                                      0.225,
-                                  decoration: BoxDecoration(
-                                      color: accentColor.withOpacity(0.1),
-                                      borderRadius:
-                                          BorderRadius.circular(12.5)),
-                                  //two lines of days
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      //first line of days
-                                      Row(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceEvenly,
-                                        children: [
-                                          //sunday
-                                          Column(
-                                            children: [
-                                              Text(
-                                                sunRelapses,
-                                                style: kSubTitlesStyle.copyWith(
-                                                    height: 1,
-                                                    color: primaryColor),
-                                              ),
-                                              SizedBox(
-                                                height: 8,
-                                              ),
-                                              Text(
-                                                AppLocalizations.of(context)
-                                                    .translate("sun"),
-                                                style: kSubTitlesStyle.copyWith(
-                                                    fontSize: 12,
-                                                    color: primaryColor,
-                                                    height: 1),
-                                              ),
-                                            ],
-                                          ),
-                                          Column(
-                                            children: [
-                                              Text(
-                                                monRelapses,
-                                                style: kSubTitlesStyle.copyWith(
-                                                    height: 1,
-                                                    color: primaryColor),
-                                              ),
-                                              SizedBox(
-                                                height: 8,
-                                              ),
-                                              Text(
-                                                AppLocalizations.of(context)
-                                                    .translate("mon"),
-                                                style: kSubTitlesStyle.copyWith(
-                                                    fontSize: 12,
-                                                    color: primaryColor,
-                                                    height: 1),
-                                              )
-                                            ],
-                                          ),
-                                          Column(
-                                            children: [
-                                              Text(
-                                                tueRelapses,
-                                                style: kSubTitlesStyle.copyWith(
-                                                    height: 1,
-                                                    color: primaryColor),
-                                              ),
-                                              SizedBox(
-                                                height: 8,
-                                              ),
-                                              Text(
-                                                AppLocalizations.of(context)
-                                                    .translate("tue"),
-                                                style: kSubTitlesStyle.copyWith(
-                                                    fontSize: 12,
-                                                    color: primaryColor,
-                                                    height: 1),
-                                              )
-                                            ],
-                                          ),
-                                          Column(
-                                            children: [
-                                              Text(
-                                                wedRelapses,
-                                                style: kSubTitlesStyle.copyWith(
-                                                    height: 1,
-                                                    color: primaryColor),
-                                              ),
-                                              SizedBox(
-                                                height: 8,
-                                              ),
-                                              Text(
-                                                AppLocalizations.of(context)
-                                                    .translate("wed"),
-                                                style: kSubTitlesStyle.copyWith(
-                                                    fontSize: 12,
-                                                    color: primaryColor,
-                                                    height: 1),
-                                              )
-                                            ],
-                                          ),
-                                        ],
-                                      ),
-                                      //space
-                                      SizedBox(
-                                        height: 28,
-                                      ),
-                                      //second line of days
-                                      Row(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceEvenly,
-                                        children: [
-                                          Column(
-                                            children: [
-                                              Text(
-                                                thuRelapses,
-                                                style: kSubTitlesStyle.copyWith(
-                                                    height: 1,
-                                                    color: primaryColor),
-                                              ),
-                                              SizedBox(
-                                                height: 8,
-                                              ),
-                                              Text(
-                                                AppLocalizations.of(context)
-                                                    .translate("thu"),
-                                                style: kSubTitlesStyle.copyWith(
-                                                    fontSize: 12,
-                                                    color: primaryColor,
-                                                    height: 1),
-                                              )
-                                            ],
-                                          ),
-                                          Column(
-                                            children: [
-                                              Text(
-                                                friRelapses,
-                                                style: kSubTitlesStyle.copyWith(
-                                                    height: 1,
-                                                    color: primaryColor),
-                                              ),
-                                              SizedBox(
-                                                height: 8,
-                                              ),
-                                              Text(
-                                                AppLocalizations.of(context)
-                                                    .translate("fri"),
-                                                style: kSubTitlesStyle.copyWith(
-                                                    fontSize: 12,
-                                                    color: primaryColor,
-                                                    height: 1),
-                                              )
-                                            ],
-                                          ),
-                                          Column(
-                                            children: [
-                                              Text(
-                                                satRelapses,
-                                                style: kSubTitlesStyle.copyWith(
-                                                    height: 1,
-                                                    color: primaryColor),
-                                              ),
-                                              SizedBox(
-                                                height: 8,
-                                              ),
-                                              Text(
-                                                AppLocalizations.of(context)
-                                                    .translate("sat"),
-                                                style: kSubTitlesStyle.copyWith(
-                                                    fontSize: 12,
-                                                    color: primaryColor,
-                                                    height: 1),
-                                              )
-                                            ],
-                                          ),
-                                        ],
-                                      )
-                                    ],
-                                  ),
-                                );
+                                return DayOfWeekRelapsesWidget(
+                                    dailyStatistics(userRelapses));
                               }
                             },
                           ),
@@ -1568,6 +1369,7 @@ class _FollowYourRebootScreenState extends State<FollowYourRebootScreen>
         });
   }
 
+//TODO - We need to slightly change the model of the data, userFirstDate indtead of userPreviousStreak
   void performNewUserDialog() {
     // set up the button
     Widget confirmExistStreakButton = TextButton(
