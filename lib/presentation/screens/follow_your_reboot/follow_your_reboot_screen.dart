@@ -1,13 +1,11 @@
 import 'dart:core';
-import 'dart:math';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:firebase_database/firebase_database.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:reboot_app_3/presentation/Screens/auth/login_screen.dart';
-import 'package:reboot_app_3/presentation/screens/follow_your_reboot/follow_up_section.dart';
+//import 'package:reboot_app_3/presentation/screens/follow_your_reboot/follow_up_section.dart';
 import 'package:reboot_app_3/shared/components/bottom_navbar.dart';
 import 'package:reboot_app_3/shared/constants/constants.dart';
 import 'package:reboot_app_3/shared/constants/textstyles_constants.dart';
@@ -18,6 +16,8 @@ import 'package:syncfusion_flutter_calendar/calendar.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'follow_your_reboot_services.dart';
+import 'follow_your_reboot_widgets.dart';
+import 'notes/calender/calender_data_model.dart';
 import 'notes/notes_screen.dart';
 
 class Day {
@@ -39,16 +39,9 @@ class FollowYourRebootScreen extends StatefulWidget {
 
 class _FollowYourRebootScreenState extends State<FollowYourRebootScreen>
     with TickerProviderStateMixin {
-  final Color barBackgroundColor = const Color(0xff72d8bf);
-  final Duration animDuration = const Duration(milliseconds: 250);
-
-  var sidebarHidden = true;
-
   String lang;
 
-  final oldDatabase = FirebaseDatabase.instance.reference();
   FirebaseFirestore database = FirebaseFirestore.instance;
-  final auth = FirebaseAuth.instance;
   final user = FirebaseAuth.instance.currentUser;
 
   var resetDay;
@@ -79,6 +72,7 @@ class _FollowYourRebootScreenState extends State<FollowYourRebootScreen>
 
   final TextEditingController newStreak = TextEditingController();
 
+//TODO - 1. Method load userRelapses from the database
   void loadUserRelapces() async {
     final userData = database.collection('users').doc('${user.uid}');
 
@@ -192,6 +186,7 @@ class _FollowYourRebootScreenState extends State<FollowYourRebootScreen>
     });
   }
 
+//TODO -2. Method load userWatchingWithoutMasturbating from the database
   void loadUserNoPorn() async {
     final userData = database.collection('users').doc('${user.uid}');
 
@@ -240,6 +235,7 @@ class _FollowYourRebootScreenState extends State<FollowYourRebootScreen>
     });
   }
 
+//TODO -3. Method load userWatchingWithoutMasturbating from the database
   void loadUserNoMasts() async {
     final userData = database.collection('users').doc('${user.uid}');
 
@@ -297,7 +293,8 @@ class _FollowYourRebootScreenState extends State<FollowYourRebootScreen>
     });
   }
 
-  List<Day> getData() {
+//TODO -4. Method crating List<Day> for calender and adding the days to it
+  List<Day> getCalenderData() {
     var daysArray = <Day>[];
     var oldRelapses = <DateTime>[];
     var oldWatches = <DateTime>[];
@@ -450,10 +447,6 @@ class _FollowYourRebootScreenState extends State<FollowYourRebootScreen>
     return differences;
   }
 
-  int findMax(List<int> numbers) {
-    return numbers.reduce(max);
-  }
-
   double relapsesAverage(int averageNumber) {
     //get the number of relapses
     var relapsesCount = generalStatistics().length;
@@ -469,7 +462,7 @@ class _FollowYourRebootScreenState extends State<FollowYourRebootScreen>
   @override
   void initState() {
     super.initState();
-    getData();
+    getCalenderData();
     loadUserRelapces();
     loadUserNoPorn();
     loadUserNoMasts();
@@ -524,8 +517,10 @@ class _FollowYourRebootScreenState extends State<FollowYourRebootScreen>
                         ),
                         GestureDetector(
                           onTap: () {
-                            Navigator.push(context,
-                                MaterialPageRoute(builder: (context) => NotesScreen()));
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => NotesScreen()));
                           },
                           child: Icon(
                             Iconsax.book,
@@ -537,10 +532,10 @@ class _FollowYourRebootScreenState extends State<FollowYourRebootScreen>
                   ),
                 ),
                 SizedBox(height: 12),
-                //followUpSection(context),
-                FollowUpSection(),
+                followUpSection(context),
+                //FollowUpSection(),
                 Padding(
-                  padding:  EdgeInsets.only(right: 16, left: 16),
+                  padding: EdgeInsets.only(right: 16, left: 16),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -571,7 +566,7 @@ class _FollowYourRebootScreenState extends State<FollowYourRebootScreen>
                                   textAlign: TextAlign.center,
                                   backgroundColor: mainYellowColor,
                                   textStyle: kSubTitlesStyle),
-                              dataSource: MeetingDataSource(getData()),
+                              dataSource: CalenderDataSource(getCalenderData()),
                               monthViewSettings: MonthViewSettings(
                                 agendaStyle: AgendaStyle(),
                                 appointmentDisplayMode:
@@ -605,7 +600,8 @@ class _FollowYourRebootScreenState extends State<FollowYourRebootScreen>
                                       MediaQuery.of(context).size.height * 0.10,
                                   decoration: BoxDecoration(
                                       color: Colors.green.withOpacity(0.2),
-                                      borderRadius: BorderRadius.circular(12.5)),
+                                      borderRadius:
+                                          BorderRadius.circular(12.5)),
                                   child: Center(
                                     child: Text(
                                       AppLocalizations.of(context)
@@ -619,14 +615,16 @@ class _FollowYourRebootScreenState extends State<FollowYourRebootScreen>
                                 return Container(
                                   padding: EdgeInsets.all(20),
                                   width: MediaQuery.of(context).size.width,
-                                  height:
-                                      MediaQuery.of(context).size.height * 0.225,
+                                  height: MediaQuery.of(context).size.height *
+                                      0.225,
                                   decoration: BoxDecoration(
                                       color: accentColor.withOpacity(0.1),
-                                      borderRadius: BorderRadius.circular(12.5)),
+                                      borderRadius:
+                                          BorderRadius.circular(12.5)),
                                   //two lines of days
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       //first line of days
@@ -845,15 +843,18 @@ class _FollowYourRebootScreenState extends State<FollowYourRebootScreen>
                                   children: [
                                     Container(
                                       padding: EdgeInsets.all(12),
-                                      width: (MediaQuery.of(context).size.width -
-                                                  40) /
-                                              2 -
-                                          6,
-                                      height: MediaQuery.of(context).size.height *
-                                          0.22,
+                                      width:
+                                          (MediaQuery.of(context).size.width -
+                                                      40) /
+                                                  2 -
+                                              6,
+                                      height:
+                                          MediaQuery.of(context).size.height *
+                                              0.22,
                                       decoration: BoxDecoration(
                                         color: Colors.green.withOpacity(0.1),
-                                        borderRadius: BorderRadius.circular(12.5),
+                                        borderRadius:
+                                            BorderRadius.circular(12.5),
                                       ),
                                       child: Column(
                                         children: [
@@ -878,15 +879,18 @@ class _FollowYourRebootScreenState extends State<FollowYourRebootScreen>
                                               ),
                                               Padding(
                                                 padding: EdgeInsets.only(
-                                                    right: 8.0, top: 3, left: 8),
+                                                    right: 8.0,
+                                                    top: 3,
+                                                    left: 8),
                                                 child: Text(
                                                   AppLocalizations.of(context)
                                                       .translate(
                                                           'highest-streak'),
-                                                  style: kSubTitlesStyle.copyWith(
-                                                      fontSize: 16,
-                                                      color: Colors.green,
-                                                      height: 1),
+                                                  style:
+                                                      kSubTitlesStyle.copyWith(
+                                                          fontSize: 16,
+                                                          color: Colors.green,
+                                                          height: 1),
                                                 ),
                                               ),
                                             ],
@@ -905,15 +909,19 @@ class _FollowYourRebootScreenState extends State<FollowYourRebootScreen>
                                     ),
                                     Container(
                                       padding: EdgeInsets.all(12),
-                                      width: (MediaQuery.of(context).size.width -
-                                                  40) /
-                                              2 -
-                                          6,
-                                      height: MediaQuery.of(context).size.height *
-                                          0.22,
+                                      width:
+                                          (MediaQuery.of(context).size.width -
+                                                      40) /
+                                                  2 -
+                                              6,
+                                      height:
+                                          MediaQuery.of(context).size.height *
+                                              0.22,
                                       decoration: BoxDecoration(
-                                        color: Colors.redAccent.withOpacity(0.1),
-                                        borderRadius: BorderRadius.circular(12.5),
+                                        color:
+                                            Colors.redAccent.withOpacity(0.1),
+                                        borderRadius:
+                                            BorderRadius.circular(12.5),
                                       ),
                                       child: Column(
                                         children: [
@@ -939,15 +947,18 @@ class _FollowYourRebootScreenState extends State<FollowYourRebootScreen>
                                               ),
                                               Padding(
                                                 padding: EdgeInsets.only(
-                                                    right: 8.0, top: 3, left: 8),
+                                                    right: 8.0,
+                                                    top: 3,
+                                                    left: 8),
                                                 child: Text(
                                                   AppLocalizations.of(context)
                                                       .translate(
                                                           'relapses-count'),
-                                                  style: kSubTitlesStyle.copyWith(
-                                                      fontSize: 16,
-                                                      color: Colors.red,
-                                                      height: 1),
+                                                  style:
+                                                      kSubTitlesStyle.copyWith(
+                                                          fontSize: 16,
+                                                          color: Colors.red,
+                                                          height: 1),
                                                 ),
                                               ),
                                             ],
@@ -1001,7 +1012,8 @@ class _FollowYourRebootScreenState extends State<FollowYourRebootScreen>
                                                 right: 8.0, top: 3, left: 8),
                                             child: Text(
                                               AppLocalizations.of(context)
-                                                  .translate('relapses-average'),
+                                                  .translate(
+                                                      'relapses-average'),
                                               style: kSubTitlesStyle.copyWith(
                                                   fontSize: 16,
                                                   color: Colors.brown,
@@ -1028,7 +1040,8 @@ class _FollowYourRebootScreenState extends State<FollowYourRebootScreen>
                                                 style: kSubTitlesStyle.copyWith(
                                                     fontSize: 24,
                                                     color: Colors.brown,
-                                                    fontWeight: FontWeight.w400),
+                                                    fontWeight:
+                                                        FontWeight.w400),
                                               ),
                                               Text(
                                                 AppLocalizations.of(context)
@@ -1036,7 +1049,8 @@ class _FollowYourRebootScreenState extends State<FollowYourRebootScreen>
                                                 style: kSubTitlesStyle.copyWith(
                                                     color: Colors.brown,
                                                     fontSize: 14,
-                                                    fontWeight: FontWeight.w700),
+                                                    fontWeight:
+                                                        FontWeight.w700),
                                               )
                                             ],
                                           ),
@@ -1052,7 +1066,8 @@ class _FollowYourRebootScreenState extends State<FollowYourRebootScreen>
                                                 style: kSubTitlesStyle.copyWith(
                                                     fontSize: 24,
                                                     color: Colors.brown,
-                                                    fontWeight: FontWeight.w400),
+                                                    fontWeight:
+                                                        FontWeight.w400),
                                               ),
                                               Text(
                                                 AppLocalizations.of(context)
@@ -1060,7 +1075,8 @@ class _FollowYourRebootScreenState extends State<FollowYourRebootScreen>
                                                 style: kSubTitlesStyle.copyWith(
                                                     color: Colors.brown,
                                                     fontSize: 14,
-                                                    fontWeight: FontWeight.w700),
+                                                    fontWeight:
+                                                        FontWeight.w700),
                                               )
                                             ],
                                           ),
@@ -1076,7 +1092,8 @@ class _FollowYourRebootScreenState extends State<FollowYourRebootScreen>
                                                 style: kSubTitlesStyle.copyWith(
                                                     fontSize: 24,
                                                     color: Colors.brown,
-                                                    fontWeight: FontWeight.w400),
+                                                    fontWeight:
+                                                        FontWeight.w400),
                                               ),
                                               Text(
                                                 AppLocalizations.of(context)
@@ -1084,7 +1101,8 @@ class _FollowYourRebootScreenState extends State<FollowYourRebootScreen>
                                                 style: kSubTitlesStyle.copyWith(
                                                     color: Colors.brown,
                                                     fontSize: 14,
-                                                    fontWeight: FontWeight.w700),
+                                                    fontWeight:
+                                                        FontWeight.w700),
                                               )
                                             ],
                                           ),
@@ -1111,7 +1129,8 @@ class _FollowYourRebootScreenState extends State<FollowYourRebootScreen>
                                                 style: kSubTitlesStyle.copyWith(
                                                     color: Colors.brown,
                                                     fontSize: 12,
-                                                    fontWeight: FontWeight.w400),
+                                                    fontWeight:
+                                                        FontWeight.w400),
                                               ))
                                             ],
                                           ),
@@ -1139,182 +1158,177 @@ class _FollowYourRebootScreenState extends State<FollowYourRebootScreen>
 
   Container followUpSection(BuildContext context) {
     return Container(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                        AppLocalizations.of(context)
-                            .translate('current-streak'),
-                        style: kSubTitlesStyle),
-                    SizedBox(
-                      height: 8,
-                    ),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Container(
-                          width: MediaQuery.of(context).size.width * 0.27,
-                          height: 150,
-                          decoration: BoxDecoration(
-                              color: Colors.red.withOpacity(0.20),
-                              borderRadius: BorderRadius.circular(15)),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Container(
-                                child: Column(
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment.center,
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceEvenly,
-                                  children: [
-                                    Text(
-                                      this.currentStreak.toString(),
-                                      style: kPageTitleStyle.copyWith(
-                                        color: Colors.red,
-                                        fontSize: 35,
-                                      ),
-                                    ),
-                                    Text(
-                                      AppLocalizations.of(context)
-                                          .translate('free-relapse-days'),
-                                      style: kSubTitlesStyle.copyWith(
-                                        fontSize: 16,
-                                      ),
-                                      textAlign: TextAlign.center,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        SizedBox(
-                          width: 8,
-                        ),
-                        Container(
-                          width: MediaQuery.of(context).size.width * 0.27,
-                          height: 150,
-                          decoration: BoxDecoration(
-                              color: Colors.orangeAccent.withOpacity(0.2),
-                              borderRadius: BorderRadius.circular(15)),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Container(
-                                child: Column(
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment.center,
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceEvenly,
-                                  children: [
-                                    Text(
-                                      this.currentNoMastStreak.toString(),
-                                      style: kPageTitleStyle.copyWith(
-                                          color: Colors.orangeAccent),
-                                    ),
-                                    Text(
-                                      AppLocalizations.of(context)
-                                          .translate('free-mast-days'),
-                                      style: kSubTitlesStyle.copyWith(
-                                        fontSize: 16,
-                                      ),
-                                      textAlign: TextAlign.center,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        SizedBox(
-                          width: 8,
-                        ),
-                        Container(
-                          width: MediaQuery.of(context).size.width * 0.27,
-                          height: 150,
-                          decoration: BoxDecoration(
-                              color: Colors.purple.withOpacity(0.2),
-                              borderRadius: BorderRadius.circular(15)),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Container(
-                                child: Column(
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment.center,
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceEvenly,
-                                  children: [
-                                    Text(
-                                      this.currentNoPornStreak.toString(),
-                                      style: kPageTitleStyle.copyWith(
-                                          color: Colors.purple),
-                                    ),
-                                    Text(
-                                      AppLocalizations.of(context)
-                                          .translate('free-porn-days'),
-                                      style: kSubTitlesStyle.copyWith(
-                                        fontSize: 16,
-                                      ),
-                                      textAlign: TextAlign.center,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(
-                      height: 20,
-                    ),
-                    Container(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          GestureDetector(
-                            onTap: () {
-                              final DateTime now = DateTime.now();
-                              final DateFormat formatter =
-                                  DateFormat('yyyy-MM-dd');
-                              final String today = formatter.format(now);
-                              changeDateEvent(today);
-                            },
-                            child: Container(
-                              width: (MediaQuery.of(context).size.width - 40),
-                              height: 50,
-                              decoration: BoxDecoration(
-                                  color: primaryColor,
-                                  borderRadius: BorderRadius.circular(10)),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    AppLocalizations.of(context)
-                                        .translate('daily-follow-up'),
-                                    style: kSubTitlesStyle.copyWith(
-                                        fontSize: 20,
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.w400,
-                                        height: 1),
-                                  ),
-                                ],
+      child: Padding(
+        padding: EdgeInsets.only(right: 16.0, left: 16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(AppLocalizations.of(context).translate('current-streak'),
+                style: kSubTitlesStyle),
+            SizedBox(
+              height: 8,
+            ),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Container(
+                  width: MediaQuery.of(context).size.width * 0.27,
+                  height: 150,
+                  decoration: BoxDecoration(
+                      color: Colors.red.withOpacity(0.20),
+                      borderRadius: BorderRadius.circular(15)),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            Text(
+                              this.currentStreak.toString(),
+                              style: kPageTitleStyle.copyWith(
+                                color: Colors.red,
+                                fontSize: 35,
                               ),
                             ),
+                            Text(
+                              AppLocalizations.of(context)
+                                  .translate('free-relapse-days'),
+                              style: kSubTitlesStyle.copyWith(
+                                fontSize: 16,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(
+                  width: 8,
+                ),
+                Container(
+                  width: MediaQuery.of(context).size.width * 0.27,
+                  height: 150,
+                  decoration: BoxDecoration(
+                      color: Colors.orangeAccent.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(15)),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            Text(
+                              this.currentNoMastStreak.toString(),
+                              style: kPageTitleStyle.copyWith(
+                                  color: Colors.orangeAccent),
+                            ),
+                            Text(
+                              AppLocalizations.of(context)
+                                  .translate('free-mast-days'),
+                              style: kSubTitlesStyle.copyWith(
+                                fontSize: 16,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(
+                  width: 8,
+                ),
+                Container(
+                  width: MediaQuery.of(context).size.width * 0.27,
+                  height: 150,
+                  decoration: BoxDecoration(
+                      color: Colors.purple.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(15)),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            Text(
+                              this.currentNoPornStreak.toString(),
+                              style: kPageTitleStyle.copyWith(
+                                  color: Colors.purple),
+                            ),
+                            Text(
+                              AppLocalizations.of(context)
+                                  .translate('free-porn-days'),
+                              style: kSubTitlesStyle.copyWith(
+                                fontSize: 16,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(
+              height: 20,
+            ),
+            Container(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      final DateTime now = DateTime.now();
+                      final DateFormat formatter = DateFormat('yyyy-MM-dd');
+                      final String today = formatter.format(now);
+                      changeDateEvent(today);
+                    },
+                    child: Container(
+                      width: (MediaQuery.of(context).size.width),
+                      height: 50,
+                      decoration: BoxDecoration(
+                          color: primaryColor,
+                          borderRadius: BorderRadius.circular(10)),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            AppLocalizations.of(context)
+                                .translate('daily-follow-up'),
+                            style: kSubTitlesStyle.copyWith(
+                                fontSize: 20,
+                                color: Colors.white,
+                                fontWeight: FontWeight.w400,
+                                height: 1),
                           ),
-                          SizedBox(height: 8),
                         ],
                       ),
                     ),
-                  ],
-                ),
-              );
+                  ),
+                  SizedBox(height: 8),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
+//TODO - This needed to be refactored to not depend on the variable in the widget
   void dateChecker(DateTime date) {
     //get the range of the dates from the first recorded date until today
     final today = DateTime.now();
@@ -1325,68 +1339,8 @@ class _FollowYourRebootScreenState extends State<FollowYourRebootScreen>
       final dateStr = date.toString().substring(0, 11);
       changeDateEvent(dateStr);
     } else {
-      outOfRangeAlert();
+      outOfRangeAlert(context);
     }
-  }
-
-  void outOfRangeAlert() {
-    showModalBottomSheet(
-        context: context,
-        builder: (context) {
-          return Padding(
-            padding: EdgeInsets.fromLTRB(0, 8, 0, 0),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      height: 5,
-                      width: MediaQuery.of(context).size.width * 0.1,
-                      decoration: BoxDecoration(
-                          color: Colors.black12,
-                          borderRadius: BorderRadius.circular(30)),
-                    )
-                  ],
-                ),
-                SizedBox(
-                  height: 12,
-                ),
-                CircleAvatar(
-                  backgroundColor: Colors.red.withOpacity(0.2),
-                  child: Icon(
-                    Iconsax.warning_2,
-                    color: Colors.red,
-                  ),
-                ),
-                SizedBox(
-                  height: 4,
-                ),
-                Text(
-                  AppLocalizations.of(context).translate('out-of-range'),
-                  style:
-                      kPageTitleStyle.copyWith(color: Colors.red, fontSize: 24),
-                ),
-                SizedBox(
-                  height: 8,
-                ),
-                Text(
-                  AppLocalizations.of(context).translate('out-of-range-p'),
-                  style: kSubTitlesStyle.copyWith(
-                      color: Colors.black.withOpacity(0.7),
-                      fontWeight: FontWeight.normal,
-                      fontSize: 18),
-                ),
-                SizedBox(
-                  height: 30,
-                )
-              ],
-            ),
-          );
-        });
   }
 
   void changeDateEvent(String date) async {
@@ -1457,8 +1411,10 @@ class _FollowYourRebootScreenState extends State<FollowYourRebootScreen>
                     //relapse
                     GestureDetector(
                       onTap: () {
+                        //TODO - Take all of this logic out of here
                         setState(() {
                           if (!userRelapses.contains(trimedDate)) {
+                            //
                             userRelapses.add(trimedDate);
                             database.collection("users").doc(user.uid).update({
                               "userRelapses": userRelapses,
@@ -1644,14 +1600,6 @@ class _FollowYourRebootScreenState extends State<FollowYourRebootScreen>
         });
   }
 
-  bool isIncluded(List list, String date) {
-    if (list.contains(date)) {
-      return false;
-    } else {
-      return true;
-    }
-  }
-
   void performNewUserDialog() {
     // set up the button
     Widget confirmExistStreakButton = TextButton(
@@ -1730,37 +1678,6 @@ class _FollowYourRebootScreenState extends State<FollowYourRebootScreen>
         return alert;
       },
     );
-  }
-}
-
-class MeetingDataSource extends CalendarDataSource {
-  MeetingDataSource(List<Day> source) {
-    appointments = source;
-  }
-
-  @override
-  String getSubject(int index) {
-    return appointments[index].type;
-  }
-
-  @override
-  DateTime getStartTime(int index) {
-    return appointments[index].date;
-  }
-
-  @override
-  DateTime getEndTime(int index) {
-    return appointments[index].date;
-  }
-
-  @override
-  Color getColor(int index) {
-    return appointments[index].color;
-  }
-
-  @override
-  bool isAllDay(int index) {
-    return true;
   }
 }
 

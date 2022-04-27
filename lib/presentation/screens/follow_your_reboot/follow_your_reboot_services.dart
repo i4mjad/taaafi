@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 String translate(String input) {
@@ -25,4 +26,8 @@ String translate(String input) {
 
 DateTime parseTime(dynamic date) {
   return Platform.isIOS ? (date as Timestamp).toDate() : (date as DateTime);
+}
+
+int findMax(List<int> numbers) {
+  return numbers.reduce(max);
 }
