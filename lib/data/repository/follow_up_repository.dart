@@ -1,4 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:reboot_app_3/data/follow_up_repository.dart';
 import 'package:reboot_app_3/data/models/user_profile.dart';
