@@ -1060,17 +1060,23 @@ class _FollowYourRebootScreenState extends State<FollowYourRebootScreen>
                 children: [
                   GestureDetector(
                     onTap: () {
-                      final DateTime now = DateTime.now();
-                      final DateFormat formatter = DateFormat('yyyy-MM-dd');
-                      final String today = formatter.format(now);
-                      changeDateEvent(today);
+                      changeDateEvent(getTodaysDateString());
                     },
                     child: Container(
                       width: (MediaQuery.of(context).size.width),
-                      height: 50,
+                      height: 60,
                       decoration: BoxDecoration(
-                          color: primaryColor,
-                          borderRadius: BorderRadius.circular(10)),
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.withOpacity(0.5),
+                            spreadRadius: .25,
+                            blurRadius: 7,
+                            offset: Offset(0, 2), // changes position of shadow
+                          ),
+                        ],
+                      ),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -1079,7 +1085,7 @@ class _FollowYourRebootScreenState extends State<FollowYourRebootScreen>
                                 .translate('daily-follow-up'),
                             style: kSubTitlesStyle.copyWith(
                                 fontSize: 20,
-                                color: Colors.white,
+                                color: primaryColor,
                                 fontWeight: FontWeight.w400,
                                 height: 1),
                           ),
@@ -1095,6 +1101,13 @@ class _FollowYourRebootScreenState extends State<FollowYourRebootScreen>
         ),
       ),
     );
+  }
+
+  String getTodaysDateString() {
+    final DateTime now = DateTime.now();
+    final DateFormat formatter = DateFormat('yyyy-MM-dd');
+    final String today = formatter.format(now);
+    return today;
   }
 
 //TODO - This needed to be refactored to not depend on the variable in the widget
