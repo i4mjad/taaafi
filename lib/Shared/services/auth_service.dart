@@ -5,8 +5,6 @@ import 'dart:async';
 
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
-//TODO: Move Apple sign in services to this file
-
 class GoogleAuthenticationService extends ChangeNotifier {
   final FirebaseAuth _firebaseAuth;
   GoogleAuthenticationService(this._firebaseAuth);
