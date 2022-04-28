@@ -6,8 +6,6 @@ import 'package:iconsax/iconsax.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:reboot_app_3/Model/Relapse.dart';
 import 'package:reboot_app_3/presentation/Screens/auth/login_screen.dart';
-//import 'package:reboot_app_3/presentation/screens/follow_your_reboot/follow_up_section.dart';
-import 'package:reboot_app_3/shared/components/bottom_navbar.dart';
 import 'package:reboot_app_3/shared/constants/constants.dart';
 import 'package:reboot_app_3/shared/constants/textstyles_constants.dart';
 import 'package:reboot_app_3/shared/localization/localization.dart';
@@ -450,10 +448,10 @@ class _FollowYourRebootScreenState extends State<FollowYourRebootScreen>
   @override
   void initState() {
     super.initState();
-    getCalenderData();
     loadUserRelapces();
     loadUserNoPorn();
     loadUserNoMasts();
+    getCalenderData();
 
     LocaleService.getSelectedLocale().then((value) {
       setState(() {
@@ -473,52 +471,33 @@ class _FollowYourRebootScreenState extends State<FollowYourRebootScreen>
               children: [
                 Padding(
                   padding: const EdgeInsets.only(right: 16, left: 16),
-                  child: GestureDetector(
-                    onTap: () {
-                      Navigator.pop(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => NavigationBar()));
-                    },
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Icon(
-                              lang != "ar"
-                                  ? Iconsax.arrow_left
-                                  : Iconsax.arrow_right,
-                              size: 28,
-                            ),
-                            SizedBox(width: 8),
-                            Text(
-                              AppLocalizations.of(context)
-                                  .translate('follow-your-reboot'),
-                              style: kPageTitleStyle.copyWith(
-                                  height: 1, fontSize: 28),
-                            ),
-                          ],
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        AppLocalizations.of(context)
+                            .translate('follow-your-reboot'),
+                        style:
+                            kPageTitleStyle.copyWith(height: 1, fontSize: 28),
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => NotesScreen()));
+                        },
+                        child: Icon(
+                          Iconsax.archive_1,
+                          size: 32,
+                          color: primaryColor,
                         ),
-                        GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => NotesScreen()));
-                          },
-                          child: Icon(
-                            Iconsax.book,
-                            size: 32,
-                          ),
-                        ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
-                SizedBox(height: 12),
+                SizedBox(height: 32),
                 followUpSection(context),
                 //FollowUpSection(),
                 Padding(
@@ -1051,7 +1030,7 @@ class _FollowYourRebootScreenState extends State<FollowYourRebootScreen>
               ],
             ),
             SizedBox(
-              height: 20,
+              height: 16,
             ),
             Container(
               child: Column(
@@ -1093,7 +1072,7 @@ class _FollowYourRebootScreenState extends State<FollowYourRebootScreen>
                       ),
                     ),
                   ),
-                  SizedBox(height: 8),
+                  SizedBox(height: 24),
                 ],
               ),
             ),
