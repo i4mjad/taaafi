@@ -1113,16 +1113,21 @@ class _FollowYourRebootScreenState extends State<FollowYourRebootScreen>
 //TODO - This needed to be refactored to not depend on the variable in the widget
   void dateChecker(DateTime date) {
     //get the range of the dates from the first recorded date until today
-    final today = DateTime.now();
 
     //check if the date clicked is within the range, if yes pass it to the function, if not inform the user
-    if (date.isAfter(resetDay != null ? resetDay : userFirstDayRecorded) &&
-        date.isBefore(today)) {
+    if (dayWithinRange(date)) {
       final dateStr = date.toString().substring(0, 11);
       changeDateEvent(dateStr);
     } else {
       outOfRangeAlert(context);
     }
+  }
+
+  bool dayWithinRange(DateTime date) {
+    final today = DateTime.now();
+
+    return date.isAfter(resetDay != null ? resetDay : userFirstDayRecorded) &&
+        date.isBefore(today);
   }
 
   void changeDateEvent(String date) async {
