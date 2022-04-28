@@ -16,6 +16,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 // ignore: unused_import
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 
+//TODO - Refactor this code and move firebase responsibility to separate files
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
