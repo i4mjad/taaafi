@@ -11,7 +11,6 @@ import 'package:reboot_app_3/shared/localization/localization.dart';
 import 'package:reboot_app_3/shared/services/auth_service.dart';
 import 'package:reboot_app_3/shared/services/notification_service.dart';
 
-
 import 'Widgets/delete_account_bottomsheet.dart';
 import 'Widgets/reset_account_bottomsheet.dart';
 import 'Widgets/user_profile_card.dart';
@@ -27,8 +26,6 @@ class AccountScreen extends StatefulWidget {
 
 class _AccountScreenState extends State<AccountScreen>
     with TickerProviderStateMixin {
-
-
   @override
   void initState() {
     super.initState();
@@ -39,7 +36,7 @@ class _AccountScreenState extends State<AccountScreen>
     return Scaffold(
         backgroundColor: seconderyColor,
         body: Padding(
-          padding: EdgeInsets.only(top: 100.0, left: 20.0, right: 20),
+          padding: EdgeInsets.only(top: 100.0, left: 16.0, right: 16),
           child: SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -54,94 +51,97 @@ class _AccountScreenState extends State<AccountScreen>
                   ],
                 ),
                 SizedBox(
-                  height: 20,
+                  height: 24,
                 ),
                 UserProfileCard(),
                 SizedBox(
-                  height: 12,
+                  height: 32,
                 ),
                 Text(AppLocalizations.of(context).translate('app-settings'),
                     style: kSubTitlesStyle),
                 SizedBox(
-                  height: 12,
+                  height: 16,
                 ),
-                Container(
-                  padding: EdgeInsets.only(top: 12, bottom: 12),
-                  decoration: BoxDecoration(
-                      color: Colors.white,
-                      border: Border.all(
-                          width: 0.25, color: primaryColor.withOpacity(0.5)),
-                      borderRadius: BorderRadius.circular(12.5)),
-                  child: Column(
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.only(top: 4, bottom: 8),
-                        child: GestureDetector(
-                          onTap: () {
-                            NotificationService.scheduleDailyNotification(context);
-                          },
+                Column(
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.only(top: 4, bottom: 8),
+                      child: GestureDetector(
+                        onTap: () {
+                          NotificationService.scheduleDailyNotification(
+                              context);
+                        },
+                        child: Padding(
+                          padding: EdgeInsets.only(bottom: 8.0, top: 8),
                           child: Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Padding(
-                                padding: EdgeInsets.only(left: 12, right: 12),
-                                child: Icon(
-                                  Iconsax.notification_bing,
-                                  size: 26,
-                                  color: primaryColor,
-                                ),
-                              ),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: <Widget>[
+                              Row(
+                                children: [
+                                  Padding(
+                                    padding:
+                                        EdgeInsets.only(left: 12, right: 12),
+                                    child: Icon(
+                                      Iconsax.message_notif,
+                                      size: 24,
+                                      color: primaryColor,
+                                    ),
+                                  ),
                                   Text(
                                       AppLocalizations.of(context)
                                           .translate('daily-notification-time'),
                                       style: kSubTitlesStyle.copyWith(
                                           fontSize: 17, height: 1.25)),
                                 ],
-                              )
+                              ),
+                              Icon(
+                                CupertinoIcons.chevron_back,
+                                size: 24,
+                                color: Colors.grey,
+                              ),
                             ],
                           ),
                         ),
                       ),
-                      Divider(),
-                      Padding(
-                        padding: EdgeInsets.only(top: 8.0, bottom: 4),
-                        child: GestureDetector(
-                          onTap: () {
-                            ChangeLanguageWidget.changeLanguage(context);
-                          },
+                    ),
+                    Divider(),
+                    Padding(
+                      padding: EdgeInsets.only(top: 8.0, bottom: 4),
+                      child: GestureDetector(
+                        onTap: () {
+                          ChangeLanguageWidget.changeLanguage(context);
+                        },
+                        child: Padding(
+                          padding: EdgeInsets.only(bottom: 8.0, top: 8),
                           child: Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Padding(
-                                padding: EdgeInsets.only(left: 12, right: 12),
-                                child: Icon(
-                                  Iconsax.global,
-                                  size: 26,
-                                  color: Colors.purple,
-                                ),
-                              ),
                               Row(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: <Widget>[
+                                children: [
+                                  Padding(
+                                    padding:
+                                        EdgeInsets.only(left: 12, right: 12),
+                                    child: Icon(
+                                      Iconsax.global,
+                                      size: 26,
+                                      color: Colors.purple,
+                                    ),
+                                  ),
                                   Text(
                                       AppLocalizations.of(context)
                                           .translate('change-lang'),
                                       style: kSubTitlesStyle.copyWith(
                                           fontSize: 17, height: 1.25)),
                                 ],
-                              )
+                              ),
+                              Icon(CupertinoIcons.chevron_back,
+                                  size: 24, color: Colors.grey),
                             ],
                           ),
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
                 SizedBox(
                   height: 12,
@@ -198,7 +198,9 @@ class _AccountScreenState extends State<AccountScreen>
                         padding: EdgeInsets.only(top: 8.0, bottom: 4),
                         child: GestureDetector(
                           onTap: () {
-                            context.read<GoogleAuthenticationService>().signOut();
+                            context
+                                .read<GoogleAuthenticationService>()
+                                .signOut();
                           },
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.start,
@@ -231,7 +233,8 @@ class _AccountScreenState extends State<AccountScreen>
                         padding: EdgeInsets.only(top: 8.0, bottom: 4),
                         child: GestureDetector(
                           onTap: () {
-                            DeleteAccountSheet.openDeleteAccountMessage(context);
+                            DeleteAccountSheet.openDeleteAccountMessage(
+                                context);
                           },
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.start,
@@ -270,9 +273,7 @@ class _AccountScreenState extends State<AccountScreen>
           ),
         ));
   }
-
 }
-
 
 class AccountScreenScreenAuthenticationWrapper extends StatelessWidget {
   @override

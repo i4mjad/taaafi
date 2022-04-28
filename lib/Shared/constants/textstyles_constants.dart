@@ -59,7 +59,7 @@ var kTitlePrimeryStyle = TextStyle(
 
 var kTitleSeconderyStyle = TextStyle(
     fontSize: 22.0,
-    fontWeight: FontWeight.w400,
+    fontWeight: FontWeight.w500,
     fontFamily: 'IBMArabic',
     decoration: TextDecoration.none,
     height: 1);
