@@ -20,8 +20,8 @@ class _NavigationBarState extends State<NavigationBar> {
   int _selectedIndex = 0;
   List<Widget> _pages = <Widget>[
     HomeScreen(),
-    CommunityPage(),
     FollowYourRebootScreenAuthenticationWrapper(),
+    CommunityPage(),
     AccountScreenScreenAuthenticationWrapper(),
     AboutScreen(),
   ];
@@ -48,14 +48,14 @@ class _NavigationBarState extends State<NavigationBar> {
               label: AppLocalizations.of(context).translate('home')),
           BottomNavigationBarItem(
               icon: Icon(
-                Iconsax.people,
+                Iconsax.chart,
               ),
-              label: AppLocalizations.of(context).translate('community')),
+              label: "تابع تعافيك"),
           BottomNavigationBarItem(
               icon: Icon(
                 Iconsax.people,
               ),
-              label: "تابع تعافيك"),
+              label: AppLocalizations.of(context).translate('community')),
           BottomNavigationBarItem(
               icon: Icon(
                 Iconsax.personalcard,
