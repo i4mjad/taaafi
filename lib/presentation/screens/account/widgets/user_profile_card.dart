@@ -50,13 +50,18 @@ class UserProfileCard extends StatelessWidget {
                       this.user.displayName,
                   style: kTitleSeconderyStyle,
                 ),
-                Text(this.user.email, style: kCaptionStyle),
+                SizedBox(height: 8),
+                Text(this.user.email.toUpperCase(), style: kCaptionStyle),
               ],
             ),
           ],
         ),
         Container(
-          child: Icon(CupertinoIcons.chevron_back, color: primaryColor),
+          child: Icon(
+            CupertinoIcons.chevron_back,
+            color: Colors.black.withOpacity(0.3),
+            size: 24,
+          ),
         ),
       ],
     );
