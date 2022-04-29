@@ -41,8 +41,7 @@ dependencies:
   flutter_html: 
   flutter_local_notifications: 5.0.0
   flutter_localizations:
-    sdk: flutter
-  flutter_svg: 
+    sdk: flutter 
   google_sign_in: 
   http: 
   iconsax: ^0.0.8
