@@ -53,6 +53,7 @@ class _FollowYourRebootScreenState extends State<FollowYourRebootScreen>
 
   var userFirstDayRecorded;
 
+
   var satRelapses = "";
   var sunRelapses = "";
   var monRelapses = "";
@@ -63,7 +64,7 @@ class _FollowYourRebootScreenState extends State<FollowYourRebootScreen>
 
   final TextEditingController newStreak = TextEditingController();
 
-//TODO - 1. Method load userRelapses from the database
+//TODO - TPUR. Method load userRelapses from the database
   void loadUserRelapces() async {
     final userData = database.collection('users').doc('${user.uid}');
 
@@ -73,7 +74,7 @@ class _FollowYourRebootScreenState extends State<FollowYourRebootScreen>
           snapshot.data().containsKey('userPreviousStreak') &&
           snapshot.get("userPreviousStreak") != null) {
         //exist user, load data
-
+        // TODO - TPUR01
         final previousStreak = await snapshot.get("userPreviousStreak");
         setState(() {
           userPreviousStreak = previousStreak;
@@ -82,6 +83,9 @@ class _FollowYourRebootScreenState extends State<FollowYourRebootScreen>
         //check if user have relapses before
         if (snapshot.data().containsKey('userRelapses') &&
             snapshot.get("userPreviousStreak") != null) {
+          //
+
+          //TODO - TPUR01-01-LOGIC
           setState(() {
             userRelapses.clear();
             for (var date in snapshot.get("userRelapses")) {
@@ -96,7 +100,9 @@ class _FollowYourRebootScreenState extends State<FollowYourRebootScreen>
 
           var userFirstDate;
 
+          //TODO - TPUR01-01-IF01
           if (snapshot.data().containsKey("resetedDate")) {
+            //TODO - TPUR01-01-IF01-01
             final userFirstDateTimeStamp = await snapshot.get("resetedDate");
 
             DateTime userRefDate = parseTime(userFirstDateTimeStamp);
@@ -106,6 +112,7 @@ class _FollowYourRebootScreenState extends State<FollowYourRebootScreen>
               this.userFirstDayRecorded = userRefDate;
             });
           } else {
+            //TODO - TP-01-01-IF01-02
             userFirstDate =
                 regDate.add(Duration(days: userPreviousStreak.toInt()));
 
@@ -114,7 +121,9 @@ class _FollowYourRebootScreenState extends State<FollowYourRebootScreen>
             });
           }
 
+          //TODO - TPUR01-01-IF02
           if (userRelapses.length > 0) {
+            //TODO - TPUR01-01-IF02-01
             //get the last relapse
             userRelapses.sort((a, b) {
               return a.compareTo(b);
@@ -135,9 +144,9 @@ class _FollowYourRebootScreenState extends State<FollowYourRebootScreen>
             });
           }
         } else {
-          //dose not have old relapses, ether he is reseted the data or he have no relapses at all, so use other calc method
-
+          //TODO - TPUR01-02
           if (snapshot.data().containsKey("resetedDate") != false) {
+            //TODO - TPUR01-02-01
             final today = DateTime.now();
             final userFirstDateTimeStamp = await snapshot.get("resetedDate");
 
@@ -149,6 +158,7 @@ class _FollowYourRebootScreenState extends State<FollowYourRebootScreen>
               resetDay = userRefDate;
             });
           } else {
+            //TODO - TPUR01-02-02
             final today = DateTime.now();
             final regDate = user.metadata.creationTime;
             final userFirstDate =
@@ -161,14 +171,14 @@ class _FollowYourRebootScreenState extends State<FollowYourRebootScreen>
             });
           }
         }
-      }
-
-      //new user or have old data
-      else {
+      } else {
+        //TODO - TPUR02
         if ((snapshot.exists == true &&
             snapshot.get("userPreviousStreak") == null)) {
+          //TODO - TPUR02-01
           performNewUserDialog();
         } else {
+          //TODO - TPUR02-02
           if (snapshot.exists == false) {
             performNewUserDialog();
           }
@@ -177,13 +187,14 @@ class _FollowYourRebootScreenState extends State<FollowYourRebootScreen>
     });
   }
 
-//TODO -2. Method load userWatchingWithoutMasturbating from the database
-  void loadUserNoPorn() async {
+//TODO -TPUW. Method load userWatchingWithoutMasturbating from the database
+  void loadUserWatchesOnly() async {
     final userData = database.collection('users').doc('${user.uid}');
 
     userData.snapshots().listen((snapshot) {
       if (snapshot.exists == true &&
           snapshot.data().containsKey("userWatchingWithoutMasturbating")) {
+            //TODO - TPUW01
         setState(() {
           userWatchingWithoutMasturbating.clear();
           for (var date in snapshot.get("userWatchingWithoutMasturbating")) {
@@ -194,6 +205,7 @@ class _FollowYourRebootScreenState extends State<FollowYourRebootScreen>
         final today = DateTime.now();
 
         if (userWatchingWithoutMasturbating.length >= 1) {
+          //TODO - TPUW01-01
           //get the last relapse
           userWatchingWithoutMasturbating.sort((a, b) {
             return a.compareTo(b);
@@ -213,12 +225,14 @@ class _FollowYourRebootScreenState extends State<FollowYourRebootScreen>
             this.currentNoPornStreak = calcStreak;
           });
         } else {
+          //TODO - TPUW01-02
           //array has one value
           setState(() {
             currentNoPornStreak = currentStreak;
           });
         }
       } else {
+        //TODO - TPUW02
         setState(() {
           currentNoPornStreak = currentStreak;
         });
@@ -226,13 +240,14 @@ class _FollowYourRebootScreenState extends State<FollowYourRebootScreen>
     });
   }
 
-//TODO -3. Method load userWatchingWithoutMasturbating from the database
-  void loadUserNoMasts() async {
+//TODO -TPUM. Method load userMasturbatingWithoutWatching from the database
+  void loadUserMastsOnly() async {
     final userData = database.collection('users').doc('${user.uid}');
 
     userData.snapshots().listen((snapshot) {
       //check if user have watches before
       if (snapshot.data().containsKey('userMasturbatingWithoutWatching')) {
+       //TODO - TPUM01
         //add the dates to the array
 
         setState(() {
@@ -247,6 +262,7 @@ class _FollowYourRebootScreenState extends State<FollowYourRebootScreen>
         //geting the current streak if
 
         if (userMasturbatingWithoutWatching.length >= 1) {
+          //TODO - TPUM01-01
           //get the last relapse
 
           //sort by date
@@ -269,6 +285,7 @@ class _FollowYourRebootScreenState extends State<FollowYourRebootScreen>
             this.currentNoMastStreak = calcStreak;
           });
         } else {
+          //TODO - TPUM01-02
           setState(() {
             currentNoMastStreak = currentStreak;
           });
@@ -277,6 +294,7 @@ class _FollowYourRebootScreenState extends State<FollowYourRebootScreen>
 
       //no mast
       else {
+        //TODO - TPUM02
         setState(() {
           currentNoMastStreak = currentStreak;
         });
@@ -449,8 +467,8 @@ class _FollowYourRebootScreenState extends State<FollowYourRebootScreen>
   void initState() {
     super.initState();
     loadUserRelapces();
-    loadUserNoPorn();
-    loadUserNoMasts();
+    loadUserWatchesOnly();
+    loadUserMastsOnly();
     getCalenderData();
 
     LocaleService.getSelectedLocale().then((value) {
