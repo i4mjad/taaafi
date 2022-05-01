@@ -176,11 +176,11 @@ class _FollowYourRebootScreenState extends State<FollowYourRebootScreen>
         if ((snapshot.exists == true &&
             snapshot.get("userPreviousStreak") == null)) {
           //TODO - TPUR02-01
-          performNewUserDialog();
+          newUserDialog();
         } else {
           //TODO - TPUR02-02
           if (snapshot.exists == false) {
-            performNewUserDialog();
+            newUserDialog();
           }
         }
       }
@@ -1385,7 +1385,7 @@ class _FollowYourRebootScreenState extends State<FollowYourRebootScreen>
   }
 
 //TODO - We need to slightly change the model of the data, userFirstDate indtead of userPreviousStreak
-  void performNewUserDialog() {
+  void newUserDialog() {
     // set up the button
     Widget confirmExistStreakButton = TextButton(
       child: Text(
