@@ -23,6 +23,7 @@ Future<void> main() async {
   await Firebase.initializeApp();
   //await PaymentServices.initPayment();
 
+//TODO - Move notification responsibility to seperate file
   var initializationSettingsAndroid = AndroidInitializationSettings('app_icon');
   var initializationSettingsiOS = IOSInitializationSettings(
       requestAlertPermission: true,

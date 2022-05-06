@@ -53,7 +53,6 @@ class _FollowYourRebootScreenState extends State<FollowYourRebootScreen>
 
   var userFirstDayRecorded;
 
-
   var satRelapses = "";
   var sunRelapses = "";
   var monRelapses = "";
@@ -93,7 +92,7 @@ class _FollowYourRebootScreenState extends State<FollowYourRebootScreen>
             }
           });
 
-          dailyStatistics(this.userRelapses);
+
 
           final today = DateTime.now();
           final regDate = user.metadata.creationTime;
@@ -112,7 +111,7 @@ class _FollowYourRebootScreenState extends State<FollowYourRebootScreen>
               this.userFirstDayRecorded = userRefDate;
             });
           } else {
-            //TODO - TP-01-01-IF01-02
+            //TODO - TPUR01-01-IF01-02
             userFirstDate =
                 regDate.add(Duration(days: userPreviousStreak.toInt()));
 
@@ -192,9 +191,10 @@ class _FollowYourRebootScreenState extends State<FollowYourRebootScreen>
     final userData = database.collection('users').doc('${user.uid}');
 
     userData.snapshots().listen((snapshot) {
+      //TODO - TPUW01
       if (snapshot.exists == true &&
           snapshot.data().containsKey("userWatchingWithoutMasturbating")) {
-            //TODO - TPUW01
+        //TODO - TPUW01-LOGIC
         setState(() {
           userWatchingWithoutMasturbating.clear();
           for (var date in snapshot.get("userWatchingWithoutMasturbating")) {
@@ -231,8 +231,10 @@ class _FollowYourRebootScreenState extends State<FollowYourRebootScreen>
             currentNoPornStreak = currentStreak;
           });
         }
-      } else {
-        //TODO - TPUW02
+      }
+
+      //TODO - TPUW02
+      else {
         setState(() {
           currentNoPornStreak = currentStreak;
         });
@@ -247,8 +249,8 @@ class _FollowYourRebootScreenState extends State<FollowYourRebootScreen>
     userData.snapshots().listen((snapshot) {
       //check if user have watches before
       if (snapshot.data().containsKey('userMasturbatingWithoutWatching')) {
-       //TODO - TPUM01
-        //add the dates to the array
+        //TODO - TPUM01
+        //TODO - TPUM01-LOGIC
 
         setState(() {
           userMasturbatingWithoutWatching.clear();
@@ -258,8 +260,6 @@ class _FollowYourRebootScreenState extends State<FollowYourRebootScreen>
         });
 
         final today = DateTime.now();
-
-        //geting the current streak if
 
         if (userMasturbatingWithoutWatching.length >= 1) {
           //TODO - TPUM01-01
