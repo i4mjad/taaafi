@@ -50,7 +50,7 @@ class _NavigationBarState extends State<NavigationBar> {
               icon: Icon(
                 Iconsax.chart,
               ),
-              label: "تابع تعافيك"),
+              label: AppLocalizations.of(context).translate('fyr')),
           BottomNavigationBarItem(
               icon: Icon(
                 Iconsax.people,
