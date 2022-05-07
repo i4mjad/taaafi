@@ -35,7 +35,7 @@ class _AboutScreenState extends State<AboutScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: seconderyColor,
+      backgroundColor: seconderyColor.withOpacity(0.2),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -53,7 +53,8 @@ class _AboutScreenState extends State<AboutScreen>
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     SvgPicture.asset("asset/illustrations/app-logo-about.svg",
-                        height: MediaQuery.of(context).size.height * 0.2),
+                        height: MediaQuery.of(context).size.height * 0.175),
+                    SizedBox(height: 16,),
                     Text(
                       AppLocalizations.of(context).translate("ta3afi"),
                       style: kPageTitleStyle.copyWith(
@@ -64,9 +65,11 @@ class _AboutScreenState extends State<AboutScreen>
                     ),
                     Text(
                       AppLocalizations.of(context).translate("about-ta3afi"),
-                      style: kSubTitlesSubsStyle.copyWith(
-                          color: Colors.black.withOpacity(0.5)),
+                      style: kBodyStyle.copyWith(
+                        height: 1.5
+                      ),
                       textAlign: TextAlign.center,
+
                     ),
                     SizedBox(
                       height: 20,
@@ -82,45 +85,47 @@ class _AboutScreenState extends State<AboutScreen>
                     SizedBox(
                       height: 80,
                     ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        InkWell(
-                          onTap: () => launch("https://www.i4mjad.com"),
-                          child: Container(
-                            height: 55,
-                            width: MediaQuery.of(context).size.width - 40,
-                            decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(12.5),
-                                border: Border.all(
-                                    color: primaryColor.withOpacity(0.5),
-                                    width: 0.25)),
-                            child: Center(
-                              child: Text(
-                                  AppLocalizations.of(context).translate(
-                                      'contact-us-through-this-channels'),
-                                  style: kSubTitlesSubsStyle.copyWith(
-                                      fontSize: 14,
-                                      color: primaryColor,
-                                      height: 1)),
-                            ),
+                    Container(
+                      child: InkWell(
+                          onTap: () => launch('https://t.me/i4mjad'),
+                        child: Container(
+                          width: (MediaQuery.of(context).size.width/1.5),
+                          height: 60,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(12),
+                            boxShadow: [
+                              BoxShadow(
+                                color: kShadowColor,
+                                spreadRadius: .25,
+                                blurRadius: 7,
+                                offset: Offset(0, 2), // changes position of shadow
+                              ),
+                            ],
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                AppLocalizations.of(context)
+                                    .translate('support'),
+                                style: kTitleSeconderyStyle.copyWith(
+                                  color: Colors.green
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                        SizedBox(
-                          height: 12,
-                        ),
-                        Text(
-                            lang == 'ar'
-                                ? 'إذا استفدت من التطبيق, اذكُر والدي - رحمه الله - بدعوة'
-                                : '',
-                            style: kSubTitlesSubsStyle.copyWith(
-                                fontSize: 12,
-                                color: accentColor.withOpacity(0.7),
-                                height: 1)),
-                      ],
+                      ),
                     ),
+                    SizedBox(
+                      height: 16,
+                    ),
+                    Text(
+                      AppLocalizations.of(context).translate('support-p'),
+                      style: kBodyStyle,
+                    )
+
                   ],
                 ),
               ),

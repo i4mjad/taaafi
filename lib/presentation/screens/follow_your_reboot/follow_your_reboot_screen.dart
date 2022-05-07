@@ -481,7 +481,7 @@ class _FollowYourRebootScreenState extends State<FollowYourRebootScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: seconderyColor,
+        backgroundColor: seconderyColor.withOpacity(0.2),
         body: Padding(
           padding: EdgeInsets.only(top: 96.0),
           child: SingleChildScrollView(

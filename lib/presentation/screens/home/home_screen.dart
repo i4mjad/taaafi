@@ -42,7 +42,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: seconderyColor,
+      backgroundColor: seconderyColor.withOpacity(0.2),
       body: Padding(
         padding: EdgeInsets.only(top: 100.0, left: 20.0, right: 20),
         child: SingleChildScrollView(
