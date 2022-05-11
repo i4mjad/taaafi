@@ -9,23 +9,26 @@ import 'package:reboot_app_3/shared/localization/localization.dart';
 class UserProfileCard extends StatelessWidget {
   UserProfileCard({
     Key key,
+    String lang
   }) : super(key: key);
+
+  String lang;
 
   final User user = FirebaseAuth.instance.currentUser;
 
   @override
   Widget build(BuildContext context) {
     return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Row(
+        Column(
           children: [
             Container(
-              padding: EdgeInsets.all(16),
+              padding: EdgeInsets.all(48),
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(30),
+                borderRadius: BorderRadius.circular(500),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.grey.withOpacity(0.5),
@@ -37,18 +40,18 @@ class UserProfileCard extends StatelessWidget {
               ),
               child: Icon(
                 Iconsax.user,
-                size: 24,
+                size: 64,
                 color: primaryColor,
               ),
             ),
-            SizedBox(width: 16),
+            SizedBox(height: 16),
             Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Text(
-                  AppLocalizations.of(context).translate("hi") +
+
                       this.user.displayName,
-                  style: kTitleSeconderyStyle,
+                  style: kTitlePrimeryStyle,
                 ),
                 SizedBox(height: 8),
                 Text(this.user.email.toUpperCase(), style: kCaptionStyle),
@@ -56,13 +59,7 @@ class UserProfileCard extends StatelessWidget {
             ),
           ],
         ),
-        Container(
-          child: Icon(
-            CupertinoIcons.chevron_back,
-            color: Colors.black.withOpacity(0.3),
-            size: 24,
-          ),
-        ),
+
       ],
     );
   }
