@@ -73,93 +73,105 @@ class _AccountScreenState extends State<AccountScreen>
                 Column(
                   children: [
                     Padding(
-                      padding: EdgeInsets.only(top: 4, bottom: 8),
+                      padding: EdgeInsets.only(top: 8, bottom: 4),
                       child: GestureDetector(
                         onTap: () {
                           NotificationService.scheduleDailyNotification(
                               context);
                         },
-                        child: Padding(
-                          padding: EdgeInsets.only(bottom: 8.0, top: 8),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Row(
-                                children: [
-                                  Padding(
-                                    padding:
-                                        EdgeInsets.only(left: 12, right: 12),
-                                    child: Icon(
-                                      Iconsax.message_notif,
-                                      size: 24,
-                                      color: primaryColor,
-                                    ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Row(
+                              children: [
+                                Padding(
+                                  padding:
+                                      EdgeInsets.only(left: 12, right: 12),
+                                  child: Icon(
+                                    Iconsax.message_notif,
+                                    size: 24,
+                                    color: primaryColor,
                                   ),
-                                  Text(
-                                      AppLocalizations.of(context)
-                                          .translate('daily-notification-time'),
-                                      style: kSubTitlesStyle.copyWith(
-                                          fontSize: 17, height: 1.25)),
-                                ],
-                              ),
-                              Icon(
-                                lang == "en" ? CupertinoIcons.chevron_forward : CupertinoIcons.chevron_back,
-                                size: 24,
-                                color: Colors.grey,
-                              ),
-                            ],
-                          ),
+                                ),
+                                Text(
+                                    AppLocalizations.of(context)
+                                        .translate('daily-notification-time'),
+                                    style: kSubTitlesStyle.copyWith(
+                                        fontSize: 17, height: 1.25)),
+                              ],
+                            ),
+
+                          ],
+                        ),
+                      ),
+                    ),
+                    Divider(),
+                    GestureDetector(
+                      onTap: () {
+                        ChangeLanguageWidget.changeLanguage(context);
+                      },
+                      child: Padding(
+                        padding: EdgeInsets.only(bottom: 8.0, top: 8),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Row(
+                              children: [
+                                Padding(
+                                  padding:
+                                      EdgeInsets.only(left: 12, right: 12),
+                                  child: Icon(
+                                    Iconsax.global,
+                                    size: 26,
+                                    color: Colors.purple,
+                                  ),
+                                ),
+                                Text(
+                                    AppLocalizations.of(context)
+                                        .translate('change-lang'),
+                                    style: kSubTitlesStyle.copyWith(
+                                        fontSize: 17, height: 1.25)),
+                              ],
+                            ),
+
+                          ],
                         ),
                       ),
                     ),
                     Divider(),
                     Padding(
-                      padding: EdgeInsets.only(top: 8.0, bottom: 4),
+                      padding: EdgeInsets.only(top: 4, bottom: 8),
                       child: GestureDetector(
                         onTap: () {
-                          ChangeLanguageWidget.changeLanguage(context);
+                          //TODO -  Implement edit user profile
                         },
-                        child: Padding(
-                          padding: EdgeInsets.only(bottom: 8.0, top: 8),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Row(
-                                children: [
-                                  Padding(
-                                    padding:
-                                        EdgeInsets.only(left: 12, right: 12),
-                                    child: Icon(
-                                      Iconsax.global,
-                                      size: 26,
-                                      color: Colors.purple,
-                                    ),
-                                  ),
-                                  Text(
-                                      AppLocalizations.of(context)
-                                          .translate('change-lang'),
-                                      style: kSubTitlesStyle.copyWith(
-                                          fontSize: 17, height: 1.25)),
-                                ],
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Padding(
+                              padding: EdgeInsets.only(left: 12, right: 12),
+                              child: Icon(
+                                Iconsax.user_edit,
+                                size: 26,
+                                color: primaryColor,
                               ),
-
-                            ],
-                          ),
+                            ),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: <Widget>[
+                                Text(
+                                    AppLocalizations.of(context)
+                                        .translate('personal-details'),
+                                    style: kSubTitlesStyle.copyWith(
+                                        fontSize: 17)),
+                              ],
+                            )
+                          ],
                         ),
                       ),
                     ),
-                  ],
-                ),
-                SizedBox(
-                  height: 12,
-                ),
-                Text(AppLocalizations.of(context).translate('account-settings'),
-                    style: kSubTitlesStyle),
-                SizedBox(
-                  height: 16,
-                ),
-                Column(
-                  children: [
+                    Divider(),
                     Padding(
                       padding: EdgeInsets.only(top: 4, bottom: 8),
                       child: GestureDetector(
@@ -195,7 +207,7 @@ class _AccountScreenState extends State<AccountScreen>
                     ),
                     Divider(),
                     Padding(
-                      padding: EdgeInsets.only(top: 8.0, bottom: 8),
+                      padding: EdgeInsets.only(top: 4, bottom: 4),
                       child: GestureDetector(
                         onTap: () {
                           context
@@ -231,7 +243,7 @@ class _AccountScreenState extends State<AccountScreen>
                     ),
                     Divider(),
                     Padding(
-                      padding: EdgeInsets.only(top: 8.0, bottom: 4),
+                      padding: EdgeInsets.only(top: 4.0, bottom: 4),
                       child: GestureDetector(
                         onTap: () {
                           DeleteAccountSheet.openDeleteAccountMessage(
@@ -265,6 +277,154 @@ class _AccountScreenState extends State<AccountScreen>
                     ),
                   ],
                 ),
+                // SizedBox(
+                //   height: 12,
+                // ),
+                // Text(AppLocalizations.of(context).translate('account-settings'),
+                //     style: kSubTitlesStyle),
+                // SizedBox(
+                //   height: 16,
+                // ),
+                // Column(
+                //   children: [
+                //     Padding(
+                //       padding: EdgeInsets.only(top: 4, bottom: 8),
+                //       child: GestureDetector(
+                //         onTap: () {
+                //           //TODO -  Implement edit user profile
+                //         },
+                //         child: Row(
+                //           mainAxisAlignment: MainAxisAlignment.start,
+                //           children: [
+                //             Padding(
+                //               padding: EdgeInsets.only(left: 12, right: 12),
+                //               child: Icon(
+                //                 Iconsax.user_edit,
+                //                 size: 26,
+                //                 color: primaryColor,
+                //               ),
+                //             ),
+                //             Column(
+                //               crossAxisAlignment: CrossAxisAlignment.center,
+                //               mainAxisAlignment: MainAxisAlignment.center,
+                //               children: <Widget>[
+                //                 Text(
+                //                     AppLocalizations.of(context)
+                //                         .translate('personal-details'),
+                //                     style: kSubTitlesStyle.copyWith(
+                //                         fontSize: 17)),
+                //               ],
+                //             )
+                //           ],
+                //         ),
+                //       ),
+                //     ),
+                //     Divider(),
+                //     Padding(
+                //       padding: EdgeInsets.only(top: 4, bottom: 8),
+                //       child: GestureDetector(
+                //         onTap: () {
+                //           //TODO reset account data
+                //           ResetAccountSheet.showResetSheet(context);
+                //         },
+                //         child: Row(
+                //           mainAxisAlignment: MainAxisAlignment.start,
+                //           children: [
+                //             Padding(
+                //               padding: EdgeInsets.only(left: 12, right: 12),
+                //               child: Icon(
+                //                 Iconsax.refresh_circle,
+                //                 size: 26,
+                //                 color: primaryColor,
+                //               ),
+                //             ),
+                //             Column(
+                //               crossAxisAlignment: CrossAxisAlignment.center,
+                //               mainAxisAlignment: MainAxisAlignment.center,
+                //               children: <Widget>[
+                //                 Text(
+                //                     AppLocalizations.of(context)
+                //                         .translate('delete-my-data'),
+                //                     style: kSubTitlesStyle.copyWith(
+                //                         fontSize: 17)),
+                //               ],
+                //             )
+                //           ],
+                //         ),
+                //       ),
+                //     ),
+                //     Divider(),
+                //     Padding(
+                //       padding: EdgeInsets.only(top: 8.0, bottom: 8),
+                //       child: GestureDetector(
+                //         onTap: () {
+                //           context
+                //               .read<GoogleAuthenticationService>()
+                //               .signOut();
+                //         },
+                //         child: Row(
+                //           mainAxisAlignment: MainAxisAlignment.start,
+                //           children: [
+                //             Padding(
+                //               padding: EdgeInsets.only(left: 12, right: 12),
+                //               child: Icon(
+                //                 Iconsax.user_remove,
+                //                 size: 28,
+                //                 color: Colors.grey,
+                //               ),
+                //             ),
+                //             Column(
+                //               crossAxisAlignment: CrossAxisAlignment.center,
+                //               mainAxisAlignment: MainAxisAlignment.center,
+                //               children: <Widget>[
+                //                 Text(
+                //                     AppLocalizations.of(context)
+                //                         .translate('log-out'),
+                //                     style: kSubTitlesStyle.copyWith(
+                //                         fontSize: 17)),
+                //               ],
+                //             ),
+                //
+                //           ],
+                //         ),
+                //       ),
+                //     ),
+                //     Divider(),
+                //     Padding(
+                //       padding: EdgeInsets.only(top: 8.0, bottom: 4),
+                //       child: GestureDetector(
+                //         onTap: () {
+                //           DeleteAccountSheet.openDeleteAccountMessage(
+                //               context);
+                //         },
+                //         child: Row(
+                //           mainAxisAlignment: MainAxisAlignment.start,
+                //           children: [
+                //             Padding(
+                //               padding: EdgeInsets.only(left: 12, right: 12),
+                //               child: Icon(
+                //                 Iconsax.trash,
+                //                 size: 28,
+                //                 color: Colors.red,
+                //               ),
+                //             ),
+                //             Column(
+                //               crossAxisAlignment: CrossAxisAlignment.center,
+                //               mainAxisAlignment: MainAxisAlignment.center,
+                //               children: <Widget>[
+                //                 Text(
+                //                     AppLocalizations.of(context)
+                //                         .translate('delete-my-account'),
+                //                     style: kSubTitlesStyle.copyWith(
+                //                         fontSize: 17, color: Colors.red)),
+                //               ],
+                //             )
+                //           ],
+                //         ),
+                //       ),
+                //     ),
+                //   ],
+                // ),
                 SizedBox(
                   height: 30,
                 ),

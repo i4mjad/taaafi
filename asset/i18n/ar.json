@@ -43,7 +43,7 @@
   "how-did-you-perform-in-this-day": "كيف كان هذا اليوم بالنسبة لك؟",
 
   "account-settings": "الحساب",
-  "app-settings": "التطبيق",
+  "app-settings": "الإعدادات",
   "user_name": "اسم المستخدم",
   "user_email": "البريد الالكتروني",
   "registered-since": "مسجل منذ:",
@@ -189,6 +189,7 @@
   "support": "الدعم الفني",
   "support-p": "متاح عبر تطبيق Telegram فقط",
 
-  "fyr": "تابع تعافيك"
+  "fyr": "تابع تعافيك",
+  "personal-details": "البيانات الشخصية"
 
 }

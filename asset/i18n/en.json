@@ -43,7 +43,7 @@
   "how-did-you-perform-in-this-day": "How was this day?",
 
   "account-settings": "Account",
-  "app-settings": "Application Settings",
+  "app-settings": "Settings",
   "user_name": "User Name",
   "user_email": "User Email",
   "registered-since": "Registered Since:",
@@ -191,7 +191,8 @@
   "support": "Support",
   "support-p": "Available on Telegram only",
 
-  "fyr": "Journey"
+  "fyr": "Journey",
+  "personal-details": "Personal Details"
 
 
 }
