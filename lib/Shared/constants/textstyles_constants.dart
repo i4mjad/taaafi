@@ -65,15 +65,15 @@ var kTitleSeconderyStyle = TextStyle(
     height: 1);
 
 var kHeadlineStyle = TextStyle(
-    fontSize: 20.0,
+    fontSize: 22.0,
     fontWeight: FontWeight.w300,
     fontFamily: 'DINNextLTArabic',
     decoration: TextDecoration.none,
     height: 1);
 
 var kBodyStyle = TextStyle(
-    fontSize: 14.0,
-    fontWeight: FontWeight.w300,
+    fontSize: 16.0,
+    fontWeight: FontWeight.w400,
     fontFamily: 'DINNextLTArabic',
     decoration: TextDecoration.none,
     height: 1);
