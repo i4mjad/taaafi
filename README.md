@@ -1,16 +1,37 @@
+
 # Ta3afi App
 
-Overcome the porn addiction
+![Logo](https://i.ibb.co/sHrVGNG/Group-1241.png )
 
-## Getting Started
+## Start Development
 
-This project is a starting point for a Flutter application.
+- Clone the repo
+- Open the folder on VS Code / Andtoid Studio
+- Instal dependinces by runing `pub get` command on termenal
+- Open the emulator
+- Run the application by:
+    - Android Studio: `Shift + F10` (Windows)
+    - VS Code: `F5` (Windows)
+```
+  For runing the app after first time execute this command `flutter clean` before runing the application
+```
 
-A few resources to get you started if this is your first Flutter project:
+## Contributing
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
+Contributions are always welcome!
 
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Please consider following these steps before runing tha app:
+
+- Install Flutter Version Manager (FVM) and use any Flutter version between `2.0.0 - 2.2.0`. Check https://fvm.app/
+- Use `Android Studio` for development
+- For runing the app, use `Pixel 4` emulator or any emulator device that have Google Play Services
+
+
+## Production Versions
+
+| Platform | Version     | Description                |
+| :-------- | :------- | :------------------------- |
+| Android | 2.0.3 |  |
+| iOS | 4.0.3 |  |
+
+
