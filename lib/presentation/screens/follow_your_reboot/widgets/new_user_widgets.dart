@@ -1,53 +1,97 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:reboot_app_3/shared/constants/constants.dart';
-import 'package:reboot_app_3/shared/constants/textstyles_constants.dart';
+import 'package:reboot_app_3/Shared/constants/constants.dart';
+import 'package:reboot_app_3/Shared/constants/textstyles_constants.dart';
+
 
 void newUserDialog(BuildContext context) {
   showModalBottomSheet(
     context: context,
+      isScrollControlled: true,
+    // isDismissible: false,
+    // enableDrag: false,
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.only(topRight: Radius.circular(30.0), topLeft: Radius.circular(30.0)),
+    ),
     builder: (context) {
       return Container(
-          height: MediaQuery.of(context).size.height * 0.5,
+          height: MediaQuery.of(context).size.height * 0.35,
           width: MediaQuery.of(context).size.width,
+
           padding: EdgeInsets.all(16),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    padding: EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(100),
-                      color: primaryColor.withOpacity(0.1),
-                    ),
-                    child: Icon(
-                      Iconsax.calendar,
-                      color: primaryColor,
-                      size: 40,
-                    ),
-                  ),
-                ],
+
+              Container(
+                padding: EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(100),
+                  color: primaryColor.withOpacity(0.1),
+
+                ),
+
+                child: Icon(
+                  Iconsax.calendar,
+                  color: primaryColor,
+                  size: 32,
+                ),
               ),
               SizedBox(
-                height: 16,
+                height: 8,
               ),
               Text(
                 'تابع تعافيك',
-                style: kHeadlineStyle,
-              ),
-              Text(
-                'حدد اليوم الذي ترغب ببدء المتابعة منه',
-                style: kBodyStyle,
-              ),
-              TextField(
-                decoration: const InputDecoration(
-                  border: UnderlineInputBorder(),
-                  labelText: 'Enter your username',
+                style: kHeadlineStyle.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: primaryColor
+
                 ),
               ),
+              SizedBox(
+                height: 8,
+              ),
+              Text(
+                'لمتابعة تعافيك من إدمان الإباحية، اختر تاريخ اليوم الذي تود بدء المتابعة منه',
+                style: kBodyStyle.copyWith(
+                  height: 1.2
+                ),
+                textAlign: TextAlign.center,
+              ),
+              SizedBox(
+                height: 8,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Container(
+                    height: 80,
+                    width: ((MediaQuery.of(context).size.width - 40) - 8) / 2,
+                    padding: EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: accentColor.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(12.5)
+
+                    ),
+                    child: Center(
+                      child: Text("يوم معين", style: kTitleSeconderyStyle,),
+                    ),
+                  ),
+                  Container(
+                    height: 80,
+                    width: ((MediaQuery.of(context).size.width - 40) - 8) / 2,
+                    padding: EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: accentColor,
+                      borderRadius: BorderRadius.circular(12.5)
+
+                    ),
+                    child: Center(
+                      child: Text("اليوم", style: kTitleSeconderyStyle.copyWith(color: Colors.white),),
+                    ),
+                  )
+                ],
+              )
             ],
           ));
     },
