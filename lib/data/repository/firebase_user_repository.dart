@@ -2,21 +2,24 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:reboot_app_3/data/user_repository.dart';
 
 class FirebaseUserRepository implements UserRepository {
-  final FirebaseAuth _firebaseAuth;
-
-  FirebaseUserRepository({FirebaseAuth firebaseAuth})
-      : _firebaseAuth = firebaseAuth ?? FirebaseAuth.instance;
+  final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
 
   Future<bool> isAuthenticated() async {
     final currentUser = await _firebaseAuth.currentUser;
     return currentUser != null;
   }
 
-  Future<void> authenticate() {
+  Future<void> authenticateAnonymously() {
     return _firebaseAuth.signInAnonymously();
   }
 
   Future<String> getUserId() async {
     return (await _firebaseAuth.currentUser).uid;
+  }
+
+  @override
+  Future<void> createNewUserDocument() {
+    // TODO: implement createNewUser
+    throw UnimplementedError();
   }
 }
