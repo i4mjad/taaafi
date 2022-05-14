@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:reboot_app_3/Shared/constants/constants.dart';
 import 'package:reboot_app_3/Shared/constants/textstyles_constants.dart';
-
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_rounded_date_picker/flutter_rounded_date_picker.dart';
 
 void newUserDialog(BuildContext context) {
   showModalBottomSheet(
@@ -59,35 +60,47 @@ void newUserDialog(BuildContext context) {
                 textAlign: TextAlign.center,
               ),
               SizedBox(
-                height: 8,
+                height: 24,
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Container(
-                    height: 80,
-                    width: ((MediaQuery.of(context).size.width - 40) - 8) / 2,
-                    padding: EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: accentColor.withOpacity(0.2),
-                      borderRadius: BorderRadius.circular(12.5)
+                  GestureDetector(
+                    onTap: () async{
+                      var selectedDate = await getDateTime(context);
+                      print(selectedDate);
+                    },
+                    child: Container(
+                      height: 80,
+                      width: ((MediaQuery.of(context).size.width - 40) - 8) / 2,
+                      padding: EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: accentColor.withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(12.5)
 
-                    ),
-                    child: Center(
-                      child: Text("يوم معين", style: kTitleSeconderyStyle,),
+                      ),
+                      child: Center(
+                        child: Text("يوم معين", style: kTitleSeconderyStyle,),
+                      ),
                     ),
                   ),
-                  Container(
-                    height: 80,
-                    width: ((MediaQuery.of(context).size.width - 40) - 8) / 2,
-                    padding: EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: accentColor,
-                      borderRadius: BorderRadius.circular(12.5)
+                  GestureDetector(
+                    onTap: (){
+                      var today = getToday();
+                      print(today);
+                    },
+                    child: Container(
+                      height: 80,
+                      width: ((MediaQuery.of(context).size.width - 40) - 8) / 2,
+                      padding: EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: accentColor,
+                        borderRadius: BorderRadius.circular(12.5)
 
-                    ),
-                    child: Center(
-                      child: Text("اليوم", style: kTitleSeconderyStyle.copyWith(color: Colors.white),),
+                      ),
+                      child: Center(
+                        child: Text("اليوم", style: kTitleSeconderyStyle.copyWith(color: Colors.white),),
+                      ),
                     ),
                   )
                 ],
@@ -96,4 +109,22 @@ void newUserDialog(BuildContext context) {
           ));
     },
   );
+}
+
+Future<DateTime> getDateTime(BuildContext context) async {
+  return await showRoundedDatePicker(
+    context: context,
+    initialDate: DateTime.now(),
+    firstDate: DateTime(DateTime.now().year - 1),
+    lastDate: DateTime.now(),
+    borderRadius: 16,
+    fontFamily: 'DINNextLTArabic',
+    height: MediaQuery.of(context).size.height / 2.5,
+    theme: ThemeData(
+      primaryColor: primaryColor,
+    ),
+  );
+}
+DateTime getToday(){
+  return DateTime.now();
 }
