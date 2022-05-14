@@ -1,35 +1,42 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 
 class FirebaseService {
-  FirebaseFirestore _db = FirebaseFirestore.instance;
-  String path;
-  CollectionReference ref;
 
-  FirebaseService(this.path) {
-    ref = _db.collection(path);
+  FirebaseService(this.firestore);
+  FirebaseFirestore firestore;
+
+  CollectionReference<Map<String, dynamic>> _usersCollection() => firestore.collection("users");
+
+  DocumentReference getUserDocument(String uid) {
+    return _usersCollection().doc(uid);
   }
 
-  Future<QuerySnapshot> getDataCollection() {
-    return ref.get();
+  Stream streamUserData(String uid) {
+    return getUserDocument(uid).snapshots();
   }
 
-  Stream<QuerySnapshot> streamDataCollection() {
-    return ref.snapshots();
+  void functionOnStream(String uid, Function payload(DocumentSnapshot sh)){
+     streamUserData(uid).listen((event) async {
+      DocumentSnapshot snapshot = event;
+       await payload(snapshot);
+    });
   }
 
-  Future<DocumentSnapshot> getDocumentById(String id) {
-    return ref.doc(id).get();
-  }
-
-  Future<void> removeDocument(String id) {
-    return ref.doc(id).delete();
-  }
-
-  Future<DocumentReference> addDocument(Map data) {
-    return ref.add(data);
-  }
-
-  Future<void> updateDocument(Map data, String id) {
-    return ref.doc(id).update(data);
-  }
+  void removeField(String uid, String fieldKey) {
+    streamUserData(uid).listen((event) async {
+      return getUserDocument(uid).update({
+        fieldKey: FieldValue.delete()
+      });
+    });
+  //
+  // Future<DocumentReference> addDocument(Map data) {
+  //   return ref.add(data);
+  // }
+  //
+  // Future<void> updateDocument(Map data, String id) {
+  //   return ref.doc(id).update(data);
+  // }
 }
