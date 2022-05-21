@@ -24,7 +24,7 @@ class UserProfileCard extends StatelessWidget {
         Column(
           children: [
             Container(
-              padding: EdgeInsets.all(48),
+              padding: EdgeInsets.all(40),
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(500),
@@ -39,7 +39,7 @@ class UserProfileCard extends StatelessWidget {
               ),
               child: Icon(
                 Iconsax.user,
-                size: 64,
+                size: 56,
                 color: primaryColor,
               ),
             ),
