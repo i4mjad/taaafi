@@ -1,8 +1,17 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class FollowUpData {
-  String startingDate;
-  List<String> relapses;
-  List<String> pornWithoutMasterbation;
-  List<String> masterbationWithoutPorn;
+  FollowUpData(
+    this.startingDate,
+    this.relapses,
+    this.pornWithoutMasterbation,
+    this.masterbationWithoutPorn,
+  );
+
+  Timestamp startingDate;
+  List<dynamic> relapses;
+  List<dynamic> pornWithoutMasterbation;
+  List<dynamic> masterbationWithoutPorn;
 
   FollowUpData.fromSnapshot(Map<String, dynamic> snapshot) {
     startingDate = snapshot['startingDate'];
