@@ -2,38 +2,38 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class FirebaseService {
-  FirebaseService(this.firestore);
+  FirebaseService(this.firestore, this.uid);
   FirebaseFirestore firestore;
+  String uid;
 
   CollectionReference<Map<String, dynamic>> _usersCollection() =>
       firestore.collection("users");
 
-  DocumentReference getUserDocument(String uid) {
+  DocumentReference getUserDocument() {
     return _usersCollection().doc(uid);
   }
 
-  Stream streamUserData(String uid) {
-    return getUserDocument(uid).snapshots();
+  Future<void> updateUserData(String uid, String name, String email) async {
+    return await getUserDocument().get().then((value) => {
+          value.data(),
+        });
   }
 
-  void functionOnStream(String uid, Function callback(DocumentSnapshot sh)) {
-    streamUserData(uid).listen((event) async {
-      DocumentSnapshot snapshot = event;
-      await callback(snapshot);
+  Stream streamUserData() {
+    return getUserDocument().snapshots();
+  }
+
+  void removeFieldByKey(String fieldKey) async {
+    streamUserData().listen((event) async {
+      return event.update({fieldKey: FieldValue.delete()});
     });
   }
 
-  void removeField(String uid, String fieldKey) {
-    streamUserData(uid).listen((event) async {
-      return getUserDocument(uid).update({fieldKey: FieldValue.delete()});
+  void addField(Map<String, dynamic> cake) async {
+    streamUserData().listen((event) async {
+      return getUserDocument()
+          .set(cake, SetOptions(merge: true))
+          .onError((error, stackTrace) => print(error));
     });
-    //
-    // Future<DocumentReference> addDocument(Map data) {
-    //   return ref.add(data);
-    // }
-    //
-    // Future<void> updateDocument(Map data, String id) {
-    //   return ref.doc(id).update(data);
-    // }
   }
 }
