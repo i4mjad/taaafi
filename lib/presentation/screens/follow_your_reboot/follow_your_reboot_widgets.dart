@@ -62,11 +62,3 @@ void outOfRangeAlert(BuildContext context) {
         );
       });
 }
-
-bool isIncluded(List list, String date) {
-  if (list.contains(date)) {
-    return false;
-  } else {
-    return true;
-  }
-}
