@@ -13,7 +13,7 @@ class FollowUpData {
   List<dynamic> pornWithoutMasterbation;
   List<dynamic> masterbationWithoutPorn;
 
-  FollowUpData.fromSnapshot(Map<String, dynamic> snapshot) {
+  FollowUpData.fromSnapshot(DocumentSnapshot snapshot) {
     startingDate = snapshot['startingDate'];
     relapses = snapshot['userRelapses'];
     pornWithoutMasterbation = snapshot['userWatchingWithoutMasturbating'];
