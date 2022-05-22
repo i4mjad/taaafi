@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:reboot_app_3/Model/Relapse.dart';
+import 'package:reboot_app_3/data/web_services/firebase_service.dart';
+import 'package:reboot_app_3/locater.dart';
 import 'package:reboot_app_3/presentation/Screens/auth/login_screen.dart';
 import 'package:reboot_app_3/shared/constants/constants.dart';
 import 'package:reboot_app_3/shared/constants/textstyles_constants.dart';
@@ -32,6 +34,20 @@ class FollowYourRebootScreen extends StatefulWidget {
 class _FollowYourRebootScreenState extends State<FollowYourRebootScreen>
     with TickerProviderStateMixin {
   String lang;
+  var service = locater<FirebaseService>();
+
+  void migrateToFirstDate() async {
+    service.streamUserData().listen((snapshot) async {
+      int userPreviousStreak = await snapshot.get("userPreviousStreak");
+      //var userResetDate = await snapshot.get("resetDate");
+      var userRigDate = user.metadata.creationTime;
+
+      var userFirstDate = await new DateTime(userRigDate.year,
+          userRigDate.month, userRigDate.day - userPreviousStreak);
+      print("$userRigDate ------------------------------- reg");
+      print("$userFirstDate ------------------------------- First");
+    });
+  }
 
   FirebaseFirestore database = FirebaseFirestore.instance;
   final user = FirebaseAuth.instance.currentUser;
@@ -91,8 +107,6 @@ class _FollowYourRebootScreenState extends State<FollowYourRebootScreen>
               userRelapses.add(translate(date));
             }
           });
-
-
 
           final today = DateTime.now();
           final regDate = user.metadata.creationTime;
@@ -466,6 +480,7 @@ class _FollowYourRebootScreenState extends State<FollowYourRebootScreen>
   @override
   void initState() {
     super.initState();
+    migrateToFirstDate();
     loadUserRelapces();
     loadUserWatchesOnly();
     loadUserMastsOnly();
