@@ -7,6 +7,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:reboot_app_3/locater.dart';
 import 'package:reboot_app_3/shared/localization/localization.dart';
 import 'package:reboot_app_3/shared/services/auth_service.dart';
 import 'package:reboot_app_3/shared/services/notification_service.dart';
@@ -16,14 +17,33 @@ import 'package:shared_preferences/shared_preferences.dart';
 // ignore: unused_import
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 
-//TODO - Refactor this code and move firebase responsibility to separate files
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await Firebase.initializeApp();
-  //await PaymentServices.initPayment();
 
-//TODO - Move notification responsibility to seperate file
+  InitializationSettings initializationSettings = await setupNotifications();
+
+  await setupFirebaseMesagging(initializationSettings);
+  setupLocater();
+  runApp(MyApp());
+}
+
+Future<void> setupFirebaseMesagging(
+    InitializationSettings initializationSettings) async {
+  RemoteMessage initialMessage =
+      await FirebaseMessaging.instance.getInitialMessage();
+
+  await NotificationService.flutterLocalNotificationsPlugin.initialize(
+      initializationSettings, onSelectNotification: (String payload) async {
+    if (payload = null) {
+      debugPrint('notification payload: ' + payload);
+    }
+    print(initialMessage);
+  });
+}
+
+Future<InitializationSettings> setupNotifications() async {
   var initializationSettingsAndroid = AndroidInitializationSettings('app_icon');
   var initializationSettingsiOS = IOSInitializationSettings(
       requestAlertPermission: true,
@@ -46,19 +66,7 @@ Future<void> main() async {
     provisional: false,
     sound: true,
   );
-
-  RemoteMessage initialMessage =
-      await FirebaseMessaging.instance.getInitialMessage();
-
-  await NotificationService.flutterLocalNotificationsPlugin.initialize(
-      initializationSettings, onSelectNotification: (String payload) async {
-    if (payload = null) {
-      debugPrint('notification payload: ' + payload);
-    }
-    print(initialMessage);
-  });
-
-  runApp(MyApp());
+  return initializationSettings;
 }
 
 class MyApp extends StatefulWidget {
