@@ -37,16 +37,31 @@ class _FollowYourRebootScreenState extends State<FollowYourRebootScreen>
   var service = locater<FirebaseService>();
 
   void migrateToFirstDate() async {
-    service.streamUserData().listen((snapshot) async {
-      int userPreviousStreak = await snapshot.get("userPreviousStreak");
-      //var userResetDate = await snapshot.get("resetDate");
-      var userRigDate = user.metadata.creationTime;
 
-      var userFirstDate = await new DateTime(userRigDate.year,
-          userRigDate.month, userRigDate.day - userPreviousStreak);
-      print("$userRigDate ------------------------------- reg");
-      print("$userFirstDate ------------------------------- First");
+    DateTime userRigDate = user.metadata.creationTime;
+    var doc = database.collection("users").doc(uid);
+
+    var st = doc.get().then((value) async {
+      //TODO - SHOULD REMOVE THE !
+      if(!(await value.data()["userFirstDate"] != null)) return;
+      print(await value.data()["userFirstDate"]);
     });
+
+    // service.streamUserData().listen((snapshot) async {
+    //
+    //   if(await snapshot.get("userFirstDate") != null) return;
+    //
+    //   int userFirstStreak = await snapshot.get("userPreviousStreak");
+    //   DateTime userResetDate = DateTime.parse(await snapshot.get('resetedDate').toDate().toString());
+    //   DateTime parseFirstDate = await new DateTime(userRigDate.year,userRigDate.month, userRigDate.day - userFirstStreak);
+    //   DateTime userFirstDate = userResetDate != null ? userResetDate  : parseFirstDate;
+    //
+    //   var firstDate = {
+    //     "userFirstDate": userFirstDate
+    //   };
+    //   await database.collection("users").doc(uid).set(firstDate, SetOptions(merge: true))
+    //       .onError((error, stackTrace) => print(error));
+    // });
   }
 
   FirebaseFirestore database = FirebaseFirestore.instance;
