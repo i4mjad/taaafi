@@ -106,6 +106,52 @@ class DB {
       return await today.difference(firstdate).inDays;
     }
   }
+
+  Future<int> getNoPornStreak() async {
+    //Get firstUserDate
+    final firstdate = await getStartingDate();
+    //Get userRelapses List
+    final followUpData = await getFollowUpData();
+    List<String> userNoPornDays = followUpData
+        .pornWithoutMasterbation; //if the userRelapses List contains no relapses
+    var today = DateTime.now();
+    //if the userRelapses List contains more than one relapse
+    if (userNoPornDays.length > 0) {
+      userNoPornDays.sort((a, b) {
+        return a.compareTo(b);
+      });
+      final lastNoPornDayStr = userNoPornDays[userNoPornDays.length - 1];
+      //make a date from the last relapse
+      final lastNoPornDay = DateTime.parse(lastNoPornDayStr);
+      //calculate the current streak by making time interval between today and the last
+      return await today.difference(lastNoPornDay).inDays;
+    } else {
+      return await today.difference(firstdate).inDays;
+    }
+  }
+
+  Future<int> getNoMastsStreak() async {
+    //Get firstUserDate
+    final firstdate = await getStartingDate();
+    //Get userRelapses List
+    final followUpData = await getFollowUpData();
+    List<String> userNoMastDays = followUpData
+        .masterbationWithoutPorn; //if the userRelapses List contains no relapses
+    var today = DateTime.now();
+    //if the userRelapses List contains more than one relapse
+    if (userNoMastDays.length > 0) {
+      userNoMastDays.sort((a, b) {
+        return a.compareTo(b);
+      });
+      final lastNoMastDayStr = userNoMastDays[userNoMastDays.length - 1];
+      //make a date from the last relapse
+      final lastNoMastDay = DateTime.parse(lastNoMastDayStr);
+      //calculate the current streak by making time interval between today and the last
+      return await today.difference(lastNoMastDay).inDays;
+    } else {
+      return await today.difference(firstdate).inDays;
+    }
+  }
 }
 
 DB db = DB();

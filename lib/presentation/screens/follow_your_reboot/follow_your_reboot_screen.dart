@@ -417,7 +417,6 @@ class FollowYourRebootScreenState extends State<FollowYourRebootScreen>
 
   @override
   Widget build(BuildContext context) {
-    final bloc = CustomBlocProvider.of<FollowYourRebootBloc>(context);
     return Scaffold(
         backgroundColor: seconderyColor.withOpacity(0.2),
         body: Padding(
@@ -874,7 +873,6 @@ class FollowYourRebootScreenState extends State<FollowYourRebootScreen>
                               builder: (BuildContext context,
                                   AsyncSnapshot<int> streak) {
                                 return Text(
-                                  //TODO - RELAPSES HERE
                                   streak.data.toString(),
                                   style: kPageTitleStyle.copyWith(
                                     color: Colors.red,
@@ -914,11 +912,16 @@ class FollowYourRebootScreenState extends State<FollowYourRebootScreen>
                           crossAxisAlignment: CrossAxisAlignment.center,
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
-                            Text(
-                              this.currentNoMastStreak.toString(),
-                              style: kPageTitleStyle.copyWith(
-                                  color: Colors.orangeAccent),
-                            ),
+                            FutureBuilder(
+                                future: bloc.getNoMastsStreak(),
+                                initialData: 0,
+                                builder: (BuildContext context,
+                                    AsyncSnapshot<int> snapshot) {
+                                  return Text(
+                                      this.currentNoMastStreak.toString(),
+                                      style: kPageTitleStyle.copyWith(
+                                          color: Colors.orangeAccent));
+                                }),
                             Text(
                               AppLocalizations.of(context)
                                   .translate('free-mast-days'),
@@ -950,11 +953,17 @@ class FollowYourRebootScreenState extends State<FollowYourRebootScreen>
                           crossAxisAlignment: CrossAxisAlignment.center,
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
-                            Text(
-                              this.currentNoPornStreak.toString(),
-                              style: kPageTitleStyle.copyWith(
-                                  color: Colors.purple),
-                            ),
+                            FutureBuilder(
+                                future: bloc.getNoMastsStreak(),
+                                initialData: 0,
+                                builder: (BuildContext context,
+                                    AsyncSnapshot<int> snapshot) {
+                                  return Text(
+                                    snapshot.data.toString(),
+                                    style: kPageTitleStyle.copyWith(
+                                        color: Colors.purple),
+                                  );
+                                }),
                             Text(
                               AppLocalizations.of(context)
                                   .translate('free-porn-days'),
