@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class Day {
   String type;
   DateTime date;
-  MaterialColor color;
+  Color color;
 
-  Day({this.type, this.date, this.color});
+  Day(this.type, this.date, this.color);
 }

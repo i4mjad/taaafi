@@ -1,42 +1,41 @@
-// // Generic Interface for all BLoCs
-// import 'package:flutter/material.dart';
+// Generic Interface for all BLoCs
+import 'package:flutter/material.dart';
 
-// abstract class BlocBase {
-//   void dispose();
-// }
+abstract class CustomBlocBase {
+  void dispose();
+}
 
-// // Generic BLoC provider
-// class BlocProvider<T extends BlocBase> extends StatefulWidget {
-//   BlocProvider({
-//     Key key,
-//     @required this.child,
-//     @required this.bloc,
-//   }) : super(key: key);
+// Generic BLoC provider
+class CustomBlocProvider<T extends CustomBlocBase> extends StatefulWidget {
+  CustomBlocProvider({
+    Key key,
+    @required this.child,
+    @required this.bloc,
+  }) : super(key: key);
 
-//   final T bloc;
-//   final Widget child;
+  final T bloc;
+  final Widget child;
 
-//   @override
-//   _BlocProviderState<T> createState() => _BlocProviderState<T>();
+  @override
+  _CustomBlocProviderState<T> createState() => _CustomBlocProviderState<T>();
 
-//   static T of<T extends BlocBase>(BuildContext context) {
-//     final type = _typeOf<BlocProvider<T>>();
-//     BlocProvider<T> provider = context.findAncestorWidgetOfExactType<type>();
-//     return provider.bloc;
-//   }
+  static T of<T extends CustomBlocBase>(BuildContext context) {
+    CustomBlocProvider<T> provider =
+        context.findAncestorWidgetOfExactType<CustomBlocProvider<T>>();
+    return provider.bloc;
+  }
+}
 
-//   static Type _typeOf<T>() => T;
-// }
+class _CustomBlocProviderState<T>
+    extends State<CustomBlocProvider<CustomBlocBase>> {
+  @override
+  void dispose() {
+    widget.bloc.dispose();
+    super.dispose();
+  }
 
-// class _BlocProviderState<T> extends State<BlocProvider<BlocBase>> {
-//   @override
-//   void dispose() {
-//     widget.bloc.dispose();
-//     super.dispose();
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return widget.child;
-//   }
-// }
+  @override
+  Widget build(BuildContext context) {
+    return widget.child;
+  }
+}

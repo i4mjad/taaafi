@@ -30,7 +30,7 @@ packages:
     source: hosted
     version: "0.0.5"
   bloc:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: bloc
       url: "https://pub.dartlang.org"

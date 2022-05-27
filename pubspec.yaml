@@ -24,7 +24,6 @@ dependencies:
   flutter_rounded_date_picker: ^2.0.2
   apple_sign_in: 
   auto_direction: 
-  bloc: ^8.0.3
   chips_choice: ^2.0.1
   cloud_firestore: 
   cupertino_icons: 

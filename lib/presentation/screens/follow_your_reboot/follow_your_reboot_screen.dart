@@ -2,12 +2,16 @@ import 'dart:core';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:reboot_app_3/Model/Relapse.dart';
+import 'package:reboot_app_3/bloc_provider.dart';
 import 'package:reboot_app_3/data/web_services/firebase_service.dart';
 import 'package:reboot_app_3/locater.dart';
 import 'package:reboot_app_3/presentation/Screens/auth/login_screen.dart';
+import 'package:reboot_app_3/presentation/blocs/follow_your_reboot_bloc.dart';
+import 'package:reboot_app_3/presentation/screens/follow_your_reboot/calender/calender_widget.dart';
 import 'package:reboot_app_3/shared/constants/constants.dart';
 import 'package:reboot_app_3/shared/constants/textstyles_constants.dart';
 import 'package:reboot_app_3/shared/localization/localization.dart';
@@ -28,41 +32,12 @@ class FollowYourRebootScreen extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _FollowYourRebootScreenState createState() => _FollowYourRebootScreenState();
+  FollowYourRebootScreenState createState() => FollowYourRebootScreenState();
 }
 
-class _FollowYourRebootScreenState extends State<FollowYourRebootScreen>
+class FollowYourRebootScreenState extends State<FollowYourRebootScreen>
     with TickerProviderStateMixin {
   String lang;
-  var service = locater<FirebaseService>();
-
-  void migrateToFirstDate() async {
-
-    DateTime userRigDate = user.metadata.creationTime;
-    var doc = database.collection("users").doc(uid);
-
-    var st = doc.get().then((value) async {
-      //TODO - SHOULD REMOVE THE !
-      if(!(await value.data()["userFirstDate"] != null)) return;
-      print(await value.data()["userFirstDate"]);
-    });
-
-    // service.streamUserData().listen((snapshot) async {
-    //
-    //   if(await snapshot.get("userFirstDate") != null) return;
-    //
-    //   int userFirstStreak = await snapshot.get("userPreviousStreak");
-    //   DateTime userResetDate = DateTime.parse(await snapshot.get('resetedDate').toDate().toString());
-    //   DateTime parseFirstDate = await new DateTime(userRigDate.year,userRigDate.month, userRigDate.day - userFirstStreak);
-    //   DateTime userFirstDate = userResetDate != null ? userResetDate  : parseFirstDate;
-    //
-    //   var firstDate = {
-    //     "userFirstDate": userFirstDate
-    //   };
-    //   await database.collection("users").doc(uid).set(firstDate, SetOptions(merge: true))
-    //       .onError((error, stackTrace) => print(error));
-    // });
-  }
 
   FirebaseFirestore database = FirebaseFirestore.instance;
   final user = FirebaseAuth.instance.currentUser;
@@ -331,66 +306,6 @@ class _FollowYourRebootScreenState extends State<FollowYourRebootScreen>
     });
   }
 
-//TODO -4. Method crating List<Day> for calender and adding the days to it
-  List<Day> getCalenderData() {
-    var daysArray = <Day>[];
-    var oldRelapses = <DateTime>[];
-    var oldWatches = <DateTime>[];
-    var oldMasts = <DateTime>[];
-
-    final today = DateTime.now();
-
-    var userPreviousStreak = 0;
-    final regDate = user.metadata.creationTime;
-
-    oldRelapses.clear();
-    for (var strDate in this.userRelapses) {
-      final date = DateTime.parse(strDate);
-      oldRelapses.add(date);
-    }
-    oldWatches.clear();
-    for (var strDate in this.userWatchingWithoutMasturbating) {
-      final date = DateTime.parse(strDate);
-      oldWatches.add(date);
-    }
-    oldMasts.clear();
-    for (var strDate in this.userMasturbatingWithoutWatching) {
-      final date = DateTime.parse(strDate);
-      oldMasts.add(date);
-    }
-
-    final userFirstDate = resetDay != null
-        ? resetDay
-        : regDate.add(Duration(days: userPreviousStreak));
-
-    List<DateTime> calculateDaysInterval(DateTime startDate, DateTime endDate) {
-      List<DateTime> days = [];
-      for (int i = 0; i <= endDate.difference(startDate).inDays; i++) {
-        days.add(startDate.add(Duration(days: i)));
-      }
-      return days;
-    }
-
-    for (var date in calculateDaysInterval(userFirstDate, today)) {
-      final dateD = new DateTime(date.year, date.month, date.day);
-
-      if (oldRelapses.contains(dateD)) {
-        daysArray.add(new Day(type: "Relapse", date: date, color: Colors.red));
-      } else if (oldWatches.contains(dateD) && !oldRelapses.contains(dateD)) {
-        daysArray.add(
-            new Day(type: "Watching Porn", date: date, color: Colors.purple));
-      } else if (oldMasts.contains(dateD) && !oldRelapses.contains(dateD)) {
-        daysArray.add(
-            new Day(type: "Masturbating", date: date, color: Colors.orange));
-      } else {
-        daysArray
-            .add(new Day(type: "Success", date: date, color: Colors.green));
-      }
-    }
-
-    return daysArray;
-  }
-
   DayOfWeekRelapses dailyStatistics(List<dynamic> userRelapses) {
     var sat = [];
     var sun = [];
@@ -495,12 +410,9 @@ class _FollowYourRebootScreenState extends State<FollowYourRebootScreen>
   @override
   void initState() {
     super.initState();
-    migrateToFirstDate();
     loadUserRelapces();
     loadUserWatchesOnly();
     loadUserMastsOnly();
-    getCalenderData();
-
     LocaleService.getSelectedLocale().then((value) {
       setState(() {
         lang = value;
@@ -510,6 +422,7 @@ class _FollowYourRebootScreenState extends State<FollowYourRebootScreen>
 
   @override
   Widget build(BuildContext context) {
+    final bloc = CustomBlocProvider.of<FollowYourRebootBloc>(context);
     return Scaffold(
         backgroundColor: seconderyColor.withOpacity(0.2),
         body: Padding(
@@ -564,30 +477,7 @@ class _FollowYourRebootScreenState extends State<FollowYourRebootScreen>
                           SizedBox(
                             height: 8,
                           ),
-                          Container(
-                            width: MediaQuery.of(context).size.width,
-                            height: MediaQuery.of(context).size.height * 0.35,
-                            decoration: BoxDecoration(
-                                color: mainGrayColor,
-                                borderRadius: BorderRadius.circular(15)),
-                            child: SfCalendar(
-                              onTap: (CalendarTapDetails details) {
-                                DateTime date = details.date;
-                                dateChecker(date);
-                              },
-                              view: CalendarView.month,
-                              headerStyle: CalendarHeaderStyle(
-                                  textAlign: TextAlign.center,
-                                  backgroundColor: mainYellowColor,
-                                  textStyle: kSubTitlesStyle),
-                              dataSource: CalenderDataSource(getCalenderData()),
-                              monthViewSettings: MonthViewSettings(
-                                agendaStyle: AgendaStyle(),
-                                appointmentDisplayMode:
-                                    MonthAppointmentDisplayMode.indicator,
-                              ),
-                            ),
-                          ),
+                          FollowUpCalender()
                         ],
                       ),
                       SizedBox(
@@ -1526,7 +1416,8 @@ class FollowYourRebootScreenAuthenticationWrapper extends StatelessWidget {
     final User firebaseUser = context.watch<User>();
 
     if (firebaseUser != null) {
-      return FollowYourRebootScreen();
+      return CustomBlocProvider(
+          bloc: FollowYourRebootBloc(), child: FollowYourRebootScreen());
     } else {
       return LoginScreen();
     }
