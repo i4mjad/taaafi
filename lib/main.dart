@@ -7,7 +7,6 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
-import 'package:reboot_app_3/locater.dart';
 import 'package:reboot_app_3/shared/localization/localization.dart';
 import 'package:reboot_app_3/shared/services/auth_service.dart';
 import 'package:reboot_app_3/shared/services/notification_service.dart';
@@ -25,7 +24,6 @@ Future<void> main() async {
   InitializationSettings initializationSettings = await setupNotifications();
 
   await setupFirebaseMesagging(initializationSettings);
-  setupLocater();
   runApp(MyApp());
 }
 

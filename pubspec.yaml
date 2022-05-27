@@ -56,7 +56,6 @@ dependencies:
   sign_in_with_apple: 
   syncfusion_flutter_calendar: 
   url_launcher: 
-  get_it: ^7.2.0
 
 dev_dependencies:
   flutter_test:
