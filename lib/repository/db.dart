@@ -83,6 +83,29 @@ class DB {
 
     return await daysArray;
   }
+
+  Future<int> getRelapseStreak() async {
+    //Get firstUserDate
+    final firstdate = await getStartingDate();
+    //Get userRelapses List
+    final followUpData = await getFollowUpData();
+    List<String> userRelapses =
+        followUpData.relapses; //if the userRelapses List contains no relapses
+    var today = DateTime.now();
+    //if the userRelapses List contains more than one relapse
+    if (userRelapses.length > 0) {
+      userRelapses.sort((a, b) {
+        return a.compareTo(b);
+      });
+      final lastRelapseDayStr = userRelapses[userRelapses.length - 1];
+      //make a date from the last relapse
+      final lastRelapseDay = DateTime.parse(lastRelapseDayStr);
+      //calculate the current streak by making time interval between today and the last
+      return await today.difference(lastRelapseDay).inDays;
+    } else {
+      return await today.difference(firstdate).inDays;
+    }
+  }
 }
 
 DB db = DB();

@@ -838,6 +838,7 @@ class FollowYourRebootScreenState extends State<FollowYourRebootScreen>
   }
 
   Container followUpSection(BuildContext context) {
+    final bloc = CustomBlocProvider.of<FollowYourRebootBloc>(context);
     return Container(
       child: Padding(
         padding: EdgeInsets.only(right: 16.0, left: 16.0),
@@ -867,12 +868,20 @@ class FollowYourRebootScreenState extends State<FollowYourRebootScreen>
                           crossAxisAlignment: CrossAxisAlignment.center,
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
-                            Text(
-                              this.currentStreak.toString(),
-                              style: kPageTitleStyle.copyWith(
-                                color: Colors.red,
-                                fontSize: 35,
-                              ),
+                            FutureBuilder(
+                              future: bloc.getRelapseStreak(),
+                              initialData: 0,
+                              builder: (BuildContext context,
+                                  AsyncSnapshot<int> streak) {
+                                return Text(
+                                  //TODO - RELAPSES HERE
+                                  streak.data.toString(),
+                                  style: kPageTitleStyle.copyWith(
+                                    color: Colors.red,
+                                    fontSize: 35,
+                                  ),
+                                );
+                              },
                             ),
                             Text(
                               AppLocalizations.of(context)

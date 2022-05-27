@@ -23,6 +23,10 @@ class FollowYourRebootBloc implements CustomBlocBase {
   Future<List<Day>> getCalenderData() async {
     return await db.getCalenderData();
   }
+  
+  Future<int> getRelapseStreak() async {
+    return await db.getRelapseStreak();
+  }
 
   void updateFollowUpData(DocumentSnapshot doc) async {
     //await db.updateData(doc);
