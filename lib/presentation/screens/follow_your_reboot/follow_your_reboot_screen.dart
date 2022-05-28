@@ -10,7 +10,6 @@ import 'package:reboot_app_3/presentation/Screens/auth/login_screen.dart';
 import 'package:reboot_app_3/presentation/blocs/follow_your_reboot_bloc.dart';
 import 'package:reboot_app_3/presentation/screens/follow_your_reboot/calender/calender_widget.dart';
 import 'package:reboot_app_3/presentation/screens/follow_your_reboot/follow_up_streaks/follow_up_streak.dart';
-import 'package:reboot_app_3/repository/db.dart';
 import 'package:reboot_app_3/shared/constants/constants.dart';
 import 'package:reboot_app_3/shared/constants/textstyles_constants.dart';
 import 'package:reboot_app_3/shared/localization/localization.dart';
@@ -19,6 +18,7 @@ import 'package:reboot_app_3/shared/services/routing/routes_names.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'day_of_week_relapses/day_of_week_relapses_widget.dart';
+import 'follow_up_section.dart';
 import 'follow_your_reboot_services.dart';
 import 'follow_your_reboot_widgets.dart';
 import 'notes/notes_screen.dart';
@@ -66,7 +66,6 @@ class FollowYourRebootScreenState extends State<FollowYourRebootScreen>
 
   final TextEditingController newStreak = TextEditingController();
 
-//TODO - TPUR. Method load userRelapses from the database
   void loadUserRelapces() async {
     final userData = database.collection('users').doc('${user.uid}');
 
@@ -187,7 +186,6 @@ class FollowYourRebootScreenState extends State<FollowYourRebootScreen>
     });
   }
 
-//TODO -TPUW. Method load userWatchingWithoutMasturbating from the database
   void loadUserWatchesOnly() async {
     final userData = database.collection('users').doc('${user.uid}');
 
@@ -243,7 +241,6 @@ class FollowYourRebootScreenState extends State<FollowYourRebootScreen>
     });
   }
 
-//TODO -TPUM. Method load userMasturbatingWithoutWatching from the database
   void loadUserMastsOnly() async {
     final userData = database.collection('users').doc('${user.uid}');
 
@@ -404,40 +401,39 @@ class FollowYourRebootScreenState extends State<FollowYourRebootScreen>
     return double.parse((relapsesCount / averagePeriods).toStringAsFixed(2));
   }
 
-  // void migerateToUserFirstDate() async {
-  //   //TODO - THIS Function needed to be executed before loading the widget - Consider putting it in FutureBuilder
-  //   var _db = database.collection("users").doc(user.uid);
+  void migerateToUserFirstDate() async {
+    var _db = database.collection("users").doc(user.uid);
 
-  //   return _db.get().then((value) async {
-  //     if (await value.data().containsKey("userFirstDate") == false) {
-  //       var userRigDate = user.metadata.creationTime;
-  //       int userFirstStreak = await value.data()["userPreviousStreak"];
+    return _db.get().then((value) async {
+      if (await value.data().containsKey("userFirstDate") == false) {
+        var userRigDate = user.metadata.creationTime;
+        int userFirstStreak = await value.data()["userPreviousStreak"];
 
-  //       DateTime userResetDate = value.data()["resetedDate"] != null
-  //           ? await DateTime.parse(
-  //               value.data()["resetedDate"].toDate().toString())
-  //           : null;
-  //       DateTime parseFirstDate = await DateTime(userRigDate.year,
-  //           userRigDate.month, userRigDate.day - userFirstStreak);
-  //       DateTime userFirstDate =
-  //           await userResetDate != null ? userResetDate : parseFirstDate;
+        DateTime userResetDate = value.data()["resetedDate"] != null
+            ? await DateTime.parse(
+                value.data()["resetedDate"].toDate().toString())
+            : null;
+        DateTime parseFirstDate = await DateTime(userRigDate.year,
+            userRigDate.month, userRigDate.day - userFirstStreak);
+        DateTime userFirstDate =
+            await userResetDate != null ? userResetDate : parseFirstDate;
 
-  //       var firstDate = {"userFirstDate": userFirstDate};
-  //       await database
-  //           .collection("users")
-  //           .doc(user.uid)
-  //           .set(firstDate, SetOptions(merge: true))
-  //           .onError((error, stackTrace) => print(error))
-  //           .then((value) {
-  //         setState(() {});
-  //       });
-  //     }
-  //   });
-  // }
+        var firstDate = {"userFirstDate": userFirstDate};
+        await database
+            .collection("users")
+            .doc(user.uid)
+            .set(firstDate, SetOptions(merge: true))
+            .onError((error, stackTrace) => print(error))
+            .then((value) {
+          setState(() {});
+        });
+      }
+    });
+  }
 
   @override
   void initState() {
-    // migerateToUserFirstDate();
+    migerateToUserFirstDate();
     super.initState();
     loadUserRelapces();
     loadUserWatchesOnly();
@@ -488,7 +484,6 @@ class FollowYourRebootScreenState extends State<FollowYourRebootScreen>
                 ),
                 SizedBox(height: 32),
                 FollowUpStreaks(),
-                //FollowUpSection(),
                 Padding(
                   padding: EdgeInsets.only(right: 16, left: 16),
                   child: Column(
