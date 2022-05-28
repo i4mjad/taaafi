@@ -30,7 +30,7 @@ class DB {
     DocumentSnapshot snapshot = await db.collection("users").doc(uid).get();
 
     return DateTime.parse(
-        await snapshot.get('startingDate').toDate().toString());
+        await snapshot.get('userFirstDate').toDate().toString());
   }
 
   Future<List<Day>> getCalenderData() async {
@@ -89,7 +89,7 @@ class DB {
     final firstdate = await getStartingDate();
     //Get userRelapses List
     final followUpData = await getFollowUpData();
-    List<String> userRelapses =
+    List<dynamic> userRelapses =
         followUpData.relapses; //if the userRelapses List contains no relapses
     var today = DateTime.now();
     //if the userRelapses List contains more than one relapse
@@ -112,7 +112,7 @@ class DB {
     final firstdate = await getStartingDate();
     //Get userRelapses List
     final followUpData = await getFollowUpData();
-    List<String> userNoPornDays = followUpData
+    List<dynamic> userNoPornDays = followUpData
         .pornWithoutMasterbation; //if the userRelapses List contains no relapses
     var today = DateTime.now();
     //if the userRelapses List contains more than one relapse
@@ -135,7 +135,7 @@ class DB {
     final firstdate = await getStartingDate();
     //Get userRelapses List
     final followUpData = await getFollowUpData();
-    List<String> userNoMastDays = followUpData
+    List<dynamic> userNoMastDays = followUpData
         .masterbationWithoutPorn; //if the userRelapses List contains no relapses
     var today = DateTime.now();
     //if the userRelapses List contains more than one relapse
@@ -152,6 +152,33 @@ class DB {
       return await today.difference(firstdate).inDays;
     }
   }
+
+  // Future<void> migerateToUserFirstDate() async {
+  //   var _db = db.collection("users").doc(user.uid);
+
+  //   _db.get().then((value) async {
+  //     if (await value.data().containsKey("userFirstDate") == false) {
+  //       var userRigDate = user.metadata.creationTime;
+  //       int userFirstStreak = await value.data()["userPreviousStreak"];
+
+  //       DateTime userResetDate = value.data()["resetedDate"] != null
+  //           ? await DateTime.parse(
+  //               value.data()["resetedDate"].toDate().toString())
+  //           : null;
+  //       DateTime parseFirstDate = await DateTime(userRigDate.year,
+  //           userRigDate.month, userRigDate.day - userFirstStreak);
+  //       DateTime userFirstDate =
+  //           await userResetDate != null ? userResetDate : parseFirstDate;
+
+  //       var firstDate = {"userFirstDate": userFirstDate};
+  //       await db
+  //           .collection("users")
+  //           .doc(user.uid)
+  //           .set(firstDate, SetOptions(merge: true))
+  //           .onError((error, stackTrace) => print(error));
+  //     }
+  //   });
+  // }
 }
 
 DB db = DB();
