@@ -9,6 +9,8 @@ import 'package:reboot_app_3/bloc_provider.dart';
 import 'package:reboot_app_3/presentation/Screens/auth/login_screen.dart';
 import 'package:reboot_app_3/presentation/blocs/follow_your_reboot_bloc.dart';
 import 'package:reboot_app_3/presentation/screens/follow_your_reboot/calender/calender_widget.dart';
+import 'package:reboot_app_3/presentation/screens/follow_your_reboot/follow_up_streaks/follow_up_streak.dart';
+import 'package:reboot_app_3/repository/db.dart';
 import 'package:reboot_app_3/shared/constants/constants.dart';
 import 'package:reboot_app_3/shared/constants/textstyles_constants.dart';
 import 'package:reboot_app_3/shared/localization/localization.dart';
@@ -402,8 +404,40 @@ class FollowYourRebootScreenState extends State<FollowYourRebootScreen>
     return double.parse((relapsesCount / averagePeriods).toStringAsFixed(2));
   }
 
+  // void migerateToUserFirstDate() async {
+  //   //TODO - THIS Function needed to be executed before loading the widget - Consider putting it in FutureBuilder
+  //   var _db = database.collection("users").doc(user.uid);
+
+  //   return _db.get().then((value) async {
+  //     if (await value.data().containsKey("userFirstDate") == false) {
+  //       var userRigDate = user.metadata.creationTime;
+  //       int userFirstStreak = await value.data()["userPreviousStreak"];
+
+  //       DateTime userResetDate = value.data()["resetedDate"] != null
+  //           ? await DateTime.parse(
+  //               value.data()["resetedDate"].toDate().toString())
+  //           : null;
+  //       DateTime parseFirstDate = await DateTime(userRigDate.year,
+  //           userRigDate.month, userRigDate.day - userFirstStreak);
+  //       DateTime userFirstDate =
+  //           await userResetDate != null ? userResetDate : parseFirstDate;
+
+  //       var firstDate = {"userFirstDate": userFirstDate};
+  //       await database
+  //           .collection("users")
+  //           .doc(user.uid)
+  //           .set(firstDate, SetOptions(merge: true))
+  //           .onError((error, stackTrace) => print(error))
+  //           .then((value) {
+  //         setState(() {});
+  //       });
+  //     }
+  //   });
+  // }
+
   @override
   void initState() {
+    // migerateToUserFirstDate();
     super.initState();
     loadUserRelapces();
     loadUserWatchesOnly();
@@ -453,7 +487,7 @@ class FollowYourRebootScreenState extends State<FollowYourRebootScreen>
                   ),
                 ),
                 SizedBox(height: 32),
-                followUpSection(context),
+                FollowUpStreaks(),
                 //FollowUpSection(),
                 Padding(
                   padding: EdgeInsets.only(right: 16, left: 16),
@@ -834,203 +868,6 @@ class FollowYourRebootScreenState extends State<FollowYourRebootScreen>
             ),
           ),
         ));
-  }
-
-  Container followUpSection(BuildContext context) {
-    final bloc = CustomBlocProvider.of<FollowYourRebootBloc>(context);
-    return Container(
-      child: Padding(
-        padding: EdgeInsets.only(right: 16.0, left: 16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(AppLocalizations.of(context).translate('current-streak'),
-                style: kSubTitlesStyle),
-            SizedBox(
-              height: 8,
-            ),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Container(
-                  width: MediaQuery.of(context).size.width * 0.27,
-                  height: 150,
-                  decoration: BoxDecoration(
-                      color: Colors.red.withOpacity(0.20),
-                      borderRadius: BorderRadius.circular(15)),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            FutureBuilder(
-                              future: bloc.getRelapseStreak(),
-                              initialData: 0,
-                              builder: (BuildContext context,
-                                  AsyncSnapshot<int> streak) {
-                                return Text(
-                                  streak.data.toString(),
-                                  style: kPageTitleStyle.copyWith(
-                                    color: Colors.red,
-                                    fontSize: 35,
-                                  ),
-                                );
-                              },
-                            ),
-                            Text(
-                              AppLocalizations.of(context)
-                                  .translate('free-relapse-days'),
-                              style: kSubTitlesStyle.copyWith(
-                                fontSize: 16,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                SizedBox(
-                  width: 8,
-                ),
-                Container(
-                  width: MediaQuery.of(context).size.width * 0.27,
-                  height: 150,
-                  decoration: BoxDecoration(
-                      color: Colors.orangeAccent.withOpacity(0.2),
-                      borderRadius: BorderRadius.circular(15)),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            FutureBuilder(
-                                future: bloc.getNoMastsStreak(),
-                                initialData: 0,
-                                builder: (BuildContext context,
-                                    AsyncSnapshot<int> snapshot) {
-                                  return Text(
-                                      this.currentNoMastStreak.toString(),
-                                      style: kPageTitleStyle.copyWith(
-                                          color: Colors.orangeAccent));
-                                }),
-                            Text(
-                              AppLocalizations.of(context)
-                                  .translate('free-mast-days'),
-                              style: kSubTitlesStyle.copyWith(
-                                fontSize: 16,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                SizedBox(
-                  width: 8,
-                ),
-                Container(
-                  width: MediaQuery.of(context).size.width * 0.27,
-                  height: 150,
-                  decoration: BoxDecoration(
-                      color: Colors.purple.withOpacity(0.2),
-                      borderRadius: BorderRadius.circular(15)),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            FutureBuilder(
-                                future: bloc.getNoMastsStreak(),
-                                initialData: 0,
-                                builder: (BuildContext context,
-                                    AsyncSnapshot<int> snapshot) {
-                                  return Text(
-                                    snapshot.data.toString(),
-                                    style: kPageTitleStyle.copyWith(
-                                        color: Colors.purple),
-                                  );
-                                }),
-                            Text(
-                              AppLocalizations.of(context)
-                                  .translate('free-porn-days'),
-                              style: kSubTitlesStyle.copyWith(
-                                fontSize: 16,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(
-              height: 16,
-            ),
-            Container(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  GestureDetector(
-                    onTap: () {
-                      changeDateEvent(getTodaysDateString());
-                    },
-                    child: Container(
-                      width: (MediaQuery.of(context).size.width),
-                      height: 60,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(12),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.grey.withOpacity(0.5),
-                            spreadRadius: .25,
-                            blurRadius: 7,
-                            offset: Offset(0, 2), // changes position of shadow
-                          ),
-                        ],
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            AppLocalizations.of(context)
-                                .translate('daily-follow-up'),
-                            style: kSubTitlesStyle.copyWith(
-                                fontSize: 20,
-                                color: primaryColor,
-                                fontWeight: FontWeight.w400,
-                                height: 1),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 24),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
   }
 
   String getTodaysDateString() {
