@@ -5,7 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:reboot_app_3/Model/Relapse.dart';
 import 'package:reboot_app_3/bloc_provider.dart';
+import 'package:reboot_app_3/data/models/user_profile.dart';
 import 'package:reboot_app_3/presentation/Screens/auth/login_screen.dart';
 import 'package:reboot_app_3/presentation/blocs/follow_your_reboot_bloc.dart';
 import 'package:reboot_app_3/presentation/screens/follow_your_reboot/calender/calender_widget.dart';
@@ -16,6 +18,8 @@ import 'package:reboot_app_3/shared/localization/localization.dart';
 import 'package:reboot_app_3/shared/localization/localization_services.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:syncfusion_flutter_calendar/calendar.dart';
+import 'calender/calender_data_model.dart';
 import 'day_of_week_relapses/day_of_week_relapses_widget.dart';
 import 'follow_your_reboot_services.dart';
 import 'follow_your_reboot_widgets.dart';
@@ -399,6 +403,70 @@ class FollowYourRebootScreenState extends State<FollowYourRebootScreen>
     return double.parse((relapsesCount / averagePeriods).toStringAsFixed(2));
   }
 
+  var days = <Day>[];
+
+  void getCalenderData() async {
+    final db = FirebaseFirestore.instance;
+    final user = FirebaseAuth.instance.currentUser;
+    final uid = FirebaseAuth.instance.currentUser.uid;
+
+    db.collection("users").doc(uid).snapshots().listen((snapshot) async {
+      FollowUpData _followUpDate = FollowUpData.fromSnapshot(snapshot);
+      DateTime _startingDate = DateTime.parse(
+          await snapshot.get('userFirstDate').toDate().toString());
+
+      var daysArray = <Day>[];
+      var oldRelapses = <DateTime>[];
+      var oldWatches = <DateTime>[];
+      var oldMasts = <DateTime>[];
+
+      final today = DateTime.now();
+
+      oldRelapses.clear();
+      for (var strDate in _followUpDate.relapses) {
+        final date = DateTime.parse(strDate);
+        oldRelapses.add(date);
+      }
+      oldWatches.clear();
+      for (var strDate in _followUpDate.pornWithoutMasterbation) {
+        final date = DateTime.parse(strDate);
+        oldWatches.add(date);
+      }
+      oldMasts.clear();
+      for (var strDate in _followUpDate.masterbationWithoutPorn) {
+        final date = DateTime.parse(strDate);
+        oldMasts.add(date);
+      }
+
+      List<DateTime> calculateDaysInterval(
+          DateTime startDate, DateTime endDate) {
+        List<DateTime> days = [];
+        for (int i = 0; i <= endDate.difference(startDate).inDays; i++) {
+          days.add(startDate.add(Duration(days: i)));
+        }
+        return days;
+      }
+
+      for (var date in calculateDaysInterval(_startingDate, today)) {
+        final dateD = new DateTime(date.year, date.month, date.day);
+
+        if (oldRelapses.contains(dateD)) {
+          daysArray.add(new Day("Relapse", date, Colors.red));
+        } else if (oldWatches.contains(dateD) && !oldRelapses.contains(dateD)) {
+          daysArray.add(new Day("Watching Porn", date, Colors.purple));
+        } else if (oldMasts.contains(dateD) && !oldRelapses.contains(dateD)) {
+          daysArray.add(new Day("Masturbating", date, Colors.orange));
+        } else {
+          daysArray.add(new Day("Success", date, Colors.green));
+        }
+      }
+
+      setState(() {
+        days = daysArray;
+      });
+    });
+  }
+
   void migerateToUserFirstDate() async {
     var _db = database.collection("users").doc(user.uid);
 
@@ -432,6 +500,7 @@ class FollowYourRebootScreenState extends State<FollowYourRebootScreen>
   @override
   void initState() {
     migerateToUserFirstDate();
+    getCalenderData();
     super.initState();
     loadUserRelapces();
     loadUserWatchesOnly();
@@ -445,6 +514,7 @@ class FollowYourRebootScreenState extends State<FollowYourRebootScreen>
 
   @override
   Widget build(BuildContext context) {
+    final bloc = CustomBlocProvider.of<FollowYourRebootBloc>(context);
     return Scaffold(
         backgroundColor: seconderyColor.withOpacity(0.2),
         body: Padding(
@@ -498,7 +568,32 @@ class FollowYourRebootScreenState extends State<FollowYourRebootScreen>
                           SizedBox(
                             height: 8,
                           ),
-                          FollowUpCalender()
+                          Container(
+                              width: MediaQuery.of(context).size.width,
+                              height: MediaQuery.of(context).size.height * 0.35,
+                              decoration: BoxDecoration(
+                                  color: mainGrayColor,
+                                  borderRadius: BorderRadius.circular(15)),
+                              child: SfCalendar(
+                                onTap: (CalendarTapDetails details) async {
+                                  DateTime date = details.date;
+                                  DateTime firstDate =
+                                      await bloc.getFirstDate();
+
+                                  dateChecker(firstDate, date, context);
+                                },
+                                view: CalendarView.month,
+                                headerStyle: CalendarHeaderStyle(
+                                    textAlign: TextAlign.center,
+                                    backgroundColor: mainYellowColor,
+                                    textStyle: kSubTitlesStyle),
+                                dataSource: CalenderDataSource(days),
+                                monthViewSettings: MonthViewSettings(
+                                  agendaStyle: AgendaStyle(),
+                                  appointmentDisplayMode:
+                                      MonthAppointmentDisplayMode.indicator,
+                                ),
+                              )),
                         ],
                       ),
                       SizedBox(
@@ -865,11 +960,273 @@ class FollowYourRebootScreenState extends State<FollowYourRebootScreen>
 
 //TODO - This needed to be refactored to not depend on the variable in the widget
 
-  bool dayWithinRange(DateTime date) {
-    final today = DateTime.now();
+  changeDateEvent(String date, BuildContext context) async {
+    final trimedDate = date.trim();
+    showModalBottomSheet(
+        context: context,
+        builder: (context) {
+          return Padding(
+            padding: EdgeInsets.only(left: 20.0, right: 20, top: 8, bottom: 8),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      height: 5,
+                      width: MediaQuery.of(context).size.width * 0.1,
+                      color: Colors.black12,
+                    )
+                  ],
+                ),
+                SizedBox(
+                  height: 12,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      trimedDate,
+                      style: kPageTitleStyle.copyWith(fontSize: 26),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.pop(context);
+                      },
+                      child: Icon(
+                        Iconsax.close_circle,
+                        color: Colors.black26,
+                        size: 32,
+                      ),
+                    )
+                  ],
+                ),
+                SizedBox(
+                  height: 8,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      AppLocalizations.of(context).translate("how-is-this-day"),
+                      style: kPageTitleStyle.copyWith(
+                          fontSize: 18,
+                          color: Colors.grey,
+                          fontWeight: FontWeight.normal),
+                    ),
+                  ],
+                ),
+                SizedBox(
+                  height: 8,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    //relapse
+                    GestureDetector(
+                      onTap: () {
+                        // setState(() {
+                        //   if (!userRelapses.contains(trimedDate)) {
+                        //     //
+                        //     userRelapses.add(trimedDate);
+                        //     database.collection("users").doc(user.uid).update({
+                        //       "userRelapses": userRelapses,
+                        //     });
+                        //   }
 
-    return date.isAfter(resetDay != null ? resetDay : userFirstDayRecorded) &&
-        date.isBefore(today);
+                        //   if (!userMasturbatingWithoutWatching
+                        //       .contains(trimedDate)) {
+                        //     userMasturbatingWithoutWatching.add(trimedDate);
+                        //     database.collection("users").doc(user.uid).update({
+                        //       "userMasturbatingWithoutWatching":
+                        //           userMasturbatingWithoutWatching,
+                        //     });
+                        //   }
+
+                        //   if (!userWatchingWithoutMasturbating
+                        //       .contains(trimedDate)) {
+                        //     userWatchingWithoutMasturbating.add(trimedDate);
+                        //     database.collection("users").doc(user.uid).update({
+                        //       "userWatchingWithoutMasturbating":
+                        //           userWatchingWithoutMasturbating,
+                        //     });
+                        //   }
+                        // });
+                        Navigator.pop(context);
+                      },
+                      child: Container(
+                        width: MediaQuery.of(context).size.width / 2.5,
+                        height: 100,
+                        decoration: BoxDecoration(
+                            color: Colors.red.withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(12.5),
+                            border: Border.all(color: Colors.red)),
+                        child: Center(
+                          child: Text(
+                            AppLocalizations.of(context).translate("relapse"),
+                            style: kSubTitlesStyle.copyWith(
+                                color: Colors.red,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600),
+                          ),
+                        ),
+                      ),
+                    ),
+                    //success
+                    GestureDetector(
+                      onTap: () {
+                        // setState(() {
+                        //   userWatchingWithoutMasturbating.remove(trimedDate);
+                        //   userMasturbatingWithoutWatching.remove(trimedDate);
+                        //   userRelapses.remove(trimedDate);
+                        // });
+
+                        // final userData =
+                        //     database.collection("users").doc(user.uid);
+
+                        // userData.update({
+                        //   "userRelapses": userRelapses,
+                        //   "userWatchingWithoutMasturbating":
+                        //       userWatchingWithoutMasturbating,
+                        //   "userMasturbatingWithoutWatching":
+                        //       userMasturbatingWithoutWatching
+                        // });
+
+                        // if (userRelapses.length == 0) {
+                        //   userData
+                        //       .update({"userRelapses": FieldValue.delete()});
+                        // }
+
+                        // if (userWatchingWithoutMasturbating.length == 0) {
+                        //   userData.update({
+                        //     "userWatchingWithoutMasturbating":
+                        //         FieldValue.delete()
+                        //   });
+                        // }
+
+                        // if (userMasturbatingWithoutWatching.length == 0) {
+                        //   userData.update({
+                        //     "userMasturbatingWithoutWatching":
+                        //         FieldValue.delete()
+                        //   });
+                        // }
+
+                        Navigator.pop(context);
+                        //
+                      },
+                      child: Container(
+                        width: MediaQuery.of(context).size.width / 2.5,
+                        height: 100,
+                        decoration: BoxDecoration(
+                            color: Colors.green.withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(12.5),
+                            border: Border.all(color: Colors.green)),
+                        child: Center(
+                          child: Text(
+                            AppLocalizations.of(context).translate("free-day"),
+                            style: kSubTitlesStyle.copyWith(
+                                color: Colors.green,
+                                fontWeight: FontWeight.w600,
+                                fontSize: 16),
+                          ),
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+                SizedBox(
+                  height: 18,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    //only porn
+                    GestureDetector(
+                      onTap: () {
+                        // setState(() {
+                        //   userWatchingWithoutMasturbating.add(trimedDate);
+                        //   database.collection("users").doc(user.uid).update({
+                        //     "userWatchingWithoutMasturbating":
+                        //         userWatchingWithoutMasturbating
+                        //   });
+                        // });
+                        Navigator.pop(context);
+                      },
+                      child: Container(
+                        width: MediaQuery.of(context).size.width / 2.5,
+                        height: 100,
+                        decoration: BoxDecoration(
+                            color: Colors.deepPurple.withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(12.5),
+                            border: Border.all(color: Colors.deepPurple)),
+                        child: Center(
+                          child: Text(
+                            AppLocalizations.of(context).translate("porn-only"),
+                            textAlign: TextAlign.center,
+                            style: kSubTitlesStyle.copyWith(
+                                color: Colors.deepPurple,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600),
+                          ),
+                        ),
+                      ),
+                    ),
+                    //only mast
+                    GestureDetector(
+                      onTap: () {
+                        // setState(() {
+                        //   userMasturbatingWithoutWatching.add(trimedDate);
+                        //   database.collection("users").doc(user.uid).update({
+                        //     "userMasturbatingWithoutWatching":
+                        //         userMasturbatingWithoutWatching
+                        //   });
+                        // });
+                        Navigator.pop(context);
+                      },
+                      child: Container(
+                        width: MediaQuery.of(context).size.width / 2.5,
+                        height: 100,
+                        decoration: BoxDecoration(
+                            color: Colors.orangeAccent.withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(12.5),
+                            border: Border.all(color: Colors.orangeAccent)),
+                        child: Center(
+                          child: Text(
+                            AppLocalizations.of(context).translate("mast-only"),
+                            textAlign: TextAlign.center,
+                            style: kSubTitlesStyle.copyWith(
+                                color: Colors.orangeAccent,
+                                fontWeight: FontWeight.w600,
+                                fontSize: 16),
+                          ),
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+                SizedBox(
+                  height: 20,
+                ),
+              ],
+            ),
+          );
+        });
+  }
+
+  dateChecker(DateTime firstDate, DateTime date, BuildContext context) {
+    if (dayWithinRange(firstDate, date)) {
+      final dateStr = date.toString().substring(0, 11);
+      changeDateEvent(dateStr, context);
+    } else {
+      outOfRangeAlert(context);
+    }
+  }
+
+  bool dayWithinRange(DateTime firstDate, DateTime date) {
+    final today = DateTime.now();
+    return date.isAfter(firstDate) && date.isBefore(today);
   }
 }
 

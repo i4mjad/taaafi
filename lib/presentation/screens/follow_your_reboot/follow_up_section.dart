@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:reboot_app_3/presentation/screens/follow_your_reboot/follow_your_reboot_widgets.dart';
 import 'package:reboot_app_3/shared/constants/constants.dart';
 import 'package:reboot_app_3/shared/constants/textstyles_constants.dart';
 import 'package:reboot_app_3/shared/localization/localization.dart';
@@ -17,7 +18,8 @@ class FollowUpSection extends StatelessWidget {
           Padding(
             padding: EdgeInsets.only(right: 16, left: 16),
             child: Text(
-                AppLocalizations.of(context).translate('current-streak') + " (TESTING)",
+                AppLocalizations.of(context).translate('current-streak') +
+                    " (TESTING)",
                 style: kSubTitlesStyle),
           ),
           SizedBox(
@@ -33,21 +35,17 @@ class FollowUpSection extends StatelessWidget {
                   width: MediaQuery.of(context).size.width * 0.27,
                   height: 150,
                   decoration: BoxDecoration(
-                      color: Colors.red.withOpacity(0.05),
-                      borderRadius: BorderRadius.circular(15),
+                    color: Colors.red.withOpacity(0.05),
+                    borderRadius: BorderRadius.circular(15),
                     border: Border.all(color: Colors.red, width: 0.25),
-
-
                   ),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Container(
                         child: Column(
-                          crossAxisAlignment:
-                          CrossAxisAlignment.center,
-                          mainAxisAlignment:
-                          MainAxisAlignment.spaceEvenly,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
                             Text(
                               "12",
@@ -79,17 +77,14 @@ class FollowUpSection extends StatelessWidget {
                   decoration: BoxDecoration(
                       color: Colors.orange.withOpacity(0.05),
                       borderRadius: BorderRadius.circular(15),
-                      border: Border.all(color: Colors.orange, width: 0.25)
-                  ),
+                      border: Border.all(color: Colors.orange, width: 0.25)),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Container(
                         child: Column(
-                          crossAxisAlignment:
-                          CrossAxisAlignment.center,
-                          mainAxisAlignment:
-                          MainAxisAlignment.spaceEvenly,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
                             Text(
                               "12",
@@ -119,18 +114,14 @@ class FollowUpSection extends StatelessWidget {
                   decoration: BoxDecoration(
                       color: Colors.purple.withOpacity(0.05),
                       borderRadius: BorderRadius.circular(15),
-                      border: Border.all(color: Colors.purple, width: 0.25)
-
-                  ),
+                      border: Border.all(color: Colors.purple, width: 0.25)),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Container(
                         child: Column(
-                          crossAxisAlignment:
-                          CrossAxisAlignment.center,
-                          mainAxisAlignment:
-                          MainAxisAlignment.spaceEvenly,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
                             Text(
                               "2",
@@ -165,11 +156,11 @@ class FollowUpSection extends StatelessWidget {
                 GestureDetector(
                   onTap: () {
                     final DateTime now = DateTime.now();
-                    final DateFormat formatter =
-                    DateFormat('yyyy-MM-dd');
+                    final DateFormat formatter = DateFormat('yyyy-MM-dd');
                     final String today = formatter.format(now);
 
-                    changeDateEvent(today, context);
+                    // changeDateEvent(today, context);
+                    UtlClass.changeDateEvent(today, context);
                   },
                   child: Padding(
                     padding: EdgeInsets.only(right: 16, left: 16),
@@ -177,8 +168,8 @@ class FollowUpSection extends StatelessWidget {
                       width: (MediaQuery.of(context).size.width),
                       height: 60,
                       decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(12),
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12),
                         boxShadow: [
                           BoxShadow(
                             color: Colors.grey.withOpacity(0.5),
@@ -188,7 +179,6 @@ class FollowUpSection extends StatelessWidget {
                           ),
                         ],
                       ),
-
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -215,7 +205,7 @@ class FollowUpSection extends StatelessWidget {
     );
   }
 
-  void changeDateEvent(String date, BuildContext context) async {
+  changeDateEvent(String date, BuildContext context) async {
     final trimedDate = date.trim();
     showModalBottomSheet(
         context: context,
@@ -393,4 +383,3 @@ class FollowUpSection extends StatelessWidget {
         });
   }
 }
-

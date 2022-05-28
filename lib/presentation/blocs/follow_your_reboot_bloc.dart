@@ -23,17 +23,18 @@ class FollowYourRebootBloc implements CustomBlocBase {
   Future<List<Day>> getCalenderData() async {
     return await db.getCalenderData();
   }
-  
+
   Future<int> getRelapseStreak() async {
     return await db.getRelapseStreak();
   }
+
   Future<int> getNoPornStreak() async {
     return await db.getNoPornStreak();
   }
+
   Future<int> getNoMastsStreak() async {
     return await db.getNoMastsStreak();
   }
-  
 
   void updateFollowUpData(DocumentSnapshot doc) async {
     //await db.updateData(doc);
@@ -45,6 +46,9 @@ class FollowYourRebootBloc implements CustomBlocBase {
 
   void createData(String name) async {
     //await db.createData(doc);
+  }
+  Future<DateTime> getFirstDate() async {
+    return await db.getStartingDate();
   }
 
   @override
