@@ -21,7 +21,7 @@ class _NavigationBarState extends State<NavigationBar> {
   List<Widget> _pages = <Widget>[
     HomeScreen(),
     FollowYourRebootScreenAuthenticationWrapper(),
-    CommunityPage(),
+    // CommunityPage(),
     AccountScreenScreenAuthenticationWrapper(),
     AboutScreen(),
   ];
@@ -51,11 +51,11 @@ class _NavigationBarState extends State<NavigationBar> {
                 Iconsax.chart,
               ),
               label: AppLocalizations.of(context).translate('fyr')),
-          BottomNavigationBarItem(
-              icon: Icon(
-                Iconsax.people,
-              ),
-              label: AppLocalizations.of(context).translate('community')),
+          // BottomNavigationBarItem(
+          //     icon: Icon(
+          //       Iconsax.people,
+          //     ),
+          //     label: AppLocalizations.of(context).translate('community')),
           BottomNavigationBarItem(
               icon: Icon(
                 Iconsax.personalcard,
