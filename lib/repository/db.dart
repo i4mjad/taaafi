@@ -153,32 +153,73 @@ class DB {
     }
   }
 
-  // Future<void> migerateToUserFirstDate() async {
-  //   var _db = db.collection("users").doc(user.uid);
+  addRelapse(String date) async {
+    FollowUpData _followUpData = await getFollowUpData();
+    List<dynamic> _watchOnly = _followUpData.pornWithoutMasterbation;
+    List<dynamic> _mastOnly = _followUpData.masterbationWithoutPorn;
+    List<dynamic> _relapses = _followUpData.relapses;
 
-  //   _db.get().then((value) async {
-  //     if (await value.data().containsKey("userFirstDate") == false) {
-  //       var userRigDate = user.metadata.creationTime;
-  //       int userFirstStreak = await value.data()["userPreviousStreak"];
+    if (_watchOnly.contains(date)) return;
+    if (_mastOnly.contains(date)) return;
+    if (_relapses.contains(date)) return;
 
-  //       DateTime userResetDate = value.data()["resetedDate"] != null
-  //           ? await DateTime.parse(
-  //               value.data()["resetedDate"].toDate().toString())
-  //           : null;
-  //       DateTime parseFirstDate = await DateTime(userRigDate.year,
-  //           userRigDate.month, userRigDate.day - userFirstStreak);
-  //       DateTime userFirstDate =
-  //           await userResetDate != null ? userResetDate : parseFirstDate;
+    _watchOnly.add(date);
+    _mastOnly.add(date);
+    _relapses.add(date);
+    db.collection("users").doc(user.uid).update({
+      "userRelapses": _relapses,
+      "userMasturbatingWithoutWatching": _mastOnly,
+      "userWatchingWithoutMasturbating": _watchOnly,
+    });
+  }
 
-  //       var firstDate = {"userFirstDate": userFirstDate};
-  //       await db
-  //           .collection("users")
-  //           .doc(user.uid)
-  //           .set(firstDate, SetOptions(merge: true))
-  //           .onError((error, stackTrace) => print(error));
-  //     }
-  //   });
-  // }
+  addSuccess(String date) async {
+    FollowUpData _followUpData = await getFollowUpData();
+    List<dynamic> _watchOnly = _followUpData.pornWithoutMasterbation;
+    List<dynamic> _mastOnly = _followUpData.masterbationWithoutPorn;
+    List<dynamic> _relapses = _followUpData.relapses;
+
+    if (_watchOnly.contains(date)) {
+      _watchOnly.remove(date);
+    }
+    if (_mastOnly.contains(date)) {
+      _mastOnly.remove(date);
+    }
+    if (_relapses.contains(date)) {
+      _relapses.remove(date);
+    }
+
+    db.collection("users").doc(user.uid).update({
+      "userRelapses": _relapses,
+      "userMasturbatingWithoutWatching": _mastOnly,
+      "userWatchingWithoutMasturbating": _watchOnly,
+    });
+  }
+
+  addWatchOnly(String date) async {
+    FollowUpData _followUpData = await getFollowUpData();
+    List<dynamic> _days = _followUpData.pornWithoutMasterbation;
+
+    if (_days.contains(date)) return;
+    _days.add(date);
+
+    db
+        .collection("users")
+        .doc(user.uid)
+        .update({"userWatchingWithoutMasturbating": _days});
+  }
+
+  addMastOnly(String date) async {
+    FollowUpData _followUpData = await getFollowUpData();
+    List<dynamic> _days = _followUpData.masterbationWithoutPorn;
+
+    if (_days.contains(date)) return;
+    _days.add(date);
+    db
+        .collection("users")
+        .doc(user.uid)
+        .update({"userMasturbatingWithoutWatching": _days});
+  }
 }
 
 DB db = DB();

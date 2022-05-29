@@ -55,4 +55,20 @@ class FollowYourRebootBloc implements CustomBlocBase {
   void dispose() async {
     return _firestoreController.close();
   }
+
+  void addRelapse(String date) async {
+    await db.addRelapse(date);
+  }
+
+  void addSuccess(String date) async {
+    await db.addSuccess(date);
+  }
+
+  void addWatchOnly(String date) async {
+    await db.addWatchOnly(date);
+  }
+
+  void addMastOnly(String date) async {
+    await db.addMastOnly(date);
+  }
 }

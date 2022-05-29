@@ -128,7 +128,7 @@ class FollowUpStreaks extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
                             FutureBuilder(
-                                future: bloc.getNoMastsStreak(),
+                                future: bloc.getNoPornStreak(),
                                 initialData: 0,
                                 builder: (BuildContext context,
                                     AsyncSnapshot<int> snapshot) {
@@ -164,7 +164,7 @@ class FollowUpStreaks extends StatelessWidget {
                 children: [
                   GestureDetector(
                     onTap: () {
-                      changeDateEvent(getTodaysDateString(), context);
+                      changeDateEvent(getTodaysDateString(), context, bloc);
                     },
                     child: Container(
                       width: (MediaQuery.of(context).size.width),
@@ -207,7 +207,8 @@ class FollowUpStreaks extends StatelessWidget {
     );
   }
 
-  changeDateEvent(String date, BuildContext context) async {
+  changeDateEvent(
+      String date, BuildContext context, FollowYourRebootBloc bloc) async {
     final trimedDate = date.trim();
     showModalBottomSheet(
         context: context,
@@ -274,6 +275,7 @@ class FollowUpStreaks extends StatelessWidget {
                     //relapse
                     GestureDetector(
                       onTap: () {
+                        bloc.addRelapse(date);
                         // setState(() {
                         //   if (!userRelapses.contains(trimedDate)) {
                         //     //
@@ -324,6 +326,7 @@ class FollowUpStreaks extends StatelessWidget {
                     //success
                     GestureDetector(
                       onTap: () {
+                        bloc.addSuccess(date);
                         // setState(() {
                         //   userWatchingWithoutMasturbating.remove(trimedDate);
                         //   userMasturbatingWithoutWatching.remove(trimedDate);
@@ -392,6 +395,7 @@ class FollowUpStreaks extends StatelessWidget {
                     //only porn
                     GestureDetector(
                       onTap: () {
+                        bloc.addWatchOnly(date);
                         // setState(() {
                         //   userWatchingWithoutMasturbating.add(trimedDate);
                         //   database.collection("users").doc(user.uid).update({
@@ -423,6 +427,7 @@ class FollowUpStreaks extends StatelessWidget {
                     //only mast
                     GestureDetector(
                       onTap: () {
+                        bloc.addMastOnly(date);
                         // setState(() {
                         //   userMasturbatingWithoutWatching.add(trimedDate);
                         //   database.collection("users").doc(user.uid).update({
@@ -461,16 +466,4 @@ class FollowUpStreaks extends StatelessWidget {
           );
         });
   }
-
-  //   void dateChecker(DateTime date) {
-  //   //get the range of the dates from the first recorded date until today
-
-  //   //check if the date clicked is within the range, if yes pass it to the function, if not inform the user
-  //   if (dayWithinRange(date)) {
-  //     final dateStr = date.toString().substring(0, 11);
-  //     this.changeDateEvent(dateStr, context);
-  //   } else {
-  //     outOfRangeAlert(context);
-  //   }
-  // }
 }

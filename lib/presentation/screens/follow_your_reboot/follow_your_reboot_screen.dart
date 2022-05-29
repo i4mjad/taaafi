@@ -570,7 +570,7 @@ class FollowYourRebootScreenState extends State<FollowYourRebootScreen>
                           ),
                           Container(
                               width: MediaQuery.of(context).size.width,
-                              height: MediaQuery.of(context).size.height * 0.35,
+                              height: MediaQuery.of(context).size.height * 0.45,
                               decoration: BoxDecoration(
                                   color: mainGrayColor,
                                   borderRadius: BorderRadius.circular(15)),
@@ -580,7 +580,7 @@ class FollowYourRebootScreenState extends State<FollowYourRebootScreen>
                                   DateTime firstDate =
                                       await bloc.getFirstDate();
 
-                                  dateChecker(firstDate, date, context);
+                                  dateChecker(firstDate, date, context, bloc);
                                 },
                                 view: CalendarView.month,
                                 headerStyle: CalendarHeaderStyle(
@@ -589,10 +589,12 @@ class FollowYourRebootScreenState extends State<FollowYourRebootScreen>
                                     textStyle: kSubTitlesStyle),
                                 dataSource: CalenderDataSource(days),
                                 monthViewSettings: MonthViewSettings(
+                                  //showAgenda: true,
                                   agendaStyle: AgendaStyle(),
                                   appointmentDisplayMode:
                                       MonthAppointmentDisplayMode.indicator,
                                 ),
+                                allowAppointmentResize: true,
                               )),
                         ],
                       ),
@@ -958,9 +960,8 @@ class FollowYourRebootScreenState extends State<FollowYourRebootScreen>
         ));
   }
 
-//TODO - This needed to be refactored to not depend on the variable in the widget
-
-  changeDateEvent(String date, BuildContext context) async {
+  changeDateEvent(
+      String date, BuildContext context, FollowYourRebootBloc bloc) async {
     final trimedDate = date.trim();
     showModalBottomSheet(
         context: context,
@@ -1027,33 +1028,7 @@ class FollowYourRebootScreenState extends State<FollowYourRebootScreen>
                     //relapse
                     GestureDetector(
                       onTap: () {
-                        // setState(() {
-                        //   if (!userRelapses.contains(trimedDate)) {
-                        //     //
-                        //     userRelapses.add(trimedDate);
-                        //     database.collection("users").doc(user.uid).update({
-                        //       "userRelapses": userRelapses,
-                        //     });
-                        //   }
-
-                        //   if (!userMasturbatingWithoutWatching
-                        //       .contains(trimedDate)) {
-                        //     userMasturbatingWithoutWatching.add(trimedDate);
-                        //     database.collection("users").doc(user.uid).update({
-                        //       "userMasturbatingWithoutWatching":
-                        //           userMasturbatingWithoutWatching,
-                        //     });
-                        //   }
-
-                        //   if (!userWatchingWithoutMasturbating
-                        //       .contains(trimedDate)) {
-                        //     userWatchingWithoutMasturbating.add(trimedDate);
-                        //     database.collection("users").doc(user.uid).update({
-                        //       "userWatchingWithoutMasturbating":
-                        //           userWatchingWithoutMasturbating,
-                        //     });
-                        //   }
-                        // });
+                        bloc.addRelapse(date);
                         Navigator.pop(context);
                       },
                       child: Container(
@@ -1077,44 +1052,9 @@ class FollowYourRebootScreenState extends State<FollowYourRebootScreen>
                     //success
                     GestureDetector(
                       onTap: () {
-                        // setState(() {
-                        //   userWatchingWithoutMasturbating.remove(trimedDate);
-                        //   userMasturbatingWithoutWatching.remove(trimedDate);
-                        //   userRelapses.remove(trimedDate);
-                        // });
-
-                        // final userData =
-                        //     database.collection("users").doc(user.uid);
-
-                        // userData.update({
-                        //   "userRelapses": userRelapses,
-                        //   "userWatchingWithoutMasturbating":
-                        //       userWatchingWithoutMasturbating,
-                        //   "userMasturbatingWithoutWatching":
-                        //       userMasturbatingWithoutWatching
-                        // });
-
-                        // if (userRelapses.length == 0) {
-                        //   userData
-                        //       .update({"userRelapses": FieldValue.delete()});
-                        // }
-
-                        // if (userWatchingWithoutMasturbating.length == 0) {
-                        //   userData.update({
-                        //     "userWatchingWithoutMasturbating":
-                        //         FieldValue.delete()
-                        //   });
-                        // }
-
-                        // if (userMasturbatingWithoutWatching.length == 0) {
-                        //   userData.update({
-                        //     "userMasturbatingWithoutWatching":
-                        //         FieldValue.delete()
-                        //   });
-                        // }
+                        bloc.addSuccess(date);
 
                         Navigator.pop(context);
-                        //
                       },
                       child: Container(
                         width: MediaQuery.of(context).size.width / 2.5,
@@ -1145,13 +1085,8 @@ class FollowYourRebootScreenState extends State<FollowYourRebootScreen>
                     //only porn
                     GestureDetector(
                       onTap: () {
-                        // setState(() {
-                        //   userWatchingWithoutMasturbating.add(trimedDate);
-                        //   database.collection("users").doc(user.uid).update({
-                        //     "userWatchingWithoutMasturbating":
-                        //         userWatchingWithoutMasturbating
-                        //   });
-                        // });
+                        bloc.addWatchOnly(date);
+
                         Navigator.pop(context);
                       },
                       child: Container(
@@ -1176,13 +1111,8 @@ class FollowYourRebootScreenState extends State<FollowYourRebootScreen>
                     //only mast
                     GestureDetector(
                       onTap: () {
-                        // setState(() {
-                        //   userMasturbatingWithoutWatching.add(trimedDate);
-                        //   database.collection("users").doc(user.uid).update({
-                        //     "userMasturbatingWithoutWatching":
-                        //         userMasturbatingWithoutWatching
-                        //   });
-                        // });
+                        bloc.addMastOnly(date);
+
                         Navigator.pop(context);
                       },
                       child: Container(
@@ -1215,13 +1145,74 @@ class FollowYourRebootScreenState extends State<FollowYourRebootScreen>
         });
   }
 
-  dateChecker(DateTime firstDate, DateTime date, BuildContext context) {
+  dateChecker(DateTime firstDate, DateTime date, BuildContext context,
+      FollowYourRebootBloc bloc) {
     if (dayWithinRange(firstDate, date)) {
-      final dateStr = date.toString().substring(0, 11);
-      changeDateEvent(dateStr, context);
+      final dateStr = date.toString().substring(0, 10);
+      changeDateEvent(dateStr, context, bloc);
     } else {
       outOfRangeAlert(context);
     }
+  }
+
+  void outOfRangeAlert(BuildContext context) {
+    showModalBottomSheet(
+        context: context,
+        builder: (context) {
+          return Padding(
+            padding: EdgeInsets.fromLTRB(0, 8, 0, 0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      height: 5,
+                      width: MediaQuery.of(context).size.width * 0.1,
+                      decoration: BoxDecoration(
+                          color: Colors.black12,
+                          borderRadius: BorderRadius.circular(30)),
+                    )
+                  ],
+                ),
+                SizedBox(
+                  height: 12,
+                ),
+                CircleAvatar(
+                  backgroundColor: Colors.red.withOpacity(0.2),
+                  child: Icon(
+                    Iconsax.warning_2,
+                    color: Colors.red,
+                  ),
+                ),
+                SizedBox(
+                  height: 4,
+                ),
+                Text(
+                  AppLocalizations.of(context).translate("out-of-range"),
+                  style:
+                      kPageTitleStyle.copyWith(color: Colors.red, fontSize: 24),
+                ),
+                SizedBox(
+                  height: 8,
+                ),
+                Text(
+                  AppLocalizations.of(context).translate('out-of-range-p'),
+                  style: kSubTitlesStyle.copyWith(
+                      color: Colors.black.withOpacity(0.7),
+                      fontWeight: FontWeight.normal,
+                      fontSize: 18),
+                ),
+                SizedBox(
+                  height: 30,
+                )
+              ],
+            ),
+          );
+        });
   }
 
   bool dayWithinRange(DateTime firstDate, DateTime date) {

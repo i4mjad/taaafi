@@ -160,7 +160,7 @@ class FollowUpSection extends StatelessWidget {
                     final String today = formatter.format(now);
 
                     // changeDateEvent(today, context);
-                    UtlClass.changeDateEvent(today, context);
+                    changeDateEvent(today, context);
                   },
                   child: Padding(
                     padding: EdgeInsets.only(right: 16, left: 16),
