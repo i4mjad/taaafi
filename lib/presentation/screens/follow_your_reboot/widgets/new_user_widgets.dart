@@ -4,11 +4,10 @@ import 'package:reboot_app_3/Shared/constants/constants.dart';
 import 'package:reboot_app_3/Shared/constants/textstyles_constants.dart';
 
 import 'package:flutter_rounded_date_picker/flutter_rounded_date_picker.dart';
-import 'package:reboot_app_3/bloc_provider.dart';
+
 import 'package:reboot_app_3/presentation/blocs/follow_your_reboot_bloc.dart';
 
-void newUserDialog(BuildContext context) {
-  final bloc = CustomBlocProvider.of<FollowYourRebootBloc>(context);
+void newUserDialog(BuildContext context, FollowYourRebootBloc bloc) {
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,
@@ -63,8 +62,7 @@ void newUserDialog(BuildContext context) {
                   GestureDetector(
                     onTap: () async {
                       var selectedDate = await getDateTime(context);
-                      await bloc.createNewUser(selectedDate);
-                      
+                      await bloc.createNewData(selectedDate);
                     },
                     child: Container(
                       height: 80,
@@ -84,7 +82,7 @@ void newUserDialog(BuildContext context) {
                   GestureDetector(
                     onTap: () async {
                       var today = getToday();
-                      await bloc.createNewUser(today);
+                      await bloc.createNewData(today);
                     },
                     child: Container(
                       height: 80,

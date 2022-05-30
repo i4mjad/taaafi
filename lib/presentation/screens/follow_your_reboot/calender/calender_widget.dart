@@ -25,7 +25,7 @@ class _FollowUpCalenderState extends State<FollowUpCalender> {
 
   void getCalenderData() async {
     final db = FirebaseFirestore.instance;
-    final user = FirebaseAuth.instance.currentUser;
+
     final uid = FirebaseAuth.instance.currentUser.uid;
 
     db.collection("users").doc(uid).snapshots().listen((snapshot) async {

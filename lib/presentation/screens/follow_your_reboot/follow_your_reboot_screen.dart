@@ -68,7 +68,7 @@ class FollowYourRebootScreenState extends State<FollowYourRebootScreen>
 
   void getCalenderData() async {
     final db = FirebaseFirestore.instance;
-    final user = FirebaseAuth.instance.currentUser;
+
     final uid = FirebaseAuth.instance.currentUser.uid;
 
     db.collection("users").doc(uid).snapshots().listen((snapshot) async {
@@ -163,7 +163,8 @@ class FollowYourRebootScreenState extends State<FollowYourRebootScreen>
 
     return _db.get().then((value) async {
       if (await value.data().containsKey("userFirstDate") == false) {
-        newUserDialog(context);
+        final bloc = CustomBlocProvider.of<FollowYourRebootBloc>(context);
+        newUserDialog(context, bloc);
       } else {
         migerateToUserFirstDate();
         getCalenderData();

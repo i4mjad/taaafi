@@ -354,7 +354,7 @@ class DB {
     return _relapses.length.toString();
   }
 
-  Future<void> createNewUser(DateTime selectedDate) {
+  Future<void> createNewData(DateTime selectedDate) {
     return db
         .collection("users")
         .doc(user.uid)
