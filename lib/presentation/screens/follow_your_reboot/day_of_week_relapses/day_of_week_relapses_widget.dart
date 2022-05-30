@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:reboot_app_3/Shared/constants/constants.dart';
 import 'package:reboot_app_3/Shared/constants/textstyles_constants.dart';
+import 'package:reboot_app_3/bloc_provider.dart';
+import 'package:reboot_app_3/presentation/blocs/follow_your_reboot_bloc.dart';
+import 'package:reboot_app_3/shared/localization/localization.dart';
 
-//TODO - Add translations to dates
-//TODO - daysOfWeekRelapses should came from state 
 class DayOfWeekRelapsesWidget extends StatelessWidget {
-  const DayOfWeekRelapsesWidget(this.dayOfWeekRelapses);
-
-  final DayOfWeekRelapses dayOfWeekRelapses;
+  const DayOfWeekRelapsesWidget();
 
   @override
   Widget build(BuildContext context) {
+    final bloc = CustomBlocProvider.of<FollowYourRebootBloc>(context);
     return Container(
       padding: EdgeInsets.all(20),
       width: MediaQuery.of(context).size.width,
@@ -31,16 +31,23 @@ class DayOfWeekRelapsesWidget extends StatelessWidget {
               //sunday
               Column(
                 children: [
-                  Text(
-                    dayOfWeekRelapses.sunRelapses,
-                    style: kSubTitlesStyle.copyWith(
-                        height: 1, color: primaryColor),
+                  FutureBuilder(
+                    future: bloc.getRelapsesByDayOfWeek(),
+                    initialData: null,
+                    builder: (BuildContext context,
+                        AsyncSnapshot<DayOfWeekRelapses> streak) {
+                      return Text(
+                        streak.data.sunRelapses ?? "0",
+                        style: kSubTitlesStyle.copyWith(
+                            height: 1, color: primaryColor),
+                      );
+                    },
                   ),
                   SizedBox(
                     height: 8,
                   ),
                   Text(
-                    "sun",
+                    AppLocalizations.of(context).translate("sun"),
                     style: kSubTitlesStyle.copyWith(
                         fontSize: 12, color: primaryColor, height: 1),
                   ),
@@ -48,33 +55,23 @@ class DayOfWeekRelapsesWidget extends StatelessWidget {
               ),
               Column(
                 children: [
-                  Text(
-                    dayOfWeekRelapses.monRelapses,
-                    style: kSubTitlesStyle.copyWith(
-                        height: 1, color: primaryColor),
+                  FutureBuilder(
+                    future: bloc.getRelapsesByDayOfWeek(),
+                    initialData: null,
+                    builder: (BuildContext context,
+                        AsyncSnapshot<DayOfWeekRelapses> streak) {
+                      return Text(
+                        streak.data.monRelapses,
+                        style: kSubTitlesStyle.copyWith(
+                            height: 1, color: primaryColor),
+                      );
+                    },
                   ),
                   SizedBox(
                     height: 8,
                   ),
                   Text(
-                    "mon",
-                    style: kSubTitlesStyle.copyWith(
-                        fontSize: 12, color: primaryColor, height: 1),
-                  )
-                ],
-              ),
-              Column(
-                children: [
-                  Text(
-                    dayOfWeekRelapses.tueRelapses,
-                    style: kSubTitlesStyle.copyWith(
-                        height: 1, color: primaryColor),
-                  ),
-                  SizedBox(
-                    height: 8,
-                  ),
-                  Text(
-                    "tue",
+                    AppLocalizations.of(context).translate("mon"),
                     style: kSubTitlesStyle.copyWith(
                         fontSize: 12, color: primaryColor, height: 1),
                   )
@@ -83,7 +80,7 @@ class DayOfWeekRelapsesWidget extends StatelessWidget {
               Column(
                 children: [
                   Text(
-                    dayOfWeekRelapses.wedRelapses,
+                    "0-",
                     style: kSubTitlesStyle.copyWith(
                         height: 1, color: primaryColor),
                   ),
@@ -91,7 +88,24 @@ class DayOfWeekRelapsesWidget extends StatelessWidget {
                     height: 8,
                   ),
                   Text(
-                    "wed",
+                    AppLocalizations.of(context).translate("tue"),
+                    style: kSubTitlesStyle.copyWith(
+                        fontSize: 12, color: primaryColor, height: 1),
+                  )
+                ],
+              ),
+              Column(
+                children: [
+                  Text(
+                    "00",
+                    style: kSubTitlesStyle.copyWith(
+                        height: 1, color: primaryColor),
+                  ),
+                  SizedBox(
+                    height: 8,
+                  ),
+                  Text(
+                    AppLocalizations.of(context).translate("wed"),
                     style: kSubTitlesStyle.copyWith(
                         fontSize: 12, color: primaryColor, height: 1),
                   )
@@ -111,7 +125,7 @@ class DayOfWeekRelapsesWidget extends StatelessWidget {
               Column(
                 children: [
                   Text(
-                    dayOfWeekRelapses.thuRelapses,
+                    "00",
                     style: kSubTitlesStyle.copyWith(
                         height: 1, color: primaryColor),
                   ),
@@ -119,7 +133,7 @@ class DayOfWeekRelapsesWidget extends StatelessWidget {
                     height: 8,
                   ),
                   Text(
-                    "thu",
+                    AppLocalizations.of(context).translate("thu"),
                     style: kSubTitlesStyle.copyWith(
                         fontSize: 12, color: primaryColor, height: 1),
                   )
@@ -128,7 +142,7 @@ class DayOfWeekRelapsesWidget extends StatelessWidget {
               Column(
                 children: [
                   Text(
-                    dayOfWeekRelapses.friRelapses,
+                    "00",
                     style: kSubTitlesStyle.copyWith(
                         height: 1, color: primaryColor),
                   ),
@@ -136,7 +150,7 @@ class DayOfWeekRelapsesWidget extends StatelessWidget {
                     height: 8,
                   ),
                   Text(
-                    "fri",
+                    AppLocalizations.of(context).translate("fri"),
                     style: kSubTitlesStyle.copyWith(
                         fontSize: 12, color: primaryColor, height: 1),
                   )
@@ -145,7 +159,7 @@ class DayOfWeekRelapsesWidget extends StatelessWidget {
               Column(
                 children: [
                   Text(
-                    dayOfWeekRelapses.satRelapses,
+                    "00",
                     style: kSubTitlesStyle.copyWith(
                         height: 1, color: primaryColor),
                   ),
@@ -153,7 +167,7 @@ class DayOfWeekRelapsesWidget extends StatelessWidget {
                     height: 8,
                   ),
                   Text(
-                    "sat",
+                    AppLocalizations.of(context).translate("sat"),
                     style: kSubTitlesStyle.copyWith(
                         fontSize: 12, color: primaryColor, height: 1),
                   )

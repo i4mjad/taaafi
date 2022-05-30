@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:reboot_app_3/Model/Relapse.dart';
 import 'package:reboot_app_3/bloc_provider.dart';
 import 'package:reboot_app_3/data/models/user_profile.dart';
+import 'package:reboot_app_3/presentation/screens/follow_your_reboot/day_of_week_relapses/day_of_week_relapses_widget.dart';
 import 'package:reboot_app_3/repository/db.dart';
 import 'package:rxdart/subjects.dart';
 
@@ -56,8 +57,28 @@ class FollowYourRebootBloc implements CustomBlocBase {
     await db.addMastOnly(date);
   }
 
+  Future<DayOfWeekRelapses> getRelapsesByDayOfWeek() async {
+    return await db.getRelapsesByDayOfWeek();
+  }
+
+  Future<String> getHighestStreak() async {
+    return await db.getHighestStreak();
+  }
+
+  Future<String> getTotalDaysWithoutRelapse() async {
+    return await db.getTotalDaysWithoutRelapse();
+  }
+
+  Future<String> getTotalDaysFromBegining() async {
+    return await db.getTotalDaysFromBegining();
+  }
+
   @override
   void dispose() async {
     return _firestoreController.close();
+  }
+
+  Future<String> getRelapsesCount() async {
+return await db.getRelapsesCount();
   }
 }

@@ -6,7 +6,8 @@
   "porn-addiction-recovery": "Porn Addiction Recovery",
   "porn-addiction-recovery-p": "Comprehansive content about NoFap",
   "personal-data": "Community",
-
+  "total-days": "Total days from first date: ",
+  "relapses-number" : "Relapses Count: ",
 
   "articles": "Articles",
   "videos": "Videos",
@@ -154,7 +155,7 @@
 
   "highest-streak" : "Higest\nStreak",
   "relapses-average" : "Relapses\nAverage",
-  "relapses-count" : "Relapses\nCount",
+  "relapses-count" : "No-Relapses\nDays",
 
   "no-relapses" : "No Relapses",
 

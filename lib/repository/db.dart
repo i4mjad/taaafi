@@ -1,8 +1,11 @@
+import 'dart:math';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:reboot_app_3/Model/Relapse.dart';
 import 'package:reboot_app_3/data/models/user_profile.dart';
+import 'package:reboot_app_3/presentation/screens/follow_your_reboot/day_of_week_relapses/day_of_week_relapses_widget.dart';
 
 class DB {
   final db = FirebaseFirestore.instance;
@@ -219,6 +222,136 @@ class DB {
         .collection("users")
         .doc(user.uid)
         .update({"userMasturbatingWithoutWatching": _days});
+  }
+
+  Future<DayOfWeekRelapses> getRelapsesByDayOfWeek() async {
+    FollowUpData _followUpData = await getFollowUpData();
+    List<dynamic> userRelapses = _followUpData.relapses;
+
+    if (userRelapses.length > 0)
+      return DayOfWeekRelapses(
+        "0",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0",
+      );
+    var sat = [];
+    var sun = [];
+    var mon = [];
+    var tue = [];
+    var wed = [];
+    var thu = [];
+    var fri = [];
+
+    for (var strDate in userRelapses) {
+      final date = DateTime.parse(strDate);
+      final dayOfWeek = date.weekday;
+
+      if (dayOfWeek == 7) {
+        sun.add(date);
+      } else if (dayOfWeek == 1) {
+        mon.add(date);
+      } else if (dayOfWeek == 2) {
+        tue.add(date);
+      } else if (dayOfWeek == 3) {
+        wed.add(date);
+      } else if (dayOfWeek == 4) {
+        thu.add(date);
+      } else if (dayOfWeek == 5) {
+        fri.add(date);
+      } else if (dayOfWeek == 6) {
+        sat.add(date);
+      }
+    }
+
+    final satLength = (sat.length ?? 0).toString();
+    final sunLength = (sun.length ?? 0).toString();
+    final monLength = (mon.length ?? 0).toString();
+    final tueLength = (tue.length ?? 0).toString();
+    final wedLength = (wed.length ?? 0).toString();
+    final thuLength = (thu.length ?? 0).toString();
+    final friLength = (fri.length ?? 0).toString();
+
+    final dayOfWeekRelapses = DayOfWeekRelapses(satLength, sunLength, monLength,
+        tueLength, wedLength, thuLength, friLength);
+    return dayOfWeekRelapses;
+  }
+
+  Future<String> getHighestStreak() async {
+    FollowUpData _followUpData = await getFollowUpData();
+    List<dynamic> _relapses = _followUpData.relapses;
+
+    final DateTime today = DateTime.now();
+    final DateTime todayE = DateTime(today.year, today.month, today.day);
+
+    var relapsesInDate = [];
+
+    if (_relapses.length > 0) {
+      relapsesInDate.clear();
+      for (var i in _relapses) {
+        final date = DateTime.parse(i);
+        relapsesInDate.add(date);
+      }
+    }
+
+    relapsesInDate.add(todayE);
+    final userFirstDate = await getStartingDate();
+
+    List<int> differences = [];
+
+    relapsesInDate.sort((a, b) {
+      return a.compareTo(b);
+    });
+
+    if (relapsesInDate.length > 0) {
+      for (var i in relapsesInDate) {
+        if (relapsesInDate[0] == i) {
+          final firstPeriod = i.difference(userFirstDate).inDays;
+
+          differences.add(firstPeriod + 1);
+        } else {
+          final period = i
+              .difference(relapsesInDate[relapsesInDate.indexOf(i) - 1])
+              .inDays;
+          final realPeriod = period - 1;
+          differences.add(realPeriod);
+        }
+      }
+    }
+
+    //differences.removeAt(differences.length - 1);
+
+    return differences.reduce((max)).toString();
+  }
+
+  Future<String> getTotalDaysWithoutRelapse() async {
+    FollowUpData _followUpData = await getFollowUpData();
+    List<dynamic> _relapses = _followUpData.relapses;
+    var _firstDate = await getStartingDate();
+
+    var totalDays = DateTime.now().difference(_firstDate).inDays;
+
+    var daysWithoutRelapses = totalDays - _relapses.length;
+
+    return daysWithoutRelapses.toString();
+  }
+
+  Future<String> getTotalDaysFromBegining() async {
+    var _firstDate = await getStartingDate();
+
+    var totalDays = DateTime.now().difference(_firstDate).inDays;
+    print(totalDays);
+    return totalDays.toString();
+  }
+
+  Future<String> getRelapsesCount() async {
+    FollowUpData _followUpData = await getFollowUpData();
+    List<dynamic> _relapses = _followUpData.relapses;
+
+    return _relapses.length.toString();
   }
 }
 
