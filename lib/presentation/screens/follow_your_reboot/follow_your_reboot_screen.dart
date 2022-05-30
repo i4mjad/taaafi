@@ -11,6 +11,7 @@ import 'package:reboot_app_3/data/models/user_profile.dart';
 import 'package:reboot_app_3/presentation/Screens/auth/login_screen.dart';
 import 'package:reboot_app_3/presentation/blocs/follow_your_reboot_bloc.dart';
 import 'package:reboot_app_3/presentation/screens/follow_your_reboot/follow_up_streaks/follow_up_streak.dart';
+import 'package:reboot_app_3/presentation/screens/follow_your_reboot/widgets/new_user_widgets.dart';
 import 'package:reboot_app_3/shared/constants/constants.dart';
 import 'package:reboot_app_3/shared/constants/textstyles_constants.dart';
 import 'package:reboot_app_3/shared/localization/localization.dart';
@@ -157,10 +158,23 @@ class FollowYourRebootScreenState extends State<FollowYourRebootScreen>
     });
   }
 
+  void isNewUser() async {
+    var _db = database.collection("users").doc(user.uid);
+
+    return _db.get().then((value) async {
+      if (await value.data().containsKey("userFirstDate") == false) {
+        newUserDialog(context);
+      } else {
+        migerateToUserFirstDate();
+        getCalenderData();
+      }
+    });
+  }
+
   @override
   void initState() {
-    migerateToUserFirstDate();
-    getCalenderData();
+    isNewUser();
+
     super.initState();
 
     LocaleService.getSelectedLocale().then((value) {

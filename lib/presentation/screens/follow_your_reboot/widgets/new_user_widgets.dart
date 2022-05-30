@@ -4,36 +4,36 @@ import 'package:reboot_app_3/Shared/constants/constants.dart';
 import 'package:reboot_app_3/Shared/constants/textstyles_constants.dart';
 
 import 'package:flutter_rounded_date_picker/flutter_rounded_date_picker.dart';
+import 'package:reboot_app_3/bloc_provider.dart';
+import 'package:reboot_app_3/presentation/blocs/follow_your_reboot_bloc.dart';
 
 void newUserDialog(BuildContext context) {
+  final bloc = CustomBlocProvider.of<FollowYourRebootBloc>(context);
   showModalBottomSheet(
     context: context,
-      isScrollControlled: true,
-    // isDismissible: false,
-    // enableDrag: false,
+    isScrollControlled: true,
+    isDismissible: false,
+    enableDrag: false,
     shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.only(topRight: Radius.circular(30.0), topLeft: Radius.circular(30.0)),
+      borderRadius: BorderRadius.only(
+          topRight: Radius.circular(30.0), topLeft: Radius.circular(30.0)),
     ),
     builder: (context) {
       return Container(
           height: MediaQuery.of(context).size.height * 0.35,
           width: MediaQuery.of(context).size.width,
-
           padding: EdgeInsets.all(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-
               Container(
                 padding: EdgeInsets.all(8),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(100),
                   color: primaryColor.withOpacity(0.1),
-
                 ),
-
                 child: Icon(
-                  Iconsax.calendar,
+                  Iconsax.calendar_tick,
                   color: primaryColor,
                   size: 32,
                 ),
@@ -44,19 +44,14 @@ void newUserDialog(BuildContext context) {
               Text(
                 'تابع تعافيك',
                 style: kHeadlineStyle.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: primaryColor
-
-                ),
+                    fontWeight: FontWeight.bold, color: primaryColor),
               ),
               SizedBox(
                 height: 8,
               ),
               Text(
                 'لمتابعة تعافيك من إدمان الإباحية، اختر تاريخ اليوم الذي تود بدء المتابعة منه',
-                style: kBodyStyle.copyWith(
-                  height: 1.2
-                ),
+                style: kBodyStyle.copyWith(height: 1.2),
                 textAlign: TextAlign.center,
               ),
               SizedBox(
@@ -66,40 +61,44 @@ void newUserDialog(BuildContext context) {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   GestureDetector(
-                    onTap: () async{
+                    onTap: () async {
                       var selectedDate = await getDateTime(context);
-                      print(selectedDate);
+                      await bloc.createNewUser(selectedDate);
+                      
                     },
                     child: Container(
                       height: 80,
                       width: ((MediaQuery.of(context).size.width - 40) - 8) / 2,
                       padding: EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: accentColor.withOpacity(0.2),
-                        borderRadius: BorderRadius.circular(12.5)
-
-                      ),
+                          color: accentColor.withOpacity(0.2),
+                          borderRadius: BorderRadius.circular(12.5)),
                       child: Center(
-                        child: Text("يوم معين", style: kTitleSeconderyStyle,),
+                        child: Text(
+                          "يوم معين",
+                          style: kTitleSeconderyStyle,
+                        ),
                       ),
                     ),
                   ),
                   GestureDetector(
-                    onTap: (){
+                    onTap: () async {
                       var today = getToday();
-                      print(today);
+                      await bloc.createNewUser(today);
                     },
                     child: Container(
                       height: 80,
                       width: ((MediaQuery.of(context).size.width - 40) - 8) / 2,
                       padding: EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: accentColor,
-                        borderRadius: BorderRadius.circular(12.5)
-
-                      ),
+                          color: accentColor,
+                          borderRadius: BorderRadius.circular(12.5)),
                       child: Center(
-                        child: Text("اليوم", style: kTitleSeconderyStyle.copyWith(color: Colors.white),),
+                        child: Text(
+                          "اليوم",
+                          style: kTitleSeconderyStyle.copyWith(
+                              color: Colors.white),
+                        ),
                       ),
                     ),
                   )
@@ -125,6 +124,7 @@ Future<DateTime> getDateTime(BuildContext context) async {
     ),
   );
 }
-DateTime getToday(){
+
+DateTime getToday() {
   return DateTime.now();
 }

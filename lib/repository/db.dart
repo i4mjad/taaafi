@@ -353,6 +353,13 @@ class DB {
 
     return _relapses.length.toString();
   }
+
+  Future<void> createNewUser(DateTime selectedDate) {
+    return db
+        .collection("users")
+        .doc(user.uid)
+        .set({"userFirstDate": selectedDate});
+  }
 }
 
 DB db = DB();

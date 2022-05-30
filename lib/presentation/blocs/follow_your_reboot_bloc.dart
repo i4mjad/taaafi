@@ -81,4 +81,8 @@ class FollowYourRebootBloc implements CustomBlocBase {
   Future<String> getRelapsesCount() async {
 return await db.getRelapsesCount();
   }
+
+  Future<void> createNewUser(DateTime selectedDate) async {
+    return await db.createNewUser(selectedDate);
+  }
 }
