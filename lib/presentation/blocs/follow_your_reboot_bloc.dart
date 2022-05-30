@@ -36,24 +36,8 @@ class FollowYourRebootBloc implements CustomBlocBase {
     return await db.getNoMastsStreak();
   }
 
-  void updateFollowUpData(DocumentSnapshot doc) async {
-    //await db.updateData(doc);
-  }
-
-  void deleteFollowUpData(DocumentSnapshot doc) async {
-    //await db.deleteData(doc);
-  }
-
-  void createData(String name) async {
-    //await db.createData(doc);
-  }
   Future<DateTime> getFirstDate() async {
     return await db.getStartingDate();
-  }
-
-  @override
-  void dispose() async {
-    return _firestoreController.close();
   }
 
   void addRelapse(String date) async {
@@ -70,5 +54,10 @@ class FollowYourRebootBloc implements CustomBlocBase {
 
   void addMastOnly(String date) async {
     await db.addMastOnly(date);
+  }
+
+  @override
+  void dispose() async {
+    return _firestoreController.close();
   }
 }
