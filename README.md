@@ -43,6 +43,7 @@ Please consider following these steps before runing tha app:
 
 ## Future Goals
 - Continue the refactoring to achive Bloc Pattern
+- Update to Flutter 3.0 (With Dependencies)
 - Enhance the UI/UX (Material 3 ?)
 - Ta3afi Community (Later)
 - Ta3afi+ (Later)
