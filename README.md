@@ -22,7 +22,7 @@ Contributions are always welcome!
 
 Please consider following these steps before runing tha app:
 
-- Install Flutter Version Manager (FVM) and use any Flutter version between `2.0.0 - 2.2.0`. Check https://fvm.app/
+- Install Flutter Version Manager (FVM) and use Flutter version `2.5.3`. Check https://fvm.app/
 - Use `Android Studio` for development
 - For runing the app, use `Pixel 4` emulator or any emulator device that have Google Play Services
 
@@ -33,5 +33,18 @@ Please consider following these steps before runing tha app:
 | :-------- | :------- | :------------------------- |
 | Android | 2.0.3 |  |
 | iOS | 4.0.3 |  |
+
+## Development Versions
+
+| Platform | Version     | Description                |
+| :-------- | :------- | :------------------------- |
+| Android | 2.0.4 |  |
+| iOS | 4.0.4 |  |
+
+## Future Goals
+- Continue the refactoring to achive Bloc Pattern
+- Enhance the UI/UX (Material 3 ?)
+- Ta3afi Community (Later)
+- Ta3afi+ (Later)
 
 
