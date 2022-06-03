@@ -131,7 +131,7 @@ class FollowYourRebootScreenState extends State<FollowYourRebootScreen>
   void migerateToUserFirstDate() async {
     var _db = database.collection("users").doc(user.uid);
 
-    return _db.get().then((value) async {
+    _db.get().then((value) async {
       if (await value.data().containsKey("userFirstDate") == false) {
         var userRigDate = user.metadata.creationTime;
         int userFirstStreak = await value.data()["userPreviousStreak"];
@@ -154,6 +154,38 @@ class FollowYourRebootScreenState extends State<FollowYourRebootScreen>
             .then((value) {
           setState(() {});
         });
+      } else if (await value.data().containsKey("userRelapses") == false) {
+        print("hiii");
+        var userRelapses = {"userRelapses": []};
+        await database
+            .collection("users")
+            .doc(user.uid)
+            .set(userRelapses, SetOptions(merge: true))
+            .onError((error, stackTrace) => print(error))
+            .then((value) {
+          setState(() {});
+        });
+
+      }else if (await value.data().containsKey("userMasturbatingWithoutWatching") == false) {
+        var userMasturbatingWithoutWatching = {"userMasturbatingWithoutWatching": []};
+        await database
+            .collection("users")
+            .doc(user.uid)
+            .set(userMasturbatingWithoutWatching, SetOptions(merge: true))
+            .onError((error, stackTrace) => print(error))
+            .then((value) {
+          setState(() {});
+        });
+      }else if (await value.data().containsKey("userMasturbatingWithoutWatching") == false) {
+        var userMasturbatingWithoutWatching = {"userMasturbatingWithoutWatching": []};
+        await database
+            .collection("users")
+            .doc(user.uid)
+            .set(userMasturbatingWithoutWatching, SetOptions(merge: true))
+            .onError((error, stackTrace) => print(error))
+            .then((value) {
+          setState(() {});
+        });
       }
     });
   }
@@ -162,11 +194,12 @@ class FollowYourRebootScreenState extends State<FollowYourRebootScreen>
     var _db = database.collection("users").doc(user.uid);
 
     return _db.get().then((value) async {
+      final bloc = CustomBlocProvider.of<FollowYourRebootBloc>(context);
+      if (value.exists == false) newUserDialog(context, bloc);
+
       if (await value.data().containsKey("userFirstDate") == false) {
-        final bloc = CustomBlocProvider.of<FollowYourRebootBloc>(context);
-        newUserDialog(context, bloc);
-      } else {
         migerateToUserFirstDate();
+      } else {
         getCalenderData();
       }
     });
@@ -340,7 +373,7 @@ class FollowYourRebootScreenState extends State<FollowYourRebootScreen>
                                 builder: (BuildContext context,
                                     AsyncSnapshot<String> sh) {
                                   return Text(
-                                    sh.data,
+                                    sh.requireData,
                                     style: kHeadlineStyle.copyWith(
                                         fontWeight: FontWeight.bold,
                                         fontSize: 18),
@@ -785,5 +818,16 @@ class FollowYourRebootScreenAuthenticationWrapper extends StatelessWidget {
     } else {
       return LoginScreen();
     }
+  }
+}
+//Todo- create a screen that check if the needed data is migerated to the new model
+class FollowYourRebootMigrator extends StatelessWidget {
+  const FollowYourRebootMigrator({Key key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+
+    );
   }
 }

@@ -10,7 +10,7 @@ import 'package:reboot_app_3/presentation/screens/follow_your_reboot/day_of_week
 class DB {
   final db = FirebaseFirestore.instance;
   final user = FirebaseAuth.instance.currentUser;
-  final uid = FirebaseAuth.instance.currentUser.uid;
+  String uid = FirebaseAuth.instance.currentUser.uid;
 
   Stream<DocumentSnapshot> initStream() {
     return db.collection("users").doc(uid).snapshots();
@@ -358,7 +358,15 @@ class DB {
     return db
         .collection("users")
         .doc(user.uid)
-        .set({"userFirstDate": selectedDate});
+        .set({
+      "uid": uid,
+      "userFirstDate": selectedDate,
+      "email": user.email,
+      "userRelapses": [],
+      "userMasturbatingWithoutWatching": [],
+      "userWatchingWithoutMasturbating": [],
+
+    }, );
   }
 }
 
