@@ -414,11 +414,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-<<<<<<< Updated upstream
 				MARKETING_VERSION = 4.0.4;
-=======
-				MARKETING_VERSION = 4.1;
->>>>>>> Stashed changes
 				PRODUCT_BUNDLE_IDENTIFIER = com.amjadkhalfan.RebootApp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
@@ -558,11 +554,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-<<<<<<< Updated upstream
 				MARKETING_VERSION = 4.0.4;
-=======
-				MARKETING_VERSION = 4.1;
->>>>>>> Stashed changes
 				PRODUCT_BUNDLE_IDENTIFIER = com.amjadkhalfan.RebootApp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
@@ -591,11 +583,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-<<<<<<< Updated upstream
 				MARKETING_VERSION = 4.0.4;
-=======
-				MARKETING_VERSION = 4.1;
->>>>>>> Stashed changes
 				PRODUCT_BUNDLE_IDENTIFIER = com.amjadkhalfan.RebootApp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
