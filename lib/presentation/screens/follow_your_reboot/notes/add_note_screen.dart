@@ -83,10 +83,7 @@ class _AddNoteScreenState extends State<AddNoteScreen> {
                                       'title': _title.toString(),
                                       "body": _body.toString(),
                                       "timestamp": DateTime.now(),
-                                    }, SetOptions(merge: true)).then((_) {
-                                      print(
-                                          "success! note has been added to cloud firestore");
-                                    });
+                                    }, SetOptions(merge: true));
                                   }
 
                                   Navigator.push(

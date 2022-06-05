@@ -34,8 +34,6 @@ class _AccountScreenState extends State<AccountScreen>
   @override
   void initState() {
     super.initState();
-    var auth = FirebaseAuth.instance.currentUser;
-    print(auth.uid);
 
     LocaleService.getSelectedLocale().then((value) {
       setState(() {
