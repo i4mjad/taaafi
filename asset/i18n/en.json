@@ -8,11 +8,15 @@
   "personal-data": "Community",
   "total-days": "Total days from first date: ",
   "relapses-number" : "Relapses Count: ",
-
+  "start-your-journy": "Start Your Journy",
+  "start-your-journy-p": "To start, please select the day you want to start from. If you want to start today click on Today button",
   "articles": "Articles",
   "videos": "Videos",
   "books": "Books",
   "blogs": "Blogs",
+  "today": "Today",
+  "specific-day": "Specific Day",
+  "no-content": "Why there is no content? The application is under maintenance, home screen will be improved and enhanced in the coming updates",
 
   "Articles": "Articles",
   "Videos": "Videos",
