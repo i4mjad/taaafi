@@ -3,11 +3,11 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:reboot_app_3/shared/localization/localization.dart';
 import 'package:reboot_app_3/presentation/Screens/ta3afi_liberary/widgets/content_screen.dart';
 import 'package:reboot_app_3/shared/components/change_locale_bottomsheet.dart';
 import 'package:reboot_app_3/shared/constants/constants.dart';
 import 'package:reboot_app_3/shared/constants/textstyles_constants.dart';
-import 'package:reboot_app_3/shared/localization/localization.dart';
 import 'package:reboot_app_3/shared/localization/localization_services.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -51,23 +51,42 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               SizedBox(
                 height: 20,
               ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(
-                    height: 12,
-                  ),
-                  Text(
-                    AppLocalizations.of(context)
-                        .translate("follow-your-reboot"),
-                    style: kSubTitlesStyle.copyWith(height: 1),
-                  ),
-                  SizedBox(
-                    height: 12,
-                  ),
-                  FollowYouRebootHero(),
-                ],
+              Container(
+                padding: EdgeInsets.all(20),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Flexible(
+                        child: Text(
+                      AppLocalizations.of(context).translate("no-content"),
+                      textAlign: TextAlign.center,
+                      style: kSubTitlesStyle.copyWith(
+                          color: primaryColor,
+                          fontSize: 16,
+                          height: 1.5,
+                          fontWeight: FontWeight.bold),
+                    ))
+                  ],
+                ),
               ),
+              // Column(
+              //   crossAxisAlignment: CrossAxisAlignment.start,
+              //   children: [
+              //     SizedBox(
+              //       height: 12,
+              //     ),
+              //     Text(
+              //       AppLocalizations.of(context)
+              //           .translate("follow-your-reboot"),
+              //       style: kSubTitlesStyle.copyWith(height: 1),
+              //     ),
+              //     SizedBox(
+              //       height: 12,
+              //     ),
+              //     //FollowYouRebootHero(),
+              //   ],
+              // ),
               SizedBox(
                 height: 20,
               ),
