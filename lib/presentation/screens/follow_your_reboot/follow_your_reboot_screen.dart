@@ -72,7 +72,7 @@ class FollowYourRebootScreenState extends State<FollowYourRebootScreen>
     final uid = FirebaseAuth.instance.currentUser.uid;
 
     db.collection("users").doc(uid).snapshots().listen((snapshot) async {
-      FollowUpData _followUpDate = FollowUpData.fromSnapshot(snapshot);
+      FollowUpData _followUpDate = await FollowUpData.fromSnapshot(snapshot);
       DateTime _startingDate = DateTime.parse(
           await snapshot.get('userFirstDate').toDate().toString());
 
@@ -150,38 +150,6 @@ class FollowYourRebootScreenState extends State<FollowYourRebootScreen>
             .collection("users")
             .doc(user.uid)
             .set(firstDate, SetOptions(merge: true))
-            .onError((error, stackTrace) => print(error))
-            .then((value) {
-          setState(() {});
-        });
-      } else if (await value.data().containsKey("userRelapses") == false) {
-        print("hiii");
-        var userRelapses = {"userRelapses": []};
-        await database
-            .collection("users")
-            .doc(user.uid)
-            .set(userRelapses, SetOptions(merge: true))
-            .onError((error, stackTrace) => print(error))
-            .then((value) {
-          setState(() {});
-        });
-
-      }else if (await value.data().containsKey("userMasturbatingWithoutWatching") == false) {
-        var userMasturbatingWithoutWatching = {"userMasturbatingWithoutWatching": []};
-        await database
-            .collection("users")
-            .doc(user.uid)
-            .set(userMasturbatingWithoutWatching, SetOptions(merge: true))
-            .onError((error, stackTrace) => print(error))
-            .then((value) {
-          setState(() {});
-        });
-      }else if (await value.data().containsKey("userMasturbatingWithoutWatching") == false) {
-        var userMasturbatingWithoutWatching = {"userMasturbatingWithoutWatching": []};
-        await database
-            .collection("users")
-            .doc(user.uid)
-            .set(userMasturbatingWithoutWatching, SetOptions(merge: true))
             .onError((error, stackTrace) => print(error))
             .then((value) {
           setState(() {});
@@ -355,32 +323,36 @@ class FollowYourRebootScreenState extends State<FollowYourRebootScreen>
                           SizedBox(
                             height: 8,
                           ),
-                          Row(
-                            children: [
-                              Icon(Iconsax.emoji_sad),
-                              SizedBox(
-                                width: 8,
-                              ),
-                              Text(
-                                AppLocalizations.of(context)
-                                    .translate("relapses-number"),
-                                style: kHeadlineStyle.copyWith(
-                                    fontWeight: FontWeight.w400, fontSize: 18),
-                              ),
-                              FutureBuilder(
-                                future: bloc.getRelapsesCount(),
-                                initialData: "0",
-                                builder: (BuildContext context,
-                                    AsyncSnapshot<String> sh) {
-                                  return Text(
-                                    sh.requireData,
-                                    style: kHeadlineStyle.copyWith(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 18),
-                                  );
-                                },
-                              ),
-                            ],
+                          Container(
+                            width: MediaQuery.of(context).size.width - 40,
+                            child: Row(
+                              children: [
+                                Icon(Iconsax.emoji_sad),
+                                SizedBox(
+                                  width: 8,
+                                ),
+                                Text(
+                                  AppLocalizations.of(context)
+                                      .translate("relapses-number"),
+                                  style: kHeadlineStyle.copyWith(
+                                      fontWeight: FontWeight.w400,
+                                      fontSize: 18),
+                                ),
+                                FutureBuilder(
+                                  future: bloc.getRelapsesCount(),
+                                  initialData: "0",
+                                  builder: (BuildContext context,
+                                      AsyncSnapshot<String> sh) {
+                                    return Text(
+                                      sh.requireData,
+                                      style: kHeadlineStyle.copyWith(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 18),
+                                    );
+                                  },
+                                ),
+                              ],
+                            ),
                           ),
                         ],
                       ),
@@ -712,16 +684,16 @@ class GeneralStats extends StatelessWidget {
                 SizedBox(
                   height: 20,
                 ),
-                FutureBuilder(
-                  future: bloc.getHighestStreak(),
-                  initialData: "0",
-                  builder: (BuildContext context, AsyncSnapshot<String> sh) {
-                    return Text(
-                      sh.data,
-                      style: kPageTitleStyle.copyWith(color: Colors.green),
-                    );
-                  },
-                ),
+                // FutureBuilder(
+                //   future: bloc.getHighestStreak(),
+                //   initialData: "0",
+                //   builder: (BuildContext context, AsyncSnapshot<String> sh) {
+                //     return Text(
+                //       sh.data,
+                //       style: kPageTitleStyle.copyWith(color: Colors.green),
+                //     );
+                //   },
+                // ),
               ],
             ),
           ),
@@ -761,47 +733,21 @@ class GeneralStats extends StatelessWidget {
                     ),
                   ],
                 ),
-                SizedBox(
-                  height: 20,
-                ),
-                FutureBuilder(
-                  future: bloc.getTotalDaysWithoutRelapse(),
-                  initialData: "0",
-                  builder: (BuildContext context, AsyncSnapshot<String> sh) {
-                    return Text(
-                      sh.data,
-                      style: kPageTitleStyle.copyWith(color: Colors.blue),
-                    );
-                  },
-                ),
+
+                // FutureBuilder(
+                //   future: bloc.getTotalDaysWithoutRelapse(),
+                //   initialData: "0",
+                //   builder: (BuildContext context, AsyncSnapshot<String> sh) {
+                //     return Text(
+                //       sh.data,
+                //       style: kPageTitleStyle.copyWith(color: Colors.blue),
+                //     );
+                //   },
+                // ),
               ],
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class NoRelapses extends StatelessWidget {
-  const NoRelapses({
-    Key key,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.all(20),
-      width: MediaQuery.of(context).size.width,
-      height: MediaQuery.of(context).size.height * 0.10,
-      decoration: BoxDecoration(
-          color: Colors.green.withOpacity(0.2),
-          borderRadius: BorderRadius.circular(12.5)),
-      child: Center(
-        child: Text(
-          AppLocalizations.of(context).translate("no-relapses"),
-          style: kSubTitlesStyle.copyWith(color: Colors.green, fontSize: 18),
-        ),
       ),
     );
   }
@@ -818,16 +764,5 @@ class FollowYourRebootScreenAuthenticationWrapper extends StatelessWidget {
     } else {
       return LoginScreen();
     }
-  }
-}
-//Todo- create a screen that check if the needed data is migerated to the new model
-class FollowYourRebootMigrator extends StatelessWidget {
-  const FollowYourRebootMigrator({Key key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-
-    );
   }
 }
