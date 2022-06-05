@@ -371,19 +371,18 @@ class DB {
         db.collection("users").doc(user.uid).set({
           "userRelapses": [],
         }, SetOptions(merge: true));
-      } else if (!(value
-          .data()
-          .containsKey("userWatchingWithoutMasturbating"))) {
+      }
+      if (!(value.data().containsKey("userWatchingWithoutMasturbating"))) {
         db.collection("users").doc(user.uid).set({
-          "userRelapses": [],
+          "userWatchingWithoutMasturbating": [],
         }, SetOptions(merge: true));
-      } else if (!(value
-          .data()
-          .containsKey("userMasturbatingWithoutWatching"))) {
+      }
+      if (!(value.data().containsKey("userMasturbatingWithoutWatching"))) {
         db.collection("users").doc(user.uid).set({
-          "userRelapses": [],
+          "userMasturbatingWithoutWatching": [],
         }, SetOptions(merge: true));
-      } else if (!(value.data().containsKey("userFirstDate"))) {
+      }
+      if (!(value.data().containsKey("userFirstDate"))) {
         await migerateToUserFirstDate();
       }
     });
