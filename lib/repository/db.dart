@@ -17,6 +17,8 @@ class DB {
   }
 
   Future<FollowUpData> getFollowUpData() async {
+    await checkData();
+
     DocumentSnapshot snapshot = await db.collection("users").doc(uid).get();
 
     return FollowUpData.fromSnapshot(snapshot);
@@ -88,22 +90,16 @@ class DB {
   }
 
   Future<int> getRelapseStreak() async {
-    //Get firstUserDate
     final firstdate = await getStartingDate();
-    //Get userRelapses List
     final followUpData = await getFollowUpData();
-    List<dynamic> userRelapses =
-        followUpData.relapses; //if the userRelapses List contains no relapses
+    List<dynamic> userRelapses = followUpData.relapses;
     var today = DateTime.now();
-    //if the userRelapses List contains more than one relapse
     if (userRelapses.length > 0) {
       userRelapses.sort((a, b) {
         return a.compareTo(b);
       });
       final lastRelapseDayStr = userRelapses[userRelapses.length - 1];
-      //make a date from the last relapse
       final lastRelapseDay = DateTime.parse(lastRelapseDayStr);
-      //calculate the current streak by making time interval between today and the last
       return await today.difference(lastRelapseDay).inDays;
     } else {
       return await today.difference(firstdate).inDays;
@@ -282,7 +278,9 @@ class DB {
 
   Future<String> getHighestStreak() async {
     FollowUpData _followUpData = await getFollowUpData();
-    List<dynamic> _relapses = _followUpData.relapses;
+    List<dynamic> _relapses = await _followUpData.relapses;
+
+    if (_relapses == null) return "0";
 
     final DateTime today = DateTime.now();
     final DateTime todayE = DateTime(today.year, today.month, today.day);
@@ -330,6 +328,9 @@ class DB {
   Future<String> getTotalDaysWithoutRelapse() async {
     FollowUpData _followUpData = await getFollowUpData();
     List<dynamic> _relapses = _followUpData.relapses;
+
+    if (_followUpData.relapses == null) return "0";
+
     var _firstDate = await getStartingDate();
 
     var totalDays = DateTime.now().difference(_firstDate).inDays;
@@ -343,7 +344,6 @@ class DB {
     var _firstDate = await getStartingDate();
 
     var totalDays = DateTime.now().difference(_firstDate).inDays;
-    print(totalDays);
     return totalDays.toString();
   }
 
@@ -355,18 +355,65 @@ class DB {
   }
 
   Future<void> createNewData(DateTime selectedDate) {
-    return db
-        .collection("users")
-        .doc(user.uid)
-        .set({
+    return db.collection("users").doc(user.uid).set({
       "uid": uid,
       "userFirstDate": selectedDate,
       "email": user.email,
       "userRelapses": [],
       "userMasturbatingWithoutWatching": [],
       "userWatchingWithoutMasturbating": [],
+    });
+  }
 
-    }, );
+  void checkData() async {
+    return await db.collection("users").doc(uid).get().then((value) async {
+      if (!(value.data().containsKey("userRelapses"))) {
+        db.collection("users").doc(user.uid).set({
+          "userRelapses": [],
+        }, SetOptions(merge: true));
+      } else if (!(value
+          .data()
+          .containsKey("userWatchingWithoutMasturbating"))) {
+        db.collection("users").doc(user.uid).set({
+          "userRelapses": [],
+        }, SetOptions(merge: true));
+      } else if (!(value
+          .data()
+          .containsKey("userMasturbatingWithoutWatching"))) {
+        db.collection("users").doc(user.uid).set({
+          "userRelapses": [],
+        }, SetOptions(merge: true));
+      } else if (!(value.data().containsKey("userFirstDate"))) {
+        await migerateToUserFirstDate();
+      }
+    });
+  }
+
+  void migerateToUserFirstDate() async {
+    var _db = db.collection("users").doc(user.uid);
+
+    _db.get().then((value) async {
+      if (await value.data().containsKey("userFirstDate") == false) {
+        var userRigDate = user.metadata.creationTime;
+        int userFirstStreak = await value.data()["userPreviousStreak"];
+
+        DateTime userResetDate = value.data()["resetedDate"] != null
+            ? await DateTime.parse(
+                value.data()["resetedDate"].toDate().toString())
+            : null;
+        DateTime parseFirstDate = await DateTime(userRigDate.year,
+            userRigDate.month, userRigDate.day - userFirstStreak);
+        DateTime userFirstDate =
+            await userResetDate != null ? userResetDate : parseFirstDate;
+
+        var firstDate = {"userFirstDate": userFirstDate};
+        await db
+            .collection("users")
+            .doc(user.uid)
+            .set(firstDate, SetOptions(merge: true))
+            .onError((error, stackTrace) => print(error));
+      }
+    });
   }
 }
 
