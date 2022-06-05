@@ -6,19 +6,13 @@ import 'package:reboot_app_3/shared/constants/constants.dart';
 import 'package:reboot_app_3/shared/constants/textstyles_constants.dart';
 
 class UserProfileCard extends StatelessWidget {
-  UserProfileCard({
-    Key key,
-    String lang
-  }) : super(key: key);
-
-  String lang;
+  UserProfileCard({Key key, String lang}) : super(key: key);
 
   final User user = FirebaseAuth.instance.currentUser;
 
   @override
   Widget build(BuildContext context) {
     return Row(
-
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Column(
@@ -48,8 +42,7 @@ class UserProfileCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Text(
-
-                      this.user.displayName,
+                  this.user.displayName,
                   style: kTitlePrimeryStyle,
                 ),
                 SizedBox(height: 8),
@@ -58,7 +51,6 @@ class UserProfileCard extends StatelessWidget {
             ),
           ],
         ),
-
       ],
     );
   }

@@ -54,7 +54,9 @@ class _AboutScreenState extends State<AboutScreen>
                   children: [
                     SvgPicture.asset("asset/illustrations/app-logo-about.svg",
                         height: MediaQuery.of(context).size.height * 0.175),
-                    SizedBox(height: 16,),
+                    SizedBox(
+                      height: 16,
+                    ),
                     Text(
                       AppLocalizations.of(context).translate("ta3afi"),
                       style: kPageTitleStyle.copyWith(
@@ -65,11 +67,8 @@ class _AboutScreenState extends State<AboutScreen>
                     ),
                     Text(
                       AppLocalizations.of(context).translate("about-ta3afi"),
-                      style: kBodyStyle.copyWith(
-                        height: 1.5
-                      ),
+                      style: kBodyStyle.copyWith(height: 1.5),
                       textAlign: TextAlign.center,
-
                     ),
                     SizedBox(
                       height: 20,
@@ -87,9 +86,9 @@ class _AboutScreenState extends State<AboutScreen>
                     ),
                     Container(
                       child: InkWell(
-                          onTap: () => launch('https://t.me/i4mjad'),
+                        onTap: () => launch('https://t.me/i4mjad'),
                         child: Container(
-                          width: (MediaQuery.of(context).size.width/1.5),
+                          width: (MediaQuery.of(context).size.width / 1.5),
                           height: 60,
                           decoration: BoxDecoration(
                             color: Colors.white,
@@ -99,7 +98,8 @@ class _AboutScreenState extends State<AboutScreen>
                                 color: kShadowColor,
                                 spreadRadius: .25,
                                 blurRadius: 7,
-                                offset: Offset(0, 2), // changes position of shadow
+                                offset:
+                                    Offset(0, 2), // changes position of shadow
                               ),
                             ],
                           ),
@@ -110,8 +110,7 @@ class _AboutScreenState extends State<AboutScreen>
                                 AppLocalizations.of(context)
                                     .translate('support'),
                                 style: kTitleSeconderyStyle.copyWith(
-                                  color: Colors.green
-                                ),
+                                    color: Colors.green),
                               ),
                             ],
                           ),
@@ -125,7 +124,6 @@ class _AboutScreenState extends State<AboutScreen>
                       AppLocalizations.of(context).translate('support-p'),
                       style: kBodyStyle,
                     )
-
                   ],
                 ),
               ),

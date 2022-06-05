@@ -657,16 +657,16 @@ class GeneralStats extends StatelessWidget {
                 SizedBox(
                   height: 20,
                 ),
-                // FutureBuilder(
-                //   future: bloc.getHighestStreak(),
-                //   initialData: "0",
-                //   builder: (BuildContext context, AsyncSnapshot<String> sh) {
-                //     return Text(
-                //       sh.data,
-                //       style: kPageTitleStyle.copyWith(color: Colors.green),
-                //     );
-                //   },
-                // ),
+                FutureBuilder(
+                  future: bloc.getHighestStreak(),
+                  initialData: "0",
+                  builder: (BuildContext context, AsyncSnapshot<String> sh) {
+                    return Text(
+                      sh.data,
+                      style: kPageTitleStyle.copyWith(color: Colors.green),
+                    );
+                  },
+                ),
               ],
             ),
           ),
@@ -706,17 +706,16 @@ class GeneralStats extends StatelessWidget {
                     ),
                   ],
                 ),
-
-                // FutureBuilder(
-                //   future: bloc.getTotalDaysWithoutRelapse(),
-                //   initialData: "0",
-                //   builder: (BuildContext context, AsyncSnapshot<String> sh) {
-                //     return Text(
-                //       sh.data,
-                //       style: kPageTitleStyle.copyWith(color: Colors.blue),
-                //     );
-                //   },
-                // ),
+                FutureBuilder(
+                  future: bloc.getTotalDaysWithoutRelapse(),
+                  initialData: "0",
+                  builder: (BuildContext context, AsyncSnapshot<String> sh) {
+                    return Text(
+                      sh.data,
+                      style: kPageTitleStyle.copyWith(color: Colors.blue),
+                    );
+                  },
+                ),
               ],
             ),
           ),

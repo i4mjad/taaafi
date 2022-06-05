@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:reboot_app_3/Shared/constants/constants.dart';
-import 'package:reboot_app_3/Shared/constants/textstyles_constants.dart';
+import 'package:reboot_app_3/shared/constants/constants.dart';
+import 'package:reboot_app_3/shared/constants/textstyles_constants.dart';
 
 import 'package:flutter_rounded_date_picker/flutter_rounded_date_picker.dart';
+import 'package:reboot_app_3/shared/localization/localization.dart';
 
 import 'package:reboot_app_3/presentation/blocs/follow_your_reboot_bloc.dart';
 
@@ -41,7 +42,7 @@ void newUserDialog(BuildContext context, FollowYourRebootBloc bloc) {
                 height: 8,
               ),
               Text(
-                'تابع تعافيك',
+                AppLocalizations.of(context).translate('start-your-journy'),
                 style: kHeadlineStyle.copyWith(
                     fontWeight: FontWeight.bold, color: primaryColor),
               ),
@@ -49,7 +50,7 @@ void newUserDialog(BuildContext context, FollowYourRebootBloc bloc) {
                 height: 8,
               ),
               Text(
-                'لمتابعة تعافيك من إدمان الإباحية، اختر تاريخ اليوم الذي تود بدء المتابعة منه',
+                AppLocalizations.of(context).translate('start-your-journy-p'),
                 style: kBodyStyle.copyWith(height: 1.2),
                 textAlign: TextAlign.center,
               ),
@@ -62,7 +63,9 @@ void newUserDialog(BuildContext context, FollowYourRebootBloc bloc) {
                   GestureDetector(
                     onTap: () async {
                       var selectedDate = await getDateTime(context);
-                      await bloc.createNewData(selectedDate);
+                      await bloc
+                          .createNewData(selectedDate)
+                          .then((value) => Navigator.pop(context));
                     },
                     child: Container(
                       height: 80,
@@ -73,7 +76,8 @@ void newUserDialog(BuildContext context, FollowYourRebootBloc bloc) {
                           borderRadius: BorderRadius.circular(12.5)),
                       child: Center(
                         child: Text(
-                          "يوم معين",
+                          AppLocalizations.of(context)
+                              .translate('specific-day'),
                           style: kTitleSeconderyStyle,
                         ),
                       ),
@@ -81,8 +85,9 @@ void newUserDialog(BuildContext context, FollowYourRebootBloc bloc) {
                   ),
                   GestureDetector(
                     onTap: () async {
-                      var today = getToday();
-                      await bloc.createNewData(today);
+                      await bloc
+                          .createNewData(DateTime.now())
+                          .then((value) => Navigator.pop(context));
                     },
                     child: Container(
                       height: 80,
@@ -93,7 +98,7 @@ void newUserDialog(BuildContext context, FollowYourRebootBloc bloc) {
                           borderRadius: BorderRadius.circular(12.5)),
                       child: Center(
                         child: Text(
-                          "اليوم",
+                          AppLocalizations.of(context).translate('today'),
                           style: kTitleSeconderyStyle.copyWith(
                               color: Colors.white),
                         ),
