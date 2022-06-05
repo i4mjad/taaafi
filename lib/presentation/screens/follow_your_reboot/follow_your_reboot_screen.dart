@@ -37,33 +37,6 @@ class FollowYourRebootScreenState extends State<FollowYourRebootScreen>
   FirebaseFirestore database = FirebaseFirestore.instance;
   final user = FirebaseAuth.instance.currentUser;
 
-  var resetDay;
-
-  var userPreviousStreak = 0;
-  var currentStreak = 0;
-  var currentNoPornStreak = 0;
-  var currentNoMastStreak = 0;
-
-  String lastWatchOnly;
-  String lastMastOnly;
-  String lastRelapce;
-
-  var userRelapses = [];
-  var userWatchingWithoutMasturbating = [];
-  var userMasturbatingWithoutWatching = [];
-
-  var userFirstDayRecorded;
-
-  var satRelapses = "";
-  var sunRelapses = "";
-  var monRelapses = "";
-  var tueRelapses = "";
-  var wedRelapses = "";
-  var thuRelapses = "";
-  var friRelapses = "";
-
-  final TextEditingController newStreak = TextEditingController();
-
   var days = <Day>[];
 
   void getCalenderData() async {
