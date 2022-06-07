@@ -102,7 +102,7 @@ class _ContentScreenState extends State<ContentScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: seconderyColor.withOpacity(0.2),
+      backgroundColor: seconderyColor,
       body: SafeArea(
         child: Padding(
           padding: EdgeInsets.only(
