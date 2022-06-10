@@ -139,39 +139,39 @@ class _AccountScreenState extends State<AccountScreen>
                       ),
                     ),
                     Divider(),
-                    // Padding(
-                    //   padding: EdgeInsets.only(top: 4, bottom: 8),
-                    //   child: GestureDetector(
-                    //     onTap: () {
-                    //       //TODO -  Implement edit user profile
-                    //     },
-                    //     child: Row(
-                    //       mainAxisAlignment: MainAxisAlignment.start,
-                    //       children: [
-                    //         Padding(
-                    //           padding: EdgeInsets.only(left: 12, right: 12),
-                    //           child: Icon(
-                    //             Iconsax.user_edit,
-                    //             size: 26,
-                    //             color: primaryColor,
-                    //           ),
-                    //         ),
-                    //         Column(
-                    //           crossAxisAlignment: CrossAxisAlignment.center,
-                    //           mainAxisAlignment: MainAxisAlignment.center,
-                    //           children: <Widget>[
-                    //             Text(
-                    //                 AppLocalizations.of(context)
-                    //                     .translate('personal-details'),
-                    //                 style:
-                    //                     kSubTitlesStyle.copyWith(fontSize: 17)),
-                    //           ],
-                    //         )
-                    //       ],
-                    //     ),
-                    //   ),
-                    // ),
-                    // Divider(),
+                    Padding(
+                      padding: EdgeInsets.only(top: 4, bottom: 8),
+                      child: GestureDetector(
+                        onTap: () {
+                          //TODO -  Implement edit user profile
+                        },
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Padding(
+                              padding: EdgeInsets.only(left: 12, right: 12),
+                              child: Icon(
+                                Iconsax.user_edit,
+                                size: 26,
+                                color: primaryColor,
+                              ),
+                            ),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: <Widget>[
+                                Text(
+                                    AppLocalizations.of(context)
+                                        .translate('personal-details'),
+                                    style:
+                                        kSubTitlesStyle.copyWith(fontSize: 17)),
+                              ],
+                            )
+                          ],
+                        ),
+                      ),
+                    ),
+                    Divider(),
                     Padding(
                       padding: EdgeInsets.only(top: 4, bottom: 8),
                       child: GestureDetector(
