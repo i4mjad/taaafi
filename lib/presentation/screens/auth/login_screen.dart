@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
@@ -100,9 +101,19 @@ class _LoginScreenState extends State<LoginScreen>
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   SignInWithAppleButton(onPressed: () async {
-                    context
-                        .read<AppleAuthenticationService>()
-                        .signInWithApple();
+                    final appleIdCredential = await SignInWithApple.getAppleIDCredential(
+                        scopes: [
+                          AppleIDAuthorizationScopes.email,
+                          AppleIDAuthorizationScopes.fullName
+                        ]);
+                    final oAuthProvider = OAuthProvider('apple.com');
+                    final credential = oAuthProvider.credential(
+                      idToken: appleIdCredential.identityToken,
+                      accessToken: appleIdCredential.authorizationCode,
+                    );
+                    await FirebaseAuth.instance
+                        .signInWithCredential(credential)
+                        .then((value) {});
                   }),
                   SizedBox(
                     height: 8,

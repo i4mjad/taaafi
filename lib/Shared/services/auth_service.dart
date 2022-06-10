@@ -61,20 +61,4 @@ class GoogleAuthenticationService extends ChangeNotifier {
   }
 }
 
-class AppleAuthenticationService extends ChangeNotifier {
-  void signInWithApple() async {
-    final appleIdCredential = await SignInWithApple.getAppleIDCredential(
-        scopes: [
-          AppleIDAuthorizationScopes.email,
-          AppleIDAuthorizationScopes.fullName
-        ]);
-    final oAuthProvider = OAuthProvider('apple.com');
-    final credential = oAuthProvider.credential(
-      idToken: appleIdCredential.identityToken,
-      accessToken: appleIdCredential.authorizationCode,
-    );
-    await FirebaseAuth.instance
-        .signInWithCredential(credential)
-        .then((value) {});
-  }
-}
+
