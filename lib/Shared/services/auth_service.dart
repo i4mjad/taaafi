@@ -3,8 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'dart:async';
 
-import 'package:sign_in_with_apple/sign_in_with_apple.dart';
-
 class GoogleAuthenticationService extends ChangeNotifier {
   final FirebaseAuth _firebaseAuth;
   GoogleAuthenticationService(this._firebaseAuth);
@@ -60,5 +58,3 @@ class GoogleAuthenticationService extends ChangeNotifier {
     }
   }
 }
-
-
