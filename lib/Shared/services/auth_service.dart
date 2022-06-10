@@ -56,3 +56,8 @@ class GoogleAuthenticationService extends ChangeNotifier {
     }
   }
 }
+<<<<<<< refs/remotes/devops/main
+=======
+
+
+>>>>>>> fix, fix apple login button that was not working
