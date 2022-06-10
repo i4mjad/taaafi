@@ -1,4 +1,6 @@
 
+# Temporeray inactive due to move to Azure DevOps. Ask for access permesion
+--------------------
 # Ta3afi App
 
 ![Logo](https://i.ibb.co/sHrVGNG/Group-1241.png )
