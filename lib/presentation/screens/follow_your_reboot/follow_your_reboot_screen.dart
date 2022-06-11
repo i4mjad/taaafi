@@ -706,6 +706,9 @@ class GeneralStats extends StatelessWidget {
                     ),
                   ],
                 ),
+                SizedBox(
+                  height: 20,
+                ),
                 FutureBuilder(
                   future: bloc.getTotalDaysWithoutRelapse(),
                   initialData: "0",
