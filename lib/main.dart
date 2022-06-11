@@ -12,7 +12,6 @@ import 'package:reboot_app_3/shared/services/notification_service.dart';
 import 'package:reboot_app_3/shared/services/routing/custom_router.dart';
 import 'package:reboot_app_3/shared/services/routing/routes_names.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-// ignore: unused_import
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 
 Future<void> main() async {
@@ -23,6 +22,7 @@ Future<void> main() async {
   InitializationSettings initializationSettings = await setupNotifications();
 
   await setupFirebaseMesagging(initializationSettings);
+  FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
   runApp(MyApp());
 }
 
