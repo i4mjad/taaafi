@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:reboot_app_3/shared/constants/constants.dart';
 import 'package:reboot_app_3/shared/constants/textstyles_constants.dart';
@@ -77,7 +76,7 @@ class CommunityPage extends StatelessWidget {
                     ),
                     SizedBox(height: 60,),
                     InkWell(
-                      onTap: () => launch('mailto:ta3afiapp@gmail.com'),
+                      onTap: () => launchUrl(Uri.parse('mailto:ta3afiapp@gmail.com')),
                       child: Container(
                         padding: EdgeInsets.fromLTRB(28, 12, 28, 12),
                         decoration: BoxDecoration(

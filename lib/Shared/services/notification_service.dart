@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/data/latest.dart' as tz;
@@ -21,7 +20,7 @@ class NotificationService {
         scheduledNotificationDateTime.minute);
 
     var androidPlatformChannelSpecifics = AndroidNotificationDetails(
-        'alarm_notif', 'alarm_notif', 'Channel for Alarm notification',
+        'alarm_notif', 'Channel for Alarm notification',
         icon: 'app_icon', playSound: true);
 
     var iOSPlatformChannelSpecifics = IOSNotificationDetails(

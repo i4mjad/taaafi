@@ -115,7 +115,7 @@ class _ContentScreenState extends State<ContentScreen> {
               GestureDetector(
                 onTap: () {
                   Navigator.pop(context,
-                      MaterialPageRoute(builder: (context) => NavigationBar()));
+                      MaterialPageRoute(builder: (context) => BottomNavBar()));
                 },
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,

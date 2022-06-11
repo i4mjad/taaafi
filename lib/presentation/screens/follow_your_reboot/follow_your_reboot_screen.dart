@@ -1,14 +1,12 @@
 import 'dart:core';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:reboot_app_3/Model/Relapse.dart';
 import 'package:reboot_app_3/bloc_provider.dart';
 import 'package:reboot_app_3/data/models/user_profile.dart';
-import 'package:reboot_app_3/presentation/Screens/auth/login_screen.dart';
+import 'package:reboot_app_3/presentation/screens/auth/login_screen.dart';
 import 'package:reboot_app_3/presentation/blocs/follow_your_reboot_bloc.dart';
 import 'package:reboot_app_3/presentation/screens/follow_your_reboot/follow_up_streaks/follow_up_streak.dart';
 import 'package:reboot_app_3/presentation/screens/follow_your_reboot/widgets/new_user_widgets.dart';

@@ -1,5 +1,4 @@
 import 'dart:core';
-import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:reboot_app_3/main.dart';
 import 'package:shared_preferences/shared_preferences.dart';

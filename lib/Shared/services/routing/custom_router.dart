@@ -12,7 +12,7 @@ class CustomRouter {
   static Route<dynamic> allRoutes(RouteSettings settings) {
     switch (settings.name) {
       case navbar:
-        return MaterialPageRoute(builder: (_) => NavigationBar());
+        return MaterialPageRoute(builder: (_) => BottomNavBar());
       case homeRoute:
         return MaterialPageRoute(builder: (_) => HomeScreen());
       case followYourReboot:

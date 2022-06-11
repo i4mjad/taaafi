@@ -1,5 +1,4 @@
 import 'dart:core';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:reboot_app_3/presentation/Screens/ta3afi_liberary/models/Content.dart';
@@ -21,7 +20,7 @@ class ContentCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
-        launch(content.contentLink);
+        launchUrl(Uri.parse(content.contentLink));
       },
       child: Container(
         padding: EdgeInsets.all(12),

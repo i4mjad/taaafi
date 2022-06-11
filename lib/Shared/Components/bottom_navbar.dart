@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:iconsax/iconsax.dart';
@@ -11,12 +10,12 @@ import 'package:reboot_app_3/presentation/Screens/home/home_screen.dart';
 import 'package:reboot_app_3/shared/constants/textstyles_constants.dart';
 import 'package:reboot_app_3/shared/localization/localization.dart';
 
-class NavigationBar extends StatefulWidget {
+class BottomNavBar extends StatefulWidget {
   @override
-  _NavigationBarState createState() => _NavigationBarState();
+  _BottomNavBarState createState() => _BottomNavBarState();
 }
 
-class _NavigationBarState extends State<NavigationBar> {
+class _BottomNavBarState extends State<BottomNavBar> {
   int _selectedIndex = 0;
   List<Widget> _pages = <Widget>[
     HomeScreen(),
