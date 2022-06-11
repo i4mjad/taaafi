@@ -21,41 +21,34 @@ environment:
   sdk: ">=2.10.5 <3.0.0"
 
 dependencies:
-  flutter_rounded_date_picker: ^2.0.2
-  apple_sign_in: 
-  auto_direction: 
-  chips_choice: ^2.0.1
-  cloud_firestore: 
-  cupertino_icons: 
-  dio: ^4.0.0
-  equatable: ^2.0.3
-  firebase_analytics: 
-  firebase_auth: ^1.0.0
-  firebase_core: ^1.10.0
-  firebase_crashlytics: ^2.2.4
-  firebase_database: 
-  firebase_messaging: ^11.1.0
   flutter:
     sdk: flutter
-  flutter_bloc: ^8.0.1
-  flutter_html: 
-  flutter_local_notifications: 5.0.0
   flutter_localizations:
     sdk: flutter
-  google_sign_in: 
-  http: 
+  flutter_rounded_date_picker: ^3.0.1
+  #auto_direction:
+  chips_choice: ^2.0.1
+  cloud_firestore: ^3.1.17
+  cupertino_icons: ^1.0.5
+  equatable: ^2.0.3
+  firebase_analytics: ^9.1.9
+  firebase_auth: ^3.3.19
+  firebase_core: ^1.17.1
+  firebase_crashlytics: ^2.8.1
+  firebase_messaging: ^11.4.1
+  flutter_local_notifications: ^9.6.0
+  google_sign_in: ^5.3.3
+  http: ^0.13.4
   iconsax: ^0.0.8
-  intl: 
-  lottie: ^1.2.1
-  path: 
+  intl: ^0.17.0
+  path:
   provider: ^6.0.2
-  purchases_flutter: ^3.6.0
-  rflutter_alert: 
-  rxdart: 
-  shared_preferences: 
-  sign_in_with_apple: 
-  syncfusion_flutter_calendar: 
-  url_launcher: 
+  shared_preferences: ^2.0.15
+  sign_in_with_apple: ^4.0.0
+  syncfusion_flutter_calendar: ^20.1.59
+  url_launcher: ^6.1.3
+  rxdart:
+  flutter_svg: ^1.1.0
 
 dev_dependencies:
   flutter_test:
