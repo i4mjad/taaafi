@@ -3,9 +3,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:reboot_app_3/Model/Relapse.dart';
+import 'package:reboot_app_3/data/models/CalenderDay.dart';
 import 'package:reboot_app_3/bloc_provider.dart';
-import 'package:reboot_app_3/data/models/user_profile.dart';
+import 'package:reboot_app_3/data/models/FollowUpData.dart';
 import 'package:reboot_app_3/presentation/screens/auth/login_screen.dart';
 import 'package:reboot_app_3/presentation/blocs/follow_your_reboot_bloc.dart';
 import 'package:reboot_app_3/presentation/screens/follow_your_reboot/follow_up_streaks/follow_up_streak.dart';
@@ -35,7 +35,7 @@ class FollowYourRebootScreenState extends State<FollowYourRebootScreen>
   FirebaseFirestore database = FirebaseFirestore.instance;
   final user = FirebaseAuth.instance.currentUser;
 
-  var days = <Day>[];
+  var days = <CalenderDay>[];
 
   void getCalenderData() async {
     final db = FirebaseFirestore.instance;
@@ -47,7 +47,7 @@ class FollowYourRebootScreenState extends State<FollowYourRebootScreen>
       DateTime _startingDate = DateTime.parse(
           await snapshot.get('userFirstDate').toDate().toString());
 
-      var daysArray = <Day>[];
+      var daysArray = <CalenderDay>[];
       var oldRelapses = <DateTime>[];
       var oldWatches = <DateTime>[];
       var oldMasts = <DateTime>[];
@@ -83,13 +83,13 @@ class FollowYourRebootScreenState extends State<FollowYourRebootScreen>
         final dateD = new DateTime(date.year, date.month, date.day);
 
         if (oldRelapses.contains(dateD)) {
-          daysArray.add(new Day("Relapse", date, Colors.red));
+          daysArray.add(new CalenderDay("Relapse", date, Colors.red));
         } else if (oldWatches.contains(dateD) && !oldRelapses.contains(dateD)) {
-          daysArray.add(new Day("Watching Porn", date, Colors.purple));
+          daysArray.add(new CalenderDay("Watching Porn", date, Colors.purple));
         } else if (oldMasts.contains(dateD) && !oldRelapses.contains(dateD)) {
-          daysArray.add(new Day("Masturbating", date, Colors.orange));
+          daysArray.add(new CalenderDay("Masturbating", date, Colors.orange));
         } else {
-          daysArray.add(new Day("Success", date, Colors.green));
+          daysArray.add(new CalenderDay("Success", date, Colors.green));
         }
       }
 

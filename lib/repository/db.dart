@@ -3,8 +3,8 @@ import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:reboot_app_3/Model/Relapse.dart';
-import 'package:reboot_app_3/data/models/user_profile.dart';
+import 'package:reboot_app_3/data/models/CalenderDay.dart';
+import 'package:reboot_app_3/data/models/FollowUpData.dart';
 import 'package:reboot_app_3/presentation/screens/follow_your_reboot/day_of_week_relapses/day_of_week_relapses_widget.dart';
 
 class DB {
@@ -38,10 +38,10 @@ class DB {
         await snapshot.get('userFirstDate').toDate().toString());
   }
 
-  Future<List<Day>> getCalenderData() async {
+  Future<List<CalenderDay>> getCalenderData() async {
     FollowUpData _followUpDate = await getFollowUpData();
     DateTime _startingDate = await getStartingDate();
-    var daysArray = <Day>[];
+    var daysArray = <CalenderDay>[];
     var oldRelapses = <DateTime>[];
     var oldWatches = <DateTime>[];
     var oldMasts = <DateTime>[];
@@ -76,13 +76,13 @@ class DB {
       final dateD = new DateTime(date.year, date.month, date.day);
 
       if (oldRelapses.contains(dateD)) {
-        daysArray.add(new Day("Relapse", date, Colors.red));
+        daysArray.add(new CalenderDay("Relapse", date, Colors.red));
       } else if (oldWatches.contains(dateD) && !oldRelapses.contains(dateD)) {
-        daysArray.add(new Day("Watching Porn", date, Colors.purple));
+        daysArray.add(new CalenderDay("Watching Porn", date, Colors.purple));
       } else if (oldMasts.contains(dateD) && !oldRelapses.contains(dateD)) {
-        daysArray.add(new Day("Masturbating", date, Colors.orange));
+        daysArray.add(new CalenderDay("Masturbating", date, Colors.orange));
       } else {
-        daysArray.add(new Day("Success", date, Colors.green));
+        daysArray.add(new CalenderDay("Success", date, Colors.green));
       }
     }
 

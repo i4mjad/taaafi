@@ -1,10 +1,10 @@
 import 'dart:ui';
 
-import 'package:reboot_app_3/Model/Relapse.dart';
+import 'package:reboot_app_3/data/models/CalenderDay.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 
 class CalenderDataSource extends CalendarDataSource {
-  CalenderDataSource(List<Day> source) {
+  CalenderDataSource(List<CalenderDay> source) {
     appointments = source;
   }
 

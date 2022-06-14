@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
-class Day {
+class CalenderDay {
   String type;
   DateTime date;
   Color color;
 
-  Day(this.type, this.date, this.color);
+  CalenderDay(this.type, this.date, this.color);
 }
