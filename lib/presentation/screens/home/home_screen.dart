@@ -51,66 +51,81 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               SizedBox(
                 height: 20,
               ),
-              Container(
-                padding: EdgeInsets.all(20),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Flexible(
-                        child: Text(
-                      AppLocalizations.of(context).translate("no-content"),
-                      textAlign: TextAlign.center,
-                      style: kSubTitlesStyle.copyWith(
-                          color: primaryColor,
-                          fontSize: 16,
-                          height: 1.5,
-                          fontWeight: FontWeight.bold),
-                    ))
-                  ],
-                ),
-              ),
-              // Column(
-              //   crossAxisAlignment: CrossAxisAlignment.start,
-              //   children: [
-              //     SizedBox(
-              //       height: 12,
-              //     ),
-              //     Text(
-              //       AppLocalizations.of(context)
-              //           .translate("follow-your-reboot"),
-              //       style: kSubTitlesStyle.copyWith(height: 1),
-              //     ),
-              //     SizedBox(
-              //       height: 12,
-              //     ),
-              //     //FollowYouRebootHero(),
-              //   ],
-              // ),
+              WelcomeWidget(),
               SizedBox(
                 height: 20,
               ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Text(
-                    AppLocalizations.of(context).translate('nofap-content'),
-                    style: kSubTitlesStyle,
-                  ),
-                ],
-              ),
+              ExploreWidget(),
               SizedBox(
-                height: 12,
+                height: 20,
               ),
-              Ta3afiLiberaryCard(),
+              Ta3afiLiberaryWidget(),
               SizedBox(
-                height: 12,
+                height: 20,
               ),
             ],
           ),
         ),
       ),
     );
+  }
+}
+
+class Ta3afiLiberaryWidget extends StatelessWidget {
+  const Ta3afiLiberaryWidget({
+    Key key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text(
+          AppLocalizations.of(context).translate('nofap-content'),
+          style: kSubTitlesStyle,
+        ),
+        SizedBox(
+          height: 12,
+        ),
+        Ta3afiLiberaryCard(),
+      ],
+    );
+  }
+}
+
+class ExploreWidget extends StatelessWidget {
+  const ExploreWidget({
+    Key key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: MediaQuery.of(context).size.width - 150,
+      height: 125,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border.all(color: primaryColor, width: 0.25),
+        borderRadius: BorderRadius.circular(12.5),
+      ),
+    );
+  }
+}
+
+class WelcomeWidget extends StatelessWidget {
+  const WelcomeWidget({
+    Key key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return ElevatedButton(
+        onPressed: () {},
+        child: Text(
+          'تابع محتوى التعافي',
+          style: kTitleSeconderyStyle,
+        ));
   }
 }
 
@@ -228,37 +243,6 @@ class Ta3afiLiberaryCard extends StatelessWidget {
           )
         ],
       ),
-    );
-  }
-}
-
-class FollowYouRebootHero extends StatelessWidget {
-  const FollowYouRebootHero({
-    Key key,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: MediaQuery.of(context).size.height * 0.225,
-      width: MediaQuery.of(context).size.width - 40,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(15),
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.5),
-            spreadRadius: .25,
-            blurRadius: 7,
-            offset: Offset(0, 2), // changes position of shadow
-          ),
-        ],
-      ),
-      child: Center(
-          child: Text(
-        "Cake",
-        style: kTitlePrimeryStyle,
-      )),
     );
   }
 }
