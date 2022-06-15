@@ -2,7 +2,10 @@ import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:reboot_app_3/presentation/screens/home/widgets/explore_widget.dart';
+import 'package:reboot_app_3/presentation/screens/home/widgets/welcome_widget.dart';
 import 'package:reboot_app_3/shared/localization/localization.dart';
 import 'package:reboot_app_3/presentation/Screens/ta3afi_liberary/widgets/content_screen.dart';
 import 'package:reboot_app_3/shared/components/change_locale_bottomsheet.dart';
@@ -41,27 +44,32 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: seconderyColor.withOpacity(0.2),
+      appBar: AppBar(
+        backgroundColor: seconderyColor.withOpacity(0.2),
+        elevation: 0,
+        title: Text(AppLocalizations.of(context).translate('home'),style: kSubTitlesStyle,),
+      ),
       body: Padding(
-        padding: EdgeInsets.only(top: 100.0, left: 20.0, right: 20),
+        padding: EdgeInsets.only(top: 20.0, left: 20.0, right: 20),
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              TobBar(),
+              // TobBar(),
               SizedBox(
-                height: 20,
+                height: 16,
               ),
               WelcomeWidget(),
               SizedBox(
-                height: 20,
+                height: 16,
               ),
               ExploreWidget(),
               SizedBox(
-                height: 20,
+                height: 16,
               ),
               Ta3afiLiberaryWidget(),
               SizedBox(
-                height: 20,
+                height: 16,
               ),
             ],
           ),
@@ -86,7 +94,7 @@ class Ta3afiLiberaryWidget extends StatelessWidget {
           style: kSubTitlesStyle,
         ),
         SizedBox(
-          height: 12,
+          height: 8,
         ),
         Ta3afiLiberaryCard(),
       ],
@@ -94,40 +102,7 @@ class Ta3afiLiberaryWidget extends StatelessWidget {
   }
 }
 
-class ExploreWidget extends StatelessWidget {
-  const ExploreWidget({
-    Key key,
-  }) : super(key: key);
 
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: MediaQuery.of(context).size.width - 150,
-      height: 125,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border.all(color: primaryColor, width: 0.25),
-        borderRadius: BorderRadius.circular(12.5),
-      ),
-    );
-  }
-}
-
-class WelcomeWidget extends StatelessWidget {
-  const WelcomeWidget({
-    Key key,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return ElevatedButton(
-        onPressed: () {},
-        child: Text(
-          'تابع محتوى التعافي',
-          style: kTitleSeconderyStyle,
-        ));
-  }
-}
 
 class TobBar extends StatelessWidget {
   const TobBar({
@@ -215,6 +190,7 @@ class Ta3afiLiberaryCard extends StatelessWidget {
             children: [
               GestureDetector(
                 onTap: () {
+                  HapticFeedback.mediumImpact();
                   Navigator.push(context,
                       MaterialPageRoute(builder: (context) => ContentScreen()));
                 },
