@@ -1,9 +1,4 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:iconsax/iconsax.dart';
-import 'package:reboot_app_3/data/models/WelcomeContent.dart';
-import 'package:reboot_app_3/shared/constants/constants.dart';
 import 'package:reboot_app_3/shared/constants/textstyles_constants.dart';
 import 'package:reboot_app_3/shared/localization/localization.dart';
 
@@ -17,92 +12,85 @@ class WelcomeWidget extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(AppLocalizations.of(context).translate('welcome'),style: kSubTitlesStyle,),
-        SizedBox(height: 8,),
+        Text(
+          AppLocalizations.of(context).translate('welcome'),
+          style: kSubTitlesStyle,
+        ),
+        SizedBox(
+          height: 8,
+        ),
         Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Builder(
-                builder: (BuildContext context) {
-                  return Expanded(
-                    child: Container(
-                      height: 200,
-                      child: Column(
-                        children: [
-                          Expanded(child: Builder(builder: (context) {
-                            return ListView.separated(
-                              scrollDirection: Axis.horizontal,
-                              itemCount: 3,
-                              itemBuilder:(BuildContext context, int index) {
-                                return GestureDetector(
-                                  onTap: (){
-                                    HapticFeedback.lightImpact();
-
-                                  },
-                                  child: Container(
-                                    padding: EdgeInsets.all(16),
-                                    width: MediaQuery.of(context).size.width * 0.35,
-                                    decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        border: Border.all(color: primaryColor, width: 0.25),
-                                        borderRadius: BorderRadius.circular(12.5)
-                                    ),
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Row(
-                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            CircleAvatar(
-                                              backgroundColor: primaryColor,
-                                              child: FAKE_CONTENT[index].icon,
-                                            ),
-                                            Container(
-                                              padding: EdgeInsets.all(8),
-                                              decoration: BoxDecoration(
-                                                color: accentColor,
-                                                borderRadius: BorderRadius.circular(10.5),
-                                              ),
-                                              child: Text(
-                                                  FAKE_CONTENT[index].subtitle,
-                                                  style: kSubTitlesSubsStyle.copyWith(
-                                                      color: Colors.white
-                                                  )
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        Spacer(),
-                                        Container(
-                                          child: Row(
-                                            crossAxisAlignment: CrossAxisAlignment.center,
-                                            mainAxisAlignment: MainAxisAlignment.start,
-                                            children: [
-                                              Flexible(
-                                                  child: Text(
-                                                      FAKE_CONTENT[index].title,
-                                                      style: kSubTitlesStyle.copyWith(
-                                                          height: 1.2)
-                                                  )
-                                              )
-                                            ],
-                                          ),
-                                        ),
-
-                                      ],
-                                    ),
-                                  ),
-                                );
-                              }, separatorBuilder: (BuildContext context, int index) {
-                              return SizedBox(width: 16);
-                            },);
-                          })),
-                        ],
-                      ),
+            Container(
+              width: MediaQuery.of(context).size.width * 0.27,
+              height: 150,
+              decoration: BoxDecoration(
+                  color: Colors.green[50],
+                  border: Border.all(width: 0.25, color: Colors.green),
+                  borderRadius: BorderRadius.circular(15)),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  //TODO - add bloc here
+                  Text(
+                    "24",
+                    style: kPageTitleStyle.copyWith(
+                      color: Colors.green,
+                      fontSize: 35,
                     ),
-                  );
-                }
+                  ),
+                  Text(
+                    AppLocalizations.of(context).translate('free-relapse-days'),
+                    style: kSubTitlesStyle.copyWith(
+                      fontSize: 16,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
             ),
-
+            Spacer(),
+            Column(
+              children: [
+                Container(
+                  padding: EdgeInsets.all(8),
+                  height: 71,
+                  width: MediaQuery.of(context).size.width * 0.60,
+                  decoration: BoxDecoration(
+                      color: Colors.brown[50],
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(width: 0.25, color: Colors.brown)),
+                  child: Center(
+                    //TODO - add bloc here
+                    child: Text(
+                      "عدد الانتكاسات في ال30 يوم الماضية: " + "0",
+                      style: kSubTitlesStyle.copyWith(fontSize: 12),
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  height: 8,
+                ),
+                Container(
+                  padding: EdgeInsets.all(8),
+                  height: 71,
+                  width: MediaQuery.of(context).size.width * 0.60,
+                  decoration: BoxDecoration(
+                    color: Colors.blue[50],
+                    border: Border.all(width: 0.25, color: Colors.blue),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Center(
+                    child: Text(
+                      "عدد الأيام بدون إباحية منذ البداية: " + "0",
+                      style: kSubTitlesStyle.copyWith(fontSize: 12),
+                    ),
+                  ),
+                ),
+              ],
+            )
           ],
         ),
       ],
