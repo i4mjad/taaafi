@@ -1,6 +1,3 @@
-import 'dart:io';
-
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:iconsax/iconsax.dart';
@@ -44,11 +41,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: seconderyColor.withOpacity(0.2),
-      appBar: AppBar(
-        backgroundColor: seconderyColor.withOpacity(0.2),
-        elevation: 0,
-        title: Text(AppLocalizations.of(context).translate('home'),style: kSubTitlesStyle,),
-      ),
+      appBar: customAppBar(context),
       body: Padding(
         padding: EdgeInsets.only(top: 20.0, left: 20.0, right: 20),
         child: SingleChildScrollView(
@@ -77,6 +70,33 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       ),
     );
   }
+
+  AppBar customAppBar(BuildContext context) {
+    return AppBar(
+      backgroundColor: seconderyColor.withOpacity(0.2),
+      elevation: 0,
+      centerTitle: true,
+      title: Text(
+        AppLocalizations.of(context).translate('home'),
+        style: kSubTitlesStyle,
+      ),
+      actions: [
+        GestureDetector(
+          onTap: () {
+            ChangeLanguageWidget.changeLanguage(context);
+          },
+          child: Container(
+            padding: EdgeInsets.only(right: 16, left: 16),
+            child: Center(
+                child: Icon(
+              Iconsax.setting,
+              color: primaryColor,
+            )),
+          ),
+        ),
+      ],
+    );
+  }
 }
 
 class Ta3afiLiberaryWidget extends StatelessWidget {
@@ -97,41 +117,6 @@ class Ta3afiLiberaryWidget extends StatelessWidget {
           height: 8,
         ),
         Ta3afiLiberaryCard(),
-      ],
-    );
-  }
-}
-
-
-
-class TobBar extends StatelessWidget {
-  const TobBar({
-    Key key,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          AppLocalizations.of(context).translate("welcome"),
-          style: kPageTitleStyle.copyWith(height: 1),
-        ),
-        GestureDetector(
-          onTap: () {
-            ChangeLanguageWidget.changeLanguage(context);
-          },
-          child: Container(
-            padding: EdgeInsets.all(8),
-            child: Center(
-                child: Icon(
-              Platform.isIOS != true ? Icons.settings : CupertinoIcons.settings,
-              color: primaryColor,
-            )),
-          ),
-        )
       ],
     );
   }
