@@ -2,8 +2,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:reboot_app_3/shared/components/custom-app-bar.dart';
 import 'package:reboot_app_3/shared/constants/constants.dart';
 import 'package:reboot_app_3/shared/constants/textstyles_constants.dart';
+import 'package:reboot_app_3/shared/localization/localization.dart';
 
 // ignore: must_be_immutable
 class NoteScreen extends StatefulWidget {
@@ -34,170 +36,138 @@ class _NoteScreenState extends State<NoteScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: SafeArea(
-            child: Padding(
-                padding: const EdgeInsets.only(right: 20.0, left: 20),
-                child: Container(
-                    width: MediaQuery.of(context).size.width - 40,
-                    child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          SizedBox(
-                            height: 20,
+      appBar:
+          noteAppBar(context, (this.widget.noteToEdit.data() as Map)["title"]),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.only(right: 20.0, left: 20),
+          child: Container(
+            width: MediaQuery.of(context).size.width - 40,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  width: MediaQuery.of(context).size.width - 40,
+                  height: 45,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.all(Radius.circular(12.0)),
+                    color: mainGrayColor,
+                  ),
+                  child: TextField(
+                    controller: title,
+                    style: kSubTitlesStyle.copyWith(
+                        fontSize: 14, height: 1, fontWeight: FontWeight.w400),
+                    decoration: InputDecoration(
+                      prefixIcon: Icon(
+                        CupertinoIcons.pen,
+                        color: primaryColor,
+                      ),
+                      border: InputBorder.none,
+                      hintText: "Title",
+                      hintStyle: kSubTitlesSubsStyle.copyWith(
+                          fontSize: 18, color: Colors.grey, height: 1.75),
+                      contentPadding: EdgeInsets.only(left: 12, right: 12),
+                    ),
+                  ),
+                ),
+                //content-list
+                SizedBox(
+                  height: 8,
+                ),
+                Container(
+                  width: MediaQuery.of(context).size.width - 40,
+                  height: MediaQuery.of(context).size.height * 0.65,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.all(Radius.circular(12.0)),
+                    color: mainGrayColor,
+                  ),
+                  child: TextField(
+                    controller: body,
+                    style: kSubTitlesStyle.copyWith(
+                        fontSize: 14, height: 1.3, fontWeight: FontWeight.w400),
+                    maxLines: null,
+                    expands: true,
+                    decoration: InputDecoration(
+                        hintText: "Body",
+                        hintStyle: kSubTitlesSubsStyle.copyWith(
+                          fontSize: 20,
+                        ),
+                        contentPadding: EdgeInsets.only(
+                            left: 12, right: 12, top: 12, bottom: 12),
+                        border: InputBorder.none),
+                  ),
+                ),
+                SizedBox(
+                  height: 16,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        confirmDeleteDialog();
+                      },
+                      child: Container(
+                        height: 50,
+                        width: (MediaQuery.of(context).size.width * 0.5) - (32),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10.5),
+                          color: Colors.deepOrange,
+                        ),
+                        child: Center(
+                          child: Text(
+                            AppLocalizations.of(context).translate("delete"),
+                            style: kSubTitlesStyle.copyWith(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w500),
                           ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            //crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              GestureDetector(
-                                onTap: () {
-                                  Navigator.pop(context);
-                                },
-                                child: Container(
-                                  height: 40,
-                                  width: 40,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(50),
-                                    color: mainGrayColor,
-                                  ),
-                                  child: Icon(
-                                    CupertinoIcons.arrow_left,
-                                    size: 20,
-                                  ),
-                                ),
-                              ),
-                              Row(
-                                children: [
-                                  GestureDetector(
-                                    onTap: () {
-                                      confirmDeleteDialog();
-                                    },
-                                    child: Container(
-                                      height: 40,
-                                      width: 40,
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(50),
-                                        color: Colors.deepOrange,
-                                      ),
-                                      child: Icon(
-                                        CupertinoIcons.delete,
-                                        size: 20,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    width: 12,
-                                  ),
-                                  GestureDetector(
-                                    onTap: () {
-                                      var _title = title?.text;
-                                      var _body = body?.text;
+                        ),
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        var _title = title?.text;
+                        var _body = body?.text;
 
-                                      if (_title != null && _body != null) {
-                                        database
-                                            .doc(user.uid)
-                                            .collection("userNotes")
-                                            .doc(this.widget.noteToEdit.id)
-                                            .update({
-                                          'title': _title.toString(),
-                                          "body": _body.toString(),
-                                        });
+                        if (_title != null && _body != null) {
+                          database
+                              .doc(user.uid)
+                              .collection("userNotes")
+                              .doc(this.widget.noteToEdit.id)
+                              .update({
+                            'title': _title.toString(),
+                            "body": _body.toString(),
+                          });
 
-                                        FocusScope.of(context).unfocus();
-                                      }
-                                    },
-                                    child: Container(
-                                      height: 40,
-                                      width: 40,
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(50),
-                                        color: primaryColor,
-                                      ),
-                                      child: Icon(
-                                        CupertinoIcons.floppy_disk,
-                                        size: 20,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
+                          FocusScope.of(context).unfocus();
+                          Navigator.pop(context);
+                        }
+                      },
+                      child: Container(
+                        height: 50,
+                        width: (MediaQuery.of(context).size.width * 0.5) - (32),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10.50),
+                          color: primaryColor,
+                        ),
+                        child: Center(
+                          child: Text(
+                            AppLocalizations.of(context).translate("save"),
+                            style: kSubTitlesStyle.copyWith(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w500),
                           ),
-                          Padding(
-                            padding: EdgeInsets.only(top: 40.0),
-                            child: Text(
-                              (this.widget.noteToEdit.data() as Map)["title"],
-                              style: kPageTitleStyle,
-                            ),
-                          ),
-                          SizedBox(
-                            height: 12,
-                          ),
-                          Container(
-                            width: MediaQuery.of(context).size.width - 40,
-                            height: 45,
-                            decoration: BoxDecoration(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(12.0)),
-                              color: mainGrayColor,
-                            ),
-                            child: TextField(
-                              controller: title,
-                              style: kSubTitlesStyle.copyWith(
-                                  fontSize: 14,
-                                  height: 1,
-                                  fontWeight: FontWeight.w400),
-                              decoration: InputDecoration(
-                                prefixIcon: Icon(
-                                  CupertinoIcons.pen,
-                                  color: primaryColor,
-                                ),
-                                border: InputBorder.none,
-                                hintText: "Title",
-                                hintStyle: kSubTitlesSubsStyle.copyWith(
-                                    fontSize: 18,
-                                    color: Colors.grey,
-                                    height: 1.75),
-                                contentPadding:
-                                    EdgeInsets.only(left: 12, right: 12),
-                              ),
-                            ),
-                          ),
-                          //content-list
-                          SizedBox(
-                            height: 8,
-                          ),
-                          Expanded(
-                              child: Container(
-                                  width: MediaQuery.of(context).size.width - 40,
-                                  decoration: BoxDecoration(
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(12.0)),
-                                    color: mainGrayColor,
-                                  ),
-                                  child: TextField(
-                                    controller: body,
-                                    style: kSubTitlesStyle.copyWith(
-                                        fontSize: 14,
-                                        height: 1.3,
-                                        fontWeight: FontWeight.w400),
-                                    maxLines: null,
-                                    expands: true,
-                                    decoration: InputDecoration(
-                                        hintText: "Body",
-                                        hintStyle: kSubTitlesSubsStyle.copyWith(
-                                          fontSize: 20,
-                                        ),
-                                        contentPadding: EdgeInsets.only(
-                                            left: 12,
-                                            right: 12,
-                                            top: 12,
-                                            bottom: 12),
-                                        border: InputBorder.none),
-                                  )))
-                        ])))));
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   void confirmDeleteDialog() {

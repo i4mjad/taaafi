@@ -23,6 +23,10 @@
   "Books": "Books",
   "Blogs": "Blogs",
 
+  "delete": "حذف",
+  "save": "حفظ",
+
+
   "user-name": "User Name",
   "user-email": "User Email",
   "follow-your-reboot": "Follow Your Reboot",
