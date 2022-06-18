@@ -104,7 +104,7 @@ class _ContentScreenState extends State<ContentScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: seconderyColor,
-      appBar: customAppBar(context, "nofap-content"),
+      appBar: appBarWithSettings(context, "nofap-content"),
       body: Padding(
         padding: EdgeInsets.only(
           top: 40.0,

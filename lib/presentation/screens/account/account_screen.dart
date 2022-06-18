@@ -44,7 +44,7 @@ class _AccountScreenState extends State<AccountScreen>
     final bloc = CustomBlocProvider.of<AccountBloc>(context);
     return Scaffold(
         backgroundColor: seconderyColor.withOpacity(0.2),
-        appBar: customAppBar(context, "account"),
+        appBar: plainAppBar(context, "account"),
         body: Padding(
           padding: EdgeInsets.only(top: 16.0, left: 16.0, right: 16),
           child: SingleChildScrollView(
