@@ -13,21 +13,21 @@ var FAKE_CONTENT = [
   WelcomeContent(
       Icon(
         Iconsax.book,
-        size: 16,
+        size: 18,
       ),
       "كيف تبدأ؟",
       "دليل"),
   WelcomeContent(
       Icon(
         Iconsax.paperclip,
-        size: 16,
+        size: 18,
       ),
       "كيف تستفيد من التطبيق؟",
       "تعافي"),
   WelcomeContent(
       Icon(
         Iconsax.pen_close,
-        size: 16,
+        size: 18,
       ),
       "مصادر مهمة",
       "مصادر"),
