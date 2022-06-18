@@ -7,6 +7,7 @@ import 'package:chips_choice/chips_choice.dart';
 import 'package:reboot_app_3/presentation/Screens/ta3afi_liberary/models/Content.dart';
 import 'package:reboot_app_3/presentation/Screens/ta3afi_liberary/services/content_load_services.dart';
 import 'package:reboot_app_3/shared/components/bottom_navbar.dart';
+import 'package:reboot_app_3/shared/components/custom-app-bar.dart';
 import 'package:reboot_app_3/shared/constants/constants.dart';
 import 'package:reboot_app_3/shared/constants/textstyles_constants.dart';
 import 'package:reboot_app_3/shared/localization/localization.dart';
@@ -103,179 +104,159 @@ class _ContentScreenState extends State<ContentScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: seconderyColor,
-      body: SafeArea(
-        child: Padding(
-          padding: EdgeInsets.only(
-            top: 40.0,
-            left: 20.0,
-            right: 20,
-          ),
-          child: Column(
-            children: [
-              GestureDetector(
-                onTap: () {
-                  Navigator.pop(context,
-                      MaterialPageRoute(builder: (context) => BottomNavBar()));
-                },
+      appBar: customAppBar(context, "nofap-content"),
+      body: Padding(
+        padding: EdgeInsets.only(
+          top: 40.0,
+          left: 20.0,
+          right: 20,
+        ),
+        child: Column(
+          children: [
+            GestureDetector(
+              onTap: () {
+                Navigator.pop(context,
+                    MaterialPageRoute(builder: (context) => BottomNavBar()));
+              },
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [],
+              ),
+            ),
+            SizedBox(
+              height: 12,
+            ),
+            Row(
+              children: [
+                Container(
+                  width: MediaQuery.of(context).size.width - 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                        color: primaryColor.withOpacity(0.3), width: 0.5),
+                    borderRadius: BorderRadius.all(Radius.circular(10.5)),
+                    color: mainGrayColor.withOpacity(0.5),
+                  ),
+                  child: TextField(
+                    controller: searchTextEditor,
+                    enableSuggestions: true,
+                    style: kSubTitlesStyle.copyWith(
+                        fontSize: 14, height: 1, fontWeight: FontWeight.w400),
+                    decoration: InputDecoration(
+                      prefixIcon: Icon(
+                        CupertinoIcons.search,
+                        color: Colors.grey.withOpacity(0.8),
+                        size: 20,
+                      ),
+                      border: InputBorder.none,
+                      hintText:
+                          AppLocalizations.of(context).translate('search'),
+                      hintStyle: kSubTitlesSubsStyle.copyWith(
+                          fontSize: 14,
+                          color: Colors.grey.withOpacity(0.8),
+                          height: 1.75),
+                      contentPadding: EdgeInsets.only(left: 12, right: 12),
+                    ),
+                    onChanged: (value) {
+                      filterSearchResults(value);
+                    },
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(
+              height: 12,
+            ),
+            GestureDetector(
+              onTap: () => _showFilters(),
+              child: Container(
+                width: MediaQuery.of(context).size.width - 40,
+                height: MediaQuery.of(context).size.height * 0.045,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.all(Radius.circular(8)),
+                  border: Border.all(
+                    color: (selectedSubTypesList.length > 0 ||
+                            selectedSubTypesList.length > 0 ||
+                            selectedLanuguagesList.length > 0)
+                        ? Colors.green
+                        : primaryColor.withOpacity(0.3),
+                    width: (selectedSubTypesList.length > 0 ||
+                            selectedSubTypesList.length > 0 ||
+                            selectedLanuguagesList.length > 0)
+                        ? 0.75
+                        : 0.5,
+                  ),
+                ),
                 child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    Row(
                       children: [
-                        Icon(
-                          lang != "ar"
-                              ? CupertinoIcons.arrow_left_circle
-                              : CupertinoIcons.arrow_right_circle,
-                          size: 28,
-                        ),
-                        SizedBox(height: 8),
+                        Icon(Iconsax.document, size: 16, color: primaryColor),
+                        SizedBox(width: 8),
                         Text(
-                          AppLocalizations.of(context)
-                              .translate('nofap-content'),
-                          style:
-                              kPageTitleStyle.copyWith(height: 1, fontSize: 28),
-                        ),
+                            AppLocalizations.of(context)
+                                .translate('search-filters'),
+                            style: kSubTitlesStyle.copyWith(
+                                fontSize: 14,
+                                height: 1,
+                                fontWeight: FontWeight.w400)),
                       ],
                     ),
                   ],
                 ),
               ),
-              SizedBox(
-                height: 12,
-              ),
-              Row(
-                children: [
-                  Container(
+            ),
+            Builder(
+              builder: (BuildContext context) {
+                if (appContent.length == 0) {
+                  return Container(
+                    padding: EdgeInsets.all(20),
                     width: MediaQuery.of(context).size.width - 40,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                          color: primaryColor.withOpacity(0.3), width: 0.5),
-                      borderRadius: BorderRadius.all(Radius.circular(10.5)),
-                      color: mainGrayColor.withOpacity(0.5),
-                    ),
-                    child: TextField(
-                      controller: searchTextEditor,
-                      enableSuggestions: true,
-                      style: kSubTitlesStyle.copyWith(
-                          fontSize: 14, height: 1, fontWeight: FontWeight.w400),
-                      decoration: InputDecoration(
-                        prefixIcon: Icon(
-                          CupertinoIcons.search,
-                          color: Colors.grey.withOpacity(0.8),
-                          size: 20,
+                    child: Column(
+                      children: [
+                        Center(
+                          child: Text(
+                            AppLocalizations.of(context).translate("loading"),
+                            style: kSubTitlesStyle.copyWith(
+                                color: primaryColor, fontSize: 18),
+                          ),
                         ),
-                        border: InputBorder.none,
-                        hintText:
-                            AppLocalizations.of(context).translate('search'),
-                        hintStyle: kSubTitlesSubsStyle.copyWith(
-                            fontSize: 14,
-                            color: Colors.grey.withOpacity(0.8),
-                            height: 1.75),
-                        contentPadding: EdgeInsets.only(left: 12, right: 12),
-                      ),
-                      onChanged: (value) {
-                        filterSearchResults(value);
-                      },
+                      ],
                     ),
-                  ),
-                ],
-              ),
-              SizedBox(
-                height: 12,
-              ),
-              GestureDetector(
-                onTap: () => _showFilters(),
-                child: Container(
-                  width: MediaQuery.of(context).size.width - 40,
-                  height: MediaQuery.of(context).size.height * 0.045,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.all(Radius.circular(8)),
-                    border: Border.all(
-                      color: (selectedSubTypesList.length > 0 ||
-                              selectedSubTypesList.length > 0 ||
-                              selectedLanuguagesList.length > 0)
-                          ? Colors.green
-                          : primaryColor.withOpacity(0.3),
-                      width: (selectedSubTypesList.length > 0 ||
-                              selectedSubTypesList.length > 0 ||
-                              selectedLanuguagesList.length > 0)
-                          ? 0.75
-                          : 0.5,
-                    ),
-                  ),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      Row(
-                        children: [
-                          Icon(Iconsax.document, size: 16, color: primaryColor),
-                          SizedBox(width: 8),
-                          Text(
-                              AppLocalizations.of(context)
-                                  .translate('search-filters'),
-                              style: kSubTitlesStyle.copyWith(
-                                  fontSize: 14,
-                                  height: 1,
-                                  fontWeight: FontWeight.w400)),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              Builder(
-                builder: (BuildContext context) {
-                  if (appContent.length == 0) {
-                    return Container(
-                      padding: EdgeInsets.all(20),
-                      width: MediaQuery.of(context).size.width - 40,
+                  );
+                } else {
+                  return Expanded(
+                    child: Container(
+                      height: double.infinity,
                       child: Column(
                         children: [
-                          Center(
-                            child: Text(
-                              AppLocalizations.of(context).translate("loading"),
-                              style: kSubTitlesStyle.copyWith(
-                                  color: primaryColor, fontSize: 18),
-                            ),
-                          ),
+                          Expanded(child: Builder(builder: (context) {
+                            return Padding(
+                              padding: EdgeInsets.only(
+                                top: 20.0,
+                              ),
+                              child: ListView.builder(
+                                  scrollDirection: Axis.vertical,
+                                  itemCount: fillteredAppContent.length,
+                                  padding: EdgeInsets.all(0),
+                                  itemBuilder:
+                                      (BuildContext context, int index) {
+                                    return ContentCard(
+                                        content: fillteredAppContent[index]);
+                                  }),
+                            );
+                          })),
                         ],
                       ),
-                    );
-                  } else {
-                    return Expanded(
-                      child: Container(
-                        height: double.infinity,
-                        child: Column(
-                          children: [
-                            Expanded(child: Builder(builder: (context) {
-                              return Padding(
-                                padding: EdgeInsets.only(
-                                  top: 20.0,
-                                ),
-                                child: ListView.builder(
-                                    scrollDirection: Axis.vertical,
-                                    itemCount: fillteredAppContent.length,
-                                    padding: EdgeInsets.all(0),
-                                    itemBuilder:
-                                        (BuildContext context, int index) {
-                                      return ContentCard(
-                                          content: fillteredAppContent[index]);
-                                    }),
-                              );
-                            })),
-                          ],
-                        ),
-                      ),
-                    );
-                  }
-                },
-              ),
-            ],
-          ),
+                    ),
+                  );
+                }
+              },
+            ),
+          ],
         ),
       ),
     );

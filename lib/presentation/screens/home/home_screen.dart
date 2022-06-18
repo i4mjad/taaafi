@@ -3,9 +3,9 @@ import 'package:flutter/services.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:reboot_app_3/presentation/screens/home/widgets/explore_widget.dart';
 import 'package:reboot_app_3/presentation/screens/home/widgets/welcome_widget.dart';
+import 'package:reboot_app_3/shared/components/custom-app-bar.dart';
 import 'package:reboot_app_3/shared/localization/localization.dart';
 import 'package:reboot_app_3/presentation/Screens/ta3afi_liberary/widgets/content_screen.dart';
-import 'package:reboot_app_3/shared/components/change_locale_bottomsheet.dart';
 import 'package:reboot_app_3/shared/constants/constants.dart';
 import 'package:reboot_app_3/shared/constants/textstyles_constants.dart';
 import 'package:reboot_app_3/shared/localization/localization_services.dart';
@@ -41,9 +41,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: seconderyColor.withOpacity(0.2),
-      appBar: customAppBar(context),
+      appBar: customAppBar(context, "home"),
       body: Padding(
-        padding: EdgeInsets.only(top: 20.0, left: 20.0, right: 20),
+        padding: EdgeInsets.only(left: 20.0, right: 20),
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -68,33 +68,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           ),
         ),
       ),
-    );
-  }
-
-  AppBar customAppBar(BuildContext context) {
-    return AppBar(
-      backgroundColor: seconderyColor.withOpacity(0.2),
-      elevation: 0,
-      centerTitle: true,
-      title: Text(
-        AppLocalizations.of(context).translate('home'),
-        style: kSubTitlesStyle,
-      ),
-      actions: [
-        GestureDetector(
-          onTap: () {
-            ChangeLanguageWidget.changeLanguage(context);
-          },
-          child: Container(
-            padding: EdgeInsets.only(right: 16, left: 16),
-            child: Center(
-                child: Icon(
-              Iconsax.setting,
-              color: primaryColor,
-            )),
-          ),
-        ),
-      ],
     );
   }
 }

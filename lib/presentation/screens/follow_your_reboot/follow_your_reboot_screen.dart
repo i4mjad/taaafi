@@ -10,6 +10,7 @@ import 'package:reboot_app_3/presentation/screens/auth/login_screen.dart';
 import 'package:reboot_app_3/presentation/blocs/follow_your_reboot_bloc.dart';
 import 'package:reboot_app_3/presentation/screens/follow_your_reboot/follow_up_streaks/follow_up_streak.dart';
 import 'package:reboot_app_3/presentation/screens/follow_your_reboot/widgets/new_user_widgets.dart';
+import 'package:reboot_app_3/shared/components/custom-app-bar.dart';
 import 'package:reboot_app_3/shared/constants/constants.dart';
 import 'package:reboot_app_3/shared/constants/textstyles_constants.dart';
 import 'package:reboot_app_3/shared/localization/localization.dart';
@@ -162,127 +163,163 @@ class FollowYourRebootScreenState extends State<FollowYourRebootScreen>
     final bloc = CustomBlocProvider.of<FollowYourRebootBloc>(context);
     return Scaffold(
         backgroundColor: seconderyColor.withOpacity(0.2),
-        body: Padding(
-          padding: EdgeInsets.only(top: 96.0),
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(right: 16, left: 16),
+        appBar: customAppBar(context, "follow-your-reboot"),
+        body: SingleChildScrollView(
+          child: Column(
+            children: [
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => NotesScreen()));
+                },
+                child: Container(
+                  width: MediaQuery.of(context).size.width,
+                  height: 75,
+                  padding: EdgeInsets.all(8),
+                  margin: EdgeInsets.only(right: 16, left: 16),
+                  decoration: BoxDecoration(
+                      color: Colors.white,
+                      border: Border.all(color: Colors.black, width: 0.25),
+                      borderRadius: BorderRadius.circular(12.5)),
                   child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        AppLocalizations.of(context)
-                            .translate('follow-your-reboot'),
-                        style:
-                            kPageTitleStyle.copyWith(height: 1, fontSize: 28),
+                      Icon(
+                        Iconsax.archive_1,
+                        size: 32,
+                        color: primaryColor,
                       ),
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => NotesScreen()));
-                        },
-                        child: Icon(
-                          Iconsax.archive_1,
-                          size: 32,
+                      SizedBox(
+                        width: 8,
+                      ),
+                      Text(
+                        "مذكرات التعافي",
+                        style: kSubTitlesStyle.copyWith(
                           color: primaryColor,
                         ),
-                      ),
+                      )
                     ],
                   ),
                 ),
-                SizedBox(height: 32),
-                FollowUpStreaks(),
-                Padding(
-                  padding: EdgeInsets.only(right: 16, left: 16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        //mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Text(
-                              AppLocalizations.of(context)
-                                  .translate('reboot-calender'),
-                              style: kSubTitlesStyle),
-                          SizedBox(
-                            height: 8,
-                          ),
-                          Container(
-                              width: MediaQuery.of(context).size.width,
-                              height: MediaQuery.of(context).size.height * 0.45,
-                              decoration: BoxDecoration(
-                                  color: mainGrayColor,
-                                  borderRadius: BorderRadius.circular(15)),
-                              child: SfCalendar(
-                                onTap: (CalendarTapDetails details) async {
-                                  DateTime date = details.date;
-                                  DateTime firstDate =
-                                      await bloc.getFirstDate();
+              ),
+              SizedBox(height: 16),
+              FollowUpStreaks(),
+              Padding(
+                padding: EdgeInsets.only(right: 16, left: 16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      //mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Text(
+                            AppLocalizations.of(context)
+                                .translate('reboot-calender'),
+                            style: kSubTitlesStyle),
+                        SizedBox(
+                          height: 8,
+                        ),
+                        Container(
+                            width: MediaQuery.of(context).size.width,
+                            height: MediaQuery.of(context).size.height * 0.45,
+                            decoration: BoxDecoration(
+                                color: mainGrayColor,
+                                borderRadius: BorderRadius.circular(15)),
+                            child: SfCalendar(
+                              onTap: (CalendarTapDetails details) async {
+                                DateTime date = details.date;
+                                DateTime firstDate = await bloc.getFirstDate();
 
-                                  dateChecker(firstDate, date, context, bloc);
-                                },
-                                view: CalendarView.month,
-                                headerStyle: CalendarHeaderStyle(
-                                    textAlign: TextAlign.center,
-                                    backgroundColor: mainYellowColor,
-                                    textStyle: kSubTitlesStyle),
-                                dataSource: CalenderDataSource(days),
-                                monthViewSettings: MonthViewSettings(
-                                  //showAgenda: true,
-                                  agendaStyle: AgendaStyle(),
-                                  appointmentDisplayMode:
-                                      MonthAppointmentDisplayMode.indicator,
-                                ),
-                                allowAppointmentResize: true,
-                              )),
-                        ],
-                      ),
-                      SizedBox(
-                        height: 12,
-                      ),
-                      Text(AppLocalizations.of(context).translate('streaks'),
-                          style: kSubTitlesStyle),
-                      SizedBox(
-                        height: 12,
-                      ),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          GeneralStats(lang: lang),
-                        ],
-                      ),
-                      SizedBox(
-                        height: 16,
-                      ),
-                      Column(
-                        children: [
-                          //dublicate this
-                          Row(
+                                dateChecker(firstDate, date, context, bloc);
+                              },
+                              view: CalendarView.month,
+                              headerStyle: CalendarHeaderStyle(
+                                  textAlign: TextAlign.center,
+                                  backgroundColor: mainYellowColor,
+                                  textStyle: kSubTitlesStyle),
+                              dataSource: CalenderDataSource(days),
+                              monthViewSettings: MonthViewSettings(
+                                //showAgenda: true,
+                                agendaStyle: AgendaStyle(),
+                                appointmentDisplayMode:
+                                    MonthAppointmentDisplayMode.indicator,
+                              ),
+                              allowAppointmentResize: true,
+                            )),
+                      ],
+                    ),
+                    SizedBox(
+                      height: 12,
+                    ),
+                    Text(AppLocalizations.of(context).translate('streaks'),
+                        style: kSubTitlesStyle),
+                    SizedBox(
+                      height: 12,
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        GeneralStats(lang: lang),
+                      ],
+                    ),
+                    SizedBox(
+                      height: 16,
+                    ),
+                    Column(
+                      children: [
+                        //dublicate this
+                        Row(
+                          children: [
+                            Icon(Iconsax.calendar_tick),
+                            SizedBox(
+                              width: 8,
+                            ),
+                            Text(
+                              AppLocalizations.of(context)
+                                  .translate("total-days"),
+                              style: kHeadlineStyle.copyWith(
+                                  fontWeight: FontWeight.w400, fontSize: 18),
+                            ),
+                            FutureBuilder(
+                              future: bloc.getTotalDaysFromBegining(),
+                              initialData: "0",
+                              builder: (BuildContext context,
+                                  AsyncSnapshot<String> sh) {
+                                return Text(
+                                  sh.data,
+                                  style: kHeadlineStyle.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 18),
+                                );
+                              },
+                            ),
+                          ],
+                        ),
+                        SizedBox(
+                          height: 8,
+                        ),
+                        Container(
+                          width: MediaQuery.of(context).size.width - 40,
+                          child: Row(
                             children: [
-                              Icon(Iconsax.calendar_tick),
+                              Icon(Iconsax.emoji_sad),
                               SizedBox(
                                 width: 8,
                               ),
                               Text(
                                 AppLocalizations.of(context)
-                                    .translate("total-days"),
+                                    .translate("relapses-number"),
                                 style: kHeadlineStyle.copyWith(
                                     fontWeight: FontWeight.w400, fontSize: 18),
                               ),
                               FutureBuilder(
-                                future: bloc.getTotalDaysFromBegining(),
+                                future: bloc.getRelapsesCount(),
                                 initialData: "0",
                                 builder: (BuildContext context,
                                     AsyncSnapshot<String> sh) {
                                   return Text(
-                                    sh.data,
+                                    sh.requireData,
                                     style: kHeadlineStyle.copyWith(
                                         fontWeight: FontWeight.bold,
                                         fontSize: 18),
@@ -291,50 +328,16 @@ class FollowYourRebootScreenState extends State<FollowYourRebootScreen>
                               ),
                             ],
                           ),
-                          SizedBox(
-                            height: 8,
-                          ),
-                          Container(
-                            width: MediaQuery.of(context).size.width - 40,
-                            child: Row(
-                              children: [
-                                Icon(Iconsax.emoji_sad),
-                                SizedBox(
-                                  width: 8,
-                                ),
-                                Text(
-                                  AppLocalizations.of(context)
-                                      .translate("relapses-number"),
-                                  style: kHeadlineStyle.copyWith(
-                                      fontWeight: FontWeight.w400,
-                                      fontSize: 18),
-                                ),
-                                FutureBuilder(
-                                  future: bloc.getRelapsesCount(),
-                                  initialData: "0",
-                                  builder: (BuildContext context,
-                                      AsyncSnapshot<String> sh) {
-                                    return Text(
-                                      sh.requireData,
-                                      style: kHeadlineStyle.copyWith(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 18),
-                                    );
-                                  },
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(
-                        height: 40,
-                      ),
-                    ],
-                  ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(
+                      height: 40,
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ));
   }

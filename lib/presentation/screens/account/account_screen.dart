@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:reboot_app_3/presentation/screens/account/delete_account.dart';
+import 'package:reboot_app_3/shared/components/custom-app-bar.dart';
 import 'package:reboot_app_3/shared/localization/localization.dart';
 import 'package:reboot_app_3/shared/localization/localization_services.dart';
 import 'package:reboot_app_3/bloc_provider.dart';
@@ -14,8 +15,6 @@ import 'package:reboot_app_3/presentation/screens/auth/login_screen.dart';
 import 'package:reboot_app_3/shared/constants/constants.dart';
 import 'package:reboot_app_3/shared/services/auth_service.dart';
 import 'package:reboot_app_3/shared/services/notification_service.dart';
-
-
 
 class AccountScreen extends StatefulWidget {
   const AccountScreen({
@@ -45,24 +44,13 @@ class _AccountScreenState extends State<AccountScreen>
     final bloc = CustomBlocProvider.of<AccountBloc>(context);
     return Scaffold(
         backgroundColor: seconderyColor.withOpacity(0.2),
+        appBar: customAppBar(context, "account"),
         body: Padding(
-          padding: EdgeInsets.only(top: 100.0, left: 16.0, right: 16),
+          padding: EdgeInsets.only(top: 16.0, left: 16.0, right: 16),
           child: SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      AppLocalizations.of(context).translate('account'),
-                      style: kPageTitleStyle.copyWith(height: 1),
-                    ),
-                  ],
-                ),
-                SizedBox(
-                  height: 24,
-                ),
                 UserProfileCard(),
                 SizedBox(
                   height: 32,
