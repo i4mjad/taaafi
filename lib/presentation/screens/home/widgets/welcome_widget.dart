@@ -1,4 +1,9 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:reboot_app_3/bloc_provider.dart';
+import 'package:reboot_app_3/presentation/blocs/follow_your_reboot_bloc.dart';
+import 'package:reboot_app_3/shared/constants/constants.dart';
 import 'package:reboot_app_3/shared/constants/textstyles_constants.dart';
 import 'package:reboot_app_3/shared/localization/localization.dart';
 
@@ -9,6 +14,66 @@ class WelcomeWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final User firebaseUser = context.watch<User>();
+    if (firebaseUser == null) {
+      return NotSignIn();
+    }
+    return CustomBlocProvider(
+        bloc: FollowYourRebootBloc(), child: WelcomeContent());
+  }
+}
+
+class NotSignIn extends StatelessWidget {
+  const NotSignIn({Key key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          AppLocalizations.of(context).translate('welcome'),
+          style: kSubTitlesStyle,
+        ),
+        SizedBox(
+          height: 8,
+        ),
+        Container(
+          height: 150,
+          padding: EdgeInsets.all(16),
+          width: MediaQuery.of(context).size.width - 40,
+          decoration: BoxDecoration(
+              color: Colors.white,
+              border: Border.all(
+                color: Colors.black,
+                width: 0.25,
+              ),
+              borderRadius: BorderRadius.circular(12.5)),
+          child: Center(
+            child: Text(
+              AppLocalizations.of(context).translate('not-login'),
+              textAlign: TextAlign.center,
+              style: kSubTitlesStyle.copyWith(
+                  color: primaryColor,
+                  fontWeight: FontWeight.w500,
+                  height: 1.5,
+                  fontSize: 16),
+            ),
+          ),
+        )
+      ],
+    );
+  }
+}
+
+class WelcomeContent extends StatelessWidget {
+  const WelcomeContent({
+    Key key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final bloc = CustomBlocProvider.of<FollowYourRebootBloc>(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -33,13 +98,18 @@ class WelcomeWidget extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  //TODO - add bloc here
-                  Text(
-                    "24",
-                    style: kPageTitleStyle.copyWith(
-                      color: Colors.green,
-                      fontSize: 35,
-                    ),
+                  FutureBuilder(
+                    future: bloc.getRelapseStreak(),
+                    initialData: 0,
+                    builder: (BuildContext context, AsyncSnapshot<int> streak) {
+                      return Text(
+                        streak.data.toString(),
+                        style: kPageTitleStyle.copyWith(
+                          color: Colors.green,
+                          fontSize: 35,
+                        ),
+                      );
+                    },
                   ),
                   Text(
                     AppLocalizations.of(context).translate('free-relapse-days'),
@@ -64,9 +134,18 @@ class WelcomeWidget extends StatelessWidget {
                       border: Border.all(width: 0.25, color: Colors.brown)),
                   child: Center(
                     //TODO - add bloc here
-                    child: Text(
-                      "عدد الانتكاسات في ال30 يوم الماضية: " + "0",
-                      style: kSubTitlesStyle.copyWith(fontSize: 12),
+
+                    child: FutureBuilder(
+                      future: bloc.getRelapsesCountInLast30Days(),
+                      initialData: "0",
+                      builder:
+                          (BuildContext context, AsyncSnapshot<String> sh) {
+                        return Text(
+                          //TODO - Add translations here
+                          "عدد الانتكاسات في ال30 يوم الماضية: " + sh.data,
+                          style: kSubTitlesStyle.copyWith(fontSize: 13),
+                        );
+                      },
                     ),
                   ),
                 ),
@@ -83,9 +162,18 @@ class WelcomeWidget extends StatelessWidget {
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Center(
-                    child: Text(
-                      "عدد الأيام بدون إباحية منذ البداية: " + "0",
-                      style: kSubTitlesStyle.copyWith(fontSize: 12),
+                    child: FutureBuilder(
+                      future: bloc.getTotalDaysWithoutRelapse(),
+                      initialData: "0",
+                      builder:
+                          (BuildContext context, AsyncSnapshot<String> sh) {
+                        return Text(
+                          //TODO - Add translations here
+                          "عدد الأيام بدون إباحية منذ البداية: " + sh.data,
+                          style: kSubTitlesStyle.copyWith(
+                              color: Colors.blue[900], fontSize: 13),
+                        );
+                      },
                     ),
                   ),
                 ),

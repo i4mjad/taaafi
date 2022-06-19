@@ -73,16 +73,20 @@ class FollowYourRebootBloc implements CustomBlocBase {
     return await db.getTotalDaysFromBegining();
   }
 
-  @override
-  void dispose() async {
-    return _firestoreController.close();
-  }
-
   Future<String> getRelapsesCount() async {
     return await db.getRelapsesCount();
   }
 
   Future<void> createNewData(DateTime selectedDate) async {
     return await db.createNewData(selectedDate);
+  }
+
+  Future<String> getRelapsesCountInLast30Days() async {
+    return await db.getRelapsesCountInLast30Days();
+  }
+
+  @override
+  void dispose() async {
+    return _firestoreController.close();
   }
 }

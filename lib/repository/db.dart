@@ -414,6 +414,33 @@ class DB {
       }
     });
   }
+
+  Future<String> getRelapsesCountInLast30Days() async {
+    int _count = 0;
+    FollowUpData _followUpDate = await getFollowUpData();
+    List relapses = _followUpDate.relapses;
+    DateTime today = DateTime.now();
+    DateTime _dateBefore30Days = DateTime.now().subtract(Duration(days: 28));
+
+    List<String> _last30Days() {
+      List<String> days = [];
+
+      for (int i = 0; i <= today.difference(_dateBefore30Days).inDays; i++) {
+        DateTime d = _dateBefore30Days.add(Duration(days: i));
+        days.add(
+            new DateTime(d.year, d.month, d.day).toString().substring(0, 10));
+      }
+      return days;
+    }
+
+    for (var date in relapses) {
+      if (_last30Days().contains(date.toString().substring(0, 10))) {
+        print(date);
+        _count += 1;
+      }
+    }
+    return await _count.toString();
+  }
 }
 
 DB db = DB();

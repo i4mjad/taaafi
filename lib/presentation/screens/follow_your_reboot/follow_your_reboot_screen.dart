@@ -192,6 +192,7 @@ class FollowYourRebootScreenState extends State<FollowYourRebootScreen>
                         width: 8,
                       ),
                       Text(
+                        //TODO - add notes translations
                         "مذكرات التعافي",
                         style: kSubTitlesStyle.copyWith(
                           color: primaryColor,
