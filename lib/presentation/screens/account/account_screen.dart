@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:reboot_app_3/presentation/screens/account/delete_account.dart';
 import 'package:reboot_app_3/shared/components/custom-app-bar.dart';
@@ -66,6 +67,7 @@ class _AccountScreenState extends State<AccountScreen>
                       padding: EdgeInsets.only(top: 8, bottom: 4),
                       child: GestureDetector(
                         onTap: () {
+                          HapticFeedback.mediumImpact();
                           NotificationService.scheduleDailyNotification(
                               context);
                         },
@@ -96,6 +98,7 @@ class _AccountScreenState extends State<AccountScreen>
                     Divider(),
                     GestureDetector(
                       onTap: () {
+                        HapticFeedback.mediumImpact();
                         ChangeLanguageWidget.changeLanguage(context);
                       },
                       child: Padding(
@@ -125,43 +128,44 @@ class _AccountScreenState extends State<AccountScreen>
                       ),
                     ),
                     Divider(),
+                    // Padding(
+                    //   padding: EdgeInsets.only(top: 4, bottom: 8),
+                    //   child: GestureDetector(
+                    //     onTap: () {
+                    //       //TODO -  Implement edit user profile
+                    //     },
+                    //     child: Row(
+                    //       mainAxisAlignment: MainAxisAlignment.start,
+                    //       children: [
+                    //         Padding(
+                    //           padding: EdgeInsets.only(left: 12, right: 12),
+                    //           child: Icon(
+                    //             Iconsax.user_edit,
+                    //             size: 26,
+                    //             color: primaryColor,
+                    //           ),
+                    //         ),
+                    //         Column(
+                    //           crossAxisAlignment: CrossAxisAlignment.center,
+                    //           mainAxisAlignment: MainAxisAlignment.center,
+                    //           children: <Widget>[
+                    //             Text(
+                    //                 AppLocalizations.of(context)
+                    //                     .translate('personal-details'),
+                    //                 style:
+                    //                     kSubTitlesStyle.copyWith(fontSize: 17)),
+                    //           ],
+                    //         )
+                    //       ],
+                    //     ),
+                    //   ),
+                    // ),
+                    // Divider(),
                     Padding(
                       padding: EdgeInsets.only(top: 4, bottom: 8),
                       child: GestureDetector(
                         onTap: () {
-                          //TODO -  Implement edit user profile
-                        },
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Padding(
-                              padding: EdgeInsets.only(left: 12, right: 12),
-                              child: Icon(
-                                Iconsax.user_edit,
-                                size: 26,
-                                color: primaryColor,
-                              ),
-                            ),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: <Widget>[
-                                Text(
-                                    AppLocalizations.of(context)
-                                        .translate('personal-details'),
-                                    style:
-                                        kSubTitlesStyle.copyWith(fontSize: 17)),
-                              ],
-                            )
-                          ],
-                        ),
-                      ),
-                    ),
-                    Divider(),
-                    Padding(
-                      padding: EdgeInsets.only(top: 4, bottom: 8),
-                      child: GestureDetector(
-                        onTap: () {
+                          HapticFeedback.mediumImpact();
                           resetUserDialog(context, bloc);
                         },
                         child: Row(
@@ -195,6 +199,7 @@ class _AccountScreenState extends State<AccountScreen>
                       padding: EdgeInsets.only(top: 4, bottom: 4),
                       child: GestureDetector(
                         onTap: () {
+                          HapticFeedback.mediumImpact();
                           context.read<GoogleAuthenticationService>().signOut();
                         },
                         child: Row(
@@ -228,6 +233,7 @@ class _AccountScreenState extends State<AccountScreen>
                       padding: EdgeInsets.only(top: 4.0, bottom: 4),
                       child: GestureDetector(
                         onTap: () {
+                          HapticFeedback.heavyImpact();
                           DeleteAccountSheet.openDeleteAccountMessage(context);
                         },
                         child: Row(

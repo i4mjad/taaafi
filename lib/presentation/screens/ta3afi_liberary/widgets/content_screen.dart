@@ -1,6 +1,7 @@
 import 'dart:core';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:iconsax/iconsax.dart';
 import 'dart:convert' show utf8;
 import 'package:chips_choice/chips_choice.dart';
@@ -107,25 +108,13 @@ class _ContentScreenState extends State<ContentScreen> {
       appBar: appBarWithSettings(context, "nofap-content"),
       body: Padding(
         padding: EdgeInsets.only(
-          top: 40.0,
+
           left: 20.0,
           right: 20,
         ),
         child: Column(
           children: [
-            GestureDetector(
-              onTap: () {
-                Navigator.pop(context,
-                    MaterialPageRoute(builder: (context) => BottomNavBar()));
-              },
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [],
-              ),
-            ),
-            SizedBox(
-              height: 12,
-            ),
+
             Row(
               children: [
                 Container(
@@ -135,7 +124,7 @@ class _ContentScreenState extends State<ContentScreen> {
                     border: Border.all(
                         color: primaryColor.withOpacity(0.3), width: 0.5),
                     borderRadius: BorderRadius.all(Radius.circular(10.5)),
-                    color: mainGrayColor.withOpacity(0.5),
+                    color: Colors.white,
                   ),
                   child: TextField(
                     controller: searchTextEditor,
@@ -145,7 +134,7 @@ class _ContentScreenState extends State<ContentScreen> {
                     decoration: InputDecoration(
                       prefixIcon: Icon(
                         CupertinoIcons.search,
-                        color: Colors.grey.withOpacity(0.8),
+                        color: Colors.black.withOpacity(0.5),
                         size: 20,
                       ),
                       border: InputBorder.none,
@@ -153,7 +142,7 @@ class _ContentScreenState extends State<ContentScreen> {
                           AppLocalizations.of(context).translate('search'),
                       hintStyle: kSubTitlesSubsStyle.copyWith(
                           fontSize: 14,
-                          color: Colors.grey.withOpacity(0.8),
+                          color: Colors.black.withOpacity(0.8),
                           height: 1.75),
                       contentPadding: EdgeInsets.only(left: 12, right: 12),
                     ),
@@ -168,7 +157,10 @@ class _ContentScreenState extends State<ContentScreen> {
               height: 12,
             ),
             GestureDetector(
-              onTap: () => _showFilters(),
+              onTap: () {
+                HapticFeedback.mediumImpact();
+                _showFilters();
+              },
               child: Container(
                 width: MediaQuery.of(context).size.width - 40,
                 height: MediaQuery.of(context).size.height * 0.045,
@@ -296,6 +288,7 @@ class _ContentScreenState extends State<ContentScreen> {
                             ),
                             GestureDetector(
                               onTap: () {
+                                HapticFeedback.mediumImpact();
                                 Navigator.pop(context);
                               },
                               child: Icon(
@@ -461,6 +454,7 @@ class _ContentScreenState extends State<ContentScreen> {
                           children: [
                             GestureDetector(
                               onTap: () {
+                                HapticFeedback.mediumImpact();
                                 filtersService();
                                 Navigator.pop(context);
                               },

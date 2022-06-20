@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:reboot_app_3/shared/constants/constants.dart';
 import 'package:reboot_app_3/shared/constants/textstyles_constants.dart';
@@ -84,7 +85,10 @@ class _AboutScreenState extends State<AboutScreen>
                     ),
                     Container(
                       child: InkWell(
-                        onTap: () => launchUrl(Uri.parse('https://t.me/i4mjad')),
+                        onTap: () {
+                          HapticFeedback.heavyImpact();
+                        launchUrl(Uri.parse('https://t.me/i4mjad'));
+                        },
                         child: Container(
                           width: (MediaQuery.of(context).size.width / 1.5),
                           height: 60,

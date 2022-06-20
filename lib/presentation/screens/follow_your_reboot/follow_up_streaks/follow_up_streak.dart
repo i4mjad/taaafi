@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:reboot_app_3/bloc_provider.dart';
 import 'package:reboot_app_3/presentation/blocs/follow_your_reboot_bloc.dart';
@@ -164,6 +165,7 @@ class FollowUpStreaks extends StatelessWidget {
                 children: [
                   GestureDetector(
                     onTap: () {
+                      HapticFeedback.mediumImpact();
                       changeDateEvent(getTodaysDateString(), context, bloc);
                     },
                     child: Container(

@@ -175,7 +175,7 @@ class FollowYourRebootScreenState extends State<FollowYourRebootScreen>
                 child: Container(
                   width: MediaQuery.of(context).size.width,
                   height: 75,
-                  padding: EdgeInsets.all(8),
+                  padding: EdgeInsets.all(16),
                   margin: EdgeInsets.only(right: 16, left: 16),
                   decoration: BoxDecoration(
                       color: Colors.white,
@@ -193,7 +193,7 @@ class FollowYourRebootScreenState extends State<FollowYourRebootScreen>
                       ),
                       Text(
                         //TODO - add notes translations
-                        "مذكرات التعافي",
+                        AppLocalizations.of(context).translate('dairies'),
                         style: kSubTitlesStyle.copyWith(
                           color: primaryColor,
                         ),
