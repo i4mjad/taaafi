@@ -10,6 +10,7 @@ import 'package:reboot_app_3/presentation/screens/auth/login_screen.dart';
 import 'package:reboot_app_3/presentation/blocs/follow_your_reboot_bloc.dart';
 import 'package:reboot_app_3/presentation/screens/follow_your_reboot/follow_up_streaks/follow_up_streak.dart';
 import 'package:reboot_app_3/presentation/screens/follow_your_reboot/widgets/new_user_widgets.dart';
+import 'package:reboot_app_3/shared/Components/snackbar.dart';
 import 'package:reboot_app_3/shared/components/custom-app-bar.dart';
 import 'package:reboot_app_3/shared/constants/constants.dart';
 import 'package:reboot_app_3/shared/constants/textstyles_constants.dart';
@@ -413,6 +414,7 @@ class FollowYourRebootScreenState extends State<FollowYourRebootScreen>
                       onTap: () {
                         bloc.addRelapse(date);
                         Navigator.pop(context);
+                        getSnackBar(context, "relapse-recorded");
                       },
                       child: Container(
                         width: MediaQuery.of(context).size.width / 2.5,
@@ -436,8 +438,8 @@ class FollowYourRebootScreenState extends State<FollowYourRebootScreen>
                     GestureDetector(
                       onTap: () {
                         bloc.addSuccess(date);
-
                         Navigator.pop(context);
+                        getSnackBar(context, "free-day-recorded");
                       },
                       child: Container(
                         width: MediaQuery.of(context).size.width / 2.5,
@@ -469,8 +471,8 @@ class FollowYourRebootScreenState extends State<FollowYourRebootScreen>
                     GestureDetector(
                       onTap: () {
                         bloc.addWatchOnly(date);
-
                         Navigator.pop(context);
+                        getSnackBar(context, "pornonly-recorded");
                       },
                       child: Container(
                         width: MediaQuery.of(context).size.width / 2.5,
@@ -495,8 +497,8 @@ class FollowYourRebootScreenState extends State<FollowYourRebootScreen>
                     GestureDetector(
                       onTap: () {
                         bloc.addMastOnly(date);
-
                         Navigator.pop(context);
+                        getSnackBar(context, "mastonly-recorded");
                       },
                       child: Container(
                         width: MediaQuery.of(context).size.width / 2.5,

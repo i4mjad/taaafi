@@ -62,6 +62,7 @@
   "about-ta3afi": "Spreading awareness about the consequences of porn & masturbation addiction by providing helpful resources and tools to overcome the addiction.",
   "version-number-ios": "v4.1",
   "version-number-android": "v2.1",
+  "dismiss" : "Dismiss",
   "contact-us-through-this-channels": "Contact Developer",
   "support-app-development": "Support Development",
   "support-app-development-p": "The development of the app takes a lot of time and effort and all of its features are free. To support the app chose among these list",
@@ -201,7 +202,9 @@
   "support-p": "Available on Telegram only",
 
   "fyr": "Journey",
-  "personal-details": "Personal Details"
-
-
+  "personal-details": "Personal Details",
+  "free-day-recorded": "Success Day, Good Job!",
+  "relapse-recorded":"Relapses recorded, keep fighting",
+  "pornonly-recorded":"Porn watching recorded, keep fighting",
+  "mastonly-recorded":"Masturbation recorded, keep fighting"
 }

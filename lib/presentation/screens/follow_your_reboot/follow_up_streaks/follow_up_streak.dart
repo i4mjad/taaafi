@@ -4,6 +4,7 @@ import 'package:iconsax/iconsax.dart';
 import 'package:reboot_app_3/bloc_provider.dart';
 import 'package:reboot_app_3/presentation/blocs/follow_your_reboot_bloc.dart';
 import 'package:reboot_app_3/presentation/screens/follow_your_reboot/follow_your_reboot_widgets.dart';
+import 'package:reboot_app_3/shared/Components/snackbar.dart';
 import 'package:reboot_app_3/shared/constants/constants.dart';
 import 'package:reboot_app_3/shared/constants/textstyles_constants.dart';
 import 'package:reboot_app_3/shared/localization/localization.dart';
@@ -278,34 +279,8 @@ class FollowUpStreaks extends StatelessWidget {
                     GestureDetector(
                       onTap: () {
                         bloc.addRelapse(date);
-                        // setState(() {
-                        //   if (!userRelapses.contains(trimedDate)) {
-                        //     //
-                        //     userRelapses.add(trimedDate);
-                        //     database.collection("users").doc(user.uid).update({
-                        //       "userRelapses": userRelapses,
-                        //     });
-                        //   }
-
-                        //   if (!userMasturbatingWithoutWatching
-                        //       .contains(trimedDate)) {
-                        //     userMasturbatingWithoutWatching.add(trimedDate);
-                        //     database.collection("users").doc(user.uid).update({
-                        //       "userMasturbatingWithoutWatching":
-                        //           userMasturbatingWithoutWatching,
-                        //     });
-                        //   }
-
-                        //   if (!userWatchingWithoutMasturbating
-                        //       .contains(trimedDate)) {
-                        //     userWatchingWithoutMasturbating.add(trimedDate);
-                        //     database.collection("users").doc(user.uid).update({
-                        //       "userWatchingWithoutMasturbating":
-                        //           userWatchingWithoutMasturbating,
-                        //     });
-                        //   }
-                        // });
                         Navigator.pop(context);
+                        getSnackBar(context, "relapse-recorded");
                       },
                       child: Container(
                         width: MediaQuery.of(context).size.width / 2.5,
@@ -329,44 +304,9 @@ class FollowUpStreaks extends StatelessWidget {
                     GestureDetector(
                       onTap: () {
                         bloc.addSuccess(date);
-                        // setState(() {
-                        //   userWatchingWithoutMasturbating.remove(trimedDate);
-                        //   userMasturbatingWithoutWatching.remove(trimedDate);
-                        //   userRelapses.remove(trimedDate);
-                        // });
-
-                        // final userData =
-                        //     database.collection("users").doc(user.uid);
-
-                        // userData.update({
-                        //   "userRelapses": userRelapses,
-                        //   "userWatchingWithoutMasturbating":
-                        //       userWatchingWithoutMasturbating,
-                        //   "userMasturbatingWithoutWatching":
-                        //       userMasturbatingWithoutWatching
-                        // });
-
-                        // if (userRelapses.length == 0) {
-                        //   userData
-                        //       .update({"userRelapses": FieldValue.delete()});
-                        // }
-
-                        // if (userWatchingWithoutMasturbating.length == 0) {
-                        //   userData.update({
-                        //     "userWatchingWithoutMasturbating":
-                        //         FieldValue.delete()
-                        //   });
-                        // }
-
-                        // if (userMasturbatingWithoutWatching.length == 0) {
-                        //   userData.update({
-                        //     "userMasturbatingWithoutWatching":
-                        //         FieldValue.delete()
-                        //   });
-                        // }
-
                         Navigator.pop(context);
-                        //
+                        getSnackBar(context, "free-day-recorded");
+
                       },
                       child: Container(
                         width: MediaQuery.of(context).size.width / 2.5,
@@ -398,14 +338,8 @@ class FollowUpStreaks extends StatelessWidget {
                     GestureDetector(
                       onTap: () {
                         bloc.addWatchOnly(date);
-                        // setState(() {
-                        //   userWatchingWithoutMasturbating.add(trimedDate);
-                        //   database.collection("users").doc(user.uid).update({
-                        //     "userWatchingWithoutMasturbating":
-                        //         userWatchingWithoutMasturbating
-                        //   });
-                        // });
                         Navigator.pop(context);
+                        getSnackBar(context, "pornonly-recorded");
                       },
                       child: Container(
                         width: MediaQuery.of(context).size.width / 2.5,
@@ -430,14 +364,8 @@ class FollowUpStreaks extends StatelessWidget {
                     GestureDetector(
                       onTap: () {
                         bloc.addMastOnly(date);
-                        // setState(() {
-                        //   userMasturbatingWithoutWatching.add(trimedDate);
-                        //   database.collection("users").doc(user.uid).update({
-                        //     "userMasturbatingWithoutWatching":
-                        //         userMasturbatingWithoutWatching
-                        //   });
-                        // });
                         Navigator.pop(context);
+                        getSnackBar(context, "mastonly-recorded");
                       },
                       child: Container(
                         width: MediaQuery.of(context).size.width / 2.5,
@@ -469,3 +397,4 @@ class FollowUpStreaks extends StatelessWidget {
         });
   }
 }
+
