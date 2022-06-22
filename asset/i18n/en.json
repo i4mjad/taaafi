@@ -22,6 +22,9 @@
   "Videos": "Videos",
   "Books": "Books",
   "Blogs": "Blogs",
+  "relapses-30-days":"Relapses in the last 30 days: ",
+  "free-days-from-start":"Success days from the beggining: ",
+
 
   "delete": "حذف",
   "save": "حفظ",

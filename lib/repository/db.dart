@@ -416,6 +416,7 @@ class DB {
   }
 
   Future<String> getRelapsesCountInLast30Days() async {
+    await checkData();
     int _count = 0;
     FollowUpData _followUpDate = await getFollowUpData();
     List relapses = _followUpDate.relapses;

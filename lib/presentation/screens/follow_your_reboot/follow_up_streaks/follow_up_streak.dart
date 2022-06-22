@@ -40,6 +40,13 @@ class FollowUpStreaks extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Container(
+                        width: MediaQuery.of(context).size.width * 0.27,
+                        height: 150,
+                        decoration: BoxDecoration(
+                            color: Colors.green[50],
+                            border:
+                                Border.all(width: 0.25, color: Colors.green),
+                            borderRadius: BorderRadius.circular(15)),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -52,7 +59,7 @@ class FollowUpStreaks extends StatelessWidget {
                                 return Text(
                                   streak.data.toString(),
                                   style: kPageTitleStyle.copyWith(
-                                    color: Colors.red,
+                                    color: Colors.green,
                                     fontSize: 35,
                                   ),
                                 );
@@ -62,7 +69,7 @@ class FollowUpStreaks extends StatelessWidget {
                               AppLocalizations.of(context)
                                   .translate('free-relapse-days'),
                               style: kSubTitlesStyle.copyWith(
-                                fontSize: 16,
+                                fontSize: 14,
                               ),
                               textAlign: TextAlign.center,
                             ),
@@ -79,37 +86,35 @@ class FollowUpStreaks extends StatelessWidget {
                   width: MediaQuery.of(context).size.width * 0.27,
                   height: 150,
                   decoration: BoxDecoration(
-                      color: Colors.orangeAccent.withOpacity(0.2),
-                      borderRadius: BorderRadius.circular(15)),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            FutureBuilder(
-                                future: bloc.getNoMastsStreak(),
-                                initialData: 0,
-                                builder: (BuildContext context,
-                                    AsyncSnapshot<int> snapshot) {
-                                  return Text(snapshot.data.toString(),
-                                      style: kPageTitleStyle.copyWith(
-                                          color: Colors.orangeAccent));
-                                }),
-                            Text(
-                              AppLocalizations.of(context)
-                                  .translate('free-mast-days'),
-                              style: kSubTitlesStyle.copyWith(
-                                fontSize: 16,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                          ],
+                      color: Colors.orange[50],
+                      borderRadius: BorderRadius.circular(15),
+                      border: Border.all(color: Colors.orange, width: 0.25)),
+                  child: Container(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        FutureBuilder(
+                            future: bloc.getNoMastsStreak(),
+                            initialData: 0,
+                            builder: (BuildContext context,
+                                AsyncSnapshot<int> snapshot) {
+                              return Text(
+                                snapshot.data.toString(),
+                                style: kPageTitleStyle.copyWith(
+                                    color: Colors.orangeAccent, fontSize: 35),
+                              );
+                            }),
+                        Text(
+                          AppLocalizations.of(context)
+                              .translate('free-mast-days'),
+                          style: kSubTitlesStyle.copyWith(
+                            fontSize: 14,
+                          ),
+                          textAlign: TextAlign.center,
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
                 SizedBox(
@@ -119,37 +124,34 @@ class FollowUpStreaks extends StatelessWidget {
                   width: MediaQuery.of(context).size.width * 0.27,
                   height: 150,
                   decoration: BoxDecoration(
-                      color: Colors.purple.withOpacity(0.2),
-                      borderRadius: BorderRadius.circular(15)),
+                    color: Colors.purple[50],
+                    border: Border.all(color: Colors.purple, width: 0.25),
+                    borderRadius: BorderRadius.circular(15),
+                  ),
                   child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      Container(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            FutureBuilder(
-                                future: bloc.getNoPornStreak(),
-                                initialData: 0,
-                                builder: (BuildContext context,
-                                    AsyncSnapshot<int> snapshot) {
-                                  return Text(
-                                    snapshot.data.toString(),
-                                    style: kPageTitleStyle.copyWith(
-                                        color: Colors.purple),
-                                  );
-                                }),
-                            Text(
-                              AppLocalizations.of(context)
-                                  .translate('free-porn-days'),
-                              style: kSubTitlesStyle.copyWith(
-                                fontSize: 16,
+                      FutureBuilder(
+                          future: bloc.getNoPornStreak(),
+                          initialData: 0,
+                          builder: (BuildContext context,
+                              AsyncSnapshot<int> snapshot) {
+                            return Text(
+                              snapshot.data.toString(),
+                              style: kPageTitleStyle.copyWith(
+                                color: Colors.purple,
+                                fontSize: 35,
                               ),
-                              textAlign: TextAlign.center,
-                            ),
-                          ],
+                            );
+                          }),
+                      Text(
+                        AppLocalizations.of(context)
+                            .translate('free-porn-days'),
+                        style: kSubTitlesStyle.copyWith(
+                          fontSize: 14,
                         ),
+                        textAlign: TextAlign.center,
                       ),
                     ],
                   ),
@@ -306,7 +308,6 @@ class FollowUpStreaks extends StatelessWidget {
                         bloc.addSuccess(date);
                         Navigator.pop(context);
                         getSnackBar(context, "free-day-recorded");
-
                       },
                       child: Container(
                         width: MediaQuery.of(context).size.width / 2.5,
@@ -397,4 +398,3 @@ class FollowUpStreaks extends StatelessWidget {
         });
   }
 }
-

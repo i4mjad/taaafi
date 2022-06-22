@@ -92,7 +92,10 @@ class WelcomeContent extends StatelessWidget {
               height: 150,
               decoration: BoxDecoration(
                   color: Colors.green[50],
-                  border: Border.all(width: 0.25, color: Colors.green),
+                  border: Border.all(
+                    width: 0.25,
+                    color: Colors.green,
+                  ),
                   borderRadius: BorderRadius.circular(15)),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -133,16 +136,15 @@ class WelcomeContent extends StatelessWidget {
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(width: 0.25, color: Colors.brown)),
                   child: Center(
-                    //TODO - add bloc here
-
                     child: FutureBuilder(
                       future: bloc.getRelapsesCountInLast30Days(),
                       initialData: "0",
                       builder:
                           (BuildContext context, AsyncSnapshot<String> sh) {
                         return Text(
-                          //TODO - Add translations here
-                          "عدد الانتكاسات في ال30 يوم الماضية: " + sh.data,
+                          AppLocalizations.of(context)
+                                  .translate("relapses-30-days") +
+                              sh.data,
                           style: kSubTitlesStyle.copyWith(fontSize: 13),
                         );
                       },
@@ -168,8 +170,9 @@ class WelcomeContent extends StatelessWidget {
                       builder:
                           (BuildContext context, AsyncSnapshot<String> sh) {
                         return Text(
-                          //TODO - Add translations here
-                          "عدد الأيام بدون إباحية منذ البداية: " + sh.data,
+                          AppLocalizations.of(context)
+                                  .translate('free-days-from-start') +
+                              sh.data,
                           style: kSubTitlesStyle.copyWith(
                               color: Colors.blue[900], fontSize: 13),
                         );

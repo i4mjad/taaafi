@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:reboot_app_3/presentation/screens/follow_your_reboot/notes/add_note_screen.dart';
 import 'package:reboot_app_3/shared/components/change_locale_bottomsheet.dart';
@@ -21,6 +22,7 @@ AppBar appBarWithSettings(BuildContext context, String titleId) {
     actions: [
       GestureDetector(
         onTap: () {
+          HapticFeedback.lightImpact();
           ChangeLanguageWidget.changeLanguage(context);
         },
         child: Container(

@@ -86,8 +86,8 @@ class _AboutScreenState extends State<AboutScreen>
                     Container(
                       child: InkWell(
                         onTap: () {
-                          HapticFeedback.heavyImpact();
-                        launchUrl(Uri.parse('https://t.me/i4mjad'));
+                          HapticFeedback.mediumImpact();
+                          launchUrl(Uri.parse('https://t.me/i4mjad'));
                         },
                         child: Container(
                           width: (MediaQuery.of(context).size.width / 1.5),

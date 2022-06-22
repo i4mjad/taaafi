@@ -1,6 +1,7 @@
 import 'dart:core';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:reboot_app_3/data/models/CalenderDay.dart';
@@ -175,12 +176,12 @@ class FollowYourRebootScreenState extends State<FollowYourRebootScreen>
                 },
                 child: Container(
                   width: MediaQuery.of(context).size.width,
-                  height: 75,
+                  height: 60,
                   padding: EdgeInsets.all(16),
                   margin: EdgeInsets.only(right: 16, left: 16),
                   decoration: BoxDecoration(
                       color: Colors.white,
-                      border: Border.all(color: Colors.black, width: 0.25),
+                      border: Border.all(color: primaryColor, width: 0.25),
                       borderRadius: BorderRadius.circular(12.5)),
                   child: Row(
                     children: [
@@ -193,10 +194,11 @@ class FollowYourRebootScreenState extends State<FollowYourRebootScreen>
                         width: 8,
                       ),
                       Text(
-                        //TODO - add notes translations
                         AppLocalizations.of(context).translate('dairies'),
                         style: kSubTitlesStyle.copyWith(
                           color: primaryColor,
+                          fontWeight: FontWeight.w500,
+                          height: 1,
                         ),
                       )
                     ],
@@ -413,8 +415,9 @@ class FollowYourRebootScreenState extends State<FollowYourRebootScreen>
                     GestureDetector(
                       onTap: () {
                         bloc.addRelapse(date);
-                        Navigator.pop(context);
+                        HapticFeedback.mediumImpact();
                         getSnackBar(context, "relapse-recorded");
+                        Navigator.pop(context);
                       },
                       child: Container(
                         width: MediaQuery.of(context).size.width / 2.5,
@@ -438,6 +441,7 @@ class FollowYourRebootScreenState extends State<FollowYourRebootScreen>
                     GestureDetector(
                       onTap: () {
                         bloc.addSuccess(date);
+                        HapticFeedback.mediumImpact();
                         Navigator.pop(context);
                         getSnackBar(context, "free-day-recorded");
                       },
@@ -471,8 +475,9 @@ class FollowYourRebootScreenState extends State<FollowYourRebootScreen>
                     GestureDetector(
                       onTap: () {
                         bloc.addWatchOnly(date);
-                        Navigator.pop(context);
+                        HapticFeedback.mediumImpact();
                         getSnackBar(context, "pornonly-recorded");
+                        Navigator.pop(context);
                       },
                       child: Container(
                         width: MediaQuery.of(context).size.width / 2.5,
@@ -497,8 +502,9 @@ class FollowYourRebootScreenState extends State<FollowYourRebootScreen>
                     GestureDetector(
                       onTap: () {
                         bloc.addMastOnly(date);
-                        Navigator.pop(context);
+                        HapticFeedback.mediumImpact();
                         getSnackBar(context, "mastonly-recorded");
+                        Navigator.pop(context);
                       },
                       child: Container(
                         width: MediaQuery.of(context).size.width / 2.5,
@@ -541,6 +547,7 @@ class FollowYourRebootScreenState extends State<FollowYourRebootScreen>
   }
 
   void outOfRangeAlert(BuildContext context) {
+    HapticFeedback.mediumImpact();
     showModalBottomSheet(
         context: context,
         builder: (context) {
@@ -705,7 +712,7 @@ class GeneralStats extends StatelessWidget {
                         AppLocalizations.of(context)
                             .translate('relapses-count'),
                         style: kSubTitlesStyle.copyWith(
-                            fontSize: 16, color: Colors.blue, height: 1),
+                            fontSize: 14, color: Colors.blue, height: 1),
                       ),
                     ),
                   ],
