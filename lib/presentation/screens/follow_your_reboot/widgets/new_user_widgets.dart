@@ -30,11 +30,11 @@ void newUserDialog(BuildContext context, FollowYourRebootBloc bloc) {
                 padding: EdgeInsets.all(8),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(100),
-                  color: primaryColor.withOpacity(0.1),
+                  color: lightPrimaryColor.withOpacity(0.1),
                 ),
                 child: Icon(
                   Iconsax.calendar_tick,
-                  color: primaryColor,
+                  color: lightPrimaryColor,
                   size: 32,
                 ),
               ),
@@ -44,7 +44,7 @@ void newUserDialog(BuildContext context, FollowYourRebootBloc bloc) {
               Text(
                 AppLocalizations.of(context).translate('start-your-journy'),
                 style: kHeadlineStyle.copyWith(
-                    fontWeight: FontWeight.bold, color: primaryColor),
+                    fontWeight: FontWeight.bold, color: lightPrimaryColor),
               ),
               SizedBox(
                 height: 8,
@@ -123,7 +123,7 @@ Future<DateTime> getDateTime(BuildContext context) async {
     fontFamily: 'DINNextLTArabic',
     height: MediaQuery.of(context).size.height / 2.5,
     theme: ThemeData(
-      primaryColor: primaryColor,
+      primaryColor: lightPrimaryColor,
     ),
   );
 }

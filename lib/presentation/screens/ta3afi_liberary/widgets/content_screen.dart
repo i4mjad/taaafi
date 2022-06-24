@@ -119,7 +119,7 @@ class _ContentScreenState extends State<ContentScreen> {
                   height: 40,
                   decoration: BoxDecoration(
                     border: Border.all(
-                        color: primaryColor.withOpacity(0.3), width: 0.5),
+                        color: lightPrimaryColor.withOpacity(0.3), width: 0.5),
                     borderRadius: BorderRadius.all(Radius.circular(10.5)),
                     color: Colors.white,
                   ),
@@ -169,7 +169,7 @@ class _ContentScreenState extends State<ContentScreen> {
                             selectedSubTypesList.length > 0 ||
                             selectedLanuguagesList.length > 0)
                         ? Colors.green
-                        : primaryColor.withOpacity(0.3),
+                        : lightPrimaryColor.withOpacity(0.3),
                     width: (selectedSubTypesList.length > 0 ||
                             selectedSubTypesList.length > 0 ||
                             selectedLanuguagesList.length > 0)
@@ -183,7 +183,8 @@ class _ContentScreenState extends State<ContentScreen> {
                   children: [
                     Row(
                       children: [
-                        Icon(Iconsax.document, size: 16, color: primaryColor),
+                        Icon(Iconsax.document,
+                            size: 16, color: lightPrimaryColor),
                         SizedBox(width: 8),
                         Text(
                             AppLocalizations.of(context)
@@ -210,7 +211,7 @@ class _ContentScreenState extends State<ContentScreen> {
                           child: Text(
                             AppLocalizations.of(context).translate("loading"),
                             style: kSubTitlesStyle.copyWith(
-                                color: primaryColor, fontSize: 18),
+                                color: lightPrimaryColor, fontSize: 18),
                           ),
                         ),
                       ],
@@ -320,10 +321,10 @@ class _ContentScreenState extends State<ContentScreen> {
                                       labelStyle: kSubTitlesStyle.copyWith(
                                           fontSize: 10.5,
                                           height: 1,
-                                          color: primaryColor,
+                                          color: lightPrimaryColor,
                                           fontWeight: FontWeight.w400),
-                                      borderColor: primaryColor,
-                                      color: primaryColor),
+                                      borderColor: lightPrimaryColor,
+                                      color: lightPrimaryColor),
                                   choiceActiveStyle: C2ChoiceStyle(),
                                   onChanged: (val) {
                                     modalSetState(
@@ -366,10 +367,10 @@ class _ContentScreenState extends State<ContentScreen> {
                                       labelStyle: kSubTitlesStyle.copyWith(
                                           fontSize: 10.5,
                                           height: 1,
-                                          color: primaryColor,
+                                          color: lightPrimaryColor,
                                           fontWeight: FontWeight.w400),
-                                      borderColor: primaryColor,
-                                      color: primaryColor),
+                                      borderColor: lightPrimaryColor,
+                                      color: lightPrimaryColor),
                                   padding: EdgeInsets.all(0),
                                   value: selectedTypesList,
                                   onChanged: (val) {
@@ -414,10 +415,10 @@ class _ContentScreenState extends State<ContentScreen> {
                                       labelStyle: kSubTitlesStyle.copyWith(
                                           fontSize: 10.5,
                                           height: 1,
-                                          color: primaryColor,
+                                          color: lightPrimaryColor,
                                           fontWeight: FontWeight.w400),
-                                      borderColor: primaryColor,
-                                      color: primaryColor),
+                                      borderColor: lightPrimaryColor,
+                                      color: lightPrimaryColor),
                                   padding: EdgeInsets.all(0),
                                   value: selectedLanuguagesList,
                                   onChanged: (val) {
@@ -459,7 +460,7 @@ class _ContentScreenState extends State<ContentScreen> {
                                 width: MediaQuery.of(context).size.width - 40,
                                 height: 50,
                                 decoration: BoxDecoration(
-                                    color: primaryColor,
+                                    color: lightPrimaryColor,
                                     borderRadius: BorderRadius.circular(10.5),
                                     border: Border.all(width: 0.25)),
                                 child: Row(

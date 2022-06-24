@@ -60,7 +60,7 @@ class _NoteScreenState extends State<NoteScreen> {
                     decoration: InputDecoration(
                       prefixIcon: Icon(
                         CupertinoIcons.pen,
-                        color: primaryColor,
+                        color: lightPrimaryColor,
                       ),
                       border: InputBorder.none,
                       hintText: "Title",
@@ -148,7 +148,7 @@ class _NoteScreenState extends State<NoteScreen> {
                         width: (MediaQuery.of(context).size.width * 0.5) - (32),
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(10.50),
-                          color: primaryColor,
+                          color: lightPrimaryColor,
                         ),
                         child: Center(
                           child: Text(
@@ -199,7 +199,7 @@ class _NoteScreenState extends State<NoteScreen> {
     AlertDialog alert = AlertDialog(
       title: Text(
         "هل أنت متأكد؟",
-        style: kSubTitlesStyle.copyWith(color: primaryColor, fontSize: 14),
+        style: kSubTitlesStyle.copyWith(color: lightPrimaryColor, fontSize: 14),
       ),
       content: Text("سيتم حذف المذكرة بشكل نهائي",
           style: kSubTitlesStyle.copyWith(color: Colors.black, fontSize: 14)),

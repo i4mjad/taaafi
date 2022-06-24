@@ -2,7 +2,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:reboot_app_3/shared/constants/constants.dart';
 import 'package:reboot_app_3/shared/constants/textstyles_constants.dart';
 import 'package:reboot_app_3/shared/localization/localization.dart';
 import 'package:reboot_app_3/shared/localization/localization_services.dart';
@@ -68,7 +67,8 @@ class _AboutScreenState extends State<AboutScreen>
                     ),
                     Text(
                       AppLocalizations.of(context).translate("about-ta3afi"),
-                      style: kBodyStyle.copyWith(height: 1.5),
+                      style: kBodyStyle.copyWith(
+                          height: 1.5, color: theme.secondaryHeaderColor),
                       textAlign: TextAlign.center,
                     ),
                     SizedBox(
@@ -79,7 +79,7 @@ class _AboutScreenState extends State<AboutScreen>
                       style: kSubTitlesStyle.copyWith(
                           fontSize: 16,
                           height: 1,
-                          color: primaryColor,
+                          color: theme.primaryColor,
                           fontWeight: FontWeight.w500),
                     ),
                     SizedBox(
@@ -95,18 +95,10 @@ class _AboutScreenState extends State<AboutScreen>
                           width: (MediaQuery.of(context).size.width / 1.5),
                           height: 60,
                           decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(12),
-                            boxShadow: [
-                              BoxShadow(
-                                color: kShadowColor,
-                                spreadRadius: .25,
-                                blurRadius: 7,
-                                offset:
-                                    Offset(0, 2), // changes position of shadow
-                              ),
-                            ],
-                          ),
+                              color: theme.backgroundColor,
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                  color: theme.primaryColor, width: 0.25)),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
@@ -114,7 +106,7 @@ class _AboutScreenState extends State<AboutScreen>
                                 AppLocalizations.of(context)
                                     .translate('support'),
                                 style: kTitleSeconderyStyle.copyWith(
-                                    color: Colors.green),
+                                    color: theme.primaryColor),
                               ),
                             ],
                           ),
@@ -126,7 +118,7 @@ class _AboutScreenState extends State<AboutScreen>
                     ),
                     Text(
                       AppLocalizations.of(context).translate('support-p'),
-                      style: kBodyStyle,
+                      style: kBodyStyle.copyWith(color: theme.primaryColor),
                     )
                   ],
                 ),

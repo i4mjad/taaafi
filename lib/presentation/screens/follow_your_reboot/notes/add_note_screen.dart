@@ -59,7 +59,7 @@ class _AddNoteScreenState extends State<AddNoteScreen> {
                   decoration: InputDecoration(
                     prefixIcon: Icon(
                       CupertinoIcons.pen,
-                      color: primaryColor,
+                      color: lightPrimaryColor,
                     ),
                     border: InputBorder.none,
                     hintText: "العنوان",
@@ -122,9 +122,10 @@ class _AddNoteScreenState extends State<AddNoteScreen> {
                   padding: EdgeInsets.all(16),
                   width: MediaQuery.of(context).size.width - 40,
                   decoration: BoxDecoration(
-                      color: primaryColor,
+                      color: lightPrimaryColor,
                       borderRadius: BorderRadius.circular(12.5),
-                      border: Border.all(color: primaryColor, width: 0.25)),
+                      border:
+                          Border.all(color: lightPrimaryColor, width: 0.25)),
                   child: Center(
                     child: Text(
                       "حفظ",

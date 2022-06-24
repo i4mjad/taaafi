@@ -39,7 +39,7 @@ class DayOfWeekRelapsesWidget extends StatelessWidget {
                       return Text(
                         streak.data.sunRelapses ?? "0",
                         style: kSubTitlesStyle.copyWith(
-                            height: 1, color: primaryColor),
+                            height: 1, color: lightPrimaryColor),
                       );
                     },
                   ),
@@ -49,7 +49,7 @@ class DayOfWeekRelapsesWidget extends StatelessWidget {
                   Text(
                     AppLocalizations.of(context).translate("sun"),
                     style: kSubTitlesStyle.copyWith(
-                        fontSize: 12, color: primaryColor, height: 1),
+                        fontSize: 12, color: lightPrimaryColor, height: 1),
                   ),
                 ],
               ),
@@ -63,7 +63,7 @@ class DayOfWeekRelapsesWidget extends StatelessWidget {
                       return Text(
                         streak.data.monRelapses,
                         style: kSubTitlesStyle.copyWith(
-                            height: 1, color: primaryColor),
+                            height: 1, color: lightPrimaryColor),
                       );
                     },
                   ),
@@ -73,7 +73,7 @@ class DayOfWeekRelapsesWidget extends StatelessWidget {
                   Text(
                     AppLocalizations.of(context).translate("mon"),
                     style: kSubTitlesStyle.copyWith(
-                        fontSize: 12, color: primaryColor, height: 1),
+                        fontSize: 12, color: lightPrimaryColor, height: 1),
                   )
                 ],
               ),
@@ -82,7 +82,7 @@ class DayOfWeekRelapsesWidget extends StatelessWidget {
                   Text(
                     "0-",
                     style: kSubTitlesStyle.copyWith(
-                        height: 1, color: primaryColor),
+                        height: 1, color: lightPrimaryColor),
                   ),
                   SizedBox(
                     height: 8,
@@ -90,7 +90,7 @@ class DayOfWeekRelapsesWidget extends StatelessWidget {
                   Text(
                     AppLocalizations.of(context).translate("tue"),
                     style: kSubTitlesStyle.copyWith(
-                        fontSize: 12, color: primaryColor, height: 1),
+                        fontSize: 12, color: lightPrimaryColor, height: 1),
                   )
                 ],
               ),
@@ -99,7 +99,7 @@ class DayOfWeekRelapsesWidget extends StatelessWidget {
                   Text(
                     "00",
                     style: kSubTitlesStyle.copyWith(
-                        height: 1, color: primaryColor),
+                        height: 1, color: lightPrimaryColor),
                   ),
                   SizedBox(
                     height: 8,
@@ -107,7 +107,7 @@ class DayOfWeekRelapsesWidget extends StatelessWidget {
                   Text(
                     AppLocalizations.of(context).translate("wed"),
                     style: kSubTitlesStyle.copyWith(
-                        fontSize: 12, color: primaryColor, height: 1),
+                        fontSize: 12, color: lightPrimaryColor, height: 1),
                   )
                 ],
               ),
@@ -127,7 +127,7 @@ class DayOfWeekRelapsesWidget extends StatelessWidget {
                   Text(
                     "00",
                     style: kSubTitlesStyle.copyWith(
-                        height: 1, color: primaryColor),
+                        height: 1, color: lightPrimaryColor),
                   ),
                   SizedBox(
                     height: 8,
@@ -135,7 +135,7 @@ class DayOfWeekRelapsesWidget extends StatelessWidget {
                   Text(
                     AppLocalizations.of(context).translate("thu"),
                     style: kSubTitlesStyle.copyWith(
-                        fontSize: 12, color: primaryColor, height: 1),
+                        fontSize: 12, color: lightPrimaryColor, height: 1),
                   )
                 ],
               ),
@@ -144,7 +144,7 @@ class DayOfWeekRelapsesWidget extends StatelessWidget {
                   Text(
                     "00",
                     style: kSubTitlesStyle.copyWith(
-                        height: 1, color: primaryColor),
+                        height: 1, color: lightPrimaryColor),
                   ),
                   SizedBox(
                     height: 8,
@@ -152,7 +152,7 @@ class DayOfWeekRelapsesWidget extends StatelessWidget {
                   Text(
                     AppLocalizations.of(context).translate("fri"),
                     style: kSubTitlesStyle.copyWith(
-                        fontSize: 12, color: primaryColor, height: 1),
+                        fontSize: 12, color: lightPrimaryColor, height: 1),
                   )
                 ],
               ),
@@ -161,7 +161,7 @@ class DayOfWeekRelapsesWidget extends StatelessWidget {
                   Text(
                     "00",
                     style: kSubTitlesStyle.copyWith(
-                        height: 1, color: primaryColor),
+                        height: 1, color: lightPrimaryColor),
                   ),
                   SizedBox(
                     height: 8,
@@ -169,7 +169,7 @@ class DayOfWeekRelapsesWidget extends StatelessWidget {
                   Text(
                     AppLocalizations.of(context).translate("sat"),
                     style: kSubTitlesStyle.copyWith(
-                        fontSize: 12, color: primaryColor, height: 1),
+                        fontSize: 12, color: lightPrimaryColor, height: 1),
                   )
                 ],
               ),

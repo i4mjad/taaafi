@@ -14,17 +14,15 @@ class CustomTheme with ChangeNotifier {
 
   static ThemeData get lightTheme {
     return ThemeData(
-      primaryColor: primaryColor,
-      backgroundColor: Colors.white,
+      primaryColor: lightPrimaryColor,
+      secondaryHeaderColor: lightSeconderyTextColor,
+      hintColor: lightPrimaryTextColor,
+      backgroundColor: lightBackgroundColor,
+      cardColor: lightCardColor,
       scaffoldBackgroundColor: seconderyColor,
+      bottomAppBarColor: lightCardColor,
       appBarTheme: AppBarTheme(
         backgroundColor: seconderyColor,
-      ),
-      textTheme: TextTheme(
-        headline1: TextStyle(color: Colors.black),
-        headline2: TextStyle(color: Colors.black),
-        bodyText1: TextStyle(color: Colors.black),
-        bodyText2: TextStyle(color: Colors.black),
       ),
     );
   }
@@ -32,16 +30,13 @@ class CustomTheme with ChangeNotifier {
   static ThemeData get darkTheme {
     return ThemeData(
       primaryColor: Colors.white,
+      secondaryHeaderColor: darkSeconderyTextColor,
+      backgroundColor: darkBackgroundColor,
       scaffoldBackgroundColor: darkBackgroundColor,
-      bottomAppBarColor: darkBackgroundColor,
+      bottomAppBarColor: darkCardColor,
+      hintColor: darkPrimaryTextColor,
       appBarTheme: AppBarTheme(
         backgroundColor: darkBackgroundColor,
-      ),
-      textTheme: TextTheme(
-        headline1: TextStyle(color: Colors.white),
-        headline2: TextStyle(color: Colors.white),
-        bodyText1: TextStyle(color: Colors.white),
-        bodyText2: TextStyle(color: Colors.white),
       ),
     );
   }

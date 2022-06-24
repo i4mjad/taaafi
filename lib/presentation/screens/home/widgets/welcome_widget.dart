@@ -28,12 +28,13 @@ class NotSignIn extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           AppLocalizations.of(context).translate('welcome'),
-          style: kSubTitlesStyle,
+          style: kSubTitlesStyle.copyWith(color: theme.primaryColor),
         ),
         SizedBox(
           height: 8,
@@ -54,7 +55,7 @@ class NotSignIn extends StatelessWidget {
               AppLocalizations.of(context).translate('not-login'),
               textAlign: TextAlign.center,
               style: kSubTitlesStyle.copyWith(
-                  color: primaryColor,
+                  color: lightPrimaryColor,
                   fontWeight: FontWeight.w500,
                   height: 1.5,
                   fontSize: 16),

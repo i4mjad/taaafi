@@ -33,6 +33,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
       body: AnnotatedRegion<SystemUiOverlayStyle>(
         value: SystemUiOverlayStyle.dark,
@@ -69,11 +70,12 @@ class _BottomNavBarState extends State<BottomNavBar> {
         showUnselectedLabels: true,
         type: BottomNavigationBarType.fixed,
         selectedLabelStyle: kSubTitlesSubsStyle.copyWith(
-          color: primaryColor,
+          color: theme.primaryColor,
         ),
+        backgroundColor: theme.bottomAppBarColor,
         unselectedLabelStyle:
             kSubTitlesSubsStyle.copyWith(color: mainGrayColor),
-        selectedItemColor: primaryColor,
+        selectedItemColor: theme.primaryColor,
         unselectedItemColor: Colors.grey,
         iconSize: 22,
         currentIndex: _selectedIndex,

@@ -11,7 +11,7 @@ void getSnackBar(BuildContext context, String messageId) {
       behavior: SnackBarBehavior.floating,
       padding: EdgeInsets.fromLTRB(16, 24, 16, 24),
       shape: RoundedRectangleBorder(
-        side: BorderSide(color: primaryColor, width: 0.5),
+        side: BorderSide(color: lightPrimaryColor, width: 0.5),
         borderRadius: BorderRadius.circular(12.5),
       ),
       backgroundColor: Color(0xFFe8eeef),
@@ -21,7 +21,7 @@ void getSnackBar(BuildContext context, String messageId) {
           children: [
             Icon(
               Iconsax.tick_circle,
-              color: primaryColor,
+              color: lightPrimaryColor,
               size: 24,
             ),
             SizedBox(
@@ -31,7 +31,7 @@ void getSnackBar(BuildContext context, String messageId) {
               child: Text(
                 AppLocalizations.of(context).translate(messageId),
                 style: kSubTitlesStyle.copyWith(
-                    color: primaryColor,
+                    color: lightPrimaryColor,
                     fontWeight: FontWeight.w500,
                     fontSize: 14),
               ),

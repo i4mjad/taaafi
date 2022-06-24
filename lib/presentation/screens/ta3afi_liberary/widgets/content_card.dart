@@ -28,7 +28,7 @@ class ContentCard extends StatelessWidget {
         decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(20),
             color: Colors.white,
-            border: Border.all(color: primaryColor.withOpacity(0.1))),
+            border: Border.all(color: lightPrimaryColor.withOpacity(0.1))),
         child: Column(
           children: [
             Row(
@@ -54,7 +54,7 @@ class ContentCard extends StatelessWidget {
                             Text(
                               content.title,
                               style: kSubTitlesStyle.copyWith(
-                                  color: primaryColor,
+                                  color: lightPrimaryColor,
                                   fontSize: 16,
                                   fontWeight: FontWeight.w500),
                             ),
@@ -65,7 +65,7 @@ class ContentCard extends StatelessWidget {
                               children: [
                                 Icon(
                                   Iconsax.user,
-                                  color: primaryColor,
+                                  color: lightPrimaryColor,
                                   size: 14,
                                 ),
                                 SizedBox(

@@ -43,6 +43,7 @@ class _AccountScreenState extends State<AccountScreen>
   @override
   Widget build(BuildContext context) {
     final bloc = CustomBlocProvider.of<AccountBloc>(context);
+    final theme = Theme.of(context);
     return Scaffold(
         appBar: plainAppBar(context, "account"),
         body: Padding(
@@ -56,7 +57,7 @@ class _AccountScreenState extends State<AccountScreen>
                   height: 32,
                 ),
                 Text(AppLocalizations.of(context).translate('app-settings'),
-                    style: kSubTitlesStyle),
+                    style: kSubTitlesStyle.copyWith(color: theme.primaryColor)),
                 SizedBox(
                   height: 16,
                 ),
@@ -80,21 +81,25 @@ class _AccountScreenState extends State<AccountScreen>
                                   child: Icon(
                                     Iconsax.message_notif,
                                     size: 24,
-                                    color: primaryColor,
+                                    color: theme.primaryColor,
                                   ),
                                 ),
                                 Text(
                                     AppLocalizations.of(context)
                                         .translate('daily-notification-time'),
                                     style: kSubTitlesStyle.copyWith(
-                                        fontSize: 17, height: 1.25)),
+                                        fontSize: 17,
+                                        height: 1.25,
+                                        color: theme.hintColor)),
                               ],
                             ),
                           ],
                         ),
                       ),
                     ),
-                    Divider(),
+                    Divider(
+                      color: theme.primaryColor,
+                    ),
                     GestureDetector(
                       onTap: () {
                         HapticFeedback.mediumImpact();
@@ -112,54 +117,25 @@ class _AccountScreenState extends State<AccountScreen>
                                   child: Icon(
                                     Iconsax.global,
                                     size: 26,
-                                    color: Colors.purple,
+                                    color: theme.primaryColor,
                                   ),
                                 ),
                                 Text(
                                     AppLocalizations.of(context)
                                         .translate('change-lang'),
                                     style: kSubTitlesStyle.copyWith(
-                                        fontSize: 17, height: 1.25)),
+                                        fontSize: 17,
+                                        height: 1.25,
+                                        color: theme.hintColor)),
                               ],
                             ),
                           ],
                         ),
                       ),
                     ),
-                    Divider(),
-                    // Padding(
-                    //   padding: EdgeInsets.only(top: 4, bottom: 8),
-                    //   child: GestureDetector(
-                    //     onTap: () {
-                    //       //TODO -  Implement edit user profile
-                    //     },
-                    //     child: Row(
-                    //       mainAxisAlignment: MainAxisAlignment.start,
-                    //       children: [
-                    //         Padding(
-                    //           padding: EdgeInsets.only(left: 12, right: 12),
-                    //           child: Icon(
-                    //             Iconsax.user_edit,
-                    //             size: 26,
-                    //             color: primaryColor,
-                    //           ),
-                    //         ),
-                    //         Column(
-                    //           crossAxisAlignment: CrossAxisAlignment.center,
-                    //           mainAxisAlignment: MainAxisAlignment.center,
-                    //           children: <Widget>[
-                    //             Text(
-                    //                 AppLocalizations.of(context)
-                    //                     .translate('personal-details'),
-                    //                 style:
-                    //                     kSubTitlesStyle.copyWith(fontSize: 17)),
-                    //           ],
-                    //         )
-                    //       ],
-                    //     ),
-                    //   ),
-                    // ),
-                    // Divider(),
+                    Divider(
+                      color: theme.primaryColor,
+                    ),
                     Padding(
                       padding: EdgeInsets.only(top: 4, bottom: 8),
                       child: GestureDetector(
@@ -175,7 +151,7 @@ class _AccountScreenState extends State<AccountScreen>
                               child: Icon(
                                 Iconsax.refresh_circle,
                                 size: 26,
-                                color: primaryColor,
+                                color: theme.primaryColor,
                               ),
                             ),
                             Column(
@@ -185,15 +161,17 @@ class _AccountScreenState extends State<AccountScreen>
                                 Text(
                                     AppLocalizations.of(context)
                                         .translate('delete-my-data'),
-                                    style:
-                                        kSubTitlesStyle.copyWith(fontSize: 17)),
+                                    style: kSubTitlesStyle.copyWith(
+                                        fontSize: 17, color: theme.hintColor)),
                               ],
                             )
                           ],
                         ),
                       ),
                     ),
-                    Divider(),
+                    Divider(
+                      color: theme.primaryColor,
+                    ),
                     Padding(
                       padding: EdgeInsets.only(top: 4, bottom: 4),
                       child: GestureDetector(
@@ -209,7 +187,7 @@ class _AccountScreenState extends State<AccountScreen>
                               child: Icon(
                                 Iconsax.user_remove,
                                 size: 28,
-                                color: Colors.grey,
+                                color: theme.primaryColor,
                               ),
                             ),
                             Column(
@@ -219,15 +197,17 @@ class _AccountScreenState extends State<AccountScreen>
                                 Text(
                                     AppLocalizations.of(context)
                                         .translate('log-out'),
-                                    style:
-                                        kSubTitlesStyle.copyWith(fontSize: 17)),
+                                    style: kSubTitlesStyle.copyWith(
+                                        fontSize: 17, color: theme.hintColor)),
                               ],
                             ),
                           ],
                         ),
                       ),
                     ),
-                    Divider(),
+                    Divider(
+                      color: theme.primaryColor,
+                    ),
                     Padding(
                       padding: EdgeInsets.only(top: 4.0, bottom: 4),
                       child: GestureDetector(
@@ -293,11 +273,11 @@ class _AccountScreenState extends State<AccountScreen>
                     padding: EdgeInsets.all(8),
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(100),
-                      color: primaryColor.withOpacity(0.1),
+                      color: lightPrimaryColor.withOpacity(0.1),
                     ),
                     child: Icon(
                       Iconsax.calendar_tick,
-                      color: primaryColor,
+                      color: lightPrimaryColor,
                       size: 32,
                     ),
                   ),
@@ -308,7 +288,7 @@ class _AccountScreenState extends State<AccountScreen>
                     AppLocalizations.of(context)
                         .translate('delete-user-dialog-title'),
                     style: kHeadlineStyle.copyWith(
-                        fontWeight: FontWeight.bold, color: primaryColor),
+                        fontWeight: FontWeight.bold, color: lightPrimaryColor),
                   ),
                   SizedBox(
                     height: 8,
@@ -392,6 +372,7 @@ class UserProfileCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -400,21 +381,13 @@ class UserProfileCard extends StatelessWidget {
             Container(
               padding: EdgeInsets.all(40),
               decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(500),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.withOpacity(0.5),
-                    spreadRadius: .25,
-                    blurRadius: 7,
-                    offset: Offset(0, 2), // changes position of shadow
-                  ),
-                ],
-              ),
+                  color: theme.backgroundColor,
+                  borderRadius: BorderRadius.circular(500),
+                  border: Border.all(color: theme.primaryColor)),
               child: Icon(
                 Iconsax.user,
                 size: 56,
-                color: primaryColor,
+                color: theme.primaryColor,
               ),
             ),
             SizedBox(height: 16),
@@ -423,10 +396,11 @@ class UserProfileCard extends StatelessWidget {
               children: [
                 Text(
                   this.user.displayName,
-                  style: kTitlePrimeryStyle,
+                  style: kTitlePrimeryStyle.copyWith(color: theme.primaryColor),
                 ),
                 SizedBox(height: 8),
-                Text(this.user.email.toUpperCase(), style: kCaptionStyle),
+                Text(this.user.email.toUpperCase(),
+                    style: kCaptionStyle.copyWith(color: theme.primaryColor)),
               ],
             ),
           ],

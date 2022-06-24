@@ -23,8 +23,8 @@ class ExploreWidget extends StatelessWidget {
             ),
             Text(
               "تصفح الكل",
-              style:
-                  kSubTitlesStyle.copyWith(fontSize: 12, color: primaryColor),
+              style: kSubTitlesStyle.copyWith(
+                  fontSize: 12, color: lightPrimaryColor),
             )
           ],
         ),
@@ -50,13 +50,13 @@ class ExploreWidget extends StatelessWidget {
                               decoration: BoxDecoration(
                                   color: Colors.white,
                                   border: Border.all(
-                                      color: primaryColor, width: 0.25),
+                                      color: lightPrimaryColor, width: 0.25),
                                   borderRadius: BorderRadius.circular(12.5)),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   CircleAvatar(
-                                    backgroundColor: primaryColor,
+                                    backgroundColor: lightPrimaryColor,
                                     child: FAKE_CONTENT[index].icon,
                                   ),
                                   Spacer(),
@@ -72,7 +72,8 @@ class ExploreWidget extends StatelessWidget {
                                                 FAKE_CONTENT[index].title,
                                                 style: kSubTitlesSubsStyle
                                                     .copyWith(
-                                                        color: primaryColor,
+                                                        color:
+                                                            lightPrimaryColor,
                                                         fontWeight:
                                                             FontWeight.w500)))
                                       ],

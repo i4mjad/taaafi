@@ -94,7 +94,7 @@ class _NotesScreenState extends State<NotesScreen> {
                                               .toString(),
                                           style: kSubTitlesSubsStyle.copyWith(
                                               fontWeight: FontWeight.w600,
-                                              color: primaryColor,
+                                              color: lightPrimaryColor,
                                               fontSize: 16),
                                         ),
                                         Text(

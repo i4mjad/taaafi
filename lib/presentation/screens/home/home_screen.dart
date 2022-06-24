@@ -40,7 +40,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      
       appBar: appBarWithSettings(context, "home"),
       body: Padding(
         padding: EdgeInsets.only(left: 20.0, right: 20),
@@ -104,15 +103,15 @@ class Ta3afiLiberaryCard extends StatelessWidget {
       decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(12.5),
-          border:
-              Border.all(width: 0.25, color: primaryColor.withOpacity(0.5))),
+          border: Border.all(
+              width: 0.25, color: lightPrimaryColor.withOpacity(0.5))),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Text(
             AppLocalizations.of(context).translate('porn-addiction-recovery-p'),
             style: kSubTitlesSubsStyle.copyWith(
-                color: primaryColor, fontWeight: FontWeight.w500),
+                color: lightPrimaryColor, fontWeight: FontWeight.w500),
           ),
           Padding(
             padding: EdgeInsets.only(right: 12, left: 12, top: 30, bottom: 30),
@@ -122,22 +121,22 @@ class Ta3afiLiberaryCard extends StatelessWidget {
               children: [
                 Icon(
                   Iconsax.message_edit,
-                  color: primaryColor,
+                  color: lightPrimaryColor,
                   size: 28,
                 ),
                 Icon(
                   Iconsax.video,
-                  color: primaryColor,
+                  color: lightPrimaryColor,
                   size: 28,
                 ),
                 Icon(
                   Iconsax.document,
-                  color: primaryColor,
+                  color: lightPrimaryColor,
                   size: 28,
                 ),
                 Icon(
                   Iconsax.book,
-                  color: primaryColor,
+                  color: lightPrimaryColor,
                   size: 28,
                 ),
               ],
@@ -156,7 +155,7 @@ class Ta3afiLiberaryCard extends StatelessWidget {
                     width: MediaQuery.of(context).size.width * 0.40,
                     padding: EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                        color: primaryColor,
+                        color: lightPrimaryColor,
                         borderRadius: BorderRadius.circular(30)),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,

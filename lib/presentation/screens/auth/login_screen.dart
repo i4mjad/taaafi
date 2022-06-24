@@ -46,11 +46,11 @@ class _LoginScreenState extends State<LoginScreen>
                   Container(
                     padding: EdgeInsets.all(40),
                     decoration: BoxDecoration(
-                        color: primaryColor.withOpacity(0.2),
+                        color: lightPrimaryColor.withOpacity(0.2),
                         borderRadius: BorderRadius.circular(150)),
                     child: Icon(
                       Iconsax.user,
-                      color: primaryColor,
+                      color: lightPrimaryColor,
                       size: 72,
                     ),
                   ),
@@ -64,7 +64,7 @@ class _LoginScreenState extends State<LoginScreen>
                       Text(
                         AppLocalizations.of(context).translate('login'),
                         style: kPageTitleStyle.copyWith(
-                            fontSize: 32, color: primaryColor),
+                            fontSize: 32, color: lightPrimaryColor),
                       ),
                     ],
                   ),
@@ -100,11 +100,11 @@ class _LoginScreenState extends State<LoginScreen>
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   SignInWithAppleButton(onPressed: () async {
-                    final appleIdCredential = await SignInWithApple.getAppleIDCredential(
-                        scopes: [
-                          AppleIDAuthorizationScopes.email,
-                          AppleIDAuthorizationScopes.fullName
-                        ]);
+                    final appleIdCredential =
+                        await SignInWithApple.getAppleIDCredential(scopes: [
+                      AppleIDAuthorizationScopes.email,
+                      AppleIDAuthorizationScopes.fullName
+                    ]);
                     final oAuthProvider = OAuthProvider('apple.com');
                     final credential = oAuthProvider.credential(
                       idToken: appleIdCredential.identityToken,

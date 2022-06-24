@@ -194,7 +194,7 @@ class FollowUpStreaks extends StatelessWidget {
                                 .translate('daily-follow-up'),
                             style: kSubTitlesStyle.copyWith(
                                 fontSize: 20,
-                                color: primaryColor,
+                                color: lightPrimaryColor,
                                 fontWeight: FontWeight.w400,
                                 height: 1),
                           ),

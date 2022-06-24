@@ -9,7 +9,17 @@ const mainBlueColor = Color(0xFF0ea6ba);
 const mainGrayColor = Color(0xFFeeeef0);
 const mainYellowColor = Color(0xFFffdd83);
 
-const primaryColor = Color(0xFF19535C);
-const seconderyColor = Color(0xFFf2f2f2);
+const lightPrimaryColor = Color(0xFF19535C);
+const lightBackgroundColor = Color(0xFFf2f2f2);
+const lightCardColor = Color(0xFFffffff);
+const seconderyColor = Color(0xFFFEFEFE);
+const lightSeconderyTextColor = Color(0xFF19535C);
+const lightPrimaryTextColor = Color(0xFF000000);
 const accentColor = Color(0xFF103C28);
-const darkBackgroundColor = Color(0xFF2A2438);
+
+const darkPrimaryColor = Color(0xFFffffff);
+const darkBackgroundColor = Color(0xFF15202B);
+const darkTintColor = Color(0xFF15202B);
+const darkCardColor = Color(0xFF192734);
+const darkPrimaryTextColor = Color(0xFFffffff);
+const darkSeconderyTextColor = Color(0xFF8899A6);

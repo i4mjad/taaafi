@@ -180,14 +180,14 @@ class FollowYourRebootScreenState extends State<FollowYourRebootScreen>
                   margin: EdgeInsets.only(right: 16, left: 16),
                   decoration: BoxDecoration(
                       color: Colors.white,
-                      border: Border.all(color: primaryColor, width: 0.25),
+                      border: Border.all(color: lightPrimaryColor, width: 0.25),
                       borderRadius: BorderRadius.circular(12.5)),
                   child: Row(
                     children: [
                       Icon(
                         Iconsax.archive_1,
                         size: 32,
-                        color: primaryColor,
+                        color: lightPrimaryColor,
                       ),
                       SizedBox(
                         width: 8,
@@ -195,7 +195,7 @@ class FollowYourRebootScreenState extends State<FollowYourRebootScreen>
                       Text(
                         AppLocalizations.of(context).translate('dairies'),
                         style: kSubTitlesStyle.copyWith(
-                          color: primaryColor,
+                          color: lightPrimaryColor,
                           fontWeight: FontWeight.w500,
                           height: 1,
                         ),
