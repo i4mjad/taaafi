@@ -40,7 +40,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: seconderyColor.withOpacity(0.2),
+      
       appBar: appBarWithSettings(context, "home"),
       body: Padding(
         padding: EdgeInsets.only(left: 20.0, right: 20),

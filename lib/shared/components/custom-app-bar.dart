@@ -8,16 +8,16 @@ import 'package:reboot_app_3/shared/constants/textstyles_constants.dart';
 import 'package:reboot_app_3/shared/localization/localization.dart';
 
 AppBar appBarWithSettings(BuildContext context, String titleId) {
+  final theme = Theme.of(context);
   return AppBar(
-    backgroundColor: seconderyColor.withOpacity(0.2),
     elevation: 0,
     centerTitle: true,
     title: Text(
       AppLocalizations.of(context).translate(titleId),
-      style: kSubTitlesStyle,
+      style: kSubTitlesStyle.copyWith(color: theme.primaryColor),
     ),
     iconTheme: IconThemeData(
-      color: primaryColor,
+      color: theme.primaryColor,
     ),
     actions: [
       GestureDetector(
@@ -30,7 +30,7 @@ AppBar appBarWithSettings(BuildContext context, String titleId) {
           child: Center(
               child: Icon(
             Iconsax.setting,
-            color: primaryColor,
+            color: theme.primaryColor,
           )),
         ),
       ),
@@ -39,16 +39,19 @@ AppBar appBarWithSettings(BuildContext context, String titleId) {
 }
 
 AppBar notesAppBar(BuildContext context, String titleId) {
+  final theme = Theme.of(context);
   return AppBar(
-    backgroundColor: seconderyColor.withOpacity(0.2),
+    backgroundColor: seconderyColor,
     elevation: 0,
     centerTitle: true,
     title: Text(
       AppLocalizations.of(context).translate(titleId),
-      style: kSubTitlesStyle,
+      style: kSubTitlesStyle.copyWith(
+        color: theme.primaryColor,
+      ),
     ),
     iconTheme: IconThemeData(
-      color: primaryColor,
+      color: theme.primaryColor,
     ),
     actions: [
       GestureDetector(
@@ -69,31 +72,33 @@ AppBar notesAppBar(BuildContext context, String titleId) {
 }
 
 AppBar plainAppBar(BuildContext context, String titleId) {
+  final theme = Theme.of(context);
   return AppBar(
-    backgroundColor: seconderyColor.withOpacity(0.2),
+    backgroundColor: seconderyColor,
     elevation: 0,
     centerTitle: true,
     title: Text(
       AppLocalizations.of(context).translate(titleId),
-      style: kSubTitlesStyle,
+      style: kSubTitlesStyle.copyWith(color: theme.primaryColor),
     ),
     iconTheme: IconThemeData(
-      color: primaryColor,
+      color: theme.primaryColor,
     ),
   );
 }
 
 AppBar noteAppBar(BuildContext context, String title) {
+  final theme = Theme.of(context);
   return AppBar(
-    backgroundColor: seconderyColor.withOpacity(0.2),
+    backgroundColor: seconderyColor,
     elevation: 0,
     centerTitle: true,
     title: Text(
       title,
-      style: kSubTitlesStyle,
+      style: kSubTitlesStyle.copyWith(color: theme.primaryColor),
     ),
     iconTheme: IconThemeData(
-      color: primaryColor,
+      color: theme.primaryColor,
     ),
   );
 }

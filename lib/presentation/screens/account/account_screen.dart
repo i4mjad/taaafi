@@ -44,7 +44,6 @@ class _AccountScreenState extends State<AccountScreen>
   Widget build(BuildContext context) {
     final bloc = CustomBlocProvider.of<AccountBloc>(context);
     return Scaffold(
-        backgroundColor: seconderyColor.withOpacity(0.2),
         appBar: plainAppBar(context, "account"),
         body: Padding(
           padding: EdgeInsets.only(top: 16.0, left: 16.0, right: 16),

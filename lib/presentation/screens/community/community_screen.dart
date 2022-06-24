@@ -10,7 +10,6 @@ class CommunityPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return SafeArea(
         child: Scaffold(
-          backgroundColor: seconderyColor.withOpacity(0.2),
             body: Padding(
               padding: EdgeInsets.fromLTRB(20, 80,20,0),
               child: Center(

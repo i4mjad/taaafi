@@ -10,7 +10,6 @@ const mainGrayColor = Color(0xFFeeeef0);
 const mainYellowColor = Color(0xFFffdd83);
 
 const primaryColor = Color(0xFF19535C);
-const seconderyColor = Color(0xFFEEEEF0);
+const seconderyColor = Color(0xFFf2f2f2);
 const accentColor = Color(0xFF103C28);
-
-
+const darkBackgroundColor = Color(0xFF2A2438);

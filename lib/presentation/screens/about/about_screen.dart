@@ -33,8 +33,8 @@ class _AboutScreenState extends State<AboutScreen>
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
-      backgroundColor: seconderyColor.withOpacity(0.2),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -59,7 +59,9 @@ class _AboutScreenState extends State<AboutScreen>
                     Text(
                       AppLocalizations.of(context).translate("ta3afi"),
                       style: kPageTitleStyle.copyWith(
-                          color: primaryColor, fontSize: 32),
+                        color: theme.primaryColor,
+                        fontSize: 32,
+                      ),
                     ),
                     SizedBox(
                       height: 20,

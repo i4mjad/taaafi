@@ -6,6 +6,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:reboot_app_3/shared/components/app-themes.dart';
 import 'package:reboot_app_3/shared/localization/localization.dart';
 import 'package:reboot_app_3/shared/services/auth_service.dart';
 import 'package:reboot_app_3/shared/services/notification_service.dart';
@@ -14,6 +15,7 @@ import 'package:reboot_app_3/shared/services/routing/routes_names.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 
+bool darkMode = false;
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -89,6 +91,9 @@ class _MyAppState extends State<MyApp> {
   initState() {
     super.initState();
     localeCkeck();
+    currentTheme.addListener(() {
+      setState(() {});
+    });
   }
 
   Future<Null> localeCkeck() async {
@@ -143,6 +148,9 @@ class _MyAppState extends State<MyApp> {
         onGenerateRoute: CustomRouter.allRoutes,
         initialRoute: navbar,
         navigatorObservers: [observer],
+        theme: CustomTheme.lightTheme,
+        darkTheme: CustomTheme.darkTheme,
+        themeMode: currentTheme.currentTheme,
       ),
     );
   }

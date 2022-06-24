@@ -164,7 +164,6 @@ class FollowYourRebootScreenState extends State<FollowYourRebootScreen>
   Widget build(BuildContext context) {
     final bloc = CustomBlocProvider.of<FollowYourRebootBloc>(context);
     return Scaffold(
-        backgroundColor: seconderyColor.withOpacity(0.2),
         appBar: appBarWithSettings(context, "follow-your-reboot"),
         body: SingleChildScrollView(
           child: Column(
