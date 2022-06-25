@@ -280,8 +280,9 @@ class _ContentScreenState extends State<ContentScreen> {
                           height: 5,
                           width: MediaQuery.of(context).size.width * 0.1,
                           decoration: BoxDecoration(
-                              color: mainGrayColor,
-                              borderRadius: BorderRadius.circular(50)),
+                            color: mainGrayColor,
+                            borderRadius: BorderRadius.circular(50),
+                          ),
                         )
                       ],
                     ),
@@ -292,7 +293,9 @@ class _ContentScreenState extends State<ContentScreen> {
                           AppLocalizations.of(context)
                               .translate('search-filters'),
                           style: kPageTitleStyle.copyWith(
-                              fontSize: 22, color: theme.primaryColor),
+                            fontSize: 22,
+                            color: theme.primaryColor,
+                          ),
                         ),
                         GestureDetector(
                           onTap: () {
@@ -330,11 +333,12 @@ class _ContentScreenState extends State<ContentScreen> {
                               value: selectedSubTypesList,
                               choiceStyle: C2ChoiceStyle(
                                 labelStyle: kSubTitlesStyle.copyWith(
-                                    fontSize: 10.5,
-                                    height: 1,
-                                    color: lightPrimaryColor,
-                                    fontWeight: FontWeight.w400),
-                                borderColor: theme.primaryColor,
+                                  fontSize: 10.5,
+                                  height: 1,
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w400,
+                                ),
+                                borderWidth: 0.25,
                                 color: theme.cardColor,
                               ),
                               choiceActiveStyle: C2ChoiceStyle(),
@@ -367,7 +371,9 @@ class _ContentScreenState extends State<ContentScreen> {
                           AppLocalizations.of(context)
                               .translate('content-type'),
                           style: kSubTitlesStyle.copyWith(
-                              fontSize: 16, color: theme.hintColor),
+                            fontSize: 16,
+                            color: theme.hintColor,
+                          ),
                         ),
                       ],
                     ),
@@ -378,13 +384,13 @@ class _ContentScreenState extends State<ContentScreen> {
                             child: ChipsChoice<String>.multiple(
                               alignment: WrapAlignment.start,
                               choiceStyle: C2ChoiceStyle(
-                                  labelStyle: kSubTitlesStyle.copyWith(
-                                      fontSize: 10.5,
-                                      height: 1,
-                                      color: lightPrimaryColor,
-                                      fontWeight: FontWeight.w400),
-                                  borderColor: theme.primaryColor,
-                                  color: theme.primaryColor),
+                                labelStyle: kSubTitlesStyle.copyWith(
+                                    fontSize: 10.5,
+                                    height: 1,
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w400),
+                                color: theme.cardColor,
+                              ),
                               padding: EdgeInsets.all(0),
                               value: selectedTypesList,
                               onChanged: (val) {
@@ -430,13 +436,14 @@ class _ContentScreenState extends State<ContentScreen> {
                             child: ChipsChoice<String>.multiple(
                               alignment: WrapAlignment.start,
                               choiceStyle: C2ChoiceStyle(
-                                  labelStyle: kSubTitlesStyle.copyWith(
-                                      fontSize: 10.5,
-                                      height: 1,
-                                      color: lightPrimaryColor,
-                                      fontWeight: FontWeight.w400),
-                                  borderColor: theme.primaryColor,
-                                  color: theme.primaryColor),
+                                labelStyle: kSubTitlesStyle.copyWith(
+                                  fontSize: 10.5,
+                                  height: 1,
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w400,
+                                ),
+                                color: theme.cardColor,
+                              ),
                               padding: EdgeInsets.all(0),
                               value: selectedLanuguagesList,
                               onChanged: (val) {

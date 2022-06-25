@@ -163,6 +163,7 @@ class FollowYourRebootScreenState extends State<FollowYourRebootScreen>
   @override
   Widget build(BuildContext context) {
     final bloc = CustomBlocProvider.of<FollowYourRebootBloc>(context);
+    final theme = Theme.of(context);
     return Scaffold(
         appBar: appBarWithSettings(context, "follow-your-reboot"),
         body: SingleChildScrollView(
@@ -179,7 +180,7 @@ class FollowYourRebootScreenState extends State<FollowYourRebootScreen>
                   padding: EdgeInsets.all(16),
                   margin: EdgeInsets.only(right: 16, left: 16),
                   decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: theme.cardColor,
                       border: Border.all(color: lightPrimaryColor, width: 0.25),
                       borderRadius: BorderRadius.circular(12.5)),
                   child: Row(
@@ -187,7 +188,7 @@ class FollowYourRebootScreenState extends State<FollowYourRebootScreen>
                       Icon(
                         Iconsax.archive_1,
                         size: 32,
-                        color: lightPrimaryColor,
+                        color: theme.primaryColor,
                       ),
                       SizedBox(
                         width: 8,
@@ -195,7 +196,7 @@ class FollowYourRebootScreenState extends State<FollowYourRebootScreen>
                       Text(
                         AppLocalizations.of(context).translate('dairies'),
                         style: kSubTitlesStyle.copyWith(
-                          color: lightPrimaryColor,
+                          color: theme.primaryColor,
                           fontWeight: FontWeight.w500,
                           height: 1,
                         ),
@@ -218,7 +219,8 @@ class FollowYourRebootScreenState extends State<FollowYourRebootScreen>
                         Text(
                             AppLocalizations.of(context)
                                 .translate('reboot-calender'),
-                            style: kSubTitlesStyle),
+                            style: kSubTitlesStyle.copyWith(
+                                color: theme.hintColor)),
                         SizedBox(
                           height: 8,
                         ),
@@ -229,6 +231,7 @@ class FollowYourRebootScreenState extends State<FollowYourRebootScreen>
                                 color: mainGrayColor,
                                 borderRadius: BorderRadius.circular(15)),
                             child: SfCalendar(
+                              backgroundColor: theme.cardColor,
                               onTap: (CalendarTapDetails details) async {
                                 DateTime date = details.date;
                                 DateTime firstDate = await bloc.getFirstDate();
@@ -238,8 +241,9 @@ class FollowYourRebootScreenState extends State<FollowYourRebootScreen>
                               view: CalendarView.month,
                               headerStyle: CalendarHeaderStyle(
                                   textAlign: TextAlign.center,
-                                  backgroundColor: mainYellowColor,
-                                  textStyle: kSubTitlesStyle),
+                                  backgroundColor: theme.cardColor,
+                                  textStyle: kSubTitlesStyle.copyWith(
+                                      color: theme.primaryColor)),
                               dataSource: CalenderDataSource(days),
                               monthViewSettings: MonthViewSettings(
                                 //showAgenda: true,
@@ -255,7 +259,8 @@ class FollowYourRebootScreenState extends State<FollowYourRebootScreen>
                       height: 12,
                     ),
                     Text(AppLocalizations.of(context).translate('streaks'),
-                        style: kSubTitlesStyle),
+                        style:
+                            kSubTitlesStyle.copyWith(color: theme.hintColor)),
                     SizedBox(
                       height: 12,
                     ),
@@ -282,7 +287,9 @@ class FollowYourRebootScreenState extends State<FollowYourRebootScreen>
                               AppLocalizations.of(context)
                                   .translate("total-days"),
                               style: kHeadlineStyle.copyWith(
-                                  fontWeight: FontWeight.w400, fontSize: 18),
+                                  fontWeight: FontWeight.w400,
+                                  fontSize: 18,
+                                  color: theme.primaryColor),
                             ),
                             FutureBuilder(
                               future: bloc.getTotalDaysFromBegining(),

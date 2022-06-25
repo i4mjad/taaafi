@@ -1,5 +1,7 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 import 'package:reboot_app_3/main.dart';
 import 'package:reboot_app_3/shared/components/app-themes.dart';
 import 'package:reboot_app_3/shared/components/snackbar.dart';
@@ -37,19 +39,6 @@ class ChangeLanguageWidget {
                     ],
                   ),
                   SizedBox(
-                    height: 12,
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        AppLocalizations.of(context).translate('app-settings'),
-                        style: kHeaderStyle.copyWith(color: theme.primaryColor),
-                      )
-                    ],
-                  ),
-                  SizedBox(
                     height: 16,
                   ),
                   Column(
@@ -57,9 +46,8 @@ class ChangeLanguageWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "الوضع الليلي",
-                        style:
-                            kSubTitlesStyle.copyWith(color: theme.primaryColor),
+                        AppLocalizations.of(context).translate("night-mode"),
+                        style: kSubTitlesStyle.copyWith(color: theme.hintColor),
                       ),
                       SizedBox(
                         height: 16,
@@ -71,33 +59,41 @@ class ChangeLanguageWidget {
                             border: Border.all(
                                 color: theme.primaryColor, width: 0.25),
                             borderRadius: BorderRadius.circular(10.5)),
-                        child: GestureDetector(
-                          onTap: () async {
-                            currentTheme.toggleTheme();
-                            Navigator.pop(context);
-                          },
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              Padding(
-                                padding: EdgeInsets.only(left: 12, right: 12),
-                                child: Icon(
-                                  Icons.nightlight_round_rounded,
-                                  size: 16,
-                                  color: theme.primaryColor,
+                        child: Consumer<CustomTheme>(
+                          builder: (context, notifier, child) =>
+                              GestureDetector(
+                            onTap: () async {
+                              notifier.toggleTheme();
+                              Navigator.pop(context);
+                            },
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Padding(
+                                  padding: EdgeInsets.only(left: 12, right: 12),
+                                  child: Icon(
+                                    CupertinoIcons.moon,
+                                    size: 16,
+                                    color: theme.primaryColor,
+                                  ),
                                 ),
-                              ),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: <Widget>[
-                                  Text("تفعيل",
-                                      style: kSubTitlesStyle.copyWith(
-                                          fontSize: 17,
-                                          color: theme.primaryColor)),
-                                ],
-                              )
-                            ],
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: <Widget>[
+                                    Text(
+                                        theme.brightness == Brightness.dark
+                                            ? AppLocalizations.of(context)
+                                                .translate('off')
+                                            : AppLocalizations.of(context)
+                                                .translate('on'),
+                                        style: kSubTitlesStyle.copyWith(
+                                            fontSize: 17,
+                                            color: theme.primaryColor)),
+                                  ],
+                                )
+                              ],
+                            ),
                           ),
                         ),
                       ),
@@ -113,7 +109,7 @@ class ChangeLanguageWidget {
                         AppLocalizations.of(context).translate("change-lang"),
                         style: kPageTitleStyle.copyWith(
                           fontSize: 22,
-                          color: theme.primaryColor,
+                          color: theme.hintColor,
                         ),
                       ),
                     ],

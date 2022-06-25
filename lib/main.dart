@@ -125,32 +125,34 @@ class _MyAppState extends State<MyApp> {
               context.read<GoogleAuthenticationService>().authStateChanges,
           initialData: null,
         ),
+        ChangeNotifierProvider(create: (_) => CustomTheme())
       ],
-      child: MaterialApp(
-        supportedLocales: [Locale('ar', ''), Locale('en', '')],
-        locale: _locale,
-        localizationsDelegates: [
-          AppLocalizations.delegate,
-          GlobalMaterialLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-        ],
-        localeResolutionCallback: (locale, supportedLocales) {
-          // Check if the current device locale is supported
-          for (var supportedLocale in supportedLocales) {
-            if (supportedLocale.languageCode == locale.languageCode) {
-              return supportedLocale;
-            }
-          }
-          return supportedLocales.first;
+      child: Consumer<CustomTheme>(
+        builder: (context, CustomTheme notifier, child) {
+          return MaterialApp(
+            supportedLocales: [Locale('ar', ''), Locale('en', '')],
+            locale: _locale,
+            localizationsDelegates: [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+            ],
+            localeResolutionCallback: (locale, supportedLocales) {
+              for (var supportedLocale in supportedLocales) {
+                if (supportedLocale.languageCode == locale.languageCode) {
+                  return supportedLocale;
+                }
+              }
+              return supportedLocales.first;
+            },
+            debugShowCheckedModeBanner: false,
+            onGenerateRoute: CustomRouter.allRoutes,
+            initialRoute: navbar,
+            navigatorObservers: [observer],
+            theme: notifier.darkTheme == true ? darkTheme : lightTheme,
+          );
         },
-        debugShowCheckedModeBanner: false,
-        onGenerateRoute: CustomRouter.allRoutes,
-        initialRoute: navbar,
-        navigatorObservers: [observer],
-        theme: CustomTheme.lightTheme,
-        darkTheme: CustomTheme.darkTheme,
-        themeMode: currentTheme.currentTheme,
       ),
     );
   }

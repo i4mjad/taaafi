@@ -1,46 +1,75 @@
 import 'package:flutter/material.dart';
 import 'package:reboot_app_3/shared/constants/constants.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 CustomTheme currentTheme = CustomTheme();
 
-class CustomTheme with ChangeNotifier {
-  static bool _isDarkTheme = false;
-  ThemeMode get currentTheme => _isDarkTheme ? ThemeMode.dark : ThemeMode.light;
+class CustomTheme extends ChangeNotifier {
+  final String key = "theme";
+  SharedPreferences _prefs;
+  bool _darkTheme = false;
 
-  void toggleTheme() {
-    _isDarkTheme = !_isDarkTheme;
+  bool get darkTheme => _darkTheme;
+
+  CustomTheme() {
+    _darkTheme = false;
+    _loadFromPrefs();
+  }
+
+  toggleTheme() {
+    _darkTheme = !_darkTheme;
+    _saveToPrefs();
     notifyListeners();
   }
 
-  static ThemeData get lightTheme {
-    return ThemeData(
-      primaryColor: lightPrimaryColor,
-      secondaryHeaderColor: lightSeconderyTextColor,
-      hintColor: lightPrimaryTextColor,
-      backgroundColor: lightBackgroundColor,
-      cardColor: lightCardColor,
-      scaffoldBackgroundColor: seconderyColor,
-      bottomAppBarColor: lightCardColor,
-      focusColor: lightPrimaryColor,
-      appBarTheme: AppBarTheme(
-        backgroundColor: seconderyColor,
-      ),
-    );
+  _initPrefs() async {
+    if (_prefs == null) _prefs = await SharedPreferences.getInstance();
   }
 
-  static ThemeData get darkTheme {
-    return ThemeData(
-      primaryColor: Colors.white,
-      secondaryHeaderColor: darkSeconderyTextColor,
-      backgroundColor: darkBackgroundColor,
-      scaffoldBackgroundColor: darkBackgroundColor,
-      cardColor: darkCardColor,
-      bottomAppBarColor: darkCardColor,
-      hintColor: darkPrimaryTextColor,
-      focusColor: darkCardColor,
-      appBarTheme: AppBarTheme(
-        backgroundColor: darkBackgroundColor,
-      ),
-    );
+  _loadFromPrefs() async {
+    await _initPrefs();
+    _darkTheme = _prefs.getBool(key) ?? true;
+    notifyListeners();
   }
+
+  _saveToPrefs() async {
+    await _initPrefs();
+    _prefs.setBool(key, _darkTheme);
+  }
+}
+
+ThemeData get lightTheme {
+  return ThemeData(
+    brightness: Brightness.light,
+    primaryColor: lightPrimaryColor,
+    secondaryHeaderColor: lightSeconderyTextColor,
+    hintColor: lightPrimaryTextColor,
+    backgroundColor: lightBackgroundColor,
+    cardColor: lightCardColor,
+    scaffoldBackgroundColor: seconderyColor,
+    canvasColor: lightPrimaryColor,
+    bottomAppBarColor: lightCardColor,
+    focusColor: lightPrimaryColor,
+    appBarTheme: AppBarTheme(
+      backgroundColor: seconderyColor,
+    ),
+  );
+}
+
+ThemeData get darkTheme {
+  return ThemeData(
+    brightness: Brightness.dark,
+    primaryColor: Colors.white,
+    secondaryHeaderColor: darkSeconderyTextColor,
+    backgroundColor: darkBackgroundColor,
+    scaffoldBackgroundColor: darkBackgroundColor,
+    cardColor: darkCardColor,
+    canvasColor: darkCardColor,
+    bottomAppBarColor: darkCardColor,
+    hintColor: darkPrimaryTextColor,
+    focusColor: darkCardColor,
+    appBarTheme: AppBarTheme(
+      backgroundColor: darkBackgroundColor,
+    ),
+  );
 }
