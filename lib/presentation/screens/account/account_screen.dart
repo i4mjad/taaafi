@@ -49,204 +49,222 @@ class _AccountScreenState extends State<AccountScreen>
         body: Padding(
           padding: EdgeInsets.only(top: 16.0, left: 16.0, right: 16),
           child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                UserProfileCard(),
-                SizedBox(
-                  height: 32,
-                ),
-                Text(AppLocalizations.of(context).translate('app-settings'),
-                    style: kSubTitlesStyle.copyWith(color: theme.primaryColor)),
-                SizedBox(
-                  height: 16,
-                ),
-                Column(
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.only(top: 8, bottom: 4),
-                      child: GestureDetector(
-                        onTap: () {
-                          HapticFeedback.mediumImpact();
-                          NotificationService.scheduleDailyNotification(
-                              context);
-                        },
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Row(
+            child: Container(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  UserProfileCard(),
+                  SizedBox(
+                    height: 32,
+                  ),
+                  Text(AppLocalizations.of(context).translate('app-settings'),
+                      style:
+                          kSubTitlesStyle.copyWith(color: theme.primaryColor)),
+                  SizedBox(
+                    height: 16,
+                  ),
+                  Container(
+                    decoration: BoxDecoration(
+                        border: Border.all(
+                          color: theme.primaryColor,
+                          width: 0.25,
+                        ),
+                        borderRadius: BorderRadius.circular(12.5)),
+                    child: Column(
+                      children: [
+                        Padding(
+                          padding: EdgeInsets.only(top: 16, bottom: 8),
+                          child: GestureDetector(
+                            onTap: () {
+                              HapticFeedback.mediumImpact();
+                              NotificationService.scheduleDailyNotification(
+                                  context);
+                            },
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Padding(
-                                  padding: EdgeInsets.only(left: 12, right: 12),
-                                  child: Icon(
-                                    Iconsax.message_notif,
-                                    size: 24,
-                                    color: theme.primaryColor,
-                                  ),
+                                Row(
+                                  children: [
+                                    Padding(
+                                      padding:
+                                          EdgeInsets.only(left: 12, right: 12),
+                                      child: Icon(
+                                        Iconsax.message_notif,
+                                        size: 24,
+                                        color: theme.primaryColor,
+                                      ),
+                                    ),
+                                    Text(
+                                        AppLocalizations.of(context).translate(
+                                            'daily-notification-time'),
+                                        style: kSubTitlesStyle.copyWith(
+                                            fontSize: 17,
+                                            height: 1.25,
+                                            color: theme.hintColor)),
+                                  ],
                                 ),
-                                Text(
-                                    AppLocalizations.of(context)
-                                        .translate('daily-notification-time'),
-                                    style: kSubTitlesStyle.copyWith(
-                                        fontSize: 17,
-                                        height: 1.25,
-                                        color: theme.hintColor)),
                               ],
                             ),
-                          ],
+                          ),
                         ),
-                      ),
-                    ),
-                    Divider(
-                      color: theme.primaryColor,
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        HapticFeedback.mediumImpact();
-                        ChangeLanguageWidget.changeLanguage(context);
-                      },
-                      child: Padding(
-                        padding: EdgeInsets.only(bottom: 8.0, top: 8),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Row(
+                        Divider(
+                          color: theme.primaryColor,
+                        ),
+                        GestureDetector(
+                          onTap: () {
+                            HapticFeedback.mediumImpact();
+                            ChangeLanguageWidget.changeLanguage(context);
+                          },
+                          child: Padding(
+                            padding: EdgeInsets.only(bottom: 8.0, top: 8),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Row(
+                                  children: [
+                                    Padding(
+                                      padding:
+                                          EdgeInsets.only(left: 12, right: 12),
+                                      child: Icon(
+                                        Iconsax.global,
+                                        size: 26,
+                                        color: theme.primaryColor,
+                                      ),
+                                    ),
+                                    Text(
+                                        AppLocalizations.of(context)
+                                            .translate('change-lang'),
+                                        style: kSubTitlesStyle.copyWith(
+                                            fontSize: 17,
+                                            height: 1.25,
+                                            color: theme.hintColor)),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        Divider(
+                          color: theme.primaryColor,
+                        ),
+                        Padding(
+                          padding: EdgeInsets.only(top: 4, bottom: 8),
+                          child: GestureDetector(
+                            onTap: () {
+                              HapticFeedback.mediumImpact();
+                              resetUserDialog(context, bloc);
+                            },
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
                               children: [
                                 Padding(
                                   padding: EdgeInsets.only(left: 12, right: 12),
                                   child: Icon(
-                                    Iconsax.global,
+                                    Iconsax.refresh_circle,
                                     size: 26,
                                     color: theme.primaryColor,
                                   ),
                                 ),
-                                Text(
-                                    AppLocalizations.of(context)
-                                        .translate('change-lang'),
-                                    style: kSubTitlesStyle.copyWith(
-                                        fontSize: 17,
-                                        height: 1.25,
-                                        color: theme.hintColor)),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: <Widget>[
+                                    Text(
+                                        AppLocalizations.of(context)
+                                            .translate('delete-my-data'),
+                                        style: kSubTitlesStyle.copyWith(
+                                            fontSize: 17,
+                                            color: theme.hintColor)),
+                                  ],
+                                )
                               ],
                             ),
-                          ],
+                          ),
                         ),
-                      ),
-                    ),
-                    Divider(
-                      color: theme.primaryColor,
-                    ),
-                    Padding(
-                      padding: EdgeInsets.only(top: 4, bottom: 8),
-                      child: GestureDetector(
-                        onTap: () {
-                          HapticFeedback.mediumImpact();
-                          resetUserDialog(context, bloc);
-                        },
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Padding(
-                              padding: EdgeInsets.only(left: 12, right: 12),
-                              child: Icon(
-                                Iconsax.refresh_circle,
-                                size: 26,
-                                color: theme.primaryColor,
-                              ),
-                            ),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: <Widget>[
-                                Text(
-                                    AppLocalizations.of(context)
-                                        .translate('delete-my-data'),
-                                    style: kSubTitlesStyle.copyWith(
-                                        fontSize: 17, color: theme.hintColor)),
-                              ],
-                            )
-                          ],
+                        Divider(
+                          color: theme.primaryColor,
                         ),
-                      ),
-                    ),
-                    Divider(
-                      color: theme.primaryColor,
-                    ),
-                    Padding(
-                      padding: EdgeInsets.only(top: 4, bottom: 4),
-                      child: GestureDetector(
-                        onTap: () {
-                          HapticFeedback.mediumImpact();
-                          context.read<GoogleAuthenticationService>().signOut();
-                        },
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Padding(
-                              padding: EdgeInsets.only(left: 12, right: 12),
-                              child: Icon(
-                                Iconsax.user_remove,
-                                size: 28,
-                                color: theme.primaryColor,
-                              ),
-                            ),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: <Widget>[
-                                Text(
-                                    AppLocalizations.of(context)
-                                        .translate('log-out'),
-                                    style: kSubTitlesStyle.copyWith(
-                                        fontSize: 17, color: theme.hintColor)),
+                        Padding(
+                          padding: EdgeInsets.only(top: 4, bottom: 4),
+                          child: GestureDetector(
+                            onTap: () {
+                              HapticFeedback.mediumImpact();
+                              context
+                                  .read<GoogleAuthenticationService>()
+                                  .signOut();
+                            },
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Padding(
+                                  padding: EdgeInsets.only(left: 12, right: 12),
+                                  child: Icon(
+                                    Iconsax.user_remove,
+                                    size: 28,
+                                    color: theme.primaryColor,
+                                  ),
+                                ),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: <Widget>[
+                                    Text(
+                                        AppLocalizations.of(context)
+                                            .translate('log-out'),
+                                        style: kSubTitlesStyle.copyWith(
+                                            fontSize: 17,
+                                            color: theme.hintColor)),
+                                  ],
+                                ),
                               ],
                             ),
-                          ],
+                          ),
                         ),
-                      ),
-                    ),
-                    Divider(
-                      color: theme.primaryColor,
-                    ),
-                    Padding(
-                      padding: EdgeInsets.only(top: 4.0, bottom: 4),
-                      child: GestureDetector(
-                        onTap: () {
-                          HapticFeedback.heavyImpact();
-                          DeleteAccountSheet.openDeleteAccountMessage(context);
-                        },
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Padding(
-                              padding: EdgeInsets.only(left: 12, right: 12),
-                              child: Icon(
-                                Iconsax.trash,
-                                size: 28,
-                                color: Colors.red,
-                              ),
-                            ),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: <Widget>[
-                                Text(
-                                    AppLocalizations.of(context)
-                                        .translate('delete-my-account'),
-                                    style: kSubTitlesStyle.copyWith(
-                                        fontSize: 17, color: Colors.red)),
+                        Divider(
+                          color: theme.primaryColor,
+                        ),
+                        Padding(
+                          padding: EdgeInsets.only(top: 8.0, bottom: 16),
+                          child: GestureDetector(
+                            onTap: () {
+                              HapticFeedback.heavyImpact();
+                              DeleteAccountSheet.openDeleteAccountMessage(
+                                  context);
+                            },
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Padding(
+                                  padding: EdgeInsets.only(left: 12, right: 12),
+                                  child: Icon(
+                                    Iconsax.trash,
+                                    size: 28,
+                                    color: Colors.red,
+                                  ),
+                                ),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: <Widget>[
+                                    Text(
+                                        AppLocalizations.of(context)
+                                            .translate('delete-my-account'),
+                                        style: kSubTitlesStyle.copyWith(
+                                            fontSize: 17, color: Colors.red)),
+                                  ],
+                                )
                               ],
-                            )
-                          ],
+                            ),
+                          ),
                         ),
-                      ),
+                      ],
                     ),
-                  ],
-                ),
-                SizedBox(
-                  height: 30,
-                ),
-              ],
+                  ),
+                  SizedBox(
+                    height: 30,
+                  ),
+                ],
+              ),
             ),
           ),
         ));
@@ -383,7 +401,7 @@ class UserProfileCard extends StatelessWidget {
               decoration: BoxDecoration(
                   color: theme.backgroundColor,
                   borderRadius: BorderRadius.circular(500),
-                  border: Border.all(color: theme.primaryColor)),
+                  border: Border.all(color: theme.primaryColor, width: 0.25)),
               child: Icon(
                 Iconsax.user,
                 size: 56,

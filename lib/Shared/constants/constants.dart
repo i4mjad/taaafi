@@ -10,7 +10,7 @@ const mainGrayColor = Color(0xFFeeeef0);
 const mainYellowColor = Color(0xFFffdd83);
 
 const lightPrimaryColor = Color(0xFF19535C);
-const lightBackgroundColor = Color(0xFFf2f2f2);
+const lightBackgroundColor = Color(0xFFffffff);
 const lightCardColor = Color(0xFFffffff);
 const seconderyColor = Color(0xFFFEFEFE);
 const lightSeconderyTextColor = Color(0xFF19535C);
