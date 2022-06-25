@@ -18,6 +18,7 @@ class ContentCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return InkWell(
       onTap: () {
         launchUrl(Uri.parse(content.contentLink));
@@ -27,7 +28,7 @@ class ContentCard extends StatelessWidget {
         margin: EdgeInsets.only(bottom: 15),
         decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(20),
-            color: Colors.white,
+            color: theme.cardColor,
             border: Border.all(color: lightPrimaryColor.withOpacity(0.1))),
         child: Column(
           children: [
@@ -40,11 +41,14 @@ class ContentCard extends StatelessWidget {
                         width: 50,
                         height: 50,
                         decoration: BoxDecoration(
-                            color: seconderyColor,
+                            color: theme.scaffoldBackgroundColor,
                             borderRadius: BorderRadius.circular(12.5)),
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(20),
-                          child: Icon(Iconsax.receipt),
+                          child: Icon(
+                            Iconsax.receipt,
+                            color: theme.primaryColor,
+                          ),
                         )),
                     SizedBox(width: 10),
                     Flexible(
@@ -54,7 +58,7 @@ class ContentCard extends StatelessWidget {
                             Text(
                               content.title,
                               style: kSubTitlesStyle.copyWith(
-                                  color: lightPrimaryColor,
+                                  color: theme.primaryColor,
                                   fontSize: 16,
                                   fontWeight: FontWeight.w500),
                             ),
@@ -65,7 +69,7 @@ class ContentCard extends StatelessWidget {
                               children: [
                                 Icon(
                                   Iconsax.user,
-                                  color: lightPrimaryColor,
+                                  color: theme.primaryColor,
                                   size: 14,
                                 ),
                                 SizedBox(
@@ -74,7 +78,7 @@ class ContentCard extends StatelessWidget {
                                 Text(
                                   content.contentOwner,
                                   style: kSubTitlesStyle.copyWith(
-                                      color: Colors.black45,
+                                      color: theme.hintColor.withOpacity(0.7),
                                       fontSize: 12,
                                       fontWeight: FontWeight.w400),
                                 ),
@@ -102,7 +106,7 @@ class ContentCard extends StatelessWidget {
                           Icon(
                             Iconsax.archive_book,
                             size: 18,
-                            color: Colors.green,
+                            color: mainBlueColor,
                           ),
                           SizedBox(
                             width: 4,
@@ -111,7 +115,7 @@ class ContentCard extends StatelessWidget {
                               style: kSubTitlesSubsStyle.copyWith(
                                   fontSize: 12,
                                   height: 1,
-                                  color: Colors.green)),
+                                  color: theme.primaryColor)),
                         ],
                       ),
                       SizedBox(
@@ -122,7 +126,7 @@ class ContentCard extends StatelessWidget {
                           Icon(
                             Iconsax.bill,
                             size: 18,
-                            color: Colors.purple,
+                            color: mainBlueColor,
                           ),
                           SizedBox(
                             width: 4,
@@ -131,7 +135,7 @@ class ContentCard extends StatelessWidget {
                               style: kSubTitlesSubsStyle.copyWith(
                                   fontSize: 12,
                                   height: 1,
-                                  color: Colors.purple)),
+                                  color: theme.primaryColor)),
                         ],
                       ),
                       SizedBox(
@@ -142,7 +146,7 @@ class ContentCard extends StatelessWidget {
                           Icon(
                             Iconsax.language_circle,
                             size: 18,
-                            color: Colors.black,
+                            color: mainBlueColor,
                           ),
                           SizedBox(
                             width: 4,
@@ -151,7 +155,7 @@ class ContentCard extends StatelessWidget {
                               style: kSubTitlesSubsStyle.copyWith(
                                   fontSize: 12,
                                   height: 1,
-                                  color: Colors.black)),
+                                  color: theme.primaryColor)),
                         ],
                       ),
                     ],

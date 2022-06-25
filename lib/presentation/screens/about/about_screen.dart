@@ -95,7 +95,7 @@ class _AboutScreenState extends State<AboutScreen>
                           width: (MediaQuery.of(context).size.width / 1.5),
                           height: 60,
                           decoration: BoxDecoration(
-                              color: theme.backgroundColor,
+                              color: theme.cardColor,
                               borderRadius: BorderRadius.circular(12),
                               border: Border.all(
                                   color: theme.primaryColor, width: 0.25)),

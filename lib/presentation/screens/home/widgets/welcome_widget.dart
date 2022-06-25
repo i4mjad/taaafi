@@ -75,12 +75,13 @@ class WelcomeContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bloc = CustomBlocProvider.of<FollowYourRebootBloc>(context);
+    final theme = Theme.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           AppLocalizations.of(context).translate('welcome'),
-          style: kSubTitlesStyle,
+          style: kSubTitlesStyle.copyWith(color: theme.hintColor),
         ),
         SizedBox(
           height: 8,
@@ -92,10 +93,10 @@ class WelcomeContent extends StatelessWidget {
               width: MediaQuery.of(context).size.width * 0.27,
               height: 150,
               decoration: BoxDecoration(
-                  color: Colors.green[50],
+                  color: theme.focusColor,
                   border: Border.all(
                     width: 0.25,
-                    color: Colors.green,
+                    color: theme.primaryColor,
                   ),
                   borderRadius: BorderRadius.circular(15)),
               child: Column(
@@ -109,7 +110,7 @@ class WelcomeContent extends StatelessWidget {
                       return Text(
                         streak.data.toString(),
                         style: kPageTitleStyle.copyWith(
-                          color: Colors.green,
+                          color: Colors.white,
                           fontSize: 35,
                         ),
                       );
@@ -118,8 +119,7 @@ class WelcomeContent extends StatelessWidget {
                   Text(
                     AppLocalizations.of(context).translate('free-relapse-days'),
                     style: kSubTitlesStyle.copyWith(
-                      fontSize: 16,
-                    ),
+                        fontSize: 16, color: Colors.white, height: 1.5),
                     textAlign: TextAlign.center,
                   ),
                 ],
@@ -133,9 +133,10 @@ class WelcomeContent extends StatelessWidget {
                   height: 71,
                   width: MediaQuery.of(context).size.width * 0.60,
                   decoration: BoxDecoration(
-                      color: Colors.brown[50],
+                      color: theme.cardColor,
                       borderRadius: BorderRadius.circular(8),
-                      border: Border.all(width: 0.25, color: Colors.brown)),
+                      border:
+                          Border.all(width: 0.25, color: theme.primaryColor)),
                   child: Center(
                     child: FutureBuilder(
                       future: bloc.getRelapsesCountInLast30Days(),
@@ -146,7 +147,8 @@ class WelcomeContent extends StatelessWidget {
                           AppLocalizations.of(context)
                                   .translate("relapses-30-days") +
                               sh.data,
-                          style: kSubTitlesStyle.copyWith(fontSize: 13),
+                          style: kSubTitlesStyle.copyWith(
+                              fontSize: 13, color: theme.hintColor),
                         );
                       },
                     ),
@@ -160,8 +162,8 @@ class WelcomeContent extends StatelessWidget {
                   height: 71,
                   width: MediaQuery.of(context).size.width * 0.60,
                   decoration: BoxDecoration(
-                    color: Colors.blue[50],
-                    border: Border.all(width: 0.25, color: Colors.blue),
+                    color: theme.cardColor,
+                    border: Border.all(width: 0.25, color: theme.primaryColor),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Center(
@@ -175,7 +177,7 @@ class WelcomeContent extends StatelessWidget {
                                   .translate('free-days-from-start') +
                               sh.data,
                           style: kSubTitlesStyle.copyWith(
-                              color: Colors.blue[900], fontSize: 13),
+                              color: theme.hintColor, fontSize: 13),
                         );
                       },
                     ),

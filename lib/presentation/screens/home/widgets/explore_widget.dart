@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:reboot_app_3/data/models/WelcomeContent.dart';
-import 'package:reboot_app_3/shared/constants/constants.dart';
 import 'package:reboot_app_3/shared/constants/textstyles_constants.dart';
 import 'package:reboot_app_3/shared/localization/localization.dart';
 
@@ -11,6 +10,7 @@ class ExploreWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -19,12 +19,12 @@ class ExploreWidget extends StatelessWidget {
           children: [
             Text(
               AppLocalizations.of(context).translate('explore'),
-              style: kSubTitlesStyle,
+              style: kSubTitlesStyle.copyWith(color: theme.hintColor),
             ),
             Text(
               "تصفح الكل",
               style: kSubTitlesStyle.copyWith(
-                  fontSize: 12, color: lightPrimaryColor),
+                  fontSize: 12, color: theme.primaryColor),
             )
           ],
         ),
@@ -48,16 +48,20 @@ class ExploreWidget extends StatelessWidget {
                               padding: EdgeInsets.all(16),
                               width: MediaQuery.of(context).size.width * 0.35,
                               decoration: BoxDecoration(
-                                  color: Colors.white,
+                                  color: theme.cardColor,
                                   border: Border.all(
-                                      color: lightPrimaryColor, width: 0.25),
+                                      color: theme.primaryColor, width: 0.25),
                                   borderRadius: BorderRadius.circular(12.5)),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   CircleAvatar(
-                                    backgroundColor: lightPrimaryColor,
-                                    child: FAKE_CONTENT[index].icon,
+                                    backgroundColor: theme.backgroundColor,
+                                    child: Icon(
+                                      FAKE_CONTENT[index].iconName,
+                                      size: 16,
+                                      color: theme.primaryColor,
+                                    ),
                                   ),
                                   Spacer(),
                                   Container(
@@ -73,7 +77,7 @@ class ExploreWidget extends StatelessWidget {
                                                 style: kSubTitlesSubsStyle
                                                     .copyWith(
                                                         color:
-                                                            lightPrimaryColor,
+                                                            theme.primaryColor,
                                                         fontWeight:
                                                             FontWeight.w500)))
                                       ],

@@ -21,6 +21,7 @@ class CustomTheme with ChangeNotifier {
       cardColor: lightCardColor,
       scaffoldBackgroundColor: seconderyColor,
       bottomAppBarColor: lightCardColor,
+      focusColor: lightPrimaryColor,
       appBarTheme: AppBarTheme(
         backgroundColor: seconderyColor,
       ),
@@ -33,8 +34,10 @@ class CustomTheme with ChangeNotifier {
       secondaryHeaderColor: darkSeconderyTextColor,
       backgroundColor: darkBackgroundColor,
       scaffoldBackgroundColor: darkBackgroundColor,
+      cardColor: darkCardColor,
       bottomAppBarColor: darkCardColor,
       hintColor: darkPrimaryTextColor,
+      focusColor: darkCardColor,
       appBarTheme: AppBarTheme(
         backgroundColor: darkBackgroundColor,
       ),

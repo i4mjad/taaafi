@@ -6,7 +6,6 @@ import 'package:reboot_app_3/presentation/screens/home/widgets/welcome_widget.da
 import 'package:reboot_app_3/shared/components/custom-app-bar.dart';
 import 'package:reboot_app_3/shared/localization/localization.dart';
 import 'package:reboot_app_3/presentation/Screens/ta3afi_liberary/widgets/content_screen.dart';
-import 'package:reboot_app_3/shared/constants/constants.dart';
 import 'package:reboot_app_3/shared/constants/textstyles_constants.dart';
 import 'package:reboot_app_3/shared/localization/localization_services.dart';
 
@@ -53,11 +52,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               ),
               WelcomeWidget(),
               SizedBox(
-                height: 16,
+                height: 24,
               ),
               ExploreWidget(),
               SizedBox(
-                height: 16,
+                height: 24,
               ),
               Ta3afiLiberaryWidget(),
               SizedBox(
@@ -78,12 +77,13 @@ class Ta3afiLiberaryWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Text(
           AppLocalizations.of(context).translate('nofap-content'),
-          style: kSubTitlesStyle,
+          style: kSubTitlesStyle.copyWith(color: theme.hintColor),
         ),
         SizedBox(
           height: 8,
@@ -97,21 +97,25 @@ class Ta3afiLiberaryWidget extends StatelessWidget {
 class Ta3afiLiberaryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Container(
       padding: EdgeInsets.all(20),
       width: MediaQuery.of(context).size.width - 40,
       decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12.5),
-          border: Border.all(
-              width: 0.25, color: lightPrimaryColor.withOpacity(0.5))),
+        color: theme.cardColor,
+        borderRadius: BorderRadius.circular(12.5),
+        border: Border.all(
+          width: 0.25,
+          color: theme.primaryColor,
+        ),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Text(
             AppLocalizations.of(context).translate('porn-addiction-recovery-p'),
             style: kSubTitlesSubsStyle.copyWith(
-                color: lightPrimaryColor, fontWeight: FontWeight.w500),
+                color: theme.primaryColor, fontWeight: FontWeight.w500),
           ),
           Padding(
             padding: EdgeInsets.only(right: 12, left: 12, top: 30, bottom: 30),
@@ -121,22 +125,22 @@ class Ta3afiLiberaryCard extends StatelessWidget {
               children: [
                 Icon(
                   Iconsax.message_edit,
-                  color: lightPrimaryColor,
+                  color: theme.primaryColor,
                   size: 28,
                 ),
                 Icon(
                   Iconsax.video,
-                  color: lightPrimaryColor,
+                  color: theme.primaryColor,
                   size: 28,
                 ),
                 Icon(
                   Iconsax.document,
-                  color: lightPrimaryColor,
+                  color: theme.primaryColor,
                   size: 28,
                 ),
                 Icon(
                   Iconsax.book,
-                  color: lightPrimaryColor,
+                  color: theme.primaryColor,
                   size: 28,
                 ),
               ],
@@ -155,8 +159,9 @@ class Ta3afiLiberaryCard extends StatelessWidget {
                     width: MediaQuery.of(context).size.width * 0.40,
                     padding: EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                        color: lightPrimaryColor,
-                        borderRadius: BorderRadius.circular(30)),
+                        color: theme.primaryColor,
+                        borderRadius: BorderRadius.circular(30),
+                        border: Border.all(color: theme.primaryColor)),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -165,7 +170,7 @@ class Ta3afiLiberaryCard extends StatelessWidget {
                               .translate("explore-content"),
                           style: kPageTitleStyle.copyWith(
                               fontSize: 14,
-                              color: seconderyColor,
+                              color: theme.scaffoldBackgroundColor,
                               height: 1,
                               fontWeight: FontWeight.w600),
                         ),

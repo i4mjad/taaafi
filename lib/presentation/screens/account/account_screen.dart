@@ -399,7 +399,7 @@ class UserProfileCard extends StatelessWidget {
             Container(
               padding: EdgeInsets.all(40),
               decoration: BoxDecoration(
-                  color: theme.backgroundColor,
+                  color: theme.cardColor,
                   borderRadius: BorderRadius.circular(500),
                   border: Border.all(color: theme.primaryColor, width: 0.25)),
               child: Icon(
@@ -414,11 +414,13 @@ class UserProfileCard extends StatelessWidget {
               children: [
                 Text(
                   this.user.displayName,
-                  style: kTitlePrimeryStyle.copyWith(color: theme.primaryColor),
+                  style: kTitlePrimeryStyle.copyWith(
+                      color: theme.hintColor, fontWeight: FontWeight.w500),
                 ),
                 SizedBox(height: 8),
                 Text(this.user.email.toUpperCase(),
-                    style: kCaptionStyle.copyWith(color: theme.primaryColor)),
+                    style: kCaptionStyle.copyWith(
+                        color: theme.hintColor.withOpacity(0.75))),
               ],
             ),
           ],
