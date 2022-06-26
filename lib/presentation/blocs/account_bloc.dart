@@ -8,7 +8,6 @@ class AccountBloc implements CustomBlocBase {
   AccountBloc() {
     db.initStream().listen((data) => _inFirestore.add(data));
   }
-//TODO This was BehaviorSubject, to be investigated
   final _firestoreController = StreamController<DocumentSnapshot>();
   Stream<DocumentSnapshot> get outFirestore => _firestoreController.stream;
   Sink<DocumentSnapshot> get _inFirestore => _firestoreController.sink;
