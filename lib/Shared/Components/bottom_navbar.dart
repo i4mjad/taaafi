@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:iconsax/iconsax.dart';
@@ -84,3 +85,84 @@ class _BottomNavBarState extends State<BottomNavBar> {
     );
   }
 }
+
+class HomeNavBar extends StatefulWidget {
+  const HomeNavBar({Key key}) : super(key: key);
+
+  @override
+  State<HomeNavBar> createState() => _HomeNavBarState();
+}
+
+class _HomeNavBarState extends State<HomeNavBar> {
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return CupertinoTabScaffold(
+
+      tabBar: CupertinoTabBar(
+        items: [
+          BottomNavigationBarItem(
+              icon: Icon(Iconsax.home),
+              // label: AppLocalizations.of(context).translate('home'),
+          ),
+          BottomNavigationBarItem(
+              icon: Icon(
+                Iconsax.chart,
+              ),
+              // label: AppLocalizations.of(context).translate('fyr')
+              ),
+          // BottomNavigationBarItem(
+          //     icon: Icon(
+          //       Iconsax.people,
+          //     ),
+          //     label: AppLocalizations.of(context).translate('community')),
+          BottomNavigationBarItem(
+              icon: Icon(
+                Iconsax.personalcard,
+              ),
+              // label: AppLocalizations.of(context).translate('account'),
+          ),
+          BottomNavigationBarItem(
+              icon: Icon(
+                Iconsax.heart_tick,
+              ),
+              // label: AppLocalizations.of(context).translate('about'),
+          ),
+        ],
+        activeColor: theme.primaryColor,
+        backgroundColor: theme.bottomAppBarColor,
+
+      ),
+      // tabBuilder: (BuildContext context, int index) {
+      //
+      // },
+
+      tabBuilder: (BuildContext context, int index) {
+        switch (index) {
+          case 0:
+            return CupertinoTabView(builder: (context){
+              return CupertinoPageScaffold(child: HomeScreen(),);
+            });
+          case 1:
+            return CupertinoTabView(builder: (context){
+              return CupertinoPageScaffold(child: FollowYourRebootScreenAuthenticationWrapper(),);
+            });
+          case 2:
+            return CupertinoTabView(builder: (context){
+              return CupertinoPageScaffold(child: AccountScreenScreenAuthenticationWrapper(),);
+            });
+          case 3:
+            return CupertinoTabView(builder: (context){
+              return CupertinoPageScaffold(child: AboutScreen(),);
+            });
+          default:
+            return CupertinoPageScaffold(child: HomeScreen(),);
+        }
+      },
+
+    );
+  }
+}
+
+

@@ -1,11 +1,18 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:iconsax/iconsax.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:reboot_app_3/presentation/screens/about/about_screen.dart';
+import 'package:reboot_app_3/presentation/screens/account/account_screen.dart';
+import 'package:reboot_app_3/presentation/screens/follow_your_reboot/follow_your_reboot_screen.dart';
+import 'package:reboot_app_3/presentation/screens/home/home_screen.dart';
+import 'package:reboot_app_3/shared/Components/bottom_navbar.dart';
 import 'package:reboot_app_3/shared/components/app-themes.dart';
 import 'package:reboot_app_3/shared/localization/localization.dart';
 import 'package:reboot_app_3/shared/services/auth_service.dart';
@@ -149,6 +156,7 @@ class _MyAppState extends State<MyApp> {
             debugShowCheckedModeBanner: false,
             onGenerateRoute: CustomRouter.allRoutes,
             initialRoute: navbar,
+            home: HomeNavBar(),
             navigatorObservers: [observer],
             theme: notifier.darkTheme == true ? darkTheme : lightTheme,
           );
@@ -157,3 +165,4 @@ class _MyAppState extends State<MyApp> {
     );
   }
 }
+

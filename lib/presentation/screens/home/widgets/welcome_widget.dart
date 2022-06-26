@@ -147,6 +147,7 @@ class WelcomeContent extends StatelessWidget {
                           AppLocalizations.of(context)
                                   .translate("relapses-30-days") +
                               sh.data,
+                          textAlign: TextAlign.center,
                           style: kSubTitlesStyle.copyWith(
                               fontSize: 13, color: theme.hintColor),
                         );
@@ -176,6 +177,7 @@ class WelcomeContent extends StatelessWidget {
                           AppLocalizations.of(context)
                                   .translate('free-days-from-start') +
                               sh.data,
+                          textAlign: TextAlign.center,
                           style: kSubTitlesStyle.copyWith(
                               color: theme.hintColor, fontSize: 13),
                         );
