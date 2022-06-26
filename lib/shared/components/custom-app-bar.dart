@@ -41,7 +41,7 @@ AppBar appBarWithSettings(BuildContext context, String titleId) {
 AppBar notesAppBar(BuildContext context, String titleId) {
   final theme = Theme.of(context);
   return AppBar(
-    backgroundColor: seconderyColor,
+    backgroundColor: theme.scaffoldBackgroundColor,
     elevation: 0,
     centerTitle: true,
     title: Text(
@@ -63,7 +63,7 @@ AppBar notesAppBar(BuildContext context, String titleId) {
           padding: EdgeInsets.only(right: 16, left: 16),
           child: Icon(
             Iconsax.element_plus,
-            color: lightPrimaryColor,
+            color: theme.primaryColor,
           ),
         ),
       )
@@ -90,7 +90,7 @@ AppBar plainAppBar(BuildContext context, String titleId) {
 AppBar noteAppBar(BuildContext context, String title) {
   final theme = Theme.of(context);
   return AppBar(
-    backgroundColor: seconderyColor,
+    backgroundColor: theme.bottomAppBarColor,
     elevation: 0,
     centerTitle: true,
     title: Text(

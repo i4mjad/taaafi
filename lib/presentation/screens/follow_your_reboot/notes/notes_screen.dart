@@ -25,6 +25,7 @@ class _NotesScreenState extends State<NotesScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
       appBar: notesAppBar(context, "dairies"),
       body: SafeArea(
@@ -61,11 +62,13 @@ class _NotesScreenState extends State<NotesScreen> {
                               return GestureDetector(
                                 onTap: () {
                                   Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (_) => NoteScreen(
-                                              noteToEdit:
-                                                  snapshot.data.docs[index])));
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => NoteScreen(
+                                        noteToEdit: snapshot.data.docs[index],
+                                      ),
+                                    ),
+                                  );
                                 },
                                 child: Container(
                                   //margin: EdgeInsets.only(top:20, bottom: 20, left: 0, right: 0),
@@ -73,15 +76,17 @@ class _NotesScreenState extends State<NotesScreen> {
                                       MediaQuery.of(context).size.width * 0.30,
                                   height: 150,
                                   decoration: BoxDecoration(
-                                    color: mainGrayColor,
-                                    borderRadius: BorderRadius.circular(12.5),
-                                  ),
+                                      color: theme.cardColor,
+                                      borderRadius: BorderRadius.circular(12.5),
+                                      border: Border.all(
+                                          color: theme.primaryColor)),
                                   child: Padding(
                                     padding: const EdgeInsets.only(
-                                        right: 20,
-                                        left: 20,
-                                        top: 20,
-                                        bottom: 20),
+                                      right: 20,
+                                      left: 20,
+                                      top: 20,
+                                      bottom: 20,
+                                    ),
                                     child: Column(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
@@ -93,9 +98,10 @@ class _NotesScreenState extends State<NotesScreen> {
                                                   as Map)["title"]
                                               .toString(),
                                           style: kSubTitlesSubsStyle.copyWith(
-                                              fontWeight: FontWeight.w600,
-                                              color: lightPrimaryColor,
-                                              fontSize: 16),
+                                            fontWeight: FontWeight.w600,
+                                            color: theme.primaryColor,
+                                            fontSize: 16,
+                                          ),
                                         ),
                                         Text(
                                           (snapshot.data.docs[index].data()
@@ -111,7 +117,8 @@ class _NotesScreenState extends State<NotesScreen> {
                                                   .substring(0, 16)
                                               : "",
                                           style: kSubTitlesSubsStyle.copyWith(
-                                              color: Colors.grey[500],
+                                              color: theme.primaryColor
+                                                  .withOpacity(0.7),
                                               fontSize: 16),
                                         )
                                       ],

@@ -35,12 +35,13 @@ class _NoteScreenState extends State<NoteScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
       appBar:
           noteAppBar(context, (this.widget.noteToEdit.data() as Map)["title"]),
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.only(right: 20.0, left: 20),
+          padding: const EdgeInsets.only(right: 20.0, left: 20, top: 20),
           child: Container(
             width: MediaQuery.of(context).size.width - 40,
             child: Column(
@@ -50,22 +51,28 @@ class _NoteScreenState extends State<NoteScreen> {
                   width: MediaQuery.of(context).size.width - 40,
                   height: 45,
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.all(Radius.circular(12.0)),
-                    color: mainGrayColor,
+                    borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                    color: theme.cardColor,
+                    border: Border.all(color: theme.primaryColor, width: 0.5),
                   ),
                   child: TextField(
                     controller: title,
                     style: kSubTitlesStyle.copyWith(
-                        fontSize: 14, height: 1, fontWeight: FontWeight.w400),
+                        fontSize: 14,
+                        height: 1,
+                        fontWeight: FontWeight.w400,
+                        color: theme.primaryColor),
                     decoration: InputDecoration(
                       prefixIcon: Icon(
                         CupertinoIcons.pen,
-                        color: lightPrimaryColor,
+                        color: theme.primaryColor,
                       ),
                       border: InputBorder.none,
                       hintText: "Title",
                       hintStyle: kSubTitlesSubsStyle.copyWith(
-                          fontSize: 18, color: Colors.grey, height: 1.75),
+                          fontSize: 18,
+                          color: theme.primaryColor,
+                          height: 1.75),
                       contentPadding: EdgeInsets.only(left: 12, right: 12),
                     ),
                   ),
@@ -78,13 +85,17 @@ class _NoteScreenState extends State<NoteScreen> {
                   width: MediaQuery.of(context).size.width - 40,
                   height: MediaQuery.of(context).size.height * 0.65,
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.all(Radius.circular(12.0)),
-                    color: mainGrayColor,
-                  ),
+                      borderRadius: BorderRadius.all(Radius.circular(12.0)),
+                      color: theme.cardColor,
+                      border:
+                          Border.all(color: theme.primaryColor, width: 0.5)),
                   child: TextField(
                     controller: body,
                     style: kSubTitlesStyle.copyWith(
-                        fontSize: 14, height: 1.3, fontWeight: FontWeight.w400),
+                        fontSize: 14,
+                        height: 1.3,
+                        fontWeight: FontWeight.w400,
+                        color: theme.primaryColor),
                     maxLines: null,
                     expands: true,
                     decoration: InputDecoration(
@@ -112,7 +123,7 @@ class _NoteScreenState extends State<NoteScreen> {
                         width: (MediaQuery.of(context).size.width * 0.5) - (32),
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(10.5),
-                          color: Colors.deepOrange,
+                          color: Colors.red,
                         ),
                         child: Center(
                           child: Text(
@@ -148,13 +159,13 @@ class _NoteScreenState extends State<NoteScreen> {
                         width: (MediaQuery.of(context).size.width * 0.5) - (32),
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(10.50),
-                          color: lightPrimaryColor,
+                          color: theme.cardColor,
                         ),
                         child: Center(
                           child: Text(
                             AppLocalizations.of(context).translate("save"),
                             style: kSubTitlesStyle.copyWith(
-                                color: Colors.white,
+                                color: theme.primaryColor,
                                 fontWeight: FontWeight.w500),
                           ),
                         ),

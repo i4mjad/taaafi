@@ -318,7 +318,7 @@ class FollowYourRebootScreenState extends State<FollowYourRebootScreen>
                                 width: 8,
                               ),
                               Text(
-                                AppLocalizations.of(context)
+                              AppLocalizations.of(context)
                                     .translate("relapses-number"),
                                 style: kHeadlineStyle.copyWith(
                                     fontWeight: FontWeight.w400, fontSize: 18),

@@ -35,6 +35,7 @@ class _AddNoteScreenState extends State<AddNoteScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
       appBar: plainAppBar(context, "new-note"),
       body: Padding(
@@ -51,15 +52,15 @@ class _AddNoteScreenState extends State<AddNoteScreen> {
                 width: MediaQuery.of(context).size.width - 40,
                 height: 45,
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.all(Radius.circular(12.0)),
-                  color: mainGrayColor,
-                ),
+                    borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                    color: theme.cardColor,
+                    border: Border.all(color: theme.primaryColor, width: 0.5)),
                 child: TextField(
                   controller: title,
                   decoration: InputDecoration(
                     prefixIcon: Icon(
                       CupertinoIcons.pen,
-                      color: lightPrimaryColor,
+                      color: theme.primaryColor,
                     ),
                     border: InputBorder.none,
                     hintText: "العنوان",
@@ -67,7 +68,7 @@ class _AddNoteScreenState extends State<AddNoteScreen> {
                         fontFamily: "DINNextLTArabic",
                         fontSize: 18,
                         fontWeight: FontWeight.w400,
-                        color: Colors.grey,
+                        color: theme.primaryColor,
                         height: 1.75),
                     contentPadding: EdgeInsets.only(left: 12, right: 12),
                   ),
@@ -81,9 +82,9 @@ class _AddNoteScreenState extends State<AddNoteScreen> {
                 width: MediaQuery.of(context).size.width - 40,
                 height: MediaQuery.of(context).size.height * 0.65,
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.all(Radius.circular(12.0)),
-                  color: mainGrayColor,
-                ),
+                    borderRadius: BorderRadius.all(Radius.circular(12.0)),
+                    color: theme.cardColor,
+                    border: Border.all(color: theme.primaryColor, width: 0.5)),
                 child: TextField(
                   controller: body,
                   maxLines: null,
@@ -91,8 +92,7 @@ class _AddNoteScreenState extends State<AddNoteScreen> {
                   decoration: InputDecoration(
                       hintText: "النص",
                       hintStyle: kSubTitlesSubsStyle.copyWith(
-                        fontSize: 14,
-                      ),
+                          fontSize: 14, color: theme.primaryColor),
                       contentPadding: EdgeInsets.only(
                           left: 12, right: 12, top: 12, bottom: 12),
                       border: InputBorder.none),
@@ -122,10 +122,9 @@ class _AddNoteScreenState extends State<AddNoteScreen> {
                   padding: EdgeInsets.all(16),
                   width: MediaQuery.of(context).size.width - 40,
                   decoration: BoxDecoration(
-                      color: lightPrimaryColor,
-                      borderRadius: BorderRadius.circular(12.5),
-                      border:
-                          Border.all(color: lightPrimaryColor, width: 0.25)),
+                    color: theme.cardColor,
+                    borderRadius: BorderRadius.circular(12.5),
+                  ),
                   child: Center(
                     child: Text(
                       "حفظ",
