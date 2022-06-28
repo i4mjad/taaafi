@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:reboot_app_3/Presentation/screens/about/about_screen.dart';
-import 'package:reboot_app_3/main.dart';
 import 'package:reboot_app_3/presentation/screens/account/account_screen.dart';
 import 'package:reboot_app_3/presentation/screens/auth/login_screen.dart';
 import 'package:reboot_app_3/presentation/screens/community/community_screen.dart';
