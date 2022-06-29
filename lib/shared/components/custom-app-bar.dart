@@ -86,7 +86,7 @@ AppBar plainAppBar(BuildContext context, String titleId) {
   );
 }
 
-AppBar noteAppBar(BuildContext context, String title) {
+AppBar appBarWithCustomTitle(BuildContext context, String title) {
   final theme = Theme.of(context);
   return AppBar(
     backgroundColor: theme.bottomAppBarColor,

@@ -37,8 +37,8 @@ class _NoteScreenState extends State<NoteScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Scaffold(
-      appBar:
-          noteAppBar(context, (this.widget.noteToEdit.data() as Map)["title"]),
+      appBar: appBarWithCustomTitle(
+          context, (this.widget.noteToEdit.data() as Map)["title"]),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.only(right: 20.0, left: 20, top: 20),

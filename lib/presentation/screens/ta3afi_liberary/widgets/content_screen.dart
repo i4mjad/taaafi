@@ -506,9 +506,6 @@ class _ContentScreenState extends State<ContentScreen> {
                         ),
                       ],
                     ),
-                    SizedBox(
-                      height: 100,
-                    )
                   ],
                 ),
               ),

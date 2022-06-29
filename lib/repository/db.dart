@@ -436,7 +436,6 @@ class DB {
 
     for (var date in relapses) {
       if (_last30Days().contains(date.toString().substring(0, 10))) {
-        print(date);
         _count += 1;
       }
     }
