@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:reboot_app_3/bloc_provider.dart';
+import 'package:reboot_app_3/presentation/blocs/content_bloc.dart';
 import 'package:reboot_app_3/presentation/screens/home/widgets/explore_widget.dart';
 import 'package:reboot_app_3/presentation/screens/home/widgets/welcome_widget.dart';
 import 'package:reboot_app_3/shared/components/custom-app-bar.dart';
@@ -50,11 +52,13 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               SizedBox(
                 height: 16,
               ),
+
               WelcomeWidget(),
               SizedBox(
                 height: 24,
               ),
-              ExploreWidget(),
+              CustomBlocProvider(bloc: ContentBloc(), child: ExploreWidget()),
+
               SizedBox(
                 height: 24,
               ),
