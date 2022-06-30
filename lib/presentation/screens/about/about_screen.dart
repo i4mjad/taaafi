@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
@@ -50,7 +51,7 @@ class _AboutScreenState extends State<AboutScreen>
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    SvgPicture.asset("asset/illustrations/app-logo-about.svg",
+                    Image.asset("asset/illustrations/app-logo.png",
                         height: MediaQuery.of(context).size.height * 0.175),
                     SizedBox(
                       height: 16,
@@ -89,7 +90,7 @@ class _AboutScreenState extends State<AboutScreen>
                       child: InkWell(
                         onTap: () {
                           HapticFeedback.mediumImpact();
-                          launchUrl(Uri.parse('https://t.me/i4mjad'));
+                          launchUrl(Uri.parse('https://t.me/Ta3afiApp'));
                         },
                         child: Container(
                           width: (MediaQuery.of(context).size.width / 1.5),

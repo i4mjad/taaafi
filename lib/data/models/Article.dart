@@ -2,22 +2,22 @@ class Article {
   String title;
   String author;
   String timeToRead;
-  String breif;
   String body;
+  String date;
 
   Article(
     this.title,
     this.author,
     this.timeToRead,
-    this.breif,
+    this.date,
     this.body,
   );
 
   Article.fromMap(Map<String, dynamic> snapshot) {
     title = snapshot['title'];
     author = snapshot['author'];
+    date = snapshot['date'];
     timeToRead = snapshot['timeToRead'];
-    breif = snapshot['breif'];
     body = snapshot['postBody'];
   }
 }

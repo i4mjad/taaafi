@@ -34,7 +34,7 @@ class FollowYourRebootScreen extends StatefulWidget {
 class FollowYourRebootScreenState extends State<FollowYourRebootScreen>
     with TickerProviderStateMixin {
   String lang;
-
+  final GlobalKey<ScaffoldState> _modelScaffoldKey = GlobalKey<ScaffoldState>();
   FirebaseFirestore database = FirebaseFirestore.instance;
   final user = FirebaseAuth.instance.currentUser;
 
@@ -355,7 +355,9 @@ class FollowYourRebootScreenState extends State<FollowYourRebootScreen>
   changeDateEvent(
       String date, BuildContext context, FollowYourRebootBloc bloc) async {
     final trimedDate = date.trim();
+          final theme = Theme.of(context);
     showModalBottomSheet(
+      backgroundColor: theme.scaffoldBackgroundColor,
         context: context,
         builder: (context) {
           return Padding(
@@ -382,7 +384,7 @@ class FollowYourRebootScreenState extends State<FollowYourRebootScreen>
                   children: [
                     Text(
                       trimedDate,
-                      style: kPageTitleStyle.copyWith(fontSize: 26),
+                      style: kPageTitleStyle.copyWith(fontSize: 26, color: theme.primaryColor),
                     ),
                     GestureDetector(
                       onTap: () {
@@ -390,7 +392,7 @@ class FollowYourRebootScreenState extends State<FollowYourRebootScreen>
                       },
                       child: Icon(
                         Iconsax.close_circle,
-                        color: Colors.black26,
+                        color: theme.primaryColor,
                         size: 32,
                       ),
                     )

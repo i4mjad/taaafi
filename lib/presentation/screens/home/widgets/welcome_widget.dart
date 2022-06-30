@@ -37,7 +37,7 @@ class NotSignIn extends StatelessWidget {
           style: kSubTitlesStyle.copyWith(color: theme.primaryColor),
         ),
         SizedBox(
-          height: 8,
+          height: 16,
         ),
         Container(
           height: 150,
@@ -84,7 +84,7 @@ class WelcomeContent extends StatelessWidget {
           style: kSubTitlesStyle.copyWith(color: theme.hintColor),
         ),
         SizedBox(
-          height: 8,
+          height: 16,
         ),
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -116,11 +116,14 @@ class WelcomeContent extends StatelessWidget {
                       );
                     },
                   ),
-                  Text(
-                    AppLocalizations.of(context).translate('free-relapse-days'),
-                    style: kSubTitlesStyle.copyWith(
-                        fontSize: 16, color: Colors.white, height: 1.5),
-                    textAlign: TextAlign.center,
+                  Padding(
+                    padding: const EdgeInsets.only(right:8.0, left: 8),
+                    child: Text(
+                      AppLocalizations.of(context).translate('free-relapse-days'),
+                      style: kSubTitlesStyle.copyWith(
+                          fontSize: 16, color: Colors.white, height: 1.5),
+                      textAlign: TextAlign.center,
+                    ),
                   ),
                 ],
               ),

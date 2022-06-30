@@ -25,15 +25,10 @@ class ExploreWidget extends StatelessWidget {
               AppLocalizations.of(context).translate('explore'),
               style: kSubTitlesStyle.copyWith(color: theme.hintColor),
             ),
-            Text(
-              "تصفح الكل",
-              style: kSubTitlesStyle.copyWith(
-                  fontSize: 12, color: theme.primaryColor),
-            )
           ],
         ),
         SizedBox(
-          height: 8,
+          height: 16,
         ),
         Row(
           children: [
@@ -103,8 +98,10 @@ class ExploreListView extends StatelessWidget {
                 context,
                 MaterialPageRoute(
                     builder: (context) => ArticlePage(
-                          title: snapshot.data[index].title,
-                        ),),);
+                          article: snapshot.data[index],
+                        ),
+                ),
+            );
           },
           child: Container(
             padding: EdgeInsets.all(16),

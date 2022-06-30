@@ -202,8 +202,9 @@ class FollowUpStreaks extends StatelessWidget {
   }
 
   changeDateEvent(
-      String date, BuildContext context, FollowYourRebootBloc bloc) async {
+    String date, BuildContext context, FollowYourRebootBloc bloc) async {
     final trimedDate = date.trim();
+    final theme = Theme.of(context);
     showModalBottomSheet(
         context: context,
         builder: (context) {
@@ -231,7 +232,7 @@ class FollowUpStreaks extends StatelessWidget {
                   children: [
                     Text(
                       trimedDate,
-                      style: kPageTitleStyle.copyWith(fontSize: 26),
+                      style: kPageTitleStyle.copyWith(fontSize: 26, color: theme.primaryColor),
                     ),
                     GestureDetector(
                       onTap: () {
@@ -239,7 +240,7 @@ class FollowUpStreaks extends StatelessWidget {
                       },
                       child: Icon(
                         Iconsax.close_circle,
-                        color: Colors.black26,
+                        color: theme.primaryColor,
                         size: 32,
                       ),
                     )

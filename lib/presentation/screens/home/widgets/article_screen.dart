@@ -1,20 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:reboot_app_3/data/models/Article.dart';
 import 'package:reboot_app_3/shared/components/custom-app-bar.dart';
-import 'package:reboot_app_3/shared/constants/constants.dart';
+import 'package:flutter_html/flutter_html.dart';
 import 'package:reboot_app_3/shared/constants/textstyles_constants.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ArticlePage extends StatelessWidget {
-  ArticlePage({Key key, this.title}) : super(key: key);
-  String title;
-  String longText =
-      "هذا نص طويل جدا جدا لدرجة أنه يجب أن يتخطى حجم شاشة الجهاز الحالي. هذا نص طويل جدا جدا لدرجة أنه يجب أن يتخطى حجم شاشة الجهاز الحالي. هذا نص طويل جدا جدا لدرجة أنه يجب أن يتخطى حجم شاشة الجهاز الحالي. هذا نص طويل جدا جدا لدرجة أنه يجب أن يتخطى حجم شاشة الجهاز الحالي. هذا نص طويل جدا جدا لدرجة أنه يجب أن يتخطى حجم شاشة الجهاز الحالي. هذا نص طويل جدا جدا لدرجة أنه يجب أن يتخطى حجم شاشة الجهاز الحالي. هذا نص طويل جدا جدا لدرجة أنه يجب أن يتخطى حجم شاشة الجهاز الحالي. هذا نص طويل جدا جدا لدرجة أنه يجب أن يتخطى حجم شاشة الجهاز الحالي. هذا نص طويل جدا جدا لدرجة أنه يجب أن يتخطى حجم شاشة الجهاز الحالي. هذا نص طويل جدا جدا لدرجة أنه يجب أن يتخطى حجم شاشة الجهاز الحالي. هذا نص طويل جدا جدا لدرجة أنه يجب أن يتخطى حجم شاشة الجهاز الحالي. هذا نص طويل جدا جدا لدرجة أنه يجب أن يتخطى حجم شاشة الجهاز الحالي. هذا نص طويل جدا جدا لدرجة أنه يجب أن يتخطى حجم شاشة الجهاز الحالي. هذا نص طويل جدا جدا لدرجة أنه يجب أن يتخطى حجم شاشة الجهاز الحالي. هذا نص طويل جدا جدا لدرجة أنه يجب أن يتخطى حجم شاشة الجهاز الحالي. هذا نص طويل جدا جدا لدرجة أنه يجب أن يتخطى حجم شاشة الجهاز الحالي. هذا نص طويل جدا جدا لدرجة أنه يجب أن يتخطى حجم شاشة الجهاز الحالي. هذا نص طويل جدا جدا لدرجة أنه يجب أن يتخطى حجم شاشة الجهاز الحالي. هذا نص طويل جدا جدا لدرجة أنه يجب أن يتخطى حجم شاشة الجهاز الحالي. هذا نص طويل جدا جدا لدرجة أنه يجب أن يتخطى حجم شاشة الجهاز الحالي. هذا نص طويل جدا جدا لدرجة أنه يجب أن يتخطى حجم شاشة الجهاز الحالي. هذا نص طويل جدا جدا لدرجة أنه يجب أن يتخطى حجم شاشة الجهاز الحالي. هذا نص طويل جدا جدا لدرجة أنه يجب أن يتخطى حجم شاشة الجهاز الحالي. هذا نص طويل جدا جدا لدرجة أنه يجب أن يتخطى حجم شاشة الجهاز الحالي. هذا نص طويل جدا جدا لدرجة أنه يجب أن يتخطى حجم شاشة الجهاز الحالي. ";
-
+  ArticlePage({Key key, this.article}) : super(key: key);
+  Article article;
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Scaffold(
-      appBar: appBarWithCustomTitle(context, title),
+      appBar: appBarWithCustomTitle(context, article.title),
       body: Padding(
         padding: EdgeInsets.only(left: 20, right: 20, bottom: 20),
         child: Column(
@@ -48,7 +47,7 @@ class ArticlePage extends StatelessWidget {
                               width: 4,
                             ),
                             Text(
-                              "28/08/2022",
+                              article.date,
                               style: kSubTitlesSubsStyle.copyWith(
                                 fontSize: 10.5,
                                 height: 1,
@@ -77,7 +76,7 @@ class ArticlePage extends StatelessWidget {
                               width: 4,
                             ),
                             Text(
-                              "أمجد السليماني",
+                              article.author,
                               style: kSubTitlesSubsStyle.copyWith(
                                 fontSize: 10.5,
                                 height: 1,
@@ -105,7 +104,7 @@ class ArticlePage extends StatelessWidget {
                             SizedBox(
                               width: 4,
                             ),
-                            Text("5 دقائق",
+                            Text(article.timeToRead,
                                 style: kSubTitlesSubsStyle.copyWith(
                                     fontSize: 10.5,
                                     height: 1,
@@ -131,14 +130,22 @@ class ArticlePage extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
                           Flexible(
-                              child: Text(
-                            longText,
-                            style: kSubTitlesStyle.copyWith(
-                                color: Colors.black,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500,
-                                height: 1.5),
-                          ))
+                            child: Html(
+                              data: article.body,
+                              style: {
+                                "body": Style(
+                                  fontFamily: 'DINNextLTArabic',
+
+                                  color: theme.primaryColor
+
+                                )
+
+                              },
+                              onLinkTap: (String url, RenderContext context, Map<String, String> attributes, element) {
+                                launchUrl(Uri.parse(url));
+                               }
+                            ),
+                          )
                         ],
                       ),
                     ),

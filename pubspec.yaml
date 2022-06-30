@@ -40,6 +40,7 @@ dependencies:
   persistent_bottom_nav_bar: ^4.0.2
   google_sign_in: ^5.3.3
   http: ^0.13.4
+  flutter_html: ^2.2.1
   iconsax: ^0.0.8
   intl: ^0.17.0
   path:
@@ -49,7 +50,7 @@ dependencies:
   syncfusion_flutter_calendar: ^20.1.59
   url_launcher: ^6.1.3
   rxdart:
-  flutter_svg: ^1.1.0
+
 
 dev_dependencies:
   dart_code_metrics: ^4.15.2
@@ -68,6 +69,7 @@ flutter:
   assets:
     - asset/illustrations/home-anumation.json
     - asset/illustrations/app-logo-about.svg
+    - asset/illustrations/app-logo.png
     - asset/i18n/en.json
     - asset/i18n/ar.json
 
