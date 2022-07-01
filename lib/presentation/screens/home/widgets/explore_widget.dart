@@ -43,13 +43,13 @@ class ExploreWidget extends StatelessWidget {
                         initialData: [],
                         builder: (BuildContext context, snapshot) {
                           switch (snapshot.connectionState) {
-                            // Uncompleted State
+                          // Uncompleted State
                             case ConnectionState.none:
                             case ConnectionState.waiting:
                               return Center(child: CircularProgressIndicator());
                               break;
                             default:
-                              // Completed with error
+                            // Completed with error
                               if (snapshot.hasError)
                                 return Container(
                                   child: Center(
@@ -58,7 +58,6 @@ class ExploreWidget extends StatelessWidget {
                                     ),
                                   ),
                                 );
-
                               return ExploreListView(
                                   theme: theme, snapshot: snapshot);
                           }
