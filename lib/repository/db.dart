@@ -367,22 +367,22 @@ class DB {
 
   void checkData() async {
     return await db.collection("users").doc(uid).get().then((value) async {
-      if (!(value.data().containsKey("userRelapses"))) {
-        db.collection("users").doc(user.uid).set({
+      if (!(await value.data().containsKey("userRelapses"))) {
+        await db.collection("users").doc(user.uid).set({
           "userRelapses": [],
         }, SetOptions(merge: true));
       }
-      if (!(value.data().containsKey("userWatchingWithoutMasturbating"))) {
-        db.collection("users").doc(user.uid).set({
+      if (!(await value.data().containsKey("userWatchingWithoutMasturbating"))) {
+        await db.collection("users").doc(user.uid).set({
           "userWatchingWithoutMasturbating": [],
         }, SetOptions(merge: true));
       }
-      if (!(value.data().containsKey("userMasturbatingWithoutWatching"))) {
-        db.collection("users").doc(user.uid).set({
+      if (!(await value.data().containsKey("userMasturbatingWithoutWatching"))) {
+        await db.collection("users").doc(user.uid).set({
           "userMasturbatingWithoutWatching": [],
         }, SetOptions(merge: true));
       }
-      if (!(value.data().containsKey("userFirstDate"))) {
+      if (!(await value.data().containsKey("userFirstDate"))) {
         await migerateToUserFirstDate();
       }
     });
