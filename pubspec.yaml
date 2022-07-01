@@ -54,9 +54,12 @@ dependencies:
 
 dev_dependencies:
   dart_code_metrics: ^4.15.2
+  flutter_launcher_icons: ^0.9.3
   flutter_test:
     sdk: flutter
 
+flutter_icons:
+  image_path: 'asset/illustrations/app-icon.png'
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 # The following section is specific to Flutter.
@@ -67,8 +70,7 @@ flutter:
   uses-material-design: true
 
   assets:
-    - asset/illustrations/home-anumation.json
-    - asset/illustrations/app-logo-about.svg
+    - asset/illustrations/app-icon.png
     - asset/illustrations/app-logo.png
     - asset/i18n/en.json
     - asset/i18n/ar.json
