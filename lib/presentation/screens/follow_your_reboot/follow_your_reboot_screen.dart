@@ -34,7 +34,7 @@ class FollowYourRebootScreen extends StatefulWidget {
 class FollowYourRebootScreenState extends State<FollowYourRebootScreen>
     with TickerProviderStateMixin {
   String lang;
-  final GlobalKey<ScaffoldState> _modelScaffoldKey = GlobalKey<ScaffoldState>();
+  //final GlobalKey<ScaffoldState> _modelScaffoldKey = GlobalKey<ScaffoldState>();
   FirebaseFirestore database = FirebaseFirestore.instance;
   final user = FirebaseAuth.instance.currentUser;
 
@@ -309,35 +309,32 @@ class FollowYourRebootScreenState extends State<FollowYourRebootScreen>
                         SizedBox(
                           height: 8,
                         ),
-                        Container(
-                          width: MediaQuery.of(context).size.width - 40,
-                          child: Row(
-                            children: [
-                              Icon(Iconsax.emoji_sad),
-                              SizedBox(
-                                width: 8,
-                              ),
-                              Text(
+                        Row(
+                          children: [
+                            Icon(Iconsax.emoji_sad),
+                            SizedBox(
+                              width: 8,
+                            ),
+                            Text(
                               AppLocalizations.of(context)
-                                    .translate("relapses-number"),
-                                style: kHeadlineStyle.copyWith(
-                                    fontWeight: FontWeight.w400, fontSize: 18),
-                              ),
-                              FutureBuilder(
-                                future: bloc.getRelapsesCount(),
-                                initialData: "0",
-                                builder: (BuildContext context,
-                                    AsyncSnapshot<String> sh) {
-                                  return Text(
-                                    sh.requireData,
-                                    style: kHeadlineStyle.copyWith(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 18),
-                                  );
-                                },
-                              ),
-                            ],
-                          ),
+                                  .translate("relapses-number"),
+                              style: kHeadlineStyle.copyWith(
+                                  fontWeight: FontWeight.w400, fontSize: 18),
+                            ),
+                            FutureBuilder(
+                              future: bloc.getRelapsesCount(),
+                              initialData: "0",
+                              builder: (BuildContext context,
+                                  AsyncSnapshot<String> sh) {
+                                return Text(
+                                  sh.requireData,
+                                  style: kHeadlineStyle.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 18),
+                                );
+                              },
+                            ),
+                          ],
                         ),
                       ],
                     ),
@@ -355,9 +352,9 @@ class FollowYourRebootScreenState extends State<FollowYourRebootScreen>
   changeDateEvent(
       String date, BuildContext context, FollowYourRebootBloc bloc) async {
     final trimedDate = date.trim();
-          final theme = Theme.of(context);
+    final theme = Theme.of(context);
     showModalBottomSheet(
-      backgroundColor: theme.scaffoldBackgroundColor,
+        backgroundColor: theme.scaffoldBackgroundColor,
         context: context,
         builder: (context) {
           return Padding(
@@ -384,7 +381,8 @@ class FollowYourRebootScreenState extends State<FollowYourRebootScreen>
                   children: [
                     Text(
                       trimedDate,
-                      style: kPageTitleStyle.copyWith(fontSize: 26, color: theme.primaryColor),
+                      style: kPageTitleStyle.copyWith(
+                          fontSize: 26, color: theme.primaryColor),
                     ),
                     GestureDetector(
                       onTap: () {
