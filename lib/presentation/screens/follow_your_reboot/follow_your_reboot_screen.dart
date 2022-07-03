@@ -171,8 +171,13 @@ class FollowYourRebootScreenState extends State<FollowYourRebootScreen>
             children: [
               GestureDetector(
                 onTap: () {
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => NotesScreen()));
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => CustomBlocProvider(
+                          child: NotesScreen(), bloc: FollowYourRebootBloc()),
+                    ),
+                  );
                 },
                 child: Container(
                   width: MediaQuery.of(context).size.width,

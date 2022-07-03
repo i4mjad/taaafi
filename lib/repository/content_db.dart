@@ -11,7 +11,7 @@ class ContentDB {
   Future<List<Article>> getArticlesList() async {
     var querySnapshot = await firebaseDB.collection("fl_content").get();
 
-    return querySnapshot.docs.map((e) => Article.fromMap(e.data())).toList();
+    return querySnapshot.docs.map((e) => Article.fromMap(e)).toList();
   }
 }
 

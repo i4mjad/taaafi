@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:reboot_app_3/data/models/CalenderDay.dart';
 import 'package:reboot_app_3/data/models/FollowUpData.dart';
+import 'package:reboot_app_3/data/models/Note.dart';
 import 'package:reboot_app_3/presentation/screens/follow_your_reboot/day_of_week_relapses/day_of_week_relapses_widget.dart';
 
 class DB {
@@ -20,7 +21,6 @@ class DB {
     await checkData();
 
     DocumentSnapshot snapshot = await db.collection("users").doc(uid).get();
-
     return FollowUpData.fromSnapshot(snapshot);
   }
 
@@ -320,7 +320,7 @@ class DB {
       }
     }
 
-    //differences.removeAt(differences.length - 1);
+    differences.removeAt(differences.length - 1);
 
     return differences.reduce((max)).toString();
   }
@@ -372,12 +372,16 @@ class DB {
           "userRelapses": [],
         }, SetOptions(merge: true));
       }
-      if (!(await value.data().containsKey("userWatchingWithoutMasturbating"))) {
+      if (!(await value
+          .data()
+          .containsKey("userWatchingWithoutMasturbating"))) {
         await db.collection("users").doc(user.uid).set({
           "userWatchingWithoutMasturbating": [],
         }, SetOptions(merge: true));
       }
-      if (!(await value.data().containsKey("userMasturbatingWithoutWatching"))) {
+      if (!(await value
+          .data()
+          .containsKey("userMasturbatingWithoutWatching"))) {
         await db.collection("users").doc(user.uid).set({
           "userMasturbatingWithoutWatching": [],
         }, SetOptions(merge: true));
@@ -440,6 +444,39 @@ class DB {
       }
     }
     return await _count.toString();
+  }
+
+  Future<List<Note>> getNoFapNotes() async {
+    QuerySnapshot querySnapshot =
+        await db.collection("users").doc(uid).collection("userNotes").get();
+
+    return querySnapshot.docs.map((e) => Note.fromMap(e.data())).toList();
+  }
+
+  Future<void> updateNote(String id, String title, String body) async {
+    var data = {
+      'title': title.toString(),
+      "body": body.toString(),
+    };
+    return db
+        .collection("users")
+        .doc(uid)
+        .collection("userNotes")
+        .doc(id)
+        .update(data);
+  }
+
+  Future<void> addNote(String title, String body) async {
+    var data = {
+      'title': title.toString(),
+      "body": body.toString(),
+    };
+    return db
+        .collection("users")
+        .doc(uid)
+        .collection("userNotes")
+        .doc()
+        .set(data, SetOptions(merge: true));
   }
 }
 

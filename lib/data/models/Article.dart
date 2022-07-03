@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class Article {
   String title;
   String author;
@@ -13,7 +15,7 @@ class Article {
     this.body,
   );
 
-  Article.fromMap(Map<String, dynamic> snapshot) {
+  Article.fromMap(DocumentSnapshot snapshot) {
     title = snapshot['title'];
     author = snapshot['author'];
     date = snapshot['date'];

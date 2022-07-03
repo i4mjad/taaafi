@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:reboot_app_3/bloc_provider.dart';
+import 'package:reboot_app_3/presentation/blocs/follow_your_reboot_bloc.dart';
 import 'package:reboot_app_3/presentation/screens/follow_your_reboot/notes/add_note_screen.dart';
 import 'package:reboot_app_3/shared/components/change_locale_bottomsheet.dart';
 import 'package:reboot_app_3/shared/constants/textstyles_constants.dart';
@@ -55,8 +57,16 @@ AppBar notesAppBar(BuildContext context, String titleId) {
     actions: [
       GestureDetector(
         onTap: () {
-          Navigator.push(context,
-              MaterialPageRoute(builder: (context) => AddNoteScreen()));
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => CustomBlocProvider(
+                bloc: FollowYourRebootBloc(),
+                child: AddNoteScreen(),
+                
+              ),
+            ),
+          );
         },
         child: Container(
           padding: EdgeInsets.only(right: 16, left: 16),
