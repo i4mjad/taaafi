@@ -13,6 +13,10 @@ class ContentDB {
 
     return querySnapshot.docs.map((e) => Article.fromMap(e)).toList();
   }
+
+  Stream<QuerySnapshot> getWelcomeArticles() {
+    return initStream();
+  }
 }
 
 ContentDB contentDb = ContentDB();

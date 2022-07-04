@@ -17,6 +17,11 @@ class ContentBloc implements CustomBlocBase {
   Future<List<Article>> getArticles() async {
     return await contentDb.getArticlesList();
   }
+  
+  Stream<QuerySnapshot> getWelcomeArticles()  {
+    return contentDb.getWelcomeArticles();
+  }
+
 
   @override
   void dispose() async {
