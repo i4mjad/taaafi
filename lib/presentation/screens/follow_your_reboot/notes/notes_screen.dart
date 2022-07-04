@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:intl/intl.dart';
 import 'package:reboot_app_3/bloc_provider.dart';
+import 'package:reboot_app_3/data/models/Note.dart';
 import 'package:reboot_app_3/presentation/blocs/follow_your_reboot_bloc.dart';
 import 'package:reboot_app_3/shared/components/custom-app-bar.dart';
 import 'package:reboot_app_3/shared/constants/textstyles_constants.dart';
@@ -27,8 +28,6 @@ class _NotesScreenState extends State<NotesScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
     return Scaffold(
       appBar: notesAppBar(context, "dairies"),
       body: SafeArea(
@@ -61,10 +60,9 @@ class NotesListView extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final bloc = CustomBlocProvider.of<FollowYourRebootBloc>(context);
-    return FutureBuilder(
-      future: bloc.getNoFapNotes(),
-      initialData: [],
-      builder: (context, snapshot) {
+    return StreamBuilder(
+      stream: bloc.getNotes(),
+      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
         switch (snapshot.connectionState) {
           // Uncompleted State
           case ConnectionState.none:
@@ -73,7 +71,7 @@ class NotesListView extends StatelessWidget {
             break;
           default:
             // Completed with error
-            if (snapshot.hasError)
+            if (snapshot.hasError || !snapshot.hasData) {
               return Container(
                 child: Center(
                   child: Text(
@@ -81,10 +79,15 @@ class NotesListView extends StatelessWidget {
                   ),
                 ),
               );
+            }
+
+            var notesList = snapshot.data.docs
+                .map((e) => Note.fromMap(e.data(), e.id))
+                .toList();
             return Expanded(
               child: ListView.separated(
                 scrollDirection: Axis.vertical,
-                itemCount: snapshot.data.length,
+                itemCount: notesList.length,
                 itemBuilder: (BuildContext context, int index) {
                   return GestureDetector(
                     onTap: () {
@@ -94,8 +97,8 @@ class NotesListView extends StatelessWidget {
                           builder: (_) => CustomBlocProvider(
                             bloc: FollowYourRebootBloc(),
                             child: NoteScreen(
-                              note: snapshot.data[index],
-                            ),
+                                note: notesList[index],
+                                id: notesList[index].noteId),
                           ),
                         ),
                       );
@@ -124,13 +127,13 @@ class NotesListView extends StatelessWidget {
                           ),
                           Flexible(
                             child: Text(
-                              snapshot.data[index].title,
+                              notesList[index].title,
                               style: kSubTitlesStyle.copyWith(
                                   color: theme.primaryColor,
                                   fontSize: 16,
                                   fontWeight: FontWeight.w400),
                             ),
-                          )
+                          ),
                         ],
                       ),
                     ),

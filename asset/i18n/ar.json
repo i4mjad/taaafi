@@ -111,6 +111,10 @@
   "changed-to-ar": "تم تغيير اللغة إلى العربية",
   "changed-to-en": "Language has been changed to English",
 
+  "title":"العنوان",
+  "body":"النص",
+
+
 
   "relapse": "انتكاسة",
   "porn-only": "مشاهدة إباحية بدون عادة سرية",
@@ -193,6 +197,8 @@
 
   "delete-account-button" :"تأكيد الحذف",
   "minutes":"دقيقة/دقائق",
+
+  "confirm-note-delete": "تأكيد حذف المذكرة",
 
   "no-donations-offer" : "يوجد خلل ما، حاول مرة أخرى",
 

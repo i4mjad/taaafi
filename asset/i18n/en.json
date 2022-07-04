@@ -32,10 +32,15 @@
 
 
 
+  "title":"Title",
+  "body":"Body",
 
 
-  "delete": "حذف",
-  "save": "حفظ",
+  "delete": "Delete",
+  "save": "Save",
+
+  "confirm-note-delete": "Confirm Note Deleting",
+
 
 
   "user-name": "User Name",

@@ -8,6 +8,7 @@ import 'package:reboot_app_3/presentation/blocs/follow_your_reboot_bloc.dart';
 import 'package:reboot_app_3/shared/components/custom-app-bar.dart';
 import 'package:reboot_app_3/shared/constants/constants.dart';
 import 'package:reboot_app_3/shared/constants/textstyles_constants.dart';
+import 'package:reboot_app_3/shared/localization/localization.dart';
 import 'package:reboot_app_3/shared/localization/localization_services.dart';
 
 import 'notes_screen.dart';
@@ -74,7 +75,8 @@ class _AddNoteScreenState extends State<AddNoteScreen> {
                           color: theme.primaryColor,
                         ),
                         border: InputBorder.none,
-                        hintText: "العنوان",
+                        hintText:
+                            AppLocalizations.of(context).translate('title'),
                         hintStyle: kSearchTextStyle.copyWith(
                             fontFamily: "DINNextLTArabic",
                             fontSize: 18,
@@ -103,7 +105,8 @@ class _AddNoteScreenState extends State<AddNoteScreen> {
                       maxLines: null,
                       expands: true,
                       decoration: InputDecoration(
-                          hintText: "النص",
+                          hintText:
+                              AppLocalizations.of(context).translate("body"),
                           hintStyle: kSubTitlesSubsStyle.copyWith(
                               fontSize: 14, color: theme.primaryColor),
                           contentPadding: EdgeInsets.only(
@@ -137,7 +140,7 @@ class _AddNoteScreenState extends State<AddNoteScreen> {
                               Border.all(color: darkPrimaryColor, width: 1)),
                       child: Center(
                         child: Text(
-                          "حفظ",
+                          AppLocalizations.of(context).translate('save'),
                           style: kSubTitlesStyle.copyWith(
                             color: theme.primaryColor,
                             fontWeight: FontWeight.w400,

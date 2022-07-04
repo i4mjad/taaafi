@@ -4,15 +4,16 @@ import 'package:flutter/services.dart';
 import 'package:reboot_app_3/bloc_provider.dart';
 import 'package:reboot_app_3/data/models/Note.dart';
 import 'package:reboot_app_3/presentation/blocs/follow_your_reboot_bloc.dart';
+import 'package:reboot_app_3/presentation/screens/follow_your_reboot/notes/notes_screen.dart';
 import 'package:reboot_app_3/shared/components/custom-app-bar.dart';
-import 'package:reboot_app_3/shared/constants/constants.dart';
 import 'package:reboot_app_3/shared/constants/textstyles_constants.dart';
 import 'package:reboot_app_3/shared/localization/localization.dart';
 
 // ignore: must_be_immutable
 class NoteScreen extends StatefulWidget {
+  NoteScreen({this.note, this.id});
   Note note;
-  NoteScreen({this.note});
+  String id;
 
   @override
   _NoteScreenState createState() => _NoteScreenState();
@@ -27,7 +28,7 @@ class _NoteScreenState extends State<NoteScreen> {
     super.initState();
 
     setState(() {
-      title.text = widget.note.id;
+      title.text = widget.note.title;
       body.text = widget.note.body;
     });
   }
@@ -120,7 +121,8 @@ class _NoteScreenState extends State<NoteScreen> {
                       children: [
                         GestureDetector(
                           onTap: () {
-                            confirmDeleteDialog();
+                            confirmDeleteDialog(
+                                bloc, theme, context, widget.note.noteId);
                           },
                           child: Container(
                             height: 50,
@@ -145,9 +147,9 @@ class _NoteScreenState extends State<NoteScreen> {
                           onTap: () async {
                             var _title = title?.text;
                             var _body = body?.text;
+                            var _id = widget.note.noteId;
 
-                            await bloc.updateNote(
-                                widget.note.id, _title, _body);
+                            await bloc.updateNote(_id, _title, _body);
 
                             HapticFeedback.lightImpact();
                             FocusScope.of(context).unfocus();
@@ -183,49 +185,114 @@ class _NoteScreenState extends State<NoteScreen> {
     );
   }
 
-  void confirmDeleteDialog() {
-    // set up the button
-    Widget confirmButton = TextButton(
-        child: Text(
-          "حذف",
-          style: kSubTitlesSubsStyle.copyWith(color: Colors.red, fontSize: 18),
-        ),
-        onPressed: () {
-          // database
-          //     .doc(user.uid)
-          //     .collection("userNotes")
-          //     .doc(this.widget.noteToEdit.id)
-          //     .delete()
-          //     .whenComplete(() => Navigator.pop(context));
+  void confirmDeleteDialog(FollowYourRebootBloc bloc, ThemeData theme,
+      BuildContext context, String id) {
+    showModalBottomSheet(
+        context: context,
+        builder: (context) {
+          return Container(
+            color: theme.scaffoldBackgroundColor,
+            child: Padding(
+              padding:
+                  EdgeInsets.only(left: 20.0, right: 20, top: 8, bottom: 8),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        height: 5,
+                        width: MediaQuery.of(context).size.width / 5,
+                        decoration: BoxDecoration(
+                          color: theme.primaryColor,
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                      )
+                    ],
+                  ),
+                  SizedBox(
+                    height: 16,
+                  ),
+                  Text(
+                    AppLocalizations.of(context)
+                        .translate("confirm-note-delete"),
+                    style: kSubTitlesStyle.copyWith(color: theme.primaryColor),
+                  ),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(bottom: 16.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        GestureDetector(
+                          onTap: () async {
+                            await bloc.deleteNote(id);
+                            HapticFeedback.lightImpact();
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => CustomBlocProvider(
+                                  bloc: FollowYourRebootBloc(),
+                                  child: NotesScreen(),
+                                ),
+                              ),
+                            );
+                          },
+                          child: Container(
+                            height: 50,
+                            width: (MediaQuery.of(context).size.width * 0.5) -
+                                (32),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10.5),
+                              color: Colors.red,
+                            ),
+                            child: Center(
+                              child: Text(
+                                AppLocalizations.of(context)
+                                    .translate("delete"),
+                                style: kSubTitlesStyle.copyWith(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w500),
+                              ),
+                            ),
+                          ),
+                        ),
+                        GestureDetector(
+                          onTap: () {
+                            HapticFeedback.lightImpact();
+                            Navigator.pop(context);
+                          },
+                          child: Container(
+                            height: 50,
+                            width: (MediaQuery.of(context).size.width * 0.5) -
+                                (32),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10.50),
+                              color: theme.cardColor,
+                            ),
+                            child: Center(
+                              child: Text(
+                                AppLocalizations.of(context)
+                                    .translate("cancel"),
+                                style: kSubTitlesStyle.copyWith(
+                                    color: theme.primaryColor,
+                                    fontWeight: FontWeight.w500),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                ],
+              ),
+            ),
+          );
         });
-
-    Widget cancelButton = TextButton(
-        child: Text(
-          "إلغاء",
-          style: kSubTitlesSubsStyle.copyWith(color: Colors.grey, fontSize: 18),
-        ),
-        onPressed: () {
-          Navigator.pop(context);
-        });
-
-    // set up the AlertDialog
-    AlertDialog alert = AlertDialog(
-      title: Text(
-        "هل أنت متأكد؟",
-        style: kSubTitlesStyle.copyWith(color: lightPrimaryColor, fontSize: 14),
-      ),
-      content: Text("سيتم حذف المذكرة بشكل نهائي",
-          style: kSubTitlesStyle.copyWith(color: Colors.black, fontSize: 14)),
-      actions: [confirmButton, cancelButton],
-    );
-
-    // show the dialog
-    showDialog(
-      barrierDismissible: false,
-      context: context,
-      builder: (BuildContext context) {
-        return alert;
-      },
-    );
   }
 }

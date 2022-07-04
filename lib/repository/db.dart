@@ -5,7 +5,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:reboot_app_3/data/models/CalenderDay.dart';
 import 'package:reboot_app_3/data/models/FollowUpData.dart';
-import 'package:reboot_app_3/data/models/Note.dart';
 import 'package:reboot_app_3/presentation/screens/follow_your_reboot/day_of_week_relapses/day_of_week_relapses_widget.dart';
 
 class DB {
@@ -446,18 +445,16 @@ class DB {
     return await _count.toString();
   }
 
-  Future<List<Note>> getNoFapNotes() async {
-    QuerySnapshot querySnapshot =
-        await db.collection("users").doc(uid).collection("userNotes").get();
-
-    return querySnapshot.docs.map((e) => Note.fromMap(e.data())).toList();
+  Stream<QuerySnapshot> getNotes() {
+    return db.collection("users").doc(uid).collection("userNotes").snapshots();
   }
 
   Future<void> updateNote(String id, String title, String body) async {
     var data = {
-      'title': title.toString(),
+      "title": title.toString(),
       "body": body.toString(),
     };
+    print(id);
     return db
         .collection("users")
         .doc(uid)
@@ -470,6 +467,7 @@ class DB {
     var data = {
       'title': title.toString(),
       "body": body.toString(),
+      "timestamp": DateTime.now()
     };
     return db
         .collection("users")
@@ -477,6 +475,15 @@ class DB {
         .collection("userNotes")
         .doc()
         .set(data, SetOptions(merge: true));
+  }
+
+  Future<void> deleteNote(String id) async {
+    return await db
+        .collection("users")
+        .doc(uid)
+        .collection("userNotes")
+        .doc(id)
+        .delete();
   }
 }
 

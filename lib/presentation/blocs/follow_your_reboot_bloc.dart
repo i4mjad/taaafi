@@ -3,7 +3,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:reboot_app_3/data/models/CalenderDay.dart';
 import 'package:reboot_app_3/bloc_provider.dart';
 import 'package:reboot_app_3/data/models/FollowUpData.dart';
-import 'package:reboot_app_3/data/models/Note.dart';
 import 'package:reboot_app_3/presentation/screens/follow_your_reboot/day_of_week_relapses/day_of_week_relapses_widget.dart';
 import 'package:reboot_app_3/repository/db.dart';
 import 'package:rxdart/subjects.dart';
@@ -86,8 +85,8 @@ class FollowYourRebootBloc implements CustomBlocBase {
     return await db.getRelapsesCountInLast30Days();
   }
 
-  Future<List<Note>> getNoFapNotes() async {
-    return await db.getNoFapNotes();
+  Stream<QuerySnapshot> getNotes() {
+    return db.getNotes();
   }
 
   Future<void> updateNote(String id, String title, String body) async {
@@ -96,6 +95,10 @@ class FollowYourRebootBloc implements CustomBlocBase {
 
   Future<void> addNote(String title, String body) async {
     return await db.addNote(title, body);
+  }
+
+  Future<void> deleteNote(String id) async {
+    return await db.deleteNote(id);
   }
 
   @override
