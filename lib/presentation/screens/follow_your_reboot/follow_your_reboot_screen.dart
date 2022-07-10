@@ -76,20 +76,21 @@ class FollowYourRebootScreenState extends State<FollowYourRebootScreen>
       List<DateTime> calculateDaysInterval(
           DateTime startDate, DateTime endDate) {
         List<DateTime> days = [];
-        for (int i = 0; i <= endDate.difference(startDate).inDays; i++) {
+        for (int i = 1; i <= endDate.difference(startDate).inDays; i++) {
           days.add(startDate.add(Duration(days: i)));
         }
         return days;
       }
 
       for (var date in calculateDaysInterval(_startingDate, today)) {
-        final dateD = new DateTime(date.year, date.month, date.day);
-
-        if (oldRelapses.contains(dateD)) {
+        final formattedDate = new DateTime(date.year, date.month, date.day);
+        if (oldRelapses.contains(formattedDate)) {
           daysArray.add(new CalenderDay("Relapse", date, Colors.red));
-        } else if (oldWatches.contains(dateD) && !oldRelapses.contains(dateD)) {
+        } else if (oldWatches.contains(formattedDate) &&
+            !oldRelapses.contains(formattedDate)) {
           daysArray.add(new CalenderDay("Watching Porn", date, Colors.purple));
-        } else if (oldMasts.contains(dateD) && !oldRelapses.contains(dateD)) {
+        } else if (oldMasts.contains(formattedDate) &&
+            !oldRelapses.contains(formattedDate)) {
           daysArray.add(new CalenderDay("Masturbating", date, Colors.orange));
         } else {
           daysArray.add(new CalenderDay("Success", date, Colors.green));
@@ -576,8 +577,9 @@ class FollowYourRebootScreenState extends State<FollowYourRebootScreen>
                       height: 5,
                       width: MediaQuery.of(context).size.width * 0.1,
                       decoration: BoxDecoration(
-                          color: Colors.black12,
-                          borderRadius: BorderRadius.circular(30)),
+                        color: Colors.black12,
+                        borderRadius: BorderRadius.circular(30),
+                      ),
                     )
                   ],
                 ),

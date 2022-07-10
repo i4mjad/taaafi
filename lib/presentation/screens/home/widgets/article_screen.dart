@@ -131,20 +131,21 @@ class ArticlePage extends StatelessWidget {
                         children: [
                           Flexible(
                             child: Html(
-                              data: article.body,
-                              style: {
-                                "body": Style(
-                                  fontFamily: 'DINNextLTArabic',
-
-                                  color: theme.primaryColor
-
-                                )
-
-                              },
-                              onLinkTap: (String url, RenderContext context, Map<String, String> attributes, element) {
-                                launchUrl(Uri.parse(url));
-                               }
-                            ),
+                                data: article.body,
+                                style: {
+                                  "body": Style(
+                                      fontFamily: 'DINNextLTArabic',
+                                      color: theme.primaryColor)
+                                },
+                                onLinkTap: (String url, _, __, ___) async {
+                                  if (await canLaunchUrl(Uri.parse(url))) {
+                                    launchUrl(
+                                      Uri.parse(url),
+                                    );
+                                  } else {
+                                    throw "Could not launch $url";
+                                  }
+                                }),
                           )
                         ],
                       ),

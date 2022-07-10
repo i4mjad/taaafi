@@ -99,9 +99,9 @@ class DB {
       });
       final lastRelapseDayStr = userRelapses[userRelapses.length - 1];
       final lastRelapseDay = DateTime.parse(lastRelapseDayStr);
-      return await today.difference(lastRelapseDay).inDays;
+      return await today.difference(lastRelapseDay).inDays - 1;
     } else {
-      return await today.difference(firstdate).inDays;
+      return await today.difference(firstdate).inDays - 1;
     }
   }
 
@@ -122,9 +122,9 @@ class DB {
       //make a date from the last relapse
       final lastNoPornDay = DateTime.parse(lastNoPornDayStr);
       //calculate the current streak by making time interval between today and the last
-      return await today.difference(lastNoPornDay).inDays;
+      return await today.difference(lastNoPornDay).inDays - 1;
     } else {
-      return await today.difference(firstdate).inDays;
+      return await today.difference(firstdate).inDays - 1;
     }
   }
 
@@ -145,9 +145,9 @@ class DB {
       //make a date from the last relapse
       final lastNoMastDay = DateTime.parse(lastNoMastDayStr);
       //calculate the current streak by making time interval between today and the last
-      return await today.difference(lastNoMastDay).inDays;
+      return await today.difference(lastNoMastDay).inDays - 1;
     } else {
-      return await today.difference(firstdate).inDays;
+      return await today.difference(firstdate).inDays - 1;
     }
   }
 
@@ -366,26 +366,23 @@ class DB {
 
   void checkData() async {
     return await db.collection("users").doc(uid).get().then((value) async {
-      if (!(await value.data().containsKey("userRelapses"))) {
+      Map<String, dynamic> data = value.data();
+      if (!(await data.containsKey("userRelapses"))) {
         await db.collection("users").doc(user.uid).set({
           "userRelapses": [],
         }, SetOptions(merge: true));
       }
-      if (!(await value
-          .data()
-          .containsKey("userWatchingWithoutMasturbating"))) {
+      if (!(await data.containsKey("userWatchingWithoutMasturbating"))) {
         await db.collection("users").doc(user.uid).set({
           "userWatchingWithoutMasturbating": [],
         }, SetOptions(merge: true));
       }
-      if (!(await value
-          .data()
-          .containsKey("userMasturbatingWithoutWatching"))) {
+      if (!(await data.containsKey("userMasturbatingWithoutWatching"))) {
         await db.collection("users").doc(user.uid).set({
           "userMasturbatingWithoutWatching": [],
         }, SetOptions(merge: true));
       }
-      if (!(await value.data().containsKey("userFirstDate"))) {
+      if (!(await data.containsKey("userFirstDate"))) {
         await migerateToUserFirstDate();
       }
     });
@@ -395,13 +392,13 @@ class DB {
     var _db = db.collection("users").doc(user.uid);
 
     _db.get().then((value) async {
-      if (await value.data().containsKey("userFirstDate") == false) {
+      Map<String, dynamic> data = value.data();
+      if (await data.containsKey("userFirstDate") == false) {
         var userRigDate = user.metadata.creationTime;
-        int userFirstStreak = await value.data()["userPreviousStreak"];
+        int userFirstStreak = await data["userPreviousStreak"];
 
-        DateTime userResetDate = value.data()["resetedDate"] != null
-            ? await DateTime.parse(
-                value.data()["resetedDate"].toDate().toString())
+        DateTime userResetDate = data["resetedDate"] != null
+            ? await DateTime.parse(data["resetedDate"].toDate().toString())
             : null;
         DateTime parseFirstDate = await DateTime(userRigDate.year,
             userRigDate.month, userRigDate.day - userFirstStreak);
