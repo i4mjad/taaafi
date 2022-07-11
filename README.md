@@ -22,8 +22,8 @@ Contributions are always welcome!
 
 Please consider following these steps before runing tha app:
 
-- Install Flutter Version Manager (FVM) and use Flutter version `2.5.3`. Check https://fvm.app/
-- Use `Android Studio` for development
+- Install Flutter with the latest stable version. Current version is `3.0.4`
+- Use `Android Studio` for development. VS Code is also a choice
 - For runing the app, use `Pixel 4` emulator or any emulator device that have Google Play Services
 
 
@@ -31,18 +31,18 @@ Please consider following these steps before runing tha app:
 
 | Platform | Version     | Description                |
 | :-------- | :------- | :------------------------- |
-| Android | 2.0.3 |  |
-| iOS | 4.0.3 |  |
+| Android | 2.1.2 |  |
+| iOS | 4.1.2 |  |
 
 ## Development Versions
 
 | Platform | Version     | Description                |
 | :-------- | :------- | :------------------------- |
-| Android | 2.0.4 |  |
-| iOS | 4.0.4 |  |
+| Android | 2.1.3 |  |
+| iOS | 4.1.3 |  |
 
 ## Future Goals
-- Enhance the UI/UX (Material 3 ?)
+- Enhance the UI/UX
 - Ta3afi Community (Later)
 - Ta3afi+ (Later)
 
