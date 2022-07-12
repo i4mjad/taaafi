@@ -759,12 +759,42 @@ class FollowYourRebootScreenAuthenticationWrapper extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final User firebaseUser = context.watch<User>();
+    final _fsInstance = FirebaseFirestore.instance;
+    bool isExist;
+
+    _fsInstance
+        .collection("users")
+        .doc(firebaseUser.uid)
+        .get()
+        .then((doc) async {
+      isExist = await doc.exists;
+    });
 
     if (firebaseUser != null) {
-      return CustomBlocProvider(
-          bloc: FollowYourRebootBloc(), child: FollowYourRebootScreen());
+      switch (isExist) {
+        case false:
+          return NewUserScreen();
+        default:
+          return CustomBlocProvider(
+              bloc: FollowYourRebootBloc(), child: FollowYourRebootScreen());
+      }
     } else {
       return LoginScreen();
     }
+  }
+}
+
+class NewUserScreen extends StatelessWidget {
+  const NewUserScreen({Key key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Container(
+        child: Center(
+          child: CircularProgressIndicator(),
+        ),
+      ),
+    );
   }
 }
