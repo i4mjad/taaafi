@@ -65,10 +65,6 @@ class _AccountScreenState extends State<AccountScreen>
                   ),
                   Container(
                     decoration: BoxDecoration(
-                        border: Border.all(
-                          color: theme.primaryColor,
-                          width: 0.25,
-                        ),
                         borderRadius: BorderRadius.circular(12.5)),
                     child: Column(
                       children: [
@@ -398,9 +394,9 @@ class UserProfileCard extends StatelessWidget {
             Container(
               padding: EdgeInsets.all(40),
               decoration: BoxDecoration(
-                  color: theme.cardColor,
-                  borderRadius: BorderRadius.circular(500),
-                  border: Border.all(color: theme.primaryColor, width: 0.25)),
+                color: theme.cardColor,
+                borderRadius: BorderRadius.circular(500),
+              ),
               child: Icon(
                 Iconsax.user,
                 size: 56,

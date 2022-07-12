@@ -49,7 +49,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // TobBar(),
               SizedBox(
                 height: 16,
               ),
@@ -57,9 +56,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 width: MediaQuery.of(context).size.width - 40,
                 padding: EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: theme.cardColor,
-                  borderRadius: BorderRadius.circular(12.5)
-                ),
+                    color: theme.cardColor,
+                    borderRadius: BorderRadius.circular(12.5)),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -81,13 +79,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               SizedBox(
                 height: 16,
               ),
-
               WelcomeWidget(),
               SizedBox(
                 height: 24,
               ),
               CustomBlocProvider(bloc: ContentBloc(), child: ExploreWidget()),
-
               SizedBox(
                 height: 24,
               ),
@@ -137,10 +133,6 @@ class Ta3afiLiberaryCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: theme.cardColor,
         borderRadius: BorderRadius.circular(12.5),
-        border: Border.all(
-          width: 0.25,
-          color: theme.primaryColor,
-        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -192,9 +184,9 @@ class Ta3afiLiberaryCard extends StatelessWidget {
                     width: MediaQuery.of(context).size.width * 0.40,
                     padding: EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                        color: theme.primaryColor,
-                        borderRadius: BorderRadius.circular(30),
-                        border: Border.all(color: theme.primaryColor)),
+                      color: theme.primaryColor,
+                      borderRadius: BorderRadius.circular(30),
+                    ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [

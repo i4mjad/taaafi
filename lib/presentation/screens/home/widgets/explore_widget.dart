@@ -84,9 +84,6 @@ class ExploreWidget extends StatelessWidget {
                                           0.35,
                                       decoration: BoxDecoration(
                                         color: theme.cardColor,
-                                        border: Border.all(
-                                            color: theme.primaryColor,
-                                            width: 0.25),
                                         borderRadius:
                                             BorderRadius.circular(12.5),
                                       ),

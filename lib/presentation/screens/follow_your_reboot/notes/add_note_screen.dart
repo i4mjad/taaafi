@@ -6,7 +6,6 @@ import 'package:flutter/services.dart';
 import 'package:reboot_app_3/bloc_provider.dart';
 import 'package:reboot_app_3/presentation/blocs/follow_your_reboot_bloc.dart';
 import 'package:reboot_app_3/shared/components/custom-app-bar.dart';
-import 'package:reboot_app_3/shared/constants/constants.dart';
 import 'package:reboot_app_3/shared/constants/textstyles_constants.dart';
 import 'package:reboot_app_3/shared/localization/localization.dart';
 import 'package:reboot_app_3/shared/localization/localization_services.dart';
@@ -61,10 +60,9 @@ class _AddNoteScreenState extends State<AddNoteScreen> {
                     width: MediaQuery.of(context).size.width - 40,
                     height: 45,
                     decoration: BoxDecoration(
-                        borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                        color: theme.cardColor,
-                        border:
-                            Border.all(color: theme.primaryColor, width: 0.5)),
+                      borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                      color: theme.cardColor,
+                    ),
                     child: TextField(
                       onTap: () => FocusScope.of(context).unfocus(),
                       keyboardType: TextInputType.text,
@@ -95,10 +93,9 @@ class _AddNoteScreenState extends State<AddNoteScreen> {
                     width: MediaQuery.of(context).size.width - 40,
                     height: MediaQuery.of(context).size.height * 0.5,
                     decoration: BoxDecoration(
-                        borderRadius: BorderRadius.all(Radius.circular(12.0)),
-                        color: theme.cardColor,
-                        border:
-                            Border.all(color: theme.primaryColor, width: 0.5)),
+                      borderRadius: BorderRadius.all(Radius.circular(12.0)),
+                      color: theme.cardColor,
+                    ),
                     child: TextField(
                       onTap: () => FocusScope.of(context).unfocus(),
                       controller: body,
@@ -134,10 +131,9 @@ class _AddNoteScreenState extends State<AddNoteScreen> {
                       padding: EdgeInsets.all(16),
                       width: MediaQuery.of(context).size.width - 40,
                       decoration: BoxDecoration(
-                          color: theme.cardColor,
-                          borderRadius: BorderRadius.circular(12.5),
-                          border:
-                              Border.all(color: darkPrimaryColor, width: 1)),
+                        color: theme.cardColor,
+                        borderRadius: BorderRadius.circular(12.5),
+                      ),
                       child: Center(
                         child: Text(
                           AppLocalizations.of(context).translate('save'),

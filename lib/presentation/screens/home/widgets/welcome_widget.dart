@@ -44,12 +44,7 @@ class NotSignIn extends StatelessWidget {
           padding: EdgeInsets.all(16),
           width: MediaQuery.of(context).size.width - 40,
           decoration: BoxDecoration(
-              color: Colors.white,
-              border: Border.all(
-                color: Colors.black,
-                width: 0.25,
-              ),
-              borderRadius: BorderRadius.circular(12.5)),
+              color: Colors.white, borderRadius: BorderRadius.circular(12.5)),
           child: Center(
             child: Text(
               AppLocalizations.of(context).translate('not-login'),
@@ -94,10 +89,6 @@ class WelcomeContent extends StatelessWidget {
               height: 150,
               decoration: BoxDecoration(
                   color: theme.focusColor,
-                  border: Border.all(
-                    width: 0.25,
-                    color: theme.primaryColor,
-                  ),
                   borderRadius: BorderRadius.circular(15)),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -108,14 +99,21 @@ class WelcomeContent extends StatelessWidget {
                     initialData: 0,
                     builder: (BuildContext context, AsyncSnapshot<int> streak) {
                       switch (streak.connectionState) {
-                      // Uncompleted State
+                        // Uncompleted State
                         case ConnectionState.none:
                         case ConnectionState.waiting:
                           return Center(child: CircularProgressIndicator());
                           break;
                         default:
-                        // Completed with error
-                          if (streak.hasError) return Container(child: Center(child: Text("0",),),);
+                          // Completed with error
+                          if (streak.hasError)
+                            return Container(
+                              child: Center(
+                                child: Text(
+                                  "0",
+                                ),
+                              ),
+                            );
                           return Text(
                             streak.data.toString(),
                             style: kPageTitleStyle.copyWith(
@@ -127,9 +125,10 @@ class WelcomeContent extends StatelessWidget {
                     },
                   ),
                   Padding(
-                    padding: const EdgeInsets.only(right:8.0, left: 8),
+                    padding: const EdgeInsets.only(right: 8.0, left: 8),
                     child: Text(
-                      AppLocalizations.of(context).translate('free-relapse-days'),
+                      AppLocalizations.of(context)
+                          .translate('free-relapse-days'),
                       style: kSubTitlesStyle.copyWith(
                           fontSize: 16, color: Colors.white, height: 1.5),
                       textAlign: TextAlign.center,
@@ -146,37 +145,42 @@ class WelcomeContent extends StatelessWidget {
                   height: 71,
                   width: MediaQuery.of(context).size.width * 0.60,
                   decoration: BoxDecoration(
-                      color: theme.cardColor,
-                      borderRadius: BorderRadius.circular(8),
-                      border:
-                          Border.all(width: 0.25, color: theme.primaryColor)),
+                    color: theme.cardColor,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
                   child: Center(
                     child: FutureBuilder(
                       future: bloc.getRelapsesCountInLast30Days(),
                       initialData: "0",
                       builder:
                           (BuildContext context, AsyncSnapshot<String> sh) {
-                            switch (sh.connectionState) {
-                            // Uncompleted State
-                              case ConnectionState.none:
-                              case ConnectionState.waiting:
-                                return Center(child: CircularProgressIndicator());
-                                break;
-                              default:
-                              // Completed with error
-                                if (sh.hasError) return Container(child: Center(child: Text(AppLocalizations.of(context)
-                                    .translate("relapses-30-days") +
-                                    "0",),),);
-                                return Text(
-                                  AppLocalizations.of(context)
+                        switch (sh.connectionState) {
+                          // Uncompleted State
+                          case ConnectionState.none:
+                          case ConnectionState.waiting:
+                            return Center(child: CircularProgressIndicator());
+                            break;
+                          default:
+                            // Completed with error
+                            if (sh.hasError)
+                              return Container(
+                                child: Center(
+                                  child: Text(
+                                    AppLocalizations.of(context)
+                                            .translate("relapses-30-days") +
+                                        "0",
+                                  ),
+                                ),
+                              );
+                            return Text(
+                              AppLocalizations.of(context)
                                       .translate("relapses-30-days") +
-                                      sh.data,
-                                  textAlign: TextAlign.center,
-                                  style: kSubTitlesStyle.copyWith(
-                                      fontSize: 13, color: theme.hintColor),
-                                );
-                            }
-
+                                  sh.data,
+                              textAlign: TextAlign.center,
+                              style: kSubTitlesStyle.copyWith(
+                                  fontSize: 13, color: theme.hintColor),
+                            );
+                        }
                       },
                     ),
                   ),
@@ -190,7 +194,6 @@ class WelcomeContent extends StatelessWidget {
                   width: MediaQuery.of(context).size.width * 0.60,
                   decoration: BoxDecoration(
                     color: theme.cardColor,
-                    border: Border.all(width: 0.25, color: theme.primaryColor),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Center(
@@ -199,27 +202,33 @@ class WelcomeContent extends StatelessWidget {
                       initialData: "0",
                       builder:
                           (BuildContext context, AsyncSnapshot<String> sh) {
-                            switch (sh.connectionState) {
-                            // Uncompleted State
-                              case ConnectionState.none:
-                              case ConnectionState.waiting:
-                                return Center(child: CircularProgressIndicator());
-                                break;
-                              default:
-                              // Completed with error
-                                if (sh.hasError) return Container(child: Center(child: Text(AppLocalizations.of(context)
-                                    .translate('free-days-from-start') +
-                                    "0",),),);
-                                return Text(
-                                  AppLocalizations.of(context)
+                        switch (sh.connectionState) {
+                          // Uncompleted State
+                          case ConnectionState.none:
+                          case ConnectionState.waiting:
+                            return Center(child: CircularProgressIndicator());
+                            break;
+                          default:
+                            // Completed with error
+                            if (sh.hasError)
+                              return Container(
+                                child: Center(
+                                  child: Text(
+                                    AppLocalizations.of(context)
+                                            .translate('free-days-from-start') +
+                                        "0",
+                                  ),
+                                ),
+                              );
+                            return Text(
+                              AppLocalizations.of(context)
                                       .translate('free-days-from-start') +
-                                      sh.data,
-                                  textAlign: TextAlign.center,
-                                  style: kSubTitlesStyle.copyWith(
-                                      color: theme.hintColor, fontSize: 13),
-                                );
-                            }
-
+                                  sh.data,
+                              textAlign: TextAlign.center,
+                              style: kSubTitlesStyle.copyWith(
+                                  color: theme.hintColor, fontSize: 13),
+                            );
+                        }
                       },
                     ),
                   ),

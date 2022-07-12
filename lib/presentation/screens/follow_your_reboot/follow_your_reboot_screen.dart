@@ -187,7 +187,6 @@ class FollowYourRebootScreenState extends State<FollowYourRebootScreen>
                   margin: EdgeInsets.only(right: 16, left: 16),
                   decoration: BoxDecoration(
                       color: theme.cardColor,
-                      border: Border.all(color: lightPrimaryColor, width: 0.25),
                       borderRadius: BorderRadius.circular(12.5)),
                   child: Row(
                     children: [
@@ -685,10 +684,14 @@ class GeneralStats extends StatelessWidget {
                   future: bloc.getHighestStreak(),
                   initialData: "0",
                   builder: (BuildContext context, AsyncSnapshot<String> sh) {
-                    return Text(
-                      sh.data,
-                      style: kPageTitleStyle.copyWith(color: Colors.green),
-                    );
+                    if (sh.hasData) {
+                      return Text(
+                        sh.data,
+                        style: kPageTitleStyle.copyWith(color: Colors.green),
+                      );
+                    } else {
+                      return CircularProgressIndicator();
+                    }
                   },
                 ),
               ],
