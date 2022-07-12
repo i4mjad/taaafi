@@ -279,7 +279,7 @@ class DB {
     FollowUpData _followUpData = await getFollowUpData();
     List<dynamic> _relapses = await _followUpData.relapses;
 
-    if (_relapses == null) return "0";
+    if (_relapses == null || _relapses.length == 0) return "0";
 
     final DateTime today = DateTime.now();
     final DateTime todayE = DateTime(today.year, today.month, today.day);
