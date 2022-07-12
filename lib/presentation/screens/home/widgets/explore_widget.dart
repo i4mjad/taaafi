@@ -40,7 +40,7 @@ class ExploreWidget extends StatelessWidget {
                   children: [
                     Expanded(
                       child: StreamBuilder(
-                        stream: bloc.getWelcomeArticles(),
+                        stream: bloc.getFeaturedArticles(),
                         builder: (BuildContext context, snapshot) {
                           switch (snapshot.connectionState) {
                             // Uncompleted State
@@ -60,12 +60,12 @@ class ExploreWidget extends StatelessWidget {
                                 );
                               }
 
-                              var featuredList = snapshot.data.docs
-                                  .map((e) => Article.fromMap(e))
+                              List<Article> featuredList = snapshot.data.docs
+                                  .map<Article>((e) => Article.fromMap(e))
                                   .toList();
                               return ListView.separated(
                                 scrollDirection: Axis.horizontal,
-                                itemCount: 3,
+                                itemCount: featuredList.length,
                                 itemBuilder: (BuildContext context, int index) {
                                   return GestureDetector(
                                     onTap: () {

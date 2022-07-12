@@ -9,15 +9,19 @@ class ContentDB {
   }
 
   Future<List<Article>> getArticlesList() async {
-    var querySnapshot = await firebaseDB.collection("fl_content").get();
+    final featured = await firebaseDB
+        .collection("fl_content")
+        .where("isFeatured" == true)
+        .get();
 
-    final citiesRef = firebaseDB.collection("cities").orderBy("field").limit(3);
-    citiesRef.orderBy("name", descending: true).limit(3);
-    return querySnapshot.docs.map((e) => Article.fromMap(e)).toList();
+    return featured.docs.map((e) => Article.fromMap(e)).toList();
   }
 
-  Stream<QuerySnapshot> getWelcomeArticles() {
-    return initStream();
+  Stream<QuerySnapshot> getFeaturedArticles() {
+    return firebaseDB
+        .collection("fl_content")
+        .where("isFeatured", isEqualTo: true)
+        .snapshots();
   }
 }
 

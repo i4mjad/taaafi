@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:reboot_app_3/bloc_provider.dart';
-import 'package:reboot_app_3/data/models/Article.dart';
 import 'package:reboot_app_3/repository/content_db.dart';
 import 'package:rxdart/subjects.dart';
 
@@ -14,14 +13,9 @@ class ContentBloc implements CustomBlocBase {
   Stream<QuerySnapshot> get outFirestore => _firestoreController.stream;
   Sink<QuerySnapshot> get _inFirestore => _firestoreController.sink;
 
-  Future<List<Article>> getArticles() async {
-    return await contentDb.getArticlesList();
+  Stream<QuerySnapshot> getFeaturedArticles() {
+    return contentDb.getFeaturedArticles();
   }
-  
-  Stream<QuerySnapshot> getWelcomeArticles()  {
-    return contentDb.getWelcomeArticles();
-  }
-
 
   @override
   void dispose() async {
