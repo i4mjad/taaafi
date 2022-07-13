@@ -20,4 +20,8 @@ class AccountBloc implements CustomBlocBase {
   Future<void> createNewData(DateTime selectedDate) async {
     return await db.createNewData(selectedDate);
   }
+
+  Stream<bool> isUserDocExist() {
+    return db.isUserDocExist().asStream();
+  }
 }
