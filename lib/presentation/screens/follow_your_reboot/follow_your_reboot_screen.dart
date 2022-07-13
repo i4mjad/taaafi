@@ -7,21 +7,17 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:reboot_app_3/data/models/CalenderDay.dart';
 import 'package:reboot_app_3/bloc_provider.dart';
 import 'package:reboot_app_3/data/models/FollowUpData.dart';
-import 'package:reboot_app_3/presentation/blocs/account_bloc.dart';
 import 'package:reboot_app_3/presentation/screens/auth/login_screen.dart';
 import 'package:reboot_app_3/presentation/blocs/follow_your_reboot_bloc.dart';
-import 'package:reboot_app_3/presentation/screens/auth/new_user_screen.dart';
 import 'package:reboot_app_3/presentation/screens/follow_your_reboot/follow_up_streaks/follow_up_streak.dart';
-import 'package:reboot_app_3/repository/db.dart';
-
-import 'package:reboot_app_3/shared/components/snackbar.dart';
+import 'package:reboot_app_3/presentation/screens/follow_your_reboot/widgets/new_user_widgets.dart';
+import 'package:reboot_app_3/shared/Components/snackbar.dart';
 import 'package:reboot_app_3/shared/components/custom-app-bar.dart';
 import 'package:reboot_app_3/shared/constants/constants.dart';
 import 'package:reboot_app_3/shared/constants/textstyles_constants.dart';
 import 'package:reboot_app_3/shared/localization/localization.dart';
 import 'package:reboot_app_3/shared/localization/localization_services.dart';
 import 'package:provider/provider.dart';
-
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 import 'calender/calender_data_model.dart';
 import 'notes/notes_screen.dart';
@@ -111,9 +107,7 @@ class FollowYourRebootScreenState extends State<FollowYourRebootScreen>
     var _db = database.collection("users").doc(user.uid);
 
     _db.get().then((value) async {
-      var data = value.data();
-      if (await value.exists &&
-          await data.containsKey("userFirstDate") == false) {
+      if (await value.data().containsKey("userFirstDate") == false) {
         var userRigDate = user.metadata.creationTime;
         int userFirstStreak = await value.data()["userPreviousStreak"];
 
@@ -143,6 +137,9 @@ class FollowYourRebootScreenState extends State<FollowYourRebootScreen>
     var _db = database.collection("users").doc(user.uid);
 
     return _db.get().then((value) async {
+      final bloc = CustomBlocProvider.of<FollowYourRebootBloc>(context);
+      if (value.exists == false) newUserDialog(context, bloc);
+
       if (await value.data().containsKey("userFirstDate") == false) {
         migerateToUserFirstDate();
       } else {
@@ -168,187 +165,193 @@ class FollowYourRebootScreenState extends State<FollowYourRebootScreen>
   Widget build(BuildContext context) {
     final bloc = CustomBlocProvider.of<FollowYourRebootBloc>(context);
     final theme = Theme.of(context);
-    return SingleChildScrollView(
-      child: Column(
-        children: [
-          GestureDetector(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => CustomBlocProvider(
-                      child: NotesScreen(), bloc: FollowYourRebootBloc()),
-                ),
-              );
-            },
-            child: Container(
-              width: MediaQuery.of(context).size.width,
-              height: 60,
-              padding: EdgeInsets.all(16),
-              margin: EdgeInsets.only(right: 16, left: 16),
-              decoration: BoxDecoration(
-                  color: theme.cardColor,
-                  borderRadius: BorderRadius.circular(12.5)),
-              child: Row(
-                children: [
-                  Icon(
-                    Iconsax.archive_1,
-                    size: 32,
-                    color: theme.primaryColor,
-                  ),
-                  SizedBox(
-                    width: 8,
-                  ),
-                  Text(
-                    AppLocalizations.of(context).translate('dairies'),
-                    style: kSubTitlesStyle.copyWith(
-                      color: theme.primaryColor,
-                      fontWeight: FontWeight.w500,
-                      height: 1,
+    return Scaffold(
+        appBar: appBarWithSettings(context, "follow-your-reboot"),
+        body: SingleChildScrollView(
+          child: Column(
+            children: [
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => CustomBlocProvider(
+                          child: NotesScreen(), bloc: FollowYourRebootBloc()),
                     ),
-                  )
-                ],
+                  );
+                },
+                child: Container(
+                  width: MediaQuery.of(context).size.width,
+                  height: 60,
+                  padding: EdgeInsets.all(16),
+                  margin: EdgeInsets.only(right: 16, left: 16),
+                  decoration: BoxDecoration(
+                      color: theme.cardColor,
+                      borderRadius: BorderRadius.circular(12.5)),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Iconsax.archive_1,
+                        size: 32,
+                        color: theme.primaryColor,
+                      ),
+                      SizedBox(
+                        width: 8,
+                      ),
+                      Text(
+                        AppLocalizations.of(context).translate('dairies'),
+                        style: kSubTitlesStyle.copyWith(
+                          color: theme.primaryColor,
+                          fontWeight: FontWeight.w500,
+                          height: 1,
+                        ),
+                      )
+                    ],
+                  ),
+                ),
               ),
-            ),
-          ),
-          SizedBox(height: 16),
-          FollowUpStreaks(),
-          Padding(
-            padding: EdgeInsets.only(right: 16, left: 16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Column(
+              SizedBox(height: 16),
+              FollowUpStreaks(),
+              Padding(
+                padding: EdgeInsets.only(right: 16, left: 16),
+                child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  //mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    Text(
-                        AppLocalizations.of(context)
-                            .translate('reboot-calender'),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      //mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Text(
+                            AppLocalizations.of(context)
+                                .translate('reboot-calender'),
+                            style: kSubTitlesStyle.copyWith(
+                                color: theme.hintColor)),
+                        SizedBox(
+                          height: 8,
+                        ),
+                        Container(
+                            width: MediaQuery.of(context).size.width,
+                            height: MediaQuery.of(context).size.height * 0.45,
+                            decoration: BoxDecoration(
+                                color: mainGrayColor,
+                                borderRadius: BorderRadius.circular(15)),
+                            child: SfCalendar(
+                              backgroundColor: theme.cardColor,
+                              onTap: (CalendarTapDetails details) async {
+                                DateTime date = details.date;
+                                DateTime firstDate = await bloc.getFirstDate();
+
+                                dateChecker(firstDate, date, context, bloc);
+                              },
+                              view: CalendarView.month,
+                              headerStyle: CalendarHeaderStyle(
+                                  textAlign: TextAlign.center,
+                                  backgroundColor: theme.cardColor,
+                                  textStyle: kSubTitlesStyle.copyWith(
+                                      color: theme.primaryColor)),
+                              dataSource: CalenderDataSource(days),
+                              monthViewSettings: MonthViewSettings(
+                                //showAgenda: true,
+                                agendaStyle: AgendaStyle(),
+                                appointmentDisplayMode:
+                                    MonthAppointmentDisplayMode.indicator,
+                              ),
+                              allowAppointmentResize: true,
+                            )),
+                      ],
+                    ),
+                    SizedBox(
+                      height: 12,
+                    ),
+                    Text(AppLocalizations.of(context).translate('streaks'),
                         style:
                             kSubTitlesStyle.copyWith(color: theme.hintColor)),
                     SizedBox(
-                      height: 8,
+                      height: 12,
                     ),
-                    Container(
-                        width: MediaQuery.of(context).size.width,
-                        height: MediaQuery.of(context).size.height * 0.45,
-                        decoration: BoxDecoration(
-                            color: mainGrayColor,
-                            borderRadius: BorderRadius.circular(15)),
-                        child: SfCalendar(
-                          backgroundColor: theme.cardColor,
-                          onTap: (CalendarTapDetails details) async {
-                            DateTime date = details.date;
-                            DateTime firstDate = await bloc.getFirstDate();
-
-                            dateChecker(firstDate, date, context, bloc);
-                          },
-                          view: CalendarView.month,
-                          headerStyle: CalendarHeaderStyle(
-                              textAlign: TextAlign.center,
-                              backgroundColor: theme.cardColor,
-                              textStyle: kSubTitlesStyle.copyWith(
-                                  color: theme.primaryColor)),
-                          dataSource: CalenderDataSource(days),
-                          monthViewSettings: MonthViewSettings(
-                            //showAgenda: true,
-                            agendaStyle: AgendaStyle(),
-                            appointmentDisplayMode:
-                                MonthAppointmentDisplayMode.indicator,
-                          ),
-                          allowAppointmentResize: true,
-                        )),
-                  ],
-                ),
-                SizedBox(
-                  height: 12,
-                ),
-                Text(AppLocalizations.of(context).translate('streaks'),
-                    style: kSubTitlesStyle.copyWith(color: theme.hintColor)),
-                SizedBox(
-                  height: 12,
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    GeneralStats(lang: lang),
-                  ],
-                ),
-                SizedBox(
-                  height: 16,
-                ),
-                Column(
-                  children: [
-                    //dublicate this
-                    Row(
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                        Icon(Iconsax.calendar_tick),
-                        SizedBox(
-                          width: 8,
-                        ),
-                        Text(
-                          AppLocalizations.of(context).translate("total-days"),
-                          style: kHeadlineStyle.copyWith(
-                              fontWeight: FontWeight.w400,
-                              fontSize: 18,
-                              color: theme.primaryColor),
-                        ),
-                        FutureBuilder(
-                          future: bloc.getTotalDaysFromBegining(),
-                          initialData: "0",
-                          builder:
-                              (BuildContext context, AsyncSnapshot<String> sh) {
-                            return Text(
-                              sh.data,
+                        GeneralStats(lang: lang),
+                      ],
+                    ),
+                    SizedBox(
+                      height: 16,
+                    ),
+                    Column(
+                      children: [
+                        //dublicate this
+                        Row(
+                          children: [
+                            Icon(Iconsax.calendar_tick),
+                            SizedBox(
+                              width: 8,
+                            ),
+                            Text(
+                              AppLocalizations.of(context)
+                                  .translate("total-days"),
                               style: kHeadlineStyle.copyWith(
-                                  fontWeight: FontWeight.bold, fontSize: 18),
-                            );
-                          },
+                                  fontWeight: FontWeight.w400,
+                                  fontSize: 18,
+                                  color: theme.primaryColor),
+                            ),
+                            FutureBuilder(
+                              future: bloc.getTotalDaysFromBegining(),
+                              initialData: "0",
+                              builder: (BuildContext context,
+                                  AsyncSnapshot<String> sh) {
+                                return Text(
+                                  sh.data,
+                                  style: kHeadlineStyle.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 18),
+                                );
+                              },
+                            ),
+                          ],
+                        ),
+                        SizedBox(
+                          height: 8,
+                        ),
+                        Row(
+                          children: [
+                            Icon(Iconsax.emoji_sad),
+                            SizedBox(
+                              width: 8,
+                            ),
+                            Text(
+                              AppLocalizations.of(context)
+                                  .translate("relapses-number"),
+                              style: kHeadlineStyle.copyWith(
+                                  fontWeight: FontWeight.w400, fontSize: 18),
+                            ),
+                            FutureBuilder(
+                              future: bloc.getRelapsesCount(),
+                              initialData: "0",
+                              builder: (BuildContext context,
+                                  AsyncSnapshot<String> sh) {
+                                return Text(
+                                  sh.requireData,
+                                  style: kHeadlineStyle.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 18),
+                                );
+                              },
+                            ),
+                          ],
                         ),
                       ],
                     ),
                     SizedBox(
-                      height: 8,
-                    ),
-                    Row(
-                      children: [
-                        Icon(Iconsax.emoji_sad),
-                        SizedBox(
-                          width: 8,
-                        ),
-                        Text(
-                          AppLocalizations.of(context)
-                              .translate("relapses-number"),
-                          style: kHeadlineStyle.copyWith(
-                              fontWeight: FontWeight.w400, fontSize: 18),
-                        ),
-                        FutureBuilder(
-                          future: bloc.getRelapsesCount(),
-                          initialData: "0",
-                          builder:
-                              (BuildContext context, AsyncSnapshot<String> sh) {
-                            return Text(
-                              sh.requireData,
-                              style: kHeadlineStyle.copyWith(
-                                  fontWeight: FontWeight.bold, fontSize: 18),
-                            );
-                          },
-                        ),
-                      ],
+                      height: 40,
                     ),
                   ],
                 ),
-                SizedBox(
-                  height: 40,
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
-        ],
-      ),
-    );
+        ));
   }
 
   changeDateEvent(
@@ -756,57 +759,41 @@ class FollowYourRebootScreenAuthenticationWrapper extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final User firebaseUser = context.watch<User>();
+    final _fsInstance = FirebaseFirestore.instance;
+    bool isExist;
+
+    _fsInstance
+        .collection("users")
+        .doc(firebaseUser.uid)
+        .get()
+        .then((doc) async {
+      isExist = await doc.exists;
+    });
 
     if (firebaseUser != null) {
-      return CustomBlocProvider(
-        bloc: AccountBloc(),
-        child: UserWrapper(),
-      );
+      switch (isExist) {
+        case false:
+          return NewUserScreen();
+        default:
+          return CustomBlocProvider(
+              bloc: FollowYourRebootBloc(), child: FollowYourRebootScreen());
+      }
     } else {
       return LoginScreen();
     }
   }
 }
 
-class UserWrapper extends StatelessWidget {
-  const UserWrapper({Key key}) : super(key: key);
-
-  Stream<bool> isExistUserDocument() {
-    return db.isExistUserDocument();
-  }
+class NewUserScreen extends StatelessWidget {
+  const NewUserScreen({Key key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final User firebaseUser = context.watch<User>();
-
     return Scaffold(
-      appBar: appBarWithStreamBuilder(context, isExistUserDocument()),
-      body: StreamBuilder(
-        stream: isExistUserDocument(),
-        builder: (BuildContext context, AsyncSnapshot snapshot) {
-          switch (snapshot.connectionState) {
-            // Uncompleted State
-            case ConnectionState.none:
-            case ConnectionState.waiting:
-              return Center(
-                child: CircularProgressIndicator(),
-              );
-              break;
-            default:
-              if (firebaseUser == null) {
-                return LoginScreen();
-              } else if (snapshot.data == false) {
-                return CustomBlocProvider(
-                  child: NewUserScreen(),
-                  bloc: AccountBloc(),
-                );
-              }
-
-              return CustomBlocProvider(
-                  bloc: FollowYourRebootBloc(),
-                  child: FollowYourRebootScreen());
-          }
-        },
+      body: Container(
+        child: Center(
+          child: CircularProgressIndicator(),
+        ),
       ),
     );
   }

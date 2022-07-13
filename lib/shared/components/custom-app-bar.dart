@@ -63,6 +63,7 @@ AppBar notesAppBar(BuildContext context, String titleId) {
               builder: (context) => CustomBlocProvider(
                 bloc: FollowYourRebootBloc(),
                 child: AddNoteScreen(),
+                
               ),
             ),
           );
@@ -105,48 +106,6 @@ AppBar appBarWithCustomTitle(BuildContext context, String title) {
       title,
       style: kSubTitlesStyle.copyWith(color: theme.primaryColor),
     ),
-    iconTheme: IconThemeData(
-      color: theme.primaryColor,
-    ),
-  );
-}
-
-AppBar appBarWithStreamBuilder(BuildContext context, Stream userStream) {
-  final theme = Theme.of(context);
-  return AppBar(
-    backgroundColor: theme.bottomAppBarColor,
-    elevation: 0,
-    centerTitle: true,
-    title: StreamBuilder(
-      stream: userStream,
-      builder: (BuildContext context, AsyncSnapshot snapshot) {
-        switch (snapshot.connectionState) {
-          case ConnectionState.none:
-          case ConnectionState.waiting:
-            return Text(
-              "",
-              style: kSubTitlesStyle.copyWith(color: theme.primaryColor),
-            );
-            break;
-          default:
-            if (snapshot.data == false) {
-              return Text(
-                AppLocalizations.of(context).translate('welcome'),
-                style: kSubTitlesStyle.copyWith(color: theme.primaryColor),
-              );
-            }
-            return Text(
-              AppLocalizations.of(context).translate('follow-your-reboot'),
-              style: kSubTitlesStyle.copyWith(color: theme.primaryColor),
-            );
-            
-        }
-      },
-    ),
-    // title: Text(
-    //   title,
-    //   style: kSubTitlesStyle.copyWith(color: theme.primaryColor),
-    // ),
     iconTheme: IconThemeData(
       color: theme.primaryColor,
     ),

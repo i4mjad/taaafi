@@ -6,7 +6,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
-import 'package:reboot_app_3/shared/components/bottom_navbar.dart';
+import 'package:reboot_app_3/shared/Components/bottom_navbar.dart';
 import 'package:reboot_app_3/shared/components/app-themes.dart';
 import 'package:reboot_app_3/shared/localization/localization.dart';
 import 'package:reboot_app_3/shared/services/auth_service.dart';
@@ -25,7 +25,7 @@ Future<void> main() async {
   InitializationSettings initializationSettings = await setupNotifications();
 
   await setupFirebaseMesagging(initializationSettings);
-  // FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
+  FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
   runApp(MyApp());
 }
 
@@ -159,3 +159,4 @@ class _MyAppState extends State<MyApp> {
     );
   }
 }
+

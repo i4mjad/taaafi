@@ -11,4 +11,3 @@ const String blogScreenRoute = 'blog-screen-page';
 const String communityPage = 'community-screen-page';
 const String notesPage = 'notes-page';
 const String notePage = 'note-page';
-const String newUserPage = 'new-user-page';

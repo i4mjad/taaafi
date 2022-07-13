@@ -99,9 +99,9 @@ class DB {
       });
       final lastRelapseDayStr = userRelapses[userRelapses.length - 1];
       final lastRelapseDay = DateTime.parse(lastRelapseDayStr);
-      return await today.difference(lastRelapseDay).inDays;
+      return await today.difference(lastRelapseDay).inDays - 1;
     } else {
-      return await today.difference(firstdate).inDays;
+      return await today.difference(firstdate).inDays - 1;
     }
   }
 
@@ -122,9 +122,9 @@ class DB {
       //make a date from the last relapse
       final lastNoPornDay = DateTime.parse(lastNoPornDayStr);
       //calculate the current streak by making time interval between today and the last
-      return await today.difference(lastNoPornDay).inDays;
+      return await today.difference(lastNoPornDay).inDays - 1;
     } else {
-      return await today.difference(firstdate).inDays;
+      return await today.difference(firstdate).inDays - 1;
     }
   }
 
@@ -145,9 +145,9 @@ class DB {
       //make a date from the last relapse
       final lastNoMastDay = DateTime.parse(lastNoMastDayStr);
       //calculate the current streak by making time interval between today and the last
-      return await today.difference(lastNoMastDay).inDays;
+      return await today.difference(lastNoMastDay).inDays - 1;
     } else {
-      return await today.difference(firstdate).inDays;
+      return await today.difference(firstdate).inDays - 1;
     }
   }
 
@@ -481,11 +481,6 @@ class DB {
         .collection("userNotes")
         .doc(id)
         .delete();
-  }
-
-  Stream<bool> isExistUserDocument() async* {
-    DocumentSnapshot snapshot = await db.collection("users").doc(uid).get();
-    yield snapshot.exists;
   }
 }
 

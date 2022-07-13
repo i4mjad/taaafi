@@ -16,13 +16,8 @@ class AccountBloc implements CustomBlocBase {
   void dispose() async {
     return _firestoreController.close();
   }
-  
 
   Future<void> createNewData(DateTime selectedDate) async {
     return await db.createNewData(selectedDate);
-  }
-
-  Stream<bool> isExistUserDocument() {
-    return db.isExistUserDocument();
   }
 }

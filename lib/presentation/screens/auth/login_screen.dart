@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
-
+import 'package:reboot_app_3/shared/constants/constants.dart';
 import 'package:reboot_app_3/shared/constants/textstyles_constants.dart';
 import 'package:reboot_app_3/shared/localization/localization.dart';
 import 'package:reboot_app_3/shared/services/auth_service.dart';
@@ -31,8 +31,8 @@ class _LoginScreenState extends State<LoginScreen>
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Padding(
+    return Scaffold(
+        body: Padding(
       padding: EdgeInsets.only(top: 100.0, left: 20.0, right: 20),
       child: SingleChildScrollView(
         child: Column(
@@ -46,11 +46,11 @@ class _LoginScreenState extends State<LoginScreen>
                   Container(
                     padding: EdgeInsets.all(40),
                     decoration: BoxDecoration(
-                        color: theme.cardColor,
+                        color: lightPrimaryColor.withOpacity(0.2),
                         borderRadius: BorderRadius.circular(150)),
                     child: Icon(
                       Iconsax.user,
-                      color: theme.primaryColor,
+                      color: lightPrimaryColor,
                       size: 72,
                     ),
                   ),
@@ -64,9 +64,7 @@ class _LoginScreenState extends State<LoginScreen>
                       Text(
                         AppLocalizations.of(context).translate('login'),
                         style: kPageTitleStyle.copyWith(
-                          fontSize: 32,
-                          color: theme.primaryColor,
-                        ),
+                            fontSize: 32, color: lightPrimaryColor),
                       ),
                     ],
                   ),
@@ -83,7 +81,7 @@ class _LoginScreenState extends State<LoginScreen>
                           AppLocalizations.of(context)
                               .translate("login-button-p"),
                           style: kSubTitlesSubsStyle.copyWith(
-                              color: theme.primaryColor.withOpacity(0.7),
+                              color: Colors.black45,
                               fontSize: 16,
                               fontWeight: FontWeight.w500),
                         ))
@@ -161,6 +159,6 @@ class _LoginScreenState extends State<LoginScreen>
           ],
         ),
       ),
-    );
+    ));
   }
 }
