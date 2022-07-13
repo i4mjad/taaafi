@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -54,5 +55,30 @@ class GoogleAuthenticationService extends ChangeNotifier {
       }
       print(e.code);
     }
+  }
+}
+
+class NewUsersService extends ChangeNotifier {
+  final FirebaseAuth _firebaseAuth;
+
+  final FirebaseFirestore _firebaseFirestore;
+
+  bool isExist;
+  NewUsersService(this._firebaseFirestore, this._firebaseAuth);
+
+  bool get isUserDocumentExist => isExist;
+
+  //     .asStream();
+
+  isDocExist() {
+    bool _isDocExist = false;
+    _firebaseFirestore
+        .collection("users")
+        .doc(_firebaseAuth.currentUser.uid)
+        .get()
+        .then((value) {
+      _isDocExist = value.exists;
+    });
+    notifyListeners();
   }
 }
