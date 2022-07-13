@@ -482,6 +482,12 @@ class DB {
         .doc(id)
         .delete();
   }
+
+  Future<bool> isUserDocExist() async {
+    DocumentSnapshot snapshot = await db.collection("users").doc(uid).get();
+
+    return await snapshot.exists;
+  }
 }
 
 DB db = DB();

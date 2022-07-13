@@ -7,8 +7,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:reboot_app_3/data/models/CalenderDay.dart';
 import 'package:reboot_app_3/bloc_provider.dart';
 import 'package:reboot_app_3/data/models/FollowUpData.dart';
+import 'package:reboot_app_3/presentation/blocs/account_bloc.dart';
+import 'package:reboot_app_3/presentation/blocs/new_user_bloc.dart';
 import 'package:reboot_app_3/presentation/screens/auth/login_screen.dart';
 import 'package:reboot_app_3/presentation/blocs/follow_your_reboot_bloc.dart';
+import 'package:reboot_app_3/presentation/screens/auth/new_user_screen.dart';
 import 'package:reboot_app_3/presentation/screens/follow_your_reboot/follow_up_streaks/follow_up_streak.dart';
 import 'package:reboot_app_3/presentation/screens/follow_your_reboot/widgets/new_user_widgets.dart';
 import 'package:reboot_app_3/shared/Components/snackbar.dart';
@@ -759,42 +762,40 @@ class FollowYourRebootScreenAuthenticationWrapper extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final User firebaseUser = context.watch<User>();
-    final _fsInstance = FirebaseFirestore.instance;
-    bool isExist;
-
-    _fsInstance
-        .collection("users")
-        .doc(firebaseUser.uid)
-        .get()
-        .then((doc) async {
-      isExist = await doc.exists;
-    });
 
     if (firebaseUser != null) {
-      switch (isExist) {
-        case false:
-          return NewUserScreen();
-        default:
-          return CustomBlocProvider(
-              bloc: FollowYourRebootBloc(), child: FollowYourRebootScreen());
-      }
-    } else {
-      return LoginScreen();
+      return CustomBlocProvider(bloc: NewUserBloc(), child: NewUserWrapper());
     }
+    return LoginScreen();
   }
 }
 
-class NewUserScreen extends StatelessWidget {
-  const NewUserScreen({Key key}) : super(key: key);
+class NewUserWrapper extends StatelessWidget {
+  const NewUserWrapper({Key key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Container(
-        child: Center(
-          child: CircularProgressIndicator(),
-        ),
-      ),
-    );
+    final bloc = CustomBlocProvider.of<NewUserBloc>(context);
+
+    return StreamBuilder(
+        stream: bloc.isUserDocExist(),
+        initialData: false,
+        builder: (BuildContext context, AsyncSnapshot sh) {
+          switch (sh.connectionState) {
+            // Uncompleted State
+            case ConnectionState.none:
+            case ConnectionState.waiting:
+              return Center(child: CircularProgressIndicator());
+              break;
+            default:
+              // Completed with error
+              if (sh.data == false)
+                return CustomBlocProvider(
+                    bloc: AccountBloc(), child: NewUserScreen());
+              return CustomBlocProvider(
+                  bloc: FollowYourRebootBloc(),
+                  child: FollowYourRebootScreen());
+          }
+        });
   }
 }
