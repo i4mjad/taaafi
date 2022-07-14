@@ -24,4 +24,8 @@ class AccountBloc implements CustomBlocBase {
   Stream<bool> isUserDocExist() {
     return db.isUserDocExist().asStream();
   }
+
+  Future<void> deleteUserData() async{
+    return await db.deleteUserData();
+  }
 }

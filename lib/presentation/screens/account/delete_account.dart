@@ -3,20 +3,23 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:provider/provider.dart';
+
 import 'package:reboot_app_3/presentation/Screens/auth/login_screen.dart';
+import 'package:reboot_app_3/presentation/blocs/account_bloc.dart';
 import 'package:reboot_app_3/shared/constants/textstyles_constants.dart';
 import 'package:reboot_app_3/shared/localization/localization.dart';
 import 'package:reboot_app_3/shared/services/auth_service.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 class DeleteAccountSheet {
-  static void openConfirmDeleteAccountMessage(BuildContext context) {
+  static void openConfirmDeleteAccountMessage(
+      BuildContext context, AccountBloc bloc) {
     showModalBottomSheet(
         context: context,
         builder: (context) {
           return Padding(
               padding:
-              EdgeInsets.only(left: 20.0, right: 20, top: 8, bottom: 8),
+                  EdgeInsets.only(left: 20.0, right: 20, top: 8, bottom: 8),
               child: Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -60,11 +63,11 @@ class DeleteAccountSheet {
                     children: [
                       Flexible(
                           child: Text(
-                            AppLocalizations.of(context)
-                                .translate('confirm-account-delete'),
-                            style: kPageTitleStyle.copyWith(
-                                fontSize: 24, color: Colors.red),
-                          ))
+                        AppLocalizations.of(context)
+                            .translate('confirm-account-delete'),
+                        style: kPageTitleStyle.copyWith(
+                            fontSize: 24, color: Colors.red),
+                      ))
                     ],
                   ),
                 ),
@@ -77,30 +80,32 @@ class DeleteAccountSheet {
                   children: [
                     Flexible(
                         child: Text(
-                          AppLocalizations.of(context)
-                              .translate('confirm-account-delete-p'),
-                          textAlign: TextAlign.center,
-                          style: kSubTitlesStyle.copyWith(
-                              fontSize: 17,
-                              color: Colors.black.withOpacity(0.7),
-                              fontWeight: FontWeight.w400,
-                              height: 1.5),
-                        ))
+                      AppLocalizations.of(context)
+                          .translate('confirm-account-delete-p'),
+                      textAlign: TextAlign.center,
+                      style: kSubTitlesStyle.copyWith(
+                          fontSize: 17,
+                          color: Colors.black.withOpacity(0.7),
+                          fontWeight: FontWeight.w400,
+                          height: 1.5),
+                    ))
                   ],
                 ),
                 SizedBox(
                   height: 30,
                 ),
                 GestureDetector(
-                  onTap: () {
-                    context
-                        .read<GoogleAuthenticationService>()
-                        .deleteAccount()
-                        .then((value) {
-                      Navigator.pop(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => LoginScreen()));
+                  onTap: () async {
+                    await bloc.deleteUserData().then((_) {
+                      context
+                          .read<GoogleAuthenticationService>()
+                          .deleteAccount()
+                          .then((value) {
+                        Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => LoginScreen()));
+                      });
                     });
                   },
                   child: Container(
@@ -131,13 +136,13 @@ class DeleteAccountSheet {
         });
   }
 
-  static void openDeleteAccountMessage(BuildContext context) {
+  static void openDeleteAccountMessage(BuildContext context, AccountBloc bloc) {
     showModalBottomSheet(
         context: context,
         builder: (context) {
           return Padding(
               padding:
-              EdgeInsets.only(left: 20.0, right: 20, top: 8, bottom: 8),
+                  EdgeInsets.only(left: 20.0, right: 20, top: 8, bottom: 8),
               child: Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -181,11 +186,11 @@ class DeleteAccountSheet {
                     children: [
                       Flexible(
                           child: Text(
-                            AppLocalizations.of(context)
-                                .translate('delete-my-account'),
-                            style: kPageTitleStyle.copyWith(
-                                fontSize: 24, color: Colors.red),
-                          ))
+                        AppLocalizations.of(context)
+                            .translate('delete-my-account'),
+                        style: kPageTitleStyle.copyWith(
+                            fontSize: 24, color: Colors.red),
+                      ))
                     ],
                   ),
                 ),
@@ -198,15 +203,15 @@ class DeleteAccountSheet {
                   children: [
                     Flexible(
                         child: Text(
-                          AppLocalizations.of(context)
-                              .translate('delete-my-account-p'),
-                          textAlign: TextAlign.center,
-                          style: kSubTitlesStyle.copyWith(
-                              fontSize: 17,
-                              color: Colors.black.withOpacity(0.7),
-                              fontWeight: FontWeight.w400,
-                              height: 1.5),
-                        ))
+                      AppLocalizations.of(context)
+                          .translate('delete-my-account-p'),
+                      textAlign: TextAlign.center,
+                      style: kSubTitlesStyle.copyWith(
+                          fontSize: 17,
+                          color: Colors.black.withOpacity(0.7),
+                          fontWeight: FontWeight.w400,
+                          height: 1.5),
+                    ))
                   ],
                 ),
                 SizedBox(
@@ -217,7 +222,7 @@ class DeleteAccountSheet {
                   children: [
                     SignInWithAppleButton(onPressed: () async {
                       final appleIdCredential =
-                      await SignInWithApple.getAppleIDCredential(
+                          await SignInWithApple.getAppleIDCredential(
                         scopes: [
                           AppleIDAuthorizationScopes.email,
                           AppleIDAuthorizationScopes.fullName
@@ -233,7 +238,7 @@ class DeleteAccountSheet {
                           .reauthenticateWithCredential(credential)
                           .then((value) {
                         Navigator.pop(context);
-                        openConfirmDeleteAccountMessage(context);
+                        openConfirmDeleteAccountMessage(context, bloc);
                       });
                     }),
                     SizedBox(
@@ -246,7 +251,7 @@ class DeleteAccountSheet {
                             .reauthenticateWithsignInWithGoogle()
                             .then((value) {
                           Navigator.pop(context);
-                          openConfirmDeleteAccountMessage(context);
+                          openConfirmDeleteAccountMessage(context, bloc);
                         });
                       },
                       child: Container(
