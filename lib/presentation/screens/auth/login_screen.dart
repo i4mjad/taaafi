@@ -1,7 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:reboot_app_3/shared/constants/constants.dart';
 import 'package:reboot_app_3/shared/constants/textstyles_constants.dart';
 import 'package:reboot_app_3/shared/localization/localization.dart';
 import 'package:reboot_app_3/shared/services/auth_service.dart';
@@ -31,6 +30,7 @@ class _LoginScreenState extends State<LoginScreen>
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
         body: Padding(
       padding: EdgeInsets.only(top: 100.0, left: 20.0, right: 20),
@@ -46,11 +46,11 @@ class _LoginScreenState extends State<LoginScreen>
                   Container(
                     padding: EdgeInsets.all(40),
                     decoration: BoxDecoration(
-                        color: lightPrimaryColor.withOpacity(0.2),
+                        color: theme.cardColor,
                         borderRadius: BorderRadius.circular(150)),
                     child: Icon(
                       Iconsax.user,
-                      color: lightPrimaryColor,
+                      color: theme.primaryColor,
                       size: 72,
                     ),
                   ),
@@ -64,7 +64,7 @@ class _LoginScreenState extends State<LoginScreen>
                       Text(
                         AppLocalizations.of(context).translate('login'),
                         style: kPageTitleStyle.copyWith(
-                            fontSize: 32, color: lightPrimaryColor),
+                            fontSize: 32, color: theme.primaryColor),
                       ),
                     ],
                   ),
@@ -81,7 +81,7 @@ class _LoginScreenState extends State<LoginScreen>
                           AppLocalizations.of(context)
                               .translate("login-button-p"),
                           style: kSubTitlesSubsStyle.copyWith(
-                              color: Colors.black45,
+                              color: theme.primaryColor.withOpacity(0.6),
                               fontSize: 16,
                               fontWeight: FontWeight.w500),
                         ))

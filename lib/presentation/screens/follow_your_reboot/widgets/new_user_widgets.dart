@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:iconsax/iconsax.dart';
 import 'package:reboot_app_3/shared/constants/constants.dart';
-import 'package:reboot_app_3/shared/constants/textstyles_constants.dart';
 
 import 'package:flutter_rounded_date_picker/flutter_rounded_date_picker.dart';
-import 'package:reboot_app_3/shared/localization/localization.dart';
 
 import 'package:reboot_app_3/presentation/blocs/follow_your_reboot_bloc.dart';
 
@@ -19,7 +16,7 @@ void newUserDialog(BuildContext context, FollowYourRebootBloc bloc) {
           topRight: Radius.circular(30.0), topLeft: Radius.circular(30.0)),
     ),
     builder: (context) {
-      return ;
+      return;
     },
   );
 }
