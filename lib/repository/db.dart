@@ -488,6 +488,10 @@ class DB {
 
     return await snapshot.exists;
   }
+
+  Future<void> deleteUserData() async {
+    return await db.collection("users").doc(uid).delete();
+  }
 }
 
 DB db = DB();
