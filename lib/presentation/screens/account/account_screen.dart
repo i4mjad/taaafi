@@ -413,7 +413,7 @@ class UserProfileCard extends StatelessWidget {
                       color: theme.hintColor, fontWeight: FontWeight.w500),
                 ),
                 SizedBox(height: 8),
-                Text(this.user.email.toUpperCase(),
+                Text(this.user.email.toUpperCase() ?? "",
                     style: kCaptionStyle.copyWith(
                         color: theme.hintColor.withOpacity(0.75))),
               ],

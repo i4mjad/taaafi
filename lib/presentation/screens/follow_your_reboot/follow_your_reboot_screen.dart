@@ -8,12 +8,11 @@ import 'package:reboot_app_3/data/models/CalenderDay.dart';
 import 'package:reboot_app_3/bloc_provider.dart';
 import 'package:reboot_app_3/data/models/FollowUpData.dart';
 import 'package:reboot_app_3/presentation/blocs/account_bloc.dart';
-import 'package:reboot_app_3/presentation/blocs/new_user_bloc.dart';
+import 'package:reboot_app_3/presentation/blocs/user_bloc.dart';
 import 'package:reboot_app_3/presentation/screens/auth/login_screen.dart';
 import 'package:reboot_app_3/presentation/blocs/follow_your_reboot_bloc.dart';
 import 'package:reboot_app_3/presentation/screens/auth/new_user_screen.dart';
 import 'package:reboot_app_3/presentation/screens/follow_your_reboot/follow_up_streaks/follow_up_streak.dart';
-import 'package:reboot_app_3/presentation/screens/follow_your_reboot/widgets/new_user_widgets.dart';
 import 'package:reboot_app_3/shared/Components/snackbar.dart';
 import 'package:reboot_app_3/shared/components/custom-app-bar.dart';
 import 'package:reboot_app_3/shared/constants/constants.dart';
@@ -37,7 +36,6 @@ class FollowYourRebootScreen extends StatefulWidget {
 class FollowYourRebootScreenState extends State<FollowYourRebootScreen>
     with TickerProviderStateMixin {
   String lang;
-  //final GlobalKey<ScaffoldState> _modelScaffoldKey = GlobalKey<ScaffoldState>();
   FirebaseFirestore database = FirebaseFirestore.instance;
   final user = FirebaseAuth.instance.currentUser;
 
@@ -106,55 +104,9 @@ class FollowYourRebootScreenState extends State<FollowYourRebootScreen>
     });
   }
 
-  void migerateToUserFirstDate() async {
-    var _db = database.collection("users").doc(user.uid);
-
-    _db.get().then((value) async {
-      if (await value.data().containsKey("userFirstDate") == false) {
-        var userRigDate = user.metadata.creationTime;
-        int userFirstStreak = await value.data()["userPreviousStreak"];
-
-        DateTime userResetDate = value.data()["resetedDate"] != null
-            ? await DateTime.parse(
-                value.data()["resetedDate"].toDate().toString())
-            : null;
-        DateTime parseFirstDate = await DateTime(userRigDate.year,
-            userRigDate.month, userRigDate.day - userFirstStreak);
-        DateTime userFirstDate =
-            await userResetDate != null ? userResetDate : parseFirstDate;
-
-        var firstDate = {"userFirstDate": userFirstDate};
-        await database
-            .collection("users")
-            .doc(user.uid)
-            .set(firstDate, SetOptions(merge: true))
-            .onError((error, stackTrace) => print(error))
-            .then((value) {
-          setState(() {});
-        });
-      }
-    });
-  }
-
-  void isNewUser() async {
-    var _db = database.collection("users").doc(user.uid);
-
-    return _db.get().then((value) async {
-      final bloc = CustomBlocProvider.of<FollowYourRebootBloc>(context);
-      if (value.exists == false) newUserDialog(context, bloc);
-
-      if (await value.data().containsKey("userFirstDate") == false) {
-        migerateToUserFirstDate();
-      } else {
-        getCalenderData();
-      }
-    });
-  }
-
   @override
   void initState() {
-    isNewUser();
-
+    getCalenderData();
     super.initState();
 
     LocaleService.getSelectedLocale().then((value) {
@@ -168,6 +120,7 @@ class FollowYourRebootScreenState extends State<FollowYourRebootScreen>
   Widget build(BuildContext context) {
     final bloc = CustomBlocProvider.of<FollowYourRebootBloc>(context);
     final theme = Theme.of(context);
+
     return Scaffold(
         appBar: appBarWithSettings(context, "follow-your-reboot"),
         body: SingleChildScrollView(
@@ -764,37 +717,47 @@ class FollowYourRebootScreenAuthenticationWrapper extends StatelessWidget {
     final User firebaseUser = context.watch<User>();
 
     if (firebaseUser != null) {
-      return CustomBlocProvider(bloc: NewUserBloc(), child: NewUserWrapper());
+      return CustomBlocProvider(
+        bloc: UserBloc(),
+        child: UserDocWrapper(),
+      );
     }
     return LoginScreen();
   }
 }
 
-class NewUserWrapper extends StatelessWidget {
-  const NewUserWrapper({Key key}) : super(key: key);
+class UserDocWrapper extends StatelessWidget {
+  const UserDocWrapper({Key key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final bloc = CustomBlocProvider.of<NewUserBloc>(context);
-
+    final bloc = CustomBlocProvider.of<UserBloc>(context);
     return StreamBuilder(
-        stream: bloc.isUserDocExist(),
-        initialData: false,
-        builder: (BuildContext context, AsyncSnapshot sh) {
-          switch (sh.connectionState) {
+        stream: bloc.UserDoc(),
+        builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+          switch (snapshot.connectionState) {
             // Uncompleted State
             case ConnectionState.none:
             case ConnectionState.waiting:
               return Center(child: CircularProgressIndicator());
-              break;
+
+
             default:
               // Completed with error
-              if (sh.data == false)
+              var data = snapshot.data.data();
+
+              if (data == null) {
                 return CustomBlocProvider(
-                    bloc: AccountBloc(), child: NewUserScreen());
-              return CustomBlocProvider(
+                  bloc: AccountBloc(),
+                  child: NewUserSection(),
+                );
+              }
+                return CustomBlocProvider(
                   bloc: FollowYourRebootBloc(),
-                  child: FollowYourRebootScreen());
+                  child: FollowYourRebootScreen(),
+                );
+
+
           }
         });
   }
