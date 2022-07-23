@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
+
 import 'package:iconsax/iconsax.dart';
 import 'package:reboot_app_3/bloc_provider.dart';
 import 'package:reboot_app_3/presentation/blocs/account_bloc.dart';
-import 'package:reboot_app_3/presentation/blocs/new_user_bloc.dart';
-import 'package:reboot_app_3/presentation/screens/follow_your_reboot/follow_your_reboot_screen.dart';
 import 'package:reboot_app_3/presentation/screens/follow_your_reboot/widgets/new_user_widgets.dart';
 import 'package:reboot_app_3/shared/constants/constants.dart';
 import 'package:reboot_app_3/shared/constants/textstyles_constants.dart';
 import 'package:reboot_app_3/shared/localization/localization.dart';
 
-class NewUserScreen extends StatelessWidget {
-  const NewUserScreen({Key key}) : super(key: key);
+class NewUserSection extends StatelessWidget {
+  NewUserSection({Key key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -65,18 +64,7 @@ class NewUserScreen extends StatelessWidget {
                   GestureDetector(
                     onTap: () async {
                       var selectedDate = await getDateTime(context);
-                      await bloc.createNewData(selectedDate).then((value) {
-                        Navigator.pushReplacement<void, void>(
-                          context,
-                          MaterialPageRoute<void>(
-                            builder: (BuildContext context) =>
-                                CustomBlocProvider(
-                              bloc: NewUserBloc(),
-                              child: NewUserWrapper(),
-                            ),
-                          ),
-                        );
-                      });
+                      await bloc.createNewData(selectedDate);
                     },
                     child: Container(
                       height: 60,
@@ -99,19 +87,7 @@ class NewUserScreen extends StatelessWidget {
                   ),
                   GestureDetector(
                     onTap: () async {
-                      await bloc.createNewData(DateTime.now()).then((value) {
-                        Navigator.pushReplacement<void, void>(
-                          context,
-                          MaterialPageRoute<void>(
-                            builder: (BuildContext context) =>
-                                CustomBlocProvider(
-                              bloc: NewUserBloc(),
-                              child: NewUserWrapper(),
-                            ),
-                            // NewUserWrapper(),
-                          ),
-                        );
-                      });
+                      await bloc.createNewData(DateTime.now());
                     },
                     child: Container(
                       height: 60,
