@@ -105,4 +105,8 @@ class FollowYourRebootBloc implements CustomBlocBase {
   void dispose() async {
     return _firestoreController.close();
   }
+
+  Stream streamUserDoc() {
+    return db.initStream();
+  }
 }

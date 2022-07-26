@@ -4,24 +4,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:reboot_app_3/data/models/CalenderDay.dart';
+
 import 'package:reboot_app_3/bloc_provider.dart';
-import 'package:reboot_app_3/data/models/FollowUpData.dart';
 import 'package:reboot_app_3/presentation/blocs/account_bloc.dart';
 import 'package:reboot_app_3/presentation/blocs/user_bloc.dart';
 import 'package:reboot_app_3/presentation/screens/auth/login_screen.dart';
 import 'package:reboot_app_3/presentation/blocs/follow_your_reboot_bloc.dart';
 import 'package:reboot_app_3/presentation/screens/auth/new_user_screen.dart';
 import 'package:reboot_app_3/presentation/screens/follow_your_reboot/follow_up_streaks/follow_up_streak.dart';
+import 'package:reboot_app_3/presentation/screens/follow_your_reboot/follow_your_reboot_widgets.dart';
 import 'package:reboot_app_3/shared/Components/snackbar.dart';
 import 'package:reboot_app_3/shared/components/custom-app-bar.dart';
-import 'package:reboot_app_3/shared/constants/constants.dart';
 import 'package:reboot_app_3/shared/constants/textstyles_constants.dart';
 import 'package:reboot_app_3/shared/localization/localization.dart';
 import 'package:reboot_app_3/shared/localization/localization_services.dart';
 import 'package:provider/provider.dart';
-import 'package:syncfusion_flutter_calendar/calendar.dart';
-import 'calender/calender_data_model.dart';
 import 'notes/notes_screen.dart';
 
 class FollowYourRebootScreen extends StatefulWidget {
@@ -36,82 +33,15 @@ class FollowYourRebootScreen extends StatefulWidget {
 class FollowYourRebootScreenState extends State<FollowYourRebootScreen>
     with TickerProviderStateMixin {
   String lang;
-  FirebaseFirestore database = FirebaseFirestore.instance;
-  final user = FirebaseAuth.instance.currentUser;
-
-  var days = <CalenderDay>[];
-
-  void getCalenderData() async {
-    final db = FirebaseFirestore.instance;
-
-    final uid = FirebaseAuth.instance.currentUser.uid;
-
-    db.collection("users").doc(uid).snapshots().listen((snapshot) async {
-      FollowUpData _followUpDate = await FollowUpData.fromSnapshot(snapshot);
-      DateTime _startingDate = DateTime.parse(
-          await snapshot.get('userFirstDate').toDate().toString());
-
-      var daysArray = <CalenderDay>[];
-      var oldRelapses = <DateTime>[];
-      var oldWatches = <DateTime>[];
-      var oldMasts = <DateTime>[];
-
-      final today = DateTime.now();
-
-      oldRelapses.clear();
-      for (var strDate in _followUpDate.relapses) {
-        final date = DateTime.parse(strDate);
-        oldRelapses.add(date);
-      }
-      oldWatches.clear();
-      for (var strDate in _followUpDate.pornWithoutMasterbation) {
-        final date = DateTime.parse(strDate);
-        oldWatches.add(date);
-      }
-      oldMasts.clear();
-      for (var strDate in _followUpDate.masterbationWithoutPorn) {
-        final date = DateTime.parse(strDate);
-        oldMasts.add(date);
-      }
-
-      List<DateTime> calculateDaysInterval(
-          DateTime startDate, DateTime endDate) {
-        List<DateTime> days = [];
-        for (int i = 1; i <= endDate.difference(startDate).inDays; i++) {
-          days.add(startDate.add(Duration(days: i)));
-        }
-        return days;
-      }
-
-      for (var date in calculateDaysInterval(_startingDate, today)) {
-        final formattedDate = new DateTime(date.year, date.month, date.day);
-        if (oldRelapses.contains(formattedDate)) {
-          daysArray.add(new CalenderDay("Relapse", date, Colors.red));
-        } else if (oldWatches.contains(formattedDate) &&
-            !oldRelapses.contains(formattedDate)) {
-          daysArray.add(new CalenderDay("Watching Porn", date, Colors.purple));
-        } else if (oldMasts.contains(formattedDate) &&
-            !oldRelapses.contains(formattedDate)) {
-          daysArray.add(new CalenderDay("Masturbating", date, Colors.orange));
-        } else {
-          daysArray.add(new CalenderDay("Success", date, Colors.green));
-        }
-      }
-
-      setState(() {
-        days = daysArray;
-      });
-    });
-  }
 
   @override
   void initState() {
-    getCalenderData();
     super.initState();
 
     LocaleService.getSelectedLocale().then((value) {
       setState(() {
         lang = value;
+        setState(() {});
       });
     });
   }
@@ -167,58 +97,14 @@ class FollowYourRebootScreenState extends State<FollowYourRebootScreen>
                 ),
               ),
               SizedBox(height: 16),
-              FollowUpStreaks(),
+              CustomBlocProvider(
+                  bloc: FollowYourRebootBloc(), child: FollowUpStreaks()),
+              RebootCalender(),
               Padding(
                 padding: EdgeInsets.only(right: 16, left: 16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      //mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Text(
-                            AppLocalizations.of(context)
-                                .translate('reboot-calender'),
-                            style: kSubTitlesStyle.copyWith(
-                                color: theme.hintColor)),
-                        SizedBox(
-                          height: 8,
-                        ),
-                        Container(
-                            width: MediaQuery.of(context).size.width,
-                            height: MediaQuery.of(context).size.height * 0.45,
-                            decoration: BoxDecoration(
-                                color: mainGrayColor,
-                                borderRadius: BorderRadius.circular(15)),
-                            child: SfCalendar(
-                              backgroundColor: theme.cardColor,
-                              onTap: (CalendarTapDetails details) async {
-                                DateTime date = details.date;
-                                DateTime firstDate = await bloc.getFirstDate();
-
-                                dateChecker(firstDate, date, context, bloc);
-                              },
-                              view: CalendarView.month,
-                              headerStyle: CalendarHeaderStyle(
-                                  textAlign: TextAlign.center,
-                                  backgroundColor: theme.cardColor,
-                                  textStyle: kSubTitlesStyle.copyWith(
-                                      color: theme.primaryColor)),
-                              dataSource: CalenderDataSource(days),
-                              monthViewSettings: MonthViewSettings(
-                                //showAgenda: true,
-                                agendaStyle: AgendaStyle(),
-                                appointmentDisplayMode:
-                                    MonthAppointmentDisplayMode.indicator,
-                              ),
-                              allowAppointmentResize: true,
-                            )),
-                      ],
-                    ),
-                    SizedBox(
-                      height: 12,
-                    ),
                     Text(AppLocalizations.of(context).translate('streaks'),
                         style:
                             kSubTitlesStyle.copyWith(color: theme.hintColor)),
@@ -308,276 +194,6 @@ class FollowYourRebootScreenState extends State<FollowYourRebootScreen>
             ],
           ),
         ));
-  }
-
-  changeDateEvent(
-      String date, BuildContext context, FollowYourRebootBloc bloc) async {
-    final trimedDate = date.trim();
-    final theme = Theme.of(context);
-    showModalBottomSheet(
-        backgroundColor: theme.scaffoldBackgroundColor,
-        context: context,
-        builder: (context) {
-          return Padding(
-            padding: EdgeInsets.only(left: 20.0, right: 20, top: 8, bottom: 8),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      height: 5,
-                      width: MediaQuery.of(context).size.width * 0.1,
-                      color: Colors.black12,
-                    )
-                  ],
-                ),
-                SizedBox(
-                  height: 12,
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      trimedDate,
-                      style: kPageTitleStyle.copyWith(
-                          fontSize: 26, color: theme.primaryColor),
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.pop(context);
-                      },
-                      child: Icon(
-                        Iconsax.close_circle,
-                        color: theme.primaryColor,
-                        size: 32,
-                      ),
-                    )
-                  ],
-                ),
-                SizedBox(
-                  height: 8,
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      AppLocalizations.of(context).translate("how-is-this-day"),
-                      style: kPageTitleStyle.copyWith(
-                          fontSize: 18,
-                          color: Colors.grey,
-                          fontWeight: FontWeight.normal),
-                    ),
-                  ],
-                ),
-                SizedBox(
-                  height: 8,
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    //relapse
-                    GestureDetector(
-                      onTap: () {
-                        bloc.addRelapse(date);
-                        HapticFeedback.mediumImpact();
-                        getSnackBar(context, "relapse-recorded");
-                        Navigator.pop(context);
-                      },
-                      child: Container(
-                        width: MediaQuery.of(context).size.width / 2.5,
-                        height: 100,
-                        decoration: BoxDecoration(
-                            color: Colors.red.withOpacity(0.2),
-                            borderRadius: BorderRadius.circular(12.5),
-                            border: Border.all(color: Colors.red)),
-                        child: Center(
-                          child: Text(
-                            AppLocalizations.of(context).translate("relapse"),
-                            style: kSubTitlesStyle.copyWith(
-                                color: Colors.red,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600),
-                          ),
-                        ),
-                      ),
-                    ),
-                    //success
-                    GestureDetector(
-                      onTap: () {
-                        bloc.addSuccess(date);
-                        HapticFeedback.mediumImpact();
-                        Navigator.pop(context);
-                        getSnackBar(context, "free-day-recorded");
-                      },
-                      child: Container(
-                        width: MediaQuery.of(context).size.width / 2.5,
-                        height: 100,
-                        decoration: BoxDecoration(
-                            color: Colors.green.withOpacity(0.2),
-                            borderRadius: BorderRadius.circular(12.5),
-                            border: Border.all(color: Colors.green)),
-                        child: Center(
-                          child: Text(
-                            AppLocalizations.of(context).translate("free-day"),
-                            style: kSubTitlesStyle.copyWith(
-                                color: Colors.green,
-                                fontWeight: FontWeight.w600,
-                                fontSize: 16),
-                          ),
-                        ),
-                      ),
-                    )
-                  ],
-                ),
-                SizedBox(
-                  height: 18,
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    //only porn
-                    GestureDetector(
-                      onTap: () {
-                        bloc.addWatchOnly(date);
-                        HapticFeedback.mediumImpact();
-                        getSnackBar(context, "pornonly-recorded");
-                        Navigator.pop(context);
-                      },
-                      child: Container(
-                        width: MediaQuery.of(context).size.width / 2.5,
-                        height: 100,
-                        decoration: BoxDecoration(
-                            color: Colors.deepPurple.withOpacity(0.2),
-                            borderRadius: BorderRadius.circular(12.5),
-                            border: Border.all(color: Colors.deepPurple)),
-                        child: Center(
-                          child: Text(
-                            AppLocalizations.of(context).translate("porn-only"),
-                            textAlign: TextAlign.center,
-                            style: kSubTitlesStyle.copyWith(
-                                color: Colors.deepPurple,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600),
-                          ),
-                        ),
-                      ),
-                    ),
-                    //only mast
-                    GestureDetector(
-                      onTap: () {
-                        bloc.addMastOnly(date);
-                        HapticFeedback.mediumImpact();
-                        getSnackBar(context, "mastonly-recorded");
-                        Navigator.pop(context);
-                      },
-                      child: Container(
-                        width: MediaQuery.of(context).size.width / 2.5,
-                        height: 100,
-                        decoration: BoxDecoration(
-                            color: Colors.orangeAccent.withOpacity(0.2),
-                            borderRadius: BorderRadius.circular(12.5),
-                            border: Border.all(color: Colors.orangeAccent)),
-                        child: Center(
-                          child: Text(
-                            AppLocalizations.of(context).translate("mast-only"),
-                            textAlign: TextAlign.center,
-                            style: kSubTitlesStyle.copyWith(
-                                color: Colors.orangeAccent,
-                                fontWeight: FontWeight.w600,
-                                fontSize: 16),
-                          ),
-                        ),
-                      ),
-                    )
-                  ],
-                ),
-                SizedBox(
-                  height: 20,
-                ),
-              ],
-            ),
-          );
-        });
-  }
-
-  dateChecker(DateTime firstDate, DateTime date, BuildContext context,
-      FollowYourRebootBloc bloc) {
-    if (dayWithinRange(firstDate, date)) {
-      final dateStr = date.toString().substring(0, 10);
-      changeDateEvent(dateStr, context, bloc);
-    } else {
-      outOfRangeAlert(context);
-    }
-  }
-
-  void outOfRangeAlert(BuildContext context) {
-    HapticFeedback.mediumImpact();
-    showModalBottomSheet(
-        context: context,
-        builder: (context) {
-          return Padding(
-            padding: EdgeInsets.fromLTRB(0, 8, 0, 0),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      height: 5,
-                      width: MediaQuery.of(context).size.width * 0.1,
-                      decoration: BoxDecoration(
-                        color: Colors.black12,
-                        borderRadius: BorderRadius.circular(30),
-                      ),
-                    )
-                  ],
-                ),
-                SizedBox(
-                  height: 12,
-                ),
-                CircleAvatar(
-                  backgroundColor: Colors.red.withOpacity(0.2),
-                  child: Icon(
-                    Iconsax.warning_2,
-                    color: Colors.red,
-                  ),
-                ),
-                SizedBox(
-                  height: 4,
-                ),
-                Text(
-                  AppLocalizations.of(context).translate("out-of-range"),
-                  style:
-                      kPageTitleStyle.copyWith(color: Colors.red, fontSize: 24),
-                ),
-                SizedBox(
-                  height: 8,
-                ),
-                Text(
-                  AppLocalizations.of(context).translate('out-of-range-p'),
-                  style: kSubTitlesStyle.copyWith(
-                      color: Colors.black.withOpacity(0.7),
-                      fontWeight: FontWeight.normal,
-                      fontSize: 18),
-                ),
-                SizedBox(
-                  height: 30,
-                )
-              ],
-            ),
-          );
-        });
-  }
-
-  bool dayWithinRange(DateTime firstDate, DateTime date) {
-    final today = DateTime.now();
-    return date.isAfter(firstDate) && date.isBefore(today);
   }
 }
 
@@ -734,13 +350,13 @@ class UserDocWrapper extends StatelessWidget {
     final bloc = CustomBlocProvider.of<UserBloc>(context);
     return StreamBuilder(
         stream: bloc.UserDoc(),
-        builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+        builder:
+            (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
           switch (snapshot.connectionState) {
             // Uncompleted State
             case ConnectionState.none:
             case ConnectionState.waiting:
               return Center(child: CircularProgressIndicator());
-
 
             default:
               // Completed with error
@@ -752,12 +368,10 @@ class UserDocWrapper extends StatelessWidget {
                   child: NewUserSection(),
                 );
               }
-                return CustomBlocProvider(
-                  bloc: FollowYourRebootBloc(),
-                  child: FollowYourRebootScreen(),
-                );
-
-
+              return CustomBlocProvider(
+                bloc: FollowYourRebootBloc(),
+                child: FollowYourRebootScreen(),
+              );
           }
         });
   }
