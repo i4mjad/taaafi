@@ -18,10 +18,7 @@ class FollowUpStreaks extends StatelessWidget {
     final bloc = CustomBlocProvider.of<FollowYourRebootBloc>(context);
     final theme = Theme.of(context);
     return StreamBuilder(
-      stream: FirebaseFirestore.instance
-          .collection("users")
-          .doc(FirebaseAuth.instance.currentUser.uid)
-          .snapshots(),
+      stream: bloc.streamUserDoc(),
       builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
         return Container(
           child: Padding(

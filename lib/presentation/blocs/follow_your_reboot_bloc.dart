@@ -106,7 +106,7 @@ class FollowYourRebootBloc implements CustomBlocBase {
     return _firestoreController.close();
   }
 
-  Stream streamUserDoc() {
+  Stream<DocumentSnapshot> streamUserDoc() {
     return db.initStream();
   }
 }
