@@ -408,14 +408,17 @@ class UserProfileCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Text(
-                  this.user.displayName,
+                  user.displayName ?? "",
                   style: kTitlePrimeryStyle.copyWith(
                       color: theme.hintColor, fontWeight: FontWeight.w500),
                 ),
                 SizedBox(height: 8),
-                Text(this.user.email.toUpperCase() ?? "",
+                Text(
+                  user.email.toUpperCase() ?? "",
                     style: kCaptionStyle.copyWith(
-                        color: theme.hintColor.withOpacity(0.75))),
+                        color: theme.hintColor.withOpacity(0.75),
+                    ),
+                ),
               ],
             ),
           ],
