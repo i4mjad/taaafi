@@ -88,7 +88,9 @@ class FollowYourRebootScreenState extends State<FollowYourRebootScreen>
               SizedBox(height: 16),
               CustomBlocProvider(
                   bloc: FollowYourRebootBloc(), child: FollowUpStreaks()),
-              RebootCalender(),
+               CustomBlocProvider(
+                  bloc: FollowYourRebootBloc(), child: RebootCalender()),
+
               SizedBox(height: 16),
               Padding(
                 padding: EdgeInsets.only(right: 16, left: 16),
