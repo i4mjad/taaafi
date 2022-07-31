@@ -13,7 +13,7 @@ class DB {
   String uid = FirebaseAuth.instance.currentUser.uid;
 
   Stream<DocumentSnapshot> initStream() {
-    return db.collection("users").doc(uid).snapshots();
+    return db.collection("users").doc(uid).snapshots().asBroadcastStream();
   }
 
   Future<FollowUpData> getFollowUpData() async {
