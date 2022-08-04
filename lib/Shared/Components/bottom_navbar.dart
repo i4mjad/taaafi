@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:reboot_app_3/presentation/screens/about/about_screen.dart';
-import 'package:reboot_app_3/presentation/screens/follow_your_reboot/follow_your_reboot_screen.dart';
 import 'package:reboot_app_3/presentation/screens/follow_your_reboot/follow_your_reboot_wrappers.dart';
 import 'package:reboot_app_3/shared/constants/constants.dart';
 import 'package:reboot_app_3/presentation/Screens/account/account_screen.dart';

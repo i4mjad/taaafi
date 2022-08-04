@@ -72,8 +72,7 @@ Future<InitializationSettings> setupNotifications() async {
 class MyApp extends StatefulWidget {
   static void setLocale(BuildContext context, Locale locale) async {
     _MyAppState state = context.findAncestorStateOfType<_MyAppState>();
-    FirebaseCrashlytics.instance.setUserIdentifier(FirebaseAuth.instance.currentUser.uid ?? "NOT-SIGNED-USER");
-    FirebaseCrashlytics.instance.setCustomKey("user_id", FirebaseAuth.instance.currentUser.uid ?? "NOT-SIGNED-USER");
+
     state.setLocale(locale);
   }
 
@@ -160,4 +159,3 @@ class _MyAppState extends State<MyApp> {
     );
   }
 }
-

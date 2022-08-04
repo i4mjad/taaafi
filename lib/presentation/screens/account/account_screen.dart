@@ -322,6 +322,7 @@ class _AccountScreenState extends State<AccountScreen>
                     GestureDetector(
                       onTap: () async {
                         var selectedDate = await getDateTime(context);
+                        if (selectedDate == null) return;
                         await bloc
                             .createNewData(selectedDate)
                             .then((value) => Navigator.pop(context));
@@ -415,9 +416,9 @@ class UserProfileCard extends StatelessWidget {
                 SizedBox(height: 8),
                 Text(
                   user.email.toUpperCase() ?? "",
-                    style: kCaptionStyle.copyWith(
-                        color: theme.hintColor.withOpacity(0.75),
-                    ),
+                  style: kCaptionStyle.copyWith(
+                    color: theme.hintColor.withOpacity(0.75),
+                  ),
                 ),
               ],
             ),

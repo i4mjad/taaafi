@@ -22,7 +22,7 @@ void newUserDialog(BuildContext context, FollowYourRebootBloc bloc) {
 }
 
 Future<DateTime> getDateTime(BuildContext context) async {
-  return await showRoundedDatePicker(
+  var selectedDate = await showRoundedDatePicker(
     context: context,
     initialDate: DateTime.now(),
     firstDate: DateTime(DateTime.now().year - 1),
@@ -34,6 +34,8 @@ Future<DateTime> getDateTime(BuildContext context) async {
       primaryColor: lightPrimaryColor,
     ),
   );
+
+  return selectedDate;
 }
 
 DateTime getToday() {

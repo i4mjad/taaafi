@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:reboot_app_3/data/models/CalenderDay.dart';
 import 'package:reboot_app_3/data/models/FollowUpData.dart';
@@ -13,6 +14,7 @@ class DB {
   String uid = FirebaseAuth.instance.currentUser.uid;
 
   Stream<DocumentSnapshot> initStream() {
+    FirebaseCrashlytics.instance.setCustomKey("uid", uid);
     return db.collection("users").doc(uid).snapshots().asBroadcastStream();
   }
 

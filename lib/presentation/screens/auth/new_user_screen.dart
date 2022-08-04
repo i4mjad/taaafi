@@ -64,6 +64,7 @@ class NewUserSection extends StatelessWidget {
                   GestureDetector(
                     onTap: () async {
                       var selectedDate = await getDateTime(context);
+                      if (selectedDate == null) return;
                       await bloc.createNewData(selectedDate);
                     },
                     child: Container(
