@@ -83,29 +83,6 @@ class NewUserSection extends StatelessWidget {
                       ),
                     ),
                   ),
-                  SizedBox(
-                    height: 16,
-                  ),
-                  GestureDetector(
-                    onTap: () async {
-                      await bloc.createNewData(DateTime.now());
-                    },
-                    child: Container(
-                      height: 60,
-                      width: MediaQuery.of(context).size.width - 40,
-                      padding: EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                          color: accentColor,
-                          borderRadius: BorderRadius.circular(12.5)),
-                      child: Center(
-                        child: Text(
-                          AppLocalizations.of(context).translate('today'),
-                          style: kTitleSeconderyStyle.copyWith(
-                              color: Colors.white),
-                        ),
-                      ),
-                    ),
-                  )
                 ],
               ),
             ],

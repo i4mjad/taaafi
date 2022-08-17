@@ -269,16 +269,15 @@ class _AccountScreenState extends State<AccountScreen>
   resetUserDialog(BuildContext context, AccountBloc bloc) {
     showModalBottomSheet(
       context: context,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.only(
-            topRight: Radius.circular(30.0), topLeft: Radius.circular(30.0)),
-      ),
+
       builder: (BuildContext context) {
+        final theme = Theme.of(context);
         return StatefulBuilder(
             builder: (BuildContext context, StateSetter bsState) {
           return Container(
             height: MediaQuery.of(context).size.height * 0.35,
             width: MediaQuery.of(context).size.width,
+            color: theme.scaffoldBackgroundColor,
             padding: EdgeInsets.all(16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -287,11 +286,11 @@ class _AccountScreenState extends State<AccountScreen>
                   padding: EdgeInsets.all(8),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(100),
-                    color: lightPrimaryColor.withOpacity(0.1),
+                    color: theme.primaryColor.withOpacity(0.1),
                   ),
                   child: Icon(
                     Iconsax.calendar_tick,
-                    color: lightPrimaryColor,
+                    color: theme.primaryColor,
                     size: 32,
                   ),
                 ),
@@ -302,7 +301,7 @@ class _AccountScreenState extends State<AccountScreen>
                   AppLocalizations.of(context)
                       .translate('delete-user-dialog-title'),
                   style: kHeadlineStyle.copyWith(
-                      fontWeight: FontWeight.bold, color: lightPrimaryColor),
+                      fontWeight: FontWeight.bold, color: theme.primaryColor),
                 ),
                 SizedBox(
                   height: 8,

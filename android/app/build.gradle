@@ -47,8 +47,8 @@ android {
         minSdkVersion 19
         //version number: 2.1.5
         versionName "2.1.5"
-        //build number : 02
-        versionCode 21502
+        //build number : 03
+        versionCode 21503
 
         //multiDexEnabled true
         multiDexEnabled true

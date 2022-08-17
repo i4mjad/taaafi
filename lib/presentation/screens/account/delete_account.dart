@@ -14,130 +14,138 @@ import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 class DeleteAccountSheet {
   static void openConfirmDeleteAccountMessage(
       BuildContext context, AccountBloc bloc) {
+    final theme = Theme.of(context);
     showModalBottomSheet(
         context: context,
+        backgroundColor: theme.scaffoldBackgroundColor,
         builder: (context) {
-          return Padding(
-              padding:
-                  EdgeInsets.only(left: 20.0, right: 20, top: 8, bottom: 8),
-              child: Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      height: 5,
-                      width: MediaQuery.of(context).size.width * 0.1,
-                      decoration: BoxDecoration(
-                          color: Colors.black12,
-                          borderRadius: BorderRadius.circular(50)),
-                    )
-                  ],
-                ),
-                SizedBox(
-                  height: 12,
-                ),
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      height: 45,
-                      width: 45,
-                      decoration: BoxDecoration(
-                          color: Colors.red.withOpacity(0.3),
-                          borderRadius: BorderRadius.circular(50)),
-                      child: Center(
-                        child: Icon(
-                          Iconsax.trash,
-                          color: Colors.red,
+
+          return Container(
+
+            child: Padding(
+                padding:
+                    EdgeInsets.only(left: 20.0, right: 20, top: 8, bottom: 8),
+                child: Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        height: 5,
+                        width: MediaQuery.of(context).size.width * 0.1,
+                        decoration: BoxDecoration(
+                            color: Colors.black12,
+                            borderRadius: BorderRadius.circular(50)),
+                      )
+                    ],
+                  ),
+                  SizedBox(
+                    height: 12,
+                  ),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        height: 45,
+                        width: 45,
+                        decoration: BoxDecoration(
+                            color: Colors.red.withOpacity(0.3),
+                            borderRadius: BorderRadius.circular(50)),
+                        child: Center(
+                          child: Icon(
+                            Iconsax.trash,
+                            color: Colors.red,
+                          ),
                         ),
-                      ),
-                    )
-                  ],
-                ),
-                Container(
-                  child: Row(
+                      )
+                    ],
+                  ),
+                  Container(
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Flexible(
+                            child: Text(
+                          AppLocalizations.of(context)
+                              .translate('confirm-account-delete'),
+                          style: kPageTitleStyle.copyWith(
+                              fontSize: 24, color: Colors.red),
+                        ))
+                      ],
+                    ),
+                  ),
+                  SizedBox(
+                    height: 8,
+                  ),
+                  Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Flexible(
                           child: Text(
                         AppLocalizations.of(context)
-                            .translate('confirm-account-delete'),
-                        style: kPageTitleStyle.copyWith(
-                            fontSize: 24, color: Colors.red),
+                            .translate('confirm-account-delete-p'),
+                        textAlign: TextAlign.center,
+                        style: kSubTitlesStyle.copyWith(
+                            fontSize: 17,
+                            color: theme.primaryColor,
+                            fontWeight: FontWeight.w400,
+                            height: 1.5),
                       ))
                     ],
                   ),
-                ),
-                SizedBox(
-                  height: 8,
-                ),
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Flexible(
-                        child: Text(
-                      AppLocalizations.of(context)
-                          .translate('confirm-account-delete-p'),
-                      textAlign: TextAlign.center,
-                      style: kSubTitlesStyle.copyWith(
-                          fontSize: 17,
-                          color: Colors.black.withOpacity(0.7),
-                          fontWeight: FontWeight.w400,
-                          height: 1.5),
-                    ))
-                  ],
-                ),
-                SizedBox(
-                  height: 30,
-                ),
-                GestureDetector(
-                  onTap: () async {
-                    final db = FirebaseFirestore.instance;
-                    final user = FirebaseAuth.instance.currentUser;
-                    String uid = user.uid;
+                  SizedBox(
+                    height: 30,
+                  ),
+                  GestureDetector(
+                    onTap: () async {
+                      final db = FirebaseFirestore.instance;
+                      final user = FirebaseAuth.instance.currentUser;
+                      String uid = user.uid;
 
-                    await db.collection("users").doc(uid).delete().then((_) {
-                      context
-                          .read<GoogleAuthenticationService>()
-                          .deleteAccount();
-                      Navigator.pop(context);
-                    });
-                  },
-                  child: Container(
-                    width: MediaQuery.of(context).size.width - 40,
-                    padding: EdgeInsets.symmetric(vertical: 12),
-                    decoration: BoxDecoration(
-                        color: Colors.red,
-                        borderRadius: BorderRadius.circular(12.5)),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                            AppLocalizations.of(context)
-                                .translate("delete-account-button"),
-                            style: kSubTitlesStyle.copyWith(
-                                fontSize: 18,
-                                color: Colors.white,
-                                fontWeight: FontWeight.w500))
-                      ],
+                      await db.collection("users").doc(uid).delete().then((_) {
+                        context
+                            .read<GoogleAuthenticationService>()
+                            .deleteAccount();
+                        Navigator.pop(context);
+                      });
+                    },
+                    child: Container(
+                      width: MediaQuery.of(context).size.width - 40,
+                      padding: EdgeInsets.symmetric(vertical: 12),
+                      decoration: BoxDecoration(
+                          color: Colors.red,
+                          borderRadius: BorderRadius.circular(12.5)),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                              AppLocalizations.of(context)
+                                  .translate("delete-account-button"),
+                              style: kSubTitlesStyle.copyWith(
+                                  fontSize: 18,
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w500))
+                        ],
+                      ),
                     ),
                   ),
-                ),
-                SizedBox(
-                  height: 50,
-                ),
-              ]));
+                  SizedBox(
+                    height: 50,
+                  ),
+                ])),
+          );
         });
   }
 
   static void openDeleteAccountMessage(BuildContext context, AccountBloc bloc) {
+    final theme = Theme.of(context);
     showModalBottomSheet(
         context: context,
+        backgroundColor: theme.scaffoldBackgroundColor,
         builder: (context) {
           return Padding(
               padding:
@@ -207,7 +215,7 @@ class DeleteAccountSheet {
                       textAlign: TextAlign.center,
                       style: kSubTitlesStyle.copyWith(
                           fontSize: 17,
-                          color: Colors.black.withOpacity(0.7),
+                          color: theme.primaryColor,
                           fontWeight: FontWeight.w400,
                           height: 1.5),
                     ))
@@ -288,7 +296,10 @@ class DeleteAccountSheet {
                 SizedBox(
                   height: 40,
                 ),
-              ]));
-        });
+              ],
+              )
+            ,);
+        },
+    );
   }
 }
