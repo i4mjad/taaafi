@@ -122,14 +122,14 @@ class _AccountScreenState extends State<AccountScreen>
                                       padding:
                                           EdgeInsets.only(left: 12, right: 12),
                                       child: Icon(
-                                        Iconsax.global,
+                                        Iconsax.screenmirroring,
                                         size: 26,
                                         color: theme.primaryColor,
                                       ),
                                     ),
                                     Text(
                                         AppLocalizations.of(context)
-                                            .translate('change-lang'),
+                                            .translate('ui-settings'),
                                         style: kSubTitlesStyle.copyWith(
                                             fontSize: 17,
                                             height: 1.25,
@@ -269,7 +269,6 @@ class _AccountScreenState extends State<AccountScreen>
   resetUserDialog(BuildContext context, AccountBloc bloc) {
     showModalBottomSheet(
       context: context,
-
       builder: (BuildContext context) {
         final theme = Theme.of(context);
         return StatefulBuilder(
@@ -328,8 +327,7 @@ class _AccountScreenState extends State<AccountScreen>
                       },
                       child: Container(
                         height: 80,
-                        width:
-                            ((MediaQuery.of(context).size.width - 40) - 8) / 2,
+                        width: (MediaQuery.of(context).size.width - 40),
                         padding: EdgeInsets.all(8),
                         decoration: BoxDecoration(
                             color: accentColor.withOpacity(0.2),
@@ -343,30 +341,6 @@ class _AccountScreenState extends State<AccountScreen>
                         ),
                       ),
                     ),
-                    GestureDetector(
-                      onTap: () async {
-                        var today = getToday();
-                        await bloc
-                            .createNewData(today)
-                            .then((value) => Navigator.pop(context));
-                      },
-                      child: Container(
-                        height: 80,
-                        width:
-                            ((MediaQuery.of(context).size.width - 40) - 8) / 2,
-                        padding: EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                            color: accentColor,
-                            borderRadius: BorderRadius.circular(12.5)),
-                        child: Center(
-                          child: Text(
-                            AppLocalizations.of(context).translate("today"),
-                            style: kTitleSeconderyStyle.copyWith(
-                                color: Colors.white),
-                          ),
-                        ),
-                      ),
-                    )
                   ],
                 )
               ],
