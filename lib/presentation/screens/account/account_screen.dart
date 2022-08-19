@@ -225,7 +225,7 @@ class _AccountScreenState extends State<AccountScreen>
                             onTap: () {
                               HapticFeedback.heavyImpact();
                               DeleteAccountSheet.openDeleteAccountMessage(
-                                  context, bloc);
+                                  context);
                             },
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.start,
