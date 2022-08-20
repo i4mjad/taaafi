@@ -74,10 +74,12 @@
   "registered-since": "Registered Since:",
   "daily-notification-time": "Daily Reminder",
   "delete-my-data": "Delete My Data",
+  "show-all" : "View All",
+
 
   "about-ta3afi": "Spreading awareness about the consequences of porn & masturbation addiction by providing helpful resources and tools to overcome the addiction.",
-  "version-number-ios": "v4.1.5",
-  "version-number-android": "v2.1.5",
+  "version-number-ios": "v4.2",
+  "version-number-android": "v2.2",
   "dismiss" : "Dismiss",
   "contact-us-through-this-channels": "Contact Developer",
   "support-app-development": "Support Development",
@@ -158,7 +160,7 @@
   "explore-content" : "Explore Content",
   "explore-articles" : "ِExplore Articles",
   "explore-tutorials" : "ِExplore Tutorials",
-  "explore" : "Explore (Beta)",
+  "explore" : "Explore",
 
   "explore-p" : "Explore Articles & Tutorials",
   "tutorials": "Tutorials",

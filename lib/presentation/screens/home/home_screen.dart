@@ -49,19 +49,22 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               SizedBox(
-                height: 16,
+                height: 24,
               ),
               WelcomeWidget(),
               SizedBox(
-                height: 24,
+                height: 32,
               ),
-              CustomBlocProvider(bloc: ContentBloc(), child: ExploreWidget()),
+              CustomBlocProvider(
+                bloc: ContentBloc(),
+                child: ExploreWidget(),
+              ),
               SizedBox(
-                height: 24,
+                height: 32,
               ),
               Ta3afiLiberaryWidget(),
               SizedBox(
-                height: 16,
+                height: 24,
               ),
             ],
           ),

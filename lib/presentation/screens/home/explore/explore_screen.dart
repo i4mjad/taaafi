@@ -1,0 +1,154 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
+import 'package:flutter/material.dart';
+import 'package:iconsax/iconsax.dart';
+
+import 'package:reboot_app_3/bloc_provider.dart';
+import 'package:reboot_app_3/data/models/Article.dart';
+
+import 'package:reboot_app_3/presentation/blocs/content_bloc.dart';
+
+import 'package:reboot_app_3/presentation/screens/home/widgets/article_screen.dart';
+import 'package:reboot_app_3/shared/components/custom-app-bar.dart';
+import 'package:reboot_app_3/shared/constants/textstyles_constants.dart';
+import 'package:reboot_app_3/shared/localization/localization.dart';
+
+class ExploreScreen extends StatefulWidget {
+  @override
+  _ExploreScreenState createState() => _ExploreScreenState();
+}
+
+class _ExploreScreenState extends State<ExploreScreen> {
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Scaffold(
+      appBar: appBarWithSettings(context, "explore"),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.only(right: 20.0, left: 20, top: 20),
+          child: Container(
+            width: MediaQuery.of(context).size.width - 40,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  AppLocalizations.of(context).translate("articles"),
+                  style: kSubTitlesStyle.copyWith(color: theme.primaryColor),
+                ),
+                SizedBox(
+                  height: 18,
+                ),
+                CustomBlocProvider(
+                  child: ArticlesListView(),
+                  bloc: ContentBloc(),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class ArticlesListView extends StatelessWidget {
+  ArticlesListView({
+    Key key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final bloc = CustomBlocProvider.of<ContentBloc>(context);
+    return StreamBuilder(
+      stream: bloc.getFeaturedArticles(),
+      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+        switch (snapshot.connectionState) {
+          // Uncompleted State
+          case ConnectionState.none:
+          case ConnectionState.waiting:
+            return Center(child: CircularProgressIndicator());
+            break;
+          default:
+            // Completed with error
+            if (snapshot.hasError || !snapshot.hasData) {
+              return Container(
+                child: Center(
+                  child: Text(
+                    snapshot.error.toString(),
+                  ),
+                ),
+              );
+            }
+
+            List<Article> featuredList = snapshot.data.docs
+                .map<Article>((e) => Article.fromMap(e))
+                .toList();
+            return Expanded(
+              child: ListView.separated(
+                scrollDirection: Axis.vertical,
+                itemCount: featuredList.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => ArticlePage(
+                            article: featuredList[index],
+                          ),
+                        ),
+                      );
+                    },
+                    child: Container(
+                      padding: EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: theme.cardColor,
+                        borderRadius: BorderRadius.circular(10.5),
+                      ),
+                      child: Row(
+                        children: [
+                          Container(
+                            height: 56,
+                            width: 56,
+                            decoration: BoxDecoration(
+                              color: theme.scaffoldBackgroundColor,
+                              borderRadius: BorderRadius.circular(12.5),
+                            ),
+                            child: Center(
+                              child: Icon(Iconsax.book),
+                            ),
+                          ),
+                          SizedBox(
+                            width: 16,
+                          ),
+                          Flexible(
+                            child: Text(
+                              featuredList[index].title,
+                              style: kSubTitlesStyle.copyWith(
+                                  color: theme.primaryColor,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w400),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+                separatorBuilder: (BuildContext context, int index) {
+                  return SizedBox(height: 16);
+                },
+              ),
+            );
+        }
+      },
+    );
+  }
+}
