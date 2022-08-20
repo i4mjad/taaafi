@@ -380,7 +380,10 @@ changeDateEvent(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Text("😍"),
+                          Text(
+                            "😍",
+                            style: TextStyle(fontSize: 22),
+                          ),
                           SizedBox(
                             height: 8,
                           ),
@@ -418,7 +421,10 @@ changeDateEvent(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Text("😒"),
+                          Text(
+                            "😒",
+                            style: TextStyle(fontSize: 22),
+                          ),
                           SizedBox(
                             height: 8,
                           ),
@@ -455,7 +461,10 @@ changeDateEvent(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Text("😥"),
+                          Text(
+                            "😥",
+                            style: TextStyle(fontSize: 22),
+                          ),
                           SizedBox(
                             height: 8,
                           ),
@@ -493,7 +502,10 @@ changeDateEvent(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Text("😪"),
+                          Text(
+                            "😪",
+                            style: TextStyle(fontSize: 22),
+                          ),
                           SizedBox(
                             height: 8,
                           ),

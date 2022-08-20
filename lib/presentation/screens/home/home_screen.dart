@@ -40,7 +40,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     return Scaffold(
       appBar: appBarWithSettings(context, "home"),
       body: Padding(
@@ -49,33 +48,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SizedBox(
-                height: 16,
-              ),
-              Container(
-                width: MediaQuery.of(context).size.width - 40,
-                padding: EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                    color: theme.cardColor,
-                    borderRadius: BorderRadius.circular(12.5)),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Flexible(
-                      child: Text(
-                        "يمكنك الوصول لصفحة تابع تعافيك عن طريق الخانة الثانية في أسفل الشاشة",
-                        style: kSubTitlesStyle.copyWith(
-                          color: theme.primaryColor,
-                          fontSize: 12,
-                          height: 1.5,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
               SizedBox(
                 height: 16,
               ),

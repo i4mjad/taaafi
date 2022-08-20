@@ -45,14 +45,14 @@ class _ContentScreenState extends State<ContentScreen> {
       List<Content> _temp = [];
 
       for (var item in array) {
-        final temp = item.content;
+        final content = item.content;
         final fixedContent = Content(
-          title: fixArbicText(temp.title),
-          contentOwner: fixArbicText(temp.contentOwner),
-          contentLink: temp.contentLink,
-          contentType: fixArbicText(temp.contentType),
-          contentSubType: fixArbicText(temp.contentSubType),
-          contentLanguage: fixArbicText(temp.contentLanguage),
+          title: fixArbicText(content.title),
+          contentOwner: fixArbicText(content.contentOwner),
+          contentLink: content.contentLink,
+          contentType: fixArbicText(content.contentType),
+          contentSubType: fixArbicText(content.contentSubType),
+          contentLanguage: fixArbicText(content.contentLanguage),
         );
         _temp.add(fixedContent);
       }
@@ -192,13 +192,14 @@ class _ContentScreenState extends State<ContentScreen> {
                             size: 16, color: theme.primaryColor),
                         SizedBox(width: 8),
                         Text(
-                            AppLocalizations.of(context)
-                                .translate('search-filters'),
-                            style: kSubTitlesStyle.copyWith(
-                                fontSize: 14,
-                                color: theme.primaryColor,
-                                height: 1,
-                                fontWeight: FontWeight.w400)),
+                          AppLocalizations.of(context)
+                              .translate('search-filters'),
+                          style: kSubTitlesStyle.copyWith(
+                              fontSize: 14,
+                              color: theme.primaryColor,
+                              height: 1,
+                              fontWeight: FontWeight.w400),
+                        ),
                       ],
                     ),
                   ],
@@ -263,9 +264,9 @@ class _ContentScreenState extends State<ContentScreen> {
         context: context,
         isScrollControlled: true,
         builder: (_) {
-          final theme = Theme.of(context);
-          return StatefulBuilder(
-            builder: (modalContext, modalSetState) => SingleChildScrollView(
+          return StatefulBuilder(builder: (modalContext, modalSetState) {
+            final theme = Theme.of(modalContext);
+            return SingleChildScrollView(
               child: Container(
                 padding: EdgeInsets.fromLTRB(20, 8, 20, 8),
                 color: theme.scaffoldBackgroundColor,
@@ -304,7 +305,7 @@ class _ContentScreenState extends State<ContentScreen> {
                           },
                           child: Icon(
                             CupertinoIcons.xmark_circle_fill,
-                            color: mainGrayColor,
+                            color: Colors.grey,
                             size: 28,
                           ),
                         )
@@ -341,7 +342,9 @@ class _ContentScreenState extends State<ContentScreen> {
                                 borderWidth: 0.25,
                                 color: theme.cardColor,
                               ),
-                              choiceActiveStyle: C2ChoiceStyle(),
+                              choiceActiveStyle: C2ChoiceStyle().copyWith(
+                                color: theme.scaffoldBackgroundColor,
+                              ),
                               onChanged: (val) {
                                 modalSetState(() => selectedSubTypesList = val);
                                 setState(() => selectedSubTypesList = val);
@@ -509,8 +512,8 @@ class _ContentScreenState extends State<ContentScreen> {
                   ],
                 ),
               ),
-            ),
-          );
+            );
+          });
         });
   }
 
