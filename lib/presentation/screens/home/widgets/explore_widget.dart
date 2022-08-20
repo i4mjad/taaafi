@@ -76,8 +76,10 @@ class ExploreWidget extends StatelessWidget {
                                 );
                               }
 
-                              List<Article> featuredList = snapshot.data.docs
-                                  .map<Article>((e) => Article.fromMap(e))
+                              List<ExploreContent> featuredList = snapshot
+                                  .data.docs
+                                  .map<ExploreContent>(
+                                      (e) => ExploreContent.fromMap(e))
                                   .toList();
                               return ListView.separated(
                                 scrollDirection: Axis.horizontal,
@@ -88,7 +90,8 @@ class ExploreWidget extends StatelessWidget {
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                          builder: (context) => ArticlePage(
+                                          builder: (context) =>
+                                              ExploreContentPage(
                                             article: featuredList[index],
                                           ),
                                         ),

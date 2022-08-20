@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:reboot_app_3/data/models/Article.dart';
+import 'package:intl/intl.dart';
 import 'package:reboot_app_3/shared/components/custom-app-bar.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:reboot_app_3/shared/constants/textstyles_constants.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class ArticlePage extends StatelessWidget {
-  ArticlePage({Key key, this.article}) : super(key: key);
-  Article article;
+class ExploreContentPage extends StatelessWidget {
+  ExploreContentPage({Key key, this.article}) : super(key: key);
+  final article;
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -19,10 +19,7 @@ class ArticlePage extends StatelessWidget {
         child: Column(
           children: [
             SizedBox(
-              height: 4,
-            ),
-            SizedBox(
-              height: 4,
+              height: 8,
             ),
             Container(
               padding: EdgeInsets.all(8),
@@ -47,7 +44,9 @@ class ArticlePage extends StatelessWidget {
                               width: 4,
                             ),
                             Text(
-                              article.date,
+                              DateFormat('dd/MM/yyyy hh:mm').format(
+                                DateTime.parse(article.date),
+                              ),
                               style: kSubTitlesSubsStyle.copyWith(
                                 fontSize: 10.5,
                                 height: 1,

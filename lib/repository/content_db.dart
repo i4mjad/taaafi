@@ -8,19 +8,33 @@ class ContentDB {
     return firebaseDB.collection("fl_content").snapshots();
   }
 
-  Future<List<Article>> getArticlesList() async {
+  Future<List<ExploreContent>> getArticlesList() async {
     final featured = await firebaseDB
         .collection("fl_content")
         .where("isFeatured" == true)
         .get();
 
-    return featured.docs.map((e) => Article.fromMap(e)).toList();
+    return featured.docs.map((e) => ExploreContent.fromMap(e)).toList();
   }
 
   Stream<QuerySnapshot> getFeaturedArticles() {
     return firebaseDB
         .collection("fl_content")
         .where("isFeatured", isEqualTo: true)
+        .snapshots();
+  }
+
+  Stream<QuerySnapshot<Object>> getAllArticles() {
+    return firebaseDB
+        .collection("fl_content")
+        .where("type", isEqualTo: "article")
+        .snapshots();
+  }
+
+  Stream<QuerySnapshot<Object>> getAllTutorials() {
+    return firebaseDB
+        .collection("fl_content")
+        .where("type", isEqualTo: "tutorial")
         .snapshots();
   }
 }

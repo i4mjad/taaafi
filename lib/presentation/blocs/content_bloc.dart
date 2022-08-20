@@ -17,6 +17,14 @@ class ContentBloc implements CustomBlocBase {
     return contentDb.getFeaturedArticles();
   }
 
+  Stream<QuerySnapshot> getAllArticles() {
+    return contentDb.getAllArticles();
+  }
+
+  Stream<QuerySnapshot> getAllTutorials() {
+    return contentDb.getAllTutorials();
+  }
+
   @override
   void dispose() async {
     return _firestoreController.close();

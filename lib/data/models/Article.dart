@@ -1,13 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class Article {
+class ExploreContent {
   String title;
   String author;
   String timeToRead;
   String body;
   String date;
 
-  Article(
+  ExploreContent(
     this.title,
     this.author,
     this.timeToRead,
@@ -15,7 +15,7 @@ class Article {
     this.body,
   );
 
-  Article.fromMap(DocumentSnapshot snapshot) {
+  ExploreContent.fromMap(DocumentSnapshot snapshot) {
     title = snapshot['title'];
     author = snapshot['author'];
     date = snapshot['date'];

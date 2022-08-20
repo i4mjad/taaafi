@@ -38,6 +38,20 @@ class _ExploreScreenState extends State<ExploreScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
+                  AppLocalizations.of(context).translate("tutorials"),
+                  style: kSubTitlesStyle.copyWith(color: theme.primaryColor),
+                ),
+                SizedBox(
+                  height: 18,
+                ),
+                CustomBlocProvider(
+                  child: TuutorialsListView(),
+                  bloc: ContentBloc(),
+                ),
+                SizedBox(
+                  height: 18,
+                ),
+                Text(
                   AppLocalizations.of(context).translate("articles"),
                   style: kSubTitlesStyle.copyWith(color: theme.primaryColor),
                 ),
@@ -67,7 +81,7 @@ class ArticlesListView extends StatelessWidget {
     final theme = Theme.of(context);
     final bloc = CustomBlocProvider.of<ContentBloc>(context);
     return StreamBuilder(
-      stream: bloc.getFeaturedArticles(),
+      stream: bloc.getAllArticles(),
       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
         switch (snapshot.connectionState) {
           // Uncompleted State
@@ -87,8 +101,8 @@ class ArticlesListView extends StatelessWidget {
               );
             }
 
-            List<Article> featuredList = snapshot.data.docs
-                .map<Article>((e) => Article.fromMap(e))
+            List<ExploreContent> featuredList = snapshot.data.docs
+                .map<ExploreContent>((e) => ExploreContent.fromMap(e))
                 .toList();
             return Expanded(
               child: ListView.separated(
@@ -100,14 +114,14 @@ class ArticlesListView extends StatelessWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (_) => ArticlePage(
+                          builder: (_) => ExploreContentPage(
                             article: featuredList[index],
                           ),
                         ),
                       );
                     },
                     child: Container(
-                      padding: EdgeInsets.all(16),
+                      padding: EdgeInsets.all(8),
                       decoration: BoxDecoration(
                         color: theme.cardColor,
                         borderRadius: BorderRadius.circular(10.5),
@@ -115,14 +129,17 @@ class ArticlesListView extends StatelessWidget {
                       child: Row(
                         children: [
                           Container(
-                            height: 56,
-                            width: 56,
+                            height: 48,
+                            width: 48,
                             decoration: BoxDecoration(
                               color: theme.scaffoldBackgroundColor,
                               borderRadius: BorderRadius.circular(12.5),
                             ),
                             child: Center(
-                              child: Icon(Iconsax.book),
+                              child: Icon(
+                                Iconsax.book,
+                                size: 16,
+                              ),
                             ),
                           ),
                           SizedBox(
@@ -146,6 +163,163 @@ class ArticlesListView extends StatelessWidget {
                   return SizedBox(height: 16);
                 },
               ),
+            );
+        }
+      },
+    );
+  }
+}
+
+class TuutorialsListView extends StatelessWidget {
+  TuutorialsListView({
+    Key key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final bloc = CustomBlocProvider.of<ContentBloc>(context);
+    return StreamBuilder(
+      stream: bloc.getAllTutorials(),
+      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+        switch (snapshot.connectionState) {
+          // Uncompleted State
+          case ConnectionState.none:
+          case ConnectionState.waiting:
+            return Center(child: CircularProgressIndicator());
+            break;
+          default:
+            // Completed with error
+            if (snapshot.hasError || !snapshot.hasData) {
+              return Container(
+                child: Center(
+                  child: Text(
+                    snapshot.error.toString(),
+                  ),
+                ),
+              );
+            }
+
+            return Row(
+              children: [
+                Expanded(
+                  child: Container(
+                    height: 150,
+                    child: Column(
+                      children: [
+                        Expanded(
+                          child: StreamBuilder(
+                            stream: bloc.getAllTutorials(),
+                            builder: (BuildContext context, snapshot) {
+                              switch (snapshot.connectionState) {
+                                // Uncompleted State
+                                case ConnectionState.none:
+                                case ConnectionState.waiting:
+                                  return Center(
+                                      child: CircularProgressIndicator());
+                                  break;
+                                default:
+                                  // Completed with error
+                                  if (snapshot.hasError) {
+                                    return Container(
+                                      child: Center(
+                                        child: Text(
+                                          snapshot.error.toString(),
+                                        ),
+                                      ),
+                                    );
+                                  }
+
+                                  List<ExploreContent> featuredList = snapshot
+                                      .data.docs
+                                      .map<ExploreContent>(
+                                          (e) => ExploreContent.fromMap(e))
+                                      .toList();
+                                  return ListView.separated(
+                                    scrollDirection: Axis.horizontal,
+                                    itemCount: featuredList.length,
+                                    itemBuilder:
+                                        (BuildContext context, int index) {
+                                      return GestureDetector(
+                                        onTap: () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  ExploreContentPage(
+                                                article: featuredList[index],
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                        child: Container(
+                                          padding: EdgeInsets.all(16),
+                                          width: MediaQuery.of(context)
+                                                  .size
+                                                  .width *
+                                              0.35,
+                                          decoration: BoxDecoration(
+                                            color: theme.cardColor,
+                                            borderRadius:
+                                                BorderRadius.circular(12.5),
+                                          ),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              CircleAvatar(
+                                                backgroundColor:
+                                                    theme.backgroundColor,
+                                                child: Icon(
+                                                  Iconsax.book,
+                                                  size: 16,
+                                                  color: theme.primaryColor,
+                                                ),
+                                              ),
+                                              Spacer(),
+                                              Container(
+                                                child: Row(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.center,
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.start,
+                                                  children: [
+                                                    Flexible(
+                                                      child: Text(
+                                                        featuredList[index]
+                                                            .title,
+                                                        style:
+                                                            kSubTitlesSubsStyle
+                                                                .copyWith(
+                                                          color: theme
+                                                              .primaryColor,
+                                                          fontWeight:
+                                                              FontWeight.w500,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                    separatorBuilder:
+                                        (BuildContext context, int index) {
+                                      return SizedBox(width: 16);
+                                    },
+                                  );
+                              }
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+              ],
             );
         }
       },
