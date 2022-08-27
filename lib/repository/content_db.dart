@@ -27,14 +27,7 @@ class ContentDB {
   Stream<QuerySnapshot<Object>> getAllArticles() {
     return firebaseDB
         .collection("fl_content")
-        .where("type", isEqualTo: "article")
-        .snapshots();
-  }
-
-  Stream<QuerySnapshot<Object>> getAllTutorials() {
-    return firebaseDB
-        .collection("fl_content")
-        .where("type", isEqualTo: "tutorial")
+        .where("isPublished", isEqualTo: true)
         .snapshots();
   }
 }

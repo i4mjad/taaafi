@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:intl/intl.dart';
 
 import 'package:reboot_app_3/bloc_provider.dart';
 import 'package:reboot_app_3/data/models/Article.dart';
@@ -37,20 +38,6 @@ class _ExploreScreenState extends State<ExploreScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  AppLocalizations.of(context).translate("tutorials"),
-                  style: kSubTitlesStyle.copyWith(color: theme.primaryColor),
-                ),
-                SizedBox(
-                  height: 18,
-                ),
-                CustomBlocProvider(
-                  child: TuutorialsListView(),
-                  bloc: ContentBloc(),
-                ),
-                SizedBox(
-                  height: 18,
-                ),
                 Text(
                   AppLocalizations.of(context).translate("articles"),
                   style: kSubTitlesStyle.copyWith(color: theme.primaryColor),
@@ -121,38 +108,83 @@ class ArticlesListView extends StatelessWidget {
                       );
                     },
                     child: Container(
-                      padding: EdgeInsets.all(8),
+                      padding: EdgeInsets.all(16),
                       decoration: BoxDecoration(
                         color: theme.cardColor,
                         borderRadius: BorderRadius.circular(10.5),
                       ),
-                      child: Row(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Container(
-                            height: 48,
-                            width: 48,
-                            decoration: BoxDecoration(
-                              color: theme.scaffoldBackgroundColor,
-                              borderRadius: BorderRadius.circular(12.5),
-                            ),
-                            child: Center(
-                              child: Icon(
-                                Iconsax.book,
-                                size: 16,
+                          Row(
+                            children: [
+                              Container(
+                                height: 48,
+                                width: 48,
+                                decoration: BoxDecoration(
+                                  color: theme.scaffoldBackgroundColor,
+                                  borderRadius: BorderRadius.circular(12.5),
+                                ),
+                                child: Center(
+                                  child: Icon(
+                                    Iconsax.book,
+                                    size: 16,
+                                  ),
+                                ),
                               ),
-                            ),
+                              SizedBox(
+                                width: 16,
+                              ),
+                              Flexible(
+                                child: Text(
+                                  featuredList[index].title,
+                                  style: kSubTitlesStyle.copyWith(
+                                      color: theme.primaryColor,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w400),
+                                ),
+                              ),
+                            ],
                           ),
                           SizedBox(
-                            width: 16,
+                            height: 8,
                           ),
-                          Flexible(
-                            child: Text(
-                              featuredList[index].title,
-                              style: kSubTitlesStyle.copyWith(
-                                  color: theme.primaryColor,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w400),
-                            ),
+                          Row(
+                            children: [
+                              Icon(
+                                Iconsax.paperclip_2,
+                                size: 14,
+                              ),
+                              SizedBox(
+                                width: 4,
+                              ),
+                              Text(
+                                AppLocalizations.of(context)
+                                    .translate(featuredList[index].type),
+                                style: kSubTitlesStyle.copyWith(
+                                    color: theme.primaryColor, fontSize: 12),
+                              ),
+                            ],
+                          ),
+                          SizedBox(
+                            height: 4,
+                          ),
+                          Row(
+                            children: [
+                              Icon(
+                                Iconsax.calendar,
+                                size: 14,
+                              ),
+                              SizedBox(
+                                width: 4,
+                              ),
+                              Text(
+                                DateFormat('dd/MM/yyyy hh:mm').format(
+                                    DateTime.parse(featuredList[index].date)),
+                                style: kSubTitlesStyle.copyWith(
+                                    color: theme.primaryColor, fontSize: 12),
+                              ),
+                            ],
                           ),
                         ],
                       ),
@@ -163,163 +195,6 @@ class ArticlesListView extends StatelessWidget {
                   return SizedBox(height: 16);
                 },
               ),
-            );
-        }
-      },
-    );
-  }
-}
-
-class TuutorialsListView extends StatelessWidget {
-  TuutorialsListView({
-    Key key,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final bloc = CustomBlocProvider.of<ContentBloc>(context);
-    return StreamBuilder(
-      stream: bloc.getAllTutorials(),
-      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-        switch (snapshot.connectionState) {
-          // Uncompleted State
-          case ConnectionState.none:
-          case ConnectionState.waiting:
-            return Center(child: CircularProgressIndicator());
-            break;
-          default:
-            // Completed with error
-            if (snapshot.hasError || !snapshot.hasData) {
-              return Container(
-                child: Center(
-                  child: Text(
-                    snapshot.error.toString(),
-                  ),
-                ),
-              );
-            }
-
-            return Row(
-              children: [
-                Expanded(
-                  child: Container(
-                    height: 150,
-                    child: Column(
-                      children: [
-                        Expanded(
-                          child: StreamBuilder(
-                            stream: bloc.getAllTutorials(),
-                            builder: (BuildContext context, snapshot) {
-                              switch (snapshot.connectionState) {
-                                // Uncompleted State
-                                case ConnectionState.none:
-                                case ConnectionState.waiting:
-                                  return Center(
-                                      child: CircularProgressIndicator());
-                                  break;
-                                default:
-                                  // Completed with error
-                                  if (snapshot.hasError) {
-                                    return Container(
-                                      child: Center(
-                                        child: Text(
-                                          snapshot.error.toString(),
-                                        ),
-                                      ),
-                                    );
-                                  }
-
-                                  List<ExploreContent> featuredList = snapshot
-                                      .data.docs
-                                      .map<ExploreContent>(
-                                          (e) => ExploreContent.fromMap(e))
-                                      .toList();
-                                  return ListView.separated(
-                                    scrollDirection: Axis.horizontal,
-                                    itemCount: featuredList.length,
-                                    itemBuilder:
-                                        (BuildContext context, int index) {
-                                      return GestureDetector(
-                                        onTap: () {
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) =>
-                                                  ExploreContentPage(
-                                                article: featuredList[index],
-                                              ),
-                                            ),
-                                          );
-                                        },
-                                        child: Container(
-                                          padding: EdgeInsets.all(16),
-                                          width: MediaQuery.of(context)
-                                                  .size
-                                                  .width *
-                                              0.35,
-                                          decoration: BoxDecoration(
-                                            color: theme.cardColor,
-                                            borderRadius:
-                                                BorderRadius.circular(12.5),
-                                          ),
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              CircleAvatar(
-                                                backgroundColor:
-                                                    theme.backgroundColor,
-                                                child: Icon(
-                                                  Iconsax.book,
-                                                  size: 16,
-                                                  color: theme.primaryColor,
-                                                ),
-                                              ),
-                                              Spacer(),
-                                              Container(
-                                                child: Row(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.center,
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.start,
-                                                  children: [
-                                                    Flexible(
-                                                      child: Text(
-                                                        featuredList[index]
-                                                            .title,
-                                                        style:
-                                                            kSubTitlesSubsStyle
-                                                                .copyWith(
-                                                          color: theme
-                                                              .primaryColor,
-                                                          fontWeight:
-                                                              FontWeight.w500,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      );
-                                    },
-                                    separatorBuilder:
-                                        (BuildContext context, int index) {
-                                      return SizedBox(width: 16);
-                                    },
-                                  );
-                              }
-                            },
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                )
-              ],
             );
         }
       },

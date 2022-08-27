@@ -6,6 +6,7 @@ class ExploreContent {
   String timeToRead;
   String body;
   String date;
+  String type;
 
   ExploreContent(
     this.title,
@@ -13,6 +14,7 @@ class ExploreContent {
     this.timeToRead,
     this.date,
     this.body,
+    this.type,
   );
 
   ExploreContent.fromMap(DocumentSnapshot snapshot) {
@@ -21,5 +23,6 @@ class ExploreContent {
     date = snapshot['date'];
     timeToRead = snapshot['timeToRead'];
     body = snapshot['postBody'];
+    type = snapshot['type'];
   }
 }
