@@ -222,19 +222,9 @@ class DB {
   }
 
   Future<DayOfWeekRelapses> getRelapsesByDayOfWeek() async {
-    FollowUpData _followUpData = await getFollowUpData();
-    List<dynamic> userRelapses = _followUpData.relapses;
-
-    if (userRelapses.length > 0)
-      return DayOfWeekRelapses(
-        "0",
-        "0",
-        "0",
-        "0",
-        "0",
-        "0",
-        "0",
-      );
+    var followUpData = await getFollowUpData();
+    var userRelapses = followUpData.relapses;
+    int totalRelapses = userRelapses.length;
     var sat = [];
     var sun = [];
     var mon = [];
@@ -247,33 +237,40 @@ class DB {
       final date = DateTime.parse(strDate);
       final dayOfWeek = date.weekday;
 
-      if (dayOfWeek == 7) {
+      if (dayOfWeek == 1) {
         sun.add(date);
-      } else if (dayOfWeek == 1) {
-        mon.add(date);
       } else if (dayOfWeek == 2) {
-        tue.add(date);
+        mon.add(date);
       } else if (dayOfWeek == 3) {
-        wed.add(date);
+        tue.add(date);
       } else if (dayOfWeek == 4) {
-        thu.add(date);
+        wed.add(date);
       } else if (dayOfWeek == 5) {
-        fri.add(date);
+        thu.add(date);
       } else if (dayOfWeek == 6) {
+        fri.add(date);
+      } else if (dayOfWeek == 7) {
         sat.add(date);
       }
     }
 
-    final satLength = (sat.length ?? 0).toString();
-    final sunLength = (sun.length ?? 0).toString();
-    final monLength = (mon.length ?? 0).toString();
-    final tueLength = (tue.length ?? 0).toString();
-    final wedLength = (wed.length ?? 0).toString();
-    final thuLength = (thu.length ?? 0).toString();
-    final friLength = (fri.length ?? 0).toString();
+    final satLength = sat.length / totalRelapses ?? 0;
+    final sunLength = sun.length / totalRelapses ?? 0;
+    final monLength = mon.length / totalRelapses ?? 0;
+    final tueLength = tue.length / totalRelapses ?? 0;
+    final wedLength = wed.length / totalRelapses ?? 0;
+    final thuLength = thu.length / totalRelapses ?? 0;
+    final friLength = fri.length / totalRelapses ?? 0;
 
-    final dayOfWeekRelapses = DayOfWeekRelapses(satLength, sunLength, monLength,
-        tueLength, wedLength, thuLength, friLength);
+    final dayOfWeekRelapses = DayOfWeekRelapses(
+      new DayOfWeekRelapsesDetails(satLength, sat.length ?? 0),
+      new DayOfWeekRelapsesDetails(sunLength, sun.length ?? 0),
+      new DayOfWeekRelapsesDetails(monLength, mon.length ?? 0),
+      new DayOfWeekRelapsesDetails(tueLength, tue.length ?? 0),
+      new DayOfWeekRelapsesDetails(wedLength, wed.length ?? 0),
+      new DayOfWeekRelapsesDetails(thuLength, thu.length ?? 0),
+      new DayOfWeekRelapsesDetails(friLength, fri.length ?? 0),
+    );
     return dayOfWeekRelapses;
   }
 

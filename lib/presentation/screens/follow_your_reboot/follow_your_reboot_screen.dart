@@ -31,7 +31,6 @@ class FollowYourRebootScreenState extends State<FollowYourRebootScreen>
     LocaleService.getSelectedLocale().then((value) {
       setState(() {
         lang = value;
-
       });
     });
   }
@@ -41,90 +40,94 @@ class FollowYourRebootScreenState extends State<FollowYourRebootScreen>
     final theme = Theme.of(context);
 
     return Scaffold(
-        appBar: appBarWithSettings(context, "follow-your-reboot"),
-        body: SingleChildScrollView(
-          child: Column(
-            children: [
-              GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => CustomBlocProvider(
-                          child: NotesScreen(), bloc: FollowYourRebootBloc()),
-                    ),
-                  );
-                },
-                child: Container(
-                  width: MediaQuery.of(context).size.width,
-                  height: 60,
-                  padding: EdgeInsets.all(16),
-                  margin: EdgeInsets.only(right: 16, left: 16),
-                  decoration: BoxDecoration(
-                      color: theme.cardColor,
-                      borderRadius: BorderRadius.circular(12.5)),
-                  child: Row(
-                    children: [
-                      Icon(
-                        Iconsax.archive_1,
-                        size: 32,
-                        color: theme.primaryColor,
-                      ),
-                      SizedBox(
-                        width: 8,
-                      ),
-                      Text(
-                        AppLocalizations.of(context).translate('dairies'),
-                        style: kSubTitlesStyle.copyWith(
-                          color: theme.primaryColor,
-                          fontWeight: FontWeight.w500,
-                          height: 1,
-                        ),
-                      )
-                    ],
+      appBar: appBarWithSettings(context, "follow-your-reboot"),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => CustomBlocProvider(
+                        child: NotesScreen(), bloc: FollowYourRebootBloc()),
                   ),
-                ),
-              ),
-              SizedBox(height: 16),
-              CustomBlocProvider(
-                  bloc: FollowYourRebootBloc(), child: FollowUpStreaks()),
-               CustomBlocProvider(
-                  bloc: FollowYourRebootBloc(), child: RebootCalender()),
-
-              SizedBox(height: 16),
-              Padding(
-                padding: EdgeInsets.only(right: 16, left: 16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                );
+              },
+              child: Container(
+                width: MediaQuery.of(context).size.width,
+                height: 60,
+                padding: EdgeInsets.all(16),
+                margin: EdgeInsets.only(right: 16, left: 16),
+                decoration: BoxDecoration(
+                    color: theme.cardColor,
+                    borderRadius: BorderRadius.circular(12.5)),
+                child: Row(
                   children: [
-                    Text(AppLocalizations.of(context).translate('streaks'),
-                        style:
-                            kSubTitlesStyle.copyWith(color: theme.hintColor)),
-                    SizedBox(
-                      height: 12,
-                    ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        GeneralStats(lang: lang),
-                      ],
+                    Icon(
+                      Iconsax.archive_1,
+                      size: 32,
+                      color: theme.primaryColor,
                     ),
                     SizedBox(
-                      height: 16,
+                      width: 8,
                     ),
-
-                    SizedBox(
-                      height: 40,
-                    ),
+                    Text(
+                      AppLocalizations.of(context).translate('dairies'),
+                      style: kSubTitlesStyle.copyWith(
+                        color: theme.primaryColor,
+                        fontWeight: FontWeight.w500,
+                        height: 1,
+                      ),
+                    )
                   ],
                 ),
               ),
-            ],
-          ),
+            ),
+            SizedBox(height: 16),
+            CustomBlocProvider(
+              bloc: FollowYourRebootBloc(),
+              child: FollowUpStreaks(),
+            ),
+            CustomBlocProvider(
+              bloc: FollowYourRebootBloc(),
+              child: RebootCalender(),
+            ),
+            SizedBox(height: 16),
+            CustomBlocProvider(
+              bloc: FollowYourRebootBloc(),
+              child: RelapsesByDayOfWeek(),
+            ),
+            SizedBox(height: 16),
+            Padding(
+              padding: EdgeInsets.only(right: 16, left: 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(AppLocalizations.of(context).translate('streaks'),
+                      style: kSubTitlesStyle.copyWith(color: theme.hintColor)),
+                  SizedBox(
+                    height: 12,
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      GeneralStats(lang: lang),
+                    ],
+                  ),
+                  SizedBox(
+                    height: 16,
+                  ),
+                  SizedBox(
+                    height: 40,
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
+      ),
     );
   }
 }
-
-

@@ -8,6 +8,7 @@ import 'package:reboot_app_3/bloc_provider.dart';
 import 'package:reboot_app_3/data/models/CalenderDay.dart';
 import 'package:reboot_app_3/presentation/blocs/follow_your_reboot_bloc.dart';
 import 'package:reboot_app_3/presentation/screens/follow_your_reboot/calender/calender_data_model.dart';
+import 'package:reboot_app_3/presentation/screens/follow_your_reboot/day_of_week_relapses/day_of_week_relapses_widget.dart';
 import 'package:reboot_app_3/shared/components/snackbar.dart';
 import 'package:reboot_app_3/shared/constants/constants.dart';
 import 'package:reboot_app_3/shared/constants/textstyles_constants.dart';
@@ -302,6 +303,142 @@ class GeneralStats extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+}
+
+class RelapsesByDayOfWeek extends StatelessWidget {
+  RelapsesByDayOfWeek({Key key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final bloc = CustomBlocProvider.of<FollowYourRebootBloc>(context);
+    final theme = Theme.of(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(AppLocalizations.of(context).translate('relapses-by-day-of-week'),
+            style: kSubTitlesStyle.copyWith(color: theme.hintColor)),
+        SizedBox(
+          height: 8,
+        ),
+        Container(
+          padding: EdgeInsets.all(16),
+          height: MediaQuery.of(context).size.height * 0.5,
+          width: MediaQuery.of(context).size.width - 40,
+          decoration: BoxDecoration(
+            color: theme.cardColor,
+            borderRadius: BorderRadius.circular(12.5),
+          ),
+          child: FutureBuilder(
+            future: bloc.getRelapsesByDayOfWeek(),
+            initialData: new DayOfWeekRelapses(
+              new DayOfWeekRelapsesDetails(0, 0),
+              new DayOfWeekRelapsesDetails(0, 0),
+              new DayOfWeekRelapsesDetails(0, 0),
+              new DayOfWeekRelapsesDetails(0, 0),
+              new DayOfWeekRelapsesDetails(0, 0),
+              new DayOfWeekRelapsesDetails(0, 0),
+              new DayOfWeekRelapsesDetails(0, 0),
+            ),
+            builder: (context, AsyncSnapshot<DayOfWeekRelapses> snapshot) {
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                          AppLocalizations.of(context)
+                              .translate('relapses-number'),
+                          style:
+                              kSubTitlesStyle.copyWith(color: theme.hintColor)),
+                      Text("3",
+                          style:
+                              kSubTitlesStyle.copyWith(color: theme.hintColor)),
+                    ],
+                  ),
+                  SizedBox(
+                    height: 16,
+                  ),
+                  DayOfWeekWidget(
+                    day: "sun",
+                    percentage: snapshot.data.sunRelapses.relapsesPercentage,
+                    count: snapshot.data.sunRelapses.relapsesCount,
+                  ),
+                  DayOfWeekWidget(
+                    day: "mon",
+                    percentage: snapshot.data.monRelapses.relapsesPercentage,
+                    count: snapshot.data.monRelapses.relapsesCount,
+                  ),
+                  DayOfWeekWidget(
+                    day: "tue",
+                    percentage: snapshot.data.tueRelapses.relapsesPercentage,
+                    count: snapshot.data.tueRelapses.relapsesCount,
+                  ),
+                  DayOfWeekWidget(
+                    day: "wed",
+                    percentage: snapshot.data.wedRelapses.relapsesPercentage,
+                    count: snapshot.data.wedRelapses.relapsesCount,
+                  ),
+                  DayOfWeekWidget(
+                    day: "thu",
+                    percentage: snapshot.data.thuRelapses.relapsesPercentage,
+                    count: snapshot.data.thuRelapses.relapsesCount,
+                  ),
+                  DayOfWeekWidget(
+                    day: "fri",
+                    percentage: snapshot.data.friRelapses.relapsesPercentage,
+                    count: snapshot.data.friRelapses.relapsesCount,
+                  ),
+                  DayOfWeekWidget(
+                    day: "sat",
+                    percentage: snapshot.data.satRelapses.relapsesPercentage,
+                    count: snapshot.data.satRelapses.relapsesCount,
+                  ),
+                ],
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class DayOfWeekWidget extends StatelessWidget {
+  DayOfWeekWidget({Key key, this.day, this.percentage, this.count})
+      : super(key: key);
+
+  final percentage;
+  final count;
+  final day;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Container(
+      width: MediaQuery.of(context).size.width - 56,
+      child: Row(
+        children: [
+          Text(AppLocalizations.of(context).translate(day),
+              style: kSubTitlesStyle.copyWith(
+                  color: theme.hintColor, fontSize: 12)),
+          Container(
+            padding: EdgeInsets.only(right: 4, left: 4),
+            width: MediaQuery.of(context).size.width - 200,
+            child: LinearProgressIndicator(
+              backgroundColor: Colors.grey[400],
+              value: percentage,
+              valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
+            ),
+          ),
+          Text(
+            "${count}",
+            style: kSubTitlesStyle.copyWith(color: theme.hintColor),
+          ),
+        ],
+      ),
     );
   }
 }

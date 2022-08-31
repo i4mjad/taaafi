@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:reboot_app_3/shared/constants/constants.dart';
-
-import 'package:flutter_rounded_date_picker/flutter_rounded_date_picker.dart';
 
 import 'package:reboot_app_3/presentation/blocs/follow_your_reboot_bloc.dart';
 
@@ -22,17 +19,11 @@ void newUserDialog(BuildContext context, FollowYourRebootBloc bloc) {
 }
 
 Future<DateTime> getDateTime(BuildContext context) async {
-  var selectedDate = await showRoundedDatePicker(
+  var selectedDate = await showDatePicker(
     context: context,
     initialDate: DateTime.now(),
     firstDate: DateTime(DateTime.now().year - 1),
     lastDate: DateTime.now(),
-    borderRadius: 16,
-    fontFamily: 'DINNextLTArabic',
-    height: MediaQuery.of(context).size.height / 2.5,
-    theme: ThemeData(
-      primaryColor: lightPrimaryColor,
-    ),
   );
 
   return selectedDate;
