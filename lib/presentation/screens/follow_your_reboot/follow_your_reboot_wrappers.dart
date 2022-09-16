@@ -1,4 +1,3 @@
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -37,13 +36,13 @@ class UserDocWrapper extends StatelessWidget {
         builder:
             (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
           switch (snapshot.connectionState) {
-          // Uncompleted State
+            // Uncompleted State
             case ConnectionState.none:
             case ConnectionState.waiting:
               return Center(child: CircularProgressIndicator());
 
             default:
-            // Completed with error
+              // Completed with error
               var data = snapshot.data.data();
 
               if (data == null) {

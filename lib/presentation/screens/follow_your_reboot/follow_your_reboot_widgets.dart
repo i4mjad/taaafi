@@ -1,5 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/services.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:intl/intl.dart';
@@ -22,69 +20,63 @@ class RebootCalender extends StatelessWidget {
   Widget build(BuildContext context) {
     final bloc = CustomBlocProvider.of<FollowYourRebootBloc>(context);
     final theme = Theme.of(context);
-    return StreamBuilder(
-      stream: bloc.streamUserDoc(),
-      builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-        return Padding(
-          padding: EdgeInsets.only(right: 16, left: 16),
-          child: Column(
+    return Padding(
+      padding: EdgeInsets.only(right: 16, left: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Column(
             crossAxisAlignment: CrossAxisAlignment.start,
+            //mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                //mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Text(
-                      AppLocalizations.of(context).translate('reboot-calender'),
-                      style: kSubTitlesStyle.copyWith(color: theme.hintColor)),
-                  SizedBox(
-                    height: 8,
-                  ),
-                  Container(
-                    width: MediaQuery.of(context).size.width,
-                    height: MediaQuery.of(context).size.height * 0.45,
-                    decoration: BoxDecoration(
-                        color: mainGrayColor,
-                        borderRadius: BorderRadius.circular(15)),
-                    child: FutureBuilder(
-                      future: bloc.getCalenderData(),
-                      initialData: [
-                        new CalenderDay("relapse", DateTime.now(), Colors.black)
-                      ],
-                      builder: (BuildContext context,
-                          AsyncSnapshot<List<CalenderDay>> snapshot) {
-                        return SfCalendar(
-                          backgroundColor: theme.cardColor,
-                          onTap: (CalendarTapDetails details) async {
-                            DateTime date = details.date;
-                            DateTime firstDate = await bloc.getFirstDate();
+              Text(AppLocalizations.of(context).translate('reboot-calender'),
+                  style: kSubTitlesStyle.copyWith(color: theme.hintColor)),
+              SizedBox(
+                height: 8,
+              ),
+              Container(
+                width: MediaQuery.of(context).size.width,
+                height: MediaQuery.of(context).size.height * 0.45,
+                decoration: BoxDecoration(
+                    color: mainGrayColor,
+                    borderRadius: BorderRadius.circular(15)),
+                child: FutureBuilder(
+                  future: bloc.getCalenderData(),
+                  initialData: [
+                    new CalenderDay("relapse", DateTime.now(), Colors.black)
+                  ],
+                  builder: (BuildContext context,
+                      AsyncSnapshot<List<CalenderDay>> snapshot) {
+                    return SfCalendar(
+                      backgroundColor: theme.cardColor,
+                      onTap: (CalendarTapDetails details) async {
+                        DateTime date = details.date;
+                        DateTime firstDate = await bloc.getFirstDate();
 
-                            dateChecker(firstDate, date, context, bloc);
-                          },
-                          view: CalendarView.month,
-                          headerStyle: CalendarHeaderStyle(
-                              textAlign: TextAlign.center,
-                              backgroundColor: theme.cardColor,
-                              textStyle: kSubTitlesStyle.copyWith(
-                                  color: theme.primaryColor)),
-                          dataSource: CalenderDataSource(snapshot.data),
-                          monthViewSettings: MonthViewSettings(
-                            //showAgenda: true,
-                            agendaStyle: AgendaStyle(),
-                            appointmentDisplayMode:
-                                MonthAppointmentDisplayMode.indicator,
-                          ),
-                          allowAppointmentResize: true,
-                        );
+                        dateChecker(firstDate, date, context, bloc);
                       },
-                    ),
-                  ),
-                ],
-              )
+                      view: CalendarView.month,
+                      headerStyle: CalendarHeaderStyle(
+                          textAlign: TextAlign.center,
+                          backgroundColor: theme.cardColor,
+                          textStyle: kSubTitlesStyle.copyWith(
+                              color: theme.primaryColor)),
+                      dataSource: CalenderDataSource(snapshot.data),
+                      monthViewSettings: MonthViewSettings(
+                        //showAgenda: true,
+                        agendaStyle: AgendaStyle(),
+                        appointmentDisplayMode:
+                            MonthAppointmentDisplayMode.indicator,
+                      ),
+                      allowAppointmentResize: true,
+                    );
+                  },
+                ),
+              ),
             ],
-          ),
-        );
-      },
+          )
+        ],
+      ),
     );
   }
 }
@@ -101,208 +93,190 @@ class GeneralStats extends StatelessWidget {
   Widget build(BuildContext context) {
     final bloc = CustomBlocProvider.of<FollowYourRebootBloc>(context);
     final theme = Theme.of(context);
-    return StreamBuilder(
-      stream: FirebaseFirestore.instance
-          .collection("users")
-          .doc(FirebaseAuth.instance.currentUser.uid)
-          .snapshots(),
-      builder: (BuildContext context, AsyncSnapshot snapshot) {
-        return Container(
-          child: Column(
+    return Container(
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
+              Container(
+                padding: EdgeInsets.all(12),
+                width: (MediaQuery.of(context).size.width - 40) / 2 - 6,
+                height: MediaQuery.of(context).size.height * 0.21,
+                decoration: BoxDecoration(
+                  color: Colors.green.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12.5),
+                ),
+                child: Column(
+                  children: [
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Align(
+                          alignment: lang == 'ar'
+                              ? Alignment.topRight
+                              : Alignment.topLeft,
+                          child: CircleAvatar(
+                            minRadius: 18,
+                            maxRadius: 20,
+                            backgroundColor: Colors.green.withOpacity(0.3),
+                            child: Icon(
+                              Iconsax.medal,
+                              color: Colors.green,
+                            ),
+                          ),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.only(right: 8.0, top: 3, left: 8),
+                          child: Text(
+                            AppLocalizations.of(context)
+                                .translate('highest-streak'),
+                            style: kSubTitlesStyle.copyWith(
+                                fontSize: 16, color: Colors.green, height: 1),
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    FutureBuilder(
+                      future: bloc.getHighestStreak(),
+                      initialData: "0",
+                      builder:
+                          (BuildContext context, AsyncSnapshot<String> sh) {
+                        if (sh.hasData) {
+                          return Text(
+                            sh.data,
+                            style:
+                                kPageTitleStyle.copyWith(color: Colors.green),
+                          );
+                        } else {
+                          return CircularProgressIndicator();
+                        }
+                      },
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                padding: EdgeInsets.all(12),
+                width: (MediaQuery.of(context).size.width - 40) / 2 - 6,
+                height: MediaQuery.of(context).size.height * 0.21,
+                decoration: BoxDecoration(
+                  color: Colors.blue.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12.5),
+                ),
+                child: Column(
+                  children: [
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Align(
+                          alignment: Alignment.topRight,
+                          child: CircleAvatar(
+                            minRadius: 18,
+                            maxRadius: 20,
+                            backgroundColor: Colors.blue.withOpacity(0.3),
+                            child: Icon(
+                              Iconsax.ranking,
+                              color: Colors.blue,
+                            ),
+                          ),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.only(right: 8.0, top: 3, left: 8),
+                          child: Text(
+                            AppLocalizations.of(context)
+                                .translate('relapses-count'),
+                            style: kSubTitlesStyle.copyWith(
+                                fontSize: 14, color: Colors.blue, height: 1),
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    FutureBuilder(
+                      future: bloc.getTotalDaysWithoutRelapse(),
+                      initialData: "0",
+                      builder:
+                          (BuildContext context, AsyncSnapshot<String> sh) {
+                        return Text(
+                          sh.data,
+                          style: kPageTitleStyle.copyWith(color: Colors.blue),
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          SizedBox(
+            height: 12,
+          ),
+          Column(
+            children: [
+              //dublicate this
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Container(
-                    padding: EdgeInsets.all(12),
-                    width: (MediaQuery.of(context).size.width - 40) / 2 - 6,
-                    height: MediaQuery.of(context).size.height * 0.21,
-                    decoration: BoxDecoration(
-                      color: Colors.green.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(12.5),
-                    ),
-                    child: Column(
-                      children: [
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Align(
-                              alignment: lang == 'ar'
-                                  ? Alignment.topRight
-                                  : Alignment.topLeft,
-                              child: CircleAvatar(
-                                minRadius: 18,
-                                maxRadius: 20,
-                                backgroundColor: Colors.green.withOpacity(0.3),
-                                child: Icon(
-                                  Iconsax.medal,
-                                  color: Colors.green,
-                                ),
-                              ),
-                            ),
-                            Padding(
-                              padding:
-                                  EdgeInsets.only(right: 8.0, top: 3, left: 8),
-                              child: Text(
-                                AppLocalizations.of(context)
-                                    .translate('highest-streak'),
-                                style: kSubTitlesStyle.copyWith(
-                                    fontSize: 16,
-                                    color: Colors.green,
-                                    height: 1),
-                              ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(
-                          height: 20,
-                        ),
-                        FutureBuilder(
-                          future: bloc.getHighestStreak(),
-                          initialData: "0",
-                          builder:
-                              (BuildContext context, AsyncSnapshot<String> sh) {
-                            if (sh.hasData) {
-                              return Text(
-                                sh.data,
-                                style: kPageTitleStyle.copyWith(
-                                    color: Colors.green),
-                              );
-                            } else {
-                              return CircularProgressIndicator();
-                            }
-                          },
-                        ),
-                      ],
-                    ),
+                  Icon(Iconsax.calendar_tick),
+                  SizedBox(
+                    width: 8,
                   ),
-                  Container(
-                    padding: EdgeInsets.all(12),
-                    width: (MediaQuery.of(context).size.width - 40) / 2 - 6,
-                    height: MediaQuery.of(context).size.height * 0.21,
-                    decoration: BoxDecoration(
-                      color: Colors.blue.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(12.5),
-                    ),
-                    child: Column(
-                      children: [
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Align(
-                              alignment: Alignment.topRight,
-                              child: CircleAvatar(
-                                minRadius: 18,
-                                maxRadius: 20,
-                                backgroundColor: Colors.blue.withOpacity(0.3),
-                                child: Icon(
-                                  Iconsax.ranking,
-                                  color: Colors.blue,
-                                ),
-                              ),
-                            ),
-                            Padding(
-                              padding:
-                                  EdgeInsets.only(right: 8.0, top: 3, left: 8),
-                              child: Text(
-                                AppLocalizations.of(context)
-                                    .translate('relapses-count'),
-                                style: kSubTitlesStyle.copyWith(
-                                    fontSize: 14,
-                                    color: Colors.blue,
-                                    height: 1),
-                              ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(
-                          height: 20,
-                        ),
-                        FutureBuilder(
-                          future: bloc.getTotalDaysWithoutRelapse(),
-                          initialData: "0",
-                          builder:
-                              (BuildContext context, AsyncSnapshot<String> sh) {
-                            return Text(
-                              sh.data,
-                              style:
-                                  kPageTitleStyle.copyWith(color: Colors.blue),
-                            );
-                          },
-                        ),
-                      ],
-                    ),
+                  Text(
+                    AppLocalizations.of(context).translate("total-days"),
+                    style: kHeadlineStyle.copyWith(
+                        fontWeight: FontWeight.w400,
+                        fontSize: 18,
+                        color: theme.primaryColor),
+                  ),
+                  FutureBuilder(
+                    future: bloc.getTotalDaysFromBegining(),
+                    initialData: "0",
+                    builder: (BuildContext context, AsyncSnapshot<String> sh) {
+                      return Text(
+                        sh.data,
+                        style: kHeadlineStyle.copyWith(
+                            fontWeight: FontWeight.bold, fontSize: 18),
+                      );
+                    },
                   ),
                 ],
               ),
               SizedBox(
-                height: 12,
+                height: 8,
               ),
-              Column(
+              Row(
                 children: [
-                  //dublicate this
-                  Row(
-                    children: [
-                      Icon(Iconsax.calendar_tick),
-                      SizedBox(
-                        width: 8,
-                      ),
-                      Text(
-                        AppLocalizations.of(context).translate("total-days"),
-                        style: kHeadlineStyle.copyWith(
-                            fontWeight: FontWeight.w400,
-                            fontSize: 18,
-                            color: theme.primaryColor),
-                      ),
-                      FutureBuilder(
-                        future: bloc.getTotalDaysFromBegining(),
-                        initialData: "0",
-                        builder:
-                            (BuildContext context, AsyncSnapshot<String> sh) {
-                          return Text(
-                            sh.data,
-                            style: kHeadlineStyle.copyWith(
-                                fontWeight: FontWeight.bold, fontSize: 18),
-                          );
-                        },
-                      ),
-                    ],
-                  ),
+                  Icon(Iconsax.emoji_sad),
                   SizedBox(
-                    height: 8,
+                    width: 8,
                   ),
-                  Row(
-                    children: [
-                      Icon(Iconsax.emoji_sad),
-                      SizedBox(
-                        width: 8,
-                      ),
-                      Text(
-                        AppLocalizations.of(context)
-                            .translate("relapses-number"),
+                  Text(
+                    AppLocalizations.of(context).translate("relapses-number"),
+                    style: kHeadlineStyle.copyWith(
+                        fontWeight: FontWeight.w400, fontSize: 18),
+                  ),
+                  FutureBuilder(
+                    future: bloc.getRelapsesCount(),
+                    initialData: "0",
+                    builder: (BuildContext context, AsyncSnapshot<String> sh) {
+                      return Text(
+                        sh.requireData,
                         style: kHeadlineStyle.copyWith(
-                            fontWeight: FontWeight.w400, fontSize: 18),
-                      ),
-                      FutureBuilder(
-                        future: bloc.getRelapsesCount(),
-                        initialData: "0",
-                        builder:
-                            (BuildContext context, AsyncSnapshot<String> sh) {
-                          return Text(
-                            sh.requireData,
-                            style: kHeadlineStyle.copyWith(
-                                fontWeight: FontWeight.bold, fontSize: 18),
-                          );
-                        },
-                      ),
-                    ],
+                            fontWeight: FontWeight.bold, fontSize: 18),
+                      );
+                    },
                   ),
                 ],
               ),
             ],
           ),
-        );
-      },
+        ],
+      ),
     );
   }
 }
