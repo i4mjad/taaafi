@@ -1,5 +1,4 @@
 import 'dart:core';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:reboot_app_3/bloc_provider.dart';
@@ -73,8 +72,9 @@ class FollowYourRebootScreenState extends State<FollowYourRebootScreen>
                             context,
                             MaterialPageRoute(
                               builder: (context) => CustomBlocProvider(
-                                  child: NotesScreen(),
-                                  bloc: FollowYourRebootBloc()),
+                                child: NotesScreen(),
+                                bloc: FollowYourRebootBloc(),
+                              ),
                             ),
                           );
                         },
@@ -84,8 +84,9 @@ class FollowYourRebootScreenState extends State<FollowYourRebootScreen>
                           padding: EdgeInsets.all(16),
                           margin: EdgeInsets.only(right: 16, left: 16),
                           decoration: BoxDecoration(
-                              color: theme.cardColor,
-                              borderRadius: BorderRadius.circular(12.5)),
+                            color: theme.cardColor,
+                            borderRadius: BorderRadius.circular(12.5),
+                          ),
                           child: Row(
                             children: [
                               Icon(
@@ -110,10 +111,10 @@ class FollowYourRebootScreenState extends State<FollowYourRebootScreen>
                         ),
                       ),
                       SizedBox(height: 16),
-                      FollowUpStreaks(),
-                      RebootCalender(),
+                      FollowUpStreaks(bloc: bloc),
+                      RebootCalender(bloc: bloc),
                       SizedBox(height: 16),
-                      RelapsesByDayOfWeek(),
+                      RelapsesByDayOfWeek(bloc: bloc),
                       SizedBox(height: 16),
                       Padding(
                         padding: EdgeInsets.only(right: 16, left: 16),
@@ -121,10 +122,10 @@ class FollowYourRebootScreenState extends State<FollowYourRebootScreen>
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                                AppLocalizations.of(context)
-                                    .translate('streaks'),
-                                style: kSubTitlesStyle.copyWith(
-                                    color: theme.hintColor)),
+                              AppLocalizations.of(context).translate('streaks'),
+                              style: kSubTitlesStyle.copyWith(
+                                  color: theme.hintColor),
+                            ),
                             SizedBox(
                               height: 12,
                             ),
@@ -132,7 +133,7 @@ class FollowYourRebootScreenState extends State<FollowYourRebootScreen>
                               crossAxisAlignment: CrossAxisAlignment.start,
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: [
-                                GeneralStats(lang: lang),
+                                GeneralStats(lang: lang, bloc: bloc),
                               ],
                             ),
                             SizedBox(

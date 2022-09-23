@@ -14,11 +14,10 @@ import 'package:reboot_app_3/shared/localization/localization.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 
 class RebootCalender extends StatelessWidget {
-  const RebootCalender({Key key}) : super(key: key);
-
+  const RebootCalender({Key key, this.bloc}) : super(key: key);
+  final bloc;
   @override
   Widget build(BuildContext context) {
-    final bloc = CustomBlocProvider.of<FollowYourRebootBloc>(context);
     final theme = Theme.of(context);
     return Padding(
       padding: EdgeInsets.only(right: 16, left: 16),
@@ -82,12 +81,11 @@ class RebootCalender extends StatelessWidget {
 }
 
 class GeneralStats extends StatelessWidget {
-  const GeneralStats({
-    Key key,
-    @required this.lang,
-  }) : super(key: key);
+  const GeneralStats({Key key, @required this.lang, this.bloc})
+      : super(key: key);
 
   final String lang;
+  final bloc;
 
   @override
   Widget build(BuildContext context) {
@@ -282,23 +280,25 @@ class GeneralStats extends StatelessWidget {
 }
 
 class RelapsesByDayOfWeek extends StatelessWidget {
-  RelapsesByDayOfWeek({Key key}) : super(key: key);
+  RelapsesByDayOfWeek({Key key, this.bloc}) : super(key: key);
+  final bloc;
 
   @override
   Widget build(BuildContext context) {
-    final bloc = CustomBlocProvider.of<FollowYourRebootBloc>(context);
     final theme = Theme.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(AppLocalizations.of(context).translate('relapses-by-day-of-week'),
-            style: kSubTitlesStyle.copyWith(color: theme.hintColor)),
+        Text(
+          AppLocalizations.of(context).translate('relapses-by-day-of-week'),
+          style: kSubTitlesStyle.copyWith(color: theme.hintColor),
+        ),
         SizedBox(
           height: 8,
         ),
         Container(
           padding: EdgeInsets.all(16),
-          height: MediaQuery.of(context).size.height * 0.5,
+          height: MediaQuery.of(context).size.height * 0.45,
           width: MediaQuery.of(context).size.width - 40,
           decoration: BoxDecoration(
             color: theme.cardColor,
@@ -307,14 +307,14 @@ class RelapsesByDayOfWeek extends StatelessWidget {
           child: FutureBuilder(
             future: bloc.getRelapsesByDayOfWeek(),
             initialData: new DayOfWeekRelapses(
-              new DayOfWeekRelapsesDetails(0, 0),
-              new DayOfWeekRelapsesDetails(0, 0),
-              new DayOfWeekRelapsesDetails(0, 0),
-              new DayOfWeekRelapsesDetails(0, 0),
-              new DayOfWeekRelapsesDetails(0, 0),
-              new DayOfWeekRelapsesDetails(0, 0),
-              new DayOfWeekRelapsesDetails(0, 0),
-            ),
+                new DayOfWeekRelapsesDetails(0, 0),
+                new DayOfWeekRelapsesDetails(0, 0),
+                new DayOfWeekRelapsesDetails(0, 0),
+                new DayOfWeekRelapsesDetails(0, 0),
+                new DayOfWeekRelapsesDetails(0, 0),
+                new DayOfWeekRelapsesDetails(0, 0),
+                new DayOfWeekRelapsesDetails(0, 0),
+                "0"),
             builder: (context, AsyncSnapshot<DayOfWeekRelapses> snapshot) {
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -323,47 +323,70 @@ class RelapsesByDayOfWeek extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                          AppLocalizations.of(context)
-                              .translate('relapses-number'),
-                          style:
-                              kSubTitlesStyle.copyWith(color: theme.hintColor)),
-                      Text("3",
-                          style:
-                              kSubTitlesStyle.copyWith(color: theme.hintColor)),
+                        AppLocalizations.of(context)
+                            .translate('relapses-number'),
+                        style: kSubTitlesStyle.copyWith(
+                          color: theme.primaryColor,
+                          fontSize: 16,
+                        ),
+                      ),
+                      Text(
+                        snapshot.data.totalRelapses,
+                        style: kSubTitlesStyle.copyWith(
+                          color: theme.primaryColor,
+                          fontSize: 16,
+                        ),
+                      ),
                     ],
                   ),
-                  SizedBox(
-                    height: 16,
-                  ),
+                  Divider(),
                   DayOfWeekWidget(
                     day: "sun",
                     percentage: snapshot.data.sunRelapses.relapsesPercentage,
                     count: snapshot.data.sunRelapses.relapsesCount,
+                  ),
+                  SizedBox(
+                    height: 4,
                   ),
                   DayOfWeekWidget(
                     day: "mon",
                     percentage: snapshot.data.monRelapses.relapsesPercentage,
                     count: snapshot.data.monRelapses.relapsesCount,
                   ),
+                  SizedBox(
+                    height: 4,
+                  ),
                   DayOfWeekWidget(
                     day: "tue",
                     percentage: snapshot.data.tueRelapses.relapsesPercentage,
                     count: snapshot.data.tueRelapses.relapsesCount,
+                  ),
+                  SizedBox(
+                    height: 4,
                   ),
                   DayOfWeekWidget(
                     day: "wed",
                     percentage: snapshot.data.wedRelapses.relapsesPercentage,
                     count: snapshot.data.wedRelapses.relapsesCount,
                   ),
+                  SizedBox(
+                    height: 4,
+                  ),
                   DayOfWeekWidget(
                     day: "thu",
                     percentage: snapshot.data.thuRelapses.relapsesPercentage,
                     count: snapshot.data.thuRelapses.relapsesCount,
                   ),
+                  SizedBox(
+                    height: 4,
+                  ),
                   DayOfWeekWidget(
                     day: "fri",
                     percentage: snapshot.data.friRelapses.relapsesPercentage,
                     count: snapshot.data.friRelapses.relapsesCount,
+                  ),
+                  SizedBox(
+                    height: 4,
                   ),
                   DayOfWeekWidget(
                     day: "sat",
@@ -394,14 +417,22 @@ class DayOfWeekWidget extends StatelessWidget {
     return Container(
       width: MediaQuery.of(context).size.width - 56,
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(AppLocalizations.of(context).translate(day),
+          CircleAvatar(
+            radius: 18,
+            backgroundColor: theme.scaffoldBackgroundColor,
+            child: Text(
+              AppLocalizations.of(context).translate(day),
               style: kSubTitlesStyle.copyWith(
-                  color: theme.hintColor, fontSize: 12)),
+                  color: theme.primaryColor, fontSize: 8),
+            ),
+          ),
           Container(
             padding: EdgeInsets.only(right: 4, left: 4),
-            width: MediaQuery.of(context).size.width - 200,
+            width: MediaQuery.of(context).size.width - 150,
             child: LinearProgressIndicator(
+              
               backgroundColor: Colors.grey[400],
               value: percentage,
               valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
@@ -409,7 +440,8 @@ class DayOfWeekWidget extends StatelessWidget {
           ),
           Text(
             "${count}",
-            style: kSubTitlesStyle.copyWith(color: theme.hintColor),
+            style:
+                kSubTitlesStyle.copyWith(color: theme.hintColor, fontSize: 14),
           ),
         ],
       ),

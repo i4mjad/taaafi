@@ -6,9 +6,16 @@ class DayOfWeekRelapses {
   final DayOfWeekRelapsesDetails thuRelapses;
   final DayOfWeekRelapsesDetails friRelapses;
   final DayOfWeekRelapsesDetails satRelapses;
-
-  DayOfWeekRelapses(this.sunRelapses, this.monRelapses, this.tueRelapses,
-      this.wedRelapses, this.thuRelapses, this.friRelapses, this.satRelapses);
+  final String totalRelapses;
+  DayOfWeekRelapses(
+      this.sunRelapses,
+      this.monRelapses,
+      this.tueRelapses,
+      this.wedRelapses,
+      this.thuRelapses,
+      this.friRelapses,
+      this.satRelapses,
+      this.totalRelapses);
 }
 
 class DayOfWeekRelapsesDetails {

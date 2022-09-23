@@ -263,14 +263,14 @@ class DB {
     final friLength = fri.length / totalRelapses ?? 0;
 
     final dayOfWeekRelapses = DayOfWeekRelapses(
-      new DayOfWeekRelapsesDetails(satLength, sat.length ?? 0),
-      new DayOfWeekRelapsesDetails(sunLength, sun.length ?? 0),
-      new DayOfWeekRelapsesDetails(monLength, mon.length ?? 0),
-      new DayOfWeekRelapsesDetails(tueLength, tue.length ?? 0),
-      new DayOfWeekRelapsesDetails(wedLength, wed.length ?? 0),
-      new DayOfWeekRelapsesDetails(thuLength, thu.length ?? 0),
-      new DayOfWeekRelapsesDetails(friLength, fri.length ?? 0),
-    );
+        new DayOfWeekRelapsesDetails(satLength, sat.length ?? 0),
+        new DayOfWeekRelapsesDetails(sunLength, sun.length ?? 0),
+        new DayOfWeekRelapsesDetails(monLength, mon.length ?? 0),
+        new DayOfWeekRelapsesDetails(tueLength, tue.length ?? 0),
+        new DayOfWeekRelapsesDetails(wedLength, wed.length ?? 0),
+        new DayOfWeekRelapsesDetails(thuLength, thu.length ?? 0),
+        new DayOfWeekRelapsesDetails(friLength, fri.length ?? 0),
+        totalRelapses.toString());
     return dayOfWeekRelapses;
   }
 
