@@ -12,7 +12,7 @@
   "videos": "مقاطع مرئية",
   "books": "كتب",
   "blogs": "مدونات",
-  "night-mode": "الوضع الليلي (تجريبي)",
+  "night-mode": "الوضع الليلي",
 
   "Articles": "مقالات",
   "Videos": "مقاطع مرئية",
@@ -175,7 +175,7 @@
   "cancel": "إلغاء",
 
   "highest-streak" : "أعلى\nفترة",
-  "relapses-average" : "معدل\nالانتكاسات",
+  "relapses-average" : "الانتكاسات في آخر 7/28/90 يوم",
   "relapses-count" : "الأيام بدون\nانتكاسة",
   "relapses-number" : "عدد الانتكاسات: ",
 

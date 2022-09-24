@@ -339,6 +339,7 @@ class RelapsesByDayOfWeek extends StatelessWidget {
                       ),
                     ],
                   ),
+                  
                   Divider(),
                   DayOfWeekWidget(
                     day: "sun",
@@ -421,27 +422,31 @@ class DayOfWeekWidget extends StatelessWidget {
         children: [
           CircleAvatar(
             radius: 18,
-            backgroundColor: theme.scaffoldBackgroundColor,
+            backgroundColor: theme.primaryColor.withOpacity(0.1),
             child: Text(
               AppLocalizations.of(context).translate(day),
               style: kSubTitlesStyle.copyWith(
-                  color: theme.primaryColor, fontSize: 8),
+                color: theme.primaryColor,
+                fontSize: 10,
+              ),
             ),
           ),
           Container(
             padding: EdgeInsets.only(right: 4, left: 4),
             width: MediaQuery.of(context).size.width - 150,
             child: LinearProgressIndicator(
-              
               backgroundColor: Colors.grey[400],
               value: percentage,
               valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
             ),
           ),
-          Text(
-            "${count}",
-            style:
-                kSubTitlesStyle.copyWith(color: theme.hintColor, fontSize: 14),
+          CircleAvatar(
+            backgroundColor: theme.primaryColor.withOpacity(0.1),
+            child: Text(
+              "${count}",
+              style: kSubTitlesStyle.copyWith(
+                  color: theme.hintColor, fontSize: 14),
+            ),
           ),
         ],
       ),
@@ -770,4 +775,42 @@ outOfRangeAlert(BuildContext context) {
 bool dayWithinRange(DateTime firstDate, DateTime date) {
   final today = DateTime.now();
   return date.isAfter(firstDate) && date.isBefore(today);
+}
+
+class JournyAverage extends StatelessWidget {
+  const JournyAverage({Key key, this.bloc}) : super(key: key);
+
+  final bloc;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          AppLocalizations.of(context).translate("relapses-average"),
+          style: kSubTitlesStyle.copyWith(color: theme.hintColor),
+        ),
+        SizedBox(
+          height: 8,
+        ),
+        Container(
+          padding: EdgeInsets.all(16),
+          height: MediaQuery.of(context).size.height * 0.3,
+          width: MediaQuery.of(context).size.width - 40,
+          decoration: BoxDecoration(
+            color: theme.cardColor,
+            borderRadius: BorderRadius.circular(12.5),
+          ),
+          child: Center(
+            child: Text(
+              "Cake",
+              style: kSubTitlesStyle,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
 }

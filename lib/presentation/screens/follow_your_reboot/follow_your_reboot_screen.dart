@@ -116,6 +116,8 @@ class FollowYourRebootScreenState extends State<FollowYourRebootScreen>
                       SizedBox(height: 16),
                       RelapsesByDayOfWeek(bloc: bloc),
                       SizedBox(height: 16),
+                      // JournyAverage(bloc: bloc),
+                      SizedBox(height: 16),
                       Padding(
                         padding: EdgeInsets.only(right: 16, left: 16),
                         child: Column(

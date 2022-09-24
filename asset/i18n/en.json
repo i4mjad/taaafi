@@ -28,7 +28,7 @@
   "free-days-from-start":"Success days from the beggining: ",
   "changed-to-en": "Language has been changed to English",
   "changed-to-ar": "تم تغيير اللغة إلى العربية",
-  "night-mode": "Night Mode (Beta)",
+  "night-mode": "Night Mode",
   "on": "On",
   "off": "Off",
 
@@ -185,7 +185,7 @@
   "cancel": "Cancel",
 
   "highest-streak" : "Higest\nStreak",
-  "relapses-average" : "Relapses\nAverage",
+  "relapses-average" : "Relapses in The Last 7/28/90 Days",
   "relapses-count" : "No-Relapses\nDays",
 
   "no-relapses" : "No Relapses",
