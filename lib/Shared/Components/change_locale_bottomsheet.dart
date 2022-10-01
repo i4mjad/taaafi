@@ -117,30 +117,30 @@ class ChangeLanguageWidget {
                   SizedBox(
                     height: 16,
                   ),
-                  GestureDetector(
-                    onTap: () async {
-                      HapticFeedback.lightImpact();
+                  Container(
+                    padding: EdgeInsets.only(top: 16, bottom: 16),
+                    decoration: BoxDecoration(
+                        color: theme.scaffoldBackgroundColor,
+                        border:
+                            Border.all(color: theme.primaryColor, width: 0.25),
+                        borderRadius: BorderRadius.circular(10.5)),
+                    child: Column(
+                      children: [
+                        Padding(
+                          padding: EdgeInsets.only(
+                              top: 4, bottom: 8, right: 16, left: 16),
+                          child: GestureDetector(
+                            onTap: () async {
+                              HapticFeedback.lightImpact();
 
-                      await prefs.setString('languageCode', 'ar');
-                      final enLocale =
-                          Locale(prefs.getString("languageCode"), '');
-                      await MyApp.setLocale(context, enLocale);
-                      getSnackBar(context, "changed-to-ar");
+                              await prefs.setString('languageCode', 'ar');
+                              final enLocale =
+                                  Locale(prefs.getString("languageCode"), '');
+                              await MyApp.setLocale(context, enLocale);
+                              getSnackBar(context, "changed-to-ar");
 
-                      Navigator.pop(context);
-                    },
-                    child: Container(
-                      padding: EdgeInsets.only(top: 16, bottom: 16),
-                      decoration: BoxDecoration(
-                          color: theme.scaffoldBackgroundColor,
-                          border: Border.all(
-                              color: theme.primaryColor, width: 0.25),
-                          borderRadius: BorderRadius.circular(10.5)),
-                      child: Column(
-                        children: [
-                          Padding(
-                            padding: EdgeInsets.only(
-                                top: 4, bottom: 8, right: 16, left: 16),
+                              Navigator.pop(context);
+                            },
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: [
@@ -167,55 +167,53 @@ class ChangeLanguageWidget {
                               ],
                             ),
                           ),
-                          Divider(
-                            color: theme.primaryColor,
-                            thickness: 0.25,
-                          ),
-                          Padding(
-                            padding: EdgeInsets.only(
-                                top: 8, bottom: 4, right: 16, left: 16),
-                            child: GestureDetector(
-                              onTap: () async {
-                                HapticFeedback.lightImpact();
+                        ),
+                        Divider(
+                          color: theme.primaryColor,
+                          thickness: 0.25,
+                        ),
+                        Padding(
+                          padding: EdgeInsets.only(
+                              top: 8, bottom: 4, right: 16, left: 16),
+                          child: GestureDetector(
+                            onTap: () async {
+                              HapticFeedback.lightImpact();
 
-                                await prefs.setString('languageCode', 'en');
-                                final enLocale =
-                                    Locale(prefs.getString("languageCode"), '');
-                                await MyApp.setLocale(context, enLocale);
-                                getSnackBar(context, "changed-to-en");
+                              await prefs.setString('languageCode', 'en');
+                              final enLocale =
+                                  Locale(prefs.getString("languageCode"), '');
+                              await MyApp.setLocale(context, enLocale);
+                              getSnackBar(context, "changed-to-en");
 
-                                Navigator.pop(context);
-                              },
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  Padding(
-                                    padding:
-                                        EdgeInsets.only(left: 12, right: 12),
-                                    child: Text(
-                                      "E",
-                                      style: kSubTitlesStyle.copyWith(
-                                          color: theme.primaryColor),
-                                    ),
+                              Navigator.pop(context);
+                            },
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Padding(
+                                  padding: EdgeInsets.only(left: 12, right: 12),
+                                  child: Text(
+                                    "E",
+                                    style: kSubTitlesStyle.copyWith(
+                                        color: theme.primaryColor),
                                   ),
-                                  Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: <Widget>[
-                                      Text("English",
-                                          style: kSubTitlesStyle.copyWith(
-                                            fontSize: 17,
-                                            color: theme.primaryColor,
-                                          )),
-                                    ],
-                                  )
-                                ],
-                              ),
+                                ),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: <Widget>[
+                                    Text("English",
+                                        style: kSubTitlesStyle.copyWith(
+                                          fontSize: 17,
+                                          color: theme.primaryColor,
+                                        )),
+                                  ],
+                                )
+                              ],
                             ),
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ),
                   SizedBox(

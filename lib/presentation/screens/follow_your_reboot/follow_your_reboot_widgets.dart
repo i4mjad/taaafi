@@ -298,7 +298,6 @@ class RelapsesByDayOfWeek extends StatelessWidget {
         ),
         Container(
           padding: EdgeInsets.all(16),
-          height: MediaQuery.of(context).size.height * 0.45,
           width: MediaQuery.of(context).size.width - 40,
           decoration: BoxDecoration(
             color: theme.cardColor,
