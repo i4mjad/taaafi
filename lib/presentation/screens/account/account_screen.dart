@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:reboot_app_3/presentation/screens/account/delete_account.dart';
+import 'package:reboot_app_3/presentation/screens/account/reminders/daily_reminders_screen.dart';
 import 'package:reboot_app_3/shared/components/custom-app-bar.dart';
 import 'package:reboot_app_3/shared/localization/localization.dart';
 import 'package:reboot_app_3/shared/localization/localization_services.dart';
@@ -15,6 +16,7 @@ import 'package:provider/provider.dart';
 import 'package:reboot_app_3/presentation/screens/auth/login_screen.dart';
 import 'package:reboot_app_3/shared/constants/constants.dart';
 import 'package:reboot_app_3/shared/services/auth_service.dart';
+import 'package:reboot_app_3/shared/services/biometric_authentication.dart';
 import 'package:reboot_app_3/shared/services/notification_service.dart';
 
 class AccountScreen extends StatefulWidget {
@@ -134,6 +136,50 @@ class _AccountScreenState extends State<AccountScreen>
                                             fontSize: 17,
                                             height: 1.25,
                                             color: theme.hintColor)),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        Divider(
+                          color: theme.primaryColor,
+                        ),
+                        GestureDetector(
+                          onTap: () {
+                            HapticFeedback.mediumImpact();
+
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => BiometricAuthentication(),
+                              ),
+                            );
+                          },
+                          child: Padding(
+                            padding: EdgeInsets.only(bottom: 8.0, top: 8),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Row(
+                                  children: [
+                                    Padding(
+                                      padding:
+                                          EdgeInsets.only(left: 12, right: 12),
+                                      child: Icon(
+                                        Iconsax.lock,
+                                        size: 26,
+                                        color: theme.primaryColor,
+                                      ),
+                                    ),
+                                    Text(
+                                      AppLocalizations.of(context)
+                                          .translate('lock-app'),
+                                      style: kSubTitlesStyle.copyWith(
+                                          fontSize: 17,
+                                          height: 1.25,
+                                          color: theme.hintColor),
+                                    ),
                                   ],
                                 ),
                               ],
