@@ -22,6 +22,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   String lang;
+  bool isArabic = true;
 
   @override
   void initState() {
@@ -30,6 +31,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     LocaleService.getSelectedLocale().then((value) {
       setState(() {
         lang = value;
+        if (value == 'ar'){
+          this.isArabic = true;
+        } else {
+          this.isArabic = false;
+        }
       });
     });
   }
@@ -55,10 +61,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               SizedBox(
                 height: 32,
               ),
-              CustomBlocProvider(
-                bloc: ContentBloc(),
-                child: ExploreWidget(),
-              ),
+            CustomBlocProvider(
+              bloc: ContentBloc(),
+              child: ExploreWidget(),
+            ),
               SizedBox(
                 height: 32,
               ),

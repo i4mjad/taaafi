@@ -254,22 +254,22 @@ class DB {
       }
     }
 
-    final satLength = sat.length / totalRelapses ?? 0;
-    final sunLength = sun.length / totalRelapses ?? 0;
-    final monLength = mon.length / totalRelapses ?? 0;
-    final tueLength = tue.length / totalRelapses ?? 0;
-    final wedLength = wed.length / totalRelapses ?? 0;
-    final thuLength = thu.length / totalRelapses ?? 0;
-    final friLength = fri.length / totalRelapses ?? 0;
+    final satLength = (sat.length / totalRelapses) ?? 0;
+    final monLength = (mon.length / totalRelapses) ?? 0;
+    final sunLength = (sun.length / totalRelapses) ?? 0;
+    final tueLength = (tue.length / totalRelapses) ?? 0;
+    final wedLength = (wed.length / totalRelapses) ?? 0;
+    final thuLength = (thu.length / totalRelapses) ?? 0;
+    final friLength = (fri.length / totalRelapses) ?? 0;
 
     final dayOfWeekRelapses = DayOfWeekRelapses(
-        new DayOfWeekRelapsesDetails(satLength, sat.length ?? 0),
-        new DayOfWeekRelapsesDetails(sunLength, sun.length ?? 0),
-        new DayOfWeekRelapsesDetails(monLength, mon.length ?? 0),
-        new DayOfWeekRelapsesDetails(tueLength, tue.length ?? 0),
-        new DayOfWeekRelapsesDetails(wedLength, wed.length ?? 0),
-        new DayOfWeekRelapsesDetails(thuLength, thu.length ?? 0),
-        new DayOfWeekRelapsesDetails(friLength, fri.length ?? 0),
+        new DayOfWeekRelapsesDetails(satLength, sat.length),
+        new DayOfWeekRelapsesDetails(sunLength, sun.length),
+        new DayOfWeekRelapsesDetails(monLength, mon.length),
+        new DayOfWeekRelapsesDetails(tueLength, tue.length),
+        new DayOfWeekRelapsesDetails(wedLength, wed.length),
+        new DayOfWeekRelapsesDetails(thuLength, thu.length),
+        new DayOfWeekRelapsesDetails(friLength, fri.length),
         totalRelapses.toString());
     return dayOfWeekRelapses;
   }

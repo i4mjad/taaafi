@@ -433,11 +433,17 @@ class DayOfWeekWidget extends StatelessWidget {
           Container(
             padding: EdgeInsets.only(right: 4, left: 4),
             width: MediaQuery.of(context).size.width - 150,
-            child: LinearProgressIndicator(
-              backgroundColor: Colors.grey[400],
-              value: percentage,
-              valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
-            ),
+            child: Builder(builder: (BuildContext context){
+             if (percentage.isNaN || percentage.isInfinite){
+               return Container();
+             } else {
+               return LinearProgressIndicator(
+                 backgroundColor: Colors.grey[400],
+                 value: percentage,
+                 valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
+               );
+             }
+            }),
           ),
           CircleAvatar(
             backgroundColor: theme.primaryColor.withOpacity(0.1),

@@ -145,50 +145,51 @@ class _AccountScreenState extends State<AccountScreen>
                         Divider(
                           color: theme.primaryColor,
                         ),
-                        GestureDetector(
-                          onTap: () {
-                            HapticFeedback.mediumImpact();
-
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => BiometricAuthentication(),
-                              ),
-                            );
-                          },
-                          child: Padding(
-                            padding: EdgeInsets.only(bottom: 8.0, top: 8),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Row(
-                                  children: [
-                                    Padding(
-                                      padding:
-                                          EdgeInsets.only(left: 12, right: 12),
-                                      child: Icon(
-                                        Iconsax.lock,
-                                        size: 26,
-                                        color: theme.primaryColor,
-                                      ),
-                                    ),
-                                    Text(
-                                      AppLocalizations.of(context)
-                                          .translate('lock-app'),
-                                      style: kSubTitlesStyle.copyWith(
-                                          fontSize: 17,
-                                          height: 1.25,
-                                          color: theme.hintColor),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        Divider(
-                          color: theme.primaryColor,
-                        ),
+                        //TODO: un comment this when you want to implmenet the app lock
+                        // GestureDetector(
+                        //   onTap: () {
+                        //     HapticFeedback.mediumImpact();
+                        //
+                        //     Navigator.push(
+                        //       context,
+                        //       MaterialPageRoute(
+                        //         builder: (context) => BiometricAuthentication(),
+                        //       ),
+                        //     );
+                        //   },
+                        //   child: Padding(
+                        //     padding: EdgeInsets.only(bottom: 8.0, top: 8),
+                        //     child: Row(
+                        //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        //       children: [
+                        //         Row(
+                        //           children: [
+                        //             Padding(
+                        //               padding:
+                        //                   EdgeInsets.only(left: 12, right: 12),
+                        //               child: Icon(
+                        //                 Iconsax.lock,
+                        //                 size: 26,
+                        //                 color: theme.primaryColor,
+                        //               ),
+                        //             ),
+                        //             Text(
+                        //               AppLocalizations.of(context)
+                        //                   .translate('lock-app'),
+                        //               style: kSubTitlesStyle.copyWith(
+                        //                   fontSize: 17,
+                        //                   height: 1.25,
+                        //                   color: theme.hintColor),
+                        //             ),
+                        //           ],
+                        //         ),
+                        //       ],
+                        //     ),
+                        //   ),
+                        // ),
+                        // Divider(
+                        //   color: theme.primaryColor,
+                        // ),
                         Padding(
                           padding: EdgeInsets.only(top: 4, bottom: 8),
                           child: GestureDetector(
