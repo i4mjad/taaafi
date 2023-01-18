@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:iconsax/iconsax.dart';
@@ -10,6 +12,7 @@ import 'package:reboot_app_3/shared/localization/localization.dart';
 import 'package:reboot_app_3/presentation/Screens/ta3afi_liberary/widgets/content_screen.dart';
 import 'package:reboot_app_3/shared/constants/textstyles_constants.dart';
 import 'package:reboot_app_3/shared/localization/localization_services.dart';
+import 'package:reboot_app_3/shared/services/app_review_service.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({
@@ -22,7 +25,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   String lang;
-  bool isArabic = true;
+  final RatingService _ratingService = RatingService();
 
   @override
   void initState() {
@@ -31,10 +34,13 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     LocaleService.getSelectedLocale().then((value) {
       setState(() {
         lang = value;
-        if (value == 'ar'){
-          this.isArabic = true;
-        } else {
-          this.isArabic = false;
+      });
+    });
+
+    Timer(const Duration(seconds: 2), () {
+      _ratingService.isSecondTimeOpen().then((secondOpen) {
+        if (secondOpen) {
+          _ratingService.showRating();
         }
       });
     });
