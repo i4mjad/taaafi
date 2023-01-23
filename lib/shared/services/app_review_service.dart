@@ -11,7 +11,7 @@ class RatingService {
   Future<bool> isSecondTimeOpen() async {
     _prefs = await SharedPreferences.getInstance();
     try {
-      dynamic isSecondTime = _prefs.getBool(KEY) as bool;
+      dynamic isSecondTime = _prefs.getBool(KEY);
       if (isSecondTime != null && !isSecondTime) {
         _prefs.setBool(KEY, false);
         return false;

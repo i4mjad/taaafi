@@ -31,21 +31,15 @@ Future<void> main() async {
 
 Future<void> setupFirebaseMesagging(
     InitializationSettings initializationSettings) async {
-  RemoteMessage initialMessage =
-      await FirebaseMessaging.instance.getInitialMessage();
+  // RemoteMessage initialMessage = await FirebaseMessaging.instance.getInitialMessage();
 
-  await NotificationService.flutterLocalNotificationsPlugin.initialize(
-      initializationSettings, onSelectNotification: (String payload) async {
-    if (payload = null) {
-      debugPrint('notification payload: ' + payload);
-    }
-    print(initialMessage);
-  });
+  await NotificationService.flutterLocalNotificationsPlugin
+      .initialize(initializationSettings);
 }
 
 Future<InitializationSettings> setupNotifications() async {
   var initializationSettingsAndroid = AndroidInitializationSettings('app_icon');
-  var initializationSettingsiOS = IOSInitializationSettings(
+  var initializationSettingsiOS = DarwinInitializationSettings(
       requestAlertPermission: true,
       requestBadgePermission: true,
       requestSoundPermission: true,

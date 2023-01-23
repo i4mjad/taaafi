@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:iconsax/iconsax.dart';
 import 'dart:convert' show utf8;
 import 'package:chips_choice/chips_choice.dart';
+import 'package:path/path.dart';
 import 'package:reboot_app_3/presentation/Screens/ta3afi_liberary/models/Content.dart';
 import 'package:reboot_app_3/presentation/Screens/ta3afi_liberary/services/content_load_services.dart';
 import 'package:reboot_app_3/shared/components/custom-app-bar.dart';
@@ -161,7 +162,7 @@ class _ContentScreenState extends State<ContentScreen> {
             GestureDetector(
               onTap: () {
                 HapticFeedback.mediumImpact();
-                _showFilters();
+                _showFilters(context);
               },
               child: Container(
                 width: MediaQuery.of(context).size.width - 40,
@@ -259,7 +260,7 @@ class _ContentScreenState extends State<ContentScreen> {
     );
   }
 
-  void _showFilters() {
+  void _showFilters(BuildContext context) {
     showModalBottomSheet(
         context: context,
         isScrollControlled: true,
@@ -325,6 +326,9 @@ class _ContentScreenState extends State<ContentScreen> {
                         ),
                       ],
                     ),
+                    SizedBox(
+                      height: 8,
+                    ),
                     Container(
                       child: Row(
                         children: [
@@ -332,18 +336,19 @@ class _ContentScreenState extends State<ContentScreen> {
                             child: ChipsChoice<String>.multiple(
                               padding: EdgeInsets.all(0),
                               value: selectedSubTypesList,
-                              choiceStyle: C2ChoiceStyle(
-                                labelStyle: kSubTitlesStyle.copyWith(
+                              choiceCheckmark: true,
+                              choiceStyle: C2ChipStyle(
+                                foregroundStyle: kSubTitlesStyle.copyWith(
                                   fontSize: 10.5,
                                   height: 1,
-                                  color: Colors.white,
+                                  color: theme.primaryColor,
                                   fontWeight: FontWeight.w400,
                                 ),
-                                borderWidth: 0.25,
-                                color: theme.cardColor,
-                              ),
-                              choiceActiveStyle: C2ChoiceStyle().copyWith(
-                                color: theme.scaffoldBackgroundColor,
+                                checkmarkColor: theme.primaryColor,
+                                borderWidth: 0.75,
+                                borderStyle: BorderStyle.solid,
+                                borderColor: theme.primaryColor,
+                                backgroundColor: theme.cardColor,
                               ),
                               onChanged: (val) {
                                 modalSetState(() => selectedSubTypesList = val);
@@ -380,19 +385,28 @@ class _ContentScreenState extends State<ContentScreen> {
                         ),
                       ],
                     ),
+                    SizedBox(
+                      height: 8,
+                    ),
                     Container(
                       child: Row(
                         children: [
                           Expanded(
                             child: ChipsChoice<String>.multiple(
                               alignment: WrapAlignment.start,
-                              choiceStyle: C2ChoiceStyle(
-                                labelStyle: kSubTitlesStyle.copyWith(
-                                    fontSize: 10.5,
-                                    height: 1,
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w400),
-                                color: theme.cardColor,
+                              choiceCheckmark: true,
+                              choiceStyle: C2ChipStyle(
+                                foregroundStyle: kSubTitlesStyle.copyWith(
+                                  fontSize: 10.5,
+                                  height: 1,
+                                  color: theme.primaryColor,
+                                  fontWeight: FontWeight.w400,
+                                ),
+                                checkmarkColor: theme.primaryColor,
+                                borderWidth: 0.75,
+                                borderStyle: BorderStyle.solid,
+                                borderColor: theme.primaryColor,
+                                backgroundColor: theme.cardColor,
                               ),
                               padding: EdgeInsets.all(0),
                               value: selectedTypesList,
@@ -432,20 +446,28 @@ class _ContentScreenState extends State<ContentScreen> {
                         ),
                       ],
                     ),
+                    SizedBox(
+                      height: 8,
+                    ),
                     Container(
                       child: Row(
                         children: [
                           Expanded(
                             child: ChipsChoice<String>.multiple(
                               alignment: WrapAlignment.start,
-                              choiceStyle: C2ChoiceStyle(
-                                labelStyle: kSubTitlesStyle.copyWith(
+                              choiceCheckmark: true,
+                              choiceStyle: C2ChipStyle(
+                                foregroundStyle: kSubTitlesStyle.copyWith(
                                   fontSize: 10.5,
                                   height: 1,
-                                  color: Colors.white,
+                                  color: theme.primaryColor,
                                   fontWeight: FontWeight.w400,
                                 ),
-                                color: theme.cardColor,
+                                checkmarkColor: theme.primaryColor,
+                                borderWidth: 0.75,
+                                borderStyle: BorderStyle.solid,
+                                borderColor: theme.primaryColor,
+                                backgroundColor: theme.cardColor,
                               ),
                               padding: EdgeInsets.all(0),
                               value: selectedLanuguagesList,

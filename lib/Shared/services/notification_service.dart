@@ -23,7 +23,7 @@ class NotificationService {
         'alarm_notif', 'Channel for Alarm notification',
         icon: 'app_icon', playSound: true);
 
-    var iOSPlatformChannelSpecifics = IOSNotificationDetails(
+    var iOSPlatformChannelSpecifics = DarwinNotificationDetails(
         sound: 'a_long_cold_sting.wav',
         presentAlert: true,
         presentBadge: true,

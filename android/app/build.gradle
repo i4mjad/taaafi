@@ -30,7 +30,7 @@ apply plugin: 'com.google.firebase.crashlytics'
 
 android {
 
-    compileSdkVersion 31
+    compileSdkVersion 33
 
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
@@ -43,12 +43,12 @@ android {
     defaultConfig {
         applicationId "com.amjadkhalfan.reboot_app_3"
 
-        targetSdkVersion 30
+        targetSdkVersion 31
         minSdkVersion 19
-        //version number: 2.1.5
-        versionName "2.1.5"
+        //version number: 2.5.0
+        versionName "2.5.0"
         //build number : 03
-        versionCode 21503
+        versionCode 25001
 
         //multiDexEnabled true
         multiDexEnabled true
