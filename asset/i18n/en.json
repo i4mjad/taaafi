@@ -7,7 +7,7 @@
   "porn-addiction-recovery-p": "Comprehansive content about NoFap",
   "personal-data": "Community",
   "total-days": "Total days from first date: ",
-  "relapses-number" : "Relapses Count: ",
+  "relapses-number": "Relapses Count: ",
   "start-your-journy": "Start Your Journy",
   "start-your-journy-p": "To start, please select the day you want to start from. If you want to start today click on Today button",
   "articles": "Articles",
@@ -19,31 +19,26 @@
   "today": "Today",
   "specific-day": "Choose Starting Day",
   "no-content": "Why there is no content? The application is under maintenance, home screen will be improved and enhanced in the coming updates",
-  "not-login":"To see a summary for your journy, you should Log in from Journy tab", 
+  "not-login": "To see a summary for your journy, you should Log in from Journy tab",
   "Articles": "Articles",
   "Videos": "Videos",
   "Books": "Books",
   "Blogs": "Blogs",
-  "relapses-30-days":"Relapses in the last 30 days: ",
-  "free-days-from-start":"Success days from the beggining: ",
+  "relapses-30-days": "Relapses in the last 30 days: ",
+  "free-days-from-start": "Success days from the beggining: ",
   "changed-to-en": "Language has been changed to English",
   "changed-to-ar": "تم تغيير اللغة إلى العربية",
   "night-mode": "Night Mode",
   "on": "On",
   "off": "Off",
 
-
-
-  "title":"Title",
-  "body":"Body",
-
+  "title": "Title",
+  "body": "Body",
 
   "delete": "Delete",
   "save": "Save",
 
   "confirm-note-delete": "Confirm Note Deleting",
-
-
 
   "user-name": "User Name",
   "user-email": "User Email",
@@ -59,14 +54,14 @@
   "current-streak": "Current Streak",
   "free-relapse-days": "Days Without Relapses",
   "free-porn-days": "Days Without Porn",
-  "free-mast-days":"Days Without Masturbation",
+  "free-mast-days": "Days Without Masturbation",
   "dairies": "Dairies",
   "daily-follow-up": "Daily Follow-up",
   "reboot-calender": "Reboot Calender",
   "relapses-by-day-of-week": "Relapses By Day-of-Week",
   "streaks": "Streaks",
 
-  "today-is-last-relapse":"This day recorded as a Relapse, you can’t followup today",
+  "today-is-last-relapse": "This day recorded as a Relapse, you can’t followup today",
   "how-is-this-day": "How was this day?",
 
   "account-settings": "Account",
@@ -76,13 +71,12 @@
   "registered-since": "Registered Since:",
   "daily-notification-time": "Daily Reminder",
   "delete-my-data": "Delete My Data",
-  "show-all" : "View All",
-
+  "show-all": "View All",
 
   "about-ta3afi": "Spreading awareness about the consequences of porn & masturbation addiction by providing helpful resources and tools to overcome the addiction.",
-  "version-number-ios": "v4.2",
+  "version-number-ios": "v4.2.1",
   "version-number-android": "v2.2",
-  "dismiss" : "Dismiss",
+  "dismiss": "Dismiss",
   "contact-us-through-this-channels": "Contact Developer",
   "support-app-development": "Support Development",
   "support-app-development-p": "The development of the app takes a lot of time and effort and all of its features are free. To support the app chose among these list",
@@ -102,7 +96,7 @@
 
   "reset-your-password": "Reset Your Password",
   "reset-fillters": "Remove Filters",
-  "content-language" : "Content Language",
+  "content-language": "Content Language",
 
   "first-name": "First Name",
   "last-name": "Last Name",
@@ -112,40 +106,39 @@
   "loading": "Loading...",
 
   "posted-at": "Posted at: ",
-  "share-app" : "We Need Your Feedback!",
+  "share-app": "We Need Your Feedback!",
 
-  "share-app-p" : "Help Us Improve Ta3afi",
+  "share-app-p": "Help Us Improve Ta3afi",
 
-  "sat" : "Sat",
-  "sun" : "Sun",
-  "mon" : "Mon",
-  "tue" : "Tue",
-  "wed" : "Wed",
-  "thu" : "Thu",
-  "fri" : "Fri",
+  "sat": "Sat",
+  "sun": "Sun",
+  "mon": "Mon",
+  "tue": "Tue",
+  "wed": "Wed",
+  "thu": "Thu",
+  "fri": "Fri",
 
-  "developed-by" : "Developed By: Amjad AlSulimani",
-  "change-lang" : "Change Language",
-  "ui-settings" : "User Interface Settings",
-
+  "developed-by": "Developed By: Amjad AlSulimani",
+  "change-lang": "Change Language",
+  "ui-settings": "User Interface Settings",
 
   "relapse": "Relapse",
   "porn-only": "Porn Only",
   "mast-only": "Masturbation Only",
   "free-day": "Success Day!",
 
-  "Article" : "Article",
-  "Video" : "Video",
-  "Book" : "Book",
-  "Blog" : "Articals",
+  "Article": "Article",
+  "Video": "Video",
+  "Book": "Book",
+  "Blog": "Articals",
 
-  "delete-user-dialog-confirm-button" :"Confirm",
-  "delete-user-dialog-back-button" :"Back",
-  "delete-user-dialog-title" :"Account Data Reset",
-  "delete-user-dialog-content" :"Your data will NOT be able to restored, are you sure?",
+  "delete-user-dialog-confirm-button": "Confirm",
+  "delete-user-dialog-back-button": "Back",
+  "delete-user-dialog-title": "Account Data Reset",
+  "delete-user-dialog-content": "Your data will NOT be able to restored, are you sure?",
 
-  "out-of-range":"Error",
-  "out-of-range-p":"You can't edit this date",
+  "out-of-range": "Error",
+  "out-of-range-p": "You can't edit this date",
 
   "follow-up-dialog-yes-button": "Yes",
   "follow-up-dialog-no-button": "No",
@@ -158,18 +151,17 @@
   "new-user-dialog-title": "Ongoing streak?",
   "new-user-dialog-content": "If you've started before please enter your Current streak and click Start, if not, click New Beginning",
 
-  "nofap-content" : "NoFap Content",
-  "explore-content" : "Explore Content",
-  "explore-articles" : "ِExplore Articles",
-  "explore-tutorials" : "ِExplore Tutorials",
-  "explore" : "Explore",
+  "nofap-content": "NoFap Content",
+  "explore-content": "Explore Content",
+  "explore-articles": "ِExplore Articles",
+  "explore-tutorials": "ِExplore Tutorials",
+  "explore": "Explore",
 
-  "explore-p" : "Explore Articles & Tutorials",
+  "explore-p": "Explore Articles & Tutorials",
   "tutorials": "Tutorials",
 
-
   "my-profile": "My Profile",
-  "my-posts":"My Posts",
+  "my-posts": "My Posts",
   "my-likes": "My Likes",
 
   "small-tip": "Small Tip",
@@ -183,42 +175,40 @@
   "content-type": "Contant Type",
   "apply-filters": "Apply",
   "cancel": "Cancel",
-  "lock-app" : "Lock Screen",
+  "lock-app": "Lock Screen",
 
+  "highest-streak": "Higest\nStreak",
+  "relapses-average": "Relapses in The Last 7/28/90 Days",
+  "relapses-count": "No-Relapses\nDays",
 
-  "highest-streak" : "Higest\nStreak",
-  "relapses-average" : "Relapses in The Last 7/28/90 Days",
-  "relapses-count" : "No-Relapses\nDays",
-
-  "no-relapses" : "No Relapses",
+  "no-relapses": "No Relapses",
 
   "7-days": "/ 7 Days",
   "28-days": "/ 28 Days",
   "90-days": "/ 90 Days",
 
-  "delete-my-data-p" : "Do you want to start from the beginning? or start from a specific date insted?",
-  "delete-my-data-warning" : "WARNING: You can't undo this action after it's done.",
+  "delete-my-data-p": "Do you want to start from the beginning? or start from a specific date insted?",
+  "delete-my-data-warning": "WARNING: You can't undo this action after it's done.",
 
-  "new-begining" : "New Beginning",
-  "start-from-specific-date" : "Specific Date",
+  "new-begining": "New Beginning",
+  "start-from-specific-date": "Specific Date",
 
-  "delete-my-account" : "Delete My Account",
-  "delete-my-account-p" : "We're sorry to see you go. For security purposes, we need to re-authenticate you to be able to delete your account. Please select the provider you used to sign up",
+  "delete-my-account": "Delete My Account",
+  "delete-my-account-p": "We're sorry to see you go. For security purposes, we need to re-authenticate you to be able to delete your account. Please select the provider you used to sign up",
 
   "signin-provider": "Signed In with:",
   "last-signin": "Last Sign in",
 
-  "confirm-account-delete" : "Confirm Account Delete",
-  "confirm-account-delete-p" : "ٌYou Can't restore anything after you confirm",
+  "confirm-account-delete": "Confirm Account Delete",
+  "confirm-account-delete-p": "ٌYou Can't restore anything after you confirm",
 
-  "delete-account-button" :"Confirm Delete",
+  "delete-account-button": "Confirm Delete",
   "minutes": "Minutes",
 
+  "no-donations-offer": "ُThere's somthing wrong, please try again",
+  "relapses-average-p": "ُThese averages depends on the total days since your first date until today",
 
-  "no-donations-offer" : "ُThere's somthing wrong, please try again",
-  "relapses-average-p" : "ُThese averages depends on the total days since your first date until today",
-
-  "only-ar" : "Only arabic content is available now",
+  "only-ar": "Only arabic content is available now",
   "share-suggestion": "Share Your Suggestions",
 
   "hi": "Hi, ",
@@ -228,7 +218,7 @@
   "fyr": "Journey",
   "personal-details": "Personal Details",
   "free-day-recorded": "Success Day, Good Job!",
-  "relapse-recorded":"Relapses recorded, keep fighting",
-  "pornonly-recorded":"Porn watching recorded, keep fighting",
-  "mastonly-recorded":"Masturbation recorded, keep fighting"
+  "relapse-recorded": "Relapses recorded, keep fighting",
+  "pornonly-recorded": "Porn watching recorded, keep fighting",
+  "mastonly-recorded": "Masturbation recorded, keep fighting"
 }
