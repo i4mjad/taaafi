@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:iconsax/iconsax.dart';
 import 'package:reboot_app_3/bloc_provider.dart';
 import 'package:reboot_app_3/data/models/Note.dart';
 import 'package:reboot_app_3/presentation/blocs/follow_your_reboot_bloc.dart';
@@ -74,9 +75,10 @@ class _NoteScreenState extends State<NoteScreen> {
                         border: InputBorder.none,
                         hintText: "Title",
                         hintStyle: kSubTitlesSubsStyle.copyWith(
-                            fontSize: 18,
-                            color: theme.primaryColor,
-                            height: 1.75),
+                          fontSize: 18,
+                          color: theme.primaryColor,
+                          height: 1.75,
+                        ),
                         contentPadding: EdgeInsets.only(left: 12, right: 12),
                       ),
                     ),

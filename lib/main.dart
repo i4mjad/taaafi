@@ -115,6 +115,7 @@ class _MyAppState extends State<MyApp> {
     return ProviderScope(
       child: Consumer(builder: (context, ref, child) {
         final theme = ref.watch(customThemeProvider);
+
         return MaterialApp(
           supportedLocales: [Locale('ar', ''), Locale('en', '')],
           locale: _locale,

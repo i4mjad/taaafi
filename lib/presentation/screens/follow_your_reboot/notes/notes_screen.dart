@@ -5,6 +5,7 @@ import 'package:iconsax/iconsax.dart';
 import 'package:reboot_app_3/bloc_provider.dart';
 
 import 'package:reboot_app_3/presentation/blocs/follow_your_reboot_bloc.dart';
+import 'package:reboot_app_3/presentation/screens/follow_your_reboot/notes/add_note_screen.dart';
 import 'package:reboot_app_3/providers/notes/notes_providers.dart';
 import 'package:reboot_app_3/shared/components/custom-app-bar.dart';
 import 'package:reboot_app_3/shared/constants/textstyles_constants.dart';
@@ -13,6 +14,7 @@ import 'note_screen.dart';
 class NotesScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
       appBar: notesAppBar(context, "dairies"),
       body: SafeArea(
@@ -24,6 +26,94 @@ class NotesScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [Expanded(child: NotesListView())],
             ),
+          ),
+        ),
+      ),
+      bottomSheet: getFooter(context),
+      floatingActionButton: FloatingActionButton(
+
+        onPressed: (){
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => CustomBlocProvider(
+                bloc: FollowYourRebootBloc(),
+                child: AddNoteScreen(),
+                
+              ),
+            ),
+          );
+        },
+        backgroundColor: theme.cardColor,
+        child: Center(
+          child: Icon(
+            Iconsax.add_square,
+            size: 30,
+            color: theme.primaryColor,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget getFooter(BuildContext context) {
+    final theme = Theme.of(context);
+    var size = MediaQuery.of(context).size;
+    return Container(
+      width: size.width,
+      height: 80,
+      decoration: BoxDecoration(boxShadow: [
+        BoxShadow(
+            color: theme.shadowColor.withOpacity(0.2),
+            spreadRadius: 1,
+            blurRadius: 3)
+      ], color: Theme.of(context).backgroundColor),
+      child: Padding(
+        padding: const EdgeInsets.only(left: 10),
+        child: Padding(
+          padding: const EdgeInsets.only(bottom: 20),
+          child: Row(
+            children: [
+              Container(
+                width: size.width * 0.7,
+                child: Row(
+                  children: [
+                    IconButton(
+                      onPressed: null,
+                      icon: Icon(
+                        Iconsax.check,
+                        size: 20,
+                        color: theme.primaryColor.withOpacity(0.5),
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: null,
+                      icon: Icon(
+                        Iconsax.paintbucket,
+                        size: 18,
+                        color: theme.primaryColor.withOpacity(0.5),
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: null,
+                      icon: Icon(
+                        Icons.mic_rounded,
+                        size: 22,
+                        color: theme.primaryColor.withOpacity(0.5),
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: null,
+                      icon: Icon(
+                        Iconsax.picture_frame,
+                        size: 22,
+                        color: theme.primaryColor.withOpacity(0.5),
+                      ),
+                    )
+                  ],
+                ),
+              ),
+            ],
           ),
         ),
       ),
