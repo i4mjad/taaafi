@@ -1,25 +1,32 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import 'package:reboot_app_3/bloc_provider.dart';
 import 'package:reboot_app_3/presentation/blocs/follow_your_reboot_bloc.dart';
+import 'package:reboot_app_3/providers/main_providers.dart';
 import 'package:reboot_app_3/shared/constants/constants.dart';
 import 'package:reboot_app_3/shared/constants/textstyles_constants.dart';
 import 'package:reboot_app_3/shared/localization/localization.dart';
 
-class WelcomeWidget extends StatelessWidget {
+class WelcomeWidget extends ConsumerWidget {
   const WelcomeWidget({
     Key key,
   }) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    final User firebaseUser = context.watch<User>();
-    if (firebaseUser == null) {
-      return NotSignIn();
-    }
-    return CustomBlocProvider(
-        bloc: FollowYourRebootBloc(), child: WelcomeContent());
+  Widget build(BuildContext context, WidgetRef ref) {
+    final userAsyncValue = ref.watch(authStateChangesProvider);
+
+    return userAsyncValue.when(
+      data: (User user) {
+        if (user == null) return NotSignIn();
+        return CustomBlocProvider(
+            bloc: FollowYourRebootBloc(), child: WelcomeContent());
+      },
+      loading: () => CircularProgressIndicator(),
+      error: (error, stackTrace) => Text('An error occurred: $error'),
+    );
   }
 }
 

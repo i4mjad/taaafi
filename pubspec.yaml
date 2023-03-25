@@ -32,14 +32,18 @@ dependencies:
   firebase_messaging: ^14.2.1
   flutter:
     sdk: flutter
+  flutter_hooks: ^0.18.6
   flutter_html: ^2.2.1
   flutter_local_notifications: ^10.0.0-dev.1
   flutter_localizations:
     sdk: flutter
+  flutter_riverpod: ^2.3.2
   flutter_rounded_date_picker: ^3.0.1
+  get_it: ^7.2.0
   google_sign_in: ^5.3.3
   http: ^0.13.4
   iconsax: ^0.0.8
+  in_app_review: ^2.0.6
   intl: ^0.17.0
   local_auth: ^2.1.2
   path: null
@@ -50,7 +54,6 @@ dependencies:
   sign_in_with_apple: ^4.0.0
   syncfusion_flutter_calendar: ^20.1.59
   url_launcher: ^6.1.3
-  in_app_review: ^2.0.6
 
 dev_dependencies:
   dart_code_metrics: ^5.4.0
@@ -60,7 +63,7 @@ dev_dependencies:
 
 flutter_icons:
   android: true
-  image_path: 'asset/illustrations/app-icon.png'
+  image_path: "asset/illustrations/app-icon.png"
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 # The following section is specific to Flutter.

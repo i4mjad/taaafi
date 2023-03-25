@@ -1,8 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:reboot_app_3/presentation/screens/account/delete_account.dart';
+import 'package:reboot_app_3/providers/main_providers.dart';
 import 'package:reboot_app_3/shared/components/custom-app-bar.dart';
 import 'package:reboot_app_3/shared/localization/localization.dart';
 import 'package:reboot_app_3/shared/localization/localization_services.dart';
@@ -143,51 +145,6 @@ class _AccountScreenState extends State<AccountScreen>
                         Divider(
                           color: theme.primaryColor,
                         ),
-                        //TODO: un comment this when you want to implmenet the app lock
-                        // GestureDetector(
-                        //   onTap: () {
-                        //     HapticFeedback.mediumImpact();
-                        //
-                        //     Navigator.push(
-                        //       context,
-                        //       MaterialPageRoute(
-                        //         builder: (context) => BiometricAuthentication(),
-                        //       ),
-                        //     );
-                        //   },
-                        //   child: Padding(
-                        //     padding: EdgeInsets.only(bottom: 8.0, top: 8),
-                        //     child: Row(
-                        //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        //       children: [
-                        //         Row(
-                        //           children: [
-                        //             Padding(
-                        //               padding:
-                        //                   EdgeInsets.only(left: 12, right: 12),
-                        //               child: Icon(
-                        //                 Iconsax.lock,
-                        //                 size: 26,
-                        //                 color: theme.primaryColor,
-                        //               ),
-                        //             ),
-                        //             Text(
-                        //               AppLocalizations.of(context)
-                        //                   .translate('lock-app'),
-                        //               style: kSubTitlesStyle.copyWith(
-                        //                   fontSize: 17,
-                        //                   height: 1.25,
-                        //                   color: theme.hintColor),
-                        //             ),
-                        //           ],
-                        //         ),
-                        //       ],
-                        //     ),
-                        //   ),
-                        // ),
-                        // Divider(
-                        //   color: theme.primaryColor,
-                        // ),
                         Padding(
                           padding: EdgeInsets.only(top: 4, bottom: 8),
                           child: GestureDetector(
@@ -447,12 +404,18 @@ class UserProfileCard extends StatelessWidget {
   }
 }
 
-class AccountScreenScreenAuthenticationWrapper extends StatelessWidget {
+class AccountScreenScreenAuthenticationWrapper extends ConsumerWidget {
   @override
-  Widget build(BuildContext context) {
-    final user = context.watch<User>();
-    return user == null
-        ? LoginScreen()
-        : CustomBlocProvider(bloc: AccountBloc(), child: AccountScreen());
+  Widget build(BuildContext context, WidgetRef ref) {
+    final userAsyncValue = ref.watch(authStateChangesProvider);
+
+    return userAsyncValue.when(
+      data: (User user) {
+        if (user == null) return LoginScreen();
+        return CustomBlocProvider(bloc: AccountBloc(), child: AccountScreen());
+      },
+      loading: () => CircularProgressIndicator(),
+      error: (error, stackTrace) => Text('An error occurred: $error'),
+    );
   }
 }

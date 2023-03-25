@@ -450,7 +450,7 @@ class DB {
       "title": title.toString(),
       "body": body.toString(),
     };
-    print(id);
+
     return db
         .collection("users")
         .doc(uid)

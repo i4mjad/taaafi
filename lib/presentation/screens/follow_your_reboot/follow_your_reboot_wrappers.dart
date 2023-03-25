@@ -1,7 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import 'package:reboot_app_3/bloc_provider.dart';
 import 'package:reboot_app_3/presentation/blocs/account_bloc.dart';
 import 'package:reboot_app_3/presentation/blocs/follow_your_reboot_bloc.dart';
@@ -9,19 +10,24 @@ import 'package:reboot_app_3/presentation/blocs/user_bloc.dart';
 import 'package:reboot_app_3/presentation/screens/auth/login_screen.dart';
 import 'package:reboot_app_3/presentation/screens/auth/new_user_screen.dart';
 import 'package:reboot_app_3/presentation/screens/follow_your_reboot/follow_your_reboot_screen.dart';
+import 'package:reboot_app_3/providers/main_providers.dart';
 
-class FollowYourRebootScreenAuthenticationWrapper extends StatelessWidget {
+class FollowYourRebootScreenAuthenticationWrapper extends ConsumerWidget {
   @override
-  Widget build(BuildContext context) {
-    final User firebaseUser = context.watch<User>();
+  Widget build(BuildContext context, WidgetRef ref) {
+    final userAsyncValue = ref.watch(authStateChangesProvider);
 
-    if (firebaseUser != null) {
-      return CustomBlocProvider(
-        bloc: UserBloc(),
-        child: UserDocWrapper(),
-      );
-    }
-    return LoginScreen();
+    return userAsyncValue.when(
+      data: (User user) {
+        if (user == null) return LoginScreen();
+        return CustomBlocProvider(
+          bloc: UserBloc(),
+          child: UserDocWrapper(),
+        );
+      },
+      loading: () => CircularProgressIndicator(),
+      error: (error, stackTrace) => Text('An error occurred: $error'),
+    );
   }
 }
 

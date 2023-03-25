@@ -1,15 +1,16 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:reboot_app_3/di/container.dart';
+import 'package:reboot_app_3/providers/main_providers.dart';
 import 'package:reboot_app_3/shared/Components/bottom_navbar.dart';
 import 'package:reboot_app_3/shared/components/app-themes.dart';
 import 'package:reboot_app_3/shared/localization/localization.dart';
-import 'package:reboot_app_3/shared/services/auth_service.dart';
+
 import 'package:reboot_app_3/shared/services/notification_service.dart';
 import 'package:reboot_app_3/shared/services/routing/custom_router.dart';
 import 'package:reboot_app_3/shared/services/routing/routes_names.dart';
@@ -18,12 +19,12 @@ import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 
 bool darkMode = false;
 Future<void> main() async {
+  SetupContainer();
   WidgetsFlutterBinding.ensureInitialized();
 
   await Firebase.initializeApp();
 
   InitializationSettings initializationSettings = await setupNotifications();
-
   await setupFirebaseMesagging(initializationSettings);
   FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
   runApp(MyApp());
@@ -111,45 +112,34 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(
-      providers: [
-        ListenableProvider<GoogleAuthenticationService>(
-            create: (_) => GoogleAuthenticationService(FirebaseAuth.instance)),
-        StreamProvider(
-          create: (context) =>
-              context.read<GoogleAuthenticationService>().authStateChanges,
-          initialData: null,
-        ),
-        ChangeNotifierProvider(create: (_) => CustomTheme())
-      ],
-      child: Consumer<CustomTheme>(
-        builder: (context, CustomTheme notifier, child) {
-          return MaterialApp(
-            supportedLocales: [Locale('ar', ''), Locale('en', '')],
-            locale: _locale,
-            localizationsDelegates: [
-              AppLocalizations.delegate,
-              GlobalMaterialLocalizations.delegate,
-              GlobalCupertinoLocalizations.delegate,
-              GlobalWidgetsLocalizations.delegate,
-            ],
-            localeResolutionCallback: (locale, supportedLocales) {
-              for (var supportedLocale in supportedLocales) {
-                if (supportedLocale.languageCode == locale.languageCode) {
-                  return supportedLocale;
-                }
+    return ProviderScope(
+      child: Consumer(builder: (context, ref, child) {
+        final theme = ref.watch(customThemeProvider);
+        return MaterialApp(
+          supportedLocales: [Locale('ar', ''), Locale('en', '')],
+          locale: _locale,
+          localizationsDelegates: [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+          ],
+          localeResolutionCallback: (locale, supportedLocales) {
+            for (var supportedLocale in supportedLocales) {
+              if (supportedLocale.languageCode == locale.languageCode) {
+                return supportedLocale;
               }
-              return supportedLocales.first;
-            },
-            debugShowCheckedModeBanner: false,
-            onGenerateRoute: CustomRouter.allRoutes,
-            initialRoute: navbar,
-            home: HomeNavBar(),
-            navigatorObservers: [observer],
-            theme: notifier.darkTheme == true ? darkTheme : lightTheme,
-          );
-        },
-      ),
+            }
+            return supportedLocales.first;
+          },
+          debugShowCheckedModeBanner: false,
+          onGenerateRoute: CustomRouter.allRoutes,
+          initialRoute: navbar,
+          home: HomeNavBar(),
+          navigatorObservers: [observer],
+          theme: theme.darkTheme == true ? darkTheme : lightTheme,
+        );
+      }),
     );
   }
 }
