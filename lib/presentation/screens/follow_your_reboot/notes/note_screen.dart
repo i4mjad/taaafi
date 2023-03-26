@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:iconsax/iconsax.dart';
+
 import 'package:reboot_app_3/bloc_provider.dart';
 import 'package:reboot_app_3/data/models/Note.dart';
 import 'package:reboot_app_3/presentation/blocs/follow_your_reboot_bloc.dart';
@@ -124,7 +124,7 @@ class _NoteScreenState extends State<NoteScreen> {
                         GestureDetector(
                           onTap: () {
                             confirmDeleteDialog(
-                                bloc, theme, context, widget.note.noteId);
+                                bloc, theme, context, widget.note.id);
                           },
                           child: Container(
                             height: 50,
@@ -149,7 +149,7 @@ class _NoteScreenState extends State<NoteScreen> {
                           onTap: () async {
                             var _title = title?.text;
                             var _body = body?.text;
-                            var _id = widget.note.noteId;
+                            var _id = widget.note.id;
 
                             await bloc.updateNote(_id, _title, _body);
 

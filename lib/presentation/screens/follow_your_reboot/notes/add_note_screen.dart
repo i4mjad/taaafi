@@ -64,7 +64,12 @@ class AddNoteScreen extends ConsumerWidget {
           final title = _titleController.text;
           final body = _bodyController.text;
 
-          final noteViewModel = ref.read(noteViewModelProvider);
+          await ref.read(noteViewModelProvider.notifier).addNote(
+                title: title,
+                body: body,
+              );
+
+          Navigator.pop(context);
         },
         child: Icon(
           Iconsax.save_add,

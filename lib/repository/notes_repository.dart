@@ -1,10 +1,11 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:reboot_app_3/data/models/Note.dart';
 
 abstract class INotesRepository {
-  Stream<List<Note>> getnotes();
-
+  Stream<List<Note>> getNotes();
   Future<void> add(Note note);
   Future<void> update(Note note);
   Future<void> delete(String noteId);
@@ -12,51 +13,56 @@ abstract class INotesRepository {
 }
 
 class FirebaseNotesRepository implements INotesRepository {
-  final FirebaseFirestore _firebaseFirestore = FirebaseFirestore.instance;
-  //TODO: extract this to a seperate repository.
-  final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
-
-  CollectionReference get _userNotesCollection => _firebaseFirestore
-      .collection('users')
-      .doc(_firebaseAuth.currentUser.uid)
-      .collection('userNotes');
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final _notesController = StreamController<List<Note>>();
 
   @override
-  Stream<List<Note>> getnotes() {
-    return _userNotesCollection.snapshots().map((snapshot) {
-      return snapshot.docs
-          .map((doc) => Note.fromMap(doc.data(), doc.id))
-          .toList();
+  Stream<List<Note>> getNotes() {
+    final userId = FirebaseAuth.instance.currentUser.uid;
+    final notesRef =
+        _firestore.collection('users').doc(userId).collection('userNotes');
+    notesRef.snapshots().listen((snap) {
+      final notes =
+          snap.docs.map((doc) => Note.fromMap(doc.data(), doc.id)).toList();
+      _notesController.add(notes);
     });
+    return _notesController.stream;
   }
 
   @override
   Future<void> add(Note note) async {
-    await _userNotesCollection.add({
-      'title': note.title,
-      'body': note.body,
-      'timestamp': DateTime.now().toUtc()
-    });
-  }
-
-  @override
-  Future<void> delete(String noteId) async {
-    await _userNotesCollection.doc(noteId).delete();
+    final userId = FirebaseAuth.instance.currentUser.uid;
+    final notesRef =
+        _firestore.collection('users').doc(userId).collection('userNotes');
+    await notesRef.add(note.toMap());
   }
 
   @override
   Future<void> update(Note note) async {
-    var data = {
-      "title": note.title,
-      "body": note.body,
-    };
-
-    await _userNotesCollection.doc(note.noteId).update(data);
+    final userId = FirebaseAuth.instance.currentUser.uid;
+    final notesRef =
+        _firestore.collection('users').doc(userId).collection('userNotes');
+    await notesRef.doc(note.id).update(note.toMap());
   }
 
   @override
-  Future<Note> get(String noteId) async {
-    var document = await _userNotesCollection.doc(noteId).get();
-    return Note.fromMap(document.data(), document.id);
+  Future<void> delete(String id) async {
+    final userId = FirebaseAuth.instance.currentUser.uid;
+    final notesRef =
+        _firestore.collection('users').doc(userId).collection('userNotes');
+    await notesRef.doc(id).delete();
+  }
+
+  @override
+  Future<Note> get(String id) async {
+    final userId = FirebaseAuth.instance.currentUser.uid;
+    final notesRef =
+        _firestore.collection('users').doc(userId).collection('userNotes');
+    final doc = await notesRef.doc(id).get();
+    return Note.fromMap(doc.data(), id);
+  }
+
+  void dispose() {
+    _notesController.close();
   }
 }

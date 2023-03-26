@@ -19,14 +19,16 @@ import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 
 bool darkMode = false;
 Future<void> main() async {
-  SetupContainer();
   WidgetsFlutterBinding.ensureInitialized();
 
   await Firebase.initializeApp();
+  SetupContainer();
 
   InitializationSettings initializationSettings = await setupNotifications();
   await setupFirebaseMesagging(initializationSettings);
-  FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
+
+  //todo
+  // FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
   runApp(MyApp());
 }
 

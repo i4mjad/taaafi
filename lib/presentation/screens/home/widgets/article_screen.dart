@@ -45,7 +45,7 @@ class ExploreContentPage extends StatelessWidget {
                             ),
                             Text(
                               DateFormat('dd/MM/yyyy hh:mm').format(
-                                DateTime.parse(article.date),
+                                DateTime.parse(article.timestamp),
                               ),
                               style: kSubTitlesSubsStyle.copyWith(
                                 fontSize: 10.5,

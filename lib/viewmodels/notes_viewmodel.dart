@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:reboot_app_3/data/models/Note.dart';
 import 'package:reboot_app_3/di/container.dart';
@@ -9,11 +10,11 @@ class NoteViewModel extends StateNotifier<List<Note>> {
   NoteViewModel()
       : _noteRepository = getIt<INotesRepository>(),
         super([]) {
-    _noteRepository.getnotes().listen((notes) => state = notes);
+    _noteRepository.getNotes().listen((notes) => state = notes);
   }
 
   getNotes() async {
-    return await _noteRepository.getnotes();
+    return await _noteRepository.getNotes();
   }
 
   getNote(String id) async {
@@ -26,5 +27,17 @@ class NoteViewModel extends StateNotifier<List<Note>> {
 
   deleteNote(String noteId) async {
     await _noteRepository.delete(noteId);
+  }
+
+  Future<void> addNote({
+    String title,
+    String body,
+  }) async {
+    final newNote = Note(
+      title: title,
+      body: body,
+      timestamp: DateTime.now(),
+    );
+    await _noteRepository.add(newNote);
   }
 }
