@@ -38,6 +38,7 @@ class AddNoteScreen extends ConsumerWidget {
           ),
           Expanded(
             child: TextField(
+              onTap: (() => FocusScope.of(context).unfocus()),
               controller: _bodyController,
               decoration: InputDecoration(
                 hintText: AppLocalizations.of(context).translate("body"),
@@ -55,6 +56,7 @@ class AddNoteScreen extends ConsumerWidget {
                 color: theme.primaryColor,
                 height: 1.25,
               ),
+            
             ),
           ),
         ],

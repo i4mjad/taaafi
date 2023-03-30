@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:reboot_app_3/data/models/Note.dart';
 import 'package:reboot_app_3/di/container.dart';

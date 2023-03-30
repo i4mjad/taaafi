@@ -45,10 +45,11 @@ android {
 
         targetSdkVersion 31
         minSdkVersion 19
-        //version number: 2.5.0
-        versionName "2.5.0"
-        //build number : 03
-        versionCode 25001
+        //version number: 2.5.1
+        versionName "2.5.1"
+        //build number : 01
+        versionCode 25101
+        // key2
 
         //multiDexEnabled true
         multiDexEnabled true

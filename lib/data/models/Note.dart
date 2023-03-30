@@ -12,8 +12,16 @@ class Note {
     this.timestamp,
   });
 
-  void _setId(String id) {
+  void setId(String id) {
     this.id = id;
+  }
+
+  void updateTitle(String title) {
+    this.title = title;
+  }
+
+  void updateBody(String body) {
+    this.body = body;
   }
 
   factory Note.fromMap(Map<String, dynamic> map, String id) {
@@ -24,7 +32,7 @@ class Note {
           ? (map['timestamp'] as Timestamp).toDate()
           : null,
     );
-    note._setId(id);
+    note.setId(id);
     return note;
   }
 

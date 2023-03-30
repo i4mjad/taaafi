@@ -29,91 +29,24 @@ class NotesScreen extends StatelessWidget {
           ),
         ),
       ),
-      bottomSheet: getFooter(context),
       floatingActionButton: FloatingActionButton(
-
-        onPressed: (){
+        onPressed: () {
           Navigator.push(
             context,
             MaterialPageRoute(
               builder: (context) => CustomBlocProvider(
                 bloc: FollowYourRebootBloc(),
                 child: AddNoteScreen(),
-                
               ),
             ),
           );
         },
-        backgroundColor: theme.cardColor,
+        backgroundColor: theme.primaryColor,
         child: Center(
           child: Icon(
             Iconsax.add_square,
             size: 30,
-            color: theme.primaryColor,
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget getFooter(BuildContext context) {
-    final theme = Theme.of(context);
-    var size = MediaQuery.of(context).size;
-    return Container(
-      width: size.width,
-      height: 80,
-      decoration: BoxDecoration(boxShadow: [
-        BoxShadow(
-            color: theme.shadowColor.withOpacity(0.2),
-            spreadRadius: 1,
-            blurRadius: 3)
-      ], color: Theme.of(context).backgroundColor),
-      child: Padding(
-        padding: const EdgeInsets.only(left: 10),
-        child: Padding(
-          padding: const EdgeInsets.only(bottom: 20),
-          child: Row(
-            children: [
-              Container(
-                width: size.width * 0.7,
-                child: Row(
-                  children: [
-                    IconButton(
-                      onPressed: null,
-                      icon: Icon(
-                        Iconsax.check,
-                        size: 20,
-                        color: theme.primaryColor.withOpacity(0.5),
-                      ),
-                    ),
-                    IconButton(
-                      onPressed: null,
-                      icon: Icon(
-                        Iconsax.paintbucket,
-                        size: 18,
-                        color: theme.primaryColor.withOpacity(0.5),
-                      ),
-                    ),
-                    IconButton(
-                      onPressed: null,
-                      icon: Icon(
-                        Icons.mic_rounded,
-                        size: 22,
-                        color: theme.primaryColor.withOpacity(0.5),
-                      ),
-                    ),
-                    IconButton(
-                      onPressed: null,
-                      icon: Icon(
-                        Iconsax.picture_frame,
-                        size: 22,
-                        color: theme.primaryColor.withOpacity(0.5),
-                      ),
-                    )
-                  ],
-                ),
-              ),
-            ],
+            color: theme.backgroundColor,
           ),
         ),
       ),
@@ -132,61 +65,63 @@ class NotesListView extends ConsumerWidget {
     final theme = Theme.of(context);
     // final bloc = CustomBlocProvider.of<FollowYourRebootBloc>(context);
 
-    return ListView.separated(
-      itemCount: notes.length,
-      itemBuilder: (BuildContext context, int index) {
-        return GestureDetector(
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => CustomBlocProvider(
-                  bloc: FollowYourRebootBloc(),
-                  child:
-                      NoteScreen(note: notes[index], id: notes[index].noteId),
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16.0),
+      child: ListView.separated(
+        itemCount: notes.length,
+        itemBuilder: (BuildContext context, int index) {
+          return GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => CustomBlocProvider(
+                    bloc: FollowYourRebootBloc(),
+                    child: NoteScreen(note: notes[index], id: notes[index].id),
+                  ),
                 ),
+              );
+            },
+            child: Container(
+              padding: EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: theme.cardColor,
+                borderRadius: BorderRadius.circular(10.5),
               ),
-            );
-          },
-          child: Container(
-            padding: EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: theme.cardColor,
-              borderRadius: BorderRadius.circular(10.5),
+              child: Row(
+                children: [
+                  Container(
+                    height: 56,
+                    width: 56,
+                    decoration: BoxDecoration(
+                      color: theme.scaffoldBackgroundColor,
+                      borderRadius: BorderRadius.circular(12.5),
+                    ),
+                    child: Center(
+                      child: Icon(Iconsax.book),
+                    ),
+                  ),
+                  SizedBox(
+                    width: 16,
+                  ),
+                  Flexible(
+                    child: Text(
+                      notes[index].title,
+                      style: kSubTitlesStyle.copyWith(
+                          color: theme.primaryColor,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w400),
+                    ),
+                  ),
+                ],
+              ),
             ),
-            child: Row(
-              children: [
-                Container(
-                  height: 56,
-                  width: 56,
-                  decoration: BoxDecoration(
-                    color: theme.scaffoldBackgroundColor,
-                    borderRadius: BorderRadius.circular(12.5),
-                  ),
-                  child: Center(
-                    child: Icon(Iconsax.book),
-                  ),
-                ),
-                SizedBox(
-                  width: 16,
-                ),
-                Flexible(
-                  child: Text(
-                    notes[index].title,
-                    style: kSubTitlesStyle.copyWith(
-                        color: theme.primaryColor,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w400),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-      separatorBuilder: (BuildContext context, int index) {
-        return SizedBox(height: 16);
-      },
+          );
+        },
+        separatorBuilder: (BuildContext context, int index) {
+          return SizedBox(height: 16);
+        },
+      ),
     );
   }
 }
