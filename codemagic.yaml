@@ -2,11 +2,11 @@
 workflows:
   main:
     # Set up environment variables
-    environment:
-      # Set the Apple ID and password for the App Store Connect API
-      APP_STORE_CONNECT_API_KEY_ID: $CM_APP_STORE_CONNECT_API_KEY_ID
-      APP_STORE_CONNECT_API_KEY_ISSUER_ID: $CM_APP_STORE_CONNECT_API_KEY_ISSUER_ID
-      APP_STORE_CONNECT_API_KEY_SECRET: $CM_APP_STORE_CONNECT_API_KEY_SECRET
+    # environment:
+    #   # Set the Apple ID and password for the App Store Connect API
+    #   APP_STORE_CONNECT_API_KEY_ID: $CM_APP_STORE_CONNECT_API_KEY_ID
+    #   APP_STORE_CONNECT_API_KEY_ISSUER_ID: $CM_APP_STORE_CONNECT_API_KEY_ISSUER_ID
+    #   APP_STORE_CONNECT_API_KEY_SECRET: $CM_APP_STORE_CONNECT_API_KEY_SECRET
     # Configure build steps
     scripts:
       # Install dependencies
