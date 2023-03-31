@@ -1,0 +1,26 @@
+# codemagic.yaml
+workflows:
+  main:
+    # Set up environment variables
+    environment:
+      # Set the Apple ID and password for the App Store Connect API
+      APP_STORE_CONNECT_API_KEY_ID: $CM_APP_STORE_CONNECT_API_KEY_ID
+      APP_STORE_CONNECT_API_KEY_ISSUER_ID: $CM_APP_STORE_CONNECT_API_KEY_ISSUER_ID
+      APP_STORE_CONNECT_API_KEY_SECRET: $CM_APP_STORE_CONNECT_API_KEY_SECRET
+    # Configure build steps
+    scripts:
+      # Install dependencies
+      - name: Install Dependencies
+        script: flutter pub get
+      # Run tests
+      - name: Run Tests
+        script: flutter test
+      # Build iOS app and upload to TestFlight
+      - name: Build and Deploy iOS App
+        script: |
+          flutter build ios --release --no-codesign
+          # Install and configure App Store Connect CLI
+          curl https://download.fastlane.tools/asc/2.184.0/asc-2.184.0.pkg -o asc.pkg
+          sudo installer -pkg asc.pkg -target /
+          # Upload to TestFlight
+          asc upload -a com.amjadKhalfan.RebootApp -f build/ios/iphoneos/Runner.ipa --skip_waiting_for_build_processing
