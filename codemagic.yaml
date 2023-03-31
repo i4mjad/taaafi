@@ -2,11 +2,12 @@
 workflows:
   main:
     # Set up environment variables
-    # environment:
-    #   # Set the Apple ID and password for the App Store Connect API
-    #   APP_STORE_CONNECT_API_KEY_ID: $CM_APP_STORE_CONNECT_API_KEY_ID
-    #   APP_STORE_CONNECT_API_KEY_ISSUER_ID: $CM_APP_STORE_CONNECT_API_KEY_ISSUER_ID
-    #   APP_STORE_CONNECT_API_KEY_SECRET: $CM_APP_STORE_CONNECT_API_KEY_SECRET
+    environment:
+      # Set the Apple ID and password for code signing
+      FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD: $CM_FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD
+      MATCH_PASSWORD: $CM_MATCH_PASSWORD
+      MATCH_KEYCHAIN_NAME: "login.keychain"
+      MATCH_KEYCHAIN_PASSWORD: $CM_MATCH_KEYCHAIN_PASSWORD
     # Configure build steps
     scripts:
       # Install dependencies
@@ -18,9 +19,9 @@ workflows:
       # Build iOS app and upload to TestFlight
       - name: Build and Deploy iOS App
         script: |
-          flutter build ios --release --no-codesign
-          # Install and configure App Store Connect CLI
-          curl https://download.fastlane.tools/asc/2.184.0/asc-2.184.0.pkg -o asc.pkg
-          sudo installer -pkg asc.pkg -target /
+          # Install and configure Fastlane
+          gem install fastlane -NV
+          # Build iOS app with code signing
+          fastlane ios release --verbose
           # Upload to TestFlight
           asc upload -a com.amjadKhalfan.RebootApp -f build/ios/iphoneos/Runner.ipa --skip_waiting_for_build_processing
