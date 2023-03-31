@@ -107,8 +107,7 @@ AppBar noteAppBarWithCustomTitle(
     actions: [
       GestureDetector(
         onTap: () async {
-          await ref.read(noteViewModelProvider.notifier).deleteNote(id);
-          Navigator.pop(context);
+          confirmDeleteDialog(theme, context, id, ref);
         },
         child: Container(
           padding: EdgeInsets.only(right: 16, left: 16),

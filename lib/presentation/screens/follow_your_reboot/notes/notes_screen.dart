@@ -34,10 +34,7 @@ class NotesScreen extends StatelessWidget {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => CustomBlocProvider(
-                bloc: FollowYourRebootBloc(),
-                child: AddNoteScreen(),
-              ),
+              builder: (context) => AddNoteScreen(),
             ),
           );
         },

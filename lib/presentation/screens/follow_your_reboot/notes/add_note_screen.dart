@@ -7,12 +7,23 @@ import 'package:reboot_app_3/shared/components/custom-app-bar.dart';
 import 'package:reboot_app_3/shared/constants/textstyles_constants.dart';
 import 'package:reboot_app_3/shared/localization/localization.dart';
 
-class AddNoteScreen extends ConsumerWidget {
+class AddNoteScreen extends ConsumerStatefulWidget {
+  @override
+  _AddNoteScreenState createState() => _AddNoteScreenState();
+}
+
+class _AddNoteScreenState extends ConsumerState<AddNoteScreen>
+    with AutomaticKeepAliveClientMixin<AddNoteScreen> {
   final _titleController = TextEditingController();
   final _bodyController = TextEditingController();
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  bool get wantKeepAlive => true;
+
+  @override
+  Widget build(BuildContext context) {
+    super.build(context); // This line is necessary to call wantKeepAlive.
+
     final theme = Theme.of(context);
     return Scaffold(
       appBar: plainAppBar(context, "new-note"),
@@ -21,10 +32,11 @@ class AddNoteScreen extends ConsumerWidget {
         children: [
           SizedBox(height: 8),
           TextField(
+            onTap: (() => FocusScope.of(context).unfocus()),
             controller: _titleController,
+            textInputAction: TextInputAction.done,
             decoration: InputDecoration(
               hintText: AppLocalizations.of(context).translate("title"),
-              // border: InputBorder,
               hintStyle: kSubTitlesStyle.copyWith(
                 color: theme.primaryColor,
                 height: 1.75,
@@ -56,7 +68,6 @@ class AddNoteScreen extends ConsumerWidget {
                 color: theme.primaryColor,
                 height: 1.25,
               ),
-            
             ),
           ),
         ],
@@ -74,7 +85,7 @@ class AddNoteScreen extends ConsumerWidget {
           Navigator.pop(context);
         },
         child: Icon(
-          Iconsax.save_add,
+          Iconsax.save_2,
           color: theme.primaryColor,
         ),
         backgroundColor: theme.cardColor,
