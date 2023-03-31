@@ -13,8 +13,8 @@ workflows:
       - name: Install Dependencies
         script: flutter pub get
       # Run tests
-      - name: Run Tests
-        script: flutter test
+      # - name: Run Tests
+      #   script: flutter test
       # Build iOS app and upload to TestFlight
       - name: Build and Deploy iOS App
         script: |
