@@ -22,12 +22,26 @@ class NoteScreen extends ConsumerStatefulWidget {
 class _NoteScreenState extends ConsumerState<NoteScreen> {
   TextEditingController _titleController;
   TextEditingController _bodyController;
+  FocusNode _focusNode = FocusNode();
+  bool _isKeyboardVisible = false;
 
   @override
   void initState() {
     super.initState();
     _titleController = TextEditingController(text: widget.note.title ?? '');
     _bodyController = TextEditingController(text: widget.note.body ?? '');
+
+    _focusNode.addListener(() {
+      setState(() {
+        _isKeyboardVisible = _focusNode.hasFocus;
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _focusNode.dispose();
+    super.dispose();
   }
 
   @override
@@ -35,7 +49,6 @@ class _NoteScreenState extends ConsumerState<NoteScreen> {
     final theme = Theme.of(context);
 
     return GestureDetector(
-      onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(
         appBar: noteAppBarWithCustomTitle(
             context, widget.note.title, ref, widget.note.id),
@@ -44,8 +57,8 @@ class _NoteScreenState extends ConsumerState<NoteScreen> {
           children: [
             SizedBox(height: 8),
             TextField(
-              onTap: (() => FocusScope.of(context).unfocus()),
               controller: _titleController,
+              textInputAction: TextInputAction.done,
               decoration: InputDecoration(
                 hintText: AppLocalizations.of(context).translate("title"),
                 hintStyle: kSubTitlesStyle.copyWith(
@@ -61,8 +74,10 @@ class _NoteScreenState extends ConsumerState<NoteScreen> {
             ),
             Expanded(
               child: TextField(
-                onTap: (() => FocusScope.of(context).unfocus()),
                 controller: _bodyController,
+                focusNode: _focusNode,
+                textInputAction: TextInputAction.newline,
+                keyboardType: TextInputType.multiline,
                 decoration: InputDecoration(
                   hintText: AppLocalizations.of(context).translate("body"),
                   border: InputBorder.none,
@@ -86,22 +101,28 @@ class _NoteScreenState extends ConsumerState<NoteScreen> {
         ),
         floatingActionButton: FloatingActionButton(
           onPressed: () async {
-            final title = _titleController.text;
-            final body = _bodyController.text;
-            final id = widget.note.id;
+            if (_isKeyboardVisible) {
+              // Dismiss the keyboard
+              FocusScope.of(context).unfocus();
+            } else {
+              // Update the note
+              final title = _titleController.text;
+              final body = _bodyController.text;
+              final id = widget.note.id;
 
-            final editedNote = Note(
-              body: body,
-              title: title,
-              timestamp: DateTime.now(),
-            );
-            editedNote.setId(id);
-            await ref
-                .read(noteViewModelProvider.notifier)
-                .updateNote(editedNote);
+              final editedNote = Note(
+                body: body,
+                title: title,
+                timestamp: DateTime.now(),
+              );
+              editedNote.setId(id);
+              await ref
+                  .read(noteViewModelProvider.notifier)
+                  .updateNote(editedNote);
+            }
           },
           child: Icon(
-            Iconsax.save_add,
+            !_isKeyboardVisible ? Iconsax.save_2 : Iconsax.arrow_down,
             color: theme.primaryColor,
           ),
           backgroundColor: theme.cardColor,

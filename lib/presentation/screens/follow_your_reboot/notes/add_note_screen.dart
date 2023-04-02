@@ -16,9 +16,27 @@ class _AddNoteScreenState extends ConsumerState<AddNoteScreen>
     with AutomaticKeepAliveClientMixin<AddNoteScreen> {
   final _titleController = TextEditingController();
   final _bodyController = TextEditingController();
+  FocusNode _focusNode = FocusNode();
+  bool _isKeyboardVisible = false;
 
   @override
   bool get wantKeepAlive => true;
+
+  @override
+  void initState() {
+    super.initState();
+    _focusNode.addListener(() {
+      setState(() {
+        _isKeyboardVisible = _focusNode.hasFocus;
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _focusNode.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +50,6 @@ class _AddNoteScreenState extends ConsumerState<AddNoteScreen>
         children: [
           SizedBox(height: 8),
           TextField(
-            onTap: (() => FocusScope.of(context).unfocus()),
             controller: _titleController,
             textInputAction: TextInputAction.done,
             decoration: InputDecoration(
@@ -50,7 +67,9 @@ class _AddNoteScreenState extends ConsumerState<AddNoteScreen>
           ),
           Expanded(
             child: TextField(
-              onTap: (() => FocusScope.of(context).unfocus()),
+              focusNode: _focusNode,
+              textInputAction: TextInputAction.newline,
+              keyboardType: TextInputType.multiline,
               controller: _bodyController,
               decoration: InputDecoration(
                 hintText: AppLocalizations.of(context).translate("body"),
@@ -68,24 +87,31 @@ class _AddNoteScreenState extends ConsumerState<AddNoteScreen>
                 color: theme.primaryColor,
                 height: 1.25,
               ),
+              expands: true,
             ),
           ),
         ],
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
-          final title = _titleController.text;
-          final body = _bodyController.text;
+          if (_isKeyboardVisible) {
+            // Dismiss the keyboard
+            FocusScope.of(context).unfocus();
+          } else {
+            // Save the note
+            final title = _titleController.text;
+            final body = _bodyController.text;
 
-          await ref.read(noteViewModelProvider.notifier).addNote(
-                title: title,
-                body: body,
-              );
+            await ref.read(noteViewModelProvider.notifier).addNote(
+                  title: title,
+                  body: body,
+                );
 
-          Navigator.pop(context);
+            Navigator.pop(context);
+          }
         },
         child: Icon(
-          Iconsax.save_2,
+          !_isKeyboardVisible ? Iconsax.save_2 : Iconsax.arrow_down,
           color: theme.primaryColor,
         ),
         backgroundColor: theme.cardColor,
