@@ -2,19 +2,18 @@ import 'dart:core';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:provider/provider.dart';
 import 'package:reboot_app_3/bloc_provider.dart';
-
 import 'package:reboot_app_3/presentation/blocs/account_bloc.dart';
+import 'package:reboot_app_3/providers/main_providers.dart';
 import 'package:reboot_app_3/shared/constants/textstyles_constants.dart';
 import 'package:reboot_app_3/shared/localization/localization.dart';
-import 'package:reboot_app_3/shared/services/auth_service.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 class DeleteAccountSheet {
   static void openConfirmDeleteAccountMessage(
-      BuildContext context, AccountBloc bloc) {
+      BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     showModalBottomSheet(
       context: context,
@@ -105,9 +104,13 @@ class DeleteAccountSheet {
                     final user = FirebaseAuth.instance.currentUser;
                     String uid = user.uid;
 
-                    await db.collection("users").doc(uid).delete().then((_) {
-                      context
-                          .read<GoogleAuthenticationService>()
+                    await db
+                        .collection("users")
+                        .doc(uid)
+                        .delete()
+                        .then((_) async {
+                      await ref
+                          .watch(googleAuthenticationServiceProvider)
                           .deleteAccount();
                       Navigator.pop(context);
                     });
@@ -145,7 +148,7 @@ class DeleteAccountSheet {
     );
   }
 
-  static void openDeleteAccountMessage(BuildContext context) {
+  static void openDeleteAccountMessage(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     showModalBottomSheet(
       context: context,
@@ -154,7 +157,6 @@ class DeleteAccountSheet {
         return CustomBlocProvider(
           bloc: AccountBloc(),
           child: Builder(builder: (context) {
-            final bloc = CustomBlocProvider.of<AccountBloc>(context);
             return Padding(
               padding:
                   EdgeInsets.only(left: 20.0, right: 20, top: 8, bottom: 8),
@@ -255,20 +257,20 @@ class DeleteAccountSheet {
                             .reauthenticateWithCredential(credential)
                             .then((value) {
                           Navigator.pop(context);
-                          openConfirmDeleteAccountMessage(context, bloc);
+                          openConfirmDeleteAccountMessage(context, ref);
                         });
                       }),
                       SizedBox(
                         height: 8,
                       ),
                       GestureDetector(
-                        onTap: () {
-                          context
-                              .read<GoogleAuthenticationService>()
-                              .reauthenticateWithsignInWithGoogle()
+                        onTap: () async {
+                          await ref
+                              .watch(googleAuthenticationServiceProvider)
+                              .reauthenticateWithCredential()
                               .then((value) {
                             Navigator.pop(context);
-                            openConfirmDeleteAccountMessage(context, bloc);
+                            openConfirmDeleteAccountMessage(context, ref);
                           });
                         },
                         child: Container(

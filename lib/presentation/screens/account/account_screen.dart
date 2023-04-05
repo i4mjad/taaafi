@@ -7,43 +7,18 @@ import 'package:reboot_app_3/presentation/screens/account/delete_account.dart';
 import 'package:reboot_app_3/providers/main_providers.dart';
 import 'package:reboot_app_3/shared/components/custom-app-bar.dart';
 import 'package:reboot_app_3/shared/localization/localization.dart';
-import 'package:reboot_app_3/shared/localization/localization_services.dart';
 import 'package:reboot_app_3/bloc_provider.dart';
 import 'package:reboot_app_3/presentation/blocs/account_bloc.dart';
 import 'package:reboot_app_3/presentation/screens/follow_your_reboot/widgets/new_user_widgets.dart';
 import 'package:reboot_app_3/shared/components/change_locale_bottomsheet.dart';
 import 'package:reboot_app_3/shared/constants/textstyles_constants.dart';
-import 'package:provider/provider.dart';
 import 'package:reboot_app_3/presentation/screens/auth/login_screen.dart';
 import 'package:reboot_app_3/shared/constants/constants.dart';
-import 'package:reboot_app_3/shared/services/auth_service.dart';
 import 'package:reboot_app_3/shared/services/notification_service.dart';
 
-class AccountScreen extends StatefulWidget {
-  const AccountScreen({
-    key,
-  }) : super(key: key);
-
+class AccountScreen extends ConsumerWidget {
   @override
-  _AccountScreenState createState() => _AccountScreenState();
-}
-
-class _AccountScreenState extends State<AccountScreen>
-    with TickerProviderStateMixin {
-  String lang;
-  @override
-  void initState() {
-    super.initState();
-
-    LocaleService.getSelectedLocale().then((value) {
-      setState(() {
-        lang = value;
-      });
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final bloc = CustomBlocProvider.of<AccountBloc>(context);
     final theme = Theme.of(context);
     return Scaffold(
@@ -185,10 +160,11 @@ class _AccountScreenState extends State<AccountScreen>
                         Padding(
                           padding: EdgeInsets.only(top: 4, bottom: 4),
                           child: GestureDetector(
-                            onTap: () {
+                            onTap: () async {
                               HapticFeedback.mediumImpact();
-                              context
-                                  .read<GoogleAuthenticationService>()
+
+                              await ref
+                                  .watch(googleAuthenticationServiceProvider)
                                   .signOut();
                             },
                             child: Row(
@@ -227,7 +203,7 @@ class _AccountScreenState extends State<AccountScreen>
                             onTap: () {
                               HapticFeedback.heavyImpact();
                               DeleteAccountSheet.openDeleteAccountMessage(
-                                  context);
+                                  context, ref);
                             },
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.start,

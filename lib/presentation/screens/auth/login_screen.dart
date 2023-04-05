@@ -1,35 +1,15 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:reboot_app_3/providers/main_providers.dart';
 import 'package:reboot_app_3/shared/constants/textstyles_constants.dart';
 import 'package:reboot_app_3/shared/localization/localization.dart';
-import 'package:reboot_app_3/shared/services/auth_service.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
-import 'package:provider/provider.dart';
-
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({
-    Key key,
-  }) : super(key: key);
-
+class LoginScreen extends ConsumerWidget {
   @override
-  _LoginScreenState createState() => _LoginScreenState();
-}
-
-class _LoginScreenState extends State<LoginScreen>
-    with TickerProviderStateMixin {
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  void dispose() {
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     return Scaffold(
         body: Padding(
@@ -118,9 +98,9 @@ class _LoginScreenState extends State<LoginScreen>
                     height: 8,
                   ),
                   GestureDetector(
-                    onTap: () {
-                      context
-                          .read<GoogleAuthenticationService>()
+                    onTap: () async {
+                      await ref
+                          .watch(googleAuthenticationServiceProvider)
                           .signInWithGoogle();
                     },
                     child: Container(

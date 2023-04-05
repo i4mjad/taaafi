@@ -24,7 +24,7 @@ class GoogleAuthenticationService extends ChangeNotifier {
     return await FirebaseAuth.instance.signInWithCredential(credential);
   }
 
-  Future<UserCredential> reauthenticateWithsignInWithGoogle() async {
+  Future<UserCredential> reauthenticateWithCredential() async {
     final GoogleSignInAccount googleUser =
         await GoogleSignIn(scopes: ["email"]).signIn();
 
