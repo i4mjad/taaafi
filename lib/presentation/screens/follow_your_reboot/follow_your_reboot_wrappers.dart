@@ -48,10 +48,7 @@ class UserDocWrapper extends StatelessWidget {
               return Center(child: CircularProgressIndicator());
 
             default:
-              // Completed with error
-              var data = snapshot.data.data();
-
-              if (data == null) {
+              if (snapshot.data.data() == null) {
                 return CustomBlocProvider(
                   bloc: AccountBloc(),
                   child: NewUserSection(),

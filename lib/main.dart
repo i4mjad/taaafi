@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:reboot_app_3/di/container.dart';
+import 'package:reboot_app_3/firebase_options.dart';
 import 'package:reboot_app_3/providers/main_providers.dart';
 import 'package:reboot_app_3/shared/Components/bottom_navbar.dart';
 import 'package:reboot_app_3/shared/components/app-themes.dart';
@@ -20,8 +21,12 @@ import 'package:shared_preferences/shared_preferences.dart';
 bool darkMode = false;
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
 
-  await Firebase.initializeApp();
+
+
   SetupContainer();
 
   InitializationSettings initializationSettings = await setupNotifications();

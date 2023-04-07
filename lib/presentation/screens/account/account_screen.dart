@@ -388,7 +388,10 @@ class AccountScreenScreenAuthenticationWrapper extends ConsumerWidget {
     return userAsyncValue.when(
       data: (User user) {
         if (user == null) return LoginScreen();
-        return CustomBlocProvider(bloc: AccountBloc(), child: AccountScreen());
+        return CustomBlocProvider(
+          bloc: AccountBloc(),
+          child: AccountScreen(),
+        );
       },
       loading: () => CircularProgressIndicator(),
       error: (error, stackTrace) => Text('An error occurred: $error'),

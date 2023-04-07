@@ -15,11 +15,27 @@
       },
       "oauth_client": [
         {
-          "client_id": "364568176835-lv0jqnaopmgek645oci9msqrg7pv9t9h.apps.googleusercontent.com",
+          "client_id": "364568176835-0ke3jcmnqfsmq2pf73dihe6369cekh67.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.amjadkhalfan.reboot_app_3",
+            "certificate_hash": "b8c9e3d306231982b30cf4544fa56905abda8ffb"
+          }
+        },
+        {
+          "client_id": "364568176835-irsejnvii8oird446j74v70ppkhdtnj0.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.amjadkhalfan.reboot_app_3",
             "certificate_hash": "e23b8a0ec8d847283596914cd5585b05f967c90d"
+          }
+        },
+        {
+          "client_id": "364568176835-pdmm0963plcop6ii05qku3r1a9889m25.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.amjadkhalfan.reboot_app_3",
+            "certificate_hash": "a2fba158d2df5cf25407dfa903e0f0546cf29976"
           }
         },
         {
