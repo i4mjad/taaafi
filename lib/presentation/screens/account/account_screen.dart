@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -5,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:reboot_app_3/presentation/screens/account/delete_account.dart';
 import 'package:reboot_app_3/providers/main_providers.dart';
+import 'package:reboot_app_3/providers/user/user_providers.dart';
 import 'package:reboot_app_3/shared/components/custom-app-bar.dart';
 import 'package:reboot_app_3/shared/localization/localization.dart';
 import 'package:reboot_app_3/bloc_provider.dart';
@@ -19,7 +21,6 @@ import 'package:reboot_app_3/shared/services/notification_service.dart';
 class AccountScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final bloc = CustomBlocProvider.of<AccountBloc>(context);
     final theme = Theme.of(context);
     return Scaffold(
         appBar: plainAppBar(context, "account"),
@@ -105,12 +106,13 @@ class AccountScreen extends ConsumerWidget {
                                       ),
                                     ),
                                     Text(
-                                        AppLocalizations.of(context)
-                                            .translate('ui-settings'),
-                                        style: kSubTitlesStyle.copyWith(
-                                            fontSize: 17,
-                                            height: 1.25,
-                                            color: theme.hintColor)),
+                                      AppLocalizations.of(context)
+                                          .translate('ui-settings'),
+                                      style: kSubTitlesStyle.copyWith(
+                                          fontSize: 17,
+                                          height: 1.25,
+                                          color: theme.hintColor),
+                                    ),
                                   ],
                                 ),
                               ],
@@ -125,7 +127,7 @@ class AccountScreen extends ConsumerWidget {
                           child: GestureDetector(
                             onTap: () {
                               HapticFeedback.mediumImpact();
-                              resetUserDialog(context, bloc);
+                              resetUserDialog(context, ref);
                             },
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.start,
@@ -244,7 +246,7 @@ class AccountScreen extends ConsumerWidget {
         ));
   }
 
-  resetUserDialog(BuildContext context, AccountBloc bloc) {
+  resetUserDialog(BuildContext context, WidgetRef ref) {
     showModalBottomSheet(
       context: context,
       builder: (BuildContext context) {
@@ -299,9 +301,10 @@ class AccountScreen extends ConsumerWidget {
                       onTap: () async {
                         var selectedDate = await getDateTime(context);
                         if (selectedDate == null) return;
-                        await bloc
-                            .createNewData(selectedDate)
-                            .then((value) => Navigator.pop(context));
+                        await ref
+                            .watch(userViewModelProvider.notifier)
+                            .createNewData(selectedDate);
+                        Navigator.pop(context);
                       },
                       child: Container(
                         height: 80,
@@ -330,14 +333,14 @@ class AccountScreen extends ConsumerWidget {
   }
 }
 
-class UserProfileCard extends StatelessWidget {
+class UserProfileCard extends ConsumerWidget {
   UserProfileCard({Key key, String lang}) : super(key: key);
 
-  final User user = FirebaseAuth.instance.currentUser;
-
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
+    var userProfile =
+        ref.watch(userViewModelProvider.notifier).getUserProfile();
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -360,13 +363,13 @@ class UserProfileCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Text(
-                  user.displayName ?? "",
+                  userProfile.displayName,
                   style: kTitlePrimeryStyle.copyWith(
                       color: theme.hintColor, fontWeight: FontWeight.w500),
                 ),
                 SizedBox(height: 8),
                 Text(
-                  user.email.toUpperCase() ?? "",
+                  userProfile.email.toUpperCase() ?? "",
                   style: kCaptionStyle.copyWith(
                     color: theme.hintColor.withOpacity(0.75),
                   ),
@@ -381,20 +384,26 @@ class UserProfileCard extends StatelessWidget {
 }
 
 class AccountScreenScreenAuthenticationWrapper extends ConsumerWidget {
+  const AccountScreenScreenAuthenticationWrapper({Key key}) : super(key: key);
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final userAsyncValue = ref.watch(authStateChangesProvider);
+    final userDocAsyncValue = ref.watch(userDocStreamProvider);
 
-    return userAsyncValue.when(
-      data: (User user) {
-        if (user == null) return LoginScreen();
-        return CustomBlocProvider(
-          bloc: AccountBloc(),
-          child: AccountScreen(),
-        );
+    return userDocAsyncValue.when(
+      data: (DocumentSnapshot userDoc) {
+        if (userDoc == null || !userDoc.exists) {
+          return LoginScreen();
+        } else {
+          return CustomBlocProvider(
+            bloc: AccountBloc(),
+            child: AccountScreen(),
+          );
+        }
       },
       loading: () => CircularProgressIndicator(),
       error: (error, stackTrace) => Text('An error occurred: $error'),
     );
   }
 }
+

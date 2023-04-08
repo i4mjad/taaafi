@@ -1,10 +1,16 @@
 {
-    // Remove .fvm files from search
-    "search.exclude": {
-        "**/.fvm": true
-    },
-    // Remove from file watching
-    "files.watcherExclude": {
-        "**/.fvm": true
+  // Remove .fvm files from search
+  "search.exclude": {
+    "**/.fvm": true
+  },
+  // Remove from file watching
+  "files.watcherExclude": {
+    "**/.fvm": true
+  },
+  "[dart]": {
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.removeUnusedImports": true
     }
-} 
+  }
+}

@@ -25,8 +25,6 @@ Future<void> main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-
-
   SetupContainer();
 
   InitializationSettings initializationSettings = await setupNotifications();

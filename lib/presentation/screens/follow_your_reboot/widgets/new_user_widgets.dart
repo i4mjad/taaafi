@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:reboot_app_3/presentation/blocs/follow_your_reboot_bloc.dart';
-
-void newUserDialog(BuildContext context, FollowYourRebootBloc bloc) {
+void newUserDialog(BuildContext context) {
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,
@@ -22,6 +20,7 @@ Future<DateTime> getDateTime(BuildContext context) async {
   var selectedDate = await showDatePicker(
     context: context,
     initialDate: DateTime.now(),
+    currentDate: DateTime.now(),
     firstDate: DateTime(DateTime.now().year - 1),
     lastDate: DateTime.now(),
   );

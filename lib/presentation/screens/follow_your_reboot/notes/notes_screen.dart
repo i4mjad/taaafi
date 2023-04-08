@@ -1,10 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:iconsax/iconsax.dart';
-
-import 'package:reboot_app_3/bloc_provider.dart';
-
-import 'package:reboot_app_3/presentation/blocs/follow_your_reboot_bloc.dart';
 import 'package:reboot_app_3/presentation/screens/follow_your_reboot/notes/add_note_screen.dart';
 import 'package:reboot_app_3/providers/notes/notes_providers.dart';
 import 'package:reboot_app_3/shared/components/custom-app-bar.dart';
@@ -60,7 +56,6 @@ class NotesListView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final notes = ref.watch(noteViewModelProvider);
     final theme = Theme.of(context);
-    // final bloc = CustomBlocProvider.of<FollowYourRebootBloc>(context);
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 16.0),
@@ -72,10 +67,8 @@ class NotesListView extends ConsumerWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (_) => CustomBlocProvider(
-                    bloc: FollowYourRebootBloc(),
-                    child: NoteScreen(note: notes[index], id: notes[index].id),
-                  ),
+                  builder: (_) =>
+                      NoteScreen(note: notes[index], id: notes[index].id),
                 ),
               );
             },

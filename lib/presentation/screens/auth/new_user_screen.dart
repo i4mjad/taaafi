@@ -1,19 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:iconsax/iconsax.dart';
-import 'package:reboot_app_3/bloc_provider.dart';
-import 'package:reboot_app_3/presentation/blocs/account_bloc.dart';
 import 'package:reboot_app_3/presentation/screens/follow_your_reboot/widgets/new_user_widgets.dart';
+import 'package:reboot_app_3/providers/user/user_providers.dart';
 import 'package:reboot_app_3/shared/constants/constants.dart';
 import 'package:reboot_app_3/shared/constants/textstyles_constants.dart';
 import 'package:reboot_app_3/shared/localization/localization.dart';
 
-class NewUserSection extends StatelessWidget {
+class NewUserSection extends ConsumerWidget {
   NewUserSection({Key key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    final bloc = CustomBlocProvider.of<AccountBloc>(context);
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     return Scaffold(
       body: Padding(
@@ -64,8 +63,13 @@ class NewUserSection extends StatelessWidget {
                   GestureDetector(
                     onTap: () async {
                       var selectedDate = await getDateTime(context);
-                      if (selectedDate == null) return;
-                      await bloc.createNewData(selectedDate);
+                      if (selectedDate == null) {
+                        return;
+                      } else {
+                        await ref
+                            .watch(userViewModelProvider.notifier)
+                            .createNewData(selectedDate);
+                      }
                     },
                     child: Container(
                       height: 60,
