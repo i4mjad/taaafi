@@ -8,7 +8,6 @@ import 'package:reboot_app_3/presentation/screens/auth/login_screen.dart';
 import 'package:reboot_app_3/presentation/screens/auth/new_user_screen.dart';
 import 'package:reboot_app_3/presentation/screens/follow_your_reboot/follow_your_reboot_screen.dart';
 import 'package:reboot_app_3/providers/main_providers.dart';
-import 'package:reboot_app_3/providers/user/user_providers.dart';
 
 class FollowYourRebootScreenAuthenticationWrapper extends ConsumerWidget {
   @override
@@ -49,4 +48,3 @@ class UserDocWrapper extends ConsumerWidget {
     );
   }
 }
-
