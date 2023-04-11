@@ -4,8 +4,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:reboot_app_3/bloc_provider.dart';
-import 'package:reboot_app_3/presentation/blocs/account_bloc.dart';
 import 'package:reboot_app_3/providers/main_providers.dart';
 import 'package:reboot_app_3/shared/constants/textstyles_constants.dart';
 import 'package:reboot_app_3/shared/localization/localization.dart';
@@ -154,164 +152,158 @@ class DeleteAccountSheet {
       context: context,
       backgroundColor: theme.scaffoldBackgroundColor,
       builder: (context) {
-        return CustomBlocProvider(
-          bloc: AccountBloc(),
-          child: Builder(builder: (context) {
-            return Padding(
-              padding:
-                  EdgeInsets.only(left: 20.0, right: 20, top: 8, bottom: 8),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                        height: 5,
-                        width: MediaQuery.of(context).size.width * 0.1,
-                        decoration: BoxDecoration(
-                            color: Colors.black12,
-                            borderRadius: BorderRadius.circular(50)),
-                      )
-                    ],
-                  ),
-                  SizedBox(
-                    height: 12,
-                  ),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                        height: 45,
-                        width: 45,
-                        decoration: BoxDecoration(
-                            color: Colors.red.withOpacity(0.3),
-                            borderRadius: BorderRadius.circular(50)),
-                        child: Center(
-                          child: Icon(
-                            Iconsax.trash,
-                            color: Colors.red,
-                          ),
-                        ),
-                      )
-                    ],
-                  ),
+        return Padding(
+          padding: EdgeInsets.only(left: 20.0, right: 20, top: 8, bottom: 8),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
                   Container(
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Flexible(
-                            child: Text(
-                          AppLocalizations.of(context)
-                              .translate('delete-my-account'),
-                          style: kPageTitleStyle.copyWith(
-                              fontSize: 24, color: Colors.red),
-                        ))
-                      ],
+                    height: 5,
+                    width: MediaQuery.of(context).size.width * 0.1,
+                    decoration: BoxDecoration(
+                        color: Colors.black12,
+                        borderRadius: BorderRadius.circular(50)),
+                  )
+                ],
+              ),
+              SizedBox(
+                height: 12,
+              ),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    height: 45,
+                    width: 45,
+                    decoration: BoxDecoration(
+                        color: Colors.red.withOpacity(0.3),
+                        borderRadius: BorderRadius.circular(50)),
+                    child: Center(
+                      child: Icon(
+                        Iconsax.trash,
+                        color: Colors.red,
+                      ),
                     ),
-                  ),
+                  )
+                ],
+              ),
+              Container(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Flexible(
+                        child: Text(
+                      AppLocalizations.of(context)
+                          .translate('delete-my-account'),
+                      style: kPageTitleStyle.copyWith(
+                          fontSize: 24, color: Colors.red),
+                    ))
+                  ],
+                ),
+              ),
+              SizedBox(
+                height: 8,
+              ),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Flexible(
+                      child: Text(
+                    AppLocalizations.of(context)
+                        .translate('delete-my-account-p'),
+                    textAlign: TextAlign.center,
+                    style: kSubTitlesStyle.copyWith(
+                        fontSize: 17,
+                        color: theme.primaryColor,
+                        fontWeight: FontWeight.w400,
+                        height: 1.5),
+                  ))
+                ],
+              ),
+              SizedBox(
+                height: 12,
+              ),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  SignInWithAppleButton(onPressed: () async {
+                    final appleIdCredential =
+                        await SignInWithApple.getAppleIDCredential(
+                      scopes: [
+                        AppleIDAuthorizationScopes.email,
+                        AppleIDAuthorizationScopes.fullName
+                      ],
+                    );
+                    final oAuthProvider = OAuthProvider('apple.com');
+                    final credential = oAuthProvider.credential(
+                      idToken: appleIdCredential.identityToken,
+                      accessToken: appleIdCredential.authorizationCode,
+                    );
+
+                    await FirebaseAuth.instance.currentUser
+                        .reauthenticateWithCredential(credential)
+                        .then((value) {
+                      Navigator.pop(context);
+                      openConfirmDeleteAccountMessage(context, ref);
+                    });
+                  }),
                   SizedBox(
                     height: 8,
                   ),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Flexible(
-                          child: Text(
-                        AppLocalizations.of(context)
-                            .translate('delete-my-account-p'),
-                        textAlign: TextAlign.center,
-                        style: kSubTitlesStyle.copyWith(
-                            fontSize: 17,
-                            color: theme.primaryColor,
-                            fontWeight: FontWeight.w400,
-                            height: 1.5),
-                      ))
-                    ],
-                  ),
-                  SizedBox(
-                    height: 12,
-                  ),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      SignInWithAppleButton(onPressed: () async {
-                        final appleIdCredential =
-                            await SignInWithApple.getAppleIDCredential(
-                          scopes: [
-                            AppleIDAuthorizationScopes.email,
-                            AppleIDAuthorizationScopes.fullName
-                          ],
-                        );
-                        final oAuthProvider = OAuthProvider('apple.com');
-                        final credential = oAuthProvider.credential(
-                          idToken: appleIdCredential.identityToken,
-                          accessToken: appleIdCredential.authorizationCode,
-                        );
-
-                        await FirebaseAuth.instance.currentUser
-                            .reauthenticateWithCredential(credential)
-                            .then((value) {
-                          Navigator.pop(context);
-                          openConfirmDeleteAccountMessage(context, ref);
-                        });
-                      }),
-                      SizedBox(
-                        height: 8,
+                  GestureDetector(
+                    onTap: () async {
+                      await ref
+                          .watch(googleAuthenticationServiceProvider)
+                          .reauthenticateWithCredential()
+                          .then((value) {
+                        Navigator.pop(context);
+                        openConfirmDeleteAccountMessage(context, ref);
+                      });
+                    },
+                    child: Container(
+                      width: MediaQuery.of(context).size.width - 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(8),
+                        color: Colors.blueAccent,
                       ),
-                      GestureDetector(
-                        onTap: () async {
-                          await ref
-                              .watch(googleAuthenticationServiceProvider)
-                              .reauthenticateWithCredential()
-                              .then((value) {
-                            Navigator.pop(context);
-                            openConfirmDeleteAccountMessage(context, ref);
-                          });
-                        },
-                        child: Container(
-                          width: MediaQuery.of(context).size.width - 40,
-                          height: 40,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(8),
-                            color: Colors.blueAccent,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.login,
+                            color: Colors.white,
+                            size: 22,
                           ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.login,
-                                color: Colors.white,
-                                size: 22,
-                              ),
-                              SizedBox(
-                                width: 8,
-                              ),
-                              Text(
-                                'Sign In With Google',
-                                style: kSubTitlesStyle.copyWith(
-                                    fontWeight: FontWeight.w400,
-                                    height: 1,
-                                    fontSize: 20,
-                                    color: Colors.white),
-                              ),
-                            ],
+                          SizedBox(
+                            width: 8,
                           ),
-                        ),
+                          Text(
+                            'Sign In With Google',
+                            style: kSubTitlesStyle.copyWith(
+                                fontWeight: FontWeight.w400,
+                                height: 1,
+                                fontSize: 20,
+                                color: Colors.white),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                  SizedBox(
-                    height: 40,
+                    ),
                   ),
                 ],
               ),
-            );
-          }),
+              SizedBox(
+                height: 40,
+              ),
+            ],
+          ),
         );
       },
     );

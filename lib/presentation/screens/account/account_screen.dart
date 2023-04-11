@@ -8,8 +8,6 @@ import 'package:reboot_app_3/providers/main_providers.dart';
 import 'package:reboot_app_3/providers/user/user_providers.dart';
 import 'package:reboot_app_3/shared/components/custom-app-bar.dart';
 import 'package:reboot_app_3/shared/localization/localization.dart';
-import 'package:reboot_app_3/bloc_provider.dart';
-import 'package:reboot_app_3/presentation/blocs/account_bloc.dart';
 import 'package:reboot_app_3/presentation/screens/follow_your_reboot/widgets/new_user_widgets.dart';
 import 'package:reboot_app_3/shared/components/change_locale_bottomsheet.dart';
 import 'package:reboot_app_3/shared/constants/textstyles_constants.dart';
@@ -394,10 +392,7 @@ class AccountScreenScreenAuthenticationWrapper extends ConsumerWidget {
         if (userDoc == null || !userDoc.exists) {
           return LoginScreen();
         } else {
-          return CustomBlocProvider(
-            bloc: AccountBloc(),
-            child: AccountScreen(),
-          );
+          return AccountScreen();
         }
       },
       loading: () => CircularProgressIndicator(),

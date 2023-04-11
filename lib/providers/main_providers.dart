@@ -18,11 +18,15 @@ final customThemeProvider = ChangeNotifierProvider<CustomTheme>((ref) {
   return CustomTheme();
 });
 
-final userDocStreamProvider = StreamProvider.autoDispose<DocumentSnapshot>((ref) {
+final userDocStreamProvider =
+    StreamProvider.autoDispose<DocumentSnapshot>((ref) {
   final user = ref.watch(authStateChangesProvider).asData.value;
   if (user == null) {
     return Stream.value(null);
   } else {
-    return FirebaseFirestore.instance.collection('users').doc(user.uid).snapshots();
+    return FirebaseFirestore.instance
+        .collection('users')
+        .doc(user.uid)
+        .snapshots();
   }
 });
