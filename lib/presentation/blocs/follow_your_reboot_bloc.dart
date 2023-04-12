@@ -77,28 +77,8 @@ class FollowYourRebootBloc implements CustomBlocBase {
     return await db.getRelapsesCount();
   }
 
-  Future<void> createNewData(DateTime selectedDate) async {
-    return await db.createNewData(selectedDate);
-  }
-
   Future<String> getRelapsesCountInLast30Days() async {
     return await db.getRelapsesCountInLast30Days();
-  }
-
-  Stream<QuerySnapshot> getNotes() {
-    return db.getNotes();
-  }
-
-  Future<void> updateNote(String id, String title, String body) async {
-    return await db.updateNote(id, title, body);
-  }
-
-  Future<void> addNote(String title, String body) async {
-    return await db.addNote(title, body);
-  }
-
-  Future<void> deleteNote(String id) async {
-    return await db.deleteNote(id);
   }
 
   @override

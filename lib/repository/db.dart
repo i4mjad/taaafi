@@ -39,7 +39,9 @@ class DB {
         await snapshot.get('userFirstDate').toDate().toString());
   }
 
+//TODO #1: this method contains buisness logic and should be moved to the viewmodel
   Future<List<CalenderDay>> getCalenderData() async {
+    //TODO: the two lines below are repository methods. Dont move them to viewmodel when you move the buisness logic. Instead, use the injected repository to get them
     FollowUpData _followUpDate = await getFollowUpData();
     DateTime _startingDate = await getStartingDate();
     var daysArray = <CalenderDay>[];
@@ -90,6 +92,7 @@ class DB {
     return await daysArray;
   }
 
+//TODO #2: same as #1
   Future<int> getRelapseStreak() async {
     final firstdate = await getStartingDate();
     final followUpData = await getFollowUpData();
@@ -107,6 +110,7 @@ class DB {
     }
   }
 
+//TODO #3: same as #1
   Future<int> getNoPornStreak() async {
     //Get firstUserDate
     final firstdate = await getStartingDate();
@@ -130,6 +134,7 @@ class DB {
     }
   }
 
+//TODO #4: same as #1
   Future<int> getNoMastsStreak() async {
     //Get firstUserDate
     final firstdate = await getStartingDate();
@@ -153,6 +158,7 @@ class DB {
     }
   }
 
+//TODO #5: this method when moved to the repository should ONLY add to the database. The buisness logic should be in the viewmodel layer
   addRelapse(String date) async {
     FollowUpData _followUpData = await getFollowUpData();
     List<dynamic> _watchOnly = _followUpData.pornWithoutMasterbation;
@@ -173,6 +179,7 @@ class DB {
     });
   }
 
+//TODO #6: same as #5
   addSuccess(String date) async {
     FollowUpData _followUpData = await getFollowUpData();
     List<dynamic> _watchOnly = _followUpData.pornWithoutMasterbation;
@@ -196,6 +203,7 @@ class DB {
     });
   }
 
+//TODO #7: same as #5
   addWatchOnly(String date) async {
     FollowUpData _followUpData = await getFollowUpData();
     List<dynamic> _days = _followUpData.pornWithoutMasterbation;
@@ -209,6 +217,7 @@ class DB {
         .update({"userWatchingWithoutMasturbating": _days});
   }
 
+//TODO #8: same as #5
   addMastOnly(String date) async {
     FollowUpData _followUpData = await getFollowUpData();
     List<dynamic> _days = _followUpData.masterbationWithoutPorn;
@@ -221,6 +230,7 @@ class DB {
         .update({"userMasturbatingWithoutWatching": _days});
   }
 
+//TODO #9: same as #5
   Future<DayOfWeekRelapses> getRelapsesByDayOfWeek() async {
     var followUpData = await getFollowUpData();
     var userRelapses = followUpData.relapses;
@@ -274,6 +284,7 @@ class DB {
     return dayOfWeekRelapses;
   }
 
+//TODO #10: same as #5
   Future<String> getHighestStreak() async {
     FollowUpData _followUpData = await getFollowUpData();
     List<dynamic> _relapses = await _followUpData.relapses;
@@ -323,6 +334,7 @@ class DB {
     return differences.reduce((max)).toString();
   }
 
+//TODO #11: same as #5
   Future<String> getTotalDaysWithoutRelapse() async {
     FollowUpData _followUpData = await getFollowUpData();
     List<dynamic> _relapses = _followUpData.relapses;
@@ -338,6 +350,7 @@ class DB {
     return daysWithoutRelapses.toString();
   }
 
+//TODO #12: same as #5
   Future<String> getTotalDaysFromBegining() async {
     var _firstDate = await getStartingDate();
 
@@ -345,6 +358,7 @@ class DB {
     return totalDays.toString();
   }
 
+//TODO #13: same as #5
   Future<String> getRelapsesCount() async {
     FollowUpData _followUpData = await getFollowUpData();
     List<dynamic> _relapses = _followUpData.relapses;
@@ -352,18 +366,8 @@ class DB {
     return _relapses.length.toString();
   }
 
-  Future<void> createNewData(DateTime selectedDate) {
-    return db.collection("users").doc(user.uid).set({
-      "uid": uid,
-      "userFirstDate": selectedDate,
-      "email": user.email,
-      "userRelapses": [],
-      "userMasturbatingWithoutWatching": [],
-      "userWatchingWithoutMasturbating": [],
-    });
-  }
-
   void checkData() async {
+    //TODO: this method need to be tracked to see if it is still used, consider checking the Firebase Analytics custom events to achieve this.
     return await db.collection("users").doc(uid).get().then((value) async {
       Map<String, dynamic> data = value.data();
       if (!(await data.containsKey("userRelapses"))) {
@@ -388,6 +392,7 @@ class DB {
   }
 
   void migerateToUserFirstDate() async {
+    //TODO: this method need to be tracked to see if it is still used by any user, consider checking the Firebase Analytics custom events to achieve this.
     var _db = db.collection("users").doc(user.uid);
 
     _db.get().then((value) async {
@@ -439,57 +444,6 @@ class DB {
       }
     }
     return await _count.toString();
-  }
-
-  Stream<QuerySnapshot> getNotes() {
-    return db.collection("users").doc(uid).collection("userNotes").snapshots();
-  }
-
-  Future<void> updateNote(String id, String title, String body) async {
-    var data = {
-      "title": title.toString(),
-      "body": body.toString(),
-    };
-
-    return db
-        .collection("users")
-        .doc(uid)
-        .collection("userNotes")
-        .doc(id)
-        .update(data);
-  }
-
-  Future<void> addNote(String title, String body) async {
-    var data = {
-      'title': title.toString(),
-      "body": body.toString(),
-      "timestamp": DateTime.now()
-    };
-    return db
-        .collection("users")
-        .doc(uid)
-        .collection("userNotes")
-        .doc()
-        .set(data, SetOptions(merge: true));
-  }
-
-  Future<void> deleteNote(String id) async {
-    return await db
-        .collection("users")
-        .doc(uid)
-        .collection("userNotes")
-        .doc(id)
-        .delete();
-  }
-
-  Future<bool> isUserDocExist() async {
-    DocumentSnapshot snapshot = await db.collection("users").doc(uid).get();
-
-    return await snapshot.exists;
-  }
-
-  Future<void> deleteUserData() async {
-    return await db.collection("users").doc(uid).delete();
   }
 }
 
