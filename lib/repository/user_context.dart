@@ -6,6 +6,7 @@ import 'package:reboot_app_3/data/models/UserProfile.dart';
 import 'package:rxdart/rxdart.dart';
 
 abstract class IUserContext {
+  String get uid;
   Stream<DocumentSnapshot> getUserDoc();
   Future<void> createNewData(DateTime date);
   Stream<bool> isUserDocExist();
@@ -90,4 +91,7 @@ class FireStoreUserContext implements IUserContext {
     final user = _auth.currentUser;
     return UserProfile.fromFirebaseUser(user);
   }
+
+  @override
+  String get uid => _auth.currentUser.uid;
 }
