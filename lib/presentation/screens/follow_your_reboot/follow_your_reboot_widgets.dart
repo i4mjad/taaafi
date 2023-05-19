@@ -1,23 +1,27 @@
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:reboot_app_3/bloc_provider.dart';
 import 'package:reboot_app_3/data/models/CalenderDay.dart';
+import 'package:reboot_app_3/data/models/FollowUpData.dart';
 import 'package:reboot_app_3/presentation/blocs/follow_your_reboot_bloc.dart';
 import 'package:reboot_app_3/presentation/screens/follow_your_reboot/calender/calender_data_model.dart';
 import 'package:reboot_app_3/presentation/screens/follow_your_reboot/day_of_week_relapses/day_of_week_relapses_widget.dart';
+import 'package:reboot_app_3/providers/followup/followup_providers.dart';
 import 'package:reboot_app_3/shared/components/snackbar.dart';
 import 'package:reboot_app_3/shared/constants/constants.dart';
 import 'package:reboot_app_3/shared/constants/textstyles_constants.dart';
 import 'package:reboot_app_3/shared/localization/localization.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 
-class RebootCalender extends StatelessWidget {
+class RebootCalender extends ConsumerWidget {
   const RebootCalender({Key key, this.bloc}) : super(key: key);
   final bloc;
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final followUpData = ref.watch(followupViewModelProvider.notifier);
     final theme = Theme.of(context);
     return Padding(
       padding: EdgeInsets.only(right: 16, left: 16),
@@ -40,7 +44,7 @@ class RebootCalender extends StatelessWidget {
                     color: mainGrayColor,
                     borderRadius: BorderRadius.circular(15)),
                 child: FutureBuilder(
-                  future: bloc.getCalenderData(),
+                  future: followUpData.getCalenderData(),
                   initialData: [
                     new CalenderDay("relapse", DateTime.now(), Colors.black)
                   ],
@@ -338,7 +342,6 @@ class RelapsesByDayOfWeek extends StatelessWidget {
                       ),
                     ],
                   ),
-                  
                   Divider(),
                   DayOfWeekWidget(
                     day: "sun",
@@ -433,16 +436,16 @@ class DayOfWeekWidget extends StatelessWidget {
           Container(
             padding: EdgeInsets.only(right: 4, left: 4),
             width: MediaQuery.of(context).size.width - 150,
-            child: Builder(builder: (BuildContext context){
-             if (percentage.isNaN || percentage.isInfinite){
-               return Container();
-             } else {
-               return LinearProgressIndicator(
-                 backgroundColor: Colors.grey[400],
-                 value: percentage,
-                 valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
-               );
-             }
+            child: Builder(builder: (BuildContext context) {
+              if (percentage.isNaN || percentage.isInfinite) {
+                return Container();
+              } else {
+                return LinearProgressIndicator(
+                  backgroundColor: Colors.grey[400],
+                  value: percentage,
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
+                );
+              }
             }),
           ),
           CircleAvatar(
