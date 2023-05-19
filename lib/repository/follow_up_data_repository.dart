@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:reboot_app_3/data/models/FollowUpData.dart';
@@ -6,6 +8,7 @@ import 'package:reboot_app_3/repository/user_context.dart';
 
 abstract class IFollowUpDataRepository {
   Future<FollowUpData> getFollowUpData();
+  Stream<FollowUpData> getFollowUpDataStream();
   Future<DateTime> getResetDate();
   Future<DateTime> getStartingDate();
   Future<void> addDayRecord(Map data);
@@ -14,6 +17,7 @@ abstract class IFollowUpDataRepository {
 class FirebaseFollowUpDataRepository implements IFollowUpDataRepository {
   FirebaseFirestore _db;
   IUserContext _userContext;
+  final _followUpDateController = StreamController<FollowUpData>();
 
   FirebaseFollowUpDataRepository() {
     _db = FirebaseFirestore.instance;
@@ -56,5 +60,16 @@ class FirebaseFollowUpDataRepository implements IFollowUpDataRepository {
     var startingDate =
         DateTime.parse(await snapshot.get('userFirstDate').toDate().toString());
     return startingDate;
+  }
+
+  @override
+  Stream<FollowUpData> getFollowUpDataStream() {
+    final snapshot = _db.collection("users").doc(_userContext.uid);
+    snapshot.snapshots().listen((event) {
+      final followUpData = FollowUpData.fromSnapshot(event);
+      _followUpDateController.add(followUpData);
+    });
+
+    return _followUpDateController.stream;
   }
 }
