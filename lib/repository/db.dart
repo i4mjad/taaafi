@@ -19,8 +19,6 @@ class DB {
   }
 
   Future<FollowUpData> getFollowUpData() async {
-    await checkData();
-
     DocumentSnapshot snapshot = await db.collection("users").doc(uid).get();
     return FollowUpData.fromSnapshot(snapshot);
   }
@@ -366,31 +364,6 @@ class DB {
     return _relapses.length.toString();
   }
 
-  void checkData() async {
-    //TODO: this method need to be tracked to see if it is still used, consider checking the Firebase Analytics custom events to achieve this.
-    return await db.collection("users").doc(uid).get().then((value) async {
-      Map<String, dynamic> data = value.data();
-      if (!(await data.containsKey("userRelapses"))) {
-        await db.collection("users").doc(user.uid).set({
-          "userRelapses": [],
-        }, SetOptions(merge: true));
-      }
-      if (!(await data.containsKey("userWatchingWithoutMasturbating"))) {
-        await db.collection("users").doc(user.uid).set({
-          "userWatchingWithoutMasturbating": [],
-        }, SetOptions(merge: true));
-      }
-      if (!(await data.containsKey("userMasturbatingWithoutWatching"))) {
-        await db.collection("users").doc(user.uid).set({
-          "userMasturbatingWithoutWatching": [],
-        }, SetOptions(merge: true));
-      }
-      if (!(await data.containsKey("userFirstDate"))) {
-        await migerateToUserFirstDate();
-      }
-    });
-  }
-
   void migerateToUserFirstDate() async {
     //TODO: this method need to be tracked to see if it is still used by any user,
     // consider checking the Firebase Analytics custom events to achieve this.
@@ -421,7 +394,6 @@ class DB {
   }
 
   Future<String> getRelapsesCountInLast30Days() async {
-    await checkData();
     int _count = 0;
     FollowUpData _followUpDate = await getFollowUpData();
     List relapses = _followUpDate.relapses;
