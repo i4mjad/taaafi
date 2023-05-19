@@ -392,7 +392,8 @@ class DB {
   }
 
   void migerateToUserFirstDate() async {
-    //TODO: this method need to be tracked to see if it is still used by any user, consider checking the Firebase Analytics custom events to achieve this.
+    //TODO: this method need to be tracked to see if it is still used by any user,
+    // consider checking the Firebase Analytics custom events to achieve this.
     var _db = db.collection("users").doc(user.uid);
 
     _db.get().then((value) async {
