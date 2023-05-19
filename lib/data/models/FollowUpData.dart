@@ -19,4 +19,7 @@ class FollowUpData {
     pornWithoutMasterbation = snapshot['userWatchingWithoutMasturbating'];
     masterbationWithoutPorn = snapshot['userMasturbatingWithoutWatching'];
   }
+
+  static FollowUpData Missing =
+      new FollowUpData(DateTime.now() as Timestamp, [], [], []);
 }
