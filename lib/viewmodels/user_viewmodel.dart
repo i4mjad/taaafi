@@ -22,6 +22,7 @@ class UserViewModel extends StateNotifier<UserProfile> {
     } catch (error) {
       print('Error creating new data: $error');
       // handle the error here, e.g. show an error message to the user
+      //TODO: consider checking a prober way to display the error using a snackbar for examnple.
     }
   }
 
