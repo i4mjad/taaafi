@@ -5,7 +5,6 @@ import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:reboot_app_3/bloc_provider.dart';
 import 'package:reboot_app_3/data/models/CalenderDay.dart';
-import 'package:reboot_app_3/data/models/FollowUpData.dart';
 import 'package:reboot_app_3/presentation/blocs/follow_your_reboot_bloc.dart';
 import 'package:reboot_app_3/presentation/screens/follow_your_reboot/calender/calender_data_model.dart';
 import 'package:reboot_app_3/presentation/screens/follow_your_reboot/day_of_week_relapses/day_of_week_relapses_widget.dart';

@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:reboot_app_3/data/models/CalenderDay.dart';
 import 'package:reboot_app_3/bloc_provider.dart';
 import 'package:reboot_app_3/data/models/FollowUpData.dart';
 import 'package:reboot_app_3/presentation/screens/follow_your_reboot/day_of_week_relapses/day_of_week_relapses_widget.dart';
@@ -19,10 +18,6 @@ class FollowYourRebootBloc implements CustomBlocBase {
   readFollowUpData() async {
     FollowUpData data = await db.getFollowUpData();
     return data;
-  }
-
-  Future<List<CalenderDay>> getCalenderData() async {
-    return await db.getCalenderData();
   }
 
   Future<int> getRelapseStreak() async {
