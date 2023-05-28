@@ -101,7 +101,7 @@ class FollowUpStreaks extends ConsumerWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
                         FutureBuilder(
-                            future: bloc.getNoMastsStreak(),
+                            future: followUpData.getNoMastsStreak(),
                             initialData: 0,
                             builder: (BuildContext context,
                                 AsyncSnapshot<int> snapshot) {
@@ -138,7 +138,7 @@ class FollowUpStreaks extends ConsumerWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       FutureBuilder(
-                          future: bloc.getNoPornStreak(),
+                          future: followUpData.getNoPornStreak(),
                           initialData: 0,
                           builder: (BuildContext context,
                               AsyncSnapshot<int> snapshot) {

@@ -83,4 +83,39 @@ class FollowUpViewModel extends StateNotifier<FollowUpData> {
       return await today.difference(firstdate).inDays;
     }
   }
+
+  Future<int> getNoPornStreak() async {
+    final firstdate = await _followUpRepository.getStartingDate();
+    final followUpData = await _followUpRepository.getFollowUpData();
+    List<dynamic> userNoPornDays = followUpData.pornWithoutMasterbation;
+    var today = DateTime.now();
+
+    if (userNoPornDays.length > 0) {
+      userNoPornDays.sort((a, b) {
+        return a.compareTo(b);
+      });
+      final lastNoPornDayStr = userNoPornDays[userNoPornDays.length - 1];
+      final lastNoPornDay = DateTime.parse(lastNoPornDayStr);
+      return await today.difference(lastNoPornDay).inDays;
+    } else {
+      return await today.difference(firstdate).inDays;
+    }
+  }
+
+  Future<int> getNoMastsStreak() async {
+    final firstdate = await _followUpRepository.getStartingDate();
+    final followUpData = await _followUpRepository.getFollowUpData();
+    List<dynamic> userNoMastDays = followUpData.masterbationWithoutPorn;
+    var today = DateTime.now();
+    if (userNoMastDays.length > 0) {
+      userNoMastDays.sort((a, b) {
+        return a.compareTo(b);
+      });
+      final lastNoMastDayStr = userNoMastDays[userNoMastDays.length - 1];
+      final lastNoMastDay = DateTime.parse(lastNoMastDayStr);
+      return await today.difference(lastNoMastDay).inDays;
+    } else {
+      return await today.difference(firstdate).inDays;
+    }
+  }
 }

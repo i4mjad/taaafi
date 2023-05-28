@@ -35,56 +35,6 @@ class DB {
         await snapshot.get('userFirstDate').toDate().toString());
   }
 
-//TODO #1: this method contains buisness logic and should be moved to the viewmodel
-
-//TODO #3: same as #1
-  Future<int> getNoPornStreak() async {
-    //Get firstUserDate
-    final firstdate = await getStartingDate();
-    //Get userRelapses List
-    final followUpData = await getFollowUpData();
-    List<dynamic> userNoPornDays = followUpData
-        .pornWithoutMasterbation; //if the userRelapses List contains no relapses
-    var today = DateTime.now();
-    //if the userRelapses List contains more than one relapse
-    if (userNoPornDays.length > 0) {
-      userNoPornDays.sort((a, b) {
-        return a.compareTo(b);
-      });
-      final lastNoPornDayStr = userNoPornDays[userNoPornDays.length - 1];
-      //make a date from the last relapse
-      final lastNoPornDay = DateTime.parse(lastNoPornDayStr);
-      //calculate the current streak by making time interval between today and the last
-      return await today.difference(lastNoPornDay).inDays;
-    } else {
-      return await today.difference(firstdate).inDays;
-    }
-  }
-
-//TODO #4: same as #1
-  Future<int> getNoMastsStreak() async {
-    //Get firstUserDate
-    final firstdate = await getStartingDate();
-    //Get userRelapses List
-    final followUpData = await getFollowUpData();
-    List<dynamic> userNoMastDays = followUpData
-        .masterbationWithoutPorn; //if the userRelapses List contains no relapses
-    var today = DateTime.now();
-    //if the userRelapses List contains more than one relapse
-    if (userNoMastDays.length > 0) {
-      userNoMastDays.sort((a, b) {
-        return a.compareTo(b);
-      });
-      final lastNoMastDayStr = userNoMastDays[userNoMastDays.length - 1];
-      //make a date from the last relapse
-      final lastNoMastDay = DateTime.parse(lastNoMastDayStr);
-      //calculate the current streak by making time interval between today and the last
-      return await today.difference(lastNoMastDay).inDays;
-    } else {
-      return await today.difference(firstdate).inDays;
-    }
-  }
-
 //TODO #5: this method when moved to the repository should ONLY add to the database. The buisness logic should be in the viewmodel layer
   addRelapse(String date) async {
     FollowUpData _followUpData = await getFollowUpData();
