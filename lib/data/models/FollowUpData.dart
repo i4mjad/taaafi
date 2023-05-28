@@ -9,15 +9,17 @@ class FollowUpData {
   );
 
   Timestamp userFirstDate;
-  List<dynamic> relapses;
-  List<dynamic> pornWithoutMasterbation;
-  List<dynamic> masterbationWithoutPorn;
+  List<String> relapses;
+  List<String> pornWithoutMasterbation;
+  List<String> masterbationWithoutPorn;
 
   FollowUpData.fromSnapshot(DocumentSnapshot snapshot) {
     userFirstDate = snapshot['userFirstDate'];
-    relapses = snapshot['userRelapses'];
-    pornWithoutMasterbation = snapshot['userWatchingWithoutMasturbating'];
-    masterbationWithoutPorn = snapshot['userMasturbatingWithoutWatching'];
+    relapses = List<String>.from(snapshot['userRelapses']);
+    pornWithoutMasterbation =
+        List<String>.from(snapshot['userWatchingWithoutMasturbating']);
+    masterbationWithoutPorn =
+        List<String>.from(snapshot['userMasturbatingWithoutWatching']);
   }
 
   static FollowUpData Missing = new FollowUpData(Timestamp.now(), [], [], []);

@@ -38,9 +38,9 @@ class DB {
 //TODO #5: this method when moved to the repository should ONLY add to the database. The buisness logic should be in the viewmodel layer
   addRelapse(String date) async {
     FollowUpData _followUpData = await getFollowUpData();
-    List<dynamic> _watchOnly = _followUpData.pornWithoutMasterbation;
-    List<dynamic> _mastOnly = _followUpData.masterbationWithoutPorn;
-    List<dynamic> _relapses = _followUpData.relapses;
+    List<String> _watchOnly = _followUpData.pornWithoutMasterbation;
+    List<String> _mastOnly = _followUpData.masterbationWithoutPorn;
+    List<String> _relapses = _followUpData.relapses;
 
     if (_watchOnly.contains(date)) return;
     if (_mastOnly.contains(date)) return;
@@ -59,9 +59,9 @@ class DB {
 //TODO #6: same as #5
   addSuccess(String date) async {
     FollowUpData _followUpData = await getFollowUpData();
-    List<dynamic> _watchOnly = _followUpData.pornWithoutMasterbation;
-    List<dynamic> _mastOnly = _followUpData.masterbationWithoutPorn;
-    List<dynamic> _relapses = _followUpData.relapses;
+    List<String> _watchOnly = _followUpData.pornWithoutMasterbation;
+    List<String> _mastOnly = _followUpData.masterbationWithoutPorn;
+    List<String> _relapses = _followUpData.relapses;
 
     if (_watchOnly.contains(date)) {
       _watchOnly.remove(date);
@@ -83,7 +83,7 @@ class DB {
 //TODO #7: same as #5
   addWatchOnly(String date) async {
     FollowUpData _followUpData = await getFollowUpData();
-    List<dynamic> _days = _followUpData.pornWithoutMasterbation;
+    List<String> _days = _followUpData.pornWithoutMasterbation;
 
     if (_days.contains(date)) return;
     _days.add(date);
@@ -97,7 +97,7 @@ class DB {
 //TODO #8: same as #5
   addMastOnly(String date) async {
     FollowUpData _followUpData = await getFollowUpData();
-    List<dynamic> _days = _followUpData.masterbationWithoutPorn;
+    List<String> _days = _followUpData.masterbationWithoutPorn;
 
     if (_days.contains(date)) return;
     _days.add(date);
@@ -164,7 +164,7 @@ class DB {
 //TODO #10: same as #5
   Future<String> getHighestStreak() async {
     FollowUpData _followUpData = await getFollowUpData();
-    List<dynamic> _relapses = await _followUpData.relapses;
+    List<String> _relapses = await _followUpData.relapses;
 
     if (_relapses == null || _relapses.length == 0) return "0";
 
@@ -214,7 +214,7 @@ class DB {
 //TODO #11: same as #5
   Future<String> getTotalDaysWithoutRelapse() async {
     FollowUpData _followUpData = await getFollowUpData();
-    List<dynamic> _relapses = _followUpData.relapses;
+    List<String> _relapses = _followUpData.relapses;
 
     if (_followUpData.relapses == null) return "0";
 
@@ -238,7 +238,7 @@ class DB {
 //TODO #13: same as #5
   Future<String> getRelapsesCount() async {
     FollowUpData _followUpData = await getFollowUpData();
-    List<dynamic> _relapses = _followUpData.relapses;
+    List<String> _relapses = _followUpData.relapses;
 
     return _relapses.length.toString();
   }

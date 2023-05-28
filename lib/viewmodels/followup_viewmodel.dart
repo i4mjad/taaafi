@@ -70,7 +70,7 @@ class FollowUpViewModel extends StateNotifier<FollowUpData> {
   Future<int> getRelapseStreak() async {
     final firstdate = await _followUpRepository.getStartingDate();
     final followUpData = await _followUpRepository.getFollowUpData();
-    List<dynamic> userRelapses = followUpData.relapses;
+    List<String> userRelapses = followUpData.relapses;
     var today = DateTime.now();
     if (userRelapses.length > 0) {
       userRelapses.sort((a, b) {
@@ -87,7 +87,7 @@ class FollowUpViewModel extends StateNotifier<FollowUpData> {
   Future<int> getNoPornStreak() async {
     final firstdate = await _followUpRepository.getStartingDate();
     final followUpData = await _followUpRepository.getFollowUpData();
-    List<dynamic> userNoPornDays = followUpData.pornWithoutMasterbation;
+    List<String> userNoPornDays = followUpData.pornWithoutMasterbation;
     var today = DateTime.now();
 
     if (userNoPornDays.length > 0) {
@@ -105,7 +105,7 @@ class FollowUpViewModel extends StateNotifier<FollowUpData> {
   Future<int> getNoMastsStreak() async {
     final firstdate = await _followUpRepository.getStartingDate();
     final followUpData = await _followUpRepository.getFollowUpData();
-    List<dynamic> userNoMastDays = followUpData.masterbationWithoutPorn;
+    List<String> userNoMastDays = followUpData.masterbationWithoutPorn;
     var today = DateTime.now();
     if (userNoMastDays.length > 0) {
       userNoMastDays.sort((a, b) {
