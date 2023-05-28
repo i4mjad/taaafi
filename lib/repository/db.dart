@@ -37,24 +37,6 @@ class DB {
 
 //TODO #1: this method contains buisness logic and should be moved to the viewmodel
 
-//TODO #2: same as #1
-  Future<int> getRelapseStreak() async {
-    final firstdate = await getStartingDate();
-    final followUpData = await getFollowUpData();
-    List<dynamic> userRelapses = followUpData.relapses;
-    var today = DateTime.now();
-    if (userRelapses.length > 0) {
-      userRelapses.sort((a, b) {
-        return a.compareTo(b);
-      });
-      final lastRelapseDayStr = userRelapses[userRelapses.length - 1];
-      final lastRelapseDay = DateTime.parse(lastRelapseDayStr);
-      return await today.difference(lastRelapseDay).inDays;
-    } else {
-      return await today.difference(firstdate).inDays;
-    }
-  }
-
 //TODO #3: same as #1
   Future<int> getNoPornStreak() async {
     //Get firstUserDate

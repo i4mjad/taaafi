@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:reboot_app_3/bloc_provider.dart';
 import 'package:reboot_app_3/presentation/blocs/follow_your_reboot_bloc.dart';
+import 'package:reboot_app_3/providers/followup/followup_providers.dart';
 import 'package:reboot_app_3/providers/main_providers.dart';
 import 'package:reboot_app_3/providers/user/user_providers.dart';
 import 'package:reboot_app_3/shared/constants/constants.dart';
@@ -80,14 +81,15 @@ class NotSignIn extends StatelessWidget {
   }
 }
 
-class WelcomeContent extends StatelessWidget {
+class WelcomeContent extends ConsumerWidget {
   const WelcomeContent({
     Key key,
   }) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final bloc = CustomBlocProvider.of<FollowYourRebootBloc>(context);
+    final followUpData = ref.watch(followupViewModelProvider.notifier);
     final theme = Theme.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -113,7 +115,7 @@ class WelcomeContent extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   FutureBuilder(
-                    future: bloc.getRelapseStreak(),
+                    future: followUpData.getRelapseStreak(),
                     initialData: 0,
                     builder: (BuildContext context, AsyncSnapshot<int> streak) {
                       switch (streak.connectionState) {

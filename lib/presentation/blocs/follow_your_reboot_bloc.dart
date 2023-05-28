@@ -20,10 +20,6 @@ class FollowYourRebootBloc implements CustomBlocBase {
     return data;
   }
 
-  Future<int> getRelapseStreak() async {
-    return await db.getRelapseStreak();
-  }
-
   Future<int> getNoPornStreak() async {
     return await db.getNoPornStreak();
   }

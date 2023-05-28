@@ -1,16 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:reboot_app_3/presentation/screens/follow_your_reboot/follow_your_reboot_widgets.dart';
+import 'package:reboot_app_3/providers/followup/followup_providers.dart';
 import 'package:reboot_app_3/shared/constants/textstyles_constants.dart';
 import 'package:reboot_app_3/shared/localization/localization.dart';
 
-class FollowUpStreaks extends StatelessWidget {
+class FollowUpStreaks extends ConsumerWidget {
   FollowUpStreaks({Key key, this.bloc}) : super(key: key);
   final bloc;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
+    final followUpData = ref.watch(followupViewModelProvider.notifier);
     return Container(
       child: Padding(
         padding: EdgeInsets.only(right: 16.0, left: 16.0),
@@ -41,7 +44,7 @@ class FollowUpStreaks extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
                           FutureBuilder(
-                            future: bloc.getRelapseStreak(),
+                            future: followUpData.getRelapseStreak(),
                             initialData: 0,
                             builder: (BuildContext context,
                                 AsyncSnapshot<int> snapshot) {

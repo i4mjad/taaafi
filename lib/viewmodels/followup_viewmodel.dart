@@ -66,4 +66,21 @@ class FollowUpViewModel extends StateNotifier<FollowUpData> {
 
     return await daysArray;
   }
+
+  Future<int> getRelapseStreak() async {
+    final firstdate = await _followUpRepository.getStartingDate();
+    final followUpData = await _followUpRepository.getFollowUpData();
+    List<dynamic> userRelapses = followUpData.relapses;
+    var today = DateTime.now();
+    if (userRelapses.length > 0) {
+      userRelapses.sort((a, b) {
+        return a.compareTo(b);
+      });
+      final lastRelapseDayStr = userRelapses[userRelapses.length - 1];
+      final lastRelapseDay = DateTime.parse(lastRelapseDayStr);
+      return await today.difference(lastRelapseDay).inDays;
+    } else {
+      return await today.difference(firstdate).inDays;
+    }
+  }
 }
