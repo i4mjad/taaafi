@@ -24,10 +24,6 @@ class FollowYourRebootBloc implements CustomBlocBase {
     return await db.getStartingDate();
   }
 
-  void addRelapse(String date) async {
-    await db.addRelapse(date);
-  }
-
   void addSuccess(String date) async {
     await db.addSuccess(date);
   }
