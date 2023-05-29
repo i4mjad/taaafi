@@ -11,7 +11,7 @@ abstract class IFollowUpDataRepository {
   Stream<FollowUpData> getFollowUpDataStream();
   Future<DateTime> getResetDate();
   Future<DateTime> getStartingDate();
-  Future<void> addDayRecord(Map data);
+  Future<void> updateFollowUpData(Map data);
 }
 
 class FirebaseFollowUpDataRepository implements IFollowUpDataRepository {
@@ -31,7 +31,7 @@ class FirebaseFollowUpDataRepository implements IFollowUpDataRepository {
   }
 
   @override
-  Future<void> addDayRecord(Map data) async {
+  Future<void> updateFollowUpData(Map data) async {
     final uid = _userContext.uid;
     await _db.collection("users").doc(uid).update(data);
   }
