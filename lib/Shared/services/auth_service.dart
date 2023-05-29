@@ -49,6 +49,7 @@ class GoogleAuthenticationService extends ChangeNotifier {
       await FirebaseAuth.instance.currentUser.delete();
     } on FirebaseAuthException catch (e) {
       if (e.code == 'requires-recent-login') {
+        //ُTODO: consider displaying the error in a snack bar
         print(
             'The user must reauthenticate before this operation can be executed.');
       }
