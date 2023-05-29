@@ -13,6 +13,7 @@ import 'package:reboot_app_3/shared/components/snackbar.dart';
 import 'package:reboot_app_3/shared/constants/constants.dart';
 import 'package:reboot_app_3/shared/constants/textstyles_constants.dart';
 import 'package:reboot_app_3/shared/localization/localization.dart';
+import 'package:reboot_app_3/viewmodels/followup_viewmodel.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 
 class RebootCalender extends ConsumerWidget {
@@ -55,7 +56,8 @@ class RebootCalender extends ConsumerWidget {
                         DateTime date = details.date;
                         DateTime firstDate = await bloc.getFirstDate();
 
-                        dateChecker(firstDate, date, context, bloc);
+                        dateChecker(
+                            firstDate, date, context, bloc, followUpData);
                       },
                       view: CalendarView.month,
                       headerStyle: CalendarHeaderStyle(
@@ -468,8 +470,8 @@ String getTodaysDateString() {
   return today;
 }
 
-changeDateEvent(
-    String date, BuildContext context, FollowYourRebootBloc bloc) async {
+changeDateEvent(String date, BuildContext context, FollowYourRebootBloc bloc,
+    FollowUpViewModel followUpViewModel) async {
   final trimedDate = date.trim();
   final theme = Theme.of(context);
   showModalBottomSheet(
@@ -514,7 +516,7 @@ changeDateEvent(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   GestureDetector(
-                    onTap: () {
+                    onTap: () async {
                       bloc.addSuccess(date);
                       HapticFeedback.mediumImpact();
                       Navigator.pop(context);
@@ -555,8 +557,8 @@ changeDateEvent(
                     ),
                   ),
                   GestureDetector(
-                    onTap: () {
-                      bloc.addRelapse(date);
+                    onTap: () async {
+                      await followUpViewModel.addRelapse(date);
                       HapticFeedback.mediumImpact();
                       getSnackBar(context, "relapse-recorded");
                       Navigator.pop(context);
@@ -708,10 +710,10 @@ changeDateEvent(
 }
 
 dateChecker(DateTime firstDate, DateTime date, BuildContext context,
-    FollowYourRebootBloc bloc) {
+    FollowYourRebootBloc bloc, FollowUpViewModel followUpViewModel) {
   if (dayWithinRange(firstDate, date)) {
     final dateStr = date.toString().substring(0, 10);
-    changeDateEvent(dateStr, context, bloc);
+    changeDateEvent(dateStr, context, bloc, followUpViewModel);
   } else {
     outOfRangeAlert(context);
   }

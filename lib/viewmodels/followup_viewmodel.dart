@@ -118,4 +118,25 @@ class FollowUpViewModel extends StateNotifier<FollowUpData> {
       return await today.difference(firstdate).inDays;
     }
   }
+
+  Future<void> addRelapse(String date) async {
+    FollowUpData _followUpData = await _followUpRepository.getFollowUpData();
+    List<String> _watchOnly = _followUpData.pornWithoutMasterbation;
+    List<String> _mastOnly = _followUpData.masterbationWithoutPorn;
+    List<String> _relapses = _followUpData.relapses;
+
+    if (_watchOnly.contains(date)) return;
+    if (_mastOnly.contains(date)) return;
+    if (_relapses.contains(date)) return;
+
+    _watchOnly.add(date);
+    _mastOnly.add(date);
+    _relapses.add(date);
+    var data = {
+      "userRelapses": _relapses,
+      "userMasturbatingWithoutWatching": _mastOnly,
+      "userWatchingWithoutMasturbating": _watchOnly,
+    };
+    await _followUpRepository.updateFollowUpData(data);
+  }
 }

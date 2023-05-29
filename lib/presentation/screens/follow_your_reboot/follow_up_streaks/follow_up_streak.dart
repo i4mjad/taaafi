@@ -173,7 +173,8 @@ class FollowUpStreaks extends ConsumerWidget {
                   GestureDetector(
                     onTap: () {
                       HapticFeedback.mediumImpact();
-                      changeDateEvent(getTodaysDateString(), context, bloc);
+                      changeDateEvent(
+                          getTodaysDateString(), context, bloc, followUpData);
                     },
                     child: Container(
                       width: (MediaQuery.of(context).size.width),
