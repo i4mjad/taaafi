@@ -139,4 +139,49 @@ class FollowUpViewModel extends StateNotifier<FollowUpData> {
     };
     await _followUpRepository.updateFollowUpData(data);
   }
+
+  Future<void> addSuccess(String date) async {
+    FollowUpData _followUpData = await _followUpRepository.getFollowUpData();
+    List<String> _watchOnly = _followUpData.pornWithoutMasterbation;
+    List<String> _mastOnly = _followUpData.masterbationWithoutPorn;
+    List<String> _relapses = _followUpData.relapses;
+
+    if (_watchOnly.contains(date)) {
+      _watchOnly.remove(date);
+    }
+    if (_mastOnly.contains(date)) {
+      _mastOnly.remove(date);
+    }
+    if (_relapses.contains(date)) {
+      _relapses.remove(date);
+    }
+
+    var data = {
+      "userRelapses": _relapses,
+      "userMasturbatingWithoutWatching": _mastOnly,
+      "userWatchingWithoutMasturbating": _watchOnly,
+    };
+    await _followUpRepository.updateFollowUpData(data);
+  }
+
+  Future<void> addWatchOnly(String date) async {
+    FollowUpData _followUpData = await _followUpRepository.getFollowUpData();
+    List<String> _days = _followUpData.pornWithoutMasterbation;
+
+    if (_days.contains(date)) return;
+    _days.add(date);
+    var data = {"userWatchingWithoutMasturbating": _days};
+    await _followUpRepository.updateFollowUpData(data);
+  }
+
+  Future<void> addMastOnly(String date) async {
+    FollowUpData _followUpData = await _followUpRepository.getFollowUpData();
+    List<String> _days = _followUpData.masterbationWithoutPorn;
+
+    if (_days.contains(date)) return;
+    _days.add(date);
+
+    var data = {"userMasturbatingWithoutWatching": _days};
+    await _followUpRepository.updateFollowUpData(data);
+  }
 }

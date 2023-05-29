@@ -516,8 +516,8 @@ changeDateEvent(String date, BuildContext context, FollowYourRebootBloc bloc,
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   GestureDetector(
-                    onTap: () async {
-                      bloc.addSuccess(date);
+                    onTap: () {
+                      followUpViewModel.addSuccess(date);
                       HapticFeedback.mediumImpact();
                       Navigator.pop(context);
                       getSnackBar(context, "free-day-recorded");
@@ -557,8 +557,8 @@ changeDateEvent(String date, BuildContext context, FollowYourRebootBloc bloc,
                     ),
                   ),
                   GestureDetector(
-                    onTap: () async {
-                      await followUpViewModel.addRelapse(date);
+                    onTap: () {
+                      followUpViewModel.addRelapse(date);
                       HapticFeedback.mediumImpact();
                       getSnackBar(context, "relapse-recorded");
                       Navigator.pop(context);
@@ -598,7 +598,7 @@ changeDateEvent(String date, BuildContext context, FollowYourRebootBloc bloc,
                   ),
                   GestureDetector(
                     onTap: () {
-                      bloc.addWatchOnly(date);
+                      followUpViewModel.addWatchOnly(date);
                       HapticFeedback.mediumImpact();
                       getSnackBar(context, "pornonly-recorded");
                       Navigator.pop(context);
@@ -639,7 +639,7 @@ changeDateEvent(String date, BuildContext context, FollowYourRebootBloc bloc,
                   ),
                   GestureDetector(
                     onTap: () {
-                      bloc.addMastOnly(date);
+                      followUpViewModel.addMastOnly(date);
                       HapticFeedback.mediumImpact();
                       getSnackBar(context, "mastonly-recorded");
                       Navigator.pop(context);

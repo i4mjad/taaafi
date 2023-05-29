@@ -36,76 +36,7 @@ class DB {
   }
 
 //TODO #5: this method when moved to the repository should ONLY add to the database. The buisness logic should be in the viewmodel layer
-  addRelapse(String date) async {
-    FollowUpData _followUpData = await getFollowUpData();
-    List<String> _watchOnly = _followUpData.pornWithoutMasterbation;
-    List<String> _mastOnly = _followUpData.masterbationWithoutPorn;
-    List<String> _relapses = _followUpData.relapses;
 
-    if (_watchOnly.contains(date)) return;
-    if (_mastOnly.contains(date)) return;
-    if (_relapses.contains(date)) return;
-
-    _watchOnly.add(date);
-    _mastOnly.add(date);
-    _relapses.add(date);
-    db.collection("users").doc(user.uid).update({
-      "userRelapses": _relapses,
-      "userMasturbatingWithoutWatching": _mastOnly,
-      "userWatchingWithoutMasturbating": _watchOnly,
-    });
-  }
-
-//TODO #6: same as #5
-  addSuccess(String date) async {
-    FollowUpData _followUpData = await getFollowUpData();
-    List<String> _watchOnly = _followUpData.pornWithoutMasterbation;
-    List<String> _mastOnly = _followUpData.masterbationWithoutPorn;
-    List<String> _relapses = _followUpData.relapses;
-
-    if (_watchOnly.contains(date)) {
-      _watchOnly.remove(date);
-    }
-    if (_mastOnly.contains(date)) {
-      _mastOnly.remove(date);
-    }
-    if (_relapses.contains(date)) {
-      _relapses.remove(date);
-    }
-
-    db.collection("users").doc(user.uid).update({
-      "userRelapses": _relapses,
-      "userMasturbatingWithoutWatching": _mastOnly,
-      "userWatchingWithoutMasturbating": _watchOnly,
-    });
-  }
-
-//TODO #7: same as #5
-  addWatchOnly(String date) async {
-    FollowUpData _followUpData = await getFollowUpData();
-    List<String> _days = _followUpData.pornWithoutMasterbation;
-
-    if (_days.contains(date)) return;
-    _days.add(date);
-
-    db
-        .collection("users")
-        .doc(user.uid)
-        .update({"userWatchingWithoutMasturbating": _days});
-  }
-
-//TODO #8: same as #5
-  addMastOnly(String date) async {
-    FollowUpData _followUpData = await getFollowUpData();
-    List<String> _days = _followUpData.masterbationWithoutPorn;
-
-    if (_days.contains(date)) return;
-    _days.add(date);
-    db
-        .collection("users")
-        .doc(user.uid)
-        .update({"userMasturbatingWithoutWatching": _days});
-  }
 
 //TODO #9: same as #5
   Future<DayOfWeekRelapses> getRelapsesByDayOfWeek() async {

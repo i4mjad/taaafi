@@ -24,18 +24,6 @@ class FollowYourRebootBloc implements CustomBlocBase {
     return await db.getStartingDate();
   }
 
-  void addSuccess(String date) async {
-    await db.addSuccess(date);
-  }
-
-  void addWatchOnly(String date) async {
-    await db.addWatchOnly(date);
-  }
-
-  void addMastOnly(String date) async {
-    await db.addMastOnly(date);
-  }
-
   Future<DayOfWeekRelapses> getRelapsesByDayOfWeek() async {
     return await db.getRelapsesByDayOfWeek();
   }
