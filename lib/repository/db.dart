@@ -37,7 +37,6 @@ class DB {
 
 //TODO #5: this method when moved to the repository should ONLY add to the database. The buisness logic should be in the viewmodel layer
 
-
 //TODO #9: same as #5
   Future<DayOfWeekRelapses> getRelapsesByDayOfWeek() async {
     var followUpData = await getFollowUpData();
@@ -172,35 +171,6 @@ class DB {
     List<String> _relapses = _followUpData.relapses;
 
     return _relapses.length.toString();
-  }
-
-  void migerateToUserFirstDate() async {
-    //TODO: this method need to be tracked to see if it is still used by any user,
-    // consider checking the Firebase Analytics custom events to achieve this.
-    var _db = db.collection("users").doc(user.uid);
-
-    _db.get().then((value) async {
-      Map<String, dynamic> data = value.data();
-      if (await data.containsKey("userFirstDate") == false) {
-        var userRigDate = user.metadata.creationTime;
-        int userFirstStreak = await data["userPreviousStreak"];
-
-        DateTime userResetDate = data["resetedDate"] != null
-            ? await DateTime.parse(data["resetedDate"].toDate().toString())
-            : null;
-        DateTime parseFirstDate = await DateTime(userRigDate.year,
-            userRigDate.month, userRigDate.day - userFirstStreak);
-        DateTime userFirstDate =
-            await userResetDate != null ? userResetDate : parseFirstDate;
-
-        var firstDate = {"userFirstDate": userFirstDate};
-        await db
-            .collection("users")
-            .doc(user.uid)
-            .set(firstDate, SetOptions(merge: true))
-            .onError((error, stackTrace) => print(error));
-      }
-    });
   }
 
   Future<String> getRelapsesCountInLast30Days() async {
