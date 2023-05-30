@@ -1,8 +1,11 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:reboot_app_3/data/models/CalenderDay.dart';
 import 'package:reboot_app_3/data/models/FollowUpData.dart';
 import 'package:reboot_app_3/di/container.dart';
+import 'package:reboot_app_3/presentation/screens/follow_your_reboot/day_of_week_relapses/day_of_week_relapses_widget.dart';
 import 'package:reboot_app_3/repository/follow_up_data_repository.dart';
 
 class FollowUpViewModel extends StateNotifier<FollowUpData> {
@@ -183,5 +186,166 @@ class FollowUpViewModel extends StateNotifier<FollowUpData> {
 
     var data = {"userMasturbatingWithoutWatching": _days};
     await _followUpRepository.updateFollowUpData(data);
+  }
+
+  Future<DayOfWeekRelapses> getRelapsesByDayOfWeek() async {
+    var followUpData = await _followUpRepository.getFollowUpData();
+    var userRelapses = followUpData.relapses;
+    int totalRelapses = userRelapses.length;
+    var sat = [];
+    var sun = [];
+    var mon = [];
+    var tue = [];
+    var wed = [];
+    var thu = [];
+    var fri = [];
+
+    for (var strDate in userRelapses) {
+      final date = DateTime.parse(strDate);
+      final dayOfWeek = date.weekday;
+
+      if (dayOfWeek == 1) {
+        sun.add(date);
+      } else if (dayOfWeek == 2) {
+        mon.add(date);
+      } else if (dayOfWeek == 3) {
+        tue.add(date);
+      } else if (dayOfWeek == 4) {
+        wed.add(date);
+      } else if (dayOfWeek == 5) {
+        thu.add(date);
+      } else if (dayOfWeek == 6) {
+        fri.add(date);
+      } else if (dayOfWeek == 7) {
+        sat.add(date);
+      }
+    }
+
+    final satLength = (sat.length / totalRelapses) ?? 0;
+    final monLength = (mon.length / totalRelapses) ?? 0;
+    final sunLength = (sun.length / totalRelapses) ?? 0;
+    final tueLength = (tue.length / totalRelapses) ?? 0;
+    final wedLength = (wed.length / totalRelapses) ?? 0;
+    final thuLength = (thu.length / totalRelapses) ?? 0;
+    final friLength = (fri.length / totalRelapses) ?? 0;
+
+    final dayOfWeekRelapses = DayOfWeekRelapses(
+        new DayOfWeekRelapsesDetails(satLength, sat.length),
+        new DayOfWeekRelapsesDetails(sunLength, sun.length),
+        new DayOfWeekRelapsesDetails(monLength, mon.length),
+        new DayOfWeekRelapsesDetails(tueLength, tue.length),
+        new DayOfWeekRelapsesDetails(wedLength, wed.length),
+        new DayOfWeekRelapsesDetails(thuLength, thu.length),
+        new DayOfWeekRelapsesDetails(friLength, fri.length),
+        totalRelapses.toString());
+    return dayOfWeekRelapses;
+  }
+
+  Future<String> getHighestStreak() async {
+    FollowUpData _followUpData = await _followUpRepository.getFollowUpData();
+    List<String> _relapses = await _followUpData.relapses;
+
+    if (_relapses == null || _relapses.length == 0) return "0";
+
+    final DateTime today = DateTime.now();
+    final DateTime todayE = DateTime(today.year, today.month, today.day);
+
+    var relapsesInDate = [];
+
+    if (_relapses.length > 0) {
+      relapsesInDate.clear();
+      for (var i in _relapses) {
+        final date = DateTime.parse(i);
+        relapsesInDate.add(date);
+      }
+    }
+
+    relapsesInDate.add(todayE);
+    final userFirstDate = await _followUpRepository.getStartingDate();
+
+    List<int> differences = [];
+
+    relapsesInDate.sort((a, b) {
+      return a.compareTo(b);
+    });
+
+    if (relapsesInDate.length > 0) {
+      for (var i in relapsesInDate) {
+        if (relapsesInDate[0] == i) {
+          final firstPeriod = i.difference(userFirstDate).inDays;
+
+          differences.add(firstPeriod + 1);
+        } else {
+          final period = i
+              .difference(relapsesInDate[relapsesInDate.indexOf(i) - 1])
+              .inDays;
+          final realPeriod = period - 1;
+          differences.add(realPeriod);
+        }
+      }
+    }
+
+    differences.removeAt(differences.length - 1);
+
+    return differences.reduce((max)).toString();
+  }
+
+  Future<String> getTotalDaysWithoutRelapse() async {
+    FollowUpData _followUpData = await _followUpRepository.getFollowUpData();
+    List<String> _relapses = _followUpData.relapses;
+
+    if (_followUpData.relapses == null) return "0";
+
+    var _firstDate = await _followUpRepository.getStartingDate();
+
+    var totalDays = DateTime.now().difference(_firstDate).inDays;
+
+    var daysWithoutRelapses = totalDays - _relapses.length;
+
+    return daysWithoutRelapses.toString();
+  }
+
+  Future<String> getTotalDaysFromBegining() async {
+    var _firstDate = await _followUpRepository.getStartingDate();
+
+    var totalDays = DateTime.now().difference(_firstDate).inDays;
+    return totalDays.toString();
+  }
+
+  Future<String> getRelapsesCount() async {
+    FollowUpData _followUpData = await _followUpRepository.getFollowUpData();
+    List<String> _relapses = _followUpData.relapses;
+
+    return _relapses.length.toString();
+  }
+
+  Future<String> getRelapsesCountInLast30Days() async {
+    int _count = 0;
+    FollowUpData _followUpDate = await _followUpRepository.getFollowUpData();
+    List relapses = _followUpDate.relapses;
+    DateTime today = DateTime.now();
+    DateTime _dateBefore30Days = DateTime.now().subtract(Duration(days: 28));
+
+    List<String> _last30Days() {
+      List<String> days = [];
+
+      for (int i = 0; i <= today.difference(_dateBefore30Days).inDays; i++) {
+        DateTime d = _dateBefore30Days.add(Duration(days: i));
+        days.add(
+            new DateTime(d.year, d.month, d.day).toString().substring(0, 10));
+      }
+      return days;
+    }
+
+    for (var date in relapses) {
+      if (_last30Days().contains(date.toString().substring(0, 10))) {
+        _count += 1;
+      }
+    }
+    return await _count.toString();
+  }
+
+  Future<DateTime> getFirstDate() async {
+    return await _followUpRepository.getStartingDate();
   }
 }

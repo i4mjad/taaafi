@@ -2,8 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:reboot_app_3/bloc_provider.dart';
-import 'package:reboot_app_3/presentation/blocs/follow_your_reboot_bloc.dart';
 import 'package:reboot_app_3/presentation/screens/auth/login_screen.dart';
 import 'package:reboot_app_3/presentation/screens/auth/new_user_screen.dart';
 import 'package:reboot_app_3/presentation/screens/follow_your_reboot/follow_your_reboot_screen.dart';
@@ -37,10 +35,7 @@ class UserDocWrapper extends ConsumerWidget {
         if (userDoc == null || !userDoc.exists) {
           return NewUserSection();
         } else {
-          return CustomBlocProvider(
-            bloc: FollowYourRebootBloc(),
-            child: FollowYourRebootScreen(),
-          );
+          return FollowYourRebootScreen();
         }
       },
       loading: () => CircularProgressIndicator(),

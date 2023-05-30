@@ -3,9 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
-import 'package:reboot_app_3/bloc_provider.dart';
 import 'package:reboot_app_3/data/models/CalenderDay.dart';
-import 'package:reboot_app_3/presentation/blocs/follow_your_reboot_bloc.dart';
 import 'package:reboot_app_3/presentation/screens/follow_your_reboot/calender/calender_data_model.dart';
 import 'package:reboot_app_3/presentation/screens/follow_your_reboot/day_of_week_relapses/day_of_week_relapses_widget.dart';
 import 'package:reboot_app_3/providers/followup/followup_providers.dart';
@@ -17,8 +15,8 @@ import 'package:reboot_app_3/viewmodels/followup_viewmodel.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 
 class RebootCalender extends ConsumerWidget {
-  const RebootCalender({Key key, this.bloc}) : super(key: key);
-  final bloc;
+  const RebootCalender({Key key}) : super(key: key);
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final followUpData = ref.watch(followupViewModelProvider.notifier);
@@ -54,10 +52,9 @@ class RebootCalender extends ConsumerWidget {
                       backgroundColor: theme.cardColor,
                       onTap: (CalendarTapDetails details) async {
                         DateTime date = details.date;
-                        DateTime firstDate = await bloc.getFirstDate();
+                        DateTime firstDate = await followUpData.getFirstDate();
 
-                        dateChecker(
-                            firstDate, date, context, bloc, followUpData);
+                        dateChecker(firstDate, date, context, followUpData);
                       },
                       view: CalendarView.month,
                       headerStyle: CalendarHeaderStyle(
@@ -85,16 +82,14 @@ class RebootCalender extends ConsumerWidget {
   }
 }
 
-class GeneralStats extends StatelessWidget {
-  const GeneralStats({Key key, @required this.lang, this.bloc})
-      : super(key: key);
+class GeneralStats extends ConsumerWidget {
+  const GeneralStats({Key key, @required this.lang}) : super(key: key);
 
   final String lang;
-  final bloc;
 
   @override
-  Widget build(BuildContext context) {
-    final bloc = CustomBlocProvider.of<FollowYourRebootBloc>(context);
+  Widget build(BuildContext context, WidgetRef ref) {
+    final followUpData = ref.watch(followupViewModelProvider.notifier);
     final theme = Theme.of(context);
     return Container(
       child: Column(
@@ -144,7 +139,7 @@ class GeneralStats extends StatelessWidget {
                       height: 20,
                     ),
                     FutureBuilder(
-                      future: bloc.getHighestStreak(),
+                      future: followUpData.getHighestStreak(),
                       initialData: "0",
                       builder:
                           (BuildContext context, AsyncSnapshot<String> sh) {
@@ -202,7 +197,7 @@ class GeneralStats extends StatelessWidget {
                       height: 20,
                     ),
                     FutureBuilder(
-                      future: bloc.getTotalDaysWithoutRelapse(),
+                      future: followUpData.getTotalDaysWithoutRelapse(),
                       initialData: "0",
                       builder:
                           (BuildContext context, AsyncSnapshot<String> sh) {
@@ -237,7 +232,7 @@ class GeneralStats extends StatelessWidget {
                         color: theme.primaryColor),
                   ),
                   FutureBuilder(
-                    future: bloc.getTotalDaysFromBegining(),
+                    future: followUpData.getTotalDaysFromBegining(),
                     initialData: "0",
                     builder: (BuildContext context, AsyncSnapshot<String> sh) {
                       return Text(
@@ -264,7 +259,7 @@ class GeneralStats extends StatelessWidget {
                         fontWeight: FontWeight.w400, fontSize: 18),
                   ),
                   FutureBuilder(
-                    future: bloc.getRelapsesCount(),
+                    future: followUpData.getRelapsesCount(),
                     initialData: "0",
                     builder: (BuildContext context, AsyncSnapshot<String> sh) {
                       return Text(
@@ -284,13 +279,13 @@ class GeneralStats extends StatelessWidget {
   }
 }
 
-class RelapsesByDayOfWeek extends StatelessWidget {
-  RelapsesByDayOfWeek({Key key, this.bloc}) : super(key: key);
-  final bloc;
+class RelapsesByDayOfWeek extends ConsumerWidget {
+  RelapsesByDayOfWeek({Key key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
+    final followUpData = ref.watch(followupViewModelProvider.notifier);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -309,7 +304,7 @@ class RelapsesByDayOfWeek extends StatelessWidget {
             borderRadius: BorderRadius.circular(12.5),
           ),
           child: FutureBuilder(
-            future: bloc.getRelapsesByDayOfWeek(),
+            future: followUpData.getRelapsesByDayOfWeek(),
             initialData: new DayOfWeekRelapses(
                 new DayOfWeekRelapsesDetails(0, 0),
                 new DayOfWeekRelapsesDetails(0, 0),
@@ -470,7 +465,7 @@ String getTodaysDateString() {
   return today;
 }
 
-changeDateEvent(String date, BuildContext context, FollowYourRebootBloc bloc,
+changeDateEvent(String date, BuildContext context,
     FollowUpViewModel followUpViewModel) async {
   final trimedDate = date.trim();
   final theme = Theme.of(context);
@@ -710,10 +705,10 @@ changeDateEvent(String date, BuildContext context, FollowYourRebootBloc bloc,
 }
 
 dateChecker(DateTime firstDate, DateTime date, BuildContext context,
-    FollowYourRebootBloc bloc, FollowUpViewModel followUpViewModel) {
+    FollowUpViewModel followUpViewModel) {
   if (dayWithinRange(firstDate, date)) {
     final dateStr = date.toString().substring(0, 10);
-    changeDateEvent(dateStr, context, bloc, followUpViewModel);
+    changeDateEvent(dateStr, context, followUpViewModel);
   } else {
     outOfRangeAlert(context);
   }
@@ -784,42 +779,4 @@ outOfRangeAlert(BuildContext context) {
 bool dayWithinRange(DateTime firstDate, DateTime date) {
   final today = DateTime.now();
   return date.isAfter(firstDate) && date.isBefore(today);
-}
-
-class JournyAverage extends StatelessWidget {
-  const JournyAverage({Key key, this.bloc}) : super(key: key);
-
-  final bloc;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          AppLocalizations.of(context).translate("relapses-average"),
-          style: kSubTitlesStyle.copyWith(color: theme.hintColor),
-        ),
-        SizedBox(
-          height: 8,
-        ),
-        Container(
-          padding: EdgeInsets.all(16),
-          height: MediaQuery.of(context).size.height * 0.3,
-          width: MediaQuery.of(context).size.width - 40,
-          decoration: BoxDecoration(
-            color: theme.cardColor,
-            borderRadius: BorderRadius.circular(12.5),
-          ),
-          child: Center(
-            child: Text(
-              "Cake",
-              style: kSubTitlesStyle,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
 }

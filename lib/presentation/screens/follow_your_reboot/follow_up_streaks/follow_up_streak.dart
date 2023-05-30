@@ -7,8 +7,7 @@ import 'package:reboot_app_3/shared/constants/textstyles_constants.dart';
 import 'package:reboot_app_3/shared/localization/localization.dart';
 
 class FollowUpStreaks extends ConsumerWidget {
-  FollowUpStreaks({Key key, this.bloc}) : super(key: key);
-  final bloc;
+  FollowUpStreaks({Key key}) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -174,7 +173,7 @@ class FollowUpStreaks extends ConsumerWidget {
                     onTap: () {
                       HapticFeedback.mediumImpact();
                       changeDateEvent(
-                          getTodaysDateString(), context, bloc, followUpData);
+                          getTodaysDateString(), context, followUpData);
                     },
                     child: Container(
                       width: (MediaQuery.of(context).size.width),

@@ -1,8 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:reboot_app_3/bloc_provider.dart';
-import 'package:reboot_app_3/presentation/blocs/follow_your_reboot_bloc.dart';
 import 'package:reboot_app_3/providers/followup/followup_providers.dart';
 import 'package:reboot_app_3/providers/main_providers.dart';
 import 'package:reboot_app_3/providers/user/user_providers.dart';
@@ -27,10 +25,7 @@ class WelcomeWidget extends ConsumerWidget {
           var userProfileProvider =
               ref.watch(userViewModelProvider.notifier).userDocumentStream;
           if (userProfileProvider != null) {
-            return CustomBlocProvider(
-              bloc: FollowYourRebootBloc(),
-              child: WelcomeContent(),
-            );
+            return WelcomeContent();
           } else {
             return NotSignIn();
           }
@@ -88,7 +83,6 @@ class WelcomeContent extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final bloc = CustomBlocProvider.of<FollowYourRebootBloc>(context);
     final followUpData = ref.watch(followupViewModelProvider.notifier);
     final theme = Theme.of(context);
     return Column(
@@ -170,7 +164,7 @@ class WelcomeContent extends ConsumerWidget {
                   ),
                   child: Center(
                     child: FutureBuilder(
-                      future: bloc.getRelapsesCountInLast30Days(),
+                      future: followUpData.getRelapsesCountInLast30Days(),
                       initialData: "0",
                       builder:
                           (BuildContext context, AsyncSnapshot<String> sh) {
@@ -218,7 +212,7 @@ class WelcomeContent extends ConsumerWidget {
                   ),
                   child: Center(
                     child: FutureBuilder(
-                      future: bloc.getTotalDaysWithoutRelapse(),
+                      future: followUpData.getTotalDaysWithoutRelapse(),
                       initialData: "0",
                       builder:
                           (BuildContext context, AsyncSnapshot<String> sh) {
