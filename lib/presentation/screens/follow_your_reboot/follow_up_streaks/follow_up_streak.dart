@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:reboot_app_3/presentation/screens/follow_your_reboot/follow_your_reboot_widgets.dart';
+import 'package:reboot_app_3/presentation/screens/follow_your_reboot/follow_your_reboot_helpers.dart';
+import 'package:reboot_app_3/presentation/screens/follow_your_reboot/widgets/followup_modal_bottomsheet_widgets.dart';
 import 'package:reboot_app_3/providers/followup/followup_providers.dart';
 import 'package:reboot_app_3/shared/constants/textstyles_constants.dart';
 import 'package:reboot_app_3/shared/localization/localization.dart';

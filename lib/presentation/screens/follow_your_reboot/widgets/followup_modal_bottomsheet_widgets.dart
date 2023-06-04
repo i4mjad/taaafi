@@ -1,21 +1,10 @@
-import 'package:reboot_app_3/presentation/screens/follow_your_reboot/widgets/general_status_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:intl/intl.dart';
 import 'package:reboot_app_3/shared/components/snackbar.dart';
 import 'package:reboot_app_3/shared/constants/textstyles_constants.dart';
 import 'package:reboot_app_3/shared/localization/localization.dart';
 import 'package:reboot_app_3/viewmodels/followup_viewmodel.dart';
-
-
-
-String getTodaysDateString() {
-  final DateTime now = DateTime.now();
-  final DateFormat formatter = DateFormat('yyyy-MM-dd');
-  final String today = formatter.format(now);
-  return today;
-}
 
 changeDateEvent(String date, BuildContext context,
     FollowUpViewModel followUpViewModel) async {
@@ -256,15 +245,7 @@ changeDateEvent(String date, BuildContext context,
       });
 }
 
-dateChecker(DateTime firstDate, DateTime date, BuildContext context,
-    FollowUpViewModel followUpViewModel) {
-  if (dayWithinRange(firstDate, date)) {
-    final dateStr = date.toString().substring(0, 10);
-    changeDateEvent(dateStr, context, followUpViewModel);
-  } else {
-    outOfRangeAlert(context);
-  }
-}
+
 
 outOfRangeAlert(BuildContext context) {
   HapticFeedback.mediumImpact();
@@ -307,7 +288,7 @@ outOfRangeAlert(BuildContext context) {
               Text(
                 AppLocalizations.of(context).translate("out-of-range"),
                 style:
-                    kPageTitleStyle.copyWith(color: Colors.red, fontSize: 24),
+                kPageTitleStyle.copyWith(color: Colors.red, fontSize: 24),
               ),
               SizedBox(
                 height: 8,
@@ -326,9 +307,4 @@ outOfRangeAlert(BuildContext context) {
           ),
         );
       });
-}
-
-bool dayWithinRange(DateTime firstDate, DateTime date) {
-  final today = DateTime.now();
-  return date.isAfter(firstDate) && date.isBefore(today);
 }

@@ -2,7 +2,6 @@ import 'dart:core';
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:reboot_app_3/presentation/screens/follow_your_reboot/follow_up_streaks/follow_up_streak.dart';
-import 'package:reboot_app_3/presentation/screens/follow_your_reboot/follow_your_reboot_widgets.dart';
 import 'package:reboot_app_3/presentation/screens/follow_your_reboot/widgets/followup_calender.dart';
 import 'package:reboot_app_3/presentation/screens/follow_your_reboot/widgets/general_status_widget.dart';
 import 'package:reboot_app_3/presentation/screens/follow_your_reboot/widgets/relapses_by_day_of_week_widget.dart';
