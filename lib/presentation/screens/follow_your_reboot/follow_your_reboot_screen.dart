@@ -4,6 +4,7 @@ import 'package:iconsax/iconsax.dart';
 import 'package:reboot_app_3/presentation/screens/follow_your_reboot/follow_up_streaks/follow_up_streak.dart';
 import 'package:reboot_app_3/presentation/screens/follow_your_reboot/follow_your_reboot_widgets.dart';
 import 'package:reboot_app_3/presentation/screens/follow_your_reboot/widgets/followup_calender.dart';
+import 'package:reboot_app_3/presentation/screens/follow_your_reboot/widgets/general_status_widget.dart';
 import 'package:reboot_app_3/shared/components/custom-app-bar.dart';
 import 'package:reboot_app_3/shared/constants/textstyles_constants.dart';
 import 'package:reboot_app_3/shared/localization/localization.dart';
@@ -106,7 +107,7 @@ class FollowYourRebootScreenState extends State<FollowYourRebootScreen>
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
-                      GeneralStats(
+                      GeneralStatusWidget(
                         lang: lang,
                       ),
                     ],
