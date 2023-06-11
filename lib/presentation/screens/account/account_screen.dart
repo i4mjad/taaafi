@@ -366,7 +366,7 @@ class UserProfileCard extends ConsumerWidget {
                 ),
                 SizedBox(height: 8),
                 Text(
-                  userProfile.email.toUpperCase() ?? "",
+                  userProfile.email.toUpperCase(),
                   style: kCaptionStyle.copyWith(
                     color: theme.hintColor.withOpacity(0.75),
                   ),

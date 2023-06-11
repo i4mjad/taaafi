@@ -8,18 +8,18 @@ class UserProfile {
   final DateTime lastSignInTime;
 
   UserProfile({
-     this.uid,
-     this.displayName,
-     this.email,
-     this.creationTime,
-     this.lastSignInTime,
+    this.uid,
+    this.displayName,
+    this.email,
+    this.creationTime,
+    this.lastSignInTime,
   });
 
   factory UserProfile.fromFirebaseUser(User user) {
     return UserProfile(
       uid: user.uid,
-      displayName: user.displayName,
-      email: user.email,
+      displayName: user.displayName ?? "",
+      email: user.email ?? "",
       creationTime: user.metadata.creationTime,
       lastSignInTime: user.metadata.lastSignInTime,
     );
