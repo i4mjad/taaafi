@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'dart:async';
 
+import 'package:promize_sdk/promize_sdk.dart';
+import 'package:reboot_app_3/shared/services/auth_helper_methods.dart';
+
 class GoogleAuthenticationService extends ChangeNotifier {
   final FirebaseAuth _firebaseAuth;
   GoogleAuthenticationService(this._firebaseAuth);
@@ -21,7 +24,15 @@ class GoogleAuthenticationService extends ChangeNotifier {
       idToken: googleAuth.idToken,
     );
 
-    return await FirebaseAuth.instance.signInWithCredential(credential);
+    var userCredential =
+        await FirebaseAuth.instance.signInWithCredential(credential);
+    final _promizeSdk = PromizeSdk.instance;
+
+    final promizeUser = createPromizeUser(userCredential.user.displayName,
+        userCredential.user.email, userCredential.user.uid);
+    _promizeSdk.createUser(user: promizeUser);
+
+    return userCredential;
   }
 
   Future<UserCredential> reauthenticateWithCredential() async {

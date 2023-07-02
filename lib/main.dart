@@ -6,6 +6,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:promize_sdk/promize_sdk.dart';
 import 'package:reboot_app_3/di/container.dart';
 import 'package:reboot_app_3/firebase_options.dart';
 import 'package:reboot_app_3/providers/main_providers.dart';
@@ -19,6 +20,8 @@ import 'package:reboot_app_3/shared/services/routing/routes_names.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 bool darkMode = false;
+final _promizeSdk = PromizeSdk.instance;
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
@@ -88,12 +91,18 @@ class _MyAppState extends State<MyApp> {
     });
   }
 
-  initState() {
+  initState() async {
     super.initState();
     localeCkeck();
     currentTheme.addListener(() {
       setState(() {});
     });
+    await _promizeSdk.initialize(
+        apiKey: 'your api key',
+        siteId: 'your site id',
+        baseUrl: 'your base url',
+        appVersion: 'your app version' //Optional,
+        );
   }
 
   Future<Null> localeCkeck() async {
