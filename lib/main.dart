@@ -91,18 +91,17 @@ class _MyAppState extends State<MyApp> {
     });
   }
 
-  initState() async {
+  initState() {
     super.initState();
     localeCkeck();
     currentTheme.addListener(() {
       setState(() {});
     });
-    await _promizeSdk.initialize(
-        apiKey: 'your api key',
-        siteId: 'your site id',
-        baseUrl: 'your base url',
-        appVersion: 'your app version' //Optional,
-        );
+    _promizeSdk.initialize(
+        apiKey:
+            'oh51RjWT33x6nmejD677bYlBx7Cf9VdG2dgMx7t075Meu0arOYbluZgBcsfflyC2',
+        siteId: '5liwmsi7su',
+        baseUrl: 'https://ta3afi.live.promize.io');
   }
 
   Future<Null> localeCkeck() async {
