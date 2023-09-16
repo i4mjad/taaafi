@@ -27,8 +27,12 @@ Future<void> main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-
   SetupContainer();
+  _promizeSdk.initialize(
+    apiKey: 'oh51RjWT33x6nmejD677bYlBx7Cf9VdG2dgMx7t075Meu0arOYbluZgBcsfflyC2',
+    siteId: '5liwmsi7su',
+    baseUrl: 'https://ta3afi.api.promize.io',
+  );
 
   InitializationSettings initializationSettings = await setupNotifications();
   await setupFirebaseMesagging(initializationSettings);
@@ -39,7 +43,11 @@ Future<void> main() async {
 
 Future<void> setupFirebaseMesagging(
     InitializationSettings initializationSettings) async {
-  // RemoteMessage initialMessage = await FirebaseMessaging.instance.getInitialMessage();
+  var firbaseMessagingToken = await FirebaseMessaging.instance.getToken();
+
+  await _promizeSdk.saveDeviceToken(
+    deviceToken: firbaseMessagingToken,
+  );
 
   await NotificationService.flutterLocalNotificationsPlugin
       .initialize(initializationSettings);
@@ -97,11 +105,6 @@ class _MyAppState extends State<MyApp> {
     currentTheme.addListener(() {
       setState(() {});
     });
-    _promizeSdk.initialize(
-        apiKey:
-            'oh51RjWT33x6nmejD677bYlBx7Cf9VdG2dgMx7t075Meu0arOYbluZgBcsfflyC2',
-        siteId: '5liwmsi7su',
-        baseUrl: 'https://ta3afi.live.promize.io');
   }
 
   Future<Null> localeCkeck() async {

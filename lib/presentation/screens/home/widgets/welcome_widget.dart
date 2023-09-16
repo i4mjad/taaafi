@@ -85,173 +85,191 @@ class WelcomeContent extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final followUpData = ref.watch(followupViewModelProvider.notifier);
     final theme = Theme.of(context);
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          AppLocalizations.of(context).translate('welcome'),
-          style: kSubTitlesStyle.copyWith(color: theme.hintColor),
-        ),
-        SizedBox(
-          height: 16,
-        ),
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              width: MediaQuery.of(context).size.width * 0.27,
-              height: 150,
-              decoration: BoxDecoration(
-                  color: theme.focusColor,
-                  borderRadius: BorderRadius.circular(15)),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  FutureBuilder(
-                    future: followUpData.getRelapseStreak(),
-                    initialData: 0,
-                    builder: (BuildContext context, AsyncSnapshot<int> streak) {
-                      switch (streak.connectionState) {
-                        // Uncompleted State
-                        case ConnectionState.none:
-                        case ConnectionState.waiting:
-                          return Center(child: CircularProgressIndicator());
-                          break;
-                        default:
-                          // Completed with error
-                          if (streak.hasError)
-                            return Container(
-                              child: Center(
-                                child: Text(
-                                  "0",
-                                ),
-                              ),
-                            );
-                          return Text(
-                            streak.data.toString(),
-                            style: kPageTitleStyle.copyWith(
-                              color: Colors.white,
-                              fontSize: 35,
-                            ),
-                          );
-                      }
-                    },
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(right: 8.0, left: 8),
-                    child: Text(
-                      AppLocalizations.of(context)
-                          .translate('free-relapse-days'),
-                      style: kSubTitlesStyle.copyWith(
-                          fontSize: 16, color: Colors.white, height: 1.5),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Spacer(),
-            Column(
+
+    return FutureBuilder<DateTime>(
+        future: followUpData.getFirstDate(),
+        builder: (context, snapshot) {
+          if (snapshot.data == null) {
+            return (NotSignIn());
+          } else {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                  padding: EdgeInsets.all(8),
-                  height: 71,
-                  width: MediaQuery.of(context).size.width * 0.60,
-                  decoration: BoxDecoration(
-                    color: theme.cardColor,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Center(
-                    child: FutureBuilder(
-                      future: followUpData.getRelapsesCountInLast30Days(),
-                      initialData: "0",
-                      builder:
-                          (BuildContext context, AsyncSnapshot<String> sh) {
-                        switch (sh.connectionState) {
-                          // Uncompleted State
-                          case ConnectionState.none:
-                          case ConnectionState.waiting:
-                            return Center(child: CircularProgressIndicator());
-                            break;
-                          default:
-                            // Completed with error
-                            if (sh.hasError)
-                              return Container(
-                                child: Center(
-                                  child: Text(
-                                    AppLocalizations.of(context)
-                                            .translate("relapses-30-days") +
-                                        "0",
-                                  ),
-                                ),
-                              );
-                            return Text(
-                              AppLocalizations.of(context)
-                                      .translate("relapses-30-days") +
-                                  sh.data,
-                              textAlign: TextAlign.center,
-                              style: kSubTitlesStyle.copyWith(
-                                  fontSize: 13, color: theme.hintColor),
-                            );
-                        }
-                      },
-                    ),
-                  ),
+                Text(
+                  AppLocalizations.of(context).translate('welcome'),
+                  style: kSubTitlesStyle.copyWith(color: theme.hintColor),
                 ),
                 SizedBox(
-                  height: 8,
+                  height: 16,
                 ),
-                Container(
-                  padding: EdgeInsets.all(8),
-                  height: 71,
-                  width: MediaQuery.of(context).size.width * 0.60,
-                  decoration: BoxDecoration(
-                    color: theme.cardColor,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Center(
-                    child: FutureBuilder(
-                      future: followUpData.getTotalDaysWithoutRelapse(),
-                      initialData: "0",
-                      builder:
-                          (BuildContext context, AsyncSnapshot<String> sh) {
-                        switch (sh.connectionState) {
-                          // Uncompleted State
-                          case ConnectionState.none:
-                          case ConnectionState.waiting:
-                            return Center(child: CircularProgressIndicator());
-                            break;
-                          default:
-                            // Completed with error
-                            if (sh.hasError)
-                              return Container(
-                                child: Center(
-                                  child: Text(
-                                    AppLocalizations.of(context)
-                                            .translate('free-days-from-start') +
-                                        "0",
-                                  ),
-                                ),
-                              );
-                            return Text(
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      width: MediaQuery.of(context).size.width * 0.27,
+                      height: 150,
+                      decoration: BoxDecoration(
+                          color: theme.focusColor,
+                          borderRadius: BorderRadius.circular(15)),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          FutureBuilder(
+                            future: followUpData.getRelapseStreak(),
+                            initialData: 0,
+                            builder: (BuildContext context,
+                                AsyncSnapshot<int> streak) {
+                              switch (streak.connectionState) {
+                                // Uncompleted State
+                                case ConnectionState.none:
+                                case ConnectionState.waiting:
+                                  return Center(
+                                      child: CircularProgressIndicator());
+                                  break;
+                                default:
+                                  // Completed with error
+                                  if (streak.hasError)
+                                    return Container(
+                                      child: Center(
+                                        child: Text(
+                                          "0",
+                                        ),
+                                      ),
+                                    );
+                                  return Text(
+                                    streak.data.toString(),
+                                    style: kPageTitleStyle.copyWith(
+                                      color: Colors.white,
+                                      fontSize: 35,
+                                    ),
+                                  );
+                              }
+                            },
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(right: 8.0, left: 8),
+                            child: Text(
                               AppLocalizations.of(context)
-                                      .translate('free-days-from-start') +
-                                  sh.data,
-                              textAlign: TextAlign.center,
+                                  .translate('free-relapse-days'),
                               style: kSubTitlesStyle.copyWith(
-                                  color: theme.hintColor, fontSize: 13),
-                            );
-                        }
-                      },
+                                  fontSize: 16,
+                                  color: Colors.white,
+                                  height: 1.5),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
+                    Spacer(),
+                    Column(
+                      children: [
+                        Container(
+                          padding: EdgeInsets.all(8),
+                          height: 71,
+                          width: MediaQuery.of(context).size.width * 0.60,
+                          decoration: BoxDecoration(
+                            color: theme.cardColor,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Center(
+                            child: FutureBuilder(
+                              future:
+                                  followUpData.getRelapsesCountInLast30Days(),
+                              initialData: "0",
+                              builder: (BuildContext context,
+                                  AsyncSnapshot<String> sh) {
+                                switch (sh.connectionState) {
+                                  // Uncompleted State
+                                  case ConnectionState.none:
+                                  case ConnectionState.waiting:
+                                    return Center(
+                                        child: CircularProgressIndicator());
+                                    break;
+                                  default:
+                                    // Completed with error
+                                    if (sh.hasError)
+                                      return Container(
+                                        child: Center(
+                                          child: Text(
+                                            AppLocalizations.of(context)
+                                                    .translate(
+                                                        "relapses-30-days") +
+                                                "0",
+                                          ),
+                                        ),
+                                      );
+                                    return Text(
+                                      AppLocalizations.of(context)
+                                              .translate("relapses-30-days") +
+                                          sh.data,
+                                      textAlign: TextAlign.center,
+                                      style: kSubTitlesStyle.copyWith(
+                                          fontSize: 13, color: theme.hintColor),
+                                    );
+                                }
+                              },
+                            ),
+                          ),
+                        ),
+                        SizedBox(
+                          height: 8,
+                        ),
+                        Container(
+                          padding: EdgeInsets.all(8),
+                          height: 71,
+                          width: MediaQuery.of(context).size.width * 0.60,
+                          decoration: BoxDecoration(
+                            color: theme.cardColor,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Center(
+                            child: FutureBuilder(
+                              future: followUpData.getTotalDaysWithoutRelapse(),
+                              initialData: "0",
+                              builder: (BuildContext context,
+                                  AsyncSnapshot<String> sh) {
+                                switch (sh.connectionState) {
+                                  // Uncompleted State
+                                  case ConnectionState.none:
+                                  case ConnectionState.waiting:
+                                    return Center(
+                                        child: CircularProgressIndicator());
+                                    break;
+                                  default:
+                                    // Completed with error
+                                    if (sh.hasError)
+                                      return Container(
+                                        child: Center(
+                                          child: Text(
+                                            AppLocalizations.of(context)
+                                                    .translate(
+                                                        'free-days-from-start') +
+                                                "0",
+                                          ),
+                                        ),
+                                      );
+                                    return Text(
+                                      AppLocalizations.of(context).translate(
+                                              'free-days-from-start') +
+                                          sh.data,
+                                      textAlign: TextAlign.center,
+                                      style: kSubTitlesStyle.copyWith(
+                                          color: theme.hintColor, fontSize: 13),
+                                    );
+                                }
+                              },
+                            ),
+                          ),
+                        ),
+                      ],
+                    )
+                  ],
                 ),
               ],
-            )
-          ],
-        ),
-      ],
-    );
+            );
+          }
+        });
   }
 }

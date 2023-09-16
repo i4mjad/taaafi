@@ -74,8 +74,8 @@
   "show-all": "View All",
 
   "about-ta3afi": "Spreading awareness about the consequences of porn & masturbation addiction by providing helpful resources and tools to overcome the addiction.",
-  "version-number-ios": "v4.2.3",
-  "version-number-android": "v2.5.2",
+  "version-number-ios": "v4.3",
+  "version-number-android": "v4.3",
   "dismiss": "Dismiss",
   "contact-us-through-this-channels": "Contact Developer",
   "support-app-development": "Support Development",
@@ -220,5 +220,14 @@
   "free-day-recorded": "Success Day, Good Job!",
   "relapse-recorded": "Relapses recorded, keep fighting",
   "pornonly-recorded": "Porn watching recorded, keep fighting",
-  "mastonly-recorded": "Masturbation recorded, keep fighting"
+  "mastonly-recorded": "Masturbation recorded, keep fighting",
+  "followup-notifications": "Follow Up Notifications (Beta)",
+  "followup-notifications-p": "This is a beta feature. You will be reciving notifications based on your journey in the app. Please make sure that your notifications are enabled from the device settings",
+  "male": "Male",
+  "female": "Female",
+  "date-of-birth": "Date of Birth",
+  "gender": "Gender",
+  "preferred-language": "Preferred Language",
+  "activate": "Activate",
+  "data-are-secured": "We keep your information secure and private."
 }

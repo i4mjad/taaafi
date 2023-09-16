@@ -1,12 +1,17 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:intl/intl.dart';
+import 'package:reboot_app_3/data/models/Enums.dart';
 import 'package:reboot_app_3/presentation/screens/account/delete_account.dart';
+import 'package:reboot_app_3/providers/followup/followup_providers.dart';
 import 'package:reboot_app_3/providers/main_providers.dart';
 import 'package:reboot_app_3/providers/user/user_providers.dart';
 import 'package:reboot_app_3/shared/components/custom-app-bar.dart';
+import 'package:reboot_app_3/shared/helpers/date_methods.dart';
 import 'package:reboot_app_3/shared/localization/localization.dart';
 import 'package:reboot_app_3/presentation/screens/follow_your_reboot/widgets/new_user_widgets.dart';
 import 'package:reboot_app_3/shared/components/change_locale_bottomsheet.dart';
@@ -43,6 +48,47 @@ class AccountScreen extends ConsumerWidget {
                         borderRadius: BorderRadius.circular(12.5)),
                     child: Column(
                       children: [
+                        Container(
+                          decoration: BoxDecoration(
+                              color: theme.focusColor,
+                              borderRadius: BorderRadius.circular(10.5)),
+                          child: GestureDetector(
+                            onTap: () {
+                              HapticFeedback.mediumImpact();
+                              subscribeToNotificationsDialog(context, ref);
+                            },
+                            child: Padding(
+                              padding: EdgeInsets.only(top: 16, bottom: 16),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Padding(
+                                        padding: EdgeInsets.only(
+                                            left: 12, right: 12),
+                                        child: Icon(
+                                          Iconsax.notification,
+                                          size: 24,
+                                          color: theme.selectedRowColor,
+                                        ),
+                                      ),
+                                      Text(
+                                          AppLocalizations.of(context)
+                                              .translate(
+                                                  'followup-notifications'),
+                                          style: kSubTitlesStyle.copyWith(
+                                              fontSize: 17,
+                                              height: 1.25,
+                                              color: theme.selectedRowColor)),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
                         Padding(
                           padding: EdgeInsets.only(top: 16, bottom: 8),
                           child: GestureDetector(
@@ -328,6 +374,14 @@ class AccountScreen extends ConsumerWidget {
       },
     );
   }
+
+  subscribeToNotificationsDialog(BuildContext context, WidgetRef ref) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (_) => NotificationBottomSheet(),
+    );
+  }
 }
 
 class UserProfileCard extends ConsumerWidget {
@@ -397,6 +451,364 @@ class AccountScreenScreenAuthenticationWrapper extends ConsumerWidget {
       },
       loading: () => CircularProgressIndicator(),
       error: (error, stackTrace) => Text('An error occurred: $error'),
+    );
+  }
+}
+
+class NotificationBottomSheet extends ConsumerStatefulWidget {
+  const NotificationBottomSheet({
+    key,
+  }) : super(key: key);
+
+  @override
+  ConsumerState<NotificationBottomSheet> createState() =>
+      _NotificationBottomSheetState();
+}
+
+class _NotificationBottomSheetState
+    extends ConsumerState<NotificationBottomSheet> {
+  Gender _selectedGender = Gender.male;
+  DateTime _selectedDate = DateTime.now();
+  Language _selectedLocale = Language.arabic;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Wrap(
+      children: [
+        Container(
+          decoration: BoxDecoration(
+            color: theme.scaffoldBackgroundColor,
+          ),
+          child: Padding(
+            padding:
+                EdgeInsets.only(top: 18.0, bottom: 18.0, right: 32, left: 32),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Container(
+                  padding: EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(100),
+                    color: theme.primaryColor.withOpacity(0.1),
+                  ),
+                  child: Icon(
+                    Iconsax.notification,
+                    color: theme.primaryColor,
+                    size: 32,
+                  ),
+                ),
+                SizedBox(
+                  height: 8,
+                ),
+                Text(
+                  AppLocalizations.of(context)
+                      .translate('followup-notifications'),
+                  style: kHeadlineStyle.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: theme.primaryColor,
+                  ),
+                ),
+                SizedBox(
+                  height: 16,
+                ),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      padding: EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(100),
+                        color: theme.primaryColor.withOpacity(0.1),
+                      ),
+                      child: Icon(
+                        Iconsax.heart,
+                        color: theme.primaryColor,
+                        size: 32 / 1.5,
+                      ),
+                    ),
+                    SizedBox(
+                      width: 10.5,
+                    ),
+                    Flexible(
+                      child: Text(
+                        AppLocalizations.of(context)
+                            .translate("followup-notifications-p"),
+                        style: kSubTitlesStyle.copyWith(
+                          color: theme.primaryColor,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          height: 1.5,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(
+                  height: 16,
+                ),
+                Column(
+                  children: [
+                    Row(
+                      children: [
+                        Text(
+                          AppLocalizations.of(context)
+                              .translate("date-of-birth"),
+                          style: kSubTitlesStyle.copyWith(
+                            color: theme.primaryColor,
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(
+                      height: 8,
+                    ),
+                    GestureDetector(
+                      onTap: () async {
+                        var dateTime = await getDateOfBirth(context);
+
+                        setState(() {
+                          _selectedDate = dateTime;
+                        });
+                      },
+                      child: Container(
+                        padding: EdgeInsets.all(8),
+                        width: MediaQuery.of(context).size.width - 40,
+                        height: 50,
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10.5),
+                            color: theme.cardColor),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Icon(Iconsax.calendar),
+                            SizedBox(
+                              width: 8,
+                            ),
+                            Text(
+                              DateFormat.yMd().format(_selectedDate),
+                              style: kSubTitlesStyle.copyWith(
+                                color: theme.primaryColor,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      height: 8,
+                    ),
+                    Row(
+                      children: [
+                        Text(
+                          AppLocalizations.of(context).translate("gender"),
+                          style: kSubTitlesStyle.copyWith(
+                            color: theme.primaryColor,
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(
+                      height: 8,
+                    ),
+                    SizedBox(
+                      width: MediaQuery.of(context).size.width - 40,
+                      child: SegmentedButton(
+                        style: ButtonStyle(
+                          shape: MaterialStateProperty.all(
+                            RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                          foregroundColor: MaterialStateProperty.all(
+                            theme.primaryColor,
+                          ),
+                          backgroundColor: MaterialStateProperty.all(
+                            theme.cardColor,
+                          ),
+                        ),
+                        selectedIcon: Icon(
+                          Icons.done,
+                          color: theme.primaryColor,
+                        ),
+                        onSelectionChanged: (p0) {
+                          setState(() {
+                            _selectedGender = p0.first;
+                          });
+                        },
+                        segments: <ButtonSegment<Gender>>[
+                          ButtonSegment<Gender>(
+                            value: Gender.male,
+                            label: Text(
+                              AppLocalizations.of(context).translate("male"),
+                              style: kSubTitlesStyle.copyWith(
+                                color: theme.primaryColor,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ),
+                          ButtonSegment<Gender>(
+                            value: Gender.femele,
+                            label: Text(
+                              AppLocalizations.of(context).translate("female"),
+                              style: kSubTitlesStyle.copyWith(
+                                color: theme.primaryColor,
+                                fontSize: 14,
+                              ),
+                            ),
+                          )
+                        ],
+                        selected: <Gender>{_selectedGender},
+                        showSelectedIcon: true,
+                        emptySelectionAllowed: false,
+                        multiSelectionEnabled: false,
+                      ),
+                    ),
+                    SizedBox(
+                      height: 8,
+                    ),
+                    Row(
+                      children: [
+                        Text(
+                          AppLocalizations.of(context)
+                              .translate("preferred-language"),
+                          style: kSubTitlesStyle.copyWith(
+                            color: theme.primaryColor,
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(
+                      height: 8,
+                    ),
+                    SizedBox(
+                      width: MediaQuery.of(context).size.width - 40,
+                      child: SegmentedButton(
+                        style: ButtonStyle(
+                          shape: MaterialStateProperty.all(
+                            RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                          foregroundColor: MaterialStateProperty.all(
+                            theme.primaryColor,
+                          ),
+                          backgroundColor: MaterialStateProperty.all(
+                            theme.cardColor,
+                          ),
+                        ),
+                        selectedIcon: Icon(
+                          Icons.done,
+                          color: theme.primaryColor,
+                        ),
+                        onSelectionChanged: (p0) {
+                          setState(() {
+                            _selectedLocale = p0.first;
+                          });
+                        },
+                        segments: <ButtonSegment<Language>>[
+                          ButtonSegment<Language>(
+                            value: Language.arabic,
+                            label: Text(
+                              'العربية',
+                              style: kSubTitlesStyle.copyWith(
+                                color: theme.primaryColor,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ),
+                          ButtonSegment<Language>(
+                            value: Language.english,
+                            label: Text(
+                              'English',
+                              style: kSubTitlesStyle.copyWith(
+                                color: theme.primaryColor,
+                                fontSize: 14,
+                              ),
+                            ),
+                          )
+                        ],
+                        selected: <Language>{_selectedLocale},
+                        showSelectedIcon: true,
+                        emptySelectionAllowed: false,
+                        multiSelectionEnabled: false,
+                      ),
+                    ),
+                    SizedBox(
+                      height: 16,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          AppLocalizations.of(context)
+                              .translate("data-are-secured"),
+                          style: kSubTitlesStyle.copyWith(
+                            color: theme.indicatorColor,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w900,
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(
+                      height: 16,
+                    ),
+                  ],
+                ),
+                GestureDetector(
+                  onTap: () async {
+                    //This is for updating the user profile in the database to add the new information
+                    await ref
+                        .watch(followupViewModelProvider.notifier)
+                        .registerPromizeUser(
+                          _selectedGender.name,
+                          _selectedLocale.name,
+                          _selectedDate,
+                        );
+
+                    await ref
+                        .watch(userViewModelProvider.notifier)
+                        .updateUserData(
+                          _selectedGender.name,
+                          _selectedLocale.name,
+                        );
+                  },
+                  child: Container(
+                    width: MediaQuery.of(context).size.width - 40,
+                    height: 60,
+                    decoration: BoxDecoration(
+                      color: theme.focusColor,
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.5),
+                          spreadRadius: .25,
+                          blurRadius: 7,
+                          offset: Offset(0, 2), // changes position of shadow
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          AppLocalizations.of(context).translate("activate"),
+                          style: kTitleSeconderyStyle.copyWith(
+                            color: theme.selectedRowColor,
+                            fontWeight: FontWeight.w900,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+              ],
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

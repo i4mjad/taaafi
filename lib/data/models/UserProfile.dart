@@ -4,12 +4,10 @@ class UserProfile {
   final String uid;
   final String displayName;
   final String email;
-  final String locale;
   final DateTime creationTime;
   final DateTime lastSignInTime;
 
   UserProfile({
-    this.locale,
     this.uid,
     this.displayName,
     this.email,
@@ -24,7 +22,26 @@ class UserProfile {
       email: user.email ?? "",
       creationTime: user.metadata.creationTime,
       lastSignInTime: user.metadata.lastSignInTime,
-      locale: "", //TODO: add this later
     );
   }
+  factory UserProfile.toMap(User user) {
+    return UserProfile(
+      uid: user.uid,
+      displayName: user.displayName ?? "",
+      email: user.email ?? "",
+      creationTime: user.metadata.creationTime,
+      lastSignInTime: user.metadata.lastSignInTime,
+    );
+  }
+
+  Map<String, dynamic> toJson(String locale, String gender, DateTime dob) => {
+        'user': uid,
+        'email': email,
+        'name': displayName,
+        'creationTime': creationTime,
+        'lastSignInTime': lastSignInTime,
+        'locale': locale,
+        'gender': gender,
+        'dayOfBirth': dob,
+      };
 }

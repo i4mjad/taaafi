@@ -1,15 +1,16 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:reboot_app_3/di/container.dart';
 import 'dart:async';
 
-import 'package:promize_sdk/promize_sdk.dart';
-import 'package:reboot_app_3/shared/services/auth_helper_methods.dart';
+import 'package:reboot_app_3/shared/services/promize_service.dart';
 
 class GoogleAuthenticationService extends ChangeNotifier {
   final FirebaseAuth _firebaseAuth;
-  GoogleAuthenticationService(this._firebaseAuth);
+  final IPromizeService _promizeService = getIt.get<IPromizeService>();
 
+  GoogleAuthenticationService(this._firebaseAuth);
   Stream<User> get authStateChanges => _firebaseAuth.authStateChanges();
 
   Future<UserCredential> signInWithGoogle() async {
@@ -26,11 +27,8 @@ class GoogleAuthenticationService extends ChangeNotifier {
 
     var userCredential =
         await FirebaseAuth.instance.signInWithCredential(credential);
-    final _promizeSdk = PromizeSdk.instance;
 
-    final promizeUser = createPromizeUser(userCredential.user.displayName,
-        userCredential.user.email, userCredential.user.uid);
-    _promizeSdk.createUser(user: promizeUser);
+    await _promizeService.createUser();
 
     return userCredential;
   }
@@ -52,6 +50,7 @@ class GoogleAuthenticationService extends ChangeNotifier {
   }
 
   Future<void> signOut() async {
+    await _promizeService.signOut();
     await _firebaseAuth.signOut();
   }
 

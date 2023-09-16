@@ -24,3 +24,20 @@ class FollowUpData {
 
   static FollowUpData Missing = new FollowUpData(Timestamp.now(), [], [], []);
 }
+
+class CheckUpData {
+  String highestStreak;
+  String noRelapsesDays;
+  String totalDays;
+  String relapsesCount;
+
+  CheckUpData(this.highestStreak, this.noRelapsesDays, this.totalDays,
+      this.relapsesCount);
+
+  Map<String, dynamic> toJson() => {
+        'highestStreak': highestStreak,
+        'noRelapsesDays': noRelapsesDays,
+        'totalDays': totalDays,
+        'relapsesCount': relapsesCount
+      };
+}

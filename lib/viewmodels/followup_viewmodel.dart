@@ -7,9 +7,11 @@ import 'package:reboot_app_3/data/models/FollowUpData.dart';
 import 'package:reboot_app_3/di/container.dart';
 import 'package:reboot_app_3/presentation/screens/follow_your_reboot/day_of_week_relapses/day_of_week_relapses_widget.dart';
 import 'package:reboot_app_3/repository/follow_up_data_repository.dart';
+import 'package:reboot_app_3/shared/services/promize_service.dart';
 
 class FollowUpViewModel extends StateNotifier<FollowUpData> {
   final IFollowUpDataRepository _followUpRepository;
+  final IPromizeService _promizeService = getIt<IPromizeService>();
 
   FollowUpViewModel()
       : _followUpRepository = getIt<IFollowUpDataRepository>(),
@@ -140,6 +142,15 @@ class FollowUpViewModel extends StateNotifier<FollowUpData> {
       "userMasturbatingWithoutWatching": _mastOnly,
       "userWatchingWithoutMasturbating": _watchOnly,
     };
+
+    _promizeService.checkIn(
+      "relapse",
+      DateTime.now(),
+      "status",
+      await getRelapseStreak(),
+      await getNoMastsStreak(),
+      await getNoPornStreak(),
+    );
     await _followUpRepository.updateFollowUpData(data);
   }
 
@@ -164,6 +175,14 @@ class FollowUpViewModel extends StateNotifier<FollowUpData> {
       "userMasturbatingWithoutWatching": _mastOnly,
       "userWatchingWithoutMasturbating": _watchOnly,
     };
+    _promizeService.checkIn(
+      "success",
+      DateTime.now(),
+      "status",
+      await getRelapseStreak(),
+      await getNoMastsStreak(),
+      await getNoPornStreak(),
+    );
     await _followUpRepository.updateFollowUpData(data);
   }
 
@@ -174,6 +193,14 @@ class FollowUpViewModel extends StateNotifier<FollowUpData> {
     if (_days.contains(date)) return;
     _days.add(date);
     var data = {"userWatchingWithoutMasturbating": _days};
+    _promizeService.checkIn(
+      "WatchingPornWithoutMasturbating",
+      DateTime.now(),
+      "status",
+      await getRelapseStreak(),
+      await getNoMastsStreak(),
+      await getNoPornStreak(),
+    );
     await _followUpRepository.updateFollowUpData(data);
   }
 
@@ -185,6 +212,16 @@ class FollowUpViewModel extends StateNotifier<FollowUpData> {
     _days.add(date);
 
     var data = {"userMasturbatingWithoutWatching": _days};
+
+    _promizeService.checkIn(
+      "MasturbatingWithoutWatchingPorn",
+      DateTime.now(),
+      "status",
+      await getRelapseStreak(),
+      await getNoMastsStreak(),
+      await getNoPornStreak(),
+    );
+
     await _followUpRepository.updateFollowUpData(data);
   }
 
@@ -347,5 +384,10 @@ class FollowUpViewModel extends StateNotifier<FollowUpData> {
 
   Future<DateTime> getFirstDate() async {
     return await _followUpRepository.getStartingDate();
+  }
+
+  Future<void> registerPromizeUser(
+      String gender, String locale, DateTime dob) async {
+    _promizeService.updateUser(gender, locale, dob);
   }
 }

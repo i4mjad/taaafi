@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:reboot_app_3/data/models/UserProfile.dart';
 import 'package:reboot_app_3/repository/user_context.dart';
@@ -16,13 +17,26 @@ class UserViewModel extends StateNotifier<UserProfile> {
     });
   }
 
-  Future<void> createNewData(DateTime selectedDate) async {
+  Future<void> createNewData(DateTime selectedDate,
+      {String gender, String locale}) async {
     try {
-      return await _userContext.createNewData(selectedDate);
+      return await _userContext.createNewData(selectedDate, gender, locale);
     } catch (error) {
       print('Error creating new data: $error');
-      // handle the error here, e.g. show an error message to the user
+
       //TODO: consider checking a prober way to display the error using a snackbar for examnple.
+    }
+  }
+
+  Future<void> updateUserData(String gender, String locale) async {
+    var map = {
+      "gender": gender,
+      "locale": locale,
+    };
+    try {
+      return await _userContext.updateUserDocument(map);
+    } catch (error) {
+      print('Error creating new data: $error');
     }
   }
 

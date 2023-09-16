@@ -53,6 +53,7 @@ ThemeData get lightTheme {
     appBarTheme: AppBarTheme(
       backgroundColor: seconderyColor,
     ),
+    indicatorColor: Colors.blue[900],
   );
 }
 
@@ -71,5 +72,6 @@ ThemeData get darkTheme {
     appBarTheme: AppBarTheme(
       backgroundColor: darkBackgroundColor,
     ),
+    indicatorColor: Colors.blue[300],
   );
 }

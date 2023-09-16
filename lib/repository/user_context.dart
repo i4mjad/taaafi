@@ -4,13 +4,16 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:reboot_app_3/data/models/UserProfile.dart';
 import 'package:rxdart/rxdart.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 abstract class IUserContext {
   String get uid;
   Stream<DocumentSnapshot> getUserDoc();
-  Future<void> createNewData(DateTime date);
+  Future<void> createNewData(DateTime date, String gender, String locale);
+  Future<void> updateUserDocument(Map<String, dynamic> data);
   Stream<bool> isUserDocExist();
   Future<void> deleteUserData();
+  Future<void> getLocale();
   UserProfile getUserProfile();
   Stream<UserProfile> get userProfileStream;
 }
@@ -27,6 +30,7 @@ class FireStoreUserContext implements IUserContext {
   @override
   Stream<DocumentSnapshot> getUserDoc() {
     final user = _auth.currentUser;
+
     if (user != null) {
       return _firestore
           .collection('users')
@@ -48,7 +52,8 @@ class FireStoreUserContext implements IUserContext {
   }
 
   @override
-  Future<void> createNewData(DateTime date) async {
+  Future<void> createNewData(
+      DateTime date, String gender, String locale) async {
     final user = _auth.currentUser;
 
     if (user != null) {
@@ -56,6 +61,8 @@ class FireStoreUserContext implements IUserContext {
         "uid": user.uid,
         "userFirstDate": Timestamp.fromDate(date),
         "email": user.email,
+        "gender": gender,
+        "locale": locale,
         "userRelapses": [],
         "userMasturbatingWithoutWatching": [],
         "userWatchingWithoutMasturbating": [],
@@ -77,8 +84,7 @@ class FireStoreUserContext implements IUserContext {
     final user = _auth.currentUser;
     if (user != null) {
       await _firestore.collection('users').doc(user.uid).delete();
-      _userProfileController.sink.add(
-          null); // Add null to the BehaviorSubject when user's data is deleted
+      _userProfileController.sink.add(null);
     } else {
       throw Exception("No user is currently signed in");
     }
@@ -94,4 +100,17 @@ class FireStoreUserContext implements IUserContext {
 
   @override
   String get uid => _auth.currentUser.uid;
+
+  @override
+  Future<void> getLocale() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    final locale = await prefs.getString("languageCode");
+    return locale;
+  }
+
+  @override
+  Future<void> updateUserDocument(Map<String, dynamic> data) async {
+    final user = _auth.currentUser;
+    await _firestore.collection('users').doc(user.uid).update(data);
+  }
 }
