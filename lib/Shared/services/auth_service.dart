@@ -63,7 +63,7 @@ class GoogleAuthenticationService extends ChangeNotifier {
         print(
             'The user must reauthenticate before this operation can be executed.');
       }
-      print(e.code);
+      print(e);
     }
   }
 }

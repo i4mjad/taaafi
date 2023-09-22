@@ -1,4 +1,5 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+
+import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -209,7 +210,7 @@ class AccountScreen extends ConsumerWidget {
                               HapticFeedback.mediumImpact();
 
                               await ref
-                                  .watch(googleAuthenticationServiceProvider)
+                                  .watch(authenticationServiceProvider)
                                   .signOut();
                             },
                             child: Row(
@@ -439,11 +440,11 @@ class AccountScreenScreenAuthenticationWrapper extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final userDocAsyncValue = ref.watch(userDocStreamProvider);
+    final authStateChanges = ref.watch(authStateChangesProvider);
 
-    return userDocAsyncValue.when(
-      data: (DocumentSnapshot userDoc) {
-        if (userDoc == null || !userDoc.exists) {
+    return authStateChanges.when(
+      data: (User user) {
+        if (user == null) {
           return LoginScreen();
         } else {
           return AccountScreen();

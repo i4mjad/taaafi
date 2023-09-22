@@ -9,7 +9,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 abstract class IUserContext {
   String get uid;
   Stream<DocumentSnapshot> getUserDoc();
-  Future<void> createNewData(DateTime date, String gender, String locale);
+  Future<void> createNewData(
+      DateTime date, String gender, String locale, DateTime dob);
   Future<void> updateUserDocument(Map<String, dynamic> data);
   Stream<bool> isUserDocExist();
   Future<void> deleteUserData();
@@ -53,7 +54,7 @@ class FireStoreUserContext implements IUserContext {
 
   @override
   Future<void> createNewData(
-      DateTime date, String gender, String locale) async {
+      DateTime date, String gender, String locale, DateTime dob) async {
     final user = _auth.currentUser;
 
     if (user != null) {
@@ -63,6 +64,7 @@ class FireStoreUserContext implements IUserContext {
         "email": user.email,
         "gender": gender,
         "locale": locale,
+        "dayOfBirth": dob,
         "userRelapses": [],
         "userMasturbatingWithoutWatching": [],
         "userWatchingWithoutMasturbating": [],

@@ -1,5 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:intl/intl.dart';
 import 'package:promize_sdk/core/event_types.dart';
 import 'package:promize_sdk/core/models/user.dart';
 import 'package:promize_sdk/promize_sdk.dart';

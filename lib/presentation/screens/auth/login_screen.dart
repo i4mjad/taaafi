@@ -2,9 +2,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:reboot_app_3/providers/main_providers.dart';
 import 'package:reboot_app_3/shared/constants/textstyles_constants.dart';
 import 'package:reboot_app_3/shared/localization/localization.dart';
+import 'package:reboot_app_3/shared/services/auth/firebase_auth_methods.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 class LoginScreen extends ConsumerWidget {
@@ -80,28 +80,16 @@ class LoginScreen extends ConsumerWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   SignInWithAppleButton(onPressed: () async {
-                    final appleIdCredential =
-                        await SignInWithApple.getAppleIDCredential(scopes: [
-                      AppleIDAuthorizationScopes.email,
-                      AppleIDAuthorizationScopes.fullName
-                    ]);
-                    final oAuthProvider = OAuthProvider('apple.com');
-                    final credential = oAuthProvider.credential(
-                      idToken: appleIdCredential.identityToken,
-                      accessToken: appleIdCredential.authorizationCode,
-                    );
-                    await FirebaseAuth.instance
-                        .signInWithCredential(credential)
-                        .then((value) {});
+                    FirebaseAuthMethods(FirebaseAuth.instance)
+                        .signInWithApple(context);
                   }),
                   SizedBox(
                     height: 8,
                   ),
                   GestureDetector(
                     onTap: () async {
-                      await ref
-                          .watch(googleAuthenticationServiceProvider)
-                          .signInWithGoogle();
+                      FirebaseAuthMethods(FirebaseAuth.instance)
+                          .signInWithGoogle(context);
                     },
                     child: Container(
                       width: MediaQuery.of(context).size.width - 40,

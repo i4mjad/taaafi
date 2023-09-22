@@ -5,8 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:reboot_app_3/providers/main_providers.dart';
+import 'package:reboot_app_3/shared/components/snackbar.dart';
 import 'package:reboot_app_3/shared/constants/textstyles_constants.dart';
 import 'package:reboot_app_3/shared/localization/localization.dart';
+import 'package:reboot_app_3/shared/services/auth/firebase_auth_methods.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 class DeleteAccountSheet {
@@ -102,16 +104,11 @@ class DeleteAccountSheet {
                     final user = FirebaseAuth.instance.currentUser;
                     String uid = user.uid;
 
-                    await db
-                        .collection("users")
-                        .doc(uid)
-                        .delete()
-                        .then((_) async {
-                      await ref
-                          .watch(googleAuthenticationServiceProvider)
-                          .deleteAccount();
-                      Navigator.pop(context);
-                    });
+                    await db.collection("users").doc(uid).delete();
+                    await ref
+                        .watch(authenticationServiceProvider)
+                        .deleteAccount(context);
+                    Navigator.pop(context);
                   },
                   child: Container(
                     width: MediaQuery.of(context).size.width - 40,
@@ -234,24 +231,15 @@ class DeleteAccountSheet {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   SignInWithAppleButton(onPressed: () async {
-                    final appleIdCredential =
-                        await SignInWithApple.getAppleIDCredential(
-                      scopes: [
-                        AppleIDAuthorizationScopes.email,
-                        AppleIDAuthorizationScopes.fullName
-                      ],
-                    );
-                    final oAuthProvider = OAuthProvider('apple.com');
-                    final credential = oAuthProvider.credential(
-                      idToken: appleIdCredential.identityToken,
-                      accessToken: appleIdCredential.authorizationCode,
-                    );
-
-                    await FirebaseAuth.instance.currentUser
-                        .reauthenticateWithCredential(credential)
+                    FirebaseAuthMethods(FirebaseAuth.instance)
+                        .reSignInWithApple(context)
                         .then((value) {
-                      Navigator.pop(context);
-                      openConfirmDeleteAccountMessage(context, ref);
+                      try {
+                        Navigator.pop(context);
+                        openConfirmDeleteAccountMessage(context, ref);
+                      } catch (e) {
+                        getSystemSnackBar(context, e);
+                      }
                     });
                   }),
                   SizedBox(
@@ -259,12 +247,15 @@ class DeleteAccountSheet {
                   ),
                   GestureDetector(
                     onTap: () async {
-                      await ref
-                          .watch(googleAuthenticationServiceProvider)
-                          .reauthenticateWithCredential()
+                      FirebaseAuthMethods(FirebaseAuth.instance)
+                          .reSignInWithGoogle(context)
                           .then((value) {
-                        Navigator.pop(context);
-                        openConfirmDeleteAccountMessage(context, ref);
+                        try {
+                          Navigator.pop(context);
+                          openConfirmDeleteAccountMessage(context, ref);
+                        } catch (e) {
+                          getSystemSnackBar(context, e);
+                        }
                       });
                     },
                     child: Container(

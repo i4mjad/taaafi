@@ -18,9 +18,9 @@ class UserViewModel extends StateNotifier<UserProfile> {
   }
 
   Future<void> createNewData(DateTime selectedDate,
-      {String gender, String locale}) async {
+      {String gender, String locale,DateTime dob}) async {
     try {
-      return await _userContext.createNewData(selectedDate, gender, locale);
+      return await _userContext.createNewData(selectedDate, gender, locale,dob);
     } catch (error) {
       print('Error creating new data: $error');
 

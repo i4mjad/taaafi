@@ -20,7 +20,7 @@ class NewUserSection extends ConsumerStatefulWidget {
 
 class NewUserSectionState extends ConsumerState<NewUserSection> {
   Gender _selectedGender = Gender.male;
-  DateTime _selectedDate = DateTime.now();
+  DateTime _selectedDateOfBirth = DateTime.now();
   DateTime _selectedStartingDate = DateTime.now();
   Language _selectedLocale = Language.arabic;
 
@@ -68,10 +68,12 @@ class NewUserSectionState extends ConsumerState<NewUserSection> {
                       GestureDetector(
                         onTap: () async {
                           var dateTime = await getDateOfBirth(context);
-
-                          setState(() {
-                            _selectedDate = dateTime;
-                          });
+                          print(dateTime);
+                          if (dateTime != null) {
+                            setState(() {
+                              _selectedDateOfBirth = dateTime;
+                            });
+                          }
                         },
                         child: Container(
                           padding: EdgeInsets.all(8),
@@ -88,7 +90,7 @@ class NewUserSectionState extends ConsumerState<NewUserSection> {
                                 width: 8,
                               ),
                               Text(
-                                DateFormat.yMd().format(_selectedDate),
+                                DateFormat.yMd().format(_selectedDateOfBirth),
                                 style: kSubTitlesStyle.copyWith(
                                   color: theme.primaryColor,
                                 ),
@@ -256,11 +258,13 @@ class NewUserSectionState extends ConsumerState<NewUserSection> {
                       ),
                       GestureDetector(
                         onTap: () async {
-                          var dateTime = await getDateOfBirth(context);
+                          var dateTime = await getStartingDate(context);
 
-                          setState(() {
-                            _selectedStartingDate = dateTime;
-                          });
+                          if (dateTime != null) {
+                            setState(() {
+                              _selectedStartingDate = dateTime;
+                            });
+                          }
                         },
                         child: Container(
                           padding: EdgeInsets.all(8),
@@ -341,17 +345,13 @@ class NewUserSectionState extends ConsumerState<NewUserSection> {
                   ),
                   GestureDetector(
                     onTap: () async {
-                      if (_selectedDate.year > 2015) {
-                        return;
-                      } else {
-                        await ref
-                            .watch(userViewModelProvider.notifier)
-                            .createNewData(
-                              _selectedStartingDate,
-                              gender: _selectedGender.name,
-                              locale: _selectedLocale.name,
-                            );
-                      }
+                      await ref
+                          .watch(userViewModelProvider.notifier)
+                          .createNewData(
+                            _selectedStartingDate,
+                            gender: _selectedGender.name,
+                            locale: _selectedLocale.name,
+                          );
                     },
                     child: Container(
                       height: 60,
