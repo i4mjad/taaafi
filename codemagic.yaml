@@ -1,27 +1,13 @@
-# codemagic.yaml
+---
 workflows:
-  main:
-    # Set up environment variables
+  android-workflow-id:
+    name:
+      Android Workflow
+      # .......
+      # .......
+      # .......
+  ios-workflow-id:
+    name: iOS Workflow
     environment:
-      # Set the Apple ID and password for code signing
-      FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD: $CM_FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD
-      MATCH_PASSWORD: $CM_MATCH_PASSWORD
-      MATCH_KEYCHAIN_NAME: "login.keychain"
-      MATCH_KEYCHAIN_PASSWORD: $CM_MATCH_KEYCHAIN_PASSWORD
-    # Configure build steps
-    scripts:
-      # Install dependencies
-      - name: Install Dependencies
-        script: flutter pub get
-      # Run tests
-      # - name: Run Tests
-      #   script: flutter test
-      # Build iOS app and upload to TestFlight
-      - name: Build and Deploy iOS App
-        script: |
-          # Install and configure Fastlane
-          gem install fastlane -NV
-          # Build iOS app with code signing
-          fastlane ios release --verbose
-          # Upload to TestFlight
-          asc upload -a com.amjadKhalfan.RebootApp -f build/ios/iphoneos/Runner.ipa --skip_waiting_for_build_processing
+      flutter: fvm
+      flavor: stable

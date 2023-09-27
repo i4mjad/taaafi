@@ -107,7 +107,7 @@ class _MyAppState extends State<MyApp> {
     });
   }
 
-  Future<Null> localeCkeck() async {
+  Future<void> localeCkeck() async {
     Locale _token;
     SharedPreferences prefs = await SharedPreferences.getInstance();
     _token = await Locale(prefs.getString("languageCode"), '');

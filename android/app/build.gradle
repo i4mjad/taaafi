@@ -43,12 +43,12 @@ android {
     defaultConfig {
         applicationId "com.amjadkhalfan.reboot_app_3"
 
-        targetSdkVersion 31
+        targetSdkVersion 33
         minSdkVersion 19
         //version number: 2.5.3
-        versionName "2.5.3"
-        //build number : 01
-        versionCode 25301
+        versionName "4.3.0"
+        //build number : 02
+        versionCode 43002
         // key2
 
         //multiDexEnabled true

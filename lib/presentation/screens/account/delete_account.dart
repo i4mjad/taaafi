@@ -4,7 +4,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:reboot_app_3/providers/main_providers.dart';
 import 'package:reboot_app_3/shared/components/snackbar.dart';
 import 'package:reboot_app_3/shared/constants/textstyles_constants.dart';
 import 'package:reboot_app_3/shared/localization/localization.dart';
@@ -104,10 +103,11 @@ class DeleteAccountSheet {
                     final user = FirebaseAuth.instance.currentUser;
                     String uid = user.uid;
 
-                    await db.collection("users").doc(uid).delete();
-                    await ref
-                        .watch(authenticationServiceProvider)
-                        .deleteAccount(context);
+                    await db.collection("users").doc(uid).delete().then(
+                        (value) async =>
+                            await FirebaseAuthMethods(FirebaseAuth.instance)
+                                .deleteAccount(context));
+
                     Navigator.pop(context);
                   },
                   child: Container(

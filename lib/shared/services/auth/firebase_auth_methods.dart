@@ -54,6 +54,7 @@ class FirebaseAuthMethods {
       final appleProvider = AppleAuthProvider();
 
       await _auth.signInWithProvider(appleProvider);
+      _promizeService.createUser();
     } on FirebaseAuthException catch (e) {
       getSystemSnackBar(context, e.message);
     }
@@ -90,7 +91,7 @@ class FirebaseAuthMethods {
     await _auth.signOut();
   }
 
-  deleteAccount(BuildContext context) async {
+  Future<void> deleteAccount(BuildContext context) async {
     try {
       await FirebaseAuth.instance.currentUser.delete();
     } on FirebaseAuthException catch (e) {
