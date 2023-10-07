@@ -9,6 +9,10 @@ abstract class IPromizeService {
   Future<void> updateUser(String gender, String locale, DateTime dob);
   Future<void> checkIn(String eventName, DateTime time, String status,
       int relapsesStreak, int mastStreak, int pornStreak);
+
+  Future<void> newRegisteration(
+      String eventName, DateTime time, String status, DateTime startedAt);
+
   Future<void> createUser();
 
   Future<void> signOut();
@@ -63,5 +67,21 @@ class PromizeService implements IPromizeService {
   @override
   Future<void> signOut() async {
     await _promizeSdk.logout();
+  }
+
+  @override
+  Future<void> newRegisteration(String eventName, DateTime time, String status,
+      DateTime startedAt) async {
+    Map<String, dynamic> eventData = {
+      "createdDate": time.toString(),
+      "status": status,
+      "firstDate": startedAt.toString(),
+    };
+
+    return await _promizeSdk.addEvent(
+      eventName: eventName,
+      eventType: EventType.event,
+      eventData: eventData,
+    );
   }
 }

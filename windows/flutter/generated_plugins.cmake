@@ -4,6 +4,7 @@
 
 list(APPEND FLUTTER_PLUGIN_LIST
   local_auth_windows
+  promize_sdk
   url_launcher_windows
 )
 

@@ -3,11 +3,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:reboot_app_3/data/models/UserProfile.dart';
 import 'package:reboot_app_3/repository/user_context.dart';
+import 'package:reboot_app_3/shared/services/promize_service.dart';
 
 class UserViewModel extends StateNotifier<UserProfile> {
   final IUserContext _userContext;
+  final IPromizeService _promizeService;
 
-  UserViewModel(this._userContext) : super(null) {
+  UserViewModel(this._userContext, this._promizeService) : super(null) {
     _fetchUserProfile();
   }
 
@@ -18,9 +20,12 @@ class UserViewModel extends StateNotifier<UserProfile> {
   }
 
   Future<void> createNewData(DateTime selectedDate,
-      {String gender, String locale,DateTime dob}) async {
+      {String gender, String locale, DateTime dob}) async {
     try {
-      return await _userContext.createNewData(selectedDate, gender, locale,dob);
+      await _promizeService.newRegisteration(
+          "new-registeration", DateTime.now(), "status", selectedDate);
+      return await _userContext.createNewData(
+          selectedDate, gender, locale, dob);
     } catch (error) {
       print('Error creating new data: $error');
 
