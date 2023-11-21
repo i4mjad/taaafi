@@ -22,8 +22,9 @@ class WelcomeWidget extends ConsumerWidget {
         if (user == null) {
           return NotSignIn();
         } else {
-          var userProfileProvider =
-              ref.watch(userViewModelProvider.notifier).userDocumentStream;
+          var userProfileProvider = ref
+              .watch(userViewModelStateNotifierProvider.notifier)
+              .userDocumentStream;
           if (userProfileProvider != null) {
             return WelcomeContent();
           } else {

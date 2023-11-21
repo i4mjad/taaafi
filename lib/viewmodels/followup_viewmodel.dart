@@ -7,11 +7,12 @@ import 'package:reboot_app_3/data/models/FollowUpData.dart';
 import 'package:reboot_app_3/di/container.dart';
 import 'package:reboot_app_3/presentation/screens/follow_your_reboot/day_of_week_relapses/day_of_week_relapses_widget.dart';
 import 'package:reboot_app_3/repository/follow_up_data_repository.dart';
+import 'package:reboot_app_3/shared/constants/customer_io_attributes_const.dart';
 import 'package:reboot_app_3/shared/services/promize_service.dart';
 
 class FollowUpViewModel extends StateNotifier<FollowUpData> {
   final IFollowUpDataRepository _followUpRepository;
-  final IPromizeService _promizeService = getIt<IPromizeService>();
+  final ICustomerIOService _promizeService = getIt<ICustomerIOService>();
 
   FollowUpViewModel()
       : _followUpRepository = getIt<IFollowUpDataRepository>(),
@@ -144,13 +145,21 @@ class FollowUpViewModel extends StateNotifier<FollowUpData> {
     };
 
     _promizeService.checkIn(
-      "relapse",
+      EventsNames.Relapse,
       DateTime.now(),
-      "status",
-      await getRelapseStreak(),
-      await getNoMastsStreak(),
-      await getNoPornStreak(),
+      relapsesStreak: await getRelapseStreak(),
+      mastStreak: await getNoMastsStreak(),
+      pornStreak: await getNoPornStreak(),
     );
+
+    _promizeService.updateUser({
+      ProfileAttributesConstants.TotalDays: await getTotalDaysFromBegining(),
+      ProfileAttributesConstants.NoRelapseDays:
+          await getTotalDaysWithoutRelapse(),
+      ProfileAttributesConstants.RelapsesCount:
+          int.parse(await getRelapsesCount()) + 1,
+      ProfileAttributesConstants.HighestStreak: await getHighestStreak(),
+    });
     await _followUpRepository.updateFollowUpData(data);
   }
 
@@ -176,13 +185,18 @@ class FollowUpViewModel extends StateNotifier<FollowUpData> {
       "userWatchingWithoutMasturbating": _watchOnly,
     };
     _promizeService.checkIn(
-      "success",
+      EventsNames.Success,
       DateTime.now(),
-      "status",
-      await getRelapseStreak(),
-      await getNoMastsStreak(),
-      await getNoPornStreak(),
     );
+
+    _promizeService.updateUser({
+      ProfileAttributesConstants.TotalDays: await getTotalDaysFromBegining(),
+      ProfileAttributesConstants.NoRelapseDays:
+          await getTotalDaysWithoutRelapse(),
+      ProfileAttributesConstants.RelapsesCount:
+          int.parse(await getRelapsesCount()),
+      ProfileAttributesConstants.HighestStreak: await getHighestStreak(),
+    });
     await _followUpRepository.updateFollowUpData(data);
   }
 
@@ -194,13 +208,19 @@ class FollowUpViewModel extends StateNotifier<FollowUpData> {
     _days.add(date);
     var data = {"userWatchingWithoutMasturbating": _days};
     _promizeService.checkIn(
-      "WatchingPornWithoutMasturbating",
+      EventsNames.PornWithoutMast,
       DateTime.now(),
-      "status",
-      await getRelapseStreak(),
-      await getNoMastsStreak(),
-      await getNoPornStreak(),
+      pornStreak: await getNoPornStreak(),
     );
+
+    _promizeService.updateUser({
+      ProfileAttributesConstants.TotalDays: await getTotalDaysFromBegining(),
+      ProfileAttributesConstants.NoRelapseDays:
+          await getTotalDaysWithoutRelapse(),
+      ProfileAttributesConstants.RelapsesCount:
+          int.parse(await getRelapsesCount()),
+      ProfileAttributesConstants.HighestStreak: await getHighestStreak(),
+    });
     await _followUpRepository.updateFollowUpData(data);
   }
 
@@ -214,12 +234,9 @@ class FollowUpViewModel extends StateNotifier<FollowUpData> {
     var data = {"userMasturbatingWithoutWatching": _days};
 
     _promizeService.checkIn(
-      "MasturbatingWithoutWatchingPorn",
+      EventsNames.PornWithoutMast,
       DateTime.now(),
-      "status",
-      await getRelapseStreak(),
-      await getNoMastsStreak(),
-      await getNoPornStreak(),
+      pornStreak: await getNoPornStreak(),
     );
 
     await _followUpRepository.updateFollowUpData(data);
@@ -388,6 +405,6 @@ class FollowUpViewModel extends StateNotifier<FollowUpData> {
 
   Future<void> registerPromizeUser(
       String gender, String locale, DateTime dob) async {
-    _promizeService.updateUser(gender, locale, dob);
+    _promizeService.createUser(gender, locale, dob);
   }
 }

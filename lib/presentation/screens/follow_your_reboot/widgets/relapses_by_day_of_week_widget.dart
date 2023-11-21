@@ -56,7 +56,7 @@ class RelapsesByDayOfWeek extends ConsumerWidget {
                         ),
                       ),
                       Text(
-                        snapshot.data.totalRelapses,
+                        snapshot.data.totalRelapses ?? "0",
                         style: kSubTitlesStyle.copyWith(
                           color: theme.primaryColor,
                           fontSize: 16,

@@ -7,7 +7,7 @@ import 'package:reboot_app_3/shared/services/promize_service.dart';
 
 class FirebaseAuthMethods {
   final FirebaseAuth _auth;
-  final IPromizeService _promizeService = getIt.get<IPromizeService>();
+  final ICustomerIOService _promizeService = getIt.get<ICustomerIOService>();
   FirebaseAuthMethods(this._auth);
 
   // FOR EVERY FUNCTION HERE
@@ -33,8 +33,6 @@ class FirebaseAuthMethods {
 
         await _auth.signInWithCredential(credential);
 
-        _promizeService.createUser();
-
         // if you want to do specific task like storing information in firestore
         // only for new users using google sign in (since there are no two options
         // for google sign in and google sign up, only one as of now),
@@ -54,7 +52,6 @@ class FirebaseAuthMethods {
       final appleProvider = AppleAuthProvider();
 
       await _auth.signInWithProvider(appleProvider);
-      _promizeService.createUser();
     } on FirebaseAuthException catch (e) {
       getSystemSnackBar(context, e.message);
     }

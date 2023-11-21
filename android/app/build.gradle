@@ -44,11 +44,11 @@ android {
         applicationId "com.amjadkhalfan.reboot_app_3"
 
         targetSdkVersion 33
-        minSdkVersion 19
-        //version number: 2.5.3
-        versionName "4.3.0"
+        minSdkVersion 21
+        //version number: 4.3.1
+        versionName "4.3.1"
         //build number : 02
-        versionCode 43002
+        versionCode 43102
         // key2
 
         //multiDexEnabled true
@@ -65,9 +65,9 @@ android {
 
     dependencies {
 
-        implementation "com.android.billingclient:billing-ktx:4.0.0"
+        implementation "com.android.billingclient:billing-ktx:6.0.1"
         implementation platform('com.google.firebase:firebase-bom:26.4.0')
-        implementation 'com.google.firebase:firebase-messaging:23.0.0'
+        implementation 'com.google.firebase:firebase-messaging:23.3.1'
         implementation 'com.google.firebase:firebase-analytics'
         implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     }

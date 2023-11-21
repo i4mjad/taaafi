@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:reboot_app_3/shared/constants/textstyles_constants.dart';
@@ -74,7 +73,7 @@ class _AboutScreenState extends State<AboutScreen>
                       height: 20,
                     ),
                     Text(
-                      "${Platform.isIOS == true ? AppLocalizations.of(context).translate('version-number-ios') : AppLocalizations.of(context).translate('version-number-android')} • ${Platform.isIOS == true ? "iOS" : "Android"}",
+                      AppLocalizations.of(context).translate('version-number'),
                       style: kSubTitlesStyle.copyWith(
                           fontSize: 16,
                           height: 1,

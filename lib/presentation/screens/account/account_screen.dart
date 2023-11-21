@@ -1,4 +1,3 @@
-
 import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:flutter/material.dart';
@@ -7,11 +6,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:intl/intl.dart';
 import 'package:reboot_app_3/data/models/Enums.dart';
+import 'package:reboot_app_3/data/models/UserProfile.dart';
 import 'package:reboot_app_3/presentation/screens/account/delete_account.dart';
 import 'package:reboot_app_3/providers/followup/followup_providers.dart';
 import 'package:reboot_app_3/providers/main_providers.dart';
 import 'package:reboot_app_3/providers/user/user_providers.dart';
 import 'package:reboot_app_3/shared/components/custom-app-bar.dart';
+import 'package:reboot_app_3/shared/components/snackbar.dart';
 import 'package:reboot_app_3/shared/helpers/date_methods.dart';
 import 'package:reboot_app_3/shared/localization/localization.dart';
 import 'package:reboot_app_3/presentation/screens/follow_your_reboot/widgets/new_user_widgets.dart';
@@ -49,47 +50,41 @@ class AccountScreen extends ConsumerWidget {
                         borderRadius: BorderRadius.circular(12.5)),
                     child: Column(
                       children: [
-                        Container(
-                          decoration: BoxDecoration(
-                              color: theme.focusColor,
-                              borderRadius: BorderRadius.circular(10.5)),
-                          child: GestureDetector(
-                            onTap: () {
-                              HapticFeedback.mediumImpact();
-                              subscribeToNotificationsDialog(context, ref);
-                            },
-                            child: Padding(
-                              padding: EdgeInsets.only(top: 16, bottom: 16),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Row(
-                                    children: [
-                                      Padding(
-                                        padding: EdgeInsets.only(
-                                            left: 12, right: 12),
-                                        child: Icon(
-                                          Iconsax.notification,
-                                          size: 24,
-                                          color: theme.selectedRowColor,
-                                        ),
-                                      ),
-                                      Text(
-                                          AppLocalizations.of(context)
-                                              .translate(
-                                                  'followup-notifications'),
-                                          style: kSubTitlesStyle.copyWith(
-                                              fontSize: 17,
-                                              height: 1.25,
-                                              color: theme.selectedRowColor)),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
+                        // GestureDetector(
+                        //   onTap: () {
+                        //     HapticFeedback.mediumImpact();
+                        //     subscribeToNotificationsDialog(context, ref);
+                        //   },
+                        //   child: Padding(
+                        //     padding: EdgeInsets.only(top: 16, bottom: 16),
+                        //     child: Row(
+                        //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        //       children: [
+                        //         Row(
+                        //           children: [
+                        //             Padding(
+                        //               padding:
+                        //                   EdgeInsets.only(left: 12, right: 12),
+                        //               child: Icon(
+                        //                 Iconsax.user,
+                        //                 size: 24,
+                        //                 color: theme.selectedRowColor,
+                        //               ),
+                        //             ),
+                        //             Text(
+                        //                 AppLocalizations.of(context)
+                        //                     .translate('account-settings'),
+                        //                 style: kSubTitlesStyle.copyWith(
+                        //                     fontSize: 17,
+                        //                     height: 1.25,
+                        //                     color: theme.selectedRowColor)),
+                        //           ],
+                        //         ),
+                        //       ],
+                        //     ),
+                        //   ),
+                        // ),
+
                         Padding(
                           padding: EdgeInsets.only(top: 16, bottom: 8),
                           child: GestureDetector(
@@ -346,8 +341,8 @@ class AccountScreen extends ConsumerWidget {
                         var selectedDate = await getDateTime(context);
                         if (selectedDate == null) return;
                         await ref
-                            .watch(userViewModelProvider.notifier)
-                            .createNewData(selectedDate);
+                            .watch(userViewModelStateNotifierProvider.notifier)
+                            .resetUserData(selectedDate);
                         Navigator.pop(context);
                       },
                       child: Container(
@@ -391,47 +386,51 @@ class UserProfileCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    var userProfile =
-        ref.watch(userViewModelProvider.notifier).getUserProfile();
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Column(
-          children: [
-            Container(
-              padding: EdgeInsets.all(40),
-              decoration: BoxDecoration(
-                color: theme.cardColor,
-                borderRadius: BorderRadius.circular(500),
-              ),
-              child: Icon(
-                Iconsax.user,
-                size: 56,
-                color: theme.primaryColor,
-              ),
-            ),
-            SizedBox(height: 16),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Text(
-                  userProfile.displayName,
-                  style: kTitlePrimeryStyle.copyWith(
-                      color: theme.hintColor, fontWeight: FontWeight.w500),
-                ),
-                SizedBox(height: 8),
-                Text(
-                  userProfile.email.toUpperCase(),
-                  style: kCaptionStyle.copyWith(
-                    color: theme.hintColor.withOpacity(0.75),
+    var userProfile = ref.watch(userViewModelStateNotifierProvider.notifier);
+    return FutureBuilder<UserProfile>(
+        future: userProfile.getUserProfile(),
+        builder: (context, snapshot) {
+          return Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Column(
+                children: [
+                  Container(
+                    padding: EdgeInsets.all(40),
+                    decoration: BoxDecoration(
+                      color: theme.cardColor,
+                      borderRadius: BorderRadius.circular(500),
+                    ),
+                    child: Icon(
+                      Iconsax.user,
+                      size: 56,
+                      color: theme.primaryColor,
+                    ),
                   ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ],
-    );
+                  SizedBox(height: 16),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text(
+                        snapshot.data?.displayName ?? 'Loading...',
+                        style: kTitlePrimeryStyle.copyWith(
+                            color: theme.hintColor,
+                            fontWeight: FontWeight.w500),
+                      ),
+                      SizedBox(height: 8),
+                      Text(
+                        snapshot.data?.email?.toUpperCase() ?? 'Loading...',
+                        style: kCaptionStyle.copyWith(
+                          color: theme.hintColor.withOpacity(0.75),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ],
+          );
+        });
   }
 }
 
@@ -469,7 +468,7 @@ class NotificationBottomSheet extends ConsumerStatefulWidget {
 class _NotificationBottomSheetState
     extends ConsumerState<NotificationBottomSheet> {
   Gender _selectedGender = Gender.male;
-  DateTime _selectedDate = DateTime.now();
+  DateTime _dayOfBirth = DateTime.now();
   Language _selectedLocale = Language.arabic;
 
   @override
@@ -495,7 +494,7 @@ class _NotificationBottomSheetState
                     color: theme.primaryColor.withOpacity(0.1),
                   ),
                   child: Icon(
-                    Iconsax.notification,
+                    Iconsax.user,
                     color: theme.primaryColor,
                     size: 32,
                   ),
@@ -504,47 +503,11 @@ class _NotificationBottomSheetState
                   height: 8,
                 ),
                 Text(
-                  AppLocalizations.of(context)
-                      .translate('followup-notifications'),
+                  AppLocalizations.of(context).translate('account-settings'),
                   style: kHeadlineStyle.copyWith(
                     fontWeight: FontWeight.bold,
                     color: theme.primaryColor,
                   ),
-                ),
-                SizedBox(
-                  height: 16,
-                ),
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      padding: EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(100),
-                        color: theme.primaryColor.withOpacity(0.1),
-                      ),
-                      child: Icon(
-                        Iconsax.heart,
-                        color: theme.primaryColor,
-                        size: 32 / 1.5,
-                      ),
-                    ),
-                    SizedBox(
-                      width: 10.5,
-                    ),
-                    Flexible(
-                      child: Text(
-                        AppLocalizations.of(context)
-                            .translate("followup-notifications-p"),
-                        style: kSubTitlesStyle.copyWith(
-                          color: theme.primaryColor,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                          height: 1.5,
-                        ),
-                      ),
-                    ),
-                  ],
                 ),
                 SizedBox(
                   height: 16,
@@ -570,7 +533,7 @@ class _NotificationBottomSheetState
                         var dateTime = await getDateOfBirth(context);
 
                         setState(() {
-                          _selectedDate = dateTime;
+                          _dayOfBirth = dateTime;
                         });
                       },
                       child: Container(
@@ -588,7 +551,7 @@ class _NotificationBottomSheetState
                               width: 8,
                             ),
                             Text(
-                              DateFormat.yMd().format(_selectedDate),
+                              DateFormat.yMd().format(_dayOfBirth),
                               style: kSubTitlesStyle.copyWith(
                                 color: theme.primaryColor,
                               ),
@@ -766,15 +729,17 @@ class _NotificationBottomSheetState
                         .registerPromizeUser(
                           _selectedGender.name,
                           _selectedLocale.name,
-                          _selectedDate,
+                          _dayOfBirth,
                         );
 
                     await ref
-                        .watch(userViewModelProvider.notifier)
-                        .updateUserData(
-                          _selectedGender.name,
-                          _selectedLocale.name,
-                        );
+                        .watch(userViewModelStateNotifierProvider.notifier)
+                        .updateUserData(_selectedGender.name,
+                            _selectedLocale.name, _dayOfBirth);
+
+                    Navigator.pop(context);
+
+                    customSnackBar(context, "Hel");
                   },
                   child: Container(
                     width: MediaQuery.of(context).size.width - 40,

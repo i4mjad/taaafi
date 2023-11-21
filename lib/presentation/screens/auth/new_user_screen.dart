@@ -68,8 +68,8 @@ class NewUserSectionState extends ConsumerState<NewUserSection> {
                       GestureDetector(
                         onTap: () async {
                           var dateTime = await getDateOfBirth(context);
-                          print(dateTime);
-                          if (dateTime != null) {
+
+                          if (dateTime != null || dateTime.year < 2010) {
                             setState(() {
                               _selectedDateOfBirth = dateTime;
                             });
@@ -346,12 +346,11 @@ class NewUserSectionState extends ConsumerState<NewUserSection> {
                   GestureDetector(
                     onTap: () async {
                       await ref
-                          .watch(userViewModelProvider.notifier)
-                          .createNewData(
-                            _selectedStartingDate,
-                            gender: _selectedGender.name,
-                            locale: _selectedLocale.name,
-                          );
+                          .watch(userViewModelStateNotifierProvider.notifier)
+                          .createNewData(_selectedStartingDate,
+                              gender: _selectedGender.name,
+                              locale: _selectedLocale.name,
+                              dob: _selectedDateOfBirth);
                     },
                     child: Container(
                       height: 60,

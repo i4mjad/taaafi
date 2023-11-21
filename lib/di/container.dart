@@ -9,8 +9,12 @@ final getIt = GetIt.instance;
 
 void SetupContainer() {
   getIt.registerSingleton<INotesRepository>(FirebaseNotesRepository());
-  getIt.registerSingleton<IUserContext>(FireStoreUserContext());
+  getIt.registerLazySingleton<IUserContext>(() {
+    final userContext = FireStoreUserContext();
+
+    return userContext;
+  });
   getIt.registerSingleton<IFollowUpDataRepository>(
       FirebaseFollowUpDataRepository());
-  getIt.registerSingleton<IPromizeService>(PromizeService());
+  getIt.registerSingleton<ICustomerIOService>(CustomerIOService());
 }

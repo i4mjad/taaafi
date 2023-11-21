@@ -1,20 +1,21 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:get_it/get_it.dart';
 import 'package:reboot_app_3/data/models/UserProfile.dart';
 import 'package:reboot_app_3/repository/user_context.dart';
+import 'package:reboot_app_3/shared/constants/customer_io_attributes_const.dart';
 import 'package:reboot_app_3/shared/services/promize_service.dart';
 
 class UserViewModel extends StateNotifier<UserProfile> {
   final IUserContext _userContext;
-  final IPromizeService _promizeService;
+  final ICustomerIOService _promizeService;
 
-  UserViewModel(this._userContext, this._promizeService) : super(null) {
-    _fetchUserProfile();
-  }
-
-  void _fetchUserProfile() {
-    _userContext.userProfileStream.listen((userProfile) {
+  UserViewModel()
+      : _userContext = GetIt.I<IUserContext>(),
+        _promizeService = GetIt.I<ICustomerIOService>(),
+        super(UserProfile.Missing) {
+    _userContext.getUserProfileStream().listen((userProfile) {
       state = userProfile;
     });
   }
@@ -22,8 +23,8 @@ class UserViewModel extends StateNotifier<UserProfile> {
   Future<void> createNewData(DateTime selectedDate,
       {String gender, String locale, DateTime dob}) async {
     try {
-      await _promizeService.newRegisteration(
-          "new-registeration", DateTime.now(), "status", selectedDate);
+      await _promizeService.newRegisterationEvent(
+          EventsNames.NewRegesteration, DateTime.now(), selectedDate);
       return await _userContext.createNewData(
           selectedDate, gender, locale, dob);
     } catch (error) {
@@ -33,10 +34,26 @@ class UserViewModel extends StateNotifier<UserProfile> {
     }
   }
 
-  Future<void> updateUserData(String gender, String locale) async {
+  Future<void> resetUserData(DateTime selectedDate) async {
+    try {
+      await _promizeService.newRegisterationEvent(
+          EventsNames.NewRegesteration, DateTime.now(), selectedDate);
+      return await _userContext.resetUserData(selectedDate);
+    } catch (error) {
+      print('Error creating new data: $error');
+
+      //TODO: consider checking a prober way to display the error using a snackbar for examnple.
+    }
+  }
+
+  Future<void> updateUserData(
+      String gender, String locale, DateTime dob) async {
+    final user = _userContext.getFirebaseUser();
     var map = {
       "gender": gender,
       "locale": locale,
+      "dayOfBirth": dob,
+      "displayName": user.displayName,
     };
     try {
       return await _userContext.updateUserDocument(map);
@@ -57,7 +74,7 @@ class UserViewModel extends StateNotifier<UserProfile> {
     return _userContext.deleteUserData();
   }
 
-  UserProfile getUserProfile() {
+  Future<UserProfile> getUserProfile() {
     return _userContext.getUserProfile();
   }
 

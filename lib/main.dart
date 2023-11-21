@@ -1,3 +1,6 @@
+import 'package:customer_io/customer_io.dart';
+
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -6,12 +9,13 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
-import 'package:promize_sdk/promize_sdk.dart';
+
 import 'package:reboot_app_3/di/container.dart';
 import 'package:reboot_app_3/firebase_options.dart';
 import 'package:reboot_app_3/providers/main_providers.dart';
 import 'package:reboot_app_3/shared/Components/bottom_navbar.dart';
 import 'package:reboot_app_3/shared/components/app-themes.dart';
+
 import 'package:reboot_app_3/shared/localization/localization.dart';
 
 import 'package:reboot_app_3/shared/services/notification_service.dart';
@@ -20,24 +24,43 @@ import 'package:reboot_app_3/shared/services/routing/routes_names.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 bool darkMode = false;
-final _promizeSdk = PromizeSdk.instance;
+// final _promizeSdk = PromizeSdk.instance;
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  bool weWantFatalErrorRecording = true;
+  FlutterError.onError = (errorDetails) {
+    if (weWantFatalErrorRecording) {
+      FirebaseCrashlytics.instance.recordFlutterFatalError(errorDetails);
+    } else {
+      FirebaseCrashlytics.instance.recordFlutterError(errorDetails);
+    }
+  };
+  FirebaseCrashlytics.instance.setUserIdentifier(
+      FirebaseAuth.instance.currentUser.uid ?? "Un Authenticated User");
+
   SetupContainer();
-  _promizeSdk.initialize(
-    apiKey: 'oh51RjWT33x6nmejD677bYlBx7Cf9VdG2dgMx7t075Meu0arOYbluZgBcsfflyC2',
-    siteId: '5liwmsi7su',
-    baseUrl: 'https://ta3afi.api.promize.io',
-  );
+
+  //TODO: uncomment this when it is ready
+
+  // await CustomerIO.initialize(
+  //   config: CustomerIOConfig(
+  //     siteId: "035af3a05d72c85a480d",
+  //     apiKey: "3e45eaf1a38eb2f53f5d",
+  //     region: Region.eu,
+  //     autoTrackDeviceAttributes: true,
+  //     autoTrackPushEvents: true,
+  //     enableInApp: false,
+  //     logLevel: CioLogLevel.debug,
+  //   ),
+  // );
 
   InitializationSettings initializationSettings = await setupNotifications();
   await setupFirebaseMesagging(initializationSettings);
 
-  FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
   runApp(MyApp());
 }
 
@@ -45,9 +68,7 @@ Future<void> setupFirebaseMesagging(
     InitializationSettings initializationSettings) async {
   var firbaseMessagingToken = await FirebaseMessaging.instance.getToken();
 
-  await _promizeSdk.saveDeviceToken(
-    deviceToken: firbaseMessagingToken,
-  );
+  CustomerIO.registerDeviceToken(deviceToken: firbaseMessagingToken);
 
   await NotificationService.flutterLocalNotificationsPlugin
       .initialize(initializationSettings);
@@ -101,6 +122,7 @@ class _MyAppState extends State<MyApp> {
 
   initState() {
     super.initState();
+
     localeCkeck();
     currentTheme.addListener(() {
       setState(() {});

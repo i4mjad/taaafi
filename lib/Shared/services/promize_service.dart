@@ -1,87 +1,78 @@
-import 'package:promize_sdk/core/event_types.dart';
-import 'package:promize_sdk/core/models/user.dart';
-import 'package:promize_sdk/promize_sdk.dart';
+import 'package:customer_io/customer_io.dart';
+
 import 'package:reboot_app_3/di/container.dart';
 
 import 'package:reboot_app_3/repository/user_context.dart';
+import 'package:reboot_app_3/shared/constants/customer_io_attributes_const.dart';
 
-abstract class IPromizeService {
-  Future<void> updateUser(String gender, String locale, DateTime dob);
-  Future<void> checkIn(String eventName, DateTime time, String status,
-      int relapsesStreak, int mastStreak, int pornStreak);
+abstract class ICustomerIOService {
+  Future<void> updateUser(Map<String, dynamic> attributes);
+  Future<void> checkIn(String eventName, DateTime time,
+      {int relapsesStreak, int mastStreak, int pornStreak});
 
-  Future<void> newRegisteration(
-      String eventName, DateTime time, String status, DateTime startedAt);
+  Future<void> newRegisterationEvent(
+      String eventName, DateTime time, DateTime startedAt);
 
-  Future<void> createUser();
+  Future<void> createUser(String gender, String locale, DateTime dob);
 
   Future<void> signOut();
 }
 
-class PromizeService implements IPromizeService {
-  final _promizeSdk = PromizeSdk.instance;
+class CustomerIOService implements ICustomerIOService {
   IUserContext _userContext = getIt.get<IUserContext>();
 
   @override
-  Future<void> updateUser(String gender, String locale, DateTime dob) async {
-    var userProfile = await _userContext.getUserProfile();
-
-    var promizeUser = new User(
-        email: userProfile.email,
-        name: userProfile.displayName,
-        userId: userProfile.uid,
-        data: userProfile.toJson(locale, gender, dob));
-    await _promizeSdk.updateUser(user: promizeUser);
+  Future<void> updateUser(Map<String, dynamic> attributes) async {
+    // CustomerIO.setProfileAttributes(attributes: attributes);
   }
 
   @override
-  Future<void> checkIn(String eventName, DateTime time, String status,
-      int relapsesStreak, int mastStreak, int pornStreak) async {
-    Map<String, dynamic> eventData = {
-      "date": time.toString(),
-      "status": status,
-      "relapsesStreak": relapsesStreak,
-      "masturbationStreak": mastStreak,
-      "pornStreak": pornStreak
+  Future<void> checkIn(String eventName, DateTime time,
+      {relapsesStreak = 0, int mastStreak = 0, int pornStreak = 0}) async {
+    Map<String, dynamic> eventAttributes = {
+      EventsAttributes.Time: time.millisecondsSinceEpoch,
+      EventsAttributes.RelapsesBrokenStreak: relapsesStreak,
+      EventsAttributes.NoMastBrokenStreak: mastStreak,
+      EventsAttributes.NoPornBrokenStreak: pornStreak
     };
 
-    return await _promizeSdk.addEvent(
-      eventName: eventName,
-      eventType: EventType.event,
-      eventData: eventData,
-    );
+    // await CustomerIO.track(name: eventName, attributes: eventAttributes);
   }
 
   @override
-  Future<void> createUser() async {
+  Future<void> createUser(String gender, String locale, DateTime dob) async {
     var userProfile = await _userContext.getUserProfile();
 
-    var promizeUser = new User(
-      email: userProfile.email,
-      name: userProfile.displayName,
-      userId: userProfile.uid,
-    );
-    await _promizeSdk.createUser(user: promizeUser);
+    var profile = await userProfile;
+
+    Map<String, Object> attributes = {
+      ProfileAttributesConstants.Name: "",
+      ProfileAttributesConstants.Email: profile.email,
+      ProfileAttributesConstants.RegistrationDate:
+          profile.creationTime.millisecondsSinceEpoch,
+      ProfileAttributesConstants.DayOfBirth:
+          profile.dayOfBirth.millisecondsSinceEpoch,
+      ProfileAttributesConstants.Locale: profile.lcoale,
+      ProfileAttributesConstants.Gender: profile.gender,
+    };
+
+    // CustomerIO.identify(identifier: profile.uid, attributes: attributes);
   }
 
   @override
   Future<void> signOut() async {
-    await _promizeSdk.logout();
+    // CustomerIO.clearIdentify();
   }
 
   @override
-  Future<void> newRegisteration(String eventName, DateTime time, String status,
-      DateTime startedAt) async {
-    Map<String, dynamic> eventData = {
-      "createdDate": time.toString(),
-      "status": status,
+  Future<void> newRegisterationEvent(
+      String eventName, DateTime time, DateTime startedAt) async {
+    Map<String, dynamic> eventAttributes = {
+      EventsAttributes.Time: time.toString(),
       "firstDate": startedAt.toString(),
     };
 
-    return await _promizeSdk.addEvent(
-      eventName: eventName,
-      eventType: EventType.event,
-      eventData: eventData,
-    );
+    // return CustomerIO.track(
+    //     name: EventsNames.NewRegesteration, attributes: eventAttributes);
   }
 }

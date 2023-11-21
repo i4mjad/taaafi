@@ -1,47 +1,60 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class UserProfile {
   final String uid;
   final String displayName;
   final String email;
+  final String gender;
+  final String lcoale;
+
   final DateTime creationTime;
-  final DateTime lastSignInTime;
+
+  final DateTime dayOfBirth;
 
   UserProfile({
     this.uid,
     this.displayName,
     this.email,
     this.creationTime,
-    this.lastSignInTime,
+    this.lcoale,
+    this.gender,
+    this.dayOfBirth,
   });
 
-  factory UserProfile.fromFirebaseUser(User user) {
-    return UserProfile(
+  static UserProfile Missing = new UserProfile();
+
+  factory UserProfile.fromFireStore(User user, Map<String, Object> data) {
+    var userProfile = UserProfile(
       uid: user.uid,
-      displayName: user.displayName ?? "",
-      email: user.email ?? "",
+      displayName: user.displayName,
+      email: user.email,
       creationTime: user.metadata.creationTime,
-      lastSignInTime: user.metadata.lastSignInTime,
+      gender: data["gender"],
+      lcoale: data["locale"],
+      dayOfBirth: DateTime.fromMillisecondsSinceEpoch(
+          (data["dayOfBirth"] as Timestamp).millisecondsSinceEpoch),
     );
+
+    return userProfile;
   }
+
   factory UserProfile.toMap(User user) {
     return UserProfile(
       uid: user.uid,
       displayName: user.displayName ?? "",
       email: user.email ?? "",
       creationTime: user.metadata.creationTime,
-      lastSignInTime: user.metadata.lastSignInTime,
     );
   }
 
-  Map<String, dynamic> toJson(String locale, String gender, DateTime dob) => {
+  Map<String, dynamic> toJson() => {
         'user': uid,
         'email': email,
         'name': displayName,
         'creationTime': creationTime,
-        'lastSignInTime': lastSignInTime,
-        'locale': locale,
+        'locale': lcoale,
         'gender': gender,
-        'dayOfBirth': dob,
+        'dayOfBirth': dayOfBirth,
       };
 }
