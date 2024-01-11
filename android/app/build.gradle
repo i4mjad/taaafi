@@ -46,9 +46,9 @@ android {
         targetSdkVersion 33
         minSdkVersion 21
         //version number: 4.3.1
-        versionName "4.3.1"
-        //build number : 02
-        versionCode 43102
+        versionName "4.3.3"
+        //build number : 01
+        versionCode 43301
         // key2
 
         //multiDexEnabled true

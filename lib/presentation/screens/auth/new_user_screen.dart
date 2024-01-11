@@ -69,7 +69,7 @@ class NewUserSectionState extends ConsumerState<NewUserSection> {
                         onTap: () async {
                           var dateTime = await getDateOfBirth(context);
 
-                          if (dateTime != null || dateTime.year < 2010) {
+                          if (dateTime != null && dateTime.year < 2010) {
                             setState(() {
                               _selectedDateOfBirth = dateTime;
                             });

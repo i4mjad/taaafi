@@ -10,7 +10,7 @@
   "[dart]": {
     "editor.formatOnSave": true,
     "editor.codeActionsOnSave": {
-      "source.removeUnusedImports": true
+      "source.removeUnusedImports": "explicit"
     }
   }
 }

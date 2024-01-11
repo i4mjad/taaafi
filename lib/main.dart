@@ -1,6 +1,5 @@
 import 'package:customer_io/customer_io.dart';
 
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -24,23 +23,14 @@ import 'package:reboot_app_3/shared/services/routing/routes_names.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 bool darkMode = false;
-// final _promizeSdk = PromizeSdk.instance;
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  bool weWantFatalErrorRecording = true;
-  FlutterError.onError = (errorDetails) {
-    if (weWantFatalErrorRecording) {
-      FirebaseCrashlytics.instance.recordFlutterFatalError(errorDetails);
-    } else {
-      FirebaseCrashlytics.instance.recordFlutterError(errorDetails);
-    }
-  };
-  FirebaseCrashlytics.instance.setUserIdentifier(
-      FirebaseAuth.instance.currentUser.uid ?? "Un Authenticated User");
+
+  FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
 
   SetupContainer();
 
@@ -130,9 +120,8 @@ class _MyAppState extends State<MyApp> {
   }
 
   Future<void> localeCkeck() async {
-    Locale _token;
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    _token = await Locale(prefs.getString("languageCode"), '');
+    Locale _token = await Locale(prefs.getString("languageCode"), '');
     if (_token != null) {
       setState(() {
         _locale = _token;
