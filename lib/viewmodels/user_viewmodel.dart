@@ -16,17 +16,17 @@ class UserViewModel extends StateNotifier<UserProfile> {
         _promizeService = GetIt.I<ICustomerIOService>(),
         super(UserProfile.Missing) {
     _userContext.getUserProfileStream().listen((userProfile) {
-      state = userProfile;
+      state = userProfile!;
     });
   }
 
   Future<void> createNewData(DateTime selectedDate,
-      {String gender, String locale, DateTime dob}) async {
+      {String? gender, String? locale, DateTime? dob}) async {
     try {
       await _promizeService.newRegisterationEvent(
           EventsNames.NewRegesteration, DateTime.now(), selectedDate);
       return await _userContext.createNewData(
-          selectedDate, gender, locale, dob);
+          selectedDate, gender!, locale!, dob!);
     } catch (error) {
       print('Error creating new data: $error');
 
@@ -53,7 +53,7 @@ class UserViewModel extends StateNotifier<UserProfile> {
       "gender": gender,
       "locale": locale,
       "dayOfBirth": dob,
-      "displayName": user.displayName,
+      "displayName": user?.displayName,
     };
     try {
       return await _userContext.updateUserDocument(map);
@@ -78,6 +78,7 @@ class UserViewModel extends StateNotifier<UserProfile> {
     return _userContext.getUserProfile();
   }
 
-  Stream<UserProfile> get userProfileStream => _userContext.userProfileStream;
+  Stream<UserProfile?> get userProfileStream =>
+      _userContext.getUserProfileStream();
   Stream<DocumentSnapshot> get userDocumentStream => _userContext.getUserDoc();
 }

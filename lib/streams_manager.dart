@@ -4,7 +4,7 @@ class StreamManager {
   final List<StreamSubscription> _subscriptions = [];
 
   StreamSubscription<T> listen<T>(Stream<T> stream, void Function(T) onData,
-      {Function onError, void Function() onDone, bool cancelOnError = false}) {
+      {required Function onError, required void Function() onDone, bool cancelOnError = false}) {
     final subscription = stream.listen(
       onData,
       onError: onError,

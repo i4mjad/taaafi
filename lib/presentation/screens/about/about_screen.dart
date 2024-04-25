@@ -16,14 +16,14 @@ class AboutScreen extends StatefulWidget {
 
 class _AboutScreenState extends State<AboutScreen>
     with TickerProviderStateMixin {
-  String lang;
+  String lang = "";
 
   @override
   void initState() {
     super.initState();
     LocaleService.getSelectedLocale().then((value) {
       setState(() {
-        lang = value;
+        lang = value as String;
       });
     });
   }

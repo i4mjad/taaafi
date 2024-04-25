@@ -3,13 +3,10 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:reboot_app_3/bloc_provider.dart';
-import 'package:reboot_app_3/presentation/blocs/content_bloc.dart';
-import 'package:reboot_app_3/presentation/screens/home/widgets/explore_widget.dart';
 import 'package:reboot_app_3/presentation/screens/home/widgets/welcome_widget.dart';
+import 'package:reboot_app_3/presentation/screens/ta3afi_liberary/widgets/content_screen.dart';
 import 'package:reboot_app_3/shared/components/custom-app-bar.dart';
 import 'package:reboot_app_3/shared/localization/localization.dart';
-import 'package:reboot_app_3/presentation/Screens/ta3afi_liberary/widgets/content_screen.dart';
 import 'package:reboot_app_3/shared/constants/textstyles_constants.dart';
 import 'package:reboot_app_3/shared/localization/localization_services.dart';
 import 'package:reboot_app_3/shared/services/app_review_service.dart';
@@ -24,7 +21,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
-  String lang;
+  var lang;
   final RatingService _ratingService = RatingService();
 
   @override
@@ -67,13 +64,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               SizedBox(
                 height: 32,
               ),
-            CustomBlocProvider(
-              bloc: ContentBloc(),
-              child: ExploreWidget(),
-            ),
-              SizedBox(
-                height: 32,
-              ),
+              // CustomBlocProvider(
+              //   bloc: ContentBloc(),
+              //   child: ExploreWidget(),
+              // ),
+
               Ta3afiLiberaryWidget(),
               SizedBox(
                 height: 24,
@@ -88,7 +83,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
 class Ta3afiLiberaryWidget extends StatelessWidget {
   const Ta3afiLiberaryWidget({
-    Key key,
+    Key? key,
   }) : super(key: key);
 
   @override

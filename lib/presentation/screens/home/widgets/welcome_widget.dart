@@ -10,7 +10,7 @@ import 'package:reboot_app_3/shared/localization/localization.dart';
 
 class WelcomeWidget extends ConsumerWidget {
   const WelcomeWidget({
-    Key key,
+    Key? key,
   }) : super(key: key);
 
   @override
@@ -18,12 +18,12 @@ class WelcomeWidget extends ConsumerWidget {
     final userAsyncValue = ref.watch(authStateChangesProvider);
 
     return userAsyncValue.when(
-      data: (User user) {
+      data: (User? user) {
         if (user == null) {
           return NotSignIn();
         } else {
-          var userProfileProvider = ref
-              .watch(userViewModelStateNotifierProvider.notifier)
+          final userProfileProvider = ref
+              .read(userViewModelStateNotifierProvider.notifier)
               .userDocumentStream;
           if (userProfileProvider != null) {
             return WelcomeContent();
@@ -39,7 +39,7 @@ class WelcomeWidget extends ConsumerWidget {
 }
 
 class NotSignIn extends StatelessWidget {
-  const NotSignIn({Key key}) : super(key: key);
+  const NotSignIn({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -79,7 +79,7 @@ class NotSignIn extends StatelessWidget {
 
 class WelcomeContent extends ConsumerWidget {
   const WelcomeContent({
-    Key key,
+    Key? key,
   }) : super(key: key);
 
   @override
@@ -127,7 +127,7 @@ class WelcomeContent extends ConsumerWidget {
                                 case ConnectionState.waiting:
                                   return Center(
                                       child: CircularProgressIndicator());
-                                  break;
+
                                 default:
                                   // Completed with error
                                   if (streak.hasError)
@@ -187,7 +187,7 @@ class WelcomeContent extends ConsumerWidget {
                                   case ConnectionState.waiting:
                                     return Center(
                                         child: CircularProgressIndicator());
-                                    break;
+
                                   default:
                                     // Completed with error
                                     if (sh.hasError)
@@ -204,7 +204,7 @@ class WelcomeContent extends ConsumerWidget {
                                     return Text(
                                       AppLocalizations.of(context)
                                               .translate("relapses-30-days") +
-                                          sh.data,
+                                          (sh.data as String),
                                       textAlign: TextAlign.center,
                                       style: kSubTitlesStyle.copyWith(
                                           fontSize: 13, color: theme.hintColor),
@@ -237,7 +237,7 @@ class WelcomeContent extends ConsumerWidget {
                                   case ConnectionState.waiting:
                                     return Center(
                                         child: CircularProgressIndicator());
-                                    break;
+
                                   default:
                                     // Completed with error
                                     if (sh.hasError)
@@ -254,7 +254,7 @@ class WelcomeContent extends ConsumerWidget {
                                     return Text(
                                       AppLocalizations.of(context).translate(
                                               'free-days-from-start') +
-                                          sh.data,
+                                          (sh.data as String),
                                       textAlign: TextAlign.center,
                                       style: kSubTitlesStyle.copyWith(
                                           color: theme.hintColor, fontSize: 13),

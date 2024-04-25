@@ -15,8 +15,8 @@ abstract class IFollowUpDataRepository {
 }
 
 class FirebaseFollowUpDataRepository implements IFollowUpDataRepository {
-  FirebaseFirestore _db;
-  IUserContext _userContext;
+  var _db;
+  var _userContext;
   final _followUpDateController = StreamController<FollowUpData>();
 
   FirebaseFollowUpDataRepository() {

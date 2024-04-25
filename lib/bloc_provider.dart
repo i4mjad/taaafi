@@ -8,9 +8,9 @@ abstract class CustomBlocBase {
 // Generic BLoC provider
 class CustomBlocProvider<T extends CustomBlocBase> extends StatefulWidget {
   CustomBlocProvider({
-    Key key,
-    @required this.child,
-    @required this.bloc,
+    Key? key,
+    required this.child,
+    required this.bloc,
   }) : super(key: key);
 
   final T bloc;
@@ -20,9 +20,9 @@ class CustomBlocProvider<T extends CustomBlocBase> extends StatefulWidget {
   _CustomBlocProviderState<T> createState() => _CustomBlocProviderState<T>();
 
   static T of<T extends CustomBlocBase>(BuildContext context) {
-    CustomBlocProvider<T> provider =
+    CustomBlocProvider<T>? provider =
         context.findAncestorWidgetOfExactType<CustomBlocProvider<T>>();
-    return provider.bloc;
+    return provider!.bloc;
   }
 }
 

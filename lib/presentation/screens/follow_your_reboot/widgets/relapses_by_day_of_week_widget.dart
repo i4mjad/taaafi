@@ -6,7 +6,7 @@ import 'package:reboot_app_3/shared/constants/textstyles_constants.dart';
 import 'package:reboot_app_3/shared/localization/localization.dart';
 
 class RelapsesByDayOfWeek extends ConsumerWidget {
-  RelapsesByDayOfWeek({Key key}) : super(key: key);
+  RelapsesByDayOfWeek({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -56,7 +56,7 @@ class RelapsesByDayOfWeek extends ConsumerWidget {
                         ),
                       ),
                       Text(
-                        snapshot.data.totalRelapses ?? "0",
+                        snapshot.data?.totalRelapses ?? "0",
                         style: kSubTitlesStyle.copyWith(
                           color: theme.primaryColor,
                           fontSize: 16,
@@ -67,56 +67,56 @@ class RelapsesByDayOfWeek extends ConsumerWidget {
                   Divider(),
                   DayOfWeekWidget(
                     day: "sun",
-                    percentage: snapshot.data.sunRelapses.relapsesPercentage,
-                    count: snapshot.data.sunRelapses.relapsesCount,
+                    percentage: snapshot.data?.sunRelapses.relapsesPercentage,
+                    count: snapshot.data?.sunRelapses.relapsesCount,
                   ),
                   SizedBox(
                     height: 4,
                   ),
                   DayOfWeekWidget(
                     day: "mon",
-                    percentage: snapshot.data.monRelapses.relapsesPercentage,
-                    count: snapshot.data.monRelapses.relapsesCount,
+                    percentage: snapshot.data?.monRelapses.relapsesPercentage,
+                    count: snapshot.data?.monRelapses.relapsesCount,
                   ),
                   SizedBox(
                     height: 4,
                   ),
                   DayOfWeekWidget(
                     day: "tue",
-                    percentage: snapshot.data.tueRelapses.relapsesPercentage,
-                    count: snapshot.data.tueRelapses.relapsesCount,
+                    percentage: snapshot.data?.tueRelapses.relapsesPercentage,
+                    count: snapshot.data?.tueRelapses.relapsesCount,
                   ),
                   SizedBox(
                     height: 4,
                   ),
                   DayOfWeekWidget(
                     day: "wed",
-                    percentage: snapshot.data.wedRelapses.relapsesPercentage,
-                    count: snapshot.data.wedRelapses.relapsesCount,
+                    percentage: snapshot.data?.wedRelapses.relapsesPercentage,
+                    count: snapshot.data?.wedRelapses.relapsesCount,
                   ),
                   SizedBox(
                     height: 4,
                   ),
                   DayOfWeekWidget(
                     day: "thu",
-                    percentage: snapshot.data.thuRelapses.relapsesPercentage,
-                    count: snapshot.data.thuRelapses.relapsesCount,
+                    percentage: snapshot.data?.thuRelapses.relapsesPercentage,
+                    count: snapshot.data?.thuRelapses.relapsesCount,
                   ),
                   SizedBox(
                     height: 4,
                   ),
                   DayOfWeekWidget(
                     day: "fri",
-                    percentage: snapshot.data.friRelapses.relapsesPercentage,
-                    count: snapshot.data.friRelapses.relapsesCount,
+                    percentage: snapshot.data?.friRelapses.relapsesPercentage,
+                    count: snapshot.data?.friRelapses.relapsesCount,
                   ),
                   SizedBox(
                     height: 4,
                   ),
                   DayOfWeekWidget(
                     day: "sat",
-                    percentage: snapshot.data.satRelapses.relapsesPercentage,
-                    count: snapshot.data.satRelapses.relapsesCount,
+                    percentage: snapshot.data?.satRelapses.relapsesPercentage,
+                    count: snapshot.data?.satRelapses.relapsesCount,
                   ),
                 ],
               );
@@ -129,7 +129,7 @@ class RelapsesByDayOfWeek extends ConsumerWidget {
 }
 
 class DayOfWeekWidget extends StatelessWidget {
-  DayOfWeekWidget({Key key, this.day, this.percentage, this.count})
+  DayOfWeekWidget({Key? key, this.day, this.percentage, this.count})
       : super(key: key);
 
   final percentage;

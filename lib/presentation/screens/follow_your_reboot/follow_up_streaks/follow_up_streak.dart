@@ -8,7 +8,7 @@ import 'package:reboot_app_3/shared/constants/textstyles_constants.dart';
 import 'package:reboot_app_3/shared/localization/localization.dart';
 
 class FollowUpStreaks extends ConsumerWidget {
-  FollowUpStreaks({Key key}) : super(key: key);
+  FollowUpStreaks({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

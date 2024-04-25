@@ -381,7 +381,7 @@ class AccountScreen extends ConsumerWidget {
 }
 
 class UserProfileCard extends ConsumerWidget {
-  UserProfileCard({Key key, String lang}) : super(key: key);
+  UserProfileCard({Key? key, String? lang}) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -435,14 +435,14 @@ class UserProfileCard extends ConsumerWidget {
 }
 
 class AccountScreenScreenAuthenticationWrapper extends ConsumerWidget {
-  const AccountScreenScreenAuthenticationWrapper({Key key}) : super(key: key);
+  const AccountScreenScreenAuthenticationWrapper({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final authStateChanges = ref.watch(authStateChangesProvider);
 
     return authStateChanges.when(
-      data: (User user) {
+      data: (User? user) {
         if (user == null) {
           return LoginScreen();
         } else {
@@ -533,7 +533,7 @@ class _NotificationBottomSheetState
                         var dateTime = await getDateOfBirth(context);
 
                         setState(() {
-                          _dayOfBirth = dateTime;
+                          _dayOfBirth = dateTime as DateTime;
                         });
                       },
                       child: Container(
@@ -598,7 +598,7 @@ class _NotificationBottomSheetState
                         ),
                         onSelectionChanged: (p0) {
                           setState(() {
-                            _selectedGender = p0.first;
+                            _selectedGender = p0.first as Gender;
                           });
                         },
                         segments: <ButtonSegment<Gender>>[
@@ -668,7 +668,7 @@ class _NotificationBottomSheetState
                         ),
                         onSelectionChanged: (p0) {
                           setState(() {
-                            _selectedLocale = p0.first;
+                            _selectedLocale = p0.first as Language;
                           });
                         },
                         segments: <ButtonSegment<Language>>[

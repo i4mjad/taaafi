@@ -6,7 +6,7 @@ CustomTheme currentTheme = CustomTheme();
 
 class CustomTheme extends ChangeNotifier {
   final String key = "theme";
-  SharedPreferences _prefs;
+  SharedPreferences? _prefs;
   bool _darkTheme = false;
 
   bool get darkTheme => _darkTheme;
@@ -28,13 +28,14 @@ class CustomTheme extends ChangeNotifier {
 
   _loadFromPrefs() async {
     await _initPrefs();
-    _darkTheme = _prefs.getBool(key) ?? true;
+    _darkTheme =
+        _prefs!.getBool(key) ?? false; // Default to false for light theme
     notifyListeners();
   }
 
   _saveToPrefs() async {
     await _initPrefs();
-    _prefs.setBool(key, _darkTheme);
+    _prefs!.setBool(key, _darkTheme);
   }
 }
 

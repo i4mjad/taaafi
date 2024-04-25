@@ -1,9 +1,6 @@
-import 'package:customer_io/customer_io.dart';
-
 import 'package:reboot_app_3/di/container.dart';
 
 import 'package:reboot_app_3/repository/user_context.dart';
-import 'package:reboot_app_3/shared/constants/customer_io_attributes_const.dart';
 
 abstract class ICustomerIOService {
   Future<void> updateUser(Map<String, dynamic> attributes);
@@ -29,32 +26,21 @@ class CustomerIOService implements ICustomerIOService {
   @override
   Future<void> checkIn(String eventName, DateTime time,
       {relapsesStreak = 0, int mastStreak = 0, int pornStreak = 0}) async {
-    Map<String, dynamic> eventAttributes = {
-      EventsAttributes.Time: time.millisecondsSinceEpoch,
-      EventsAttributes.RelapsesBrokenStreak: relapsesStreak,
-      EventsAttributes.NoMastBrokenStreak: mastStreak,
-      EventsAttributes.NoPornBrokenStreak: pornStreak
-    };
-
     // await CustomerIO.track(name: eventName, attributes: eventAttributes);
   }
 
   @override
   Future<void> createUser(String gender, String locale, DateTime dob) async {
-    var userProfile = await _userContext.getUserProfile();
-
-    var profile = await userProfile;
-
-    Map<String, Object> attributes = {
-      ProfileAttributesConstants.Name: "",
-      ProfileAttributesConstants.Email: profile.email,
-      ProfileAttributesConstants.RegistrationDate:
-          profile.creationTime.millisecondsSinceEpoch,
-      ProfileAttributesConstants.DayOfBirth:
-          profile.dayOfBirth.millisecondsSinceEpoch,
-      ProfileAttributesConstants.Locale: profile.lcoale,
-      ProfileAttributesConstants.Gender: profile.gender,
-    };
+    // Map<String, Object> attributes = {
+    //   ProfileAttributesConstants.Name: "",
+    //   ProfileAttributesConstants.Email: profile.email,
+    //   ProfileAttributesConstants.RegistrationDate:
+    //       profile.creationTime.millisecondsSinceEpoch,
+    //   ProfileAttributesConstants.DayOfBirth:
+    //       profile.dayOfBirth.millisecondsSinceEpoch,
+    //   ProfileAttributesConstants.Locale: profile.lcoale,
+    //   ProfileAttributesConstants.Gender: profile.gender,
+    // };
 
     // CustomerIO.identify(identifier: profile.uid, attributes: attributes);
   }
@@ -67,11 +53,6 @@ class CustomerIOService implements ICustomerIOService {
   @override
   Future<void> newRegisterationEvent(
       String eventName, DateTime time, DateTime startedAt) async {
-    Map<String, dynamic> eventAttributes = {
-      EventsAttributes.Time: time.toString(),
-      "firstDate": startedAt.toString(),
-    };
-
     // return CustomerIO.track(
     //     name: EventsNames.NewRegesteration, attributes: eventAttributes);
   }

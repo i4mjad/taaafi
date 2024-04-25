@@ -9,7 +9,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 class ContentCard extends StatelessWidget {
   final Content content;
-  ContentCard({Key key, this.content}) : super(key: key);
+  ContentCard({Key? key, required this.content}) : super(key: key);
 
   String fixArbicText(String currptedText) {
     String text = utf8.decode(currptedText.codeUnits);
@@ -21,7 +21,7 @@ class ContentCard extends StatelessWidget {
     final theme = Theme.of(context);
     return InkWell(
       onTap: () {
-        launchUrl(Uri.parse(content.contentLink));
+        launchUrl(Uri.parse(content.contentLink!));
       },
       child: Container(
         padding: EdgeInsets.all(12),
@@ -56,7 +56,7 @@ class ContentCard extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              content.title,
+                              content.title as String,
                               style: kSubTitlesStyle.copyWith(
                                   color: theme.primaryColor,
                                   fontSize: 16,
@@ -76,7 +76,7 @@ class ContentCard extends StatelessWidget {
                                   width: 4,
                                 ),
                                 Text(
-                                  content.contentOwner,
+                                  content.contentOwner as String,
                                   style: kSubTitlesStyle.copyWith(
                                       color: theme.hintColor.withOpacity(0.7),
                                       fontSize: 12,
@@ -111,7 +111,7 @@ class ContentCard extends StatelessWidget {
                           SizedBox(
                             width: 4,
                           ),
-                          Text(content.contentType,
+                          Text(content.contentType as String,
                               style: kSubTitlesSubsStyle.copyWith(
                                   fontSize: 12,
                                   height: 1,
@@ -131,7 +131,7 @@ class ContentCard extends StatelessWidget {
                           SizedBox(
                             width: 4,
                           ),
-                          Text(content.contentSubType,
+                          Text(content.contentSubType as String,
                               style: kSubTitlesSubsStyle.copyWith(
                                   fontSize: 12,
                                   height: 1,
@@ -151,7 +151,7 @@ class ContentCard extends StatelessWidget {
                           SizedBox(
                             width: 4,
                           ),
-                          Text(content.contentLanguage,
+                          Text(content.contentLanguage as String,
                               style: kSubTitlesSubsStyle.copyWith(
                                   fontSize: 12,
                                   height: 1,

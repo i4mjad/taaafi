@@ -29,8 +29,8 @@ class NoteViewModel extends StateNotifier<List<Note>> {
   }
 
   Future<void> addNote({
-    String title,
-    String body,
+    String? title,
+    String? body,
   }) async {
     final newNote = Note(
       title: title,

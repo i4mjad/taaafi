@@ -12,7 +12,7 @@ import 'package:reboot_app_3/shared/helpers/date_methods.dart';
 import 'package:reboot_app_3/shared/localization/localization.dart';
 
 class NewUserSection extends ConsumerStatefulWidget {
-  NewUserSection({Key key}) : super(key: key);
+  NewUserSection({Key? key}) : super(key: key);
 
   @override
   NewUserSectionState createState() => NewUserSectionState();
@@ -137,7 +137,7 @@ class NewUserSectionState extends ConsumerState<NewUserSection> {
                           ),
                           onSelectionChanged: (p0) {
                             setState(() {
-                              _selectedGender = p0.first;
+                              _selectedGender = p0.first as Gender;
                             });
                           },
                           segments: <ButtonSegment<Gender>>[
@@ -208,7 +208,7 @@ class NewUserSectionState extends ConsumerState<NewUserSection> {
                           ),
                           onSelectionChanged: (p0) {
                             setState(() {
-                              _selectedLocale = p0.first;
+                              _selectedLocale = p0.first as Language;
                             });
                           },
                           segments: <ButtonSegment<Language>>[

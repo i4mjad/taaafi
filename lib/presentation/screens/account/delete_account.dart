@@ -101,7 +101,7 @@ class DeleteAccountSheet {
                   onTap: () async {
                     final db = FirebaseFirestore.instance;
                     final user = FirebaseAuth.instance.currentUser;
-                    String uid = user.uid;
+                    var uid = user?.uid;
 
                     await db.collection("users").doc(uid).delete().then(
                         (value) async =>
@@ -238,7 +238,7 @@ class DeleteAccountSheet {
                         Navigator.pop(context);
                         openConfirmDeleteAccountMessage(context, ref);
                       } catch (e) {
-                        getSystemSnackBar(context, e);
+                        getSystemSnackBar(context, e.toString());
                       }
                     });
                   }),
@@ -254,7 +254,7 @@ class DeleteAccountSheet {
                           Navigator.pop(context);
                           openConfirmDeleteAccountMessage(context, ref);
                         } catch (e) {
-                          getSystemSnackBar(context, e);
+                          getSystemSnackBar(context, e.toString());
                         }
                       });
                     },

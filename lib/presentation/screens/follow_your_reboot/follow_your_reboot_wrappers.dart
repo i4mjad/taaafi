@@ -22,7 +22,8 @@ class FollowYourRebootScreenAuthenticationWrapper extends ConsumerWidget {
     final userAsyncValue = ref.watch(authStateChangesProvider);
 
     return userAsyncValue.when(
-      data: (User user) {
+      data: (User? user) {
+        // Updated to User? to reflect nullable user
         if (user == null) return LoginScreen();
         return UserDocWrapper();
       },
@@ -33,28 +34,36 @@ class FollowYourRebootScreenAuthenticationWrapper extends ConsumerWidget {
 }
 
 class UserDocWrapper extends ConsumerWidget {
-  const UserDocWrapper({Key key}) : super(key: key);
+  const UserDocWrapper({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final userDocAsyncValue = ref.watch(userDocStreamProvider);
 
     return userDocAsyncValue.when(
-      data: (DocumentSnapshot userDoc) {
+      data: (DocumentSnapshot? userDoc) {
         if (userDoc == null || !userDoc.exists) {
           return NewUserSection();
         } else {
-          Map<String, Object> userData = userDoc.data();
+          var userData = userDoc.data() as Map<String, dynamic>?;
 
-          if (!userData.containsKey("gender") ||
-              userData["gender"] == null ||
-              !userData.containsKey("dayOfBirth") ||
-              userData["dayOfBirth"] == null ||
-              !userData.containsKey("locale") ||
-              userData["locale"] == null) {
+          if (userData == null) {
             return Center(child: NotificationActivationScreen());
           }
-          return FollowYourRebootScreen();
+
+          final gender = userData["gender"];
+          final dayOfBirth = userData["dayOfBirth"];
+          final locale = userData["locale"];
+
+          if (gender == null || dayOfBirth == null || locale == null) {
+            return Center(child: NotificationActivationScreen());
+          }
+
+          if (gender is String && dayOfBirth is Timestamp && locale is String) {
+            return FollowYourRebootScreen();
+          } else {
+            return Center(child: NotificationActivationScreen());
+          }
         }
       },
       loading: () => CircularProgressIndicator(),
@@ -244,7 +253,7 @@ class _NotificationActivationScreenState
                         ),
                         onSelectionChanged: (p0) {
                           setState(() {
-                            _selectedGender = p0.first;
+                            _selectedGender = p0.first as Gender;
                           });
                         },
                         segments: <ButtonSegment<Gender>>[
@@ -314,7 +323,7 @@ class _NotificationActivationScreenState
                         ),
                         onSelectionChanged: (p0) {
                           setState(() {
-                            _selectedLocale = p0.first;
+                            _selectedLocale = p0.first as Language;
                           });
                         },
                         segments: <ButtonSegment<Language>>[

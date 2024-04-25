@@ -1,5 +1,3 @@
-import 'package:customer_io/customer_io.dart';
-
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -34,20 +32,6 @@ Future<void> main() async {
 
   SetupContainer();
 
-  //TODO: uncomment this when it is ready
-
-  // await CustomerIO.initialize(
-  //   config: CustomerIOConfig(
-  //     siteId: "035af3a05d72c85a480d",
-  //     apiKey: "3e45eaf1a38eb2f53f5d",
-  //     region: Region.eu,
-  //     autoTrackDeviceAttributes: true,
-  //     autoTrackPushEvents: true,
-  //     enableInApp: false,
-  //     logLevel: CioLogLevel.debug,
-  //   ),
-  // );
-
   InitializationSettings initializationSettings = await setupNotifications();
   await setupFirebaseMesagging(initializationSettings);
 
@@ -56,9 +40,7 @@ Future<void> main() async {
 
 Future<void> setupFirebaseMesagging(
     InitializationSettings initializationSettings) async {
-  var firbaseMessagingToken = await FirebaseMessaging.instance.getToken();
-
-  CustomerIO.registerDeviceToken(deviceToken: firbaseMessagingToken);
+  // CustomerIO.registerDeviceToken(deviceToken: firbaseMessagingToken);
 
   await NotificationService.flutterLocalNotificationsPlugin
       .initialize(initializationSettings);
@@ -67,11 +49,10 @@ Future<void> setupFirebaseMesagging(
 Future<InitializationSettings> setupNotifications() async {
   var initializationSettingsAndroid = AndroidInitializationSettings('app_icon');
   var initializationSettingsiOS = DarwinInitializationSettings(
-      requestAlertPermission: true,
-      requestBadgePermission: true,
-      requestSoundPermission: true,
-      onDidReceiveLocalNotification:
-          (int id, String title, String body, String payload) async {});
+    requestAlertPermission: true,
+    requestBadgePermission: true,
+    requestSoundPermission: true,
+  );
 
   FirebaseMessaging messaging = FirebaseMessaging.instance;
 
@@ -91,9 +72,8 @@ Future<InitializationSettings> setupNotifications() async {
 }
 
 class MyApp extends StatefulWidget {
-  static void setLocale(BuildContext context, Locale locale) async {
-    _MyAppState state = context.findAncestorStateOfType<_MyAppState>();
-
+  static void setLocale(BuildContext context, Locale locale) {
+    var state = context.findAncestorStateOfType<_MyAppState>() as _MyAppState;
     state.setLocale(locale);
   }
 
@@ -102,7 +82,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  Locale _locale;
+  var _locale;
 
   void setLocale(Locale locale) {
     setState(() {
@@ -121,15 +101,10 @@ class _MyAppState extends State<MyApp> {
 
   Future<void> localeCkeck() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    Locale _token = await Locale(prefs.getString("languageCode"), '');
-    if (_token != null) {
-      setState(() {
-        _locale = _token;
-      }); //your home page is loaded
-    } else {
-      //replace it with the login page
-      _locale = Locale("ar", "");
-    }
+    var _token = await Locale(prefs.getString("languageCode") as String, '');
+    setState(() {
+      _locale = _token;
+    });
   }
 
   static FirebaseAnalytics analytics = FirebaseAnalytics.instance;
@@ -153,7 +128,7 @@ class _MyAppState extends State<MyApp> {
           ],
           localeResolutionCallback: (locale, supportedLocales) {
             for (var supportedLocale in supportedLocales) {
-              if (supportedLocale.languageCode == locale.languageCode) {
+              if (supportedLocale.languageCode == locale?.languageCode) {
                 return supportedLocale;
               }
             }

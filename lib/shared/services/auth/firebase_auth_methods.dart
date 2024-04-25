@@ -16,16 +16,16 @@ class FirebaseAuthMethods {
   // GET USER DATA
   // using null check operator since this method should be called only
   // when the user is logged in
-  User get user => _auth.currentUser;
+  User? get user => _auth.currentUser;
 
   // STATE PERSISTENCE STREAM
-  Stream<User> get authState => FirebaseAuth.instance.authStateChanges();
+  Stream<User?> get authState => FirebaseAuth.instance.authStateChanges();
 
   Future<void> signInWithGoogle(BuildContext context) async {
     try {
-      final GoogleSignInAccount googleUser = await GoogleSignIn().signIn();
+      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
       final GoogleSignInAuthentication googleAuth =
-          await googleUser.authentication;
+          await googleUser!.authentication;
 
       if (googleAuth.accessToken != null && googleAuth.idToken != null) {
         final credential = GoogleAuthProvider.credential(
@@ -43,7 +43,7 @@ class FirebaseAuthMethods {
         // }
       }
     } on FirebaseAuthException catch (e) {
-      getSystemSnackBar(context, e.message);
+      getSystemSnackBar(context, e.toString());
     }
   }
 
@@ -53,46 +53,46 @@ class FirebaseAuthMethods {
 
       await _auth.signInWithProvider(appleProvider);
     } on FirebaseAuthException catch (e) {
-      getSystemSnackBar(context, e.message);
+      getSystemSnackBar(context, e.toString());
     }
   }
 
   Future<void> reSignInWithApple(BuildContext context) async {
     try {
       final appleProvider = AppleAuthProvider();
-      await _auth.currentUser.reauthenticateWithProvider(appleProvider);
+      await _auth.currentUser?.reauthenticateWithProvider(appleProvider);
     } on FirebaseAuthException catch (e) {
-      getSystemSnackBar(context, e.message);
+      getSystemSnackBar(context, e.toString());
     }
   }
 
-  Future<void> reSignInWithGoogle(BuildContext context) async {
+  Future<UserCredential?> reSignInWithGoogle(BuildContext context) async {
     try {
-      final GoogleSignInAccount googleUser = await GoogleSignIn().signIn();
+      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
       final GoogleSignInAuthentication googleAuth =
-          await googleUser.authentication;
+          await googleUser!.authentication;
 
       if (googleAuth.accessToken != null && googleAuth.idToken != null) {
         final credential = GoogleAuthProvider.credential(
             accessToken: googleAuth.accessToken, idToken: googleAuth.idToken);
 
-        return await _auth.currentUser.reauthenticateWithCredential(credential);
+        return await _auth.currentUser
+            ?.reauthenticateWithCredential(credential);
       }
     } on FirebaseAuthException catch (e) {
-      getSystemSnackBar(context, e.message);
+      getSystemSnackBar(context, e.toString());
     }
   }
 
   Future<void> signOut() async {
-    await _promizeService.signOut();
     await _auth.signOut();
   }
 
   Future<void> deleteAccount(BuildContext context) async {
     try {
-      await FirebaseAuth.instance.currentUser.delete();
+      await FirebaseAuth.instance.currentUser?.delete();
     } on FirebaseAuthException catch (e) {
-      getSystemSnackBar(context, e.message);
+      getSystemSnackBar(context, e.toString());
     }
   }
 }

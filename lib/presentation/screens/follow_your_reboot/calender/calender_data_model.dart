@@ -10,22 +10,22 @@ class CalenderDataSource extends CalendarDataSource {
 
   @override
   String getSubject(int index) {
-    return appointments[index].type;
+    return (appointments as List<CalenderDay>)[index].type;
   }
 
   @override
   DateTime getStartTime(int index) {
-    return appointments[index].date;
+    return (appointments as List<CalenderDay>)[index].date;
   }
 
   @override
   DateTime getEndTime(int index) {
-    return appointments[index].date;
+    return (appointments as List<CalenderDay>)[index].date;
   }
 
   @override
   Color getColor(int index) {
-    return appointments[index].color;
+    return (appointments as List<CalenderDay>)[index].color;
   }
 
   @override

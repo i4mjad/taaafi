@@ -22,7 +22,7 @@ class FollowYourRebootScreen extends StatefulWidget {
 
 class FollowYourRebootScreenState extends State<FollowYourRebootScreen>
     with TickerProviderStateMixin {
-  String lang;
+  String? lang;
 
   @override
   void initState() {

@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:reboot_app_3/presentation/Screens/ta3afi_liberary/models/Item.dart';
 
-
 AppContentServices appContentServicesFromJson(String str) =>
     AppContentServices.fromJson(json.decode(str));
 
@@ -11,7 +10,7 @@ String appContentServicesToJson(AppContentServices data) =>
 
 class AppContentServices {
   AppContentServices({
-    this.items,
+    required this.items,
   });
   List<Item> items;
 

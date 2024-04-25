@@ -60,7 +60,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
 
 class ArticlesListView extends StatelessWidget {
   ArticlesListView({
-    Key key,
+    Key? key,
   }) : super(key: key);
 
   @override
@@ -75,7 +75,7 @@ class ArticlesListView extends StatelessWidget {
           case ConnectionState.none:
           case ConnectionState.waiting:
             return Center(child: CircularProgressIndicator());
-            break;
+
           default:
             // Completed with error
             if (snapshot.hasError || !snapshot.hasData) {
@@ -88,13 +88,13 @@ class ArticlesListView extends StatelessWidget {
               );
             }
 
-            List<ExploreContent> featuredList = snapshot.data.docs
+            var featuredList = snapshot.data?.docs
                 .map<ExploreContent>((e) => ExploreContent.fromMap(e))
                 .toList();
             return Expanded(
               child: ListView.separated(
                 scrollDirection: Axis.vertical,
-                itemCount: featuredList.length,
+                itemCount: featuredList?.length as int,
                 itemBuilder: (BuildContext context, int index) {
                   return GestureDetector(
                     onTap: () {
@@ -102,7 +102,7 @@ class ArticlesListView extends StatelessWidget {
                         context,
                         MaterialPageRoute(
                           builder: (_) => ExploreContentPage(
-                            article: featuredList[index],
+                            article: featuredList?[index] as ExploreContent,
                           ),
                         ),
                       );
@@ -137,7 +137,7 @@ class ArticlesListView extends StatelessWidget {
                               ),
                               Flexible(
                                 child: Text(
-                                  featuredList[index].title,
+                                  featuredList?[index].title as String,
                                   style: kSubTitlesStyle.copyWith(
                                       color: theme.primaryColor,
                                       fontSize: 16,
@@ -159,8 +159,8 @@ class ArticlesListView extends StatelessWidget {
                                 width: 4,
                               ),
                               Text(
-                                AppLocalizations.of(context)
-                                    .translate(featuredList[index].type),
+                                AppLocalizations.of(context).translate(
+                                    featuredList?[index].type as String),
                                 style: kSubTitlesStyle.copyWith(
                                     color: theme.primaryColor, fontSize: 12),
                               ),
@@ -180,7 +180,8 @@ class ArticlesListView extends StatelessWidget {
                               ),
                               Text(
                                 DateFormat('dd/MM/yyyy hh:mm').format(
-                                    DateTime.parse(featuredList[index].date)),
+                                    DateTime.parse(
+                                        featuredList?[index].date as String)),
                                 style: kSubTitlesStyle.copyWith(
                                     color: theme.primaryColor, fontSize: 12),
                               ),

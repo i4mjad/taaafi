@@ -14,11 +14,16 @@ abstract class INotesRepository {
 
 class FirebaseNotesRepository implements INotesRepository {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final _notesController = StreamController<List<Note>>();
+  final _notesController = StreamController<List<Note>>.broadcast();
 
   @override
   Stream<List<Note>> getNotes() {
-    final userId = FirebaseAuth.instance.currentUser.uid;
+    final userId = FirebaseAuth.instance.currentUser?.uid;
+    if (userId == null) {
+      _notesController.addError('No user signed in');
+      return _notesController.stream;
+    }
+
     final notesRef =
         _firestore.collection('users').doc(userId).collection('userNotes');
     notesRef.snapshots().listen((snap) {
@@ -26,12 +31,15 @@ class FirebaseNotesRepository implements INotesRepository {
           snap.docs.map((doc) => Note.fromMap(doc.data(), doc.id)).toList();
       _notesController.add(notes);
     });
+
     return _notesController.stream;
   }
 
   @override
   Future<void> add(Note note) async {
-    final userId = FirebaseAuth.instance.currentUser.uid;
+    final userId = FirebaseAuth.instance.currentUser?.uid;
+    if (userId == null) throw Exception('No user signed in');
+
     final notesRef =
         _firestore.collection('users').doc(userId).collection('userNotes');
     await notesRef.add(note.toMap());
@@ -39,7 +47,9 @@ class FirebaseNotesRepository implements INotesRepository {
 
   @override
   Future<void> update(Note note) async {
-    final userId = FirebaseAuth.instance.currentUser.uid;
+    final userId = FirebaseAuth.instance.currentUser?.uid;
+    if (userId == null) throw Exception('No user signed in');
+
     final notesRef =
         _firestore.collection('users').doc(userId).collection('userNotes');
     await notesRef.doc(note.id).update(note.toMap());
@@ -47,7 +57,9 @@ class FirebaseNotesRepository implements INotesRepository {
 
   @override
   Future<void> delete(String id) async {
-    final userId = FirebaseAuth.instance.currentUser.uid;
+    final userId = FirebaseAuth.instance.currentUser?.uid;
+    if (userId == null) throw Exception('No user signed in');
+
     final notesRef =
         _firestore.collection('users').doc(userId).collection('userNotes');
     await notesRef.doc(id).delete();
@@ -55,11 +67,16 @@ class FirebaseNotesRepository implements INotesRepository {
 
   @override
   Future<Note> get(String id) async {
-    final userId = FirebaseAuth.instance.currentUser.uid;
+    final userId = FirebaseAuth.instance.currentUser?.uid;
+    if (userId == null) throw Exception('No user signed in');
+
     final notesRef =
         _firestore.collection('users').doc(userId).collection('userNotes');
     final doc = await notesRef.doc(id).get();
-    return Note.fromMap(doc.data(), id);
+
+    if (!doc.exists) throw Exception('Note not found');
+
+    return Note.fromMap(doc.data() as Map<String, dynamic>, id);
   }
 
   void dispose() {

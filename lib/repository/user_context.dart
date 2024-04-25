@@ -14,20 +14,19 @@ abstract class IUserContext {
 
   Future<void> resetUserData(DateTime date);
 
-  Future<void> updateUserDocument(Map<String, dynamic> data);
+  Future<void> updateUserDocument(Map<String, Object?> data);
   Stream<bool> isUserDocExist();
   Future<void> deleteUserData();
   Future<void> getLocale();
   Future<UserProfile> getUserProfile();
-  Stream<UserProfile> getUserProfileStream();
-  Stream<UserProfile> get userProfileStream;
-  User getFirebaseUser();
+  Stream<UserProfile?> getUserProfileStream();
+  User? getFirebaseUser();
 }
 
 class FireStoreUserContext implements IUserContext {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  final _userProfileController = StreamController<UserProfile>();
+  final _userProfileController = StreamController<UserProfile?>();
 
   @override
   Stream<DocumentSnapshot> getUserDoc() {
@@ -40,15 +39,14 @@ class FireStoreUserContext implements IUserContext {
           .snapshots()
           .map((doc) {
         if (doc.exists) {
-          UserProfile userProfile =
-              UserProfile.fromFireStore(_auth.currentUser, doc.data());
+          UserProfile userProfile = UserProfile.fromFireStore(
+              _auth.currentUser!, doc.data() as Map<String, Object>);
 
           _userProfileController.add(userProfile);
-          return doc;
         } else {
           _userProfileController.add(null);
-          return doc;
         }
+        return doc;
       });
     }
     throw Exception("No user is currently signed in");
@@ -74,8 +72,8 @@ class FireStoreUserContext implements IUserContext {
       };
       await _firestore.collection('users').doc(user.uid).set(userData);
       var doc = await _firestore.collection('users').doc(user.uid).get();
-      _userProfileController.sink
-          .add(UserProfile.fromFireStore(user, doc.data()));
+      _userProfileController.sink.add(
+          UserProfile.fromFireStore(user, doc.data() as Map<String, Object>));
     } else {
       throw Exception("No user is currently signed in");
     }
@@ -95,8 +93,8 @@ class FireStoreUserContext implements IUserContext {
       };
       await _firestore.collection('users').doc(user.uid).update(userData);
       var doc = await _firestore.collection('users').doc(user.uid).get();
-      _userProfileController.sink
-          .add(UserProfile.fromFireStore(user, doc.data()));
+      _userProfileController.sink.add(
+          UserProfile.fromFireStore(user, doc.data() as Map<String, Object>));
     } else {
       throw Exception("No user is currently signed in");
     }
@@ -118,7 +116,7 @@ class FireStoreUserContext implements IUserContext {
     }
   }
 
-  Stream<UserProfile> get userProfileStream => _userProfileController.stream;
+  Stream<UserProfile?> get userProfileStream => _userProfileController.stream;
 
   @override
   Future<UserProfile> getUserProfile() async {
@@ -128,35 +126,36 @@ class FireStoreUserContext implements IUserContext {
   }
 
   @override
-  String get uid => _auth.currentUser.uid;
+  String get uid => _auth.currentUser!.uid;
 
   @override
-  Future<void> getLocale() async {
+  Future<String> getLocale() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    final locale = await prefs.getString("languageCode");
-    return locale;
+    final locale = prefs.getString("languageCode");
+    return locale ?? ''; // Return an empty string if locale is null
   }
 
   @override
-  Future<void> updateUserDocument(Map<String, dynamic> data) async {
+  Future<void> updateUserDocument(Map<String, Object?> data) async {
     final user = _auth.currentUser;
-    await _firestore.collection('users').doc(user.uid).update(data);
+    await _firestore.collection('users').doc(user!.uid).update(data);
   }
 
-  Future<Map<String, Object>> getUserData() async {
+  Future<Map<String, Object?>> getUserData() async {
     var user = _auth.currentUser;
-    var document = await _firestore.collection('users').doc(user.uid).get();
+    var document = await _firestore.collection('users').doc(user!.uid).get();
 
-    return document.data();
+    return document.data() as Map<String, Object?>;
   }
 
   @override
-  Stream<UserProfile> getUserProfileStream() {
+  Stream<UserProfile?> getUserProfileStream() {
     final user = _auth.currentUser;
     final snapshot = _firestore.collection("users").doc(uid);
 
     snapshot.snapshots().listen((event) {
-      final userProfile = UserProfile.fromFireStore(user, event.data());
+      final userProfile = UserProfile.fromFireStore(
+          user!, event.data() as Map<String, dynamic>);
       _userProfileController.sink.add(userProfile);
     });
 
@@ -164,7 +163,11 @@ class FireStoreUserContext implements IUserContext {
   }
 
   @override
-  getFirebaseUser() {
+  User? getFirebaseUser() {
     return _auth.currentUser;
+  }
+
+  void dispose() {
+    _userProfileController.close();
   }
 }

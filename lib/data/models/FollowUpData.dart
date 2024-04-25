@@ -13,13 +13,13 @@ class FollowUpData {
   List<String> pornWithoutMasterbation;
   List<String> masterbationWithoutPorn;
 
-  FollowUpData.fromSnapshot(DocumentSnapshot snapshot) {
-    userFirstDate = snapshot['userFirstDate'];
-    relapses = List<String>.from(snapshot['userRelapses']);
-    pornWithoutMasterbation =
-        List<String>.from(snapshot['userWatchingWithoutMasturbating']);
-    masterbationWithoutPorn =
-        List<String>.from(snapshot['userMasturbatingWithoutWatching']);
+  factory FollowUpData.fromSnapshot(DocumentSnapshot snapshot) {
+    return FollowUpData(
+      snapshot['userFirstDate'],
+      List<String>.from(snapshot['userRelapses']),
+      List<String>.from(snapshot['userWatchingWithoutMasturbating']),
+      List<String>.from(snapshot['userMasturbatingWithoutWatching']),
+    );
   }
 
   static FollowUpData Missing = new FollowUpData(Timestamp.now(), [], [], []);

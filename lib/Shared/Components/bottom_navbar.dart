@@ -87,7 +87,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
 }
 
 class HomeNavBar extends StatefulWidget {
-  const HomeNavBar({Key key}) : super(key: key);
+  const HomeNavBar({Key? key}) : super(key: key);
 
   @override
   State<HomeNavBar> createState() => _HomeNavBarState();

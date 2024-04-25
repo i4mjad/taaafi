@@ -3,18 +3,16 @@ import 'package:iconsax/iconsax.dart';
 import 'package:intl/intl.dart';
 import 'package:reboot_app_3/data/models/Article.dart';
 import 'package:reboot_app_3/shared/components/custom-app-bar.dart';
-import 'package:flutter_html/flutter_html.dart';
 import 'package:reboot_app_3/shared/constants/textstyles_constants.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class ExploreContentPage extends StatelessWidget {
-  ExploreContentPage({Key key, this.article}) : super(key: key);
+  ExploreContentPage({Key? key, required this.article}) : super(key: key);
   final ExploreContent article;
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Scaffold(
-      appBar: appBarWithCustomTitle(context, article.title),
+      appBar: appBarWithCustomTitle(context, article.title as String),
       body: Padding(
         padding: EdgeInsets.only(left: 20, right: 20, bottom: 20),
         child: Column(
@@ -46,7 +44,7 @@ class ExploreContentPage extends StatelessWidget {
                             ),
                             Text(
                               DateFormat('dd/MM/yyyy hh:mm').format(
-                                DateTime.parse(article.date),
+                                DateTime.parse(article.date as String),
                               ),
                               style: kSubTitlesSubsStyle.copyWith(
                                 fontSize: 10.5,
@@ -76,7 +74,7 @@ class ExploreContentPage extends StatelessWidget {
                               width: 4,
                             ),
                             Text(
-                              article.author,
+                              article.author as String,
                               style: kSubTitlesSubsStyle.copyWith(
                                 fontSize: 10.5,
                                 height: 1,
@@ -104,7 +102,7 @@ class ExploreContentPage extends StatelessWidget {
                             SizedBox(
                               width: 4,
                             ),
-                            Text(article.timeToRead,
+                            Text(article.timeToRead as String,
                                 style: kSubTitlesSubsStyle.copyWith(
                                     fontSize: 10.5,
                                     height: 1,
@@ -128,26 +126,7 @@ class ExploreContentPage extends StatelessWidget {
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Flexible(
-                            child: Html(
-                                data: article.body,
-                                style: {
-                                  "body": Style(
-                                      fontFamily: 'DINNextLTArabic',
-                                      color: theme.primaryColor)
-                                },
-                                onLinkTap: (String url, _, __, ___) async {
-                                  if (await canLaunchUrl(Uri.parse(url))) {
-                                    launchUrl(
-                                      Uri.parse(url),
-                                    );
-                                  } else {
-                                    throw "Could not launch $url";
-                                  }
-                                }),
-                          )
-                        ],
+                        children: [],
                       ),
                     ),
                   ],

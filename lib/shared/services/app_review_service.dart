@@ -5,13 +5,13 @@ import 'package:shared_preferences/shared_preferences.dart';
 const KEY = 'FIRST_TIME_OPEN';
 
 class RatingService {
-  SharedPreferences _prefs;
+  late SharedPreferences _prefs;
   final InAppReview _inAppReview = InAppReview.instance;
 
   Future<bool> isSecondTimeOpen() async {
     _prefs = await SharedPreferences.getInstance();
     try {
-      dynamic isSecondTime = _prefs.getBool(KEY);
+      final isSecondTime = _prefs.getBool(KEY);
       if (isSecondTime != null && !isSecondTime) {
         _prefs.setBool(KEY, false);
         return false;
@@ -31,7 +31,7 @@ class RatingService {
     try {
       final available = await _inAppReview.isAvailable();
       if (available) {
-        _inAppReview.requestReview();
+        await _inAppReview.requestReview();
       } else {
         _inAppReview.openStoreListing(
           appStoreId: 'com.amjadkhalfan.RebootApp',

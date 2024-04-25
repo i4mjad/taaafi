@@ -6,7 +6,7 @@ import 'package:reboot_app_3/shared/components/custom-app-bar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class BiometricAuthentication extends StatefulWidget {
-  const BiometricAuthentication({Key key}) : super(key: key);
+  const BiometricAuthentication({Key? key}) : super(key: key);
 
   @override
   State<BiometricAuthentication> createState() =>
@@ -39,7 +39,7 @@ class _BiometricAuthenticationState extends State<BiometricAuthentication> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setBool("isAppLockEnabled", isAuthorized);
     setState(() {
-      _isUserAuthorized = prefs.getBool("isAppLockEnabled");
+      _isUserAuthorized = prefs.getBool("isAppLockEnabled") as bool;
     });
   }
 

@@ -275,13 +275,13 @@ class FollowUpViewModel extends StateNotifier<FollowUpData> {
       }
     }
 
-    final satLength = (sat.length / totalRelapses) ?? 0;
-    final monLength = (mon.length / totalRelapses) ?? 0;
-    final sunLength = (sun.length / totalRelapses) ?? 0;
-    final tueLength = (tue.length / totalRelapses) ?? 0;
-    final wedLength = (wed.length / totalRelapses) ?? 0;
-    final thuLength = (thu.length / totalRelapses) ?? 0;
-    final friLength = (fri.length / totalRelapses) ?? 0;
+    var satLength = (sat.length / totalRelapses);
+    var monLength = (mon.length / totalRelapses);
+    var sunLength = (sun.length / totalRelapses);
+    var tueLength = (tue.length / totalRelapses);
+    var wedLength = (wed.length / totalRelapses);
+    var thuLength = (thu.length / totalRelapses);
+    var friLength = (fri.length / totalRelapses);
 
     final dayOfWeekRelapses = DayOfWeekRelapses(
         new DayOfWeekRelapsesDetails(satLength, sat.length),

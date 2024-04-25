@@ -2,15 +2,15 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class UserProfile {
-  final String uid;
-  final String displayName;
-  final String email;
-  final String gender;
-  final String lcoale;
+  String? uid;
+  String? displayName;
+  String? email;
+  String? gender;
+  String? lcoale;
 
-  final DateTime creationTime;
+  DateTime? creationTime;
 
-  final DateTime dayOfBirth;
+  DateTime? dayOfBirth;
 
   UserProfile({
     this.uid,
@@ -24,14 +24,14 @@ class UserProfile {
 
   static UserProfile Missing = new UserProfile();
 
-  factory UserProfile.fromFireStore(User user, Map<String, Object> data) {
+  factory UserProfile.fromFireStore(User? user, Map<String, dynamic> data) {
     var userProfile = UserProfile(
-      uid: user.uid,
+      uid: user!.uid,
       displayName: user.displayName,
       email: user.email,
       creationTime: user.metadata.creationTime,
-      gender: data["gender"],
-      lcoale: data["locale"],
+      gender: data["gender"] as String,
+      lcoale: data["locale"] as String,
       dayOfBirth: DateTime.fromMillisecondsSinceEpoch(
           (data["dayOfBirth"] as Timestamp).millisecondsSinceEpoch),
     );

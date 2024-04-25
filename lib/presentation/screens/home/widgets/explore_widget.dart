@@ -10,7 +10,7 @@ import 'package:reboot_app_3/shared/localization/localization.dart';
 
 class ExploreWidget extends StatelessWidget {
   const ExploreWidget({
-    Key key,
+    Key? key,
   }) : super(key: key);
 
   @override
@@ -57,13 +57,13 @@ class ExploreWidget extends StatelessWidget {
                     Expanded(
                       child: StreamBuilder(
                         stream: bloc.getFeaturedArticles(),
-                        builder: (BuildContext context, snapshot) {
+                        builder:
+                            (BuildContext context, AsyncSnapshot snapshot) {
                           switch (snapshot.connectionState) {
                             // Uncompleted State
                             case ConnectionState.none:
                             case ConnectionState.waiting:
                               return Center(child: CircularProgressIndicator());
-                              break;
                             default:
                               // Completed with error
                               if (snapshot.hasError) {
@@ -76,11 +76,16 @@ class ExploreWidget extends StatelessWidget {
                                 );
                               }
 
-                              List<ExploreContent> featuredList = snapshot
-                                  .data.docs
+                              if (!snapshot.hasData ||
+                                  snapshot.data?.docs == null) {
+                                return Center(child: Text('No data available'));
+                              }
+
+                              var featuredList = (snapshot.data!.docs as List)
                                   .map<ExploreContent>(
-                                      (e) => ExploreContent.fromMap(e))
+                                      (e) => ExploreContent.fromMap(e.data()))
                                   .toList();
+
                               return ListView.separated(
                                 scrollDirection: Axis.horizontal,
                                 itemCount: featuredList.length,
@@ -129,7 +134,8 @@ class ExploreWidget extends StatelessWidget {
                                               children: [
                                                 Flexible(
                                                   child: Text(
-                                                    featuredList[index].title,
+                                                    featuredList[index].title ??
+                                                        '',
                                                     style: kSubTitlesSubsStyle
                                                         .copyWith(
                                                       color: theme.primaryColor,

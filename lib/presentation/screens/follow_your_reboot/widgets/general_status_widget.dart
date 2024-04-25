@@ -6,14 +6,12 @@ import 'package:reboot_app_3/shared/constants/textstyles_constants.dart';
 import 'package:reboot_app_3/shared/localization/localization.dart';
 
 class GeneralStatusWidget extends ConsumerWidget {
-  const GeneralStatusWidget({
-    Key key,
-    @required this.lang,
-
+  GeneralStatusWidget({
+    Key? key,
+    required this.lang,
   }) : super(key: key);
 
-  final String lang;
-
+  String? lang;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -73,7 +71,7 @@ class GeneralStatusWidget extends ConsumerWidget {
                           (BuildContext context, AsyncSnapshot<String> sh) {
                         if (sh.hasData) {
                           return Text(
-                            sh.data,
+                            sh.data as String,
                             style:
                                 kPageTitleStyle.copyWith(color: Colors.green),
                           );
@@ -130,7 +128,7 @@ class GeneralStatusWidget extends ConsumerWidget {
                       builder:
                           (BuildContext context, AsyncSnapshot<String> sh) {
                         return Text(
-                          sh.data,
+                          sh.data as String,
                           style: kPageTitleStyle.copyWith(color: Colors.blue),
                         );
                       },
@@ -164,7 +162,7 @@ class GeneralStatusWidget extends ConsumerWidget {
                     initialData: "0",
                     builder: (BuildContext context, AsyncSnapshot<String> sh) {
                       return Text(
-                        sh.data,
+                        sh.data as String,
                         style: kHeadlineStyle.copyWith(
                             fontWeight: FontWeight.bold, fontSize: 18),
                       );
@@ -206,4 +204,3 @@ class GeneralStatusWidget extends ConsumerWidget {
     );
   }
 }
-

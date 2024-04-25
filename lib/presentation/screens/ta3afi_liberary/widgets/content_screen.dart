@@ -17,18 +17,18 @@ import 'package:reboot_app_3/shared/localization/localization_services.dart';
 import 'content_card.dart';
 
 class ContentScreen extends StatefulWidget {
-  const ContentScreen({Key key}) : super(key: key);
+  const ContentScreen({Key? key}) : super(key: key);
 
   @override
   _ContentScreenState createState() => _ContentScreenState();
 }
 
 class _ContentScreenState extends State<ContentScreen> {
-  String lang;
+  var lang;
   final TextEditingController searchTextEditor = TextEditingController();
 
-  List<Content> appContent = [];
-  List<Content> fillteredAppContent = [];
+  List<Content?> appContent = [];
+  List<Content?> fillteredAppContent = [];
 
   List<String> selectedSubTypesList = [];
   List<String> selectedTypesList = [];
@@ -36,24 +36,24 @@ class _ContentScreenState extends State<ContentScreen> {
 
   List<String> lanuguagesList = ["عربي", "English"];
 
-  String fixArbicText(String currptedText) {
-    String text = utf8.decode(currptedText.codeUnits);
+  String fixArbicText(String? currptedText) {
+    var text = utf8.decode(currptedText!.codeUnits);
     return text;
   }
 
   loadContent() async {
     await ContentServices.getContent().then((array) {
-      List<Content> _temp = [];
+      List<Content?> _temp = [];
 
       for (var item in array) {
-        final content = item.content;
+        var content = item.content;
         final fixedContent = Content(
-          title: fixArbicText(content.title),
-          contentOwner: fixArbicText(content.contentOwner),
-          contentLink: content.contentLink,
-          contentType: fixArbicText(content.contentType),
-          contentSubType: fixArbicText(content.contentSubType),
-          contentLanguage: fixArbicText(content.contentLanguage),
+          title: fixArbicText(content?.title),
+          contentOwner: fixArbicText(content?.contentOwner),
+          contentLink: content?.contentLink,
+          contentType: fixArbicText(content?.contentType),
+          contentSubType: fixArbicText(content?.contentSubType),
+          contentLanguage: fixArbicText(content?.contentLanguage),
         );
         _temp.add(fixedContent);
       }
@@ -67,7 +67,7 @@ class _ContentScreenState extends State<ContentScreen> {
     List<String> contentTypes = [];
 
     for (var item in appContent) {
-      contentTypes.add(item.contentType);
+      contentTypes.add(item?.contentType as String);
     }
 
     return contentTypes.toSet().toList();
@@ -77,7 +77,7 @@ class _ContentScreenState extends State<ContentScreen> {
     List<String> contentTypes = [];
 
     for (var item in appContent) {
-      contentTypes.add(item.contentSubType);
+      contentTypes.add(item?.contentSubType as String);
     }
 
     return contentTypes.toSet().toList();
@@ -243,7 +243,8 @@ class _ContentScreenState extends State<ContentScreen> {
                                   itemBuilder:
                                       (BuildContext context, int index) {
                                     return ContentCard(
-                                        content: fillteredAppContent[index]);
+                                        content: fillteredAppContent[index]
+                                            as Content);
                                   }),
                             );
                           })),
@@ -540,7 +541,7 @@ class _ContentScreenState extends State<ContentScreen> {
   }
 
   void filterSearchResults(String value) {
-    List<Content> results = [];
+    List<Content?> results = [];
     if (value.isEmpty) {
       results = appContent;
       if (value.isEmpty &&
@@ -549,21 +550,27 @@ class _ContentScreenState extends State<ContentScreen> {
               selectedLanuguagesList.length > 0)) {
         results = appContent
             .where((content) =>
-                selectedTypesList.contains(content.contentType) ||
-                selectedSubTypesList.contains(content.contentSubType) ||
-                selectedLanuguagesList.contains(content.contentLanguage))
+                selectedTypesList.contains(content?.contentType) ||
+                selectedSubTypesList.contains(content?.contentSubType) ||
+                selectedLanuguagesList.contains(content?.contentLanguage))
             .toList();
       }
     } else {
       results = appContent
           .where((content) =>
-              (content.title.toLowerCase().contains(value) ||
-                  content.contentOwner.toLowerCase().contains(value) ||
-                  content.contentType.toLowerCase().contains(value) ||
-                  content.contentSubType.toLowerCase().contains(value)) &&
-              (selectedTypesList.contains(content.contentType) ||
-                  selectedSubTypesList.contains(content.contentSubType) ||
-                  selectedLanuguagesList.contains(content.contentLanguage)))
+              ((content?.title as String).toLowerCase().contains(value) ||
+                  (content?.contentOwner as String)
+                      .toLowerCase()
+                      .contains(value) ||
+                  (content?.contentType as String)
+                      .toLowerCase()
+                      .contains(value) ||
+                  (content?.contentSubType as String)
+                      .toLowerCase()
+                      .contains(value)) &&
+              (selectedTypesList.contains(content?.contentType) ||
+                  selectedSubTypesList.contains(content?.contentSubType) ||
+                  selectedLanuguagesList.contains(content?.contentLanguage)))
           .toList();
     }
 
@@ -573,15 +580,15 @@ class _ContentScreenState extends State<ContentScreen> {
   }
 
   void filtersService() {
-    List<Content> results = [];
+    List<Content?> results = [];
     if (selectedSubTypesList.length != 0 ||
         selectedTypesList.length != 0 ||
         selectedLanuguagesList.length != 0) {
       results = appContent
           .where((content) =>
-                  (selectedTypesList.contains(content.contentType) ||
-                      selectedSubTypesList.contains(content.contentSubType) ||
-                      selectedLanuguagesList.contains(content.contentLanguage))
+                  (selectedTypesList.contains(content?.contentType) ||
+                      selectedSubTypesList.contains(content?.contentSubType) ||
+                      selectedLanuguagesList.contains(content?.contentLanguage))
 
               //here
               )

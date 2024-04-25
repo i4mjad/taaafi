@@ -10,7 +10,7 @@ import 'package:reboot_app_3/shared/localization/localization.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 
 class RebootCalender extends ConsumerWidget {
-  const RebootCalender({Key key}) : super(key: key);
+  const RebootCalender({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -46,8 +46,8 @@ class RebootCalender extends ConsumerWidget {
                     return SfCalendar(
                       backgroundColor: theme.cardColor,
                       onTap: (CalendarTapDetails details) async {
-                        DateTime date = details.date;
-                        DateTime firstDate = await followUpData.getFirstDate();
+                        var date = details.date as DateTime;
+                        var firstDate = await followUpData.getFirstDate();
 
                         dateChecker(firstDate, date, context, followUpData);
                       },
@@ -57,12 +57,12 @@ class RebootCalender extends ConsumerWidget {
                           backgroundColor: theme.cardColor,
                           textStyle: kSubTitlesStyle.copyWith(
                               color: theme.primaryColor)),
-                      dataSource: CalenderDataSource(snapshot.data),
+                      dataSource: CalenderDataSource(snapshot.data!),
                       monthViewSettings: MonthViewSettings(
                         //showAgenda: true,
                         agendaStyle: AgendaStyle(),
                         appointmentDisplayMode:
-                        MonthAppointmentDisplayMode.indicator,
+                            MonthAppointmentDisplayMode.indicator,
                       ),
                       allowAppointmentResize: true,
                     );

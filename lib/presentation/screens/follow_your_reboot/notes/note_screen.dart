@@ -1,3 +1,5 @@
+// ignore_for_file: must_be_immutable
+
 import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -11,17 +13,17 @@ import 'package:reboot_app_3/shared/constants/textstyles_constants.dart';
 import 'package:reboot_app_3/shared/localization/localization.dart';
 
 class NoteScreen extends ConsumerStatefulWidget {
-  NoteScreen({this.note, this.id});
-  final Note note;
-  final String id;
+  NoteScreen(this.note, this.id);
+  var note;
+  var id;
 
   @override
   _NoteScreenState createState() => _NoteScreenState();
 }
 
 class _NoteScreenState extends ConsumerState<NoteScreen> {
-  TextEditingController _titleController;
-  TextEditingController _bodyController;
+  TextEditingController _titleController = new TextEditingController();
+  TextEditingController _bodyController = new TextEditingController();
   FocusNode _focusNode = FocusNode();
   bool _isKeyboardVisible = false;
 
