@@ -12,6 +12,9 @@ import { getMessaging, provideMessaging } from '@angular/fire/messaging';
 import { getPerformance, providePerformance } from '@angular/fire/performance';
 import { getStorage, provideStorage } from '@angular/fire/storage';
 import { getRemoteConfig, provideRemoteConfig } from '@angular/fire/remote-config';
+import {AngularFireModule} from "@angular/fire/compat";
+import {AngularFirestoreModule} from "@angular/fire/compat/firestore";
+import {environment} from "../environments/environment";
 
 @NgModule({
   declarations: [
@@ -19,7 +22,9 @@ import { getRemoteConfig, provideRemoteConfig } from '@angular/fire/remote-confi
   ],
   imports: [
     BrowserModule,
-    AppRoutingModule
+    AppRoutingModule,
+    AngularFireModule.initializeApp(environment.firebase),
+    AngularFirestoreModule
   ],
   providers: [
     provideFirebaseApp(() => initializeApp({"projectId":"rebootapp-37a30",
