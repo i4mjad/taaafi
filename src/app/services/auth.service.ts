@@ -2,28 +2,28 @@ import { Injectable } from '@angular/core';
 import {AngularFireAuth} from "@angular/fire/compat/auth";
 import { GoogleAuthProvider } from "firebase/auth";
 
-
-
-
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
 
-  constructor(private afAuth: AngularFireAuth) { }
 
-  login(email: string, password: string) {
-    this.afAuth.signInWithEmailAndPassword(email, password)
-      .then(() => {
-        // Login successful
-        console.log("Logged in successfully!");
-      })
-      .catch((error) => {
-        // An error occurred
-      });
 
+  constructor(private afAuth: AngularFireAuth) {
 
   }
+
+  //TODO: uncomment this after implementing the auth with email
+  // login(email: string, password: string) {
+  //   this.afAuth.signInWithEmailAndPassword(email, password)
+  //     .then(() => {
+  //       // Login successful
+  //       console.log("Logged in successfully!");
+  //     })
+  //     .catch((error) => {
+  //       // An error occurred
+  //     });
+  // }
 
   loginWithGoogle() {
     this.afAuth.signInWithPopup(new GoogleAuthProvider())
@@ -38,7 +38,7 @@ export class AuthService {
     });
   }
 
-  get isAuthenticated(): boolean {
-    return this.afAuth.currentUser !== null;
-  }
+  // get isAuthenticated(): boolean {
+  //   return this.afAuth.currentUser !== null;
+  // }
 }
