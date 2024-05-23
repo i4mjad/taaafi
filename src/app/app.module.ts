@@ -22,7 +22,14 @@ import { getRemoteConfig, provideRemoteConfig } from '@angular/fire/remote-confi
     AppRoutingModule
   ],
   providers: [
-    provideFirebaseApp(() => initializeApp({"projectId":"rebootapp-37a30","appId":"1:364568176835:web:169cbadb6e2a85ffe31a76","databaseURL":"https://rebootapp-37a30.firebaseio.com","storageBucket":"rebootapp-37a30.appspot.com","locationId":"us-central","apiKey":"AIzaSyDTqyzIxVboEDvW3g5S_zCnGK0smR-jqg8","authDomain":"rebootapp-37a30.firebaseapp.com","messagingSenderId":"364568176835","measurementId":"G-E3PBLR6YFF"})),
+    provideFirebaseApp(() => initializeApp({"projectId":"rebootapp-37a30",
+      "appId":"1:364568176835:web:169cbadb6e2a85ffe31a76",
+      "databaseURL":"https://rebootapp-37a30.firebaseio.com",
+      "storageBucket":"rebootapp-37a30.appspot.com",
+      "apiKey":"AIzaSyDTqyzIxVboEDvW3g5S_zCnGK0smR-jqg8",
+      "authDomain":"rebootapp-37a30.firebaseapp.com",
+      "messagingSenderId":"364568176835",
+      "measurementId":"G-E3PBLR6YFF"})),
     provideAuth(() => getAuth()),
     provideAnalytics(() => getAnalytics()),
     ScreenTrackingService,
