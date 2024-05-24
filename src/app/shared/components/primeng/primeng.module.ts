@@ -1,6 +1,10 @@
 import { NgModule } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
-const components = [ButtonModule];
+import { MenubarModule } from 'primeng/menubar';
+import { AvatarModule } from 'primeng/avatar';
+import { CardModule } from 'primeng/card';
+
+const components = [ButtonModule,MenubarModule,AvatarModule,CardModule];
 @NgModule({
   imports: components,
   exports: components

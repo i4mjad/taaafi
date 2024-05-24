@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import {AngularFireAuth} from "@angular/fire/compat/auth";
 import { GoogleAuthProvider } from "firebase/auth";
+import {first} from "rxjs";
+import {Router} from "@angular/router";
 
 @Injectable({
   providedIn: 'root'
@@ -9,7 +11,7 @@ export class AuthService {
 
 
 
-  constructor(private afAuth: AngularFireAuth) {
+  constructor(private afAuth: AngularFireAuth, private router: Router) {
 
   }
 
@@ -36,6 +38,21 @@ export class AuthService {
       // Login error
       console.log(err);
     });
+  }
+
+  async logout() {
+    await this.afAuth.signOut();
+    this.router.navigate(['/login']);
+    localStorage.clear(); // Clearing local storage on logout
+  }
+
+  async isAdmin(): Promise<boolean> {
+    const user = await this.afAuth.authState.pipe(first()).toPromise();
+    if (user) {
+      const tokenResult = await user.getIdTokenResult();
+      return tokenResult.claims['role'] === 'admin';
+    }
+    return false;
   }
 
   // get isAuthenticated(): boolean {

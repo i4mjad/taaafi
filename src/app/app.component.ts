@@ -7,11 +7,7 @@ import {AuthService} from "./services/auth.service";
   styleUrl: './app.component.css'
 })
 export class AppComponent {
-  title = 'ta3afi-cp';
+  constructor()  {
+  }
 
-  constructor(private authService: AuthService)  {
-  }
-  loginButton() {
-    this.authService.loginWithGoogle();
-  }
 }
