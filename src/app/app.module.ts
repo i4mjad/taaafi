@@ -15,6 +15,7 @@ import { getRemoteConfig, provideRemoteConfig } from '@angular/fire/remote-confi
 import {AngularFireModule} from "@angular/fire/compat";
 import {AngularFirestoreModule} from "@angular/fire/compat/firestore";
 import {environment} from "../environments/environment";
+import {PrimengModule} from "./shared/components/primeng/primeng.module";
 
 @NgModule({
   declarations: [
@@ -24,7 +25,8 @@ import {environment} from "../environments/environment";
     BrowserModule,
     AppRoutingModule,
     AngularFireModule.initializeApp(environment.firebase),
-    AngularFirestoreModule
+    AngularFirestoreModule,
+    PrimengModule
   ],
   providers: [
     provideFirebaseApp(() => initializeApp({"projectId":"rebootapp-37a30",
