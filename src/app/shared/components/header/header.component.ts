@@ -9,6 +9,8 @@ import {AuthService} from "../../../services/auth.service";
 })
 export class HeaderComponent implements  OnInit{
   items: MenuItem[] | undefined;
+  isLoggedIn = false;  // Tracks the login state
+
 
   constructor(private authService: AuthService) {
   }
@@ -59,10 +61,18 @@ export class HeaderComponent implements  OnInit{
         icon: 'pi pi-envelope'
       }
     ]
+
+    this.authService.streamAuthState().subscribe(user => {
+      this.isLoggedIn = !!user;  // Update isLoggedIn based on user presence
+    });
   }
 
-  login() {
-    this.authService.loginWithGoogle();
+  loginOrLogout() {
+    if (this.isLoggedIn) {
+      this.authService.logout().subscribe();  // Perform logout
+    } else {
+      this.authService.googleSignIn().subscribe();  // Perform Google sign-in
+    }
   }
 
 }

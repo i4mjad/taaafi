@@ -2,7 +2,12 @@
   <p-menubar [model]="items" >
     <ng-template pTemplate="end">
       <div class="flex align-items-center gap-2">
-        <p-button icon="pi pi-check" [rounded]="true" [text]="true" [raised]="true" (click)="login()" />
+        <p-button
+          icon="pi {{isLoggedIn === true? 'pi-lock-open': 'pi-lock'}}"
+          [rounded]="true"
+          [raised]="true"
+          (click)="loginOrLogout()">
+        </p-button>
       </div>
     </ng-template>
     </p-menubar>
