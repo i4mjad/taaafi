@@ -1,78 +1,82 @@
-import {Component, OnInit} from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { MenuItem } from 'primeng/api';
-import {AuthService} from "../../../services/auth.service";
+import { AuthService } from '../../../services/auth.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-header',
   templateUrl: './header.component.html',
-  styleUrl: './header.component.css'
+  styleUrls: ['./header.component.css'],
 })
-export class HeaderComponent implements  OnInit{
-  items: MenuItem[] | undefined;
-  isLoggedIn = false;  // Tracks the login state
+export class HeaderComponent implements OnInit {
+  items: MenuItem[] = [];
+  isLoggedIn = false; // Tracks the login state
 
+  constructor(private authService: AuthService, private router: Router) {}
 
-  constructor(private authService: AuthService) {
-  }
   ngOnInit(): void {
-    this.items = [
-      {
-        label: 'Home',
-        icon: 'pi pi-home'
-      },
-      {
-        label: 'Features',
-        icon: 'pi pi-star'
-      },
-      {
-        label: 'Projects',
-        icon: 'pi pi-search',
-        items: [
-          {
-            label: 'Components',
-            icon: 'pi pi-bolt'
-          },
-          {
-            label: 'Blocks',
-            icon: 'pi pi-server'
-          },
-          {
-            label: 'UI Kit',
-            icon: 'pi pi-pencil'
-          },
-          {
-            label: 'Templates',
-            icon: 'pi pi-palette',
-            items: [
-              {
-                label: 'Apollo',
-                icon: 'pi pi-palette'
-              },
-              {
-                label: 'Ultima',
-                icon: 'pi pi-palette'
-              }
-            ]
-          }
-        ]
-      },
-      {
-        label: 'Contact',
-        icon: 'pi pi-envelope'
-      }
-    ]
-
-    this.authService.streamAuthState().subscribe(user => {
-      this.isLoggedIn = !!user;  // Update isLoggedIn based on user presence
+    this.authService.streamAuthState().subscribe((user) => {
+      this.isLoggedIn = !!user; // Update isLoggedIn based on user presence
+      this.updateMenuItems();
     });
+  }
+
+  updateMenuItems() {
+    if (this.isLoggedIn) {
+      this.items = [
+        {
+          label: 'Dashboard',
+          icon: 'pi pi-home',
+          routerLink: '/dashboard',
+        },
+        {
+          label: 'Projects',
+          icon: 'pi pi-search',
+          items: [
+            {
+              label: 'Components',
+              icon: 'pi pi-bolt',
+            },
+            {
+              label: 'Blocks',
+              icon: 'pi pi-server',
+            },
+            {
+              label: 'UI Kit',
+              icon: 'pi pi-pencil',
+            },
+            {
+              label: 'Templates',
+              icon: 'pi pi-palette',
+              items: [
+                {
+                  label: 'Apollo',
+                  icon: 'pi pi-palette',
+                },
+                {
+                  label: 'Ultima',
+                  icon: 'pi pi-palette',
+                },
+              ],
+            },
+          ],
+        },
+      ];
+    } else {
+      this.items = [];
+    }
   }
 
   loginOrLogout() {
     if (this.isLoggedIn) {
-      this.authService.logout().subscribe();  // Perform logout
+      this.authService.logout().subscribe({
+        next: () => this.router.navigate(['/']), // Optional: navigate to login on logout
+        error: (error) => console.error('Logout failed', error),
+      });
     } else {
-      this.authService.googleSignIn().subscribe();  // Perform Google sign-in
+      this.authService.googleSignIn().subscribe({
+        error: (error) => console.error('Login failed', error),
+      });
     }
   }
-
 }

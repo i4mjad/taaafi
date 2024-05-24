@@ -4,9 +4,9 @@ import { MenubarModule } from 'primeng/menubar';
 import { AvatarModule } from 'primeng/avatar';
 import { CardModule } from 'primeng/card';
 
-const components = [ButtonModule,MenubarModule,AvatarModule,CardModule];
+const components = [MenubarModule, ButtonModule, AvatarModule, CardModule];
 @NgModule({
   imports: components,
-  exports: components
+  exports: components,
 })
-export class PrimengModule { }
+export class PrimengModule {}

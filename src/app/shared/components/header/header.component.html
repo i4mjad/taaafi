@@ -1,14 +1,16 @@
 <div class="card">
-  <p-menubar [model]="items" >
-    <ng-template pTemplate="end">
-      <div class="flex align-items-center gap-2">
-        <p-button
-          icon="pi {{isLoggedIn === true? 'pi-lock-open': 'pi-lock'}}"
-          [rounded]="true"
-          [raised]="true"
-          (click)="loginOrLogout()">
-        </p-button>
-      </div>
+  <p-menubar [model]="items" styleClass="border">
+    <ng-template pTemplate="start">
+      <h1>Ta'aafi Platform</h1>
     </ng-template>
-    </p-menubar>
+    <ng-template pTemplate="end">
+      <p-button
+        styleClass="p-button-sm p-button-raised mr-2"
+        [label]="isLoggedIn ? 'Log Out' : 'Log In'"
+        severity="info"
+        (click)="loginOrLogout()"
+        size="small"
+      />
+    </ng-template>
+  </p-menubar>
 </div>
