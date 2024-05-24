@@ -5,12 +5,7 @@ import { Router } from '@angular/router';
 import firebase from 'firebase/compat/app';
 import {from, Observable, of, switchMap} from 'rxjs';
 import { catchError, map, tap } from 'rxjs/operators';
-
-interface User {
-  uid: string;
-  email?: string;
-  role: string;
-}
+import {User} from "../models/auth.model";
 
 @Injectable({
   providedIn: 'root'
