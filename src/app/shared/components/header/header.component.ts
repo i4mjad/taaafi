@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { MenuItem } from 'primeng/api';
 import { AuthService } from '../../../services/auth.service';
 import { Router } from '@angular/router';
 
@@ -9,7 +8,7 @@ import { Router } from '@angular/router';
   styleUrls: ['./header.component.css'],
 })
 export class HeaderComponent implements OnInit {
-  items: MenuItem[] = [];
+  items: any[] = [];
   isLoggedIn = false; // Tracks the login state
 
   constructor(private authService: AuthService, private router: Router) {}
