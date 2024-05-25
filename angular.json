@@ -4,6 +4,12 @@
   "newProjectRoot": "projects",
   "projects": {
     "ta3afi-cp": {
+      "i18n": {
+        "sourceLocale": "en",
+        "locales": {
+          "ar": "src/locale/messages.ar.xlf"
+        }
+      },
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -30,8 +36,8 @@
             "tsConfig": "tsconfig.app.json",
             "assets": ["src/favicon.ico", "src/assets"],
             "styles": [
-              "src/styles.css"
-              "@angular/material/prebuilt-themes/deeppurple-amber.css",
+              "src/styles.css",
+              "@angular/material/prebuilt-themes/deeppurple-amber.css"
             ],
             "scripts": []
           },

@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthService } from './services/auth.service';
 import { Router } from '@angular/router';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-root',
@@ -11,13 +12,36 @@ export class AppComponent implements OnInit {
   items: any[] = [];
   isLoggedIn = false; // Tracks the login state
 
-  constructor(private authService: AuthService, private router: Router) {}
+  currentLanguage: string = 'ar';
+
+  constructor(
+    private authService: AuthService,
+    private router: Router,
+    private translate: TranslateService
+  ) {
+    this.currentLanguage = this.translate.currentLang;
+    this.translate.onLangChange.subscribe((event) => {
+      this.currentLanguage = event.lang;
+      document.documentElement.dir = event.lang === 'ar' ? 'rtl' : 'ltr';
+    });
+  }
 
   ngOnInit(): void {
     this.authService.streamAuthState().subscribe((user) => {
       this.isLoggedIn = !!user; // Update isLoggedIn based on user presence
       this.updateMenuItems();
     });
+
+    this.currentLanguage = this.translate.currentLang;
+    // Listen to language change events
+    this.translate.onLangChange.subscribe((langChangeEvent) => {
+      this.currentLanguage = langChangeEvent.lang;
+    });
+  }
+
+  toggleLanguage() {
+    const newLang = this.currentLanguage === 'en' ? 'ar' : 'en';
+    this.translate.use(newLang);
   }
 
   updateMenuItems() {

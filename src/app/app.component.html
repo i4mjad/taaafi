@@ -1,9 +1,11 @@
 <mat-sidenav-container fullscreen>
-  <mat-sidenav mode="side" #sidenav  opened position="start">
-<!--  TODO: the list of pages goes here -->
-    <h2>
-      Taa'afi Control Panel
-    </h2>
+  <mat-sidenav
+    mode="side"
+    #sidenav
+    closed
+    [position]="currentLanguage === 'en' ? 'start' : 'end'"
+  >
+    <h2>Taa'afi Control Panel</h2>
   </mat-sidenav>
   <mat-sidenav-content>
     <mat-toolbar color="primary">
@@ -13,9 +15,15 @@
       My Application
       <span class="toolbar-spacer"></span>
 
-      <button mat-raised-button color="accent"  (click)="loginOrLogout()">
-        {{ isLoggedIn ? "Log Out" : "Log In" }}
-      </button>
+      <div>
+        <button mat-raised-button color="accent" (click)="loginOrLogout()">
+          {{ isLoggedIn ? "Log Out" : "Log In" }}
+        </button>
+
+        <button mat-button (click)="toggleLanguage()">
+          {{ currentLanguage === "en" ? "العربية" : "English" }}
+        </button>
+      </div>
     </mat-toolbar>
     <div class="main-content">
       <router-outlet></router-outlet>
