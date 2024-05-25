@@ -1,0 +1,10 @@
+mat-sidenav {
+ max-width: 300px;
+  padding: 15px;
+}
+.main-content {
+  padding: 20px;
+}
+.toolbar-spacer {
+  flex: 1 1 auto;
+}
