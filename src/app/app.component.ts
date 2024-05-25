@@ -27,6 +27,8 @@ export class AppComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.currentLanguage = 'ar';
+    document.documentElement.dir === 'ar';
     this.authService.streamAuthState().subscribe((user) => {
       this.isLoggedIn = !!user; // Update isLoggedIn based on user presence
       this.updateMenuItems();
