@@ -1,14 +1,29 @@
+// Import Angular Material theming capabilities
+@use "@angular/material" as mat;
+
+// Import Google Fonts
+@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@100;200;300;400;500;600;700&display=swap");
+
+// Define a custom typography configuration using the correct Angular Material function
+$custom-typography: mat.m2-define-typography-config(
+  $font-family: "IBM Plex Sans Arabic, sans-serif",
+);
+
+// Include the custom typography in your Angular Material theme
+@include mat.all-component-typographies($custom-typography);
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+// Include the rest of your theme definitions here
 html,
 body {
   height: 100%;
+  font-family: "Cairo", sans-serif;
 }
 body {
   margin: 0;
-  font-family: "Cairo", sans-serif;
 }
 
 mat-card {
