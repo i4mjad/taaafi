@@ -33,7 +33,6 @@ export class AppComponent implements OnInit {
     document.documentElement.dir === 'ar';
     this.authService.streamAuthState().subscribe((user) => {
       this.isLoggedIn = !!user; // Update isLoggedIn based on user presence
-      this.updateMenuItems();
     });
 
     this.currentLanguage = this.translate.currentLang;
@@ -46,52 +45,6 @@ export class AppComponent implements OnInit {
   toggleLanguage() {
     const newLang = this.currentLanguage === 'en' ? 'ar' : 'en';
     this.translate.use(newLang);
-  }
-
-  updateMenuItems() {
-    if (this.isLoggedIn) {
-      this.items = [
-        {
-          label: 'Dashboard',
-          icon: 'pi pi-home',
-          routerLink: '/dashboard',
-        },
-        {
-          label: 'Projects',
-          icon: 'pi pi-search',
-          items: [
-            {
-              label: 'Components',
-              icon: 'pi pi-bolt',
-            },
-            {
-              label: 'Blocks',
-              icon: 'pi pi-server',
-            },
-            {
-              label: 'UI Kit',
-              icon: 'pi pi-pencil',
-            },
-            {
-              label: 'Templates',
-              icon: 'pi pi-palette',
-              items: [
-                {
-                  label: 'Apollo',
-                  icon: 'pi pi-palette',
-                },
-                {
-                  label: 'Ultima',
-                  icon: 'pi pi-palette',
-                },
-              ],
-            },
-          ],
-        },
-      ];
-    } else {
-      this.items = [];
-    }
   }
 
   loginOrLogout() {

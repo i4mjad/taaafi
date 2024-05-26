@@ -15,9 +15,12 @@ import { MaterialModule } from './shared/material/material.module';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
+import { NotFoundComponent } from './pages/errors-pages/not-found/not-found.component';
+import { UnauthorizedAccessComponent } from './pages/errors-pages/unauthorized-access/unauthorized-access.component';
+import { ForbiddenAccessComponent } from './pages/errors-pages/forbidden-access/forbidden-access.component';
 
 @NgModule({
-  declarations: [AppComponent, HomeComponent, DashboardComponent],
+  declarations: [AppComponent, HomeComponent, DashboardComponent, NotFoundComponent, UnauthorizedAccessComponent, ForbiddenAccessComponent],
   imports: [
     BrowserModule,
     AppRoutingModule,

@@ -7,5 +7,22 @@
   "log-in": "Log In",
   "ta3afi-cp": "Taa'afi Managment Platform",
   "hero-disc": "For more Information, visit the app link",
-  "admin-only": "This page is only for moderators, please visit the main web page for app details"
+  "admin-only": "This page is only for moderators, please visit the main web page for app details",
+  "ERRORS": {
+    "404": {
+      "Title": "404 Not Found",
+      "Message": "The page you are looking for was not found.",
+      "HomeButton": "Go Home"
+    },
+    "403": {
+      "Title": "403 Forbidden",
+      "Message": "You do not have permission to access this page.",
+      "HomeButton": "Go Home"
+    },
+    "401": {
+      "Title": "401 Unauthorized",
+      "Message": "Please log in to access this page.",
+      "LoginButton": "Log In"
+    }
+  }
 }
