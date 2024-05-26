@@ -19,6 +19,9 @@ export class AppComponent implements OnInit {
     private router: Router,
     private translate: TranslateService
   ) {
+    this.translate.setDefaultLang('ar');
+    document.documentElement.dir = 'rtl';
+
     this.currentLanguage = this.translate.currentLang;
     this.translate.onLangChange.subscribe((event) => {
       this.currentLanguage = event.lang;
@@ -27,7 +30,6 @@ export class AppComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.currentLanguage = 'ar';
     document.documentElement.dir === 'ar';
     this.authService.streamAuthState().subscribe((user) => {
       this.isLoggedIn = !!user; // Update isLoggedIn based on user presence
