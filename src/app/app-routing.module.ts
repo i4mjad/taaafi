@@ -7,6 +7,10 @@ import { canActivateAuth } from './guards/auth.guard';
 import { NotFoundComponent } from './pages/errors-pages/not-found/not-found.component';
 import { ForbiddenAccessComponent } from './pages/errors-pages/forbidden-access/forbidden-access.component';
 import { UnauthorizedAccessComponent } from './pages/errors-pages/unauthorized-access/unauthorized-access.component';
+import { LibraryComponent } from './pages/library/library.component';
+import { VaultComponent } from './pages/vault/vault.component';
+import { FellowshipsComponent } from './pages/fellowships/fellowships.component';
+import { UsersManagementComponent } from './pages/users-management/users-management.component';
 
 const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -18,7 +22,12 @@ const routes: Routes = [
   { path: 'not-found', component: NotFoundComponent },
   { path: 'forbidden-access', component: ForbiddenAccessComponent },
   { path: 'unauthorized-access', component: UnauthorizedAccessComponent },
-  { path: '**', redirectTo: '/404' },
+  { path: 'not-found', component: NotFoundComponent },
+  { path: 'library', component: LibraryComponent },
+  { path: 'vault', component: VaultComponent },
+  { path: 'fellowships', component: FellowshipsComponent },
+  { path: 'users-management', component: UsersManagementComponent },
+  { path: '**', redirectTo: '/not-found' },
 ];
 
 @NgModule({

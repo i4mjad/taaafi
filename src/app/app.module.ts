@@ -18,9 +18,13 @@ import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { NotFoundComponent } from './pages/errors-pages/not-found/not-found.component';
 import { UnauthorizedAccessComponent } from './pages/errors-pages/unauthorized-access/unauthorized-access.component';
 import { ForbiddenAccessComponent } from './pages/errors-pages/forbidden-access/forbidden-access.component';
+import { LibraryComponent } from './pages/library/library.component';
+import { VaultComponent } from './pages/vault/vault.component';
+import { FellowshipsComponent } from './pages/fellowships/fellowships.component';
+import { UsersManagementComponent } from './pages/users-management/users-management.component';
 
 @NgModule({
-  declarations: [AppComponent, HomeComponent, DashboardComponent, NotFoundComponent, UnauthorizedAccessComponent, ForbiddenAccessComponent],
+  declarations: [AppComponent, HomeComponent, DashboardComponent, NotFoundComponent, UnauthorizedAccessComponent, ForbiddenAccessComponent, LibraryComponent, VaultComponent, FellowshipsComponent, UsersManagementComponent],
   imports: [
     BrowserModule,
     AppRoutingModule,

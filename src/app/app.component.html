@@ -1,20 +1,72 @@
-<div>
-  <mat-toolbar color="primary">
-    <mat-toolbar-row>
-      <div class="flex flex-row gap-4">
-        <span>{{ "app-name" | translate }}</span>
-        <button mat-outlined-button>{{ "dashboard" | translate }}</button>
-      </div>
-      <span class="toolbar-spacer"></span>
-      <div>
-        <button mat-button (click)="toggleLanguage()">
-          {{ (currentLanguage === "en" ? "arabic" : "english") | translate }}
+<div class="h-screen">
+  <mat-toolbar color="primary" class="flex justify-between items-center">
+    <button mat-outlined-button routerLink="/dashboard">
+      {{ "app-name" | translate }}
+    </button>
+
+    <!-- Spacer to push navigation to the right -->
+    <div class="flex-grow"></div>
+
+    <!-- Buttons visible on larger screens (gt-md) -->
+    <div class="flex gap-4 items-center">
+      <div class="hidden gt-md:flex gap-4">
+        <button mat-outlined-button routerLink="/library">
+          {{ "library" | translate }}
         </button>
-        <button mat-raised-button color="accent" (click)="loginOrLogout()">
+        <button mat-outlined-button routerLink="/vault">
+          {{ "vault" | translate }}
+        </button>
+        <button mat-outlined-button routerLink="/fellowships">
+          {{ "fellowships" | translate }}
+        </button>
+        <button mat-outlined-button routerLink="/users-management">
+          {{ "users-management" | translate }}
+        </button>
+
+        <button mat-icon-button [matMenuTriggerFor]="menu1">
+          <mat-icon>person</mat-icon>
+        </button>
+        <mat-menu #menu1="matMenu">
+          <button mat-menu-item (click)="toggleLanguage()">
+            {{ (currentLanguage === "en" ? "arabic" : "english") | translate }}
+          </button>
+          <mat-divider></mat-divider>
+          <button mat-menu-item (click)="loginOrLogout()">
+            <span [ngClass]="isLoggedIn ? 'text-red-600' : 'text-green-600'">
+              {{ (isLoggedIn ? "log-out" : "log-in") | translate }}
+            </span>
+          </button>
+        </mat-menu>
+      </div>
+
+      <button mat-icon-button [matMenuTriggerFor]="menu" class="hamburger-menu">
+        <mat-icon>menu</mat-icon>
+      </button>
+    </div>
+
+    <mat-menu #menu="matMenu">
+      <button mat-menu-item routerLink="/library">
+        {{ "library" | translate }}
+      </button>
+      <button mat-menu-item routerLink="/vault">
+        {{ "vault" | translate }}
+      </button>
+      <button mat-menu-item routerLink="/fellowships">
+        {{ "fellowships" | translate }}
+      </button>
+      <button mat-menu-item routerLink="/users-management">
+        {{ "users-management" | translate }}
+      </button>
+      <mat-divider></mat-divider>
+      <button mat-menu-item (click)="toggleLanguage()">
+        {{ (currentLanguage === "en" ? "arabic" : "english") | translate }}
+      </button>
+      <button mat-menu-item (click)="loginOrLogout()">
+        <span [ngClass]="isLoggedIn ? 'text-red-600' : 'text-green-600'">
           {{ (isLoggedIn ? "log-out" : "log-in") | translate }}
-        </button>
-      </div>
-    </mat-toolbar-row>
+        </span>
+      </button>
+    </mat-menu>
   </mat-toolbar>
 
   <div class="p-4">

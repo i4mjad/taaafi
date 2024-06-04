@@ -10,3 +10,21 @@ mat-sidenav {
 .main-content {
   padding: 16px;
 }
+
+.reverse {
+  display: flex;
+  flex-direction: row-reverse;
+
+  mat-icon {
+    padding: 0 0 0 1rem;
+    margin: 0;
+  }
+}
+
+.hamburger-menu {
+  display: none;
+
+  @media (max-width: 1279.99px) {
+    display: block;
+  }
+}
