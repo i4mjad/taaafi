@@ -2,6 +2,7 @@ import 'package:figma_squircle/figma_squircle.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/providers/followup/followup_providers.dart';
 import 'package:reboot_app_3/providers/main_providers.dart';
 import 'package:reboot_app_3/providers/user/user_providers.dart';
@@ -86,7 +87,7 @@ class WelcomeContent extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final followUpData = ref.watch(followupViewModelProvider.notifier);
-    final theme = Theme.of(context);
+    final theme = CustomThemeInherited.of(context);
 
     return FutureBuilder<DateTime>(
         future: followUpData.getFirstDate(),
@@ -99,7 +100,7 @@ class WelcomeContent extends ConsumerWidget {
               children: [
                 Text(
                   AppLocalizations.of(context).translate('welcome'),
-                  style: kSubTitlesStyle.copyWith(color: theme.hintColor),
+                  style: kSubTitlesStyle.copyWith(color: theme.grey[900]),
                 ),
                 SizedBox(
                   height: 16,
@@ -107,15 +108,20 @@ class WelcomeContent extends ConsumerWidget {
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    //TODO: consider extacting this to a reusable widget
                     Container(
                       width: MediaQuery.of(context).size.width * 0.27,
                       height: 150,
                       decoration: ShapeDecoration(
-                        color: theme.focusColor,
+                        color: theme.grey[50],
                         shape: SmoothRectangleBorder(
                           borderRadius: SmoothBorderRadius(
                             cornerRadius: 15,
                             cornerSmoothing: 1,
+                          ),
+                          side: BorderSide(
+                            color: theme.grey[100]!,
+                            width: 1.0,
                           ),
                         ),
                       ),
@@ -148,7 +154,7 @@ class WelcomeContent extends ConsumerWidget {
                                   return Text(
                                     streak.data.toString(),
                                     style: kPageTitleStyle.copyWith(
-                                      color: Colors.white,
+                                      color: theme.primary,
                                       fontSize: 35,
                                     ),
                                   );
@@ -162,7 +168,7 @@ class WelcomeContent extends ConsumerWidget {
                                   .translate('free-relapse-days'),
                               style: kSubTitlesStyle.copyWith(
                                   fontSize: 16,
-                                  color: Colors.white,
+                                  color: theme.primary[300],
                                   height: 1.5),
                               textAlign: TextAlign.center,
                             ),
@@ -178,7 +184,7 @@ class WelcomeContent extends ConsumerWidget {
                           height: 71,
                           width: MediaQuery.of(context).size.width * 0.60,
                           decoration: BoxDecoration(
-                            color: theme.cardColor,
+                            color: theme.primary[100],
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Center(
@@ -214,7 +220,8 @@ class WelcomeContent extends ConsumerWidget {
                                           (sh.data as String),
                                       textAlign: TextAlign.center,
                                       style: kSubTitlesStyle.copyWith(
-                                          fontSize: 13, color: theme.hintColor),
+                                          fontSize: 13,
+                                          color: theme.primary[100]),
                                     );
                                 }
                               },
@@ -229,7 +236,7 @@ class WelcomeContent extends ConsumerWidget {
                           height: 71,
                           width: MediaQuery.of(context).size.width * 0.60,
                           decoration: BoxDecoration(
-                            color: theme.cardColor,
+                            color: theme.primary[100],
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Center(
@@ -264,7 +271,8 @@ class WelcomeContent extends ConsumerWidget {
                                           (sh.data as String),
                                       textAlign: TextAlign.center,
                                       style: kSubTitlesStyle.copyWith(
-                                          color: theme.hintColor, fontSize: 13),
+                                          color: theme.primary[100],
+                                          fontSize: 13),
                                     );
                                 }
                               },

@@ -73,3 +73,115 @@ class ThemeColors {
   static const Color error800 = Color(0xff7b0909);
   static const Color error900 = Color(0xff5e0707);
 }
+
+const MaterialColor primarySwatch = MaterialColor(
+  0xff376d71,
+  <int, Color>{
+    50: ThemeColors.primary50,
+    100: ThemeColors.primary100,
+    200: ThemeColors.primary200,
+    300: ThemeColors.primary300,
+    400: ThemeColors.primary400,
+    500: ThemeColors.primary500,
+    600: ThemeColors.primary600,
+    700: ThemeColors.primary700,
+    800: ThemeColors.primary800,
+    900: ThemeColors.primary900,
+  },
+);
+
+const MaterialColor secondarySwatch = MaterialColor(
+  0xff94c5c9,
+  <int, Color>{
+    50: ThemeColors.secondary50,
+    100: ThemeColors.secondary100,
+    200: ThemeColors.secondary200,
+    300: ThemeColors.secondary300,
+    400: ThemeColors.secondary400,
+    500: ThemeColors.secondary500,
+    600: ThemeColors.secondary600,
+    700: ThemeColors.secondary700,
+    800: ThemeColors.secondary800,
+    900: ThemeColors.secondary900,
+  },
+);
+
+const MaterialColor tintSwatch = MaterialColor(
+  0xffefc0aa,
+  <int, Color>{
+    50: ThemeColors.tint50,
+    100: ThemeColors.tint100,
+    200: ThemeColors.tint200,
+    300: ThemeColors.tint300,
+    400: ThemeColors.tint400,
+    500: ThemeColors.tint500,
+    600: ThemeColors.tint600,
+    700: ThemeColors.tint700,
+    800: ThemeColors.tint800,
+    900: ThemeColors.tint900,
+  },
+);
+
+const MaterialColor successSwatch = MaterialColor(
+  0xff38c172,
+  <int, Color>{
+    50: ThemeColors.sucess50,
+    100: ThemeColors.sucess100,
+    200: ThemeColors.sucess200,
+    300: ThemeColors.sucess300,
+    400: ThemeColors.sucess400,
+    500: ThemeColors.sucess500,
+    600: ThemeColors.sucess600,
+    700: ThemeColors.sucess700,
+    800: ThemeColors.sucess800,
+    900: ThemeColors.sucess900,
+  },
+);
+
+const MaterialColor warnSwatch = MaterialColor(
+  0xfff1c863,
+  <int, Color>{
+    50: ThemeColors.warn50,
+    100: ThemeColors.warn100,
+    200: ThemeColors.warn200,
+    300: ThemeColors.warn300,
+    400: ThemeColors.warn400,
+    500: ThemeColors.warn500,
+    600: ThemeColors.warn600,
+    700: ThemeColors.warn700,
+    800: ThemeColors.warn800,
+    900: ThemeColors.warn900,
+  },
+);
+
+const MaterialColor greySwatch = MaterialColor(
+  0xff95a1ac,
+  <int, Color>{
+    50: ThemeColors.grey50,
+    100: ThemeColors.grey100,
+    200: ThemeColors.grey200,
+    300: ThemeColors.grey300,
+    400: ThemeColors.grey400,
+    500: ThemeColors.grey500,
+    600: ThemeColors.grey600,
+    700: ThemeColors.grey700,
+    800: ThemeColors.grey800,
+    900: ThemeColors.grey900,
+  },
+);
+
+const MaterialColor errorSwatch = MaterialColor(
+  0xffdf1111,
+  <int, Color>{
+    50: ThemeColors.error50,
+    100: ThemeColors.error100,
+    200: ThemeColors.error200,
+    300: ThemeColors.error300,
+    400: ThemeColors.error400,
+    500: ThemeColors.error500,
+    600: ThemeColors.error600,
+    700: ThemeColors.error700,
+    800: ThemeColors.error800,
+    900: ThemeColors.error900,
+  },
+);

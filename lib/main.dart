@@ -9,10 +9,11 @@ import 'package:firebase_analytics/firebase_analytics.dart';
 
 import 'package:reboot_app_3/core/di/container.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
+import 'package:reboot_app_3/core/theming/custom_theme_data.dart';
 import 'package:reboot_app_3/firebase_options.dart';
 import 'package:reboot_app_3/providers/main_providers.dart';
 import 'package:reboot_app_3/shared/Components/bottom_navbar.dart';
-import 'package:reboot_app_3/shared/components/app-themes.dart';
+import 'package:reboot_app_3/core/theming/app-themes.dart';
 
 import 'package:reboot_app_3/shared/services/notification_service.dart';
 import 'package:reboot_app_3/shared/services/routing/custom_router.dart';
@@ -116,29 +117,33 @@ class _MyAppState extends State<MyApp> {
       child: Consumer(builder: (context, ref, child) {
         final theme = ref.watch(customThemeProvider);
 
-        return MaterialApp(
-          supportedLocales: [Locale('ar', ''), Locale('en', '')],
-          locale: _locale,
-          localizationsDelegates: [
-            AppLocalizations.delegate,
-            GlobalMaterialLocalizations.delegate,
-            GlobalCupertinoLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-          ],
-          localeResolutionCallback: (locale, supportedLocales) {
-            for (var supportedLocale in supportedLocales) {
-              if (supportedLocale.languageCode == locale?.languageCode) {
-                return supportedLocale;
+        return CustomThemeInherited(
+          customThemeData:
+              currentTheme.darkTheme ? darkCustomTheme : lightCustomTheme,
+          child: MaterialApp(
+            supportedLocales: [Locale('ar', ''), Locale('en', '')],
+            locale: _locale,
+            localizationsDelegates: [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+            ],
+            localeResolutionCallback: (locale, supportedLocales) {
+              for (var supportedLocale in supportedLocales) {
+                if (supportedLocale.languageCode == locale?.languageCode) {
+                  return supportedLocale;
+                }
               }
-            }
-            return supportedLocales.first;
-          },
-          debugShowCheckedModeBanner: false,
-          onGenerateRoute: CustomRouter.allRoutes,
-          initialRoute: navbar,
-          home: HomeNavBar(),
-          navigatorObservers: [observer],
-          theme: theme.darkTheme == true ? darkTheme : lightTheme,
+              return supportedLocales.first;
+            },
+            debugShowCheckedModeBanner: false,
+            onGenerateRoute: CustomRouter.allRoutes,
+            initialRoute: navbar,
+            home: HomeNavBar(),
+            navigatorObservers: [observer],
+            theme: theme.darkTheme == true ? darkTheme : lightTheme,
+          ),
         );
       }),
     );

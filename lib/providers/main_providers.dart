@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:reboot_app_3/shared/components/app-themes.dart';
+import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/shared/services/auth/firebase_auth_methods.dart';
 
 final authenticationServiceProvider = Provider<FirebaseAuthMethods>((ref) {
