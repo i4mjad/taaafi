@@ -239,19 +239,19 @@ flutter:
     - family: ExpoArabic
       fonts:
         - asset: asset/fonts/ExpoArabic-Book.ttf
-          weight: 400
-          style: normal
-        - asset: asset/fonts/ExpoArabic-Bold.otf
-          weight: 700
-          style: normal
-        - asset: asset/fonts/ExpoArabic-Medium.ttf
           weight: 500
           style: normal
+        - asset: asset/fonts/ExpoArabic-Bold.otf
+          weight: 800
+          style: normal
+        - asset: asset/fonts/ExpoArabic-Medium.ttf
+          weight: 600
+          style: normal
         - asset: asset/fonts/ExpoArabic-Light.ttf
-          weight: 300
+          weight: 400
           style: normal
         - asset: asset/fonts/ExpoArabic-SemiBold.ttf
-          weight: 600
+          weight: 700
           style: normal
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
