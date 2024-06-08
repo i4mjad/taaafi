@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:reboot_app_3/data/models/FollowUpData.dart';
-import 'package:reboot_app_3/di/container.dart';
+import 'package:reboot_app_3/core/di/container.dart';
 import 'package:reboot_app_3/repository/user_context.dart';
 
 abstract class IFollowUpDataRepository {

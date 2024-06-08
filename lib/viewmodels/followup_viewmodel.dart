@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:reboot_app_3/data/models/CalenderDay.dart';
 import 'package:reboot_app_3/data/models/FollowUpData.dart';
-import 'package:reboot_app_3/di/container.dart';
+import 'package:reboot_app_3/core/di/container.dart';
 import 'package:reboot_app_3/presentation/screens/follow_your_reboot/day_of_week_relapses/day_of_week_relapses_widget.dart';
 import 'package:reboot_app_3/repository/follow_up_data_repository.dart';
 import 'package:reboot_app_3/shared/constants/customer_io_attributes_const.dart';

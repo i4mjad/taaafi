@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:reboot_app_3/di/container.dart';
+import 'package:reboot_app_3/core/di/container.dart';
 import 'package:reboot_app_3/shared/components/snackbar.dart';
 import 'package:reboot_app_3/shared/services/promize_service.dart';
 

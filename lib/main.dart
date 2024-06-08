@@ -7,7 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 
-import 'package:reboot_app_3/di/container.dart';
+import 'package:reboot_app_3/core/di/container.dart';
 import 'package:reboot_app_3/firebase_options.dart';
 import 'package:reboot_app_3/providers/main_providers.dart';
 import 'package:reboot_app_3/shared/Components/bottom_navbar.dart';
