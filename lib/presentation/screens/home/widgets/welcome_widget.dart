@@ -1,3 +1,4 @@
+import 'package:figma_squircle/figma_squircle.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -109,9 +110,15 @@ class WelcomeContent extends ConsumerWidget {
                     Container(
                       width: MediaQuery.of(context).size.width * 0.27,
                       height: 150,
-                      decoration: BoxDecoration(
-                          color: theme.focusColor,
-                          borderRadius: BorderRadius.circular(15)),
+                      decoration: ShapeDecoration(
+                        color: theme.focusColor,
+                        shape: SmoothRectangleBorder(
+                          borderRadius: SmoothBorderRadius(
+                            cornerRadius: 15,
+                            cornerSmoothing: 1,
+                          ),
+                        ),
+                      ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
