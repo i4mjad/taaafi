@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:reboot_app_3/core/theming/app-themes.dart';
+import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/presentation/screens/follow_your_reboot/notes/notes_screen.dart';
 import 'package:reboot_app_3/providers/notes/notes_providers.dart';
 
@@ -10,16 +12,17 @@ import 'package:reboot_app_3/shared/constants/textstyles_constants.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
 
 AppBar appBarWithSettings(BuildContext context, String titleId) {
-  final theme = Theme.of(context);
+  final theme = CustomThemeInherited.of(context);
   return AppBar(
     elevation: 0,
-    centerTitle: true,
+    centerTitle: false,
+    backgroundColor: theme.backgroundColor,
     title: Text(
       AppLocalizations.of(context).translate(titleId),
-      style: kSubTitlesStyle.copyWith(color: theme.primaryColor),
+      style: textStyles.screenHeadding.copyWith(color: theme.primary),
     ),
     iconTheme: IconThemeData(
-      color: theme.primaryColor,
+      color: theme.primary,
     ),
     actions: [
       GestureDetector(
@@ -32,7 +35,7 @@ AppBar appBarWithSettings(BuildContext context, String titleId) {
           child: Center(
               child: Icon(
             Iconsax.setting,
-            color: theme.primaryColor,
+            color: theme.primary,
           )),
         ),
       ),

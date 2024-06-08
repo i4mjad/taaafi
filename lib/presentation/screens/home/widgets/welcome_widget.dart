@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
+import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/providers/followup/followup_providers.dart';
 import 'package:reboot_app_3/providers/main_providers.dart';
 import 'package:reboot_app_3/providers/user/user_providers.dart';
@@ -51,7 +52,7 @@ class NotSignIn extends StatelessWidget {
       children: [
         Text(
           AppLocalizations.of(context).translate('welcome'),
-          style: kSubTitlesStyle.copyWith(color: theme.primaryColor),
+          style: textStyles.h6.copyWith(color: theme.primaryColor),
         ),
         SizedBox(
           height: 16,
@@ -100,7 +101,7 @@ class WelcomeContent extends ConsumerWidget {
               children: [
                 Text(
                   AppLocalizations.of(context).translate('welcome'),
-                  style: kSubTitlesStyle.copyWith(color: theme.grey[900]),
+                  style: textStyles.h6.copyWith(color: theme.grey[900]),
                 ),
                 SizedBox(
                   height: 16,

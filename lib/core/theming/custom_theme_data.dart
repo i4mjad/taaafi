@@ -9,6 +9,7 @@ class CustomThemeData {
   final MaterialColor warn;
   final MaterialColor grey;
   final MaterialColor error;
+  final MaterialColor backgroundColor;
 
   const CustomThemeData({
     required this.primary,
@@ -18,6 +19,7 @@ class CustomThemeData {
     required this.warn,
     required this.grey,
     required this.error,
+    required this.backgroundColor,
   });
 }
 
@@ -37,6 +39,7 @@ const CustomThemeData lightCustomTheme = CustomThemeData(
       900: ThemeColors.primary900,
     },
   ),
+  backgroundColor: MaterialColor(0xfff8f8f8, <int, Color>{}),
   secondary: MaterialColor(
     0xff94c5c9,
     <int, Color>{
@@ -146,6 +149,7 @@ const CustomThemeData darkCustomTheme = CustomThemeData(
       900: ThemeColors.primary900,
     },
   ),
+  backgroundColor: MaterialColor(0xfff8f8f8, <int, Color>{}),
   secondary: MaterialColor(
     0xff3e5354,
     <int, Color>{
