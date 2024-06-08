@@ -73,7 +73,9 @@ class _BottomNavBarState extends State<BottomNavBar> {
         selectedLabelStyle: kSubTitlesSubsStyle.copyWith(
           color: theme.primaryColor,
         ),
-        backgroundColor: theme.bottomAppBarColor,
+        //TODO: this was changed due to the depreacted color, do not forget to change to the new themeing
+        // backgroundColor: theme.bottomAppBarColor,
+        backgroundColor: Colors.black,
         unselectedLabelStyle:
             kSubTitlesSubsStyle.copyWith(color: mainGrayColor),
         selectedItemColor: theme.primaryColor,
@@ -129,7 +131,9 @@ class _HomeNavBarState extends State<HomeNavBar> {
           ),
         ],
         activeColor: theme.primaryColor,
-        backgroundColor: theme.bottomAppBarColor,
+        //TODO: this was changed due to the depreacted color, do not forget to change to the new themeing
+        // backgroundColor: theme.bottomAppBarColor,
+        backgroundColor: Colors.black,
       ),
       // tabBuilder: (BuildContext context, int index) {
       //

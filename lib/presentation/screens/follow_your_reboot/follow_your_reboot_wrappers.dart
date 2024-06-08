@@ -423,7 +423,9 @@ class _NotificationActivationScreenState
                         Text(
                           AppLocalizations.of(context).translate("activate"),
                           style: kTitleSeconderyStyle.copyWith(
-                            color: theme.selectedRowColor,
+                            //TODO: this was changed due to the depreacted color, do not forget to change to the new themeing
+                            // color: theme.selectedRowColor,
+                            color: Colors.black,
                             fontWeight: FontWeight.w900,
                           ),
                         ),

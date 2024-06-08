@@ -40,7 +40,9 @@ class NotesScreen extends StatelessWidget {
           child: Icon(
             Iconsax.add_square,
             size: 30,
-            color: theme.backgroundColor,
+            //TODO: this was changed due to the depreacted color, do not forget to change to the new themeing
+            // color: theme.backgroundColor,
+            color: Colors.black,
           ),
         ),
       ),

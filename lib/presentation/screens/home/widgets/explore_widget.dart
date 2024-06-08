@@ -116,8 +116,9 @@ class ExploreWidget extends StatelessWidget {
                                             CrossAxisAlignment.start,
                                         children: [
                                           CircleAvatar(
-                                            backgroundColor:
-                                                theme.backgroundColor,
+                                            //TODO: this was changed due to the depreacted color, do not forget to change to the new themeing
+                                            // backgroundColor:theme.backgroundColor,
+                                            backgroundColor: Colors.black,
                                             child: Icon(
                                               Iconsax.book,
                                               size: 16,

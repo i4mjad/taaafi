@@ -45,11 +45,13 @@ ThemeData get lightTheme {
     primaryColor: lightPrimaryColor,
     secondaryHeaderColor: lightSeconderyTextColor,
     hintColor: lightPrimaryTextColor,
-    backgroundColor: lightBackgroundColor,
+    //TODO: this was changed due to the depreacted color, do not forget to change to the new themeing
+    // backgroundColor: lightBackgroundColor,
     cardColor: lightCardColor,
     scaffoldBackgroundColor: seconderyColor,
     canvasColor: lightPrimaryColor,
-    bottomAppBarColor: lightCardColor,
+    //TODO: this was changed due to the depreacted color, do not forget to change to the new themeing
+    // bottomAppBarColor: lightCardColor,
     focusColor: lightPrimaryColor,
     appBarTheme: AppBarTheme(
       backgroundColor: seconderyColor,
@@ -63,11 +65,13 @@ ThemeData get darkTheme {
     brightness: Brightness.dark,
     primaryColor: Colors.white,
     secondaryHeaderColor: darkSeconderyTextColor,
-    backgroundColor: darkBackgroundColor,
+    //TODO: this was changed due to the depreacted color, do not forget to change to the new themeing
+    // backgroundColor: darkBackgroundColor,
     scaffoldBackgroundColor: darkBackgroundColor,
     cardColor: darkCardColor,
     canvasColor: darkCardColor,
-    bottomAppBarColor: darkCardColor,
+    //TODO: this was changed due to the depreacted color, do not forget to change to the new themeing
+    // bottomAppBarColor: darkCardColor,
     hintColor: darkPrimaryTextColor,
     focusColor: darkCardColor,
     appBarTheme: AppBarTheme(

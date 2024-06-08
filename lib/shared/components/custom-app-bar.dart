@@ -77,7 +77,9 @@ AppBar plainAppBar(BuildContext context, String titleId) {
 AppBar appBarWithCustomTitle(BuildContext context, String title) {
   final theme = Theme.of(context);
   return AppBar(
-    backgroundColor: theme.bottomAppBarColor,
+    //TODO: this was changed due to the depreacted color, do not forget to change to the new themeing
+    // backgroundColor: theme.bottomAppBarColor,
+    backgroundColor: Colors.black,
     elevation: 0,
     centerTitle: true,
     title: Text(
@@ -94,7 +96,9 @@ AppBar noteAppBarWithCustomTitle(
     BuildContext context, String title, WidgetRef ref, String id) {
   final theme = Theme.of(context);
   return AppBar(
-    backgroundColor: theme.bottomAppBarColor,
+    //TODO: this was changed due to the depreacted color, do not forget to change to the new themeing
+    // backgroundColor: theme.bottomAppBarColor,
+    backgroundColor: Colors.black,
     elevation: 0,
     centerTitle: true,
     title: Text(
