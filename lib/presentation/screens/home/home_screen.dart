@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/presentation/screens/home/widgets/welcome_widget.dart';
 import 'package:reboot_app_3/presentation/screens/ta3afi_liberary/widgets/content_screen.dart';
 import 'package:reboot_app_3/shared/components/custom-app-bar.dart';
@@ -61,9 +62,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 height: 24,
               ),
               WelcomeWidget(),
-              SizedBox(
-                height: 32,
-              ),
+
+              verticalSpace(Spacing.points32),
               // CustomBlocProvider(
               //   bloc: ContentBloc(),
               //   child: ExploreWidget(),
