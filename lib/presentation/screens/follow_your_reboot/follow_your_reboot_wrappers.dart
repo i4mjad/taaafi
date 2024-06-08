@@ -14,7 +14,7 @@ import 'package:reboot_app_3/providers/user/user_providers.dart';
 
 import 'package:reboot_app_3/shared/constants/textstyles_constants.dart';
 import 'package:reboot_app_3/shared/helpers/date_methods.dart';
-import 'package:reboot_app_3/shared/localization/localization.dart';
+import 'package:reboot_app_3/core/localization/localization.dart';
 
 class FollowYourRebootScreenAuthenticationWrapper extends ConsumerWidget {
   @override

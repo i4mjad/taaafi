@@ -5,7 +5,7 @@ import 'package:reboot_app_3/presentation/screens/follow_your_reboot/follow_your
 import 'package:reboot_app_3/presentation/screens/follow_your_reboot/widgets/followup_modal_bottomsheet_widgets.dart';
 import 'package:reboot_app_3/providers/followup/followup_providers.dart';
 import 'package:reboot_app_3/shared/constants/textstyles_constants.dart';
-import 'package:reboot_app_3/shared/localization/localization.dart';
+import 'package:reboot_app_3/core/localization/localization.dart';
 
 class FollowUpStreaks extends ConsumerWidget {
   FollowUpStreaks({Key? key}) : super(key: key);

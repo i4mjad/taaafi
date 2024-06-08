@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:reboot_app_3/core/localization/localization.dart';
+import 'package:reboot_app_3/core/localization/localization_services.dart';
 import 'package:reboot_app_3/shared/constants/textstyles_constants.dart';
-import 'package:reboot_app_3/shared/localization/localization.dart';
-import 'package:reboot_app_3/shared/localization/localization_services.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class AboutScreen extends StatefulWidget {

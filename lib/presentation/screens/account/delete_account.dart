@@ -6,7 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:reboot_app_3/shared/components/snackbar.dart';
 import 'package:reboot_app_3/shared/constants/textstyles_constants.dart';
-import 'package:reboot_app_3/shared/localization/localization.dart';
+import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/shared/services/auth/firebase_auth_methods.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 

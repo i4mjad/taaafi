@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:reboot_app_3/presentation/screens/follow_your_reboot/day_of_week_relapses/day_of_week_relapses_widget.dart';
 import 'package:reboot_app_3/providers/followup/followup_providers.dart';
 import 'package:reboot_app_3/shared/constants/textstyles_constants.dart';
-import 'package:reboot_app_3/shared/localization/localization.dart';
+import 'package:reboot_app_3/core/localization/localization.dart';
 
 class RelapsesByDayOfWeek extends ConsumerWidget {
   RelapsesByDayOfWeek({Key? key}) : super(key: key);

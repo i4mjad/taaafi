@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:reboot_app_3/shared/constants/constants.dart';
 import 'package:reboot_app_3/shared/constants/textstyles_constants.dart';
-import 'package:reboot_app_3/shared/localization/localization.dart';
+import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class CommunityPage extends StatelessWidget {

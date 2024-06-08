@@ -6,7 +6,7 @@ import 'package:reboot_app_3/presentation/blocs/content_bloc.dart';
 import 'package:reboot_app_3/presentation/screens/home/explore/explore_screen.dart';
 import 'package:reboot_app_3/presentation/screens/home/widgets/article_screen.dart';
 import 'package:reboot_app_3/shared/constants/textstyles_constants.dart';
-import 'package:reboot_app_3/shared/localization/localization.dart';
+import 'package:reboot_app_3/core/localization/localization.dart';
 
 class ExploreWidget extends StatelessWidget {
   const ExploreWidget({

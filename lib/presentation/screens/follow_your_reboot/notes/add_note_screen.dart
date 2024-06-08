@@ -5,7 +5,7 @@ import 'package:reboot_app_3/providers/notes/notes_providers.dart';
 
 import 'package:reboot_app_3/shared/components/custom-app-bar.dart';
 import 'package:reboot_app_3/shared/constants/textstyles_constants.dart';
-import 'package:reboot_app_3/shared/localization/localization.dart';
+import 'package:reboot_app_3/core/localization/localization.dart';
 
 class AddNoteScreen extends ConsumerStatefulWidget {
   @override
