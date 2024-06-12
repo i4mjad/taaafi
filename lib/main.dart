@@ -9,6 +9,7 @@ import 'package:firebase_analytics/firebase_analytics.dart';
 
 import 'package:reboot_app_3/core/di/container.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
+import 'package:reboot_app_3/core/routing/app_routes.dart';
 import 'package:reboot_app_3/core/theming/custom_theme_data.dart';
 import 'package:reboot_app_3/firebase_options.dart';
 import 'package:reboot_app_3/providers/main_providers.dart';
@@ -120,7 +121,7 @@ class _MyAppState extends State<MyApp> {
         return CustomThemeInherited(
           customThemeData:
               currentTheme.darkTheme ? darkCustomTheme : lightCustomTheme,
-          child: MaterialApp(
+          child: MaterialApp.router(
             supportedLocales: [Locale('ar', ''), Locale('en', '')],
             locale: _locale,
             localizationsDelegates: [
@@ -138,10 +139,11 @@ class _MyAppState extends State<MyApp> {
               return supportedLocales.first;
             },
             debugShowCheckedModeBanner: false,
-            onGenerateRoute: CustomRouter.allRoutes,
-            initialRoute: navbar,
-            home: HomeNavBar(),
-            navigatorObservers: [observer],
+            // onGenerateRoute: CustomRouter.allRoutes,
+            // initialRoute: navbar,
+            // home: HomeNavBar(),
+            // navigatorObservers: [observer],
+            routerConfig: goRouter,
             theme: theme.darkTheme == true ? darkTheme : lightTheme,
           ),
         );
