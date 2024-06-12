@@ -19,7 +19,7 @@ AppBar appBarWithSettings(BuildContext context, String titleId) {
     backgroundColor: theme.backgroundColor,
     title: Text(
       AppLocalizations.of(context).translate(titleId),
-      style: textStyles.screenHeadding.copyWith(color: theme.primary),
+      style: TextStyles.screenHeadding.copyWith(color: theme.primary),
     ),
     iconTheme: IconThemeData(
       color: theme.primary,
