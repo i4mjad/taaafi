@@ -64,6 +64,7 @@ class CustomThemeInherited extends InheritedWidget {
 
 ThemeData get lightTheme {
   return ThemeData(
+    useMaterial3: true,
     brightness: Brightness.light,
     primarySwatch: lightCustomTheme.primary,
     secondaryHeaderColor: lightCustomTheme.secondary[500],
@@ -83,6 +84,7 @@ ThemeData get lightTheme {
 
 ThemeData get darkTheme {
   return ThemeData(
+    useMaterial3: true,
     brightness: Brightness.dark,
     primarySwatch: darkCustomTheme.primary,
     secondaryHeaderColor: darkCustomTheme.secondary[500],
