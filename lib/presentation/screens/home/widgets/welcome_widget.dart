@@ -52,7 +52,7 @@ class NotSignIn extends StatelessWidget {
       children: [
         Text(
           AppLocalizations.of(context).translate('welcome'),
-          style: textStyles.h6.copyWith(color: theme.primaryColor),
+          style: TextStyles.h6.copyWith(color: theme.primaryColor),
         ),
         SizedBox(
           height: 16,
@@ -101,7 +101,7 @@ class WelcomeContent extends ConsumerWidget {
               children: [
                 Text(
                   AppLocalizations.of(context).translate('welcome'),
-                  style: textStyles.h6.copyWith(color: theme.grey[900]),
+                  style: TextStyles.h6.copyWith(color: theme.grey[900]),
                 ),
                 SizedBox(
                   height: 16,
