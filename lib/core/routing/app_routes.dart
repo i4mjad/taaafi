@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
+import 'package:reboot_app_3/core/routing/navigator_keys.dart';
 import 'package:reboot_app_3/core/routing/route_names.dart';
+import 'package:reboot_app_3/core/routing/scaffold_with_nested_navigation.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/features/account/presentation/account_screen.dart';
 import 'package:reboot_app_3/features/home/presentation/home_screen.dart';
@@ -11,21 +13,14 @@ import 'package:reboot_app_3/features/vault/presentation/vault_screen.dart';
 import 'package:reboot_app_3/presentation/screens/account/account_screen.dart';
 import 'package:reboot_app_3/presentation/screens/home/home_screen.dart';
 import 'package:reboot_app_3/presentation/screens/ta3afi_liberary/widgets/content_screen.dart';
-
-final _rootNavigatorKey = GlobalKey<NavigatorState>();
-final _shellNavigatorHomeKey =
-    GlobalKey<NavigatorState>(debugLabel: 'homeShell');
-final _shellNavigatorVaultKey =
-    GlobalKey<NavigatorState>(debugLabel: 'vaultShell');
-final _shellNavigatorFellowshipKey =
-    GlobalKey<NavigatorState>(debugLabel: 'fellowshipShell');
-final _shellNavigatorAccountKey =
-    GlobalKey<NavigatorState>(debugLabel: 'accountShell');
-
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 // the one and only GoRouter instance
-final goRouter = GoRouter(
+part 'app_routes.g.dart';
+
+@riverpod
+GoRouter goRouter(ref) => GoRouter(
   initialLocation: '/home',
-  navigatorKey: _rootNavigatorKey,
+  navigatorKey: rootNavigatorKey,
   routes: [
     // Stateful nested navigation based on:
     // https://github.com/flutter/packages/blob/main/packages/go_router/example/lib/stateful_shell_route.dart
@@ -37,7 +32,7 @@ final goRouter = GoRouter(
       branches: [
         // first tab (home)
         StatefulShellBranch(
-          navigatorKey: _shellNavigatorHomeKey,
+          navigatorKey: shellNavigatorHomeKey,
           routes: [
             // top route inside branch
             GoRoute(
@@ -60,7 +55,7 @@ final goRouter = GoRouter(
 
         // second tab (vault)
         StatefulShellBranch(
-          navigatorKey: _shellNavigatorVaultKey,
+          navigatorKey: shellNavigatorVaultKey,
           routes: [
             // top route inside branch
             GoRoute(
@@ -81,7 +76,7 @@ final goRouter = GoRouter(
         ),
         // third tab (fellowship)
         StatefulShellBranch(
-          navigatorKey: _shellNavigatorFellowshipKey,
+          navigatorKey: shellNavigatorFellowshipKey,
           routes: [
             // top route inside branch
             GoRoute(
@@ -103,7 +98,7 @@ final goRouter = GoRouter(
 
         // forth tab (account)
         StatefulShellBranch(
-          navigatorKey: _shellNavigatorAccountKey,
+          navigatorKey: shellNavigatorAccountKey,
           routes: [
             // top route inside branch
             GoRoute(
@@ -126,59 +121,3 @@ final goRouter = GoRouter(
     ),
   ],
 );
-
-// Stateful nested navigation based on:
-// https://github.com/flutter/packages/blob/main/packages/go_router/example/lib/stateful_shell_route.dart
-class ScaffoldWithNestedNavigation extends StatelessWidget {
-  const ScaffoldWithNestedNavigation({
-    Key? key,
-    required this.navigationShell,
-  }) : super(key: key ?? const ValueKey('ScaffoldWithNestedNavigation'));
-  final StatefulNavigationShell navigationShell;
-
-  void _goBranch(int index) {
-    navigationShell.goBranch(
-      index,
-      // A common pattern when using bottom navigation bars is to support
-      // navigating to the initial location when tapping the item that is
-      // already active. This example demonstrates how to support this behavior,
-      // using the initialLocation parameter of goBranch.
-      initialLocation: index == navigationShell.currentIndex,
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: navigationShell,
-      bottomNavigationBar: NavigationBarTheme(
-        data: NavigationBarThemeData(
-          labelTextStyle:
-              WidgetStatePropertyAll<TextStyle>(TextStyles.footnoteSelected),
-        ),
-        child: NavigationBar(
-          selectedIndex: navigationShell.currentIndex,
-          destinations: [
-            NavigationDestination(
-              label: AppLocalizations.of(context).translate("home"),
-              icon: Icon(LucideIcons.home),
-            ),
-            NavigationDestination(
-              label: AppLocalizations.of(context).translate("vault"),
-              icon: Icon(LucideIcons.bookLock),
-            ),
-            NavigationDestination(
-              label: AppLocalizations.of(context).translate("fellowship"),
-              icon: Icon(LucideIcons.users),
-            ),
-            NavigationDestination(
-              label: AppLocalizations.of(context).translate("account"),
-              icon: Icon(LucideIcons.settings),
-            ),
-          ],
-          onDestinationSelected: _goBranch,
-        ),
-      ),
-    );
-  }
-}
