@@ -1,6 +1,10 @@
 import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+part 'localization.g.dart';
 
 class AppLocalizations {
   final Locale locale;
@@ -70,4 +74,29 @@ class _AppLocalizationsDelegate
 
   @override
   bool shouldReload(_AppLocalizationsDelegate old) => false;
+}
+
+@riverpod
+class LocaleNotifier extends _$LocaleNotifier {
+  @override
+  Locale? build() {
+    _loadLocale();
+    return null;
+  }
+
+  void setLocale(Locale locale) {
+    state = locale;
+    _saveLocale(locale);
+  }
+
+  Future<void> _loadLocale() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var languageCode = prefs.getString("languageCode") ?? 'en';
+    state = Locale(languageCode, '');
+  }
+
+  Future<void> _saveLocale(Locale locale) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString("languageCode", locale.languageCode);
+  }
 }

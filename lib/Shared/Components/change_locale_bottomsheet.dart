@@ -2,8 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:reboot_app_3/app.dart';
-import 'package:reboot_app_3/main.dart';
 import 'package:reboot_app_3/providers/main_providers.dart';
 import 'package:reboot_app_3/shared/components/snackbar.dart';
 import 'package:reboot_app_3/shared/constants/textstyles_constants.dart';
@@ -18,22 +16,24 @@ class ChangeLanguageWidget {
     showModalBottomSheet(
       context: context,
       builder: (context) {
-        return Container(
-          color: theme.scaffoldBackgroundColor,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                _buildDivider(context, theme),
-                SizedBox(height: 16),
-                _buildNightModeSwitcher(context, theme),
-                SizedBox(height: 16),
-                _buildChangeLanguageHeader(context, theme),
-                SizedBox(height: 16),
-                _buildLanguageSelection(context, theme, prefs),
-                SizedBox(height: 20),
-              ],
+        return Consumer(
+          builder: (context, ref, child) => Container(
+            color: theme.scaffoldBackgroundColor,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  _buildDivider(context, theme),
+                  SizedBox(height: 16),
+                  _buildNightModeSwitcher(context, theme),
+                  SizedBox(height: 16),
+                  _buildChangeLanguageHeader(context, theme),
+                  SizedBox(height: 16),
+                  _buildLanguageSelection(context, theme, prefs, ref),
+                  SizedBox(height: 20),
+                ],
+              ),
             ),
           ),
         );
@@ -132,8 +132,8 @@ class ChangeLanguageWidget {
     );
   }
 
-  static Widget _buildLanguageSelection(
-      BuildContext context, ThemeData theme, SharedPreferences prefs) {
+  static Widget _buildLanguageSelection(BuildContext context, ThemeData theme,
+      SharedPreferences prefs, WidgetRef ref) {
     return Container(
       padding: EdgeInsets.symmetric(vertical: 16),
       decoration: BoxDecoration(
@@ -143,9 +143,11 @@ class ChangeLanguageWidget {
       ),
       child: Column(
         children: [
-          _buildLanguageOption(context, theme, prefs, 'ar', "ع", "العربية"),
+          _buildLanguageOption(
+              context, ref, theme, prefs, 'ar', "ع", "العربية"),
           Divider(color: theme.primaryColor, thickness: 0.25),
-          _buildLanguageOption(context, theme, prefs, 'en', "E", "English"),
+          _buildLanguageOption(
+              context, ref, theme, prefs, 'en', "E", "English"),
         ],
       ),
     );
@@ -153,6 +155,7 @@ class ChangeLanguageWidget {
 
   static Widget _buildLanguageOption(
       BuildContext context,
+      WidgetRef ref,
       ThemeData theme,
       SharedPreferences prefs,
       String languageCode,
@@ -165,7 +168,7 @@ class ChangeLanguageWidget {
           HapticFeedback.lightImpact();
           await prefs.setString('languageCode', languageCode);
           final enLocale = Locale(languageCode, '');
-          MyApp.setLocale(context, enLocale);
+          ref.watch(localeNotifierProvider.notifier).setLocale(enLocale);
           getSnackBar(context, "changed-to-$languageCode");
           Navigator.pop(context);
         },
