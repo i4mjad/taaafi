@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:go_router/go_router.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/presentation/screens/home/widgets/welcome_widget.dart';
@@ -159,8 +160,9 @@ class Ta3afiLiberaryCard extends StatelessWidget {
               GestureDetector(
                 onTap: () {
                   HapticFeedback.mediumImpact();
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => ContentScreen()));
+                  // Navigator.push(context,
+                  //     MaterialPageRoute(builder: (context) => ContentScreen()));
+                  context.go('/home/content');
                 },
                 child: Container(
                     width: MediaQuery.of(context).size.width * 0.40,

@@ -10,6 +10,7 @@ import 'package:reboot_app_3/features/home/presentation/home_screen.dart';
 import 'package:reboot_app_3/features/vault/presentation/vault_screen.dart';
 import 'package:reboot_app_3/presentation/screens/account/account_screen.dart';
 import 'package:reboot_app_3/presentation/screens/home/home_screen.dart';
+import 'package:reboot_app_3/presentation/screens/ta3afi_liberary/widgets/content_screen.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 final _shellNavigatorHomeKey =
@@ -43,14 +44,15 @@ final goRouter = GoRouter(
               name: RouteNames.home.name,
               path: '/home',
               pageBuilder: (context, state) => const NoTransitionPage(
-                child: UpdatedHomeScreen(),
+                child: HomeScreen(),
               ),
               routes: [
                 // child route
-                // GoRoute(
-                //   path: RouteNames.account.name,
-                //   builder: (context, state) => AccountScreen(),
-                // ),
+                GoRoute(
+                  path: 'content',
+                  name: RouteNames.content.name,
+                  builder: (context, state) => ContentScreen(),
+                ),
               ],
             ),
           ],
@@ -65,8 +67,6 @@ final goRouter = GoRouter(
               name: RouteNames.vault.name,
               path: '/vault',
               pageBuilder: (context, state) => const NoTransitionPage(
-                //TODO: change this to the vault screen when it's created
-                //! CHANGE THIS
                 child: VaultScreen(),
               ),
               routes: [
