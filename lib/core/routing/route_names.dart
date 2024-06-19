@@ -1,3 +1,3 @@
 // private navigators
 
-enum RouteNames { home, account, vault, fellowship, content }
+enum RouteNames { home, account, vault, fellowship, content, onboarding, login }

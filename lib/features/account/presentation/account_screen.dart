@@ -8,6 +8,7 @@ import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/custom_theme_data.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
+import 'package:reboot_app_3/features/authentication/repositories/auth_repository.dart';
 
 //TODO: to be updated after the migeration from old account screen
 //! RENAME THIS
@@ -16,6 +17,7 @@ class UpdatedAccountScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final authRepository = ref.watch(authRepositoryProvider);
     return Scaffold(
       appBar: appBar(context, ref, 'account'),
       body: Padding(
@@ -55,6 +57,9 @@ class UpdatedAccountScreen extends ConsumerWidget {
               SettingsButton(
                 icon: LucideIcons.logOut,
                 textKey: 'log-out',
+                action: () {
+                  authRepository.signOut();
+                },
               ),
               verticalSpace(Spacing.points4),
               SettingsButton(
@@ -91,30 +96,38 @@ class SettingsButton extends StatelessWidget {
   final IconData icon;
   final String textKey;
   final String? type;
+  final VoidCallback? action;
   const SettingsButton(
-      {super.key, required this.icon, required this.textKey, this.type});
+      {super.key,
+      required this.icon,
+      required this.textKey,
+      this.type,
+      this.action});
 
   @override
   Widget build(BuildContext context) {
     final theme = CustomThemeInherited.of(context);
-    return WidgetsContainer(
-      padding: EdgeInsets.all(12),
-      backgroundColor: _getBackgroundColor(type, theme),
-      borderRadius: BorderRadius.circular(10.5),
-      borderSide: BorderSide(color: _getBorderColor(type, theme), width: 1),
-      child: Row(
-        children: [
-          Icon(
-            icon,
-            color: _getTextColor(type, theme),
-          ),
-          horizontalSpace(Spacing.points16),
-          Text(
-            AppLocalizations.of(context).translate(textKey),
-            style:
-                TextStyles.footnote.copyWith(color: _getTextColor(type, theme)),
-          )
-        ],
+    return GestureDetector(
+      onTap: action,
+      child: WidgetsContainer(
+        padding: EdgeInsets.all(12),
+        backgroundColor: _getBackgroundColor(type, theme),
+        borderRadius: BorderRadius.circular(10.5),
+        borderSide: BorderSide(color: _getBorderColor(type, theme), width: 1),
+        child: Row(
+          children: [
+            Icon(
+              icon,
+              color: _getTextColor(type, theme),
+            ),
+            horizontalSpace(Spacing.points16),
+            Text(
+              AppLocalizations.of(context).translate(textKey),
+              style: TextStyles.footnote
+                  .copyWith(color: _getTextColor(type, theme)),
+            )
+          ],
+        ),
       ),
     );
   }

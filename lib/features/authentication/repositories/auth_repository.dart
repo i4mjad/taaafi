@@ -18,10 +18,14 @@ class AuthRepository {
   Future<void> signInAnonymously() {
     return _auth.signInAnonymously();
   }
+
+  Future<void> signOut() {
+    return _auth.signOut();
+  }
 }
 
 @riverpod
-AuthRepository authRepository(ref) {
+AuthRepository authRepository(AuthRepositoryRef ref) {
   return AuthRepository(ref.watch(firebaseAuthProvider));
 }
 
@@ -29,3 +33,5 @@ AuthRepository authRepository(ref) {
 Stream<User?> authStateChanges(ref) {
   return ref.watch(authRepositoryProvider).authStateChanges();
 }
+
+

@@ -34,10 +34,6 @@ class MyApp extends ConsumerWidget {
           return supportedLocales.first;
         },
         debugShowCheckedModeBanner: false,
-        // onGenerateRoute: CustomRouter.allRoutes,
-        // initialRoute: navbar,
-        // home: HomeNavBar(),
-        // navigatorObservers: [observer],
         routerConfig: goRouter,
         theme: theme.darkTheme == true ? darkTheme : lightTheme,
       ),
