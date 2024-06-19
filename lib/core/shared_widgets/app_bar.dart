@@ -15,6 +15,7 @@ AppBar appBar(BuildContext context, WidgetRef ref, String titleTranslationKey) {
       ),
     ),
     backgroundColor: theme.backgroundColor,
+    surfaceTintColor: theme.backgroundColor,
     centerTitle: false,
     shadowColor: theme.grey[100],
   );
