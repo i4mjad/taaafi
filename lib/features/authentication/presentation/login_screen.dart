@@ -101,37 +101,47 @@ class LogInScreen extends ConsumerWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Container(
-                    height: 60,
-                    width: 60,
-                    padding: EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                        color: theme.primary[50],
-                        borderRadius: BorderRadius.circular(150),
-                        border: Border.all(
-                          color: theme.primary[100]!,
-                          width: 1,
-                        )),
-                    child: SvgPicture.asset(
-                      'asset/icons/apple-icon.svg',
-                      semanticsLabel: 'Apple Logo',
+                  GestureDetector(
+                    onTap: () async {
+                      await authRepository.signInWithApple(context);
+                    },
+                    child: Container(
+                      height: 60,
+                      width: 60,
+                      padding: EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                          color: theme.primary[50],
+                          borderRadius: BorderRadius.circular(150),
+                          border: Border.all(
+                            color: theme.primary[100]!,
+                            width: 1,
+                          )),
+                      child: SvgPicture.asset(
+                        'asset/icons/apple-icon.svg',
+                        semanticsLabel: 'Apple Logo',
+                      ),
                     ),
                   ),
                   horizontalSpace(Spacing.points4),
-                  Container(
-                    height: 60,
-                    width: 60,
-                    padding: EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                        color: theme.primary[50],
-                        borderRadius: BorderRadius.circular(150),
-                        border: Border.all(
-                          color: theme.primary[100]!,
-                          width: 1,
-                        )),
-                    child: SvgPicture.asset(
-                      'asset/icons/google-icon.svg',
-                      semanticsLabel: 'Google Logo',
+                  GestureDetector(
+                    onTap: () async {
+                      await authRepository.signInWithGoogle(context);
+                    },
+                    child: Container(
+                      height: 60,
+                      width: 60,
+                      padding: EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                          color: theme.primary[50],
+                          borderRadius: BorderRadius.circular(150),
+                          border: Border.all(
+                            color: theme.primary[100]!,
+                            width: 1,
+                          )),
+                      child: SvgPicture.asset(
+                        'asset/icons/google-icon.svg',
+                        semanticsLabel: 'Google Logo',
+                      ),
                     ),
                   ),
                 ],

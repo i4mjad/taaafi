@@ -20,7 +20,6 @@ part 'app_routes.g.dart';
 GoRouter goRouter(GoRouterRef ref) {
   // Watch the auth state changes
   final authState = ref.watch(authStateChangesProvider);
-  final authRepository = ref.watch(authRepositoryProvider);
 
   return GoRouter(
     initialLocation: '/home',
