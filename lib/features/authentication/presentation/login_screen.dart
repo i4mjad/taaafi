@@ -4,13 +4,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
-import 'package:reboot_app_3/core/shared_widgets/app_bar.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/features/authentication/repositories/auth_repository.dart';
-import 'package:reboot_app_3/providers/main_providers.dart';
 
 class LogInScreen extends ConsumerWidget {
   const LogInScreen({super.key});
@@ -69,10 +67,9 @@ class LogInScreen extends ConsumerWidget {
                   ),
                   Text(
                     AppLocalizations.of(context).translate('sign-up'),
-                    style: TextStyles.footnoteSelected.copyWith(
-                      color: theme.primary[600],
-                    ),
-                  )
+                    style: TextStyles.footnoteSelected
+                        .copyWith(color: theme.primary[600]),
+                  ),
                 ],
               ),
               verticalSpace(Spacing.points16),
@@ -154,27 +151,39 @@ class LogInScreen extends ConsumerWidget {
   }
 }
 
-class SignInForm extends ConsumerWidget {
+class SignInForm extends ConsumerStatefulWidget {
   SignInForm({
     super.key,
   });
 
+  @override
+  _SignInFormState createState() => _SignInFormState();
+}
+
+class _SignInFormState extends ConsumerState<SignInForm> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  void dispose() {
+    emailController.dispose();
+    passwordController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Column(
       children: [
         CustomTextField(
-          controller: passwordController,
+          controller: emailController,
           hint: AppLocalizations.of(context).translate('email'),
           prefixIcon: LucideIcons.mail,
           inputType: TextInputType.emailAddress,
         ),
         verticalSpace(Spacing.points8),
         CustomTextField(
-          controller: emailController,
+          controller: passwordController,
           obscureText: true,
           hint: AppLocalizations.of(context).translate('password'),
           prefixIcon: LucideIcons.lock,
