@@ -7,6 +7,7 @@ import 'package:reboot_app_3/core/routing/scaffold_with_nested_navigation.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/features/account/presentation/account_screen.dart';
 import 'package:reboot_app_3/features/authentication/presentation/login_screen.dart';
+import 'package:reboot_app_3/features/authentication/presentation/signup_screen.dart';
 import 'package:reboot_app_3/features/authentication/repositories/auth_repository.dart';
 import 'package:reboot_app_3/features/onboarding/presentation/onboarding_screen.dart';
 import 'package:reboot_app_3/features/vault/presentation/vault_screen.dart';
@@ -28,10 +29,14 @@ GoRouter goRouter(GoRouterRef ref) {
     redirect: (context, state) {
       final isLoggedIn = authState.asData?.value != null;
 
-      // Allow navigation to the login page without redirection
+      // Allow navigation to login, signup, and forgetPassword pages without redirection
+      final isAuthRoute = state.matchedLocation == '/login' ||
+          state.matchedLocation == '/signup' ||
+          state.matchedLocation == '/forgetPassword';
+
       if (!isLoggedIn &&
-          state.matchedLocation != '/onboarding' &&
-          state.matchedLocation != '/login') {
+          !isAuthRoute &&
+          state.matchedLocation != '/onboarding') {
         return '/onboarding';
       }
 
@@ -54,6 +59,13 @@ GoRouter goRouter(GoRouterRef ref) {
         name: RouteNames.login.name,
         pageBuilder: (context, state) => NoTransitionPage(
           child: LogInScreen(),
+        ),
+      ),
+      GoRoute(
+        path: '/signup',
+        name: RouteNames.signup.name,
+        pageBuilder: (context, state) => NoTransitionPage(
+          child: SignUpScreen(),
         ),
       ),
       StatefulShellRoute.indexedStack(
