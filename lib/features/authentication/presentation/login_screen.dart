@@ -1,6 +1,7 @@
 import 'package:figma_squircle/figma_squircle.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/shared_widgets/app_bar.dart';
@@ -101,33 +102,36 @@ class LogInScreen extends ConsumerWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Container(
-                    padding:
-                        EdgeInsets.only(left: 16, right: 16, top: 4, bottom: 4),
+                    height: 60,
+                    width: 60,
+                    padding: EdgeInsets.all(16),
                     decoration: BoxDecoration(
                         color: theme.primary[50],
-                        borderRadius: BorderRadius.circular(100),
+                        borderRadius: BorderRadius.circular(150),
                         border: Border.all(
                           color: theme.primary[100]!,
                           width: 1,
                         )),
-                    child: Text(
-                      "",
-                      style:
-                          TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+                    child: SvgPicture.asset(
+                      'asset/icons/apple-icon.svg',
+                      semanticsLabel: 'Apple Logo',
                     ),
                   ),
                   horizontalSpace(Spacing.points4),
                   Container(
+                    height: 60,
+                    width: 60,
                     padding: EdgeInsets.all(16),
                     decoration: BoxDecoration(
                         color: theme.primary[50],
-                        borderRadius: BorderRadius.circular(100),
+                        borderRadius: BorderRadius.circular(150),
                         border: Border.all(
                           color: theme.primary[100]!,
                           width: 1,
                         )),
-                    child: Icon(
-                      LucideIcons.apple,
+                    child: SvgPicture.asset(
+                      'asset/icons/google-icon.svg',
+                      semanticsLabel: 'Google Logo',
                     ),
                   ),
                 ],
