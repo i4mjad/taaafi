@@ -19,7 +19,7 @@ class UpdatedAccountScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final authRepository = ref.watch(authRepositoryProvider);
     return Scaffold(
-      appBar: appBar(context, ref, 'account'),
+      appBar: appBar(context, ref, 'account', false),
       body: Padding(
         padding: const EdgeInsets.only(left: 16.0, right: 16, top: 16),
         child: SingleChildScrollView(
