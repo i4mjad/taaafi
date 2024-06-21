@@ -1,15 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 
 //TODO: An issue appeared when the app bar has back button, keep this in mind when testing
-AppBar appBar(BuildContext context, WidgetRef ref, String titleTranslationKey) {
+AppBar appBar(BuildContext context, WidgetRef ref, String? titleTranslationKey,
+    bool showLocaleChangeIcon) {
   final theme = CustomThemeInherited.of(context);
   return AppBar(
     title: Text(
-      AppLocalizations.of(context).translate(titleTranslationKey),
+      titleTranslationKey != null
+          ? AppLocalizations.of(context).translate(titleTranslationKey)
+          : '',
       style: TextStyles.screenHeadding.copyWith(
         color: theme.grey[900],
       ),
@@ -18,5 +22,22 @@ AppBar appBar(BuildContext context, WidgetRef ref, String titleTranslationKey) {
     surfaceTintColor: theme.backgroundColor,
     centerTitle: false,
     shadowColor: theme.grey[100],
+    actions: loadedActions(ref),
   );
+}
+
+List<Widget> loadedActions(WidgetRef ref) {
+  return [
+    GestureDetector(
+      onTap: () {
+        ref.watch(localeNotifierProvider.notifier).toggleLocale();
+      },
+      child: Padding(
+        padding: const EdgeInsets.only(right: 16, left: 16),
+        child: Icon(
+          LucideIcons.languages,
+        ),
+      ),
+    )
+  ];
 }
