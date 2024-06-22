@@ -92,6 +92,8 @@
   "email": "Email",
   "password": "Password",
   "forget-password": "Forget Password",
+  "send-reset-password-link": "Send passowrd reset link",
+
   "sign-up": "Sign Up",
   "login-button": "Login",
   "login-button-p": "Chose your sign in method",
