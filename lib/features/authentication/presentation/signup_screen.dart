@@ -19,6 +19,7 @@ class SignUpScreen extends ConsumerWidget {
     final theme = CustomThemeInherited.of(context);
     return Scaffold(
       backgroundColor: theme.backgroundColor,
+      resizeToAvoidBottomInset: false,
       appBar: appBar(
         context,
         ref,
@@ -26,37 +27,31 @@ class SignUpScreen extends ConsumerWidget {
         true,
       ),
       body: SafeArea(
-        child: Column(
-          children: [
-            Expanded(
-              child: SingleChildScrollView(
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              children: [
+                SignUpForm(),
+                WidgetsContainer(
+                  backgroundColor: theme.primary[600],
+                  width: MediaQuery.of(context).size.width - (16 + 16),
+                  padding: EdgeInsets.only(top: 12, bottom: 12),
+                  borderRadius: BorderRadius.circular(10.5),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      SignUpForm(),
+                      Text(
+                        AppLocalizations.of(context).translate('sign-up'),
+                        style: TextStyles.footnoteSelected
+                            .copyWith(color: theme.grey[50]),
+                      ),
                     ],
                   ),
                 ),
-              ),
+              ],
             ),
-            WidgetsContainer(
-              backgroundColor: theme.primary[600],
-              width: MediaQuery.of(context).size.width - (16 + 16),
-              padding: EdgeInsets.only(top: 12, bottom: 12),
-              borderRadius: BorderRadius.circular(10.5),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    AppLocalizations.of(context).translate('sign-up'),
-                    style: TextStyles.footnoteSelected
-                        .copyWith(color: theme.grey[50]),
-                  ),
-                ],
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );
@@ -297,7 +292,6 @@ class _SignUpFormState extends ConsumerState<SignUpForm> {
                 onChanged: (bool value) {
                   // This is called when the user toggles the switch.
                   setState(() {
-                    //TODO: set the value of the starting date as of now
                     nowIsStartingDate = !nowIsStartingDate;
                     startingDateController.text = getDisplayDateTime(
                         DateTime.now(), locale!.languageCode);
