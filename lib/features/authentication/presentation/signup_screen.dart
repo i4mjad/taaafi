@@ -25,31 +25,38 @@ class SignUpScreen extends ConsumerWidget {
         'sign-up',
         true,
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            children: [
-              SignUpForm(),
-              verticalSpace(Spacing.points8),
-              WidgetsContainer(
-                backgroundColor: theme.primary[600],
-                width: MediaQuery.of(context).size.width - (16 + 16),
-                padding: EdgeInsets.only(top: 12, bottom: 12),
-                borderRadius: BorderRadius.circular(10.5),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      AppLocalizations.of(context).translate('sign-up'),
-                      style: TextStyles.footnoteSelected
-                          .copyWith(color: theme.grey[50]),
-                    ),
-                  ],
+      body: SafeArea(
+        child: Column(
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    children: [
+                      SignUpForm(),
+                    ],
+                  ),
                 ),
               ),
-            ],
-          ),
+            ),
+            WidgetsContainer(
+              backgroundColor: theme.primary[600],
+              width: MediaQuery.of(context).size.width - (16 + 16),
+              padding: EdgeInsets.only(top: 12, bottom: 12),
+              borderRadius: BorderRadius.circular(10.5),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    AppLocalizations.of(context).translate('sign-up'),
+                    style: TextStyles.footnoteSelected
+                        .copyWith(color: theme.grey[50]),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -75,6 +82,7 @@ class _SignUpFormState extends ConsumerState<SignUpForm> {
   String selectedGender = 'Male';
   String selectedLanguage = 'English';
   bool nowIsStartingDate = false;
+  bool isTermsAccepted = false;
 
   @override
   void dispose() {
@@ -298,6 +306,26 @@ class _SignUpFormState extends ConsumerState<SignUpForm> {
               )
             ],
           ),
+        ),
+        verticalSpace(Spacing.points8),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Checkbox(
+              value: isTermsAccepted,
+              onChanged: (value) {
+                setState(() {
+                  isTermsAccepted = !isTermsAccepted;
+                });
+              },
+            ),
+            horizontalSpace(Spacing.points4),
+            Text(
+              'أوافق على شروط الاستخدام',
+              style: TextStyles.footnoteSelected,
+            )
+          ],
         )
       ],
     );
