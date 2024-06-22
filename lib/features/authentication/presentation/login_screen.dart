@@ -7,6 +7,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/routing/route_names.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
+import 'package:reboot_app_3/core/shared_widgets/custom_textfield.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
@@ -195,70 +196,6 @@ class _SignInFormState extends ConsumerState<SignInForm> {
           inputType: TextInputType.visiblePassword,
         ),
       ],
-    );
-  }
-}
-
-class CustomTextField extends ConsumerWidget {
-  final TextEditingController controller;
-  final String hint;
-  final IconData prefixIcon;
-  final bool obscureText;
-  final TextCapitalization textCapitalization;
-  final TextInputType inputType;
-  final BorderRadius? borderRadius;
-  final BorderSide? borderSide;
-
-  const CustomTextField({
-    Key? key,
-    this.borderRadius,
-    this.borderSide,
-    required this.controller,
-    required this.hint,
-    required this.prefixIcon,
-    this.obscureText = false,
-    this.textCapitalization = TextCapitalization.none,
-    required this.inputType,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final theme = CustomThemeInherited.of(context);
-    return Container(
-      width: MediaQuery.of(context).size.width - 32,
-      decoration: ShapeDecoration(
-        color: theme.grey[50],
-        shape: SmoothRectangleBorder(
-          borderRadius: SmoothBorderRadius(
-            cornerRadius:
-                (borderRadius ?? BorderRadius.circular(10.5)).topLeft.x,
-            cornerSmoothing: 1,
-          ),
-          side: borderSide ??
-              BorderSide(
-                color: theme.primary[200]!,
-                width: 1.5,
-              ),
-        ),
-      ),
-      child: TextField(
-        enabled: true,
-        controller: controller,
-        textCapitalization: textCapitalization,
-        maxLength: 32,
-        maxLines: 1,
-        obscureText: obscureText,
-        keyboardType: inputType,
-        textAlign: TextAlign.start,
-        style: TextStyles.footnote.copyWith(height: 3),
-        decoration: InputDecoration(
-          prefixIcon: Icon(prefixIcon),
-          hintText: hint,
-          counterText: "",
-          hintStyle: TextStyles.footnote,
-          border: InputBorder.none, // Remove default border
-        ),
-      ),
     );
   }
 }
