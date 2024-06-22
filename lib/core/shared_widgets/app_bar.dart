@@ -16,28 +16,53 @@ AppBar appBar(BuildContext context, WidgetRef ref, String? titleTranslationKey,
           : '',
       style: TextStyles.screenHeadding.copyWith(
         color: theme.grey[900],
+        height: 1,
       ),
     ),
     backgroundColor: theme.backgroundColor,
     surfaceTintColor: theme.backgroundColor,
     centerTitle: false,
     shadowColor: theme.grey[100],
-    actions: loadedActions(ref),
+    actions: loadedActions(ref, showLocaleChangeIcon),
+    leadingWidth: 16,
+    automaticallyImplyLeading: true,
   );
 }
 
-List<Widget> loadedActions(WidgetRef ref) {
-  return [
-    GestureDetector(
-      onTap: () {
-        ref.watch(localeNotifierProvider.notifier).toggleLocale();
-      },
-      child: Padding(
-        padding: const EdgeInsets.only(right: 16, left: 16),
-        child: Icon(
-          LucideIcons.languages,
+List<Widget> loadedActions(WidgetRef ref, bool showLocaleChangeIcon) {
+  List<Widget> widgets = [];
+  if (showLocaleChangeIcon) {
+    widgets.add(
+      GestureDetector(
+        onTap: () {
+          ref.watch(localeNotifierProvider.notifier).toggleLocale();
+        },
+        child: Padding(
+          padding: const EdgeInsets.only(right: 16, left: 16),
+          child: Icon(
+            LucideIcons.languages,
+          ),
         ),
       ),
-    )
-  ];
+    );
+  }
+  return widgets;
 }
+
+
+
+//TODO: check this later
+// class MyAppBar extends ConsumerWidget implements PreferredSizeWidget {
+//   const MyAppBar({super.key});
+
+//   @override
+//   Widget build(BuildContext context,WidgetRef ref) {
+//     return Padding(
+//       padding: EdgeInsets.only(left: 10,right:10),//adjust the padding as you want
+//       child: appBar(), //or row/any widget
+//     );
+//   }
+
+//   @override
+//   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
+// }

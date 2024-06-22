@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/routing/route_names.dart';
+import 'package:reboot_app_3/core/shared_widgets/app_bar.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
 import 'package:reboot_app_3/core/shared_widgets/custom_textfield.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
@@ -21,12 +22,12 @@ class LogInScreen extends ConsumerWidget {
     final theme = CustomThemeInherited.of(context);
     return Scaffold(
       backgroundColor: theme.backgroundColor,
+      appBar: appBar(context, ref, 'login', true),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
             children: [
-              verticalSpace(Spacing.points80),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -50,21 +51,20 @@ class LogInScreen extends ConsumerWidget {
                   ),
                 ],
               ),
-              verticalSpace(Spacing.points12),
-              Text(
-                AppLocalizations.of(context).translate('login'),
-                style: TextStyles.h2.copyWith(color: theme.primary[600]),
-              ),
-              verticalSpace(Spacing.points24),
+              verticalSpace(Spacing.points36),
               SignInForm(),
               verticalSpace(Spacing.points8),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    AppLocalizations.of(context).translate('forget-password'),
-                    style: TextStyles.footnoteSelected.copyWith(
-                      color: theme.primary[600],
+                  GestureDetector(
+                    onTap: () =>
+                        context.goNamed(RouteNames.forgotPassword.name),
+                    child: Text(
+                      AppLocalizations.of(context).translate('forget-password'),
+                      style: TextStyles.footnoteSelected.copyWith(
+                        color: theme.primary[600],
+                      ),
                     ),
                   ),
                   GestureDetector(

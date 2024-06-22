@@ -6,6 +6,7 @@ import 'package:reboot_app_3/core/routing/route_names.dart';
 import 'package:reboot_app_3/core/routing/scaffold_with_nested_navigation.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/features/account/presentation/account_screen.dart';
+import 'package:reboot_app_3/features/authentication/presentation/forgot_password_screen.dart';
 import 'package:reboot_app_3/features/authentication/presentation/login_screen.dart';
 import 'package:reboot_app_3/features/authentication/presentation/signup_screen.dart';
 import 'package:reboot_app_3/features/authentication/repositories/auth_repository.dart';
@@ -30,9 +31,9 @@ GoRouter goRouter(GoRouterRef ref) {
       final isLoggedIn = authState.asData?.value != null;
 
       // Allow navigation to login, signup, and forgetPassword pages without redirection
-      final isAuthRoute = state.matchedLocation == '/login' ||
-          state.matchedLocation == '/signup' ||
-          state.matchedLocation == '/forgetPassword';
+      final isAuthRoute = state.matchedLocation == '/onboarding/login' ||
+          state.matchedLocation == '/onboarding/login/signup' ||
+          state.matchedLocation == '/onboarding/login/forgetPassword';
 
       if (!isLoggedIn &&
           !isAuthRoute &&
@@ -48,26 +49,30 @@ GoRouter goRouter(GoRouterRef ref) {
     },
     routes: [
       GoRoute(
-        path: '/onboarding',
-        name: RouteNames.onboarding.name,
-        pageBuilder: (context, state) => NoTransitionPage(
-          child: OnBoardingScreen(),
-        ),
-      ),
-      GoRoute(
-        path: '/login',
-        name: RouteNames.login.name,
-        pageBuilder: (context, state) => NoTransitionPage(
-          child: LogInScreen(),
-        ),
-      ),
-      GoRoute(
-        path: '/signup',
-        name: RouteNames.signup.name,
-        pageBuilder: (context, state) => NoTransitionPage(
-          child: SignUpScreen(),
-        ),
-      ),
+          path: '/onboarding',
+          name: RouteNames.onboarding.name,
+          pageBuilder: (context, state) => NoTransitionPage(
+                child: OnBoardingScreen(),
+              ),
+          routes: [
+            GoRoute(
+              path: 'login',
+              name: RouteNames.login.name,
+              builder: (context, state) => LogInScreen(),
+              routes: [
+                GoRoute(
+                  path: 'forgetPassword',
+                  name: RouteNames.forgotPassword.name,
+                  builder: (context, state) => ForgotPasswordScreen(),
+                ),
+                GoRoute(
+                  path: 'signup',
+                  name: RouteNames.signup.name,
+                  builder: (context, state) => SignUpScreen(),
+                ),
+              ],
+            ),
+          ]),
       StatefulShellRoute.indexedStack(
         pageBuilder: (context, state, navigationShell) => NoTransitionPage(
           child: ScaffoldWithNestedNavigation(navigationShell: navigationShell),
