@@ -6,9 +6,11 @@ import 'package:reboot_app_3/core/routing/route_names.dart';
 import 'package:reboot_app_3/core/routing/scaffold_with_nested_navigation.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/features/account/presentation/account_screen.dart';
+import 'package:reboot_app_3/features/authentication/presentation/complete_account_registeration.dart';
 import 'package:reboot_app_3/features/authentication/presentation/forgot_password_screen.dart';
 import 'package:reboot_app_3/features/authentication/presentation/login_screen.dart';
 import 'package:reboot_app_3/features/authentication/presentation/signup_screen.dart';
+import 'package:reboot_app_3/features/authentication/providers/user_document_provider.dart';
 import 'package:reboot_app_3/features/authentication/repositories/auth_repository.dart';
 import 'package:reboot_app_3/features/onboarding/presentation/onboarding_screen.dart';
 import 'package:reboot_app_3/features/vault/presentation/vault_screen.dart';
@@ -22,57 +24,95 @@ part 'app_routes.g.dart';
 GoRouter goRouter(GoRouterRef ref) {
   // Watch the auth state changes
   final authState = ref.watch(authStateChangesProvider);
+  final userDocumentState = ref.watch(userDocumentNotifierProvider);
 
   return GoRouter(
     initialLocation: '/home',
     navigatorKey: rootNavigatorKey,
     debugLogDiagnostics: true,
-    redirect: (context, state) {
+    redirect: (context, state) async {
       final isLoggedIn = authState.asData?.value != null;
+      print('Is Logged In: $isLoggedIn');
 
-      // Allow navigation to login, signup, and forgetPassword pages without redirection
-      final isAuthRoute = state.matchedLocation == '/onboarding/login' ||
-          state.matchedLocation == '/onboarding/login/signup' ||
-          state.matchedLocation == '/onboarding/login/forgetPassword';
+      if (isLoggedIn) {
+        // If userDocumentState is still loading, do nothing
+        if (userDocumentState is AsyncLoading) {
+          print('User Document State: Loading');
+          return null;
+        }
 
-      if (!isLoggedIn &&
-          !isAuthRoute &&
-          state.matchedLocation != '/onboarding') {
-        return '/onboarding';
-      }
+        final userDocument = userDocumentState.value;
+        print('User Document: $userDocument');
+        print(userDocument?.uid);
 
-      if (isLoggedIn && state.matchedLocation == '/onboarding') {
-        return '/home';
+        // If userDocumentState has an error or is still null, do nothing
+        if (userDocument == null || userDocumentState is AsyncError) {
+          print('User Document State: Error or Null');
+          return null;
+        }
+
+        final userDocNotifier = ref.read(userDocumentNotifierProvider.notifier);
+
+        // Check for missing required data or old structure
+        if (userDocNotifier.hasMissingData(userDocument) ||
+            await userDocNotifier.hasOldStructure()) {
+          if (state.matchedLocation != '/completeAccountRegisteration') {
+            print('Redirecting to /completeAccountRegisteration');
+            return '/completeAccountRegisteration';
+          }
+          return null;
+        }
+
+        // Redirect to home if the user is logged in and trying to access auth routes
+        if (state.matchedLocation.startsWith('/onboarding')) {
+          print('Redirecting to /home');
+          return '/home';
+        }
+      } else {
+        // Non-logged-in user trying to access protected routes
+        final isAuthRoute = state.matchedLocation.startsWith('/onboarding');
+        if (!isAuthRoute && state.matchedLocation != '/onboarding') {
+          print('Redirecting to /onboarding');
+          return '/onboarding';
+        }
       }
 
       return null;
     },
     routes: [
       GoRoute(
-          path: '/onboarding',
-          name: RouteNames.onboarding.name,
-          pageBuilder: (context, state) => NoTransitionPage(
-                child: OnBoardingScreen(),
+        path: '/onboarding',
+        name: RouteNames.onboarding.name,
+        pageBuilder: (context, state) => NoTransitionPage(
+          child: OnBoardingScreen(),
+        ),
+        routes: [
+          GoRoute(
+            path: 'login',
+            name: RouteNames.login.name,
+            builder: (context, state) => LogInScreen(),
+            routes: [
+              GoRoute(
+                path: 'forgetPassword',
+                name: RouteNames.forgotPassword.name,
+                builder: (context, state) => ForgotPasswordScreen(),
               ),
-          routes: [
-            GoRoute(
-              path: 'login',
-              name: RouteNames.login.name,
-              builder: (context, state) => LogInScreen(),
-              routes: [
-                GoRoute(
-                  path: 'forgetPassword',
-                  name: RouteNames.forgotPassword.name,
-                  builder: (context, state) => ForgotPasswordScreen(),
-                ),
-                GoRoute(
-                  path: 'signup',
-                  name: RouteNames.signup.name,
-                  builder: (context, state) => SignUpScreen(),
-                ),
-              ],
-            ),
-          ]),
+              GoRoute(
+                path: 'signup',
+                name: RouteNames.signup.name,
+                builder: (context, state) => SignUpScreen(),
+              ),
+            ],
+          ),
+        ],
+      ),
+      GoRoute(
+        path: '/completeAccountRegisteration',
+        name: RouteNames.completeAccountRegisteration.name,
+        pageBuilder: (context, state) => NoTransitionPage(
+          child: CompleteAccountRegisterationScreen(),
+        ),
+      ),
       StatefulShellRoute.indexedStack(
         pageBuilder: (context, state, navigationShell) => NoTransitionPage(
           child: ScaffoldWithNestedNavigation(navigationShell: navigationShell),
