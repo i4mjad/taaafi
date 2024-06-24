@@ -9,5 +9,6 @@ enum RouteNames {
   onboarding,
   login,
   signup,
-  forgotPassword
+  forgotPassword,
+  completeAccountRegisteration,
 }
