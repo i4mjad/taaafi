@@ -15,9 +15,11 @@ class CustomTextField extends ConsumerWidget {
   final BorderRadius? borderRadius;
   final BorderSide? borderSide;
   final double? width;
+  final bool? enabled;
 
   const CustomTextField({
     Key? key,
+    this.enabled,
     this.borderRadius,
     this.borderSide,
     this.width,
@@ -69,7 +71,7 @@ class CustomTextField extends ConsumerWidget {
             ),
           ),
           child: TextField(
-            enabled: true,
+            enabled: enabled ?? true,
             controller: controller,
             textCapitalization: textCapitalization,
             maxLength: 100,

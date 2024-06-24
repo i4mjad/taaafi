@@ -180,6 +180,10 @@
   "apply-filters": "تطبيق",
   "cancel": "إلغاء",
 
+  "starting-date": "توقيت بدء متابعة التعافي",
+  "starting-date-p": "هذا التوقيت يمثل توقيت بداية متابعة التعافي يمكنك تغييره من خانة إعدادات الحساب",
+  "without-starting-date-p": "هذا التوقيت يمثل توقيت بداية متابعة التعافي يجب إدخاله لمتابعة استخدام التطبيق",
+
   "highest-streak": "أعلى\nفترة",
   "relapses-average": "الانتكاسات في آخر 7/28/90 يوم",
   "relapses-count": "الأيام بدون\nانتكاسة",
@@ -204,6 +208,9 @@
 
   "confirm-account-delete": "تأكيد حذف الحساب",
   "confirm-account-delete-p": "لا يمكن التراجع عن هذه الخطوة",
+
+  "confirm-your-details": "تأكيد بياناتك",
+  "confirm-your-details-p": "تأكد من صحة البيانات التالية",
 
   "delete-account-button": "تأكيد الحذف",
   "minutes": "دقيقة/دقائق",

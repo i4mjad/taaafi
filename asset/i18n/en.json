@@ -40,6 +40,11 @@
 
   "confirm-note-delete": "Confirm Note Deleting",
 
+  "starting-date": "Starting date and time",
+  "starting-date-p": "This represent the starting date and time of your journy. You can change it later in the Account settings",
+  "without-starting-date-p": "This represent the starting date and time of your journy. You have to set it to continue using the app",
+
+  "confirm-your-details-p": "Confirm the following information are correct:",
   "user-name": "User Name",
   "user-email": "User Email",
   "follow-your-reboot": "Follow Your Reboot",
@@ -93,6 +98,8 @@
   "password": "Password",
   "forget-password": "Forget Password",
   "send-reset-password-link": "Send passowrd reset link",
+
+  "confirm-your-details": "Confirm your details",
 
   "sign-up": "Sign Up",
   "login-button": "Login",

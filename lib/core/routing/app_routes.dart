@@ -7,6 +7,7 @@ import 'package:reboot_app_3/core/routing/scaffold_with_nested_navigation.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/features/account/presentation/account_screen.dart';
 import 'package:reboot_app_3/features/authentication/presentation/complete_account_registeration.dart';
+import 'package:reboot_app_3/features/authentication/presentation/confirm_user_details_screen.dart';
 import 'package:reboot_app_3/features/authentication/presentation/forgot_password_screen.dart';
 import 'package:reboot_app_3/features/authentication/presentation/login_screen.dart';
 import 'package:reboot_app_3/features/authentication/presentation/signup_screen.dart';
@@ -26,6 +27,9 @@ GoRouter goRouter(GoRouterRef ref) {
   final authState = ref.watch(authStateChangesProvider);
   final userDocumentState = ref.watch(userDocumentNotifierProvider);
 
+  print('Auth State: $authState');
+  print('User Document State: $userDocumentState');
+
   return GoRouter(
     initialLocation: '/home',
     navigatorKey: rootNavigatorKey,
@@ -43,7 +47,6 @@ GoRouter goRouter(GoRouterRef ref) {
 
         final userDocument = userDocumentState.value;
         print('User Document: $userDocument');
-        print(userDocument?.uid);
 
         // If userDocumentState has an error or is still null, do nothing
         if (userDocument == null || userDocumentState is AsyncError) {
@@ -53,12 +56,22 @@ GoRouter goRouter(GoRouterRef ref) {
 
         final userDocNotifier = ref.read(userDocumentNotifierProvider.notifier);
 
-        // Check for missing required data or old structure
-        if (userDocNotifier.hasMissingData(userDocument) ||
-            await userDocNotifier.hasOldStructure()) {
+        // Check for missing required data
+        if (userDocNotifier.hasMissingData(userDocument)) {
           if (state.matchedLocation != '/completeAccountRegisteration') {
             print('Redirecting to /completeAccountRegisteration');
             return '/completeAccountRegisteration';
+          }
+          return null;
+        }
+
+        // Check for old document structure
+        final hasOldStructure = await userDocNotifier.hasOldStructure();
+        print('Has Old Structure: $hasOldStructure');
+        if (hasOldStructure) {
+          if (state.matchedLocation != '/confirmProfileDetails') {
+            print('Redirecting to /confirmProfileDetails');
+            return '/confirmProfileDetails';
           }
           return null;
         }
@@ -111,6 +124,13 @@ GoRouter goRouter(GoRouterRef ref) {
         name: RouteNames.completeAccountRegisteration.name,
         pageBuilder: (context, state) => NoTransitionPage(
           child: CompleteAccountRegisterationScreen(),
+        ),
+      ),
+      GoRoute(
+        path: '/confirmProfileDetails',
+        name: RouteNames.confirmUserDetails.name,
+        pageBuilder: (context, state) => NoTransitionPage(
+          child: ConfirmUserDetailsScreen(),
         ),
       ),
       StatefulShellRoute.indexedStack(
