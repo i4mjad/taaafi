@@ -60,9 +60,7 @@ class UserDocumentNotifier extends _$UserDocumentNotifier {
 
       final doc = await _firestore.collection('users').doc(uid).get();
       final data = doc.data();
-      print('has old strcture');
-      print(data != null && data.containsKey('role'));
-      // UEn9iASYDBWmDPPBXpPoOXXWTWt1
+
       return data != null && !data.containsKey('role');
     } catch (e) {
       return false;

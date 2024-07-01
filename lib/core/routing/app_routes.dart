@@ -27,30 +27,23 @@ GoRouter goRouter(GoRouterRef ref) {
   final authState = ref.watch(authStateChangesProvider);
   final userDocumentState = ref.watch(userDocumentNotifierProvider);
 
-  print('Auth State: $authState');
-  print('User Document State: $userDocumentState');
-
   return GoRouter(
     initialLocation: '/home',
     navigatorKey: rootNavigatorKey,
-    debugLogDiagnostics: true,
+    // debugLogDiagnostics: true,
     redirect: (context, state) async {
       final isLoggedIn = authState.asData?.value != null;
-      print('Is Logged In: $isLoggedIn');
 
       if (isLoggedIn) {
         // If userDocumentState is still loading, do nothing
         if (userDocumentState is AsyncLoading) {
-          print('User Document State: Loading');
           return null;
         }
 
         final userDocument = userDocumentState.value;
-        print('User Document: $userDocument');
 
         // If userDocumentState has an error or is still null, do nothing
         if (userDocument == null || userDocumentState is AsyncError) {
-          print('User Document State: Error or Null');
           return null;
         }
 
@@ -59,7 +52,6 @@ GoRouter goRouter(GoRouterRef ref) {
         // Check for missing required data
         if (userDocNotifier.hasMissingData(userDocument)) {
           if (state.matchedLocation != '/completeAccountRegisteration') {
-            print('Redirecting to /completeAccountRegisteration');
             return '/completeAccountRegisteration';
           }
           return null;
@@ -67,10 +59,9 @@ GoRouter goRouter(GoRouterRef ref) {
 
         // Check for old document structure
         final hasOldStructure = await userDocNotifier.hasOldStructure();
-        print('Has Old Structure: $hasOldStructure');
+
         if (hasOldStructure) {
           if (state.matchedLocation != '/confirmProfileDetails') {
-            print('Redirecting to /confirmProfileDetails');
             return '/confirmProfileDetails';
           }
           return null;
@@ -78,14 +69,12 @@ GoRouter goRouter(GoRouterRef ref) {
 
         // Redirect to home if the user is logged in and trying to access auth routes
         if (state.matchedLocation.startsWith('/onboarding')) {
-          print('Redirecting to /home');
           return '/home';
         }
       } else {
         // Non-logged-in user trying to access protected routes
         final isAuthRoute = state.matchedLocation.startsWith('/onboarding');
         if (!isAuthRoute && state.matchedLocation != '/onboarding') {
-          print('Redirecting to /onboarding');
           return '/onboarding';
         }
       }

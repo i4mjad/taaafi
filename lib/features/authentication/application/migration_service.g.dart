@@ -22,7 +22,23 @@ final firestoreInstanceProvider =
 );
 
 typedef FirestoreInstanceRef = AutoDisposeProviderRef<FirebaseFirestore>;
-String _$migrationServiceHash() => r'3b203e7ad4ba0df1c9d4b40593595ee707d1c2a6';
+String _$messagingInstanceHash() => r'ce6fc65b6012977bc63ec29b778e015f2fb43970';
+
+/// See also [messagingInstance].
+@ProviderFor(messagingInstance)
+final messagingInstanceProvider =
+    AutoDisposeProvider<FirebaseMessaging>.internal(
+  messagingInstance,
+  name: r'messagingInstanceProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$messagingInstanceHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef MessagingInstanceRef = AutoDisposeProviderRef<FirebaseMessaging>;
+String _$migrationServiceHash() => r'f3a187588e8aac4f7e1744a1c352a5c0ff224b8d';
 
 /// See also [migrationService].
 @ProviderFor(migrationService)

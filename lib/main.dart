@@ -21,6 +21,8 @@ Future<void> main() async {
   //Setup DI Container
   SetupContainer();
 
+  //TODO: Investigate about what is the best way to update the user FCM token every time the app got initailized
+
   //Initialize Notification settings
   InitializationSettings initializationSettings = await setupNotifications();
   await setupFirebaseMesagging(initializationSettings);
