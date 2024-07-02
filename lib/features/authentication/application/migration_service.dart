@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'package:device_info_plus/device_info_plus.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';

@@ -25,34 +25,6 @@ class UserDocumentNotifier extends _$UserDocumentNotifier {
     }
   }
 
-  // Future<void> updateUserDocument(LegacyUserDocument updatedDocument) async {
-  //   try {
-  //     final uid = ref.watch(firebaseAuthProvider).currentUser?.uid;
-
-  //     await _firestore
-  //         .collection('users')
-  //         .doc(uid)
-  //         .set(updatedDocument.toFirestore(), SetOptions(merge: true));
-  //     state = AsyncValue.data(updatedDocument);
-  //   } catch (e) {
-  //     state = AsyncValue.error(e, StackTrace.current);
-  //   }
-  // }
-
-  // Future<void> migrateUserDocument(LegacyUserDocument userDocument) async {
-  //   try {
-  //     // Perform migration logic here
-  //     final updatedDocument = userDocument.copyWith(
-  //       role: 'user', // Assuming role is removed in the new structure
-  //       // Add any new fields or migrate data here
-  //     );
-
-  //     await updateUserDocument(updatedDocument);
-  //   } catch (e) {
-  //     state = AsyncValue.error(e, StackTrace.current);
-  //   }
-  // }
-
   Future<bool> hasOldStructure() async {
     try {
       final uid = ref.watch(firebaseAuthProvider).currentUser?.uid;
@@ -68,7 +40,6 @@ class UserDocumentNotifier extends _$UserDocumentNotifier {
   }
 
   bool hasMissingData(LegacyUserDocument userDocument) {
-    print('has missing data');
     return userDocument.displayName == null ||
         userDocument.email == null ||
         userDocument.gender == null ||

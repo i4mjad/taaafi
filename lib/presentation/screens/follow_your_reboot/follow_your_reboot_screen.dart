@@ -5,7 +5,7 @@ import 'package:reboot_app_3/presentation/screens/follow_your_reboot/follow_up_s
 import 'package:reboot_app_3/presentation/screens/follow_your_reboot/widgets/followup_calender.dart';
 import 'package:reboot_app_3/presentation/screens/follow_your_reboot/widgets/general_status_widget.dart';
 import 'package:reboot_app_3/presentation/screens/follow_your_reboot/widgets/relapses_by_day_of_week_widget.dart';
-import 'package:reboot_app_3/shared/components/custom-app-bar.dart';
+
 import 'package:reboot_app_3/shared/constants/textstyles_constants.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/localization/localization_services.dart';
@@ -40,7 +40,6 @@ class FollowYourRebootScreenState extends State<FollowYourRebootScreen>
     final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: appBarWithSettings(context, "follow-your-reboot"),
       body: SingleChildScrollView(
         child: Column(
           children: [

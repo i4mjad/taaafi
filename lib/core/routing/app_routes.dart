@@ -177,7 +177,7 @@ GoRouter goRouter(GoRouterRef ref) {
                 path: '/account',
                 name: RouteNames.account.name,
                 pageBuilder: (context, state) => NoTransitionPage(
-                  child: UpdatedAccountScreen(),
+                  child: AccountScreen(),
                 ),
               ),
             ],

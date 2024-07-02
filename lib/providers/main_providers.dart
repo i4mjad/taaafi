@@ -3,7 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:reboot_app_3/core/theming/app-themes.dart';
-import 'package:reboot_app_3/shared/services/auth/firebase_auth_methods.dart';
+import 'package:reboot_app_3/features/authentication/application/firebase_auth_methods.dart';
 
 final authenticationServiceProvider = Provider<FirebaseAuthMethods>((ref) {
   return FirebaseAuthMethods(FirebaseAuth.instance);

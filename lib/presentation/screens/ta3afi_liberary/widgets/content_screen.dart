@@ -8,7 +8,6 @@ import 'package:chips_choice/chips_choice.dart';
 
 import 'package:reboot_app_3/presentation/Screens/ta3afi_liberary/models/Content.dart';
 import 'package:reboot_app_3/presentation/Screens/ta3afi_liberary/services/content_load_services.dart';
-import 'package:reboot_app_3/shared/components/custom-app-bar.dart';
 import 'package:reboot_app_3/shared/constants/constants.dart';
 import 'package:reboot_app_3/shared/constants/textstyles_constants.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
@@ -105,7 +104,6 @@ class _ContentScreenState extends State<ContentScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Scaffold(
-      appBar: appBarWithSettings(context, "nofap-content"),
       body: Padding(
         padding: EdgeInsets.only(
           top: 20,

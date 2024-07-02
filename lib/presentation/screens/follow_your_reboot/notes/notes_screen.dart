@@ -4,7 +4,7 @@ import 'package:iconsax/iconsax.dart';
 import 'package:reboot_app_3/data/models/Note.dart';
 import 'package:reboot_app_3/presentation/screens/follow_your_reboot/notes/add_note_screen.dart';
 import 'package:reboot_app_3/providers/notes/notes_providers.dart';
-import 'package:reboot_app_3/shared/components/custom-app-bar.dart';
+
 import 'package:reboot_app_3/shared/constants/textstyles_constants.dart';
 import 'note_screen.dart';
 
@@ -13,7 +13,7 @@ class NotesScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Scaffold(
-      appBar: notesAppBar(context, "dairies"),
+      
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.only(right: 20.0, left: 20, top: 20),

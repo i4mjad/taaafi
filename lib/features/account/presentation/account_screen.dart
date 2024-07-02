@@ -10,10 +10,8 @@ import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/features/authentication/repositories/auth_repository.dart';
 
-//TODO: to be updated after the migeration from old account screen
-//! RENAME THIS
-class UpdatedAccountScreen extends ConsumerWidget {
-  const UpdatedAccountScreen({super.key});
+class AccountScreen extends ConsumerWidget {
+  const AccountScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

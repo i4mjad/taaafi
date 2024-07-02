@@ -78,7 +78,6 @@ class _ConfirmUserDetailsScreenState
             return Center(child: Text('No user document found.'));
           }
 
-          print(userDocument.userFirstDate?.toDate());
           displayNameController.text = userDocument.displayName ?? '';
           emailController.text = userDocument.email ?? '';
           dateOfBirthController.text = getDisplayDate(

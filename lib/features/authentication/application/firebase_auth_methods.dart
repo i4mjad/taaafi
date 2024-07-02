@@ -1,13 +1,13 @@
+import 'dart:async';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:reboot_app_3/core/di/container.dart';
 import 'package:reboot_app_3/shared/components/snackbar.dart';
-import 'package:reboot_app_3/shared/services/promize_service.dart';
 
 class FirebaseAuthMethods {
   final FirebaseAuth _auth;
-  final ICustomerIOService _promizeService = getIt.get<ICustomerIOService>();
+
   FirebaseAuthMethods(this._auth);
 
   // FOR EVERY FUNCTION HERE
@@ -66,7 +66,7 @@ class FirebaseAuthMethods {
     }
   }
 
-  Future<UserCredential?> reSignInWithGoogle(BuildContext context) async {
+  Future<void> reSignInWithGoogle(BuildContext context) async {
     try {
       final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
       final GoogleSignInAuthentication googleAuth =
@@ -76,8 +76,7 @@ class FirebaseAuthMethods {
         final credential = GoogleAuthProvider.credential(
             accessToken: googleAuth.accessToken, idToken: googleAuth.idToken);
 
-        return await _auth.currentUser
-            ?.reauthenticateWithCredential(credential);
+        await _auth.currentUser?.reauthenticateWithCredential(credential);
       }
     } on FirebaseAuthException catch (e) {
       getSystemSnackBar(context, e.toString());

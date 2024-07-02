@@ -4,9 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:reboot_app_3/core/theming/spacing.dart';
-import 'package:reboot_app_3/presentation/screens/home/widgets/welcome_widget.dart';
-import 'package:reboot_app_3/shared/components/custom-app-bar.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/shared/constants/textstyles_constants.dart';
 import 'package:reboot_app_3/core/localization/localization_services.dart';
@@ -51,24 +48,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: appBarWithSettings(context, "home"),
       body: Padding(
         padding: EdgeInsets.only(left: 20.0, right: 20),
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SizedBox(
-                height: 24,
-              ),
-              WelcomeWidget(),
-
-              verticalSpace(Spacing.points32),
-              // CustomBlocProvider(
-              //   bloc: ContentBloc(),
-              //   child: ExploreWidget(),
-              // ),
-
               Ta3afiLiberaryWidget(),
               SizedBox(
                 height: 24,
