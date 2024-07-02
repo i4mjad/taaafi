@@ -13,10 +13,9 @@ import 'package:reboot_app_3/features/authentication/presentation/login_screen.d
 import 'package:reboot_app_3/features/authentication/presentation/signup_screen.dart';
 import 'package:reboot_app_3/features/authentication/providers/user_document_provider.dart';
 import 'package:reboot_app_3/features/authentication/repositories/auth_repository.dart';
+import 'package:reboot_app_3/features/home/presentation/home_screen.dart';
 import 'package:reboot_app_3/features/onboarding/presentation/onboarding_screen.dart';
 import 'package:reboot_app_3/features/vault/presentation/vault_screen.dart';
-import 'package:reboot_app_3/presentation/screens/home/home_screen.dart';
-import 'package:reboot_app_3/presentation/screens/ta3afi_liberary/widgets/content_screen.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'app_routes.g.dart';
@@ -137,11 +136,7 @@ GoRouter goRouter(GoRouterRef ref) {
                   child: HomeScreen(),
                 ),
                 routes: [
-                  GoRoute(
-                    path: 'content',
-                    name: RouteNames.content.name,
-                    builder: (context, state) => ContentScreen(),
-                  ),
+                  //! Add Pages
                 ],
               ),
             ],
@@ -155,6 +150,9 @@ GoRouter goRouter(GoRouterRef ref) {
                 pageBuilder: (context, state) => NoTransitionPage(
                   child: VaultScreen(),
                 ),
+                routes: [
+                  //! Add Pages
+                ],
               ),
             ],
           ),
@@ -167,6 +165,9 @@ GoRouter goRouter(GoRouterRef ref) {
                 pageBuilder: (context, state) => NoTransitionPage(
                   child: VaultScreen(),
                 ),
+                routes: [
+                  //! Add Pages
+                ],
               ),
             ],
           ),
@@ -179,6 +180,9 @@ GoRouter goRouter(GoRouterRef ref) {
                 pageBuilder: (context, state) => NoTransitionPage(
                   child: AccountScreen(),
                 ),
+                routes: [
+                  //! Add Pages
+                ],
               ),
             ],
           ),
