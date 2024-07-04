@@ -74,8 +74,10 @@ class _SignUpFormState extends ConsumerState<SignUpForm> {
   final passwordController = TextEditingController();
   final confirmPasswordController = TextEditingController();
   final startingDateController = TextEditingController();
-  String selectedGender = 'Male';
-  String selectedLanguage = 'English';
+  SegmentedButtonOption selectedGender =
+      SegmentedButtonOption(value: 'male', translationKey: 'male');
+  SegmentedButtonOption selectedLanguage =
+      SegmentedButtonOption(value: 'english', translationKey: 'english');
   bool nowIsStartingDate = false;
   bool isTermsAccepted = false;
 
@@ -199,13 +201,13 @@ class _SignUpFormState extends ConsumerState<SignUpForm> {
         CustomSegmentedButton(
           label: AppLocalizations.of(context).translate('gender'),
           options: [
-            AppLocalizations.of(context).translate('male'),
-            AppLocalizations.of(context).translate('female')
+            SegmentedButtonOption(value: 'male', translationKey: 'male'),
+            SegmentedButtonOption(value: 'female', translationKey: 'female')
           ],
           selectedOption: selectedGender,
-          onChanged: (value) {
+          onChanged: (selection) {
             setState(() {
-              selectedGender = value!;
+              selectedGender = selection;
             });
           },
         ),
@@ -213,13 +215,13 @@ class _SignUpFormState extends ConsumerState<SignUpForm> {
         CustomSegmentedButton(
           label: AppLocalizations.of(context).translate('preferred-language'),
           options: [
-            'العربية',
-            'English',
+            SegmentedButtonOption(value: 'arabic', translationKey: 'arabic'),
+            SegmentedButtonOption(value: 'english', translationKey: 'english')
           ],
           selectedOption: selectedLanguage,
-          onChanged: (value) {
+          onChanged: (selection) {
             setState(() {
-              selectedLanguage = value!;
+              selectedLanguage = selection;
             });
           },
         ),
@@ -239,16 +241,14 @@ class _SignUpFormState extends ConsumerState<SignUpForm> {
           child: AbsorbPointer(
             child: CustomTextField(
               controller: startingDateController,
-
+              hint: AppLocalizations.of(context).translate('starting-date'),
               prefixIcon: LucideIcons.calendar,
               inputType: TextInputType.datetime,
-              // width: MediaQuery.of(context).size.width / 2 - (16 + 2),
             ),
           ),
         ),
         verticalSpace(Spacing.points8),
         WidgetsContainer(
-          // padding: EdgeInsets.all(8),
           padding: EdgeInsets.fromLTRB(16, 8, 16, 8),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -286,11 +286,9 @@ class _SignUpFormState extends ConsumerState<SignUpForm> {
                 ],
               ),
               Switch(
-                // This bool value toggles the switch.
                 value: nowIsStartingDate,
                 activeColor: theme.primary[600],
                 onChanged: (bool value) {
-                  // This is called when the user toggles the switch.
                   setState(() {
                     nowIsStartingDate = !nowIsStartingDate;
                     startingDateController.text = getDisplayDateTime(

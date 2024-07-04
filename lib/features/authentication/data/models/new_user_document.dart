@@ -1,10 +1,11 @@
 import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 
 class NewUserDocument {
   final String uid;
-  final String deviceId;
+  final List<String> deviceIds;
   final String displayName;
   final String email;
   final String gender;
@@ -13,10 +14,10 @@ class NewUserDocument {
   final Timestamp userFirstDate;
   final String role;
   final String messagingToken;
-
+  final List<String> bookmarkedContentIds;
   NewUserDocument({
     required this.uid,
-    required this.deviceId,
+    required this.deviceIds,
     required this.displayName,
     required this.email,
     required this.gender,
@@ -25,11 +26,12 @@ class NewUserDocument {
     required this.userFirstDate,
     required this.role,
     required this.messagingToken,
+    required this.bookmarkedContentIds,
   });
 
   NewUserDocument copyWith({
     String? uid,
-    String? deviceId,
+    List<String>? deviceIds,
     String? displayName,
     String? email,
     String? gender,
@@ -38,10 +40,11 @@ class NewUserDocument {
     Timestamp? userFirstDate,
     String? role,
     String? messagingToken,
+    List<String>? bookmarkedContentIds,
   }) {
     return NewUserDocument(
       uid: uid ?? this.uid,
-      deviceId: deviceId ?? this.deviceId,
+      deviceIds: deviceIds ?? this.deviceIds,
       displayName: displayName ?? this.displayName,
       email: email ?? this.email,
       gender: gender ?? this.gender,
@@ -50,6 +53,7 @@ class NewUserDocument {
       userFirstDate: userFirstDate ?? this.userFirstDate,
       role: role ?? this.role,
       messagingToken: messagingToken ?? this.messagingToken,
+      bookmarkedContentIds: bookmarkedContentIds ?? this.bookmarkedContentIds,
     );
   }
 
@@ -57,7 +61,7 @@ class NewUserDocument {
     final result = <String, dynamic>{};
 
     result.addAll({'uid': uid});
-    result.addAll({'deviceId': deviceId});
+    result.addAll({'deviceIds': deviceIds});
     result.addAll({'displayName': displayName});
     result.addAll({'email': email});
     result.addAll({'gender': gender});
@@ -66,6 +70,7 @@ class NewUserDocument {
     result.addAll({'userFirstDate': userFirstDate});
     result.addAll({'role': role});
     result.addAll({'messagingToken': messagingToken});
+    result.addAll({'bookmarkedContentIds': bookmarkedContentIds});
 
     return result;
   }
@@ -73,7 +78,7 @@ class NewUserDocument {
   factory NewUserDocument.fromMap(Map<String, dynamic> map) {
     return NewUserDocument(
       uid: map['uid'] ?? '',
-      deviceId: map['deviceId'] ?? '',
+      deviceIds: map['deviceIds'] ?? '',
       displayName: map['displayName'] ?? '',
       email: map['email'] ?? '',
       gender: map['gender'] ?? '',
@@ -82,6 +87,7 @@ class NewUserDocument {
       userFirstDate: map['userFirstDate'],
       role: map['role'] ?? '',
       messagingToken: map['messagingToken'] ?? '',
+      bookmarkedContentIds: List<String>.from(map['bookmarkedContentIds']),
     );
   }
 
@@ -92,7 +98,7 @@ class NewUserDocument {
 
   @override
   String toString() {
-    return 'NewUserDocument(uid: $uid, deviceId: $deviceId, displayName: $displayName, email: $email, gender: $gender, locale: $locale, dayOfBirth: $dayOfBirth, userFirstDate: $userFirstDate, role: $role, messagingToken: $messagingToken)';
+    return 'NewUserDocument(uid: $uid, deviceId: $deviceIds, displayName: $displayName, email: $email, gender: $gender, locale: $locale, dayOfBirth: $dayOfBirth, userFirstDate: $userFirstDate, role: $role, messagingToken: $messagingToken, bookmarkedContentIds: $bookmarkedContentIds)';
   }
 
   @override
@@ -101,7 +107,7 @@ class NewUserDocument {
 
     return other is NewUserDocument &&
         other.uid == uid &&
-        other.deviceId == deviceId &&
+        other.deviceIds == deviceIds &&
         other.displayName == displayName &&
         other.email == email &&
         other.gender == gender &&
@@ -109,13 +115,14 @@ class NewUserDocument {
         other.dayOfBirth == dayOfBirth &&
         other.userFirstDate == userFirstDate &&
         other.role == role &&
-        other.messagingToken == messagingToken;
+        other.messagingToken == messagingToken &&
+        listEquals(other.bookmarkedContentIds, bookmarkedContentIds);
   }
 
   @override
   int get hashCode {
     return uid.hashCode ^
-        deviceId.hashCode ^
+        deviceIds.hashCode ^
         displayName.hashCode ^
         email.hashCode ^
         gender.hashCode ^
@@ -123,6 +130,7 @@ class NewUserDocument {
         dayOfBirth.hashCode ^
         userFirstDate.hashCode ^
         role.hashCode ^
-        messagingToken.hashCode;
+        messagingToken.hashCode ^
+        bookmarkedContentIds.hashCode;
   }
 }

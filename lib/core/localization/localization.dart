@@ -91,7 +91,7 @@ class LocaleNotifier extends _$LocaleNotifier {
 
   Future<void> toggleLocale() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    var languageCode = prefs.getString("languageCode") ?? 'en';
+    var languageCode = prefs.getString("languageCode");
     var updatedLocale = languageCode == 'ar' ? Locale('en') : Locale('ar');
     state = updatedLocale;
     _saveLocale(updatedLocale);
@@ -99,7 +99,7 @@ class LocaleNotifier extends _$LocaleNotifier {
 
   Future<void> _loadLocale() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    var languageCode = prefs.getString("languageCode") ?? 'en';
+    var languageCode = prefs.getString("languageCode")!;
     state = Locale(languageCode, '');
   }
 

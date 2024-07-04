@@ -5,11 +5,11 @@ String getDisplayDateTime(dynamic date, String language) {
   if (date is Timestamp) {
     date = date.toDate();
   }
+  String locale = getLocale(language);
   String formattedDate =
-      DateFormat('d - MMMM - yyyy hh:mm a', language).format(date);
-  if (language == 'ar') {
+      DateFormat('d - MMMM - yyyy hh:mm a', locale).format(date);
+  if (language == 'arabic') {
     formattedDate = replaceWesternWithEasternArabicNumerals(formattedDate);
-    formattedDate = replaceEnglishAmPmWithArabic(formattedDate);
   }
   return formattedDate;
 }
@@ -18,31 +18,47 @@ String getDisplayDate(dynamic date, String language) {
   if (date is Timestamp) {
     date = date.toDate();
   }
-  String formattedDate = DateFormat('d - MMMM - yyyy', language).format(date);
-  if (language == 'ar') {
+  print(date);
+  String locale = getLocale(language);
+  String formattedDate = DateFormat('d - MMMM - yyyy', locale).format(date);
+  if (language == 'arabic') {
     formattedDate = replaceWesternWithEasternArabicNumerals(formattedDate);
   }
   return formattedDate;
 }
 
 Timestamp parseDisplayDateTime(String dateStr, String language) {
-  if (language == 'ar') {
+  if (language == 'arabic') {
     dateStr = replaceEasternWithWesternArabicNumerals(dateStr);
     dateStr = replaceArabicMonthWithEnglish(dateStr);
-    dateStr = replaceArabicAmPmWithEnglish(dateStr);
   }
+  String locale = getLocale(language);
   DateTime parsedDate =
-      DateFormat('d - MMMM - yyyy hh:mm a', 'en').parse(dateStr);
+      DateFormat('d - MMMM - yyyy hh:mm a', locale).parse(dateStr);
   return Timestamp.fromDate(parsedDate);
 }
 
 Timestamp parseDisplayDate(String dateStr, String language) {
-  if (language == 'ar') {
+  if (language == 'arabic') {
     dateStr = replaceEasternWithWesternArabicNumerals(dateStr);
     dateStr = replaceArabicMonthWithEnglish(dateStr);
   }
-  DateTime parsedDate = DateFormat('d - MMMM - yyyy', 'en').parse(dateStr);
+  String locale = getLocale(language);
+  DateTime parsedDate = DateFormat('d - MMMM - yyyy', locale).parse(dateStr);
   return Timestamp.fromDate(parsedDate);
+}
+
+String getLocale(String language) {
+  switch (language) {
+    case 'arabic':
+      return 'ar';
+    case 'english':
+      return 'en';
+    case 'ar':
+      return 'ar';
+    default:
+      return 'en';
+  }
 }
 
 String replaceWesternWithEasternArabicNumerals(String input) {
@@ -136,22 +152,71 @@ String replaceArabicMonthWithEnglish(String input) {
   return input;
 }
 
-String replaceArabicAmPmWithEnglish(String input) {
-  const arabicToEnglishAmPm = {'ص': 'AM', 'م': 'PM'};
+class DisplayDateTime {
+  dynamic date;
+  late String displayDateTime;
 
-  arabicToEnglishAmPm.forEach((arabic, english) {
-    input = input.replaceAll(arabic, english);
-  });
+  DisplayDateTime(this.date, String language) {
+    displayDateTime = _toDisplay(date, language);
+  }
 
-  return input;
+  // Method to convert the date and time to a displayable string
+  String _toDisplay(dynamic date, String language) {
+    if (date is Timestamp) {
+      date = date.toDate();
+    }
+    String formattedDate =
+        DateFormat('d - MMMM - yyyy hh:mm a', language).format(date);
+    if (language == 'ar') {
+      formattedDate = replaceWesternWithEasternArabicNumerals(formattedDate);
+    }
+    return formattedDate;
+  }
+
+  // Method to parse the displayable string back to a DateTime
+  DateTime toDateTime(String language) {
+    String dateStr = displayDateTime;
+    if (language == 'ar') {
+      dateStr = replaceEasternWithWesternArabicNumerals(dateStr);
+      dateStr = replaceArabicMonthWithEnglish(dateStr);
+    }
+    DateTime parsedDate =
+        DateFormat('d - MMMM - yyyy hh:mm a', language).parse(dateStr);
+    return parsedDate;
+  }
 }
 
-String replaceEnglishAmPmWithArabic(String input) {
-  const englishToArabicAmPm = {'AM': 'ص', 'PM': 'م'};
+class DisplayDate {
+  dynamic date;
+  late String displayDate;
 
-  englishToArabicAmPm.forEach((english, arabic) {
-    input = input.replaceAll(english, arabic);
-  });
+  DisplayDate(this.date, String language) {
+    displayDate = _toDisplay(date, language);
+  }
 
-  return input;
+  // Method to convert the date to a displayable string
+  String _toDisplay(dynamic date, String language) {
+    if (date is Timestamp) {
+      date = date.toDate();
+    }
+    String formattedDate = DateFormat('d - MMMM - yyyy', language).format(date);
+    if (language == 'ar') {
+      formattedDate = replaceWesternWithEasternArabicNumerals(formattedDate);
+    }
+    return formattedDate;
+  }
+
+  // Method to parse the displayable string back to a DateTime
+  DateTime toDate(String language) {
+    String dateStr = displayDate;
+    if (language == 'ar') {
+      dateStr = replaceEasternWithWesternArabicNumerals(dateStr);
+      dateStr = replaceArabicMonthWithEnglish(dateStr);
+    }
+    DateTime parsedDate =
+        DateFormat('d - MMMM - yyyy', language).parse(dateStr);
+    return parsedDate;
+  }
 }
+
+// Utility methods

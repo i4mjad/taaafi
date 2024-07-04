@@ -27,9 +27,11 @@ class _ConfirmUserDetailsScreenState
   late TextEditingController displayNameController;
   late TextEditingController emailController;
   late TextEditingController dateOfBirthController;
+  late DateTime selectedBirthDate;
   late TextEditingController userFirstDateController;
-  String selectedGender = 'Male';
-  String selectedLocale = 'English';
+  late DateTime selectedUserFirstDate;
+  SegmentedButtonOption? selectedGender;
+  SegmentedButtonOption? selectedLocale;
 
   @override
   void initState() {
@@ -52,13 +54,15 @@ class _ConfirmUserDetailsScreenState
   Future<void> _selectDob(BuildContext context, String language) async {
     DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime(1900),
-      lastDate: DateTime.now(),
+      initialDate: selectedBirthDate,
+      firstDate: DateTime(1950),
+      lastDate: DateTime(2010),
     );
     if (picked != null) {
+      var date = DisplayDate(picked, language);
       setState(() {
-        dateOfBirthController.text = getDisplayDate(picked, language);
+        selectedBirthDate = date.date;
+        dateOfBirthController.text = date.displayDate;
       });
     }
   }
@@ -78,14 +82,26 @@ class _ConfirmUserDetailsScreenState
             return Center(child: Text('No user document found.'));
           }
 
-          displayNameController.text = userDocument.displayName ?? '';
-          emailController.text = userDocument.email ?? '';
-          dateOfBirthController.text = getDisplayDate(
-              userDocument.dayOfBirth?.toDate(), locale!.languageCode);
-          userFirstDateController.text = getDisplayDateTime(
-              userDocument.userFirstDate?.toDate(), locale.languageCode);
-          selectedGender = userDocument.gender ?? '';
-          selectedLocale = userDocument.locale ?? 'English';
+          if (selectedGender == null) {
+            displayNameController.text = userDocument.displayName!;
+            emailController.text = userDocument.email!;
+            var dob = DisplayDate(
+                userDocument.dayOfBirth!.toDate(), locale!.languageCode);
+
+            dateOfBirthController.text = dob.displayDate;
+            selectedBirthDate = dob.date;
+
+            var displayUserFirstDate = DisplayDateTime(
+                userDocument.userFirstDate!.toDate(), locale.languageCode);
+            userFirstDateController.text = displayUserFirstDate.displayDateTime;
+
+            selectedUserFirstDate = displayUserFirstDate.date;
+            selectedGender = _getGenderActualValue(userDocument.gender!);
+            selectedLocale = SegmentedButtonOption(
+              value: userDocument.locale!,
+              translationKey: userDocument.locale!,
+            );
+          }
 
           return SingleChildScrollView(
             child: Padding(
@@ -115,11 +131,16 @@ class _ConfirmUserDetailsScreenState
                   verticalSpace(Spacing.points8),
                   CustomSegmentedButton(
                     label: AppLocalizations.of(context).translate('gender'),
-                    options: ['Male', 'Female'],
-                    selectedOption: _getSelectedGender(selectedGender),
-                    onChanged: (value) {
+                    options: [
+                      SegmentedButtonOption(
+                          value: 'male', translationKey: 'male'),
+                      SegmentedButtonOption(
+                          value: 'female', translationKey: 'female')
+                    ],
+                    selectedOption: selectedGender!,
+                    onChanged: (selection) {
                       setState(() {
-                        selectedGender = value!;
+                        selectedGender = _getGenderActualValue(selection.value);
                       });
                     },
                   ),
@@ -127,27 +148,35 @@ class _ConfirmUserDetailsScreenState
                   CustomSegmentedButton(
                     label: AppLocalizations.of(context)
                         .translate('preferred-language'),
-                    options: ['English', 'العربية'],
-                    selectedOption: _getSelectedLocale(selectedLocale),
-                    onChanged: (value) {
+                    options: [
+                      SegmentedButtonOption(
+                          value: 'english', translationKey: 'english'),
+                      SegmentedButtonOption(
+                          value: 'arabic', translationKey: 'arabic')
+                    ],
+                    selectedOption: selectedLocale!,
+                    onChanged: (selection) {
                       setState(() {
-                        selectedLocale = value!;
+                        selectedLocale = selection;
                       });
                     },
                   ),
                   verticalSpace(Spacing.points8),
-                  GestureDetector(
-                    onTap: () => _selectDob(context, locale.languageCode),
-                    child: AbsorbPointer(
-                      child: CustomTextField(
-                        controller: dateOfBirthController,
-                        hint: AppLocalizations.of(context)
-                            .translate('date-of-birth'),
-                        prefixIcon: LucideIcons.calendar,
-                        inputType: TextInputType.datetime,
+                  Consumer(builder: (context, ref, child) {
+                    final locale = ref.watch(localeNotifierProvider);
+                    return GestureDetector(
+                      onTap: () => _selectDob(context, locale!.languageCode),
+                      child: AbsorbPointer(
+                        child: CustomTextField(
+                          controller: dateOfBirthController,
+                          hint: AppLocalizations.of(context)
+                              .translate('date-of-birth'),
+                          prefixIcon: LucideIcons.calendar,
+                          inputType: TextInputType.datetime,
+                        ),
                       ),
-                    ),
-                  ),
+                    );
+                  }),
                   verticalSpace(Spacing.points8),
                   CustomTextField(
                     enabled: false,
@@ -172,18 +201,19 @@ class _ConfirmUserDetailsScreenState
                       final userFirstDate = userFirstDateController.value.text;
                       final selectedGender = this.selectedGender;
                       final selectedLocale = this.selectedLocale;
-                      await migrateService
-                          .migrateToNewDocuemntStrcture(LegacyUserDocument(
-                        id: uid,
-                        displayName: displayName,
-                        dayOfBirth:
-                            parseDisplayDate(dateOfBirth, locale.languageCode),
-                        userFirstDate: parseDisplayDateTime(
-                            userFirstDate, locale.languageCode),
-                        email: email,
-                        locale: selectedLocale,
-                        gender: selectedGender,
-                      ));
+                      await migrateService.migrateToNewDocuemntStrcture(
+                        LegacyUserDocument(
+                          uid: uid,
+                          displayName: displayName,
+                          dayOfBirth: parseDisplayDate(
+                              dateOfBirth, locale!.languageCode),
+                          userFirstDate: parseDisplayDateTime(
+                              userFirstDate, locale.languageCode),
+                          email: email,
+                          locale: selectedLocale?.value,
+                          gender: selectedGender?.value,
+                        ),
+                      );
                     },
                     child: WidgetsContainer(
                       backgroundColor: theme.primary[600],
@@ -212,19 +242,11 @@ class _ConfirmUserDetailsScreenState
     );
   }
 
-  _getSelectedGender(String selectedGender) {
-    if (selectedGender == 'male') {
-      return 'Male';
-    } else if (selectedGender == 'femele') {
-      return 'Female';
-    }
-  }
-
-  _getSelectedLocale(String selectedLocale) {
-    if (selectedLocale == 'arabic') {
-      return 'العربية';
-    } else if (selectedLocale == 'english') {
-      return 'English';
+  SegmentedButtonOption _getGenderActualValue(String value) {
+    if (value == 'femele') {
+      return SegmentedButtonOption(value: 'female', translationKey: "female");
+    } else {
+      return SegmentedButtonOption(value: value, translationKey: value);
     }
   }
 }

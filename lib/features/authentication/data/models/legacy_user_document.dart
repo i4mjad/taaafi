@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class LegacyUserDocument {
-  final String id;
   final String? displayName;
   final String? email;
   final String? gender;
@@ -15,7 +14,6 @@ class LegacyUserDocument {
   final String? role;
 
   LegacyUserDocument({
-    required this.id,
     this.displayName,
     this.email,
     this.gender,
@@ -33,7 +31,6 @@ class LegacyUserDocument {
   factory LegacyUserDocument.fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
     return LegacyUserDocument(
-      id: doc.id,
       displayName: data['displayName'],
       email: data['email'],
       gender: data['gender'],
@@ -41,9 +38,17 @@ class LegacyUserDocument {
       uid: data['uid'],
       dayOfBirth: data['dayOfBirth'],
       userFirstDate: data['userFirstDate'],
-      userRelapses: data['userRelapses'] != null ? List<String>.from(data['userRelapses']) : null,
-      userMasturbatingWithoutWatching: data['userMasturbatingWithoutWatching'] != null ? List<String>.from(data['userMasturbatingWithoutWatching']) : null,
-      userWatchingWithoutMasturbating: data['userWatchingWithoutMasturbating'] != null ? List<String>.from(data['userWatchingWithoutMasturbating']) : null,
+      userRelapses: data['userRelapses'] != null
+          ? List<String>.from(data['userRelapses'])
+          : null,
+      userMasturbatingWithoutWatching:
+          data['userMasturbatingWithoutWatching'] != null
+              ? List<String>.from(data['userMasturbatingWithoutWatching'])
+              : null,
+      userWatchingWithoutMasturbating:
+          data['userWatchingWithoutMasturbating'] != null
+              ? List<String>.from(data['userWatchingWithoutMasturbating'])
+              : null,
       role: data['role'],
     );
   }
@@ -81,7 +86,6 @@ class LegacyUserDocument {
     String? role,
   }) {
     return LegacyUserDocument(
-      id: id ?? this.id,
       displayName: displayName ?? this.displayName,
       email: email ?? this.email,
       gender: gender ?? this.gender,
@@ -90,8 +94,10 @@ class LegacyUserDocument {
       dayOfBirth: dayOfBirth ?? this.dayOfBirth,
       userFirstDate: userFirstDate ?? this.userFirstDate,
       userRelapses: userRelapses ?? this.userRelapses,
-      userMasturbatingWithoutWatching: userMasturbatingWithoutWatching ?? this.userMasturbatingWithoutWatching,
-      userWatchingWithoutMasturbating: userWatchingWithoutMasturbating ?? this.userWatchingWithoutMasturbating,
+      userMasturbatingWithoutWatching: userMasturbatingWithoutWatching ??
+          this.userMasturbatingWithoutWatching,
+      userWatchingWithoutMasturbating: userWatchingWithoutMasturbating ??
+          this.userWatchingWithoutMasturbating,
       role: role ?? this.role,
     );
   }

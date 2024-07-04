@@ -1,9 +1,13 @@
+import 'dart:developer';
+import 'dart:io';
+
 import 'package:device_info_plus/device_info_plus.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:reboot_app_3/features/authentication/data/models/legacy_user_document.dart';
+import 'package:reboot_app_3/features/authentication/data/models/new_user_document.dart';
 import 'package:reboot_app_3/features/authentication/data/repos/migeration_repository.dart';
 
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -48,7 +52,7 @@ class MigrationService {
       legacyDoc.userMasturbatingWithoutWatching,
     );
 
-    await _updateUserDocument();
+    await _updateUserDocument(document);
   }
 
   Future<void> _migerateFollowups(
@@ -56,31 +60,46 @@ class MigrationService {
     List<String>? porns,
     List<String>? masts,
   ) async {
-    //! DO SOMETHING
+    // Convert the three lists to be lists of List<FollowUp>
+    // Merge the lists to be in one list of List<FollowUp>
+    // add the lists to the followup collection
   }
 
-  Future<void> _updateUserDocument() async {
+  Future<void> _updateUserDocument(LegacyUserDocument document) async {
     String fcmToken = await _fcmRepository.getMessagingToken();
 
-    String deviceId = await _getDeviceId();
+    var deviceId = await _getDeviceId();
 
     String role = "user";
-    // if (Platform.isAndroid) {
-    //   AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
-    //   deviceInfoStr = 'Android ID: ${androidInfo.id}';
-    // } else if (Platform.isIOS) {
-    //   IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
-    //   deviceInfoStr =
-    //       'iOS Identifier For Vendor: ${iosInfo.identifierForVendor}';
-    // }
+    NewUserDocument newDocuemnt = NewUserDocument(
+      uid: document.uid!,
+      deviceIds: [deviceId],
+      displayName: document.displayName!,
+      email: document.email!,
+      gender: document.gender!,
+      locale: document.locale!,
+      dayOfBirth: document.dayOfBirth!,
+      userFirstDate: document.userFirstDate!,
+      role: role,
+      messagingToken: fcmToken,
+      bookmarkedContentIds: [],
+    );
 
-    // print(deviceInfoStr);
+    inspect(newDocuemnt);
   }
 
-  Future<String> _getDeviceId() async {
+  _getDeviceId() async {
     DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
     String deviceInfoStr = '';
-    BaseDeviceInfo deviceInfoo = await deviceInfo.iosInfo;
-    return "";
+    if (Platform.isAndroid) {
+      AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+      deviceInfoStr = androidInfo.id;
+    } else if (Platform.isIOS) {
+      IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
+      deviceInfoStr = iosInfo.identifierForVendor != null
+          ? iosInfo.identifierForVendor as String
+          : "";
+    }
+    return deviceInfoStr;
   }
 }
