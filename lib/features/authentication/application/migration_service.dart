@@ -73,7 +73,7 @@ class MigrationService {
     String role = "user";
     NewUserDocument newDocuemnt = NewUserDocument(
       uid: document.uid!,
-      deviceIds: [deviceId],
+      devicesIds: [deviceId],
       displayName: document.displayName!,
       email: document.email!,
       gender: document.gender!,

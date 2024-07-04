@@ -5,7 +5,7 @@ import 'package:flutter/foundation.dart';
 
 class NewUserDocument {
   final String uid;
-  final List<String> deviceIds;
+  final List<String> devicesIds;
   final String displayName;
   final String email;
   final String gender;
@@ -17,7 +17,7 @@ class NewUserDocument {
   final List<String> bookmarkedContentIds;
   NewUserDocument({
     required this.uid,
-    required this.deviceIds,
+    required this.devicesIds,
     required this.displayName,
     required this.email,
     required this.gender,
@@ -31,7 +31,7 @@ class NewUserDocument {
 
   NewUserDocument copyWith({
     String? uid,
-    List<String>? deviceIds,
+    List<String>? devicesIds,
     String? displayName,
     String? email,
     String? gender,
@@ -44,7 +44,7 @@ class NewUserDocument {
   }) {
     return NewUserDocument(
       uid: uid ?? this.uid,
-      deviceIds: deviceIds ?? this.deviceIds,
+      devicesIds: devicesIds ?? this.devicesIds,
       displayName: displayName ?? this.displayName,
       email: email ?? this.email,
       gender: gender ?? this.gender,
@@ -61,7 +61,7 @@ class NewUserDocument {
     final result = <String, dynamic>{};
 
     result.addAll({'uid': uid});
-    result.addAll({'deviceIds': deviceIds});
+    result.addAll({'devicesIds': devicesIds});
     result.addAll({'displayName': displayName});
     result.addAll({'email': email});
     result.addAll({'gender': gender});
@@ -78,7 +78,7 @@ class NewUserDocument {
   factory NewUserDocument.fromMap(Map<String, dynamic> map) {
     return NewUserDocument(
       uid: map['uid'] ?? '',
-      deviceIds: map['deviceIds'] ?? '',
+      devicesIds: map['devicesIds'] ?? '',
       displayName: map['displayName'] ?? '',
       email: map['email'] ?? '',
       gender: map['gender'] ?? '',
@@ -98,7 +98,7 @@ class NewUserDocument {
 
   @override
   String toString() {
-    return 'NewUserDocument(uid: $uid, deviceId: $deviceIds, displayName: $displayName, email: $email, gender: $gender, locale: $locale, dayOfBirth: $dayOfBirth, userFirstDate: $userFirstDate, role: $role, messagingToken: $messagingToken, bookmarkedContentIds: $bookmarkedContentIds)';
+    return 'NewUserDocument(uid: $uid, devicesId: $devicesIds, displayName: $displayName, email: $email, gender: $gender, locale: $locale, dayOfBirth: $dayOfBirth, userFirstDate: $userFirstDate, role: $role, messagingToken: $messagingToken, bookmarkedContentIds: $bookmarkedContentIds)';
   }
 
   @override
@@ -107,7 +107,7 @@ class NewUserDocument {
 
     return other is NewUserDocument &&
         other.uid == uid &&
-        other.deviceIds == deviceIds &&
+        other.devicesIds == devicesIds &&
         other.displayName == displayName &&
         other.email == email &&
         other.gender == gender &&
@@ -122,7 +122,7 @@ class NewUserDocument {
   @override
   int get hashCode {
     return uid.hashCode ^
-        deviceIds.hashCode ^
+        devicesIds.hashCode ^
         displayName.hashCode ^
         email.hashCode ^
         gender.hashCode ^
