@@ -12,7 +12,7 @@ import 'package:reboot_app_3/features/authentication/presentation/forgot_passwor
 import 'package:reboot_app_3/features/authentication/presentation/login_screen.dart';
 import 'package:reboot_app_3/features/authentication/presentation/signup_screen.dart';
 import 'package:reboot_app_3/features/authentication/providers/user_document_provider.dart';
-import 'package:reboot_app_3/features/authentication/repositories/auth_repository.dart';
+import 'package:reboot_app_3/features/authentication/data/repositories/auth_repository.dart';
 import 'package:reboot_app_3/features/home/presentation/home_screen.dart';
 import 'package:reboot_app_3/features/onboarding/presentation/onboarding_screen.dart';
 import 'package:reboot_app_3/features/vault/presentation/vault_screen.dart';

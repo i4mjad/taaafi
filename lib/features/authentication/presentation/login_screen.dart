@@ -11,7 +11,7 @@ import 'package:reboot_app_3/core/shared_widgets/custom_textfield.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
-import 'package:reboot_app_3/features/authentication/repositories/auth_repository.dart';
+import 'package:reboot_app_3/features/authentication/data/repositories/auth_repository.dart';
 
 class LogInScreen extends ConsumerWidget {
   const LogInScreen({super.key});

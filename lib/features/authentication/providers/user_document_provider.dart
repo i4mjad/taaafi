@@ -1,5 +1,5 @@
 import 'package:reboot_app_3/features/authentication/data/models/legacy_user_document.dart';
-import 'package:reboot_app_3/features/authentication/repositories/auth_repository.dart';
+import 'package:reboot_app_3/features/authentication/data/repositories/auth_repository.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 

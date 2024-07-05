@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:reboot_app_3/features/authentication/application/migration_service.dart';
-import 'package:reboot_app_3/features/authentication/repositories/auth_repository.dart';
+import 'package:reboot_app_3/features/authentication/data/repositories/auth_repository.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'migeration_repository.g.dart';
