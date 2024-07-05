@@ -99,8 +99,8 @@ class LocaleNotifier extends _$LocaleNotifier {
 
   Future<void> _loadLocale() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    var languageCode = prefs.getString("languageCode")!;
-    state = Locale(languageCode, '');
+    var languageCode = prefs.getString("languageCode");
+    state = Locale(languageCode ?? 'ar', '');
   }
 
   Future<void> _saveLocale(Locale locale) async {
