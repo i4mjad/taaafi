@@ -2,6 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:reboot_app_3/features/authentication/application/migration_service.dart';
+import 'package:reboot_app_3/features/authentication/data/models/FollowUp.dart';
+import 'package:reboot_app_3/features/authentication/data/models/new_user_document.dart';
 import 'package:reboot_app_3/features/authentication/data/repositories/auth_repository.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -32,6 +34,43 @@ class MigerationRepository {
         .collection('users')
         .doc(_auth.currentUser?.uid)
         .get();
+  }
+
+  Future<void> bulkFollowUpsInsertion(List<FollowUp> followUps) async {
+    final collectionRef = _firestore
+        .collection('users')
+        .doc(_auth.currentUser?.uid)
+        .collection('followUps');
+
+    WriteBatch batch = FirebaseFirestore.instance.batch();
+
+    for (var followUp in followUps) {
+      var docRef = collectionRef.doc(followUp.id);
+      batch.set(docRef, followUp.toMap());
+    }
+
+    return await batch.commit();
+  }
+
+  Future<void> updateUserDocument(NewUserDocument newDocument) async {
+    final uid = _auth.currentUser?.uid;
+    if (uid == null) {
+      // Handle the case where the user is not authenticated
+      throw FirebaseAuthException(
+        code: 'user-not-signed-in',
+        message: 'User must be signed in to update their document.',
+      );
+    }
+
+    final docRef = _firestore.collection('users').doc(uid);
+
+    try {
+      await docRef.update(newDocument.toMap());
+    } catch (e) {
+      // Handle potential errors
+      print('Failed to update user document: $e');
+      rethrow; // Optionally rethrow the error to handle it further up the call stack
+    }
   }
 }
 
