@@ -8,9 +8,10 @@ import 'package:reboot_app_3/core/localization/localization.dart';
 
 import '../constants/textstyles_constants.dart';
 
-void getSnackBar(BuildContext context, String messageId) {
+void getSnackBar(BuildContext context, String messageId,
+    [String extraText = ""]) {
   ScaffoldMessenger.of(context)
-      .showSnackBar(customSnackBar(context, messageId));
+      .showSnackBar(customSnackBar(context, messageId, extraText));
 }
 
 void getErrorSnackBar(BuildContext context, String messageId) {
@@ -21,7 +22,7 @@ void getSystemSnackBar(BuildContext context, String message) {
   ScaffoldMessenger.of(context).showSnackBar(systemSnackBar(context, message));
 }
 
-SnackBar customSnackBar(BuildContext context, String messageId) {
+SnackBar errorSnackBar(BuildContext context, String messageId) {
   final theme = CustomThemeInherited.of(context);
   return SnackBar(
     behavior: SnackBarBehavior.floating,
@@ -60,7 +61,8 @@ SnackBar customSnackBar(BuildContext context, String messageId) {
   );
 }
 
-SnackBar errorSnackBar(BuildContext context, String messageId) {
+SnackBar customSnackBar(BuildContext context, String messageId,
+    [String extraText = ""]) {
   return SnackBar(
     behavior: SnackBarBehavior.floating,
     padding: EdgeInsets.fromLTRB(16, 24, 16, 24),
@@ -83,7 +85,7 @@ SnackBar errorSnackBar(BuildContext context, String messageId) {
           ),
           Flexible(
             child: Text(
-              AppLocalizations.of(context).translate(messageId),
+              AppLocalizations.of(context).translate(messageId) + extraText,
               style: kSubTitlesStyle.copyWith(
                   color: lightPrimaryColor,
                   fontWeight: FontWeight.w500,

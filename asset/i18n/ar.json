@@ -70,7 +70,6 @@
   "total-days": "إجمالي الأيام منذ بداية العد: ",
   "start-your-journy-p": "لتبدأ، اختر اليوم الذي ترغب بالبدء منه، أو يمكنك البدء من اليوم",
 
-
   "delete": "حذف",
   "save": "حفظ",
   "not-login": "لمشاهدة ملخص لرحلة التعافي يجب عليك تسجيل الدخول من صفحة تابع تعافيك",
@@ -86,6 +85,7 @@
   "password": "كلمة السر",
   "forget-password": "نسيت كلمة السر؟",
   "send-reset-password-link": "أرسل رابط إعادة تعيين كلمة السر",
+  "password-link-has-been-sent-to": "تم إرسال رابط إعادة تعيين كلمة السر إلى: ",
   "sign-up": "تسجيل حساب جديد",
   "login-button": "تسجيل الدخول",
   "login-button-p": "اختر طريقة تسجيل الدخول المناسبة من الخدمات أدناه:",
@@ -199,11 +199,11 @@
   "invalid-verification-id": "معرف التحقق الذي أدخلته غير صالح.",
   "user-mismatch": "بيانات الاعتماد التي قدمتها لا تتطابق مع المستخدم.",
   "expired-action-code": "انتهت صلاحية OTP في رابط البريد الإلكتروني. يرجى طلب رمز جديد.",
-  "password-must-contain-a-number":"يجب أن تحتوي كلمة السر على رقم واحد على الأقل",
-  "password-must-contain-at-least-8-characters":"يجب أن تحتوي كلمة السر على ٨ خانات على الأقل",
-  "password-must-contain-at-least-1-special-character":"يجب أن تحتوي كلمة السر على أحد الرموز. مثل: @",
-  "password-is-not-valid":"كلمة السر غير صالحة. يجب أن تكون باللغة الانجليزية فقط",
-  "passwords-doesnt-match":"كلمتي السر غير متطابقتين",
+  "password-must-contain-a-number": "يجب أن تحتوي كلمة السر على رقم واحد على الأقل",
+  "password-must-contain-at-least-8-characters": "يجب أن تحتوي كلمة السر على ٨ خانات على الأقل",
+  "password-must-contain-at-least-1-special-character": "يجب أن تحتوي كلمة السر على أحد الرموز. مثل: @",
+  "password-is-not-valid": "كلمة السر غير صالحة. يجب أن تكون باللغة الانجليزية فقط",
+  "passwords-doesnt-match": "كلمتي السر غير متطابقتين",
 
   "starting-date": "توقيت بدء متابعة التعافي",
   "starting-date-p": "هذا التوقيت يمثل توقيت بداية متابعة التعافي يمكنك تغييره من خانة إعدادات الحساب",

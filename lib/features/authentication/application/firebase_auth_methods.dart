@@ -12,15 +12,8 @@ class FirebaseAuthMethods {
 
   FirebaseAuthMethods(this._auth, this._authService);
 
-  // FOR EVERY FUNCTION HERE
-  // POP THE ROUTE USING: Navigator.of(context).pushNamedAndRemoveUntil('/', (Route<dynamic> route) => false);
-
-  // GET USER DATA
-  // using null check operator since this method should be called only
-  // when the user is logged in
   User? get user => _auth.currentUser;
 
-  // STATE PERSISTENCE STREAM
   Stream<User?> get authState => FirebaseAuth.instance.authStateChanges();
 
   Future<void> signInWithGoogle(BuildContext context) async {
@@ -87,8 +80,7 @@ class FirebaseAuthMethods {
     DateTime firstDate,
   ) async {
     try {
-      final credential =
-          await FirebaseAuth.instance.createUserWithEmailAndPassword(
+      final credential = await _auth.createUserWithEmailAndPassword(
         email: emailAddress,
         password: password,
       );
@@ -109,8 +101,8 @@ class FirebaseAuthMethods {
     String password,
   ) async {
     try {
-      final credential = await FirebaseAuth.instance
-          .signInWithEmailAndPassword(email: emailAddress, password: password);
+      final credential = await _auth.signInWithEmailAndPassword(
+          email: emailAddress, password: password);
     } on FirebaseAuthException catch (e) {
       getSnackBar(context, e.code);
     } catch (e) {
@@ -124,8 +116,20 @@ class FirebaseAuthMethods {
 
   Future<void> deleteAccount(BuildContext context) async {
     try {
-      await FirebaseAuth.instance.currentUser?.delete();
+      await _auth.currentUser?.delete();
     } on FirebaseAuthException catch (e) {
+      getSystemSnackBar(context, e.toString());
+    }
+  }
+
+  Future<void> sendForgotPasswordLink(
+      BuildContext context, String email) async {
+    try {
+      await _auth.sendPasswordResetEmail(email: email);
+      getSnackBar(context, "password-link-has-been-sent-to", email);
+    } on FirebaseAuthException catch (e) {
+      getErrorSnackBar(context, e.code);
+    } catch (e) {
       getSystemSnackBar(context, e.toString());
     }
   }

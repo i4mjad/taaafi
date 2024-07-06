@@ -61,6 +61,11 @@ class AuthRepository {
     return await _firebaseAuthMethods.createUserWithEmailAndPassword(
         context, email, password, name, selectedDob, gender, locale, firstDate);
   }
+
+  Future<void> sendForgotPasswordLink(
+      BuildContext context, String email) async {
+    return await _firebaseAuthMethods.sendForgotPasswordLink(context, email);
+  }
 }
 
 @riverpod

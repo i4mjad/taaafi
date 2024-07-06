@@ -122,7 +122,13 @@ class _ConfirmUserDetailsScreenState
                     hint: AppLocalizations.of(context).translate('first-name'),
                     prefixIcon: LucideIcons.user,
                     inputType: TextInputType.name,
-                    validator: (value) {},
+                    validator: (value) {
+                      //TODO: do the actual validation for this specifc field
+                      if (value == null || value.isEmpty) {
+                        return AppLocalizations.of(context)
+                            .translate('cant-be-empty');
+                      }
+                    },
                   ),
                   verticalSpace(Spacing.points8),
                   CustomTextField(
@@ -133,7 +139,8 @@ class _ConfirmUserDetailsScreenState
                     validator: (value) {
                       //TODO: do the actual validation for this specifc field
                       if (value == null || value.isEmpty) {
-                        return 'Please enter some text';
+                        return AppLocalizations.of(context)
+                            .translate('cant-be-empty');
                       }
                       return null;
                     },
@@ -186,7 +193,8 @@ class _ConfirmUserDetailsScreenState
                           validator: (value) {
                             //TODO: do the actual validation for this specifc field
                             if (value == null || value.isEmpty) {
-                              return 'Please enter some text';
+                              return AppLocalizations.of(context)
+                                  .translate('cant-be-empty');
                             }
                             return null;
                           },
@@ -204,8 +212,10 @@ class _ConfirmUserDetailsScreenState
                     inputType: TextInputType.datetime,
                     validator: (value) {
                       //TODO: do the actual validation for this specifc field
+
                       if (value == null || value.isEmpty) {
-                        return 'Please enter some text';
+                        return AppLocalizations.of(context)
+                            .translate('cant-be-empty');
                       }
                       return null;
                     },
