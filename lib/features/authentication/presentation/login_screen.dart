@@ -53,47 +53,6 @@ class LogInScreen extends ConsumerWidget {
               ),
               verticalSpace(Spacing.points36),
               SignInForm(),
-              verticalSpace(Spacing.points8),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  GestureDetector(
-                    onTap: () =>
-                        context.goNamed(RouteNames.forgotPassword.name),
-                    child: Text(
-                      AppLocalizations.of(context).translate('forget-password'),
-                      style: TextStyles.footnoteSelected.copyWith(
-                        color: theme.primary[600],
-                      ),
-                    ),
-                  ),
-                  GestureDetector(
-                    onTap: () => context.goNamed(RouteNames.signup.name),
-                    child: Text(
-                      AppLocalizations.of(context).translate('sign-up'),
-                      style: TextStyles.footnoteSelected
-                          .copyWith(color: theme.primary[600]),
-                    ),
-                  ),
-                ],
-              ),
-              verticalSpace(Spacing.points16),
-              WidgetsContainer(
-                backgroundColor: theme.primary[600],
-                width: MediaQuery.of(context).size.width - (16 + 16),
-                padding: EdgeInsets.only(top: 12, bottom: 12),
-                borderRadius: BorderRadius.circular(10.5),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      AppLocalizations.of(context).translate('login'),
-                      style: TextStyles.footnoteSelected
-                          .copyWith(color: theme.grey[50]),
-                    ),
-                  ],
-                ),
-              ),
               verticalSpace(Spacing.points24),
               Text(
                 AppLocalizations.of(context).translate('or-login-with'),
@@ -178,6 +137,8 @@ class _SignInFormState extends ConsumerState<SignInForm> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = CustomThemeInherited.of(context);
+    final authRepositoryNotifier = ref.watch(authRepositoryProvider);
     return Column(
       children: [
         CustomTextField(
@@ -193,6 +154,58 @@ class _SignInFormState extends ConsumerState<SignInForm> {
           hint: AppLocalizations.of(context).translate('password'),
           prefixIcon: LucideIcons.lock,
           inputType: TextInputType.visiblePassword,
+        ),
+        verticalSpace(Spacing.points8),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            GestureDetector(
+              onTap: () => context.goNamed(RouteNames.forgotPassword.name),
+              child: Text(
+                AppLocalizations.of(context).translate('forget-password'),
+                style: TextStyles.footnoteSelected.copyWith(
+                  color: theme.primary[600],
+                ),
+              ),
+            ),
+            GestureDetector(
+              onTap: () => context.goNamed(RouteNames.signup.name),
+              child: Text(
+                AppLocalizations.of(context).translate('sign-up'),
+                style: TextStyles.footnoteSelected
+                    .copyWith(color: theme.primary[600]),
+              ),
+            ),
+          ],
+        ),
+        verticalSpace(Spacing.points16),
+        GestureDetector(
+          onTap: () async {
+            final email = emailController.value.text;
+            final password = passwordController.value.text;
+            //TODO: validate before sending
+            await authRepositoryNotifier.signInWithEmail(
+              context,
+              email,
+              password,
+            );
+          },
+          child: WidgetsContainer(
+            backgroundColor: theme.primary[600],
+            width: MediaQuery.of(context).size.width - (16 + 16),
+            padding: EdgeInsets.only(top: 12, bottom: 12),
+            borderRadius: BorderRadius.circular(10.5),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  AppLocalizations.of(context).translate('login'),
+                  style: TextStyles.footnoteSelected
+                      .copyWith(color: theme.grey[50]),
+                ),
+              ],
+            ),
+          ),
         ),
       ],
     );

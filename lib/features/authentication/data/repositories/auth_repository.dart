@@ -41,6 +41,12 @@ class AuthRepository {
   Future<void> reSignInWithApple(BuildContext context) async {
     await _firebaseAuthMethods.reSignInWithApple(context);
   }
+
+  Future<void> signInWithEmail(
+      BuildContext context, String email, String password) async {
+    await _firebaseAuthMethods.loginWithEmailAndPassword(
+        context, email, password);
+  }
 }
 
 @riverpod

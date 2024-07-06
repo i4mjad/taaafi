@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -85,8 +83,6 @@ class _ConfirmUserDetailsScreenState
           if (userDocument == null) {
             return Center(child: Text('No user document found.'));
           }
-
-          inspect(userDocument);
 
           if (selectedGender == null) {
             displayNameController.text = userDocument.displayName!;

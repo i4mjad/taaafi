@@ -83,6 +83,39 @@ class FirebaseAuthMethods {
     }
   }
 
+  Future<void> createUserWithEmailAndPassword(
+    BuildContext context,
+    String emailAddress,
+    String password,
+  ) async {
+    try {
+      final credential =
+          await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: emailAddress,
+        password: password,
+      );
+    } on FirebaseAuthException catch (e) {
+      getSystemSnackBar(context, e.message ?? e.toString());
+    } catch (e) {
+      getSystemSnackBar(context, e.toString());
+    }
+  }
+
+  Future<void> loginWithEmailAndPassword(
+    BuildContext context,
+    String emailAddress,
+    String password,
+  ) async {
+    try {
+      final credential = await FirebaseAuth.instance
+          .signInWithEmailAndPassword(email: emailAddress, password: password);
+    } on FirebaseAuthException catch (e) {
+      getSnackBar(context, e.code);
+    } catch (e) {
+      getSystemSnackBar(context, e.toString());
+    }
+  }
+
   Future<void> signOut() async {
     await _auth.signOut();
   }

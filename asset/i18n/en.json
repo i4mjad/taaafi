@@ -56,6 +56,20 @@
   "about": "About",
   "log-out": "Log Out",
 
+  "wrong-password": "The password you entered is incorrect for this email, or the account does not have a password set.",
+  "invalid-email": "The email address you entered is not valid.",
+  "user-disabled": "Your account has been disabled. Please contact support for assistance.",
+  "user-not-found": "No account found with this email address.",
+  "email-already-in-use": "An account with this email address already exists.",
+  "operation-not-allowed": "Email and password accounts are not enabled. Please contact support for assistance.",
+  "weak-password": "The password you entered is too weak. Please choose a stronger password.",
+  "account-exists-with-different-credential": "An account with this email address already exists but with different credentials. Please sign in using one of the linked providers.",
+  "invalid-credential": "The credentials you provided are not valid or have expired.",
+  "invalid-verification-code": "The verification code you entered is not valid.",
+  "invalid-verification-id": "The verification ID you entered is not valid.",
+  "user-mismatch": "The credentials you provided do not match the user.",
+  "expired-action-code": "The OTP in the email link has expired. Please request a new one.",
+
   "english": "English",
   "arabic": "العربية",
 
