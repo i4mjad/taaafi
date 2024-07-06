@@ -42,6 +42,13 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
               hint: AppLocalizations.of(context).translate('email'),
               prefixIcon: LucideIcons.mail,
               inputType: TextInputType.emailAddress,
+              validator: (value) {
+                //TODO: do the actual validation for this specifc field
+                if (value == null || value.isEmpty) {
+                  return 'Please enter some text';
+                }
+                return null;
+              },
             ),
             verticalSpace(Spacing.points32),
             WidgetsContainer(

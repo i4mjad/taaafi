@@ -122,6 +122,7 @@ class _ConfirmUserDetailsScreenState
                     hint: AppLocalizations.of(context).translate('first-name'),
                     prefixIcon: LucideIcons.user,
                     inputType: TextInputType.name,
+                    validator: (value) {},
                   ),
                   verticalSpace(Spacing.points8),
                   CustomTextField(
@@ -129,6 +130,13 @@ class _ConfirmUserDetailsScreenState
                     hint: AppLocalizations.of(context).translate('email'),
                     prefixIcon: LucideIcons.mail,
                     inputType: TextInputType.emailAddress,
+                    validator: (value) {
+                      //TODO: do the actual validation for this specifc field
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter some text';
+                      }
+                      return null;
+                    },
                   ),
                   verticalSpace(Spacing.points8),
                   CustomSegmentedButton(
@@ -175,6 +183,13 @@ class _ConfirmUserDetailsScreenState
                               .translate('date-of-birth'),
                           prefixIcon: LucideIcons.calendar,
                           inputType: TextInputType.datetime,
+                          validator: (value) {
+                            //TODO: do the actual validation for this specifc field
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter some text';
+                            }
+                            return null;
+                          },
                         ),
                       ),
                     );
@@ -187,6 +202,13 @@ class _ConfirmUserDetailsScreenState
                         AppLocalizations.of(context).translate('starting-date'),
                     prefixIcon: LucideIcons.calendar,
                     inputType: TextInputType.datetime,
+                    validator: (value) {
+                      //TODO: do the actual validation for this specifc field
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter some text';
+                      }
+                      return null;
+                    },
                   ),
                   verticalSpace(Spacing.points4),
                   Text(

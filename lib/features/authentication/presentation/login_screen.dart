@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:reboot_app_3/core/helpers/app_regex.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/routing/route_names.dart';
 import 'package:reboot_app_3/core/shared_widgets/app_bar.dart';
@@ -128,6 +129,8 @@ class _SignInFormState extends ConsumerState<SignInForm> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
 
+  final _formKey = GlobalKey<FormState>();
+
   @override
   void dispose() {
     emailController.dispose();
@@ -139,75 +142,97 @@ class _SignInFormState extends ConsumerState<SignInForm> {
   Widget build(BuildContext context) {
     final theme = CustomThemeInherited.of(context);
     final authRepositoryNotifier = ref.watch(authRepositoryProvider);
-    return Column(
-      children: [
-        CustomTextField(
-          controller: emailController,
-          hint: AppLocalizations.of(context).translate('email'),
-          prefixIcon: LucideIcons.mail,
-          inputType: TextInputType.emailAddress,
-        ),
-        verticalSpace(Spacing.points8),
-        CustomTextField(
-          controller: passwordController,
-          obscureText: true,
-          hint: AppLocalizations.of(context).translate('password'),
-          prefixIcon: LucideIcons.lock,
-          inputType: TextInputType.visiblePassword,
-        ),
-        verticalSpace(Spacing.points8),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            GestureDetector(
-              onTap: () => context.goNamed(RouteNames.forgotPassword.name),
-              child: Text(
-                AppLocalizations.of(context).translate('forget-password'),
-                style: TextStyles.footnoteSelected.copyWith(
-                  color: theme.primary[600],
+    return Form(
+      key: _formKey,
+      child: Column(
+        children: [
+          CustomTextField(
+            controller: emailController,
+            hint: AppLocalizations.of(context).translate('email'),
+            prefixIcon: LucideIcons.mail,
+            inputType: TextInputType.emailAddress,
+            validator: (value) {
+              //TODO: do the actual validation for this specifc field
+              if (value == null ||
+                  value.isEmpty ||
+                  !AppRegex.isEmailValid(value)) {
+                return AppLocalizations.of(context).translate('invalid-email');
+              }
+              return null;
+            },
+          ),
+          verticalSpace(Spacing.points8),
+          CustomTextField(
+            controller: passwordController,
+            obscureText: true,
+            hint: AppLocalizations.of(context).translate('password'),
+            prefixIcon: LucideIcons.lock,
+            inputType: TextInputType.visiblePassword,
+            validator: (value) {
+              //TODO: do the actual validation for this specifc field
+              if (value == null || value.isEmpty) {
+                return 'Please enter some text';
+              }
+              return null;
+            },
+          ),
+          verticalSpace(Spacing.points8),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              GestureDetector(
+                onTap: () => context.goNamed(RouteNames.forgotPassword.name),
+                child: Text(
+                  AppLocalizations.of(context).translate('forget-password'),
+                  style: TextStyles.footnoteSelected.copyWith(
+                    color: theme.primary[600],
+                  ),
                 ),
               ),
-            ),
-            GestureDetector(
-              onTap: () => context.goNamed(RouteNames.signup.name),
-              child: Text(
-                AppLocalizations.of(context).translate('sign-up'),
-                style: TextStyles.footnoteSelected
-                    .copyWith(color: theme.primary[600]),
-              ),
-            ),
-          ],
-        ),
-        verticalSpace(Spacing.points16),
-        GestureDetector(
-          onTap: () async {
-            final email = emailController.value.text;
-            final password = passwordController.value.text;
-            //TODO: validate before sending
-            await authRepositoryNotifier.signInWithEmail(
-              context,
-              email,
-              password,
-            );
-          },
-          child: WidgetsContainer(
-            backgroundColor: theme.primary[600],
-            width: MediaQuery.of(context).size.width - (16 + 16),
-            padding: EdgeInsets.only(top: 12, bottom: 12),
-            borderRadius: BorderRadius.circular(10.5),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  AppLocalizations.of(context).translate('login'),
+              GestureDetector(
+                onTap: () => context.goNamed(RouteNames.signup.name),
+                child: Text(
+                  AppLocalizations.of(context).translate('sign-up'),
                   style: TextStyles.footnoteSelected
-                      .copyWith(color: theme.grey[50]),
+                      .copyWith(color: theme.primary[600]),
                 ),
-              ],
+              ),
+            ],
+          ),
+          verticalSpace(Spacing.points16),
+          GestureDetector(
+            onTap: () async {
+              final email = emailController.value.text;
+              final password = passwordController.value.text;
+              //TODO: validate before sending
+
+              if (_formKey.currentState!.validate()) {
+                await authRepositoryNotifier.signInWithEmail(
+                  context,
+                  email,
+                  password,
+                );
+              }
+            },
+            child: WidgetsContainer(
+              backgroundColor: theme.primary[600],
+              width: MediaQuery.of(context).size.width - (16 + 16),
+              padding: EdgeInsets.only(top: 12, bottom: 12),
+              borderRadius: BorderRadius.circular(10.5),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    AppLocalizations.of(context).translate('login'),
+                    style: TextStyles.footnoteSelected
+                        .copyWith(color: theme.grey[50]),
+                  ),
+                ],
+              ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

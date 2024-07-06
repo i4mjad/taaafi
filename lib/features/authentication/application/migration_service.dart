@@ -34,9 +34,6 @@ MigrationService migrationService(ref) {
 }
 
 class MigrationService {
-  //  1- add the new information (defined in the UML)
-  //  2- move the followups from the list to a new collection called follwups
-
   final FCMRepository _fcmRepository;
   final MigerationRepository _migerationRepository;
 

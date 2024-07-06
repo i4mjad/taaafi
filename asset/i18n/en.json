@@ -56,6 +56,8 @@
   "about": "About",
   "log-out": "Log Out",
 
+  "cant-be-empty": "This field can't be empty",
+  "enter-a-valid-dob": "Enter a valid Day of Birth",
   "wrong-password": "The password you entered is incorrect for this email, or the account does not have a password set.",
   "invalid-email": "The email address you entered is not valid.",
   "user-disabled": "Your account has been disabled. Please contact support for assistance.",
@@ -69,7 +71,11 @@
   "invalid-verification-id": "The verification ID you entered is not valid.",
   "user-mismatch": "The credentials you provided do not match the user.",
   "expired-action-code": "The OTP in the email link has expired. Please request a new one.",
-
+  "password-must-contain-a-number": "Password must contain a number",
+  "password-must-contain-at-least-8-characters": "Password must contain at least 8 characters",
+  "password-must-contain-at-least-1-special-character": "Password must contain at least 1 special character. For example: @",
+  "password-is-not-valid": "Passowrd is not valid. Passowrd should be in English only",
+  "passwords-doesnt-match": "Passwords do not match",
   "english": "English",
   "arabic": "العربية",
 
