@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
@@ -11,6 +12,9 @@ import 'package:reboot_app_3/core/shared_widgets/custom_textfield.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
+import 'package:reboot_app_3/features/authentication/application/auth_service.dart';
+import 'package:reboot_app_3/features/authentication/data/models/new_user_document.dart';
+import 'package:reboot_app_3/features/authentication/data/repositories/auth_repository.dart';
 
 class SignUpScreen extends ConsumerWidget {
   const SignUpScreen({super.key});
@@ -84,10 +88,10 @@ class _SignUpFormState extends ConsumerState<SignUpForm> {
     );
 
     if (picked != null) {
-      var datetimepicked = DisplayDate(picked, language);
+      var pickedDob = DisplayDate(picked, language);
       setState(() {
-        dobController.text = datetimepicked.displayDate;
-        dob = datetimepicked.date;
+        dobController.text = pickedDob.displayDate;
+        dob = pickedDob.date;
       });
     }
   }
@@ -127,6 +131,8 @@ class _SignUpFormState extends ConsumerState<SignUpForm> {
   @override
   Widget build(BuildContext context) {
     final locale = ref.watch(localeNotifierProvider);
+    final authRepository = ref.watch(authRepositoryProvider);
+    final authService = ref.watch(authServiceProvider);
     final theme = CustomThemeInherited.of(context);
 
     return Form(
@@ -174,7 +180,7 @@ class _SignUpFormState extends ConsumerState<SignUpForm> {
                                   dob == DateTime(1900, 1, 1) ||
                                   value == null ||
                                   value.isEmpty ||
-                                  dob.year < 2012) {
+                                  dob.year > 2012) {
                                 return AppLocalizations.of(context)
                                     .translate('enter-a-valid-dob');
                               }
@@ -373,11 +379,16 @@ class _SignUpFormState extends ConsumerState<SignUpForm> {
                           value: nowIsStartingDate,
                           activeColor: theme.primary[600],
                           onChanged: (bool value) {
-                            setState(() {
-                              nowIsStartingDate = !nowIsStartingDate;
-                              startingDateController.text = getDisplayDateTime(
-                                  DateTime.now(), locale!.languageCode);
-                            });
+                            setState(
+                              () {
+                                nowIsStartingDate = !nowIsStartingDate;
+                                final selectedDate = DisplayDateTime(
+                                    DateTime.now(), locale!.languageCode);
+                                startingDateController.text =
+                                    selectedDate.displayDateTime;
+                                startingDate = selectedDate.date;
+                              },
+                            );
                           },
                         ),
                       ],
@@ -411,9 +422,21 @@ class _SignUpFormState extends ConsumerState<SignUpForm> {
             onTap: () async {
               if (_formKey.currentState!.validate() && isTermsAccepted) {
                 //1. create the user and get the user
-                //2. check if the iser is not null
-                //3. create the document
-                //4. navigate to home
+                final name = nameController.value.text;
+                final selectedDob = dob;
+                final gender = selectedGender.value;
+                final locale = selectedLanguage.value;
+                final firstDate = startingDate;
+                await authRepository.signUpWithEmail(
+                  context,
+                  emailController.value.text,
+                  passwordController.value.text,
+                  name,
+                  selectedDob,
+                  gender,
+                  locale,
+                  firstDate,
+                );
               }
             },
             child: Padding(

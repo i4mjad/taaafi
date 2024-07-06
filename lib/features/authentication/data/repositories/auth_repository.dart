@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:reboot_app_3/features/authentication/application/auth_service.dart';
 import 'package:reboot_app_3/features/authentication/application/firebase_auth_methods.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -47,6 +48,19 @@ class AuthRepository {
     await _firebaseAuthMethods.loginWithEmailAndPassword(
         context, email, password);
   }
+
+  Future<void> signUpWithEmail(
+      BuildContext context,
+      String email,
+      String password,
+      String name,
+      DateTime selectedDob,
+      String gender,
+      String locale,
+      DateTime firstDate) async {
+    return await _firebaseAuthMethods.createUserWithEmailAndPassword(
+        context, email, password, name, selectedDob, gender, locale, firstDate);
+  }
 }
 
 @riverpod
@@ -57,7 +71,8 @@ AuthRepository authRepository(AuthRepositoryRef ref) {
 
 @riverpod
 FirebaseAuthMethods firebaseAuthMethods(ref) {
-  return FirebaseAuthMethods(ref.watch(firebaseAuthProvider));
+  return FirebaseAuthMethods(
+      ref.watch(firebaseAuthProvider), ref.watch(authServiceProvider));
 }
 
 @riverpod

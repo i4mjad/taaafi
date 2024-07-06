@@ -36,7 +36,7 @@ final authRepositoryProvider = AutoDisposeProvider<AuthRepository>.internal(
 
 typedef AuthRepositoryRef = AutoDisposeProviderRef<AuthRepository>;
 String _$firebaseAuthMethodsHash() =>
-    r'35a804292d150c7ba1ef4c5fffd4e73890f2edca';
+    r'b2777db70af2b34e23382f10d7287591cea1f989';
 
 /// See also [firebaseAuthMethods].
 @ProviderFor(firebaseAuthMethods)

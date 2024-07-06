@@ -5,7 +5,7 @@ import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/routing/app_routes.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/custom_theme_data.dart';
-import 'package:reboot_app_3/providers/main_providers.dart';
+import 'package:reboot_app_3/core/theming/theme_provider.dart';
 
 class MyApp extends ConsumerWidget {
   @override

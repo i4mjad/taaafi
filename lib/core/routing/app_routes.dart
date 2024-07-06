@@ -43,6 +43,7 @@ GoRouter goRouter(GoRouterRef ref) {
 
         // If userDocumentState has an error or is still null, do nothing
         if (userDocument == null || userDocumentState is AsyncError) {
+          //TODO: here it should return the user to /completeAccountRegisteration
           return null;
         }
 

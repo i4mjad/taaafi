@@ -3,12 +3,14 @@ import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:reboot_app_3/features/authentication/application/auth_service.dart';
 import 'package:reboot_app_3/shared/components/snackbar.dart';
 
 class FirebaseAuthMethods {
   final FirebaseAuth _auth;
+  final AuthService _authService;
 
-  FirebaseAuthMethods(this._auth);
+  FirebaseAuthMethods(this._auth, this._authService);
 
   // FOR EVERY FUNCTION HERE
   // POP THE ROUTE USING: Navigator.of(context).pushNamedAndRemoveUntil('/', (Route<dynamic> route) => false);
@@ -32,15 +34,6 @@ class FirebaseAuthMethods {
             accessToken: googleAuth.accessToken, idToken: googleAuth.idToken);
 
         await _auth.signInWithCredential(credential);
-
-        // if you want to do specific task like storing information in firestore
-        // only for new users using google sign in (since there are no two options
-        // for google sign in and google sign up, only one as of now),
-        // do the following:
-
-        // if (userCredential.user != null) {
-        //   if (userCredential.additionalUserInfo!.isNewUser) {}
-        // }
       }
     } on FirebaseAuthException catch (e) {
       getSystemSnackBar(context, e.toString());
@@ -87,6 +80,11 @@ class FirebaseAuthMethods {
     BuildContext context,
     String emailAddress,
     String password,
+    String name,
+    DateTime dob,
+    String gender,
+    String locale,
+    DateTime firstDate,
   ) async {
     try {
       final credential =
@@ -94,6 +92,10 @@ class FirebaseAuthMethods {
         email: emailAddress,
         password: password,
       );
+
+      var user = credential.user;
+      _authService.createUserDocument(
+          user!, name, dob, gender, locale, firstDate);
     } on FirebaseAuthException catch (e) {
       getSystemSnackBar(context, e.message ?? e.toString());
     } catch (e) {
