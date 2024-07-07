@@ -23,6 +23,11 @@ class AccountScreen extends ConsumerWidget {
         appBar: appBar(context, ref, 'account', false),
         body: userProfileState.when(
           data: (userProfile) {
+            if (userProfile == null) {
+              return Center(
+                child: CircularProgressIndicator(),
+              );
+            }
             return Padding(
               padding: const EdgeInsets.only(left: 16.0, right: 16, top: 16),
               child: SingleChildScrollView(
@@ -30,7 +35,7 @@ class AccountScreen extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    UserDetailsWidget(userProfile!),
+                    UserDetailsWidget(userProfile),
                     verticalSpace(Spacing.points24),
                     Text(
                       AppLocalizations.of(context).translate('app-settings'),

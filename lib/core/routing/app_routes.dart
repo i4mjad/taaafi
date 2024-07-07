@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:reboot_app_3/core/routing/navigator_keys.dart';
 import 'package:reboot_app_3/core/routing/route_names.dart';
 import 'package:reboot_app_3/core/routing/scaffold_with_nested_navigation.dart';
+import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/features/account/presentation/account_screen.dart';
 import 'package:reboot_app_3/features/authentication/presentation/complete_account_registeration.dart';
@@ -14,6 +15,7 @@ import 'package:reboot_app_3/features/authentication/presentation/signup_screen.
 import 'package:reboot_app_3/features/authentication/providers/legacy_document_provider.dart';
 import 'package:reboot_app_3/features/authentication/data/repositories/auth_repository.dart';
 import 'package:reboot_app_3/features/authentication/providers/new_document_provider.dart';
+import 'package:reboot_app_3/features/fellowship/presentation/fellowship_screen.dart';
 import 'package:reboot_app_3/features/home/presentation/home_screen.dart';
 import 'package:reboot_app_3/features/onboarding/presentation/onboarding_screen.dart';
 import 'package:reboot_app_3/features/vault/presentation/vault_screen.dart';
@@ -23,26 +25,23 @@ part 'app_routes.g.dart';
 
 @riverpod
 GoRouter goRouter(GoRouterRef ref) {
-  // Watch the auth state changes
   final authState = ref.watch(authStateChangesProvider);
-  final userDocumentState = ref.watch(legacyDocumentNotifierProvider);
+  final legacyUserDocumentState = ref.watch(legacyDocumentNotifierProvider);
   final newUserDocumentState = ref.watch(newUserDocumentNotifierProvider);
-  final userDocNotifier = ref.read(newUserDocumentNotifierProvider.notifier);
 
   return GoRouter(
     initialLocation: '/home',
     navigatorKey: rootNavigatorKey,
-
-    // debugLogDiagnostics: true,
     redirect: (context, state) async {
       final isLoggedIn = authState.asData?.value != null;
-      final legacyUserDocumentState = ref.watch(legacyDocumentNotifierProvider);
-      final newUserDocumentState = ref.watch(newUserDocumentNotifierProvider);
 
       if (isLoggedIn) {
-        // If legacyUserDocumentState is still loading, do nothing
+        // If either document state is still loading, navigate to the loading screen
         if (legacyUserDocumentState is AsyncLoading ||
             newUserDocumentState is AsyncLoading) {
+          if (state.matchedLocation != '/loading') {
+            return '/loading';
+          }
           return null;
         }
 
@@ -53,13 +52,14 @@ GoRouter goRouter(GoRouterRef ref) {
         if ((legacyUserDocument == null && newUserDocument == null) ||
             (legacyUserDocumentState is AsyncError &&
                 newUserDocumentState is AsyncError)) {
-          return '/completeAccountRegisteration';
+          if (state.matchedLocation != '/completeAccountRegisteration') {
+            return '/completeAccountRegisteration';
+          }
+          return null;
         }
 
         final legacyUserDocNotifier =
             ref.read(legacyDocumentNotifierProvider.notifier);
-        final newUserDocNotifier =
-            ref.read(newUserDocumentNotifierProvider.notifier);
 
         // Check for missing required data in the legacy document
         if (legacyUserDocument != null &&
@@ -72,6 +72,7 @@ GoRouter goRouter(GoRouterRef ref) {
 
         // Check for old document structure in the legacy document
         final hasOldStructure = await legacyUserDocNotifier.hasOldStructure();
+
         if (hasOldStructure) {
           if (state.matchedLocation != '/confirmProfileDetails') {
             return '/confirmProfileDetails';
@@ -79,9 +80,13 @@ GoRouter goRouter(GoRouterRef ref) {
           return null;
         }
 
-        // Redirect to home if the user is logged in and trying to access auth routes
-        if (state.matchedLocation.startsWith('/onboarding')) {
-          return '/home';
+        // Allow navigation to other routes if the user has the new document structure
+        if (newUserDocument != null) {
+          if (state.matchedLocation.startsWith('/onboarding') ||
+              state.matchedLocation == '/loading') {
+            return '/home';
+          }
+          return null; // No redirection if already on a valid route
         }
       } else {
         // Non-logged-in user trying to access protected routes
@@ -93,8 +98,14 @@ GoRouter goRouter(GoRouterRef ref) {
 
       return null;
     },
-
     routes: [
+      GoRoute(
+        path: '/loading',
+        name: RouteNames.loading.name,
+        pageBuilder: (context, state) => NoTransitionPage(
+          child: LoadingScreen(),
+        ),
+      ),
       GoRoute(
         path: '/onboarding',
         name: RouteNames.onboarding.name,
@@ -177,7 +188,7 @@ GoRouter goRouter(GoRouterRef ref) {
                 name: RouteNames.fellowship.name,
                 path: '/fellowship',
                 pageBuilder: (context, state) => NoTransitionPage(
-                  child: VaultScreen(),
+                  child: FellowshipScreen(),
                 ),
                 routes: [
                   //! Add Pages
@@ -218,6 +229,21 @@ class NotFoundScreen extends StatelessWidget {
       appBar: AppBar(),
       body: EmptyPlaceholderWidget(
         message: '404 - Page not found!',
+      ),
+    );
+  }
+}
+
+class LoadingScreen extends ConsumerWidget {
+  const LoadingScreen({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = CustomThemeInherited.of(context);
+    return Scaffold(
+      backgroundColor: theme.backgroundColor,
+      body: Center(
+        child: CircularProgressIndicator(),
       ),
     );
   }

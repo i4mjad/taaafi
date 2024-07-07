@@ -86,8 +86,10 @@ class FirebaseAuthMethods {
       );
 
       var user = credential.user;
-      _authService.createUserDocument(
-          user!, name, dob, gender, locale, firstDate);
+      if (user != null) {
+        _authService.createUserDocument(
+            user, name, dob, gender, locale, firstDate);
+      }
     } on FirebaseAuthException catch (e) {
       getSystemSnackBar(context, e.message ?? e.toString());
     } catch (e) {

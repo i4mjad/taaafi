@@ -15,18 +15,35 @@ class NewUserDocumentNotifier extends _$NewUserDocumentNotifier {
 
   @override
   FutureOr<NewUserDocument?> build() async {
-    return _fetchNewUserDocument();
+    return await _fetchNewUserDocument();
   }
 
   Future<NewUserDocument?> _fetchNewUserDocument() async {
     try {
+      state = const AsyncLoading(); // Indicate loading state
       final uid = FirebaseAuth.instance.currentUser?.uid;
-      if (uid == null) return null;
+      if (uid == null) {
+        throw Exception("User ID is null");
+      }
 
       final doc = await _firestore.collection('users').doc(uid).get();
 
-      return NewUserDocument.fromMap(doc.data()!);
-    } catch (e) {
+      if (!doc.exists) {
+        throw Exception("Document does not exist");
+      }
+
+      var map = doc.data();
+      if (map == null) {
+        throw Exception("Document data is null");
+      }
+
+      var newUserDocument = NewUserDocument.fromMap(map);
+
+      state = AsyncValue.data(newUserDocument); // Update state with data
+      return newUserDocument;
+    } catch (e, stack) {
+      print("Error fetching new user document: $e");
+      state = AsyncValue.error(e, stack); // Update state with error
       return null;
     }
   }
@@ -36,16 +53,21 @@ class NewUserDocumentNotifier extends _$NewUserDocumentNotifier {
     try {
       var authService = AuthService(FCMRepository(_messaging));
       var user = await authService.getUser();
+      if (user == null) {
+        throw Exception("User is null");
+      }
+
       var userDocument = await authService.createUserDocument(
-          user!, name, dob, gender, locale, firstDate);
+          user, name, dob, gender, locale, firstDate);
 
       await _firestore
           .collection('users')
           .doc(userDocument.uid)
           .set(userDocument.toMap());
-      state = AsyncValue.data(userDocument); // Update state
-    } catch (e) {
-      state = AsyncValue.error(e, StackTrace.current); // Handle error
+      state = AsyncValue.data(userDocument); // Update state with new document
+    } catch (e, stack) {
+      print("Error creating new user document: $e");
+      state = AsyncValue.error(e, stack); // Update state with error
     }
   }
 }

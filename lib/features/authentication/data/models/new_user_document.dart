@@ -78,7 +78,7 @@ class NewUserDocument {
   factory NewUserDocument.fromMap(Map<String, dynamic> map) {
     return NewUserDocument(
       uid: map['uid'] ?? '',
-      devicesIds: map['devicesIds'] ?? '',
+      devicesIds: List<String>.from(map['bookmarkedContentIds']),
       displayName: map['displayName'] ?? '',
       email: map['email'] ?? '',
       gender: map['gender'] ?? '',

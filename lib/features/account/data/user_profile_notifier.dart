@@ -21,7 +21,7 @@ class UserProfileNotifier extends _$UserProfileNotifier {
 
   Future<UserProfile?> _fetchUserProfile() async {
     try {
-      final uid = ref.watch(firebaseAuthProvider).currentUser?.uid;
+      final uid = FirebaseAuth.instance.currentUser?.uid;
       if (uid == null) return null;
 
       final doc = await _firestore.collection('users').doc(uid).get();
@@ -39,7 +39,7 @@ class UserProfileNotifier extends _$UserProfileNotifier {
           .set(userProfile.toMap(), SetOptions(merge: true));
       state = AsyncValue.data(userProfile); // Update state
     } catch (e) {
-      state = AsyncValue.error(e,StackTrace.current); // Handle error
+      state = AsyncValue.error(e, StackTrace.current); // Handle error
     }
   }
 }
