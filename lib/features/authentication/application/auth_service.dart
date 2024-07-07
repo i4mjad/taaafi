@@ -4,7 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:reboot_app_3/features/authentication/data/models/new_user_document.dart';
-import 'package:reboot_app_3/features/authentication/data/repos/migeration_repository.dart';
+import 'package:reboot_app_3/features/authentication/data/repositories/migeration_repository.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'auth_service.g.dart';
@@ -17,11 +17,9 @@ AuthService authService(ref) {
 class AuthService {
   final FCMRepository _fcmRepository;
 
-  AuthService(
-    this._fcmRepository,
-  );
+  AuthService(this._fcmRepository);
 
-  Future<void> createUserDocument(
+  Future<NewUserDocument> createUserDocument(
     User user,
     String name,
     DateTime dob,
@@ -45,7 +43,11 @@ class AuthService {
       bookmarkedContentIds: [],
     );
 
-    print(userDocument);
+    return userDocument;
+  }
+
+  Future<User?> getUser() async {
+    return await FirebaseAuth.instance.currentUser;
   }
 
   _getDeviceId() async {

@@ -18,7 +18,7 @@ String getDisplayDate(dynamic date, String language) {
   if (date is Timestamp) {
     date = date.toDate();
   }
-  print(date);
+
   String locale = getLocale(language);
   String formattedDate = DateFormat('d - MMMM - yyyy', locale).format(date);
   if (language == 'arabic') {

@@ -3,10 +3,10 @@ import 'package:reboot_app_3/features/authentication/data/repositories/auth_repo
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-part 'user_document_provider.g.dart';
+part 'legacy_document_provider.g.dart';
 
 @riverpod
-class UserDocumentNotifier extends _$UserDocumentNotifier {
+class LegacyDocumentNotifier extends _$LegacyDocumentNotifier {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   @override

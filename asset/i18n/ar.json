@@ -21,6 +21,8 @@
   "on": "تفعيل",
   "off": "تعطيل",
 
+  "complete-account-registeration": "أكمل عملية التسجيل",
+
   "user-name": "اسم المستخدم",
   "user-email": "البريد الالكتروني",
   "follow-your-reboot": "تابع تعافيك",
@@ -96,6 +98,8 @@
   "first-name": "الاسم الأول",
   "last-name": "اسم العائلة",
   "repeat-password": "إعادة إدخال كلمة السر",
+
+  "terms-should-be-accepted": "يجب الموافقة على شروط الاستخدام",
 
   "search": "ابحث",
   "loading": "يتم الآن جلب المحتوى...",

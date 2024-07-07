@@ -56,6 +56,9 @@
   "about": "About",
   "log-out": "Log Out",
 
+  "complete-account-registeration": "Complete Registeration",
+  "terms-should-be-accepted": "Terms should be accepted",
+
   "cant-be-empty": "This field can't be empty",
   "enter-a-valid-dob": "Enter a valid Day of Birth",
   "wrong-password": "The password you entered is incorrect for this email, or the account does not have a password set.",

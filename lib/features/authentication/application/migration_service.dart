@@ -8,7 +8,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:reboot_app_3/features/authentication/data/models/FollowUp.dart';
 import 'package:reboot_app_3/features/authentication/data/models/legacy_user_document.dart';
 import 'package:reboot_app_3/features/authentication/data/models/new_user_document.dart';
-import 'package:reboot_app_3/features/authentication/data/repos/migeration_repository.dart';
+import 'package:reboot_app_3/features/authentication/data/repositories/migeration_repository.dart';
 
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:uuid/uuid.dart';

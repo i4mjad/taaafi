@@ -62,9 +62,25 @@ class AuthRepository {
         context, email, password, name, selectedDob, gender, locale, firstDate);
   }
 
+  Future<void> signUpWithProvider(
+      BuildContext context,
+      String name,
+      DateTime selectedDob,
+      String gender,
+      String locale,
+      DateTime firstDate) async {
+    return await _firebaseAuthMethods.createUserDocument(
+        context, name, selectedDob, gender, locale, firstDate);
+  }
+
+
   Future<void> sendForgotPasswordLink(
       BuildContext context, String email) async {
     return await _firebaseAuthMethods.sendForgotPasswordLink(context, email);
+  }
+
+  Future<User?> getLoggedInUser() async {
+    return await _auth.currentUser;
   }
 }
 

@@ -11,8 +11,9 @@ import 'package:reboot_app_3/features/authentication/presentation/confirm_user_d
 import 'package:reboot_app_3/features/authentication/presentation/forgot_password_screen.dart';
 import 'package:reboot_app_3/features/authentication/presentation/login_screen.dart';
 import 'package:reboot_app_3/features/authentication/presentation/signup_screen.dart';
-import 'package:reboot_app_3/features/authentication/providers/user_document_provider.dart';
+import 'package:reboot_app_3/features/authentication/providers/legacy_document_provider.dart';
 import 'package:reboot_app_3/features/authentication/data/repositories/auth_repository.dart';
+import 'package:reboot_app_3/features/authentication/providers/new_document_provider.dart';
 import 'package:reboot_app_3/features/home/presentation/home_screen.dart';
 import 'package:reboot_app_3/features/onboarding/presentation/onboarding_screen.dart';
 import 'package:reboot_app_3/features/vault/presentation/vault_screen.dart';
@@ -24,42 +25,53 @@ part 'app_routes.g.dart';
 GoRouter goRouter(GoRouterRef ref) {
   // Watch the auth state changes
   final authState = ref.watch(authStateChangesProvider);
-  final userDocumentState = ref.watch(userDocumentNotifierProvider);
+  final userDocumentState = ref.watch(legacyDocumentNotifierProvider);
+  final newUserDocumentState = ref.watch(newUserDocumentNotifierProvider);
+  final userDocNotifier = ref.read(newUserDocumentNotifierProvider.notifier);
 
   return GoRouter(
     initialLocation: '/home',
     navigatorKey: rootNavigatorKey,
+
     // debugLogDiagnostics: true,
     redirect: (context, state) async {
       final isLoggedIn = authState.asData?.value != null;
+      final legacyUserDocumentState = ref.watch(legacyDocumentNotifierProvider);
+      final newUserDocumentState = ref.watch(newUserDocumentNotifierProvider);
 
       if (isLoggedIn) {
-        // If userDocumentState is still loading, do nothing
-        if (userDocumentState is AsyncLoading) {
+        // If legacyUserDocumentState is still loading, do nothing
+        if (legacyUserDocumentState is AsyncLoading ||
+            newUserDocumentState is AsyncLoading) {
           return null;
         }
 
-        final userDocument = userDocumentState.value;
+        final legacyUserDocument = legacyUserDocumentState.value;
+        final newUserDocument = newUserDocumentState.value;
 
-        // If userDocumentState has an error or is still null, do nothing
-        if (userDocument == null || userDocumentState is AsyncError) {
-          //TODO: here it should return the user to /completeAccountRegisteration
-          return null;
+        // If both legacyUserDocumentState and newUserDocumentState have errors or are null, redirect to complete account registration
+        if ((legacyUserDocument == null && newUserDocument == null) ||
+            (legacyUserDocumentState is AsyncError &&
+                newUserDocumentState is AsyncError)) {
+          return '/completeAccountRegisteration';
         }
 
-        final userDocNotifier = ref.read(userDocumentNotifierProvider.notifier);
+        final legacyUserDocNotifier =
+            ref.read(legacyDocumentNotifierProvider.notifier);
+        final newUserDocNotifier =
+            ref.read(newUserDocumentNotifierProvider.notifier);
 
-        // Check for missing required data
-        if (userDocNotifier.hasMissingData(userDocument)) {
+        // Check for missing required data in the legacy document
+        if (legacyUserDocument != null &&
+            legacyUserDocNotifier.hasMissingData(legacyUserDocument)) {
           if (state.matchedLocation != '/completeAccountRegisteration') {
             return '/completeAccountRegisteration';
           }
           return null;
         }
 
-        // Check for old document structure
-        final hasOldStructure = await userDocNotifier.hasOldStructure();
-
+        // Check for old document structure in the legacy document
+        final hasOldStructure = await legacyUserDocNotifier.hasOldStructure();
         if (hasOldStructure) {
           if (state.matchedLocation != '/confirmProfileDetails') {
             return '/confirmProfileDetails';
@@ -81,6 +93,7 @@ GoRouter goRouter(GoRouterRef ref) {
 
       return null;
     },
+
     routes: [
       GoRoute(
         path: '/onboarding',

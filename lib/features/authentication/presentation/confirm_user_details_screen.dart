@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:reboot_app_3/core/helpers/app_regex.dart';
 import 'package:reboot_app_3/core/helpers/date_display_formater.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/routing/route_names.dart';
@@ -14,7 +15,7 @@ import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/features/authentication/application/migration_service.dart';
 import 'package:reboot_app_3/features/authentication/data/models/legacy_user_document.dart';
-import 'package:reboot_app_3/features/authentication/providers/user_document_provider.dart';
+import 'package:reboot_app_3/features/authentication/providers/legacy_document_provider.dart';
 
 class ConfirmUserDetailsScreen extends ConsumerStatefulWidget {
   const ConfirmUserDetailsScreen({Key? key}) : super(key: key);
@@ -71,7 +72,7 @@ class _ConfirmUserDetailsScreenState
 
   @override
   Widget build(BuildContext context) {
-    final userDocumentAsyncValue = ref.watch(userDocumentNotifierProvider);
+    final userDocumentAsyncValue = ref.watch(legacyDocumentNotifierProvider);
     final theme = CustomThemeInherited.of(context);
     final locale = ref.watch(localeNotifierProvider);
     final migrateService = ref.watch(migrationServiceProvider);
@@ -123,11 +124,11 @@ class _ConfirmUserDetailsScreenState
                     prefixIcon: LucideIcons.user,
                     inputType: TextInputType.name,
                     validator: (value) {
-                      //TODO: do the actual validation for this specifc field
                       if (value == null || value.isEmpty) {
                         return AppLocalizations.of(context)
                             .translate('cant-be-empty');
                       }
+                      return null;
                     },
                   ),
                   verticalSpace(Spacing.points8),
@@ -137,10 +138,13 @@ class _ConfirmUserDetailsScreenState
                     prefixIcon: LucideIcons.mail,
                     inputType: TextInputType.emailAddress,
                     validator: (value) {
-                      //TODO: do the actual validation for this specifc field
                       if (value == null || value.isEmpty) {
                         return AppLocalizations.of(context)
                             .translate('cant-be-empty');
+                      }
+                      if (!AppRegex.isEmailValid(value)) {
+                        return AppLocalizations.of(context)
+                            .translate('invalid-email');
                       }
                       return null;
                     },
@@ -191,7 +195,6 @@ class _ConfirmUserDetailsScreenState
                           prefixIcon: LucideIcons.calendar,
                           inputType: TextInputType.datetime,
                           validator: (value) {
-                            //TODO: do the actual validation for this specifc field
                             if (value == null || value.isEmpty) {
                               return AppLocalizations.of(context)
                                   .translate('cant-be-empty');
@@ -211,8 +214,6 @@ class _ConfirmUserDetailsScreenState
                     prefixIcon: LucideIcons.calendar,
                     inputType: TextInputType.datetime,
                     validator: (value) {
-                      //TODO: do the actual validation for this specifc field
-
                       if (value == null || value.isEmpty) {
                         return AppLocalizations.of(context)
                             .translate('cant-be-empty');

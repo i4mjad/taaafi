@@ -118,7 +118,7 @@ class FirebaseAuthMethods {
     try {
       await _auth.currentUser?.delete();
     } on FirebaseAuthException catch (e) {
-      getSystemSnackBar(context, e.toString());
+      getErrorSnackBar(context, e.code);
     }
   }
 
@@ -129,6 +129,25 @@ class FirebaseAuthMethods {
       getSnackBar(context, "password-link-has-been-sent-to", email);
     } on FirebaseAuthException catch (e) {
       getErrorSnackBar(context, e.code);
+    } catch (e) {
+      getSystemSnackBar(context, e.toString());
+    }
+  }
+
+  Future<void> createUserDocument(
+    BuildContext context,
+    String name,
+    DateTime dob,
+    String gender,
+    String locale,
+    DateTime firstDate,
+  ) async {
+    try {
+      var user = _auth.currentUser;
+      await _authService.createUserDocument(
+          user!, name, dob, gender, locale, firstDate);
+    } on FirebaseAuthException catch (e) {
+      getSystemSnackBar(context, e.message ?? e.toString());
     } catch (e) {
       getSystemSnackBar(context, e.toString());
     }

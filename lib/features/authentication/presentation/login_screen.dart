@@ -152,10 +152,11 @@ class _SignInFormState extends ConsumerState<SignInForm> {
             prefixIcon: LucideIcons.mail,
             inputType: TextInputType.emailAddress,
             validator: (value) {
-              //TODO: do the actual validation for this specifc field
-              if (value == null ||
-                  value.isEmpty ||
-                  !AppRegex.isEmailValid(value)) {
+              if (value == null || value.isEmpty) {
+                return AppLocalizations.of(context).translate('cant-be-empty');
+              }
+
+              if (!AppRegex.isEmailValid(value)) {
                 return AppLocalizations.of(context).translate('invalid-email');
               }
               return null;
@@ -204,7 +205,6 @@ class _SignInFormState extends ConsumerState<SignInForm> {
             onTap: () async {
               final email = emailController.value.text;
               final password = passwordController.value.text;
-              //TODO: validate before sending
 
               if (_formKey.currentState!.validate()) {
                 await authRepositoryNotifier.signInWithEmail(
