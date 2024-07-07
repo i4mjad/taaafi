@@ -7,7 +7,7 @@ part of 'new_document_provider.dart';
 // **************************************************************************
 
 String _$newUserDocumentNotifierHash() =>
-    r'8f1c2a237177be0afd6ea983ae861ead947fbb7c';
+    r'753357fc8a5d45f52d38f03e43c2a309447ceabe';
 
 /// See also [NewUserDocumentNotifier].
 @ProviderFor(NewUserDocumentNotifier)

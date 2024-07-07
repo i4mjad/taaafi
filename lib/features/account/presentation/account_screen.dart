@@ -8,6 +8,8 @@ import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/custom_theme_data.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
+import 'package:reboot_app_3/features/account/data/models/user_profile.dart';
+import 'package:reboot_app_3/features/account/data/user_profile_notifier.dart';
 import 'package:reboot_app_3/features/authentication/data/repositories/auth_repository.dart';
 
 class AccountScreen extends ConsumerWidget {
@@ -16,77 +18,84 @@ class AccountScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final authRepository = ref.watch(authRepositoryProvider);
+    final userProfileState = ref.watch(userProfileNotifierProvider);
     return Scaffold(
-      appBar: appBar(context, ref, 'account', false),
-      body: Padding(
-        padding: const EdgeInsets.only(left: 16.0, right: 16, top: 16),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              UserDetailsWidget(),
-              verticalSpace(Spacing.points24),
-              Text(
-                AppLocalizations.of(context).translate('app-settings'),
-                style: TextStyles.h6,
+        appBar: appBar(context, ref, 'account', false),
+        body: userProfileState.when(
+          data: (userProfile) {
+            return Padding(
+              padding: const EdgeInsets.only(left: 16.0, right: 16, top: 16),
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    UserDetailsWidget(userProfile!),
+                    verticalSpace(Spacing.points24),
+                    Text(
+                      AppLocalizations.of(context).translate('app-settings'),
+                      style: TextStyles.h6,
+                    ),
+                    verticalSpace(Spacing.points8),
+                    SettingsButton(
+                      icon: LucideIcons.database,
+                      textKey: 'daily-notification-time',
+                    ),
+                    verticalSpace(Spacing.points4),
+                    SettingsButton(
+                      icon: LucideIcons.smartphone,
+                      textKey: 'ui-settings',
+                    ),
+                    verticalSpace(Spacing.points16),
+                    Text(
+                      AppLocalizations.of(context)
+                          .translate('account-settings'),
+                      style: TextStyles.h6,
+                    ),
+                    verticalSpace(Spacing.points8),
+                    SettingsButton(
+                      icon: LucideIcons.userCog,
+                      textKey: 'delete-my-data',
+                    ),
+                    verticalSpace(Spacing.points4),
+                    SettingsButton(
+                      icon: LucideIcons.logOut,
+                      textKey: 'log-out',
+                      action: () {
+                        authRepository.signOut();
+                      },
+                    ),
+                    verticalSpace(Spacing.points4),
+                    SettingsButton(
+                      icon: LucideIcons.userX,
+                      textKey: 'delete-my-account',
+                      type: 'error',
+                    ),
+                    verticalSpace(Spacing.points16),
+                    Text(
+                      AppLocalizations.of(context).translate('about-app'),
+                      style: TextStyles.h6,
+                    ),
+                    verticalSpace(Spacing.points8),
+                    SettingsButton(
+                      icon: LucideIcons.heart,
+                      textKey: 'version-number',
+                      type: 'app',
+                    ),
+                    verticalSpace(Spacing.points4),
+                    SettingsButton(
+                      icon: LucideIcons.laptop,
+                      textKey: 'contact-us-through-this-channels',
+                    ),
+                    verticalSpace(Spacing.points4),
+                  ],
+                ),
               ),
-              verticalSpace(Spacing.points8),
-              SettingsButton(
-                icon: LucideIcons.database,
-                textKey: 'daily-notification-time',
-              ),
-              verticalSpace(Spacing.points4),
-              SettingsButton(
-                icon: LucideIcons.smartphone,
-                textKey: 'ui-settings',
-              ),
-              verticalSpace(Spacing.points16),
-              Text(
-                AppLocalizations.of(context).translate('account-settings'),
-                style: TextStyles.h6,
-              ),
-              verticalSpace(Spacing.points8),
-              SettingsButton(
-                icon: LucideIcons.userCog,
-                textKey: 'delete-my-data',
-              ),
-              verticalSpace(Spacing.points4),
-              SettingsButton(
-                icon: LucideIcons.logOut,
-                textKey: 'log-out',
-                action: () {
-                  authRepository.signOut();
-                },
-              ),
-              verticalSpace(Spacing.points4),
-              SettingsButton(
-                icon: LucideIcons.userX,
-                textKey: 'delete-my-account',
-                type: 'error',
-              ),
-              verticalSpace(Spacing.points16),
-              Text(
-                AppLocalizations.of(context).translate('about-app'),
-                style: TextStyles.h6,
-              ),
-              verticalSpace(Spacing.points8),
-              SettingsButton(
-                icon: LucideIcons.heart,
-                textKey: 'version-number',
-                type: 'app',
-              ),
-              verticalSpace(Spacing.points4),
-              SettingsButton(
-                icon: LucideIcons.laptop,
-                textKey: 'contact-us-through-this-channels',
-              ),
-              verticalSpace(Spacing.points4),
-            ],
-          ),
-        ),
-      ),
-    );
+            );
+          },
+          error: (error, stackTrace) => Center(child: Text('Error: $error')),
+          loading: () => Center(child: CircularProgressIndicator()),
+        ));
   }
 }
 
@@ -171,10 +180,11 @@ class SettingsButton extends StatelessWidget {
 }
 
 class UserDetailsWidget extends StatelessWidget {
-  const UserDetailsWidget({
+  const UserDetailsWidget(
+    this.userProfile, {
     super.key,
   });
-
+  final UserProfile userProfile;
   @override
   Widget build(BuildContext context) {
     final theme = CustomThemeInherited.of(context);
@@ -189,31 +199,40 @@ class UserDetailsWidget extends StatelessWidget {
       ),
       cornerSmoothing: 1,
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          CircleAvatar(
-            backgroundColor: theme.grey[100],
-            child: Icon(
-              LucideIcons.user,
-            ),
-          ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          Row(
             children: [
-              Text(
-                "أمجد خلفان",
-                style: TextStyles.h6.copyWith(color: theme.grey[900]),
+              CircleAvatar(
+                backgroundColor: theme.grey[100],
+                child: Icon(
+                  LucideIcons.user,
+                ),
               ),
-              verticalSpace(Spacing.points4),
-              Text(
-                "akalsulimani@gmail.com",
-                style: TextStyles.caption.copyWith(color: theme.grey[600]),
-              ),
-              verticalSpace(Spacing.points4),
-              Text(
-                " ذكر " + "•" + " 26 سنة " + "•" + " مسجل منذ أغسطس  2022 ",
-                style: TextStyles.caption.copyWith(color: theme.grey[600]),
+              horizontalSpace(Spacing.points16),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    userProfile.displayName,
+                    style: TextStyles.h6.copyWith(color: theme.grey[900]),
+                  ),
+                  verticalSpace(Spacing.points4),
+                  Text(
+                    userProfile.email,
+                    style: TextStyles.caption.copyWith(color: theme.grey[600]),
+                  ),
+                  verticalSpace(Spacing.points4),
+                  Text(
+                    AppLocalizations.of(context).translate(userProfile.gender) +
+                        " • " +
+                        userProfile.age.toString() +
+                        " " +
+                        AppLocalizations.of(context).translate('years'),
+                    style: TextStyles.caption.copyWith(color: theme.grey[600]),
+                  ),
+                ],
               ),
             ],
           ),
