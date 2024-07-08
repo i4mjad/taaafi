@@ -1,56 +1,72 @@
 import 'dart:io';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:reboot_app_3/features/authentication/data/models/new_user_document.dart';
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:reboot_app_3/core/routing/route_names.dart';
+import 'package:reboot_app_3/features/authentication/data/repositories/auth_repository.dart';
 import 'package:reboot_app_3/features/authentication/data/repositories/migeration_repository.dart';
+import 'package:reboot_app_3/shared/components/snackbar.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'auth_service.g.dart';
 
 @riverpod
 AuthService authService(ref) {
-  return AuthService(ref.watch(fcmRepositoryProvider));
+  return AuthService(ref.watch(firebaseAuthProvider),
+      ref.watch(authRepositoryProvider), ref.watch(fcmRepositoryProvider));
 }
 
 class AuthService {
+  final FirebaseAuth _auth;
+  final AuthRepository _authRepository;
   final FCMRepository _fcmRepository;
 
-  AuthService(this._fcmRepository);
+  AuthService(this._auth, this._authRepository, this._fcmRepository);
 
-  Future<NewUserDocument> createUserDocument(
-    User user,
+  Future<void> signUpWithEmail(
+    BuildContext context,
+    String email,
+    String password,
     String name,
     DateTime dob,
     String gender,
     String locale,
     DateTime firstDate,
   ) async {
-    final fcmToken = await _fcmRepository.getMessagingToken();
-    final deviceId = await _getDeviceId();
-    final userDocument = NewUserDocument(
-      uid: user.uid,
-      devicesIds: [deviceId],
-      displayName: name,
-      email: user.email as String,
-      gender: gender,
-      locale: locale,
-      dayOfBirth: Timestamp.fromDate(dob),
-      userFirstDate: Timestamp.fromDate(firstDate),
-      role: "user",
-      messagingToken: fcmToken,
-      bookmarkedContentIds: [],
-    );
+    try {
+      final credential = await _auth.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
 
-    return userDocument;
+      final fcmToken = await _fcmRepository.getMessagingToken();
+      final deviceId = await _getDeviceId();
+
+      await _authRepository.creatUserDocuemnt(
+        context,
+        credential.user,
+        name,
+        dob,
+        gender,
+        locale,
+        firstDate,
+        fcmToken,
+        deviceId,
+      );
+    } on FirebaseAuthException catch (e) {
+      getSnackBar(context, e.code);
+    } catch (e) {
+      getSystemSnackBar(
+        context,
+        e.toString(),
+      );
+    }
   }
 
-  Future<User?> getUser() async {
-    return await FirebaseAuth.instance.currentUser;
-  }
-
-  _getDeviceId() async {
+  Future<String> _getDeviceId() async {
     DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
     String deviceInfoStr = '';
     if (Platform.isAndroid) {
@@ -63,5 +79,145 @@ class AuthService {
           : "";
     }
     return deviceInfoStr;
+  }
+
+  Future<void> signInWithGoogle(BuildContext context) async {
+    try {
+      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser!.authentication;
+
+      if (googleAuth.accessToken != null && googleAuth.idToken != null) {
+        final credential = GoogleAuthProvider.credential(
+            accessToken: googleAuth.accessToken, idToken: googleAuth.idToken);
+
+        final userCredential = await _auth.signInWithCredential(credential);
+
+        var userDocumentExist = await _authRepository.isUserDocumentExist();
+
+        if (userCredential.user != null && !userDocumentExist) {
+          context.goNamed(RouteNames.completeAccountRegisteration.name);
+        }
+      }
+    } on FirebaseAuthException catch (e) {
+      getSystemSnackBar(context, e.toString());
+    }
+  }
+
+  Future<void> signInWithApple(BuildContext context) async {
+    try {
+      final appleProvider = AppleAuthProvider();
+      final credential = await _auth.signInWithProvider(appleProvider);
+
+      var userDocumentExist = await _authRepository.isUserDocumentExist();
+
+      if (credential.user != null && !userDocumentExist) {
+        context.goNamed(RouteNames.completeAccountRegisteration.name);
+      }
+    } on FirebaseAuthException catch (e) {
+      getSystemSnackBar(context, e.toString());
+    }
+  }
+
+  Future<void> signInWithEmail(
+    BuildContext context,
+    String emailAddress,
+    String password,
+  ) async {
+    try {
+      await _auth.signInWithEmailAndPassword(
+        email: emailAddress,
+        password: password,
+      );
+
+      var userDocumentExist = await _authRepository.isUserDocumentExist();
+
+      if (!userDocumentExist) {
+        context.goNamed(RouteNames.completeAccountRegisteration.name);
+      }
+    } on FirebaseAuthException catch (e) {
+      getSnackBar(context, e.code);
+    } catch (e) {
+      getSystemSnackBar(context, e.toString());
+    }
+  }
+
+  Future<void> reSignInWithApple(BuildContext context) async {
+    try {
+      final appleProvider = AppleAuthProvider();
+      await _auth.currentUser?.reauthenticateWithProvider(appleProvider);
+    } on FirebaseAuthException catch (e) {
+      getSystemSnackBar(context, e.toString());
+    }
+  }
+
+  Future<void> reSignInWithGoogle(BuildContext context) async {
+    try {
+      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser!.authentication;
+
+      if (googleAuth.accessToken != null && googleAuth.idToken != null) {
+        final credential = GoogleAuthProvider.credential(
+            accessToken: googleAuth.accessToken, idToken: googleAuth.idToken);
+
+        await _auth.currentUser?.reauthenticateWithCredential(credential);
+      }
+    } on FirebaseAuthException catch (e) {
+      getSystemSnackBar(context, e.toString());
+    }
+  }
+
+  Future<void> signOut() async {
+    await _auth.signOut();
+  }
+
+  Future<void> deleteAccount(BuildContext context) async {
+    try {
+      await _authRepository.deleteUserDocument();
+      await _auth.currentUser?.delete();
+    } on FirebaseAuthException catch (e) {
+      getErrorSnackBar(context, e.code);
+    }
+  }
+
+  Future<void> sendForgotPasswordLink(
+      BuildContext context, String email) async {
+    try {
+      await _auth.sendPasswordResetEmail(email: email);
+      getSnackBar(context, "password-link-has-been-sent-to", email);
+    } on FirebaseAuthException catch (e) {
+      getErrorSnackBar(context, e.code);
+    } catch (e) {
+      getSystemSnackBar(context, e.toString());
+    }
+  }
+
+  Future<User?> getUser() async {
+    return await _authRepository.currentUser;
+  }
+
+  Future<void> completeAccountRegiseration(
+    BuildContext context,
+    String name,
+    DateTime dob,
+    String gender,
+    String locale,
+    DateTime firstDate,
+  ) async {
+    final user = await _authRepository.currentUser;
+    final fcmToken = await _fcmRepository.getMessagingToken();
+    final deviceId = await _getDeviceId();
+    await _authRepository.creatUserDocuemnt(
+      context,
+      user,
+      name,
+      dob,
+      gender,
+      locale,
+      firstDate,
+      fcmToken,
+      deviceId,
+    );
   }
 }

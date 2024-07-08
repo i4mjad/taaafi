@@ -9,7 +9,7 @@ import 'package:reboot_app_3/core/shared_widgets/custom_textfield.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
-import 'package:reboot_app_3/features/authentication/data/repositories/auth_repository.dart';
+import 'package:reboot_app_3/features/authentication/application/auth_service.dart';
 
 class ForgotPasswordScreen extends ConsumerStatefulWidget {
   const ForgotPasswordScreen({super.key});
@@ -33,7 +33,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = CustomThemeInherited.of(context);
-    final authRepository = ref.watch(authRepositoryProvider);
+    final authService = ref.watch(authServiceProvider);
     return Scaffold(
       appBar: appBar(context, ref, 'forget-password', true),
       body: Form(
@@ -63,7 +63,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
               GestureDetector(
                 onTap: () async {
                   if (_formKey.currentState!.validate()) {
-                    await authRepository.sendForgotPasswordLink(
+                    await authService.sendForgotPasswordLink(
                         context, emailController.value.text);
                   }
                 },

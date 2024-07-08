@@ -125,7 +125,7 @@ class MigrationService {
     await _migerationRepository.updateUserDocument(newDocuemnt);
   }
 
-  _getDeviceId() async {
+  Future<String> _getDeviceId() async {
     DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
     String deviceInfoStr = '';
     if (Platform.isAndroid) {

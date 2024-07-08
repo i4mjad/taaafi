@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:reboot_app_3/features/authentication/data/models/legacy_user_document.dart';
 import 'package:reboot_app_3/features/authentication/data/repositories/auth_repository.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -11,16 +12,35 @@ class LegacyDocumentNotifier extends _$LegacyDocumentNotifier {
 
   @override
   FutureOr<LegacyUserDocument?> build() async {
-    return _fetchUserDocument();
+    return await _fetchLegacyUserDocument();
   }
 
-  Future<LegacyUserDocument?> _fetchUserDocument() async {
+  Future<LegacyUserDocument?> _fetchLegacyUserDocument() async {
     try {
-      final uid = ref.watch(firebaseAuthProvider).currentUser?.uid;
+      state = const AsyncLoading(); // Indicate loading state
+      final uid = FirebaseAuth.instance.currentUser?.uid;
+      if (uid == null) {
+        throw Exception("User ID is null");
+      }
+
       final doc = await _firestore.collection('users').doc(uid).get();
 
-      return LegacyUserDocument.fromFirestore(doc);
-    } catch (e) {
+      if (!doc.exists) {
+        return null; // No document found
+      }
+
+      var map = doc.data();
+      if (map == null) {
+        return null; // No document data
+      }
+
+      var legacyUserDocument = LegacyUserDocument.fromFirestore(doc);
+
+      
+      state = AsyncValue.data(legacyUserDocument); // Update state with data
+      return legacyUserDocument;
+    } catch (e, stack) {
+      state = AsyncValue.error(e, stack); // Update state with error
       return null;
     }
   }

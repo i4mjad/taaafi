@@ -13,6 +13,7 @@ import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/features/authentication/application/auth_service.dart';
 import 'package:reboot_app_3/features/authentication/data/repositories/auth_repository.dart';
+import 'package:reboot_app_3/features/authentication/providers/new_document_provider.dart';
 
 class SignUpScreen extends ConsumerWidget {
   const SignUpScreen({super.key});
@@ -130,6 +131,7 @@ class _SignUpFormState extends ConsumerState<SignUpForm> {
   Widget build(BuildContext context) {
     final locale = ref.watch(localeNotifierProvider);
     final authRepository = ref.watch(authRepositoryProvider);
+    final newUserNotifier = ref.watch(newUserDocumentNotifierProvider.notifier);
     final authService = ref.watch(authServiceProvider);
     final theme = CustomThemeInherited.of(context);
 
@@ -419,13 +421,13 @@ class _SignUpFormState extends ConsumerState<SignUpForm> {
           GestureDetector(
             onTap: () async {
               if (_formKey.currentState!.validate() && isTermsAccepted) {
-                //1. create the user and get the user
                 final name = nameController.value.text;
                 final selectedDob = dob;
                 final gender = selectedGender.value;
                 final locale = selectedLanguage.value;
                 final firstDate = startingDate;
-                await authRepository.signUpWithEmail(
+
+                await authService.signUpWithEmail(
                   context,
                   emailController.value.text,
                   passwordController.value.text,
@@ -461,5 +463,4 @@ class _SignUpFormState extends ConsumerState<SignUpForm> {
       ),
     );
   }
-
 }

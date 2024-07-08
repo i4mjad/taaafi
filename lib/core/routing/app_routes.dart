@@ -26,12 +26,13 @@ part 'app_routes.g.dart';
 @riverpod
 GoRouter goRouter(GoRouterRef ref) {
   final authState = ref.watch(authStateChangesProvider);
-  final legacyUserDocumentState = ref.watch(legacyDocumentNotifierProvider);
   final newUserDocumentState = ref.watch(newUserDocumentNotifierProvider);
+  final legacyUserDocumentState = ref.watch(legacyDocumentNotifierProvider);
 
   return GoRouter(
     initialLocation: '/home',
     navigatorKey: rootNavigatorKey,
+    // debugLogDiagnostics: true,
     redirect: (context, state) async {
       final isLoggedIn = authState.asData?.value != null;
 
@@ -90,6 +91,7 @@ GoRouter goRouter(GoRouterRef ref) {
         }
       } else {
         // Non-logged-in user trying to access protected routes
+
         final isAuthRoute = state.matchedLocation.startsWith('/onboarding');
         if (!isAuthRoute && state.matchedLocation != '/onboarding') {
           return '/onboarding';
@@ -98,6 +100,7 @@ GoRouter goRouter(GoRouterRef ref) {
 
       return null;
     },
+
     routes: [
       GoRoute(
         path: '/loading',

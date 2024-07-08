@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
-import 'package:reboot_app_3/core/helpers/app_regex.dart';
 import 'package:reboot_app_3/core/helpers/date_display_formater.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/shared_widgets/app_bar.dart';
@@ -12,10 +11,11 @@ import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/features/authentication/application/auth_service.dart';
-import 'package:reboot_app_3/features/authentication/data/repositories/auth_repository.dart';
 import 'package:reboot_app_3/features/authentication/providers/new_document_provider.dart';
 import 'package:reboot_app_3/features/authentication/providers/user_provider.dart';
 import 'package:reboot_app_3/shared/components/snackbar.dart';
+import 'package:go_router/go_router.dart';
+import 'package:reboot_app_3/core/routing/route_names.dart';
 
 class CompleteAccountRegisterationScreen extends ConsumerStatefulWidget {
   const CompleteAccountRegisterationScreen({super.key});
@@ -107,7 +107,7 @@ class _CompleteAccountRegisterationScreenState
   @override
   Widget build(BuildContext context) {
     final locale = ref.watch(localeNotifierProvider);
-    final authRepository = ref.watch(authRepositoryProvider);
+
     final authService = ref.watch(authServiceProvider);
     final theme = CustomThemeInherited.of(context);
 
@@ -194,18 +194,10 @@ class _CompleteAccountRegisterationScreenState
                                 controller: emailController,
                                 hint: AppLocalizations.of(context)
                                     .translate('email'),
+                                enabled: false,
                                 prefixIcon: LucideIcons.mail,
                                 inputType: TextInputType.emailAddress,
                                 validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return AppLocalizations.of(context)
-                                        .translate('cant-be-empty');
-                                  }
-
-                                  if (!AppRegex.isEmailValid(value)) {
-                                    return AppLocalizations.of(context)
-                                        .translate('invalid-email');
-                                  }
                                   return null;
                                 },
                               ),
@@ -379,10 +371,14 @@ class _CompleteAccountRegisterationScreenState
                             final locale = selectedLanguage.value;
                             final firstDate = startingDate;
 
-                            await ref
+                            await authService.completeAccountRegiseration(
+                                context, name, dob, gender, locale, firstDate);
+
+                            // Update the state and redirect to home
+                            ref
                                 .read(newUserDocumentNotifierProvider.notifier)
-                                .createNewUserDocument(
-                                    name, dob, gender, locale, firstDate);
+                                .build();
+                            context.goNamed(RouteNames.home.name);
                           }
                         },
                         child: Padding(

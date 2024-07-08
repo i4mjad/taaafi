@@ -10,14 +10,14 @@ import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/features/account/data/models/user_profile.dart';
 import 'package:reboot_app_3/features/account/data/user_profile_notifier.dart';
-import 'package:reboot_app_3/features/authentication/data/repositories/auth_repository.dart';
+import 'package:reboot_app_3/features/authentication/application/auth_service.dart';
 
 class AccountScreen extends ConsumerWidget {
   const AccountScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final authRepository = ref.watch(authRepositoryProvider);
+    final AuthService authService = ref.watch(authServiceProvider);
     final userProfileState = ref.watch(userProfileNotifierProvider);
     return Scaffold(
         appBar: appBar(context, ref, 'account', false),
@@ -66,15 +66,22 @@ class AccountScreen extends ConsumerWidget {
                     SettingsButton(
                       icon: LucideIcons.logOut,
                       textKey: 'log-out',
-                      action: () {
-                        authRepository.signOut();
+                      action: () async {
+                        await authService.signOut();
                       },
                     ),
                     verticalSpace(Spacing.points4),
-                    SettingsButton(
-                      icon: LucideIcons.userX,
-                      textKey: 'delete-my-account',
-                      type: 'error',
+                    GestureDetector(
+                      onTap: () async {
+                        //TODO: this should be selected based on the provider, for testing purposes we will use Google
+                        await authService.reSignInWithGoogle(context);
+                        await authService.deleteAccount(context);
+                      },
+                      child: SettingsButton(
+                        icon: LucideIcons.userX,
+                        textKey: 'delete-my-account',
+                        type: 'error',
+                      ),
                     ),
                     verticalSpace(Spacing.points16),
                     Text(
@@ -122,7 +129,7 @@ class SettingsButton extends StatelessWidget {
     return GestureDetector(
       onTap: action,
       child: WidgetsContainer(
-        padding: EdgeInsets.all(12),
+        padding: EdgeInsets.all(14),
         backgroundColor: _getBackgroundColor(type, theme),
         borderRadius: BorderRadius.circular(10.5),
         borderSide: BorderSide(color: _getBorderColor(type, theme), width: 1),

@@ -12,14 +12,14 @@ import 'package:reboot_app_3/core/shared_widgets/custom_textfield.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
-import 'package:reboot_app_3/features/authentication/data/repositories/auth_repository.dart';
+import 'package:reboot_app_3/features/authentication/application/auth_service.dart';
 
 class LogInScreen extends ConsumerWidget {
   const LogInScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final authRepository = ref.watch(authRepositoryProvider);
+    final authService = ref.watch(authServiceProvider);
     final theme = CustomThemeInherited.of(context);
     return Scaffold(
       backgroundColor: theme.backgroundColor,
@@ -65,7 +65,7 @@ class LogInScreen extends ConsumerWidget {
                 children: [
                   GestureDetector(
                     onTap: () async {
-                      await authRepository.signInWithApple(context);
+                      await authService.signInWithApple(context);
                     },
                     child: Container(
                       height: 60,
@@ -87,7 +87,7 @@ class LogInScreen extends ConsumerWidget {
                   horizontalSpace(Spacing.points4),
                   GestureDetector(
                     onTap: () async {
-                      await authRepository.signInWithGoogle(context);
+                      await authService.signInWithGoogle(context);
                     },
                     child: Container(
                       height: 60,
@@ -141,7 +141,7 @@ class _SignInFormState extends ConsumerState<SignInForm> {
   @override
   Widget build(BuildContext context) {
     final theme = CustomThemeInherited.of(context);
-    final authRepositoryNotifier = ref.watch(authRepositoryProvider);
+    final authService = ref.watch(authServiceProvider);
     return Form(
       key: _formKey,
       child: Column(
@@ -207,7 +207,7 @@ class _SignInFormState extends ConsumerState<SignInForm> {
               final password = passwordController.value.text;
 
               if (_formKey.currentState!.validate()) {
-                await authRepositoryNotifier.signInWithEmail(
+                await authService.signInWithEmail(
                   context,
                   email,
                   password,
