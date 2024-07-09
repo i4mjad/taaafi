@@ -188,6 +188,8 @@
   "english": "English",
   "arabic": "العربية",
 
+  "admin":"مدير",
+  "user":"عضو",
   "years": "سنة",
   "cant-be-empty": "لا يمكن أن يكون هذا الحقل فارغًا",
   "enter-a-valid-dob": "اختر تاريخ ميلادك الفعلي",

@@ -67,7 +67,7 @@ class AccountScreen extends ConsumerWidget {
                       icon: LucideIcons.logOut,
                       textKey: 'log-out',
                       action: () async {
-                        await authService.signOut();
+                        await authService.signOut(context, ref);
                       },
                     ),
                     verticalSpace(Spacing.points4),
@@ -75,7 +75,7 @@ class AccountScreen extends ConsumerWidget {
                       onTap: () async {
                         //TODO: this should be selected based on the provider, for testing purposes we will use Google
                         await authService.reSignInWithGoogle(context);
-                        await authService.deleteAccount(context);
+                        await authService.deleteAccount(context, ref);
                       },
                       child: SettingsButton(
                         icon: LucideIcons.userX,
@@ -218,9 +218,7 @@ class UserDetailsWidget extends StatelessWidget {
             children: [
               CircleAvatar(
                 backgroundColor: theme.grey[100],
-                child: Icon(
-                  LucideIcons.user,
-                ),
+                child: Icon(LucideIcons.user),
               ),
               horizontalSpace(Spacing.points16),
               Column(
@@ -228,12 +226,16 @@ class UserDetailsWidget extends StatelessWidget {
                 children: [
                   Text(
                     userProfile.displayName,
-                    style: TextStyles.h6.copyWith(color: theme.grey[900]),
+                    style: TextStyles.h6.copyWith(
+                      color: theme.grey[900],
+                    ),
                   ),
                   verticalSpace(Spacing.points4),
                   Text(
                     userProfile.email,
-                    style: TextStyles.caption.copyWith(color: theme.grey[600]),
+                    style: TextStyles.caption.copyWith(
+                      color: theme.grey[600],
+                    ),
                   ),
                   verticalSpace(Spacing.points4),
                   Text(
@@ -241,8 +243,14 @@ class UserDetailsWidget extends StatelessWidget {
                         " • " +
                         userProfile.age.toString() +
                         " " +
-                        AppLocalizations.of(context).translate('years'),
-                    style: TextStyles.caption.copyWith(color: theme.grey[600]),
+                        AppLocalizations.of(context).translate('years') +
+                        " • " +
+                        AppLocalizations.of(context).translate(
+                          userProfile.role,
+                        ),
+                    style: TextStyles.caption.copyWith(
+                      color: theme.grey[600],
+                    ),
                   ),
                 ],
               ),

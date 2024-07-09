@@ -59,8 +59,9 @@
   "complete-account-registeration": "Complete Registeration",
   "terms-should-be-accepted": "Terms should be accepted",
 
-
   "years": "Years",
+  "admin": "Admin",
+  "user": "User",
 
   "cant-be-empty": "This field can't be empty",
   "enter-a-valid-dob": "Enter a valid Day of Birth",

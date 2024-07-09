@@ -6,6 +6,7 @@ class UserProfile {
   final String email;
   final String gender;
   final String locale;
+  final String role;
   final DateTime dayOfBirth;
   final DateTime userFirstDate;
 
@@ -17,6 +18,7 @@ class UserProfile {
     required this.locale,
     required this.dayOfBirth,
     required this.userFirstDate,
+    required this.role,
   });
 
   factory UserProfile.fromFirestore(DocumentSnapshot doc) {
@@ -27,6 +29,7 @@ class UserProfile {
       email: data['email'],
       gender: data['gender'],
       locale: data['locale'],
+      role: data['role'],
       dayOfBirth: (data['dayOfBirth'] as Timestamp?)!.toDate(),
       userFirstDate: (data['userFirstDate'] as Timestamp?)!.toDate(),
     );
@@ -38,6 +41,7 @@ class UserProfile {
       'email': email,
       'gender': gender,
       'locale': locale,
+      'role': role,
       'dayOfBirth': dayOfBirth != null ? Timestamp.fromDate(dayOfBirth) : null,
       'userFirstDate':
           userFirstDate != null ? Timestamp.fromDate(userFirstDate) : null,

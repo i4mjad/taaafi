@@ -3,11 +3,13 @@ import 'dart:io';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:reboot_app_3/core/routing/route_names.dart';
 import 'package:reboot_app_3/features/authentication/data/repositories/auth_repository.dart';
 import 'package:reboot_app_3/features/authentication/data/repositories/migeration_repository.dart';
+import 'package:reboot_app_3/features/authentication/providers/legacy_document_provider.dart';
+import 'package:reboot_app_3/features/authentication/providers/new_document_provider.dart';
+import 'package:reboot_app_3/features/authentication/providers/user_provider.dart';
 import 'package:reboot_app_3/shared/components/snackbar.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -15,8 +17,11 @@ part 'auth_service.g.dart';
 
 @riverpod
 AuthService authService(ref) {
-  return AuthService(ref.watch(firebaseAuthProvider),
-      ref.watch(authRepositoryProvider), ref.watch(fcmRepositoryProvider));
+  return AuthService(
+    ref.watch(firebaseAuthProvider),
+    ref.watch(authRepositoryProvider),
+    ref.watch(fcmRepositoryProvider),
+  );
 }
 
 class AuthService {
@@ -89,15 +94,11 @@ class AuthService {
 
       if (googleAuth.accessToken != null && googleAuth.idToken != null) {
         final credential = GoogleAuthProvider.credential(
-            accessToken: googleAuth.accessToken, idToken: googleAuth.idToken);
+          accessToken: googleAuth.accessToken,
+          idToken: googleAuth.idToken,
+        );
 
         final userCredential = await _auth.signInWithCredential(credential);
-
-        var userDocumentExist = await _authRepository.isUserDocumentExist();
-
-        if (userCredential.user != null && !userDocumentExist) {
-          context.goNamed(RouteNames.completeAccountRegisteration.name);
-        }
       }
     } on FirebaseAuthException catch (e) {
       getSystemSnackBar(context, e.toString());
@@ -108,12 +109,6 @@ class AuthService {
     try {
       final appleProvider = AppleAuthProvider();
       final credential = await _auth.signInWithProvider(appleProvider);
-
-      var userDocumentExist = await _authRepository.isUserDocumentExist();
-
-      if (credential.user != null && !userDocumentExist) {
-        context.goNamed(RouteNames.completeAccountRegisteration.name);
-      }
     } on FirebaseAuthException catch (e) {
       getSystemSnackBar(context, e.toString());
     }
@@ -129,12 +124,6 @@ class AuthService {
         email: emailAddress,
         password: password,
       );
-
-      var userDocumentExist = await _authRepository.isUserDocumentExist();
-
-      if (!userDocumentExist) {
-        context.goNamed(RouteNames.completeAccountRegisteration.name);
-      }
     } on FirebaseAuthException catch (e) {
       getSnackBar(context, e.code);
     } catch (e) {
@@ -159,7 +148,9 @@ class AuthService {
 
       if (googleAuth.accessToken != null && googleAuth.idToken != null) {
         final credential = GoogleAuthProvider.credential(
-            accessToken: googleAuth.accessToken, idToken: googleAuth.idToken);
+          accessToken: googleAuth.accessToken,
+          idToken: googleAuth.idToken,
+        );
 
         await _auth.currentUser?.reauthenticateWithCredential(credential);
       }
@@ -168,14 +159,24 @@ class AuthService {
     }
   }
 
-  Future<void> signOut() async {
-    await _auth.signOut();
+  Future<void> signOut(BuildContext context, WidgetRef ref) async {
+    try {
+      await _auth.signOut();
+
+      ref.invalidate(userNotifierProvider);
+      ref.invalidate(newUserDocumentNotifierProvider);
+      ref.invalidate(legacyDocumentNotifierProvider);
+    } catch (e) {}
   }
 
-  Future<void> deleteAccount(BuildContext context) async {
+  Future<void> deleteAccount(BuildContext context, WidgetRef ref) async {
     try {
       await _authRepository.deleteUserDocument();
       await _auth.currentUser?.delete();
+
+      ref.invalidate(userNotifierProvider);
+      ref.invalidate(newUserDocumentNotifierProvider);
+      ref.invalidate(legacyDocumentNotifierProvider);
     } on FirebaseAuthException catch (e) {
       getErrorSnackBar(context, e.code);
     }

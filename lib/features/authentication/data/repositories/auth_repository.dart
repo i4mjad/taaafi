@@ -27,10 +27,8 @@ class AuthRepository {
   }
 
   Future<bool> isUserDocumentExist() async {
-    print("Checking if user document exists for: ${_auth.currentUser?.uid}");
     final docRef =
         await _firestore.collection('users').doc(_auth.currentUser?.uid).get();
-    print("Document exists: ${docRef.exists}");
     return docRef.exists; // Correctly check if the document exists
   }
 
