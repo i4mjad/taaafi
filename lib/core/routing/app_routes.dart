@@ -25,8 +25,6 @@ part 'app_routes.g.dart';
 @riverpod
 GoRouter goRouter(GoRouterRef ref) {
   final authState = ref.watch(authStateChangesProvider);
-  // final newUserDocumentState = ref.watch(newUserDocumentNotifierProvider);
-  // final legacyUserDocumentState = ref.watch(legacyDocumentNotifierProvider);
   final userDocumentState = ref.watch(userDocumentsNotifierProvider);
   var userDocumentNotifer = ref.read(userDocumentsNotifierProvider.notifier);
 
@@ -39,10 +37,13 @@ GoRouter goRouter(GoRouterRef ref) {
 
       if (isLoggedIn) {
         // Fetch the user document state
-
+        final userDocumentState = ref.watch(userDocumentsNotifierProvider);
         final isLoading = userDocumentState is AsyncLoading;
         final hasError = userDocumentState is AsyncError;
-        final userDocument = userDocumentState.valueOrNull;
+        final userDocument = userDocumentState.asData?.value;
+
+        print(
+            "Redirection: isLoading: $isLoading, hasError: $hasError, userDocument: $userDocument");
 
         // Always navigate to the loading screen if the document state is loading
         if (isLoading) {
@@ -55,18 +56,26 @@ GoRouter goRouter(GoRouterRef ref) {
         // If document is null or has errors, redirect to complete account registration
         if (userDocument == null || hasError) {
           if (state.matchedLocation != '/completeAccountRegisteration') {
+            print("User document is null or has error once logged in");
+            print(
+                userDocument); // This is null once I log in, but on hard restart it's okay and loading
+            print("we are here there is an issue in Spot 1");
             return '/completeAccountRegisteration';
           }
           return null;
         }
 
         // Check if the user document is legacy or new
+        final userDocumentNotifier =
+            ref.read(userDocumentsNotifierProvider.notifier);
+        final isLegacy =
+            userDocumentNotifier.isLegacyUserDocument(userDocument);
+        final isNew = userDocumentNotifier.isNewUserDocument(userDocument);
 
-        final isLegacy = userDocumentNotifer.isLegacyUserDocument(userDocument);
-        final isNew = userDocumentNotifer.isNewUserDocument(userDocument);
+        print("Redirection: isLegacy: $isLegacy, isNew: $isNew");
 
         // Check for missing required data
-        if (userDocumentNotifer.hasMissingData(userDocument)) {
+        if (userDocumentNotifier.hasMissingData(userDocument)) {
           if (state.matchedLocation != '/completeAccountRegisteration') {
             return '/completeAccountRegisteration';
           }
@@ -74,7 +83,7 @@ GoRouter goRouter(GoRouterRef ref) {
         }
 
         // Check for old document structure in the legacy document
-        if (isLegacy && await userDocumentNotifer.hasOldStructure()) {
+        if (isLegacy && await userDocumentNotifier.hasOldStructure()) {
           if (state.matchedLocation != '/confirmProfileDetails') {
             return '/confirmProfileDetails';
           }
@@ -270,44 +279,8 @@ class EmptyPlaceholderWidget extends ConsumerWidget {
               textAlign: TextAlign.center,
             ),
             verticalSpace(Spacing.points16),
-            PrimaryButton(
-              onPressed: () {
-                final isLoggedIn =
-                    ref.watch(authRepositoryProvider).currentUser != null;
-                context.goNamed(
-                    isLoggedIn ? RouteNames.home.name : RouteNames.login.name);
-              },
-              text: 'Go Home',
-            )
           ],
         ),
-      ),
-    );
-  }
-}
-
-class PrimaryButton extends StatelessWidget {
-  const PrimaryButton(
-      {super.key, required this.text, this.isLoading = false, this.onPressed});
-  final String text;
-  final bool isLoading;
-  final VoidCallback? onPressed;
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height: 48,
-      child: ElevatedButton(
-        onPressed: onPressed,
-        child: isLoading
-            ? const CircularProgressIndicator()
-            : Text(
-                text,
-                textAlign: TextAlign.center,
-                style: Theme.of(context)
-                    .textTheme
-                    .titleLarge!
-                    .copyWith(color: Colors.white),
-              ),
       ),
     );
   }

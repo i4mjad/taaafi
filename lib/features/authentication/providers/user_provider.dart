@@ -16,6 +16,7 @@ class UserNotifier extends _$UserNotifier {
 
   Future<User?> _fetchLoggedInUser() async {
     try {
+      state = AsyncValue.data(_auth.currentUser);
       return _auth.currentUser;
     } catch (e) {
       return null;

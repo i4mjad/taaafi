@@ -12,31 +12,53 @@ class UserDocumentsNotifier extends _$UserDocumentsNotifier {
 
   @override
   FutureOr<UserDocument?> build() async {
+    print("UserDocumentsNotifier: build called");
     return await _fetchUserDocument();
   }
 
   Future<UserDocument?> _fetchUserDocument() async {
-    try {
-      state = const AsyncLoading(); // Indicate loading state
+    int retries = 150; // Number of retries
+    while (retries > 0) {
+      try {
+        state = const AsyncLoading(); // Indicate loading state
+        print("UserDocumentsNotifier: Fetching user document");
 
-      final uid = FirebaseAuth.instance.currentUser?.uid;
-      if (uid == null) {
-        throw Exception("User ID is null");
+        final user = FirebaseAuth.instance.currentUser;
+        if (user == null) {
+          print(
+              "UserDocumentsNotifier: User is not authenticated, retrying...");
+          retries--;
+          await Future.delayed(
+              Duration(seconds: 1)); // Wait for a second before retrying
+          continue;
+        }
+
+        final uid = user.uid;
+        print("UserDocumentsNotifier: User ID is $uid");
+
+        final doc = await _firestore.collection('users').doc(uid).get();
+        if (!doc.exists) {
+          print("UserDocumentsNotifier: No document found");
+          return null; // No document found
+        }
+
+        var userDocument = UserDocument.fromFirestore(doc);
+        print("UserDocumentsNotifier: Document fetched successfully");
+        print("UserDocumentsNotifier: ${userDocument.toString()}");
+
+        state = AsyncValue.data(userDocument); // Update state with data
+        return userDocument;
+      } catch (e, stack) {
+        print("UserDocumentsNotifier: Error fetching document - $e");
+        state = AsyncValue.error(e, stack); // Update state with error
+        return null;
       }
-
-      final doc = await _firestore.collection('users').doc(uid).get();
-      if (!doc.exists) {
-        return null; // No document found
-      }
-
-      var userDocument = UserDocument.fromFirestore(doc);
-
-      state = AsyncValue.data(userDocument); // Update state with data
-      return userDocument;
-    } catch (e, stack) {
-      state = AsyncValue.error(e, stack); // Update state with error
-      return null;
     }
+
+    print("UserDocumentsNotifier: Failed to fetch user document after retries");
+    state = const AsyncValue.error(
+        "Failed to fetch user document after retries", StackTrace.empty);
+    return null;
   }
 
   bool isLegacyUserDocument(UserDocument userDocument) {

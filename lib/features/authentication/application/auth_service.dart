@@ -162,7 +162,7 @@ class AuthService {
     try {
       await _auth.signOut();
 
-      ref.invalidate(userNotifierProvider);
+      // ref.invalidate(userNotifierProvider);
       ref.invalidate(userDocumentsNotifierProvider);
     } catch (e) {}
   }
