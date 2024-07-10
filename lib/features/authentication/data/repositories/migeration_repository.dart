@@ -3,7 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:reboot_app_3/features/authentication/application/migration_service.dart';
 import 'package:reboot_app_3/features/authentication/data/models/FollowUp.dart';
-import 'package:reboot_app_3/features/authentication/data/models/new_user_document.dart';
+import 'package:reboot_app_3/features/authentication/data/models/user_document.dart';
 import 'package:reboot_app_3/features/authentication/data/repositories/auth_repository.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -52,7 +52,7 @@ class MigerationRepository {
     return await batch.commit();
   }
 
-  Future<void> updateUserDocument(NewUserDocument newDocument) async {
+  Future<void> updateUserDocument(UserDocument newDocument) async {
     final uid = _auth.currentUser?.uid;
     if (uid == null) {
       // Handle the case where the user is not authenticated
@@ -65,7 +65,7 @@ class MigerationRepository {
     final docRef = _firestore.collection('users').doc(uid);
 
     try {
-      await docRef.update(newDocument.toMap());
+      await docRef.update(newDocument.toFirestore());
     } catch (e) {
       // Handle potential errors
       print('Failed to update user document: $e');
@@ -73,7 +73,6 @@ class MigerationRepository {
     }
   }
 }
-
 
 class FCMRepository {
   FirebaseMessaging _messaging;

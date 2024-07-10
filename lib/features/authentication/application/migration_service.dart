@@ -6,8 +6,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:reboot_app_3/features/authentication/data/models/FollowUp.dart';
-import 'package:reboot_app_3/features/authentication/data/models/legacy_user_document.dart';
-import 'package:reboot_app_3/features/authentication/data/models/new_user_document.dart';
+import 'package:reboot_app_3/features/authentication/data/models/user_document.dart';
 import 'package:reboot_app_3/features/authentication/data/repositories/migeration_repository.dart';
 
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -39,10 +38,10 @@ class MigrationService {
 
   MigrationService(this._fcmRepository, this._migerationRepository);
 
-  Future<void> migrateToNewDocuemntStrcture(LegacyUserDocument document) async {
+  Future<void> migrateToNewDocuemntStrcture(UserDocument document) async {
     final userDoc = await _migerationRepository.getUserDocMap();
 
-    final legacyDoc = LegacyUserDocument.fromFirestore(userDoc);
+    final legacyDoc = UserDocument.fromFirestore(userDoc);
 
     await _migrateFollowups(
       legacyDoc.userRelapses,
@@ -102,13 +101,13 @@ class MigrationService {
     await _migerationRepository.bulkFollowUpsInsertion(followUps);
   }
 
-  Future<void> _updateUserDocument(LegacyUserDocument document) async {
+  Future<void> _updateUserDocument(UserDocument document) async {
     String fcmToken = await _fcmRepository.getMessagingToken();
 
     var deviceId = await _getDeviceId();
 
     String role = "user";
-    NewUserDocument newDocuemnt = NewUserDocument(
+    UserDocument newDocuemnt = UserDocument(
       uid: document.uid!,
       devicesIds: [deviceId],
       displayName: document.displayName!,

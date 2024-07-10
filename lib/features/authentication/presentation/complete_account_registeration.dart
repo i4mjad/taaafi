@@ -11,7 +11,7 @@ import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/features/authentication/application/auth_service.dart';
-import 'package:reboot_app_3/features/authentication/providers/new_document_provider.dart';
+import 'package:reboot_app_3/features/authentication/providers/user_document_provider.dart';
 import 'package:reboot_app_3/features/authentication/providers/user_provider.dart';
 import 'package:reboot_app_3/shared/components/snackbar.dart';
 import 'package:go_router/go_router.dart';
@@ -376,7 +376,7 @@ class _CompleteAccountRegisterationScreenState
 
                             // Update the state and redirect to home
                             ref
-                                .read(newUserDocumentNotifierProvider.notifier)
+                                .read(userDocumentsNotifierProvider.notifier)
                                 .build();
                             context.goNamed(RouteNames.home.name);
                           }

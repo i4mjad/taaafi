@@ -14,8 +14,8 @@ import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/features/authentication/application/migration_service.dart';
-import 'package:reboot_app_3/features/authentication/data/models/legacy_user_document.dart';
-import 'package:reboot_app_3/features/authentication/providers/legacy_document_provider.dart';
+import 'package:reboot_app_3/features/authentication/data/models/user_document.dart';
+import 'package:reboot_app_3/features/authentication/providers/user_document_provider.dart';
 
 class ConfirmUserDetailsScreen extends ConsumerStatefulWidget {
   const ConfirmUserDetailsScreen({Key? key}) : super(key: key);
@@ -72,7 +72,7 @@ class _ConfirmUserDetailsScreenState
 
   @override
   Widget build(BuildContext context) {
-    final userDocumentAsyncValue = ref.watch(legacyDocumentNotifierProvider);
+    final userDocumentAsyncValue = ref.watch(userDocumentsNotifierProvider);
     final theme = CustomThemeInherited.of(context);
     final locale = ref.watch(localeNotifierProvider);
     final migrateService = ref.watch(migrationServiceProvider);
@@ -237,7 +237,7 @@ class _ConfirmUserDetailsScreenState
                       final selectedGender = this.selectedGender;
                       final selectedLocale = this.selectedLocale;
                       await migrateService.migrateToNewDocuemntStrcture(
-                        LegacyUserDocument(
+                        UserDocument(
                           uid: uid,
                           displayName: displayName,
                           dayOfBirth: parseDisplayDate(

@@ -7,8 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:reboot_app_3/features/authentication/data/repositories/auth_repository.dart';
 import 'package:reboot_app_3/features/authentication/data/repositories/migeration_repository.dart';
-import 'package:reboot_app_3/features/authentication/providers/legacy_document_provider.dart';
-import 'package:reboot_app_3/features/authentication/providers/new_document_provider.dart';
+import 'package:reboot_app_3/features/authentication/providers/user_document_provider.dart';
 import 'package:reboot_app_3/features/authentication/providers/user_provider.dart';
 import 'package:reboot_app_3/shared/components/snackbar.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -164,8 +163,7 @@ class AuthService {
       await _auth.signOut();
 
       ref.invalidate(userNotifierProvider);
-      ref.invalidate(newUserDocumentNotifierProvider);
-      ref.invalidate(legacyDocumentNotifierProvider);
+      ref.invalidate(userDocumentsNotifierProvider);
     } catch (e) {}
   }
 
@@ -175,8 +173,8 @@ class AuthService {
       await _auth.currentUser?.delete();
 
       ref.invalidate(userNotifierProvider);
-      ref.invalidate(newUserDocumentNotifierProvider);
-      ref.invalidate(legacyDocumentNotifierProvider);
+
+      ref.invalidate(userDocumentsNotifierProvider);
     } on FirebaseAuthException catch (e) {
       getErrorSnackBar(context, e.code);
     }

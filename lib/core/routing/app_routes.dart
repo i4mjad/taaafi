@@ -12,9 +12,8 @@ import 'package:reboot_app_3/features/authentication/presentation/confirm_user_d
 import 'package:reboot_app_3/features/authentication/presentation/forgot_password_screen.dart';
 import 'package:reboot_app_3/features/authentication/presentation/login_screen.dart';
 import 'package:reboot_app_3/features/authentication/presentation/signup_screen.dart';
-import 'package:reboot_app_3/features/authentication/providers/legacy_document_provider.dart';
+import 'package:reboot_app_3/features/authentication/providers/user_document_provider.dart';
 import 'package:reboot_app_3/features/authentication/data/repositories/auth_repository.dart';
-import 'package:reboot_app_3/features/authentication/providers/new_document_provider.dart';
 import 'package:reboot_app_3/features/fellowship/presentation/fellowship_screen.dart';
 import 'package:reboot_app_3/features/home/presentation/home_screen.dart';
 import 'package:reboot_app_3/features/onboarding/presentation/onboarding_screen.dart';
@@ -26,8 +25,10 @@ part 'app_routes.g.dart';
 @riverpod
 GoRouter goRouter(GoRouterRef ref) {
   final authState = ref.watch(authStateChangesProvider);
-  final newUserDocumentState = ref.watch(newUserDocumentNotifierProvider);
-  final legacyUserDocumentState = ref.watch(legacyDocumentNotifierProvider);
+  // final newUserDocumentState = ref.watch(newUserDocumentNotifierProvider);
+  // final legacyUserDocumentState = ref.watch(legacyDocumentNotifierProvider);
+  final userDocumentState = ref.watch(userDocumentsNotifierProvider);
+  var userDocumentNotifer = ref.read(userDocumentsNotifierProvider.notifier);
 
   return GoRouter(
     initialLocation: '/home',
@@ -37,34 +38,35 @@ GoRouter goRouter(GoRouterRef ref) {
       final isLoggedIn = authState.asData?.value != null;
 
       if (isLoggedIn) {
-        // If either document state is still loading, navigate to the loading screen
-        if (legacyUserDocumentState is AsyncLoading ||
-            newUserDocumentState is AsyncLoading) {
+        // Fetch the user document state
+
+        final isLoading = userDocumentState is AsyncLoading;
+        final hasError = userDocumentState is AsyncError;
+        final userDocument = userDocumentState.valueOrNull;
+
+        // Always navigate to the loading screen if the document state is loading
+        if (isLoading) {
           if (state.matchedLocation != '/loading') {
             return '/loading';
           }
           return null;
         }
 
-        final legacyUserDocument = legacyUserDocumentState.value;
-        final newUserDocument = newUserDocumentState.value;
-
-        // If both legacyUserDocumentState and newUserDocumentState have errors or are null, redirect to complete account registration
-        if ((legacyUserDocument == null && newUserDocument == null) ||
-            (legacyUserDocumentState is AsyncError &&
-                newUserDocumentState is AsyncError)) {
+        // If document is null or has errors, redirect to complete account registration
+        if (userDocument == null || hasError) {
           if (state.matchedLocation != '/completeAccountRegisteration') {
             return '/completeAccountRegisteration';
           }
           return null;
         }
 
-        final legacyUserDocNotifier =
-            ref.read(legacyDocumentNotifierProvider.notifier);
+        // Check if the user document is legacy or new
 
-        // Check for missing required data in the legacy document
-        if (legacyUserDocument != null &&
-            legacyUserDocNotifier.hasMissingData(legacyUserDocument)) {
+        final isLegacy = userDocumentNotifer.isLegacyUserDocument(userDocument);
+        final isNew = userDocumentNotifer.isNewUserDocument(userDocument);
+
+        // Check for missing required data
+        if (userDocumentNotifer.hasMissingData(userDocument)) {
           if (state.matchedLocation != '/completeAccountRegisteration') {
             return '/completeAccountRegisteration';
           }
@@ -72,9 +74,7 @@ GoRouter goRouter(GoRouterRef ref) {
         }
 
         // Check for old document structure in the legacy document
-        final hasOldStructure = await legacyUserDocNotifier.hasOldStructure();
-
-        if (hasOldStructure) {
+        if (isLegacy && await userDocumentNotifer.hasOldStructure()) {
           if (state.matchedLocation != '/confirmProfileDetails') {
             return '/confirmProfileDetails';
           }
@@ -82,7 +82,7 @@ GoRouter goRouter(GoRouterRef ref) {
         }
 
         // Allow navigation to other routes if the user has the new document structure
-        if (newUserDocument != null) {
+        if (isNew) {
           if (state.matchedLocation.startsWith('/onboarding') ||
               state.matchedLocation == '/loading') {
             return '/home';
@@ -91,7 +91,6 @@ GoRouter goRouter(GoRouterRef ref) {
         }
       } else {
         // Non-logged-in user trying to access protected routes
-
         final isAuthRoute = state.matchedLocation.startsWith('/onboarding');
         if (!isAuthRoute && state.matchedLocation != '/onboarding') {
           return '/onboarding';

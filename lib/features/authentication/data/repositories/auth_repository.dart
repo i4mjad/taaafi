@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:reboot_app_3/core/routing/route_names.dart';
 import 'package:reboot_app_3/features/authentication/application/migration_service.dart';
-import 'package:reboot_app_3/features/authentication/data/models/new_user_document.dart';
+import 'package:reboot_app_3/features/authentication/data/models/user_document.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'auth_repository.g.dart';
@@ -46,7 +46,7 @@ class AuthRepository {
     if (user == null) {
       return null;
     }
-    final userDocument = NewUserDocument(
+    final userDocument = UserDocument(
       uid: user.uid,
       devicesIds: [deviceId],
       displayName: name,
@@ -61,7 +61,7 @@ class AuthRepository {
     );
 
     await _firestore.collection("users").doc(userDocument.uid).set(
-          userDocument.toMap(),
+          userDocument.toFirestore(),
         );
 
     final documentExist = await isUserDocumentExist();
