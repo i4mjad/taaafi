@@ -19,6 +19,7 @@ class AccountScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final AuthService authService = ref.watch(authServiceProvider);
     final userProfileState = ref.watch(userProfileNotifierProvider);
+    final theme = CustomThemeInherited.of(context);
     return Scaffold(
         appBar: appBar(context, ref, 'account', false),
         body: userProfileState.when(
@@ -99,7 +100,30 @@ class AccountScreen extends ConsumerWidget {
                       icon: LucideIcons.laptop,
                       textKey: 'contact-us-through-this-channels',
                     ),
-                    verticalSpace(Spacing.points4),
+                    verticalSpace(Spacing.points12),
+                    Container(
+                      width: MediaQuery.of(context).size.width - 32,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            AppLocalizations.of(context)
+                                .translate('sponsored-by'),
+                            style: TextStyles.bodyLarge
+                                .copyWith(color: theme.primary[600]),
+                          ),
+                          verticalSpace(Spacing.points8),
+                          //TODO: update the text to be Awalim logo
+                          Text(
+                            'منصة عوالم',
+                            style:
+                                TextStyles.h4.copyWith(color: theme.warn[500]),
+                          ),
+                        ],
+                      ),
+                    ),
+                    verticalSpace(Spacing.points12),
                   ],
                 ),
               ),
