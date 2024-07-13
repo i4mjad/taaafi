@@ -26,24 +26,19 @@ part 'app_routes.g.dart';
 GoRouter goRouter(GoRouterRef ref) {
   final authState = ref.watch(authStateChangesProvider);
   final userDocumentState = ref.watch(userDocumentsNotifierProvider);
-  var userDocumentNotifer = ref.read(userDocumentsNotifierProvider.notifier);
+  final userDocumentNotifier = ref.read(userDocumentsNotifierProvider.notifier);
 
   return GoRouter(
     initialLocation: '/home',
     navigatorKey: rootNavigatorKey,
-    // debugLogDiagnostics: true,
     redirect: (context, state) async {
       final isLoggedIn = authState.asData?.value != null;
 
       if (isLoggedIn) {
         // Fetch the user document state
-        final userDocumentState = ref.watch(userDocumentsNotifierProvider);
         final isLoading = userDocumentState is AsyncLoading;
         final hasError = userDocumentState is AsyncError;
-        final userDocument = userDocumentState.asData?.value;
-
-        print(
-            "Redirection: isLoading: $isLoading, hasError: $hasError, userDocument: $userDocument");
+        final userDocument = userDocumentState.valueOrNull;
 
         // Always navigate to the loading screen if the document state is loading
         if (isLoading) {
@@ -56,23 +51,15 @@ GoRouter goRouter(GoRouterRef ref) {
         // If document is null or has errors, redirect to complete account registration
         if (userDocument == null || hasError) {
           if (state.matchedLocation != '/completeAccountRegisteration') {
-            print("User document is null or has error once logged in");
-            print(
-                userDocument); // This is null once I log in, but on hard restart it's okay and loading
-            print("we are here there is an issue in Spot 1");
             return '/completeAccountRegisteration';
           }
           return null;
         }
 
         // Check if the user document is legacy or new
-        final userDocumentNotifier =
-            ref.read(userDocumentsNotifierProvider.notifier);
         final isLegacy =
             userDocumentNotifier.isLegacyUserDocument(userDocument);
         final isNew = userDocumentNotifier.isNewUserDocument(userDocument);
-
-        print("Redirection: isLegacy: $isLegacy, isNew: $isNew");
 
         // Check for missing required data
         if (userDocumentNotifier.hasMissingData(userDocument)) {
@@ -108,7 +95,6 @@ GoRouter goRouter(GoRouterRef ref) {
 
       return null;
     },
-
     routes: [
       GoRoute(
         path: '/loading',
