@@ -73,12 +73,13 @@ class _ConfirmUserDetailsScreenState
   @override
   Widget build(BuildContext context) {
     final userDocumentAsyncValue = ref.watch(userDocumentsNotifierProvider);
-    final theme = CustomThemeInherited.of(context);
+    final theme = AppTheme.of(context);
     final locale = ref.watch(localeNotifierProvider);
     final migrateService = ref.watch(migrationServiceProvider);
 
     return Scaffold(
-      appBar: appBar(context, ref, 'confirm-your-details', true,true),
+      backgroundColor: theme.backgroundColor,
+      appBar: appBar(context, ref, 'confirm-your-details', true, true),
       body: userDocumentAsyncValue.when(
         data: (userDocument) {
           if (userDocument == null) {

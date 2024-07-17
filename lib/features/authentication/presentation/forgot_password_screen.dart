@@ -32,10 +32,11 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = CustomThemeInherited.of(context);
+    final theme = AppTheme.of(context);
     final authService = ref.watch(authServiceProvider);
     return Scaffold(
-      appBar: appBar(context, ref, 'forget-password', true,true),
+      backgroundColor: theme.backgroundColor,
+      appBar: appBar(context, ref, 'forget-password', true, true),
       body: Form(
         key: _formKey,
         child: Padding(

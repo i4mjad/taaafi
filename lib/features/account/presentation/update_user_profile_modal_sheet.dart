@@ -48,7 +48,7 @@ class _UpdateUserProfileModalSheetState
 
   @override
   Widget build(BuildContext context) {
-    final theme = CustomThemeInherited.of(context);
+    final theme = AppTheme.of(context);
     final userProfileAsync = ref.watch(userProfileNotifierProvider);
 
     return Scaffold(
@@ -172,7 +172,7 @@ class _UpdateUserProfileModalSheetState
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        final theme = CustomThemeInherited.of(context);
+        final theme = AppTheme.of(context);
         return AlertDialog(
           actionsAlignment: MainAxisAlignment.start,
           backgroundColor: theme.backgroundColor,

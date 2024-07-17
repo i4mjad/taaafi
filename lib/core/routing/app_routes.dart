@@ -236,7 +236,7 @@ class LoadingScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final theme = CustomThemeInherited.of(context);
+    final theme = AppTheme.of(context);
     return Scaffold(
       backgroundColor: theme.backgroundColor,
       body: Center(

@@ -13,7 +13,7 @@ class MyApp extends ConsumerWidget {
     final goRouter = ref.watch(goRouterProvider);
     final theme = ref.watch(customThemeProvider);
     final locale = ref.watch(localeNotifierProvider);
-    return CustomThemeInherited(
+    return AppTheme(
       customThemeData:
           currentTheme.darkTheme ? darkCustomTheme : lightCustomTheme,
       child: MaterialApp.router(

@@ -21,7 +21,7 @@ class CustomSegmentedButton extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final theme = CustomThemeInherited.of(context);
+    final theme = AppTheme.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

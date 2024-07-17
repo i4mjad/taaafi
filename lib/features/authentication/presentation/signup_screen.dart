@@ -20,16 +20,11 @@ class SignUpScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final theme = CustomThemeInherited.of(context);
+    final theme = AppTheme.of(context);
     return Scaffold(
       backgroundColor: theme.backgroundColor,
       resizeToAvoidBottomInset: false,
-      appBar: appBar(
-        context,
-        ref,
-        'sign-up',
-        true,true
-      ),
+      appBar: appBar(context, ref, 'sign-up', true, true),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -133,7 +128,7 @@ class _SignUpFormState extends ConsumerState<SignUpForm> {
     final authRepository = ref.watch(authRepositoryProvider);
     final newUserNotifier = ref.watch(userDocumentsNotifierProvider.notifier);
     final authService = ref.watch(authServiceProvider);
-    final theme = CustomThemeInherited.of(context);
+    final theme = AppTheme.of(context);
 
     return Form(
       key: _formKey,

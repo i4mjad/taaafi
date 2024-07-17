@@ -15,15 +15,10 @@ class OnBoardingScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final theme = CustomThemeInherited.of(context);
+    final theme = AppTheme.of(context);
     return Scaffold(
       backgroundColor: theme.backgroundColor,
-      appBar: appBar(
-        context,
-        ref,
-        null,
-        true,true
-      ),
+      appBar: appBar(context, ref, null, true, true),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
@@ -123,7 +118,7 @@ class OnboardingSection extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final theme = CustomThemeInherited.of(context);
+    final theme = AppTheme.of(context);
     return Container(
       padding: EdgeInsets.only(right: 32, left: 32),
       child: Row(

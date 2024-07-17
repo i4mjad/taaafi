@@ -20,10 +20,10 @@ class LogInScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final authService = ref.watch(authServiceProvider);
-    final theme = CustomThemeInherited.of(context);
+    final theme = AppTheme.of(context);
     return Scaffold(
       backgroundColor: theme.backgroundColor,
-      appBar: appBar(context, ref, 'login', true,true),
+      appBar: appBar(context, ref, 'login', true, true),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -140,7 +140,7 @@ class _SignInFormState extends ConsumerState<SignInForm> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = CustomThemeInherited.of(context);
+    final theme = AppTheme.of(context);
     final authService = ref.watch(authServiceProvider);
     return Form(
       key: _formKey,

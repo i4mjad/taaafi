@@ -7,7 +7,7 @@ import 'package:reboot_app_3/core/theming/text_styles.dart';
 
 AppBar appBar(BuildContext context, WidgetRef ref, String? titleTranslationKey,
     bool showLocaleChangeIcon, bool automaticallyImplyLeading) {
-  final theme = CustomThemeInherited.of(context);
+  final theme = AppTheme.of(context);
   return AppBar(
     title: Text(
       titleTranslationKey != null

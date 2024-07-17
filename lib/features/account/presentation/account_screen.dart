@@ -9,6 +9,7 @@ import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/custom_theme_data.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
+import 'package:reboot_app_3/core/theming/theme_provider.dart';
 import 'package:reboot_app_3/features/account/data/models/user_profile.dart';
 import 'package:reboot_app_3/features/account/data/user_profile_notifier.dart';
 import 'package:reboot_app_3/features/account/presentation/update_user_profile_modal_sheet.dart';
@@ -21,8 +22,10 @@ class AccountScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final AuthService authService = ref.watch(authServiceProvider);
     final userProfileState = ref.watch(userProfileNotifierProvider);
-    final theme = CustomThemeInherited.of(context);
+    final theme = AppTheme.of(context);
+    final customTheme = ref.watch(customThemeProvider);
     return Scaffold(
+        backgroundColor: theme.backgroundColor,
         appBar: appBar(context, ref, 'account', false, true),
         body: userProfileState.when(
           data: (userProfile) {
@@ -50,9 +53,15 @@ class AccountScreen extends ConsumerWidget {
                       textKey: 'daily-notification-time',
                     ),
                     verticalSpace(Spacing.points4),
-                    SettingsButton(
-                      icon: LucideIcons.smartphone,
-                      textKey: 'ui-settings',
+                    GestureDetector(
+                      onTap: () {
+                        HapticFeedback.mediumImpact();
+                        customTheme.toggleTheme();
+                      },
+                      child: SettingsButton(
+                        icon: LucideIcons.smartphone,
+                        textKey: 'ui-settings',
+                      ),
                     ),
                     verticalSpace(Spacing.points16),
                     Text(
@@ -151,7 +160,7 @@ class SettingsButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = CustomThemeInherited.of(context);
+    final theme = AppTheme.of(context);
     return GestureDetector(
       onTap: action,
       child: WidgetsContainer(
@@ -225,7 +234,7 @@ class UserDetailsWidget extends StatelessWidget {
   final UserProfile userProfile;
   @override
   Widget build(BuildContext context) {
-    final theme = CustomThemeInherited.of(context);
+    final theme = AppTheme.of(context);
     return WidgetsContainer(
       width: MediaQuery.of(context).size.width,
       padding: EdgeInsets.all(16),

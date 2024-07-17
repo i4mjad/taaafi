@@ -41,23 +41,23 @@ class CustomTheme extends ChangeNotifier {
 
 // Define the custom theme data
 
-class CustomThemeInherited extends InheritedWidget {
+class AppTheme extends InheritedWidget {
   final CustomThemeData customThemeData;
 
-  const CustomThemeInherited({
+  const AppTheme({
     required this.customThemeData,
     required Widget child,
   }) : super(child: child);
 
   static CustomThemeData of(BuildContext context) {
-    final CustomThemeInherited? result =
-        context.dependOnInheritedWidgetOfExactType<CustomThemeInherited>();
+    final AppTheme? result =
+        context.dependOnInheritedWidgetOfExactType<AppTheme>();
     assert(result != null, 'No CustomThemeInherited found in context');
     return result!.customThemeData;
   }
 
   @override
-  bool updateShouldNotify(CustomThemeInherited oldWidget) {
+  bool updateShouldNotify(AppTheme oldWidget) {
     return customThemeData != oldWidget.customThemeData;
   }
 }
@@ -97,7 +97,7 @@ ThemeData get darkTheme {
     focusColor: darkCustomTheme.primary[500],
     bottomAppBarTheme: BottomAppBarTheme(color: darkCustomTheme.grey[600]),
     appBarTheme: AppBarTheme(
-      backgroundColor: darkCustomTheme.secondary[700],
+      backgroundColor: darkCustomTheme.backgroundColor,
     ),
     indicatorColor: darkCustomTheme.primary[300],
   );

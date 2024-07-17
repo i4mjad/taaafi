@@ -22,7 +22,7 @@ void getSystemSnackBar(BuildContext context, String message) {
 }
 
 SnackBar errorSnackBar(BuildContext context, String messageId) {
-  final theme = CustomThemeInherited.of(context);
+  final theme = AppTheme.of(context);
   return SnackBar(
     behavior: SnackBarBehavior.floating,
     shape: RoundedRectangleBorder(
