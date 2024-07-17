@@ -59,10 +59,14 @@
   "complete-account-registeration": "Complete Registeration",
   "terms-should-be-accepted": "Terms should be accepted",
   "sponsored-by": "A Partnership With:",
+  "update-profile": "Update Profile",
+
+  "profile-updated": "Your profile has been updated!",
 
   "years": "Years",
   "admin": "Admin",
   "user": "User",
+  "confirm": "Confirm",
 
   "cant-be-empty": "This field can't be empty",
   "enter-a-valid-dob": "Enter a valid Day of Birth",
@@ -86,7 +90,7 @@
   "passwords-doesnt-match": "Passwords do not match",
   "english": "English",
   "arabic": "العربية",
-  "password-link-has-been-sent-to": "Password link has been sent to: ",
+  "password-link-has-been-sent-to": "Password link has been sent",
   "current-streak": "Current Streak",
   "free-relapse-days": "Days Without Relapses",
   "free-porn-days": "Days Without Porn",

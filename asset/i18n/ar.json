@@ -87,7 +87,7 @@
   "password": "كلمة السر",
   "forget-password": "نسيت كلمة السر؟",
   "send-reset-password-link": "أرسل رابط إعادة تعيين كلمة السر",
-  "password-link-has-been-sent-to": "تم إرسال رابط إعادة تعيين كلمة السر إلى: ",
+  "password-link-has-been-sent-to": "تم إرسال رابط إعادة تعيين كلمة السر",
   "sign-up": "تسجيل حساب جديد",
   "login-button": "تسجيل الدخول",
   "login-button-p": "اختر طريقة تسجيل الدخول المناسبة من الخدمات أدناه:",
@@ -140,6 +140,9 @@
   "Book": "كتاب",
   "Blog": "تدوينة",
 
+  "profile-updated": "تم تحديث بيانات حسابك بنجاح!",
+
+  "confirm": "تأكيد",
   "delete-user-dialog-confirm-button": "تأكيد",
   "delete-user-dialog-back-button": "العودة",
   "delete-user-dialog-title": "إعادة تعيين بيانات الحساب",
@@ -276,5 +279,6 @@
   "date-of-birth": "تاريخ الميلاد",
   "gender": "الجنس",
   "preferred-language": "اللفة المفضلة",
-  "data-are-secured": "نحن نحتفظ بمعلوماتك بأمان وسرية."
+  "data-are-secured": "نحن نحتفظ بمعلوماتك بأمان وسرية.",
+  "update-profile": "تحديث الملف الشخصي"
 }

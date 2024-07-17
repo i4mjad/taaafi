@@ -8,7 +8,7 @@ class FellowshipScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
-      appBar: appBar(context, ref, 'fellowship', false),
+      appBar: appBar(context, ref, 'fellowship', false,true),
       body: Center(
         child: Text("Fellowship"),
       ),

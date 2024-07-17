@@ -23,7 +23,7 @@ class LogInScreen extends ConsumerWidget {
     final theme = CustomThemeInherited.of(context);
     return Scaffold(
       backgroundColor: theme.backgroundColor,
-      appBar: appBar(context, ref, 'login', true),
+      appBar: appBar(context, ref, 'login', true,true),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),

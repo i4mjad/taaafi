@@ -22,7 +22,7 @@ class OnBoardingScreen extends ConsumerWidget {
         context,
         ref,
         null,
-        true,
+        true,true
       ),
       body: SafeArea(
         child: Padding(

@@ -184,7 +184,7 @@ class AuthService {
       BuildContext context, String email) async {
     try {
       await _auth.sendPasswordResetEmail(email: email);
-      getSnackBar(context, "password-link-has-been-sent-to", email);
+      getSnackBar(context, "password-link-has-been-sent-to");
     } on FirebaseAuthException catch (e) {
       getErrorSnackBar(context, e.code);
     } catch (e) {

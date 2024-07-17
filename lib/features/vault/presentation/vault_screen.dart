@@ -8,7 +8,7 @@ class VaultScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
-      appBar: appBar(context, ref, 'vault', false),
+      appBar: appBar(context, ref, 'vault', false, true),
       body: Center(
         child: Text("Vault"),
       ),

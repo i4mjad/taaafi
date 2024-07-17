@@ -111,12 +111,12 @@ class _CompleteAccountRegisterationScreenState
     final authService = ref.watch(authServiceProvider);
     final theme = CustomThemeInherited.of(context);
 
-    final userNotider = ref.watch(userNotifierProvider);
+    final userNotifer = ref.watch(userNotifierProvider);
 
     return Scaffold(
         backgroundColor: theme.backgroundColor,
-        appBar: appBar(context, ref, 'complete-account-registeration', false),
-        body: userNotider.when(
+        appBar: appBar(context, ref, 'complete-account-registeration', false,true),
+        body: userNotifer.when(
           data: (user) {
             if (user == null) {
               return Center(

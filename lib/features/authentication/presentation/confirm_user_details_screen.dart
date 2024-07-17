@@ -78,7 +78,7 @@ class _ConfirmUserDetailsScreenState
     final migrateService = ref.watch(migrationServiceProvider);
 
     return Scaffold(
-      appBar: appBar(context, ref, 'confirm-your-details', true),
+      appBar: appBar(context, ref, 'confirm-your-details', true,true),
       body: userDocumentAsyncValue.when(
         data: (userDocument) {
           if (userDocument == null) {

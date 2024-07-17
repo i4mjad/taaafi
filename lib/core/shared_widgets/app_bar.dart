@@ -6,7 +6,7 @@ import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 
 AppBar appBar(BuildContext context, WidgetRef ref, String? titleTranslationKey,
-    bool showLocaleChangeIcon) {
+    bool showLocaleChangeIcon, bool automaticallyImplyLeading) {
   final theme = CustomThemeInherited.of(context);
   return AppBar(
     title: Text(
@@ -24,7 +24,7 @@ AppBar appBar(BuildContext context, WidgetRef ref, String? titleTranslationKey,
     shadowColor: theme.grey[100],
     actions: loadedActions(ref, showLocaleChangeIcon),
     leadingWidth: 16,
-    automaticallyImplyLeading: true,
+    automaticallyImplyLeading: automaticallyImplyLeading,
   );
 }
 

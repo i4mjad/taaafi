@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
@@ -10,6 +11,7 @@ import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/features/account/data/models/user_profile.dart';
 import 'package:reboot_app_3/features/account/data/user_profile_notifier.dart';
+import 'package:reboot_app_3/features/account/presentation/update_user_profile_modal_sheet.dart';
 import 'package:reboot_app_3/features/authentication/application/auth_service.dart';
 
 class AccountScreen extends ConsumerWidget {
@@ -21,7 +23,7 @@ class AccountScreen extends ConsumerWidget {
     final userProfileState = ref.watch(userProfileNotifierProvider);
     final theme = CustomThemeInherited.of(context);
     return Scaffold(
-        appBar: appBar(context, ref, 'account', false),
+        appBar: appBar(context, ref, 'account', false, true),
         body: userProfileState.when(
           data: (userProfile) {
             if (userProfile == null) {
@@ -280,10 +282,23 @@ class UserDetailsWidget extends StatelessWidget {
               ),
             ],
           ),
-          Icon(
-            LucideIcons.edit,
-            size: 16,
-          )
+          GestureDetector(
+            onTap: () {
+              HapticFeedback.lightImpact();
+              showModalBottomSheet(
+                useSafeArea: true,
+                isScrollControlled: true,
+                useRootNavigator: true,
+                context: context,
+                backgroundColor: Colors.transparent,
+                builder: (context) => UpdateUserProfileModalSheet(),
+              );
+            },
+            child: Icon(
+              LucideIcons.edit,
+              size: 18,
+            ),
+          ),
         ],
       ),
     );

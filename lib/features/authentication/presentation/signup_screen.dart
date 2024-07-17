@@ -28,7 +28,7 @@ class SignUpScreen extends ConsumerWidget {
         context,
         ref,
         'sign-up',
-        true,
+        true,true
       ),
       body: SafeArea(
         child: Padding(
