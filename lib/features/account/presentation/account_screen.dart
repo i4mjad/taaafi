@@ -195,18 +195,18 @@ class SettingsButton extends StatelessWidget {
       case 'app':
         return theme.primary[600] as Color;
       default:
-        return theme.grey[50] as Color;
+        return theme.primary[50] as Color;
     }
   }
 
   Color _getTextColor(String? type, CustomThemeData theme) {
     switch (type) {
       case 'warn':
-        return theme.warn[600] as Color;
+        return theme.warn[900] as Color;
       case 'error':
-        return theme.error[600] as Color;
+        return theme.error[900] as Color;
       case 'app':
-        return theme.primary[50] as Color;
+        return theme.grey[50] as Color;
       default:
         return theme.grey[900] as Color;
     }
@@ -215,13 +215,13 @@ class SettingsButton extends StatelessWidget {
   Color _getBorderColor(String? type, CustomThemeData theme) {
     switch (type) {
       case 'warn':
-        return theme.warn[100] as Color;
+        return theme.warn[50] as Color;
       case 'error':
         return theme.error[100] as Color;
       case 'app':
-        return theme.primary[50] as Color;
+        return theme.primary[100] as Color;
       default:
-        return theme.grey[100] as Color;
+        return theme.primary[100] as Color;
     }
   }
 }

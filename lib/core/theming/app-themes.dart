@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:reboot_app_3/core/theming/custom_theme_data.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-CustomTheme currentTheme = CustomTheme();
-
 class CustomTheme extends ChangeNotifier {
   final String key = "theme";
   SharedPreferences? _prefs;

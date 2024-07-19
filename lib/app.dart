@@ -14,8 +14,7 @@ class MyApp extends ConsumerWidget {
     final theme = ref.watch(customThemeProvider);
     final locale = ref.watch(localeNotifierProvider);
     return AppTheme(
-      customThemeData:
-          currentTheme.darkTheme ? darkCustomTheme : lightCustomTheme,
+      customThemeData: theme.darkTheme ? darkCustomTheme : lightCustomTheme,
       child: MaterialApp.router(
         supportedLocales: [Locale('ar', ''), Locale('en', '')],
         locale: locale,

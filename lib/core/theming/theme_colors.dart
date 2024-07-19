@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class ThemeColors {
+class LightThemeColors {
   static const Color backgroundcolor = Color(0xfff8f8f8);
   static const Color primary50 = Color(0xffebf0f1);
   static const Color primary100 = Color(0xffc1d2d3);
@@ -74,114 +74,116 @@ class ThemeColors {
   static const Color error900 = Color(0xff5e0707);
 }
 
-const MaterialColor primarySwatch = MaterialColor(
+const MaterialColor lightPrimarySwatch = MaterialColor(
   0xff376d71,
   <int, Color>{
-    50: ThemeColors.primary50,
-    100: ThemeColors.primary100,
-    200: ThemeColors.primary200,
-    300: ThemeColors.primary300,
-    400: ThemeColors.primary400,
-    500: ThemeColors.primary500,
-    600: ThemeColors.primary600,
-    700: ThemeColors.primary700,
-    800: ThemeColors.primary800,
-    900: ThemeColors.primary900,
+    50: LightThemeColors.primary50,
+    100: LightThemeColors.primary100,
+    200: LightThemeColors.primary200,
+    300: LightThemeColors.primary300,
+    400: LightThemeColors.primary400,
+    500: LightThemeColors.primary500,
+    600: LightThemeColors.primary600,
+    700: LightThemeColors.primary700,
+    800: LightThemeColors.primary800,
+    900: LightThemeColors.primary900,
   },
 );
 
-const MaterialColor secondarySwatch = MaterialColor(
+const MaterialColor lightBackgroundSwatch =
+    MaterialColor(0xfff8f8f8, <int, Color>{});
+const MaterialColor lightSecondarySwatch = MaterialColor(
   0xff94c5c9,
   <int, Color>{
-    50: ThemeColors.secondary50,
-    100: ThemeColors.secondary100,
-    200: ThemeColors.secondary200,
-    300: ThemeColors.secondary300,
-    400: ThemeColors.secondary400,
-    500: ThemeColors.secondary500,
-    600: ThemeColors.secondary600,
-    700: ThemeColors.secondary700,
-    800: ThemeColors.secondary800,
-    900: ThemeColors.secondary900,
+    50: LightThemeColors.secondary50,
+    100: LightThemeColors.secondary100,
+    200: LightThemeColors.secondary200,
+    300: LightThemeColors.secondary300,
+    400: LightThemeColors.secondary400,
+    500: LightThemeColors.secondary500,
+    600: LightThemeColors.secondary600,
+    700: LightThemeColors.secondary700,
+    800: LightThemeColors.secondary800,
+    900: LightThemeColors.secondary900,
   },
 );
 
-const MaterialColor tintSwatch = MaterialColor(
+const MaterialColor lightTintSwatch = MaterialColor(
   0xffefc0aa,
   <int, Color>{
-    50: ThemeColors.tint50,
-    100: ThemeColors.tint100,
-    200: ThemeColors.tint200,
-    300: ThemeColors.tint300,
-    400: ThemeColors.tint400,
-    500: ThemeColors.tint500,
-    600: ThemeColors.tint600,
-    700: ThemeColors.tint700,
-    800: ThemeColors.tint800,
-    900: ThemeColors.tint900,
+    50: LightThemeColors.tint50,
+    100: LightThemeColors.tint100,
+    200: LightThemeColors.tint200,
+    300: LightThemeColors.tint300,
+    400: LightThemeColors.tint400,
+    500: LightThemeColors.tint500,
+    600: LightThemeColors.tint600,
+    700: LightThemeColors.tint700,
+    800: LightThemeColors.tint800,
+    900: LightThemeColors.tint900,
   },
 );
 
-const MaterialColor successSwatch = MaterialColor(
+const MaterialColor lightSuccessSwatch = MaterialColor(
   0xff38c172,
   <int, Color>{
-    50: ThemeColors.sucess50,
-    100: ThemeColors.sucess100,
-    200: ThemeColors.sucess200,
-    300: ThemeColors.sucess300,
-    400: ThemeColors.sucess400,
-    500: ThemeColors.sucess500,
-    600: ThemeColors.sucess600,
-    700: ThemeColors.sucess700,
-    800: ThemeColors.sucess800,
-    900: ThemeColors.sucess900,
+    50: LightThemeColors.sucess50,
+    100: LightThemeColors.sucess100,
+    200: LightThemeColors.sucess200,
+    300: LightThemeColors.sucess300,
+    400: LightThemeColors.sucess400,
+    500: LightThemeColors.sucess500,
+    600: LightThemeColors.sucess600,
+    700: LightThemeColors.sucess700,
+    800: LightThemeColors.sucess800,
+    900: LightThemeColors.sucess900,
   },
 );
 
-const MaterialColor warnSwatch = MaterialColor(
+const MaterialColor lightWarnSwatch = MaterialColor(
   0xfff1c863,
   <int, Color>{
-    50: ThemeColors.warn50,
-    100: ThemeColors.warn100,
-    200: ThemeColors.warn200,
-    300: ThemeColors.warn300,
-    400: ThemeColors.warn400,
-    500: ThemeColors.warn500,
-    600: ThemeColors.warn600,
-    700: ThemeColors.warn700,
-    800: ThemeColors.warn800,
-    900: ThemeColors.warn900,
+    50: LightThemeColors.warn50,
+    100: LightThemeColors.warn100,
+    200: LightThemeColors.warn200,
+    300: LightThemeColors.warn300,
+    400: LightThemeColors.warn400,
+    500: LightThemeColors.warn500,
+    600: LightThemeColors.warn600,
+    700: LightThemeColors.warn700,
+    800: LightThemeColors.warn800,
+    900: LightThemeColors.warn900,
   },
 );
 
-const MaterialColor greySwatch = MaterialColor(
+const MaterialColor lightGreySwatch = MaterialColor(
   0xff95a1ac,
   <int, Color>{
-    50: ThemeColors.grey50,
-    100: ThemeColors.grey100,
-    200: ThemeColors.grey200,
-    300: ThemeColors.grey300,
-    400: ThemeColors.grey400,
-    500: ThemeColors.grey500,
-    600: ThemeColors.grey600,
-    700: ThemeColors.grey700,
-    800: ThemeColors.grey800,
-    900: ThemeColors.grey900,
+    50: LightThemeColors.grey50,
+    100: LightThemeColors.grey100,
+    200: LightThemeColors.grey200,
+    300: LightThemeColors.grey300,
+    400: LightThemeColors.grey400,
+    500: LightThemeColors.grey500,
+    600: LightThemeColors.grey600,
+    700: LightThemeColors.grey700,
+    800: LightThemeColors.grey800,
+    900: LightThemeColors.grey900,
   },
 );
 
-const MaterialColor errorSwatch = MaterialColor(
+const MaterialColor lightErrorSwatch = MaterialColor(
   0xffdf1111,
   <int, Color>{
-    50: ThemeColors.error50,
-    100: ThemeColors.error100,
-    200: ThemeColors.error200,
-    300: ThemeColors.error300,
-    400: ThemeColors.error400,
-    500: ThemeColors.error500,
-    600: ThemeColors.error600,
-    700: ThemeColors.error700,
-    800: ThemeColors.error800,
-    900: ThemeColors.error900,
+    50: LightThemeColors.error50,
+    100: LightThemeColors.error100,
+    200: LightThemeColors.error200,
+    300: LightThemeColors.error300,
+    400: LightThemeColors.error400,
+    500: LightThemeColors.error500,
+    600: LightThemeColors.error600,
+    700: LightThemeColors.error700,
+    800: LightThemeColors.error800,
+    900: LightThemeColors.error900,
   },
 );

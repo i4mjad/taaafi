@@ -36,7 +36,7 @@ class LogInScreen extends ConsumerWidget {
                     height: 150,
                     width: 150,
                     decoration: BoxDecoration(
-                      color: theme.grey[50],
+                      color: theme.primary[50],
                       borderRadius: BorderRadius.circular(100),
                       border: Border.all(
                         width: 2,
