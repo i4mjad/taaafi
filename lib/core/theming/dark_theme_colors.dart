@@ -67,16 +67,16 @@ class DarkThemeColors {
   static const Color grey700 = Color(0xfff6f8f9); // #f6f8f9
   static const Color grey800 = Color(0xfff5f7f8); // #f5f7f8
   static const Color grey900 = Color(0xfff4f6f7); // #f4f6f7
-  static const Color error50 = Color(0xff650a00); // #cc2000
-  static const Color error100 = Color(0xffd4422b); // #d4422b
-  static const Color error200 = Color(0xffdc5c46); // #dc5c46
-  static const Color error300 = Color(0xffe3725e); // #e3725e
-  static const Color error400 = Color(0xffea8774); // #ea8774
-  static const Color error500 = Color(0xffef9c8b); // #ef9c8b
-  static const Color error600 = Color(0xfff4b0a2); // #f4b0a2
-  static const Color error700 = Color(0xfff8c4b9); // #f8c4b9
-  static const Color error800 = Color(0xfffbd7d0); // #fbd7d0
-  static const Color error900 = Color(0xfffeebe7); // #feebe7
+  static const Color error50 = Color(0xffe15839); // #e15839
+  static const Color error100 = Color(0xffe66b4f); // #e66b4f
+  static const Color error200 = Color(0xffeb7d63); // #eb7d63
+  static const Color error300 = Color(0xfff08e77); // #f08e77
+  static const Color error400 = Color(0xfff49f8a); // #f49f8a
+  static const Color error500 = Color(0xfff7af9d); // #f7af9d
+  static const Color error600 = Color(0xfffabfb1); // #fabfb1
+  static const Color error700 = Color(0xfffccfc4); // #fccfc4
+  static const Color error800 = Color(0xfffedfd7); // #fedfd7
+  static const Color error900 = Color(0xffffefeb); // #ffefeb
 }
 
 const MaterialColor darkPrimarySwatch = MaterialColor(

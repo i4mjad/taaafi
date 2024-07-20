@@ -83,6 +83,7 @@ ThemeData get lightTheme {
 ThemeData get darkTheme {
   return ThemeData(
     useMaterial3: true,
+
     brightness: Brightness.dark,
     primarySwatch: darkCustomTheme.primary,
     secondaryHeaderColor: darkCustomTheme.secondary[500],

@@ -1,9 +1,8 @@
-// private navigators
-
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
+import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 
 class ScaffoldWithNestedNavigation extends StatelessWidget {
@@ -26,36 +25,47 @@ class ScaffoldWithNestedNavigation extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = AppTheme.of(context);
     return Scaffold(
       body: navigationShell,
       bottomNavigationBar: NavigationBarTheme(
-        data: NavigationBarThemeData(
-          labelTextStyle:
-              WidgetStatePropertyAll<TextStyle>(TextStyles.footnoteSelected),
-        ),
-        child: NavigationBar(
-          selectedIndex: navigationShell.currentIndex,
-          destinations: [
-            NavigationDestination(
-              label: AppLocalizations.of(context).translate("home"),
-              icon: Icon(LucideIcons.home),
+          data: NavigationBarThemeData(
+            labelTextStyle:
+                WidgetStatePropertyAll<TextStyle>(TextStyles.footnoteSelected),
+          ),
+          child: Container(
+            decoration: BoxDecoration(
+                border: Border(
+              top: BorderSide(
+                color: theme.primary[100]!,
+                width: 1.0,
+              ),
+            )),
+            child: NavigationBar(
+              indicatorColor: theme.primary[100],
+              selectedIndex: navigationShell.currentIndex,
+              backgroundColor: theme.primary[50],
+              destinations: [
+                NavigationDestination(
+                  label: AppLocalizations.of(context).translate("home"),
+                  icon: Icon(LucideIcons.home),
+                ),
+                NavigationDestination(
+                  label: AppLocalizations.of(context).translate("vault"),
+                  icon: Icon(LucideIcons.bookLock),
+                ),
+                NavigationDestination(
+                  label: AppLocalizations.of(context).translate("fellowship"),
+                  icon: Icon(LucideIcons.users),
+                ),
+                NavigationDestination(
+                  label: AppLocalizations.of(context).translate("account"),
+                  icon: Icon(LucideIcons.settings),
+                ),
+              ],
+              onDestinationSelected: _goBranch,
             ),
-            NavigationDestination(
-              label: AppLocalizations.of(context).translate("vault"),
-              icon: Icon(LucideIcons.bookLock),
-            ),
-            NavigationDestination(
-              label: AppLocalizations.of(context).translate("fellowship"),
-              icon: Icon(LucideIcons.users),
-            ),
-            NavigationDestination(
-              label: AppLocalizations.of(context).translate("account"),
-              icon: Icon(LucideIcons.settings),
-            ),
-          ],
-          onDestinationSelected: _goBranch,
-        ),
-      ),
+          )),
     );
   }
 }
