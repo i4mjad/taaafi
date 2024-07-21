@@ -6,14 +6,14 @@ import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 
 class CustomSegmentedButton extends ConsumerWidget {
-  final String label;
+  final String? label;
   final List<SegmentedButtonOption> options;
   final SegmentedButtonOption selectedOption;
   final ValueChanged<SegmentedButtonOption> onChanged;
 
   const CustomSegmentedButton({
     Key? key,
-    required this.label,
+    this.label,
     required this.options,
     required this.selectedOption,
     required this.onChanged,
@@ -25,12 +25,16 @@ class CustomSegmentedButton extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          label,
-          style: TextStyles.footnote.copyWith(
-            color: theme.grey[900],
-          ),
-        ),
+        label != null
+            ? Text(
+                label!,
+                style: TextStyles.footnote.copyWith(
+                  color: theme.primary[900],
+                ),
+              )
+            : SizedBox(
+                height: 0,
+              ),
         verticalSpace(Spacing.points8),
         Container(
           width: MediaQuery.of(context).size.width,
@@ -50,7 +54,7 @@ class CustomSegmentedButton extends ConsumerWidget {
                         child: Text(
                           AppLocalizations.of(context)
                               .translate(option.translationKey),
-                          style: TextStyles.body,
+                          style: TextStyles.body.copyWith(),
                         ),
                       ),
                     )

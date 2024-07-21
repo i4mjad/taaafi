@@ -5,6 +5,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/shared_widgets/app_bar.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
+import 'package:reboot_app_3/core/shared_widgets/custom_segmented_button.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/custom_theme_data.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
@@ -56,7 +57,7 @@ class AccountScreen extends ConsumerWidget {
                     GestureDetector(
                       onTap: () {
                         HapticFeedback.mediumImpact();
-                        customTheme.toggleTheme();
+                        changeLanguage(context);
                       },
                       child: SettingsButton(
                         icon: LucideIcons.smartphone,
@@ -143,6 +144,127 @@ class AccountScreen extends ConsumerWidget {
           error: (error, stackTrace) => Center(child: Text('Error: $error')),
           loading: () => Center(child: CircularProgressIndicator()),
         ));
+  }
+
+  void changeLanguage(BuildContext context) async {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return Consumer(builder: (context, ref, child) {
+          final theme = AppTheme.of(context);
+          final themeNotifier = ref.watch(customThemeProvider.notifier);
+          return Container(
+            color: theme.backgroundColor,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  verticalSpace(Spacing.points16),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        AppLocalizations.of(context).translate('ui-settings'),
+                        style: TextStyles.h4.copyWith(
+                          color: theme.grey[900],
+                        ),
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.of(context).pop();
+                        },
+                        child: Icon(LucideIcons.xCircle),
+                      )
+                    ],
+                  ),
+                  verticalSpace(Spacing.points16),
+                  Text(
+                    AppLocalizations.of(context).translate('night-mode'),
+                    style: TextStyles.h6.copyWith(
+                      color: theme.grey[900],
+                    ),
+                  ),
+                  verticalSpace(Spacing.points12),
+                  GestureDetector(
+                    onTap: () {
+                      themeNotifier.toggleTheme();
+                      Navigator.of(context).pop();
+                    },
+                    child: WidgetsContainer(
+                      padding: EdgeInsets.all(14),
+                      backgroundColor: theme.primary[50],
+                      borderSide: BorderSide(color: theme.primary[100]!),
+                      borderRadius: BorderRadius.circular(10.5),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Icon(LucideIcons.moon),
+                          horizontalSpace(Spacing.points12),
+                          Text(
+                            themeNotifier.darkTheme == true
+                                ? AppLocalizations.of(context).translate('off')
+                                : AppLocalizations.of(context).translate('on'),
+                            style: TextStyles.footnoteSelected
+                                .copyWith(color: theme.grey[900], height: 2),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  verticalSpace(Spacing.points24),
+                  Text(
+                    AppLocalizations.of(context).translate('change-lang'),
+                    style: TextStyles.h6.copyWith(
+                      color: theme.grey[900],
+                    ),
+                  ),
+                  verticalSpace(Spacing.points8),
+                  CustomSegmentedButton(
+                    options: [
+                      SegmentedButtonOption(
+                          value: 'arabic', translationKey: 'arabic'),
+                      SegmentedButtonOption(
+                          value: 'english', translationKey: 'english'),
+                    ],
+                    selectedOption: _getSelectedLocale(context, ref),
+                    onChanged: (value) {
+                      _updateThelocale(value, ref);
+                      Navigator.of(context).pop();
+                    },
+                  )
+                ],
+              ),
+            ),
+          );
+        });
+      },
+    );
+  }
+
+  _getSelectedLocale(BuildContext context, WidgetRef ref) {
+    final locale = ref.watch(localeNotifierProvider);
+
+    if (locale?.languageCode == 'ar') {
+      return SegmentedButtonOption(value: 'arabic', translationKey: 'arabic');
+    } else if (locale?.languageCode == 'en') {
+      return SegmentedButtonOption(value: 'english', translationKey: 'english');
+    } else {
+      return SegmentedButtonOption(value: 'arabic', translationKey: 'arabic');
+    }
+  }
+
+  void _updateThelocale(SegmentedButtonOption value, WidgetRef ref) {
+    final locale = ref.watch(localeNotifierProvider);
+    final localeNotifier = ref.watch(localeNotifierProvider.notifier);
+
+    if (value.value == "arabic" && locale?.languageCode == 'en') {
+      localeNotifier.toggleLocale();
+    } else if (value.value == "english" && locale?.languageCode == 'ar') {
+      localeNotifier.toggleLocale();
+    }
   }
 }
 
@@ -278,11 +400,7 @@ class UserDetailsWidget extends StatelessWidget {
                         " • " +
                         userProfile.age.toString() +
                         " " +
-                        AppLocalizations.of(context).translate('years') +
-                        " • " +
-                        AppLocalizations.of(context).translate(
-                          userProfile.role,
-                        ),
+                        AppLocalizations.of(context).translate('years'),
                     style: TextStyles.caption.copyWith(
                       color: theme.grey[600],
                     ),
