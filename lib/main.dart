@@ -7,8 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:reboot_app_3/app.dart';
-
-import 'package:reboot_app_3/core/di/container.dart';
 import 'package:reboot_app_3/firebase_options.dart';
 
 import 'package:reboot_app_3/shared/services/notification_service.dart';
@@ -17,9 +15,6 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   //Initalize Firebase
   await initFirebase();
-
-  //Setup DI Container
-  SetupContainer();
 
   //TODO: Investigate about what is the best way to update the user FCM token every time the app got initailized
 
