@@ -10,7 +10,7 @@ import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/features/account/data/user_profile_notifier.dart';
-import 'package:reboot_app_3/shared/components/snackbar.dart';
+import 'package:reboot_app_3/core/shared_widgets/snackbar.dart';
 
 class UpdateUserProfileModalSheet extends ConsumerStatefulWidget {
   UpdateUserProfileModalSheet({Key? key}) : super(key: key);

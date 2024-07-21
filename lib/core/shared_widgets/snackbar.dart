@@ -1,12 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:iconsax/iconsax.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
-import 'package:reboot_app_3/shared/constants/constants.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
-
-import '../constants/textstyles_constants.dart';
 
 void getSnackBar(BuildContext context, String messageId) {
   ScaffoldMessenger.of(context)
@@ -61,11 +57,12 @@ SnackBar errorSnackBar(BuildContext context, String messageId) {
 }
 
 SnackBar customSnackBar(BuildContext context, String messageId) {
+  final theme = AppTheme.of(context);
   return SnackBar(
     behavior: SnackBarBehavior.floating,
     padding: EdgeInsets.fromLTRB(16, 24, 16, 24),
     shape: RoundedRectangleBorder(
-      side: BorderSide(color: lightPrimaryColor, width: 0.5),
+      side: BorderSide(color: theme.primary[100]!, width: 0.5),
       borderRadius: BorderRadius.circular(12.5),
     ),
     backgroundColor: Color(0xFFe8eeef),
@@ -74,8 +71,8 @@ SnackBar customSnackBar(BuildContext context, String messageId) {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Icon(
-            Iconsax.tick_circle,
-            color: lightPrimaryColor,
+            LucideIcons.check,
+            color: theme.primary[600]!,
             size: 24,
           ),
           SizedBox(
@@ -84,10 +81,9 @@ SnackBar customSnackBar(BuildContext context, String messageId) {
           Flexible(
             child: Text(
               AppLocalizations.of(context).translate(messageId),
-              style: kSubTitlesStyle.copyWith(
-                  color: lightPrimaryColor,
-                  fontWeight: FontWeight.w500,
-                  fontSize: 14),
+              style: TextStyles.caption.copyWith(
+                color: theme.primary[600],
+              ),
             ),
           ),
         ],
@@ -97,11 +93,12 @@ SnackBar customSnackBar(BuildContext context, String messageId) {
 }
 
 SnackBar systemSnackBar(BuildContext context, String message) {
+  final theme = AppTheme.of(context);
   return SnackBar(
     behavior: SnackBarBehavior.floating,
     padding: EdgeInsets.fromLTRB(16, 24, 16, 24),
     shape: RoundedRectangleBorder(
-      side: BorderSide(color: lightPrimaryColor, width: 0.5),
+      side: BorderSide(color: theme.primary[100]!, width: 0.5),
       borderRadius: BorderRadius.circular(12.5),
     ),
     backgroundColor: Color(0xFFe8eeef),
@@ -110,8 +107,8 @@ SnackBar systemSnackBar(BuildContext context, String message) {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Icon(
-            Iconsax.info_circle,
-            color: lightPrimaryColor,
+            LucideIcons.check,
+            color: theme.primary[600]!,
             size: 24,
           ),
           SizedBox(
@@ -120,10 +117,9 @@ SnackBar systemSnackBar(BuildContext context, String message) {
           Flexible(
             child: Text(
               message,
-              style: kSubTitlesStyle.copyWith(
-                  color: lightPrimaryColor,
-                  fontWeight: FontWeight.w500,
-                  fontSize: 14),
+              style: TextStyles.caption.copyWith(
+                color: theme.primary[600]!,
+              ),
             ),
           ),
         ],

@@ -9,8 +9,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:reboot_app_3/app.dart';
 import 'package:reboot_app_3/firebase_options.dart';
 
-import 'package:reboot_app_3/shared/services/notification_service.dart';
-
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   //Initalize Firebase
@@ -36,9 +34,6 @@ Future<void> main() async {
 Future<void> setupFirebaseMesagging(
     InitializationSettings initializationSettings) async {
   // CustomerIO.registerDeviceToken(deviceToken: firbaseMessagingToken);
-
-  await NotificationService.flutterLocalNotificationsPlugin
-      .initialize(initializationSettings);
 }
 
 Future<InitializationSettings> setupNotifications() async {
@@ -91,6 +86,8 @@ void registerErrorHandlers() {
 }
 
 Future<void> initFirebase() async {
+  //TODO: investigate about a way to setup custom analytics events
+  //TODO: investigate about the best way to setup Crashalytics
   try {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,

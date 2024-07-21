@@ -9,7 +9,7 @@ import 'package:reboot_app_3/features/authentication/data/repositories/auth_repo
 import 'package:reboot_app_3/features/authentication/data/repositories/migeration_repository.dart';
 import 'package:reboot_app_3/features/authentication/providers/user_document_provider.dart';
 import 'package:reboot_app_3/features/authentication/providers/user_provider.dart';
-import 'package:reboot_app_3/shared/components/snackbar.dart';
+import 'package:reboot_app_3/core/shared_widgets/snackbar.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'auth_service.g.dart';
