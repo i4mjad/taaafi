@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/data/models/Note.dart';
 import 'package:reboot_app_3/presentation/screens/follow_your_reboot/notes/add_note_screen.dart';
 import 'package:reboot_app_3/providers/notes/notes_providers.dart';
@@ -11,9 +12,8 @@ import 'note_screen.dart';
 class NotesScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    final theme = AppTheme.of(context);
     return Scaffold(
-      
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.only(right: 20.0, left: 20, top: 20),
@@ -35,14 +35,12 @@ class NotesScreen extends StatelessWidget {
             ),
           );
         },
-        backgroundColor: theme.primaryColor,
+        backgroundColor: theme.primary[600],
         child: Center(
           child: Icon(
             Iconsax.add_square,
             size: 30,
-            //TODO: this was changed due to the depreacted color, do not forget to change to the new themeing
-            // color: theme.backgroundColor,
-            color: Colors.black,
+            color: theme.backgroundColor,
           ),
         ),
       ),
