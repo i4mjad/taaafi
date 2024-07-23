@@ -1,3 +1,4 @@
+import 'package:figma_squircle/figma_squircle.dart';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
@@ -21,12 +22,15 @@ SnackBar errorSnackBar(BuildContext context, String messageId) {
   final theme = AppTheme.of(context);
   return SnackBar(
     behavior: SnackBarBehavior.floating,
-    shape: RoundedRectangleBorder(
-      side: BorderSide(
-        color: theme.error[200]!,
-        width: 1.5,
+    shape: SmoothRectangleBorder(
+      borderRadius: SmoothBorderRadius(
+        cornerRadius: 15,
+        cornerSmoothing: 1,
       ),
-      borderRadius: BorderRadius.circular(10.5),
+      side: BorderSide(
+        width: 2,
+        color: theme.primary[300]!,
+      ),
     ),
     backgroundColor: theme.error[50],
     content: Container(
@@ -61,11 +65,17 @@ SnackBar customSnackBar(BuildContext context, String messageId) {
   return SnackBar(
     behavior: SnackBarBehavior.floating,
     padding: EdgeInsets.fromLTRB(16, 24, 16, 24),
-    shape: RoundedRectangleBorder(
-      side: BorderSide(color: theme.primary[100]!, width: 0.5),
-      borderRadius: BorderRadius.circular(12.5),
+    shape: SmoothRectangleBorder(
+      borderRadius: SmoothBorderRadius(
+        cornerRadius: 15,
+        cornerSmoothing: 1,
+      ),
+      side: BorderSide(
+        width: 2,
+        color: theme.primary[300]!,
+      ),
     ),
-    backgroundColor: Color(0xFFe8eeef),
+    backgroundColor: theme.primary[50],
     content: Container(
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -82,7 +92,7 @@ SnackBar customSnackBar(BuildContext context, String messageId) {
             child: Text(
               AppLocalizations.of(context).translate(messageId),
               style: TextStyles.caption.copyWith(
-                color: theme.primary[600],
+                color: theme.grey[900],
               ),
             ),
           ),
@@ -97,11 +107,17 @@ SnackBar systemSnackBar(BuildContext context, String message) {
   return SnackBar(
     behavior: SnackBarBehavior.floating,
     padding: EdgeInsets.fromLTRB(16, 24, 16, 24),
-    shape: RoundedRectangleBorder(
-      side: BorderSide(color: theme.primary[100]!, width: 0.5),
-      borderRadius: BorderRadius.circular(12.5),
+    shape: SmoothRectangleBorder(
+      borderRadius: SmoothBorderRadius(
+        cornerRadius: 15,
+        cornerSmoothing: 1,
+      ),
+      side: BorderSide(
+        width: 2,
+        color: theme.primary[300]!,
+      ),
     ),
-    backgroundColor: Color(0xFFe8eeef),
+    backgroundColor: theme.primary[50],
     content: Container(
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,

@@ -151,7 +151,8 @@ class _UpdateUserProfileModalSheetState
                       ],
                     ),
                   ),
-                )
+                ),
+                verticalSpace(Spacing.points36)
               ],
             ),
           );
