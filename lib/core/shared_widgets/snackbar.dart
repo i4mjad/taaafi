@@ -29,7 +29,7 @@ SnackBar errorSnackBar(BuildContext context, String messageId) {
       ),
       side: BorderSide(
         width: 2,
-        color: theme.primary[300]!,
+        color: theme.error[300]!,
       ),
     ),
     backgroundColor: theme.error[50],
