@@ -50,7 +50,7 @@ SnackBar errorSnackBar(BuildContext context, String messageId) {
             child: Text(
               AppLocalizations.of(context).translate(messageId),
               style: TextStyles.caption.copyWith(
-                color: theme.error[600],
+                color: theme.error[900],
               ),
             ),
           ),
