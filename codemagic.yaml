@@ -8,7 +8,6 @@ workflows:
         - android-signing-key
       flutter: stable
       groups:
-        - keystore_credentials
         - google_credentials
       vars:
         PACKAGE_NAME: "com.amjadkhalfan.reboot_app_3"
