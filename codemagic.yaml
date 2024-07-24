@@ -3,19 +3,28 @@ workflows:
   android-workflow-id:
     name: Android Workflow
     environment:
+      groups:
+        - keystore_credentials
+        - google_play
+      vars:
+        PACKAGE_NAME: "io.codemagic.fluttersample"
+        GOOGLE_PLAY_TRACK: alpha
       flutter: stable
       android_signing:
         - android-signing-key
     scripts:
       - name: Set up local.properties
-        script: | 
+        script: |
           echo "flutter.sdk=$HOME/programs/flutter" > "$CM_BUILD_DIR/android/local.properties"
       - name: Get Flutter packages
-        script: | 
+        script: |
           flutter packages pub get
       - name: Build AAB with Flutter
-        script: | 
-          flutter build appbundle --release
+        script: |
+          BUILD_NUMBER=$(($(google-play get-latest-build-number --package-name "$PACKAGE_NAME" --tracks="$GOOGLE_PLAY_TRACK") + 1))      
+          flutter build appbundle --release \
+            --build-name=1.0.$BUILD_NUMBER \
+            --build-number=$BUILD_NUMBER
     artifacts:
       - build/**/outputs/**/*.aab
       - build/**/outputs/**/mapping.txt
