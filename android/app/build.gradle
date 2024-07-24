@@ -30,7 +30,7 @@ apply plugin: 'com.google.firebase.crashlytics'
 
 android {
 
-    compileSdkVersion 33
+    compileSdkVersion 34
 
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
@@ -43,12 +43,12 @@ android {
     defaultConfig {
         applicationId "com.amjadkhalfan.reboot_app_3"
 
-        targetSdkVersion 33
-        minSdkVersion 21
+        targetSdkVersion 34
+        minSdkVersion 23
         //version number: 4.3.1
-        versionName "4.3.3"
+        versionName "5.0.0"
         //build number : 01
-        versionCode 43301
+        versionCode 50001
         // key2
 
         //multiDexEnabled true
@@ -65,9 +65,9 @@ android {
 
     dependencies {
 
-        implementation "com.android.billingclient:billing-ktx:6.0.1"
-        implementation platform('com.google.firebase:firebase-bom:26.4.0')
-        implementation 'com.google.firebase:firebase-messaging:23.3.1'
+        implementation "com.android.billingclient:billing-ktx:7.0.0"
+        implementation platform('com.google.firebase:firebase-bom:33.1.2')
+        implementation 'com.google.firebase:firebase-messaging:24.0.0'
         implementation 'com.google.firebase:firebase-analytics'
         implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     }
