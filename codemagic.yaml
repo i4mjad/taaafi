@@ -21,6 +21,3 @@ workflows:
       - flutter_drive.log
   ios-workflow-id:
     name: iOS Workflow
-    environment:
-      flutter: fvm
-      flavor: stable
