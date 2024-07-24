@@ -1,17 +1,18 @@
 ---
 workflows:
-  android-workflow-id:
+  android-internal-test-workflow:
+    max_build_duration: 120
     name: Android Workflow
     environment:
+      android_signing:
+        - android-signing-key
+      flutter: stable
       groups:
         - keystore_credentials
         - google_play
       vars:
-        PACKAGE_NAME: "io.codemagic.fluttersample"
+        PACKAGE_NAME: "com.amjadkhalfan.reboot_app_3"
         GOOGLE_PLAY_TRACK: alpha
-      flutter: stable
-      android_signing:
-        - android-signing-key
     scripts:
       - name: Set up local.properties
         script: |
@@ -29,5 +30,11 @@ workflows:
       - build/**/outputs/**/*.aab
       - build/**/outputs/**/mapping.txt
       - flutter_drive.log
+    publishing:
+      google_play:
+        credentials: $GCLOUD_SERVICE_ACCOUNT_CREDENTIALS
+        track: closed
+        submit_as_draft: true
+
   ios-workflow-id:
     name: iOS Workflow
