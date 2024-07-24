@@ -3,8 +3,9 @@ workflows:
   android-workflow-id:
     name: Android Workflow
     environment:
+      flutter: stable
       android_signing:
-        - keystore_reference
+        - android-signing-key
     scripts:
       - name: Set up local.properties
         script: | 
