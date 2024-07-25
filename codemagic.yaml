@@ -20,13 +20,18 @@ workflows:
           flutter packages pub get
       - name: Build AAB file
         script: |
+          VERSION=$(cat pubspec.yaml | grep 'version:' | head -1 | awk '{print $2}' | cut -d '+' -f 1)
           LATEST_BUILD_NUMBER=$(google-play get-latest-build-number --package-name "$PACKAGE_NAME" --tracks="$GOOGLE_PLAY_TRACK")
           BUILD_NUMBER=$((LATEST_BUILD_NUMBER + 1))
+          if [ $BUILD_NUMBER -lt 10 ]; then
+            BUILD_NUMBER="0$BUILD_NUMBER"
+          fi
           flutter build appbundle --release \
-            --build-name=$BUILD_NUMBER \
+            --build-name=$VERSION \
             --build-number=$BUILD_NUMBER \
             -PVERSION_CODE=$BUILD_NUMBER \
-            -PVERSION_NAME=$BUILD_NUMBER
+            -PVERSION_NAME=$VERSION
+
     artifacts:
       - build/**/outputs/**/*.aab
       - build/**/outputs/**/mapping.txt
