@@ -89,6 +89,7 @@ workflows:
       email:
         recipients:
           - admin@ta3afi.app
+          - i4mjad@gmail.com
         notify:
           success: true
           failure: true
