@@ -26,11 +26,12 @@ workflows:
           if [ $BUILD_NUMBER -lt 10 ]; then
             BUILD_NUMBER="0$BUILD_NUMBER"
           fi
+          FORMATTED_BUILD_NAME="${BUILD_NUMBER} (${VERSION})"
           flutter build appbundle --release \
-            --build-name=$VERSION \
+            --build-name=$FORMATTED_BUILD_NAME \
             --build-number=$BUILD_NUMBER \
             -PVERSION_CODE=$BUILD_NUMBER \
-            -PVERSION_NAME=$VERSION
+            -PVERSION_NAME=$FORMATTED_BUILD_NAME
 
     artifacts:
       - build/**/outputs/**/*.aab
