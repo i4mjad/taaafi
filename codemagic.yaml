@@ -19,25 +19,13 @@ workflows:
       - name: Get Flutter packages
         script: |
           flutter packages pub get
-      - name: Fetch and Increment Build Number
-        script: |
-          LATEST_BUILD_NUMBER=$(google-play get-latest-build-number --package-name "$PACKAGE_NAME" --tracks="$GOOGLE_PLAY_TRACK")
-          if [ -z "$LATEST_BUILD_NUMBER" ]; then
-            echo "Failed to fetch the latest build number."
-            exit 1
-          fi
-          echo "Latest build number: $LATEST_BUILD_NUMBER"
-          BUILD_NUMBER=$((LATEST_BUILD_NUMBER + 1))
-          if [ -z "$BUILD_NUMBER" ]; then
-            echo "Failed to increment the build number."
-            exit 1
-          fi
-          echo "New build number: $BUILD_NUMBER"
-          echo "VERSION_CODE=$BUILD_NUMBER" >> $CM_ENV_FILE
-          echo "VERSION_NAME=1.0.$BUILD_NUMBER" >> $CM_ENV_FILE
       - name: Build AAB with Flutter
         script: |
-          flutter build appbundle --release
+          LATEST_BUILD_NUMBER=$(google-play get-latest-build-number --package-name "$PACKAGE_NAME" --tracks="$GOOGLE_PLAY_TRACK")
+          BUILD_NUMBER=$((LATEST_BUILD_NUMBER + 1))     
+          flutter build appbundle --release \
+            --build-name=1.0.$BUILD_NUMBER \
+            --build-number=$BUILD_NUMBER
     artifacts:
       - build/**/outputs/**/*.aab
       - build/**/outputs/**/mapping.txt
