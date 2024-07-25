@@ -74,6 +74,10 @@ workflows:
           find build/ios/ipa -name "*.ipa"
           echo "Generated Xcode build logs:"
           find /tmp/xcodebuild_logs -name "*.log"
+          echo "Checking for generated artifacts in build directory:"
+          ls -R build
+          echo "Checking for generated artifacts in /tmp/xcodebuild_logs directory:"
+          ls -R /tmp/xcodebuild_logs
 
     artifacts:
       - build/ios/ipa/*.ipa
@@ -85,7 +89,6 @@ workflows:
       email:
         recipients:
           - admin@ta3afi.app
-          - i4mjad@gmail.com
         notify:
           success: true
           failure: true
