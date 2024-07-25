@@ -31,7 +31,8 @@ workflows:
         script: |
           LATEST_BUILD_NUMBER=$(google-play get-latest-build-number --package-name "$PACKAGE_NAME" --tracks="$GOOGLE_PLAY_TRACK")
           BUILD_NUMBER=$((LATEST_BUILD_NUMBER + 1))
-          VERSION_CODE="${VERSION_NUMBER}$(printf "%02d" $(($BUILD_NUMBER % 100)))"
+          BUILD_NUMBER_PADDED=$(printf "%02d" $((BUILD_NUMBER % 100)))
+          VERSION_CODE="${VERSION_NUMBER}${BUILD_NUMBER_PADDED}"
           echo "Final build number: $VERSION_CODE"
           flutter build appbundle --release \
             --build-name="$VERSION_CODE ($VERSION_NAME)" \
