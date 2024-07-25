@@ -18,27 +18,15 @@ workflows:
       - name: Get Flutter packages
         script: |
           flutter packages pub get
-      - name: Fetch version from pubspec.yaml
-        script: |
-          VERSION_NAME=$(grep 'version:' pubspec.yaml | sed 's/version: //g' | cut -d '+' -f1)
-          echo "Fetched version name: $VERSION_NAME"
-          VERSION_NUMBER=$(echo $VERSION_NAME | sed 's/\.//g')
-          if [ ${#VERSION_NUMBER} -ne 3 ]; then
-            echo "Version number format is incorrect. Expected format X.Y.Z"
-            exit 1
-          fi
       - name: Build AAB file
         script: |
           LATEST_BUILD_NUMBER=$(google-play get-latest-build-number --package-name "$PACKAGE_NAME" --tracks="$GOOGLE_PLAY_TRACK")
           BUILD_NUMBER=$((LATEST_BUILD_NUMBER + 1))
-          BUILD_NUMBER_PADDED=$(printf "%02d" $((BUILD_NUMBER % 100)))
-          VERSION_CODE="${VERSION_NUMBER}${BUILD_NUMBER_PADDED}"
-          echo "Final version code: $VERSION_CODE"
           flutter build appbundle --release \
-            --build-name="$VERSION_NAME ($VERSION_CODE)" \
-            --build-number=$VERSION_CODE \
-            -PVERSION_CODE=$VERSION_CODE \
-            -PVERSION_NAME=$VERSION_NAME
+            --build-name=$BUILD_NUMBER \
+            --build-number=$BUILD_NUMBER \
+            -PVERSION_CODE=$BUILD_NUMBER \
+            -PVERSION_NAME=$BUILD_NUMBER
     artifacts:
       - build/**/outputs/**/*.aab
       - build/**/outputs/**/mapping.txt
@@ -50,4 +38,4 @@ workflows:
         submit_as_draft: true
 
   ios-testflight-workflow:
-    name: iOS Test Workflow
+    name: iOS Workflow
