@@ -73,10 +73,13 @@ workflows:
     integrations:
       app_store_connect: Codemagic
     publishing:
+      email:
+        recipients:
+          - admin@ta3afi.app
+          - i4mjad@gmail.com
+        notify:
+          success: true
+          failure: true
       app_store_connect:
         auth: integration
         submit_to_testflight: true
-        expire_build_submitted_for_review: true
-        beta_groups:
-          - Testers
-        submit_to_app_store: false
