@@ -63,13 +63,28 @@ workflows:
       - name: Install pods
         script: |
           find . -name "Podfile" -execdir pod install \;
-      - name: Flutter build ipa
+      - name: Flutter build ios
         script: |
           VERSION=$(cat pubspec.yaml | grep 'version:' | head -1 | awk '{print $2}' | cut -d '+' -f 1)
           BUILD_NUMBER=$(($(app-store-connect get-latest-app-store-build-number "$APP_STORE_APPLE_ID") + 1))
-          flutter build ipa --release \
+          flutter build ios --release \
             --build-name=$VERSION \
             --build-number=$BUILD_NUMBER
+          echo "Generated Xcode project files:"
+          find build/ios -name "*.xcodeproj"
+      - name: Create IPA file
+        script: |
+          xcodebuild -workspace ios/Runner.xcworkspace \
+          -scheme Runner \
+          -sdk iphoneos \
+          -configuration Release \
+          -archivePath $PWD/build/ios/archive/Runner.xcarchive archive
+
+          xcodebuild -exportArchive \
+          -archivePath $PWD/build/ios/archive/Runner.xcarchive \
+          -exportOptionsPlist ios/Runner/Info.plist \
+          -exportPath $PWD/build/ios/ipa
+
           echo "Generated IPA files:"
           find build/ios/ipa -name "*.ipa"
           echo "Generated Xcode build logs:"
