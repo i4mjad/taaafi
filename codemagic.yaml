@@ -18,15 +18,15 @@ workflows:
       - name: Get Flutter packages
         script: |
           flutter packages pub get
-      - name: Build AAB with Flutter
+      - name: Build AAB file
         script: |
           LATEST_BUILD_NUMBER=$(google-play get-latest-build-number --package-name "$PACKAGE_NAME" --tracks="$GOOGLE_PLAY_TRACK")
           BUILD_NUMBER=$((LATEST_BUILD_NUMBER + 1))
           flutter build appbundle --release \
-            --build-name=1.0.$BUILD_NUMBER \
+            --build-name=$BUILD_NUMBER \
             --build-number=$BUILD_NUMBER \
             -PVERSION_CODE=$BUILD_NUMBER \
-            -PVERSION_NAME=1.0.$BUILD_NUMBER
+            -PVERSION_NAME=$BUILD_NUMBER
     artifacts:
       - build/**/outputs/**/*.aab
       - build/**/outputs/**/mapping.txt
@@ -37,5 +37,5 @@ workflows:
         track: closed
         submit_as_draft: true
 
-  ios-workflow-id:
-    name: iOS Workflow
+  ios-testflight-workflow:
+    name: iOS Test Workflow
