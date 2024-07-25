@@ -33,9 +33,9 @@ workflows:
           BUILD_NUMBER=$((LATEST_BUILD_NUMBER + 1))
           BUILD_NUMBER_PADDED=$(printf "%02d" $((BUILD_NUMBER % 100)))
           VERSION_CODE="${VERSION_NUMBER}${BUILD_NUMBER_PADDED}"
-          echo "Final build number: $VERSION_CODE"
+          echo "Final version code: $VERSION_CODE"
           flutter build appbundle --release \
-            --build-name="$VERSION_CODE ($VERSION_NAME)" \
+            --build-name="$VERSION_NAME ($VERSION_CODE)" \
             --build-number=$VERSION_CODE \
             -PVERSION_CODE=$VERSION_CODE \
             -PVERSION_NAME=$VERSION_NAME
