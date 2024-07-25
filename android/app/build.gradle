@@ -33,31 +33,23 @@ apply plugin: 'com.google.gms.google-services'
 apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 apply plugin: 'com.google.firebase.crashlytics'
 
-
 android {
-
     compileSdkVersion 34
 
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
     }
-//
+
     lintOptions {
         disable 'InvalidPackage'
     }
 
     defaultConfig {
         applicationId "com.amjadkhalfan.reboot_app_3"
-
         targetSdkVersion 34
         minSdkVersion 23
-        //version number: 5.0.0
-        versionName "5.0.0"
-        //build number : 02
-        versionCode 50002
-        // key2
-
-        //multiDexEnabled true
+        versionCode Integer.parseInt(project.hasProperty('VERSION_CODE') ? project.VERSION_CODE : flutterVersionCode)
+        versionName project.hasProperty('VERSION_NAME') ? project.VERSION_NAME : flutterVersionName
         multiDexEnabled true
     }
 
@@ -70,7 +62,6 @@ android {
     }
 
     dependencies {
-
         implementation "com.android.billingclient:billing-ktx:7.0.0"
         implementation platform('com.google.firebase:firebase-bom:33.1.2')
         implementation 'com.google.firebase:firebase-messaging:24.0.0'
@@ -78,21 +69,21 @@ android {
         implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     }
 
-      signingConfigs {
-          release {
-              if (System.getenv()["CI"]) { // CI=true is exported by Codemagic
-                  storeFile file(System.getenv()["CM_KEYSTORE_PATH"])
-                  storePassword System.getenv()["CM_KEYSTORE_PASSWORD"]
-                  keyAlias System.getenv()["CM_KEY_ALIAS"]
-                  keyPassword System.getenv()["CM_KEY_PASSWORD"]
-              } else {
-                  keyAlias keystoreProperties['keyAlias']
-                  keyPassword keystoreProperties['keyPassword']
-                  storeFile keystoreProperties['storeFile'] ? file(keystoreProperties['storeFile']) : null
-                  storePassword keystoreProperties['storePassword']
-              }
-          }
-      }
+    signingConfigs {
+        release {
+            if (System.getenv()["CI"]) { // CI=true is exported by Codemagic
+                storeFile file(System.getenv()["CM_KEYSTORE_PATH"])
+                storePassword System.getenv()["CM_KEYSTORE_PASSWORD"]
+                keyAlias System.getenv()["CM_KEY_ALIAS"]
+                keyPassword System.getenv()["CM_KEY_PASSWORD"]
+            } else {
+                keyAlias keystoreProperties['keyAlias']
+                keyPassword keystoreProperties['keyPassword']
+                storeFile keystoreProperties['storeFile'] ? file(keystoreProperties['storeFile']) : null
+                storePassword keystoreProperties['storePassword']
+            }
+        }
+    }
     buildTypes {
         release {
             signingConfig signingConfigs.release

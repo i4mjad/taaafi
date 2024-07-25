@@ -33,9 +33,11 @@ workflows:
             exit 1
           fi
           echo "New build number: $BUILD_NUMBER"
-          flutter build appbundle --release \
-            --build-name=1.0.$BUILD_NUMBER \
-            --build-number=$((BUILD_NUMBER + 1))
+          echo "VERSION_CODE=$BUILD_NUMBER" >> $CM_ENV_FILE
+          echo "VERSION_NAME=1.0.$BUILD_NUMBER" >> $CM_ENV_FILE
+      - name: Build AAB with Flutter
+        script: |
+          flutter build appbundle --release
     artifacts:
       - build/**/outputs/**/*.aab
       - build/**/outputs/**/mapping.txt
