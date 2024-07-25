@@ -48,6 +48,8 @@ workflows:
       ios_signing:
         distribution_type: app_store
         bundle_identifier: com.amjadkhalfan.RebootApp
+      vars:
+        APP_STORE_APPLE_ID: 1531562469
     scripts:
       - name: Set up code signing settings on Xcode project
         script: xcode-project use-profiles
@@ -69,7 +71,7 @@ workflows:
       - /tmp/xcodebuild_logs/*.log
       - flutter_drive.log
     integrations:
-      app_store_connect: asc
+      app_store_connect: Codemagic
     publishing:
       app_store_connect:
         auth: integration
