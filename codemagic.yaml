@@ -35,7 +35,7 @@ workflows:
           echo "New build number: $BUILD_NUMBER"
           flutter build appbundle --release \
             --build-name=1.0.$BUILD_NUMBER \
-            --build-number=$(BUILD_NUMBER + 1)
+            --build-number=$BUILD_NUMBER + 1
     artifacts:
       - build/**/outputs/**/*.aab
       - build/**/outputs/**/mapping.txt
