@@ -76,14 +76,18 @@ workflows:
           ls -R /tmp/xcodebuild_logs
       - name: Export IPA
         script: |
+          mkdir -p build/ios/ipa
           xcodebuild -exportArchive \
             -archivePath $PWD/build/ios/archive/Runner.xcarchive \
             -exportOptionsPlist ios/Runner/Info.plist \
-            -exportPath $PWD/build/ios/ipa
+            -exportPath $PWD/build/ios/ipa \
+            | tee /tmp/xcodebuild_export.log
           echo "Exported IPA files:"
           find $PWD/build/ios/ipa -name "*.ipa"
           echo "Checking for generated artifacts in build/ios/ipa directory:"
           ls -R $PWD/build/ios/ipa
+          echo "Checking Xcode build export logs:"
+          cat /tmp/xcodebuild_export.log
 
     artifacts:
       - build/ios/ipa/*.ipa
