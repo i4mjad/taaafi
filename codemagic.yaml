@@ -71,7 +71,7 @@ workflows:
       - /tmp/xcodebuild_logs/*.log
       - flutter_drive.log
     integrations:
-      app_store_connect: Codemagic
+      app_store_connect: Taa'afi Codemagic
     publishing:
       email:
         recipients:
