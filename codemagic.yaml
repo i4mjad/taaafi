@@ -66,7 +66,7 @@ workflows:
           BUILD_NUMBER=$(($(app-store-connect get-latest-testflight-build-number "$APP_STORE_APPLE_ID") + 1))
 
           # Path to Info.plist
-          PLIST_PATH="./Runner/Info.plist"
+          PLIST_PATH="./ios/Runner/Info.plist"
 
           # Update CFBundleShortVersionString and CFBundleVersion in Info.plist
           /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $VERSION" "$PLIST_PATH"
