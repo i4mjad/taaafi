@@ -65,8 +65,7 @@ workflows:
       - name: Flutter build ipa
         script: |
           VERSION=$(cat pubspec.yaml | grep 'version:' | head -1 | awk '{print $2}' | cut -d '+' -f 1)
-          flutter build ipa --release \
-            --build-name=$VERSION
+          flutter build ipa --release --build-name=$VERSION --verbose
           echo "Generated IPA files:"
           find build/ios/ipa -name "*.ipa"
           echo "Generated Xcode build logs:"
