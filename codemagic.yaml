@@ -53,6 +53,9 @@ workflows:
     scripts:
       - name: Set up code signing settings on Xcode project
         script: xcode-project use-profiles
+      - name: Update pods repo
+        script: |
+          pod repo update
       - name: Get Flutter packages
         script: |
           flutter packages pub get
@@ -62,10 +65,8 @@ workflows:
       - name: Flutter build ipa
         script: |
           VERSION=$(cat pubspec.yaml | grep 'version:' | head -1 | awk '{print $2}' | cut -d '+' -f 1)
-          BUILD_NUMBER=$(($(app-store-connect get-latest-app-store-build-number "$APP_STORE_APPLE_ID") + 1))
           flutter build ipa --release \
-            --build-name=$VERSION \
-            --build-number=$BUILD_NUMBER
+            --build-name=$VERSION
           echo "Generated IPA files:"
           find build/ios/ipa -name "*.ipa"
           echo "Generated Xcode build logs:"
@@ -98,7 +99,6 @@ workflows:
     publishing:
       email:
         recipients:
-          - admin@ta3afi.app
           - i4mjad@gmail.com
         notify:
           success: true
