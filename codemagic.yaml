@@ -65,30 +65,7 @@ workflows:
       - name: Flutter build ipa
         script: |
           VERSION=$(cat pubspec.yaml | grep 'version:' | head -1 | awk '{print $2}' | cut -d '+' -f 1)
-          flutter build ipa --release --build-name=$VERSION --verbose
-          echo "Generated IPA files:"
-          find build/ios/ipa -name "*.ipa"
-          echo "Generated Xcode build logs:"
-          find /tmp/xcodebuild_logs -name "*.log"
-          echo "Checking for generated artifacts in build directory:"
-          ls -R build
-          echo "Checking for generated artifacts in /tmp/xcodebuild_logs directory:"
-          ls -R /tmp/xcodebuild_logs
-      - name: Export IPA
-        script: |
-          mkdir -p build/ios/ipa
-          xcodebuild -exportArchive \
-            -archivePath $PWD/build/ios/archive/Runner.xcarchive \
-            -exportOptionsPlist ios/Runner/Info.plist \
-            -exportPath $PWD/build/ios/ipa \
-            | tee /tmp/xcodebuild_export.log
-          echo "Exported IPA files:"
-          find $PWD/build/ios/ipa -name "*.ipa"
-          echo "Checking for generated artifacts in build/ios/ipa directory:"
-          ls -R $PWD/build/ios/ipa
-          echo "Checking Xcode build export logs:"
-          cat /tmp/xcodebuild_export.log
-
+          flutter build ipa --export-options-plist=ios/buildInfo.plist --build-name=$VERSION --release
     artifacts:
       - build/ios/ipa/*.ipa
       - /tmp/xcodebuild_logs/*.log
