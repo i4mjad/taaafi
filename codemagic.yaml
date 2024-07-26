@@ -31,10 +31,6 @@ workflows:
             --build-number=$BUILD_NUMBER \
             -PVERSION_CODE=$BUILD_NUMBER \
             -PVERSION_NAME="$BUILD_NUMBER ($VERSION)"
-          echo "Generated AAB files:"
-          find build -name "*.aab"
-          echo "Generated mapping files:"
-          find build -name "mapping.txt"
 
     artifacts:
       - build/**/outputs/**/*.aab
@@ -70,15 +66,6 @@ workflows:
           flutter build ipa --release \
             --build-name=$VERSION \
             --build-number=$BUILD_NUMBER
-          echo "Generated IPA files:"
-          find build/ios/ipa -name "*.ipa"
-          echo "Generated Xcode build logs:"
-          find /tmp/xcodebuild_logs -name "*.log"
-          echo "Checking for generated artifacts in build directory:"
-          ls -R build
-          echo "Checking for generated artifacts in /tmp/xcodebuild_logs directory:"
-          ls -R /tmp/xcodebuild_logs
-
     artifacts:
       - build/ios/ipa/*.ipa
       - /tmp/xcodebuild_logs/*.log
