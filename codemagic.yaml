@@ -53,12 +53,6 @@ workflows:
     scripts:
       - name: Set up code signing settings on Xcode project
         script: xcode-project use-profiles
-      - name: Get current versions
-        script: |
-          VERSION=$(cat pubspec.yaml | grep 'version:' | head -1 | awk '{print $2}' | cut -d '+' -f 1)
-          BUILD_NUMBER=$(($(app-store-connect get-latest-app-store-build-number "$APP_STORE_APPLE_ID") + 1))
-          echo $VERSION
-          echo $BUILD_NUMBER
       - name: Get Flutter packages
         script: |
           flutter packages pub get
@@ -68,7 +62,8 @@ workflows:
       - name: Flutter build ipa
         script: |
           VERSION=$(cat pubspec.yaml | grep 'version:' | head -1 | awk '{print $2}' | cut -d '+' -f 1)
-          flutter build ipa --export-options-plist=ios/buildInfo.plist --build-name=$VERSION --release
+          BUILD_NUMBER=$(($(app-store-connect get-latest-testflight-build-number "$APP_STORE_APPLE_ID") + 1))
+          flutter build ipa --export-options-plist=ios/buildInfo.plist --build-name=$VERSION --build-number=$BUILD_NUMBER --release
     artifacts:
       - build/ios/ipa/*.ipa
       - /tmp/xcodebuild_logs/*.log
