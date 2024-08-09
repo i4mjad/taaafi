@@ -14,7 +14,7 @@ import 'package:reboot_app_3/features/authentication/presentation/login_screen.d
 import 'package:reboot_app_3/features/authentication/presentation/signup_screen.dart';
 import 'package:reboot_app_3/features/authentication/providers/user_document_provider.dart';
 import 'package:reboot_app_3/features/authentication/data/repositories/auth_repository.dart';
-import 'package:reboot_app_3/features/fellowship/presentation/fellowship_screen.dart';
+import 'package:reboot_app_3/features/plus/presentation/taaafi_plus_screen.dart';
 import 'package:reboot_app_3/features/home/presentation/home_screen.dart';
 import 'package:reboot_app_3/features/onboarding/presentation/onboarding_screen.dart';
 import 'package:reboot_app_3/features/vault/presentation/vault_screen.dart';
@@ -182,10 +182,10 @@ GoRouter goRouter(GoRouterRef ref) {
             navigatorKey: shellNavigatorFellowshipKey,
             routes: [
               GoRoute(
-                name: RouteNames.fellowship.name,
-                path: '/fellowship',
+                name: RouteNames.ta3afiPlus.name,
+                path: '/ta3afi-plus',
                 pageBuilder: (context, state) => NoTransitionPage(
-                  child: FellowshipScreen(),
+                  child: TaaafiPlusScreen(),
                 ),
                 routes: [
                   //! Add Pages

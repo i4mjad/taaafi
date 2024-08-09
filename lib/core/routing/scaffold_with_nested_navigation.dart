@@ -51,12 +51,12 @@ class ScaffoldWithNestedNavigation extends StatelessWidget {
                   icon: Icon(LucideIcons.home),
                 ),
                 NavigationDestination(
-                  label: AppLocalizations.of(context).translate("vault"),
+                label: AppLocalizations.of(context).translate("vault"),
                   icon: Icon(LucideIcons.bookLock),
                 ),
                 NavigationDestination(
-                  label: AppLocalizations.of(context).translate("fellowship"),
-                  icon: Icon(LucideIcons.users),
+                  label: AppLocalizations.of(context).translate("ta3afi-plus"),
+                  icon: Icon(LucideIcons.crown),
                 ),
                 NavigationDestination(
                   label: AppLocalizations.of(context).translate("account"),
