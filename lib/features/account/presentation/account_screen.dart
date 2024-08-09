@@ -49,11 +49,6 @@ class AccountScreen extends ConsumerWidget {
                       style: TextStyles.h6,
                     ),
                     verticalSpace(Spacing.points8),
-                    SettingsButton(
-                      icon: LucideIcons.database,
-                      textKey: 'daily-notification-time',
-                    ),
-                    verticalSpace(Spacing.points4),
                     GestureDetector(
                       onTap: () {
                         HapticFeedback.mediumImpact();
@@ -75,7 +70,7 @@ class AccountScreen extends ConsumerWidget {
                       icon: LucideIcons.userCog,
                       textKey: 'delete-my-data',
                     ),
-                    verticalSpace(Spacing.points4),
+                    verticalSpace(Spacing.points16),
                     SettingsButton(
                       icon: LucideIcons.logOut,
                       textKey: 'log-out',
@@ -83,7 +78,7 @@ class AccountScreen extends ConsumerWidget {
                         await authService.signOut(context, ref);
                       },
                     ),
-                    verticalSpace(Spacing.points4),
+                    verticalSpace(Spacing.points16),
                     GestureDetector(
                       onTap: () async {
                         //TODO: this should be selected based on the provider, for testing purposes we will use Google
@@ -107,7 +102,7 @@ class AccountScreen extends ConsumerWidget {
                       textKey: 'version-number',
                       type: 'app',
                     ),
-                    verticalSpace(Spacing.points4),
+                    verticalSpace(Spacing.points16),
                     SettingsButton(
                       icon: LucideIcons.laptop,
                       textKey: 'contact-us-through-this-channels',
