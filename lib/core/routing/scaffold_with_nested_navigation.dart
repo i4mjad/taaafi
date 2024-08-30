@@ -30,8 +30,8 @@ class ScaffoldWithNestedNavigation extends StatelessWidget {
       body: navigationShell,
       bottomNavigationBar: NavigationBarTheme(
           data: NavigationBarThemeData(
-            labelTextStyle:
-                WidgetStatePropertyAll<TextStyle>(TextStyles.footnoteSelected),
+            labelTextStyle: WidgetStatePropertyAll<TextStyle>(
+                TextStyles.bottomNavigationBarLabel),
           ),
           child: Container(
             decoration: BoxDecoration(
@@ -51,7 +51,7 @@ class ScaffoldWithNestedNavigation extends StatelessWidget {
                   icon: Icon(LucideIcons.home),
                 ),
                 NavigationDestination(
-                label: AppLocalizations.of(context).translate("vault"),
+                  label: AppLocalizations.of(context).translate("vault"),
                   icon: Icon(LucideIcons.bookLock),
                 ),
                 NavigationDestination(

@@ -70,7 +70,7 @@ class AccountScreen extends ConsumerWidget {
                       icon: LucideIcons.userCog,
                       textKey: 'delete-my-data',
                     ),
-                    verticalSpace(Spacing.points16),
+                    verticalSpace(Spacing.points8),
                     SettingsButton(
                       icon: LucideIcons.logOut,
                       textKey: 'log-out',
@@ -78,7 +78,7 @@ class AccountScreen extends ConsumerWidget {
                         await authService.signOut(context, ref);
                       },
                     ),
-                    verticalSpace(Spacing.points16),
+                    verticalSpace(Spacing.points8),
                     GestureDetector(
                       onTap: () async {
                         //TODO: this should be selected based on the provider, for testing purposes we will use Google
@@ -102,7 +102,7 @@ class AccountScreen extends ConsumerWidget {
                       textKey: 'version-number',
                       type: 'app',
                     ),
-                    verticalSpace(Spacing.points16),
+                    verticalSpace(Spacing.points8),
                     SettingsButton(
                       icon: LucideIcons.laptop,
                       textKey: 'contact-us-through-this-channels',
@@ -291,7 +291,7 @@ class SettingsButton extends StatelessWidget {
               icon,
               color: _getTextColor(type, theme),
             ),
-            horizontalSpace(Spacing.points16),
+            horizontalSpace(Spacing.points8),
             Text(
               AppLocalizations.of(context).translate(textKey),
               style: TextStyles.footnote
@@ -378,7 +378,7 @@ class UserDetailsWidget extends StatelessWidget {
                 children: [
                   Text(
                     userProfile.displayName,
-                    style: TextStyles.h6.copyWith(
+                    style: TextStyles.footnoteSelected.copyWith(
                       color: theme.grey[900],
                     ),
                   ),
