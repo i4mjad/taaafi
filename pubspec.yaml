@@ -235,20 +235,23 @@ flutter:
 
     - family: Kufam
       fonts:
-        - asset: asset/fonts/Kufam-VariableFont_wght.ttf
+        - asset: asset/fonts/Kufam-bold.ttf
           weight: 500
           style: normal
-        - asset: asset/fonts/Kufam-VariableFont_wght.ttf
+        - asset: asset/fonts/Kufam-bold.ttf
           weight: 800
           style: normal
-        - asset: asset/fonts/Kufam-VariableFont_wght.ttf
+        - asset: asset/fonts/Kufam-bold.ttf
           weight: 600
           style: normal
-        - asset: asset/fonts/Kufam-VariableFont_wght.ttf
+        - asset: asset/fonts/Kufam-bold.ttf
           weight: 400
           style: normal
-        - asset: asset/fonts/Kufam-VariableFont_wght.ttf
+        - asset: asset/fonts/Kufam-bold.ttf
           weight: 700
+          style: normal
+        - asset: asset/fonts/Kufam-bold.ttf
+          weight: 800
           style: normal
 
     - family: Alexandria
