@@ -10,6 +10,7 @@
   "relapses-number": "Relapses Count: ",
   "start-your-journy": "Start Your Journy",
   "start-your-journy-p": "To start, please select the day you want to start from. If you want to start today click on Today button",
+  "statistics":"Statistics",
   "articles": "Articles",
   "article": "Article",
   "tutorial": "Tutorial",
@@ -101,6 +102,8 @@
   "relapses-by-day-of-week": "Relapses By Day-of-Week",
   "streaks": "Streaks",
 
+
+  "day":"Day",
   "today-is-last-relapse": "This day recorded as a Relapse, you can’t followup today",
   "how-is-this-day": "How was this day?",
 
