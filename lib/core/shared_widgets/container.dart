@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 class WidgetsContainer extends StatelessWidget {
   final Widget child;
   final double? width;
+  final double? height;
   final EdgeInsets? padding;
   final Color? backgroundColor;
   final BorderRadius? borderRadius;
@@ -13,6 +14,7 @@ class WidgetsContainer extends StatelessWidget {
   WidgetsContainer({
     required this.child,
     this.width,
+    this.height,
     this.padding,
     this.backgroundColor,
     this.borderRadius,
@@ -24,7 +26,8 @@ class WidgetsContainer extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Container(
-      width: width ?? MediaQuery.of(context).size.width,
+      width: width,
+      height: height,
       padding: padding ?? EdgeInsets.all(16),
       decoration: ShapeDecoration(
         color: backgroundColor ?? theme.primaryColor.withOpacity(0.1),
