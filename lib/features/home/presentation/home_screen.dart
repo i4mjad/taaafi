@@ -83,7 +83,8 @@ class CalenderWidget extends StatelessWidget {
               headerStyle: CalendarHeaderStyle(
                 backgroundColor: theme.primary[100],
                 textAlign: TextAlign.center,
-                textStyle: TextStyles.caption,
+                textStyle:
+                    TextStyles.caption.copyWith(fontWeight: FontWeight.bold),
               ),
               todayHighlightColor: theme.primary[800],
               monthViewSettings: MonthViewSettings(
@@ -185,7 +186,6 @@ class StatisticsWidget extends StatelessWidget {
                             Container(
                               padding: EdgeInsets.all(10),
                               decoration: BoxDecoration(
-                                color: theme.tint[50],
                                 borderRadius: BorderRadius.circular(50),
                                 border: Border.all(
                                     color: theme.tint[200]!, width: 1),
