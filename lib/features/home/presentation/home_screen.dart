@@ -60,7 +60,7 @@ class StatisticsWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = AppTheme.of(context);
     return Container(
-      width: MediaQuery.of(context).size.width,
+      width: MediaQuery.of(context).size.width - 32,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -70,135 +70,148 @@ class StatisticsWidget extends StatelessWidget {
             style: TextStyles.h6.copyWith(color: theme.grey[900]),
           ),
           verticalSpace(Spacing.points8),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              WidgetsContainer(
-                padding: EdgeInsets.all(24),
-                backgroundColor: theme.primary[50],
-                borderSide: BorderSide(color: theme.primary[100]!),
-                child: Column(
-                  children: [
-                    Container(
-                      padding: EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(50),
-                        border:
-                            Border.all(color: theme.primary[200]!, width: 1),
-                      ),
-                      child: Icon(
-                        LucideIcons.heart,
-                        color: theme.primary[600],
-                        size: 20,
-                      ),
-                    ),
-                    verticalSpace(Spacing.points8),
-                    Text(
-                        "28" +
-                            " " +
-                            AppLocalizations.of(context).translate("day"),
-                        style: TextStyles.h6),
-                    verticalSpace(Spacing.points8),
-                    Text(
-                      AppLocalizations.of(context).translate("current-streak"),
-                      style: TextStyles.small,
-                    ),
-                  ],
-                ),
-              ),
-              horizontalSpace(Spacing.points8),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  WidgetsContainer(
-                    padding: EdgeInsets.all(12),
+          IntrinsicHeight(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Expanded(
+                  flex: 1,
+                  child: WidgetsContainer(
+                    padding: EdgeInsets.all(20),
                     backgroundColor: theme.primary[50],
                     borderSide: BorderSide(color: theme.primary[100]!),
-                    child: Row(
-                      children: [
-                        Container(
-                          padding: EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                            color: theme.tint[50],
-                            borderRadius: BorderRadius.circular(50),
-                            border:
-                                Border.all(color: theme.tint[200]!, width: 1),
-                          ),
-                          child: Icon(
-                            LucideIcons.lineChart,
-                            color: theme.tint[600],
-                            size: 20,
-                          ),
-                        ),
-                        horizontalSpace(Spacing.points8),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Text(
-                                "28" +
-                                    " " +
-                                    AppLocalizations.of(context)
-                                        .translate("day"),
-                                style: TextStyles.h6),
-                            verticalSpace(Spacing.points8),
-                            Text(
-                              AppLocalizations.of(context)
-                                  .translate("highest-streak"),
-                              style: TextStyles.small,
-                            ),
-                          ],
-                        )
-                      ],
-                    ),
-                  ),
-                  verticalSpace(Spacing.points8),
-                  WidgetsContainer(
-                    padding: EdgeInsets.all(12),
-                    backgroundColor: theme.primary[50],
-                    borderSide: BorderSide(color: theme.primary[100]!),
-                    child: Row(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         Container(
                           padding: EdgeInsets.all(10),
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(50),
                             border: Border.all(
-                                color: theme.success[200]!, width: 1),
+                                color: theme.primary[200]!, width: 1),
                           ),
                           child: Icon(
-                            LucideIcons.calendar,
-                            color: theme.success[600],
+                            LucideIcons.heart,
+                            color: theme.primary[600],
                             size: 20,
                           ),
                         ),
-                        horizontalSpace(Spacing.points8),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Text(
-                                "28" +
-                                    " " +
-                                    AppLocalizations.of(context)
-                                        .translate("day"),
-                                style: TextStyles.h6),
-                            verticalSpace(Spacing.points8),
-                            Text(
-                              AppLocalizations.of(context)
-                                  .translate("free-days-from-start"),
-                              style: TextStyles.small,
-                            ),
-                          ],
-                        )
+                        verticalSpace(Spacing.points8),
+                        Text(
+                            "28" +
+                                " " +
+                                AppLocalizations.of(context).translate("day"),
+                            style: TextStyles.h6),
+                        verticalSpace(Spacing.points8),
+                        Text(
+                          AppLocalizations.of(context)
+                              .translate("current-streak"),
+                          style: TextStyles.small,
+                          textAlign: TextAlign.center,
+                        ),
                       ],
                     ),
                   ),
-                ],
-              )
-            ],
+                ),
+                horizontalSpace(Spacing.points8),
+                Expanded(
+                  flex: 2,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      WidgetsContainer(
+                        padding: EdgeInsets.all(12),
+                        backgroundColor: theme.primary[50],
+                        borderSide: BorderSide(color: theme.primary[100]!),
+                        child: Row(
+                          children: [
+                            Container(
+                              padding: EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                color: theme.tint[50],
+                                borderRadius: BorderRadius.circular(50),
+                                border: Border.all(
+                                    color: theme.tint[200]!, width: 1),
+                              ),
+                              child: Icon(
+                                LucideIcons.lineChart,
+                                color: theme.tint[600],
+                                size: 20,
+                              ),
+                            ),
+                            horizontalSpace(Spacing.points8),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Text(
+                                    "28" +
+                                        " " +
+                                        AppLocalizations.of(context)
+                                            .translate("day"),
+                                    style: TextStyles.h6),
+                                verticalSpace(Spacing.points8),
+                                Text(
+                                  AppLocalizations.of(context)
+                                      .translate("highest-streak"),
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyles.small,
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                      verticalSpace(Spacing.points8),
+                      WidgetsContainer(
+                        padding: EdgeInsets.all(12),
+                        backgroundColor: theme.primary[50],
+                        borderSide: BorderSide(color: theme.primary[100]!),
+                        child: Row(
+                          children: [
+                            Container(
+                              padding: EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(50),
+                                border: Border.all(
+                                    color: theme.success[200]!, width: 1),
+                              ),
+                              child: Icon(
+                                LucideIcons.calendar,
+                                color: theme.success[600],
+                                size: 20,
+                              ),
+                            ),
+                            horizontalSpace(Spacing.points8),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Text(
+                                    "28" +
+                                        " " +
+                                        AppLocalizations.of(context)
+                                            .translate("day"),
+                                    style: TextStyles.h6),
+                                verticalSpace(Spacing.points8),
+                                Text(
+                                  AppLocalizations.of(context)
+                                      .translate("free-days-from-start"),
+                                  style: TextStyles.small,
+                                ),
+                              ],
+                            )
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       ),
