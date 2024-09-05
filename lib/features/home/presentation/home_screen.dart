@@ -80,20 +80,24 @@ class CalenderWidget extends StatelessWidget {
             backgroundColor: theme.primary[50],
             child: SfCalendar(
               view: CalendarView.month,
+              viewHeaderStyle: ViewHeaderStyle(
+                dayTextStyle: TextStyles.tinyBold,
+              ),
               headerStyle: CalendarHeaderStyle(
                 backgroundColor: theme.primary[100],
                 textAlign: TextAlign.center,
-                textStyle:
-                    TextStyles.caption.copyWith(fontWeight: FontWeight.bold),
+                textStyle: TextStyles.caption.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               todayHighlightColor: theme.primary[800],
               monthViewSettings: MonthViewSettings(
                 showTrailingAndLeadingDates: false,
+                agendaStyle: AgendaStyle(
+                  dayTextStyle: TextStyles.body,
+                ),
                 monthCellStyle: MonthCellStyle(
                   todayBackgroundColor: theme.primary[100],
-
-                  // trailingDatesBackgroundColor: Color(0xff216583),
-                  // leadingDatesBackgroundColor: Color(0xff216583),
                   backgroundColor: theme.primary[50],
                   textStyle: TextStyles.caption,
                 ),
