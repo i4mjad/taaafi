@@ -1,6 +1,8 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:reboot_app_3/core/helpers/date_display_formater.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/shared_widgets/app_bar.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
@@ -8,6 +10,7 @@ import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
+import 'package:time_picker_spinner_pop_up/time_picker_spinner_pop_up.dart';
 
 class HomeScreen extends ConsumerWidget {
   HomeScreen({super.key});
@@ -43,13 +46,120 @@ class HomeScreen extends ConsumerWidget {
       floatingActionButton: FloatingActionButton.extended(
           backgroundColor: theme.primary[600],
           onPressed: () {
-            // TODO: open the followup modal
+            showModalBottomSheet<void>(
+                context: context,
+                builder: (BuildContext context) {
+                  return FollowUpSheet();
+                });
           },
           label: Text(
             AppLocalizations.of(context).translate("daily-follow-up"),
             style: TextStyles.caption.copyWith(color: theme.grey[50]),
           ),
           icon: Icon(LucideIcons.pencil, color: theme.grey[50])),
+    );
+  }
+}
+
+class FollowUpSheet extends ConsumerStatefulWidget {
+  const FollowUpSheet({super.key});
+
+  @override
+  _FollowUpSheetState createState() => _FollowUpSheetState();
+}
+
+class _FollowUpSheetState extends ConsumerState<FollowUpSheet> {
+  @override
+  Widget build(BuildContext context) {
+    final locale = ref.watch(localeNotifierProvider);
+    final theme = AppTheme.of(context);
+    final width = MediaQuery.of(context).size.width;
+
+    return Container(
+      padding: EdgeInsets.all(16),
+      width: MediaQuery.of(context).size.width,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              TimePickerSpinnerPopUp(
+                mode: CupertinoDatePickerMode.dateAndTime,
+                barrierColor: theme.primary[50]!,
+                padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
+                locale: locale,
+                cancelTextStyle:
+                    TextStyles.caption.copyWith(color: theme.primary[600]),
+                confirmTextStyle:
+                    TextStyles.caption.copyWith(color: theme.primary[600]),
+                timeFormat: "d - MMMM - yyyy hh:mm a",
+                timeWidgetBuilder: (dateTime) {
+                  return WidgetsContainer(
+                    padding: EdgeInsets.all(8),
+                    backgroundColor: theme.primary[50],
+                    borderSide:
+                        BorderSide(color: theme.primary[100]!, width: 0.75),
+                    borderRadius: BorderRadius.circular(8),
+                    child: Text(
+                      getDisplayDateTime(dateTime, locale!.languageCode),
+                      style: TextStyles.body,
+                    ),
+                  );
+                },
+                cancelText: AppLocalizations.of(context).translate("cancel"),
+                confirmText: AppLocalizations.of(context).translate("confirm"),
+              ),
+              GestureDetector(
+                onTap: () {
+                  Navigator.pop(context);
+                },
+                child: Icon(
+                  LucideIcons.xCircle,
+                ),
+              )
+            ],
+          ),
+          Spacer(),
+          Row(
+            children: [
+              Expanded(
+                child: WidgetsContainer(
+                  backgroundColor: theme.primary[600],
+                  child: Center(
+                    child: Text(
+                      AppLocalizations.of(context).translate('save'),
+                      style: TextStyles.h6.copyWith(color: theme.grey[50]),
+                    ),
+                  ),
+                ),
+              ),
+              horizontalSpace(Spacing.points8),
+              Expanded(
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.pop(context);
+                  },
+                  child: WidgetsContainer(
+                    backgroundColor: theme.secondary[50],
+                    padding: EdgeInsets.all(16),
+                    borderSide: BorderSide(color: theme.secondary[200]!),
+                    child: Center(
+                      child: Text(
+                        AppLocalizations.of(context).translate('cancel'),
+                        style: TextStyles.h6.copyWith(
+                          color: theme.secondary[900],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }

@@ -135,11 +135,11 @@ class TextStyles {
   );
 
   static TextStyle bottomNavigationBarLabel = const TextStyle(
-    fontSize: 14,
+    fontSize: 11,
     decoration: TextDecoration.none,
     fontFamily: 'Kufam',
     fontStyle: FontStyle.normal,
-    fontWeight: FontWeightHelper.semiBold,
+    fontWeight: FontWeightHelper.medium,
     height: 20 / 14,
     letterSpacing: 0,
   );

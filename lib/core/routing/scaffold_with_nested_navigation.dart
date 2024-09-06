@@ -42,25 +42,39 @@ class ScaffoldWithNestedNavigation extends StatelessWidget {
               ),
             )),
             child: NavigationBar(
+              height: 58,
               indicatorColor: theme.primary[100],
+              indicatorShape: CircleBorder(),
               selectedIndex: navigationShell.currentIndex,
               backgroundColor: theme.primary[50],
               destinations: [
                 NavigationDestination(
                   label: AppLocalizations.of(context).translate("home"),
-                  icon: Icon(LucideIcons.home),
+                  icon: Icon(
+                    LucideIcons.home,
+                    size: 18,
+                  ),
                 ),
                 NavigationDestination(
                   label: AppLocalizations.of(context).translate("vault"),
-                  icon: Icon(LucideIcons.bookLock),
+                  icon: Icon(
+                    LucideIcons.bookLock,
+                    size: 18,
+                  ),
                 ),
                 NavigationDestination(
                   label: AppLocalizations.of(context).translate("ta3afi-plus"),
-                  icon: Icon(LucideIcons.crown),
+                  icon: Icon(
+                    LucideIcons.crown,
+                    size: 18,
+                  ),
                 ),
                 NavigationDestination(
                   label: AppLocalizations.of(context).translate("account"),
-                  icon: Icon(LucideIcons.settings),
+                  icon: Icon(
+                    LucideIcons.settings,
+                    size: 18,
+                  ),
                 ),
               ],
               onDestinationSelected: _goBranch,
