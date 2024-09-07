@@ -10,8 +10,8 @@ import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/features/home/data/models/emotion.dart';
 import 'package:reboot_app_3/features/home/data/models/follow_up_option.dart';
-import 'package:reboot_app_3/features/home/presentation/screens/home/widgets/emotion_widget.dart';
-import 'package:reboot_app_3/features/home/presentation/screens/home/widgets/follow_up_widget.dart';
+import 'package:reboot_app_3/features/home/presentation/home/widgets/emotion_widget.dart';
+import 'package:reboot_app_3/features/home/presentation/home/widgets/follow_up_widget.dart';
 import 'package:time_picker_spinner_pop_up/time_picker_spinner_pop_up.dart';
 
 class FollowUpSheet extends ConsumerStatefulWidget {

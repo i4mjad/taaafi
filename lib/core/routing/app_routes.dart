@@ -15,7 +15,7 @@ import 'package:reboot_app_3/features/authentication/presentation/signup_screen.
 import 'package:reboot_app_3/features/authentication/providers/user_document_provider.dart';
 import 'package:reboot_app_3/features/authentication/data/repositories/auth_repository.dart';
 import 'package:reboot_app_3/features/plus/presentation/taaafi_plus_screen.dart';
-import 'package:reboot_app_3/features/home/presentation/screens/home/home_screen.dart';
+import 'package:reboot_app_3/features/home/presentation/home/home_screen.dart';
 import 'package:reboot_app_3/features/onboarding/presentation/onboarding_screen.dart';
 import 'package:reboot_app_3/features/vault/presentation/vault_screen.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';

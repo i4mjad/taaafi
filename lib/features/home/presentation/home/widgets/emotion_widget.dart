@@ -25,7 +25,6 @@ class EmotionWidget extends StatelessWidget {
       backgroundColor: theme.tint[50],
       borderSide: BorderSide(
         color: isSelected ? theme.success[600]! : theme.tint[400]!,
-        width: isSelected ? 2 : 1,
 
         // Change border color based on selection
       ),
