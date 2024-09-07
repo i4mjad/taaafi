@@ -174,7 +174,7 @@ class AccountScreen extends ConsumerWidget {
                       )
                     ],
                   ),
-                  verticalSpace(Spacing.points16),
+                  verticalSpace(Spacing.points24),
                   Text(
                     AppLocalizations.of(context).translate('night-mode'),
                     style: TextStyles.h6.copyWith(
@@ -188,7 +188,7 @@ class AccountScreen extends ConsumerWidget {
                       Navigator.of(context).pop();
                     },
                     child: WidgetsContainer(
-                      padding: EdgeInsets.all(14),
+                      padding: EdgeInsets.all(12),
                       backgroundColor: theme.primary[50],
                       borderSide: BorderSide(color: theme.primary[100]!),
                       borderRadius: BorderRadius.circular(10.5),
@@ -229,7 +229,8 @@ class AccountScreen extends ConsumerWidget {
                       _updateThelocale(value, ref);
                       Navigator.of(context).pop();
                     },
-                  )
+                  ),
+                  verticalSpace(Spacing.points16),
                 ],
               ),
             ),

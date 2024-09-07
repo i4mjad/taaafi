@@ -132,10 +132,28 @@
   "title": "العنوان",
   "body": "النص",
 
+  "happy": "فرح",
+  "gratitude": "امتنان",
+  "serenity": "سكينة",
+  "confidence": "ثقة",
+  "satisfaction": "رضى",
+
+
   "relapse": "انتكاسة",
   "porn-only": " إباحية فقط",
   "mast-only": "عادة سرية فقط",
   "free-day": "يوم موفق!",
+  "slip-up": "زلة",
+  "how-do-you-feel":"كيف تشعُر؟",
+
+  "what-you-want-to-add":"ما الذي تريد إضافته؟",
+
+
+  "angry":"غاضب",
+  "sad":"حزين",
+  "regret":"نادم",
+  "anxious":"متوتر",
+  "fear":"خائف",
 
   "Article": "مقال",
   "Video": "مقطع مرئي",

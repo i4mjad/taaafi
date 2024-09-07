@@ -34,7 +34,7 @@ class WidgetsContainer extends StatelessWidget {
         shape: SmoothRectangleBorder(
           borderRadius: SmoothBorderRadius(
             cornerRadius: (borderRadius ?? BorderRadius.circular(15)).topLeft.x,
-            cornerSmoothing: cornerSmoothing ?? 1,
+            cornerSmoothing: cornerSmoothing ?? 0.6,
           ),
           side: borderSide ??
               BorderSide(

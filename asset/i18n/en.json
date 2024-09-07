@@ -108,6 +108,8 @@
   "today-is-last-relapse": "This day recorded as a Relapse, you can’t followup today",
   "how-is-this-day": "How was this day?",
 
+  "what-you-want-to-add":"What do you want to add?",
+
   "account-settings": "User Information",
   "app-settings": "Settings",
   "user_name": "User Name",
@@ -158,6 +160,12 @@
   "search": "Search",
   "loading": "Loading...",
 
+
+  "sad":"Sad",
+  "regret":"Regret",
+  "anxious":"Anxious",
+  "fear":"Fear",
+
   "posted-at": "Posted at: ",
   "share-app": "We Need Your Feedback!",
 
@@ -175,10 +183,22 @@
   "change-lang": "Change Language",
   "ui-settings": "User Interface Settings",
 
+
+
+  "happy": "happy",
+  "gratitude": "gratitude",
+  "serenity": "serenity",
+  "confidence": "confidence",
+  "satisfaction": "satisfaction",
   "relapse": "Relapse",
   "porn-only": "Porn Only",
   "mast-only": "Masturbation Only",
   "free-day": "Success Day!",
+  "slip-up": "Slip up",
+
+  "how-do-you-feel":"How do you feel?",
+
+  "angry":"Angry",
 
   "Article": "Article",
   "Video": "Video",
