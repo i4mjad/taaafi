@@ -10,10 +10,12 @@ class EmotionWidget extends StatelessWidget {
     super.key,
     required this.emotionEmoji,
     required this.emotionNameTranslationKey,
+    required this.isSelected, // New parameter to indicate selection
   });
 
   final String emotionEmoji;
   final String emotionNameTranslationKey;
+  final bool isSelected; // Whether the emotion is selected or not
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +23,12 @@ class EmotionWidget extends StatelessWidget {
     return WidgetsContainer(
       cornerSmoothing: 1,
       backgroundColor: theme.tint[50],
-      borderSide: BorderSide(color: theme.tint[400]!),
+      borderSide: BorderSide(
+        color: isSelected ? theme.success[600]! : theme.tint[400]!,
+        width: isSelected ? 2 : 1,
+
+        // Change border color based on selection
+      ),
       padding: EdgeInsets.all(8),
       child: Column(
         children: [

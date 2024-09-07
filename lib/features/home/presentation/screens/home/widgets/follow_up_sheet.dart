@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/helpers/date_display_formater.dart';
@@ -8,7 +9,9 @@ import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/features/home/data/models/emotion.dart';
+import 'package:reboot_app_3/features/home/data/models/follow_up_option.dart';
 import 'package:reboot_app_3/features/home/presentation/screens/home/widgets/emotion_widget.dart';
+import 'package:reboot_app_3/features/home/presentation/screens/home/widgets/follow_up_widget.dart';
 import 'package:time_picker_spinner_pop_up/time_picker_spinner_pop_up.dart';
 
 class FollowUpSheet extends ConsumerStatefulWidget {
@@ -19,6 +22,38 @@ class FollowUpSheet extends ConsumerStatefulWidget {
 }
 
 class _FollowUpSheetState extends ConsumerState<FollowUpSheet> {
+  Set<FollowUpOption> selectedFollowUps = {};
+  Set<Emotion> selectedEmotions = {};
+
+  final List<FollowUpOption> followUpOptions = [
+    FollowUpOption(icon: LucideIcons.planeLanding, translationKey: 'slip-up'),
+    FollowUpOption(icon: LucideIcons.heartCrack, translationKey: 'relapse'),
+    FollowUpOption(icon: LucideIcons.play, translationKey: 'porn-only'),
+    FollowUpOption(icon: LucideIcons.hand, translationKey: 'mast-only'),
+  ];
+
+  void toggleFollowUp(FollowUpOption followUpOption) {
+    setState(() {
+      if (selectedFollowUps.contains(followUpOption)) {
+        selectedFollowUps.remove(followUpOption);
+      } else {
+        selectedFollowUps.add(followUpOption);
+      }
+    });
+    HapticFeedback.selectionClick(); // Haptic feedback on selection
+  }
+
+  void toggleEmotion(Emotion emotion) {
+    setState(() {
+      if (selectedEmotions.contains(emotion)) {
+        selectedEmotions.remove(emotion);
+      } else {
+        selectedEmotions.add(emotion);
+      }
+    });
+    HapticFeedback.selectionClick(); // Haptic feedback on selection
+  }
+
   @override
   Widget build(BuildContext context) {
     final locale = ref.watch(localeNotifierProvider);
@@ -79,159 +114,122 @@ class _FollowUpSheetState extends ConsumerState<FollowUpSheet> {
             style: TextStyles.h6,
           ),
           verticalSpace(Spacing.points8),
-          Column(
-            children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: WidgetsContainer(
-                      backgroundColor: theme.primary[50],
-                      borderSide: BorderSide(color: theme.primary[100]!),
-                      child: Column(
-                        children: [
-                          Icon(LucideIcons.planeLanding),
-                          verticalSpace(Spacing.points8),
-                          Text(
-                            AppLocalizations.of(context).translate('slip-up'),
-                            style: TextStyles.footnote,
-                          ),
-                        ],
-                      ),
+          // Display follow-up options using FollowUpWidget
+          Container(
+            height: 80,
+            width: MediaQuery.of(context).size.width -
+                32 +
+                (4 *
+                    (followUpOptions.length -
+                        1)), // Container width remains the same
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              itemCount: followUpOptions.length,
+              separatorBuilder: (BuildContext context, int index) =>
+                  horizontalSpace(Spacing.points4),
+              itemBuilder: (BuildContext context, int index) {
+                final followUp = followUpOptions[index];
+                final isSelected = selectedFollowUps.contains(followUp);
+
+                return GestureDetector(
+                  onTap: () => toggleFollowUp(followUp),
+                  child: Container(
+                    width: (MediaQuery.of(context).size.width - 32) /
+                        followUpOptions
+                            .length, // Dynamically distribute width across all follow-ups
+                    child: FollowUpWidget(
+                      icon: followUp.icon,
+                      translationKey: followUp.translationKey,
+                      isSelected: isSelected,
                     ),
                   ),
-                  horizontalSpace(Spacing.points8),
-                  Expanded(
-                    child: WidgetsContainer(
-                      backgroundColor: theme.primary[50],
-                      borderSide: BorderSide(color: theme.primary[100]!),
-                      child: Column(
-                        children: [
-                          Icon(LucideIcons.heartCrack),
-                          verticalSpace(Spacing.points8),
-                          Text(
-                            AppLocalizations.of(context).translate('relapse'),
-                            style: TextStyles.footnote,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              verticalSpace(Spacing.points8),
-              Row(
-                children: [
-                  Expanded(
-                    child: WidgetsContainer(
-                      backgroundColor: theme.primary[50],
-                      borderSide: BorderSide(color: theme.primary[100]!),
-                      child: Column(
-                        children: [
-                          Icon(LucideIcons.play),
-                          verticalSpace(Spacing.points8),
-                          Text(
-                            AppLocalizations.of(context).translate('porn-only'),
-                            style: TextStyles.footnote,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  horizontalSpace(Spacing.points8),
-                  Expanded(
-                    child: WidgetsContainer(
-                      backgroundColor: theme.primary[50],
-                      borderSide: BorderSide(color: theme.primary[100]!),
-                      child: Column(
-                        children: [
-                          Icon(LucideIcons.hand),
-                          verticalSpace(Spacing.points8),
-                          Text(
-                            AppLocalizations.of(context).translate('mast-only'),
-                            style: TextStyles.footnote,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
+                );
+              },
+            ),
           ),
+
           verticalSpace(Spacing.points16),
-          Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                AppLocalizations.of(context).translate('how-do-you-feel'),
-                style: TextStyles.h6,
-              ),
-              verticalSpace(Spacing.points8),
-              Text("مشاعر سلبية", style: TextStyles.footnoteSelected),
-              verticalSpace(Spacing.points4),
-              Container(
-                height: 80,
-                width: MediaQuery.of(context).size.width - 32,
-                child: ListView.separated(
-                  scrollDirection: Axis.horizontal, // Horizontal scrolling
-                  itemCount: badEmotions.length,
-                  separatorBuilder: (BuildContext context, int index) =>
-                      horizontalSpace(Spacing.points4),
-                  itemBuilder: (BuildContext context, int index) {
-                    final emotion = badEmotions[index];
-
-                    // Use Align to prevent stretching of EmotionWidget
-                    return SizedBox(
-                      width: 80,
-                      child: EmotionWidget(
-                        emotionEmoji: emotion.emotionEmoji,
-                        emotionNameTranslationKey:
-                            emotion.emotionNameTranslationKey,
-                      ),
-                    );
-                  },
-                ),
-              ),
-              verticalSpace(Spacing.points8),
-              Text("مشاعر إيجابية", style: TextStyles.footnoteSelected),
-              verticalSpace(Spacing.points4),
-              Container(
-                height: 80,
-                width: MediaQuery.of(context).size.width - 32,
-                child: ListView.separated(
-                  scrollDirection: Axis.horizontal, // Horizontal scrolling
-                  itemCount: goodEmotions.length,
-                  separatorBuilder: (BuildContext context, int index) =>
-                      horizontalSpace(Spacing.points4),
-                  itemBuilder: (BuildContext context, int index) {
-                    final emotion = goodEmotions[index];
-
-                    // Use Align to prevent stretching of EmotionWidget
-                    return SizedBox(
-                      width: 80,
-                      child: EmotionWidget(
-                        emotionEmoji: emotion.emotionEmoji,
-                        emotionNameTranslationKey:
-                            emotion.emotionNameTranslationKey,
-                      ),
-                    );
-                  },
-                ),
-              ),
-            ],
+          Text(
+            AppLocalizations.of(context).translate('how-do-you-feel'),
+            style: TextStyles.h6,
           ),
+          verticalSpace(Spacing.points8),
+          Text("مشاعر سلبية", style: TextStyles.footnoteSelected),
+          verticalSpace(Spacing.points4),
+          Container(
+            height: 80,
+            width: MediaQuery.of(context).size.width - 32,
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              itemCount: badEmotions.length,
+              separatorBuilder: (BuildContext context, int index) =>
+                  horizontalSpace(Spacing.points4),
+              itemBuilder: (BuildContext context, int index) {
+                final emotion = badEmotions[index];
+                final isSelected = selectedEmotions.contains(emotion);
+
+                return GestureDetector(
+                  onTap: () => toggleEmotion(emotion),
+                  child: SizedBox(
+                    width: 80,
+                    child: EmotionWidget(
+                      emotionEmoji: emotion.emotionEmoji,
+                      emotionNameTranslationKey:
+                          emotion.emotionNameTranslationKey,
+                      isSelected: isSelected,
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+          Text("مشاعر إيجابية", style: TextStyles.footnoteSelected),
+          verticalSpace(Spacing.points4),
+          Container(
+            height: 80,
+            width: MediaQuery.of(context).size.width - 32,
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              itemCount: goodEmotions.length,
+              separatorBuilder: (BuildContext context, int index) =>
+                  horizontalSpace(Spacing.points4),
+              itemBuilder: (BuildContext context, int index) {
+                final emotion = goodEmotions[index];
+                final isSelected = selectedEmotions.contains(emotion);
+
+                return GestureDetector(
+                  onTap: () => toggleEmotion(emotion),
+                  child: SizedBox(
+                    width: 80,
+                    child: EmotionWidget(
+                      emotionEmoji: emotion.emotionEmoji,
+                      emotionNameTranslationKey:
+                          emotion.emotionNameTranslationKey,
+                      isSelected: isSelected,
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+
           verticalSpace(Spacing.points16),
           Row(
             children: [
               Expanded(
-                child: WidgetsContainer(
-                  borderRadius: BorderRadius.circular(10),
-                  backgroundColor: theme.primary[600],
-                  child: Center(
-                    child: Text(
-                      AppLocalizations.of(context).translate('save'),
-                      style: TextStyles.h6.copyWith(color: theme.grey[50]),
+                child: GestureDetector(
+                  onTap: () {
+                    print("Selected FollowUps: $selectedFollowUps");
+                    print("Selected Emotions: $selectedEmotions");
+                  },
+                  child: WidgetsContainer(
+                    borderRadius: BorderRadius.circular(10),
+                    backgroundColor: theme.primary[600],
+                    child: Center(
+                      child: Text(
+                        AppLocalizations.of(context).translate('save'),
+                        style: TextStyles.h6.copyWith(color: theme.grey[50]),
+                      ),
                     ),
                   ),
                 ),
