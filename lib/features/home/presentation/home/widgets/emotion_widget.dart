@@ -10,12 +10,12 @@ class EmotionWidget extends StatelessWidget {
     super.key,
     required this.emotionEmoji,
     required this.emotionNameTranslationKey,
-    required this.isSelected, // New parameter to indicate selection
+    required this.isSelected,
   });
 
   final String emotionEmoji;
   final String emotionNameTranslationKey;
-  final bool isSelected; // Whether the emotion is selected or not
+  final bool isSelected;
 
   @override
   Widget build(BuildContext context) {

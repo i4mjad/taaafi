@@ -154,7 +154,11 @@ class _FollowUpSheetState extends ConsumerState<FollowUpSheet> {
             style: TextStyles.h6,
           ),
           verticalSpace(Spacing.points8),
-          Text("مشاعر سلبية", style: TextStyles.footnoteSelected),
+          // TODO: translate this
+          Text(
+            "مشاعر سلبية",
+            style: TextStyles.footnoteSelected.copyWith(color: theme.grey[700]),
+          ),
           verticalSpace(Spacing.points4),
           Container(
             height: 80,
@@ -183,6 +187,7 @@ class _FollowUpSheetState extends ConsumerState<FollowUpSheet> {
               },
             ),
           ),
+          // TODO: translate this
           Text("مشاعر إيجابية", style: TextStyles.footnoteSelected),
           verticalSpace(Spacing.points4),
           Container(
