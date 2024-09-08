@@ -149,6 +149,10 @@
   "what-you-want-to-add":"ما الذي تريد إضافته؟",
 
 
+  "day-overview":"حصيلة اليوم",
+
+  "diaries":"اليوميات",
+
   "angry":"غاضب",
   "sad":"حزين",
   "regret":"نادم",
@@ -214,6 +218,9 @@
   "english": "English",
   "arabic": "العربية",
   "sponsored-by": "بالشراكة مع:",
+
+  "emotions":"المشاعر",
+  "follow-up":"إضافة متابعة",
 
   "admin": "مدير",
   "user": "عضو",

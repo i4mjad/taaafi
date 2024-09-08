@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/widgets.dart';
+import 'package:go_router/go_router.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
@@ -56,6 +57,10 @@ class CalenderWidget extends StatelessWidget {
                   textStyle: TextStyles.caption,
                 ),
               ),
+              onTap: (date) {
+                var selectedDate = date.date;
+                context.go('/home/dayOverview/${selectedDate}');
+              },
             ),
           ),
         ],

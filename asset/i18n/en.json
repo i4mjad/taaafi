@@ -121,6 +121,8 @@
 
   "ta3afi-plus":"Ta'aafi +",
 
+  "emotions":"Emotions",
+
   "vault": "Vault",
   "fellowship": "Group",
   "about-app": "About the app",
@@ -135,6 +137,10 @@
   "new-note": "New Note",
   "ta3afi": "Reboot App",
   "taaafi-platform": "Ta'aafi Platform",
+
+  "diaries":"Diaries",
+
+  "follow-up":"Add Follow-Up",
 
   "login": "Login",
   "email": "Email",
@@ -195,6 +201,8 @@
   "mast-only": "Masturbation",
   "free-day": "Success Day!",
   "slip-up": "Slip up",
+
+  "day-overview":"Day Overview",
 
   "how-do-you-feel":"How do you feel?",
 

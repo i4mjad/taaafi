@@ -14,6 +14,7 @@ import 'package:reboot_app_3/features/authentication/presentation/login_screen.d
 import 'package:reboot_app_3/features/authentication/presentation/signup_screen.dart';
 import 'package:reboot_app_3/features/authentication/providers/user_document_provider.dart';
 import 'package:reboot_app_3/features/authentication/data/repositories/auth_repository.dart';
+import 'package:reboot_app_3/features/home/presentation/day_overview/day_overview_screen.dart';
 import 'package:reboot_app_3/features/plus/presentation/taaafi_plus_screen.dart';
 import 'package:reboot_app_3/features/home/presentation/home/home_screen.dart';
 import 'package:reboot_app_3/features/onboarding/presentation/onboarding_screen.dart';
@@ -31,6 +32,7 @@ GoRouter goRouter(GoRouterRef ref) {
   return GoRouter(
     initialLocation: '/home',
     navigatorKey: rootNavigatorKey,
+    debugLogDiagnostics: true,
     redirect: (context, state) async {
       final isLoggedIn = authState.asData?.value != null;
 
@@ -158,7 +160,13 @@ GoRouter goRouter(GoRouterRef ref) {
                   child: HomeScreen(),
                 ),
                 routes: [
-                  //! Add Pages
+                  GoRoute(
+                    path: "dayOverview/:date",
+                    name: RouteNames.dayOverview.name,
+                    builder: (context, state) => DayOverviewScreen(
+                      date: DateTime.parse(state.pathParameters["date"]!),
+                    ),
+                  )
                 ],
               ),
             ],

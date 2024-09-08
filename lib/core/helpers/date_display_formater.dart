@@ -8,7 +8,7 @@ String getDisplayDateTime(dynamic date, String language) {
   String locale = getLocale(language);
   String formattedDate =
       DateFormat('d - MMMM - yyyy hh:mm a', locale).format(date);
-  if (language == 'arabic') {
+  if (language == 'arabic' || language == 'ar') {
     formattedDate = replaceWesternWithEasternArabicNumerals(formattedDate);
   }
   return formattedDate;
@@ -21,14 +21,14 @@ String getDisplayDate(dynamic date, String language) {
 
   String locale = getLocale(language);
   String formattedDate = DateFormat('d - MMMM - yyyy', locale).format(date);
-  if (language == 'arabic') {
+  if (language == 'arabic' || language == 'ar') {
     formattedDate = replaceWesternWithEasternArabicNumerals(formattedDate);
   }
   return formattedDate;
 }
 
 Timestamp parseDisplayDateTime(String dateStr, String language) {
-  if (language == 'arabic') {
+  if (language == 'arabic' || language == 'ar') {
     dateStr = replaceEasternWithWesternArabicNumerals(dateStr);
     dateStr = replaceArabicMonthWithEnglish(dateStr);
   }
@@ -39,7 +39,7 @@ Timestamp parseDisplayDateTime(String dateStr, String language) {
 }
 
 Timestamp parseDisplayDate(String dateStr, String language) {
-  if (language == 'arabic') {
+  if (language == 'arabic' || language == 'ar') {
     dateStr = replaceEasternWithWesternArabicNumerals(dateStr);
     dateStr = replaceArabicMonthWithEnglish(dateStr);
   }

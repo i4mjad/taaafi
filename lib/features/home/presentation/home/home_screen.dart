@@ -39,7 +39,7 @@ class HomeScreen extends ConsumerWidget {
               context: context,
               isScrollControlled: true,
               builder: (BuildContext context) {
-                return FollowUpSheet();
+                return FollowUpSheet(DateTime.now());
               });
         },
         label: Text(

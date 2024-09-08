@@ -28,6 +28,27 @@ AppBar appBar(BuildContext context, WidgetRef ref, String? titleTranslationKey,
   );
 }
 
+AppBar plainAppBar(BuildContext context, WidgetRef ref, String? title,
+    bool showLocaleChangeIcon, bool automaticallyImplyLeading) {
+  final theme = AppTheme.of(context);
+  return AppBar(
+    title: Text(
+      title != null ? title : '',
+      style: TextStyles.screenHeadding.copyWith(
+        color: theme.grey[900],
+        height: 1,
+      ),
+    ),
+    backgroundColor: theme.backgroundColor,
+    surfaceTintColor: theme.backgroundColor,
+    centerTitle: false,
+    shadowColor: theme.grey[100],
+    actions: loadedActions(ref, showLocaleChangeIcon),
+    leadingWidth: 16,
+    automaticallyImplyLeading: automaticallyImplyLeading,
+  );
+}
+
 List<Widget> loadedActions(WidgetRef ref, bool showLocaleChangeIcon) {
   List<Widget> widgets = [];
   if (showLocaleChangeIcon) {

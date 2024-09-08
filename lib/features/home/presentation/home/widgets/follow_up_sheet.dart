@@ -15,8 +15,9 @@ import 'package:reboot_app_3/features/home/presentation/home/widgets/follow_up_w
 import 'package:time_picker_spinner_pop_up/time_picker_spinner_pop_up.dart';
 
 class FollowUpSheet extends ConsumerStatefulWidget {
-  const FollowUpSheet({super.key});
+  FollowUpSheet(this.date, {super.key});
 
+  final DateTime date;
   @override
   _FollowUpSheetState createState() => _FollowUpSheetState();
 }
@@ -95,6 +96,7 @@ class _FollowUpSheetState extends ConsumerState<FollowUpSheet> {
                     ),
                   );
                 },
+                initTime: widget.date,
                 cancelText: AppLocalizations.of(context).translate("cancel"),
                 confirmText: AppLocalizations.of(context).translate("confirm"),
               ),
