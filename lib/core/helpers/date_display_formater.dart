@@ -89,7 +89,7 @@ String replaceWesternWithEasternArabicNumerals(String input) {
 
   for (int i = 0; i < westernArabicNumerals.length; i++) {
     input =
-        input.replaceAll(westernArabicNumerals[i], easternArabicNumerals[i]);
+        input.replaceAll(easternArabicNumerals[i], westernArabicNumerals[i]);
   }
 
   return input;
