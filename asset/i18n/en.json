@@ -191,16 +191,19 @@
 
 
 
-  "happy": "happy",
-  "gratitude": "gratitude",
-  "serenity": "serenity",
-  "confidence": "confidence",
-  "satisfaction": "satisfaction",
+  "happy": "Happy",
+  "gratitude": "Gratitude",
+  "serenity": "Serenity",
+  "confidence": "Confidence",
+  "satisfaction": "Satisfaction",
   "relapse": "Relapse",
   "porn-only": "Porn",
   "mast-only": "Masturbation",
   "free-day": "Success Day!",
   "slip-up": "Slip up",
+
+  "negative-feelings": "Negative Feelings",
+  "positive-feelings": "Positive Feelings",
 
   "day-overview":"Day Overview",
 
@@ -310,5 +313,14 @@
   "gender": "Gender",
   "preferred-language": "Preferred Language",
   "activate": "Activate",
-  "data-are-secured": "We keep your information secure and private."
+  "data-are-secured": "We keep your information secure and private.",
+
+  "no-follow-ups":"No Follow Up for this day",
+  "add-follow-ups":"Add Follow up",
+
+  "no-notes":"No Diaries for this day",
+  "add-note":"Add Diaries",
+
+  "no-emotions":"No Emotions added for this day",
+  "add-emotions":"Add Emotions"
 }

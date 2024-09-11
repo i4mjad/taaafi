@@ -146,6 +146,9 @@
   "slip-up": "زلة",
   "how-do-you-feel":"كيف تشعُر؟",
 
+  "negative-feelings": "مشاعر سلبية",
+  "positive-feelings": "مشاعر إيجابية",
+
   "what-you-want-to-add":"ما الذي تريد إضافته؟",
 
 
@@ -310,5 +313,18 @@
   "gender": "الجنس",
   "preferred-language": "اللفة المفضلة",
   "data-are-secured": "نحن نحتفظ بمعلوماتك بأمان وسرية.",
-  "update-profile": "تحديث الملف الشخصي"
+  "update-profile": "تحديث الملف الشخصي",
+
+  "no-follow-ups":"لم تقم بإضافة متابعة لهذا اليوم",
+  "add-follow-ups":"إضافة متابعة",
+
+  "no-notes":"لم تقم بإضافة يوميات لهذا اليوم",
+  "add-note":"إضافة يوميات",
+
+  "no-emotions":"لم تقم بإضافة مشاعر لهذا اليوم",
+  "add-emotions":"إضافة مشاعر"
+
+
+
+
 }

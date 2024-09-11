@@ -23,6 +23,7 @@ class FollowUpWidget extends StatelessWidget {
 
     return WidgetsContainer(
       backgroundColor: theme.primary[50],
+      width: 100,
       borderSide: BorderSide(
         color: isSelected ? theme.success[600]! : theme.primary[100]!,
       ),

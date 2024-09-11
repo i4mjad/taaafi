@@ -119,11 +119,8 @@ class _FollowUpSheetState extends ConsumerState<FollowUpSheet> {
           // Display follow-up options using FollowUpWidget
           Container(
             height: 80,
-            width: MediaQuery.of(context).size.width -
-                32 +
-                (4 *
-                    (followUpOptions.length -
-                        1)), // Container width remains the same
+            width: MediaQuery.of(context).size.width - 32,
+            // (4 * (followUpOptions.length - 1)),
             child: ListView.separated(
               scrollDirection: Axis.horizontal,
               itemCount: followUpOptions.length,
@@ -136,9 +133,7 @@ class _FollowUpSheetState extends ConsumerState<FollowUpSheet> {
                 return GestureDetector(
                   onTap: () => toggleFollowUp(followUp),
                   child: Container(
-                    width: (MediaQuery.of(context).size.width - 32) /
-                        followUpOptions
-                            .length, // Dynamically distribute width across all follow-ups
+                    width: MediaQuery.of(context).size.width / 3.5,
                     child: FollowUpWidget(
                       icon: followUp.icon,
                       translationKey: followUp.translationKey,
@@ -156,10 +151,11 @@ class _FollowUpSheetState extends ConsumerState<FollowUpSheet> {
             style: TextStyles.h6,
           ),
           verticalSpace(Spacing.points8),
-          // TODO: translate this
           Text(
-            "مشاعر سلبية",
-            style: TextStyles.footnoteSelected.copyWith(color: theme.grey[700]),
+            AppLocalizations.of(context).translate('negative-feelings'),
+            style: TextStyles.footnoteSelected.copyWith(
+              color: theme.grey[700],
+            ),
           ),
           verticalSpace(Spacing.points4),
           Container(
@@ -177,7 +173,7 @@ class _FollowUpSheetState extends ConsumerState<FollowUpSheet> {
                 return GestureDetector(
                   onTap: () => toggleEmotion(emotion),
                   child: SizedBox(
-                    width: 80,
+                    width: 100,
                     child: EmotionWidget(
                       emotionEmoji: emotion.emotionEmoji,
                       emotionNameTranslationKey:
@@ -189,8 +185,13 @@ class _FollowUpSheetState extends ConsumerState<FollowUpSheet> {
               },
             ),
           ),
-          // TODO: translate this
-          Text("مشاعر إيجابية", style: TextStyles.footnoteSelected),
+          verticalSpace(Spacing.points16),
+          Text(
+            AppLocalizations.of(context).translate('positive-feelings'),
+            style: TextStyles.footnoteSelected.copyWith(
+              color: theme.grey[700],
+            ),
+          ),
           verticalSpace(Spacing.points4),
           Container(
             height: 80,
@@ -207,7 +208,7 @@ class _FollowUpSheetState extends ConsumerState<FollowUpSheet> {
                 return GestureDetector(
                   onTap: () => toggleEmotion(emotion),
                   child: SizedBox(
-                    width: 80,
+                    width: 100,
                     child: EmotionWidget(
                       emotionEmoji: emotion.emotionEmoji,
                       emotionNameTranslationKey:
