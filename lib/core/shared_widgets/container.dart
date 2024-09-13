@@ -10,17 +10,18 @@ class WidgetsContainer extends StatelessWidget {
   final BorderRadius? borderRadius;
   final BorderSide? borderSide;
   final double? cornerSmoothing;
+  final List<BoxShadow>? boxShadow;
 
-  WidgetsContainer({
-    required this.child,
-    this.width,
-    this.height,
-    this.padding,
-    this.backgroundColor,
-    this.borderRadius,
-    this.borderSide,
-    this.cornerSmoothing,
-  });
+  WidgetsContainer(
+      {required this.child,
+      this.width,
+      this.height,
+      this.padding,
+      this.backgroundColor,
+      this.borderRadius,
+      this.borderSide,
+      this.cornerSmoothing,
+      this.boxShadow});
 
   @override
   Widget build(BuildContext context) {
@@ -31,6 +32,7 @@ class WidgetsContainer extends StatelessWidget {
       padding: padding ?? EdgeInsets.all(16),
       decoration: ShapeDecoration(
         color: backgroundColor ?? theme.primaryColor.withOpacity(0.1),
+        shadows: boxShadow,
         shape: SmoothRectangleBorder(
           borderRadius: SmoothBorderRadius(
             cornerRadius:

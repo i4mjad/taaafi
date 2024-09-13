@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/helpers/date_display_formater.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
@@ -151,44 +152,51 @@ class DiaryWidget extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = AppTheme.of(context);
     final locale = ref.watch(localeNotifierProvider);
-    return WidgetsContainer(
-      padding: EdgeInsets.all(12),
-      backgroundColor: theme.primary[50],
-      borderSide: BorderSide(color: theme.primary[100]!),
-      borderRadius: BorderRadius.circular(10.5),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            index.toString(),
-            style: TextStyles.footnoteSelected.copyWith(
-              color: theme.grey[900],
+    return GestureDetector(
+      onTap: () => context.go("/vault/diaries/diary/${index}"),
+      child: WidgetsContainer(
+        padding: EdgeInsets.all(12),
+        backgroundColor: theme.primary[50],
+        borderSide: BorderSide(color: theme.primary[100]!),
+        borderRadius: BorderRadius.circular(10.5),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              index.toString(),
+              style: TextStyles.footnoteSelected.copyWith(
+                color: theme.grey[900],
+              ),
             ),
-          ),
-          horizontalSpace(Spacing.points8),
-          Expanded(
-            flex: 1000,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [Text(diary.title, style: TextStyles.footnote)],
-                ),
-                verticalSpace(Spacing.points4),
-                Text(
-                  getDisplayDateTime(diary.date, locale!.languageCode),
-                  style: TextStyles.caption.copyWith(color: theme.grey[700]),
-                ),
-                Text(
-                  diary.body,
-                  style: TextStyles.small.copyWith(color: theme.grey[700]),
-                  maxLines: 3, // Set the maximum number of lines
-                  overflow: TextOverflow.ellipsis, // Ellipses after max lines
-                ),
-              ],
+            horizontalSpace(Spacing.points8),
+            Expanded(
+              flex: 3,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [Text(diary.title, style: TextStyles.footnote)],
+                  ),
+                  verticalSpace(Spacing.points4),
+                  Text(
+                    getDisplayDateTime(diary.date, locale!.languageCode),
+                    style: TextStyles.caption.copyWith(color: theme.grey[700]),
+                  ),
+                  Text(
+                    diary.body,
+                    style: TextStyles.small.copyWith(color: theme.grey[700]),
+                    maxLines: 3, // Set the maximum number of lines
+                    overflow: TextOverflow.ellipsis, // Ellipses after max lines
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+            Icon(
+              LucideIcons.chevronLeft,
+              color: theme.grey[300],
+            )
+          ],
+        ),
       ),
     );
   }
