@@ -160,10 +160,12 @@ class AccountScreen extends ConsumerWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        AppLocalizations.of(context).translate('ui-settings'),
-                        style: TextStyles.h4.copyWith(
-                          color: theme.grey[900],
+                      Flexible(
+                        child: Text(
+                          AppLocalizations.of(context).translate('ui-settings'),
+                          style: TextStyles.h4.copyWith(
+                            color: theme.grey[900],
+                          ),
                         ),
                       ),
                       GestureDetector(
