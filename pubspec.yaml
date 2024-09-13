@@ -202,6 +202,7 @@ flutter:
   assets:
     - asset/illustrations/app-icon.png
     - asset/illustrations/app-logo.png
+    - asset/illustrations/vault-hero-image.svg
     - asset/icons/apple-icon.svg
     - asset/icons/google-icon.svg
     - asset/i18n/en.json

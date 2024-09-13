@@ -6,6 +6,11 @@
   "porn-addiction-recovery": "تعافي",
   "porn-addiction-recovery-p": "محتوى مفيد للتعافي من إدمان الإباحية",
 
+  "activities":"التمارين",
+  "library":"المكتبة",
+
+  "vault-p":"مكانك الشخصي، يحتوي على مذكراتك وتمارين وتذكيرات رحلة التعافي",
+
   "articles": "مقالات",
   "article": "مقال",
   "tutorial": "شرح",
@@ -56,6 +61,8 @@
   "how-is-this-day": "كيف كان هذا اليوم بالنسبة لك؟",
   "dismiss": "إغلاق",
   "lock-app": "قفل التطبيق",
+
+  "settings":"الإعدادات",
 
   "account-settings": "معلومات المستخدم",
   "app-settings": "إعدادات التطبيق",

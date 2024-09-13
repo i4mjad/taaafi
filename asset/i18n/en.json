@@ -10,6 +10,10 @@
   "relapses-number": "Relapses Count: ",
   "start-your-journy": "Start Your Journy",
   "start-your-journy-p": "To start, please select the day you want to start from. If you want to start today click on Today button",
+
+  "activities":"Activities",
+
+  "vault-p":"Your personal space, where you can write your diaries, challenge your self to become better person",
   "statistics":"Statistics",
   "articles": "Articles",
   "article": "Article",
@@ -236,6 +240,8 @@
   "new-user-dialog-content": "If you've started before please enter your Current streak and click Start, if not, click New Beginning",
 
   "nofap-content": "NoFap Content",
+  "library":"Library",
+  "settings":"Settings",
   "explore-content": "Explore Content",
   "explore-articles": "ِExplore Articles",
   "explore-tutorials": "ِExplore Tutorials",
