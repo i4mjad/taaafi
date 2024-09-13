@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
-import 'package:reboot_app_3/core/shared_widgets/app_bar.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
@@ -19,7 +18,6 @@ class VaultScreen extends ConsumerWidget {
     final height = MediaQuery.of(context).size.height;
     return Scaffold(
       backgroundColor: theme.backgroundColor,
-      // appBar: appBar(context, ref, 'vault', false, true),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.fromLTRB(16, 48, 16, 16),
