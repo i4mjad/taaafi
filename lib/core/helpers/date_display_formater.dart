@@ -14,6 +14,19 @@ String getDisplayDateTime(dynamic date, String language) {
   return formattedDate;
 }
 
+String getDisplayTime(dynamic date, String language) {
+  if (date is Timestamp) {
+    date = date.toDate();
+  }
+
+  String locale = getLocale(language);
+  String formattedTime = DateFormat('hh:mm a', locale).format(date);
+  if (language == 'arabic' || language == 'ar') {
+    formattedTime = replaceWesternWithEasternArabicNumerals(formattedTime);
+  }
+  return formattedTime;
+}
+
 String getDisplayDate(dynamic date, String language) {
   if (date is Timestamp) {
     date = date.toDate();
