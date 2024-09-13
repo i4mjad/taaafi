@@ -19,130 +19,134 @@ class VaultScreen extends ConsumerWidget {
     final height = MediaQuery.of(context).size.height;
     return Scaffold(
       backgroundColor: theme.backgroundColor,
-      appBar: appBar(context, ref, 'vault', false, true),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Container(
-          width: width,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            // mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              SvgPicture.asset(
-                'asset/illustrations/vault-hero-image.svg',
-              ),
-              verticalSpace(Spacing.points24),
-              Text(
-                AppLocalizations.of(context).translate('vault'),
-                style: TextStyles.h1,
-              ),
-              verticalSpace(Spacing.points12),
-              Text(
-                AppLocalizations.of(context).translate('vault-p'),
-                style: TextStyles.footnoteSelected.copyWith(
-                  color: theme.grey[600],
+      // appBar: appBar(context, ref, 'vault', false, true),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(16, 48, 16, 16),
+          child: Container(
+            width: width,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              // mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                SvgPicture.asset(
+                  'asset/illustrations/vault-hero-image.svg',
                 ),
-                textAlign: TextAlign.center,
-              ),
-              verticalSpace(Spacing.points12),
-              Row(
-                children: [
-                  Expanded(
-                    child: WidgetsContainer(
-                      backgroundColor: theme.primary[50],
-                      borderSide: BorderSide(color: theme.primary[100]!),
-                      padding: EdgeInsets.all(14),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Icon(LucideIcons.clipboardCheck,
-                              color: theme.primary[900]),
-                          verticalSpace(Spacing.points8),
-                          Text(
-                            AppLocalizations.of(context)
-                                .translate('activities'),
-                            style: TextStyles.h3
-                                .copyWith(color: theme.primary[900]),
-                          )
-                        ],
+                verticalSpace(Spacing.points24),
+                Text(
+                  AppLocalizations.of(context).translate('vault'),
+                  style: TextStyles.h1,
+                ),
+                verticalSpace(Spacing.points12),
+                Text(
+                  AppLocalizations.of(context).translate('vault-p'),
+                  style: TextStyles.footnoteSelected.copyWith(
+                    color: theme.grey[600],
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                Spacer(),
+                Row(
+                  children: [
+                    Expanded(
+                      child: WidgetsContainer(
+                        backgroundColor: theme.primary[50],
+                        borderSide: BorderSide(color: theme.primary[100]!),
+                        padding: EdgeInsets.all(14),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Icon(LucideIcons.clipboardCheck,
+                                color: theme.primary[900]),
+                            verticalSpace(Spacing.points8),
+                            Text(
+                              AppLocalizations.of(context)
+                                  .translate('activities'),
+                              style: TextStyles.h3
+                                  .copyWith(color: theme.primary[900]),
+                            )
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                  horizontalSpace(Spacing.points8),
-                  Expanded(
-                    child: WidgetsContainer(
-                      backgroundColor: theme.secondary[50],
-                      borderSide: BorderSide(color: theme.secondary[100]!),
-                      padding: EdgeInsets.all(14),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Icon(LucideIcons.pencil, color: theme.secondary[900]),
-                          verticalSpace(Spacing.points8),
-                          Text(
-                            AppLocalizations.of(context).translate('diaries'),
-                            style: TextStyles.h3
-                                .copyWith(color: theme.secondary[900]),
-                          )
-                        ],
+                    horizontalSpace(Spacing.points8),
+                    Expanded(
+                      child: WidgetsContainer(
+                        backgroundColor: theme.secondary[50],
+                        borderSide: BorderSide(color: theme.secondary[100]!),
+                        padding: EdgeInsets.all(14),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Icon(LucideIcons.pencil,
+                                color: theme.secondary[900]),
+                            verticalSpace(Spacing.points8),
+                            Text(
+                              AppLocalizations.of(context).translate('diaries'),
+                              style: TextStyles.h3
+                                  .copyWith(color: theme.secondary[900]),
+                            )
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                ],
-              ),
-              verticalSpace(Spacing.points8),
-              Row(
-                children: [
-                  Expanded(
-                    child: WidgetsContainer(
-                      backgroundColor: theme.tint[50],
-                      borderSide: BorderSide(color: theme.tint[400]!),
-                      padding: EdgeInsets.all(14),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Icon(LucideIcons.lamp, color: theme.tint[900]),
-                          verticalSpace(Spacing.points8),
-                          Text(
-                            AppLocalizations.of(context).translate('library'),
-                            style:
-                                TextStyles.h3.copyWith(color: theme.tint[900]),
-                          )
-                        ],
+                  ],
+                ),
+                verticalSpace(Spacing.points8),
+                Row(
+                  children: [
+                    Expanded(
+                      child: WidgetsContainer(
+                        backgroundColor: theme.tint[50],
+                        borderSide: BorderSide(color: theme.tint[400]!),
+                        padding: EdgeInsets.all(14),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Icon(LucideIcons.lamp, color: theme.tint[900]),
+                            verticalSpace(Spacing.points8),
+                            Text(
+                              AppLocalizations.of(context).translate('library'),
+                              style: TextStyles.h3
+                                  .copyWith(color: theme.tint[900]),
+                            )
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                  horizontalSpace(Spacing.points8),
-                  Expanded(
-                    child: WidgetsContainer(
-                      backgroundColor: theme.secondary[50],
-                      borderSide: BorderSide(color: theme.primary[200]!),
-                      padding: EdgeInsets.all(14),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Icon(
-                            LucideIcons.settings2,
-                            color: theme.primary[900],
-                          ),
-                          verticalSpace(Spacing.points8),
-                          Text(
-                            AppLocalizations.of(context).translate('settings'),
-                            style: TextStyles.h3.copyWith(
+                    horizontalSpace(Spacing.points8),
+                    Expanded(
+                      child: WidgetsContainer(
+                        backgroundColor: theme.secondary[50],
+                        borderSide: BorderSide(color: theme.primary[200]!),
+                        padding: EdgeInsets.all(14),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Icon(
+                              LucideIcons.settings2,
                               color: theme.primary[900],
                             ),
-                          )
-                        ],
+                            verticalSpace(Spacing.points8),
+                            Text(
+                              AppLocalizations.of(context)
+                                  .translate('settings'),
+                              style: TextStyles.h3.copyWith(
+                                color: theme.primary[900],
+                              ),
+                            )
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                ],
-              )
-            ],
+                  ],
+                )
+              ],
+            ),
           ),
         ),
       ),
