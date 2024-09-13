@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
+import 'package:reboot_app_3/core/routing/route_names.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
@@ -70,23 +72,29 @@ class VaultScreen extends ConsumerWidget {
                     ),
                     horizontalSpace(Spacing.points8),
                     Expanded(
-                      child: WidgetsContainer(
-                        backgroundColor: theme.secondary[50],
-                        borderSide: BorderSide(color: theme.secondary[100]!),
-                        padding: EdgeInsets.all(14),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Icon(LucideIcons.pencil,
-                                color: theme.secondary[900]),
-                            verticalSpace(Spacing.points8),
-                            Text(
-                              AppLocalizations.of(context).translate('diaries'),
-                              style: TextStyles.h3
-                                  .copyWith(color: theme.secondary[900]),
-                            )
-                          ],
+                      child: GestureDetector(
+                        onTap: () {
+                          context.goNamed(RouteNames.diaries.name);
+                        },
+                        child: WidgetsContainer(
+                          backgroundColor: theme.secondary[50],
+                          borderSide: BorderSide(color: theme.secondary[100]!),
+                          padding: EdgeInsets.all(14),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Icon(LucideIcons.pencil,
+                                  color: theme.secondary[900]),
+                              verticalSpace(Spacing.points8),
+                              Text(
+                                AppLocalizations.of(context)
+                                    .translate('diaries'),
+                                style: TextStyles.h3
+                                    .copyWith(color: theme.secondary[900]),
+                              )
+                            ],
+                          ),
                         ),
                       ),
                     ),

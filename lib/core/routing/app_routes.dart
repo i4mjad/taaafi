@@ -18,6 +18,7 @@ import 'package:reboot_app_3/features/home/presentation/day_overview/day_overvie
 import 'package:reboot_app_3/features/plus/presentation/taaafi_plus_screen.dart';
 import 'package:reboot_app_3/features/home/presentation/home/home_screen.dart';
 import 'package:reboot_app_3/features/onboarding/presentation/onboarding_screen.dart';
+import 'package:reboot_app_3/features/vault/presentation/diaries_screen.dart';
 import 'package:reboot_app_3/features/vault/presentation/vault_screen.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -181,7 +182,11 @@ GoRouter goRouter(GoRouterRef ref) {
                   child: VaultScreen(),
                 ),
                 routes: [
-                  //! Add Pages
+                  GoRoute(
+                    path: "diaries",
+                    name: RouteNames.diaries.name,
+                    builder: (context, state) => DiariesScreen(),
+                  )
                 ],
               ),
             ],

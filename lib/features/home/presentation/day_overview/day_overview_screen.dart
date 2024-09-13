@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:reboot_app_3/core/helpers/date_display_formater.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
+import 'package:reboot_app_3/core/routing/route_names.dart';
 import 'package:reboot_app_3/core/shared_widgets/app_bar.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
@@ -208,7 +210,7 @@ class DayNotes extends StatelessWidget {
         ),
         verticalSpace(Spacing.points12),
         Builder(builder: (BuildContext context) {
-          final noData = false;
+          final noData = true;
           // ignore: dead_code
           if (noData) {
             return Column(
@@ -227,13 +229,16 @@ class DayNotes extends StatelessWidget {
                   ),
                 ),
                 verticalSpace(Spacing.points12),
-                WidgetsContainer(
-                  backgroundColor: theme.tint[100],
-                  borderSide: BorderSide(color: theme.tint[100]!),
-                  child: Center(
-                    child: Text(
-                      AppLocalizations.of(context).translate('add-note'),
-                      style: TextStyles.h6.copyWith(color: theme.tint[900]),
+                GestureDetector(
+                  onTap: () => context.goNamed(RouteNames.diaries.name),
+                  child: WidgetsContainer(
+                    backgroundColor: theme.tint[100],
+                    borderSide: BorderSide(color: theme.tint[100]!),
+                    child: Center(
+                      child: Text(
+                        AppLocalizations.of(context).translate('add-note'),
+                        style: TextStyles.h6.copyWith(color: theme.tint[900]),
+                      ),
                     ),
                   ),
                 ),
