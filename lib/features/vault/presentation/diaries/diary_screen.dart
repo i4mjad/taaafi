@@ -115,21 +115,21 @@ class _DiaryScreenState extends ConsumerState<DiaryScreen> {
                       configurations: QuillEditorConfigurations(
                         customStyles: DefaultStyles(
                           paragraph: DefaultTextBlockStyle(
-                            TextStyles.body,
+                            TextStyles.body.copyWith(color: theme.grey[900]),
                             HorizontalSpacing(0, 0),
                             VerticalSpacing(0, 0),
                             VerticalSpacing(0, 0),
                             BoxDecoration(),
                           ),
                           h4: DefaultTextBlockStyle(
-                            TextStyles.h4,
+                            TextStyles.h4.copyWith(color: theme.grey[900]),
                             HorizontalSpacing(0, 0),
                             VerticalSpacing(0, 0),
                             VerticalSpacing(0, 0),
                             BoxDecoration(),
                           ),
                           lists: DefaultListBlockStyle(
-                              TextStyles.body,
+                              TextStyles.body.copyWith(color: theme.grey[900]),
                               HorizontalSpacing(0, 0),
                               VerticalSpacing(0, 0),
                               VerticalSpacing(0, 0),
@@ -137,10 +137,12 @@ class _DiaryScreenState extends ConsumerState<DiaryScreen> {
                               null),
                           bold: TextStyles.body.copyWith(
                             fontWeight: FontWeightHelper.semiBold,
+                            color: theme.grey[900],
                           ),
                           italic: TextStyles.body.copyWith(
                             fontWeight: FontWeightHelper.semiBold,
                             fontStyle: FontStyle.italic,
+                            color: theme.grey[900],
                           ),
                         ),
                       ),
