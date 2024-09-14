@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
@@ -27,7 +26,6 @@ class _DiaryScreenState extends ConsumerState<DiaryScreen> {
   @override
   void initState() {
     super.initState();
-    // For now, mocking the Diary object for testing
     _bodyController = TextEditingController(
       text:
           "استمتعت بيوم مريح على الشاطئ مع الأصدقاء. قضينا الوقت في السباحة والاستمتاع بأشعة الشمس. كانت هذه فرصة مثالية للابتعاد عن ضغوط العمل والاسترخاء التام.",
@@ -43,6 +41,26 @@ class _DiaryScreenState extends ConsumerState<DiaryScreen> {
     super.dispose();
   }
 
+  void _applyMarkdown(String markdownSymbol, {bool wrapWithSpace = false}) {
+    final selection = _bodyController.selection;
+
+    if (!selection.isValid) return;
+
+    final text = _bodyController.text;
+    final selectedText = text.substring(selection.start, selection.end);
+
+    final wrappedText = wrapWithSpace
+        ? "$markdownSymbol $selectedText $markdownSymbol"
+        : "$markdownSymbol$selectedText$markdownSymbol";
+
+    final newText =
+        text.replaceRange(selection.start, selection.end, wrappedText);
+
+    _bodyController.text = newText;
+    _bodyController.selection =
+        TextSelection.collapsed(offset: selection.start + wrappedText.length);
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = AppTheme.of(context);
@@ -50,12 +68,14 @@ class _DiaryScreenState extends ConsumerState<DiaryScreen> {
     final width = MediaQuery.of(context).size.width;
     final height = MediaQuery.of(context).size.height;
 
-    // Mock Diary object until connected to provider
     final Diary diary = Diary(
       _titleController.text,
       _bodyController.text,
       DateTime.now(),
-      ["تمرين", "عمل"],
+      [
+        "تمرين",
+        "عمل",
+      ],
     );
 
     return Scaffold(
@@ -105,21 +125,15 @@ class _DiaryScreenState extends ConsumerState<DiaryScreen> {
               Expanded(
                 child: Stack(
                   children: [
-                    Markdown(
-                      data: _bodyController.text,
-                      styleSheet: MarkdownStyleSheet(
-                        h1: TextStyles.h1,
-                        h2: TextStyles.h2,
-                        h3: TextStyles.h3,
-                        h4: TextStyles.h4,
-                        h5: TextStyles.h5,
-                        h6: TextStyles.h6,
-                        tableBody: TextStyles.body,
-                        codeblockPadding: EdgeInsets.all(0),
+                    TextField(
+                      controller: _bodyController,
+                      maxLines: null,
+                      keyboardType: TextInputType.multiline,
+                      style: TextStyles.body,
+                      decoration: InputDecoration(
+                        hintText: 'Edit your diary...',
                       ),
                     ),
-
-                    // Bottom Buttons (Save/Cancel) at the bottom of the screen
                     Positioned(
                       bottom: 0,
                       left: 0,
@@ -149,28 +163,56 @@ class _DiaryScreenState extends ConsumerState<DiaryScreen> {
                           children: [
                             Row(
                               children: [
-                                Padding(
-                                  padding: EdgeInsets.all(8),
-                                  child: Text("عنوان", style: TextStyles.small),
+                                GestureDetector(
+                                  onTap: () => _applyMarkdown('# '),
+                                  child: Padding(
+                                    padding: EdgeInsets.all(8),
+                                    child: Text(
+                                      AppLocalizations.of(context)
+                                          .translate('heading'),
+                                      style: TextStyles.small,
+                                    ),
+                                  ),
                                 ),
-                                Padding(
-                                  padding: EdgeInsets.all(8),
-                                  child:
-                                      Text("غامق", style: TextStyles.smallBold),
+                                GestureDetector(
+                                  onTap: () => _applyMarkdown('**'),
+                                  child: Padding(
+                                    padding: EdgeInsets.all(8),
+                                    child: Text(
+                                        AppLocalizations.of(context)
+                                            .translate('bold'),
+                                        style: TextStyles.smallBold),
+                                  ),
                                 ),
-                                Padding(
-                                  padding: EdgeInsets.all(8),
-                                  child: Text("مائل", style: TextStyles.small),
+                                GestureDetector(
+                                  onTap: () => _applyMarkdown('*'),
+                                  child: Padding(
+                                    padding: EdgeInsets.all(8),
+                                    child: Text(
+                                        AppLocalizations.of(context)
+                                            .translate('italic'),
+                                        style: TextStyles.small),
+                                  ),
                                 ),
-                                Padding(
-                                  padding: EdgeInsets.all(8),
-                                  child: Text("''اقتباس''",
-                                      style: TextStyles.small),
+                                GestureDetector(
+                                  onTap: () => _applyMarkdown('> '),
+                                  child: Padding(
+                                    padding: EdgeInsets.all(8),
+                                    child: Text(
+                                        AppLocalizations.of(context)
+                                            .translate('quote'),
+                                        style: TextStyles.small),
+                                  ),
                                 ),
-                                Padding(
-                                  padding: EdgeInsets.all(8),
-                                  child:
-                                      Text("-قائمة", style: TextStyles.small),
+                                GestureDetector(
+                                  onTap: () => _applyMarkdown('- '),
+                                  child: Padding(
+                                    padding: EdgeInsets.all(8),
+                                    child: Text(
+                                        AppLocalizations.of(context)
+                                            .translate('list'),
+                                        style: TextStyles.small),
+                                  ),
                                 ),
                               ],
                             ),

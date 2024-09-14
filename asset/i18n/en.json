@@ -13,6 +13,12 @@
 
   "activities":"Activities",
 
+  "heading":"Heading",
+  "bold":"Bold",
+  "italic":"Italic",
+  "quote":"''Quote''",
+  "list":"- List",
+
   "vault-p":"Your personal space, where you can write your diaries, challenge your self to become better person",
   "statistics":"Statistics",
   "articles": "Articles",
