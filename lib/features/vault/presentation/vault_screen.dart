@@ -59,7 +59,7 @@ class VaultScreen extends ConsumerWidget {
                           children: [
                             Icon(LucideIcons.clipboardCheck,
                                 color: theme.primary[900]),
-                            verticalSpace(Spacing.points8),
+                            verticalSpace(Spacing.points28),
                             Text(
                               AppLocalizations.of(context)
                                   .translate('activities'),
@@ -86,7 +86,7 @@ class VaultScreen extends ConsumerWidget {
                             children: [
                               Icon(LucideIcons.pencil,
                                   color: theme.secondary[900]),
-                              verticalSpace(Spacing.points8),
+                              verticalSpace(Spacing.points28),
                               Text(
                                 AppLocalizations.of(context)
                                     .translate('diaries'),
@@ -113,7 +113,7 @@ class VaultScreen extends ConsumerWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Icon(LucideIcons.lamp, color: theme.tint[900]),
-                            verticalSpace(Spacing.points8),
+                            verticalSpace(Spacing.points28),
                             Text(
                               AppLocalizations.of(context).translate('library'),
                               style: TextStyles.h3
@@ -137,7 +137,7 @@ class VaultScreen extends ConsumerWidget {
                               LucideIcons.settings2,
                               color: theme.primary[900],
                             ),
-                            verticalSpace(Spacing.points8),
+                            verticalSpace(Spacing.points28),
                             Text(
                               AppLocalizations.of(context)
                                   .translate('settings'),
