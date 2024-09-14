@@ -35,6 +35,7 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   flutter_markdown: ^0.7.3
+  flutter_quill: ^10.5.14
   flutter_riverpod: ^2.3.2
   flutter_svg: any
   go_router: ^14.1.4

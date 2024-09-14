@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_quill/flutter_quill.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/custom_theme_data.dart';
+import 'package:reboot_app_3/core/theming/font_weights.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/core/theming/theme_provider.dart';
@@ -20,57 +23,38 @@ class DiaryScreen extends ConsumerStatefulWidget {
 }
 
 class _DiaryScreenState extends ConsumerState<DiaryScreen> {
-  late TextEditingController _bodyController;
+  late QuillController _controller;
   late TextEditingController _titleController;
 
   @override
   void initState() {
     super.initState();
-    _bodyController = TextEditingController(
-      text:
-          "استمتعت بيوم مريح على الشاطئ مع الأصدقاء. قضينا الوقت في السباحة والاستمتاع بأشعة الشمس. كانت هذه فرصة مثالية للابتعاد عن ضغوط العمل والاسترخاء التام.",
-    );
+
     _titleController =
         TextEditingController(text: "التحدي الأول: البداية الجديدة في التعافي");
+
+    _controller = QuillController(
+      document: Document()
+        ..insert(0,
+            "استمتعت بيوم مريح على الشاطئ مع الأصدقاء. قضينا الوقت في السباحة والاستمتاع بأشعة الشمس."),
+      selection: const TextSelection.collapsed(offset: 0),
+    );
   }
 
   @override
   void dispose() {
-    _bodyController.dispose();
     _titleController.dispose();
     super.dispose();
-  }
-
-  void _applyMarkdown(String markdownSymbol, {bool wrapWithSpace = false}) {
-    final selection = _bodyController.selection;
-
-    if (!selection.isValid) return;
-
-    final text = _bodyController.text;
-    final selectedText = text.substring(selection.start, selection.end);
-
-    final wrappedText = wrapWithSpace
-        ? "$markdownSymbol $selectedText $markdownSymbol"
-        : "$markdownSymbol$selectedText$markdownSymbol";
-
-    final newText =
-        text.replaceRange(selection.start, selection.end, wrappedText);
-
-    _bodyController.text = newText;
-    _bodyController.selection =
-        TextSelection.collapsed(offset: selection.start + wrappedText.length);
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = AppTheme.of(context);
     final themeNotifier = ref.watch(customThemeProvider.notifier);
-    final width = MediaQuery.of(context).size.width;
-    final height = MediaQuery.of(context).size.height;
 
     final Diary diary = Diary(
       _titleController.text,
-      _bodyController.text,
+      _controller.document.toPlainText(),
       DateTime.now(),
       [
         "تمرين",
@@ -125,13 +109,40 @@ class _DiaryScreenState extends ConsumerState<DiaryScreen> {
               Expanded(
                 child: Stack(
                   children: [
-                    TextField(
-                      controller: _bodyController,
-                      maxLines: null,
-                      keyboardType: TextInputType.multiline,
-                      style: TextStyles.body,
-                      decoration: InputDecoration(
-                        hintText: 'Edit your diary...',
+                    // Quill Editor
+                    QuillEditor.basic(
+                      controller: _controller,
+                      configurations: QuillEditorConfigurations(
+                        customStyles: DefaultStyles(
+                          paragraph: DefaultTextBlockStyle(
+                            TextStyles.body,
+                            HorizontalSpacing(0, 0),
+                            VerticalSpacing(0, 0),
+                            VerticalSpacing(0, 0),
+                            BoxDecoration(),
+                          ),
+                          h4: DefaultTextBlockStyle(
+                            TextStyles.h4,
+                            HorizontalSpacing(0, 0),
+                            VerticalSpacing(0, 0),
+                            VerticalSpacing(0, 0),
+                            BoxDecoration(),
+                          ),
+                          lists: DefaultListBlockStyle(
+                              TextStyles.body,
+                              HorizontalSpacing(0, 0),
+                              VerticalSpacing(0, 0),
+                              VerticalSpacing(0, 0),
+                              BoxDecoration(),
+                              null),
+                          bold: TextStyles.body.copyWith(
+                            fontWeight: FontWeightHelper.semiBold,
+                          ),
+                          italic: TextStyles.body.copyWith(
+                            fontWeight: FontWeightHelper.semiBold,
+                            fontStyle: FontStyle.italic,
+                          ),
+                        ),
                       ),
                     ),
                     Positioned(
@@ -142,31 +153,44 @@ class _DiaryScreenState extends ConsumerState<DiaryScreen> {
                         backgroundColor: theme.primary[50],
                         boxShadow: [
                           BoxShadow(
-                            color: Color(0xff323247).withOpacity(0.08),
+                            color: const Color(0xff323247).withOpacity(0.08),
                             spreadRadius: 0,
                             blurRadius: 64,
-                            offset: Offset(0, 8),
+                            offset: const Offset(0, 8),
                           ),
                           BoxShadow(
-                            color: Color(0xff323247).withOpacity(0.06),
+                            color: const Color(0xff323247).withOpacity(0.06),
                             spreadRadius: 0,
                             blurRadius: 128,
-                            offset: Offset(0, 8),
+                            offset: const Offset(0, 8),
                           ),
                         ],
                         borderSide:
                             BorderSide(color: theme.grey[200]!, width: 1),
                         borderRadius: BorderRadius.circular(10.5),
-                        padding: EdgeInsets.all(8),
+                        padding: const EdgeInsets.all(8),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Row(
                               children: [
                                 GestureDetector(
-                                  onTap: () => _applyMarkdown('# '),
+                                  onTap: () {
+                                    HapticFeedback.mediumImpact();
+                                    // Toggle heading style
+                                    final isHeading = _controller
+                                        .getSelectionStyle()
+                                        .attributes
+                                        .containsKey('h4');
+                                    _controller.formatSelection(
+                                      isHeading
+                                          ? Attribute.fromKeyValue(
+                                              Attribute.h4.key, null)
+                                          : Attribute.h4,
+                                    );
+                                  },
                                   child: Padding(
-                                    padding: EdgeInsets.all(8),
+                                    padding: const EdgeInsets.all(8),
                                     child: Text(
                                       AppLocalizations.of(context)
                                           .translate('heading'),
@@ -175,9 +199,19 @@ class _DiaryScreenState extends ConsumerState<DiaryScreen> {
                                   ),
                                 ),
                                 GestureDetector(
-                                  onTap: () => _applyMarkdown('**'),
+                                  onTap: () {
+                                    HapticFeedback.mediumImpact();
+                                    final isBold = _controller
+                                        .getSelectionStyle()
+                                        .attributes
+                                        .containsKey('bold');
+                                    _controller.formatSelection(isBold
+                                        ? Attribute.fromKeyValue(
+                                            Attribute.bold.key, null)
+                                        : Attribute.bold);
+                                  },
                                   child: Padding(
-                                    padding: EdgeInsets.all(8),
+                                    padding: const EdgeInsets.all(8),
                                     child: Text(
                                         AppLocalizations.of(context)
                                             .translate('bold'),
@@ -185,29 +219,63 @@ class _DiaryScreenState extends ConsumerState<DiaryScreen> {
                                   ),
                                 ),
                                 GestureDetector(
-                                  onTap: () => _applyMarkdown('*'),
+                                  onTap: () {
+                                    HapticFeedback.mediumImpact();
+                                    final isItalic = _controller
+                                        .getSelectionStyle()
+                                        .attributes
+                                        .containsKey('italic');
+                                    _controller.formatSelection(isItalic
+                                        ? Attribute.fromKeyValue(
+                                            Attribute.italic.key, null)
+                                        : Attribute.italic);
+                                  },
                                   child: Padding(
-                                    padding: EdgeInsets.all(8),
+                                    padding: const EdgeInsets.all(8),
                                     child: Text(
                                         AppLocalizations.of(context)
                                             .translate('italic'),
                                         style: TextStyles.small),
                                   ),
                                 ),
+                                // Adding Quote
                                 GestureDetector(
-                                  onTap: () => _applyMarkdown('> '),
+                                  onTap: () {
+                                    HapticFeedback.mediumImpact();
+                                    final isQuote = _controller
+                                        .getSelectionStyle()
+                                        .attributes
+                                        .containsKey('blockquote');
+                                    _controller.formatSelection(
+                                      isQuote
+                                          ? Attribute.fromKeyValue(
+                                              Attribute.blockQuote.key, null)
+                                          : Attribute.blockQuote,
+                                    );
+                                  },
                                   child: Padding(
-                                    padding: EdgeInsets.all(8),
+                                    padding: const EdgeInsets.all(8),
                                     child: Text(
                                         AppLocalizations.of(context)
                                             .translate('quote'),
                                         style: TextStyles.small),
                                   ),
                                 ),
+                                // Adding List (unordered)
                                 GestureDetector(
-                                  onTap: () => _applyMarkdown('- '),
+                                  onTap: () {
+                                    HapticFeedback.mediumImpact();
+                                    final isList = _controller
+                                        .getSelectionStyle()
+                                        .attributes
+                                        .containsKey('list');
+                                    _controller.formatSelection(isList
+                                        ? Attribute.fromKeyValue(
+                                            Attribute.ol.key, null)
+                                        : Attribute.ol);
+                                  },
                                   child: Padding(
-                                    padding: EdgeInsets.all(8),
+                                    padding: const EdgeInsets.all(8),
                                     child: Text(
                                         AppLocalizations.of(context)
                                             .translate('list'),
@@ -223,19 +291,21 @@ class _DiaryScreenState extends ConsumerState<DiaryScreen> {
                               ),
                               boxShadow: [
                                 BoxShadow(
-                                  color: Color(0xff323247).withOpacity(0.08),
+                                  color:
+                                      const Color(0xff323247).withOpacity(0.08),
                                   spreadRadius: 0,
                                   blurRadius: 64,
-                                  offset: Offset(0, 8),
+                                  offset: const Offset(0, 8),
                                 ),
                                 BoxShadow(
-                                  color: Color(0xff323247).withOpacity(0.06),
+                                  color:
+                                      const Color(0xff323247).withOpacity(0.06),
                                   spreadRadius: 0,
                                   blurRadius: 128,
-                                  offset: Offset(0, 8),
+                                  offset: const Offset(0, 8),
                                 ),
                               ],
-                              padding: EdgeInsets.all(8),
+                              padding: const EdgeInsets.all(8),
                               child: Row(
                                 children: [
                                   Icon(
@@ -273,11 +343,11 @@ class _DiaryScreenState extends ConsumerState<DiaryScreen> {
         diary.title,
         style: TextStyles.h5.copyWith(
           color: theme.grey[900],
-          height: 1.2, // Adjust line height if necessary
+          height: 1.2,
         ),
-        maxLines: 2, // Allow up to 2 lines for wrapping
-        softWrap: true, // Enable wrapping
-        overflow: TextOverflow.visible, // Allow text to flow to the next line
+        maxLines: 2,
+        softWrap: true,
+        overflow: TextOverflow.visible,
       ),
       backgroundColor: theme.backgroundColor,
       surfaceTintColor: theme.backgroundColor,
@@ -287,7 +357,7 @@ class _DiaryScreenState extends ConsumerState<DiaryScreen> {
       automaticallyImplyLeading: true,
       actions: [
         Padding(
-          padding: EdgeInsets.only(right: 16, left: 16),
+          padding: const EdgeInsets.only(right: 16, left: 16),
           child: Icon(LucideIcons.settings),
         ),
       ],
