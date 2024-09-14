@@ -36,7 +36,7 @@ class _DiaryScreenState extends ConsumerState<DiaryScreen> {
     _controller = QuillController(
       document: Document()
         ..insert(0,
-            "استمتعت بيوم مريح على الشاطئ مع الأصدقاء. قضينا الوقت في السباحة والاستمتاع بأشعة الشمس."),
+            "استمتعت بيوم مريح على الشاطئ مع الأصدقاء. قضينا الوقت في السباحة والاستمتاع بأشعة الشمس.  استمتعت بيوم مريح على الشاطئ مع الأصدقاء. قضينا الوقت في السباحة والاستمتاع بأشعة الشمس.  استمتعت بيوم مريح على الشاطئ مع الأصدقاء. قضينا الوقت في السباحة والاستمتاع بأشعة الشمس.  استمتعت بيوم مريح على الشاطئ مع الأصدقاء. قضينا الوقت في السباحة والاستمتاع بأشعة الشمس.  استمتعت بيوم مريح على الشاطئ مع الأصدقاء. قضينا الوقت في السباحة والاستمتاع بأشعة الشمس.  استمتعت بيوم مريح على الشاطئ مع الأصدقاء. قضينا الوقت في السباحة والاستمتاع بأشعة الشمس.  استمتعت بيوم مريح على الشاطئ مع الأصدقاء. قضينا الوقت في السباحة والاستمتاع بأشعة الشمس. "),
       selection: const TextSelection.collapsed(offset: 0),
     );
   }
@@ -109,40 +109,45 @@ class _DiaryScreenState extends ConsumerState<DiaryScreen> {
               Expanded(
                 child: Stack(
                   children: [
-                    // Quill Editor
-                    QuillEditor.basic(
-                      controller: _controller,
-                      configurations: QuillEditorConfigurations(
-                        customStyles: DefaultStyles(
-                          paragraph: DefaultTextBlockStyle(
-                            TextStyles.body.copyWith(color: theme.grey[900]),
-                            HorizontalSpacing(0, 0),
-                            VerticalSpacing(0, 0),
-                            VerticalSpacing(0, 0),
-                            BoxDecoration(),
-                          ),
-                          h4: DefaultTextBlockStyle(
-                            TextStyles.h4.copyWith(color: theme.grey[900]),
-                            HorizontalSpacing(0, 0),
-                            VerticalSpacing(0, 0),
-                            VerticalSpacing(0, 0),
-                            BoxDecoration(),
-                          ),
-                          lists: DefaultListBlockStyle(
+                    Padding(
+                      padding: const EdgeInsets.only(
+                          bottom:
+                              80), // Adjust this value according to your control's height
+                      child: QuillEditor.basic(
+                        controller: _controller,
+                        configurations: QuillEditorConfigurations(
+                          customStyles: DefaultStyles(
+                            paragraph: DefaultTextBlockStyle(
                               TextStyles.body.copyWith(color: theme.grey[900]),
                               HorizontalSpacing(0, 0),
                               VerticalSpacing(0, 0),
                               VerticalSpacing(0, 0),
                               BoxDecoration(),
-                              null),
-                          bold: TextStyles.body.copyWith(
-                            fontWeight: FontWeightHelper.semiBold,
-                            color: theme.grey[900],
-                          ),
-                          italic: TextStyles.body.copyWith(
-                            fontWeight: FontWeightHelper.semiBold,
-                            fontStyle: FontStyle.italic,
-                            color: theme.grey[900],
+                            ),
+                            h4: DefaultTextBlockStyle(
+                              TextStyles.h4.copyWith(color: theme.grey[900]),
+                              HorizontalSpacing(0, 0),
+                              VerticalSpacing(0, 0),
+                              VerticalSpacing(0, 0),
+                              BoxDecoration(),
+                            ),
+                            lists: DefaultListBlockStyle(
+                              TextStyles.body.copyWith(color: theme.grey[900]),
+                              HorizontalSpacing(0, 0),
+                              VerticalSpacing(0, 0),
+                              VerticalSpacing(0, 0),
+                              BoxDecoration(),
+                              null,
+                            ),
+                            bold: TextStyles.body.copyWith(
+                              fontWeight: FontWeightHelper.semiBold,
+                              color: theme.grey[900],
+                            ),
+                            italic: TextStyles.body.copyWith(
+                              fontWeight: FontWeightHelper.semiBold,
+                              fontStyle: FontStyle.italic,
+                              color: theme.grey[900],
+                            ),
                           ),
                         ),
                       ),
@@ -174,6 +179,7 @@ class _DiaryScreenState extends ConsumerState<DiaryScreen> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
+                            // Your existing controls
                             Row(
                               children: [
                                 GestureDetector(
@@ -286,6 +292,8 @@ class _DiaryScreenState extends ConsumerState<DiaryScreen> {
                                 ),
                               ],
                             ),
+
+                            // Save button
                             WidgetsContainer(
                               backgroundColor: theme.primary[50],
                               borderSide: BorderSide(
@@ -331,7 +339,7 @@ class _DiaryScreenState extends ConsumerState<DiaryScreen> {
                     ),
                   ],
                 ),
-              ),
+              )
             ],
           ),
         ),
