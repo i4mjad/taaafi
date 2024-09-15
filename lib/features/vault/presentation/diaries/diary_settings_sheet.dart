@@ -294,6 +294,8 @@ class _DayActivityWidgetState extends ConsumerState<DayActivityWidget> {
           Spacer(),
           Checkbox(
             value: isLinkedToADiary,
+            checkColor: theme.grey[50],
+            activeColor: theme.success[600],
             onChanged: (value) {
               setState(() {
                 isLinkedToADiary = !isLinkedToADiary;
