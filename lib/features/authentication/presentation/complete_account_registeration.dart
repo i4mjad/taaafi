@@ -270,6 +270,7 @@ class _CompleteAccountRegisterationScreenState
                                   ),
                                 ),
                               ),
+
                               verticalSpace(Spacing.points8),
                               WidgetsContainer(
                                 padding: EdgeInsets.fromLTRB(16, 8, 16, 8),

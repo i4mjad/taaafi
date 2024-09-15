@@ -36,11 +36,12 @@ class HomeScreen extends ConsumerWidget {
         backgroundColor: theme.primary[600],
         onPressed: () {
           showModalBottomSheet<void>(
-              context: context,
-              isScrollControlled: true,
-              builder: (BuildContext context) {
-                return FollowUpSheet(DateTime.now());
-              });
+            context: context,
+            isScrollControlled: true,
+            builder: (BuildContext context) {
+              return FollowUpSheet(DateTime.now());
+            },
+          );
         },
         label: Text(
           AppLocalizations.of(context).translate("daily-follow-up"),

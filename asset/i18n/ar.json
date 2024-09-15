@@ -7,7 +7,10 @@
   "porn-addiction-recovery-p": "محتوى مفيد للتعافي من إدمان الإباحية",
 
   "activities":"التمارين",
+  "linked-activities":"التمارين المرتبطة",
   "library":"المكتبة",
+
+  "diary-settings":"إعدادات المذكرة",
 
 
 
@@ -183,6 +186,8 @@
   "Blog": "تدوينة",
 
   "profile-updated": "تم تحديث بيانات حسابك بنجاح!",
+
+  "date":"التاريخ",
 
   "confirm": "تأكيد",
   "delete-user-dialog-confirm-button": "تأكيد",

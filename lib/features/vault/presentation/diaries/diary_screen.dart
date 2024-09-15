@@ -12,6 +12,7 @@ import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/core/theming/theme_provider.dart';
 import 'package:reboot_app_3/features/vault/data/diaries/diary.dart';
+import 'package:reboot_app_3/features/vault/presentation/diaries/diary_settings_sheet.dart';
 
 class DiaryScreen extends ConsumerStatefulWidget {
   const DiaryScreen({super.key, required this.diaryId});
@@ -24,14 +25,10 @@ class DiaryScreen extends ConsumerStatefulWidget {
 
 class _DiaryScreenState extends ConsumerState<DiaryScreen> {
   late QuillController _controller;
-  late TextEditingController _titleController;
 
   @override
   void initState() {
     super.initState();
-
-    _titleController =
-        TextEditingController(text: "التحدي الأول: البداية الجديدة في التعافي");
 
     _controller = QuillController(
       document: Document()
@@ -43,7 +40,6 @@ class _DiaryScreenState extends ConsumerState<DiaryScreen> {
 
   @override
   void dispose() {
-    _titleController.dispose();
     super.dispose();
   }
 
@@ -53,7 +49,7 @@ class _DiaryScreenState extends ConsumerState<DiaryScreen> {
     final themeNotifier = ref.watch(customThemeProvider.notifier);
 
     final Diary diary = Diary(
-      _titleController.text,
+      "التحدي الأول: البداية الجديدة في التعافي",
       _controller.document.toPlainText(),
       DateTime.now(),
       [
@@ -78,7 +74,8 @@ class _DiaryScreenState extends ConsumerState<DiaryScreen> {
                     child: Row(
                       children: [
                         Text(
-                          AppLocalizations.of(context).translate('activities'),
+                          AppLocalizations.of(context)
+                              .translate('linked-activities'),
                           style: TextStyles.h6,
                         ),
                         horizontalSpace(Spacing.points12),
@@ -102,7 +99,6 @@ class _DiaryScreenState extends ConsumerState<DiaryScreen> {
                       ],
                     ),
                   ),
-                  Icon(LucideIcons.plusSquare),
                 ],
               ),
               Divider(),
@@ -366,9 +362,20 @@ class _DiaryScreenState extends ConsumerState<DiaryScreen> {
       leadingWidth: 16,
       automaticallyImplyLeading: true,
       actions: [
-        Padding(
-          padding: const EdgeInsets.only(right: 16, left: 16),
-          child: Icon(LucideIcons.settings),
+        GestureDetector(
+          onTap: () {
+            showModalBottomSheet<void>(
+              context: context,
+              isScrollControlled: true,
+              builder: (BuildContext context) {
+                return DiarySettingsSheet(diary);
+              },
+            );
+          },
+          child: Padding(
+            padding: const EdgeInsets.only(right: 16, left: 16),
+            child: Icon(LucideIcons.settings),
+          ),
         ),
       ],
     );

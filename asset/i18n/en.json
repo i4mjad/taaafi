@@ -11,7 +11,12 @@
   "start-your-journy": "Start Your Journy",
   "start-your-journy-p": "To start, please select the day you want to start from. If you want to start today click on Today button",
 
+  "date":"Date",
+
   "activities":"Activities",
+  "linked-activities":"Linked Activities",
+
+  "diary-settings":"Diary Settings",
 
   "heading":"Heading",
   "bold":"Bold",
