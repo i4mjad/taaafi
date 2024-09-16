@@ -104,22 +104,28 @@ class VaultScreen extends ConsumerWidget {
                 Row(
                   children: [
                     Expanded(
-                      child: WidgetsContainer(
-                        backgroundColor: theme.tint[50],
-                        borderSide: BorderSide(color: theme.tint[400]!),
-                        padding: EdgeInsets.all(14),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Icon(LucideIcons.lamp, color: theme.tint[900]),
-                            verticalSpace(Spacing.points28),
-                            Text(
-                              AppLocalizations.of(context).translate('library'),
-                              style: TextStyles.h3
-                                  .copyWith(color: theme.tint[900]),
-                            )
-                          ],
+                      child: GestureDetector(
+                        onTap: () {
+                          context.goNamed(RouteNames.library.name);
+                        },
+                        child: WidgetsContainer(
+                          backgroundColor: theme.tint[50],
+                          borderSide: BorderSide(color: theme.tint[400]!),
+                          padding: EdgeInsets.all(14),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Icon(LucideIcons.lamp, color: theme.tint[900]),
+                              verticalSpace(Spacing.points28),
+                              Text(
+                                AppLocalizations.of(context)
+                                    .translate('library'),
+                                style: TextStyles.h3
+                                    .copyWith(color: theme.tint[900]),
+                              )
+                            ],
+                          ),
                         ),
                       ),
                     ),

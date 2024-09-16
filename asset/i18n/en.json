@@ -55,6 +55,9 @@
   "delete": "Delete",
   "save": "Save",
   "changes-has-been-saved":"Changes has been saved",
+  "library-search-placeholder":"Search for a book, podcast ...etc",
+
+  "latest-additions": "Latest Additions",
 
   "confirm-note-delete": "Confirm Note Deleting",
 

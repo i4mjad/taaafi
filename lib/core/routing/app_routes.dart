@@ -20,6 +20,7 @@ import 'package:reboot_app_3/features/home/presentation/home/home_screen.dart';
 import 'package:reboot_app_3/features/onboarding/presentation/onboarding_screen.dart';
 import 'package:reboot_app_3/features/vault/presentation/diaries/diaries_screen.dart';
 import 'package:reboot_app_3/features/vault/presentation/diaries/diary_screen.dart';
+import 'package:reboot_app_3/features/vault/presentation/library/library_screen.dart';
 import 'package:reboot_app_3/features/vault/presentation/vault_screen.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -184,18 +185,25 @@ GoRouter goRouter(GoRouterRef ref) {
                 ),
                 routes: [
                   GoRoute(
-                      path: "diaries",
-                      name: RouteNames.diaries.name,
-                      builder: (context, state) => DiariesScreen(),
-                      routes: [
-                        GoRoute(
-                          path: "diary/:id",
-                          name: RouteNames.diary.name,
-                          builder: (context, state) => DiaryScreen(
-                            diaryId: state.pathParameters["id"]!,
-                          ),
-                        )
-                      ])
+                    path: "diaries",
+                    name: RouteNames.diaries.name,
+                    builder: (context, state) => DiariesScreen(),
+                    routes: [
+                      GoRoute(
+                        path: "diary/:id",
+                        name: RouteNames.diary.name,
+                        builder: (context, state) => DiaryScreen(
+                          diaryId: state.pathParameters["id"]!,
+                        ),
+                      )
+                    ],
+                  ),
+                  GoRoute(
+                    path: "library",
+                    name: RouteNames.library.name,
+                    builder: (context, state) => LibraryScreen(),
+                    routes: [],
+                  ),
                 ],
               ),
             ],
