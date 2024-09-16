@@ -270,7 +270,6 @@ class _CompleteAccountRegisterationScreenState
                                   ),
                                 ),
                               ),
-
                               verticalSpace(Spacing.points8),
                               WidgetsContainer(
                                 padding: EdgeInsets.fromLTRB(16, 8, 16, 8),
@@ -362,7 +361,8 @@ class _CompleteAccountRegisterationScreenState
                       GestureDetector(
                         onTap: () async {
                           if (isTermsAccepted == false) {
-                            errorSnackBar(context, "terms-should-be-accepted");
+                            getErrorSnackBar(
+                                context, "terms-should-be-accepted");
                           }
 
                           if (_formKey.currentState!.validate() &&

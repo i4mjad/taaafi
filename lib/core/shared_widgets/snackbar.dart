@@ -11,14 +11,20 @@ void getSnackBar(BuildContext context, String messageId) {
 }
 
 void getErrorSnackBar(BuildContext context, String messageId) {
-  ScaffoldMessenger.of(context).showSnackBar(errorSnackBar(context, messageId));
+  ScaffoldMessenger.of(context)
+      .showSnackBar(_errorSnackBar(context, messageId));
+}
+
+void getSuccessSnackBar(BuildContext context, String messageId) {
+  ScaffoldMessenger.of(context)
+      .showSnackBar(_successSnackBar(context, messageId));
 }
 
 void getSystemSnackBar(BuildContext context, String message) {
   ScaffoldMessenger.of(context).showSnackBar(systemSnackBar(context, message));
 }
 
-SnackBar errorSnackBar(BuildContext context, String messageId) {
+SnackBar _errorSnackBar(BuildContext context, String messageId) {
   final theme = AppTheme.of(context);
   return SnackBar(
     behavior: SnackBarBehavior.floating,
@@ -51,6 +57,48 @@ SnackBar errorSnackBar(BuildContext context, String messageId) {
               AppLocalizations.of(context).translate(messageId),
               style: TextStyles.caption.copyWith(
                 color: theme.error[900],
+              ),
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
+SnackBar _successSnackBar(BuildContext context, String messageId) {
+  final theme = AppTheme.of(context);
+  return SnackBar(
+    behavior: SnackBarBehavior.floating,
+    shape: SmoothRectangleBorder(
+      borderRadius: SmoothBorderRadius(
+        cornerRadius: 15,
+        cornerSmoothing: 1,
+      ),
+      side: BorderSide(
+        width: 2,
+        color: theme.success[300]!,
+      ),
+    ),
+    backgroundColor: theme.backgroundColor,
+    content: Container(
+      padding: EdgeInsets.all(8),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Icon(
+            LucideIcons.checkSquare,
+            color: theme.success[600],
+            size: 24,
+          ),
+          SizedBox(
+            width: 8,
+          ),
+          Flexible(
+            child: Text(
+              AppLocalizations.of(context).translate(messageId),
+              style: TextStyles.caption.copyWith(
+                color: theme.success[600],
               ),
             ),
           ),

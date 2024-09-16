@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
+import 'package:reboot_app_3/core/shared_widgets/snackbar.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/custom_theme_data.dart';
 import 'package:reboot_app_3/core/theming/font_weights.dart';
@@ -273,10 +274,12 @@ class _DiaryScreenState extends ConsumerState<DiaryScreen> {
                                         .getSelectionStyle()
                                         .attributes
                                         .containsKey('list');
-                                    _controller.formatSelection(isList
-                                        ? Attribute.fromKeyValue(
-                                            Attribute.ol.key, null)
-                                        : Attribute.ol);
+                                    _controller.formatSelection(
+                                      isList
+                                          ? Attribute.fromKeyValue(
+                                              Attribute.ol.key, null)
+                                          : Attribute.ol,
+                                    );
                                   },
                                   child: Padding(
                                     padding: const EdgeInsets.all(8),
@@ -290,43 +293,50 @@ class _DiaryScreenState extends ConsumerState<DiaryScreen> {
                             ),
 
                             // Save button
-                            WidgetsContainer(
-                              backgroundColor: theme.primary[50],
-                              borderSide: BorderSide(
-                                color: theme.grey[100]!,
-                              ),
-                              boxShadow: [
-                                BoxShadow(
-                                  color:
-                                      const Color(0xff323247).withOpacity(0.08),
-                                  spreadRadius: 0,
-                                  blurRadius: 64,
-                                  offset: const Offset(0, 8),
+                            GestureDetector(
+                              onTap: () {
+                                HapticFeedback.heavyImpact();
+                                getSuccessSnackBar(
+                                    context, "changes-has-been-saved");
+                              },
+                              child: WidgetsContainer(
+                                backgroundColor: theme.primary[50],
+                                borderSide: BorderSide(
+                                  color: theme.grey[100]!,
                                 ),
-                                BoxShadow(
-                                  color:
-                                      const Color(0xff323247).withOpacity(0.06),
-                                  spreadRadius: 0,
-                                  blurRadius: 128,
-                                  offset: const Offset(0, 8),
-                                ),
-                              ],
-                              padding: const EdgeInsets.all(8),
-                              child: Row(
-                                children: [
-                                  Icon(
-                                    LucideIcons.save,
-                                    color: theme.grey[600],
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: const Color(0xff323247)
+                                        .withOpacity(0.08),
+                                    spreadRadius: 0,
+                                    blurRadius: 64,
+                                    offset: const Offset(0, 8),
                                   ),
-                                  horizontalSpace(Spacing.points4),
-                                  Text(
-                                    AppLocalizations.of(context)
-                                        .translate('save'),
-                                    style: TextStyles.smallBold.copyWith(
-                                      color: theme.grey[700],
-                                    ),
-                                  )
+                                  BoxShadow(
+                                    color: const Color(0xff323247)
+                                        .withOpacity(0.06),
+                                    spreadRadius: 0,
+                                    blurRadius: 128,
+                                    offset: const Offset(0, 8),
+                                  ),
                                 ],
+                                padding: const EdgeInsets.all(8),
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      LucideIcons.save,
+                                      color: theme.grey[600],
+                                    ),
+                                    horizontalSpace(Spacing.points4),
+                                    Text(
+                                      AppLocalizations.of(context)
+                                          .translate('save'),
+                                      style: TextStyles.smallBold.copyWith(
+                                        color: theme.grey[700],
+                                      ),
+                                    )
+                                  ],
+                                ),
                               ),
                             )
                           ],
