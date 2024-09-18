@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
-import 'package:reboot_app_3/core/shared_widgets/app_bar.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/custom_theme_data.dart';
@@ -24,7 +23,27 @@ class LibraryScreen extends ConsumerWidget {
     final height = MediaQuery.of(context).size.height;
     return Scaffold(
       backgroundColor: theme.backgroundColor,
-      appBar: appBar(context, ref, 'library', false, true),
+      appBar: AppBar(
+        title: Text(
+          AppLocalizations.of(context).translate("library"),
+          style: TextStyles.screenHeadding.copyWith(
+            color: theme.grey[900],
+            height: 1,
+          ),
+        ),
+        backgroundColor: theme.backgroundColor,
+        surfaceTintColor: theme.backgroundColor,
+        centerTitle: false,
+        shadowColor: theme.grey[100],
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 16.0, left: 16),
+            child: Icon(LucideIcons.bookmark, color: theme.grey[900]),
+          )
+        ],
+        leadingWidth: 16,
+        automaticallyImplyLeading: true,
+      ),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16),
