@@ -5,8 +5,10 @@ import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/shared_widgets/app_bar.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
+import 'package:reboot_app_3/core/theming/custom_theme_data.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
+import 'package:reboot_app_3/features/vault/data/library/content_type_item.dart';
 import 'package:reboot_app_3/features/vault/data/library/featured_list_item.dart';
 import 'package:reboot_app_3/features/vault/data/library/latest_addition_item.dart';
 
@@ -31,37 +33,127 @@ class LibraryScreen extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  WidgetsContainer(
-                    backgroundColor: theme.primary[50],
-                    padding: EdgeInsets.all(8),
-                    borderSide: BorderSide(color: theme.primary[100]!),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Icon(
-                          LucideIcons.search,
-                          color: theme.grey[500],
-                        ),
-                        horizontalSpace(Spacing.points12),
-                        Text(
-                          AppLocalizations.of(context)
-                              .translate('library-search-placeholder'),
-                          style: TextStyles.caption.copyWith(
-                            color: theme.grey[500],
-                          ),
-                        )
-                      ],
-                    ),
-                  ),
+                  _searchWidget(theme, context),
                   verticalSpace(Spacing.points16),
                   LatestAdditionsWidget(),
                   verticalSpace(Spacing.points16),
-                  FeaturedListsWidget()
+                  FeaturedListsWidget(),
+                  verticalSpace(Spacing.points16),
+                  ContentTypesWidget()
                 ],
               ),
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  WidgetsContainer _searchWidget(CustomThemeData theme, BuildContext context) {
+    return WidgetsContainer(
+      backgroundColor: theme.primary[50],
+      padding: EdgeInsets.all(8),
+      borderSide: BorderSide(color: theme.primary[100]!),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Icon(
+            LucideIcons.search,
+            color: theme.grey[500],
+          ),
+          horizontalSpace(Spacing.points12),
+          Text(
+            AppLocalizations.of(context)
+                .translate('library-search-placeholder'),
+            style: TextStyles.caption.copyWith(
+              color: theme.grey[500],
+            ),
+          )
+        ],
+      ),
+    );
+  }
+}
+
+class ContentTypesWidget extends StatelessWidget {
+  const ContentTypesWidget({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = AppTheme.of(context);
+    final content = [
+      ContentTypeItem(LucideIcons.book, "Article"),
+      ContentTypeItem(LucideIcons.video, "Video"),
+      ContentTypeItem(LucideIcons.paperclip, "Book"),
+      ContentTypeItem(LucideIcons.pencil, "Blog"),
+    ];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          AppLocalizations.of(context).translate('content-type'),
+          style: TextStyles.h6.copyWith(
+            color: theme.grey[900],
+          ),
+        ),
+        verticalSpace(Spacing.points8),
+        GridView.builder(
+          shrinkWrap: true,
+          physics: NeverScrollableScrollPhysics(),
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 4,
+            childAspectRatio: 1 / 1,
+            crossAxisSpacing: 10,
+            mainAxisSpacing: 10,
+          ),
+          itemCount: content.length,
+          itemBuilder: (context, index) {
+            return ContentTypeWidget(content[index]);
+          },
+        ),
+      ],
+    );
+  }
+}
+
+class ContentTypeWidget extends StatelessWidget {
+  const ContentTypeWidget(
+    this.contentTypeItem, {
+    super.key,
+  });
+
+  final ContentTypeItem contentTypeItem;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = AppTheme.of(context);
+    final width = MediaQuery.of(context).size.width;
+    return WidgetsContainer(
+      cornerSmoothing: 0.6,
+      backgroundColor: theme.primary[50],
+      borderSide: BorderSide(
+        color: theme.primary[100]!,
+      ),
+      padding: EdgeInsets.all(8),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Icon(contentTypeItem.icon, color: theme.primary[600]),
+          verticalSpace(Spacing.points8),
+          Text(
+            AppLocalizations.of(context)
+                .translate(contentTypeItem.contentTypeNameTranslationKey),
+            textAlign: TextAlign.center,
+            style: TextStyles.caption.copyWith(
+              color: theme.primary[900],
+              height: 1,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -186,7 +278,6 @@ class LastAdditionItemWidget extends StatelessWidget {
                 overflow: TextOverflow
                     .ellipsis, // Add ellipsis at the end of the text
               ),
-              // verticalSpace(Spacing.points4),
               Spacer(),
               Text(
                 latestAdditionItem.seconderyTitle,
