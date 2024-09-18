@@ -1,3 +1,5 @@
+// ignore_for_file: dead_code
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
@@ -100,20 +102,41 @@ class ContentTypesWidget extends StatelessWidget {
           ),
         ),
         verticalSpace(Spacing.points8),
-        GridView.builder(
-          shrinkWrap: true,
-          physics: NeverScrollableScrollPhysics(),
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 4,
-            childAspectRatio: 1 / 1,
-            crossAxisSpacing: 10,
-            mainAxisSpacing: 10,
-          ),
-          itemCount: content.length,
-          itemBuilder: (context, index) {
-            return ContentTypeWidget(content[index]);
-          },
-        ),
+        Builder(builder: (BuildContext context) {
+          final hasData = true;
+          if (hasData) {
+            return GridView.builder(
+              shrinkWrap: true,
+              physics: NeverScrollableScrollPhysics(),
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 4,
+                childAspectRatio: 1 / 1,
+                crossAxisSpacing: 10,
+                mainAxisSpacing: 10,
+              ),
+              itemCount: content.length,
+              itemBuilder: (context, index) {
+                return ContentTypeWidget(content[index]);
+              },
+            );
+          } else {
+            return Container(
+              padding: EdgeInsets.all(16),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text(
+                    "لا توجد بيانات",
+                    style: TextStyles.caption.copyWith(
+                      color: theme.grey[900],
+                    ),
+                  )
+                ],
+              ),
+            );
+          }
+        }),
       ],
     );
   }
