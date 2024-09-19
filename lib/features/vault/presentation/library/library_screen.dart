@@ -1,5 +1,3 @@
-// ignore_for_file: dead_code
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
@@ -138,6 +136,7 @@ class ContentTypesWidget extends StatelessWidget {
                 return ContentTypeWidget(content[index]);
               },
             );
+            // ignore: dead_code
           } else {
             return Container(
               padding: EdgeInsets.all(16),
@@ -146,7 +145,7 @@ class ContentTypesWidget extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Text(
-                    "لا توجد بيانات",
+                    AppLocalizations.of(context).translate('no-data'),
                     style: TextStyles.caption.copyWith(
                       color: theme.grey[900],
                     ),
