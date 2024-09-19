@@ -49,24 +49,29 @@ class VaultScreen extends ConsumerWidget {
                 Row(
                   children: [
                     Expanded(
-                      child: WidgetsContainer(
-                        backgroundColor: theme.primary[50],
-                        borderSide: BorderSide(color: theme.primary[100]!),
-                        padding: EdgeInsets.all(14),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Icon(LucideIcons.clipboardCheck,
-                                color: theme.primary[900]),
-                            verticalSpace(Spacing.points28),
-                            Text(
-                              AppLocalizations.of(context)
-                                  .translate('activities'),
-                              style: TextStyles.h3
-                                  .copyWith(color: theme.primary[900]),
-                            )
-                          ],
+                      child: GestureDetector(
+                        onTap: () {
+                          context.goNamed(RouteNames.activities.name);
+                        },
+                        child: WidgetsContainer(
+                          backgroundColor: theme.primary[50],
+                          borderSide: BorderSide(color: theme.primary[100]!),
+                          padding: EdgeInsets.all(14),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Icon(LucideIcons.clipboardCheck,
+                                  color: theme.primary[900]),
+                              verticalSpace(Spacing.points28),
+                              Text(
+                                AppLocalizations.of(context)
+                                    .translate('activities'),
+                                style: TextStyles.h3
+                                    .copyWith(color: theme.primary[900]),
+                              )
+                            ],
+                          ),
                         ),
                       ),
                     ),
