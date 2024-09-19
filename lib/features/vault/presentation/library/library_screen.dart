@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
+import 'package:reboot_app_3/core/routing/route_names.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/custom_theme_data.dart';
@@ -69,27 +70,32 @@ class LibraryScreen extends ConsumerWidget {
     );
   }
 
-  WidgetsContainer _searchWidget(CustomThemeData theme, BuildContext context) {
-    return WidgetsContainer(
-      backgroundColor: theme.primary[50],
-      padding: EdgeInsets.all(8),
-      borderSide: BorderSide(color: theme.primary[100]!),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Icon(
-            LucideIcons.search,
-            color: theme.grey[500],
-          ),
-          horizontalSpace(Spacing.points12),
-          Text(
-            AppLocalizations.of(context)
-                .translate('library-search-placeholder'),
-            style: TextStyles.caption.copyWith(
+  Widget _searchWidget(CustomThemeData theme, BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        context.goNamed(RouteNames.content.name);
+      },
+      child: WidgetsContainer(
+        backgroundColor: theme.primary[50],
+        padding: EdgeInsets.all(8),
+        borderSide: BorderSide(color: theme.primary[100]!),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Icon(
+              LucideIcons.search,
               color: theme.grey[500],
             ),
-          )
-        ],
+            horizontalSpace(Spacing.points12),
+            Text(
+              AppLocalizations.of(context)
+                  .translate('library-search-placeholder'),
+              style: TextStyles.caption.copyWith(
+                color: theme.grey[500],
+              ),
+            )
+          ],
+        ),
       ),
     );
   }
@@ -173,29 +179,39 @@ class ContentTypeWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = AppTheme.of(context);
     final width = MediaQuery.of(context).size.width;
-    return WidgetsContainer(
-      cornerSmoothing: 0.6,
-      backgroundColor: theme.primary[50],
-      borderSide: BorderSide(
-        color: theme.primary[100]!,
-      ),
-      padding: EdgeInsets.all(8),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Icon(contentTypeItem.icon, color: theme.primary[600]),
-          verticalSpace(Spacing.points8),
-          Text(
-            AppLocalizations.of(context)
-                .translate(contentTypeItem.contentTypeNameTranslationKey),
-            textAlign: TextAlign.center,
-            style: TextStyles.caption.copyWith(
-              color: theme.primary[900],
-              height: 1,
+    return GestureDetector(
+      onTap: () {
+        context.goNamed(
+          RouteNames.contentType.name,
+          pathParameters: {
+            'name': contentTypeItem.contentTypeNameTranslationKey.toString()
+          },
+        );
+      },
+      child: WidgetsContainer(
+        cornerSmoothing: 0.6,
+        backgroundColor: theme.primary[50],
+        borderSide: BorderSide(
+          color: theme.primary[100]!,
+        ),
+        padding: EdgeInsets.all(8),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Icon(contentTypeItem.icon, color: theme.grey[900]),
+            verticalSpace(Spacing.points8),
+            Text(
+              AppLocalizations.of(context)
+                  .translate(contentTypeItem.contentTypeNameTranslationKey),
+              textAlign: TextAlign.center,
+              style: TextStyles.caption.copyWith(
+                color: theme.primary[900],
+                height: 1,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -254,10 +270,15 @@ class LatestAdditionsWidget extends ConsumerWidget {
                 color: theme.grey[900],
               ),
             ),
-            Text(
-              AppLocalizations.of(context).translate('show-all'),
-              style: TextStyles.caption.copyWith(
-                color: theme.grey[500],
+            GestureDetector(
+              onTap: () {
+                context.goNamed(RouteNames.content.name);
+              },
+              child: Text(
+                AppLocalizations.of(context).translate('show-all'),
+                style: TextStyles.caption.copyWith(
+                  color: theme.grey[500],
+                ),
               ),
             )
           ],
@@ -365,10 +386,15 @@ class FeaturedListsWidget extends ConsumerWidget {
                 color: theme.grey[900],
               ),
             ),
-            Text(
-              AppLocalizations.of(context).translate('show-all'),
-              style: TextStyles.caption.copyWith(
-                color: theme.grey[500],
+            GestureDetector(
+              onTap: () {
+                context.goNamed(RouteNames.content.name);
+              },
+              child: Text(
+                AppLocalizations.of(context).translate('show-all'),
+                style: TextStyles.caption.copyWith(
+                  color: theme.grey[500],
+                ),
               ),
             )
           ],

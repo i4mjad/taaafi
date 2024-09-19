@@ -13,6 +13,7 @@ class CustomTextField extends StatefulWidget {
   final TextInputType inputType;
   final BorderRadius? borderRadius;
   final BorderSide? borderSide;
+  final FocusNode? focusNode;
   final double? width;
   final bool? enabled;
   final String? Function(String?) validator;
@@ -20,6 +21,7 @@ class CustomTextField extends StatefulWidget {
   const CustomTextField({
     Key? key,
     this.enabled,
+    this.focusNode,
     required this.validator,
     this.borderRadius,
     this.borderSide,
@@ -86,6 +88,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
             textCapitalization: widget.textCapitalization,
             maxLength: 100,
             maxLines: 1,
+            focusNode: widget.focusNode,
             obscureText: widget.obscureText,
             keyboardType: widget.inputType,
             textAlign: TextAlign.start,
@@ -95,7 +98,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
                 _isValid = error == null;
                 _errorText = error;
               });
-              return null; // Returning null since we handle error display manually
+              return null;
             },
             onChanged: (value) {
               _validate();
@@ -104,7 +107,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
             decoration: InputDecoration(
               prefixIcon: Icon(
                 widget.prefixIcon,
-                color: theme.primary[600],
+                color: theme.grey[900],
               ),
               counterText: "",
               border: InputBorder.none,

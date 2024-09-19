@@ -20,6 +20,8 @@ import 'package:reboot_app_3/features/home/presentation/home/home_screen.dart';
 import 'package:reboot_app_3/features/onboarding/presentation/onboarding_screen.dart';
 import 'package:reboot_app_3/features/vault/presentation/diaries/diaries_screen.dart';
 import 'package:reboot_app_3/features/vault/presentation/diaries/diary_screen.dart';
+import 'package:reboot_app_3/features/vault/presentation/library/content_screen.dart';
+import 'package:reboot_app_3/features/vault/presentation/library/content_type_screen.dart';
 import 'package:reboot_app_3/features/vault/presentation/library/library_screen.dart';
 import 'package:reboot_app_3/features/vault/presentation/library/list_screen.dart';
 import 'package:reboot_app_3/features/vault/presentation/vault_screen.dart';
@@ -210,6 +212,17 @@ GoRouter goRouter(GoRouterRef ref) {
                         builder: (context, state) => ListScreen(
                           state.pathParameters["name"]!,
                         ),
+                      ),
+                      GoRoute(
+                        path: "content",
+                        name: RouteNames.content.name,
+                        builder: (context, state) => ContentScreen(),
+                      ),
+                      GoRoute(
+                        path: "contentType/:name",
+                        name: RouteNames.contentType.name,
+                        builder: (context, state) =>
+                            ContentTypeScreen(state.pathParameters["name"]!),
                       )
                     ],
                   ),
