@@ -21,6 +21,7 @@ import 'package:reboot_app_3/features/onboarding/presentation/onboarding_screen.
 import 'package:reboot_app_3/features/vault/presentation/diaries/diaries_screen.dart';
 import 'package:reboot_app_3/features/vault/presentation/diaries/diary_screen.dart';
 import 'package:reboot_app_3/features/vault/presentation/library/library_screen.dart';
+import 'package:reboot_app_3/features/vault/presentation/library/list_screen.dart';
 import 'package:reboot_app_3/features/vault/presentation/vault_screen.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -202,7 +203,15 @@ GoRouter goRouter(GoRouterRef ref) {
                     path: "library",
                     name: RouteNames.library.name,
                     builder: (context, state) => LibraryScreen(),
-                    routes: [],
+                    routes: [
+                      GoRoute(
+                        path: "list/:name",
+                        name: RouteNames.libraryList.name,
+                        builder: (context, state) => ListScreen(
+                          state.pathParameters["name"]!,
+                        ),
+                      )
+                    ],
                   ),
                 ],
               ),

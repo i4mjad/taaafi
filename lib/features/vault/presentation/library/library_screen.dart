@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
@@ -399,30 +400,40 @@ class FeaturedListItemWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = AppTheme.of(context);
-    return WidgetsContainer(
-      padding: EdgeInsets.all(8),
-      backgroundColor: theme.primary[50],
-      borderSide: BorderSide(
-        color: theme.primary[100]!,
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Icon(listItem.icon),
-          horizontalSpace(Spacing.points4),
-          Expanded(
-            child: Text(
-              listItem.listName,
-              style: TextStyles.small.copyWith(
-                color: theme.grey[900],
+    return GestureDetector(
+      onTap: () {
+        print(listItem.listName);
+        context.go('/vault/library/list/${listItem.listName}');
+      },
+      child: WidgetsContainer(
+        padding: EdgeInsets.all(8),
+        backgroundColor: theme.primary[50],
+        borderSide: BorderSide(
+          color: theme.primary[100]!,
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Icon(listItem.icon),
+            horizontalSpace(Spacing.points4),
+            Expanded(
+              child: Text(
+                listItem.listName,
+                style: TextStyles.small.copyWith(
+                  color: theme.grey[900],
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
             ),
-          ),
-          // Spacer(),
-          Icon(LucideIcons.arrowLeft, size: 16, color: theme.grey[500]),
-        ],
+            // Spacer(),
+            Icon(
+              LucideIcons.arrowLeft,
+              size: 16,
+              color: theme.grey[500],
+            ),
+          ],
+        ),
       ),
     );
   }
