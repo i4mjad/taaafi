@@ -56,14 +56,14 @@ class OngoingActivitiesWidget extends StatelessWidget {
       OngoingActivity(
         "1",
         'تمرين المتابعة اليومية',
-        DateTime(2022, 5, 2),
+        DateTime(2022, 8, 28),
         59,
       ),
       OngoingActivity(
         "2",
         'تمرين الامتنان',
-        DateTime(2022, 5, 2),
-        12,
+        DateTime(2024, 9, 20),
+        0,
       ),
       OngoingActivity(
         "3",
