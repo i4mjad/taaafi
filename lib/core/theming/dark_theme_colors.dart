@@ -36,27 +36,27 @@ class DarkThemeColors {
   static const Color tint800 = Color(0xff9ca9a9);
   static const Color tint900 = Color(0xffaebcbc);
 
-  static const Color sucess50 = Color(0xffebf9f1);
-  static const Color sucess100 = Color(0xffc1ecd3);
-  static const Color sucess200 = Color(0xffa3e2be);
-  static const Color sucess300 = Color(0xff7ad5a1);
-  static const Color sucess400 = Color(0xff60cd8e);
-  static const Color sucess500 = Color(0xff38c172);
-  static const Color sucess600 = Color(0xff33b068);
-  static const Color sucess700 = Color(0xff288951);
-  static const Color sucess800 = Color(0xff1f6a3f);
-  static const Color sucess900 = Color(0xff185130);
+  static const Color sucess50 = Color(0xff185130);
+  static const Color sucess100 = Color(0xff1f6a3f);
+  static const Color sucess200 = Color(0xff288951);
+  static const Color sucess300 = Color(0xff33b068);
+  static const Color sucess400 = Color(0xff38c172);
+  static const Color sucess500 = Color(0xff60cd8e);
+  static const Color sucess600 = Color(0xff7ad5a1);
+  static const Color sucess700 = Color(0xffa3e2be);
+  static const Color sucess800 = Color(0xffc1ecd3);
+  static const Color sucess900 = Color(0xffebf9f1);
 
-  static const Color warn50 = Color(0xfffefaf1);
-  static const Color warn100 = Color(0xfffcf4e2);
-  static const Color warn200 = Color(0xfffbefd4);
-  static const Color warn300 = Color(0xfffaeac5);
-  static const Color warn400 = Color(0xfff8e4b6);
-  static const Color warn500 = Color(0xfff7dfa7);
-  static const Color warn600 = Color(0xfff5d997);
-  static const Color warn700 = Color(0xfff4d387);
-  static const Color warn800 = Color(0xfff3ce76);
-  static const Color warn900 = Color(0xfff1c863);
+  static const Color warn50 = Color(0xfff1c863);
+  static const Color warn100 = Color(0xfff3ce76);
+  static const Color warn200 = Color(0xfff4d387);
+  static const Color warn300 = Color(0xfff5d997);
+  static const Color warn400 = Color(0xfff7dfa7);
+  static const Color warn500 = Color(0xfff8e4b6);
+  static const Color warn600 = Color(0xfffaeac5);
+  static const Color warn700 = Color(0xfffbefd4);
+  static const Color warn800 = Color(0xfffcf4e2);
+  static const Color warn900 = Color(0xfffefaf1);
 
   static const Color grey50 = Color(0xfffefefe);
   static const Color grey100 = Color(0xfffdfdfd);

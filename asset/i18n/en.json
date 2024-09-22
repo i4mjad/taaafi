@@ -19,6 +19,21 @@
 
 "all-tasks":"All Tasks",
 
+"add-activity":"Add Activity",
+
+"easy":"Easy",
+  "medium":"Medium",
+  "hard":"Hard",
+
+  "starter": "Starter",
+  "intermediate": "Intermediate",
+  "advanced": "Advanced",
+  "expert": "Expert",
+
+  "activity-level":"Activity Level: ",
+  "activity-starting-date": "Starting Date: ",
+  "activity-progress":"Activity Progress: ",
+
   "date":"Date",
 
   "list-content":"List Content",

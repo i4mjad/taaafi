@@ -12,5 +12,5 @@ enum RouteNames {
   forgotPassword,
   completeAccountRegisteration,
   confirmUserDetails,
-  loading, dayOverview, diaries, diary, library, libraryList, contentType, activities, allTasks,
+  loading, dayOverview, diaries, diary, library, libraryList, contentType, activities, allTasks, addActivity,
 }

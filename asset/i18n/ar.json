@@ -7,6 +7,7 @@
   "porn-addiction-recovery-p": "محتوى مفيد للتعافي من إدمان الإباحية",
 
   "activities":"التمارين",
+  "add-activity":"إضافة تمرين",
   "linked-activities":"التمارين المرتبطة",
   "library":"المكتبة",
 
@@ -292,6 +293,20 @@
   "relapses-average": "الانتكاسات في آخر 7/28/90 يوم",
   "relapses-count": "الأيام بدون\nانتكاسة",
   "relapses-number": "عدد الانتكاسات: ",
+
+  "easy":"سهل",
+  "medium":"متوسط",
+  "hard":"صعب",
+
+  "starter": "مبتدئ",
+  "intermediate": "متوسط",
+  "advanced": "متقدم",
+  "expert": "خبير",
+
+  "activity-level":"مستوى التمرين: ",
+  "activity-starting-date": "تاريخ البداية: ",
+  "activity-progress":"نسبة الانجاز: ",
+
 
   "no-relapses": "لا توجد انتكاسات",
   "7-days": "كل 7 أيام",

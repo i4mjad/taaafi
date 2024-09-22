@@ -11,6 +11,7 @@ import 'package:reboot_app_3/core/theming/custom_theme_data.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/features/vault/data/activities/activity_task.dart';
+import 'package:reboot_app_3/features/vault/data/activities/ongoing_activity.dart';
 import 'package:reboot_app_3/features/vault/presentation/activities/shared_widgets/day_task_widget.dart';
 
 class ActivitiesScreen extends ConsumerWidget {
@@ -69,8 +70,14 @@ class ActivitiesScreen extends ConsumerWidget {
       actions: [
         Padding(
           padding: EdgeInsets.only(right: 16, left: 16),
-          child: Icon(
-            LucideIcons.plusSquare,
+          child: GestureDetector(
+            onTap: () {
+              context.goNamed(RouteNames.addActivity.name);
+            },
+            child: Icon(
+              LucideIcons.plus,
+              color: theme.grey[900],
+            ),
           ),
         )
       ],
@@ -276,7 +283,8 @@ class OngoingActivitiyWidget extends ConsumerWidget {
               Row(
                 children: [
                   Text(
-                    'تاريخ البداية: ',
+                    AppLocalizations.of(context)
+                        .translate('activity-starting-date'),
                     style: TextStyles.small.copyWith(color: theme.grey[700]),
                   ),
                   Text(
@@ -288,7 +296,7 @@ class OngoingActivitiyWidget extends ConsumerWidget {
               Row(
                 children: [
                   Text(
-                    'نسبة الانجاز: ',
+                    AppLocalizations.of(context).translate('activity-progress'),
                     style: TextStyles.small.copyWith(color: theme.grey[700]),
                   ),
                   Text(
@@ -304,7 +312,9 @@ class OngoingActivitiyWidget extends ConsumerWidget {
           ),
           Spacer(),
           Icon(
-            LucideIcons.chevronLeft,
+            locale.languageCode == 'en'
+                ? LucideIcons.chevronRight
+                : LucideIcons.chevronLeft,
             color: theme.grey[500],
           ),
         ],

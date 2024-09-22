@@ -80,7 +80,7 @@ class _DiaryScreenState extends ConsumerState<DiaryScreen> {
                           style: TextStyles.h6,
                         ),
                         horizontalSpace(Spacing.points12),
-                        Flexible(
+                      Flexible(
                           child: Wrap(
                             spacing: 4,
                             children: diary.linkedActivites.map((activity) {
@@ -97,6 +97,7 @@ class _DiaryScreenState extends ConsumerState<DiaryScreen> {
                             }).toList(),
                           ),
                         ),
+
                       ],
                     ),
                   ),

@@ -10,13 +10,3 @@ class ActivityTask {
   ActivityTask(this.id, this.taskName, this.activityName, this.linkedDiaryId,
       this.isLinkedToADiary, this.taskDatetime);
 }
-
-class OngoingActivity {
-  final String id;
-  final String title;
-  final DateTime startingDate;
-  final int activityProgress;
-
-  OngoingActivity(
-      this.id, this.title, this.startingDate, this.activityProgress);
-}
