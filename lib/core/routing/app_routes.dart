@@ -19,6 +19,7 @@ import 'package:reboot_app_3/features/plus/presentation/taaafi_plus_screen.dart'
 import 'package:reboot_app_3/features/home/presentation/home/home_screen.dart';
 import 'package:reboot_app_3/features/onboarding/presentation/onboarding_screen.dart';
 import 'package:reboot_app_3/features/vault/presentation/activities/activities_screen.dart';
+import 'package:reboot_app_3/features/vault/presentation/activities/all_tasks_screen.dart';
 import 'package:reboot_app_3/features/vault/presentation/diaries/diaries_screen.dart';
 import 'package:reboot_app_3/features/vault/presentation/diaries/diary_screen.dart';
 import 'package:reboot_app_3/features/vault/presentation/library/content_screen.dart';
@@ -192,7 +193,13 @@ GoRouter goRouter(GoRouterRef ref) {
                     path: "activities",
                     name: RouteNames.activities.name,
                     builder: (context, state) => ActivitiesScreen(),
-                    routes: [],
+                    routes: [
+                      GoRoute(
+                        path: "allTasks",
+                        name: RouteNames.allTasks.name,
+                        builder: (context, state) => AllTasksScreen(),
+                      )
+                    ],
                   ),
                   GoRoute(
                     path: "diaries",
