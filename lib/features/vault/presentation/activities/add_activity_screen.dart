@@ -2,12 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
+import 'package:reboot_app_3/core/routing/route_names.dart';
 import 'package:reboot_app_3/core/shared_widgets/app_bar.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/custom_theme_data.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
+import 'package:go_router/go_router.dart';
+
 import 'package:reboot_app_3/features/vault/data/activities/activity.dart';
 
 class AddActivityScreen extends ConsumerWidget {
@@ -109,80 +112,87 @@ class ActivitiyWidget extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = AppTheme.of(context);
     final locale = ref.watch(localeNotifierProvider);
-    return WidgetsContainer(
-      backgroundColor: theme.primary[50],
-      padding: EdgeInsets.fromLTRB(16, 12, 16, 12),
-      borderSide: BorderSide(color: theme.primary[100]!),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Text(
-            order.toString(),
-            style: TextStyles.h6.copyWith(color: theme.grey[900]),
-          ),
-          horizontalSpace(Spacing.points16),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                activity.name,
-                style: TextStyles.footnoteSelected.copyWith(
-                  color: theme.grey[900],
+    return GestureDetector(
+      onTap: () {
+        context.goNamed(RouteNames.activityOverview.name,
+            pathParameters: {"id": activity.id});
+      },
+      child: WidgetsContainer(
+        backgroundColor: theme.primary[50],
+        padding: EdgeInsets.fromLTRB(16, 12, 16, 12),
+        borderSide: BorderSide(color: theme.primary[100]!),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Text(
+              order.toString(),
+              style: TextStyles.h6.copyWith(color: theme.grey[900]),
+            ),
+            horizontalSpace(Spacing.points16),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  activity.name,
+                  style: TextStyles.footnoteSelected.copyWith(
+                    color: theme.grey[900],
+                  ),
                 ),
-              ),
-              verticalSpace(Spacing.points4),
-              Row(
-                children: [
-                  Text(
-                    AppLocalizations.of(context).translate('activity-level'),
-                    style: TextStyles.small.copyWith(color: theme.grey[700]),
-                  ),
-                  Text(
-                    AppLocalizations.of(context)
-                        .translate(activity.difficulty.name),
-                    style: TextStyles.smallBold.copyWith(
-                      color: _getDifficultyColor(activity.difficulty, theme),
+                verticalSpace(Spacing.points4),
+                Row(
+                  children: [
+                    Text(
+                      AppLocalizations.of(context).translate('activity-level'),
+                      style: TextStyles.small.copyWith(color: theme.grey[700]),
                     ),
-                  ),
-                ],
-              ),
-              verticalSpace(Spacing.points4),
-              Row(
-                children: [
-                  Wrap(
-                    spacing: 4,
-                    children: activity.levels.map(
-                      (level) {
-                        return WidgetsContainer(
-                          borderRadius: BorderRadius.circular(8),
-                          padding: EdgeInsets.fromLTRB(8, 2, 8, 2),
-                          child: Text(
-                            AppLocalizations.of(context).translate(level.name),
-                            style: TextStyles.tiny.copyWith(
-                              color: getTextColorForUserLevel(level, theme),
+                    Text(
+                      AppLocalizations.of(context)
+                          .translate(activity.difficulty.name),
+                      style: TextStyles.smallBold.copyWith(
+                        color: _getDifficultyColor(activity.difficulty, theme),
+                      ),
+                    ),
+                  ],
+                ),
+                verticalSpace(Spacing.points4),
+                Row(
+                  children: [
+                    Wrap(
+                      spacing: 4,
+                      children: activity.levels.map(
+                        (level) {
+                          return WidgetsContainer(
+                            borderRadius: BorderRadius.circular(8),
+                            padding: EdgeInsets.fromLTRB(8, 2, 8, 2),
+                            child: Text(
+                              AppLocalizations.of(context)
+                                  .translate(level.name),
+                              style: TextStyles.tiny.copyWith(
+                                color: getTextColorForUserLevel(level, theme),
+                              ),
                             ),
-                          ),
-                          backgroundColor:
-                              getBackgroundColorForUserLevel(level, theme),
-                          borderSide: BorderSide(
-                            color: getBorderColorForUserLevel(level, theme),
-                          ),
-                        );
-                      },
-                    ).toList(),
-                  ),
-                ],
-              ),
-            ],
-          ),
-          Spacer(),
-          Icon(
-            locale!.languageCode == 'en'
-                ? LucideIcons.chevronRight
-                : LucideIcons.chevronLeft,
-            color: theme.grey[500],
-          ),
-        ],
+                            backgroundColor:
+                                getBackgroundColorForUserLevel(level, theme),
+                            borderSide: BorderSide(
+                              color: getBorderColorForUserLevel(level, theme),
+                            ),
+                          );
+                        },
+                      ).toList(),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            Spacer(),
+            Icon(
+              locale!.languageCode == 'en'
+                  ? LucideIcons.chevronRight
+                  : LucideIcons.chevronLeft,
+              color: theme.grey[500],
+            ),
+          ],
+        ),
       ),
     );
   }

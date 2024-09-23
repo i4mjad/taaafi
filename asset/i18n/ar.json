@@ -307,6 +307,10 @@
   "activity-starting-date": "تاريخ البداية: ",
   "activity-progress":"نسبة الانجاز: ",
 
+  "subscriber":"مشترك",
+  "month":"شهر/أشهر",
+
+  "all-levels":"كل المستويات",
 
   "no-relapses": "لا توجد انتكاسات",
   "7-days": "كل 7 أيام",
