@@ -30,6 +30,8 @@
 
   "activity-period":"Activity period",
 
+  "activity-period-is-not-valid":"The period between start and end date cannot exceed 90 days.",
+
   "add-the-activity":"Add the activity",
 
   "starter": "Starter",
@@ -38,7 +40,7 @@
   "expert": "Expert",
 
   "activity-level":"Activity Level: ",
-  "activity-starting-date": "Starting Date: ",
+  "ongoing-activity-starting-date": "Starting Date: ",
   "activity-progress":"Activity Progress: ",
 
   "date":"Date",
@@ -99,6 +101,8 @@
   "confirm-note-delete": "Confirm Note Deleting",
 
   "starting-date": "Starting date and time",
+  "activity-starting-date": "Activity starting date and time",
+  "activity-ending-date": "Activity ending date and time",
   "starting-date-p": "This represent the starting date and time of your journy. You can change it later in the Account settings",
   "without-starting-date-p": "This represent the starting date and time of your journy. You have to set it to continue using the app",
 
@@ -279,6 +283,8 @@
 
   "out-of-range": "Error",
   "out-of-range-p": "You can't edit this date",
+
+  "start-from-today":"Start from today",
 
   "follow-up-dialog-yes-button": "Yes",
   "follow-up-dialog-no-button": "No",

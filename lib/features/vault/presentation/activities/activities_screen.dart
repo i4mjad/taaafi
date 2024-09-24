@@ -151,30 +151,12 @@ class TodayTasksWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = AppTheme.of(context);
     var records = [
-      ActivityTask(
-        "1",
-        'كتابة اليوميات',
-        "تدوين الرحلة",
-        "1",
-        true,
-        DateTime(2024, 5, 2),""
-      ),
-      ActivityTask(
-        "2",
-        'كتابة اليوميات',
-        "تدوين الرحلة",
-        "12",
-        false,
-        DateTime(2024, 5, 2),""
-      ),
-      ActivityTask(
-        "3",
-        'كتابة اليوميات',
-        "تدوين الرحلة",
-        "134",
-        false,
-        DateTime(2024, 5, 2),""
-      ),
+      ActivityTask("1", 'كتابة اليوميات', "تدوين الرحلة", "1", true,
+          DateTime(2024, 5, 2), ""),
+      ActivityTask("2", 'كتابة اليوميات', "تدوين الرحلة", "12", false,
+          DateTime(2024, 5, 2), ""),
+      ActivityTask("3", 'كتابة اليوميات', "تدوين الرحلة", "134", false,
+          DateTime(2024, 5, 2), ""),
     ];
 
     return Column(
@@ -285,7 +267,7 @@ class OngoingActivitiyWidget extends ConsumerWidget {
                 children: [
                   Text(
                     AppLocalizations.of(context)
-                        .translate('activity-starting-date'),
+                        .translate('ongoing-activity-starting-date'),
                     style: TextStyles.small.copyWith(color: theme.grey[700]),
                   ),
                   Text(

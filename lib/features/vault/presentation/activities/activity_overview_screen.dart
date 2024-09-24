@@ -5,6 +5,8 @@ import 'package:reboot_app_3/core/helpers/date_display_formater.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/shared_widgets/app_bar.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
+import 'package:reboot_app_3/core/shared_widgets/custom_textfield.dart';
+import 'package:reboot_app_3/core/shared_widgets/snackbar.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
@@ -312,9 +314,10 @@ class AddTheActivitySheet extends ConsumerStatefulWidget {
 class _AddTheActivitySheetState extends ConsumerState<AddTheActivitySheet> {
   final activityStartingDateController = TextEditingController();
   late DateTime activityStartingDateTime = DateTime.now();
-
   final activityEndingDateController = TextEditingController();
   late DateTime activityEndingDateTime = DateTime.now();
+
+  bool nowIsStartingDate = false;
 
   Future<void> _selectActivityStartingDate(
       BuildContext context, String language) async {
@@ -340,6 +343,7 @@ class _AddTheActivitySheetState extends ConsumerState<AddTheActivitySheet> {
 
         var pickedStarting = DisplayDateTime(pickedDateTime, language);
         setState(() {
+          nowIsStartingDate = false;
           activityStartingDateController.text = pickedStarting.displayDateTime;
           activityStartingDateTime = pickedStarting.date;
         });
@@ -352,8 +356,8 @@ class _AddTheActivitySheetState extends ConsumerState<AddTheActivitySheet> {
     DateTime? pickedDate = await showDatePicker(
       context: context,
       initialDate: DateTime.now(),
-      firstDate: DateTime.now(),
-      lastDate: DateTime.now().add(Duration(days: 90)),
+      firstDate: activityStartingDateTime,
+      lastDate: activityStartingDateTime.add(Duration(days: 90)),
     );
     if (pickedDate != null) {
       TimeOfDay? pickedTime = await showTimePicker(
@@ -369,11 +373,15 @@ class _AddTheActivitySheetState extends ConsumerState<AddTheActivitySheet> {
           pickedTime.minute,
         );
 
-        var pickedEnding = DisplayDateTime(pickedDateTime, language);
-        setState(() {
-          activityEndingDateController.text = pickedEnding.displayDateTime;
-          activityEndingDateTime = pickedEnding.date;
-        });
+        if (pickedDateTime.difference(activityStartingDateTime).inDays > 90) {
+          getErrorSnackBar(context, 'activity-period-is-not-valid');
+        } else {
+          var pickedEnding = DisplayDateTime(pickedDateTime, language);
+          setState(() {
+            activityEndingDateController.text = pickedEnding.displayDateTime;
+            activityEndingDateTime = pickedEnding.date;
+          });
+        }
       }
     }
   }
@@ -382,13 +390,15 @@ class _AddTheActivitySheetState extends ConsumerState<AddTheActivitySheet> {
   void dispose() {
     activityStartingDateController.dispose();
     activityEndingDateController.dispose();
-
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = AppTheme.of(context);
+    final locale = ref.watch(
+        localeNotifierProvider); // Assuming English locale for now; adjust as needed
+
     return Container(
       color: theme.backgroundColor,
       padding: EdgeInsets.all(16),
@@ -412,31 +422,125 @@ class _AddTheActivitySheetState extends ConsumerState<AddTheActivitySheet> {
             ],
           ),
           verticalSpace(Spacing.points16),
-          // ADD HERE
+          GestureDetector(
+            onTap: () =>
+                _selectActivityStartingDate(context, locale!.languageCode),
+            child: AbsorbPointer(
+              child: CustomTextField(
+                controller: activityStartingDateController,
+                hint: AppLocalizations.of(context)
+                    .translate('activity-starting-date'),
+                prefixIcon: LucideIcons.calendar,
+                inputType: TextInputType.datetime,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter the starting date';
+                  }
+                  return null;
+                },
+              ),
+            ),
+          ),
+          verticalSpace(Spacing.points8),
+          WidgetsContainer(
+            padding: EdgeInsets.fromLTRB(16, 8, 16, 8),
+            backgroundColor: theme.secondary[50],
+            borderSide: BorderSide(color: theme.secondary[100]!),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    Icon(LucideIcons.bell),
+                    horizontalSpace(Spacing.points16),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          AppLocalizations.of(context)
+                              .translate('start-from-today'),
+                          style: TextStyles.footnote.copyWith(
+                            color: theme.grey[900],
+                          ),
+                        ),
+                        verticalSpace(Spacing.points4),
+                        if (nowIsStartingDate)
+                          Text(
+                            getDisplayDateTime(
+                                DateTime.now(), locale!.languageCode),
+                            style: TextStyles.footnote.copyWith(
+                              color: theme.grey[400],
+                            ),
+                          ),
+                      ],
+                    ),
+                  ],
+                ),
+                Switch(
+                  value: nowIsStartingDate,
+                  activeColor: theme.primary[600],
+                  onChanged: (bool value) {
+                    setState(() {
+                      nowIsStartingDate = value;
+                      if (nowIsStartingDate) {
+                        final selectedDate = DisplayDateTime(
+                            DateTime.now(), locale!.languageCode);
+                        activityStartingDateController.text =
+                            selectedDate.displayDateTime;
+                        activityStartingDateTime = selectedDate.date;
+                      }
+                    });
+                  },
+                ),
+              ],
+            ),
+          ),
+          verticalSpace(Spacing.points16),
+          GestureDetector(
+            onTap: () =>
+                _selectActivityEndingDate(context, locale!.languageCode),
+            child: AbsorbPointer(
+              child: CustomTextField(
+                controller: activityEndingDateController,
+                hint: AppLocalizations.of(context)
+                    .translate('activity-ending-date'),
+                prefixIcon: LucideIcons.calendarRange,
+                inputType: TextInputType.datetime,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter the ending date';
+                  }
+                  return null;
+                },
+              ),
+            ),
+          ),
           verticalSpace(Spacing.points16),
           GestureDetector(
             onTap: () {
-              Navigator.pop(context);
+              print(widget.activityId);
+              print(activityStartingDateTime);
+              print(activityEndingDateTime);
             },
             child: WidgetsContainer(
-              backgroundColor: theme.primary[900],
+              backgroundColor: theme.primary[200],
+              borderSide: BorderSide(color: theme.primary[400]!),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    AppLocalizations.of(context).translate("close"),
+                    AppLocalizations.of(context).translate('add-the-activity'),
                     style: TextStyles.body.copyWith(
-                      color: theme.grey[50],
+                      color: theme.grey[900],
                     ),
                   ),
                 ],
               ),
             ),
-          )
+          ),
         ],
       ),
     );
-    ;
   }
 }

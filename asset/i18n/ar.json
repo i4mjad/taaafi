@@ -23,6 +23,7 @@
 
   "activity-period":"مدة التمرين",
 
+  "activity-period-is-not-valid":"لا يمكن أن تزيد مدة التمرين عن 90 يوم",
 
   "vault-p":"مكانك الشخصي، يحتوي على مذكراتك وتمارين وتذكيرات رحلة التعافي",
 
@@ -190,6 +191,8 @@
 
   "day-overview":"حصيلة اليوم",
 
+  "start-from-today":"البدء من اليوم",
+
   "diaries":"اليوميات",
 
   "angry":"غاضب",
@@ -309,8 +312,11 @@
   "advanced": "متقدم",
   "expert": "خبير",
 
+  "activity-starting-date": "توقيت بدء التمرين",
+  "activity-ending-date": "توقيت نهاية التمرين",
+
   "activity-level":"مستوى التمرين: ",
-  "activity-starting-date": "تاريخ البداية: ",
+  "ongoing-activity-starting-date": "تاريخ البداية: ",
   "activity-progress":"نسبة الانجاز: ",
 
   "subscriber":"مشترك",
