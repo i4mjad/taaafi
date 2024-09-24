@@ -103,6 +103,11 @@
   "starting-date": "Starting date and time",
   "activity-starting-date": "Activity starting date and time",
   "activity-ending-date": "Activity ending date and time",
+  "please-enter-a-starting-date":"Please enter the starting date",
+  "please-enter-an-ending-date":"Please enter the ending date",
+
+  "please-add-all-required-data":"Please fill the required fields",
+
   "starting-date-p": "This represent the starting date and time of your journy. You can change it later in the Account settings",
   "without-starting-date-p": "This represent the starting date and time of your journy. You have to set it to continue using the app",
 

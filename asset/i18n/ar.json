@@ -315,6 +315,11 @@
   "activity-starting-date": "توقيت بدء التمرين",
   "activity-ending-date": "توقيت نهاية التمرين",
 
+  "please-enter-a-starting-date":"يجب إدخال تاريخ لبداية التمرين",
+  "please-enter-an-ending-date":"يجب إدخال تاريخ لنهاية التمرين",
+
+  "please-add-all-required-data":"الرجاء إدخال جميع الحقول المطلوبة",
+
   "activity-level":"مستوى التمرين: ",
   "ongoing-activity-starting-date": "تاريخ البداية: ",
   "activity-progress":"نسبة الانجاز: ",
