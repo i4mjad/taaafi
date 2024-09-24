@@ -82,30 +82,12 @@ class _DiarySettingsSheetState extends ConsumerState<DiarySettingsSheet> {
     final locale = ref.watch(localeNotifierProvider);
 
     var records = [
-      ActivityTask(
-        "1",
-        'كتابة اليوميات',
-        "تدوين الرحلة",
-        "1",
-        true,
-        DateTime(2024, 5, 2),
-      ),
-      ActivityTask(
-        "2",
-        'كتابة اليوميات',
-        "تدوين الرحلة",
-        "12",
-        false,
-        DateTime(2024, 5, 2),
-      ),
-      ActivityTask(
-        "3",
-        'كتابة اليوميات',
-        "تدوين الرحلة",
-        "134",
-        false,
-        DateTime(2024, 5, 2),
-      ),
+      ActivityTask("1", 'كتابة اليوميات', "تدوين الرحلة", "1", true,
+          DateTime(2024, 5, 2), ""),
+      ActivityTask("2", 'كتابة اليوميات', "تدوين الرحلة", "12", false,
+          DateTime(2024, 5, 2), ""),
+      ActivityTask("3", 'كتابة اليوميات', "تدوين الرحلة", "134", false,
+          DateTime(2024, 5, 2), ""),
     ];
     return Container(
       color: theme.backgroundColor,

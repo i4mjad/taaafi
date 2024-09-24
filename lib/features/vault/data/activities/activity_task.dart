@@ -4,9 +4,10 @@ class ActivityTask {
   final String taskName;
   final String activityName;
   final String linkedDiaryId;
+  final String description;
   final DateTime taskDatetime;
   final bool isLinkedToADiary;
 
   ActivityTask(this.id, this.taskName, this.activityName, this.linkedDiaryId,
-      this.isLinkedToADiary, this.taskDatetime);
+      this.isLinkedToADiary, this.taskDatetime, this.description);
 }

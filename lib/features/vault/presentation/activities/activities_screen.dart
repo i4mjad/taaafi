@@ -157,7 +157,7 @@ class TodayTasksWidget extends StatelessWidget {
         "تدوين الرحلة",
         "1",
         true,
-        DateTime(2024, 5, 2),
+        DateTime(2024, 5, 2),""
       ),
       ActivityTask(
         "2",
@@ -165,7 +165,7 @@ class TodayTasksWidget extends StatelessWidget {
         "تدوين الرحلة",
         "12",
         false,
-        DateTime(2024, 5, 2),
+        DateTime(2024, 5, 2),""
       ),
       ActivityTask(
         "3",
@@ -173,7 +173,7 @@ class TodayTasksWidget extends StatelessWidget {
         "تدوين الرحلة",
         "134",
         false,
-        DateTime(2024, 5, 2),
+        DateTime(2024, 5, 2),""
       ),
     ];
 
