@@ -17,13 +17,17 @@
 
   "ongoing-activities":"Ongoing Activities",
 
-"all-tasks":"All Tasks",
+  "all-tasks":"All Tasks",
 
-"add-activity":"Add Activity",
+  "add-activity":"Add Activity",
 
-"easy":"Easy",
+  "easy":"Easy",
   "medium":"Medium",
   "hard":"Hard",
+
+  "activity-tasks":"Activity Tasks",
+
+  "add-the-activity":"Add the activity",
 
   "starter": "Starter",
   "intermediate": "Intermediate",

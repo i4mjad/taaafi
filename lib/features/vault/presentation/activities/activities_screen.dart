@@ -176,6 +176,7 @@ class TodayTasksWidget extends StatelessWidget {
         DateTime(2024, 5, 2),
       ),
     ];
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.start,
