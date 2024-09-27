@@ -241,66 +241,74 @@ class OngoingActivitiyWidget extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = AppTheme.of(context);
     final locale = ref.watch(localeNotifierProvider);
-    return WidgetsContainer(
-      backgroundColor: theme.primary[50],
-      padding: EdgeInsets.fromLTRB(16, 12, 16, 12),
-      borderSide: BorderSide(color: theme.primary[100]!),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Text(
-            order.toString(),
-            style: TextStyles.h6.copyWith(color: theme.grey[900]),
-          ),
-          horizontalSpace(Spacing.points16),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                activity.title,
-                style: TextStyles.footnoteSelected.copyWith(
-                  color: theme.grey[900],
+    return GestureDetector(
+      onTap: () {
+        context.goNamed(RouteNames.ongoingActivity.name,
+            pathParameters: {"id": activity.id});
+      },
+      child: WidgetsContainer(
+        backgroundColor: theme.primary[50],
+        padding: EdgeInsets.fromLTRB(16, 12, 16, 12),
+        borderSide: BorderSide(color: theme.primary[100]!),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Text(
+              order.toString(),
+              style: TextStyles.h6.copyWith(color: theme.grey[900]),
+            ),
+            horizontalSpace(Spacing.points16),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  activity.title,
+                  style: TextStyles.footnoteSelected.copyWith(
+                    color: theme.grey[900],
+                  ),
                 ),
-              ),
-              verticalSpace(Spacing.points4),
-              Row(
-                children: [
-                  Text(
-                    AppLocalizations.of(context)
-                        .translate('ongoing-activity-starting-date'),
-                    style: TextStyles.small.copyWith(color: theme.grey[700]),
-                  ),
-                  Text(
-                    getDisplayDate(activity.startingDate, locale!.languageCode),
-                    style: TextStyles.small.copyWith(color: theme.grey[700]),
-                  ),
-                ],
-              ),
-              Row(
-                children: [
-                  Text(
-                    AppLocalizations.of(context).translate('activity-progress'),
-                    style: TextStyles.small.copyWith(color: theme.grey[700]),
-                  ),
-                  Text(
-                    "${activity.activityProgress} %",
-                    style: TextStyles.smallBold.copyWith(
-                      color:
-                          getPercentageColor(activity.activityProgress, theme),
+                verticalSpace(Spacing.points4),
+                Row(
+                  children: [
+                    Text(
+                      AppLocalizations.of(context)
+                          .translate('ongoing-activity-starting-date'),
+                      style: TextStyles.small.copyWith(color: theme.grey[700]),
                     ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-          Spacer(),
-          Icon(
-            locale.languageCode == 'en'
-                ? LucideIcons.chevronRight
-                : LucideIcons.chevronLeft,
-            color: theme.grey[500],
-          ),
-        ],
+                    Text(
+                      getDisplayDate(
+                          activity.startingDate, locale!.languageCode),
+                      style: TextStyles.small.copyWith(color: theme.grey[700]),
+                    ),
+                  ],
+                ),
+                Row(
+                  children: [
+                    Text(
+                      AppLocalizations.of(context)
+                          .translate('activity-progress'),
+                      style: TextStyles.small.copyWith(color: theme.grey[700]),
+                    ),
+                    Text(
+                      "${activity.activityProgress} %",
+                      style: TextStyles.smallBold.copyWith(
+                        color: getPercentageColor(
+                            activity.activityProgress, theme),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            Spacer(),
+            Icon(
+              locale.languageCode == 'en'
+                  ? LucideIcons.chevronRight
+                  : LucideIcons.chevronLeft,
+              color: theme.grey[500],
+            ),
+          ],
+        ),
       ),
     );
   }

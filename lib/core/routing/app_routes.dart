@@ -22,6 +22,7 @@ import 'package:reboot_app_3/features/vault/presentation/activities/activities_s
 import 'package:reboot_app_3/features/vault/presentation/activities/activity_overview_screen.dart';
 import 'package:reboot_app_3/features/vault/presentation/activities/add_activity_screen.dart';
 import 'package:reboot_app_3/features/vault/presentation/activities/all_tasks_screen.dart';
+import 'package:reboot_app_3/features/vault/presentation/activities/ongoing_activitiy_screen.dart';
 import 'package:reboot_app_3/features/vault/presentation/diaries/diaries_screen.dart';
 import 'package:reboot_app_3/features/vault/presentation/diaries/diary_screen.dart';
 import 'package:reboot_app_3/features/vault/presentation/library/content_screen.dart';
@@ -200,6 +201,11 @@ GoRouter goRouter(GoRouterRef ref) {
                         path: "allTasks",
                         name: RouteNames.allTasks.name,
                         builder: (context, state) => AllTasksScreen(),
+                      ),
+                      GoRoute(
+                        path: "ongoingActivity/:id",
+                        name: RouteNames.ongoingActivity.name,
+                        builder: (context, state) => OngoingActivitiyScreen(state.pathParameters["id"]!),
                       ),
                       GoRoute(
                           path: "addActivity",
