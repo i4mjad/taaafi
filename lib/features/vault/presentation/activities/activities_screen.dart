@@ -84,6 +84,7 @@ class ActivitiesScreen extends ConsumerWidget {
       leadingWidth: 16,
     );
   }
+
 }
 
 class OngoingActivitiesWidget extends StatelessWidget {
