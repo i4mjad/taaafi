@@ -312,6 +312,8 @@
   "advanced": "متقدم",
   "expert": "خبير",
 
+  "activity-settings":"إعدادات التمرين",
+
   "activity-starting-date": "توقيت بدء التمرين",
   "activity-ending-date": "توقيت نهاية التمرين",
 
@@ -340,6 +342,7 @@
   "delete-my-data-warning": "ملاحظة: لا يمكن التراجع بعد مسح البيانات",
 
   "new-begining": "بداية جديدة",
+  "remove-activity": "إزالة التمرين",
   "start-from-specific-date": "ابدأ من تاريخ معين",
 
   "delete-my-account": "حذف حسابي",

@@ -86,8 +86,12 @@ class OngoingActivitiyScreen extends ConsumerWidget {
           padding: EdgeInsets.only(right: 16, left: 16),
           child: GestureDetector(
             onTap: () {
-              //TODO: add the ongoing activity pop up here
-              // context.goNamed(RouteNames.addActivity.name);
+              showModalBottomSheet<void>(
+                  context: context,
+                  isScrollControlled: true,
+                  builder: (BuildContext context) {
+                    return OngoingActivitySettingsSheet(ongoingActivitiyId);
+                  });
             },
             child: Icon(
               LucideIcons.settings,
@@ -97,6 +101,85 @@ class OngoingActivitiyScreen extends ConsumerWidget {
         )
       ],
       leadingWidth: 16,
+    );
+  }
+}
+
+class OngoingActivitySettingsSheet extends ConsumerWidget {
+  const OngoingActivitySettingsSheet(this.ongoingActivitiyId, {super.key});
+
+  final String ongoingActivitiyId;
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = AppTheme.of(context);
+    return Container(
+      color: theme.backgroundColor,
+      padding: EdgeInsets.all(16),
+      width: MediaQuery.of(context).size.width,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                AppLocalizations.of(context).translate('activity-settings'),
+                style: TextStyles.h6.copyWith(
+                  color: theme.grey[900],
+                ),
+              ),
+              GestureDetector(
+                onTap: () {
+                  Navigator.pop(context);
+                },
+                child: Icon(
+                  LucideIcons.xCircle,
+                  color: theme.grey[900],
+                ),
+              )
+            ],
+          ),
+          verticalSpace(Spacing.points16),
+          WidgetsContainer(
+            backgroundColor: theme.warn[50],
+            borderSide: BorderSide(color: theme.warn[100]!),
+            child: Center(
+              child: Text(
+                AppLocalizations.of(context).translate('new-begining'),
+                style: TextStyles.body.copyWith(color: theme.warn[900]),
+              ),
+            ),
+          ),
+          verticalSpace(Spacing.points8),
+          WidgetsContainer(
+            backgroundColor: theme.error[50],
+            borderSide: BorderSide(color: theme.error[100]!),
+            child: Center(
+              child: Text(
+                AppLocalizations.of(context).translate('remove-activity'),
+                style: TextStyles.body.copyWith(color: theme.error[700]),
+              ),
+            ),
+          ),
+          verticalSpace(Spacing.points32),
+          GestureDetector(
+            onTap: () {
+              Navigator.pop(context);
+            },
+            child: WidgetsContainer(
+              backgroundColor: theme.primary[50],
+              borderSide: BorderSide(color: theme.primary[100]!),
+              child: Center(
+                child: Text(
+                  AppLocalizations.of(context).translate('close'),
+                  style: TextStyles.body.copyWith(color: theme.primary[900]),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -123,13 +206,13 @@ class OngoingActivityPerformanceWidget extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            OngoingActivityPerformanceDayWidget(true),
-            OngoingActivityPerformanceDayWidget(true),
-            OngoingActivityPerformanceDayWidget(false),
-            OngoingActivityPerformanceDayWidget(true),
-            OngoingActivityPerformanceDayWidget(false),
-            OngoingActivityPerformanceDayWidget(false),
-            OngoingActivityPerformanceDayWidget(true),
+            OngoingActivityDayPerformanceWidget(true),
+            OngoingActivityDayPerformanceWidget(true),
+            OngoingActivityDayPerformanceWidget(false),
+            OngoingActivityDayPerformanceWidget(true),
+            OngoingActivityDayPerformanceWidget(false),
+            OngoingActivityDayPerformanceWidget(false),
+            OngoingActivityDayPerformanceWidget(true),
           ],
         )
       ],
@@ -137,8 +220,8 @@ class OngoingActivityPerformanceWidget extends StatelessWidget {
   }
 }
 
-class OngoingActivityPerformanceDayWidget extends StatelessWidget {
-  const OngoingActivityPerformanceDayWidget(
+class OngoingActivityDayPerformanceWidget extends StatelessWidget {
+  const OngoingActivityDayPerformanceWidget(
     this.isFinished, {
     super.key,
   });
