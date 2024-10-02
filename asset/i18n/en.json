@@ -104,7 +104,17 @@
   "activity-settings":"Activity Settings",
   "remove-activity": "Remove Activity",
 
-  "taaafi-groups":"Ta'afi Groups",
+  "taaafi-groups":"Ta'aafi Groups",
+
+  "group":"Group",
+  "not-alone": "You Are Not Alone",
+  "not-alone-description": "Learn about different experiences and share your own with a group of recovering individuals to exchange knowledge and discover challenges in the recovery journey.",
+  "privacy-first": "Privacy First!",
+  "privacy-first-description": "You can share your recovery journey and challenges with complete privacy without revealing your identity.",
+  "challenge-peers": "Challenge Your Peers",
+  "challenge-peers-description": "Challenge your peers in the recovery journey to achieve advanced stages in the process.",
+  "follow-up-peers": "Follow Up on Your Peers",
+  "follow-up-peers-description": "Keep up with updates from your peers in the fellowship, help them, and benefit from their recovery experiences.",
 
   "starting-date": "Starting date and time",
   "activity-starting-date": "Activity starting date and time",

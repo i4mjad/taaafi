@@ -63,9 +63,9 @@ class ScaffoldWithNestedNavigation extends StatelessWidget {
                   ),
                 ),
                 NavigationDestination(
-                  label: AppLocalizations.of(context).translate("ta3afi-plus"),
+                  label: AppLocalizations.of(context).translate("group"),
                   icon: Icon(
-                    LucideIcons.crown,
+                    LucideIcons.users,
                     size: 18,
                   ),
                 ),
