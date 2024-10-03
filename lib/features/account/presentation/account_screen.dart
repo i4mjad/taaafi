@@ -145,101 +145,110 @@ class AccountScreen extends ConsumerWidget {
     showModalBottomSheet(
       context: context,
       builder: (context) {
-        return Consumer(builder: (context, ref, child) {
-          final theme = AppTheme.of(context);
-          final themeNotifier = ref.watch(customThemeProvider.notifier);
-          return Container(
-            color: theme.backgroundColor,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  verticalSpace(Spacing.points16),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Flexible(
-                        child: Text(
-                          AppLocalizations.of(context).translate('ui-settings'),
-                          style: TextStyles.h4.copyWith(
-                            color: theme.grey[900],
-                          ),
-                        ),
-                      ),
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.of(context).pop();
-                        },
-                        child: Icon(LucideIcons.xCircle),
-                      )
-                    ],
-                  ),
-                  verticalSpace(Spacing.points24),
-                  Text(
-                    AppLocalizations.of(context).translate('night-mode'),
-                    style: TextStyles.h6.copyWith(
-                      color: theme.grey[900],
-                    ),
-                  ),
-                  verticalSpace(Spacing.points12),
-                  GestureDetector(
-                    onTap: () {
-                      themeNotifier.toggleTheme();
-                      Navigator.of(context).pop();
-                    },
-                    child: WidgetsContainer(
-                      padding: EdgeInsets.all(12),
-                      backgroundColor: theme.primary[50],
-                      borderSide: BorderSide(color: theme.primary[100]!),
-                      borderRadius: BorderRadius.circular(10.5),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Icon(LucideIcons.moon),
-                          horizontalSpace(Spacing.points12),
-                          Text(
-                            themeNotifier.darkTheme == true
-                                ? AppLocalizations.of(context).translate('off')
-                                : AppLocalizations.of(context).translate('on'),
-                            style: TextStyles.footnoteSelected
-                                .copyWith(color: theme.grey[900], height: 2),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  verticalSpace(Spacing.points24),
-                  Text(
-                    AppLocalizations.of(context).translate('change-lang'),
-                    style: TextStyles.h6.copyWith(
-                      color: theme.grey[900],
-                    ),
-                  ),
-                  verticalSpace(Spacing.points8),
-                  CustomSegmentedButton(
-                    options: [
-                      SegmentedButtonOption(
-                          value: 'arabic', translationKey: 'arabic'),
-                      SegmentedButtonOption(
-                          value: 'english', translationKey: 'english'),
-                    ],
-                    selectedOption: _getSelectedLocale(context, ref),
-                    onChanged: (value) {
-                      _updateThelocale(value, ref);
-                      Navigator.of(context).pop();
-                    },
-                  ),
-                  verticalSpace(Spacing.points16),
-                ],
-              ),
-            ),
-          );
-        });
+        return UiAndLanguageSettings();
       },
     );
+  }
+}
+
+class UiAndLanguageSettings extends ConsumerWidget {
+  const UiAndLanguageSettings({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Consumer(builder: (context, ref, child) {
+      final theme = AppTheme.of(context);
+      final themeNotifier = ref.watch(customThemeProvider.notifier);
+      return Container(
+        color: theme.backgroundColor,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              verticalSpace(Spacing.points16),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Flexible(
+                    child: Text(
+                      AppLocalizations.of(context).translate('ui-settings'),
+                      style: TextStyles.h4.copyWith(
+                        color: theme.grey[900],
+                      ),
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: Icon(LucideIcons.xCircle),
+                  )
+                ],
+              ),
+              verticalSpace(Spacing.points24),
+              Text(
+                AppLocalizations.of(context).translate('night-mode'),
+                style: TextStyles.h6.copyWith(
+                  color: theme.grey[900],
+                ),
+              ),
+              verticalSpace(Spacing.points12),
+              GestureDetector(
+                onTap: () {
+                  themeNotifier.toggleTheme();
+                  Navigator.of(context).pop();
+                },
+                child: WidgetsContainer(
+                  padding: EdgeInsets.all(12),
+                  backgroundColor: theme.primary[50],
+                  borderSide: BorderSide(color: theme.primary[100]!),
+                  borderRadius: BorderRadius.circular(10.5),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Icon(LucideIcons.moon),
+                      horizontalSpace(Spacing.points12),
+                      Text(
+                        themeNotifier.darkTheme == true
+                            ? AppLocalizations.of(context).translate('off')
+                            : AppLocalizations.of(context).translate('on'),
+                        style: TextStyles.footnoteSelected
+                            .copyWith(color: theme.grey[900], height: 2),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              verticalSpace(Spacing.points24),
+              Text(
+                AppLocalizations.of(context).translate('change-lang'),
+                style: TextStyles.h6.copyWith(
+                  color: theme.grey[900],
+                ),
+              ),
+              verticalSpace(Spacing.points8),
+              CustomSegmentedButton(
+                options: [
+                  SegmentedButtonOption(
+                      value: 'arabic', translationKey: 'arabic'),
+                  SegmentedButtonOption(
+                      value: 'english', translationKey: 'english'),
+                ],
+                selectedOption: _getSelectedLocale(context, ref),
+                onChanged: (value) {
+                  _updateThelocale(value, ref);
+                  Navigator.of(context).pop();
+                },
+              ),
+              verticalSpace(Spacing.points16),
+            ],
+          ),
+        ),
+      );
+    });
   }
 
   _getSelectedLocale(BuildContext context, WidgetRef ref) {
@@ -254,7 +263,7 @@ class AccountScreen extends ConsumerWidget {
     }
   }
 
-  void _updateThelocale(SegmentedButtonOption value, WidgetRef ref) {
+  _updateThelocale(SegmentedButtonOption value, WidgetRef ref) {
     final locale = ref.watch(localeNotifierProvider);
     final localeNotifier = ref.watch(localeNotifierProvider.notifier);
 
@@ -285,14 +294,25 @@ class SettingsButton extends StatelessWidget {
       onTap: action,
       child: WidgetsContainer(
         padding: EdgeInsets.all(14),
-        backgroundColor: _getBackgroundColor(type, theme),
+        backgroundColor: theme.backgroundColor,
         borderRadius: BorderRadius.circular(10.5),
-        borderSide: BorderSide(color: _getBorderColor(type, theme), width: 1),
+        borderSide: BorderSide(color: _getBorderColor(type, theme), width: 0.5),
+        boxShadow: [
+          BoxShadow(
+            color: Color.fromRGBO(0, 0, 0, 0.15),
+            blurRadius: 2.6,
+            spreadRadius: 0,
+            offset: Offset(
+              1.95,
+              1.95,
+            ),
+          ),
+        ],
         child: Row(
           children: [
             Icon(
               icon,
-              color: _getTextColor(type, theme),
+              color: theme.grey[900],
             ),
             horizontalSpace(Spacing.points8),
             Text(
@@ -321,28 +341,15 @@ class SettingsButton extends StatelessWidget {
 
   Color _getTextColor(String? type, CustomThemeData theme) {
     switch (type) {
-      case 'warn':
-        return theme.warn[900] as Color;
-      case 'error':
-        return theme.error[900] as Color;
       case 'app':
-        return theme.grey[50] as Color;
+        return theme.primary[600] as Color;
       default:
         return theme.grey[900] as Color;
     }
   }
 
   Color _getBorderColor(String? type, CustomThemeData theme) {
-    switch (type) {
-      case 'warn':
-        return theme.warn[50] as Color;
-      case 'error':
-        return theme.error[100] as Color;
-      case 'app':
-        return theme.primary[100] as Color;
-      default:
-        return theme.primary[100] as Color;
-    }
+    return theme.primary[200] as Color;
   }
 }
 
@@ -358,11 +365,10 @@ class UserDetailsWidget extends StatelessWidget {
     return WidgetsContainer(
       width: MediaQuery.of(context).size.width,
       padding: EdgeInsets.all(16),
-      backgroundColor: theme.primary[50],
+      backgroundColor: theme.backgroundColor,
       borderRadius: BorderRadius.circular(15),
       borderSide: BorderSide(
-        color: theme.primary[100]!,
-        width: 1.0,
+        color: theme.primary[200]!,
       ),
       cornerSmoothing: 1,
       child: Row(
