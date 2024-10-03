@@ -67,7 +67,6 @@ class LibraryScreen extends ConsumerWidget {
           ),
         ),
       ),
-    
     );
   }
 
@@ -80,6 +79,26 @@ class LibraryScreen extends ConsumerWidget {
         backgroundColor: theme.primary[50],
         padding: EdgeInsets.all(8),
         borderSide: BorderSide(color: theme.primary[100]!),
+        boxShadow: [
+          BoxShadow(
+            color: Color.fromRGBO(0, 0, 0, 0.1),
+            blurRadius: 5,
+            spreadRadius: 0,
+            offset: Offset(
+              0,
+              0,
+            ),
+          ),
+          BoxShadow(
+            color: Color.fromRGBO(0, 0, 0, 0.1),
+            blurRadius: 1,
+            spreadRadius: 0,
+            offset: Offset(
+              0,
+              0,
+            ),
+          ),
+        ],
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
@@ -196,6 +215,26 @@ class ContentTypeWidget extends StatelessWidget {
           color: theme.primary[100]!,
         ),
         padding: EdgeInsets.all(8),
+        boxShadow: [
+          BoxShadow(
+            color: Color.fromRGBO(0, 0, 0, 0.1),
+            blurRadius: 5,
+            spreadRadius: 0,
+            offset: Offset(
+              0,
+              0,
+            ),
+          ),
+          BoxShadow(
+            color: Color.fromRGBO(0, 0, 0, 0.1),
+            blurRadius: 1,
+            spreadRadius: 0,
+            offset: Offset(
+              0,
+              0,
+            ),
+          ),
+        ],
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -318,6 +357,26 @@ class LastAdditionItemWidget extends StatelessWidget {
         WidgetsContainer(
           backgroundColor: theme.primary[50],
           borderSide: BorderSide(color: theme.primary[100]!, width: 0.25),
+          boxShadow: [
+            BoxShadow(
+              color: Color.fromRGBO(0, 0, 0, 0.1),
+              blurRadius: 5,
+              spreadRadius: 0,
+              offset: Offset(
+                0,
+                0,
+              ),
+            ),
+            BoxShadow(
+              color: Color.fromRGBO(0, 0, 0, 0.1),
+              blurRadius: 1,
+              spreadRadius: 0,
+              offset: Offset(
+                0,
+                0,
+              ),
+            ),
+          ],
           child: Center(
             child: Icon(
               latestAdditionItem.icon,
@@ -438,6 +497,26 @@ class FeaturedListItemWidget extends StatelessWidget {
         borderSide: BorderSide(
           color: theme.primary[100]!,
         ),
+        boxShadow: [
+          BoxShadow(
+            color: Color.fromRGBO(0, 0, 0, 0.1),
+            blurRadius: 5,
+            spreadRadius: 0,
+            offset: Offset(
+              0,
+              0,
+            ),
+          ),
+          BoxShadow(
+            color: Color.fromRGBO(0, 0, 0, 0.1),
+            blurRadius: 1,
+            spreadRadius: 0,
+            offset: Offset(
+              0,
+              0,
+            ),
+          ),
+        ],
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
