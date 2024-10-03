@@ -46,6 +46,7 @@ dependencies:
   path: null
   provider: ^6.0.2
   riverpod_annotation: ^2.3.5
+  sentry_flutter: ^8.9.0
   shared_preferences: ^2.0.15
   sign_in_with_apple: ^6.1.1
   syncfusion_flutter_calendar: ^26.2.11+1
