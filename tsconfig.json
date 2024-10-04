@@ -24,6 +24,12 @@
     "paths": {
       "@spartan-ng/ui-button-helm": [
         "./src/app/shared/components/ui-button-helm/src/index.ts"
+      ],
+      "@spartan-ng/ui-card-helm": [
+        "./src/app/shared/components/ui-card-helm/src/index.ts"
+      ],
+      "@spartan-ng/ui-icon-helm": [
+        "./src/app/shared/components/ui-icon-helm/src/index.ts"
       ]
     }
   },

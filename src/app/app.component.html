@@ -1,6 +1,6 @@
 <div class="h-screen">
   <mat-toolbar color="primary" class="flex justify-between items-center">
-    <button mat-outlined-button routerLink="/dashboard">
+    <button hlmBtn variant="ghost" routerLink="/dashboard" >
       {{ "app-name" | translate }}
     </button>
 
@@ -9,23 +9,28 @@
 
     <!-- Buttons visible on larger screens (gt-md) -->
     <div class="flex gap-4 items-center">
-      <div class="hidden gt-md:flex gap-4" >
-        <button mat-outlined-button routerLink="/library" *ngIf="isLoggedIn">
+      <div class="hidden gt-md:flex gap-4 items-center content-center" >
+        <button hlmBtn variant="ghost" routerLink="/library" *ngIf="isLoggedIn">
           {{ "library" | translate }}
         </button>
-        <button mat-outlined-button routerLink="/vault" *ngIf="isLoggedIn">
+
+        <button hlmBtn variant="ghost" routerLink="/vault" *ngIf="isLoggedIn">
           {{ "vault" | translate }}
         </button>
-        <button mat-outlined-button routerLink="/fellowships" *ngIf="isLoggedIn">
+
+        <button hlmBtn variant="ghost" routerLink="/fellowships" *ngIf="isLoggedIn">
           {{ "fellowships" | translate }}
         </button>
-        <button mat-outlined-button routerLink="/users-management" *ngIf="isLoggedIn">
+
+        <button hlmBtn variant="ghost" routerLink="/users-management" *ngIf="isLoggedIn">
           {{ "users-management" | translate }}
         </button>
 
-        <button mat-icon-button [matMenuTriggerFor]="menu1">
-          <mat-icon>person</mat-icon>
+        <button hlmBtn size="icon" variant="outline" [matMenuTriggerFor]="menu1">
+          <hlm-icon size='sm' name="lucideUsers" />
         </button>
+
+
         <mat-menu #menu1="matMenu">
           <button mat-menu-item (click)="toggleLanguage()">
             {{ (currentLanguage === "en" ? "arabic" : "english") | translate }}

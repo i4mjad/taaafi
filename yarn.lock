@@ -3225,6 +3225,20 @@
     "@emnapi/runtime" "^1.1.0"
     "@tybys/wasm-util" "^0.9.0"
 
+"@ng-icons/core@^25.1.0":
+  version "25.6.1"
+  resolved "https://registry.yarnpkg.com/@ng-icons/core/-/core-25.6.1.tgz#471c2597af226c5b6f53ec5d39c8ec680964b9b2"
+  integrity sha512-o6vCttlzXvDZRYiOKOULr7fsX8gY/DwwxzBSrBQzwa/at+pC0xRoe6uczJ9Ato+y1EDWP/PlrEMAQfvokBA6tQ==
+  dependencies:
+    tslib "^2.2.0"
+
+"@ng-icons/lucide@^29.5.1":
+  version "29.5.1"
+  resolved "https://registry.yarnpkg.com/@ng-icons/lucide/-/lucide-29.5.1.tgz#c3363ee0557b317cab26f30deb578596e1a2c53b"
+  integrity sha512-PL7lK1BxTzpe7kMCbFK85jOOQG+VGi0pcNShan429c1M0tOVJ9M7O1XuaFIkuq2yZZ5KKOphT0vwz3CDI4wPNg==
+  dependencies:
+    tslib "^2.2.0"
+
 "@ngtools/webpack@18.0.1":
   version "18.0.1"
   resolved "https://registry.npmjs.org/@ngtools/webpack/-/webpack-18.0.1.tgz"
@@ -7677,6 +7691,13 @@ lru-cache@^6.0.0:
   dependencies:
     yallist "^4.0.0"
 
+lucide-angular@^0.447.0:
+  version "0.447.0"
+  resolved "https://registry.yarnpkg.com/lucide-angular/-/lucide-angular-0.447.0.tgz#87bc9663a763b4883724351da421a018ee933ab1"
+  integrity sha512-WZfJqI0r8LaZ5vR77owtAZq7NbLC6PmeJ4IsmhxXGOg6+yq0ANbJeg23XACULFaVBUQaSN32XwxV2SdW5uo2oQ==
+  dependencies:
+    tslib "^2.3.0"
+
 luxon@^3.2.1:
   version "3.5.0"
   resolved "https://registry.npmjs.org/luxon/-/luxon-3.5.0.tgz"
@@ -10210,6 +10231,11 @@ tslib@^1.9.0:
   version "1.14.1"
   resolved "https://registry.npmjs.org/tslib/-/tslib-1.14.1.tgz"
   integrity sha512-Xni35NKzjgMrwevysHTCArtLDpPvye8zV/0E4EyYn43P7/7qvQwPh9BGkHewbMulVntbigmcT7rdX3BNo9wRJg==
+
+tslib@^2.2.0:
+  version "2.7.0"
+  resolved "https://registry.yarnpkg.com/tslib/-/tslib-2.7.0.tgz#d9b40c5c40ab59e8738f297df3087bf1a2690c01"
+  integrity sha512-gLXCKdN1/j47AiHiOkJN69hJmcbGTHI0ImLmbYLHykhgeN0jVGola9yVjFgzCUklsZQMW55o+dW7IXv3RCXDzA==
 
 tsscmp@1.0.6:
   version "1.0.6"
