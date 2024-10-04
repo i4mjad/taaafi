@@ -19,14 +19,18 @@ const routes: Routes = [
     component: DashboardComponent,
     canActivate: [canActivateAuth],
   },
+  // Main pages
+  { path: 'library', component: LibraryComponent, canActivate: [canActivateAuth]},
+  { path: 'vault', component: VaultComponent, canActivate: [canActivateAuth] },
+  { path: 'fellowships', component: FellowshipsComponent, canActivate: [canActivateAuth] },
+  { path: 'users-management', component: UsersManagementComponent, canActivate: [canActivateAuth] },
+
+
+  // Error pages
   { path: 'not-found', component: NotFoundComponent },
   { path: 'forbidden-access', component: ForbiddenAccessComponent },
   { path: 'unauthorized-access', component: UnauthorizedAccessComponent },
   { path: 'not-found', component: NotFoundComponent },
-  { path: 'library', component: LibraryComponent },
-  { path: 'vault', component: VaultComponent },
-  { path: 'fellowships', component: FellowshipsComponent },
-  { path: 'users-management', component: UsersManagementComponent },
   { path: '**', redirectTo: '/not-found' },
 ];
 

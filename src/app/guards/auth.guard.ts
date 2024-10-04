@@ -7,5 +7,5 @@ export const canActivateAuth: () => Observable<boolean | UrlTree> = () => {
   const router = inject(Router);
   const afAuth = inject(AngularFireAuth);
 
-  return afAuth.authState.pipe(map(user => user ? true : router.parseUrl('/login')));
+  return afAuth.authState.pipe(map(user => user ? true : router.parseUrl('/forbidden-access')));
 };
