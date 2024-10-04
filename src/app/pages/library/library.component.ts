@@ -20,7 +20,7 @@ export class LibraryComponent implements OnInit {
     this.contentTypes$.subscribe((data)=>{
       if(data.length > 0){
 
-
+        console.log(data);
       }
     });
   }
