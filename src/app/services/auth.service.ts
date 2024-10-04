@@ -72,13 +72,15 @@ export class AuthService {
   }
 
   checkUserRole(userId: string) {
+    console.log("this is called");
+
     return this.firestore
       .doc<User>(`users/${userId}`)
       .valueChanges()
       .pipe(
         tap((user) => {
           if (user && user.role === 'admin') {
-            this.router.navigate(['/dashboard']);
+            // this.router.navigate(['/dashboard']);
           } else {
             this.handleAccessDenied();
           }

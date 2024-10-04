@@ -6,12 +6,22 @@
   "log-out": "Log Out",
   "log-in": "Log In",
   "ta3afi-cp": "Taa'afi Managment Platform",
+  "add-new-item":"Add New Item",
+  "content-management":"Content Management",
+  "content-management-p":"Here you can manage the content in the app. You can add a new content, categories, lists and other related content parts. you can manage, delete, update the content here.",
   "hero-disc": "For more Information, visit the app link",
   "admin-only": "This page is only for moderators, please visit the main web page for app details",
   "library": "Content Liberary",
   "users-management": "Users Mangement",
   "fellowships": "Fellowships",
   "vault": "Vault",
+
+  "content":"Content",
+  "lists":"Lists",
+  "categories":"Categories",
+  "authors":"Authors",
+  "types":"Content Types",
+
   "ERRORS": {
     "404": {
       "Title": "404 Not Found",
