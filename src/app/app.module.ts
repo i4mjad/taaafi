@@ -24,6 +24,8 @@ import { FellowshipsComponent } from './pages/fellowships/fellowships.component'
 import { UsersManagementComponent } from './pages/users-management/users-management.component';
 import { HlmButtonDirective } from '@spartan-ng/ui-button-helm';
 import { SpartanCompnentsModule } from './shared/components/component.module';
+import { NgxsModule } from '@ngxs/store';
+import { AppState } from './state/app.store';
 
 @NgModule({
   declarations: [AppComponent, HomeComponent, DashboardComponent, NotFoundComponent, UnauthorizedAccessComponent, ForbiddenAccessComponent, LibraryComponent, VaultComponent, FellowshipsComponent, UsersManagementComponent],
@@ -31,6 +33,7 @@ import { SpartanCompnentsModule } from './shared/components/component.module';
     BrowserModule,
     AppRoutingModule,
     HttpClientModule,
+    NgxsModule.forRoot([AppState]),
 
     AngularFireModule.initializeApp(environment.firebase),
     AngularFireAuthModule, // Authentication module
@@ -45,7 +48,7 @@ import { SpartanCompnentsModule } from './shared/components/component.module';
       },
     }),
   ],
-  providers: [provideAnimationsAsync()],
+  providers: [provideAnimationsAsync(),HttpClient],
   bootstrap: [AppComponent],
 })
 export class AppModule {}
