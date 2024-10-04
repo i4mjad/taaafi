@@ -1,6 +1,12 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  content: ["./src/**/*.{html,ts}"],
+  // content: [],
+
+  presets: [require('@spartan-ng/ui-core/hlm-tailwind-preset')],
+  content: [
+    './src/**/*.{html,ts}',
+    './src/app/shared/components/**/*.{html,ts}',
+  ],
   theme: {
     screens: {
       xs: {
@@ -47,4 +53,3 @@ module.exports = {
   },
   plugins: [],
 };
-
