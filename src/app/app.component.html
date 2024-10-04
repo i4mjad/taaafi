@@ -9,17 +9,17 @@
 
     <!-- Buttons visible on larger screens (gt-md) -->
     <div class="flex gap-4 items-center">
-      <div class="hidden gt-md:flex gap-4">
-        <button mat-outlined-button routerLink="/library">
+      <div class="hidden gt-md:flex gap-4" >
+        <button mat-outlined-button routerLink="/library" *ngIf="isLoggedIn">
           {{ "library" | translate }}
         </button>
-        <button mat-outlined-button routerLink="/vault">
+        <button mat-outlined-button routerLink="/vault" *ngIf="isLoggedIn">
           {{ "vault" | translate }}
         </button>
-        <button mat-outlined-button routerLink="/fellowships">
+        <button mat-outlined-button routerLink="/fellowships" *ngIf="isLoggedIn">
           {{ "fellowships" | translate }}
         </button>
-        <button mat-outlined-button routerLink="/users-management">
+        <button mat-outlined-button routerLink="/users-management" *ngIf="isLoggedIn">
           {{ "users-management" | translate }}
         </button>
 
@@ -45,16 +45,16 @@
     </div>
 
     <mat-menu #menu="matMenu">
-      <button mat-menu-item routerLink="/library">
+      <button mat-menu-item routerLink="/library" *ngIf="isLoggedIn">
         {{ "library" | translate }}
       </button>
-      <button mat-menu-item routerLink="/vault">
+      <button mat-menu-item routerLink="/vault" *ngIf="isLoggedIn">
         {{ "vault" | translate }}
       </button>
-      <button mat-menu-item routerLink="/fellowships">
+      <button mat-menu-item routerLink="/fellowships" *ngIf="isLoggedIn">
         {{ "fellowships" | translate }}
       </button>
-      <button mat-menu-item routerLink="/users-management">
+      <button mat-menu-item routerLink="/users-management" *ngIf="isLoggedIn">
         {{ "users-management" | translate }}
       </button>
       <mat-divider></mat-divider>
