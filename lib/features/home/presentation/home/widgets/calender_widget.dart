@@ -57,7 +57,7 @@ class CalenderWidget extends StatelessWidget {
                 dayTextStyle: TextStyles.tinyBold,
               ),
               headerStyle: CalendarHeaderStyle(
-                backgroundColor: theme.primary[100],
+                backgroundColor: theme.primary[50],
                 textAlign: TextAlign.center,
                 textStyle: TextStyles.caption.copyWith(
                   fontWeight: FontWeight.bold,
@@ -70,8 +70,8 @@ class CalenderWidget extends StatelessWidget {
                   dayTextStyle: TextStyles.body,
                 ),
                 monthCellStyle: MonthCellStyle(
-                  todayBackgroundColor: theme.primary[100],
-                  backgroundColor: theme.primary[50],
+                  todayBackgroundColor: theme.primary[200],
+                  backgroundColor: theme.primary[100],
                   textStyle: TextStyles.caption,
                 ),
               ),

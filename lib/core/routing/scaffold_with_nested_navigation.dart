@@ -33,52 +33,43 @@ class ScaffoldWithNestedNavigation extends StatelessWidget {
             labelTextStyle: WidgetStatePropertyAll<TextStyle>(
                 TextStyles.bottomNavigationBarLabel),
           ),
-          child: Container(
-            decoration: BoxDecoration(
-                border: Border(
-              top: BorderSide(
-                color: theme.primary[100]!,
-                width: 1.0,
+          child: NavigationBar(
+            height: 58,
+            indicatorColor: theme.primary[200],
+            indicatorShape: CircleBorder(),
+            selectedIndex: navigationShell.currentIndex,
+            backgroundColor: theme.primary[50],
+            destinations: [
+              NavigationDestination(
+                label: AppLocalizations.of(context).translate("home"),
+                icon: Icon(
+                  LucideIcons.home,
+                  size: 20,
+                ),
               ),
-            )),
-            child: NavigationBar(
-              height: 58,
-              indicatorColor: theme.primary[100],
-              indicatorShape: CircleBorder(),
-              selectedIndex: navigationShell.currentIndex,
-              backgroundColor: theme.primary[50],
-              destinations: [
-                NavigationDestination(
-                  label: AppLocalizations.of(context).translate("home"),
-                  icon: Icon(
-                    LucideIcons.home,
-                    size: 18,
-                  ),
+              NavigationDestination(
+                label: AppLocalizations.of(context).translate("vault"),
+                icon: Icon(
+                  LucideIcons.bookLock,
+                  size: 20,
                 ),
-                NavigationDestination(
-                  label: AppLocalizations.of(context).translate("vault"),
-                  icon: Icon(
-                    LucideIcons.bookLock,
-                    size: 18,
-                  ),
+              ),
+              NavigationDestination(
+                label: AppLocalizations.of(context).translate("group"),
+                icon: Icon(
+                  LucideIcons.users,
+                  size: 20,
                 ),
-                NavigationDestination(
-                  label: AppLocalizations.of(context).translate("group"),
-                  icon: Icon(
-                    LucideIcons.users,
-                    size: 18,
-                  ),
+              ),
+              NavigationDestination(
+                label: AppLocalizations.of(context).translate("account"),
+                icon: Icon(
+                  LucideIcons.settings,
+                  size: 20,
                 ),
-                NavigationDestination(
-                  label: AppLocalizations.of(context).translate("account"),
-                  icon: Icon(
-                    LucideIcons.settings,
-                    size: 18,
-                  ),
-                ),
-              ],
-              onDestinationSelected: _goBranch,
-            ),
+              ),
+            ],
+            onDestinationSelected: _goBranch,
           )),
     );
   }

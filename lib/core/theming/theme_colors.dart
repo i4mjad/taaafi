@@ -1,27 +1,31 @@
 import 'package:flutter/material.dart';
 
 class LightThemeColors {
-  static const Color backgroundcolor = Color(0xfff8f8f8);
-  static const Color primary50 = Color(0xffebf0f1);
-  static const Color primary100 = Color(0xffc1d2d3);
-  static const Color primary200 = Color(0xffa3bcbe);
-  static const Color primary300 = Color(0xff799da0);
-  static const Color primary400 = Color(0xff5f8a8d);
-  static const Color primary500 = Color(0xff376d71);
-  static const Color primary600 = Color(0xff326367);
-  static const Color primary700 = Color(0xff274d50);
-  static const Color primary800 = Color(0xff1e3c3e);
-  static const Color primary900 = Color(0xff172e2f);
-  static const Color secondary50 = Color(0xfff4f9fa);
-  static const Color secondary100 = Color(0xffdeedee);
-  static const Color secondary200 = Color(0xffcee4e6);
-  static const Color secondary300 = Color(0xffb7d8db);
-  static const Color secondary400 = Color(0xffa9d1d4);
-  static const Color secondary500 = Color(0xff94c5c9);
-  static const Color secondary600 = Color(0xff87b3b7);
-  static const Color secondary700 = Color(0xff698c8f);
-  static const Color secondary800 = Color(0xff516c6f);
-  static const Color secondary900 = Color(0xff3e5354);
+  static const Color backgroundcolor = Color(0xffE9E9D9);
+  // Adjusted Primary color shades with warmer, orangish tones
+
+  static const Color primary50 = Color(0xFFFAF0E8);
+  static const Color primary100 = Color(0xFFF4E2D1);
+  static const Color primary200 = Color(0xFFE8C5A3);
+  static const Color primary300 = Color(0xFFDCA875);
+  static const Color primary400 = Color(0xFFC68B47);
+  static const Color primary500 = Color(0xFFB03F27); // Adjusted primary color
+  static const Color primary600 = Color(0xFF9E3923);
+  static const Color primary700 = Color(0xFF7B2D1C);
+  static const Color primary800 = Color(0xFF592114);
+  static const Color primary900 = Color(0xFF2E110A);
+
+  static const Color secondary50 = Color(0xFFE8F2F5);
+  static const Color secondary100 = Color(0xFFC5DEE7);
+  static const Color secondary200 = Color(0xFFA1C9D8);
+  static const Color secondary300 = Color(0xFF7DB4CA);
+  static const Color secondary400 = Color(0xFF5A9FBB);
+  static const Color secondary500 =
+      Color(0xFF2F6F8F); // Adjusted secondary color
+  static const Color secondary600 = Color(0xFF29647F);
+  static const Color secondary700 = Color(0xFF20506A);
+  static const Color secondary800 = Color(0xFF173D54);
+  static const Color secondary900 = Color(0xFF0E2938);
   static const Color tint50 = Color(0xfffdf9f7);
   static const Color tint100 = Color(0xfffaebe5);
   static const Color tint200 = Color(0xfff8e2d8);
@@ -52,16 +56,19 @@ class LightThemeColors {
   static const Color warn700 = Color(0xffab8e46);
   static const Color warn800 = Color(0xff856e36);
   static const Color warn900 = Color(0xff65542a);
-  static const Color grey50 = Color(0xfff4f6f7);
-  static const Color grey100 = Color(0xffdee2e5);
-  static const Color grey200 = Color(0xffced4d9);
-  static const Color grey300 = Color(0xffb8c0c7);
-  static const Color grey400 = Color(0xffaab4bd);
-  static const Color grey500 = Color(0xff95a1ac);
-  static const Color grey600 = Color(0xff88939d);
-  static const Color grey700 = Color(0xff6a727a);
-  static const Color grey800 = Color(0xff52595f);
-  static const Color grey900 = Color(0xff3f4448);
+  // Updated Grey color shades for text and borders
+
+  static const Color grey50 = Color(0xFFF7E6D1);
+  static const Color grey100 = Color(0xFFF2E0CB);
+  static const Color grey200 = Color(0xFFE6D4B7);
+  static const Color grey300 = Color(0xFFCCCBA3);
+  static const Color grey400 = Color(0xFFB3A58E);
+  static const Color grey500 = Color(0xFF998D7A);
+  static const Color grey600 = Color(0xFF807666);
+  static const Color grey700 = Color(0xFF665E51);
+  static const Color grey800 = Color(0xFF4D473D);
+  static const Color grey900 = Color(0xFF332F28);
+
   static const Color error50 = Color(0xfffce7e7);
   static const Color error100 = Color(0xfff5b5b5);
   static const Color error200 = Color(0xfff09292);
@@ -91,7 +98,7 @@ const MaterialColor lightPrimarySwatch = MaterialColor(
 );
 
 const MaterialColor lightBackgroundSwatch =
-    MaterialColor(0xfff8f8f8, <int, Color>{});
+    MaterialColor(0xffE9E9D9, <int, Color>{});
 const MaterialColor lightSecondarySwatch = MaterialColor(
   0xff94c5c9,
   <int, Color>{
