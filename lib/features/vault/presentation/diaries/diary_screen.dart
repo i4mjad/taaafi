@@ -80,7 +80,7 @@ class _DiaryScreenState extends ConsumerState<DiaryScreen> {
                           style: TextStyles.h6,
                         ),
                         horizontalSpace(Spacing.points12),
-                      Flexible(
+                        Flexible(
                           child: Wrap(
                             spacing: 4,
                             children: diary.linkedActivites.map((activity) {
@@ -97,7 +97,6 @@ class _DiaryScreenState extends ConsumerState<DiaryScreen> {
                             }).toList(),
                           ),
                         ),
-
                       ],
                     ),
                   ),
@@ -155,19 +154,16 @@ class _DiaryScreenState extends ConsumerState<DiaryScreen> {
                       left: 0,
                       right: 0,
                       child: WidgetsContainer(
-                        backgroundColor: theme.primary[50],
+                        backgroundColor: theme.backgroundColor,
                         boxShadow: [
                           BoxShadow(
-                            color: const Color(0xff323247).withOpacity(0.08),
+                            color: Color.fromRGBO(17, 12, 46, 0.15),
+                            blurRadius: 100,
                             spreadRadius: 0,
-                            blurRadius: 64,
-                            offset: const Offset(0, 8),
-                          ),
-                          BoxShadow(
-                            color: const Color(0xff323247).withOpacity(0.06),
-                            spreadRadius: 0,
-                            blurRadius: 128,
-                            offset: const Offset(0, 8),
+                            offset: Offset(
+                              0,
+                              48,
+                            ),
                           ),
                         ],
                         borderSide:
@@ -301,24 +297,27 @@ class _DiaryScreenState extends ConsumerState<DiaryScreen> {
                                     context, "changes-has-been-saved");
                               },
                               child: WidgetsContainer(
-                                backgroundColor: theme.primary[50],
+                                backgroundColor: theme.backgroundColor,
                                 borderSide: BorderSide(
-                                  color: theme.grey[100]!,
-                                ),
+                                    color: theme.grey[300]!, width: 0.25),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: const Color(0xff323247)
-                                        .withOpacity(0.08),
+                                    color: Color.fromRGBO(0, 0, 0, 0.02),
+                                    blurRadius: 3,
                                     spreadRadius: 0,
-                                    blurRadius: 64,
-                                    offset: const Offset(0, 8),
+                                    offset: Offset(
+                                      0,
+                                      1,
+                                    ),
                                   ),
                                   BoxShadow(
-                                    color: const Color(0xff323247)
-                                        .withOpacity(0.06),
-                                    spreadRadius: 0,
-                                    blurRadius: 128,
-                                    offset: const Offset(0, 8),
+                                    color: Color.fromRGBO(27, 31, 35, 0.15),
+                                    blurRadius: 0,
+                                    spreadRadius: 1,
+                                    offset: Offset(
+                                      0,
+                                      0,
+                                    ),
                                   ),
                                 ],
                                 padding: const EdgeInsets.all(8),
@@ -326,7 +325,7 @@ class _DiaryScreenState extends ConsumerState<DiaryScreen> {
                                   children: [
                                     Icon(
                                       LucideIcons.save,
-                                      color: theme.grey[600],
+                                      color: theme.grey[700],
                                     ),
                                     horizontalSpace(Spacing.points4),
                                     Text(

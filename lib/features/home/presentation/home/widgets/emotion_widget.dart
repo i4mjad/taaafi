@@ -22,13 +22,32 @@ class EmotionWidget extends StatelessWidget {
     final theme = AppTheme.of(context);
     return WidgetsContainer(
       cornerSmoothing: 1,
-      backgroundColor: theme.tint[50],
-      borderSide: BorderSide(
-        color: isSelected ? theme.success[600]! : theme.tint[400]!,
-
-        // Change border color based on selection
-      ),
+      backgroundColor: theme.backgroundColor,
       padding: EdgeInsets.all(8),
+      borderSide: BorderSide(
+        color: isSelected ? theme.success[600]! : theme.grey[600]!,
+      ),
+      boxShadow: [
+        BoxShadow(
+          color: Color.fromRGBO(9, 30, 66, 0.25),
+          blurRadius: 8,
+          spreadRadius: -2,
+          offset: Offset(
+            0,
+            4,
+          ),
+        ),
+        BoxShadow(
+          color: Color.fromRGBO(9, 30, 66, 0.08),
+          blurRadius: 0,
+          spreadRadius: 1,
+          offset: Offset(
+            0,
+            0,
+          ),
+        ),
+      ],
+
       child: Column(
         children: [
           Text(

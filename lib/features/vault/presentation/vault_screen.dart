@@ -54,21 +54,44 @@ class VaultScreen extends ConsumerWidget {
                           context.goNamed(RouteNames.activities.name);
                         },
                         child: WidgetsContainer(
-                          backgroundColor: theme.primary[50],
-                          borderSide: BorderSide(color: theme.primary[100]!),
+                          backgroundColor: theme.backgroundColor,
+                          borderSide:
+                              BorderSide(color: theme.grey[600]!, width: 0.5),
                           padding: EdgeInsets.all(14),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Color.fromRGBO(0, 0, 0, 0.02),
+                              blurRadius: 3,
+                              spreadRadius: 0,
+                              offset: Offset(
+                                0,
+                                1,
+                              ),
+                            ),
+                            BoxShadow(
+                              color: Color.fromRGBO(27, 31, 35, 0.15),
+                              blurRadius: 0,
+                              spreadRadius: 1,
+                              offset: Offset(
+                                0,
+                                0,
+                              ),
+                            ),
+                          ],
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.start,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Icon(LucideIcons.clipboardCheck,
-                                  color: theme.primary[900]),
+                              Icon(
+                                LucideIcons.clipboardCheck,
+                                color: theme.grey[900],
+                              ),
                               verticalSpace(Spacing.points28),
                               Text(
                                 AppLocalizations.of(context)
                                     .translate('activities'),
                                 style: TextStyles.h3
-                                    .copyWith(color: theme.primary[900]),
+                                    .copyWith(color: theme.grey[900]),
                               )
                             ],
                           ),
@@ -82,9 +105,30 @@ class VaultScreen extends ConsumerWidget {
                           context.goNamed(RouteNames.diaries.name);
                         },
                         child: WidgetsContainer(
-                          backgroundColor: theme.secondary[50],
-                          borderSide: BorderSide(color: theme.secondary[100]!),
+                          backgroundColor: theme.backgroundColor,
+                          borderSide:
+                              BorderSide(color: theme.grey[600]!, width: 0.5),
                           padding: EdgeInsets.all(14),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Color.fromRGBO(0, 0, 0, 0.02),
+                              blurRadius: 3,
+                              spreadRadius: 0,
+                              offset: Offset(
+                                0,
+                                1,
+                              ),
+                            ),
+                            BoxShadow(
+                              color: Color.fromRGBO(27, 31, 35, 0.15),
+                              blurRadius: 0,
+                              spreadRadius: 1,
+                              offset: Offset(
+                                0,
+                                0,
+                              ),
+                            ),
+                          ],
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.start,
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -95,8 +139,9 @@ class VaultScreen extends ConsumerWidget {
                               Text(
                                 AppLocalizations.of(context)
                                     .translate('diaries'),
-                                style: TextStyles.h3
-                                    .copyWith(color: theme.secondary[900]),
+                                style: TextStyles.h3.copyWith(
+                                  color: theme.grey[900],
+                                ),
                               )
                             ],
                           ),
@@ -114,20 +159,41 @@ class VaultScreen extends ConsumerWidget {
                           context.goNamed(RouteNames.library.name);
                         },
                         child: WidgetsContainer(
-                          backgroundColor: theme.tint[50],
-                          borderSide: BorderSide(color: theme.tint[400]!),
+                          backgroundColor: theme.backgroundColor,
+                          borderSide:
+                              BorderSide(color: theme.grey[600]!, width: 0.5),
                           padding: EdgeInsets.all(14),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Color.fromRGBO(0, 0, 0, 0.02),
+                              blurRadius: 3,
+                              spreadRadius: 0,
+                              offset: Offset(
+                                0,
+                                1,
+                              ),
+                            ),
+                            BoxShadow(
+                              color: Color.fromRGBO(27, 31, 35, 0.15),
+                              blurRadius: 0,
+                              spreadRadius: 1,
+                              offset: Offset(
+                                0,
+                                0,
+                              ),
+                            ),
+                          ],
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.start,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Icon(LucideIcons.lamp, color: theme.tint[900]),
+                              Icon(LucideIcons.lamp, color: theme.grey[900]),
                               verticalSpace(Spacing.points28),
                               Text(
                                 AppLocalizations.of(context)
                                     .translate('library'),
                                 style: TextStyles.h3
-                                    .copyWith(color: theme.tint[900]),
+                                    .copyWith(color: theme.grey[900]),
                               )
                             ],
                           ),
@@ -137,23 +203,41 @@ class VaultScreen extends ConsumerWidget {
                     horizontalSpace(Spacing.points8),
                     Expanded(
                       child: WidgetsContainer(
-                        backgroundColor: theme.secondary[50],
-                        borderSide: BorderSide(color: theme.primary[200]!),
+                        backgroundColor: theme.backgroundColor,
+                        borderSide:
+                            BorderSide(color: theme.grey[600]!, width: 0.5),
                         padding: EdgeInsets.all(14),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Color.fromRGBO(0, 0, 0, 0.02),
+                            blurRadius: 3,
+                            spreadRadius: 0,
+                            offset: Offset(
+                              0,
+                              1,
+                            ),
+                          ),
+                          BoxShadow(
+                            color: Color.fromRGBO(27, 31, 35, 0.15),
+                            blurRadius: 0,
+                            spreadRadius: 1,
+                            offset: Offset(
+                              0,
+                              0,
+                            ),
+                          ),
+                        ],
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.start,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Icon(
-                              LucideIcons.settings2,
-                              color: theme.primary[900],
-                            ),
+                            Icon(LucideIcons.settings2, color: theme.grey[900]),
                             verticalSpace(Spacing.points28),
                             Text(
                               AppLocalizations.of(context)
                                   .translate('settings'),
                               style: TextStyles.h3.copyWith(
-                                color: theme.primary[900],
+                                color: theme.grey[900],
                               ),
                             )
                           ],

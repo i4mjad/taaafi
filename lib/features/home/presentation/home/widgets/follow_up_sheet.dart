@@ -133,6 +133,7 @@ class _FollowUpSheetState extends ConsumerState<FollowUpSheet> {
                 return GestureDetector(
                   onTap: () => toggleFollowUp(followUp),
                   child: Container(
+                    padding: EdgeInsets.all(1),
                     width: MediaQuery.of(context).size.width / 3.5,
                     child: FollowUpWidget(
                       icon: followUp.icon,
@@ -174,11 +175,14 @@ class _FollowUpSheetState extends ConsumerState<FollowUpSheet> {
                   onTap: () => toggleEmotion(emotion),
                   child: SizedBox(
                     width: 100,
-                    child: EmotionWidget(
-                      emotionEmoji: emotion.emotionEmoji,
-                      emotionNameTranslationKey:
-                          emotion.emotionNameTranslationKey,
-                      isSelected: isSelected,
+                    child: Padding(
+                      padding: EdgeInsets.all(1),
+                      child: EmotionWidget(
+                        emotionEmoji: emotion.emotionEmoji,
+                        emotionNameTranslationKey:
+                            emotion.emotionNameTranslationKey,
+                        isSelected: isSelected,
+                      ),
                     ),
                   ),
                 );
@@ -209,11 +213,14 @@ class _FollowUpSheetState extends ConsumerState<FollowUpSheet> {
                   onTap: () => toggleEmotion(emotion),
                   child: SizedBox(
                     width: 100,
-                    child: EmotionWidget(
-                      emotionEmoji: emotion.emotionEmoji,
-                      emotionNameTranslationKey:
-                          emotion.emotionNameTranslationKey,
-                      isSelected: isSelected,
+                    child: Padding(
+                      padding: EdgeInsets.all(1),
+                      child: EmotionWidget(
+                        emotionEmoji: emotion.emotionEmoji,
+                        emotionNameTranslationKey:
+                            emotion.emotionNameTranslationKey,
+                        isSelected: isSelected,
+                      ),
                     ),
                   ),
                 );
@@ -265,7 +272,6 @@ class _FollowUpSheetState extends ConsumerState<FollowUpSheet> {
               ),
             ],
           ),
-
         ],
       ),
     );

@@ -32,8 +32,31 @@ class _DayActivityWidgetState extends ConsumerState<DayTaskWidget> {
 
     return WidgetsContainer(
       padding: EdgeInsets.fromLTRB(8, 6, 8, 6),
-      backgroundColor: theme.primary[50],
-      borderSide: BorderSide(color: theme.primary[100]!),
+      backgroundColor: theme.backgroundColor,
+      borderSide: BorderSide(
+        color: theme.grey[600]!,
+        width: 0.25,
+      ),
+      boxShadow: [
+        BoxShadow(
+          color: Color.fromRGBO(0, 0, 0, 0.02),
+          blurRadius: 3,
+          spreadRadius: 0,
+          offset: Offset(
+            0,
+            1,
+          ),
+        ),
+        BoxShadow(
+          color: Color.fromRGBO(27, 31, 35, 0.15),
+          blurRadius: 0,
+          spreadRadius: 1,
+          offset: Offset(
+            0,
+            0,
+          ),
+        ),
+      ],
       borderRadius: BorderRadius.circular(8),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,

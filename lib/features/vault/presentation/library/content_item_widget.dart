@@ -20,14 +20,25 @@ class ContentItem extends StatelessWidget {
     final theme = AppTheme.of(context);
 
     return WidgetsContainer(
-      backgroundColor: theme.primary[50],
-      borderSide: BorderSide(color: theme.primary[100]!),
+      backgroundColor: theme.backgroundColor,
+      borderSide: BorderSide(color: theme.grey[600]!, width: 0.25),
+      boxShadow: [
+        BoxShadow(
+          color: Color.fromRGBO(0, 0, 0, 0.05),
+          blurRadius: 0,
+          spreadRadius: 1,
+          offset: Offset(
+            0,
+            0,
+          ),
+        ),
+      ],
       padding: EdgeInsets.fromLTRB(16, 8, 16, 8),
       child: Row(
         children: [
           Icon(
             LucideIcons.playCircle,
-            color: theme.grey[900],
+            color: theme.primary[600],
           ),
           horizontalSpace(Spacing.points8),
           Column(
@@ -49,7 +60,7 @@ class ContentItem extends StatelessWidget {
             ],
           ),
           Spacer(),
-          Icon(LucideIcons.link, color: theme.grey[500])
+          Icon(LucideIcons.link, color: theme.grey[400])
         ],
       ),
     );

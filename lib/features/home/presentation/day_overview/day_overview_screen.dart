@@ -82,7 +82,7 @@ class DayEmotions extends StatelessWidget {
         verticalSpace(Spacing.points12),
         Builder(
           builder: (BuildContext context) {
-            final noData = false;
+            final noData = true;
             // ignore: dead_code
             if (noData) {
               return Column(
@@ -111,14 +111,35 @@ class DayEmotions extends StatelessWidget {
                           });
                     },
                     child: WidgetsContainer(
-                      backgroundColor: theme.secondary[100],
-                      borderSide: BorderSide(color: theme.secondary[100]!),
+                      backgroundColor: theme.backgroundColor,
+                      borderSide:
+                          BorderSide(color: theme.grey[900]!, width: 0.25),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Color.fromRGBO(9, 30, 66, 0.25),
+                          blurRadius: 8,
+                          spreadRadius: -2,
+                          offset: Offset(
+                            0,
+                            4,
+                          ),
+                        ),
+                        BoxShadow(
+                          color: Color.fromRGBO(9, 30, 66, 0.08),
+                          blurRadius: 0,
+                          spreadRadius: 1,
+                          offset: Offset(
+                            0,
+                            0,
+                          ),
+                        ),
+                      ],
                       child: Center(
                         child: Text(
                           AppLocalizations.of(context)
                               .translate('add-emotions'),
                           style: TextStyles.h6.copyWith(
-                            color: theme.secondary[900],
+                            color: theme.secondary[600],
                           ),
                         ),
                       ),
@@ -232,12 +253,33 @@ class DayNotes extends StatelessWidget {
                 GestureDetector(
                   onTap: () => context.goNamed(RouteNames.diaries.name),
                   child: WidgetsContainer(
-                    backgroundColor: theme.tint[100],
-                    borderSide: BorderSide(color: theme.tint[100]!),
+                    backgroundColor: theme.backgroundColor,
+                    borderSide:
+                        BorderSide(color: theme.grey[900]!, width: 0.25),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Color.fromRGBO(9, 30, 66, 0.25),
+                        blurRadius: 8,
+                        spreadRadius: -2,
+                        offset: Offset(
+                          0,
+                          4,
+                        ),
+                      ),
+                      BoxShadow(
+                        color: Color.fromRGBO(9, 30, 66, 0.08),
+                        blurRadius: 0,
+                        spreadRadius: 1,
+                        offset: Offset(
+                          0,
+                          0,
+                        ),
+                      ),
+                    ],
                     child: Center(
                       child: Text(
                         AppLocalizations.of(context).translate('add-note'),
-                        style: TextStyles.h6.copyWith(color: theme.tint[900]),
+                        style: TextStyles.h6.copyWith(color: theme.tint[700]),
                       ),
                     ),
                   ),
@@ -261,7 +303,6 @@ class DayNotes extends StatelessWidget {
             );
           }
         }),
-
       ],
     );
   }
@@ -323,14 +364,35 @@ class DayFollowUps extends StatelessWidget {
                         });
                   },
                   child: WidgetsContainer(
-                    backgroundColor: theme.primary[100],
-                    borderSide: BorderSide(color: theme.primary[100]!),
+                    backgroundColor: theme.backgroundColor,
+                    borderSide:
+                        BorderSide(color: theme.grey[900]!, width: 0.25),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Color.fromRGBO(9, 30, 66, 0.25),
+                        blurRadius: 8,
+                        spreadRadius: -2,
+                        offset: Offset(
+                          0,
+                          4,
+                        ),
+                      ),
+                      BoxShadow(
+                        color: Color.fromRGBO(9, 30, 66, 0.08),
+                        blurRadius: 0,
+                        spreadRadius: 1,
+                        offset: Offset(
+                          0,
+                          0,
+                        ),
+                      ),
+                    ],
                     child: Center(
                       child: Text(
                         AppLocalizations.of(context)
                             .translate('add-follow-ups'),
                         style:
-                            TextStyles.h6.copyWith(color: theme.primary[900]),
+                            TextStyles.h6.copyWith(color: theme.primary[600]),
                       ),
                     ),
                   ),

@@ -1,5 +1,6 @@
 import 'package:figma_squircle/figma_squircle.dart';
 import 'package:flutter/material.dart';
+import 'package:reboot_app_3/core/theming/app-themes.dart';
 
 class WidgetsContainer extends StatelessWidget {
   final Widget child;
@@ -25,13 +26,14 @@ class WidgetsContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    final theme = AppTheme.of(context);
+    final contextWidth = MediaQuery.of(context).size.width;
     return Container(
       width: width,
       height: height,
       padding: padding ?? EdgeInsets.all(16),
       decoration: ShapeDecoration(
-        color: backgroundColor ?? theme.primaryColor.withOpacity(0.1),
+        color: backgroundColor ?? theme.primary.withOpacity(0.1),
         shadows: boxShadow,
         shape: SmoothRectangleBorder(
           borderRadius: SmoothBorderRadius(
@@ -41,7 +43,7 @@ class WidgetsContainer extends StatelessWidget {
           ),
           side: borderSide ??
               BorderSide(
-                color: theme.primaryColor.withOpacity(0.4),
+                color: theme.primary.withOpacity(0.4),
                 width: 1.0,
               ),
         ),

@@ -66,7 +66,27 @@ class _CustomTextFieldState extends State<CustomTextField> {
         Container(
           width: widget.width ?? MediaQuery.of(context).size.width - 32,
           decoration: ShapeDecoration(
-            color: theme.primary[50],
+            color: theme.backgroundColor,
+            shadows: [
+              BoxShadow(
+                color: Color.fromRGBO(50, 50, 93, 0.25),
+                blurRadius: 5,
+                spreadRadius: -1,
+                offset: Offset(
+                  0,
+                  2,
+                ),
+              ),
+              BoxShadow(
+                color: Color.fromRGBO(0, 0, 0, 0.3),
+                blurRadius: 3,
+                spreadRadius: -1,
+                offset: Offset(
+                  0,
+                  1,
+                ),
+              ),
+            ],
             shape: SmoothRectangleBorder(
               borderRadius: SmoothBorderRadius(
                 cornerRadius:
@@ -77,8 +97,8 @@ class _CustomTextFieldState extends State<CustomTextField> {
               ),
               side: widget.borderSide ??
                   BorderSide(
-                    color: _isValid ? theme.grey[100]! : theme.error[600]!,
-                    width: 1,
+                    color: _isValid ? theme.grey[600]! : theme.error[600]!,
+                    width: 0.75,
                   ),
             ),
           ),

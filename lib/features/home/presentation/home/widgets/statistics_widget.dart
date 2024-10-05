@@ -34,8 +34,28 @@ class StatisticsWidget extends StatelessWidget {
                   flex: 1,
                   child: WidgetsContainer(
                     padding: EdgeInsets.all(20),
-                    backgroundColor: theme.primary[50],
-                    borderSide: BorderSide(color: theme.primary[100]!),
+                    backgroundColor: theme.backgroundColor,
+                    borderSide: BorderSide(color: theme.grey[600]!, width: 0.5),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Color.fromRGBO(0, 0, 0, 0.02),
+                        blurRadius: 3,
+                        spreadRadius: 0,
+                        offset: Offset(
+                          0,
+                          1,
+                        ),
+                      ),
+                      BoxShadow(
+                        color: Color.fromRGBO(27, 31, 35, 0.15),
+                        blurRadius: 0,
+                        spreadRadius: 1,
+                        offset: Offset(
+                          0,
+                          0,
+                        ),
+                      ),
+                    ],
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       mainAxisAlignment: MainAxisAlignment.start,
@@ -45,7 +65,9 @@ class StatisticsWidget extends StatelessWidget {
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(50),
                             border: Border.all(
-                                color: theme.primary[200]!, width: 1),
+                              color: theme.primary[600]!,
+                              width: 1,
+                            ),
                           ),
                           child: Icon(
                             LucideIcons.heart,
@@ -79,8 +101,29 @@ class StatisticsWidget extends StatelessWidget {
                     children: [
                       WidgetsContainer(
                         padding: EdgeInsets.all(12),
-                        backgroundColor: theme.primary[50],
-                        borderSide: BorderSide(color: theme.primary[100]!),
+                        backgroundColor: theme.backgroundColor,
+                        borderSide:
+                            BorderSide(color: theme.grey[600]!, width: 0.5),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Color.fromRGBO(0, 0, 0, 0.02),
+                            blurRadius: 3,
+                            spreadRadius: 0,
+                            offset: Offset(
+                              0,
+                              1,
+                            ),
+                          ),
+                          BoxShadow(
+                            color: Color.fromRGBO(27, 31, 35, 0.15),
+                            blurRadius: 0,
+                            spreadRadius: 1,
+                            offset: Offset(
+                              0,
+                              0,
+                            ),
+                          ),
+                        ],
                         child: Row(
                           children: [
                             Container(
@@ -88,11 +131,11 @@ class StatisticsWidget extends StatelessWidget {
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(50),
                                 border: Border.all(
-                                    color: theme.tint[200]!, width: 1),
+                                    color: theme.primary[600]!, width: 1),
                               ),
                               child: Icon(
                                 LucideIcons.lineChart,
-                                color: theme.tint[600],
+                                color: theme.primary[600],
                                 size: 20,
                               ),
                             ),
@@ -122,8 +165,29 @@ class StatisticsWidget extends StatelessWidget {
                       verticalSpace(Spacing.points8),
                       WidgetsContainer(
                         padding: EdgeInsets.all(12),
-                        backgroundColor: theme.primary[50],
-                        borderSide: BorderSide(color: theme.primary[100]!),
+                        backgroundColor: theme.backgroundColor,
+                        borderSide:
+                            BorderSide(color: theme.grey[600]!, width: 0.5),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Color.fromRGBO(0, 0, 0, 0.02),
+                            blurRadius: 3,
+                            spreadRadius: 0,
+                            offset: Offset(
+                              0,
+                              1,
+                            ),
+                          ),
+                          BoxShadow(
+                            color: Color.fromRGBO(27, 31, 35, 0.15),
+                            blurRadius: 0,
+                            spreadRadius: 1,
+                            offset: Offset(
+                              0,
+                              0,
+                            ),
+                          ),
+                        ],
                         child: Row(
                           children: [
                             Container(
@@ -131,11 +195,11 @@ class StatisticsWidget extends StatelessWidget {
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(50),
                                 border: Border.all(
-                                    color: theme.success[200]!, width: 1),
+                                    color: theme.primary[600]!, width: 1),
                               ),
                               child: Icon(
                                 LucideIcons.calendar,
-                                color: theme.success[600],
+                                color: theme.primary[600],
                                 size: 20,
                               ),
                             ),

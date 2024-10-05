@@ -98,14 +98,17 @@ class _DiariesScreenState extends ConsumerState<DiariesScreen> {
                 children: [
                   Row(
                     children: [
-                      CustomTextField(
-                        controller: searchController,
-                        prefixIcon: LucideIcons.search,
-                        inputType: TextInputType.text,
-                        width: width * 0.75,
-                        validator: (value) {
-                          return null;
-                        },
+                      Padding(
+                        padding: const EdgeInsets.all(1.0),
+                        child: CustomTextField(
+                          controller: searchController,
+                          prefixIcon: LucideIcons.search,
+                          inputType: TextInputType.text,
+                          width: width * 0.75,
+                          validator: (value) {
+                            return null;
+                          },
+                        ),
                       ),
                       horizontalSpace(Spacing.points24),
                       Icon(LucideIcons.slidersHorizontal)
@@ -152,50 +155,75 @@ class DiaryWidget extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = AppTheme.of(context);
     final locale = ref.watch(localeNotifierProvider);
-    return GestureDetector(
-      onTap: () => context.go("/vault/diaries/diary/${index}"),
-      child: WidgetsContainer(
-        padding: EdgeInsets.all(12),
-        backgroundColor: theme.primary[50],
-        borderSide: BorderSide(color: theme.primary[100]!),
-        borderRadius: BorderRadius.circular(10.5),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              index.toString(),
-              style: TextStyles.footnoteSelected.copyWith(
-                color: theme.grey[900],
+    return Padding(
+      padding: const EdgeInsets.all(1.0),
+      child: GestureDetector(
+        onTap: () => context.go("/vault/diaries/diary/${index}"),
+        child: WidgetsContainer(
+          padding: EdgeInsets.all(12),
+          backgroundColor: theme.backgroundColor,
+          borderSide: BorderSide(color: theme.grey[600]!, width: 0.25),
+          borderRadius: BorderRadius.circular(10.5),
+          boxShadow: [
+            BoxShadow(
+              color: Color.fromRGBO(50, 50, 93, 0.25),
+              blurRadius: 5,
+              spreadRadius: -1,
+              offset: Offset(
+                0,
+                2,
               ),
             ),
-            horizontalSpace(Spacing.points8),
-            Expanded(
-              flex: 3,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [Text(diary.title, style: TextStyles.footnote)],
-                  ),
-                  verticalSpace(Spacing.points4),
-                  Text(
-                    getDisplayDateTime(diary.date, locale!.languageCode),
-                    style: TextStyles.caption.copyWith(color: theme.grey[700]),
-                  ),
-                  Text(
-                    diary.body,
-                    style: TextStyles.small.copyWith(color: theme.grey[700]),
-                    maxLines: 3, // Set the maximum number of lines
-                    overflow: TextOverflow.ellipsis, // Ellipses after max lines
-                  ),
-                ],
+            BoxShadow(
+              color: Color.fromRGBO(0, 0, 0, 0.3),
+              blurRadius: 3,
+              spreadRadius: -1,
+              offset: Offset(
+                0,
+                1,
               ),
             ),
-            Icon(
-              LucideIcons.chevronLeft,
-              color: theme.grey[300],
-            )
           ],
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                index.toString(),
+                style: TextStyles.footnoteSelected.copyWith(
+                  color: theme.grey[900],
+                ),
+              ),
+              horizontalSpace(Spacing.points8),
+              Expanded(
+                flex: 3,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [Text(diary.title, style: TextStyles.footnote)],
+                    ),
+                    verticalSpace(Spacing.points4),
+                    Text(
+                      getDisplayDateTime(diary.date, locale!.languageCode),
+                      style:
+                          TextStyles.caption.copyWith(color: theme.grey[700]),
+                    ),
+                    Text(
+                      diary.body,
+                      style: TextStyles.small.copyWith(color: theme.grey[700]),
+                      maxLines: 3, // Set the maximum number of lines
+                      overflow:
+                          TextOverflow.ellipsis, // Ellipses after max lines
+                    ),
+                  ],
+                ),
+              ),
+              Icon(
+                LucideIcons.chevronLeft,
+                color: theme.grey[300],
+              )
+            ],
+          ),
         ),
       ),
     );

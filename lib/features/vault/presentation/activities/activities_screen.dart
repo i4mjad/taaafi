@@ -84,7 +84,6 @@ class ActivitiesScreen extends ConsumerWidget {
       leadingWidth: 16,
     );
   }
-
 }
 
 class OngoingActivitiesWidget extends StatelessWidget {
@@ -203,7 +202,7 @@ class TodayTasksWidget extends StatelessWidget {
               child: Text(
                 AppLocalizations.of(context).translate('show-all'),
                 style: TextStyles.footnoteSelected.copyWith(
-                  color: theme.grey[600],
+                  color: theme.grey[500],
                 ),
               ),
             ),
@@ -248,9 +247,29 @@ class OngoingActivitiyWidget extends ConsumerWidget {
             pathParameters: {"id": activity.id});
       },
       child: WidgetsContainer(
-        backgroundColor: theme.primary[50],
+        backgroundColor: theme.backgroundColor,
         padding: EdgeInsets.fromLTRB(16, 12, 16, 12),
-        borderSide: BorderSide(color: theme.primary[100]!),
+        borderSide: BorderSide(color: theme.grey[600]!, width: 0.5),
+        boxShadow: [
+          BoxShadow(
+            color: Color.fromRGBO(50, 50, 93, 0.25),
+            blurRadius: 5,
+            spreadRadius: -1,
+            offset: Offset(
+              0,
+              2,
+            ),
+          ),
+          BoxShadow(
+            color: Color.fromRGBO(0, 0, 0, 0.3),
+            blurRadius: 3,
+            spreadRadius: -1,
+            offset: Offset(
+              0,
+              1,
+            ),
+          ),
+        ],
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [

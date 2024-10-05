@@ -20,9 +20,28 @@ class TaskWidget extends ConsumerWidget {
 
     return WidgetsContainer(
       padding: EdgeInsets.all(16),
-      backgroundColor: theme.primary[50],
-      borderSide: BorderSide(color: theme.primary[100]!),
-      borderRadius: BorderRadius.circular(8),
+      backgroundColor: theme.backgroundColor,
+      borderSide: BorderSide(color: theme.grey[600]!, width: 0.5),
+      boxShadow: [
+        BoxShadow(
+          color: Color.fromRGBO(50, 50, 93, 0.25),
+          blurRadius: 5,
+          spreadRadius: -1,
+          offset: Offset(
+            0,
+            2,
+          ),
+        ),
+        BoxShadow(
+          color: Color.fromRGBO(0, 0, 0, 0.3),
+          blurRadius: 3,
+          spreadRadius: -1,
+          offset: Offset(
+            0,
+            1,
+          ),
+        ),
+      ],
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [

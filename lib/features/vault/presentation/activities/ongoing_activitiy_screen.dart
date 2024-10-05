@@ -142,12 +142,32 @@ class OngoingActivitySettingsSheet extends ConsumerWidget {
           ),
           verticalSpace(Spacing.points16),
           WidgetsContainer(
-            backgroundColor: theme.warn[50],
-            borderSide: BorderSide(color: theme.warn[100]!),
+            backgroundColor: theme.warn[100],
+            borderSide: BorderSide(color: theme.warn[600]!, width: 0.5),
+            boxShadow: [
+              BoxShadow(
+                color: Color.fromRGBO(0, 0, 0, 0.05),
+                blurRadius: 24,
+                spreadRadius: 0,
+                offset: Offset(
+                  0,
+                  6,
+                ),
+              ),
+              BoxShadow(
+                color: Color.fromRGBO(0, 0, 0, 0.08),
+                blurRadius: 0,
+                spreadRadius: 1,
+                offset: Offset(
+                  0,
+                  0,
+                ),
+              ),
+            ],
             child: Center(
               child: Text(
                 AppLocalizations.of(context).translate('new-begining'),
-                style: TextStyles.body.copyWith(color: theme.warn[900]),
+                style: TextStyles.body.copyWith(color: theme.warn[800]),
               ),
             ),
           ),
@@ -155,6 +175,26 @@ class OngoingActivitySettingsSheet extends ConsumerWidget {
           WidgetsContainer(
             backgroundColor: theme.error[50],
             borderSide: BorderSide(color: theme.error[100]!),
+            boxShadow: [
+              BoxShadow(
+                color: Color.fromRGBO(0, 0, 0, 0.05),
+                blurRadius: 24,
+                spreadRadius: 0,
+                offset: Offset(
+                  0,
+                  6,
+                ),
+              ),
+              BoxShadow(
+                color: Color.fromRGBO(0, 0, 0, 0.08),
+                blurRadius: 0,
+                spreadRadius: 1,
+                offset: Offset(
+                  0,
+                  0,
+                ),
+              ),
+            ],
             child: Center(
               child: Text(
                 AppLocalizations.of(context).translate('remove-activity'),
@@ -170,6 +210,26 @@ class OngoingActivitySettingsSheet extends ConsumerWidget {
             child: WidgetsContainer(
               backgroundColor: theme.primary[50],
               borderSide: BorderSide(color: theme.primary[100]!),
+              boxShadow: [
+                BoxShadow(
+                  color: Color.fromRGBO(0, 0, 0, 0.05),
+                  blurRadius: 24,
+                  spreadRadius: 0,
+                  offset: Offset(
+                    0,
+                    6,
+                  ),
+                ),
+                BoxShadow(
+                  color: Color.fromRGBO(0, 0, 0, 0.08),
+                  blurRadius: 0,
+                  spreadRadius: 1,
+                  offset: Offset(
+                    0,
+                    0,
+                  ),
+                ),
+              ],
               child: Center(
                 child: Text(
                   AppLocalizations.of(context).translate('close'),
@@ -231,11 +291,31 @@ class OngoingActivityDayPerformanceWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = AppTheme.of(context);
     return WidgetsContainer(
-        backgroundColor: theme.primary[50],
         padding: EdgeInsets.all(6),
+        backgroundColor: theme.backgroundColor,
         borderSide: BorderSide(
-          color: isFinished ? theme.success[300]! : theme.error[300]!,
-        ),
+            color: isFinished ? theme.success[300]! : theme.error[300]!,
+            width: 0.5),
+        boxShadow: [
+          BoxShadow(
+            color: Color.fromRGBO(50, 50, 93, 0.25),
+            blurRadius: 5,
+            spreadRadius: -1,
+            offset: Offset(
+              0,
+              2,
+            ),
+          ),
+          BoxShadow(
+            color: Color.fromRGBO(0, 0, 0, 0.3),
+            blurRadius: 3,
+            spreadRadius: -1,
+            offset: Offset(
+              0,
+              1,
+            ),
+          ),
+        ],
         child: Column(
           children: [
             Text(
@@ -324,9 +404,29 @@ class OngoingActivityDescriptionAndUserStatisticsWidget extends ConsumerWidget {
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
         WidgetsContainer(
-          backgroundColor: theme.primary[50],
-          borderSide: BorderSide(color: theme.primary[100]!),
-          width: width,
+          backgroundColor: theme.backgroundColor,
+          padding: EdgeInsets.fromLTRB(16, 12, 16, 12),
+          borderSide: BorderSide(color: theme.grey[600]!, width: 0.5),
+          boxShadow: [
+            BoxShadow(
+              color: Color.fromRGBO(50, 50, 93, 0.25),
+              blurRadius: 5,
+              spreadRadius: -1,
+              offset: Offset(
+                0,
+                2,
+              ),
+            ),
+            BoxShadow(
+              color: Color.fromRGBO(0, 0, 0, 0.3),
+              blurRadius: 3,
+              spreadRadius: -1,
+              offset: Offset(
+                0,
+                1,
+              ),
+            ),
+          ],
           child: Text(
             'هذا توصيف للقائمة والفكرة منها وطبيعة المحتوى الموجود في هذه القائمة. مثال: قائمة كيف أبدأ تحتوي على بعض المصادر لمساعدة المتعافي للبدء في التعافي وكيف يدخل لهذا العالم. سيتم إضافة التوصيف عند إضافة القائمة.',
             style: TextStyles.small.copyWith(
@@ -340,7 +440,7 @@ class OngoingActivityDescriptionAndUserStatisticsWidget extends ConsumerWidget {
           children: [
             Column(
               children: [
-                Icon(LucideIcons.lineChart, color: theme.primary[900]),
+                Icon(LucideIcons.lineChart, color: theme.primary[600]),
                 verticalSpace(Spacing.points4),
                 Text(
                   AppLocalizations.of(context).translate('easy'),
@@ -350,7 +450,7 @@ class OngoingActivityDescriptionAndUserStatisticsWidget extends ConsumerWidget {
             ),
             Column(
               children: [
-                Icon(LucideIcons.calendar, color: theme.primary[900]),
+                Icon(LucideIcons.calendar, color: theme.primary[600]),
                 verticalSpace(Spacing.points4),
                 Text(
                   getDisplayDate(DateTime.now(), locale!.languageCode),
@@ -361,7 +461,7 @@ class OngoingActivityDescriptionAndUserStatisticsWidget extends ConsumerWidget {
             Column(
               //TODO: this will represent the best period to do this activity
               children: [
-                Icon(LucideIcons.calendarRange, color: theme.primary[900]),
+                Icon(LucideIcons.calendarRange, color: theme.primary[600]),
                 verticalSpace(Spacing.points4),
                 Text(
                   "3 " + AppLocalizations.of(context).translate('month'),
@@ -371,7 +471,7 @@ class OngoingActivityDescriptionAndUserStatisticsWidget extends ConsumerWidget {
             ),
             Column(
               children: [
-                Icon(LucideIcons.loader2, color: theme.primary[900]),
+                Icon(LucideIcons.loader2, color: theme.primary[600]),
                 verticalSpace(Spacing.points4),
                 Text(
                   "29%",

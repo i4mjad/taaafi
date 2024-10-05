@@ -7,6 +7,7 @@ import 'package:reboot_app_3/core/theming/text_styles.dart';
 
 class CustomSegmentedButton extends ConsumerWidget {
   final String? label;
+
   final List<SegmentedButtonOption> options;
   final SegmentedButtonOption selectedOption;
   final ValueChanged<SegmentedButtonOption> onChanged;

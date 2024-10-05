@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
@@ -73,12 +74,13 @@ class LibraryScreen extends ConsumerWidget {
   Widget _searchWidget(CustomThemeData theme, BuildContext context) {
     return GestureDetector(
       onTap: () {
+        HapticFeedback.lightImpact();
         context.goNamed(RouteNames.content.name);
       },
       child: WidgetsContainer(
-        backgroundColor: theme.primary[50],
+        backgroundColor: theme.backgroundColor,
         padding: EdgeInsets.all(8),
-        borderSide: BorderSide(color: theme.primary[100]!),
+        borderSide: BorderSide(color: theme.grey[400]!),
         boxShadow: [
           BoxShadow(
             color: Color.fromRGBO(0, 0, 0, 0.1),
@@ -208,49 +210,50 @@ class ContentTypeWidget extends StatelessWidget {
           },
         );
       },
-      child: WidgetsContainer(
-        cornerSmoothing: 0.6,
-        backgroundColor: theme.primary[50],
-        borderSide: BorderSide(
-          color: theme.primary[100]!,
-        ),
-        padding: EdgeInsets.all(8),
-        boxShadow: [
-          BoxShadow(
-            color: Color.fromRGBO(0, 0, 0, 0.1),
-            blurRadius: 5,
-            spreadRadius: 0,
-            offset: Offset(
-              0,
-              0,
+      child: Padding(
+        padding: const EdgeInsets.all(1.0),
+        child: WidgetsContainer(
+          cornerSmoothing: 0.6,
+          backgroundColor: theme.backgroundColor,
+          borderSide: BorderSide(color: theme.grey[900]!, width: 0.25),
+          padding: EdgeInsets.all(8),
+          boxShadow: [
+            BoxShadow(
+              color: Color.fromRGBO(0, 0, 0, 0.1),
+              blurRadius: 5,
+              spreadRadius: 0,
+              offset: Offset(
+                0,
+                0,
+              ),
             ),
-          ),
-          BoxShadow(
-            color: Color.fromRGBO(0, 0, 0, 0.1),
-            blurRadius: 1,
-            spreadRadius: 0,
-            offset: Offset(
-              0,
-              0,
-            ),
-          ),
-        ],
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Icon(contentTypeItem.icon, color: theme.grey[900]),
-            verticalSpace(Spacing.points8),
-            Text(
-              AppLocalizations.of(context)
-                  .translate(contentTypeItem.contentTypeNameTranslationKey),
-              textAlign: TextAlign.center,
-              style: TextStyles.caption.copyWith(
-                color: theme.primary[900],
-                height: 1,
+            BoxShadow(
+              color: Color.fromRGBO(0, 0, 0, 0.1),
+              blurRadius: 1,
+              spreadRadius: 0,
+              offset: Offset(
+                0,
+                0,
               ),
             ),
           ],
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Icon(contentTypeItem.icon, color: theme.primary[600]),
+              verticalSpace(Spacing.points8),
+              Text(
+                AppLocalizations.of(context)
+                    .translate(contentTypeItem.contentTypeNameTranslationKey),
+                textAlign: TextAlign.center,
+                style: TextStyles.caption.copyWith(
+                  color: theme.primary[900],
+                  height: 1,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -355,8 +358,8 @@ class LastAdditionItemWidget extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         WidgetsContainer(
-          backgroundColor: theme.primary[50],
-          borderSide: BorderSide(color: theme.primary[100]!, width: 0.25),
+          backgroundColor: theme.backgroundColor,
+          borderSide: BorderSide(color: theme.primary[600]!, width: 0.25),
           boxShadow: [
             BoxShadow(
               color: Color.fromRGBO(0, 0, 0, 0.1),
@@ -380,11 +383,11 @@ class LastAdditionItemWidget extends StatelessWidget {
           child: Center(
             child: Icon(
               latestAdditionItem.icon,
-              color: theme.grey[800],
+              color: theme.primary[600],
             ),
           ),
         ),
-        horizontalSpace(Spacing.points4),
+        horizontalSpace(Spacing.points8),
         Expanded(
           // Ensures the text uses the available width without overflowing
           child: Column(
@@ -395,7 +398,7 @@ class LastAdditionItemWidget extends StatelessWidget {
               Text(
                 latestAdditionItem.primaryTitle,
                 style: TextStyles.footnote.copyWith(
-                  color: theme.grey[900],
+                  color: theme.grey[800],
                 ),
                 maxLines: 2, // Restrict to one line
                 overflow: TextOverflow
@@ -493,10 +496,8 @@ class FeaturedListItemWidget extends StatelessWidget {
       },
       child: WidgetsContainer(
         padding: EdgeInsets.all(8),
-        backgroundColor: theme.primary[50],
-        borderSide: BorderSide(
-          color: theme.primary[100]!,
-        ),
+        backgroundColor: theme.backgroundColor,
+        borderSide: BorderSide(color: theme.primary[600]!, width: 0.25),
         boxShadow: [
           BoxShadow(
             color: Color.fromRGBO(0, 0, 0, 0.1),
@@ -520,7 +521,7 @@ class FeaturedListItemWidget extends StatelessWidget {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Icon(listItem.icon),
+            Icon(listItem.icon, color: theme.primary[600]),
             horizontalSpace(Spacing.points4),
             Expanded(
               child: Text(

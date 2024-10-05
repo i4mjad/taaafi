@@ -77,7 +77,6 @@ class ActivityOverviewScreen extends ConsumerWidget {
                     )
                   ],
                 ),
-
                 Spacer(),
                 GestureDetector(
                   onTap: () {
@@ -129,8 +128,30 @@ class ActivityDescriptionAndStatisticsWidget extends ConsumerWidget {
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
         WidgetsContainer(
-          backgroundColor: theme.primary[50],
-          borderSide: BorderSide(color: theme.primary[100]!),
+          backgroundColor: theme.backgroundColor,
+          padding: EdgeInsets.fromLTRB(16, 12, 16, 12),
+          borderSide: BorderSide(color: theme.grey[600]!, width: 0.5),
+          boxShadow: [
+            BoxShadow(
+              color: Color.fromRGBO(50, 50, 93, 0.25),
+              blurRadius: 5,
+              spreadRadius: -1,
+              offset: Offset(
+                0,
+                2,
+              ),
+            ),
+            BoxShadow(
+              color: Color.fromRGBO(0, 0, 0, 0.3),
+              blurRadius: 3,
+              spreadRadius: -1,
+              offset: Offset(
+                0,
+                1,
+              ),
+            ),
+          ],
+
           width: width,
           child: Text(
             'هذا توصيف للقائمة والفكرة منها وطبيعة المحتوى الموجود في هذه القائمة. مثال: قائمة كيف أبدأ تحتوي على بعض المصادر لمساعدة المتعافي للبدء في التعافي وكيف يدخل لهذا العالم. سيتم إضافة التوصيف عند إضافة القائمة.',
@@ -145,7 +166,7 @@ class ActivityDescriptionAndStatisticsWidget extends ConsumerWidget {
           children: [
             Column(
               children: [
-                Icon(LucideIcons.lineChart, color: theme.primary[900]),
+                Icon(LucideIcons.lineChart, color: theme.primary[600]),
                 verticalSpace(Spacing.points4),
                 Text(
                   AppLocalizations.of(context).translate('easy'),
@@ -155,7 +176,7 @@ class ActivityDescriptionAndStatisticsWidget extends ConsumerWidget {
             ),
             Column(
               children: [
-                Icon(LucideIcons.users, color: theme.primary[900]),
+                Icon(LucideIcons.users, color: theme.primary[600]),
                 verticalSpace(Spacing.points4),
                 Text(
                   "2808 " +
@@ -167,7 +188,7 @@ class ActivityDescriptionAndStatisticsWidget extends ConsumerWidget {
             Column(
               //TODO: this will represent the best period to do this activity
               children: [
-                Icon(LucideIcons.calendarRange, color: theme.primary[900]),
+                Icon(LucideIcons.calendarRange, color: theme.primary[600]),
                 verticalSpace(Spacing.points4),
                 Text(
                   "3 " + AppLocalizations.of(context).translate('month'),
@@ -177,7 +198,7 @@ class ActivityDescriptionAndStatisticsWidget extends ConsumerWidget {
             ),
             Column(
               children: [
-                Icon(LucideIcons.panelLeftInactive, color: theme.primary[900]),
+                Icon(LucideIcons.panelLeftInactive, color: theme.primary[600]),
                 verticalSpace(Spacing.points4),
                 Text(
                   AppLocalizations.of(context).translate('all-levels'),
@@ -230,8 +251,29 @@ class TaskDescriptionSheet extends ConsumerWidget {
               Navigator.pop(context);
             },
             child: WidgetsContainer(
-              backgroundColor: theme.secondary[100],
-              borderSide: BorderSide(color: theme.secondary[200]!),
+              backgroundColor: theme.backgroundColor,
+              padding: EdgeInsets.fromLTRB(16, 12, 16, 12),
+              borderSide: BorderSide(color: theme.grey[600]!, width: 0.5),
+              boxShadow: [
+                BoxShadow(
+                  color: Color.fromRGBO(50, 50, 93, 0.25),
+                  blurRadius: 5,
+                  spreadRadius: -1,
+                  offset: Offset(
+                    0,
+                    2,
+                  ),
+                ),
+                BoxShadow(
+                  color: Color.fromRGBO(0, 0, 0, 0.3),
+                  blurRadius: 3,
+                  spreadRadius: -1,
+                  offset: Offset(
+                    0,
+                    1,
+                  ),
+                ),
+              ],
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -239,7 +281,7 @@ class TaskDescriptionSheet extends ConsumerWidget {
                   Text(
                     AppLocalizations.of(context).translate("close"),
                     style: TextStyles.body.copyWith(
-                      color: theme.grey[900],
+                      color: theme.primary[600],
                     ),
                   ),
                 ],
@@ -349,8 +391,7 @@ class _AddTheActivitySheetState extends ConsumerState<AddTheActivitySheet> {
   @override
   Widget build(BuildContext context) {
     final theme = AppTheme.of(context);
-    final locale = ref.watch(
-        localeNotifierProvider); // Assuming English locale for now; adjust as needed
+    final locale = ref.watch(localeNotifierProvider);
 
     return Form(
       key: _formKey,
@@ -400,9 +441,29 @@ class _AddTheActivitySheetState extends ConsumerState<AddTheActivitySheet> {
             ),
             verticalSpace(Spacing.points8),
             WidgetsContainer(
+              backgroundColor: theme.backgroundColor,
               padding: EdgeInsets.fromLTRB(16, 8, 16, 8),
-              backgroundColor: theme.secondary[50],
-              borderSide: BorderSide(color: theme.secondary[100]!),
+              borderSide: BorderSide(color: theme.grey[600]!, width: 0.5),
+              boxShadow: [
+                BoxShadow(
+                  color: Color.fromRGBO(50, 50, 93, 0.25),
+                  blurRadius: 12,
+                  spreadRadius: -2,
+                  offset: Offset(
+                    0,
+                    6,
+                  ),
+                ),
+                BoxShadow(
+                  color: Color.fromRGBO(0, 0, 0, 0.3),
+                  blurRadius: 7,
+                  spreadRadius: -3,
+                  offset: Offset(
+                    0,
+                    3,
+                  ),
+                ),
+              ],
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -485,7 +546,7 @@ class _AddTheActivitySheetState extends ConsumerState<AddTheActivitySheet> {
                 }
               },
               child: WidgetsContainer(
-                backgroundColor: theme.primary[900],
+                backgroundColor: theme.primary[600],
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.center,

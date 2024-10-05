@@ -29,8 +29,28 @@ class CalenderWidget extends StatelessWidget {
           ),
           verticalSpace(Spacing.points8),
           WidgetsContainer(
-            borderSide: BorderSide(color: theme.primary[100]!),
-            backgroundColor: theme.primary[50],
+            backgroundColor: theme.backgroundColor,
+            borderSide: BorderSide(color: theme.grey[600]!, width: 0.5),
+            boxShadow: [
+              BoxShadow(
+                color: Color.fromRGBO(0, 0, 0, 0.02),
+                blurRadius: 3,
+                spreadRadius: 0,
+                offset: Offset(
+                  0,
+                  1,
+                ),
+              ),
+              BoxShadow(
+                color: Color.fromRGBO(27, 31, 35, 0.15),
+                blurRadius: 0,
+                spreadRadius: 1,
+                offset: Offset(
+                  0,
+                  0,
+                ),
+              ),
+            ],
             child: SfCalendar(
               view: CalendarView.month,
               viewHeaderStyle: ViewHeaderStyle(

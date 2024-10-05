@@ -35,103 +35,106 @@ class AccountScreen extends ConsumerWidget {
                 child: CircularProgressIndicator(),
               );
             }
-            return Padding(
-              padding: const EdgeInsets.only(left: 16.0, right: 16, top: 16),
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    UserDetailsWidget(userProfile),
-                    verticalSpace(Spacing.points24),
-                    Text(
-                      AppLocalizations.of(context).translate('app-settings'),
-                      style: TextStyles.h6,
-                    ),
-                    verticalSpace(Spacing.points8),
-                    GestureDetector(
-                      onTap: () {
-                        HapticFeedback.mediumImpact();
-                        changeLanguage(context);
-                      },
-                      child: SettingsButton(
-                        icon: LucideIcons.smartphone,
-                        textKey: 'ui-settings',
+            return Container(
+              width: MediaQuery.of(context).size.width,
+              child: Padding(
+                padding: EdgeInsets.all(16),
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      UserDetailsWidget(userProfile),
+                      verticalSpace(Spacing.points24),
+                      Text(
+                        AppLocalizations.of(context).translate('app-settings'),
+                        style: TextStyles.h6,
                       ),
-                    ),
-                    verticalSpace(Spacing.points16),
-                    Text(
-                      AppLocalizations.of(context)
-                          .translate('account-settings'),
-                      style: TextStyles.h6,
-                    ),
-                    verticalSpace(Spacing.points8),
-                    SettingsButton(
-                      icon: LucideIcons.userCog,
-                      textKey: 'delete-my-data',
-                    ),
-                    verticalSpace(Spacing.points8),
-                    SettingsButton(
-                      icon: LucideIcons.logOut,
-                      textKey: 'log-out',
-                      action: () async {
-                        await authService.signOut(context, ref);
-                      },
-                    ),
-                    verticalSpace(Spacing.points8),
-                    GestureDetector(
-                      onTap: () async {
-                        //TODO: this should be selected based on the provider, for testing purposes we will use Google
-                        await authService.reSignInWithGoogle(context);
-                        await authService.deleteAccount(context, ref);
-                      },
-                      child: SettingsButton(
-                        icon: LucideIcons.userX,
-                        textKey: 'delete-my-account',
-                        type: 'error',
+                      verticalSpace(Spacing.points8),
+                      GestureDetector(
+                        onTap: () {
+                          HapticFeedback.mediumImpact();
+                          changeLanguage(context);
+                        },
+                        child: SettingsButton(
+                          icon: LucideIcons.smartphone,
+                          textKey: 'ui-settings',
+                        ),
                       ),
-                    ),
-                    verticalSpace(Spacing.points16),
-                    Text(
-                      AppLocalizations.of(context).translate('about-app'),
-                      style: TextStyles.h6,
-                    ),
-                    verticalSpace(Spacing.points8),
-                    SettingsButton(
-                      icon: LucideIcons.heart,
-                      textKey: 'version-number',
-                      type: 'app',
-                    ),
-                    verticalSpace(Spacing.points8),
-                    SettingsButton(
-                      icon: LucideIcons.laptop,
-                      textKey: 'contact-us-through-this-channels',
-                    ),
-                    verticalSpace(Spacing.points12),
-                    Container(
-                      width: MediaQuery.of(context).size.width - 32,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            AppLocalizations.of(context)
-                                .translate('sponsored-by'),
-                            style: TextStyles.bodyLarge
-                                .copyWith(color: theme.primary[600]),
-                          ),
-                          verticalSpace(Spacing.points8),
-                          //TODO: update the text to be Awalim logo
-                          Text(
-                            'منصة عوالم',
-                            style:
-                                TextStyles.h4.copyWith(color: theme.warn[500]),
-                          ),
-                        ],
+                      verticalSpace(Spacing.points16),
+                      Text(
+                        AppLocalizations.of(context)
+                            .translate('account-settings'),
+                        style: TextStyles.h6,
                       ),
-                    ),
-                    verticalSpace(Spacing.points12),
-                  ],
+                      verticalSpace(Spacing.points8),
+                      SettingsButton(
+                        icon: LucideIcons.userCog,
+                        textKey: 'delete-my-data',
+                      ),
+                      verticalSpace(Spacing.points8),
+                      SettingsButton(
+                        icon: LucideIcons.logOut,
+                        textKey: 'log-out',
+                        action: () async {
+                          await authService.signOut(context, ref);
+                        },
+                      ),
+                      verticalSpace(Spacing.points8),
+                      GestureDetector(
+                        onTap: () async {
+                          //TODO: this should be selected based on the provider, for testing purposes we will use Google
+                          await authService.reSignInWithGoogle(context);
+                          await authService.deleteAccount(context, ref);
+                        },
+                        child: SettingsButton(
+                          icon: LucideIcons.userX,
+                          textKey: 'delete-my-account',
+                          type: 'error',
+                        ),
+                      ),
+                      verticalSpace(Spacing.points16),
+                      Text(
+                        AppLocalizations.of(context).translate('about-app'),
+                        style: TextStyles.h6,
+                      ),
+                      verticalSpace(Spacing.points8),
+                      SettingsButton(
+                        icon: LucideIcons.heart,
+                        textKey: 'version-number',
+                        type: 'app',
+                      ),
+                      verticalSpace(Spacing.points8),
+                      SettingsButton(
+                        icon: LucideIcons.laptop,
+                        textKey: 'contact-us-through-this-channels',
+                      ),
+                      verticalSpace(Spacing.points12),
+                      Container(
+                        width: MediaQuery.of(context).size.width - 32,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              AppLocalizations.of(context)
+                                  .translate('sponsored-by'),
+                              style: TextStyles.bodyLarge
+                                  .copyWith(color: theme.primary[600]),
+                            ),
+                            verticalSpace(Spacing.points8),
+                            //TODO: update the text to be Awalim logo
+                            Text(
+                              'منصة عوالم',
+                              style: TextStyles.h4
+                                  .copyWith(color: theme.warn[500]),
+                            ),
+                          ],
+                        ),
+                      ),
+                      verticalSpace(Spacing.points12),
+                    ],
+                  ),
                 ),
               ),
             );
@@ -202,9 +205,20 @@ class UiAndLanguageSettings extends ConsumerWidget {
                 },
                 child: WidgetsContainer(
                   padding: EdgeInsets.all(12),
-                  backgroundColor: theme.primary[50],
-                  borderSide: BorderSide(color: theme.primary[100]!),
+                  backgroundColor: theme.backgroundColor,
+                  borderSide: BorderSide(color: theme.grey[600]!, width: 0.5),
                   borderRadius: BorderRadius.circular(10.5),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Color.fromRGBO(0, 0, 0, 0.16),
+                      blurRadius: 4,
+                      spreadRadius: 0,
+                      offset: Offset(
+                        0,
+                        1,
+                      ),
+                    ),
+                  ],
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -292,35 +306,38 @@ class SettingsButton extends StatelessWidget {
     final theme = AppTheme.of(context);
     return GestureDetector(
       onTap: action,
-      child: WidgetsContainer(
-        padding: EdgeInsets.all(14),
-        backgroundColor: theme.backgroundColor,
-        borderRadius: BorderRadius.circular(10.5),
-        borderSide: BorderSide(color: _getBorderColor(type, theme), width: 0.5),
-        boxShadow: [
-          BoxShadow(
-            color: Color.fromRGBO(0, 0, 0, 0.15),
-            blurRadius: 2.6,
-            spreadRadius: 0,
-            offset: Offset(
-              1.95,
-              1.95,
+      child: Padding(
+        padding: const EdgeInsets.all(1.0),
+        child: WidgetsContainer(
+          padding: EdgeInsets.all(16),
+          backgroundColor: theme.backgroundColor,
+          borderSide: BorderSide(color: theme.grey[600]!, width: 0.5),
+          borderRadius: BorderRadius.circular(10.5),
+          boxShadow: [
+            BoxShadow(
+              color: Color.fromRGBO(0, 0, 0, 0.16),
+              blurRadius: 4,
+              spreadRadius: 0,
+              offset: Offset(
+                0,
+                1,
+              ),
             ),
-          ),
-        ],
-        child: Row(
-          children: [
-            Icon(
-              icon,
-              color: theme.grey[900],
-            ),
-            horizontalSpace(Spacing.points8),
-            Text(
-              AppLocalizations.of(context).translate(textKey),
-              style: TextStyles.footnote
-                  .copyWith(color: _getTextColor(type, theme)),
-            )
           ],
+          child: Row(
+            children: [
+              Icon(
+                icon,
+                color: theme.grey[900],
+              ),
+              horizontalSpace(Spacing.points8),
+              Text(
+                AppLocalizations.of(context).translate(textKey),
+                style: TextStyles.footnote
+                    .copyWith(color: _getTextColor(type, theme)),
+              )
+            ],
+          ),
         ),
       ),
     );
@@ -362,75 +379,97 @@ class UserDetailsWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = AppTheme.of(context);
-    return WidgetsContainer(
-      width: MediaQuery.of(context).size.width,
-      padding: EdgeInsets.all(16),
-      backgroundColor: theme.backgroundColor,
-      borderRadius: BorderRadius.circular(15),
-      borderSide: BorderSide(
-        color: theme.primary[200]!,
-      ),
-      cornerSmoothing: 1,
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Row(
-            children: [
-              CircleAvatar(
-                backgroundColor: theme.grey[100],
-                child: Icon(LucideIcons.user),
-              ),
-              horizontalSpace(Spacing.points16),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    userProfile.displayName,
-                    style: TextStyles.footnoteSelected.copyWith(
-                      color: theme.grey[900],
-                    ),
-                  ),
-                  verticalSpace(Spacing.points4),
-                  Text(
-                    userProfile.email,
-                    style: TextStyles.caption.copyWith(
-                      color: theme.grey[600],
-                    ),
-                  ),
-                  verticalSpace(Spacing.points4),
-                  Text(
-                    AppLocalizations.of(context).translate(userProfile.gender) +
-                        " • " +
-                        userProfile.age.toString() +
-                        " " +
-                        AppLocalizations.of(context).translate('years'),
-                    style: TextStyles.caption.copyWith(
-                      color: theme.grey[600],
-                    ),
-                  ),
-                ],
-              ),
-            ],
+    return Padding(
+      padding: const EdgeInsets.all(1.0),
+      child: WidgetsContainer(
+        width: MediaQuery.of(context).size.width - 20,
+        padding: EdgeInsets.all(16),
+        backgroundColor: theme.backgroundColor,
+        borderRadius: BorderRadius.circular(15),
+        borderSide: BorderSide(color: theme.grey[900]!, width: 0.25),
+        cornerSmoothing: 1,
+        boxShadow: [
+          BoxShadow(
+            color: Color.fromRGBO(0, 0, 0, 0.05),
+            blurRadius: 24,
+            spreadRadius: 0,
+            offset: Offset(
+              0,
+              6,
+            ),
           ),
-          GestureDetector(
-            onTap: () {
-              HapticFeedback.lightImpact();
-              showModalBottomSheet(
-                useSafeArea: true,
-                isScrollControlled: true,
-                useRootNavigator: true,
-                context: context,
-                backgroundColor: Colors.transparent,
-                builder: (context) => UpdateUserProfileModalSheet(),
-              );
-            },
-            child: Icon(
-              LucideIcons.edit,
-              size: 18,
+          BoxShadow(
+            color: Color.fromRGBO(0, 0, 0, 0.08),
+            blurRadius: 0,
+            spreadRadius: 1,
+            offset: Offset(
+              0,
+              0,
             ),
           ),
         ],
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Row(
+              children: [
+                CircleAvatar(
+                  backgroundColor: theme.grey[100],
+                  child: Icon(LucideIcons.user),
+                ),
+                horizontalSpace(Spacing.points16),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      userProfile.displayName,
+                      style: TextStyles.footnoteSelected.copyWith(
+                        color: theme.grey[900],
+                      ),
+                    ),
+                    verticalSpace(Spacing.points4),
+                    Text(
+                      userProfile.email,
+                      style: TextStyles.caption.copyWith(
+                        color: theme.grey[600],
+                      ),
+                    ),
+                    verticalSpace(Spacing.points4),
+                    Text(
+                      AppLocalizations.of(context)
+                              .translate(userProfile.gender) +
+                          " • " +
+                          userProfile.age.toString() +
+                          " " +
+                          AppLocalizations.of(context).translate('years'),
+                      style: TextStyles.caption.copyWith(
+                        color: theme.grey[600],
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            GestureDetector(
+              onTap: () {
+                HapticFeedback.lightImpact();
+                showModalBottomSheet(
+                  useSafeArea: true,
+                  isScrollControlled: true,
+                  useRootNavigator: true,
+                  context: context,
+                  backgroundColor: Colors.transparent,
+                  builder: (context) => UpdateUserProfileModalSheet(),
+                );
+              },
+              child: Icon(
+                LucideIcons.edit,
+                size: 18,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
