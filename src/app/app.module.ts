@@ -26,9 +26,22 @@ import { HlmButtonDirective } from '@spartan-ng/ui-button-helm';
 import { SpartanCompnentsModule } from './shared/components/component.module';
 import { NgxsModule } from '@ngxs/store';
 import { AppState } from './state/app.store';
+import { ContentTypesComponent } from './pages/library/screens/content-types/content-types.component';
 
 @NgModule({
-  declarations: [AppComponent, HomeComponent, DashboardComponent, NotFoundComponent, UnauthorizedAccessComponent, ForbiddenAccessComponent, LibraryComponent, VaultComponent, FellowshipsComponent, UsersManagementComponent],
+  declarations: [
+    AppComponent,
+    HomeComponent,
+    DashboardComponent,
+    NotFoundComponent,
+    UnauthorizedAccessComponent,
+    ForbiddenAccessComponent,
+    LibraryComponent,
+    VaultComponent,
+    FellowshipsComponent,
+    UsersManagementComponent,
+    ContentTypesComponent,
+  ],
   imports: [
     BrowserModule,
     AppRoutingModule,
@@ -48,7 +61,7 @@ import { AppState } from './state/app.store';
       },
     }),
   ],
-  providers: [provideAnimationsAsync(),HttpClient],
+  providers: [provideAnimationsAsync(), HttpClient],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

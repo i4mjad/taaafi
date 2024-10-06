@@ -1,6 +1,24 @@
 <div class="h-screen">
-  <mat-toolbar  class="flex justify-between items-center ">
-    <button hlmBtn variant="ghost" routerLink="/dashboard" >
+  <mat-toolbar class="flex justify-between items-center">
+    <button
+      hlmBtn
+      variant="ghost"
+      routerLink="/dashboard"
+      class="flex flex-row gap-2"
+    >
+      <svg
+        width="28"
+        height="34"
+        viewBox="0 0 610 762"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M540.07 601.6C517.56 635.54 491.45 663.61 473.97 680.81L431.6 638.79L436.04 634.63C583.18 496.85 583.83 262.06 436.07 123.55L304.99 0.719971L173.91 123.55C26.3499 261.87 26.5199 496.54 173.91 634.63L178.35 638.79L136.02 680.81C118.54 663.61 92.4299 635.54 69.9199 601.6H0.669922C54.2699 701.28 139.62 761.28 139.62 761.28L221.87 679.55L309.06 761.28H395.96L214.56 591.29C156.11 536.52 122.59 459.19 122.59 379.11C122.59 299.03 156.11 221.67 214.56 166.9L304.99 82.17L395.42 166.94C453.87 221.68 487.35 299.04 487.35 379.12C487.35 517.67 389.4 596.93 389.41 596.93L347.18 555.05C347.18 555.05 427.93 491.54 427.93 379.12C427.93 315.4 401.29 253.84 354.8 210.29L304.99 163.62L255.18 210.29C208.69 253.84 182.02 315.4 182.02 379.12C182.02 442.84 208.69 504.37 255.18 547.92L388.12 679.56L470.37 761.29C470.37 761.29 554.58 703.43 609.32 601.61H540.07V601.6ZM314.16 504.57L305 513.17L295.84 504.57C261.27 472.2 241.45 426.44 241.45 379.11C241.45 331.78 261.27 286.02 295.84 253.62L305 245.06L314.16 253.62C348.73 286.02 368.52 331.75 368.52 379.11C368.52 426.47 348.74 472.2 314.16 504.57Z"
+          fill="#E53E20"
+        />
+      </svg>
+
       {{ "app-name" | translate }}
     </button>
 
@@ -9,7 +27,7 @@
 
     <!-- Buttons visible on larger screens (gt-md) -->
     <div class="flex gap-4 items-center">
-      <div class="hidden gt-md:flex gap-4 items-center content-center" >
+      <div class="hidden gt-md:flex gap-4 items-center content-center">
         <button hlmBtn variant="ghost" routerLink="/library" *ngIf="isLoggedIn">
           {{ "library" | translate }}
         </button>
@@ -18,18 +36,27 @@
           {{ "vault" | translate }}
         </button>
 
-        <button hlmBtn variant="ghost" routerLink="/fellowships" *ngIf="isLoggedIn">
+        <button
+          hlmBtn
+          variant="ghost"
+          routerLink="/fellowships"
+          *ngIf="isLoggedIn"
+        >
           {{ "fellowships" | translate }}
         </button>
 
-        <button hlmBtn variant="ghost" routerLink="/users-management" *ngIf="isLoggedIn">
+        <button
+          hlmBtn
+          variant="ghost"
+          routerLink="/users-management"
+          *ngIf="isLoggedIn"
+        >
           {{ "users-management" | translate }}
         </button>
 
         <button hlmBtn size="icon" variant="ghost" [matMenuTriggerFor]="menu1">
-          <hlm-icon size='sm' name="lucideUsers" />
+          <hlm-icon size="sm" name="lucideUsers" />
         </button>
-
 
         <mat-menu #menu1="matMenu">
           <button mat-menu-item (click)="toggleLanguage()">

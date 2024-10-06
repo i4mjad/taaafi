@@ -11,6 +11,7 @@ import { LibraryComponent } from './pages/library/library.component';
 import { VaultComponent } from './pages/vault/vault.component';
 import { FellowshipsComponent } from './pages/fellowships/fellowships.component';
 import { UsersManagementComponent } from './pages/users-management/users-management.component';
+import { ContentTypesComponent } from './pages/library/screens/content-types/content-types.component';
 
 const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -20,11 +21,27 @@ const routes: Routes = [
     canActivate: [canActivateAuth],
   },
   // Main pages
-  { path: 'library', component: LibraryComponent, canActivate: [canActivateAuth]},
+  {
+    path: 'library',
+    component: LibraryComponent,
+    canActivate: [canActivateAuth],
+  },
+  {
+    path: 'library/content-types',
+    component: ContentTypesComponent,
+    canActivate: [canActivateAuth],
+  },
   { path: 'vault', component: VaultComponent, canActivate: [canActivateAuth] },
-  { path: 'fellowships', component: FellowshipsComponent, canActivate: [canActivateAuth] },
-  { path: 'users-management', component: UsersManagementComponent, canActivate: [canActivateAuth] },
-
+  {
+    path: 'fellowships',
+    component: FellowshipsComponent,
+    canActivate: [canActivateAuth],
+  },
+  {
+    path: 'users-management',
+    component: UsersManagementComponent,
+    canActivate: [canActivateAuth],
+  },
 
   // Error pages
   { path: 'not-found', component: NotFoundComponent },
