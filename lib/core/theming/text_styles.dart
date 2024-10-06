@@ -185,4 +185,27 @@ class TextStyles {
   );
 }
 
-final textStyles = TextStyles();
+class Shadows {
+  const Shadows();
+
+  static List<BoxShadow> mainShadows = [
+    BoxShadow(
+      color: Color.fromRGBO(60, 64, 67, 0.3),
+      blurRadius: 2,
+      spreadRadius: 0,
+      offset: Offset(
+        0,
+        1,
+      ),
+    ),
+    BoxShadow(
+      color: Color.fromRGBO(60, 64, 67, 0.15),
+      blurRadius: 6,
+      spreadRadius: 2,
+      offset: Offset(
+        0,
+        2,
+      ),
+    ),
+  ];
+}

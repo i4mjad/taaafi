@@ -79,6 +79,8 @@ class DarkThemeColors {
   static const Color error700 = Color(0xfffccfc4);
   static const Color error800 = Color(0xfffedfd7);
   static const Color error900 = Color(0xffffefeb);
+
+  static const Color darkCalenderHeaderBackgoundColor = Color(0xff212121);
 }
 
 const MaterialColor darkPrimarySwatch = MaterialColor(
@@ -96,7 +98,13 @@ const MaterialColor darkPrimarySwatch = MaterialColor(
     900: DarkThemeColors.primary900,
   },
 );
+
 const MaterialColor darkBackgroundSwatch = MaterialColor(
+  0xff212121,
+  <int, Color>{},
+);
+
+const MaterialColor darkCalenderHeaderBackgoundSwatch = MaterialColor(
   0xff212121,
   <int, Color>{},
 );

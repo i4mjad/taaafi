@@ -22,36 +22,17 @@ class FollowUpWidget extends StatelessWidget {
     final theme = AppTheme.of(context);
 
     return WidgetsContainer(
-      cornerSmoothing: 1,
       backgroundColor: theme.backgroundColor,
       padding: EdgeInsets.all(8),
       borderSide: BorderSide(
         color: isSelected ? theme.success[600]! : theme.grey[600]!,
+        width: 0.5,
       ),
-      boxShadow: [
-        BoxShadow(
-          color: Color.fromRGBO(9, 30, 66, 0.25),
-          blurRadius: 8,
-          spreadRadius: -2,
-          offset: Offset(
-            0,
-            4,
-          ),
-        ),
-        BoxShadow(
-          color: Color.fromRGBO(9, 30, 66, 0.08),
-          blurRadius: 0,
-          spreadRadius: 1,
-          offset: Offset(
-            0,
-            0,
-          ),
-        ),
-      ],
+      boxShadow: Shadows.mainShadows,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(icon, color: theme.primary[600]),
+          Icon(icon, color: theme.primary[900]),
           verticalSpace(Spacing.points8),
           Text(
             AppLocalizations.of(context).translate(translationKey),

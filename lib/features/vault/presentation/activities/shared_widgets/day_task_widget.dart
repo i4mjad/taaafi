@@ -39,8 +39,8 @@ class _DayActivityWidgetState extends ConsumerState<DayTaskWidget> {
       ),
       boxShadow: [
         BoxShadow(
-          color: Color.fromRGBO(0, 0, 0, 0.02),
-          blurRadius: 3,
+          color: Color.fromRGBO(60, 64, 67, 0.3),
+          blurRadius: 2,
           spreadRadius: 0,
           offset: Offset(
             0,
@@ -48,12 +48,12 @@ class _DayActivityWidgetState extends ConsumerState<DayTaskWidget> {
           ),
         ),
         BoxShadow(
-          color: Color.fromRGBO(27, 31, 35, 0.15),
-          blurRadius: 0,
-          spreadRadius: 1,
+          color: Color.fromRGBO(60, 64, 67, 0.15),
+          blurRadius: 6,
+          spreadRadius: 2,
           offset: Offset(
             0,
-            0,
+            2,
           ),
         ),
       ],

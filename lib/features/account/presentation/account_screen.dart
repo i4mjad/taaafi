@@ -38,7 +38,7 @@ class AccountScreen extends ConsumerWidget {
             return Container(
               width: MediaQuery.of(context).size.width,
               child: Padding(
-                padding: EdgeInsets.all(16),
+                padding: EdgeInsets.all(14),
                 child: SingleChildScrollView(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -307,23 +307,13 @@ class SettingsButton extends StatelessWidget {
     return GestureDetector(
       onTap: action,
       child: Padding(
-        padding: const EdgeInsets.all(1.0),
+        padding: const EdgeInsets.all(4.0),
         child: WidgetsContainer(
           padding: EdgeInsets.all(16),
           backgroundColor: theme.backgroundColor,
           borderSide: BorderSide(color: theme.grey[600]!, width: 0.5),
           borderRadius: BorderRadius.circular(10.5),
-          boxShadow: [
-            BoxShadow(
-              color: Color.fromRGBO(0, 0, 0, 0.16),
-              blurRadius: 4,
-              spreadRadius: 0,
-              offset: Offset(
-                0,
-                1,
-              ),
-            ),
-          ],
+          boxShadow: Shadows.mainShadows,
           child: Row(
             children: [
               Icon(
@@ -380,34 +370,15 @@ class UserDetailsWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = AppTheme.of(context);
     return Padding(
-      padding: const EdgeInsets.all(1.0),
+      padding: const EdgeInsets.all(4.0),
       child: WidgetsContainer(
-        width: MediaQuery.of(context).size.width - 20,
+        width: MediaQuery.of(context).size.width - 32,
         padding: EdgeInsets.all(16),
         backgroundColor: theme.backgroundColor,
         borderRadius: BorderRadius.circular(15),
         borderSide: BorderSide(color: theme.grey[900]!, width: 0.25),
         cornerSmoothing: 1,
-        boxShadow: [
-          BoxShadow(
-            color: Color.fromRGBO(0, 0, 0, 0.05),
-            blurRadius: 24,
-            spreadRadius: 0,
-            offset: Offset(
-              0,
-              6,
-            ),
-          ),
-          BoxShadow(
-            color: Color.fromRGBO(0, 0, 0, 0.08),
-            blurRadius: 0,
-            spreadRadius: 1,
-            offset: Offset(
-              0,
-              0,
-            ),
-          ),
-        ],
+        boxShadow: Shadows.mainShadows,
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,

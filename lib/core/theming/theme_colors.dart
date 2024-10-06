@@ -4,24 +4,23 @@ class LightThemeColors {
   static const Color backgroundcolor = Color(0xffE9E9D9);
   // Adjusted Primary color shades with warmer, orangish tones
 
-  static const Color primary50 = Color(0xFFFAF0E8);
-  static const Color primary100 = Color(0xFFF4E2D1);
-  static const Color primary200 = Color(0xFFE8C5A3);
-  static const Color primary300 = Color(0xFFDCA875);
-  static const Color primary400 = Color(0xFFC68B47);
-  static const Color primary500 = Color(0xFFB03F27); // Adjusted primary color
-  static const Color primary600 = Color(0xFF9E3923);
-  static const Color primary700 = Color(0xFF7B2D1C);
-  static const Color primary800 = Color(0xFF592114);
-  static const Color primary900 = Color(0xFF2E110A);
+  static const Color primary50 = Color(0xFFFFF3E0);
+  static const Color primary100 = Color(0xFFFFE0B2);
+  static const Color primary200 = Color(0xFFFFCC80);
+  static const Color primary300 = Color(0xFFFFB74D);
+  static const Color primary400 = Color(0xFFFFA726);
+  static const Color primary500 = Color(0xFFE64A19); // Adjusted primary color
+  static const Color primary600 = Color(0xFFD84315);
+  static const Color primary700 = Color(0xFFBF360C);
+  static const Color primary800 = Color(0xFF8D2803);
+  static const Color primary900 = Color(0xFF5C1A02);
 
   static const Color secondary50 = Color(0xFFE8F2F5);
   static const Color secondary100 = Color(0xFFC5DEE7);
   static const Color secondary200 = Color(0xFFA1C9D8);
   static const Color secondary300 = Color(0xFF7DB4CA);
   static const Color secondary400 = Color(0xFF5A9FBB);
-  static const Color secondary500 =
-      Color(0xFF2F6F8F); // Adjusted secondary color
+  static const Color secondary500 = Color(0xFF2F6F8F);
   static const Color secondary600 = Color(0xFF29647F);
   static const Color secondary700 = Color(0xFF20506A);
   static const Color secondary800 = Color(0xFF173D54);
@@ -79,6 +78,8 @@ class LightThemeColors {
   static const Color error700 = Color(0xff9e0c0c);
   static const Color error800 = Color(0xff7b0909);
   static const Color error900 = Color(0xff5e0707);
+
+  static const Color calenderHeaderBackgoundColor = Color(0xffDFDFCE);
 }
 
 const MaterialColor lightPrimarySwatch = MaterialColor(
@@ -98,7 +99,13 @@ const MaterialColor lightPrimarySwatch = MaterialColor(
 );
 
 const MaterialColor lightBackgroundSwatch =
-    MaterialColor(0xffE9E9D9, <int, Color>{});
+    MaterialColor(0xffF5F7F8, <int, Color>{});
+
+const MaterialColor calenderHeaderBackgoundSwatch = MaterialColor(
+  0xffF6F1E9,
+  <int, Color>{},
+);
+
 const MaterialColor lightSecondarySwatch = MaterialColor(
   0xff94c5c9,
   <int, Color>{

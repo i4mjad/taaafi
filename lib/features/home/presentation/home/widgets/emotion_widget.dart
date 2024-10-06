@@ -25,29 +25,28 @@ class EmotionWidget extends StatelessWidget {
       backgroundColor: theme.backgroundColor,
       padding: EdgeInsets.all(8),
       borderSide: BorderSide(
-        color: isSelected ? theme.success[600]! : theme.grey[600]!,
-      ),
+          color: isSelected ? theme.success[600]! : theme.grey[600]!,
+          width: 0.5),
       boxShadow: [
         BoxShadow(
-          color: Color.fromRGBO(9, 30, 66, 0.25),
-          blurRadius: 8,
-          spreadRadius: -2,
+          color: Color.fromRGBO(60, 64, 67, 0.3),
+          blurRadius: 2,
+          spreadRadius: 0,
           offset: Offset(
             0,
-            4,
+            1,
           ),
         ),
         BoxShadow(
-          color: Color.fromRGBO(9, 30, 66, 0.08),
-          blurRadius: 0,
-          spreadRadius: 1,
+          color: Color.fromRGBO(60, 64, 67, 0.15),
+          blurRadius: 6,
+          spreadRadius: 2,
           offset: Offset(
             0,
-            0,
+            2,
           ),
         ),
       ],
-
       child: Column(
         children: [
           Text(

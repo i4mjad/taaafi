@@ -30,11 +30,14 @@ class CalenderWidget extends StatelessWidget {
           verticalSpace(Spacing.points8),
           WidgetsContainer(
             backgroundColor: theme.backgroundColor,
-            borderSide: BorderSide(color: theme.grey[600]!, width: 0.5),
+            borderSide: BorderSide(
+              color: theme.grey[600]!,
+              width: 0.5,
+            ),
             boxShadow: [
               BoxShadow(
-                color: Color.fromRGBO(0, 0, 0, 0.02),
-                blurRadius: 3,
+                color: Color.fromRGBO(60, 64, 67, 0.3),
+                blurRadius: 2,
                 spreadRadius: 0,
                 offset: Offset(
                   0,
@@ -42,12 +45,12 @@ class CalenderWidget extends StatelessWidget {
                 ),
               ),
               BoxShadow(
-                color: Color.fromRGBO(27, 31, 35, 0.15),
-                blurRadius: 0,
-                spreadRadius: 1,
+                color: Color.fromRGBO(60, 64, 67, 0.15),
+                blurRadius: 6,
+                spreadRadius: 2,
                 offset: Offset(
                   0,
-                  0,
+                  2,
                 ),
               ),
             ],
@@ -57,22 +60,23 @@ class CalenderWidget extends StatelessWidget {
                 dayTextStyle: TextStyles.tinyBold,
               ),
               headerStyle: CalendarHeaderStyle(
-                backgroundColor: theme.primary[50],
+                backgroundColor: theme.calenderHeaderBackgound,
                 textAlign: TextAlign.center,
                 textStyle: TextStyles.caption.copyWith(
                   fontWeight: FontWeight.bold,
+                  color: theme.grey[900],
                 ),
               ),
-              todayHighlightColor: theme.primary[800],
+              todayHighlightColor: theme.primary[900],
               monthViewSettings: MonthViewSettings(
                 showTrailingAndLeadingDates: false,
                 agendaStyle: AgendaStyle(
                   dayTextStyle: TextStyles.body,
                 ),
                 monthCellStyle: MonthCellStyle(
-                  todayBackgroundColor: theme.primary[200],
-                  backgroundColor: theme.primary[100],
-                  textStyle: TextStyles.caption,
+                  backgroundColor: theme.calenderHeaderBackgound,
+                  textStyle: TextStyles.footnoteSelected
+                      .copyWith(fontWeight: FontWeight.bold),
                 ),
               ),
               onTap: (date) {

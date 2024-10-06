@@ -80,7 +80,7 @@ class LibraryScreen extends ConsumerWidget {
       child: WidgetsContainer(
         backgroundColor: theme.backgroundColor,
         padding: EdgeInsets.all(8),
-        borderSide: BorderSide(color: theme.grey[400]!),
+        borderSide: BorderSide(color: theme.grey[600]!, width: 0.5),
         boxShadow: [
           BoxShadow(
             color: Color.fromRGBO(0, 0, 0, 0.1),
@@ -215,7 +215,7 @@ class ContentTypeWidget extends StatelessWidget {
         child: WidgetsContainer(
           cornerSmoothing: 0.6,
           backgroundColor: theme.backgroundColor,
-          borderSide: BorderSide(color: theme.grey[900]!, width: 0.25),
+          borderSide: BorderSide(color: theme.grey[600]!, width: 0.25),
           padding: EdgeInsets.all(8),
           boxShadow: [
             BoxShadow(
@@ -241,7 +241,7 @@ class ContentTypeWidget extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Icon(contentTypeItem.icon, color: theme.primary[600]),
+              Icon(contentTypeItem.icon, color: theme.primary[900]),
               verticalSpace(Spacing.points8),
               Text(
                 AppLocalizations.of(context)
@@ -359,7 +359,7 @@ class LastAdditionItemWidget extends StatelessWidget {
       children: [
         WidgetsContainer(
           backgroundColor: theme.backgroundColor,
-          borderSide: BorderSide(color: theme.primary[600]!, width: 0.25),
+          borderSide: BorderSide(color: theme.grey[600]!, width: 0.25),
           boxShadow: [
             BoxShadow(
               color: Color.fromRGBO(0, 0, 0, 0.1),
@@ -383,7 +383,7 @@ class LastAdditionItemWidget extends StatelessWidget {
           child: Center(
             child: Icon(
               latestAdditionItem.icon,
-              color: theme.primary[600],
+              color: theme.primary[900],
             ),
           ),
         ),
@@ -497,7 +497,7 @@ class FeaturedListItemWidget extends StatelessWidget {
       child: WidgetsContainer(
         padding: EdgeInsets.all(8),
         backgroundColor: theme.backgroundColor,
-        borderSide: BorderSide(color: theme.primary[600]!, width: 0.25),
+        borderSide: BorderSide(color: theme.grey[600]!, width: 0.25),
         boxShadow: [
           BoxShadow(
             color: Color.fromRGBO(0, 0, 0, 0.1),
@@ -521,7 +521,10 @@ class FeaturedListItemWidget extends StatelessWidget {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Icon(listItem.icon, color: theme.primary[600]),
+            Icon(
+              listItem.icon,
+              color: theme.primary[900],
+            ),
             horizontalSpace(Spacing.points4),
             Expanded(
               child: Text(
@@ -533,7 +536,6 @@ class FeaturedListItemWidget extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
               ),
             ),
-            // Spacer(),
             Icon(
               LucideIcons.arrowLeft,
               size: 16,

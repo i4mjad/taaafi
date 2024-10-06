@@ -86,10 +86,29 @@ class _FollowUpSheetState extends ConsumerState<FollowUpSheet> {
                 timeWidgetBuilder: (dateTime) {
                   return WidgetsContainer(
                     padding: EdgeInsets.all(8),
-                    backgroundColor: theme.primary[50],
-                    borderSide:
-                        BorderSide(color: theme.primary[100]!, width: 0.75),
+                    backgroundColor: theme.backgroundColor,
+                    borderSide: BorderSide(color: theme.grey[600]!, width: 0.5),
                     borderRadius: BorderRadius.circular(8),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Color.fromRGBO(60, 64, 67, 0.3),
+                        blurRadius: 2,
+                        spreadRadius: 0,
+                        offset: Offset(
+                          0,
+                          1,
+                        ),
+                      ),
+                      BoxShadow(
+                        color: Color.fromRGBO(60, 64, 67, 0.15),
+                        blurRadius: 6,
+                        spreadRadius: 2,
+                        offset: Offset(
+                          0,
+                          2,
+                        ),
+                      ),
+                    ],
                     child: Text(
                       getDisplayDateTime(dateTime, locale!.languageCode),
                       style: TextStyles.body,
@@ -116,36 +135,39 @@ class _FollowUpSheetState extends ConsumerState<FollowUpSheet> {
             style: TextStyles.h6,
           ),
           verticalSpace(Spacing.points8),
-          // Display follow-up options using FollowUpWidget
-          Container(
-            height: 80,
-            width: MediaQuery.of(context).size.width - 32,
-            // (4 * (followUpOptions.length - 1)),
-            child: ListView.separated(
-              scrollDirection: Axis.horizontal,
-              itemCount: followUpOptions.length,
-              separatorBuilder: (BuildContext context, int index) =>
-                  horizontalSpace(Spacing.points4),
-              itemBuilder: (BuildContext context, int index) {
-                final followUp = followUpOptions[index];
-                final isSelected = selectedFollowUps.contains(followUp);
+          Padding(
+            padding: const EdgeInsets.only(top: 5.0, bottom: 5),
+            child: Container(
+              height: 90,
+              child: ListView.separated(
+                scrollDirection: Axis.horizontal,
+                itemCount: followUpOptions.length,
+                shrinkWrap: true,
+                separatorBuilder: (BuildContext context, int index) =>
+                    horizontalSpace(Spacing.points4),
+                itemBuilder: (BuildContext context, int index) {
+                  final followUp = followUpOptions[index];
+                  final isSelected = selectedFollowUps.contains(followUp);
 
-                return GestureDetector(
-                  onTap: () => toggleFollowUp(followUp),
-                  child: Container(
-                    padding: EdgeInsets.all(1),
-                    width: MediaQuery.of(context).size.width / 3.5,
-                    child: FollowUpWidget(
-                      icon: followUp.icon,
-                      translationKey: followUp.translationKey,
-                      isSelected: isSelected,
+                  return GestureDetector(
+                    onTap: () => toggleFollowUp(followUp),
+                    child: Padding(
+                      padding: const EdgeInsets.all(5.0),
+                      child: Container(
+                        width: 90,
+                        height: 80,
+                        child: FollowUpWidget(
+                          icon: followUp.icon,
+                          translationKey: followUp.translationKey,
+                          isSelected: isSelected,
+                        ),
+                      ),
                     ),
-                  ),
-                );
-              },
+                  );
+                },
+              ),
             ),
           ),
-
           verticalSpace(Spacing.points16),
           Text(
             AppLocalizations.of(context).translate('how-do-you-feel'),
@@ -159,34 +181,37 @@ class _FollowUpSheetState extends ConsumerState<FollowUpSheet> {
             ),
           ),
           verticalSpace(Spacing.points4),
-          Container(
-            height: 80,
-            width: MediaQuery.of(context).size.width - 32,
-            child: ListView.separated(
-              scrollDirection: Axis.horizontal,
-              itemCount: badEmotions.length,
-              separatorBuilder: (BuildContext context, int index) =>
-                  horizontalSpace(Spacing.points4),
-              itemBuilder: (BuildContext context, int index) {
-                final emotion = badEmotions[index];
-                final isSelected = selectedEmotions.contains(emotion);
+          Padding(
+            padding: const EdgeInsets.only(top: 5.0, bottom: 5),
+            child: Container(
+              height: 90,
+              child: ListView.separated(
+                scrollDirection: Axis.horizontal,
+                itemCount: badEmotions.length,
+                separatorBuilder: (BuildContext context, int index) =>
+                    horizontalSpace(Spacing.points4),
+                itemBuilder: (BuildContext context, int index) {
+                  final emotion = badEmotions[index];
+                  final isSelected = selectedEmotions.contains(emotion);
 
-                return GestureDetector(
-                  onTap: () => toggleEmotion(emotion),
-                  child: SizedBox(
-                    width: 100,
+                  return GestureDetector(
+                    onTap: () => toggleEmotion(emotion),
                     child: Padding(
-                      padding: EdgeInsets.all(1),
-                      child: EmotionWidget(
-                        emotionEmoji: emotion.emotionEmoji,
-                        emotionNameTranslationKey:
-                            emotion.emotionNameTranslationKey,
-                        isSelected: isSelected,
+                      padding: const EdgeInsets.all(5.0),
+                      child: Container(
+                        width: 90,
+                        height: 80,
+                        child: EmotionWidget(
+                          emotionEmoji: emotion.emotionEmoji,
+                          emotionNameTranslationKey:
+                              emotion.emotionNameTranslationKey,
+                          isSelected: isSelected,
+                        ),
                       ),
                     ),
-                  ),
-                );
-              },
+                  );
+                },
+              ),
             ),
           ),
           verticalSpace(Spacing.points16),
@@ -198,8 +223,7 @@ class _FollowUpSheetState extends ConsumerState<FollowUpSheet> {
           ),
           verticalSpace(Spacing.points4),
           Container(
-            height: 80,
-            width: MediaQuery.of(context).size.width - 32,
+            height: 90,
             child: ListView.separated(
               scrollDirection: Axis.horizontal,
               itemCount: goodEmotions.length,
@@ -211,10 +235,11 @@ class _FollowUpSheetState extends ConsumerState<FollowUpSheet> {
 
                 return GestureDetector(
                   onTap: () => toggleEmotion(emotion),
-                  child: SizedBox(
-                    width: 100,
-                    child: Padding(
-                      padding: EdgeInsets.all(1),
+                  child: Padding(
+                    padding: EdgeInsets.all(5),
+                    child: Container(
+                      width: 90,
+                      height: 80,
                       child: EmotionWidget(
                         emotionEmoji: emotion.emotionEmoji,
                         emotionNameTranslationKey:
@@ -227,7 +252,6 @@ class _FollowUpSheetState extends ConsumerState<FollowUpSheet> {
               },
             ),
           ),
-
           verticalSpace(Spacing.points16),
           Row(
             children: [
@@ -240,6 +264,26 @@ class _FollowUpSheetState extends ConsumerState<FollowUpSheet> {
                   child: WidgetsContainer(
                     borderRadius: BorderRadius.circular(10),
                     backgroundColor: theme.primary[600],
+                    boxShadow: [
+                      BoxShadow(
+                        color: Color.fromRGBO(50, 50, 93, 0.25),
+                        blurRadius: 5,
+                        spreadRadius: -1,
+                        offset: Offset(
+                          0,
+                          2,
+                        ),
+                      ),
+                      BoxShadow(
+                        color: Color.fromRGBO(0, 0, 0, 0.3),
+                        blurRadius: 3,
+                        spreadRadius: -1,
+                        offset: Offset(
+                          0,
+                          1,
+                        ),
+                      ),
+                    ],
                     child: Center(
                       child: Text(
                         AppLocalizations.of(context).translate('save'),
@@ -257,13 +301,34 @@ class _FollowUpSheetState extends ConsumerState<FollowUpSheet> {
                   },
                   child: WidgetsContainer(
                     borderRadius: BorderRadius.circular(10),
-                    backgroundColor: theme.secondary[50],
-                    borderSide: BorderSide(color: theme.secondary[200]!),
+                    backgroundColor: theme.backgroundColor,
+                    borderSide:
+                        BorderSide(color: theme.grey[600]!, width: 0.25),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Color.fromRGBO(50, 50, 93, 0.25),
+                        blurRadius: 5,
+                        spreadRadius: -1,
+                        offset: Offset(
+                          0,
+                          2,
+                        ),
+                      ),
+                      BoxShadow(
+                        color: Color.fromRGBO(0, 0, 0, 0.3),
+                        blurRadius: 3,
+                        spreadRadius: -1,
+                        offset: Offset(
+                          0,
+                          1,
+                        ),
+                      ),
+                    ],
                     child: Center(
                       child: Text(
                         AppLocalizations.of(context).translate('cancel'),
                         style: TextStyles.h6.copyWith(
-                          color: theme.secondary[900],
+                          color: theme.grey[900],
                         ),
                       ),
                     ),

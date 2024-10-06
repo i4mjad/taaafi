@@ -54,8 +54,8 @@ class _DiaryScreenState extends ConsumerState<DiaryScreen> {
       _controller.document.toPlainText(),
       DateTime.now(),
       [
-        "تمرين",
-        "عمل",
+        "تمرين المتابعة اليومية",
+        "تمرين المتابعة اليومية",
       ],
     );
 
@@ -85,14 +85,36 @@ class _DiaryScreenState extends ConsumerState<DiaryScreen> {
                             spacing: 4,
                             children: diary.linkedActivites.map((activity) {
                               return WidgetsContainer(
-                                borderRadius: BorderRadius.circular(8),
+                                borderRadius: BorderRadius.circular(6),
                                 padding: EdgeInsets.fromLTRB(8, 2, 8, 2),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Color.fromRGBO(0, 0, 0, 0.1),
+                                    blurRadius: 5,
+                                    spreadRadius: 0,
+                                    offset: Offset(
+                                      0,
+                                      0,
+                                    ),
+                                  ),
+                                  BoxShadow(
+                                    color: Color.fromRGBO(0, 0, 0, 0.1),
+                                    blurRadius: 1,
+                                    spreadRadius: 0,
+                                    offset: Offset(
+                                      0,
+                                      0,
+                                    ),
+                                  ),
+                                ],
                                 child: Text(
                                   activity,
                                   style: TextStyles.tiny
-                                      .copyWith(color: theme.secondary[900]),
+                                      .copyWith(color: theme.grey[900]),
                                 ),
-                                backgroundColor: theme.secondary[100],
+                                backgroundColor: theme.backgroundColor,
+                                borderSide: BorderSide(
+                                    color: theme.grey[600]!, width: 0.25),
                               );
                             }).toList(),
                           ),
@@ -157,17 +179,26 @@ class _DiaryScreenState extends ConsumerState<DiaryScreen> {
                         backgroundColor: theme.backgroundColor,
                         boxShadow: [
                           BoxShadow(
-                            color: Color.fromRGBO(17, 12, 46, 0.15),
-                            blurRadius: 100,
+                            color: Color.fromRGBO(60, 64, 67, 0.3),
+                            blurRadius: 2,
                             spreadRadius: 0,
                             offset: Offset(
                               0,
-                              48,
+                              1,
+                            ),
+                          ),
+                          BoxShadow(
+                            color: Color.fromRGBO(60, 64, 67, 0.15),
+                            blurRadius: 6,
+                            spreadRadius: 2,
+                            offset: Offset(
+                              0,
+                              2,
                             ),
                           ),
                         ],
                         borderSide:
-                            BorderSide(color: theme.grey[200]!, width: 1),
+                            BorderSide(color: theme.grey[600]!, width: 0.125),
                         borderRadius: BorderRadius.circular(10.5),
                         padding: const EdgeInsets.all(8),
                         child: Row(
@@ -302,8 +333,8 @@ class _DiaryScreenState extends ConsumerState<DiaryScreen> {
                                     color: theme.grey[300]!, width: 0.25),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: Color.fromRGBO(0, 0, 0, 0.02),
-                                    blurRadius: 3,
+                                    color: Color.fromRGBO(60, 64, 67, 0.3),
+                                    blurRadius: 2,
                                     spreadRadius: 0,
                                     offset: Offset(
                                       0,
@@ -311,12 +342,12 @@ class _DiaryScreenState extends ConsumerState<DiaryScreen> {
                                     ),
                                   ),
                                   BoxShadow(
-                                    color: Color.fromRGBO(27, 31, 35, 0.15),
-                                    blurRadius: 0,
-                                    spreadRadius: 1,
+                                    color: Color.fromRGBO(60, 64, 67, 0.15),
+                                    blurRadius: 6,
+                                    spreadRadius: 2,
                                     offset: Offset(
                                       0,
-                                      0,
+                                      2,
                                     ),
                                   ),
                                 ],
@@ -325,7 +356,8 @@ class _DiaryScreenState extends ConsumerState<DiaryScreen> {
                                   children: [
                                     Icon(
                                       LucideIcons.save,
-                                      color: theme.grey[700],
+                                      size: 16,
+                                      color: theme.grey[900],
                                     ),
                                     horizontalSpace(Spacing.points4),
                                     Text(

@@ -40,31 +40,12 @@ class TaaafiPlusScreen extends ConsumerWidget {
                   width: width / 4,
                   borderSide: BorderSide(color: theme.grey[600]!, width: 0),
                   backgroundColor: theme.backgroundColor,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Color.fromRGBO(50, 50, 93, 0.25),
-                      blurRadius: 12,
-                      spreadRadius: -2,
-                      offset: Offset(
-                        0,
-                        6,
-                      ),
-                    ),
-                    BoxShadow(
-                      color: Color.fromRGBO(0, 0, 0, 0.3),
-                      blurRadius: 7,
-                      spreadRadius: -3,
-                      offset: Offset(
-                        0,
-                        3,
-                      ),
-                    ),
-                  ],
+                  boxShadow: Shadows.mainShadows,
                   child: Center(
                     child: Text(
                       AppLocalizations.of(context).translate('soon'),
                       style: TextStyles.h4.copyWith(
-                        color: theme.grey[600],
+                        color: theme.primary[600],
                       ),
                     ),
                   ),
