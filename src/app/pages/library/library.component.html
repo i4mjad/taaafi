@@ -1,30 +1,38 @@
 <div class="flex flex-col gap-4">
-  <section hlmCard>
-    <div hlmCardHeader>
-      <h3 hlmCardTitle>{{ "content-management" | translate }}</h3>
-      <span hlmCardDescription>{{ "content-management-p" | translate }}</span>
-    </div>
-    <div hlmCardContent class="flex flex-grow gap-1 lt-md:flex-wrap">
-      <button hlmBtn variant="outline" class="w-1/2 lt-lg:w-full">
-        {{ "content" | translate }}
-      </button>
-      <button hlmBtn variant="outline" class="w-1/2 lt-lg:w-full">
-        {{ "lists" | translate }}
-      </button>
-      <button hlmBtn variant="outline" class="w-1/2 lt-lg:w-full">
-        {{ "categories" | translate }}
-      </button>
-      <button hlmBtn variant="outline" class="w-1/2 lt-lg:w-full">
-        {{ "authors" | translate }}
-      </button>
-      <button
-        hlmBtn
-        variant="outline"
-        routerLink="content-types"
-        class="w-1/2 lt-lg:w-full"
-      >
-        {{ "types" | translate }}
-      </button>
-    </div>
-  </section>
+  <mat-card>
+    <mat-card-header class="mb-4">
+      <mat-card-title>{{ "content-management" | translate }}</mat-card-title>
+      <mat-card-subtitle>{{
+        "content-management-p" | translate
+      }}</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="flex flex-row gap-1 lt-md:flex-col">
+        <button class="w-1/5 lt-md:w-full" mat-flat-button color="primary">
+          {{ "content" | translate }}
+        </button>
+
+        <button class="w-1/5 lt-md:w-full" mat-flat-button color="primary">
+          {{ "lists" | translate }}
+        </button>
+
+        <button class="w-1/5 lt-md:w-full" mat-flat-button color="primary">
+          {{ "categories" | translate }}
+        </button>
+
+        <button class="w-1/5 lt-md:w-full" mat-flat-button color="primary">
+          {{ "authors" | translate }}
+        </button>
+
+        <button
+          class="w-1/5 lt-md:w-full"
+          mat-flat-button
+          color="primary"
+          routerLink="content-types"
+        >
+          {{ "types" | translate }}
+        </button>
+      </div>
+    </mat-card-content>
+  </mat-card>
 </div>

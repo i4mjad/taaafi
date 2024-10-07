@@ -18,6 +18,14 @@ import {
   HlmThComponent,
   HlmTrowComponent,
 } from '@spartan-ng/ui-table-helm';
+import {
+  HlmDialogComponent,
+  HlmDialogContentComponent,
+  HlmDialogDescriptionDirective,
+  HlmDialogFooterComponent,
+  HlmDialogHeaderComponent,
+  HlmDialogTitleDirective,
+} from '@spartan-ng/ui-dialog-helm';
 
 const components = [
   HlmButtonDirective,
@@ -33,6 +41,12 @@ const components = [
   HlmTdComponent,
   HlmThComponent,
   HlmTrowComponent,
+  HlmDialogComponent,
+  HlmDialogContentComponent,
+  HlmDialogDescriptionDirective,
+  HlmDialogFooterComponent,
+  HlmDialogHeaderComponent,
+  HlmDialogTitleDirective,
 ];
 
 @NgModule({

@@ -1,40 +1,61 @@
 <div class="flex flex-col gap-4">
-  <div hlmCard class="p-4">
-    <div hlmCardContent class="flex flex-row gap-2 lt-md:flex-wrap">
-      <section hlmCard class="w-1/2 lt-md:w-full">
-        <div hlmCardHeader>
-          <h1 hlmCardTitle>أنواع المحتوى</h1>
-        </div>
-        <h1 hlmCardContent>6</h1>
-        <!-- <div hlmCardFooter></div> -->
-      </section>
-      <section hlmCard class="w-1/2 lt-md:w-full">
-        <div hlmCardHeader>
-          <h1 hlmCardTitle>أنواع المحتوى</h1>
-        </div>
-        <h1 hlmCardContent>6</h1>
-        <!-- <div hlmCardFooter></div> -->
-      </section>
-    </div>
+  <mat-card>
+    <mat-card-actions>
+      <button mat-flat-button color="primary" (click)="openAddBottomSheet()">
+        إضافة محتوى
+      </button>
+    </mat-card-actions>
+  </mat-card>
 
-    <div hlmCardFooter>
-      <button hlmBtn variant="default">إضافة محتوى</button>
-    </div>
-  </div>
+  <mat-card appearance="outlined">
+    <div class="overflow-x-auto md:overflow-x-visible">
+      <table mat-table [dataSource]="types" class="mat-elevation-z8">
+        <ng-container matColumnDef="id">
+          <th mat-header-cell *matHeaderCellDef>الرمز</th>
+          <td mat-cell *matCellDef="let type">{{ type.id }}</td>
+        </ng-container>
 
-  <div hlmCard class="p-4">
-    <hlm-table class="w-full min-w-[400px]">
-      <hlm-trow>
-        <hlm-th class="flex-auto">الإسم</hlm-th>
-        <hlm-th class="flex-auto">عدد المحتوى المرتبط</hlm-th>
-        <hlm-th class="flex-auto">عدد المحتوى النشط</hlm-th>
-      </hlm-trow>
-      <!-- TODO: loop through all the values here -->
-      <hlm-trow>
-        <hlm-td class="flex-auto">مقطع مرئي</hlm-td>
-        <hlm-td class="flex-auto">28</hlm-td>
-        <hlm-td class="flex-auto">28</hlm-td>
-      </hlm-trow>
-    </hlm-table>
-  </div>
+        <ng-container matColumnDef="contentTypeName">
+          <th mat-header-cell *matHeaderCellDef>الإسم</th>
+          <td mat-cell *matCellDef="let type">{{ type.contentTypeName }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="enable">
+          <th mat-header-cell *matHeaderCellDef>تفعيل</th>
+          <td mat-cell *matCellDef="let type">
+            <mat-slide-toggle
+              [checked]="type.isActive"
+              (change)="onToggleClicked(type.id)"
+            >
+            </mat-slide-toggle>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef>الإجراءات</th>
+          <td mat-cell *matCellDef="let type">
+            <div class="flex flex-row gap-1">
+              <button
+                mat-icon-button
+                color="error"
+                (click)="openDeleteDialog(type)"
+              >
+                <mat-icon>delete</mat-icon>
+              </button>
+              <button
+                mat-icon-button
+                color="error"
+                (click)="openEditBottomSheet(type)"
+              >
+                <mat-icon>edit</mat-icon>
+              </button>
+            </div>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="tableColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: tableColumns"></tr>
+      </table>
+    </div>
+  </mat-card>
 </div>

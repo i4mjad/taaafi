@@ -3,6 +3,11 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatDividerModule } from '@angular/material/divider';
+import {
+  MatBottomSheet,
+  MatBottomSheetModule,
+  MatBottomSheetRef,
+} from '@angular/material/bottom-sheet';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { CdkTableModule } from '@angular/cdk/table';
 import { MatButtonModule } from '@angular/material/button';
@@ -32,6 +37,7 @@ import { MatTableModule } from '@angular/material/table';
 import { MatSortModule } from '@angular/material/sort';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatRippleModule } from '@angular/material/core';
+import { ReactiveFormsModule } from '@angular/forms';
 
 const components = [
   MatSidenavModule,
@@ -67,6 +73,8 @@ const components = [
   MatSortModule,
   MatPaginatorModule,
   MatRippleModule,
+  MatBottomSheetModule,
+  ReactiveFormsModule,
 ];
 
 @NgModule({

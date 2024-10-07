@@ -27,6 +27,9 @@ import { SpartanCompnentsModule } from './shared/components/component.module';
 import { NgxsModule } from '@ngxs/store';
 import { AppState } from './state/app.store';
 import { ContentTypesComponent } from './pages/library/screens/content-types/content-types.component';
+import { AddNewContentCategoryComponent } from './pages/library/screens/content-types/componenets/add-new-content-category/add-new-content-category.component';
+import { EditContentCategoryComponent } from './pages/library/screens/content-types/componenets/edit-content-category/edit-content-category.component';
+import { DeleteContentCategoryComponent } from './pages/library/screens/content-types/componenets/delete-content-category/delete-content-category.component';
 
 @NgModule({
   declarations: [
@@ -41,6 +44,9 @@ import { ContentTypesComponent } from './pages/library/screens/content-types/con
     FellowshipsComponent,
     UsersManagementComponent,
     ContentTypesComponent,
+    AddNewContentCategoryComponent,
+    EditContentCategoryComponent,
+    DeleteContentCategoryComponent,
   ],
   imports: [
     BrowserModule,

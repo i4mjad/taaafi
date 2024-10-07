@@ -1,8 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
-import { AppState } from '../../state/app.store';
-import { Store } from '@ngxs/store';
-import { Observable } from 'rxjs';
-import { GetContentTypesAction } from '../../state/app.actions';
+import { Component, OnInit } from '@angular/core';
 
 @Component({
   selector: 'app-library',
@@ -10,17 +6,6 @@ import { GetContentTypesAction } from '../../state/app.actions';
   styleUrl: './library.component.scss',
 })
 export class LibraryComponent implements OnInit {
-  contentTypes$: Observable<string[]> = inject(Store).select(
-    AppState.contentTypes
-  );
-
-  constructor(private store: Store) {}
-  ngOnInit(): void {
-    this.store.dispatch(new GetContentTypesAction());
-    this.contentTypes$.subscribe((data) => {
-      if (data.length > 0) {
-        console.log(data);
-      }
-    });
-  }
+  constructor() {}
+  ngOnInit(): void {}
 }
