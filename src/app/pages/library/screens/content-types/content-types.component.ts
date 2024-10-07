@@ -9,10 +9,10 @@ import {
 } from '../../../../state/app.actions';
 import { ContentType } from '../../../../models/app.model';
 import { MatBottomSheet } from '@angular/material/bottom-sheet';
-import { AddNewContentCategoryComponent } from './componenets/add-new-content-category/add-new-content-category.component';
-import { EditContentCategoryComponent } from './componenets/edit-content-category/edit-content-category.component';
+import { AddNewContentTypeComponent } from './componenets/add-new-content-type/add-new-content-type.component';
+import { EditContentTypeComponent } from './componenets/edit-content-type/edit-content-type.component';
 import { MatDialog } from '@angular/material/dialog';
-import { DeleteContentCategoryComponent } from './componenets/delete-content-category/delete-content-category.component';
+import { DeleteContentTypeComponent } from './componenets/delete-content-type/delete-content-type.component';
 
 @Component({
   selector: 'app-content-types',
@@ -46,10 +46,10 @@ export class ContentTypesComponent implements OnInit {
   }
 
   openAddBottomSheet(): void {
-    this.sheet.open(AddNewContentCategoryComponent);
+    this.sheet.open(AddNewContentTypeComponent);
   }
   openEditBottomSheet(type: ContentType): void {
-    const dialogRef = this.dialog.open(EditContentCategoryComponent, {
+    const dialogRef = this.dialog.open(EditContentTypeComponent, {
       width: '400px',
       data: type,
     });
@@ -59,7 +59,7 @@ export class ContentTypesComponent implements OnInit {
     });
   }
   openDeleteDialog(contentType: ContentType): void {
-    const dialogRef = this.dialog.open(DeleteContentCategoryComponent, {
+    const dialogRef = this.dialog.open(DeleteContentTypeComponent, {
       width: '400px',
       data: { contentType: contentType }, // Pass the name for confirmation
     });

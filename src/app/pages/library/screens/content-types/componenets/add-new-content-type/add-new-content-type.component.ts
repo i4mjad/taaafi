@@ -5,13 +5,13 @@ import { Store } from '@ngxs/store';
 import { CreateContentTypeAction } from '../../../../../../state/app.actions';
 
 @Component({
-  selector: 'app-add-new-content-category',
-  templateUrl: './add-new-content-category.component.html',
-  styleUrl: './add-new-content-category.component.scss',
+  selector: 'app-add-new-content-type',
+  templateUrl: './add-new-content-type.component.html',
+  styleUrl: './add-new-content-type.component.scss',
 })
-export class AddNewContentCategoryComponent {
+export class AddNewContentTypeComponent {
   private _bottomSheetRef =
-    inject<MatBottomSheetRef<AddNewContentCategoryComponent>>(
+    inject<MatBottomSheetRef<AddNewContentTypeComponent>>(
       MatBottomSheetRef
     );
 

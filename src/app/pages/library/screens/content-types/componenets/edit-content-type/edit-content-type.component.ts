@@ -6,17 +6,17 @@ import { ContentType } from '../../../../../../models/app.model';
 import { UpdateContentTypeAction } from '../../../../../../state/app.actions';
 
 @Component({
-  selector: 'app-edit-content-category',
-  templateUrl: './edit-content-category.component.html',
-  styleUrl: './edit-content-category.component.scss',
+  selector: 'app-edit-content-type',
+  templateUrl: './edit-content-type.component.html',
+  styleUrl: './edit-content-type.component.scss',
 })
-export class EditContentCategoryComponent {
+export class EditContentTypeComponent {
   contentTypeForm: FormGroup;
 
   constructor(
     private fb: FormBuilder,
     private store: Store,
-    private dialogRef: MatDialogRef<EditContentCategoryComponent>,
+    private dialogRef: MatDialogRef<EditContentTypeComponent>,
     @Inject(MAT_DIALOG_DATA) public data: ContentType // The content type object passed to the dialog
   ) {}
 

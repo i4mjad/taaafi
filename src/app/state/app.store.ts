@@ -1,4 +1,3 @@
-import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Action, Selector, State, StateContext } from '@ngxs/store';
 import {
@@ -8,13 +7,15 @@ import {
   ToggleContentTypeStatusAction,
   UpdateContentTypeAction,
 } from './app.actions';
-import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { ContentType, ContentTypeDataModel } from '../models/app.model';
-import { map, switchMap, throwError } from 'rxjs';
+import { tap, catchError } from 'rxjs/operators';
+import { throwError } from 'rxjs';
+import { ContentTypeService } from './services/content-type/content-type.service';
 
 interface AppStateModel {
   contentTypes: ContentType[];
 }
+
 @State<AppStateModel>({
   name: 'taaafiControlPanel',
   defaults: {
@@ -28,23 +29,15 @@ export class AppState {
     return state.contentTypes;
   }
 
-  constructor(private firestore: AngularFirestore) {}
+  constructor(private contentTypeService: ContentTypeService) {}
 
   @Action(GetContentTypesAction)
-  getContentTypes(
-    ctx: StateContext<AppStateModel>,
-    action: GetContentTypesAction
-  ) {
-    const collectionRef =
-      this.firestore.collection<ContentType>('contentTypes');
-    return collectionRef.snapshotChanges().pipe(
-      map((actions) => {
-        const contentTypes = actions.map((a) => {
-          const data = a.payload.doc.data() as Omit<ContentType, 'id'>; // Omit 'id' from the type
-          const id = a.payload.doc.id; // Extract document ID
-          return { id, ...data };
-        });
-        ctx.patchState({ contentTypes: contentTypes });
+  getContentTypes(ctx: StateContext<AppStateModel>) {
+    return this.contentTypeService.getContentTypes().pipe(
+      tap((contentTypes) => ctx.patchState({ contentTypes })),
+      catchError((error) => {
+        console.error('Error fetching content types:', error);
+        return throwError(() => error);
       })
     );
   }
@@ -54,31 +47,19 @@ export class AppState {
     ctx: StateContext<AppStateModel>,
     action: ToggleContentTypeStatusAction
   ) {
-    const collectionRef =
-      this.firestore.collection<ContentType>('contentTypes');
-    const docRef = collectionRef.doc(action.id); // Get the document reference using the ID passed in the action
-
-    return docRef.get().pipe(
-      switchMap((doc) => {
-        if (doc.exists) {
-          const currentData = doc.data() as ContentType;
-          const newStatus = !currentData.isActive; // Toggle the boolean field `status`
-
-          // Update the Firestore document with the toggled status
-          return docRef.update({ isActive: newStatus }).then(() => {
-            // Optionally update the state in NGXS after the document is successfully updated
-            const contentTypes = ctx
-              .getState()
-              .contentTypes.map((contentType) =>
-                contentType.id === action.id
-                  ? { ...contentType, status: newStatus }
-                  : contentType
-              );
-            ctx.patchState({ contentTypes: contentTypes });
-          });
-        } else {
-          throw new Error('Document does not exist');
-        }
+    return this.contentTypeService.toggleContentTypeStatus(action.id).pipe(
+      tap(() => {
+        const contentTypes = ctx.getState().contentTypes.map((contentType) => {
+          if (contentType.id === action.id) {
+            return { ...contentType, isActive: !contentType.isActive };
+          }
+          return contentType;
+        });
+        ctx.patchState({ contentTypes });
+      }),
+      catchError((error) => {
+        console.error('Error toggling content type status:', error);
+        return throwError(() => error);
       })
     );
   }
@@ -88,24 +69,23 @@ export class AppState {
     ctx: StateContext<AppStateModel>,
     action: CreateContentTypeAction
   ) {
-    const collectionRef =
-      this.firestore.collection<ContentTypeDataModel>('contentTypes');
-
     const newContentType: ContentTypeDataModel = {
       contentTypeName: action.contentTypeName,
       isActive: action.isActive,
     };
-
-    return collectionRef.add(newContentType).then((docRef) => {
-      const createdContentType: ContentType = {
-        id: docRef.id,
-        contentTypeName: action.contentTypeName,
-        isActive: action.isActive,
-      };
-
-      const contentTypes = ctx.getState().contentTypes;
-      ctx.patchState({ contentTypes: [...contentTypes, createdContentType] });
-    });
+    return this.contentTypeService.createContentType(newContentType).pipe(
+      tap((createdContentType) => {
+        const contentTypes = [
+          ...ctx.getState().contentTypes,
+          createdContentType,
+        ];
+        ctx.patchState({ contentTypes });
+      }),
+      catchError((error) => {
+        console.error('Error creating content type:', error);
+        return throwError(() => error);
+      })
+    );
   }
 
   @Action(UpdateContentTypeAction)
@@ -113,30 +93,20 @@ export class AppState {
     ctx: StateContext<AppStateModel>,
     action: UpdateContentTypeAction
   ) {
-    const contentType = action.contentType;
-    const collectionRef = this.firestore.collection('contentTypes');
-
-    // Get the document reference using the id and update it
-    return collectionRef
-      .doc(contentType.id)
-      .update({
-        contentTypeName: contentType.contentTypeName,
-        isActive: contentType.isActive,
-      })
-      .then(() => {
-        // Update the local state after successfully updating Firestore
+    return this.contentTypeService.updateContentType(action.contentType).pipe(
+      tap(() => {
         const contentTypes = ctx
           .getState()
           .contentTypes.map((ct) =>
-            ct.id === contentType.id ? contentType : ct
+            ct.id === action.contentType.id ? action.contentType : ct
           );
-        ctx.patchState({ contentTypes: contentTypes });
+        ctx.patchState({ contentTypes });
+      }),
+      catchError((error) => {
+        console.error('Error updating content type:', error);
+        return throwError(() => error);
       })
-      .catch((error) => {
-        // Handle any errors
-        console.error('Error updating content type: ', error);
-        return throwError(error);
-      });
+    );
   }
 
   @Action(DeleteContentTypeAction)
@@ -144,23 +114,17 @@ export class AppState {
     ctx: StateContext<AppStateModel>,
     action: DeleteContentTypeAction
   ) {
-    const collectionRef = this.firestore.collection('contentTypes');
-
-    // Delete the document from Firestore using its ID
-    return collectionRef
-      .doc(action.id)
-      .delete()
-      .then(() => {
-        // Update the local state after successful deletion
+    return this.contentTypeService.deleteContentType(action.id).pipe(
+      tap(() => {
         const contentTypes = ctx
           .getState()
-          .contentTypes.filter((contentType) => contentType.id !== action.id);
-        ctx.patchState({ contentTypes: contentTypes });
+          .contentTypes.filter((ct) => ct.id !== action.id);
+        ctx.patchState({ contentTypes });
+      }),
+      catchError((error) => {
+        console.error('Error deleting content type:', error);
+        return throwError(() => error);
       })
-      .catch((error) => {
-        // Handle any errors
-        console.error('Error deleting content type: ', error);
-        return throwError(error);
-      });
+    );
   }
 }
