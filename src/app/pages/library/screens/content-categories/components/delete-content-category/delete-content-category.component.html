@@ -1,0 +1,11 @@
+<h2 mat-dialog-title>تأكيد الحذف</h2>
+<mat-dialog-content>
+  <p>
+    هل أنت متأكد أنك تريد حذف نوع المحتوى "{{ data.contentType.categoryName }}"؟
+  </p>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onCancel()">إلغاء</button>
+  <button mat-raised-button color="warn" (click)="onConfirm()">حذف</button>
+</mat-dialog-actions>
