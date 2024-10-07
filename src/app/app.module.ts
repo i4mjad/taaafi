@@ -30,6 +30,10 @@ import { ContentTypesComponent } from './pages/library/screens/content-types/con
 import { AddNewContentTypeComponent } from './pages/library/screens/content-types/componenets/add-new-content-type/add-new-content-type.component';
 import { EditContentTypeComponent } from './pages/library/screens/content-types/componenets/edit-content-type/edit-content-type.component';
 import { DeleteContentTypeComponent } from './pages/library/screens/content-types/componenets/delete-content-type/delete-content-type.component';
+import { AddNewContentCategoryComponent } from './pages/library/screens/content-categories/components/add-new-content-category/add-new-content-category.component';
+import { DeleteContentCategoryComponent } from './pages/library/screens/content-categories/components/delete-content-category/delete-content-category.component';
+import { EditContentCategoryComponent } from './pages/library/screens/content-categories/components/edit-content-category/edit-content-category.component';
+import { ContentCategoriesComponent } from './pages/library/screens/content-categories/content-categories.component';
 
 @NgModule({
   declarations: [
@@ -47,6 +51,10 @@ import { DeleteContentTypeComponent } from './pages/library/screens/content-type
     AddNewContentTypeComponent,
     EditContentTypeComponent,
     DeleteContentTypeComponent,
+    ContentCategoriesComponent,
+    AddNewContentCategoryComponent,
+    EditContentCategoryComponent,
+    DeleteContentCategoryComponent,
   ],
   imports: [
     BrowserModule,
