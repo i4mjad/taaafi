@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { MatBottomSheetRef } from '@angular/material/bottom-sheet';
 import { Store } from '@ngxs/store';
@@ -9,7 +9,7 @@ import { CreateContentCategoryAction } from '../../../../../../state/app.actions
   templateUrl: './add-new-content-category.component.html',
   styleUrl: './add-new-content-category.component.scss',
 })
-export class AddNewContentCategoryComponent {
+export class AddNewContentCategoryComponent implements OnInit {
   private _bottomSheetRef =
     inject<MatBottomSheetRef<AddNewContentCategoryComponent>>(
       MatBottomSheetRef

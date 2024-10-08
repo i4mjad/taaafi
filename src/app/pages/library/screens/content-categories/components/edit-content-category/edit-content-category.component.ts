@@ -22,7 +22,7 @@ export class EditContentCategoryComponent {
 
   ngOnInit(): void {
     this.contentCategoryForm = this.fb.group({
-      contentTypeName: [this.data.categoryName, [Validators.required]],
+      categoryName: [this.data.categoryName, [Validators.required]],
       isActive: [this.data.isActive],
     });
   }

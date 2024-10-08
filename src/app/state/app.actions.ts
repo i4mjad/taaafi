@@ -1,4 +1,8 @@
-import { ContentCategory, ContentType } from '../models/app.model';
+import {
+  ContentCategory,
+  ContentOwner,
+  ContentType,
+} from '../models/app.model';
 
 export class GetContentTypesAction {
   static readonly type = '[TaaafiControlPanel] Get Content Types Action';
@@ -49,5 +53,35 @@ export class UpdateContentCategoryAction {
 
 export class DeleteContentCategoryAction {
   static readonly type = '[TaaafiControlPanel] Delete Content Category Action';
+  constructor(public id: string) {}
+}
+
+export class GetContentOwnersAction {
+  static readonly type = '[TaaafiControlPanel] Get Content Owners Action';
+}
+
+export class CreateContentOwnerAction {
+  static readonly type = '[TaaafiControlPanel] Create Content Owner Action';
+  constructor(
+    public ownerName: string,
+    public ownerSource: string,
+    public isActive: boolean
+  ) {}
+}
+
+export class UpdateContentOwnerAction {
+  static readonly type = '[TaaafiControlPanel] Update Content Owner Action';
+  constructor(public contentOwner: ContentOwner) {}
+}
+
+export class DeleteContentOwnerAction {
+  static readonly type = '[TaaafiControlPanel] Delete Content Owner Action';
+  constructor(public id: string) {}
+}
+
+export class ToggleContentOwnerStatusAction {
+  static readonly type =
+    '[TaaafiControlPanel] Toggle Content Owner Status Action';
+
   constructor(public id: string) {}
 }

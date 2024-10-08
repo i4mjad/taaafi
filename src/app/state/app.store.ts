@@ -2,19 +2,26 @@ import { Injectable } from '@angular/core';
 import { Action, Selector, State, StateContext } from '@ngxs/store';
 import {
   CreateContentCategoryAction,
+  CreateContentOwnerAction,
   CreateContentTypeAction,
   DeleteContentCategoryAction,
+  DeleteContentOwnerAction,
   DeleteContentTypeAction,
   GetContentCategoriesAction,
+  GetContentOwnersAction,
   GetContentTypesAction,
   ToggleContentCategoryStatusAction,
+  ToggleContentOwnerStatusAction,
   ToggleContentTypeStatusAction,
   UpdateContentCategoryAction,
+  UpdateContentOwnerAction,
   UpdateContentTypeAction,
 } from './app.actions';
 import {
   ContentCategory,
   ContentCategoryDataModel,
+  ContentOwner,
+  ContentOwnerDataModel,
   ContentType,
   ContentTypeDataModel,
 } from '../models/app.model';
@@ -22,10 +29,12 @@ import { tap, catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import { ContentTypeService } from './services/content-type/content-type.service';
 import { ContentCategoryService } from './services/content-category/content-category.service';
+import { ContentOwnerService } from './services/content-owner/content-owner.service';
 
 interface AppStateModel {
   contentTypes: ContentType[];
   contentCategories: ContentCategory[];
+  contentOwners: ContentOwner[];
 }
 
 @State<AppStateModel>({
@@ -33,6 +42,7 @@ interface AppStateModel {
   defaults: {
     contentTypes: [],
     contentCategories: [],
+    contentOwners: [],
   },
 })
 @Injectable()
@@ -47,9 +57,15 @@ export class AppState {
     return state.contentCategories;
   }
 
+  @Selector()
+  static contentOwners(state: AppStateModel): ContentOwner[] {
+    return state.contentOwners;
+  }
+
   constructor(
     private contentTypeService: ContentTypeService,
-    private contentCategoryService: ContentCategoryService
+    private contentCategoryService: ContentCategoryService,
+    private contentOwnerService: ContentOwnerService
   ) {}
 
   @Action(GetContentCategoriesAction)
@@ -249,6 +265,106 @@ export class AppState {
       }),
       catchError((error) => {
         console.error('Error deleting content type:', error);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  @Action(GetContentOwnersAction)
+  getContentOwners(ctx: StateContext<AppStateModel>) {
+    return this.contentOwnerService.getContentOwners().pipe(
+      tap((contentOwners) => ctx.patchState({ contentOwners })),
+      catchError((error) => {
+        console.error('Error fetching content owners:', error);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  @Action(CreateContentOwnerAction)
+  createContentOwner(
+    ctx: StateContext<AppStateModel>,
+    action: CreateContentOwnerAction
+  ) {
+    const newContentOwner: ContentOwnerDataModel = {
+      ownerName: action.ownerName,
+      ownerSource: action.ownerSource,
+      isActive: action.isActive,
+    };
+    return this.contentOwnerService.createContentOwner(newContentOwner).pipe(
+      tap((createdContentOwner) => {
+        const contentOwners = [
+          ...ctx.getState().contentOwners,
+          createdContentOwner,
+        ];
+        ctx.patchState({ contentOwners });
+      }),
+      catchError((error) => {
+        console.error('Error creating content owner:', error);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  @Action(UpdateContentOwnerAction)
+  updateContentOwner(
+    ctx: StateContext<AppStateModel>,
+    action: UpdateContentOwnerAction
+  ) {
+    return this.contentOwnerService
+      .updateContentOwner(action.contentOwner)
+      .pipe(
+        tap(() => {
+          const contentOwners = ctx
+            .getState()
+            .contentOwners.map((owner) =>
+              owner.id === action.contentOwner.id ? action.contentOwner : owner
+            );
+          ctx.patchState({ contentOwners });
+        }),
+        catchError((error) => {
+          console.error('Error updating content owner:', error);
+          return throwError(() => error);
+        })
+      );
+  }
+
+  @Action(DeleteContentOwnerAction)
+  deleteContentOwner(
+    ctx: StateContext<AppStateModel>,
+    action: DeleteContentOwnerAction
+  ) {
+    return this.contentOwnerService.deleteContentOwner(action.id).pipe(
+      tap(() => {
+        const contentOwners = ctx
+          .getState()
+          .contentOwners.filter((owner) => owner.id !== action.id);
+        ctx.patchState({ contentOwners });
+      }),
+      catchError((error) => {
+        console.error('Error deleting content owner:', error);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  @Action(ToggleContentOwnerStatusAction)
+  toggleContentOwnerStatus(
+    ctx: StateContext<AppStateModel>,
+    action: ToggleContentOwnerStatusAction
+  ) {
+    return this.contentOwnerService.toggleContentOwnerStatus(action.id).pipe(
+      tap(() => {
+        const contentOwners = ctx.getState().contentOwners.map((owner) => {
+          if (owner.id === action.id) {
+            return { ...owner, isActive: !owner.isActive };
+          }
+          return owner;
+        });
+        ctx.patchState({ contentOwners });
+      }),
+      catchError((error) => {
+        console.error('Error toggling content category status:', error);
         return throwError(() => error);
       })
     );

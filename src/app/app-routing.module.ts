@@ -13,6 +13,7 @@ import { FellowshipsComponent } from './pages/fellowships/fellowships.component'
 import { UsersManagementComponent } from './pages/users-management/users-management.component';
 import { ContentTypesComponent } from './pages/library/screens/content-types/content-types.component';
 import { ContentCategoriesComponent } from './pages/library/screens/content-categories/content-categories.component';
+import { ContentOwnersComponent } from './pages/library/screens/content-owners/content-owners.component';
 
 const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -35,6 +36,11 @@ const routes: Routes = [
   {
     path: 'library/content-categories',
     component: ContentCategoriesComponent,
+    canActivate: [canActivateAuth],
+  },
+  {
+    path: 'library/content-owners',
+    component: ContentOwnersComponent,
     canActivate: [canActivateAuth],
   },
   { path: 'vault', component: VaultComponent, canActivate: [canActivateAuth] },

@@ -1,0 +1,10 @@
+<h2 mat-dialog-title>تأكيد الحذف</h2>
+<mat-dialog-content>
+  <p>
+    هل أنت متأكد أنك تريد حذف صاحب المحتوى "{{ data.contentOwner.ownerName }}"؟
+  </p>
+</mat-dialog-content>
+<mat-dialog-actions>
+  <button mat-button (click)="onCancel()">إلغاء</button>
+  <button mat-raised-button color="warn" (click)="onDelete()">حذف</button>
+</mat-dialog-actions>

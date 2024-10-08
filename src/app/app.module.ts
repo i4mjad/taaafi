@@ -34,6 +34,10 @@ import { AddNewContentCategoryComponent } from './pages/library/screens/content-
 import { DeleteContentCategoryComponent } from './pages/library/screens/content-categories/components/delete-content-category/delete-content-category.component';
 import { EditContentCategoryComponent } from './pages/library/screens/content-categories/components/edit-content-category/edit-content-category.component';
 import { ContentCategoriesComponent } from './pages/library/screens/content-categories/content-categories.component';
+import { ContentOwnersComponent } from './pages/library/screens/content-owners/content-owners.component';
+import { AddContentOwnerComponent } from './pages/library/screens/content-owners/components/add-content-owner/add-content-owner.component';
+import { EditContentOwnerComponent } from './pages/library/screens/content-owners/components/edit-content-owner/edit-content-owner.component';
+import { DeleteContentOwnerComponent } from './pages/library/screens/content-owners/components/delete-content-owner/delete-content-owner.component';
 
 @NgModule({
   declarations: [
@@ -55,6 +59,10 @@ import { ContentCategoriesComponent } from './pages/library/screens/content-cate
     AddNewContentCategoryComponent,
     EditContentCategoryComponent,
     DeleteContentCategoryComponent,
+    ContentOwnersComponent,
+    AddContentOwnerComponent,
+    EditContentOwnerComponent,
+    DeleteContentOwnerComponent,
   ],
   imports: [
     BrowserModule,
