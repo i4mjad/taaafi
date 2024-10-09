@@ -451,20 +451,24 @@ export class AppState {
 
   @Action(UpdateContentAction)
   updateContent(ctx: StateContext<AppStateModel>, action: UpdateContentAction) {
-    return this.contentService.updateContent(action.content).pipe(
-      tap(() => {
-        const contents = ctx
-          .getState()
-          .contents.map((ct) =>
-            ct.id === action.content.id ? action.content : ct
-          );
-        ctx.patchState({ contents });
-      }),
-      catchError((error) => {
-        console.error('Error updating content:', error);
-        return throwError(() => error);
-      })
-    );
+    return this.contentService
+      .updateContent(action.contentId, action.contentData)
+      .pipe(
+        tap(() => {
+          const contents = ctx
+            .getState()
+            .contents.map((content) =>
+              content.id === action.contentId
+                ? { ...content, ...action.contentData }
+                : content
+            );
+          ctx.patchState({ contents });
+        }),
+        catchError((error) => {
+          console.error('Error updating content:', error);
+          return throwError(() => error);
+        })
+      );
   }
 
   @Action(DeleteContentAction)

@@ -26,9 +26,9 @@ export interface ContentDateModel {
   contentCategoryId: string;
   contentOwnerId: string;
   contentLink: string;
-  createdAt: Date;
-  updatedAt: Date;
-  updatedBy: string; // user id
+  createdAt?: Date;
+  updatedAt?: Date;
+  updatedBy?: string; // user id
   isActive: boolean;
 }
 

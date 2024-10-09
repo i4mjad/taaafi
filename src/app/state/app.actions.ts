@@ -1,6 +1,7 @@
 import {
   Content,
   ContentCategory,
+  ContentDateModel,
   ContentOwner,
   ContentType,
 } from '../models/app.model';
@@ -29,7 +30,7 @@ export class CreateContentAction {
 
 export class UpdateContentAction {
   static readonly type = '[TaaafiControlPanel] Edit Content Action';
-  constructor(public content: Content) {}
+  constructor(public contentId: string, public contentData: ContentDateModel) {}
 }
 
 export class DeleteContentAction {

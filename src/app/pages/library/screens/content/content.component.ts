@@ -12,6 +12,10 @@ import {
 } from '../../../../state/app.actions';
 import { AddNewContentComponent } from './components/add-new-content/add-new-content.component';
 
+import { Timestamp } from 'firebase/firestore';
+import { EditContentComponent } from './components/edit-content/edit-content.component';
+import { DeleteContentComponent } from './components/delete-content/delete-content.component';
+
 @Component({
   selector: 'app-content',
   templateUrl: './content.component.html',
@@ -20,7 +24,6 @@ import { AddNewContentComponent } from './components/add-new-content/add-new-con
 export class ContentComponent {
   content$: Observable<Content[]> = inject(Store).select(AppState.content);
   tableColumns: string[] = [
-    'id',
     'contentName',
     'contentType',
     'contentCategory',
@@ -43,8 +46,6 @@ export class ContentComponent {
   ngOnInit(): void {
     this.store.dispatch(new GetContentsAction());
     this.content$.subscribe((data) => {
-      console.log(data);
-
       if (data.length > 0) {
         this.contents = data;
       }
@@ -60,24 +61,32 @@ export class ContentComponent {
   }
 
   openEditBottomSheet(content: Content): void {
-    // const dialogRef = this.dialog.open(EditContentComponent, {
-    //   width: '400px',
-    //   data: content,
-    // });
-    // dialogRef.afterClosed().subscribe((result) => {
-    //   // Handle post-dialog actions here
-    // });
+    const dialogRef = this.dialog.open(EditContentComponent, {
+      width: '400px',
+      data: content,
+    });
+    dialogRef.afterClosed().subscribe((result) => {
+      // Handle post-dialog actions here
+    });
   }
 
   openDeleteDialog(content: Content): void {
-    // const dialogRef = this.dialog.open(DeleteContentComponent, {
-    //   width: '400px',
-    //   data: { content },
-    // });
-    // dialogRef.afterClosed().subscribe((result) => {
-    //   if (result === true) {
-    //     this.store.dispatch(new DeleteContentAction(content.id));
-    //   }
-    // });
+    const dialogRef = this.dialog.open(DeleteContentComponent, {
+      width: '400px',
+      data: { content },
+    });
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result === true) {
+        this.store.dispatch(new DeleteContentAction(content.id));
+      }
+    });
+  }
+
+  getDateFromTimestamp(date: Timestamp) {
+    if (date instanceof Timestamp) {
+      return date.toDate();
+    } else {
+      return date;
+    }
   }
 }

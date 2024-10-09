@@ -72,8 +72,6 @@ export class AuthService {
   }
 
   checkUserRole(userId: string) {
-    console.log("this is called");
-
     return this.firestore
       .doc<User>(`users/${userId}`)
       .valueChanges()
@@ -112,5 +110,15 @@ export class AuthService {
   }
   streamAuthState(): Observable<firebase.User | null> {
     return this.afAuth.authState;
+  }
+
+  getCurrentUserUid(): Observable<string | null> {
+    return this.afAuth.authState.pipe(
+      map((user) => (user ? user.uid : null)),
+      catchError((err) => {
+        console.error('Error fetching user UID:', err);
+        return of(null);
+      })
+    );
   }
 }

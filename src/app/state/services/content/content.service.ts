@@ -11,6 +11,7 @@ import {
   throwError,
   combineLatest,
   forkJoin,
+  take,
 } from 'rxjs';
 import {
   ContentDateModel,
@@ -22,6 +23,7 @@ import {
   ContentType,
   ContentTypeDataModel,
 } from '../../../models/app.model';
+import { AuthService } from '../../../services/auth.service';
 
 @Injectable({
   providedIn: 'root',
@@ -32,7 +34,10 @@ export class ContentService {
   private contentCategoriesRef: AngularFirestoreCollection<ContentCategoryDataModel>;
   private contentOwnersRef: AngularFirestoreCollection<ContentOwnerDataModel>;
 
-  constructor(private firestore: AngularFirestore) {
+  constructor(
+    private firestore: AngularFirestore,
+    private authService: AuthService
+  ) {
     this.contentCollectionsRef =
       this.firestore.collection<ContentDateModel>('content');
     this.contentTypesRef =
@@ -45,8 +50,6 @@ export class ContentService {
 
   // Method to get the content type details by id
   getContentTypeById(contentTypeId: string): Observable<ContentType> {
-    console.log(contentTypeId);
-
     return this.contentTypesRef
       .doc(contentTypeId)
       .snapshotChanges()
@@ -54,7 +57,6 @@ export class ContentService {
         map((doc) => {
           const data = doc.payload.data() as ContentTypeDataModel;
           const contentType = { id: doc.payload.id, ...data };
-          console.log('this is cake', contentType);
           return contentType as ContentType;
         })
       );
@@ -92,22 +94,22 @@ export class ContentService {
   getContents(): Observable<Content[]> {
     return this.contentCollectionsRef.snapshotChanges().pipe(
       switchMap((contentDocuments) => {
-        // For each content document, get the related content type, category, and owner
         const contentObservables = contentDocuments.map((contentDoc) => {
           const data = contentDoc.payload.doc.data() as ContentDateModel;
           const id = contentDoc.payload.doc.id;
 
-          // Retrieve related documents
-          const contentType$ = this.getContentTypeById(data.contentTypeId);
+          const contentType$ = this.getContentTypeById(data.contentTypeId).pipe(
+            take(1)
+          );
           const contentCategory$ = this.getContentCategoryById(
             data.contentCategoryId
-          );
-          const contentOwner$ = this.getContentOwnerById(data.contentOwnerId);
+          ).pipe(take(1));
+          const contentOwner$ = this.getContentOwnerById(
+            data.contentOwnerId
+          ).pipe(take(1));
 
           return forkJoin([contentType$, contentCategory$, contentOwner$]).pipe(
             map(([contentType, contentCategory, contentOwner]) => {
-              console.log(contentType, contentCategory, contentOwner);
-
               return {
                 id,
                 contentName: data.contentName,
@@ -124,7 +126,6 @@ export class ContentService {
           );
         });
 
-        // Return all content after fetching related details
         return combineLatest(contentObservables);
       })
     );
@@ -198,17 +199,20 @@ export class ContentService {
   }
 
   // Method to update the content, including its related document IDs
-  updateContent(content: Content): Observable<void> {
+  updateContent(
+    contentId: string,
+    contentData: ContentDateModel
+  ): Observable<void> {
     return from(
-      this.contentCollectionsRef.doc(content.id).update({
-        contentName: content.contentName,
-        contentTypeId: content.contentType.id, // Only store the ID
-        contentCategoryId: content.contentCategory.id, // Only store the ID
-        contentOwnerId: content.contentOwner.id, // Only store the ID
-        contentLink: content.contentLink,
+      this.contentCollectionsRef.doc(contentId).update({
+        contentName: contentData.contentName,
+        contentTypeId: contentData.contentTypeId, // Only store the ID
+        contentCategoryId: contentData.contentCategoryId, // Only store the ID
+        contentOwnerId: contentData.contentOwnerId, // Only store the ID
+        contentLink: contentData.contentLink,
         updatedAt: new Date(),
-        updatedBy: content.updatedBy,
-        isActive: content.isActive,
+        updatedBy: contentData.updatedBy, // Ensure you pass the user ID
+        isActive: contentData.isActive,
       })
     );
   }
