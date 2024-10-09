@@ -14,6 +14,7 @@ import { UsersManagementComponent } from './pages/users-management/users-managem
 import { ContentTypesComponent } from './pages/library/screens/content-types/content-types.component';
 import { ContentCategoriesComponent } from './pages/library/screens/content-categories/content-categories.component';
 import { ContentOwnersComponent } from './pages/library/screens/content-owners/content-owners.component';
+import { ContentComponent } from './pages/library/screens/content/content.component';
 
 const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -26,6 +27,11 @@ const routes: Routes = [
   {
     path: 'library',
     component: LibraryComponent,
+    canActivate: [canActivateAuth],
+  },
+  {
+    path: 'library/content',
+    component: ContentComponent,
     canActivate: [canActivateAuth],
   },
   {

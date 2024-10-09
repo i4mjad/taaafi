@@ -38,6 +38,8 @@ import { ContentOwnersComponent } from './pages/library/screens/content-owners/c
 import { AddContentOwnerComponent } from './pages/library/screens/content-owners/components/add-content-owner/add-content-owner.component';
 import { EditContentOwnerComponent } from './pages/library/screens/content-owners/components/edit-content-owner/edit-content-owner.component';
 import { DeleteContentOwnerComponent } from './pages/library/screens/content-owners/components/delete-content-owner/delete-content-owner.component';
+import { ContentComponent } from './pages/library/screens/content/content.component';
+import { AddNewContentComponent } from './pages/library/screens/content/components/add-new-content/add-new-content.component';
 
 @NgModule({
   declarations: [
@@ -63,6 +65,8 @@ import { DeleteContentOwnerComponent } from './pages/library/screens/content-own
     AddContentOwnerComponent,
     EditContentOwnerComponent,
     DeleteContentOwnerComponent,
+    ContentComponent,
+    AddNewContentComponent,
   ],
   imports: [
     BrowserModule,

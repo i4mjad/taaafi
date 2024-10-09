@@ -1,11 +1,16 @@
-<!-- hero-section.component.html -->
 <div
   class="flex flex-col items-center justify-center bg-primary-500 p-10 text-center space-y-4 h-96"
 >
-  <h1 class="font-bold">{{ "ta3afi-cp" | translate }}</h1>
-  <button hlmBtn  (click)="goToAppUrl()" >
-    {{ "hero-disc" | translate }}
-  </button>
+  <mat-card appearance="outlined">
+    <mat-card-title>
+      {{ "ta3afi-cp" | translate }}
+    </mat-card-title>
+    <mat-card-content>
+      <button mat-flat-button (click)="goToAppUrl()">
+        {{ "hero-disc" | translate }}
+      </button>
 
-  <h1 class="font-bold text-red-800">{{ "admin-only" | translate }}</h1>
+      <p>{{ "admin-only" | translate }}</p>
+    </mat-card-content>
+  </mat-card>
 </div>

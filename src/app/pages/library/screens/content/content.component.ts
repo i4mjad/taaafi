@@ -1,0 +1,83 @@
+import { Component, inject } from '@angular/core';
+import { MatBottomSheet } from '@angular/material/bottom-sheet';
+import { MatDialog } from '@angular/material/dialog';
+import { Store } from '@ngxs/store';
+import { Observable } from 'rxjs';
+import { Content } from '../../../../models/app.model';
+import { AppState } from '../../../../state/app.store';
+import {
+  GetContentsAction,
+  ToggleContentStatusAction,
+  DeleteContentAction,
+} from '../../../../state/app.actions';
+import { AddNewContentComponent } from './components/add-new-content/add-new-content.component';
+
+@Component({
+  selector: 'app-content',
+  templateUrl: './content.component.html',
+  styleUrl: './content.component.scss',
+})
+export class ContentComponent {
+  content$: Observable<Content[]> = inject(Store).select(AppState.content);
+  tableColumns: string[] = [
+    'id',
+    'contentName',
+    'contentType',
+    'contentCategory',
+    'contentLink',
+    'createdAt',
+    'updatedAt',
+    'updatedBy',
+    'isActive',
+    'actions',
+  ];
+
+  contents: Content[];
+
+  constructor(
+    private store: Store,
+    private sheet: MatBottomSheet,
+    private dialog: MatDialog
+  ) {}
+
+  ngOnInit(): void {
+    this.store.dispatch(new GetContentsAction());
+    this.content$.subscribe((data) => {
+      console.log(data);
+
+      if (data.length > 0) {
+        this.contents = data;
+      }
+    });
+  }
+
+  onToggleClicked(id: string) {
+    this.store.dispatch(new ToggleContentStatusAction(id));
+  }
+
+  openAddBottomSheet(): void {
+    this.sheet.open(AddNewContentComponent);
+  }
+
+  openEditBottomSheet(content: Content): void {
+    // const dialogRef = this.dialog.open(EditContentComponent, {
+    //   width: '400px',
+    //   data: content,
+    // });
+    // dialogRef.afterClosed().subscribe((result) => {
+    //   // Handle post-dialog actions here
+    // });
+  }
+
+  openDeleteDialog(content: Content): void {
+    // const dialogRef = this.dialog.open(DeleteContentComponent, {
+    //   width: '400px',
+    //   data: { content },
+    // });
+    // dialogRef.afterClosed().subscribe((result) => {
+    //   if (result === true) {
+    //     this.store.dispatch(new DeleteContentAction(content.id));
+    //   }
+    // });
+  }
+}

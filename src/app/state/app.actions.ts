@@ -1,8 +1,41 @@
 import {
+  Content,
   ContentCategory,
   ContentOwner,
   ContentType,
 } from '../models/app.model';
+
+export class GetContentsAction {
+  static readonly type = '[TaaafiControlPanel] Get Contents Action';
+}
+
+export class ToggleContentStatusAction {
+  static readonly type = '[TaaafiControlPanel] Toggle Content Status Action';
+  constructor(public id: string) {}
+}
+
+export class CreateContentAction {
+  static readonly type = '[TaaafiControlPanel] Create Content Action';
+  constructor(
+    public contentName: string,
+    public contentTypeId: string,
+    public contentCategoryId: string,
+    public contentOwnerId: string,
+    public contentLink: string,
+    public updatedBy: string, // user id
+    public isActive: boolean
+  ) {}
+}
+
+export class UpdateContentAction {
+  static readonly type = '[TaaafiControlPanel] Edit Content Action';
+  constructor(public content: Content) {}
+}
+
+export class DeleteContentAction {
+  static readonly type = '[TaaafiControlPanel] Delete Content Action';
+  constructor(public id: string) {}
+}
 
 export class GetContentTypesAction {
   static readonly type = '[TaaafiControlPanel] Get Content Types Action';

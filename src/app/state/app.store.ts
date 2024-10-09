@@ -1,25 +1,32 @@
 import { Injectable } from '@angular/core';
 import { Action, Selector, State, StateContext } from '@ngxs/store';
 import {
+  CreateContentAction,
   CreateContentCategoryAction,
   CreateContentOwnerAction,
   CreateContentTypeAction,
+  DeleteContentAction,
   DeleteContentCategoryAction,
   DeleteContentOwnerAction,
   DeleteContentTypeAction,
   GetContentCategoriesAction,
   GetContentOwnersAction,
+  GetContentsAction,
   GetContentTypesAction,
   ToggleContentCategoryStatusAction,
   ToggleContentOwnerStatusAction,
+  ToggleContentStatusAction,
   ToggleContentTypeStatusAction,
+  UpdateContentAction,
   UpdateContentCategoryAction,
   UpdateContentOwnerAction,
   UpdateContentTypeAction,
 } from './app.actions';
 import {
+  Content,
   ContentCategory,
   ContentCategoryDataModel,
+  ContentDateModel,
   ContentOwner,
   ContentOwnerDataModel,
   ContentType,
@@ -30,8 +37,10 @@ import { throwError } from 'rxjs';
 import { ContentTypeService } from './services/content-type/content-type.service';
 import { ContentCategoryService } from './services/content-category/content-category.service';
 import { ContentOwnerService } from './services/content-owner/content-owner.service';
+import { ContentService } from './services/content/content.service';
 
 interface AppStateModel {
+  contents: Content[];
   contentTypes: ContentType[];
   contentCategories: ContentCategory[];
   contentOwners: ContentOwner[];
@@ -40,6 +49,7 @@ interface AppStateModel {
 @State<AppStateModel>({
   name: 'taaafiControlPanel',
   defaults: {
+    contents: [],
     contentTypes: [],
     contentCategories: [],
     contentOwners: [],
@@ -47,6 +57,10 @@ interface AppStateModel {
 })
 @Injectable()
 export class AppState {
+  @Selector()
+  static content(state: AppStateModel): Content[] {
+    return state.contents;
+  }
   @Selector()
   static contentTypes(state: AppStateModel): ContentType[] {
     return state.contentTypes;
@@ -65,7 +79,8 @@ export class AppState {
   constructor(
     private contentTypeService: ContentTypeService,
     private contentCategoryService: ContentCategoryService,
-    private contentOwnerService: ContentOwnerService
+    private contentOwnerService: ContentOwnerService,
+    private contentService: ContentService
   ) {}
 
   @Action(GetContentCategoriesAction)
@@ -365,6 +380,104 @@ export class AppState {
       }),
       catchError((error) => {
         console.error('Error toggling content category status:', error);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  @Action(GetContentsAction)
+  getContents(ctx: StateContext<AppStateModel>) {
+    return this.contentService.getContents().pipe(
+      tap((contents) => {
+        console.log(contents);
+
+        ctx.patchState({ contents });
+      }),
+      catchError((error) => {
+        console.error('Error fetching contents:', error);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  @Action(ToggleContentStatusAction)
+  toggleContentStatus(
+    ctx: StateContext<AppStateModel>,
+    action: ToggleContentStatusAction
+  ) {
+    return this.contentService.toggleContentStatus(action.id).pipe(
+      tap(() => {
+        const contents = ctx.getState().contents.map((content) => {
+          if (content.id === action.id) {
+            return { ...content, isActive: !content.isActive };
+          }
+          return content;
+        });
+        ctx.patchState({ contents });
+      }),
+      catchError((error) => {
+        console.error('Error toggling content status:', error);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  @Action(CreateContentAction)
+  createContent(ctx: StateContext<AppStateModel>, action: CreateContentAction) {
+    const newContent: ContentDateModel = {
+      contentName: action.contentName,
+      contentTypeId: action.contentTypeId,
+      contentCategoryId: action.contentCategoryId,
+      contentOwnerId: action.contentOwnerId,
+      contentLink: action.contentLink,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      updatedBy: action.updatedBy,
+      isActive: action.isActive,
+    };
+
+    return this.contentService.createContent(newContent).pipe(
+      tap((fullContent) => {
+        // Full content with related details
+        const contents = [...ctx.getState().contents, fullContent];
+        ctx.patchState({ contents });
+      }),
+      catchError((error) => {
+        console.error('Error creating content:', error);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  @Action(UpdateContentAction)
+  updateContent(ctx: StateContext<AppStateModel>, action: UpdateContentAction) {
+    return this.contentService.updateContent(action.content).pipe(
+      tap(() => {
+        const contents = ctx
+          .getState()
+          .contents.map((ct) =>
+            ct.id === action.content.id ? action.content : ct
+          );
+        ctx.patchState({ contents });
+      }),
+      catchError((error) => {
+        console.error('Error updating content:', error);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  @Action(DeleteContentAction)
+  deleteContent(ctx: StateContext<AppStateModel>, action: DeleteContentAction) {
+    return this.contentService.deleteContent(action.id).pipe(
+      tap(() => {
+        const contents = ctx
+          .getState()
+          .contents.filter((ct) => ct.id !== action.id);
+        ctx.patchState({ contents });
+      }),
+      catchError((error) => {
+        console.error('Error deleting content:', error);
         return throwError(() => error);
       })
     );
