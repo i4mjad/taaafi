@@ -12,6 +12,8 @@ import {
   combineLatest,
   forkJoin,
   take,
+  catchError,
+  of,
 } from 'rxjs';
 import {
   ContentDateModel,
@@ -98,35 +100,64 @@ export class ContentService {
           const data = contentDoc.payload.doc.data() as ContentDateModel;
           const id = contentDoc.payload.doc.id;
 
-          const contentType$ = this.getContentTypeById(data.contentTypeId).pipe(
-            take(1)
-          );
-          const contentCategory$ = this.getContentCategoryById(
-            data.contentCategoryId
-          ).pipe(take(1));
-          const contentOwner$ = this.getContentOwnerById(
-            data.contentOwnerId
-          ).pipe(take(1));
-
-          return forkJoin([contentType$, contentCategory$, contentOwner$]).pipe(
-            map(([contentType, contentCategory, contentOwner]) => {
-              return {
-                id,
-                contentName: data.contentName,
-                contentType,
-                contentCategory,
-                contentOwner,
-                contentLink: data.contentLink,
-                createdAt: data.createdAt,
-                updatedAt: data.updatedAt,
-                updatedBy: data.updatedBy,
-                isActive: data.isActive,
-              } as Content;
-            })
-          );
+          return this.getRelatedData(data, id);
         });
 
         return combineLatest(contentObservables);
+      }),
+      catchError((error) => {
+        console.error('Error fetching contents:', error);
+        return of([]); // Return an empty array if an error occurs
+      })
+    );
+  }
+
+  private getRelatedData(
+    data: ContentDateModel,
+    id: string
+  ): Observable<Content> {
+    const contentType$ = this.getContentTypeById(data.contentTypeId).pipe(
+      take(1)
+    );
+    const contentCategory$ = this.getContentCategoryById(
+      data.contentCategoryId
+    ).pipe(take(1));
+    const contentOwner$ = this.getContentOwnerById(data.contentOwnerId).pipe(
+      take(1)
+    );
+
+    return forkJoin([contentType$, contentCategory$, contentOwner$]).pipe(
+      map(
+        ([contentType, contentCategory, contentOwner]) =>
+          ({
+            id,
+            contentName: data.contentName,
+            contentType,
+            contentCategory,
+            contentOwner,
+            contentLink: data.contentLink,
+            createdAt: data.createdAt ? data.createdAt : new Date(), // Ensure a valid Date object
+            updatedAt: data.updatedAt ? data.updatedAt : new Date(), // Ensure a valid Date object
+            updatedBy: data.updatedBy || '', // Fallback for undefined values
+            isActive: data.isActive,
+          } as Content)
+      ),
+      catchError((error) => {
+        console.error('Error fetching related data:', error);
+
+        // Return a default Content object if an error occurs
+        return of({
+          id,
+          contentName: data.contentName,
+          contentType: {} as ContentType, // Return empty objects or defaults
+          contentCategory: {} as ContentCategory,
+          contentOwner: {} as ContentOwner,
+          contentLink: data.contentLink || '',
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          updatedBy: '',
+          isActive: false,
+        } as Content);
       })
     );
   }
