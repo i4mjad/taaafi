@@ -66,7 +66,7 @@ export class ContentListsComponent implements OnInit {
 
   // Open the Add New Content List Bottom Sheet
   openAddBottomSheet(): void {
-    this.sheet.open(AddNewContentListComponent);
+    this.dialog.open(AddNewContentListComponent);
   }
 
   // Open the Edit Content List Dialog
