@@ -55,3 +55,20 @@ export interface ContentOwnerDataModel {
   ownerSource: string;
   isActive: boolean;
 }
+
+export interface ContentList {
+  id: string;
+  listName: string;
+  listDescription: string;
+  listContent: Content[];
+  isActive: boolean;
+  isFeatured: boolean;
+}
+export interface ContentListDataModel {
+  id: string;
+  listName: string;
+  listDescription: string;
+  listContentIds: string[];
+  isActive: boolean;
+  isFeatured: boolean;
+}

@@ -15,6 +15,7 @@ import { ContentTypesComponent } from './pages/library/screens/content-types/con
 import { ContentCategoriesComponent } from './pages/library/screens/content-categories/content-categories.component';
 import { ContentOwnersComponent } from './pages/library/screens/content-owners/content-owners.component';
 import { ContentComponent } from './pages/library/screens/content/content.component';
+import { ContentListsComponent } from './pages/library/screens/content-lists/content-lists.component';
 
 const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -47,6 +48,11 @@ const routes: Routes = [
   {
     path: 'library/content-owners',
     component: ContentOwnersComponent,
+    canActivate: [canActivateAuth],
+  },
+  {
+    path: 'library/content-lists',
+    component: ContentListsComponent,
     canActivate: [canActivateAuth],
   },
   { path: 'vault', component: VaultComponent, canActivate: [canActivateAuth] },

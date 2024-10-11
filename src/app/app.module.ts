@@ -43,6 +43,11 @@ import { AddNewContentComponent } from './pages/library/screens/content/componen
 import { EditContentComponent } from './pages/library/screens/content/components/edit-content/edit-content.component';
 import { DeleteContentComponent } from './pages/library/screens/content/components/delete-content/delete-content.component';
 
+import { ContentListsComponent } from './pages/library/screens/content-lists/content-lists.component';
+import { AddNewContentListComponent } from './pages/library/screens/content-lists/components/add-new-content-list/add-new-content-list.component';
+import { DeleteContentListComponent } from './pages/library/screens/content-lists/components/delete-content-list/delete-content-list.component';
+import { EditContentListComponent } from './pages/library/screens/content-lists/components/edit-content-list/edit-content-list.component';
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -71,6 +76,10 @@ import { DeleteContentComponent } from './pages/library/screens/content/componen
     AddNewContentComponent,
     EditContentComponent,
     DeleteContentComponent,
+    ContentListsComponent,
+    AddNewContentListComponent,
+    DeleteContentListComponent,
+    EditContentListComponent,
   ],
   imports: [
     BrowserModule,

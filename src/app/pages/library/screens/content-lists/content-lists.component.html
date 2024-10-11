@@ -1,0 +1,81 @@
+<div class="flex flex-col gap-4">
+  <mat-card>
+    <mat-card-actions>
+      <button mat-flat-button color="primary" (click)="openAddBottomSheet()">
+        إضافة قائمة جديدة
+      </button>
+    </mat-card-actions>
+  </mat-card>
+
+  <mat-card appearance="outlined">
+    <div class="overflow-x-auto md:overflow-x-visible">
+      <table mat-table [dataSource]="contentLists" class="mat-elevation-z8">
+        <!-- ID Column -->
+        <ng-container matColumnDef="id">
+          <th mat-header-cell *matHeaderCellDef>الرمز</th>
+          <td mat-cell *matCellDef="let list">{{ list.id }}</td>
+        </ng-container>
+
+        <!-- List Name Column -->
+        <ng-container matColumnDef="listName">
+          <th mat-header-cell *matHeaderCellDef>إسم القائمة</th>
+          <td mat-cell *matCellDef="let list">{{ list.listName }}</td>
+        </ng-container>
+
+        <!-- Number of Content Items Column -->
+        <ng-container matColumnDef="contentCount">
+          <th mat-header-cell *matHeaderCellDef>عدد المحتويات</th>
+          <td mat-cell *matCellDef="let list">{{ list.listContent.length }}</td>
+        </ng-container>
+
+        <!-- Is Active Column -->
+        <ng-container matColumnDef="isActive">
+          <th mat-header-cell *matHeaderCellDef>تفعيل</th>
+          <td mat-cell *matCellDef="let list">
+            <mat-slide-toggle
+              [checked]="list.isActive"
+              (change)="onToggleActive(list.id)"
+            ></mat-slide-toggle>
+          </td>
+        </ng-container>
+
+        <!-- Is Featured Column -->
+        <ng-container matColumnDef="isFeatured">
+          <th mat-header-cell *matHeaderCellDef>مميز</th>
+          <td mat-cell *matCellDef="let list">
+            <mat-slide-toggle
+              [checked]="list.isFeatured"
+              (change)="onToggleFeatured(list.id)"
+            ></mat-slide-toggle>
+          </td>
+        </ng-container>
+
+        <!-- Actions Column -->
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef>الإجراءات</th>
+          <td mat-cell *matCellDef="let list">
+            <div class="flex flex-row gap-1">
+              <button
+                mat-icon-button
+                color="error"
+                (click)="openDeleteDialog(list)"
+              >
+                <mat-icon>delete</mat-icon>
+              </button>
+              <button
+                mat-icon-button
+                color="primary"
+                (click)="openEditBottomSheet(list)"
+              >
+                <mat-icon>edit</mat-icon>
+              </button>
+            </div>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="tableColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: tableColumns"></tr>
+      </table>
+    </div>
+  </mat-card>
+</div>

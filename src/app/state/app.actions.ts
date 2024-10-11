@@ -2,6 +2,7 @@ import {
   Content,
   ContentCategory,
   ContentDateModel,
+  ContentListDataModel,
   ContentOwner,
   ContentType,
 } from '../models/app.model';
@@ -117,5 +118,45 @@ export class ToggleContentOwnerStatusAction {
   static readonly type =
     '[TaaafiControlPanel] Toggle Content Owner Status Action';
 
+  constructor(public id: string) {}
+}
+
+export class GetContentListsAction {
+  static readonly type = '[TaaafiControlPanel] Get Content Lists Action';
+}
+
+export class CreateContentListAction {
+  static readonly type = '[TaaafiControlPanel] Create Content List Action';
+  constructor(
+    public listName: string,
+    public listDescription: string,
+    public listContentIds: string[],
+    public isActive: boolean,
+    public isFeatured: boolean
+  ) {}
+}
+
+export class UpdateContentListAction {
+  static readonly type = '[TaaafiControlPanel] Edit Content List Action';
+  constructor(
+    public id: string,
+    public contentListData: ContentListDataModel
+  ) {}
+}
+
+export class DeleteContentListAction {
+  static readonly type = '[TaaafiControlPanel] Delete Content List Action';
+  constructor(public id: string) {}
+}
+
+export class ToggleContentListStatusAction {
+  static readonly type =
+    '[TaaafiControlPanel] Toggle Content List Status Action';
+  constructor(public id: string) {}
+}
+
+export class ToggleContentListFeaturedAction {
+  static readonly type =
+    '[TaaafiControlPanel] Toggle Content List Featured Status Action';
   constructor(public id: string) {}
 }

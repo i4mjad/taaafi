@@ -3,22 +3,28 @@ import { Action, Selector, State, StateContext } from '@ngxs/store';
 import {
   CreateContentAction,
   CreateContentCategoryAction,
+  CreateContentListAction,
   CreateContentOwnerAction,
   CreateContentTypeAction,
   DeleteContentAction,
   DeleteContentCategoryAction,
+  DeleteContentListAction,
   DeleteContentOwnerAction,
   DeleteContentTypeAction,
   GetContentCategoriesAction,
+  GetContentListsAction,
   GetContentOwnersAction,
   GetContentsAction,
   GetContentTypesAction,
   ToggleContentCategoryStatusAction,
+  ToggleContentListFeaturedAction,
+  ToggleContentListStatusAction,
   ToggleContentOwnerStatusAction,
   ToggleContentStatusAction,
   ToggleContentTypeStatusAction,
   UpdateContentAction,
   UpdateContentCategoryAction,
+  UpdateContentListAction,
   UpdateContentOwnerAction,
   UpdateContentTypeAction,
 } from './app.actions';
@@ -27,6 +33,8 @@ import {
   ContentCategory,
   ContentCategoryDataModel,
   ContentDateModel,
+  ContentList,
+  ContentListDataModel,
   ContentOwner,
   ContentOwnerDataModel,
   ContentType,
@@ -38,9 +46,11 @@ import { ContentTypeService } from './services/content-type/content-type.service
 import { ContentCategoryService } from './services/content-category/content-category.service';
 import { ContentOwnerService } from './services/content-owner/content-owner.service';
 import { ContentService } from './services/content/content.service';
+import { ContentListService } from './services/content-lists/content-lists.service';
 
 interface AppStateModel {
   contents: Content[];
+  contentLists: ContentList[];
   contentTypes: ContentType[];
   contentCategories: ContentCategory[];
   contentOwners: ContentOwner[];
@@ -50,6 +60,7 @@ interface AppStateModel {
   name: 'taaafiControlPanel',
   defaults: {
     contents: [],
+    contentLists: [],
     contentTypes: [],
     contentCategories: [],
     contentOwners: [],
@@ -60,6 +71,11 @@ export class AppState {
   @Selector()
   static content(state: AppStateModel): Content[] {
     return state.contents;
+  }
+
+  @Selector()
+  static contentLists(state: AppStateModel): ContentList[] {
+    return state.contentLists;
   }
   @Selector()
   static contentTypes(state: AppStateModel): ContentType[] {
@@ -80,7 +96,8 @@ export class AppState {
     private contentTypeService: ContentTypeService,
     private contentCategoryService: ContentCategoryService,
     private contentOwnerService: ContentOwnerService,
-    private contentService: ContentService
+    private contentService: ContentService,
+    private contentListService: ContentListService
   ) {}
 
   @Action(GetContentCategoriesAction)
@@ -482,6 +499,127 @@ export class AppState {
       }),
       catchError((error) => {
         console.error('Error deleting content:', error);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  @Action(GetContentListsAction)
+  getContentLists(ctx: StateContext<AppStateModel>) {
+    return this.contentListService.getContentLists().pipe(
+      tap((contentLists) => {
+        ctx.patchState({ contentLists });
+      }),
+      catchError((error) => {
+        console.error('Error fetching content lists:', error);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  @Action(CreateContentListAction)
+  createContentList(
+    ctx: StateContext<AppStateModel>,
+    action: CreateContentListAction
+  ) {
+    const newContentList: ContentListDataModel = {
+      id: '', // Firestore will generate the ID
+      listName: action.listName,
+      listDescription: action.listDescription,
+      listContentIds: action.listContentIds,
+      isActive: action.isActive,
+      isFeatured: action.isFeatured,
+    };
+
+    return this.contentListService.createContentList(newContentList).pipe(
+      tap(() => {
+        // Fetch the updated content lists after creating
+        return ctx.dispatch(new GetContentListsAction());
+      }),
+      catchError((error) => {
+        console.error('Error creating content list:', error);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  @Action(UpdateContentListAction)
+  updateContentList(
+    ctx: StateContext<AppStateModel>,
+    action: UpdateContentListAction
+  ) {
+    return this.contentListService
+      .updateContentList(action.id, action.contentListData)
+      .pipe(
+        tap(() => {
+          // Fetch the updated content lists after updating
+          return ctx.dispatch(new GetContentListsAction());
+        }),
+        catchError((error) => {
+          console.error('Error updating content list:', error);
+          return throwError(() => error);
+        })
+      );
+  }
+
+  @Action(DeleteContentListAction)
+  deleteContentList(
+    ctx: StateContext<AppStateModel>,
+    action: DeleteContentListAction
+  ) {
+    return this.contentListService.deleteContentList(action.id).pipe(
+      tap(() => {
+        // Fetch the updated content lists after deleting
+        return ctx.dispatch(new GetContentListsAction());
+      }),
+      catchError((error) => {
+        console.error('Error deleting content list:', error);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  @Action(ToggleContentListStatusAction)
+  toggleContentListStatus(
+    ctx: StateContext<AppStateModel>,
+    action: ToggleContentListStatusAction
+  ) {
+    return this.contentListService.toggleContentListStatus(action.id).pipe(
+      tap(() => {
+        // Update the state after toggling the status
+        const contentLists = ctx
+          .getState()
+          .contentLists.map((list) =>
+            list.id === action.id ? { ...list, isActive: !list.isActive } : list
+          );
+        ctx.patchState({ contentLists });
+      }),
+      catchError((error) => {
+        console.error('Error toggling content list status:', error);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  @Action(ToggleContentListFeaturedAction)
+  toggleContentListFeatured(
+    ctx: StateContext<AppStateModel>,
+    action: ToggleContentListFeaturedAction
+  ) {
+    return this.contentListService.toggleContentListFeatured(action.id).pipe(
+      tap(() => {
+        // Update the state after toggling the featured status
+        const contentLists = ctx
+          .getState()
+          .contentLists.map((list) =>
+            list.id === action.id
+              ? { ...list, isFeatured: !list.isFeatured }
+              : list
+          );
+        ctx.patchState({ contentLists });
+      }),
+      catchError((error) => {
+        console.error('Error toggling content list featured status:', error);
         return throwError(() => error);
       })
     );
