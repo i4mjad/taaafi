@@ -508,7 +508,19 @@ export class AppState {
   getContentLists(ctx: StateContext<AppStateModel>) {
     return this.contentListService.getContentLists().pipe(
       tap((contentLists) => {
-        ctx.patchState({ contentLists });
+        console.log('NGXS method contentLists:', contentLists); // Ensure this logs correctly
+
+        if (contentLists.length > 0) {
+          console.log('Valid content lists:', contentLists);
+        } else {
+          console.log('Content lists are empty');
+        }
+
+        // Only patch state if contentLists is not empty
+        const state = ctx.getState();
+        console.log('Current state before patching:', state); // Check current state before patching
+        ctx.setState({ ...state, contentLists: contentLists });
+        console.log('State after patching:', ctx.getState()); // Verify state is updated
       }),
       catchError((error) => {
         console.error('Error fetching content lists:', error);
