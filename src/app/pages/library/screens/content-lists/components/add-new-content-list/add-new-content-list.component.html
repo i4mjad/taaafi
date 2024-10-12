@@ -1,1 +1,99 @@
-<p>add-new-content-list works!</p>
+<mat-card appearance="outlined">
+  <mat-card-header>
+    <mat-card-title>إضافة قائمة محتوى جديدة</mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    <form [formGroup]="contentListForm">
+      <div class="flex flex-col gap-4">
+        <!-- List Name -->
+        <mat-form-field appearance="fill" class="w-full">
+          <mat-label>إسم القائمة</mat-label>
+          <input
+            matInput
+            formControlName="listName"
+            placeholder="أدخل إسم القائمة"
+          />
+        </mat-form-field>
+
+        <!-- List Description -->
+        <mat-form-field appearance="fill" class="w-full">
+          <mat-label>وصف القائمة</mat-label>
+          <textarea
+            matInput
+            formControlName="listDescription"
+            placeholder="أدخل وصف القائمة"
+          ></textarea>
+        </mat-form-field>
+
+        <!-- Is Active -->
+        <mat-slide-toggle formControlName="isActive">تفعيل</mat-slide-toggle>
+
+        <!-- Is Featured -->
+        <mat-slide-toggle formControlName="isFeatured">مميز</mat-slide-toggle>
+
+        <!-- Search Content -->
+        <mat-form-field appearance="fill" class="w-full">
+          <mat-label>بحث عن محتوى</mat-label>
+          <input matInput placeholder="أدخل كلمة للبحث" />
+        </mat-form-field>
+
+        <!-- Table of Available Content with Checkbox -->
+        <div class="table-container">
+          <table
+            mat-table
+            [dataSource]="filteredContent"
+            class="mat-elevation-z8"
+          >
+            <!-- Checkbox Column -->
+            <ng-container matColumnDef="select">
+              <th mat-header-cell *matHeaderCellDef>
+                <mat-checkbox
+                  (change)="toggleSelectAll($event)"
+                  [checked]="isAllSelected()"
+                  [indeterminate]="isIndeterminate()"
+                >
+                </mat-checkbox>
+              </th>
+              <td mat-cell *matCellDef="let content">
+                <mat-checkbox
+                  (change)="onContentSelect(content.id)"
+                  [checked]="selection.has(content.id)"
+                >
+                </mat-checkbox>
+              </td>
+            </ng-container>
+
+            <!-- Content Name Column -->
+            <ng-container matColumnDef="contentName">
+              <th mat-header-cell *matHeaderCellDef>إسم المحتوى</th>
+              <td mat-cell *matCellDef="let content">
+                {{ content.contentName }}
+              </td>
+            </ng-container>
+
+            <!-- Content Owner Column -->
+            <ng-container matColumnDef="contentOwner">
+              <th mat-header-cell *matHeaderCellDef>مالك المحتوى</th>
+              <td mat-cell *matCellDef="let content">
+                {{ content.contentOwner.ownerName }}
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="tableColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: tableColumns"></tr>
+          </table>
+        </div>
+      </div>
+    </form>
+  </mat-card-content>
+  <mat-card-actions>
+    <button
+      mat-raised-button
+      color="primary"
+      (click)="onSubmit()"
+      [disabled]="contentListForm.invalid"
+    >
+      إضافة
+    </button>
+  </mat-card-actions>
+</mat-card>

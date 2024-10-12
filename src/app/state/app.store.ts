@@ -11,6 +11,7 @@ import {
   DeleteContentListAction,
   DeleteContentOwnerAction,
   DeleteContentTypeAction,
+  GetActiveContentAction,
   GetContentCategoriesAction,
   GetContentListsAction,
   GetContentOwnersAction,
@@ -50,6 +51,7 @@ import { ContentListService } from './services/content-lists/content-lists.servi
 
 interface AppStateModel {
   contents: Content[];
+  activeContent: Content[];
   contentLists: ContentList[];
   contentTypes: ContentType[];
   contentCategories: ContentCategory[];
@@ -60,6 +62,7 @@ interface AppStateModel {
   name: 'taaafiControlPanel',
   defaults: {
     contents: [],
+    activeContent: [],
     contentLists: [],
     contentTypes: [],
     contentCategories: [],
@@ -92,6 +95,11 @@ export class AppState {
     return state.contentOwners;
   }
 
+  @Selector()
+  static activeContent(state: AppStateModel): Content[] {
+    return state.activeContent;
+  }
+
   constructor(
     private contentTypeService: ContentTypeService,
     private contentCategoryService: ContentCategoryService,
@@ -104,6 +112,17 @@ export class AppState {
   getContentCategories(ctx: StateContext<AppStateModel>) {
     return this.contentCategoryService.getContentCategories().pipe(
       tap((contentCategories) => ctx.patchState({ contentCategories })),
+      catchError((error) => {
+        console.error('Error fetching content categories:', error);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  @Action(GetActiveContentAction)
+  getActiveContentCategories(ctx: StateContext<AppStateModel>) {
+    return this.contentService.getActiveContents().pipe(
+      tap((activeContent) => ctx.patchState({ activeContent })),
       catchError((error) => {
         console.error('Error fetching content categories:', error);
         return throwError(() => error);

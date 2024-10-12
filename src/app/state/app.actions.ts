@@ -10,6 +10,9 @@ import {
 export class GetContentsAction {
   static readonly type = '[TaaafiControlPanel] Get Contents Action';
 }
+export class GetActiveContentAction {
+  static readonly type = '[TaaafiControlPanel] Get Active Contents Action';
+}
 
 export class ToggleContentStatusAction {
   static readonly type = '[TaaafiControlPanel] Toggle Content Status Action';

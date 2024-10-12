@@ -112,6 +112,30 @@ export class ContentService {
     );
   }
 
+  getActiveContents(): Observable<Content[]> {
+    return this.contentCollectionsRef.snapshotChanges().pipe(
+      switchMap((contentDocuments) => {
+        const activeContentDocuments = contentDocuments.filter((contentDoc) => {
+          const data = contentDoc.payload.doc.data() as ContentDateModel;
+          return data.isActive; // Only include active contents
+        });
+
+        const contentObservables = activeContentDocuments.map((contentDoc) => {
+          const data = contentDoc.payload.doc.data() as ContentDateModel;
+          const id = contentDoc.payload.doc.id;
+
+          return this.getRelatedData(data, id);
+        });
+
+        return combineLatest(contentObservables);
+      }),
+      catchError((error) => {
+        console.error('Error fetching active contents:', error);
+        return of([]); // Return an empty array if an error occurs
+      })
+    );
+  }
+
   private getRelatedData(
     data: ContentDateModel,
     id: string

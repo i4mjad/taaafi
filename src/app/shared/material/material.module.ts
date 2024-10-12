@@ -38,11 +38,13 @@ import { MatSortModule } from '@angular/material/sort';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatRippleModule } from '@angular/material/core';
 import { ReactiveFormsModule } from '@angular/forms';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 
 const components = [
   MatSidenavModule,
   BrowserAnimationsModule,
   CdkTableModule,
+  MatCheckboxModule,
   MatButtonModule,
   MatInputModule,
   MatAutocompleteModule,

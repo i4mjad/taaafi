@@ -66,13 +66,15 @@ export class ContentListsComponent implements OnInit {
 
   // Open the Add New Content List Bottom Sheet
   openAddBottomSheet(): void {
-    this.dialog.open(AddNewContentListComponent);
+    this.dialog.open(AddNewContentListComponent, {
+      width: '90%',
+    });
   }
 
   // Open the Edit Content List Dialog
   openEditBottomSheet(contentList: ContentList): void {
     const dialogRef = this.dialog.open(EditContentListComponent, {
-      width: '400px',
+      width: '90%',
       data: contentList,
     });
 
