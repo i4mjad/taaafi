@@ -79,6 +79,12 @@ export class ToggleContentCategoryStatusAction {
   constructor(public id: string) {}
 }
 
+export class GetContentListByIdAction {
+  static readonly type = '[TaaafiControlPanel] Get Content List By Id Action';
+
+  constructor(public id: string) {}
+}
+
 export class CreateContentCategoryAction {
   static readonly type = '[TaaafiControlPanel] Create Content Category Action';
   constructor(public categoryName: string, public isActive: boolean) {}

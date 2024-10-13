@@ -36,8 +36,6 @@ export class ContentCategoriesComponent implements OnInit {
     this.store.dispatch(new GetContentCategoriesAction());
     this.contentCategories$.subscribe((data) => {
       if (data.length > 0) {
-        console.log(data);
-
         this.categories = data;
       }
     });

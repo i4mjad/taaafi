@@ -44,12 +44,9 @@ export class ContentListsComponent implements OnInit {
   ngOnInit(): void {
     this.store.dispatch(new GetContentListsAction());
     this.contentLists$.subscribe((data) => {
-      console.log('Data received in component:', data); // Ensure data is received in the component
       if (data.length > 0) {
-        console.log('Content lists available:', data);
         this.contentLists = data;
       } else {
-        console.log('No content lists available');
       }
     });
   }
@@ -75,7 +72,11 @@ export class ContentListsComponent implements OnInit {
   openEditBottomSheet(contentList: ContentList): void {
     const dialogRef = this.dialog.open(EditContentListComponent, {
       width: '90%',
-      data: contentList,
+      height: '90%',
+
+      data: {
+        id: contentList.id,
+      },
     });
 
     dialogRef.afterClosed().subscribe((result) => {

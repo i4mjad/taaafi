@@ -117,7 +117,7 @@ export class ContentService {
       switchMap((contentDocuments) => {
         const activeContentDocuments = contentDocuments.filter((contentDoc) => {
           const data = contentDoc.payload.doc.data() as ContentDateModel;
-          return data.isActive; // Only include active contents
+          return data.isActive;
         });
 
         const contentObservables = activeContentDocuments.map((contentDoc) => {

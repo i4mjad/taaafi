@@ -13,6 +13,7 @@ import {
   DeleteContentTypeAction,
   GetActiveContentAction,
   GetContentCategoriesAction,
+  GetContentListByIdAction,
   GetContentListsAction,
   GetContentOwnersAction,
   GetContentsAction,
@@ -53,6 +54,7 @@ interface AppStateModel {
   contents: Content[];
   activeContent: Content[];
   contentLists: ContentList[];
+  selectedContentList: ContentList;
   contentTypes: ContentType[];
   contentCategories: ContentCategory[];
   contentOwners: ContentOwner[];
@@ -64,6 +66,14 @@ interface AppStateModel {
     contents: [],
     activeContent: [],
     contentLists: [],
+    selectedContentList: {
+      id: '',
+      listContent: [],
+      listName: '',
+      listDescription: '',
+      isActive: false,
+      isFeatured: false,
+    },
     contentTypes: [],
     contentCategories: [],
     contentOwners: [],
@@ -83,6 +93,11 @@ export class AppState {
   @Selector()
   static contentTypes(state: AppStateModel): ContentType[] {
     return state.contentTypes;
+  }
+
+  @Selector()
+  static selectedContentList(state: AppStateModel): ContentList {
+    return state.selectedContentList;
   }
 
   @Selector()
@@ -112,6 +127,20 @@ export class AppState {
   getContentCategories(ctx: StateContext<AppStateModel>) {
     return this.contentCategoryService.getContentCategories().pipe(
       tap((contentCategories) => ctx.patchState({ contentCategories })),
+      catchError((error) => {
+        console.error('Error fetching content categories:', error);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  @Action(GetContentListByIdAction)
+  getContentList(
+    ctx: StateContext<AppStateModel>,
+    action: GetContentListByIdAction
+  ) {
+    return this.contentListService.getContentListById(action.id).pipe(
+      tap((selectedContentList) => ctx.patchState({ selectedContentList })),
       catchError((error) => {
         console.error('Error fetching content categories:', error);
         return throwError(() => error);
@@ -425,8 +454,6 @@ export class AppState {
   getContents(ctx: StateContext<AppStateModel>) {
     return this.contentService.getContents().pipe(
       tap((contents) => {
-        console.log(contents);
-
         ctx.patchState({ contents });
       }),
       catchError((error) => {
@@ -527,19 +554,14 @@ export class AppState {
   getContentLists(ctx: StateContext<AppStateModel>) {
     return this.contentListService.getContentLists().pipe(
       tap((contentLists) => {
-        console.log('NGXS method contentLists:', contentLists); // Ensure this logs correctly
-
         if (contentLists.length > 0) {
-          console.log('Valid content lists:', contentLists);
         } else {
-          console.log('Content lists are empty');
         }
 
         // Only patch state if contentLists is not empty
         const state = ctx.getState();
-        console.log('Current state before patching:', state); // Check current state before patching
+
         ctx.setState({ ...state, contentLists: contentLists });
-        console.log('State after patching:', ctx.getState()); // Verify state is updated
       }),
       catchError((error) => {
         console.error('Error fetching content lists:', error);

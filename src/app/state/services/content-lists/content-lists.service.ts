@@ -18,7 +18,6 @@ import {
 import {
   Observable,
   switchMap,
-  combineLatest,
   map,
   from,
   throwError,
@@ -57,9 +56,7 @@ export class ContentListService {
 
   getContentLists(): Observable<ContentList[]> {
     return this.contentListsRef.snapshotChanges().pipe(
-      tap((snapshots) => {
-        console.log('Firestore snapshots:', snapshots); // Ensure that snapshots are retrieved
-      }),
+      tap((snapshots) => {}),
       switchMap((snapshots) => {
         if (snapshots.length === 0) {
           console.warn('No content lists found');
@@ -69,8 +66,6 @@ export class ContentListService {
         const contentListsObservables = snapshots.map((doc) => {
           const data = doc.payload.doc.data() as ContentListDataModel;
           const id = doc.payload.doc.id;
-
-          console.log('List Content Data:', data); // Ensure each content list's data is available
 
           if (data.listContentIds.length === 0) {
             console.warn(
@@ -96,7 +91,6 @@ export class ContentListService {
               const validListContent = listContent.filter(
                 (content) => content !== null
               );
-              console.log('List content after forkJoin:', validListContent);
 
               return {
                 id,
@@ -119,6 +113,77 @@ export class ContentListService {
     );
   }
 
+  getContentListById(id: string): Observable<ContentList> {
+    return this.contentListsRef
+      .doc(id)
+      .snapshotChanges()
+      .pipe(
+        switchMap((doc) => {
+          if (!doc.payload.exists) {
+            console.warn('Content list not found with id:', id);
+            return of({
+              id,
+              listName: '',
+              listDescription: '',
+              listContent: [], // Empty listContent if not found
+              isActive: false,
+              isFeatured: false,
+            } as ContentList); // Return an empty ContentList object if not found
+          }
+
+          const data = doc.payload.data() as ContentListDataModel;
+
+          if (data.listContentIds.length === 0) {
+            console.warn(
+              'No content IDs for this content list:',
+              data.listName
+            );
+            return of({
+              id: doc.payload.id,
+              listName: data.listName,
+              listDescription: data.listDescription,
+              listContent: [], // Empty listContent if no contentIds
+              isActive: data.isActive,
+              isFeatured: data.isFeatured,
+            } as ContentList);
+          }
+
+          // Fetch associated content items using listContentIds
+          return forkJoin(
+            data.listContentIds.map((contentId) =>
+              this.getContentById(contentId)
+            )
+          ).pipe(
+            map((listContent) => {
+              const validListContent = listContent.filter(
+                (content) => content !== null
+              );
+
+              return {
+                id: doc.payload.id,
+                listName: data.listName,
+                listDescription: data.listDescription,
+                listContent: validListContent,
+                isActive: data.isActive,
+                isFeatured: data.isFeatured,
+              } as ContentList;
+            })
+          );
+        }),
+        catchError((error) => {
+          console.error('Error fetching content list by id:', error);
+          return of({
+            id,
+            listName: '',
+            listDescription: '',
+            listContent: [], // Return an empty listContent on error
+            isActive: false,
+            isFeatured: false,
+          } as ContentList); // Return an empty ContentList object on error
+        })
+      );
+  }
+
   // Method to create a new content list
   createContentList(contentListData: ContentListDataModel): Observable<void> {
     return from(this.contentListsRef.add(contentListData)).pipe(map(() => {}));
@@ -129,7 +194,15 @@ export class ContentListService {
     id: string,
     contentListData: ContentListDataModel
   ): Observable<void> {
-    return from(this.contentListsRef.doc(id).update(contentListData));
+    return from(
+      this.contentListsRef.doc(id).update({
+        listName: contentListData.listName,
+        listDescription: contentListData.listDescription,
+        listContentIds: contentListData.listContentIds,
+        isActive: contentListData.isActive,
+        isFeatured: contentListData.isFeatured,
+      })
+    );
   }
 
   // Method to delete a content list
@@ -247,8 +320,6 @@ export class ContentListService {
       const data = contentDoc.data() as ContentDateModel;
       const id = contentDoc.id;
 
-      console.log('Found content:', data);
-
       // Fetch related documents (non-observable)
       const contentType = await this.getContentTypeById(data.contentTypeId);
       const contentCategory = await this.getContentCategoryById(
@@ -277,8 +348,6 @@ export class ContentListService {
         updatedBy: data.updatedBy,
         isActive: data.isActive,
       } as Content;
-
-      console.log('Final content object:', content);
 
       return content;
     } catch (error) {

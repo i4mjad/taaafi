@@ -49,7 +49,6 @@ export class AppComponent implements OnInit {
 
   loginOrLogout() {
     if (this.isLoggedIn) {
-      console.log("here");
       this.authService.logout().subscribe({
         next: () => this.router.navigate(['/']), // Optional: navigate to login on logout
         error: (error) => console.error('Logout failed', error),

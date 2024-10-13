@@ -22,9 +22,10 @@ import { MatDialogRef } from '@angular/material/dialog';
 })
 export class AddNewContentListComponent {
   contentListForm: FormGroup;
+  contents$: Observable<Content[]> = this.store.select(AppState.content);
 
-  contents$: Observable<Content[]> = this.store.select(AppState.activeContent);
-  filteredContent: Content[] = [];
+  allContent: Content[] = []; // Store the original content list
+  filteredContent: Content[] = []; // The filtered content list
   selection: Set<string> = new Set(); // Store selected content IDs
 
   tableColumns: string[] = ['select', 'contentName', 'contentOwner'];
@@ -45,20 +46,27 @@ export class AddNewContentListComponent {
     });
 
     // Fetch available content
-    this.store.dispatch(new GetActiveContentAction());
+    this.store.dispatch(new GetContentsAction());
 
     // Subscribe to the content list and initialize the filtered content
     this.contents$.subscribe((contents) => {
-      this.filteredContent = contents;
+      this.allContent = contents; // Store the full list of content
+      this.filteredContent = contents; // Initially show all content
     });
   }
 
   // Apply a filter to search for content in the table
   applyFilter(filterValue: string) {
     filterValue = filterValue.trim().toLowerCase(); // Normalize the input
-    this.filteredContent = this.filteredContent.filter((content) =>
-      content.contentName.toLowerCase().includes(filterValue)
-    );
+    if (filterValue) {
+      // Filter the content based on the input value
+      this.filteredContent = this.allContent.filter((content) =>
+        content.contentName.toLowerCase().includes(filterValue)
+      );
+    } else {
+      // If the filter is cleared, reset the filtered content to the full list
+      this.filteredContent = this.allContent;
+    }
   }
 
   // Toggle content selection
