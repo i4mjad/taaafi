@@ -37,6 +37,7 @@ import {
   ContentDateModel,
   ContentList,
   ContentListDataModel,
+  ContentListViewModel,
   ContentOwner,
   ContentOwnerDataModel,
   ContentType,
@@ -53,7 +54,7 @@ import { ContentListService } from './services/content-lists/content-lists.servi
 interface AppStateModel {
   contents: Content[];
   activeContent: Content[];
-  contentLists: ContentList[];
+  contentLists: ContentListViewModel[];
   selectedContentList: ContentList;
   contentTypes: ContentType[];
   contentCategories: ContentCategory[];
@@ -87,7 +88,7 @@ export class AppState {
   }
 
   @Selector()
-  static contentLists(state: AppStateModel): ContentList[] {
+  static contentLists(state: AppStateModel): ContentListViewModel[] {
     return state.contentLists;
   }
   @Selector()

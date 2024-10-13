@@ -6,6 +6,7 @@ import {
   ContentDateModel,
   ContentList,
   ContentListDataModel,
+  ContentListViewModel,
   ContentOwner,
   ContentOwnerDataModel,
   ContentType,
@@ -54,7 +55,7 @@ export class ContentListService {
       this.firestore.collection<ContentListDataModel>('contentLists');
   }
 
-  getContentLists(): Observable<ContentList[]> {
+  getContentLists(): Observable<ContentListViewModel[]> {
     return this.contentListsRef.snapshotChanges().pipe(
       tap((snapshots) => {}),
       switchMap((snapshots) => {
@@ -63,48 +64,23 @@ export class ContentListService {
           return of([]); // Handle case when no content lists are found
         }
 
-        const contentListsObservables = snapshots.map((doc) => {
+        // Map each snapshot to a ContentListViewModel
+        const contentListViewModels = snapshots.map((doc) => {
           const data = doc.payload.doc.data() as ContentListDataModel;
           const id = doc.payload.doc.id;
 
-          if (data.listContentIds.length === 0) {
-            console.warn(
-              'No content IDs for this content list:',
-              data.listName
-            );
-            return of({
-              id,
-              listName: data.listName,
-              listDescription: data.listDescription,
-              listContent: [], // Empty listContent if no contentIds
-              isActive: data.isActive,
-              isFeatured: data.isFeatured,
-            } as ContentList);
-          }
-
-          return forkJoin(
-            data.listContentIds.map((contentId) =>
-              this.getContentById(contentId)
-            )
-          ).pipe(
-            map((listContent) => {
-              const validListContent = listContent.filter(
-                (content) => content !== null
-              );
-
-              return {
-                id,
-                listName: data.listName,
-                listDescription: data.listDescription,
-                listContent: validListContent,
-                isActive: data.isActive,
-                isFeatured: data.isFeatured,
-              } as ContentList;
-            })
-          );
+          return {
+            id,
+            listName: data.listName,
+            listDescription: data.listDescription,
+            listContentCount: data.listContentIds.length, // Use length for content count
+            isActive: data.isActive,
+            isFeatured: data.isFeatured,
+          } as ContentListViewModel;
         });
 
-        return forkJoin(contentListsObservables); // Collect all content lists after processing
+        // Return the array of ContentListViewModels
+        return of(contentListViewModels);
       }),
       catchError((error) => {
         console.error('Error fetching content lists:', error);

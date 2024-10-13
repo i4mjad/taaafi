@@ -64,6 +64,14 @@ export interface ContentList {
   isActive: boolean;
   isFeatured: boolean;
 }
+export interface ContentListViewModel {
+  id: string;
+  listName: string;
+  listDescription: string;
+  listContentCount: number;
+  isActive: boolean;
+  isFeatured: boolean;
+}
 export interface ContentListDataModel {
   id: string;
   listName: string;

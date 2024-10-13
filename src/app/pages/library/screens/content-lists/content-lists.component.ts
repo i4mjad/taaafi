@@ -3,7 +3,10 @@ import { MatBottomSheet } from '@angular/material/bottom-sheet';
 import { MatDialog } from '@angular/material/dialog';
 import { Store } from '@ngxs/store';
 import { Observable } from 'rxjs';
-import { ContentList } from '../../../../models/app.model';
+import {
+  ContentList,
+  ContentListViewModel,
+} from '../../../../models/app.model';
 import {
   GetContentListsAction,
   ToggleContentListStatusAction,
@@ -21,7 +24,7 @@ import { EditContentListComponent } from '../content-lists/components/edit-conte
   styleUrls: ['./content-lists.component.scss'],
 })
 export class ContentListsComponent implements OnInit {
-  contentLists$: Observable<ContentList[]> = inject(Store).select(
+  contentLists$: Observable<ContentListViewModel[]> = inject(Store).select(
     AppState.contentLists
   );
   tableColumns: String[] = [
@@ -33,13 +36,9 @@ export class ContentListsComponent implements OnInit {
     'actions',
   ];
 
-  contentLists: ContentList[];
+  contentLists: ContentListViewModel[];
 
-  constructor(
-    private store: Store,
-    private sheet: MatBottomSheet,
-    private dialog: MatDialog
-  ) {}
+  constructor(private store: Store, private dialog: MatDialog) {}
 
   ngOnInit(): void {
     this.store.dispatch(new GetContentListsAction());
