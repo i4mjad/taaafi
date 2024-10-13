@@ -1,27 +1,27 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'user_document_provider.dart';
+part of 'firebase_remote_config_provider.dart';
 
 // **************************************************************************
 // RiverpodGenerator
 // **************************************************************************
 
-String _$userDocumentsNotifierHash() =>
-    r'd7434602c024b9827cc797fa29f8e9546e897c90';
+String _$firebaseRemoteConfigHash() =>
+    r'f560541ae96606840dfd3c5b33df756f8cc84f86';
 
-/// See also [UserDocumentsNotifier].
-@ProviderFor(UserDocumentsNotifier)
-final userDocumentsNotifierProvider = AutoDisposeAsyncNotifierProvider<
-    UserDocumentsNotifier, UserDocument?>.internal(
-  UserDocumentsNotifier.new,
-  name: r'userDocumentsNotifierProvider',
+/// See also [firebaseRemoteConfig].
+@ProviderFor(firebaseRemoteConfig)
+final firebaseRemoteConfigProvider =
+    FutureProvider<FirebaseRemoteConfig>.internal(
+  firebaseRemoteConfig,
+  name: r'firebaseRemoteConfigProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
       ? null
-      : _$userDocumentsNotifierHash,
+      : _$firebaseRemoteConfigHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
 
-typedef _$UserDocumentsNotifier = AutoDisposeAsyncNotifier<UserDocument?>;
+typedef FirebaseRemoteConfigRef = FutureProviderRef<FirebaseRemoteConfig>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

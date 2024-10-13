@@ -1,24 +1,24 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'app_routes.dart';
+part of 'url_launcher_provider.dart';
 
 // **************************************************************************
 // RiverpodGenerator
 // **************************************************************************
 
-String _$goRouterHash() => r'7bb9419f4f747f430a276ebd2e032c1b9b8fcab5';
+String _$urlLauncherHash() => r'7bdbc1008709e0314413ea5fe74d8b51f25e7396';
 
-/// See also [goRouter].
-@ProviderFor(goRouter)
-final goRouterProvider = AutoDisposeProvider<GoRouter>.internal(
-  goRouter,
-  name: r'goRouterProvider',
+/// See also [urlLauncher].
+@ProviderFor(urlLauncher)
+final urlLauncherProvider = AutoDisposeProvider<UrlLauncher>.internal(
+  urlLauncher,
+  name: r'urlLauncherProvider',
   debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product') ? null : _$goRouterHash,
+      const bool.fromEnvironment('dart.vm.product') ? null : _$urlLauncherHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
 
-typedef GoRouterRef = AutoDisposeProviderRef<GoRouter>;
+typedef UrlLauncherRef = AutoDisposeProviderRef<UrlLauncher>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

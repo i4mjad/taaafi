@@ -191,6 +191,10 @@
 
   "what-you-want-to-add":"What do you want to add?",
 
+  "required-update":"New Version Available!",
+  "update-now":"Update now",
+  "required-update-p":"You can't use this version, update to the latest version.",
+
   "account-settings": "User Information",
   "app-settings": "Settings",
   "user_name": "User Name",
