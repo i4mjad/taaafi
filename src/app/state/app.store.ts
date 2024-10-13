@@ -494,6 +494,7 @@ export class AppState {
       contentCategoryId: action.contentCategoryId,
       contentOwnerId: action.contentOwnerId,
       contentLink: action.contentLink,
+      contentLanguage: action.contentLanguage,
       createdAt: new Date(),
       updatedAt: new Date(),
       updatedBy: action.updatedBy,

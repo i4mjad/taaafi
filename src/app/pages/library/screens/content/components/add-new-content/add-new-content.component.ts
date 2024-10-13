@@ -13,7 +13,6 @@ import {
   GetContentOwnersAction,
   GetContentTypesAction,
 } from '../../../../../../state/app.actions';
-import { ContentService } from '../../../../../../state/services/content/content.service';
 import { Observable } from 'rxjs';
 import { AppState } from '../../../../../../state/app.store';
 
@@ -41,7 +40,6 @@ export class AddNewContentComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private store: Store,
-    private contentService: ContentService, // Inject ContentService to get data
     private _bottomSheetRef: MatBottomSheetRef<AddNewContentComponent>
   ) {}
 
@@ -49,6 +47,7 @@ export class AddNewContentComponent implements OnInit {
     // Initialize the form with the required controls
     this.contentForm = this.fb.group({
       contentName: ['', [Validators.required]],
+      contentLanguage: ['', [Validators.required]],
       contentTypeId: ['', [Validators.required]],
       contentCategoryId: ['', [Validators.required]],
       contentOwnerId: ['', [Validators.required]],
@@ -100,6 +99,7 @@ export class AddNewContentComponent implements OnInit {
         contentTypeId,
         contentCategoryId,
         contentOwnerId,
+        contentLanguage,
         contentLink,
         isActive,
       } = this.contentForm.value;
@@ -112,6 +112,7 @@ export class AddNewContentComponent implements OnInit {
           contentCategoryId,
           contentOwnerId,
           contentLink,
+          contentLanguage,
           '',
           isActive
         )

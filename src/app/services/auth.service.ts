@@ -3,7 +3,7 @@ import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { Router } from '@angular/router';
 import firebase from 'firebase/compat/app';
-import { from, Observable, of, switchMap } from 'rxjs';
+import { firstValueFrom, from, Observable, of, switchMap } from 'rxjs';
 import { catchError, map, tap } from 'rxjs/operators';
 import { User } from '../models/auth.model';
 
@@ -110,15 +110,5 @@ export class AuthService {
   }
   streamAuthState(): Observable<firebase.User | null> {
     return this.afAuth.authState;
-  }
-
-  getCurrentUserUid(): Observable<string | null> {
-    return this.afAuth.authState.pipe(
-      map((user) => (user ? user.uid : null)),
-      catchError((err) => {
-        console.error('Error fetching user UID:', err);
-        return of(null);
-      })
-    );
   }
 }

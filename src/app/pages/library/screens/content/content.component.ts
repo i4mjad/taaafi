@@ -28,6 +28,7 @@ export class ContentComponent {
     'contentType',
     'contentCategory',
     'contentLink',
+    'contentLanguage',
     'createdAt',
     'updatedAt',
     'updatedBy',

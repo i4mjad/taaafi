@@ -27,6 +27,7 @@ export class CreateContentAction {
     public contentCategoryId: string,
     public contentOwnerId: string,
     public contentLink: string,
+    public contentLanguage: string,
     public updatedBy: string, // user id
     public isActive: boolean
   ) {}

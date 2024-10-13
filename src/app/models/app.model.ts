@@ -15,6 +15,7 @@ export interface Content {
   contentCategory: ContentCategory;
   contentOwner: ContentOwner;
   contentLink: string;
+  contentLanguage: string;
   createdAt: Date;
   updatedAt: Date;
   updatedBy: string; // user id
@@ -26,9 +27,10 @@ export interface ContentDateModel {
   contentCategoryId: string;
   contentOwnerId: string;
   contentLink: string;
+  contentLanguage: string;
   createdAt?: Date;
   updatedAt?: Date;
-  updatedBy?: string; // user id
+  updatedBy: string; // user id
   isActive: boolean;
 }
 

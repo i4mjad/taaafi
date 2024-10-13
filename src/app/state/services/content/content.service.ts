@@ -160,6 +160,7 @@ export class ContentService {
             contentCategory,
             contentOwner,
             contentLink: data.contentLink,
+            contentLanguage: data.contentLanguage,
             createdAt: data.createdAt ? data.createdAt : new Date(), // Ensure a valid Date object
             updatedAt: data.updatedAt ? data.updatedAt : new Date(), // Ensure a valid Date object
             updatedBy: data.updatedBy || '', // Fallback for undefined values
@@ -176,6 +177,7 @@ export class ContentService {
           contentType: {} as ContentType, // Return empty objects or defaults
           contentCategory: {} as ContentCategory,
           contentOwner: {} as ContentOwner,
+          contentLanguage: data.contentLanguage || '',
           contentLink: data.contentLink || '',
           createdAt: new Date(),
           updatedAt: new Date(),
@@ -241,6 +243,7 @@ export class ContentService {
                 contentType,
                 contentCategory,
                 contentOwner,
+                contentLanguage: data.contentLanguage,
                 contentLink: data.contentLink,
                 createdAt: data.createdAt,
                 updatedAt: data.updatedAt,
@@ -263,6 +266,7 @@ export class ContentService {
         contentName: contentData.contentName,
         contentTypeId: contentData.contentTypeId, // Only store the ID
         contentCategoryId: contentData.contentCategoryId, // Only store the ID
+        contentLanguage: contentData.contentLanguage,
         contentOwnerId: contentData.contentOwnerId, // Only store the ID
         contentLink: contentData.contentLink,
         updatedAt: new Date(),

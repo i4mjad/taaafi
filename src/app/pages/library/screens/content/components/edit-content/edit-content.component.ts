@@ -16,7 +16,6 @@ import {
   ContentDateModel,
 } from '../../../../../../models/app.model';
 import { AppState } from '../../../../../../state/app.store';
-import { ContentService } from '../../../../../../state/services/content/content.service';
 
 @Component({
   selector: 'app-edit-content',
@@ -32,7 +31,7 @@ export class EditContentComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private store: Store,
-    private contentService: ContentService,
+
     private dialogRef: MatDialogRef<EditContentComponent>,
     @Inject(MAT_DIALOG_DATA) public data: Content // The content object passed to the dialog
   ) {}
@@ -41,6 +40,7 @@ export class EditContentComponent implements OnInit {
     // Initialize the form with the required controls
     this.contentForm = this.fb.group({
       contentName: [this.data.contentName, [Validators.required]],
+      contentLanguage: [this.data.contentLanguage, [Validators.required]],
       contentTypeId: [this.data.contentType.id, [Validators.required]],
       contentCategoryId: [this.data.contentCategory.id, [Validators.required]],
       contentOwnerId: [this.data.contentOwner.id, [Validators.required]],
@@ -86,6 +86,7 @@ export class EditContentComponent implements OnInit {
         contentTypeId,
         contentCategoryId,
         contentOwnerId,
+        contentLanguage,
         contentLink,
         isActive,
       } = this.contentForm.value;
@@ -93,6 +94,7 @@ export class EditContentComponent implements OnInit {
       const contentData: ContentDateModel = {
         contentName,
         contentTypeId,
+        contentLanguage,
         contentCategoryId,
         contentOwnerId,
         contentLink,
