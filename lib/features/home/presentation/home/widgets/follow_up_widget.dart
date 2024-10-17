@@ -32,7 +32,7 @@ class FollowUpWidget extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(icon, color: theme.primary[900]),
+          Icon(icon, color: theme.primary[700]),
           verticalSpace(Spacing.points8),
           Text(
             AppLocalizations.of(context).translate(translationKey),

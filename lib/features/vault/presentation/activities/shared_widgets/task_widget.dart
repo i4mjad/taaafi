@@ -71,7 +71,7 @@ class TaskWidget extends ConsumerWidget {
                     return TaskDescriptionSheet(task);
                   });
             },
-            child: Icon(LucideIcons.info, color: theme.primary[900]),
+            child: Icon(LucideIcons.info, color: theme.primary[700]),
           )
         ],
       ),

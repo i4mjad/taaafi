@@ -33,7 +33,7 @@ class TaaafiPlusScreen extends ConsumerWidget {
                 verticalSpace(Spacing.points24),
                 Text(
                   AppLocalizations.of(context).translate('taaafi-groups'),
-                  style: TextStyles.h2.copyWith(color: theme.primary[900]),
+                  style: TextStyles.h2.copyWith(color: theme.primary[700]),
                 ),
                 verticalSpace(Spacing.points12),
                 WidgetsContainer(
@@ -45,7 +45,7 @@ class TaaafiPlusScreen extends ConsumerWidget {
                     child: Text(
                       AppLocalizations.of(context).translate('soon'),
                       style: TextStyles.h4.copyWith(
-                        color: theme.primary[600],
+                        color: theme.primary[700],
                       ),
                     ),
                   ),
@@ -62,14 +62,14 @@ class TaaafiPlusScreen extends ConsumerWidget {
                             children: [
                               Icon(
                                 LucideIcons.users,
-                                color: theme.primary[800],
+                                color: theme.primary[700],
                               ),
                               horizontalSpace(Spacing.points8),
                               Text(
                                 AppLocalizations.of(context)
                                     .translate('not-alone'),
                                 style: TextStyles.h5.copyWith(
-                                  color: theme.primary[800],
+                                  color: theme.primary[700],
                                 ),
                               ),
                             ],
@@ -93,14 +93,14 @@ class TaaafiPlusScreen extends ConsumerWidget {
                             children: [
                               Icon(
                                 LucideIcons.shield,
-                                color: theme.primary[800],
+                                color: theme.primary[700],
                               ),
                               horizontalSpace(Spacing.points8),
                               Text(
                                 AppLocalizations.of(context)
                                     .translate('privacy-first'),
                                 style: TextStyles.h5.copyWith(
-                                  color: theme.primary[800],
+                                  color: theme.primary[700],
                                 ),
                               ),
                             ],
@@ -124,14 +124,14 @@ class TaaafiPlusScreen extends ConsumerWidget {
                             children: [
                               Icon(
                                 LucideIcons.trophy,
-                                color: theme.primary[800],
+                                color: theme.primary[700],
                               ),
                               horizontalSpace(Spacing.points8),
                               Text(
                                 AppLocalizations.of(context)
                                     .translate('challenge-peers'),
                                 style: TextStyles.h5.copyWith(
-                                  color: theme.primary[800],
+                                  color: theme.primary[700],
                                 ),
                               ),
                             ],
@@ -155,14 +155,14 @@ class TaaafiPlusScreen extends ConsumerWidget {
                             children: [
                               Icon(
                                 LucideIcons.squareStack,
-                                color: theme.primary[800],
+                                color: theme.primary[700],
                               ),
                               horizontalSpace(Spacing.points8),
                               Text(
                                 AppLocalizations.of(context)
                                     .translate('follow-up-peers'),
                                 style: TextStyles.h5.copyWith(
-                                  color: theme.primary[800],
+                                  color: theme.primary[700],
                                 ),
                               ),
                             ],

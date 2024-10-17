@@ -88,7 +88,7 @@ class ActivityOverviewScreen extends ConsumerWidget {
                         });
                   },
                   child: WidgetsContainer(
-                    backgroundColor: theme.primary[900],
+                    backgroundColor: theme.primary[700],
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -151,7 +151,6 @@ class ActivityDescriptionAndStatisticsWidget extends ConsumerWidget {
               ),
             ),
           ],
-
           width: width,
           child: Text(
             'هذا توصيف للقائمة والفكرة منها وطبيعة المحتوى الموجود في هذه القائمة. مثال: قائمة كيف أبدأ تحتوي على بعض المصادر لمساعدة المتعافي للبدء في التعافي وكيف يدخل لهذا العالم. سيتم إضافة التوصيف عند إضافة القائمة.',
