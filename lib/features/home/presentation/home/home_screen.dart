@@ -33,7 +33,7 @@ class HomeScreen extends ConsumerWidget {
         ),
       ),
       floatingActionButton: FloatingActionButton.extended(
-        backgroundColor: theme.primary[900],
+        backgroundColor: theme.primary[700],
         onPressed: () {
           showModalBottomSheet<void>(
             context: context,

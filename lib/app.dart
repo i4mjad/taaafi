@@ -14,8 +14,6 @@ import 'package:reboot_app_3/core/utils/firebase_remote_config_provider.dart';
 import 'package:reboot_app_3/core/utils/url_launcher_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-final _rootNavigatorKey = GlobalKey<NavigatorState>();
-
 class MyApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -52,7 +50,7 @@ class MyApp extends ConsumerWidget {
                 final remoteConfig =
                     await ref.read(firebaseRemoteConfigProvider.future);
                 var string = remoteConfig.getString('required_version');
-                print(string);
+
                 return string;
               },
               iosAppStoreId: "1531562469",

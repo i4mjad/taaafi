@@ -46,13 +46,13 @@ class StatisticsWidget extends StatelessWidget {
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(50),
                             border: Border.all(
-                              color: theme.primary[900]!,
+                              color: theme.primary[700]!,
                               width: 1,
                             ),
                           ),
                           child: Icon(
                             LucideIcons.heart,
-                            color: theme.primary[900],
+                            color: theme.primary[700],
                             size: 20,
                           ),
                         ),
@@ -93,11 +93,11 @@ class StatisticsWidget extends StatelessWidget {
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(50),
                                 border: Border.all(
-                                    color: theme.primary[900]!, width: 1),
+                                    color: theme.primary[700]!, width: 1),
                               ),
                               child: Icon(
                                 LucideIcons.lineChart,
-                                color: theme.primary[900],
+                                color: theme.primary[700],
                                 size: 20,
                               ),
                             ),
@@ -138,11 +138,11 @@ class StatisticsWidget extends StatelessWidget {
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(50),
                                 border: Border.all(
-                                    color: theme.primary[900]!, width: 1),
+                                    color: theme.primary[700]!, width: 1),
                               ),
                               child: Icon(
                                 LucideIcons.calendar,
-                                color: theme.primary[900],
+                                color: theme.primary[700],
                                 size: 20,
                               ),
                             ),

@@ -67,7 +67,7 @@ class CalenderWidget extends StatelessWidget {
                   color: theme.grey[900],
                 ),
               ),
-              todayHighlightColor: theme.primary[900],
+              todayHighlightColor: theme.primary[700],
               monthViewSettings: MonthViewSettings(
                 showTrailingAndLeadingDates: false,
                 agendaStyle: AgendaStyle(

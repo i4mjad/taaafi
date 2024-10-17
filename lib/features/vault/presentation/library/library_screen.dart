@@ -241,14 +241,14 @@ class ContentTypeWidget extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Icon(contentTypeItem.icon, color: theme.primary[900]),
+              Icon(contentTypeItem.icon, color: theme.primary[700]),
               verticalSpace(Spacing.points8),
               Text(
                 AppLocalizations.of(context)
                     .translate(contentTypeItem.contentTypeNameTranslationKey),
                 textAlign: TextAlign.center,
                 style: TextStyles.caption.copyWith(
-                  color: theme.primary[900],
+                  color: theme.grey[900],
                   height: 1,
                 ),
               ),
@@ -383,7 +383,7 @@ class LastAdditionItemWidget extends StatelessWidget {
           child: Center(
             child: Icon(
               latestAdditionItem.icon,
-              color: theme.primary[900],
+              color: theme.primary[700],
             ),
           ),
         ),
@@ -523,7 +523,7 @@ class FeaturedListItemWidget extends StatelessWidget {
           children: [
             Icon(
               listItem.icon,
-              color: theme.primary[900],
+              color: theme.primary[700],
             ),
             horizontalSpace(Spacing.points4),
             Expanded(
