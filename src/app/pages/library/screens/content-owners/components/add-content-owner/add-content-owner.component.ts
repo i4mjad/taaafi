@@ -1,8 +1,9 @@
 import { Component, inject } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Store } from '@ngxs/store';
-import { CreateContentOwnerAction } from '../../../../../../state/app.actions';
+
 import { MatBottomSheetRef } from '@angular/material/bottom-sheet';
+import { CreateContentOwnerAction } from '../../../../../../state/library/library.actions';
 
 @Component({
   selector: 'app-add-content-owner',

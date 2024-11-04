@@ -4,15 +4,16 @@ import { MatDialog } from '@angular/material/dialog';
 import { Store } from '@ngxs/store';
 import { Observable } from 'rxjs';
 import { ContentOwner } from '../../../../models/app.model';
-import {
-  GetContentOwnersAction,
-  DeleteContentOwnerAction,
-  ToggleContentOwnerStatusAction,
-} from '../../../../state/app.actions';
-import { AppState } from '../../../../state/app.store';
+
 import { DeleteContentOwnerComponent } from './components/delete-content-owner/delete-content-owner.component';
 import { EditContentOwnerComponent } from './components/edit-content-owner/edit-content-owner.component';
 import { AddContentOwnerComponent } from './components/add-content-owner/add-content-owner.component';
+import {
+  GetContentOwnersAction,
+  ToggleContentOwnerStatusAction,
+  DeleteContentOwnerAction,
+} from '../../../../state/library/library.actions';
+import { AppState } from '../../../../state/library/library.store';
 
 @Component({
   selector: 'app-content-owners',

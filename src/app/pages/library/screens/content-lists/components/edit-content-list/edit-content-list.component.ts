@@ -9,8 +9,8 @@ import {
   GetActiveContentAction,
   GetContentListByIdAction,
   UpdateContentListAction,
-} from '../../../../../../state/app.actions';
-import { AppState } from '../../../../../../state/app.store';
+} from '../../../../../../state/library/library.actions';
+import { AppState } from '../../../../../../state/library/library.store';
 
 @Component({
   selector: 'app-edit-content-list',

@@ -4,7 +4,10 @@ import {
   AngularFirestore,
 } from '@angular/fire/compat/firestore';
 import { Observable, map, from, switchMap, throwError } from 'rxjs';
-import { ContentOwnerDataModel, ContentOwner } from '../../../models/app.model';
+import {
+  ContentOwnerDataModel,
+  ContentOwner,
+} from '../../../../models/app.model';
 
 @Injectable({
   providedIn: 'root',

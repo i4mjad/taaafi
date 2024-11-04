@@ -2,7 +2,7 @@ import { Component, inject } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { MatBottomSheetRef } from '@angular/material/bottom-sheet';
 import { Store } from '@ngxs/store';
-import { CreateContentTypeAction } from '../../../../../../state/app.actions';
+import { CreateContentTypeAction } from '../../../../../../state/library/library.actions';
 
 @Component({
   selector: 'app-add-new-content-type',
@@ -11,9 +11,7 @@ import { CreateContentTypeAction } from '../../../../../../state/app.actions';
 })
 export class AddNewContentTypeComponent {
   private _bottomSheetRef =
-    inject<MatBottomSheetRef<AddNewContentTypeComponent>>(
-      MatBottomSheetRef
-    );
+    inject<MatBottomSheetRef<AddNewContentTypeComponent>>(MatBottomSheetRef);
 
   contentTypeForm: FormGroup;
 

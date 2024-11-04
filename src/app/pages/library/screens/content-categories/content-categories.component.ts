@@ -1,18 +1,19 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { Store } from '@ngxs/store';
 import { Observable } from 'rxjs';
-import { AppState } from '../../../../state/app.store';
-import {
-  DeleteContentCategoryAction,
-  GetContentCategoriesAction,
-  ToggleContentCategoryStatusAction,
-} from '../../../../state/app.actions';
+
 import { ContentCategory } from '../../../../models/app.model';
 import { MatBottomSheet } from '@angular/material/bottom-sheet';
 import { MatDialog } from '@angular/material/dialog';
 import { AddNewContentCategoryComponent } from './components/add-new-content-category/add-new-content-category.component';
 import { EditContentCategoryComponent } from './components/edit-content-category/edit-content-category.component';
 import { DeleteContentCategoryComponent } from './components/delete-content-category/delete-content-category.component';
+import {
+  GetContentCategoriesAction,
+  ToggleContentCategoryStatusAction,
+  DeleteContentCategoryAction,
+} from '../../../../state/library/library.actions';
+import { AppState } from '../../../../state/library/library.store';
 
 @Component({
   selector: 'app-content-categories',

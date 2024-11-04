@@ -5,7 +5,7 @@ import {
   ContentListDataModel,
   ContentOwner,
   ContentType,
-} from '../models/app.model';
+} from '../../models/app.model';
 
 export class GetContentsAction {
   static readonly type = '[TaaafiControlPanel] Get Contents Action';

@@ -5,7 +5,10 @@ import {
 } from '@angular/fire/compat/firestore';
 import { Observable, from, throwError } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
-import { ContentType, ContentTypeDataModel } from '../../../models/app.model';
+import {
+  ContentType,
+  ContentTypeDataModel,
+} from '../../../../models/app.model';
 
 @Injectable({
   providedIn: 'root',

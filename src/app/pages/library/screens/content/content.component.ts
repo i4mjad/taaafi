@@ -4,17 +4,18 @@ import { MatDialog } from '@angular/material/dialog';
 import { Store } from '@ngxs/store';
 import { Observable } from 'rxjs';
 import { Content } from '../../../../models/app.model';
-import { AppState } from '../../../../state/app.store';
-import {
-  GetContentsAction,
-  ToggleContentStatusAction,
-  DeleteContentAction,
-} from '../../../../state/app.actions';
+
 import { AddNewContentComponent } from './components/add-new-content/add-new-content.component';
 
 import { Timestamp } from 'firebase/firestore';
 import { EditContentComponent } from './components/edit-content/edit-content.component';
 import { DeleteContentComponent } from './components/delete-content/delete-content.component';
+import {
+  GetContentsAction,
+  ToggleContentStatusAction,
+  DeleteContentAction,
+} from '../../../../state/library/library.actions';
+import { AppState } from '../../../../state/library/library.store';
 
 @Component({
   selector: 'app-content',

@@ -6,14 +6,14 @@ import {
   Content,
   ContentListDataModel,
 } from '../../../../../../models/app.model';
-import {
-  CreateContentListAction,
-  GetActiveContentAction,
-  GetContentsAction,
-} from '../../../../../../state/app.actions';
-import { AppState } from '../../../../../../state/app.store';
+
 import { MatCheckboxChange } from '@angular/material/checkbox';
 import { MatDialogRef } from '@angular/material/dialog';
+import {
+  GetContentsAction,
+  CreateContentListAction,
+} from '../../../../../../state/library/library.actions';
+import { AppState } from '../../../../../../state/library/library.store';
 
 @Component({
   selector: 'app-add-new-content-list',

@@ -1,18 +1,19 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { Store } from '@ngxs/store';
 import { Observable } from 'rxjs';
-import { AppState } from '../../../../state/app.store';
-import {
-  DeleteContentTypeAction,
-  GetContentTypesAction,
-  ToggleContentTypeStatusAction,
-} from '../../../../state/app.actions';
+
 import { ContentType } from '../../../../models/app.model';
 import { MatBottomSheet } from '@angular/material/bottom-sheet';
 import { AddNewContentTypeComponent } from './componenets/add-new-content-type/add-new-content-type.component';
 import { EditContentTypeComponent } from './componenets/edit-content-type/edit-content-type.component';
 import { MatDialog } from '@angular/material/dialog';
 import { DeleteContentTypeComponent } from './componenets/delete-content-type/delete-content-type.component';
+import {
+  GetContentTypesAction,
+  ToggleContentTypeStatusAction,
+  DeleteContentTypeAction,
+} from '../../../../state/library/library.actions';
+import { AppState } from '../../../../state/library/library.store';
 
 @Component({
   selector: 'app-content-types',

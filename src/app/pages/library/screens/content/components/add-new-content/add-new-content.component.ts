@@ -7,14 +7,14 @@ import {
   ContentCategory,
   ContentOwner,
 } from '../../../../../../models/app.model';
+import { Observable } from 'rxjs';
 import {
-  CreateContentAction,
+  GetContentTypesAction,
   GetContentCategoriesAction,
   GetContentOwnersAction,
-  GetContentTypesAction,
-} from '../../../../../../state/app.actions';
-import { Observable } from 'rxjs';
-import { AppState } from '../../../../../../state/app.store';
+  CreateContentAction,
+} from '../../../../../../state/library/library.actions';
+import { AppState } from '../../../../../../state/library/library.store';
 
 @Component({
   selector: 'app-add-new-content',

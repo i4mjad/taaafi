@@ -2,7 +2,7 @@ import { Component, inject, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { MatBottomSheetRef } from '@angular/material/bottom-sheet';
 import { Store } from '@ngxs/store';
-import { CreateContentCategoryAction } from '../../../../../../state/app.actions';
+import { CreateContentCategoryAction } from '../../../../../../state/library/library.actions';
 
 @Component({
   selector: 'app-add-new-content-category',

@@ -3,7 +3,7 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Store } from '@ngxs/store';
 import { ContentOwner } from '../../../../../../models/app.model';
-import { UpdateContentOwnerAction } from '../../../../../../state/app.actions';
+import { UpdateContentOwnerAction } from '../../../../../../state/library/library.actions';
 
 @Component({
   selector: 'app-edit-content-owner',

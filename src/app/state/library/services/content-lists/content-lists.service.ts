@@ -11,7 +11,7 @@ import {
   ContentOwnerDataModel,
   ContentType,
   ContentTypeDataModel,
-} from '../../../models/app.model';
+} from '../../../../models/app.model';
 import {
   AngularFirestoreCollection,
   AngularFirestore,

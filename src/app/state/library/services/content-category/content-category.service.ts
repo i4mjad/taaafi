@@ -8,7 +8,7 @@ import { map, switchMap } from 'rxjs/operators';
 import {
   ContentCategory,
   ContentCategoryDataModel,
-} from '../../../models/app.model';
+} from '../../../../models/app.model';
 
 @Injectable({
   providedIn: 'root',

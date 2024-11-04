@@ -3,7 +3,7 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Store } from '@ngxs/store';
 import { ContentType } from '../../../../../../models/app.model';
-import { UpdateContentTypeAction } from '../../../../../../state/app.actions';
+import { UpdateContentTypeAction } from '../../../../../../state/library/library.actions';
 
 @Component({
   selector: 'app-edit-content-type',

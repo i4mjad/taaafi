@@ -17,15 +17,15 @@ import {
 } from 'rxjs';
 import {
   ContentDateModel,
-  Content,
-  ContentCategory,
+  ContentTypeDataModel,
   ContentCategoryDataModel,
-  ContentOwner,
   ContentOwnerDataModel,
   ContentType,
-  ContentTypeDataModel,
-} from '../../../models/app.model';
-import { AuthService } from '../../../services/auth.service';
+  ContentCategory,
+  ContentOwner,
+  Content,
+} from '../../../../models/app.model';
+import { AuthService } from '../../../../services/auth.service';
 
 @Injectable({
   providedIn: 'root',

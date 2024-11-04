@@ -29,7 +29,7 @@ import {
   UpdateContentListAction,
   UpdateContentOwnerAction,
   UpdateContentTypeAction,
-} from './app.actions';
+} from './library.actions';
 import {
   Content,
   ContentCategory,
@@ -42,7 +42,7 @@ import {
   ContentOwnerDataModel,
   ContentType,
   ContentTypeDataModel,
-} from '../models/app.model';
+} from '../../models/app.model';
 import { tap, catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import { ContentTypeService } from './services/content-type/content-type.service';

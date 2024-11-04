@@ -1,10 +1,5 @@
 import { Component, Inject, OnInit } from '@angular/core';
-import {
-  GetContentCategoriesAction,
-  GetContentOwnersAction,
-  GetContentTypesAction,
-  UpdateContentAction,
-} from '../../../../../../state/app.actions';
+
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Store } from '@ngxs/store';
@@ -15,7 +10,13 @@ import {
   Content,
   ContentDateModel,
 } from '../../../../../../models/app.model';
-import { AppState } from '../../../../../../state/app.store';
+import {
+  GetContentTypesAction,
+  GetContentCategoriesAction,
+  GetContentOwnersAction,
+  UpdateContentAction,
+} from '../../../../../../state/library/library.actions';
+import { AppState } from '../../../../../../state/library/library.store';
 
 @Component({
   selector: 'app-edit-content',

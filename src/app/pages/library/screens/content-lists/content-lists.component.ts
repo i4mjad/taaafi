@@ -7,16 +7,17 @@ import {
   ContentList,
   ContentListViewModel,
 } from '../../../../models/app.model';
+
+import { AddNewContentListComponent } from '../content-lists/components/add-new-content-list/add-new-content-list.component';
+import { DeleteContentListComponent } from '../content-lists/components/delete-content-list/delete-content-list.component';
+import { EditContentListComponent } from '../content-lists/components/edit-content-list/edit-content-list.component';
 import {
   GetContentListsAction,
   ToggleContentListStatusAction,
   ToggleContentListFeaturedAction,
   DeleteContentListAction,
-} from '../../../../state/app.actions';
-import { AppState } from '../../../../state/app.store';
-import { AddNewContentListComponent } from '../content-lists/components/add-new-content-list/add-new-content-list.component';
-import { DeleteContentListComponent } from '../content-lists/components/delete-content-list/delete-content-list.component';
-import { EditContentListComponent } from '../content-lists/components/edit-content-list/edit-content-list.component';
+} from '../../../../state/library/library.actions';
+import { AppState } from '../../../../state/library/library.store';
 
 @Component({
   selector: 'app-content-lists',
