@@ -89,6 +89,7 @@ export class EditContentComponent implements OnInit {
         contentLanguage,
         contentLink,
         isActive,
+        isDeleted,
       } = this.contentForm.value;
 
       const contentData: ContentDateModel = {
@@ -101,6 +102,7 @@ export class EditContentComponent implements OnInit {
         updatedAt: new Date(), // Automatically update the timestamp
         updatedBy: '', // Set this to the current user's ID
         isActive,
+        isDeleted,
       };
 
       // Dispatch the updated content data with the content ID

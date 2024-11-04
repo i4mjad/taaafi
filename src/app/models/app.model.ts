@@ -32,6 +32,7 @@ export interface ContentDateModel {
   updatedAt?: Date;
   updatedBy: string; // user id
   isActive: boolean;
+  isDeleted: boolean;
 }
 
 export interface ContentCategory {

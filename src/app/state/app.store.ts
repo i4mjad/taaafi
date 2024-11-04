@@ -499,6 +499,7 @@ export class AppState {
       updatedAt: new Date(),
       updatedBy: action.updatedBy,
       isActive: action.isActive,
+      isDeleted: false,
     };
 
     return this.contentService.createContent(newContent).pipe(

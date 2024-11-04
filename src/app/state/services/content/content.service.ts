@@ -94,11 +94,15 @@ export class ContentService {
 
   // Method to get the contents with all their related documents
   getContents(): Observable<Content[]> {
-    return this.contentCollectionsRef.snapshotChanges().pipe(
-      switchMap((contentDocuments) => {
-        const contentObservables = contentDocuments.map((contentDoc) => {
-          const data = contentDoc.payload.doc.data() as ContentDateModel;
-          const id = contentDoc.payload.doc.id;
+    return from(
+      this.contentCollectionsRef.ref
+        .where('isDeleted', '==', false) // Add a filter to only get documents that are not deleted
+        .get()
+    ).pipe(
+      switchMap((querySnapshot) => {
+        const contentObservables = querySnapshot.docs.map((contentDoc) => {
+          const data = contentDoc.data() as ContentDateModel;
+          const id = contentDoc.id;
 
           return this.getRelatedData(data, id);
         });
@@ -117,7 +121,7 @@ export class ContentService {
       switchMap((contentDocuments) => {
         const activeContentDocuments = contentDocuments.filter((contentDoc) => {
           const data = contentDoc.payload.doc.data() as ContentDateModel;
-          return data.isActive;
+          return data.isActive && !data.isDeleted;
         });
 
         const contentObservables = activeContentDocuments.map((contentDoc) => {
@@ -278,6 +282,6 @@ export class ContentService {
 
   // Method to delete content
   deleteContent(id: string): Observable<void> {
-    return from(this.contentCollectionsRef.doc(id).delete());
+    return from(this.contentCollectionsRef.doc(id).update({ isDeleted: true }));
   }
 }
