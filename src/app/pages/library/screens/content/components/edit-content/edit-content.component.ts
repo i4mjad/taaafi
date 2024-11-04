@@ -16,7 +16,7 @@ import {
   GetContentOwnersAction,
   UpdateContentAction,
 } from '../../../../../../state/library/library.actions';
-import { AppState } from '../../../../../../state/library/library.store';
+import { LibraryState } from '../../../../../../state/library/library.store';
 
 @Component({
   selector: 'app-edit-content',
@@ -58,7 +58,7 @@ export class EditContentComponent implements OnInit {
   // Load content types from Firestore
   loadContentTypes() {
     this.store.dispatch(new GetContentTypesAction());
-    this.store.select(AppState.contentTypes).subscribe((data) => {
+    this.store.select(LibraryState.contentTypes).subscribe((data) => {
       this.contentTypes = data;
     });
   }
@@ -66,7 +66,7 @@ export class EditContentComponent implements OnInit {
   // Load content categories from Firestore
   loadContentCategories() {
     this.store.dispatch(new GetContentCategoriesAction());
-    this.store.select(AppState.contentCategories).subscribe((data) => {
+    this.store.select(LibraryState.contentCategories).subscribe((data) => {
       this.contentCategories = data;
     });
   }
@@ -74,7 +74,7 @@ export class EditContentComponent implements OnInit {
   // Load content owners from Firestore
   loadContentOwners() {
     this.store.dispatch(new GetContentOwnersAction());
-    this.store.select(AppState.contentOwners).subscribe((data) => {
+    this.store.select(LibraryState.contentOwners).subscribe((data) => {
       this.contentOwners = data;
     });
   }

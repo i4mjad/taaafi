@@ -51,7 +51,7 @@ import { ContentOwnerService } from './services/content-owner/content-owner.serv
 import { ContentService } from './services/content/content.service';
 import { ContentListService } from './services/content-lists/content-lists.service';
 
-interface AppStateModel {
+interface LibraryStateModel {
   contents: Content[];
   activeContent: Content[];
   contentLists: ContentListViewModel[];
@@ -61,8 +61,8 @@ interface AppStateModel {
   contentOwners: ContentOwner[];
 }
 
-@State<AppStateModel>({
-  name: 'taaafiControlPanel',
+@State<LibraryStateModel>({
+  name: 'library',
   defaults: {
     contents: [],
     activeContent: [],
@@ -81,38 +81,38 @@ interface AppStateModel {
   },
 })
 @Injectable()
-export class AppState {
+export class LibraryState {
   @Selector()
-  static content(state: AppStateModel): Content[] {
+  static content(state: LibraryStateModel): Content[] {
     return state.contents;
   }
 
   @Selector()
-  static contentLists(state: AppStateModel): ContentListViewModel[] {
+  static contentLists(state: LibraryStateModel): ContentListViewModel[] {
     return state.contentLists;
   }
   @Selector()
-  static contentTypes(state: AppStateModel): ContentType[] {
+  static contentTypes(state: LibraryStateModel): ContentType[] {
     return state.contentTypes;
   }
 
   @Selector()
-  static selectedContentList(state: AppStateModel): ContentList {
+  static selectedContentList(state: LibraryStateModel): ContentList {
     return state.selectedContentList;
   }
 
   @Selector()
-  static contentCategories(state: AppStateModel): ContentCategory[] {
+  static contentCategories(state: LibraryStateModel): ContentCategory[] {
     return state.contentCategories;
   }
 
   @Selector()
-  static contentOwners(state: AppStateModel): ContentOwner[] {
+  static contentOwners(state: LibraryStateModel): ContentOwner[] {
     return state.contentOwners;
   }
 
   @Selector()
-  static activeContent(state: AppStateModel): Content[] {
+  static activeContent(state: LibraryStateModel): Content[] {
     return state.activeContent;
   }
 
@@ -125,7 +125,7 @@ export class AppState {
   ) {}
 
   @Action(GetContentCategoriesAction)
-  getContentCategories(ctx: StateContext<AppStateModel>) {
+  getContentCategories(ctx: StateContext<LibraryStateModel>) {
     return this.contentCategoryService.getContentCategories().pipe(
       tap((contentCategories) => ctx.patchState({ contentCategories })),
       catchError((error) => {
@@ -137,7 +137,7 @@ export class AppState {
 
   @Action(GetContentListByIdAction)
   getContentList(
-    ctx: StateContext<AppStateModel>,
+    ctx: StateContext<LibraryStateModel>,
     action: GetContentListByIdAction
   ) {
     return this.contentListService.getContentListById(action.id).pipe(
@@ -150,7 +150,7 @@ export class AppState {
   }
 
   @Action(GetActiveContentAction)
-  getActiveContentCategories(ctx: StateContext<AppStateModel>) {
+  getActiveContentCategories(ctx: StateContext<LibraryStateModel>) {
     return this.contentService.getActiveContents().pipe(
       tap((activeContent) => ctx.patchState({ activeContent })),
       catchError((error) => {
@@ -162,7 +162,7 @@ export class AppState {
 
   @Action(ToggleContentCategoryStatusAction)
   toggleContentCategoryStatus(
-    ctx: StateContext<AppStateModel>,
+    ctx: StateContext<LibraryStateModel>,
     action: ToggleContentCategoryStatusAction
   ) {
     return this.contentCategoryService
@@ -188,7 +188,7 @@ export class AppState {
 
   @Action(CreateContentCategoryAction)
   createContentCategory(
-    ctx: StateContext<AppStateModel>,
+    ctx: StateContext<LibraryStateModel>,
     action: CreateContentCategoryAction
   ) {
     const newContentCategory: ContentCategoryDataModel = {
@@ -214,7 +214,7 @@ export class AppState {
 
   @Action(UpdateContentCategoryAction)
   updateContentCategory(
-    ctx: StateContext<AppStateModel>,
+    ctx: StateContext<LibraryStateModel>,
     action: UpdateContentCategoryAction
   ) {
     return this.contentCategoryService
@@ -237,7 +237,7 @@ export class AppState {
 
   @Action(DeleteContentCategoryAction)
   deleteContentCategory(
-    ctx: StateContext<AppStateModel>,
+    ctx: StateContext<LibraryStateModel>,
     action: DeleteContentCategoryAction
   ) {
     return this.contentCategoryService.deleteContentCategory(action.id).pipe(
@@ -255,7 +255,7 @@ export class AppState {
   }
 
   @Action(GetContentTypesAction)
-  getContentTypes(ctx: StateContext<AppStateModel>) {
+  getContentTypes(ctx: StateContext<LibraryStateModel>) {
     return this.contentTypeService.getContentTypes().pipe(
       tap((contentTypes) => ctx.patchState({ contentTypes })),
       catchError((error) => {
@@ -267,7 +267,7 @@ export class AppState {
 
   @Action(ToggleContentTypeStatusAction)
   toggleContentTypeStatus(
-    ctx: StateContext<AppStateModel>,
+    ctx: StateContext<LibraryStateModel>,
     action: ToggleContentTypeStatusAction
   ) {
     return this.contentTypeService.toggleContentTypeStatus(action.id).pipe(
@@ -289,7 +289,7 @@ export class AppState {
 
   @Action(CreateContentTypeAction)
   createContentType(
-    ctx: StateContext<AppStateModel>,
+    ctx: StateContext<LibraryStateModel>,
     action: CreateContentTypeAction
   ) {
     const newContentType: ContentTypeDataModel = {
@@ -313,7 +313,7 @@ export class AppState {
 
   @Action(UpdateContentTypeAction)
   updateContentType(
-    ctx: StateContext<AppStateModel>,
+    ctx: StateContext<LibraryStateModel>,
     action: UpdateContentTypeAction
   ) {
     return this.contentTypeService.updateContentType(action.contentType).pipe(
@@ -334,7 +334,7 @@ export class AppState {
 
   @Action(DeleteContentTypeAction)
   deleteContentType(
-    ctx: StateContext<AppStateModel>,
+    ctx: StateContext<LibraryStateModel>,
     action: DeleteContentTypeAction
   ) {
     return this.contentTypeService.deleteContentType(action.id).pipe(
@@ -352,7 +352,7 @@ export class AppState {
   }
 
   @Action(GetContentOwnersAction)
-  getContentOwners(ctx: StateContext<AppStateModel>) {
+  getContentOwners(ctx: StateContext<LibraryStateModel>) {
     return this.contentOwnerService.getContentOwners().pipe(
       tap((contentOwners) => ctx.patchState({ contentOwners })),
       catchError((error) => {
@@ -364,7 +364,7 @@ export class AppState {
 
   @Action(CreateContentOwnerAction)
   createContentOwner(
-    ctx: StateContext<AppStateModel>,
+    ctx: StateContext<LibraryStateModel>,
     action: CreateContentOwnerAction
   ) {
     const newContentOwner: ContentOwnerDataModel = {
@@ -389,7 +389,7 @@ export class AppState {
 
   @Action(UpdateContentOwnerAction)
   updateContentOwner(
-    ctx: StateContext<AppStateModel>,
+    ctx: StateContext<LibraryStateModel>,
     action: UpdateContentOwnerAction
   ) {
     return this.contentOwnerService
@@ -412,7 +412,7 @@ export class AppState {
 
   @Action(DeleteContentOwnerAction)
   deleteContentOwner(
-    ctx: StateContext<AppStateModel>,
+    ctx: StateContext<LibraryStateModel>,
     action: DeleteContentOwnerAction
   ) {
     return this.contentOwnerService.deleteContentOwner(action.id).pipe(
@@ -431,7 +431,7 @@ export class AppState {
 
   @Action(ToggleContentOwnerStatusAction)
   toggleContentOwnerStatus(
-    ctx: StateContext<AppStateModel>,
+    ctx: StateContext<LibraryStateModel>,
     action: ToggleContentOwnerStatusAction
   ) {
     return this.contentOwnerService.toggleContentOwnerStatus(action.id).pipe(
@@ -452,7 +452,7 @@ export class AppState {
   }
 
   @Action(GetContentsAction)
-  getContents(ctx: StateContext<AppStateModel>) {
+  getContents(ctx: StateContext<LibraryStateModel>) {
     return this.contentService.getContents().pipe(
       tap((contents) => {
         ctx.patchState({ contents });
@@ -466,7 +466,7 @@ export class AppState {
 
   @Action(ToggleContentStatusAction)
   toggleContentStatus(
-    ctx: StateContext<AppStateModel>,
+    ctx: StateContext<LibraryStateModel>,
     action: ToggleContentStatusAction
   ) {
     return this.contentService.toggleContentStatus(action.id).pipe(
@@ -487,7 +487,10 @@ export class AppState {
   }
 
   @Action(CreateContentAction)
-  createContent(ctx: StateContext<AppStateModel>, action: CreateContentAction) {
+  createContent(
+    ctx: StateContext<LibraryStateModel>,
+    action: CreateContentAction
+  ) {
     const newContent: ContentDateModel = {
       contentName: action.contentName,
       contentTypeId: action.contentTypeId,
@@ -516,7 +519,10 @@ export class AppState {
   }
 
   @Action(UpdateContentAction)
-  updateContent(ctx: StateContext<AppStateModel>, action: UpdateContentAction) {
+  updateContent(
+    ctx: StateContext<LibraryStateModel>,
+    action: UpdateContentAction
+  ) {
     return this.contentService
       .updateContent(action.contentId, action.contentData)
       .pipe(
@@ -538,7 +544,10 @@ export class AppState {
   }
 
   @Action(DeleteContentAction)
-  deleteContent(ctx: StateContext<AppStateModel>, action: DeleteContentAction) {
+  deleteContent(
+    ctx: StateContext<LibraryStateModel>,
+    action: DeleteContentAction
+  ) {
     return this.contentService.deleteContent(action.id).pipe(
       tap(() => {
         const contents = ctx
@@ -554,7 +563,7 @@ export class AppState {
   }
 
   @Action(GetContentListsAction)
-  getContentLists(ctx: StateContext<AppStateModel>) {
+  getContentLists(ctx: StateContext<LibraryStateModel>) {
     return this.contentListService.getContentLists().pipe(
       tap((contentLists) => {
         if (contentLists.length > 0) {
@@ -575,7 +584,7 @@ export class AppState {
 
   @Action(CreateContentListAction)
   createContentList(
-    ctx: StateContext<AppStateModel>,
+    ctx: StateContext<LibraryStateModel>,
     action: CreateContentListAction
   ) {
     const newContentList: ContentListDataModel = {
@@ -601,7 +610,7 @@ export class AppState {
 
   @Action(UpdateContentListAction)
   updateContentList(
-    ctx: StateContext<AppStateModel>,
+    ctx: StateContext<LibraryStateModel>,
     action: UpdateContentListAction
   ) {
     return this.contentListService
@@ -620,7 +629,7 @@ export class AppState {
 
   @Action(DeleteContentListAction)
   deleteContentList(
-    ctx: StateContext<AppStateModel>,
+    ctx: StateContext<LibraryStateModel>,
     action: DeleteContentListAction
   ) {
     return this.contentListService.deleteContentList(action.id).pipe(
@@ -637,7 +646,7 @@ export class AppState {
 
   @Action(ToggleContentListStatusAction)
   toggleContentListStatus(
-    ctx: StateContext<AppStateModel>,
+    ctx: StateContext<LibraryStateModel>,
     action: ToggleContentListStatusAction
   ) {
     return this.contentListService.toggleContentListStatus(action.id).pipe(
@@ -659,7 +668,7 @@ export class AppState {
 
   @Action(ToggleContentListFeaturedAction)
   toggleContentListFeatured(
-    ctx: StateContext<AppStateModel>,
+    ctx: StateContext<LibraryStateModel>,
     action: ToggleContentListFeaturedAction
   ) {
     return this.contentListService.toggleContentListFeatured(action.id).pipe(

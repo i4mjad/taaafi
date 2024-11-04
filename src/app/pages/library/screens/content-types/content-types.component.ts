@@ -13,7 +13,7 @@ import {
   ToggleContentTypeStatusAction,
   DeleteContentTypeAction,
 } from '../../../../state/library/library.actions';
-import { AppState } from '../../../../state/library/library.store';
+import { LibraryState } from '../../../../state/library/library.store';
 
 @Component({
   selector: 'app-content-types',
@@ -22,7 +22,7 @@ import { AppState } from '../../../../state/library/library.store';
 })
 export class ContentTypesComponent implements OnInit {
   contentTypes$: Observable<ContentType[]> = inject(Store).select(
-    AppState.contentTypes
+    LibraryState.contentTypes
   );
   tableColumns: String[] = ['id', 'contentTypeName', 'enable', 'actions'];
 

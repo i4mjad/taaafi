@@ -13,7 +13,7 @@ import {
   ToggleContentCategoryStatusAction,
   DeleteContentCategoryAction,
 } from '../../../../state/library/library.actions';
-import { AppState } from '../../../../state/library/library.store';
+import { LibraryState } from '../../../../state/library/library.store';
 
 @Component({
   selector: 'app-content-categories',
@@ -22,7 +22,7 @@ import { AppState } from '../../../../state/library/library.store';
 })
 export class ContentCategoriesComponent implements OnInit {
   contentCategories$: Observable<ContentCategory[]> = inject(Store).select(
-    AppState.contentCategories
+    LibraryState.contentCategories
   );
   tableColumns: String[] = ['id', 'contentTypeName', 'enable', 'actions'];
 

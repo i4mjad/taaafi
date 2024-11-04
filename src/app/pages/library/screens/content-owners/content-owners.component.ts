@@ -13,7 +13,7 @@ import {
   ToggleContentOwnerStatusAction,
   DeleteContentOwnerAction,
 } from '../../../../state/library/library.actions';
-import { AppState } from '../../../../state/library/library.store';
+import { LibraryState } from '../../../../state/library/library.store';
 
 @Component({
   selector: 'app-content-owners',
@@ -22,7 +22,7 @@ import { AppState } from '../../../../state/library/library.store';
 })
 export class ContentOwnersComponent {
   contentOwners$: Observable<ContentOwner[]> = inject(Store).select(
-    AppState.contentOwners
+    LibraryState.contentOwners
   );
   tableColumns: string[] = [
     'id',

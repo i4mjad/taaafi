@@ -17,7 +17,7 @@ import {
   ToggleContentListFeaturedAction,
   DeleteContentListAction,
 } from '../../../../state/library/library.actions';
-import { AppState } from '../../../../state/library/library.store';
+import { LibraryState } from '../../../../state/library/library.store';
 
 @Component({
   selector: 'app-content-lists',
@@ -26,7 +26,7 @@ import { AppState } from '../../../../state/library/library.store';
 })
 export class ContentListsComponent implements OnInit {
   contentLists$: Observable<ContentListViewModel[]> = inject(Store).select(
-    AppState.contentLists
+    LibraryState.contentLists
   );
   tableColumns: String[] = [
     'id',

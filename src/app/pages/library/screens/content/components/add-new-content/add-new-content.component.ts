@@ -14,7 +14,7 @@ import {
   GetContentOwnersAction,
   CreateContentAction,
 } from '../../../../../../state/library/library.actions';
-import { AppState } from '../../../../../../state/library/library.store';
+import { LibraryState } from '../../../../../../state/library/library.store';
 
 @Component({
   selector: 'app-add-new-content',
@@ -23,13 +23,13 @@ import { AppState } from '../../../../../../state/library/library.store';
 })
 export class AddNewContentComponent implements OnInit {
   contentTypes$: Observable<ContentType[]> = inject(Store).select(
-    AppState.contentTypes
+    LibraryState.contentTypes
   );
   contentCategories$: Observable<ContentCategory[]> = inject(Store).select(
-    AppState.contentCategories
+    LibraryState.contentCategories
   );
   contentOwners$: Observable<ContentOwner[]> = inject(Store).select(
-    AppState.contentOwners
+    LibraryState.contentOwners
   );
 
   contentForm: FormGroup;

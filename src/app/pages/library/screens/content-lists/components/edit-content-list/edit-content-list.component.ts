@@ -10,7 +10,7 @@ import {
   GetContentListByIdAction,
   UpdateContentListAction,
 } from '../../../../../../state/library/library.actions';
-import { AppState } from '../../../../../../state/library/library.store';
+import { LibraryState } from '../../../../../../state/library/library.store';
 
 @Component({
   selector: 'app-edit-content-list',
@@ -19,9 +19,11 @@ import { AppState } from '../../../../../../state/library/library.store';
 })
 export class EditContentListComponent {
   contentListForm: FormGroup;
-  contents$: Observable<Content[]> = this.store.select(AppState.activeContent);
+  contents$: Observable<Content[]> = this.store.select(
+    LibraryState.activeContent
+  );
   selectedContentList$: Observable<ContentList> = this.store.select(
-    AppState.selectedContentList
+    LibraryState.selectedContentList
   );
 
   allContent: Content[] = [];

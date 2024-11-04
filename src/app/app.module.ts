@@ -47,7 +47,7 @@ import { ContentListsComponent } from './pages/library/screens/content-lists/con
 import { AddNewContentListComponent } from './pages/library/screens/content-lists/components/add-new-content-list/add-new-content-list.component';
 import { DeleteContentListComponent } from './pages/library/screens/content-lists/components/delete-content-list/delete-content-list.component';
 import { EditContentListComponent } from './pages/library/screens/content-lists/components/edit-content-list/edit-content-list.component';
-import { AppState } from './state/library/library.store';
+import { LibraryState } from './state/library/library.store';
 
 @NgModule({
   declarations: [
@@ -86,7 +86,7 @@ import { AppState } from './state/library/library.store';
     BrowserModule,
     AppRoutingModule,
     HttpClientModule,
-    NgxsModule.forRoot([AppState]),
+    NgxsModule.forRoot([LibraryState]),
 
     AngularFireModule.initializeApp(environment.firebase),
     AngularFireAuthModule, // Authentication module

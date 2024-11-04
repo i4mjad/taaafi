@@ -15,7 +15,7 @@ import {
   ToggleContentStatusAction,
   DeleteContentAction,
 } from '../../../../state/library/library.actions';
-import { AppState } from '../../../../state/library/library.store';
+import { LibraryState } from '../../../../state/library/library.store';
 
 @Component({
   selector: 'app-content',
@@ -23,7 +23,7 @@ import { AppState } from '../../../../state/library/library.store';
   styleUrl: './content.component.scss',
 })
 export class ContentComponent {
-  content$: Observable<Content[]> = inject(Store).select(AppState.content);
+  content$: Observable<Content[]> = inject(Store).select(LibraryState.content);
   tableColumns: string[] = [
     'contentName',
     'contentType',

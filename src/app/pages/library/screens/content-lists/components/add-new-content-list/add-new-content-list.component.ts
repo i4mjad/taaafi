@@ -13,7 +13,7 @@ import {
   GetContentsAction,
   CreateContentListAction,
 } from '../../../../../../state/library/library.actions';
-import { AppState } from '../../../../../../state/library/library.store';
+import { LibraryState } from '../../../../../../state/library/library.store';
 
 @Component({
   selector: 'app-add-new-content-list',
@@ -22,7 +22,7 @@ import { AppState } from '../../../../../../state/library/library.store';
 })
 export class AddNewContentListComponent {
   contentListForm: FormGroup;
-  contents$: Observable<Content[]> = this.store.select(AppState.content);
+  contents$: Observable<Content[]> = this.store.select(LibraryState.content);
 
   allContent: Content[] = []; // Store the original content list
   filteredContent: Content[] = []; // The filtered content list
