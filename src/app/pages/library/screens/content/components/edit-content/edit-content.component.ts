@@ -9,7 +9,7 @@ import {
   ContentOwner,
   Content,
   ContentDateModel,
-} from '../../../../../../models/app.model';
+} from '../../../../../../models/library.model';
 import {
   GetContentTypesAction,
   GetContentCategoriesAction,

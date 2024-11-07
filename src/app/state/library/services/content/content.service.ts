@@ -24,7 +24,7 @@ import {
   ContentCategory,
   ContentOwner,
   Content,
-} from '../../../../models/app.model';
+} from '../../../../models/library.model';
 import { AuthService } from '../../../../services/auth.service';
 
 @Injectable({

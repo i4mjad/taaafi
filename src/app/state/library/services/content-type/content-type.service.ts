@@ -8,7 +8,7 @@ import { map, switchMap } from 'rxjs/operators';
 import {
   ContentType,
   ContentTypeDataModel,
-} from '../../../../models/app.model';
+} from '../../../../models/library.model';
 
 @Injectable({
   providedIn: 'root',

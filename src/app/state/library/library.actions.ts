@@ -5,7 +5,7 @@ import {
   ContentListDataModel,
   ContentOwner,
   ContentType,
-} from '../../models/app.model';
+} from '../../models/library.model';
 
 export class GetContentsAction {
   static readonly type = '[Library] Get Contents Action';

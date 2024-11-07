@@ -2,7 +2,7 @@ import { Component, inject, OnInit } from '@angular/core';
 import { Store } from '@ngxs/store';
 import { Observable } from 'rxjs';
 
-import { ContentCategory } from '../../../../models/app.model';
+import { ContentCategory } from '../../../../models/library.model';
 import { MatBottomSheet } from '@angular/material/bottom-sheet';
 import { MatDialog } from '@angular/material/dialog';
 import { AddNewContentCategoryComponent } from './components/add-new-content-category/add-new-content-category.component';

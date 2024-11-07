@@ -3,7 +3,7 @@ import { MatBottomSheet } from '@angular/material/bottom-sheet';
 import { MatDialog } from '@angular/material/dialog';
 import { Store } from '@ngxs/store';
 import { Observable } from 'rxjs';
-import { ContentOwner } from '../../../../models/app.model';
+import { ContentOwner } from '../../../../models/library.model';
 
 import { DeleteContentOwnerComponent } from './components/delete-content-owner/delete-content-owner.component';
 import { EditContentOwnerComponent } from './components/edit-content-owner/edit-content-owner.component';

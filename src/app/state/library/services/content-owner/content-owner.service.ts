@@ -7,7 +7,7 @@ import { Observable, map, from, switchMap, throwError } from 'rxjs';
 import {
   ContentOwnerDataModel,
   ContentOwner,
-} from '../../../../models/app.model';
+} from '../../../../models/library.model';
 
 @Injectable({
   providedIn: 'root',

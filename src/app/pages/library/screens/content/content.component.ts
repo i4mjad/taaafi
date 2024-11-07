@@ -3,7 +3,7 @@ import { MatBottomSheet } from '@angular/material/bottom-sheet';
 import { MatDialog } from '@angular/material/dialog';
 import { Store } from '@ngxs/store';
 import { Observable } from 'rxjs';
-import { Content } from '../../../../models/app.model';
+import { Content } from '../../../../models/library.model';
 
 import { AddNewContentComponent } from './components/add-new-content/add-new-content.component';
 

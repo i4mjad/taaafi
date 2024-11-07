@@ -2,7 +2,7 @@ import { Component, Inject } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Store } from '@ngxs/store';
-import { ContentType } from '../../../../../../models/app.model';
+import { ContentType } from '../../../../../../models/library.model';
 import { UpdateContentTypeAction } from '../../../../../../state/library/library.actions';
 
 @Component({

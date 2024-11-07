@@ -4,7 +4,7 @@ import { MatCheckboxChange } from '@angular/material/checkbox';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Store } from '@ngxs/store';
 import { Observable } from 'rxjs';
-import { Content, ContentList } from '../../../../../../models/app.model';
+import { Content, ContentList } from '../../../../../../models/library.model';
 import {
   GetActiveContentAction,
   GetContentListByIdAction,

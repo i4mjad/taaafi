@@ -1,6 +1,6 @@
 import { Component, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { ContentCategory } from '../../../../../../models/app.model';
+import { ContentCategory } from '../../../../../../models/library.model';
 
 @Component({
   selector: 'app-delete-content-category',

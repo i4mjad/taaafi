@@ -6,7 +6,7 @@ import {
   ContentType,
   ContentCategory,
   ContentOwner,
-} from '../../../../../../models/app.model';
+} from '../../../../../../models/library.model';
 import { Observable } from 'rxjs';
 import {
   GetContentTypesAction,

@@ -2,7 +2,7 @@ import { Component, Inject } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Store } from '@ngxs/store';
-import { ContentOwner } from '../../../../../../models/app.model';
+import { ContentOwner } from '../../../../../../models/library.model';
 import { UpdateContentOwnerAction } from '../../../../../../state/library/library.actions';
 
 @Component({

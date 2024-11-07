@@ -42,7 +42,7 @@ import {
   ContentOwnerDataModel,
   ContentType,
   ContentTypeDataModel,
-} from '../../models/app.model';
+} from '../../models/library.model';
 import { tap, catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import { ContentTypeService } from './services/content-type/content-type.service';

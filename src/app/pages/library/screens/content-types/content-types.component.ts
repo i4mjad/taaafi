@@ -2,7 +2,7 @@ import { Component, inject, OnInit } from '@angular/core';
 import { Store } from '@ngxs/store';
 import { Observable } from 'rxjs';
 
-import { ContentType } from '../../../../models/app.model';
+import { ContentType } from '../../../../models/library.model';
 import { MatBottomSheet } from '@angular/material/bottom-sheet';
 import { AddNewContentTypeComponent } from './componenets/add-new-content-type/add-new-content-type.component';
 import { EditContentTypeComponent } from './componenets/edit-content-type/edit-content-type.component';

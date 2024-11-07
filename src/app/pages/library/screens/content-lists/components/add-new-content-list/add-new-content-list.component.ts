@@ -5,7 +5,7 @@ import { Observable } from 'rxjs';
 import {
   Content,
   ContentListDataModel,
-} from '../../../../../../models/app.model';
+} from '../../../../../../models/library.model';
 
 import { MatCheckboxChange } from '@angular/material/checkbox';
 import { MatDialogRef } from '@angular/material/dialog';

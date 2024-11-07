@@ -6,7 +6,7 @@ import { Observable } from 'rxjs';
 import {
   ContentList,
   ContentListViewModel,
-} from '../../../../models/app.model';
+} from '../../../../models/library.model';
 
 import { AddNewContentListComponent } from '../content-lists/components/add-new-content-list/add-new-content-list.component';
 import { DeleteContentListComponent } from '../content-lists/components/delete-content-list/delete-content-list.component';
