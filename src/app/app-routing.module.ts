@@ -16,6 +16,8 @@ import { ContentCategoriesComponent } from './pages/library/screens/content-cate
 import { ContentOwnersComponent } from './pages/library/screens/content-owners/content-owners.component';
 import { ContentComponent } from './pages/library/screens/content/content.component';
 import { ContentListsComponent } from './pages/library/screens/content-lists/content-lists.component';
+import { ActivitiesComponent } from './pages/vault/pages/activities/activities.component';
+import { ActivityComponent } from './pages/vault/pages/activities/pages/activity/activity.component';
 
 const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -56,6 +58,16 @@ const routes: Routes = [
     canActivate: [canActivateAuth],
   },
   { path: 'vault', component: VaultComponent, canActivate: [canActivateAuth] },
+  {
+    path: 'vault/activities',
+    component: ActivitiesComponent,
+    canActivate: [canActivateAuth],
+  },
+  {
+    path: 'vault/activities/:id',
+    component: ActivityComponent,
+    canActivate: [canActivateAuth],
+  },
   {
     path: 'fellowships',
     component: FellowshipsComponent,

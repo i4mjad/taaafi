@@ -48,6 +48,8 @@ import { AddNewContentListComponent } from './pages/library/screens/content-list
 import { DeleteContentListComponent } from './pages/library/screens/content-lists/components/delete-content-list/delete-content-list.component';
 import { EditContentListComponent } from './pages/library/screens/content-lists/components/edit-content-list/edit-content-list.component';
 import { LibraryState } from './state/library/library.store';
+import { ActivitiesComponent } from './pages/vault/pages/activities/activities.component';
+import { ActivityComponent } from './pages/vault/pages/activities/pages/activity/activity.component';
 
 @NgModule({
   declarations: [
@@ -81,6 +83,8 @@ import { LibraryState } from './state/library/library.store';
     AddNewContentListComponent,
     DeleteContentListComponent,
     EditContentListComponent,
+    ActivitiesComponent,
+    ActivityComponent,
   ],
   imports: [
     BrowserModule,
