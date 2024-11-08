@@ -4,6 +4,7 @@ import {
   Activity,
   ActivitySubscriptionSession,
   fakeActivities,
+  fakeActivityDataModels,
 } from '../../../../../../models/vault.model';
 
 @Component({
@@ -14,7 +15,12 @@ import {
 export class ActivityComponent implements OnInit {
   activityId: string;
   activity: Activity;
-  displayedColumns: string[] = ['sessionId', 'sessionDate', 'sessionDuration'];
+  displayedColumns: string[] = [
+    'sessionId',
+    'userUid',
+    'sessionDate',
+    'sessionDuration',
+  ];
   activitySubscriptionSessions: ActivitySubscriptionSession[] = [];
   constructor(private route: ActivatedRoute, private router: Router) {
     if (this.route.snapshot.paramMap.get('id')) {
@@ -25,5 +31,8 @@ export class ActivityComponent implements OnInit {
     this.activity = fakeActivities.find(
       (activity) => activity.activityId === this.activityId
     )!;
+    this.activitySubscriptionSessions = fakeActivityDataModels.find(
+      (activity) => activity.activityId === this.activityId
+    )!.activitySubscriptionSessions;
   }
 }

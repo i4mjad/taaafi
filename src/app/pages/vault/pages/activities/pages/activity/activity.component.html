@@ -2,32 +2,40 @@
   <mat-card appearance="outlined">
     <div class="flex flex-col gap-2">
       <h3 style="margin: 0">{{ activity.activityName }}</h3>
+      <p style="margin: 0">{{ activity.activityDescription }}</p>
 
-      <div class="flex flex-row justify-between">
-        <div class="flex flex-col content-center">
+      <div class="flex flex-row gap-2">
+        <mat-card
+          appearance="outlined"
+          class="flex flex-col content-center flex-1"
+        >
           <p>عدد المشتركين</p>
           <p>{{ activity.activitySubscribersCount }}</p>
-        </div>
-        <mat-divider [vertical]="true"></mat-divider>
-        <div class="flex flex-col content-center">
-          <p>عدد التمارين</p>
+        </mat-card>
+
+        <mat-card
+          appearance="outlined"
+          class="flex flex-col content-center flex-1"
+        >
+          <p>عدد المهام</p>
           <p>{{ activity.activityTasks.length }}</p>
-        </div>
-        <mat-divider [vertical]="true"></mat-divider>
-        <div class="flex flex-col content-center">
+        </mat-card>
+
+        <mat-card
+          appearance="outlined"
+          class="flex flex-col content-center flex-1"
+        >
           <p>مستوى الصعوبة</p>
           <p>{{ activity.activityDifficulty }}</p>
-        </div>
-        <mat-divider [vertical]="true"></mat-divider>
-        <div class="flex flex-col content-center">
+        </mat-card>
+
+        <mat-card
+          appearance="outlined"
+          class="flex flex-col content-center flex-1"
+        >
           <p>تاريخ الإضافة</p>
           <p>{{ activity.activitySubscribersCount }}</p>
-        </div>
-        <mat-divider [vertical]="true"></mat-divider>
-        <div class="flex flex-col content-center">
-          <p>عدد المشتركين</p>
-          <p>{{ activity.activitySubscribersCount }}</p>
-        </div>
+        </mat-card>
       </div>
       <mat-divider></mat-divider>
     </div>
@@ -49,22 +57,32 @@
         <!-- Session ID Column -->
         <ng-container matColumnDef="sessionId">
           <th mat-header-cell *matHeaderCellDef>معرف الجلسة</th>
-          <td mat-cell *matCellDef="let session">{{ session.sessionId }}</td>
+          <td mat-cell *matCellDef="let session">
+            {{ session.activitySubscriptionSessionId }}
+          </td>
+        </ng-container>
+
+        <!-- Session Date Column -->
+        <ng-container matColumnDef="userUid">
+          <th mat-header-cell *matHeaderCellDef>معرف المستخدم</th>
+          <td mat-cell *matCellDef="let session">
+            {{ session.userUid }}
+          </td>
         </ng-container>
 
         <!-- Session Date Column -->
         <ng-container matColumnDef="sessionDate">
           <th mat-header-cell *matHeaderCellDef>تاريخ الجلسة</th>
           <td mat-cell *matCellDef="let session">
-            {{ session.sessionDate | date }}
+            {{ session.subscribeDate | date }}
           </td>
         </ng-container>
 
         <!-- Session Duration Column -->
         <ng-container matColumnDef="sessionDuration">
-          <th mat-header-cell *matHeaderCellDef>مدة الجلسة</th>
+          <th mat-header-cell *matHeaderCellDef>نشط؟</th>
           <td mat-cell *matCellDef="let session">
-            {{ session.sessionDuration }}
+            {{ session.isActive }}
           </td>
         </ng-container>
 
