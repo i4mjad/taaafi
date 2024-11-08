@@ -22,8 +22,7 @@ import { LibraryComponent } from './pages/library/library.component';
 import { VaultComponent } from './pages/vault/vault.component';
 import { FellowshipsComponent } from './pages/fellowships/fellowships.component';
 import { UsersManagementComponent } from './pages/users-management/users-management.component';
-import { HlmButtonDirective } from '@spartan-ng/ui-button-helm';
-import { SpartanCompnentsModule } from './shared/components/component.module';
+
 import { NgxsModule } from '@ngxs/store';
 
 import { ContentTypesComponent } from './pages/library/screens/content-types/content-types.component';
@@ -96,7 +95,6 @@ import { ActivityComponent } from './pages/vault/pages/activities/pages/activity
     AngularFireAuthModule, // Authentication module
     AngularFirestoreModule, // Firestore module
     MaterialModule,
-    SpartanCompnentsModule,
     TranslateModule.forRoot({
       loader: {
         provide: TranslateLoader,

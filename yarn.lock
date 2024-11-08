@@ -129,10 +129,10 @@
     ora "5.4.1"
     rxjs "7.8.1"
 
-"@angular/animations@^18.0.0":
-  version "18.2.7"
-  resolved "https://registry.yarnpkg.com/@angular/animations/-/animations-18.2.7.tgz#ab3fd324f08449f4e2b1a7a8724cfde91d5229eb"
-  integrity sha512-5B7qD1K+kKOf9lgJT4VNMft3IK2BnRHjN1S6l38ywzQ/nxpmCG7f+qKAAU6CpCywhNUBeXW0hVXTMuMNPVOcQQ==
+"@angular/animations@^18.0.1":
+  version "18.2.11"
+  resolved "https://registry.yarnpkg.com/@angular/animations/-/animations-18.2.11.tgz#d49afc2c76d6ef13a5a2e1d2a146c19d7b7e8621"
+  integrity sha512-ghgXa2VhtyJJnTMuH2NYxCMsveQbZno44AZGygPqrcW8UQMQe9GulFaTXCH5s6/so2CLy2ZviIwSZQRgK0ZlDw==
   dependencies:
     tslib "^2.3.0"
 
@@ -167,10 +167,10 @@
     vite "5.4.6"
     watchpack "2.4.1"
 
-"@angular/cdk@18.0.0":
-  version "18.0.0"
-  resolved "https://registry.yarnpkg.com/@angular/cdk/-/cdk-18.0.0.tgz#6358f553d54969b18a2efa9305e1aa08449d6021"
-  integrity sha512-V0i1SAiT2PTNyugBW0E4fev8G/4XP5FdyX2YD6oc5sNyt3GFcoDNHcz+oEne8+aYVnQ3Ax9Zutq/SQincDHIbw==
+"@angular/cdk@18.0.1":
+  version "18.0.1"
+  resolved "https://registry.yarnpkg.com/@angular/cdk/-/cdk-18.0.1.tgz#7338c85ac88aa57633eb0b55ba5b6deea508a86b"
+  integrity sha512-2fCqX1sz5cM+LncO6ak4EU2ZBm8MWitv5V53go3Iz5dOVOdrvysBt8smEkWZ4nvEKkFYHEPpQo0YlxEWbuTEmA==
   dependencies:
     tslib "^2.3.0"
   optionalDependencies:
@@ -220,10 +220,10 @@
     tslib "^2.3.0"
     yargs "^17.2.1"
 
-"@angular/compiler@^18.0.0":
-  version "18.2.7"
-  resolved "https://registry.yarnpkg.com/@angular/compiler/-/compiler-18.2.7.tgz#3442ff5ce34b9ce2e7e2aac5cc2cfc1e3ffb4b17"
-  integrity sha512-XemlYyRGnu/HrICtXwTPmGtyOrI8BhbGg/HMiJ7sVx40AeEIX0uyDgnu9Gc5OjmtDqZZ8Qftg1sQAxaCVjLb1w==
+"@angular/compiler@^18.0.1":
+  version "18.2.11"
+  resolved "https://registry.yarnpkg.com/@angular/compiler/-/compiler-18.2.11.tgz#8665cbbb94e667e18f829782e04c7932224c5ff5"
+  integrity sha512-PSVL1YXUhTzkgJNYXiWk9eAZxNV6laQJRGdj9++C1q9m2S9/GlehZGzkt5GtC5rlUweJucCNvBC1+2D5FAt9vA==
   dependencies:
     tslib "^2.3.0"
 
@@ -256,10 +256,10 @@
     tslib "^2.3.0"
     winston "^3.0.0"
 
-"@angular/forms@^18.0.0":
-  version "18.2.7"
-  resolved "https://registry.yarnpkg.com/@angular/forms/-/forms-18.2.7.tgz#17b5532ab9cf1492b59a75185d3abf4d9cb1c36e"
-  integrity sha512-WO3c9/OA7ekBnDBgmvi5TlHshOt5S4NREIP+/VVyuRgg28BwUWyO/Nqh19nguE1UNNRt6OMLkT6NSV2ewhcXUg==
+"@angular/forms@^18.0.1":
+  version "18.2.11"
+  resolved "https://registry.yarnpkg.com/@angular/forms/-/forms-18.2.11.tgz#74da53064e0d54c013982b642ad49da4f827bd07"
+  integrity sha512-QjxayOxDTqsTJGBzfWd3nms1LZIXj2f1+wIPxxUNXyNS5ZaM7hBWkz2BTFYeewlD/HdNj0alNVCYK3M8ElLWYw==
   dependencies:
     tslib "^2.3.0"
 
