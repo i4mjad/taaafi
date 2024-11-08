@@ -11,7 +11,7 @@ export class ActivitiesComponent {
     'id',
     'activityName',
     'activityDescription',
-    'activityTasksCount',
+    'activityDifficulty',
     'activitySubscribersCount',
     'actions',
   ];

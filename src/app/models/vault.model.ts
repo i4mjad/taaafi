@@ -29,9 +29,9 @@ export interface ActivitySubscriptionSession {
 }
 
 export enum TaskFrequency {
-  Daily = 'daily',
-  Weekly = 'weekly',
-  Monthly = 'monthly',
+  daily = 'daily',
+  weekly = 'weekly',
+  monthly = 'monthly',
 }
 export const fakeActivities: Activity[] = [
   {
@@ -45,13 +45,13 @@ export const fakeActivities: Activity[] = [
         taskId: '1-1',
         taskName: 'Morning Yoga',
         taskDescription: 'Start your day with a morning yoga session.',
-        taskFrequency: TaskFrequency.Daily,
+        taskFrequency: TaskFrequency.daily,
       },
       {
         taskId: '1-2',
         taskName: 'Evening Yoga',
         taskDescription: 'End your day with a relaxing evening yoga session.',
-        taskFrequency: TaskFrequency.Daily,
+        taskFrequency: TaskFrequency.daily,
       },
     ],
   },
@@ -66,13 +66,13 @@ export const fakeActivities: Activity[] = [
         taskId: '2-1',
         taskName: 'Morning Run',
         taskDescription: 'Start your day with a morning run.',
-        taskFrequency: TaskFrequency.Daily,
+        taskFrequency: TaskFrequency.daily,
       },
       {
         taskId: '2-2',
         taskName: 'Weekend Long Run',
         taskDescription: 'A long run on the weekend.',
-        taskFrequency: TaskFrequency.Weekly,
+        taskFrequency: TaskFrequency.weekly,
       },
     ],
   },
@@ -97,13 +97,13 @@ export const fakeActivityDataModels: ActivityDataModel[] = [
         taskId: '1-1',
         taskName: 'Morning Yoga',
         taskDescription: 'Start your day with a morning yoga session.',
-        taskFrequency: TaskFrequency.Daily,
+        taskFrequency: TaskFrequency.daily,
       },
       {
         taskId: '1-2',
         taskName: 'Evening Yoga',
         taskDescription: 'End your day with a relaxing evening yoga session.',
-        taskFrequency: TaskFrequency.Daily,
+        taskFrequency: TaskFrequency.daily,
       },
     ],
   },
@@ -125,13 +125,13 @@ export const fakeActivityDataModels: ActivityDataModel[] = [
         taskId: '2-1',
         taskName: 'Morning Run',
         taskDescription: 'Start your day with a morning run.',
-        taskFrequency: TaskFrequency.Daily,
+        taskFrequency: TaskFrequency.daily,
       },
       {
         taskId: '2-2',
         taskName: 'Weekend Long Run',
         taskDescription: 'A long run on the weekend.',
-        taskFrequency: TaskFrequency.Weekly,
+        taskFrequency: TaskFrequency.weekly,
       },
     ],
   },
