@@ -82,7 +82,7 @@
         <ng-container matColumnDef="sessionDuration">
           <th mat-header-cell *matHeaderCellDef>نشط؟</th>
           <td mat-cell *matCellDef="let session">
-            {{ session.isActive }}
+            {{ session.isActive ? "نعم" : "لا" }}
           </td>
         </ng-container>
 
