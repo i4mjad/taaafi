@@ -42,5 +42,22 @@
 
   "activities":"Activities",
   "vault-management":"Vault Management",
-  "vault-management-p":"Here you can manage the activities and other content in the vault"
+  "vault-management-p":"Here you can manage the activities and other content in the vault",
+  "create-activity": {
+    "title": "Create Activity",
+    "subtitle": "Fill in the details below to create a new activity",
+    "activity-name": "Activity Name",
+    "activity-difficulty": "Activity Difficulty",
+    "easy": "Easy",
+    "intermediate": "Intermediate",
+    "advanced": "Advanced",
+    "activity-description": "Activity Description",
+    "task-name": "Task Name",
+    "task-description": "Task Description",
+    "task-frequency": "Task Frequency",
+    "remove-task": "Remove Task",
+    "add-task": "Add Task",
+    "reset": "Reset",
+    "create-activity": "Create Activity"
+  }
 }

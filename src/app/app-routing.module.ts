@@ -18,6 +18,7 @@ import { ContentComponent } from './pages/library/screens/content/content.compon
 import { ContentListsComponent } from './pages/library/screens/content-lists/content-lists.component';
 import { ActivitiesComponent } from './pages/vault/pages/activities/activities.component';
 import { ActivityComponent } from './pages/vault/pages/activities/pages/activity/activity.component';
+import { CreateActivityComponent } from './pages/vault/pages/activities/pages/create-activity/create-activity.component';
 
 const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -64,8 +65,13 @@ const routes: Routes = [
     canActivate: [canActivateAuth],
   },
   {
-    path: 'vault/activities/:id',
+    path: 'vault/activities/activity/:id',
     component: ActivityComponent,
+    canActivate: [canActivateAuth],
+  },
+  {
+    path: 'vault/activities/create',
+    component: CreateActivityComponent,
     canActivate: [canActivateAuth],
   },
   {

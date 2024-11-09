@@ -4,7 +4,11 @@
 
     <mat-divider></mat-divider>
     <mat-card-actions>
-      <button mat-raised-button color="primary" routerLink="/create">
+      <button
+        mat-raised-button
+        color="primary"
+        routerLink="/vault/activities/create"
+      >
         إنشاء تمرين جديد
       </button>
     </mat-card-actions>
@@ -53,7 +57,7 @@
         <td mat-cell *matCellDef="let element">
           <button
             mat-icon-button
-            [routerLink]="['/vault/activities', element.activityId]"
+            [routerLink]="['/vault/activities/activity', element.activityId]"
           >
             <mat-icon>arrow_back</mat-icon>
           </button>

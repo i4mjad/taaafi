@@ -49,6 +49,7 @@ import { EditContentListComponent } from './pages/library/screens/content-lists/
 import { LibraryState } from './state/library/library.store';
 import { ActivitiesComponent } from './pages/vault/pages/activities/activities.component';
 import { ActivityComponent } from './pages/vault/pages/activities/pages/activity/activity.component';
+import { CreateActivityComponent } from './pages/vault/pages/activities/pages/create-activity/create-activity.component';
 
 @NgModule({
   declarations: [
@@ -84,6 +85,7 @@ import { ActivityComponent } from './pages/vault/pages/activities/pages/activity
     EditContentListComponent,
     ActivitiesComponent,
     ActivityComponent,
+    CreateActivityComponent,
   ],
   imports: [
     BrowserModule,

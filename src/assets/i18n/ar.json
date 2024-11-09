@@ -45,5 +45,22 @@
 
   "activities":"التمارين",
   "vault-management":"إدارة الخزنة",
-  "vault-management-p":"هنا يتم إدارة التمارين وغيرها من محتويات الخزنة"
+  "vault-management-p":"هنا يتم إدارة التمارين وغيرها من محتويات الخزنة",
+  "create-activity": {
+    "title": "إنشاء نشاط",
+    "subtitle": "املأ التفاصيل أدناه لإنشاء نشاط جديد",
+    "activity-name": "اسم النشاط",
+    "activity-difficulty": "صعوبة النشاط",
+    "easy": "سهل",
+    "intermediate": "متوسط",
+    "advanced": "متقدم",
+    "activity-description": "وصف النشاط",
+    "task-name": "اسم المهمة",
+    "task-description": "وصف المهمة",
+    "task-frequency": "تكرار المهمة",
+    "remove-task": "إزالة المهمة",
+    "add-task": "إضافة مهمة",
+    "reset": "إعادة تعيين",
+    "create-activity": "إنشاء نشاط"
+  }
 }
