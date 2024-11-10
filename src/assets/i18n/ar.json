@@ -1,5 +1,4 @@
 {
-
   "app-name": "منصة تعافي",
   "dashboard": "لوحة العرض",
   "arabic": "عربي",
@@ -13,15 +12,11 @@
   "hero-disc": "لتنزيل التطبيق قم بزيارة الموقع الخاص  بالتطبيق",
   "admin-only": "هذه الصفحة مخصصة لإدارة التطبيق فقط، قم بزيارة صفحة التطبيق الرئيسية",
   "library": "مكتبة المحتوى",
-
   "content":"المحتوى",
   "lists":"القوائم",
   "categories":"التصنيفات",
   "authors":"ملاك المحتوى",
   "types":"أنواع المحتوى",
-
-
-
   "users-management": "إدارة المستخدمين",
   "fellowships": "الزمالات",
   "vault": "الخزنة",
@@ -42,28 +37,26 @@
       "LoginButton": "تسجيل الدخول"
     }
   },
-
   "activities":"التمارين",
   "vault-management":"إدارة الخزنة",
   "vault-management-p":"هنا يتم إدارة التمارين وغيرها من محتويات الخزنة",
   "create-activity": {
-    "title": "إنشاء نشاط",
-    "subtitle": "املأ التفاصيل أدناه لإنشاء نشاط جديد",
-    "activity-name": "اسم النشاط",
-    "activity-difficulty": "صعوبة النشاط",
+    "title": "إنشاء تمرين",
+    "subtitle": "املأ التفاصيل أدناه لإنشاء تمرين جديد",
+    "activity-name": "اسم التمرين",
+    "activity-difficulty": "صعوبة التمرين",
     "easy": "سهل",
     "intermediate": "متوسط",
     "advanced": "متقدم",
-    "activity-description": "وصف النشاط",
+    "activity-description": "وصف التمرين",
     "task-name": "اسم المهمة",
     "task-description": "وصف المهمة",
     "task-frequency": "تكرار المهمة",
     "remove-task": "إزالة المهمة",
     "add-task": "إضافة مهمة",
     "reset": "إعادة تعيين",
-    "create-activity": "إنشاء نشاط"
+    "create-activity": "إنشاء تمرين"
   },
-  
   "daily": "يومي",
   "weekly": "أسبوعي",
   "monthly": "شهري"
