@@ -51,6 +51,8 @@ import { ActivitiesComponent } from './pages/vault/pages/activities/activities.c
 import { ActivityComponent } from './pages/vault/pages/activities/pages/activity/activity.component';
 import { CreateActivityComponent } from './pages/vault/pages/activities/pages/create-activity/create-activity.component';
 import { VaultState } from './state/vault/vault.store';
+import { UpdateActivityComponent } from './pages/vault/pages/activities/pages/activity/dialogs/update-activity/update-activity.component';
+import { UpdateActivityTasksComponent } from './pages/vault/pages/activities/pages/activity/dialogs/update-activity-tasks/update-activity-tasks.component';
 
 @NgModule({
   declarations: [
@@ -87,6 +89,8 @@ import { VaultState } from './state/vault/vault.store';
     ActivitiesComponent,
     ActivityComponent,
     CreateActivityComponent,
+    UpdateActivityComponent,
+    UpdateActivityTasksComponent,
   ],
   imports: [
     BrowserModule,

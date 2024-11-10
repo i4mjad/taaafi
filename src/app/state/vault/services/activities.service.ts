@@ -4,6 +4,7 @@ import {
   Activity,
   ActivityDataModel,
   ActivitySubscriptionSession,
+  ActivityTask,
 } from '../../../models/vault.model';
 import {
   AngularFirestore,
@@ -42,6 +43,44 @@ export class ActivitiesService {
       });
       await Promise.all(tasksPromises);
     }
+  }
+
+  async updateActivity(activity: Activity): Promise<void> {
+    const activityDocRef = this.contentTypesCollectionsRef.doc(
+      activity.activityId
+    );
+    await activityDocRef.update({
+      activityName: activity.activityName,
+      activityDifficulty: activity.activityDifficulty,
+      activityDescription: activity.activityDescription,
+      createdAt: activity.createdAt ?? new Date(),
+    });
+
+    if (activity.activityTasks) {
+      const tasksPromises = activity.activityTasks.map((task) => {
+        const taskRef = activityDocRef
+          .collection('activityTasks')
+          .doc(task.taskId);
+        return taskRef.set(task);
+      });
+      await Promise.all(tasksPromises);
+    }
+  }
+
+  async updateActivityTasks(
+    activityId: string,
+    tasks: ActivityTask[]
+  ): Promise<ActivityTask[]> {
+    const activityDocRef = this.contentTypesCollectionsRef.doc(activityId);
+    const tasksPromises = tasks.map((task) => {
+      const taskRef = activityDocRef
+        .collection('activityTasks')
+        .doc(task.taskId);
+      return taskRef.set(task);
+    });
+    await Promise.all(tasksPromises);
+
+    return tasks;
   }
 
   getActivities(): Observable<Activity[]> {
@@ -100,6 +139,20 @@ export class ActivitiesService {
           const data = a.payload.doc.data() as ActivitySubscriptionSession;
           const id = a.payload.doc.id;
           return { ...data, activitySubscriptionSessionId: id };
+        })
+      )
+    );
+  }
+
+  getActivityTasks(activityId: string): Observable<ActivityTask[]> {
+    const activityDocRef = this.contentTypesCollectionsRef.doc(activityId);
+    const activityTasksRef = activityDocRef.collection('activityTasks');
+    return activityTasksRef.snapshotChanges().pipe(
+      map((actions) =>
+        actions.map((a) => {
+          const data = a.payload.doc.data() as ActivityTask;
+          const id = a.payload.doc.id;
+          return { ...data, taskId: id };
         })
       )
     );

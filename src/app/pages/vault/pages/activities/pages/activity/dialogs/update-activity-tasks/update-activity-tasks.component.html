@@ -1,0 +1,49 @@
+<h1 mat-dialog-title>تعديل مهام التمرين</h1>
+<div mat-dialog-content>
+  <form [formGroup]="tasksForm">
+    <div formArrayName="tasks">
+      <div
+        *ngFor="let task of tasks.controls; let i = index"
+        [formGroupName]="i"
+        class="flex flex-col"
+      >
+        <div class="flex flex-row gap-2">
+          <mat-form-field class="flex-1">
+            <mat-label>اسم المهمة</mat-label>
+            <input matInput formControlName="taskName" />
+          </mat-form-field>
+          <mat-form-field class="flex-1">
+            <mat-label>تكرار المهمة</mat-label>
+            <mat-select formControlName="taskFrequency">
+              <mat-option
+                *ngFor="let frequency of taskFrequencies"
+                [value]="frequency"
+              >
+                {{ frequency | translate }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+        <mat-form-field>
+          <mat-label>وصف المهمة</mat-label>
+          <textarea matInput formControlName="taskDescription"></textarea>
+        </mat-form-field>
+        <button
+          mat-button
+          type="button"
+          class="self-end"
+          (click)="removeTask(i)"
+        >
+          إزالة المهمة
+        </button>
+      </div>
+    </div>
+    <button mat-button type="button" (click)="addTask()">إضافة مهمة</button>
+  </form>
+</div>
+<div mat-dialog-actions>
+  <button mat-button (click)="onCancel()">إلغاء</button>
+  <button mat-button (click)="onSubmit()" [disabled]="!tasksForm.valid">
+    حفظ
+  </button>
+</div>

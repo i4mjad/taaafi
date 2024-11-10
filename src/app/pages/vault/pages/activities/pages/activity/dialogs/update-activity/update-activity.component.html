@@ -1,0 +1,19 @@
+<h1 mat-dialog-title>تعديل التمرين</h1>
+<div mat-dialog-content>
+  <form [formGroup]="activityForm">
+    <mat-form-field>
+      <mat-label>اسم التمرين</mat-label>
+      <input matInput formControlName="activityName" />
+    </mat-form-field>
+    <mat-form-field>
+      <mat-label>وصف التمرين</mat-label>
+      <textarea matInput formControlName="activityDescription"></textarea>
+    </mat-form-field>
+  </form>
+</div>
+<div mat-dialog-actions>
+  <button mat-button (click)="onCancel()">إلغاء</button>
+  <button mat-button (click)="onSubmit()" [disabled]="!activityForm.valid">
+    حفظ
+  </button>
+</div>

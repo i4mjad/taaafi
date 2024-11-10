@@ -1,6 +1,8 @@
 import {
+  Activity,
   ActivityDataModel,
   ActivitySubscriptionSession,
+  ActivityTask,
 } from '../../models/vault.model';
 
 export class CreateActivityAction {
@@ -19,5 +21,20 @@ export class FetchActivityByIdAction {
 
 export class FetchActivitySubscriptionSessionsAction {
   static readonly type = '[Vault] Fetch Activity Subscription Sessions Action';
+  constructor(public activityId: string) {}
+}
+
+export class UpdateActivityAction {
+  static readonly type = '[Vault] Update Activity Action';
+  constructor(public activity: Activity) {}
+}
+
+export class UpdateActivityTasksAction {
+  static readonly type = '[Vault] Update Activity Tasks Action';
+  constructor(public activityId: string, public tasks: ActivityTask[]) {}
+}
+
+export class FetchActivityTasksAction {
+  static readonly type = '[Vault] Fetch Activity Tasks Action';
   constructor(public activityId: string) {}
 }

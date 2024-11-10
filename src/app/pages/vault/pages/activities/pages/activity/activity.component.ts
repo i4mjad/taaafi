@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Store, Select } from '@ngxs/store';
 import { Observable } from 'rxjs';
+import { MatDialog } from '@angular/material/dialog';
 import {
   Activity,
   ActivitySubscriptionSession,
@@ -10,7 +11,11 @@ import { VaultState } from '../../../../../../state/vault/vault.store';
 import {
   FetchActivityByIdAction,
   FetchActivitySubscriptionSessionsAction,
+  UpdateActivityAction,
+  UpdateActivityTasksAction,
 } from '../../../../../../state/vault/vault.actions';
+import { UpdateActivityComponent } from './dialogs/update-activity/update-activity.component';
+import { UpdateActivityTasksComponent } from './dialogs/update-activity-tasks/update-activity-tasks.component';
 
 @Component({
   selector: 'app-activity',
@@ -31,7 +36,11 @@ export class ActivityComponent implements OnInit {
   ];
   activitySubscriptionSessions: ActivitySubscriptionSession[] = [];
 
-  constructor(private route: ActivatedRoute, private store: Store) {
+  constructor(
+    private route: ActivatedRoute,
+    private store: Store,
+    private dialog: MatDialog
+  ) {
     this.activityId = this.route.snapshot.paramMap.get('id')!;
   }
 
@@ -47,6 +56,32 @@ export class ActivityComponent implements OnInit {
     });
     this.activitySubscriptionSessions$.subscribe((sessions) => {
       this.activitySubscriptionSessions = sessions;
+    });
+  }
+
+  openUpdateActivityDialog(): void {
+    const dialogRef = this.dialog.open(UpdateActivityComponent, {
+      data: { activity: this.activity },
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result) {
+        this.store.dispatch(new UpdateActivityAction(result));
+      }
+    });
+  }
+
+  openUpdateActivityTasksDialog(): void {
+    const dialogRef = this.dialog.open(UpdateActivityTasksComponent, {
+      data: { activityId: this.activityId },
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result) {
+        this.store.dispatch(
+          new UpdateActivityTasksAction(this.activityId, result)
+        );
+      }
     });
   }
 }

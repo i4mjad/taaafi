@@ -41,8 +41,20 @@
     </div>
     <mat-card-actions>
       <div class="flex flex-row gap-2">
-        <button mat-flat-button color="primary">تعديل التمرين</button>
-        <button mat-flat-button color="accent">تعديل مهام التمرين</button>
+        <button
+          mat-flat-button
+          color="primary"
+          (click)="openUpdateActivityDialog()"
+        >
+          تعديل التمرين
+        </button>
+        <button
+          mat-flat-button
+          color="accent"
+          (click)="openUpdateActivityTasksDialog()"
+        >
+          تعديل مهام التمرين
+        </button>
       </div>
     </mat-card-actions>
   </mat-card>
