@@ -50,6 +50,7 @@ import { LibraryState } from './state/library/library.store';
 import { ActivitiesComponent } from './pages/vault/pages/activities/activities.component';
 import { ActivityComponent } from './pages/vault/pages/activities/pages/activity/activity.component';
 import { CreateActivityComponent } from './pages/vault/pages/activities/pages/create-activity/create-activity.component';
+import { VaultState } from './state/vault/vault.store';
 
 @NgModule({
   declarations: [
@@ -91,7 +92,7 @@ import { CreateActivityComponent } from './pages/vault/pages/activities/pages/cr
     BrowserModule,
     AppRoutingModule,
     HttpClientModule,
-    NgxsModule.forRoot([LibraryState]),
+    NgxsModule.forRoot([LibraryState, VaultState]),
 
     AngularFireModule.initializeApp(environment.firebase),
     AngularFireAuthModule, // Authentication module

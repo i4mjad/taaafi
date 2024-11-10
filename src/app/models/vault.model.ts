@@ -7,12 +7,12 @@ export interface Activity {
   activityTasks: ActivityTask[];
 }
 export interface ActivityDataModel {
-  activityId: string;
   activityName: string;
   activityDifficulty: string;
-  activityDescribition: string;
-  activitySubscriptionSessions: ActivitySubscriptionSession[];
-  activityTasks: ActivityTask[];
+  activityDescription: string;
+  activitySubscriptionSessions?: ActivitySubscriptionSession[];
+  activityTasks?: ActivityTask[];
+  createdAt?: Date;
 }
 
 export interface ActivityTask {
@@ -80,10 +80,9 @@ export const fakeActivities: Activity[] = [
 
 export const fakeActivityDataModels: ActivityDataModel[] = [
   {
-    activityId: '1',
     activityName: 'Yoga',
     activityDifficulty: 'Medium',
-    activityDescribition: 'A series of stretching and breathing exercises.',
+    activityDescription: 'A series of stretching and breathing exercises.',
     activitySubscriptionSessions: [
       {
         activitySubscriptionSessionId: '1-1',
@@ -108,10 +107,9 @@ export const fakeActivityDataModels: ActivityDataModel[] = [
     ],
   },
   {
-    activityId: '2',
     activityName: 'Running',
     activityDifficulty: 'Hard',
-    activityDescribition: 'A high-intensity running activity.',
+    activityDescription: 'A high-intensity running activity.',
     activitySubscriptionSessions: [
       {
         activitySubscriptionSessionId: '2-1',

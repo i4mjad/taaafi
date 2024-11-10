@@ -31,8 +31,8 @@ export class ActivityComponent implements OnInit {
     this.activity = fakeActivities.find(
       (activity) => activity.activityId === this.activityId
     )!;
-    this.activitySubscriptionSessions = fakeActivityDataModels.find(
-      (activity) => activity.activityId === this.activityId
-    )!.activitySubscriptionSessions;
+    // this.activitySubscriptionSessions = fakeActivityDataModels.find(
+    //   (activity) => activity.activityId === this.activityId
+    // )!.activitySubscriptionSessions;
   }
 }

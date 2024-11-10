@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
 import { TaskFrequency } from '../../../../../../models/vault.model';
+import { Store } from '@ngxs/store';
+import { CreateActivityAction } from '../../../../../../state/vault/vault.actions';
 
 @Component({
   selector: 'app-create-activity',
@@ -11,7 +13,7 @@ export class CreateActivityComponent implements OnInit {
   activityForm: FormGroup;
   taskFrequencies = Object.values(TaskFrequency);
 
-  constructor(private fb: FormBuilder) {}
+  constructor(private fb: FormBuilder, private store: Store) {}
 
   ngOnInit(): void {
     this.activityForm = this.fb.group({
@@ -49,7 +51,8 @@ export class CreateActivityComponent implements OnInit {
   onSubmit(): void {
     if (this.activityForm.valid) {
       console.log(this.activityForm.value);
-      // Handle form submission logic here
+
+      this.store.dispatch(new CreateActivityAction(this.activityForm.value));
     }
   }
 }
