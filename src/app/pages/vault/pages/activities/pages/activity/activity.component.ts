@@ -1,20 +1,28 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
+import { Store, Select } from '@ngxs/store';
+import { Observable } from 'rxjs';
 import {
   Activity,
   ActivitySubscriptionSession,
-  fakeActivities,
-  fakeActivityDataModels,
 } from '../../../../../../models/vault.model';
+import { VaultState } from '../../../../../../state/vault/vault.store';
+import {
+  FetchActivityByIdAction,
+  FetchActivitySubscriptionSessionsAction,
+} from '../../../../../../state/vault/vault.actions';
 
 @Component({
   selector: 'app-activity',
   templateUrl: './activity.component.html',
-  styleUrl: './activity.component.scss',
+  styleUrls: ['./activity.component.scss'],
 })
 export class ActivityComponent implements OnInit {
   activityId: string;
-  activity: Activity;
+  @Select(VaultState.selectedActivity) activity$: Observable<Activity | null>;
+  @Select(VaultState.selectedActivitySubscriptionSessions)
+  activitySubscriptionSessions$: Observable<ActivitySubscriptionSession[]>;
+  activity: Activity | null = null;
   displayedColumns: string[] = [
     'sessionId',
     'userUid',
@@ -22,17 +30,23 @@ export class ActivityComponent implements OnInit {
     'sessionDuration',
   ];
   activitySubscriptionSessions: ActivitySubscriptionSession[] = [];
-  constructor(private route: ActivatedRoute, private router: Router) {
-    if (this.route.snapshot.paramMap.get('id')) {
-      this.activityId = this.route.snapshot.paramMap.get('id')!;
-    }
+
+  constructor(private route: ActivatedRoute, private store: Store) {
+    this.activityId = this.route.snapshot.paramMap.get('id')!;
   }
+
   ngOnInit(): void {
-    this.activity = fakeActivities.find(
-      (activity) => activity.activityId === this.activityId
-    )!;
-    // this.activitySubscriptionSessions = fakeActivityDataModels.find(
-    //   (activity) => activity.activityId === this.activityId
-    // )!.activitySubscriptionSessions;
+    this.store.dispatch(new FetchActivityByIdAction(this.activityId));
+    this.store.dispatch(
+      new FetchActivitySubscriptionSessionsAction(this.activityId)
+    );
+    this.activity$.subscribe((activity) => {
+      if (activity) {
+        this.activity = activity;
+      }
+    });
+    this.activitySubscriptionSessions$.subscribe((sessions) => {
+      this.activitySubscriptionSessions = sessions;
+    });
   }
 }

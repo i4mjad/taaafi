@@ -5,6 +5,7 @@ export interface Activity {
   activityDescription: string;
   activitySubscribersCount: number;
   activityTasks: ActivityTask[];
+  createdAt?: Date;
 }
 export interface ActivityDataModel {
   activityName: string;
