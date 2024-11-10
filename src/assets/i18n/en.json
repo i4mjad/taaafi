@@ -59,5 +59,9 @@
     "add-task": "Add Task",
     "reset": "Reset",
     "create-activity": "Create Activity"
-  }
+  },
+  "daily": "Daily",
+  "weekly": "Weekly",
+  "monthly": "Monthly"
+  
 }

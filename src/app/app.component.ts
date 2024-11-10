@@ -22,9 +22,15 @@ export class AppComponent implements OnInit {
     this.translate.setDefaultLang('ar');
     document.documentElement.dir = 'rtl';
 
+    // Set initial language from translate service's current language
     this.currentLanguage = this.translate.currentLang;
+
+    
+    // Subscribe to language change events
     this.translate.onLangChange.subscribe((event) => {
+      // Update current language when language changes
       this.currentLanguage = event.lang;
+      // Set document direction based on language (RTL for Arabic, LTR for English)
       document.documentElement.dir = event.lang === 'ar' ? 'rtl' : 'ltr';
     });
   }
