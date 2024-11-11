@@ -15,7 +15,7 @@ import {
   UpdateActivityTasksAction,
 } from '../../../../../../state/vault/vault.actions';
 import { UpdateActivityComponent } from './dialogs/update-activity/update-activity.component';
-import { UpdateActivityTasksComponent } from './dialogs/update-activity-tasks/update-activity-tasks.component';
+import { UpdateActivityTaskComponent } from './dialogs/update-activity-task/update-activity-task.component';
 
 @Component({
   selector: 'app-activity',
@@ -24,15 +24,21 @@ import { UpdateActivityTasksComponent } from './dialogs/update-activity-tasks/up
 })
 export class ActivityComponent implements OnInit {
   activityId: string;
-  @Select(VaultState.selectedActivity) activity$: Observable<Activity | null>;
+  @Select(VaultState.selectedActivity) activity$: Observable<Activity>;
   @Select(VaultState.selectedActivitySubscriptionSessions)
   activitySubscriptionSessions$: Observable<ActivitySubscriptionSession[]>;
   activity: Activity | null = null;
-  displayedColumns: string[] = [
+  sessionsTableDisplayedColumns: string[] = [
     'sessionId',
     'userUid',
     'sessionDate',
     'sessionDuration',
+  ];
+  tasksTableDisplayedColumns: string[] = [
+    'taskName',
+    'taskDescription',
+    'taskFrequency',
+    'action',
   ];
   activitySubscriptionSessions: ActivitySubscriptionSession[] = [];
 
@@ -71,9 +77,9 @@ export class ActivityComponent implements OnInit {
     });
   }
 
-  openUpdateActivityTasksDialog(): void {
-    const dialogRef = this.dialog.open(UpdateActivityTasksComponent, {
-      data: { activityId: this.activityId },
+  openUpdateActivityTasksDialog(taskId: string): void {
+    const dialogRef = this.dialog.open(UpdateActivityTaskComponent, {
+      data: { activityId: this.activityId, taskId },
     });
 
     dialogRef.afterClosed().subscribe((result) => {

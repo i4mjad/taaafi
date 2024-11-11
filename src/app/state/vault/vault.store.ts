@@ -15,6 +15,7 @@ import {
   UpdateActivityAction,
   UpdateActivityTasksAction,
   FetchActivityTasksAction,
+  FetchActivityTaskByIdAction,
 } from './vault.actions';
 
 interface VaultStateModel {
@@ -22,6 +23,7 @@ interface VaultStateModel {
   selectedActivity: Activity;
   selectedActivitySubscriptionSessions: ActivitySubscriptionSession[];
   selectedActivityTasks: ActivityTask[];
+  selectedTask: ActivityTask | null;
 }
 
 @State<VaultStateModel>({
@@ -38,6 +40,7 @@ interface VaultStateModel {
     },
     selectedActivitySubscriptionSessions: [],
     selectedActivityTasks: [],
+    selectedTask: null,
   },
 })
 @Injectable()
@@ -62,6 +65,11 @@ export class VaultState {
   @Selector()
   static selectedActivityTasks(state: VaultStateModel): ActivityTask[] {
     return state.selectedActivityTasks;
+  }
+
+  @Selector()
+  static selectedTask(state: VaultStateModel): ActivityTask | null {
+    return state.selectedTask;
   }
 
   constructor(private activitiesService: ActivitiesService) {}
@@ -148,27 +156,28 @@ export class VaultState {
     action: UpdateActivityTasksAction
   ) {
     return from(
-      this.activitiesService.updateActivityTasks(
+      this.activitiesService.updateActivityTask(
         action.activityId,
-        action.tasks
+        action.tasks[0]
       )
     ).pipe(
-      tap((updatedTasks) => {
+      tap((updatedTask) => {
         const state = ctx.getState();
         const existingTasks = state.selectedActivity.activityTasks;
-        const taskMap = new Map(
-          existingTasks.map((task) => [task.taskId, task])
+        const taskIndex = existingTasks.findIndex(
+          (task) => task.taskId === updatedTask.taskId
         );
-        updatedTasks.forEach((task) => taskMap.set(task.taskId, task));
-        const uniqueTasks = Array.from(taskMap.values());
+        if (taskIndex > -1) {
+          existingTasks[taskIndex] = updatedTask;
+        }
         const selectedActivity = {
           ...state.selectedActivity,
-          activityTasks: uniqueTasks,
+          activityTasks: [...existingTasks],
         };
         ctx.patchState({ selectedActivity });
       }),
       catchError((error) => {
-        console.error('Error updating activity tasks:', error);
+        console.error('Error updating activity task:', error);
         return throwError(() => error);
       })
     );
@@ -188,5 +197,23 @@ export class VaultState {
         return throwError(() => error);
       })
     );
+  }
+
+  @Action(FetchActivityTaskByIdAction)
+  fetchActivityTaskById(
+    ctx: StateContext<VaultStateModel>,
+    action: FetchActivityTaskByIdAction
+  ) {
+    return this.activitiesService
+      .getActivityTaskById(action.activityId, action.taskId)
+      .pipe(
+        tap((task) => {
+          ctx.patchState({ selectedTask: task });
+        }),
+        catchError((error) => {
+          console.error('Error fetching activity task by id:', error);
+          return throwError(() => error);
+        })
+      );
   }
 }

@@ -11,7 +11,7 @@ import {
   AngularFirestoreCollection,
 } from '@angular/fire/compat/firestore';
 import { map, switchMap } from 'rxjs/operators';
-import { Timestamp } from 'firebase/firestore';
+import { QueryDocumentSnapshot, Timestamp } from 'firebase/firestore';
 
 @Injectable({
   providedIn: 'root',
@@ -83,6 +83,20 @@ export class ActivitiesService {
     return tasks;
   }
 
+  async updateActivityTask(
+    activityId: string,
+    task: ActivityTask
+  ): Promise<ActivityTask> {
+    const activityDocRef = this.contentTypesCollectionsRef.doc(activityId);
+    const taskRef = activityDocRef.collection('activityTasks').doc(task.taskId);
+    await taskRef.set({
+      taskName: task.taskName,
+      taskDescription: task.taskDescription,
+      taskFrequency: task.taskFrequency,
+    });
+    return task;
+  }
+
   getActivities(): Observable<Activity[]> {
     return this.contentTypesCollectionsRef
       .snapshotChanges()
@@ -92,7 +106,6 @@ export class ActivitiesService {
         )
       );
   }
-
   getActivityById(activityId: string): Observable<Activity> {
     const activityDocRef = this.contentTypesCollectionsRef.doc(activityId);
     return from(activityDocRef.get()).pipe(
@@ -107,13 +120,20 @@ export class ActivitiesService {
           const activitySubscribersCount =
             activitySubscriptionSessionsSnapshot.size;
 
+          const activityTasksRef = doc.ref.collection('activityTasks');
+          const activityTasksSnapshot = await activityTasksRef.get();
+          const activityTasks = activityTasksSnapshot.docs.map((taskDoc) => {
+            const taskData = taskDoc.data() as ActivityTask;
+            return { ...taskData, taskId: taskDoc.id };
+          });
+
           return {
             activityId: doc.id,
             activityName: data.activityName,
             activityDifficulty: data.activityDifficulty,
             activityDescription: data.activityDescription,
             activitySubscribersCount: activitySubscribersCount,
-            activityTasks: data.activityTasks || [],
+            activityTasks: activityTasks,
             createdAt:
               data.createdAt instanceof Timestamp
                 ? data.createdAt.toDate()
@@ -158,6 +178,24 @@ export class ActivitiesService {
     );
   }
 
+  getActivityTaskById(
+    activityId: string,
+    taskId: string
+  ): Observable<ActivityTask> {
+    const activityDocRef = this.contentTypesCollectionsRef.doc(activityId);
+    const taskDocRef = activityDocRef.collection('activityTasks').doc(taskId);
+    return from(taskDocRef.get()).pipe(
+      map((doc) => {
+        if (doc.exists) {
+          const data = doc.data() as ActivityTask;
+          return { ...data, taskId: doc.id };
+        } else {
+          throw new Error('Task not found');
+        }
+      })
+    );
+  }
+
   private async mapActivity(a: any): Promise<Activity> {
     const data = a.payload.doc.data() as ActivityDataModel;
     const id = a.payload.doc.id;
@@ -168,13 +206,20 @@ export class ActivitiesService {
       await activitySubscriptionSessionsRef.get();
     const activitySubscribersCount = activitySubscriptionSessionsSnapshot.size;
 
+    const activityTasksRef = a.payload.doc.ref.collection('activityTasks');
+    const activityTasksSnapshot = await activityTasksRef.get();
+    const activityTasks = activityTasksSnapshot.docs.map((taskDoc: any) => {
+      const taskData = taskDoc.data() as ActivityTask;
+      return { ...taskData, taskId: taskDoc.id };
+    });
+
     return {
       activityId: id,
       activityName: data.activityName,
       activityDifficulty: data.activityDifficulty,
       activityDescription: data.activityDescription,
       activitySubscribersCount: activitySubscribersCount,
-      activityTasks: data.activityTasks || [],
+      activityTasks: activityTasks,
       createdAt:
         data.createdAt instanceof Timestamp
           ? data.createdAt.toDate()

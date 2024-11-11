@@ -48,16 +48,59 @@
         >
           تعديل التمرين
         </button>
-        <button
-          mat-flat-button
-          color="accent"
-          (click)="openUpdateActivityTasksDialog()"
-        >
-          تعديل مهام التمرين
-        </button>
       </div>
     </mat-card-actions>
   </mat-card>
+
+  <mat-card appearance="outlined">
+    <mat-card-title>مهام التمرين</mat-card-title>
+    <mat-card-content>
+      <table
+        mat-table
+        [dataSource]="activity.activityTasks"
+        class="mat-elevation-z8"
+      >
+        <!-- Task Name Column -->
+        <ng-container matColumnDef="taskName">
+          <th mat-header-cell *matHeaderCellDef>اسم المهمة</th>
+          <td mat-cell *matCellDef="let task">{{ task.taskName }}</td>
+        </ng-container>
+
+        <!-- Task Description Column -->
+        <ng-container matColumnDef="taskDescription">
+          <th mat-header-cell *matHeaderCellDef>وصف المهمة</th>
+          <td mat-cell *matCellDef="let task">{{ task.taskDescription }}</td>
+        </ng-container>
+
+        <!-- Task Frequency Column -->
+        <ng-container matColumnDef="taskFrequency">
+          <th mat-header-cell *matHeaderCellDef>تكرار المهمة</th>
+          <td mat-cell *matCellDef="let task">{{ task.taskFrequency }}</td>
+        </ng-container>
+
+        <!-- Action Column -->
+        <ng-container matColumnDef="action">
+          <th mat-header-cell *matHeaderCellDef>الإجراءات</th>
+          <td mat-cell *matCellDef="let task">
+            <button
+              mat-button
+              (click)="openUpdateActivityTasksDialog(task.taskId)"
+            >
+              تعديل
+            </button>
+          </td>
+        </ng-container>
+
+        <!-- Header and Row Declarations -->
+        <tr mat-header-row *matHeaderRowDef="tasksTableDisplayedColumns"></tr>
+        <tr
+          mat-row
+          *matRowDef="let row; columns: tasksTableDisplayedColumns"
+        ></tr>
+      </table>
+    </mat-card-content>
+  </mat-card>
+
   <mat-card appearance="outlined">
     <mat-card-title>جلسات الاشتراك</mat-card-title>
     <mat-card-content>
@@ -99,8 +142,14 @@
         </ng-container>
 
         <!-- Header and Row Declarations -->
-        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-        <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+        <tr
+          mat-header-row
+          *matHeaderRowDef="sessionsTableDisplayedColumns"
+        ></tr>
+        <tr
+          mat-row
+          *matRowDef="let row; columns: sessionsTableDisplayedColumns"
+        ></tr>
       </table>
     </mat-card-content>
   </mat-card>

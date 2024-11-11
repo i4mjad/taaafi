@@ -52,7 +52,7 @@ import { ActivityComponent } from './pages/vault/pages/activities/pages/activity
 import { CreateActivityComponent } from './pages/vault/pages/activities/pages/create-activity/create-activity.component';
 import { VaultState } from './state/vault/vault.store';
 import { UpdateActivityComponent } from './pages/vault/pages/activities/pages/activity/dialogs/update-activity/update-activity.component';
-import { UpdateActivityTasksComponent } from './pages/vault/pages/activities/pages/activity/dialogs/update-activity-tasks/update-activity-tasks.component';
+import { UpdateActivityTaskComponent } from './pages/vault/pages/activities/pages/activity/dialogs/update-activity-task/update-activity-task.component';
 
 @NgModule({
   declarations: [
@@ -90,7 +90,7 @@ import { UpdateActivityTasksComponent } from './pages/vault/pages/activities/pag
     ActivityComponent,
     CreateActivityComponent,
     UpdateActivityComponent,
-    UpdateActivityTasksComponent,
+    UpdateActivityTaskComponent,
   ],
   imports: [
     BrowserModule,
