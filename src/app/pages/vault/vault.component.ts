@@ -1,5 +1,4 @@
 import { Component } from '@angular/core';
-import { Activity, fakeActivities } from '../../models/vault.model';
 
 @Component({
   selector: 'app-vault',

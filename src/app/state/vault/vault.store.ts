@@ -16,6 +16,7 @@ import {
   UpdateActivityTasksAction,
   FetchActivityTasksAction,
   FetchActivityTaskByIdAction,
+  DeleteActivityTaskAction,
 } from './vault.actions';
 
 interface VaultStateModel {
@@ -215,5 +216,35 @@ export class VaultState {
           return throwError(() => error);
         })
       );
+  }
+
+  @Action(DeleteActivityTaskAction)
+  deleteActivityTask(
+    ctx: StateContext<VaultStateModel>,
+    action: DeleteActivityTaskAction
+  ) {
+    return from(
+      this.activitiesService.deleteActivityTask(
+        action.activityId,
+        action.taskId
+      )
+    ).pipe(
+      tap(() => {
+        const state = ctx.getState();
+        const updatedTasks = state.selectedActivity.activityTasks.map((task) =>
+          task.taskId === action.taskId ? { ...task, isDeleted: true } : task
+        );
+        ctx.patchState({
+          selectedActivity: {
+            ...state.selectedActivity,
+            activityTasks: updatedTasks,
+          },
+        });
+      }),
+      catchError((error) => {
+        console.error('Error deleting activity task:', error);
+        return throwError(() => error);
+      })
+    );
   }
 }

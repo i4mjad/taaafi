@@ -53,6 +53,7 @@ import { CreateActivityComponent } from './pages/vault/pages/activities/pages/cr
 import { VaultState } from './state/vault/vault.store';
 import { UpdateActivityComponent } from './pages/vault/pages/activities/pages/activity/dialogs/update-activity/update-activity.component';
 import { UpdateActivityTaskComponent } from './pages/vault/pages/activities/pages/activity/dialogs/update-activity-task/update-activity-task.component';
+import { DeleteTaskComponent } from './pages/vault/pages/activities/pages/activity/dialogs/delete-task/delete-task.component';
 
 @NgModule({
   declarations: [
@@ -91,6 +92,7 @@ import { UpdateActivityTaskComponent } from './pages/vault/pages/activities/page
     CreateActivityComponent,
     UpdateActivityComponent,
     UpdateActivityTaskComponent,
+    DeleteTaskComponent,
   ],
   imports: [
     BrowserModule,

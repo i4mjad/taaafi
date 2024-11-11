@@ -97,6 +97,12 @@ export class ActivitiesService {
     return task;
   }
 
+  async deleteActivityTask(activityId: string, taskId: string): Promise<void> {
+    const activityDocRef = this.contentTypesCollectionsRef.doc(activityId);
+    const taskRef = activityDocRef.collection('activityTasks').doc(taskId);
+    await taskRef.update({ isDeleted: true });
+  }
+
   getActivities(): Observable<Activity[]> {
     return this.contentTypesCollectionsRef
       .snapshotChanges()
@@ -106,6 +112,7 @@ export class ActivitiesService {
         )
       );
   }
+
   getActivityById(activityId: string): Observable<Activity> {
     const activityDocRef = this.contentTypesCollectionsRef.doc(activityId);
     return from(activityDocRef.get()).pipe(
@@ -122,10 +129,12 @@ export class ActivitiesService {
 
           const activityTasksRef = doc.ref.collection('activityTasks');
           const activityTasksSnapshot = await activityTasksRef.get();
-          const activityTasks = activityTasksSnapshot.docs.map((taskDoc) => {
-            const taskData = taskDoc.data() as ActivityTask;
-            return { ...taskData, taskId: taskDoc.id };
-          });
+          const activityTasks = activityTasksSnapshot.docs
+            .map((taskDoc) => {
+              const taskData = taskDoc.data() as ActivityTask;
+              return { ...taskData, taskId: taskDoc.id };
+            })
+            .filter((task) => !task.isDeleted);
 
           return {
             activityId: doc.id,
@@ -169,11 +178,13 @@ export class ActivitiesService {
     const activityTasksRef = activityDocRef.collection('activityTasks');
     return activityTasksRef.snapshotChanges().pipe(
       map((actions) =>
-        actions.map((a) => {
-          const data = a.payload.doc.data() as ActivityTask;
-          const id = a.payload.doc.id;
-          return { ...data, taskId: id };
-        })
+        actions
+          .map((a) => {
+            const data = a.payload.doc.data() as ActivityTask;
+            const id = a.payload.doc.id;
+            return { ...data, taskId: id };
+          })
+          .filter((task) => !task.isDeleted)
       )
     );
   }
@@ -208,10 +219,12 @@ export class ActivitiesService {
 
     const activityTasksRef = a.payload.doc.ref.collection('activityTasks');
     const activityTasksSnapshot = await activityTasksRef.get();
-    const activityTasks = activityTasksSnapshot.docs.map((taskDoc: any) => {
-      const taskData = taskDoc.data() as ActivityTask;
-      return { ...taskData, taskId: taskDoc.id };
-    });
+    const activityTasks = activityTasksSnapshot.docs
+      .map((taskDoc: any) => {
+        const taskData = taskDoc.data() as ActivityTask;
+        return { ...taskData, taskId: taskDoc.id };
+      })
+      .filter((task: ActivityTask) => !task.isDeleted);
 
     return {
       activityId: id,

@@ -13,9 +13,11 @@ import {
   FetchActivitySubscriptionSessionsAction,
   UpdateActivityAction,
   UpdateActivityTasksAction,
+  DeleteActivityTaskAction,
 } from '../../../../../../state/vault/vault.actions';
 import { UpdateActivityComponent } from './dialogs/update-activity/update-activity.component';
 import { UpdateActivityTaskComponent } from './dialogs/update-activity-task/update-activity-task.component';
+import { DeleteTaskComponent } from './dialogs/delete-task/delete-task.component';
 
 @Component({
   selector: 'app-activity',
@@ -86,6 +88,20 @@ export class ActivityComponent implements OnInit {
       if (result) {
         this.store.dispatch(
           new UpdateActivityTasksAction(this.activityId, result)
+        );
+      }
+    });
+  }
+
+  openDeleteTaskDialog(taskId: string): void {
+    const dialogRef = this.dialog.open(DeleteTaskComponent, {
+      data: { taskId },
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result) {
+        this.store.dispatch(
+          new DeleteActivityTaskAction(this.activityId, taskId)
         );
       }
     });

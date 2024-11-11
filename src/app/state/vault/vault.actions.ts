@@ -43,3 +43,8 @@ export class FetchActivityTaskByIdAction {
   static readonly type = '[Vault] Fetch Activity Task By Id Action';
   constructor(public activityId: string, public taskId: string) {}
 }
+
+export class DeleteActivityTaskAction {
+  static readonly type = '[Vault] Delete Activity Task Action';
+  constructor(public activityId: string, public taskId: string) {}
+}
