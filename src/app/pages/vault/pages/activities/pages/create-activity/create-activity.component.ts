@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
 import { TaskFrequency } from '../../../../../../models/vault.model';
 import { Store } from '@ngxs/store';
 import { CreateActivityAction } from '../../../../../../state/vault/vault.actions';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-create-activity',
@@ -13,7 +14,11 @@ export class CreateActivityComponent implements OnInit {
   activityForm: FormGroup;
   taskFrequencies = Object.values(TaskFrequency);
 
-  constructor(private fb: FormBuilder, private store: Store) {}
+  constructor(
+    private fb: FormBuilder,
+    private store: Store,
+    private router: Router
+  ) {}
 
   ngOnInit(): void {
     this.activityForm = this.fb.group({
@@ -52,7 +57,11 @@ export class CreateActivityComponent implements OnInit {
     if (this.activityForm.valid) {
       console.log(this.activityForm.value);
 
-      this.store.dispatch(new CreateActivityAction(this.activityForm.value));
+      this.store
+        .dispatch(new CreateActivityAction(this.activityForm.value))
+        .subscribe(() => {
+          this.router.navigate(['/vault/activities']);
+        });
     }
   }
 }
