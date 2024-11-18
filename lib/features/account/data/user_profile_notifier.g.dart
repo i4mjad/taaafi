@@ -21,7 +21,7 @@ final firebaseAuthProvider = AutoDisposeProvider<FirebaseAuth>.internal(
 
 typedef FirebaseAuthRef = AutoDisposeProviderRef<FirebaseAuth>;
 String _$userProfileNotifierHash() =>
-    r'fe30822e7b2d01a7cabe26c603dda82215a12461';
+    r'331b34bef5b78443f2e2abcf132549912282ec24';
 
 /// See also [UserProfileNotifier].
 @ProviderFor(UserProfileNotifier)

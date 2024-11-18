@@ -73,7 +73,7 @@ class AccountScreen extends ConsumerWidget {
                       verticalSpace(Spacing.points8),
                       GestureDetector(
                         onTap: () {
-                          // TODO: analytics: create a method to track user data reset/delete
+                          _showDeleteDataDialog(context);
                         },
                         child: SettingsButton(
                           icon: LucideIcons.userCog,
@@ -161,6 +161,59 @@ class AccountScreen extends ConsumerWidget {
       context: context,
       builder: (context) {
         return UiAndLanguageSettings();
+      },
+    );
+  }
+
+  void _showDeleteDataDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        final theme = AppTheme.of(context);
+        return AlertDialog(
+          backgroundColor: theme.backgroundColor,
+          title: Text(
+            AppLocalizations.of(context).translate('delete-data'),
+            style: TextStyles.h6,
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              CheckboxListTile(
+                title:
+                    Text(AppLocalizations.of(context).translate('followups')),
+                value: false,
+                onChanged: (bool? value) {},
+              ),
+              CheckboxListTile(
+                title: Text(AppLocalizations.of(context).translate('emotions')),
+                value: false,
+                onChanged: (bool? value) {},
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text(
+                AppLocalizations.of(context).translate('cancel'),
+                style: TextStyles.h6.copyWith(color: theme.error[600]),
+              ),
+            ),
+            TextButton(
+              onPressed: () {
+                // TODO: handle data deletion
+                Navigator.of(context).pop();
+              },
+              child: Text(
+                AppLocalizations.of(context).translate('confirm'),
+                style: TextStyles.h6.copyWith(color: theme.success[600]),
+              ),
+            ),
+          ],
+        );
       },
     );
   }

@@ -193,6 +193,7 @@
 
   "required-update":"New Version Available!",
   "update-now":"Update now",
+  "role":"Account Type",
   "required-update-p":"You can't use this version, update to the latest version.",
 
   "account-settings": "User Information",

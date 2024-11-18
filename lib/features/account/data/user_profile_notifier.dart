@@ -19,9 +19,13 @@ class UserProfileNotifier extends _$UserProfileNotifier {
     return _fetchUserProfile();
   }
 
+  Future<String?> _getUserId() async {
+    return FirebaseAuth.instance.currentUser?.uid;
+  }
+
   Future<UserProfile?> _fetchUserProfile() async {
     try {
-      final uid = FirebaseAuth.instance.currentUser?.uid;
+      final uid = await _getUserId();
       if (uid == null) return null;
 
       final doc = await _firestore.collection('users').doc(uid).get();
@@ -31,13 +35,48 @@ class UserProfileNotifier extends _$UserProfileNotifier {
     }
   }
 
-  Future<void> updateUserProfile(UserProfile userProfile) async {
+  Future<void> updateUserProfile({
+    required String displayName,
+    required String email,
+    required String gender,
+    required String locale,
+    required DateTime dayOfBirth,
+    required DateTime userFirstDate,
+    required String role,
+  }) async {
     try {
+      final uid = await _getUserId();
+      if (uid == null) return;
+
+      final userProfile = UserProfile(
+        uid: uid,
+        displayName: displayName,
+        email: email,
+        gender: gender,
+        locale: locale,
+        dayOfBirth: dayOfBirth,
+        userFirstDate: userFirstDate,
+        role: role,
+      );
+
       await _firestore
           .collection('users')
-          .doc(userProfile.uid)
+          .doc(uid)
           .set(userProfile.toMap(), SetOptions(merge: true));
       state = AsyncValue.data(userProfile); // Update state
+    } catch (e) {
+      state = AsyncValue.error(e, StackTrace.current); // Handle error
+    }
+  }
+
+  Future<void> deleteUserAccount() async {
+    try {
+      final uid = await _getUserId();
+      if (uid == null) return;
+
+      await _firestore.collection('users').doc(uid).delete();
+      await FirebaseAuth.instance.currentUser?.delete();
+      state = AsyncValue.data(null); // Update state
     } catch (e) {
       state = AsyncValue.error(e, StackTrace.current); // Handle error
     }

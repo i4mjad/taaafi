@@ -1,7 +1,11 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:reboot_app_3/core/helpers/date_display_formater.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
+import 'package:reboot_app_3/core/monitoring/analytics_facade.dart';
 import 'package:reboot_app_3/core/shared_widgets/app_bar.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
 import 'package:reboot_app_3/core/shared_widgets/custom_segmented_button.dart';
@@ -25,8 +29,13 @@ class _UpdateUserProfileModalSheetState
   late TextEditingController nameController;
   late TextEditingController emailController;
   late TextEditingController dobController;
-  late SegmentedButtonOption gender;
-  late SegmentedButtonOption locale;
+  late TextEditingController userFirstDateController;
+  late TextEditingController roleController;
+  late SegmentedButtonOption selectedGender;
+  late SegmentedButtonOption selectedLocale;
+  late DateTime dob;
+  late String role;
+  late DateTime userFirstDate;
 
   @override
   void initState() {
@@ -34,6 +43,10 @@ class _UpdateUserProfileModalSheetState
     nameController = TextEditingController();
     emailController = TextEditingController();
     dobController = TextEditingController();
+    userFirstDateController = TextEditingController();
+    roleController = TextEditingController();
+    dob = DateTime(1900, 1, 1);
+    userFirstDate = DateTime.now();
   }
 
   @override
@@ -41,13 +54,33 @@ class _UpdateUserProfileModalSheetState
     nameController.dispose();
     emailController.dispose();
     dobController.dispose();
+    userFirstDateController.dispose();
+    roleController.dispose();
     super.dispose();
+  }
+
+  Future<void> _selectDob(BuildContext context, String language) async {
+    DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime(2012),
+      firstDate: DateTime(1950),
+      lastDate: DateTime(2012),
+    );
+
+    if (picked != null) {
+      var pickedDob = DisplayDate(picked, language);
+      setState(() {
+        dobController.text = pickedDob.displayDate;
+        dob = pickedDob.date;
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = AppTheme.of(context);
     final userProfileAsync = ref.watch(userProfileNotifierProvider);
+    final locale = ref.watch(localeNotifierProvider);
 
     return Scaffold(
       appBar: appBar(context, ref, 'my-profile', false, false),
@@ -63,11 +96,20 @@ class _UpdateUserProfileModalSheetState
           if (nameController.text.isEmpty) {
             nameController.text = userProfile.displayName;
             emailController.text = userProfile.email;
-            gender = SegmentedButtonOption(
+            dobController.text = getDisplayDateTime(
+                userProfile.dayOfBirth, locale!.languageCode);
+            dob = userProfile.dayOfBirth;
+            userFirstDateController.text = getDisplayDateTime(
+                userProfile.userFirstDate, locale.languageCode);
+            userFirstDate = userProfile.userFirstDate;
+            roleController.text =
+                AppLocalizations.of(context).translate(userProfile.role);
+            role = userProfile.role;
+            selectedGender = SegmentedButtonOption(
               value: userProfile.gender,
               translationKey: userProfile.gender,
             );
-            locale = SegmentedButtonOption(
+            selectedLocale = SegmentedButtonOption(
               value: userProfile.locale,
               translationKey: userProfile.locale,
             );
@@ -99,6 +141,44 @@ class _UpdateUserProfileModalSheetState
                   enabled: false,
                 ),
                 verticalSpace(Spacing.points8),
+                GestureDetector(
+                  onTap: () => _selectDob(context, locale!.languageCode),
+                  child: AbsorbPointer(
+                    child: CustomTextField(
+                      validator: (value) {
+                        return null;
+                      },
+                      controller: dobController,
+                      prefixIcon: LucideIcons.calendar,
+                      inputType: TextInputType.datetime,
+                      hint: AppLocalizations.of(context)
+                          .translate('date-of-birth'),
+                    ),
+                  ),
+                ),
+                verticalSpace(Spacing.points8),
+                CustomTextField(
+                  validator: (value) {
+                    return null;
+                  },
+                  controller: userFirstDateController,
+                  prefixIcon: LucideIcons.calendar,
+                  inputType: TextInputType.datetime,
+                  hint: AppLocalizations.of(context).translate('starting-date'),
+                  enabled: false,
+                ),
+                verticalSpace(Spacing.points8),
+                CustomTextField(
+                  validator: (value) {
+                    return null;
+                  },
+                  controller: roleController,
+                  prefixIcon: LucideIcons.userCheck,
+                  inputType: TextInputType.text,
+                  hint: AppLocalizations.of(context).translate('role'),
+                  enabled: false,
+                ),
+                verticalSpace(Spacing.points8),
                 CustomSegmentedButton(
                   label: AppLocalizations.of(context).translate('gender'),
                   options: [
@@ -107,10 +187,10 @@ class _UpdateUserProfileModalSheetState
                     SegmentedButtonOption(
                         value: 'female', translationKey: 'female')
                   ],
-                  selectedOption: gender,
+                  selectedOption: selectedGender,
                   onChanged: (selection) {
                     setState(() {
-                      gender = selection;
+                      selectedGender = selection;
                     });
                   },
                 ),
@@ -124,10 +204,10 @@ class _UpdateUserProfileModalSheetState
                     SegmentedButtonOption(
                         value: 'english', translationKey: 'english')
                   ],
-                  selectedOption: locale,
+                  selectedOption: selectedLocale,
                   onChanged: (selection) {
                     setState(() {
-                      locale = selection;
+                      selectedLocale = selection;
                     });
                   },
                 ),
@@ -193,11 +273,23 @@ class _UpdateUserProfileModalSheetState
                 style: TextStyles.small,
               ),
               Text(
-                '${AppLocalizations.of(context).translate('gender')}: ${AppLocalizations.of(context).translate(gender.translationKey)}',
+                '${AppLocalizations.of(context).translate('date-of-birth')}: ${dobController.text}',
                 style: TextStyles.small,
               ),
               Text(
-                '${AppLocalizations.of(context).translate('preferred-language')}: ${AppLocalizations.of(context).translate(locale.translationKey)}',
+                '${AppLocalizations.of(context).translate('starting-date')}: ${userFirstDateController.text}',
+                style: TextStyles.small,
+              ),
+              Text(
+                '${AppLocalizations.of(context).translate('role')}: ${roleController.text}',
+                style: TextStyles.small,
+              ),
+              Text(
+                '${AppLocalizations.of(context).translate('gender')}: ${AppLocalizations.of(context).translate(selectedGender.translationKey)}',
+                style: TextStyles.small,
+              ),
+              Text(
+                '${AppLocalizations.of(context).translate('preferred-language')}: ${AppLocalizations.of(context).translate(selectedLocale.translationKey)}',
                 style: TextStyles.small,
               ),
             ],
@@ -205,11 +297,10 @@ class _UpdateUserProfileModalSheetState
           actions: [
             TextButton(
               onPressed: () async {
-                // TODO: add a function here to handle the profile update
-
+                _updateUserProfile();
                 //TODO: Analytics
                 unawaited(
-                    ref.read(analyticsFacadeProvider).trackOnboardingFinish());
+                    ref.read(analyticsFacadeProvider).trackUserUpdateProfile());
                 Navigator.of(context).pop(); // Close the dialog
                 Navigator.of(context).pop(); // Close the dialog
                 // TODO: show a snackbar
@@ -237,5 +328,17 @@ class _UpdateUserProfileModalSheetState
         );
       },
     );
+  }
+
+  void _updateUserProfile() async {
+    await ref.read(userProfileNotifierProvider.notifier).updateUserProfile(
+          displayName: nameController.text,
+          email: emailController.text,
+          gender: selectedGender.value,
+          locale: selectedLocale.value,
+          dayOfBirth: dob,
+          userFirstDate: userFirstDate,
+          role: role,
+        );
   }
 }
