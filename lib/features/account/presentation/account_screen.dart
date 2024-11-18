@@ -1,8 +1,11 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
+import 'package:reboot_app_3/core/monitoring/analytics_facade.dart';
 import 'package:reboot_app_3/core/shared_widgets/app_bar.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
 import 'package:reboot_app_3/core/shared_widgets/custom_segmented_button.dart';
@@ -68,9 +71,14 @@ class AccountScreen extends ConsumerWidget {
                         style: TextStyles.h6,
                       ),
                       verticalSpace(Spacing.points8),
-                      SettingsButton(
-                        icon: LucideIcons.userCog,
-                        textKey: 'delete-my-data',
+                      GestureDetector(
+                        onTap: () {
+                          // TODO: analytics: create a method to track user data reset/delete
+                        },
+                        child: SettingsButton(
+                          icon: LucideIcons.userCog,
+                          textKey: 'delete-my-data',
+                        ),
                       ),
                       verticalSpace(Spacing.points8),
                       SettingsButton(
@@ -83,6 +91,10 @@ class AccountScreen extends ConsumerWidget {
                       verticalSpace(Spacing.points8),
                       GestureDetector(
                         onTap: () async {
+                          // TODO: analytics
+                          unawaited(ref
+                              .read(analyticsFacadeProvider)
+                              .trackUserDeleteAccount());
                           //TODO: this should be selected based on the provider, for testing purposes we will use Google
                           await authService.reSignInWithGoogle(context);
                           await authService.deleteAccount(context, ref);

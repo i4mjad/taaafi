@@ -206,6 +206,10 @@ class _UpdateUserProfileModalSheetState
             TextButton(
               onPressed: () async {
                 // TODO: add a function here to handle the profile update
+
+                //TODO: Analytics
+                unawaited(
+                    ref.read(analyticsFacadeProvider).trackOnboardingFinish());
                 Navigator.of(context).pop(); // Close the dialog
                 Navigator.of(context).pop(); // Close the dialog
                 // TODO: show a snackbar
