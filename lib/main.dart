@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
@@ -7,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:reboot_app_3/app.dart';
+import 'package:reboot_app_3/core/monitoring/analytics_facade.dart';
 import 'package:reboot_app_3/firebase_options.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
@@ -14,6 +17,10 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   //Initalize Firebase
   await initFirebase();
+
+  // Track app opened event
+  final container = ProviderContainer();
+  unawaited(container.read(analyticsFacadeProvider).trackAppOpened());
 
   //TODO: Investigate about what is the best way to update the user FCM token every time the app got initailized
 

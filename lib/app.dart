@@ -68,7 +68,6 @@ class MyApp extends ConsumerWidget {
             showStoreListing: (storeUrl) async {
               ref.read(urlLauncherProvider).launch(
                     storeUrl,
-                    // * Open app store app directly (or fallback to browser)
                     mode: LaunchMode.externalApplication,
                   );
             },
