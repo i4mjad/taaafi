@@ -19,6 +19,16 @@ class LoggerAnalyticsClient implements AnalyticsClient {
   }
 
   @override
+  Future<void> trackOnboardingStart() async {
+    log('trackOnboardingStart', name: _name);
+  }
+
+  @override
+  Future<void> trackOnboardingFinish() async {
+    log('trackOnboardingFinish', name: _name);
+  }
+
+  @override
   Future<void> trackNewFollowUpAdded() async {
     log('trackNewFollowUpAdded', name: _name);
   }
@@ -31,5 +41,35 @@ class LoggerAnalyticsClient implements AnalyticsClient {
   @override
   Future<void> trackFollowUpRemoved() async {
     log('trackFollowUpRemoved', name: _name);
+  }
+
+  @override
+  Future<void> trackAppClosed() async {
+    log('trackAppClosed', name: _name);
+  }
+
+  @override
+  Future<void> trackUserLogin() async {
+    log('trackUserLogin', name: _name);
+  }
+
+  @override
+  Future<void> trackUserLogout() async {
+    log('trackUserLogout', name: _name);
+  }
+
+  @override
+  Future<void> trackUserSignup() async {
+    log('trackUserSignup', name: _name);
+  }
+
+  @override
+  Future<void> trackUserUpdateProfile() async {
+    log('trackUserUpdateProfile', name: _name);
+  }
+
+  @override
+  Future<void> trackUserDeleteAccount() async {
+    log('trackUserDeleteAccount', name: _name);
   }
 }

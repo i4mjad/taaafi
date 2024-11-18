@@ -4,4 +4,12 @@ abstract class AnalyticsClient {
   Future<void> trackNewFollowUpAdded();
   Future<void> trackFollowUpUpdated();
   Future<void> trackFollowUpRemoved();
+  Future<void> trackAppClosed();
+  Future<void> trackOnboardingStart();
+  Future<void> trackOnboardingFinish();
+  Future<void> trackUserLogin();
+  Future<void> trackUserLogout();
+  Future<void> trackUserSignup();
+  Future<void> trackUserUpdateProfile();
+  Future<void> trackUserDeleteAccount();
 }

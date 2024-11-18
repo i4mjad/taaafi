@@ -42,6 +42,46 @@ class AnalyticsFacade implements AnalyticsClient {
         (c) => c.trackOnboarding(),
       );
 
+  @override
+  Future<void> trackAppClosed() => _dispatch(
+        (c) => c.trackAppClosed(),
+      );
+
+  @override
+  Future<void> trackOnboardingStart() => _dispatch(
+        (c) => c.trackOnboardingStart(),
+      );
+
+  @override
+  Future<void> trackOnboardingFinish() => _dispatch(
+        (c) => c.trackOnboardingFinish(),
+      );
+
+  @override
+  Future<void> trackUserLogin() => _dispatch(
+        (c) => c.trackUserLogin(),
+      );
+
+  @override
+  Future<void> trackUserLogout() => _dispatch(
+        (c) => c.trackUserLogout(),
+      );
+
+  @override
+  Future<void> trackUserSignup() => _dispatch(
+        (c) => c.trackUserSignup(),
+      );
+
+  @override
+  Future<void> trackUserUpdateProfile() => _dispatch(
+        (c) => c.trackUserUpdateProfile(),
+      );
+
+  @override
+  Future<void> trackUserDeleteAccount() => _dispatch(
+        (c) => c.trackUserDeleteAccount(),
+      );
+
   Future<void> _dispatch(
       Future<void> Function(AnalyticsClient client) work) async {
     for (var client in clients) {

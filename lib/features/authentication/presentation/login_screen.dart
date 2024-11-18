@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -5,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/helpers/app_regex.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
+import 'package:reboot_app_3/core/monitoring/analytics_facade.dart';
 import 'package:reboot_app_3/core/routing/route_names.dart';
 import 'package:reboot_app_3/core/shared_widgets/app_bar.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
@@ -65,6 +68,8 @@ class LogInScreen extends ConsumerWidget {
                 children: [
                   GestureDetector(
                     onTap: () async {
+                      unawaited(
+                          ref.read(analyticsFacadeProvider).trackUserLogin());
                       await authService.signInWithApple(context);
                     },
                     child: Container(
@@ -87,6 +92,8 @@ class LogInScreen extends ConsumerWidget {
                   horizontalSpace(Spacing.points4),
                   GestureDetector(
                     onTap: () async {
+                      unawaited(
+                          ref.read(analyticsFacadeProvider).trackUserLogin());
                       await authService.signInWithGoogle(context);
                     },
                     child: Container(
@@ -206,6 +213,7 @@ class _SignInFormState extends ConsumerState<SignInForm> {
               final password = passwordController.value.text;
 
               if (_formKey.currentState!.validate()) {
+                unawaited(ref.read(analyticsFacadeProvider).trackUserLogin());
                 await authService.signInWithEmail(
                   context,
                   email,

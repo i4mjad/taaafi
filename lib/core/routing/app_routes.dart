@@ -43,7 +43,7 @@ GoRouter goRouter(GoRouterRef ref) {
   return GoRouter(
     initialLocation: '/home',
     navigatorKey: rootNavigatorKey,
-    debugLogDiagnostics: true,
+    debugLogDiagnostics: false,
     redirect: (context, state) async {
       final isLoggedIn = authState.asData?.value != null;
 
@@ -205,7 +205,8 @@ GoRouter goRouter(GoRouterRef ref) {
                       GoRoute(
                         path: "ongoingActivity/:id",
                         name: RouteNames.ongoingActivity.name,
-                        builder: (context, state) => OngoingActivitiyScreen(state.pathParameters["id"]!),
+                        builder: (context, state) =>
+                            OngoingActivitiyScreen(state.pathParameters["id"]!),
                       ),
                       GoRoute(
                           path: "addActivity",

@@ -1,9 +1,12 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/helpers/app_regex.dart';
 import 'package:reboot_app_3/core/helpers/date_display_formater.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
+import 'package:reboot_app_3/core/monitoring/analytics_facade.dart';
 import 'package:reboot_app_3/core/shared_widgets/app_bar.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
 import 'package:reboot_app_3/core/shared_widgets/custom_segmented_button.dart';
@@ -332,7 +335,6 @@ class _SignUpFormState extends ConsumerState<SignUpForm> {
                       ),
                     ),
                   ),
-
                   verticalSpace(Spacing.points8),
                   WidgetsContainer(
                     padding: EdgeInsets.fromLTRB(16, 8, 16, 8),
@@ -433,6 +435,7 @@ class _SignUpFormState extends ConsumerState<SignUpForm> {
                   locale,
                   firstDate,
                 );
+                unawaited(ref.read(analyticsFacadeProvider).trackUserSignup());
               }
             },
             child: Padding(
