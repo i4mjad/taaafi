@@ -196,6 +196,8 @@
   "role":"Account Type",
   "required-update-p":"You can't use this version, update to the latest version.",
 
+  "followups":"Followups",
+
   "account-settings": "User Information",
   "app-settings": "Settings",
   "user_name": "User Name",
