@@ -58,7 +58,7 @@ class MyApp extends ConsumerWidget with WidgetsBindingObserver {
         theme: theme.darkTheme == true ? darkTheme : lightTheme,
         builder: (context, child) {
           return ForceUpdateWidget(
-            navigatorKey: rootNavigatorKey,
+            navigatorKey: goRouter.routerDelegate.navigatorKey,
             forceUpdateClient: ForceUpdateClient(
               fetchRequiredVersion: () async {
                 final remoteConfig =
