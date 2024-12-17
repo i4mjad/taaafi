@@ -172,21 +172,39 @@ class AccountScreen extends ConsumerWidget {
         final theme = AppTheme.of(context);
         return AlertDialog(
           backgroundColor: theme.backgroundColor,
+          // contentPadding: EdgeInsets.all(0),
+          // iconPadding: EdgeInsets.all(0),
+          // insetPadding: EdgeInsets.all(0),
           title: Text(
-            AppLocalizations.of(context).translate('delete-data'),
+            AppLocalizations.of(context).translate('delete-my-data'),
             style: TextStyles.h6,
           ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               CheckboxListTile(
-                title:
-                    Text(AppLocalizations.of(context).translate('followups')),
+                title: Text(
+                  AppLocalizations.of(context).translate('daily-follow-ups'),
+                  style: TextStyles.body,
+                ),
+                subtitle: Text(
+                  AppLocalizations.of(context)
+                      .translate('daily-follow-ups-delete-desc'),
+                  style: TextStyles.small.copyWith(color: theme.grey[600]),
+                ),
                 value: false,
                 onChanged: (bool? value) {},
               ),
               CheckboxListTile(
-                title: Text(AppLocalizations.of(context).translate('emotions')),
+                title: Text(
+                  AppLocalizations.of(context).translate('emotions'),
+                  style: TextStyles.body,
+                ),
+                subtitle: Text(
+                  AppLocalizations.of(context)
+                      .translate('emotions-delete-desc'),
+                  style: TextStyles.small.copyWith(color: theme.grey[600]),
+                ),
                 value: false,
                 onChanged: (bool? value) {},
               ),

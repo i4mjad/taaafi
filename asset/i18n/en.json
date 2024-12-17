@@ -197,6 +197,11 @@
   "required-update-p":"You can't use this version, update to the latest version.",
 
   "followups":"Followups",
+  "daily-follow-ups": "Daily follow ups",
+
+  "daily-follow-ups-delete-desc": "All previous daily follow-ups will be deleted and the counter start date will be updated to the deletion time",
+
+  "emotions-delete-desc": "All recorded emotions will be deleted",
 
   "account-settings": "User Information",
   "app-settings": "Settings",
