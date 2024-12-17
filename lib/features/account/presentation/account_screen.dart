@@ -3,9 +3,11 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/monitoring/analytics_facade.dart';
+import 'package:reboot_app_3/core/routing/route_names.dart';
 import 'package:reboot_app_3/core/shared_widgets/app_bar.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
 import 'package:reboot_app_3/core/shared_widgets/custom_segmented_button.dart';
@@ -96,9 +98,8 @@ class AccountScreen extends ConsumerWidget {
                           unawaited(ref
                               .read(analyticsFacadeProvider)
                               .trackUserDeleteAccount());
-                          //TODO: this should be selected based on the provider, for testing purposes we will use Google
-                          await authService.reSignInWithGoogle(context);
-                          await authService.deleteAccount(context, ref);
+
+                          context.goNamed(RouteNames.accountDelete.name);
                         },
                         child: SettingsButton(
                           icon: LucideIcons.userX,

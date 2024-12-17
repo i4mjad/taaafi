@@ -7,6 +7,7 @@ import 'package:reboot_app_3/core/routing/scaffold_with_nested_navigation.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/features/account/presentation/account_screen.dart';
+import 'package:reboot_app_3/features/account/presentation/delete_account_screen.dart';
 import 'package:reboot_app_3/features/authentication/presentation/complete_account_registeration.dart';
 import 'package:reboot_app_3/features/authentication/presentation/confirm_user_details_screen.dart';
 import 'package:reboot_app_3/features/authentication/presentation/forgot_password_screen.dart';
@@ -291,7 +292,11 @@ GoRouter goRouter(GoRouterRef ref) {
                   child: AccountScreen(),
                 ),
                 routes: [
-                  //! Add Pages
+                  GoRoute(
+                    path: 'account-delete',
+                    name: RouteNames.accountDelete.name,
+                    builder: (context, state) => DeleteAccountScreen(),
+                  ),
                 ],
               ),
             ],

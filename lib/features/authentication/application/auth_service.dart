@@ -158,6 +158,22 @@ class AuthService {
     }
   }
 
+  Future<bool> reSignInWithEmail(
+      BuildContext context, String email, String password) async {
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) return false;
+
+      final credential =
+          EmailAuthProvider.credential(email: email, password: password);
+      await user.reauthenticateWithCredential(credential);
+      return true;
+    } catch (e) {
+      // Handle error
+      return false;
+    }
+  }
+
   Future<void> signOut(BuildContext context, WidgetRef ref) async {
     try {
       await _auth.signOut();

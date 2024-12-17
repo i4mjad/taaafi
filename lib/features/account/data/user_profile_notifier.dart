@@ -116,4 +116,21 @@ class UserProfileNotifier extends _$UserProfileNotifier {
   Future<void> deleteEmotions() async {
     await _deleteUserCollection('emotions');
   }
+
+  Future<void> handleUserDeletion() async {
+    try {
+      final uid = await _getUserId();
+      if (uid == null) return;
+
+      // TODO: Implement the user deletion process
+      // This should include deleting user data from Firestore and any other necessary cleanup
+
+      //TODO: uncomment this when every things is done, for now we will sign the user out
+      await FirebaseAuth.instance.signOut();
+
+      state = AsyncValue.data(null); // Update state
+    } catch (e) {
+      state = AsyncValue.error(e, StackTrace.current); // Handle error
+    }
+  }
 }
