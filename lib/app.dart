@@ -9,7 +9,6 @@ import 'package:force_update_helper/force_update_helper.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/monitoring/analytics_facade.dart';
 import 'package:reboot_app_3/core/routing/app_routes.dart';
-import 'package:reboot_app_3/core/routing/navigator_keys.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/custom_theme_data.dart';
 import 'package:reboot_app_3/core/theming/theme_provider.dart';
