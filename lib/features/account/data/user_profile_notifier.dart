@@ -81,4 +81,39 @@ class UserProfileNotifier extends _$UserProfileNotifier {
       state = AsyncValue.error(e, StackTrace.current); // Handle error
     }
   }
+
+  Future<void> _deleteUserCollection(String collectionName) async {
+    try {
+      final uid = await _getUserId();
+      if (uid == null) return;
+
+      final collectionRef =
+          _firestore.collection('users').doc(uid).collection(collectionName);
+      final snapshots = await collectionRef.get();
+
+      for (var doc in snapshots.docs) {
+        await doc.reference.delete();
+      }
+    } catch (e) {
+      state = AsyncValue.error(e, StackTrace.current); // Handle error
+    }
+  }
+
+  Future<void> deleteDailyFollowUps() async {
+    try {
+      await _deleteUserCollection('followUps');
+      final uid = await _getUserId();
+      if (uid == null) return;
+
+      await _firestore.collection('users').doc(uid).update({
+        'userFirstDate': FieldValue.serverTimestamp(),
+      });
+    } catch (e) {
+      state = AsyncValue.error(e, StackTrace.current); // Handle error
+    }
+  }
+
+  Future<void> deleteEmotions() async {
+    await _deleteUserCollection('emotions');
+  }
 }

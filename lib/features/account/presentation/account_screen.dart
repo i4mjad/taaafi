@@ -73,7 +73,9 @@ class AccountScreen extends ConsumerWidget {
                       verticalSpace(Spacing.points8),
                       GestureDetector(
                         onTap: () {
-                          _showDeleteDataDialog(context);
+                          //TODO: analytics: delete data proccess started
+
+                          _showDeleteDataDialog(context, ref);
                         },
                         child: SettingsButton(
                           icon: LucideIcons.userCog,
@@ -91,7 +93,6 @@ class AccountScreen extends ConsumerWidget {
                       verticalSpace(Spacing.points8),
                       GestureDetector(
                         onTap: () async {
-                          // TODO: analytics
                           unawaited(ref
                               .read(analyticsFacadeProvider)
                               .trackUserDeleteAccount());
@@ -165,74 +166,102 @@ class AccountScreen extends ConsumerWidget {
     );
   }
 
-  void _showDeleteDataDialog(BuildContext context) {
+  void _showDeleteDataDialog(BuildContext context, WidgetRef ref) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        final theme = AppTheme.of(context);
-        return AlertDialog(
-          backgroundColor: theme.backgroundColor,
-          // contentPadding: EdgeInsets.all(0),
-          // iconPadding: EdgeInsets.all(0),
-          // insetPadding: EdgeInsets.all(0),
-          title: Text(
-            AppLocalizations.of(context).translate('delete-my-data'),
-            style: TextStyles.h6,
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              CheckboxListTile(
-                title: Text(
-                  AppLocalizations.of(context).translate('daily-follow-ups'),
-                  style: TextStyles.body,
-                ),
-                subtitle: Text(
-                  AppLocalizations.of(context)
-                      .translate('daily-follow-ups-delete-desc'),
-                  style: TextStyles.small.copyWith(color: theme.grey[600]),
-                ),
-                value: false,
-                onChanged: (bool? value) {},
-              ),
-              CheckboxListTile(
-                title: Text(
-                  AppLocalizations.of(context).translate('emotions'),
-                  style: TextStyles.body,
-                ),
-                subtitle: Text(
-                  AppLocalizations.of(context)
-                      .translate('emotions-delete-desc'),
-                  style: TextStyles.small.copyWith(color: theme.grey[600]),
-                ),
-                value: false,
-                onChanged: (bool? value) {},
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text(
-                AppLocalizations.of(context).translate('cancel'),
-                style: TextStyles.h6.copyWith(color: theme.error[600]),
-              ),
-            ),
-            TextButton(
-              onPressed: () {
-                // TODO: handle data deletion
-                Navigator.of(context).pop();
-              },
-              child: Text(
-                AppLocalizations.of(context).translate('confirm'),
-                style: TextStyles.h6.copyWith(color: theme.success[600]),
-              ),
-            ),
-          ],
-        );
+        return DeleteDataDialog();
       },
+    );
+  }
+}
+
+class DeleteDataDialog extends ConsumerStatefulWidget {
+  const DeleteDataDialog({Key? key}) : super(key: key);
+
+  @override
+  _DeleteDataDialogState createState() => _DeleteDataDialogState();
+}
+
+class _DeleteDataDialogState extends ConsumerState<DeleteDataDialog> {
+  bool deleteFollowUps = false;
+  bool deleteEmotions = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final userProfileNotifier = ref.read(userProfileNotifierProvider.notifier);
+    final theme = AppTheme.of(context);
+
+    return AlertDialog(
+      backgroundColor: theme.backgroundColor,
+      title: Text(
+        AppLocalizations.of(context).translate('delete-my-data'),
+        style: TextStyles.h6,
+      ),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          CheckboxListTile(
+            title: Text(
+              AppLocalizations.of(context).translate('daily-follow-ups'),
+              style: TextStyles.body,
+            ),
+            subtitle: Text(
+              AppLocalizations.of(context)
+                  .translate('daily-follow-ups-delete-desc'),
+              style: TextStyles.small.copyWith(color: theme.grey[600]),
+            ),
+            value: deleteFollowUps,
+            onChanged: (bool? value) {
+              setState(() {
+                deleteFollowUps = value ?? false;
+              });
+            },
+          ),
+          CheckboxListTile(
+            title: Text(
+              AppLocalizations.of(context).translate('emotions'),
+              style: TextStyles.body,
+            ),
+            subtitle: Text(
+              AppLocalizations.of(context).translate('emotions-delete-desc'),
+              style: TextStyles.small.copyWith(color: theme.grey[600]),
+            ),
+            value: deleteEmotions,
+            onChanged: (bool? value) {
+              setState(() {
+                deleteEmotions = value ?? false;
+              });
+            },
+          ),
+        ],
+      ),
+      actions: [
+        TextButton(
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+          child: Text(
+            AppLocalizations.of(context).translate('cancel'),
+            style: TextStyles.h6.copyWith(color: theme.error[600]),
+          ),
+        ),
+        TextButton(
+          onPressed: () async {
+            if (deleteFollowUps) {
+              await userProfileNotifier.deleteDailyFollowUps();
+            }
+            if (deleteEmotions) {
+              await userProfileNotifier.deleteEmotions();
+            }
+            Navigator.of(context).pop();
+          },
+          child: Text(
+            AppLocalizations.of(context).translate('confirm'),
+            style: TextStyles.h6.copyWith(color: theme.success[600]),
+          ),
+        ),
+      ],
     );
   }
 }
