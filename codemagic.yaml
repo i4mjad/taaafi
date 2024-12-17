@@ -5,7 +5,7 @@ workflows:
     environment:
       android_signing:
         - android-signing-key
-      flutter: stable
+      flutter: 3.24.3
       groups:
         - google_credentials
       vars:
@@ -48,7 +48,7 @@ workflows:
       ios_signing:
         distribution_type: app_store
         bundle_identifier: com.amjadkhalfan.RebootApp
-      flutter: stable
+      flutter: 3.24.3
       vars:
         APP_STORE_APPLE_ID: 1531562469
     scripts:
