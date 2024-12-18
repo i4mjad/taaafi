@@ -9,6 +9,7 @@ import 'package:force_update_helper/force_update_helper.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/monitoring/analytics_facade.dart';
 import 'package:reboot_app_3/core/routing/app_routes.dart';
+import 'package:reboot_app_3/core/routing/app_startup.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/custom_theme_data.dart';
 import 'package:reboot_app_3/core/theming/theme_provider.dart';
@@ -56,39 +57,42 @@ class MyApp extends ConsumerWidget with WidgetsBindingObserver {
         routerConfig: goRouter,
         theme: theme.darkTheme == true ? darkTheme : lightTheme,
         builder: (context, child) {
-          return ForceUpdateWidget(
-            navigatorKey: goRouter.routerDelegate.navigatorKey,
-            forceUpdateClient: ForceUpdateClient(
-              fetchRequiredVersion: () async {
-                final remoteConfig =
-                    await ref.read(firebaseRemoteConfigProvider.future);
-                var string = remoteConfig.getString('required_version');
+          return AppStartupWidget(
+            onLoaded: (_) => ForceUpdateWidget(
+              navigatorKey: goRouter.routerDelegate.navigatorKey,
+              forceUpdateClient: ForceUpdateClient(
+                fetchRequiredVersion: () async {
+                  final remoteConfig =
+                      await ref.read(firebaseRemoteConfigProvider.future);
+                  var string = remoteConfig.getString('required_version');
 
-                return string;
+                  return string;
+                },
+                iosAppStoreId: "1531562469",
+              ),
+              allowCancel: false,
+              showForceUpdateAlert: (context, allowCancel) => showAlertDialog(
+                context: context,
+                title:
+                    AppLocalizations.of(context).translate('required-update'),
+                content:
+                    AppLocalizations.of(context).translate('required-update-p'),
+                cancelActionText: allowCancel ? 'Later' : null,
+                defaultActionText:
+                    AppLocalizations.of(context).translate('update-now'),
+              ),
+              showStoreListing: (storeUrl) async {
+                ref.read(urlLauncherProvider).launch(
+                      storeUrl,
+                      mode: LaunchMode.externalApplication,
+                    );
               },
-              iosAppStoreId: "1531562469",
+              onException: (e, st) {
+                // TODO: add this later
+                // ref.read(errorLoggerProvider).logException(e, st);
+              },
+              child: child!,
             ),
-            allowCancel: false,
-            showForceUpdateAlert: (context, allowCancel) => showAlertDialog(
-              context: context,
-              title: AppLocalizations.of(context).translate('required-update'),
-              content:
-                  AppLocalizations.of(context).translate('required-update-p'),
-              cancelActionText: allowCancel ? 'Later' : null,
-              defaultActionText:
-                  AppLocalizations.of(context).translate('update-now'),
-            ),
-            showStoreListing: (storeUrl) async {
-              ref.read(urlLauncherProvider).launch(
-                    storeUrl,
-                    mode: LaunchMode.externalApplication,
-                  );
-            },
-            onException: (e, st) {
-              // TODO: add this later
-              // ref.read(errorLoggerProvider).logException(e, st);
-            },
-            child: child!,
           );
         },
       ),

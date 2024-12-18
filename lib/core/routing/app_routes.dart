@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -45,6 +47,7 @@ GoRouter goRouter(GoRouterRef ref) {
     initialLocation: '/home',
     navigatorKey: rootNavigatorKey,
     debugLogDiagnostics: false,
+    refreshListenable: GoRouterRefreshStream(authStateChanges(ref)),
     redirect: (context, state) async {
       final isLoggedIn = authState.asData?.value != null;
 
@@ -310,6 +313,7 @@ GoRouter goRouter(GoRouterRef ref) {
   );
 }
 
+//TODO: move those to seperate file
 class NotFoundScreen extends StatelessWidget {
   const NotFoundScreen({super.key});
 
@@ -368,6 +372,16 @@ class EmptyPlaceholderWidget extends ConsumerWidget {
 class GoRouterRefreshStream extends ChangeNotifier {
   GoRouterRefreshStream(Stream<dynamic> stream) {
     notifyListeners();
-    stream.listen((_) => notifyListeners());
+    _subscription = stream.asBroadcastStream().listen(
+          (dynamic _) => notifyListeners(),
+        );
+  }
+
+  late final StreamSubscription<dynamic> _subscription;
+
+  @override
+  void dispose() {
+    _subscription.cancel();
+    super.dispose();
   }
 }
