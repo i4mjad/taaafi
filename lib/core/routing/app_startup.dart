@@ -12,13 +12,13 @@ part 'app_startup.g.dart';
 @Riverpod(keepAlive: true)
 Future<void> appStartup(Ref ref) async {
   ref.onDispose(() {
-    // ensure dependent providers are disposed as well
+    // TODO: ensure dependent providers are disposed as well
     // ref.invalidate(sharedPreferencesProvider);
     // ref.invalidate(onboardingRepositoryProvider);
   });
-  // Uncomment this to test that URL-based navigation and deep linking works
-  // even when there's a delay in the app startup logic
-  // await Future.delayed(Duration(seconds: 1));
+  // TODO: Uncomment this to test that URL-based navigation and deep linking works
+  //       even when there's a delay in the app startup logic
+  await Future.delayed(Duration(seconds: 1));
   // await for all initialization code to be complete before returning
   // await ref.watch(sharedPreferencesProvider.future);
   // await ref.watch(onboardingRepositoryProvider.future);
