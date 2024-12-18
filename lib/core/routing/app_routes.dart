@@ -337,7 +337,7 @@ class LoadingScreen extends ConsumerWidget {
     return Scaffold(
       backgroundColor: theme.backgroundColor,
       body: Center(
-        child: CircularProgressIndicator(),
+        child: CircularProgressIndicator(color: theme.primary[600]),
       ),
     );
   }
