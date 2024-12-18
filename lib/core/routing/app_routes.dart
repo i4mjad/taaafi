@@ -1,13 +1,10 @@
-import 'dart:async';
-
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:reboot_app_3/core/routing/go_router_refresh_stream.dart';
+import 'package:reboot_app_3/core/routing/loading_screen.dart';
 import 'package:reboot_app_3/core/routing/navigator_keys.dart';
+import 'package:reboot_app_3/core/routing/not_found_screen.dart';
 import 'package:reboot_app_3/core/routing/route_names.dart';
 import 'package:reboot_app_3/core/routing/scaffold_with_nested_navigation.dart';
-import 'package:reboot_app_3/core/theming/app-themes.dart';
-import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/features/account/presentation/account_screen.dart';
 import 'package:reboot_app_3/features/account/presentation/delete_account_screen.dart';
 import 'package:reboot_app_3/features/authentication/presentation/complete_account_registeration.dart';
@@ -311,77 +308,4 @@ GoRouter goRouter(GoRouterRef ref) {
       child: NotFoundScreen(),
     ),
   );
-}
-
-//TODO: move those to seperate file
-class NotFoundScreen extends StatelessWidget {
-  const NotFoundScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(),
-      body: EmptyPlaceholderWidget(
-        message: '404 - Page not found!',
-      ),
-    );
-  }
-}
-
-class LoadingScreen extends ConsumerWidget {
-  const LoadingScreen({super.key});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final theme = AppTheme.of(context);
-    return Scaffold(
-      backgroundColor: theme.backgroundColor,
-      body: Center(
-        child: CircularProgressIndicator(color: theme.primary[600]),
-      ),
-    );
-  }
-}
-
-class EmptyPlaceholderWidget extends ConsumerWidget {
-  const EmptyPlaceholderWidget({super.key, required this.message});
-  final String message;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Text(
-              message,
-              style: Theme.of(context).textTheme.headlineMedium,
-              textAlign: TextAlign.center,
-            ),
-            verticalSpace(Spacing.points16),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class GoRouterRefreshStream extends ChangeNotifier {
-  GoRouterRefreshStream(Stream<dynamic> stream) {
-    notifyListeners();
-    _subscription = stream.asBroadcastStream().listen(
-          (dynamic _) => notifyListeners(),
-        );
-  }
-
-  late final StreamSubscription<dynamic> _subscription;
-
-  @override
-  void dispose() {
-    _subscription.cancel();
-    super.dispose();
-  }
 }
