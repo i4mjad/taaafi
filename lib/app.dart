@@ -37,6 +37,7 @@ class MyApp extends ConsumerWidget with WidgetsBindingObserver {
     return AppTheme(
       customThemeData: theme.darkTheme ? darkCustomTheme : lightCustomTheme,
       child: MaterialApp.router(
+        routerConfig: goRouter,
         supportedLocales: [Locale('ar', ''), Locale('en', '')],
         locale: locale,
         localizationsDelegates: [
@@ -54,9 +55,8 @@ class MyApp extends ConsumerWidget with WidgetsBindingObserver {
           return supportedLocales.first;
         },
         debugShowCheckedModeBanner: false,
-        routerConfig: goRouter,
         theme: theme.darkTheme == true ? darkTheme : lightTheme,
-        builder: (context, child) {
+        builder: (_, child) {
           return AppStartupWidget(
             onLoaded: (_) => ForceUpdateWidget(
               navigatorKey: goRouter.routerDelegate.navigatorKey,

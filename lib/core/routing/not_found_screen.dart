@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:reboot_app_3/core/routing/app_routes.dart';
 import 'package:reboot_app_3/core/routing/empty_placeholder_widget.dart';
 
 class NotFoundScreen extends StatelessWidget {
