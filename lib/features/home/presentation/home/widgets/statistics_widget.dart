@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
@@ -17,12 +18,14 @@ class StatisticsWidget extends StatefulWidget {
 }
 
 class _StatisticsWidgetState extends State<StatisticsWidget> {
-  // final PageController _pageController = PageController();
+  final PageController _pageController = PageController();
   int _currentPage = 0;
 
   @override
   Widget build(BuildContext context) {
     final theme = AppTheme.of(context);
+    final localization =
+        AppLocalizations.of(context); // Obtain localization instance
     return Container(
       width: MediaQuery.of(context).size.width - 16,
       child: Column(
@@ -33,7 +36,7 @@ class _StatisticsWidgetState extends State<StatisticsWidget> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                AppLocalizations.of(context).translate("statistics"),
+                localization.translate("statistics"), // Replaced "Statistics"
                 style: TextStyles.h6.copyWith(color: theme.grey[900]),
               ),
               Row(
@@ -55,31 +58,34 @@ class _StatisticsWidgetState extends State<StatisticsWidget> {
             ],
           ),
           verticalSpace(Spacing.points8),
-          _buildFirstPage(context, theme),
-          // ConstrainedBox(
-          //   constraints: BoxConstraints(
-          //     maxHeight: MediaQuery.of(context).size.height * 0.17125,
-          //   ),
-          //   child: PageView(
-          //     clipBehavior: Clip.none,
-          //     controller: _pageController,
-          //     onPageChanged: (int page) {
-          //       setState(() {
-          //         _currentPage = page;
-          //       });
-          //     },
-          //     children: [
-          //       _buildFirstPage(context, theme),
-          //       _buildSecondPage(context, theme),
-          //     ],
-          //   ),
-          // ),
+          // _buildFirstPage(context, theme),
+          ConstrainedBox(
+            constraints: BoxConstraints(
+              maxHeight: MediaQuery.of(context).size.height * 0.17125,
+            ),
+            child: PageView(
+              clipBehavior: Clip.none,
+              controller: _pageController,
+              onPageChanged: (int page) {
+                setState(() {
+                  _currentPage = page;
+                });
+              },
+              children: [
+                _buildFirstPage(
+                    context, theme, localization), // Pass localization
+                _buildSecondPage(
+                    context, theme, localization), // Pass localization
+              ],
+            ),
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildFirstPage(BuildContext context, CustomThemeData theme) {
+  Widget _buildSecondPage(BuildContext context, CustomThemeData theme,
+      AppLocalizations localization) {
     return IntrinsicHeight(
       child: Row(
         mainAxisAlignment: MainAxisAlignment.start,
@@ -108,11 +114,11 @@ class _StatisticsWidgetState extends State<StatisticsWidget> {
                   ),
                 ),
                 verticalSpace(Spacing.points8),
-                Text("28" + " " + AppLocalizations.of(context).translate("day"),
+                Text("28" + " " + localization.translate("day"),
                     style: TextStyles.h6),
                 verticalSpace(Spacing.points8),
                 Text(
-                  AppLocalizations.of(context).translate("current-streak"),
+                  localization.translate("free-days-from-start"),
                   style: TextStyles.small,
                   textAlign: TextAlign.center,
                 ),
@@ -149,15 +155,11 @@ class _StatisticsWidgetState extends State<StatisticsWidget> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
-                          Text(
-                              "28" +
-                                  " " +
-                                  AppLocalizations.of(context).translate("day"),
+                          Text("28" + " " + localization.translate("day"),
                               style: TextStyles.h6),
                           verticalSpace(Spacing.points8),
                           Text(
-                            AppLocalizations.of(context)
-                                .translate("highest-streak"),
+                            localization.translate("highest-streak"),
                             overflow: TextOverflow.ellipsis,
                             style: TextStyles.small,
                           ),
@@ -190,15 +192,11 @@ class _StatisticsWidgetState extends State<StatisticsWidget> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
-                          Text(
-                              "28" +
-                                  " " +
-                                  AppLocalizations.of(context).translate("day"),
+                          Text("28" + " " + localization.translate("day"),
                               style: TextStyles.h6),
                           verticalSpace(Spacing.points8),
                           Text(
-                            AppLocalizations.of(context)
-                                .translate("free-days-from-start"),
+                            localization.translate("free-days-from-start"),
                             style: TextStyles.small,
                           ),
                         ],
@@ -214,12 +212,297 @@ class _StatisticsWidgetState extends State<StatisticsWidget> {
     );
   }
 
-  Widget _buildSecondPage(BuildContext context, CustomThemeData theme) {
+  Widget _buildFirstPage(BuildContext context, CustomThemeData theme,
+      AppLocalizations localization) {
     // Add your second page widget here
-    return Center(
-      child: Text(
-        "Second Page",
-        style: TextStyles.h6.copyWith(color: theme.grey[900]),
+    return WidgetsContainer(
+      padding: EdgeInsets.all(16),
+      backgroundColor: theme.backgroundColor,
+      borderRadius: BorderRadius.circular(15),
+      borderSide: BorderSide(color: theme.grey[600]!, width: 0.5),
+      boxShadow: Shadows.mainShadows,
+      child: Row(
+        children: [
+          Container(
+            padding: EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: theme.backgroundColor,
+              boxShadow: Shadows.mainShadows,
+              shape: BoxShape.circle,
+              border: Border.all(
+                width: 0.5,
+                color: theme.grey[600]!,
+              ),
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  "28 ",
+                  style: TextStyles.h5,
+                  textAlign: TextAlign.center,
+                ),
+                Text(
+                  localization.translate("day"),
+                  style: TextStyles.h5,
+                  textAlign: TextAlign.center,
+                ),
+                verticalSpace(Spacing.points8),
+                Flexible(
+                  child: Text(
+                    localization.translate("current-streak"),
+                    textAlign: TextAlign.center,
+                    style: TextStyles.small,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          horizontalSpace(Spacing.points16),
+          Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Container(
+                        width: 8,
+                        height: 8,
+                        decoration: BoxDecoration(
+                          color: Color(0xFF5F8A8D),
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                      horizontalSpace(Spacing.points4),
+                      Text(
+                        '28 ' + AppLocalizations.of(context).translate("day"),
+                        style: TextStyles.h6,
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
+                  horizontalSpace(Spacing.points8),
+                  Text(
+                    AppLocalizations.of(context).translate("free-porn-days"),
+                    style: TextStyles.small,
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Container(
+                        width: 8,
+                        height: 8,
+                        decoration: BoxDecoration(
+                          color: Color(0xFFF1C863),
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                      horizontalSpace(Spacing.points4),
+                      Text(
+                        '28 ' + AppLocalizations.of(context).translate("day"),
+                        style: TextStyles.h6,
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
+                  horizontalSpace(Spacing.points8),
+                  Text(
+                    AppLocalizations.of(context).translate("free-mast-days"),
+                    style: TextStyles.small,
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Container(
+                        width: 8,
+                        height: 8,
+                        decoration: BoxDecoration(
+                          color: Color(0xFFD9AF9B),
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                      horizontalSpace(Spacing.points4),
+                      Text(
+                        '28 ' + AppLocalizations.of(context).translate("day"),
+                        style: TextStyles.h6,
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
+                  horizontalSpace(Spacing.points8),
+                  Text(
+                    AppLocalizations.of(context).translate("slip-up"),
+                    style: TextStyles.small,
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            ],
+          ),
+          Spacer(),
+          GestureDetector(
+            onTap: () {
+              _showOnboardingModal(context);
+            },
+            child: Icon(LucideIcons.badgeInfo, color: theme.grey[400]),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showOnboardingModal(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        final theme = AppTheme.of(context);
+        return Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              FollowupDescriptionSection(
+                color: Color(0xFF5F8A8D),
+                title: AppLocalizations.of(context).translate("relapse"),
+                description:
+                    AppLocalizations.of(context).translate("current-streak"),
+              ),
+              verticalSpace(Spacing.points16),
+              FollowupDescriptionSection(
+                color: Color(0xFFF1C863),
+                title: AppLocalizations.of(context).translate("porn-only"),
+                description:
+                    AppLocalizations.of(context).translate("free-porn-days"),
+              ),
+              verticalSpace(Spacing.points16),
+              FollowupDescriptionSection(
+                color: Color(0xFFD9AF9B),
+                title: AppLocalizations.of(context).translate("mast-only"),
+                description:
+                    AppLocalizations.of(context).translate("free-mast-days"),
+              ),
+              verticalSpace(Spacing.points16),
+              FollowupDescriptionSection(
+                color: Color(0xFFD9AF9B),
+                title: AppLocalizations.of(context).translate("slip-up"),
+                description: AppLocalizations.of(context).translate("slip-up"),
+              ),
+              Spacer(),
+              GestureDetector(
+                onTap: () {
+                  Navigator.pop(context);
+                },
+                child: WidgetsContainer(
+                  backgroundColor: theme.backgroundColor,
+                  padding: EdgeInsets.fromLTRB(16, 12, 16, 12),
+                  borderSide: BorderSide(color: theme.grey[600]!, width: 0.5),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Color.fromRGBO(50, 50, 93, 0.25),
+                      blurRadius: 5,
+                      spreadRadius: -1,
+                      offset: Offset(
+                        0,
+                        2,
+                      ),
+                    ),
+                    BoxShadow(
+                      color: Color.fromRGBO(0, 0, 0, 0.3),
+                      blurRadius: 3,
+                      spreadRadius: -1,
+                      offset: Offset(
+                        0,
+                        1,
+                      ),
+                    ),
+                  ],
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        AppLocalizations.of(context).translate("close"),
+                        style: TextStyles.body.copyWith(
+                          color: theme.primary[600],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              )
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+class FollowupDescriptionSection extends StatelessWidget {
+  const FollowupDescriptionSection({
+    super.key,
+    required this.color,
+    required this.title,
+    required this.description,
+  });
+
+  final Color color;
+  final String title;
+  final String description;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = AppTheme.of(context);
+    return Container(
+      padding: EdgeInsets.only(right: 32, left: 32),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 16,
+            height: 16,
+            decoration: BoxDecoration(
+              color: color,
+              shape: BoxShape.circle,
+            ),
+          ),
+          horizontalSpace(Spacing.points16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: TextStyles.h5.copyWith(
+                    color: theme.primary[600],
+                  ),
+                ),
+                verticalSpace(Spacing.points8),
+                Text(
+                  description,
+                  style: TextStyles.footnote.copyWith(
+                    color: theme.grey[700],
+                  ),
+                ),
+              ],
+            ),
+          )
+        ],
       ),
     );
   }
