@@ -57,41 +57,40 @@ class MyApp extends ConsumerWidget with WidgetsBindingObserver {
         debugShowCheckedModeBanner: false,
         theme: theme.darkTheme == true ? darkTheme : lightTheme,
         builder: (_, child) {
-          return AppStartupWidget(
-            onLoaded: (_) => ForceUpdateWidget(
-              navigatorKey: goRouter.routerDelegate.navigatorKey,
-              forceUpdateClient: ForceUpdateClient(
-                fetchRequiredVersion: () async {
-                  final remoteConfig =
-                      await ref.read(firebaseRemoteConfigProvider.future);
-                  var string = remoteConfig.getString('required_version');
+          return ForceUpdateWidget(
+            navigatorKey: goRouter.routerDelegate.navigatorKey,
+            forceUpdateClient: ForceUpdateClient(
+              fetchRequiredVersion: () async {
+                final remoteConfig =
+                    await ref.read(firebaseRemoteConfigProvider.future);
+                var string = remoteConfig.getString('required_version');
 
-                  return string;
-                },
-                iosAppStoreId: "1531562469",
-              ),
-              allowCancel: false,
-              showForceUpdateAlert: (context, allowCancel) => showAlertDialog(
-                context: context,
-                title:
-                    AppLocalizations.of(context).translate('required-update'),
-                content:
-                    AppLocalizations.of(context).translate('required-update-p'),
-                cancelActionText: allowCancel ? 'Later' : null,
-                defaultActionText:
-                    AppLocalizations.of(context).translate('update-now'),
-              ),
-              showStoreListing: (storeUrl) async {
-                ref.read(urlLauncherProvider).launch(
-                      storeUrl,
-                      mode: LaunchMode.externalApplication,
-                    );
+                return string;
               },
-              onException: (e, st) {
-                // TODO: add this later
-                // ref.read(errorLoggerProvider).logException(e, st);
-              },
-              child: child!,
+              iosAppStoreId: "1531562469",
+            ),
+            allowCancel: false,
+            showForceUpdateAlert: (context, allowCancel) => showAlertDialog(
+              context: context,
+              title: AppLocalizations.of(context).translate('required-update'),
+              content:
+                  AppLocalizations.of(context).translate('required-update-p'),
+              cancelActionText: allowCancel ? 'Later' : null,
+              defaultActionText:
+                  AppLocalizations.of(context).translate('update-now'),
+            ),
+            showStoreListing: (storeUrl) async {
+              ref.read(urlLauncherProvider).launch(
+                    storeUrl,
+                    mode: LaunchMode.externalApplication,
+                  );
+            },
+            onException: (e, st) {
+              // TODO: add this later
+              // ref.read(errorLoggerProvider).logException(e, st);
+            },
+            child: AppStartupWidget(
+              onLoaded: (_) => child!,
             ),
           );
         },
