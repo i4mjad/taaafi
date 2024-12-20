@@ -435,5 +435,9 @@
   "delete-account-emotions-desc": "All recorded emotions will be deleted.",
   "delete-account-warning": "WARNING: This action cannot be undone.",
   "relogin-required": "For security purposes, we need to re-authenticate you to delete your account. Please log in again using your email and password or one of the social login options below.",
-  "delete-account": "Delete Account"
+  "delete-account": "Delete Account",
+  "what-is-relapse": "Relapse: A deliberate abandonment of the recovery plan and a full return to unwanted behaviors.",
+  "what-is-slip-up": "Slip-up: A temporary lapse that does not mean abandoning the recovery plan entirely.",
+  "what-is-no-porn": "No porn means your streak of days you spent without watching porn.",
+  "what-is-no-mast": "No masturbation means your streak of days you spent without masturbating."
 }

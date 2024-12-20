@@ -368,41 +368,52 @@ class _StatisticsWidgetState extends State<StatisticsWidget> {
   }
 
   void _showOnboardingModal(BuildContext context) {
+    final theme = AppTheme.of(context);
     showModalBottomSheet(
+      backgroundColor: theme.backgroundColor,
       context: context,
       builder: (BuildContext context) {
-        final theme = AppTheme.of(context);
-        return Padding(
-          padding: const EdgeInsets.all(16.0),
+        return Container(
+          padding: EdgeInsets.all(16),
+          height: MediaQuery.of(context).size.height * 0.75,
           child: Column(
             children: [
+              verticalSpace(Spacing.points16),
               FollowupDescriptionSection(
                 color: Color(0xFF5F8A8D),
                 title: AppLocalizations.of(context).translate("relapse"),
                 description:
-                    AppLocalizations.of(context).translate("current-streak"),
+                    AppLocalizations.of(context).translate("what-is-relapse"),
               ),
               verticalSpace(Spacing.points16),
               FollowupDescriptionSection(
                 color: Color(0xFFF1C863),
                 title: AppLocalizations.of(context).translate("porn-only"),
                 description:
-                    AppLocalizations.of(context).translate("free-porn-days"),
+                    AppLocalizations.of(context).translate("what-is-no-porn"),
               ),
               verticalSpace(Spacing.points16),
               FollowupDescriptionSection(
                 color: Color(0xFFD9AF9B),
                 title: AppLocalizations.of(context).translate("mast-only"),
                 description:
-                    AppLocalizations.of(context).translate("free-mast-days"),
+                    AppLocalizations.of(context).translate("what-is-no-mast"),
               ),
               verticalSpace(Spacing.points16),
               FollowupDescriptionSection(
-                color: Color(0xFFD9AF9B),
+                color: Colors.grey,
                 title: AppLocalizations.of(context).translate("slip-up"),
-                description: AppLocalizations.of(context).translate("slip-up"),
+                description:
+                    AppLocalizations.of(context).translate("what-is-slip-up"),
               ),
+              verticalSpace(Spacing.points16),
               Spacer(),
+              Text(
+                "المصدر" + ": " + "nofap.com",
+                style: TextStyles.caption.copyWith(
+                  color: theme.grey[600],
+                ),
+              ),
               GestureDetector(
                 onTap: () {
                   Navigator.pop(context);
@@ -488,14 +499,14 @@ class FollowupDescriptionSection extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: TextStyles.h5.copyWith(
+                  style: TextStyles.h6.copyWith(
                     color: theme.primary[600],
                   ),
                 ),
                 verticalSpace(Spacing.points8),
                 Text(
                   description,
-                  style: TextStyles.footnote.copyWith(
+                  style: TextStyles.small.copyWith(
                     color: theme.grey[700],
                   ),
                 ),
