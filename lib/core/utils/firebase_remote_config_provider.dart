@@ -9,7 +9,7 @@ Future<FirebaseRemoteConfig> firebaseRemoteConfig(
   final remoteConfig = FirebaseRemoteConfig.instance;
   await remoteConfig.setConfigSettings(RemoteConfigSettings(
     fetchTimeout: const Duration(minutes: 1),
-    minimumFetchInterval: const Duration(minutes: 1),
+    minimumFetchInterval: Duration(seconds: 1),
   ));
   await remoteConfig.fetchAndActivate();
   return remoteConfig;

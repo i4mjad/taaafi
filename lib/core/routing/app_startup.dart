@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
-import 'package:reboot_app_3/core/utils/firebase_remote_config_provider.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 // import 'package:starter_architecture_flutter_firebase/src/constants/app_sizes.dart';
 // import 'package:starter_architecture_flutter_firebase/src/features/onboarding/data/onboarding_repository.dart';
@@ -15,7 +14,7 @@ part 'app_startup.g.dart';
 Future<void> appStartup(Ref ref) async {
   ref.onDispose(() {
     // TODO: ensure dependent providers are disposed as well
-    ref.invalidate(firebaseRemoteConfigProvider);
+    // ref.invalidate(firebaseRemoteConfigProvider);
     // ref.invalidate(sharedPreferencesProvider);
     // ref.invalidate(onboardingRepositoryProvider);
   });
