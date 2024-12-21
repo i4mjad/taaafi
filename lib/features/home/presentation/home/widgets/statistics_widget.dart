@@ -380,7 +380,7 @@ class _StatisticsWidgetState extends State<StatisticsWidget> {
             children: [
               verticalSpace(Spacing.points16),
               FollowupDescriptionSection(
-                color: Color(0xFF5F8A8D),
+                color: Colors.grey,
                 title: AppLocalizations.of(context).translate("relapse"),
                 description:
                     AppLocalizations.of(context).translate("what-is-relapse"),
@@ -401,7 +401,7 @@ class _StatisticsWidgetState extends State<StatisticsWidget> {
               ),
               verticalSpace(Spacing.points16),
               FollowupDescriptionSection(
-                color: Colors.grey,
+                color: Color(0xFF5F8A8D),
                 title: AppLocalizations.of(context).translate("slip-up"),
                 description:
                     AppLocalizations.of(context).translate("what-is-slip-up"),

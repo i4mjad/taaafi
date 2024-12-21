@@ -54,17 +54,6 @@ class UserDocument {
       bookmarkedContentIds: data['bookmarkedContentIds'] != null
           ? List<String>.from(data['bookmarkedContentIds'])
           : null,
-      userRelapses: data['userRelapses'] != null
-          ? List<String>.from(data['userRelapses'])
-          : null,
-      userMasturbatingWithoutWatching:
-          data['userMasturbatingWithoutWatching'] != null
-              ? List<String>.from(data['userMasturbatingWithoutWatching'])
-              : null,
-      userWatchingWithoutMasturbating:
-          data['userWatchingWithoutMasturbating'] != null
-              ? List<String>.from(data['userWatchingWithoutMasturbating'])
-              : null,
     );
   }
 

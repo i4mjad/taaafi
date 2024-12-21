@@ -80,6 +80,7 @@ class FCMRepository {
   FCMRepository(this._messaging);
 
   Future<String> getMessagingToken() async {
-    return await _messaging.getToken() as String;
+    final token = await _messaging.getAPNSToken();
+    return token as String;
   }
 }

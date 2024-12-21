@@ -11,8 +11,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:reboot_app_3/app.dart';
 import 'package:reboot_app_3/core/monitoring/analytics_facade.dart';
 import 'package:reboot_app_3/firebase_options.dart';
-import 'package:sentry_flutter/sentry_flutter.dart';
 
+FirebaseMessaging messaging = FirebaseMessaging.instance;
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   //Initalize Firebase
@@ -21,6 +21,9 @@ Future<void> main() async {
   // Track app opened event
   final container = ProviderContainer();
   unawaited(container.read(analyticsFacadeProvider).trackAppOpened());
+
+  final notificationSettings =
+      await messaging.requestPermission(provisional: true);
 
   //TODO: Investigate about what is the best way to update the user FCM token every time the app got initailized
 
@@ -33,21 +36,27 @@ Future<void> main() async {
   //Setup error handeling pages
   registerErrorHandlers();
 
-  await SentryFlutter.init(
-    (options) {
-      options.dsn =
-          'https://8b5f32f9c6b6e9844338848ad1eadafa@o4507702647848960.ingest.de.sentry.io/4507702652108880';
-      // Set tracesSampleRate to 1.0 to capture 100% of transactions for tracing.
-      // We recommend adjusting this value in production.
-      options.tracesSampleRate = 1.0;
-      // The sampling rate for profiling is relative to tracesSampleRate
-      // Setting to 1.0 will profile 100% of sampled transactions:
-      options.profilesSampleRate = 1.0;
-    },
-    appRunner: () => runApp(
-      ProviderScope(
-        child: MyApp(),
-      ),
+  // await SentryFlutter.init(
+  //   (options) {
+  //     options.dsn =
+  //         'https://8b5f32f9c6b6e9844338848ad1eadafa@o4507702647848960.ingest.de.sentry.io/4507702652108880';
+  //     // Set tracesSampleRate to 1.0 to capture 100% of transactions for tracing.
+  //     // We recommend adjusting this value in production.
+  //     options.tracesSampleRate = 1.0;
+  //     // The sampling rate for profiling is relative to tracesSampleRate
+  //     // Setting to 1.0 will profile 100% of sampled transactions:
+  //     options.profilesSampleRate = 1.0;
+  //   },
+  //   appRunner: () => runApp(
+  //     ProviderScope(
+  //       child: MyApp(),
+  //     ),
+  //   ),
+  // );
+
+  runApp(
+    ProviderScope(
+      child: MyApp(),
     ),
   );
 }
@@ -57,6 +66,10 @@ Future<void> setupFirebaseMesagging(
   // CustomerIO.registerDeviceToken(deviceToken: firbaseMessagingToken);
 }
 
+Future<void> _backgroundHandler(RemoteMessage message) async {
+  // Handle background message
+}
+
 Future<InitializationSettings> setupNotifications() async {
   var initializationSettingsAndroid = AndroidInitializationSettings('app_icon');
   var initializationSettingsiOS = DarwinInitializationSettings(
@@ -64,8 +77,6 @@ Future<InitializationSettings> setupNotifications() async {
     requestBadgePermission: true,
     requestSoundPermission: true,
   );
-
-  FirebaseMessaging messaging = FirebaseMessaging.instance;
 
   var initializationSettings = InitializationSettings(
       iOS: initializationSettingsiOS, android: initializationSettingsAndroid);
@@ -79,6 +90,7 @@ Future<InitializationSettings> setupNotifications() async {
     provisional: false,
     sound: true,
   );
+
   return initializationSettings;
 }
 

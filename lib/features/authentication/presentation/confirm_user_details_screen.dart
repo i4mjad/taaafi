@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -67,7 +68,7 @@ class _ConfirmUserDetailsScreenState
     if (picked != null) {
       var date = DisplayDate(picked, language);
       setState(() {
-        selectedBirthDate = date.date;
+        selectedBirthDate = picked;
         dateOfBirthController.text = date.displayDate;
       });
     }
@@ -98,8 +99,9 @@ class _ConfirmUserDetailsScreenState
             dateOfBirthController.text = dob.displayDate;
             selectedBirthDate = dob.date;
 
-            var displayUserFirstDate = DisplayDateTime(
-                userDocument.userFirstDate!.toDate(), locale.languageCode);
+            var userFirstDate = userDocument.userFirstDate!.toDate();
+            var displayUserFirstDate =
+                DisplayDateTime(userFirstDate, locale.languageCode);
             userFirstDateController.text = displayUserFirstDate.displayDateTime;
 
             selectedUserFirstDate = displayUserFirstDate.date;
@@ -244,10 +246,8 @@ class _ConfirmUserDetailsScreenState
                         UserDocument(
                           uid: uid,
                           displayName: displayName,
-                          dayOfBirth: parseDisplayDate(
-                              dateOfBirth, locale!.languageCode),
-                          userFirstDate: parseDisplayDateTime(
-                              userFirstDate, locale.languageCode),
+                          dayOfBirth: Timestamp.fromDate(selectedBirthDate),
+                          userFirstDate: userDocument.userFirstDate,
                           email: email,
                           locale: selectedLocale?.value,
                           gender: selectedGender?.value,
