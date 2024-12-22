@@ -4,9 +4,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:reboot_app_3/features/authentication/application/migration_service.dart';
-import 'package:reboot_app_3/features/authentication/data/models/FollowUp.dart';
 import 'package:reboot_app_3/features/authentication/data/models/user_document.dart';
 import 'package:reboot_app_3/features/authentication/data/repositories/auth_repository.dart';
+import 'package:reboot_app_3/features/shared/models/follow_up.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'migeration_repository.g.dart';
@@ -38,7 +38,7 @@ class MigerationRepository {
         .get();
   }
 
-  Future<void> bulkFollowUpsInsertion(List<FollowUp> followUps) async {
+  Future<void> bulkFollowUpsInsertion(List<FollowUpModel> followUps) async {
     final collectionRef = _firestore
         .collection('users')
         .doc(_auth.currentUser?.uid)
@@ -47,7 +47,7 @@ class MigerationRepository {
     WriteBatch batch = FirebaseFirestore.instance.batch();
 
     for (var followUp in followUps) {
-      var docRef = collectionRef.doc(followUp.id);
+      var docRef = collectionRef.doc(); // Use Firebase auto-generated ID
       batch.set(docRef, followUp.toMap());
     }
 

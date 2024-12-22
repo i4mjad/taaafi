@@ -55,9 +55,9 @@ class UserDocumentsNotifier extends _$UserDocumentsNotifier {
   }
 
   bool isNewUserDocument(UserDocument userDocument) {
-    return userDocument.devicesIds != null &&
-        userDocument.messagingToken != null &&
-        userDocument.bookmarkedContentIds != null &&
+    return userDocument.devicesIds != null ||
+        userDocument.messagingToken != null ||
+        userDocument.bookmarkedContentIds != null ||
         userDocument.role != null;
   }
 

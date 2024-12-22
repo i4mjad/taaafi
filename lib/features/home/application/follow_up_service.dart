@@ -1,4 +1,4 @@
-import 'package:reboot_app_3/features/home/data/models/follow_up.dart';
+import 'package:reboot_app_3/features/shared/models/follow_up.dart';
 import 'package:reboot_app_3/features/home/data/repos/follow_up_repository.dart';
 
 /// A service that contains business logic or computation related to FollowUps.
@@ -63,6 +63,7 @@ class FollowUpService {
     } else {
       relapseFollowUps.sort((a, b) => b.time.compareTo(a.time));
       final lastFollowUpDate = _onlyDate(relapseFollowUps.first.time);
+      print(lastFollowUpDate);
       return DateTime.now().difference(lastFollowUpDate).inDays;
     }
   }
@@ -154,34 +155,14 @@ class FollowUpService {
     return longest;
   }
 
-  /// Calculate the number of days from userFirstDate until today
-  /// that do NOT have a relapse follow-up.
+  /// Calculate the days without relapse.
   Future<int> calculateDaysWithoutRelapse() async {
-    final userFirstDate = await _getUserFirstDate();
-    final relapses =
-        await _repository.readFollowUpsByType(FollowUpType.relapse);
-
-    // We'll do a naive approach: iterate through all days from
-    // userFirstDate to now and check if that day is in relapseFollowUps.
-    final today = _onlyDate(DateTime.now());
-    int daysCount = 0;
-    DateTime current = _onlyDate(userFirstDate);
-
-    while (!current.isAfter(today)) {
-      if (!relapses.contains(current)) {
-        daysCount++;
-      }
-      current = current.add(const Duration(days: 1));
-    }
-    return daysCount;
+    return await _repository.calculateDaysWithoutRelapse();
   }
 
-  /// Calculate the total number of days from userFirstDate until today.
+  /// Calculate the total days from the user's first date.
   Future<int> calculateTotalDaysFromFirstDate() async {
-    final userFirstDate = await _getUserFirstDate();
-    final today = _onlyDate(DateTime.now());
-    final start = _onlyDate(userFirstDate);
-    return today.difference(start).inDays + 1; // +1 if inclusive
+    return await _repository.calculateTotalDaysFromFirstDate();
   }
 
   /// A helper function that strips the time portion from a DateTime

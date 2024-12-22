@@ -54,6 +54,17 @@ class UserDocument {
       bookmarkedContentIds: data['bookmarkedContentIds'] != null
           ? List<String>.from(data['bookmarkedContentIds'])
           : null,
+      userRelapses: data['userRelapses'] != null
+          ? List<String>.from(data['userRelapses'])
+          : null,
+      userMasturbatingWithoutWatching:
+          !data.containsKey('userMasturbatingWithoutWatching')
+              ? null
+              : List<String>.from(data['userMasturbatingWithoutWatching']),
+      userWatchingWithoutMasturbating:
+          data['userWatchingWithoutMasturbating'] != null
+              ? List<String>.from(data['userWatchingWithoutMasturbating'])
+              : null,
     );
   }
 
@@ -70,6 +81,9 @@ class UserDocument {
       'role': role,
       'messagingToken': messagingToken,
       'bookmarkedContentIds': bookmarkedContentIds,
+      'userRelapses': userRelapses ?? [],
+      'userMasturbatingWithoutWatching': userMasturbatingWithoutWatching ?? [],
+      'userWatchingWithoutMasturbating': userWatchingWithoutMasturbating ?? [],
     };
   }
 

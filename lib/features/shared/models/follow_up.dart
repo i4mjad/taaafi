@@ -1,15 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:equatable/equatable.dart';
-
-enum FollowUpType {
-  relapse,
-  pornOnly,
-  mastOnly,
-  slipUp,
-}
 
 /// A model class that represents a follow-up entry in Firestore.
-class FollowUpModel extends Equatable {
+class FollowUpModel {
   final String id;
   final FollowUpType type;
   final DateTime time;
@@ -47,6 +39,22 @@ class FollowUpModel extends Equatable {
     );
   }
 
-  @override
   List<Object?> get props => [id, type, time];
+}
+
+enum FollowUpType {
+  relapse,
+  pornOnly,
+  mastOnly,
+  slipUp,
+}
+
+class FollowUpModelDataModel {
+  final FollowUpType type;
+  final DateTime time;
+
+  const FollowUpModelDataModel({
+    required this.type,
+    required this.time,
+  });
 }

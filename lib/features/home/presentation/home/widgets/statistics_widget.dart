@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:reboot_app_3/core/helpers/date_display_formater.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
@@ -28,6 +29,7 @@ class _StatisticsWidgetState extends ConsumerState<StatisticsWidget> {
     final localization =
         AppLocalizations.of(context); // Obtain localization instance
 
+    final locale = ref.watch(localeNotifierProvider);
     final followUpState = ref.watch(followUpNotifierProvider);
 
     return followUpState.when(
@@ -64,7 +66,15 @@ class _StatisticsWidgetState extends ConsumerState<StatisticsWidget> {
                   ),
                 ],
               ),
-              verticalSpace(Spacing.points8),
+              verticalSpace(Spacing.points4),
+              Text(
+                localization.translate("starting-date") +
+                    ": " +
+                    getDisplayDateTime(data.userFirstDate,
+                        locale!.languageCode), // Replaced "Statistics"
+                style: TextStyles.small.copyWith(color: theme.grey[400]),
+              ),
+              verticalSpace(Spacing.points4),
               SizedBox(
                 height: MediaQuery.of(context).size.height * 0.17125,
                 child: PageView(

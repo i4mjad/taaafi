@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:reboot_app_3/features/home/data/models/follow_up.dart';
+import 'package:reboot_app_3/features/shared/models/follow_up.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 /// Responsible for all Firestore interactions related to followUps.
@@ -45,6 +45,16 @@ class FollowUpRepository {
   }
 
   /// Read all follow-ups for the user.
+  Future<List<FollowUpModel>> readAllFollowUps() async {
+    final uid = _getUserId();
+    if (uid == null) throw Exception('User not logged in');
+    final querySnapshot = await _firestore
+        .collection('users')
+        .doc(uid)
+        .collection('followUps')
+        .get();
+    return querySnapshot.docs.map((doc) => FollowUpModel.fromDoc(doc)).toList();
+  }
 
   /// Read follow-ups by type.
   Future<List<FollowUpModel>> readFollowUpsByType(FollowUpType type) async {
@@ -55,6 +65,35 @@ class FollowUpRepository {
         .doc(uid)
         .collection('followUps')
         .where('type', isEqualTo: type.toString())
+        .get();
+    return querySnapshot.docs.map((doc) => FollowUpModel.fromDoc(doc)).toList();
+  }
+
+  /// Read follow-ups for a specific date range.
+  Future<List<FollowUpModel>> readFollowUpsForDateRange(
+      DateTime start, DateTime end) async {
+    final uid = _getUserId();
+    if (uid == null) throw Exception('User not logged in');
+    final querySnapshot = await _firestore
+        .collection('users')
+        .doc(uid)
+        .collection('followUps')
+        .where('time', isGreaterThanOrEqualTo: Timestamp.fromDate(start))
+        .where('time', isLessThanOrEqualTo: Timestamp.fromDate(end))
+        .get();
+    return querySnapshot.docs.map((doc) => FollowUpModel.fromDoc(doc)).toList();
+  }
+
+  Future<List<FollowUpModel>> readFollowUpsForDates(
+      List<DateTime> dates) async {
+    final uid = _getUserId();
+    if (uid == null) throw Exception('User not logged in');
+    final querySnapshot = await _firestore
+        .collection('users')
+        .doc(uid)
+        .collection('followUps')
+        .where('time',
+            whereIn: dates.map((date) => Timestamp.fromDate(date)).toList())
         .get();
     return querySnapshot.docs.map((doc) => FollowUpModel.fromDoc(doc)).toList();
   }
@@ -111,5 +150,37 @@ class FollowUpRepository {
       }
     }
     throw Exception('User first date not found');
+  }
+
+  /// Calculate the total number of follow-ups for the user.
+  Future<int> calculateTotalFollowUps() async {
+    final followUps = await readAllFollowUps();
+    return followUps.length;
+  }
+
+  /// Calculate the days without relapse.
+  Future<int> calculateDaysWithoutRelapse() async {
+    final userFirstDate = await getUserFirstDate();
+    final relapseFollowUps = await readFollowUpsByType(FollowUpType.relapse);
+
+    if (relapseFollowUps.isEmpty) {
+      return DateTime.now().difference(_onlyDate(userFirstDate)).inDays;
+    } else {
+      relapseFollowUps.sort((a, b) => b.time.compareTo(a.time));
+      final lastFollowUpDate = _onlyDate(relapseFollowUps.first.time);
+      return DateTime.now().difference(lastFollowUpDate).inDays;
+    }
+  }
+
+  /// Calculate the total days from the user's first date.
+  Future<int> calculateTotalDaysFromFirstDate() async {
+    final userFirstDate = await getUserFirstDate();
+    return DateTime.now().difference(_onlyDate(userFirstDate)).inDays;
+  }
+
+  /// A helper function that strips the time portion from a DateTime
+  /// so that only the date is used (year-month-day).
+  DateTime _onlyDate(DateTime dt) {
+    return DateTime(dt.year, dt.month, dt.day);
   }
 }

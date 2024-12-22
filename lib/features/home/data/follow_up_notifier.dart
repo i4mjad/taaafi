@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:reboot_app_3/features/home/application/follow_up_service.dart';
-import 'package:reboot_app_3/features/home/data/models/follow_up.dart';
+import 'package:reboot_app_3/features/shared/models/follow_up.dart';
 import 'package:reboot_app_3/features/home/data/repos/follow_up_repository.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -72,6 +72,14 @@ class FollowUpNotifier extends _$FollowUpNotifier {
 
   Future<int> calculateSlipUpStreak() async {
     return await _service.calculateSlipUpStreak();
+  }
+
+  Future<int> calculateDaysWithoutRelapse() async {
+    return await _service.calculateDaysWithoutRelapse();
+  }
+
+  Future<int> calculateTotalDaysFromFirstDate() async {
+    return await _service.calculateTotalDaysFromFirstDate();
   }
 
   Future<void> createFollowUp(FollowUpModel followUp) async {

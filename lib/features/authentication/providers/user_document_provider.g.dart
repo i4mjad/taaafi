@@ -7,7 +7,7 @@ part of 'user_document_provider.dart';
 // **************************************************************************
 
 String _$userDocumentsNotifierHash() =>
-    r'c723f673309771f18d1e3779d29e8038fa0c8712';
+    r'b4ab0d1bda4501bec8828f87130723fed4389977';
 
 /// See also [UserDocumentsNotifier].
 @ProviderFor(UserDocumentsNotifier)
