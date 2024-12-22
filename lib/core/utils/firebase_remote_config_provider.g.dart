@@ -7,7 +7,7 @@ part of 'firebase_remote_config_provider.dart';
 // **************************************************************************
 
 String _$firebaseRemoteConfigHash() =>
-    r'f560541ae96606840dfd3c5b33df756f8cc84f86';
+    r'b78fb5762233da7e78b44e6e21894d47ae920218';
 
 /// See also [firebaseRemoteConfig].
 @ProviderFor(firebaseRemoteConfig)
