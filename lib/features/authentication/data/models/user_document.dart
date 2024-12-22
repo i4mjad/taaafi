@@ -70,9 +70,9 @@ class UserDocument {
       'role': role,
       'messagingToken': messagingToken,
       'bookmarkedContentIds': bookmarkedContentIds,
-      'userRelapses': userRelapses,
-      'userMasturbatingWithoutWatching': userMasturbatingWithoutWatching,
-      'userWatchingWithoutMasturbating': userWatchingWithoutMasturbating,
+      'userRelapses': userRelapses ?? [],
+      'userMasturbatingWithoutWatching': userMasturbatingWithoutWatching ?? [],
+      'userWatchingWithoutMasturbating': userWatchingWithoutMasturbating ?? [],
     };
   }
 

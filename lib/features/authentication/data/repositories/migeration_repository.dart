@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -65,7 +67,9 @@ class MigerationRepository {
     final docRef = _firestore.collection('users').doc(uid);
 
     try {
-      await docRef.update(newDocument.toFirestore());
+      var updatedDocument = newDocument.toFirestore();
+
+      await docRef.set(updatedDocument, SetOptions(merge: true));
     } catch (e) {
       // Handle potential errors
       print('Failed to update user document: $e');
@@ -80,7 +84,10 @@ class FCMRepository {
   FCMRepository(this._messaging);
 
   Future<String> getMessagingToken() async {
-    final token = await _messaging.getAPNSToken();
-    return token as String;
+    if (Platform.isIOS) {
+      return await _messaging.getAPNSToken() as String;
+    } else {
+      return await _messaging.getToken() as String;
+    }
   }
 }
