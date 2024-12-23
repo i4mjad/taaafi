@@ -47,6 +47,7 @@ enum FollowUpType {
   pornOnly,
   mastOnly,
   slipUp,
+  none,
 }
 
 class FollowUpModelDataModel {

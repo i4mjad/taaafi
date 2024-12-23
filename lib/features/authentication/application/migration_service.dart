@@ -56,9 +56,6 @@ class MigrationService {
     List<String>? porns,
     List<String>? masts,
   ) async {
-    print('Relapses: $relapses');
-    print('Porns: $porns');
-    print('Masts: $masts');
     // Convert each list to a set of DateTime strings for easy comparison
     Set<String> relapseSet = relapses?.toSet() ?? {};
     Set<String> pornSet = porns?.toSet() ?? {};
@@ -97,8 +94,6 @@ class MigrationService {
         type: FollowUpType.mastOnly,
       );
     }).toList());
-
-    print(followUps);
 
     await _migerationRepository.bulkFollowUpsInsertion(followUps);
   }

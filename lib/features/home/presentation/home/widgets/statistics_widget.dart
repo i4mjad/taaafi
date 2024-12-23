@@ -9,6 +9,7 @@ import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:reboot_app_3/features/home/data/statistics_notifier.dart';
 import 'package:reboot_app_3/features/home/data/streak_notifier.dart';
+import 'package:reboot_app_3/features/shared/models/follow_up.dart';
 
 class StatisticsWidget extends ConsumerStatefulWidget {
   const StatisticsWidget({
