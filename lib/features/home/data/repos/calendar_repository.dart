@@ -57,4 +57,13 @@ class CalendarRepository {
         .get();
     return querySnapshot.docs.map((doc) => FollowUpModel.fromDoc(doc)).toList();
   }
+
+  Future<DateTime> getUserFirstDate() async {
+    final uid = _getUserId();
+    if (uid == null) throw Exception('User not logged in');
+    final userDoc = await _firestore.collection('users').doc(uid).get();
+
+    final userFirstDate = userDoc.data()?['userFirstDate'];
+    return (userFirstDate as Timestamp).toDate();
+  }
 }

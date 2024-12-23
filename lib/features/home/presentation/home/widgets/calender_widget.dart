@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/routing/route_names.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
+import 'package:reboot_app_3/core/shared_widgets/snackbar.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
@@ -21,12 +22,16 @@ class CalenderWidget extends ConsumerStatefulWidget {
 }
 
 class _CalenderWidgetState extends ConsumerState<CalenderWidget> {
+  DateTime? userFirstDate;
+
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       final now = DateTime.now();
       ref.read(calendarNotifierProvider.notifier).fetchFollowUpsForMonth(now);
+      userFirstDate =
+          await ref.read(calendarNotifierProvider.notifier).getUserFirstDate();
     });
   }
 
@@ -94,8 +99,17 @@ class _CalenderWidgetState extends ConsumerState<CalenderWidget> {
                   },
                   onTap: (date) {
                     var selectedDate = date.date;
-                    context.goNamed(RouteNames.dayOverview.name,
-                        pathParameters: {'date': selectedDate.toString()});
+                    if (selectedDate != null &&
+                        selectedDate.isAfter(DateTime.now())) {
+                      getErrorSnackBar(context, "future-date-message");
+                    } else if (selectedDate != null &&
+                        userFirstDate != null &&
+                        selectedDate.isBefore(userFirstDate!)) {
+                      getErrorSnackBar(context, "past-date-message");
+                    } else {
+                      context.goNamed(RouteNames.dayOverview.name,
+                          pathParameters: {'date': selectedDate.toString()});
+                    }
                   },
                 ),
               ),
@@ -109,24 +123,38 @@ class _CalenderWidgetState extends ConsumerState<CalenderWidget> {
   }
 
   _AppointmentDataSource _getCalendarDataSource(List<FollowUpModel> followUps) {
-    List<Appointment> appointments = followUps.map((followUp) {
-      Color color;
-      switch (followUp.type) {
-        case FollowUpType.relapse:
-          color = Colors.grey;
-          break;
-        case FollowUpType.pornOnly:
-          color = Color(0xFFF1C863);
-          break;
-        case FollowUpType.mastOnly:
-          color = Color(0xFFD9AF9B);
-          break;
-        case FollowUpType.slipUp:
-          color = Color(0xFF5F8A8D);
-          break;
-        default:
-          color = Colors.green;
+    final now = DateTime.now();
+    final daysInMonth = DateUtils.getDaysInMonth(now.year, now.month);
+    final followUpDates = followUps.map((followUp) => followUp.time).toSet();
+
+    // Define follow-up colors
+    final followUpColors = {
+      FollowUpType.relapse: Colors.grey,
+      FollowUpType.pornOnly: Color(0xFFF1C863),
+      FollowUpType.mastOnly: Color(0xFFD9AF9B),
+      FollowUpType.slipUp: Color(0xFF5F8A8D),
+      FollowUpType.none: Colors.green,
+    };
+
+    List<Appointment> appointments = [];
+
+    for (int i = 1; i <= daysInMonth; i++) {
+      final date = DateTime(now.year, now.month, i);
+      if (date.isAfter(now)) break; // Avoid adding anything after today's date
+      if (!followUpDates.contains(date)) {
+        appointments.add(Appointment(
+          startTime: date,
+          endTime: date.add(Duration(minutes: 10)),
+          subject: 'No Follow-up',
+          color: followUpColors[FollowUpType.none]!,
+          startTimeZone: '',
+          endTimeZone: '',
+        ));
       }
+    }
+
+    appointments.addAll(followUps.map((followUp) {
+      final color = followUpColors[followUp.type]!;
       return Appointment(
         startTime: followUp.time,
         endTime: followUp.time.add(Duration(minutes: 10)),
@@ -135,7 +163,7 @@ class _CalenderWidgetState extends ConsumerState<CalenderWidget> {
         startTimeZone: '',
         endTimeZone: '',
       );
-    }).toList();
+    }).toList());
 
     return _AppointmentDataSource(appointments);
   }

@@ -118,6 +118,15 @@ class _FirstPageWidget extends ConsumerWidget {
     final localization = AppLocalizations.of(context);
     final streakState = ref.watch(streakNotifierProvider);
 
+    // Define follow-up colors
+    final followUpColors = {
+      FollowUpType.relapse: Colors.grey,
+      FollowUpType.pornOnly: Color(0xFFF1C863),
+      FollowUpType.mastOnly: Color(0xFFD9AF9B),
+      FollowUpType.slipUp: Color(0xFF5F8A8D),
+      FollowUpType.none: Colors.green,
+    };
+
     return streakState.when(
       data: (data) {
         return WidgetsContainer(
@@ -178,7 +187,7 @@ class _FirstPageWidget extends ConsumerWidget {
                             width: 8,
                             height: 8,
                             decoration: BoxDecoration(
-                              color: Color(0xFF5F8A8D),
+                              color: followUpColors[FollowUpType.pornOnly],
                               shape: BoxShape.circle,
                             ),
                           ),
@@ -209,7 +218,7 @@ class _FirstPageWidget extends ConsumerWidget {
                             width: 8,
                             height: 8,
                             decoration: BoxDecoration(
-                              color: Color(0xFFF1C863),
+                              color: followUpColors[FollowUpType.mastOnly],
                               shape: BoxShape.circle,
                             ),
                           ),
@@ -240,7 +249,7 @@ class _FirstPageWidget extends ConsumerWidget {
                             width: 8,
                             height: 8,
                             decoration: BoxDecoration(
-                              color: Color(0xFFD9AF9B),
+                              color: followUpColors[FollowUpType.slipUp],
                               shape: BoxShape.circle,
                             ),
                           ),
@@ -385,6 +394,15 @@ class _SecondPageWidget extends ConsumerWidget {
     final theme = AppTheme.of(context);
     final localization = AppLocalizations.of(context);
     final statisticsState = ref.watch(statisticsNotifierProvider);
+
+    // Define follow-up colors
+    final followUpColors = {
+      FollowUpType.relapse: Colors.grey,
+      FollowUpType.pornOnly: Color(0xFFF1C863),
+      FollowUpType.mastOnly: Color(0xFFD9AF9B),
+      FollowUpType.slipUp: Color(0xFF5F8A8D),
+      FollowUpType.none: Colors.green,
+    };
 
     return statisticsState.when(
       data: (data) {

@@ -23,4 +23,8 @@ class CalendarService {
     DateTime end = DateTime(year, month + 1, 0);
     return await _repository.readFollowUpsForDateRange(start, end);
   }
+
+  Future<DateTime> getUserFirstDate() async {
+    return await _repository.getUserFirstDate();
+  }
 }

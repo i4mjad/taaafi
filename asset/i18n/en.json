@@ -439,5 +439,7 @@
   "what-is-relapse": "Relapse: A deliberate abandonment of the recovery plan and a full return to unwanted behaviors.",
   "what-is-slip-up": "Slip-up: A temporary lapse that does not mean abandoning the recovery plan entirely.",
   "what-is-no-porn": "No porn means your streak of days you spent without watching porn.",
-  "what-is-no-mast": "No masturbation means your streak of days you spent without masturbating."
+  "what-is-no-mast": "No masturbation means your streak of days you spent without masturbating.",
+  "future-date-message": "You clicked on a future date!",
+  "past-date-message": "You clicked on a date before your start date!"
 }

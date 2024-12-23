@@ -33,6 +33,10 @@ class CalendarNotifier extends _$CalendarNotifier {
     final endOfMonth = DateTime(month.year, month.month + 1, 0);
     return await _service.fetchFollowUpsForDateRange(startOfMonth, endOfMonth);
   }
+
+  Future<DateTime> getUserFirstDate() async {
+    return await _service.getUserFirstDate();
+  }
 }
 
 /// A provider for the [CalendarService].
