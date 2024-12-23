@@ -64,7 +64,7 @@ class FollowUpRepository {
         .collection('users')
         .doc(uid)
         .collection('followUps')
-        .where('type', isEqualTo: type.toString())
+        .where('type', isEqualTo: type.name)
         .get();
     return querySnapshot.docs.map((doc) => FollowUpModel.fromDoc(doc)).toList();
   }

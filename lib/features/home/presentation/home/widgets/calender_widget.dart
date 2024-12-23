@@ -111,7 +111,7 @@ class _CalenderWidgetState extends ConsumerState<CalenderWidget> {
       Color color;
       switch (followUp.type) {
         case FollowUpType.relapse:
-          color = Colors.red;
+          color = Colors.grey;
           break;
         case FollowUpType.pornOnly:
           color = Color(0xFFF1C863);

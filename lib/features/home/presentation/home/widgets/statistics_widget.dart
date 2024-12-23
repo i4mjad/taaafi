@@ -26,8 +26,7 @@ class _StatisticsWidgetState extends ConsumerState<StatisticsWidget> {
   @override
   Widget build(BuildContext context) {
     final theme = AppTheme.of(context);
-    final localization =
-        AppLocalizations.of(context); // Obtain localization instance
+    final localization = AppLocalizations.of(context);
 
     final locale = ref.watch(localeNotifierProvider);
     final followUpState = ref.watch(followUpNotifierProvider);
