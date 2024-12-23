@@ -66,7 +66,6 @@ class MyApp extends ConsumerWidget with WidgetsBindingObserver {
                   final remoteConfig =
                       await ref.read(firebaseRemoteConfigProvider.future);
                   var string = remoteConfig.getString('required_version');
-
                   return string;
                 },
                 iosAppStoreId: "1531562469",
