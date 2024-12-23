@@ -1,36 +1,47 @@
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:reboot_app_3/features/home/application/follow_up_service.dart';
+import 'package:reboot_app_3/features/home/application/statistics_service.dart';
 import 'package:reboot_app_3/features/shared/models/follow_up.dart';
-import 'package:reboot_app_3/features/home/data/repos/follow_up_repository.dart';
+import 'package:reboot_app_3/features/home/data/repos/statistics_repository.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-part 'follow_up_notifier.g.dart';
+part 'statistics_notifier.g.dart';
 
 class UserStatistics {
   final int daysWithoutRelapse;
   final int totalDaysFromFirstDate;
+  final int longestRelapseStreak;
 
   UserStatistics({
     required this.daysWithoutRelapse,
     required this.totalDaysFromFirstDate,
+    required this.longestRelapseStreak,
   });
 }
 
 @riverpod
-class FollowUpNotifier extends _$FollowUpNotifier {
-  late final FollowUpService _service;
+class StatisticsNotifier extends _$StatisticsNotifier {
+  late final StatisticsService _service;
 
   @override
   FutureOr<UserStatistics> build() async {
-    _service = ref.read(followUpServiceProvider);
-    final daysWithoutRelapse = await _service.calculateDaysWithoutRelapse();
-    final totalDaysFromFirstDate =
-        await _service.calculateTotalDaysFromFirstDate();
+    _service = ref.read(statisticsServiceProvider);
+
+    final daysWithoutRelapseFuture = _service.calculateDaysWithoutRelapse();
+    final totalDaysFromFirstDateFuture =
+        _service.calculateTotalDaysFromFirstDate();
+    final longestRelapseStreakFuture = _service.calculateLongestRelapseStreak();
+
+    final results = await Future.wait([
+      daysWithoutRelapseFuture,
+      totalDaysFromFirstDateFuture,
+      longestRelapseStreakFuture,
+    ]);
 
     return UserStatistics(
-      daysWithoutRelapse: daysWithoutRelapse,
-      totalDaysFromFirstDate: totalDaysFromFirstDate,
+      daysWithoutRelapse: results[0],
+      totalDaysFromFirstDate: results[1],
+      longestRelapseStreak: results[2],
     );
   }
 
@@ -76,8 +87,8 @@ class FollowUpNotifier extends _$FollowUpNotifier {
 }
 
 @Riverpod(keepAlive: true)
-FollowUpService followUpService(FollowUpServiceRef ref) {
+StatisticsService statisticsService(StatisticsServiceRef ref) {
   final firestore = FirebaseFirestore.instance;
-  final repository = FollowUpRepository(firestore);
-  return FollowUpService(repository);
+  final repository = StatisticsRepository(firestore);
+  return StatisticsService(repository);
 }

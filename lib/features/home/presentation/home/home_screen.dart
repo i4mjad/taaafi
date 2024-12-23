@@ -18,18 +18,18 @@ class HomeScreen extends ConsumerWidget {
     return Scaffold(
       backgroundColor: theme.backgroundColor,
       appBar: appBar(context, ref, 'home', false, true),
-      body: Padding(
-        padding: EdgeInsets.all(16),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              StatisticsWidget(),
-              verticalSpace(Spacing.points16),
-              CalenderWidget()
-            ],
-          ),
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            StatisticsWidget(),
+            verticalSpace(Spacing.points16),
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: CalenderWidget(),
+            )
+          ],
         ),
       ),
       floatingActionButton: FloatingActionButton.extended(

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
+import 'package:reboot_app_3/core/routing/route_names.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
@@ -93,7 +94,8 @@ class _CalenderWidgetState extends ConsumerState<CalenderWidget> {
                   },
                   onTap: (date) {
                     var selectedDate = date.date;
-                    context.go('/home/dayOverview/${selectedDate}');
+                    context.goNamed(RouteNames.dayOverview.name,
+                        pathParameters: {'date': selectedDate.toString()});
                   },
                 ),
               ),

@@ -3,10 +3,10 @@ import 'package:reboot_app_3/features/shared/models/follow_up.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 /// Responsible for all Firestore interactions related to followUps.
-class FollowUpRepository {
+class StatisticsRepository {
   final FirebaseFirestore _firestore;
 
-  FollowUpRepository(this._firestore);
+  StatisticsRepository(this._firestore);
 
   String? _getUserId() {
     return FirebaseAuth.instance.currentUser?.uid;
@@ -116,18 +116,6 @@ class FollowUpRepository {
     return followUps.length;
   }
 
-  Future<List<FollowUpModel>> readFollowUpsByType(FollowUpType type) async {
-    final uid = _getUserId();
-    if (uid == null) throw Exception('User not logged in');
-    final querySnapshot = await _firestore
-        .collection('users')
-        .doc(uid)
-        .collection('followUps')
-        .where('type', isEqualTo: type.name)
-        .get();
-    return querySnapshot.docs.map((doc) => FollowUpModel.fromDoc(doc)).toList();
-  }
-
   /// Calculate the days without relapse.
   Future<int> calculateDaysWithoutRelapse() async {
     final userFirstDate = await getUserFirstDate();
@@ -140,6 +128,18 @@ class FollowUpRepository {
       final lastFollowUpDate = _onlyDate(relapseFollowUps.first.time);
       return DateTime.now().difference(lastFollowUpDate).inDays;
     }
+  }
+
+  Future<List<FollowUpModel>> readFollowUpsByType(FollowUpType type) async {
+    final uid = _getUserId();
+    if (uid == null) throw Exception('User not logged in');
+    final querySnapshot = await _firestore
+        .collection('users')
+        .doc(uid)
+        .collection('followUps')
+        .where('type', isEqualTo: type.name)
+        .get();
+    return querySnapshot.docs.map((doc) => FollowUpModel.fromDoc(doc)).toList();
   }
 
   /// Calculate the total days from the user's first date.

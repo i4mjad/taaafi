@@ -8,9 +8,7 @@ part of 'follow_up_notifier.dart';
 
 String _$followUpServiceHash() => r'7ccd2d00203752adf99ee2e2824451649369b73e';
 
-/// A provider for the [FollowUpService].
-///
-/// Copied from [followUpService].
+/// See also [followUpService].
 @ProviderFor(followUpService)
 final followUpServiceProvider = Provider<FollowUpService>.internal(
   followUpService,
@@ -23,7 +21,7 @@ final followUpServiceProvider = Provider<FollowUpService>.internal(
 );
 
 typedef FollowUpServiceRef = ProviderRef<FollowUpService>;
-String _$followUpNotifierHash() => r'f24686b641a151c5e27bde886f730b4813547281';
+String _$followUpNotifierHash() => r'a33171278c8d12ff4fdaa2a246214154eb5072af';
 
 /// See also [FollowUpNotifier].
 @ProviderFor(FollowUpNotifier)
