@@ -10,6 +10,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:reboot_app_3/features/home/data/statistics_notifier.dart';
 import 'package:reboot_app_3/features/home/data/streak_notifier.dart';
 import 'package:reboot_app_3/features/shared/models/follow_up.dart';
+import 'package:reboot_app_3/features/home/data/models/follow_up_colors.dart';
 
 class StatisticsWidget extends ConsumerStatefulWidget {
   const StatisticsWidget({
@@ -118,15 +119,6 @@ class _FirstPageWidget extends ConsumerWidget {
     final theme = AppTheme.of(context);
     final localization = AppLocalizations.of(context);
     final streakState = ref.watch(streakNotifierProvider);
-
-    // Define follow-up colors
-    final followUpColors = {
-      FollowUpType.relapse: Colors.grey,
-      FollowUpType.pornOnly: Color(0xFFF1C863),
-      FollowUpType.mastOnly: Color(0xFFD9AF9B),
-      FollowUpType.slipUp: Color(0xFF5F8A8D),
-      FollowUpType.none: Colors.green,
-    };
 
     return streakState.when(
       data: (data) {
@@ -305,28 +297,28 @@ class _FirstPageWidget extends ConsumerWidget {
             children: [
               verticalSpace(Spacing.points16),
               FollowupDescriptionSection(
-                color: Colors.grey,
+                color: followUpColors[FollowUpType.relapse]!,
                 title: AppLocalizations.of(context).translate("relapse"),
                 description:
                     AppLocalizations.of(context).translate("what-is-relapse"),
               ),
               verticalSpace(Spacing.points16),
               FollowupDescriptionSection(
-                color: Color(0xFFF1C863),
+                color: followUpColors[FollowUpType.pornOnly]!,
                 title: AppLocalizations.of(context).translate("porn-only"),
                 description:
                     AppLocalizations.of(context).translate("what-is-no-porn"),
               ),
               verticalSpace(Spacing.points16),
               FollowupDescriptionSection(
-                color: Color(0xFFD9AF9B),
+                color: followUpColors[FollowUpType.mastOnly]!,
                 title: AppLocalizations.of(context).translate("mast-only"),
                 description:
                     AppLocalizations.of(context).translate("what-is-no-mast"),
               ),
               verticalSpace(Spacing.points16),
               FollowupDescriptionSection(
-                color: Color(0xFF5F8A8D),
+                color: followUpColors[FollowUpType.slipUp]!,
                 title: AppLocalizations.of(context).translate("slip-up"),
                 description:
                     AppLocalizations.of(context).translate("what-is-slip-up"),
@@ -395,15 +387,6 @@ class _SecondPageWidget extends ConsumerWidget {
     final theme = AppTheme.of(context);
     final localization = AppLocalizations.of(context);
     final statisticsState = ref.watch(statisticsNotifierProvider);
-
-    // Define follow-up colors
-    final followUpColors = {
-      FollowUpType.relapse: Colors.grey,
-      FollowUpType.pornOnly: Color(0xFFF1C863),
-      FollowUpType.mastOnly: Color(0xFFD9AF9B),
-      FollowUpType.slipUp: Color(0xFF5F8A8D),
-      FollowUpType.none: Colors.green,
-    };
 
     return statisticsState.when(
       data: (data) {

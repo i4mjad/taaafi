@@ -11,6 +11,7 @@ import 'package:reboot_app_3/features/shared/models/follow_up.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 import 'package:reboot_app_3/features/home/data/calendar_notifier.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:reboot_app_3/features/home/data/models/follow_up_colors.dart';
 
 class CalenderWidget extends ConsumerStatefulWidget {
   const CalenderWidget({
@@ -126,15 +127,6 @@ class _CalenderWidgetState extends ConsumerState<CalenderWidget> {
     final now = DateTime.now();
     final daysInMonth = DateUtils.getDaysInMonth(now.year, now.month);
     final followUpDates = followUps.map((followUp) => followUp.time).toSet();
-
-    // Define follow-up colors
-    final followUpColors = {
-      FollowUpType.relapse: Colors.grey,
-      FollowUpType.pornOnly: Color(0xFFF1C863),
-      FollowUpType.mastOnly: Color(0xFFD9AF9B),
-      FollowUpType.slipUp: Color(0xFF5F8A8D),
-      FollowUpType.none: Colors.green,
-    };
 
     List<Appointment> appointments = [];
 
