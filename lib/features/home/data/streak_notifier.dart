@@ -53,6 +53,15 @@ class StreakNotifier extends _$StreakNotifier {
       slipUpStreak: results[4] as int,
     );
   }
+
+  Future<void> refreshStreakStatistics() async {
+    state = const AsyncValue.loading();
+    try {
+      state = AsyncValue.data(await build());
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+    }
+  }
 }
 
 @Riverpod(keepAlive: true)

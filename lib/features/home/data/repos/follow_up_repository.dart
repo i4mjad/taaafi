@@ -22,8 +22,26 @@ class FollowUpRepository {
         .collection('users')
         .doc(uid)
         .collection('followUps')
-        .doc(followUp.id);
-    await docRef.set(followUp.toMap());
+        .doc(); // Generate ID by Firestore
+    await docRef.set(followUp.copyWith(id: docRef.id).toMap());
+  }
+
+  /// Create multiple follow-up documents under `users/{uid}/followUps`.
+  Future<void> createMultipleFollowUps({
+    required List<FollowUpModel> followUps,
+  }) async {
+    final uid = _getUserId();
+    if (uid == null) throw Exception('User not logged in');
+    final batch = _firestore.batch();
+    for (var followUp in followUps) {
+      final docRef = _firestore
+          .collection('users')
+          .doc(uid)
+          .collection('followUps')
+          .doc(); // Generate ID by Firestore
+      batch.set(docRef, followUp.copyWith(id: docRef.id).toMap());
+    }
+    await batch.commit();
   }
 
   /// Read a single follow-up by its ID.

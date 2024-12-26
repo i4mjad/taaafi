@@ -84,6 +84,15 @@ class StatisticsNotifier extends _$StatisticsNotifier {
       state = AsyncValue.error(e, st);
     }
   }
+
+  Future<void> refreshUserStatistics() async {
+    state = const AsyncValue.loading();
+    try {
+      state = AsyncValue.data(await build());
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+    }
+  }
 }
 
 @Riverpod(keepAlive: true)

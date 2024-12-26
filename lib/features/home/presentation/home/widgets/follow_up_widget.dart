@@ -26,7 +26,7 @@ class FollowUpWidget extends StatelessWidget {
       padding: EdgeInsets.all(8),
       borderSide: BorderSide(
         color: isSelected ? theme.success[600]! : theme.grey[600]!,
-        width: 0.5,
+        width: isSelected ? 1 : 0.5,
       ),
       boxShadow: Shadows.mainShadows,
       child: Column(

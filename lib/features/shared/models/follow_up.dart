@@ -31,6 +31,18 @@ class FollowUpModel {
     };
   }
 
+  FollowUpModel copyWith({
+    String? id,
+    FollowUpType? type,
+    DateTime? time,
+  }) {
+    return FollowUpModel(
+      id: id ?? this.id,
+      type: type ?? this.type,
+      time: time ?? this.time,
+    );
+  }
+
   /// Helper function to convert string to enum.
   static FollowUpType _fromStringToEnum(String typeStr) {
     return FollowUpType.values.firstWhere(

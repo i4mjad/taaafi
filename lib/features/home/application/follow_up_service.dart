@@ -14,6 +14,13 @@ class FollowUpService {
     await _repository.createFollowUp(followUp: followUp);
   }
 
+  /// Creates multiple follow-ups in Firestore.
+  Future<void> createMultipleFollowUps({
+    required List<FollowUpModel> followUps,
+  }) async {
+    await _repository.createMultipleFollowUps(followUps: followUps);
+  }
+
   /// Reads all follow-ups for the user.
 
   /// Updates an existing follow-up.
