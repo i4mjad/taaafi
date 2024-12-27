@@ -36,7 +36,17 @@ class FirebaseDiariesRepository implements DiariesRepository {
           .get();
 
       return snapshot.docs
-          .map((doc) => Diary.fromFirestore(doc.id, doc.data()))
+          .map((doc) => Diary(
+                doc.id,
+                doc.data()['title'] as String,
+                doc.data()['body'] as String, // Using body for plainText
+                (doc.data()['timestamp'] as Timestamp).toDate(),
+                formattedContent:
+                    doc.data()['formattedContent'] as List<dynamic>?,
+                updatedAt: doc.data()['updatedAt'] != null
+                    ? (doc.data()['updatedAt'] as Timestamp).toDate()
+                    : null,
+              ))
           .toList();
     } catch (e) {
       throw Exception('Failed to fetch diaries: $e');
@@ -55,7 +65,16 @@ class FirebaseDiariesRepository implements DiariesRepository {
 
       if (!doc.exists) return null;
 
-      return Diary.fromFirestore(doc.id, doc.data()!);
+      return Diary(
+        doc.id,
+        doc.data()!['title'] as String,
+        doc.data()!['body'] as String,
+        (doc.data()!['timestamp'] as Timestamp).toDate(),
+        formattedContent: doc.data()!['formattedContent'] as List<dynamic>?,
+        updatedAt: doc.data()!['updatedAt'] != null
+            ? (doc.data()!['updatedAt'] as Timestamp).toDate()
+            : null,
+      );
     } catch (e) {
       throw Exception('Failed to fetch diary: $e');
     }
@@ -69,7 +88,12 @@ class FirebaseDiariesRepository implements DiariesRepository {
           .doc(_userId)
           .collection('userNotes')
           .doc(diaryId)
-          .update(diary.toFirestore());
+          .update({
+        'title': diary.title,
+        'body': diary.plainText,
+        'formattedContent': diary.formattedContent,
+        'updatedAt': FieldValue.serverTimestamp(),
+      });
     } catch (e) {
       throw Exception('Failed to update diary: $e');
     }
@@ -82,7 +106,13 @@ class FirebaseDiariesRepository implements DiariesRepository {
           .collection('users')
           .doc(_userId)
           .collection('userNotes')
-          .add(diary.toFirestore());
+          .add({
+        'title': diary.title,
+        'body': diary.plainText,
+        'timestamp': Timestamp.fromDate(diary.date),
+        'formattedContent': diary.formattedContent,
+        'updatedAt': FieldValue.serverTimestamp(),
+      });
     } catch (e) {
       throw Exception('Failed to add diary: $e');
     }

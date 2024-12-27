@@ -34,21 +34,8 @@ class _DiaryScreenState extends ConsumerState<DiaryScreen> {
       try {
         print('Step 1 - Raw formatted content: ${diary.formattedContent}');
 
-        // First decode the outer JSON
-        var operations = jsonDecode(diary.formattedContent!);
-        print('Step 2 - Decoded operations: $operations');
-
-        // Check if this is a wrapped format (old format) or direct delta (new format)
-        if (operations.length == 1 &&
-            operations[0]['insert'] is String &&
-            operations[0]['insert'].contains('"insert"')) {
-          // Old format - need to unwrap
-          final String innerJsonString = operations[0]['insert'] as String;
-          print('Step 3a - Unwrapping old format: $innerJsonString');
-          operations = jsonDecode(innerJsonString);
-        }
-
-        print('Step 4 - Final operations: $operations');
+        var operations = diary.formattedContent!;
+        print('Step 2 - Operations: $operations');
 
         // Create a new Delta and add each operation
         final delta = Delta();
@@ -62,7 +49,7 @@ class _DiaryScreenState extends ConsumerState<DiaryScreen> {
           }
         }
 
-        print('Step 5 - Created Delta: ${delta.toJson()}');
+        print('Step 3 - Created Delta: ${delta.toJson()}');
         doc = Document.fromDelta(delta);
       } catch (e, stackTrace) {
         print('Error creating delta: $e');
@@ -473,7 +460,7 @@ class _DiaryScreenState extends ConsumerState<DiaryScreen> {
             plainText,
             diary.date,
             formattedContent:
-                jsonEncode(deltaJson), // Store the Delta JSON directly
+                deltaJson, // Store the Delta JSON directly as List
             updatedAt: DateTime.now(),
           ),
         );

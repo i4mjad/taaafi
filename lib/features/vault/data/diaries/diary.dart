@@ -4,8 +4,8 @@ class Diary {
   final String id;
   final String title;
   final String plainText;
-  final String? formattedContent; // Delta JSON string
   final DateTime date;
+  final List<dynamic>? formattedContent;
   final DateTime? updatedAt;
 
   Diary(
@@ -17,28 +17,25 @@ class Diary {
     this.updatedAt,
   });
 
-  // Helper method to create from Firestore data
-  factory Diary.fromFirestore(String id, Map<String, dynamic> data) {
-    return Diary(
-      id,
-      data['title'] as String,
-      data['body'] as String, // For backwards compatibility
-      (data['timestamp'] as Timestamp).toDate(),
-      formattedContent: data['formattedContent'] as String?,
-      updatedAt: data['updatedAt'] != null
-          ? (data['updatedAt'] as Timestamp).toDate()
-          : null,
-    );
-  }
+  // Update toJson to handle List directly
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'title': title,
+        'plainText': plainText,
+        'date': date.toIso8601String(),
+        'formattedContent': formattedContent,
+        'updatedAt': updatedAt?.toIso8601String(),
+      };
 
-  // Helper method to convert to Firestore data
-  Map<String, dynamic> toFirestore() {
-    return {
-      'title': title,
-      'body': plainText, // Keep the plain text for backwards compatibility
-      'formattedContent': formattedContent,
-      'timestamp': date,
-      'updatedAt': updatedAt ?? FieldValue.serverTimestamp(),
-    };
-  }
+  // Update fromJson to handle List directly
+  factory Diary.fromJson(Map<String, dynamic> json) => Diary(
+        json['id'] as String,
+        json['title'] as String,
+        json['plainText'] as String,
+        DateTime.parse(json['date'] as String),
+        formattedContent: json['formattedContent'] as List<dynamic>?,
+        updatedAt: json['updatedAt'] != null
+            ? DateTime.parse(json['updatedAt'] as String)
+            : null,
+      );
 }
