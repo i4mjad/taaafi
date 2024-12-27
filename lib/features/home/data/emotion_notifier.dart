@@ -43,7 +43,7 @@ class EmotionNotifier extends _$EmotionNotifier {
     }
   }
 
-  Future<void> deleteEmotion(String emotionId, DateTime date) async {
+  Future<void> deleteEmotion(String emotionId) async {
     state = const AsyncValue.loading();
     try {
       await _service.deleteEmotion(emotionId: emotionId);

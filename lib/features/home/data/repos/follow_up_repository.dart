@@ -187,4 +187,19 @@ class FollowUpRepository {
   DateTime _onlyDate(DateTime dt) {
     return DateTime(dt.year, dt.month, dt.day);
   }
+
+  Stream<List<FollowUpModel>> watchFollowUpsByDate(DateTime date) {
+    final uid = _getUserId();
+    final startOfDay = DateTime(date.year, date.month, date.day);
+    final endOfDay = DateTime(date.year, date.month, date.day, 23, 59, 59);
+    return _firestore
+        .collection('users')
+        .doc(uid)
+        .collection('followUps')
+        .where('time', isGreaterThanOrEqualTo: startOfDay)
+        .where('time', isLessThanOrEqualTo: endOfDay)
+        .snapshots()
+        .map((snapshot) =>
+            snapshot.docs.map((doc) => FollowUpModel.fromDoc(doc)).toList());
+  }
 }

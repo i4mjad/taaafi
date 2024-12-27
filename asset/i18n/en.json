@@ -446,5 +446,9 @@
   "future-date-message": "You clicked on a future date!",
   "past-date-message": "You clicked on a date before your start date!",
   "add-all-follow-ups": "Reset all streaks",
-  "add-all-follow-ups-desc": "If selected, all streaks will be restarted"
+  "add-all-follow-ups-desc": "If selected, all streaks will be restarted",
+  "edit-follow-up": "Edit Follow up",
+  "delete-follow-up": "Delete Follow up",
+  "edit-emotion": "Edit Emotion"
+
 }

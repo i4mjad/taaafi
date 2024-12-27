@@ -96,4 +96,8 @@ class FollowUpService {
 
     return longestStreak > currentStreak ? longestStreak : currentStreak;
   }
+
+  Stream<List<FollowUpModel>> getFollowUpsByDateStream(DateTime date) {
+    return _repository.watchFollowUpsByDate(date);
+  }
 }
