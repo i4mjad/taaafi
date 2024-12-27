@@ -118,7 +118,7 @@ class _FirstPageWidget extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = AppTheme.of(context);
     final localization = AppLocalizations.of(context);
-    final streakState = ref.watch(streakNotifierProvider);
+    final streakState = ref.watch(streakStreamProvider);
 
     return streakState.when(
       data: (data) {

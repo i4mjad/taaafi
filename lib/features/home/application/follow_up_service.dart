@@ -22,6 +22,9 @@ class FollowUpService {
   }
 
   /// Reads all follow-ups for the user.
+  Future<List<FollowUpModel>> readAllFollowUps() async {
+    return await _repository.readAllFollowUps();
+  }
 
   /// Updates an existing follow-up.
   Future<void> updateFollowUp({
@@ -58,5 +61,29 @@ class FollowUpService {
   /// Calculate the total days from the user's first date.
   Future<int> calculateTotalDaysFromFirstDate() async {
     return await _repository.calculateTotalDaysFromFirstDate();
+  }
+
+  /// Calculate the longest relapse streak.
+  Future<int> calculateLongestRelapseStreak() async {
+    final followUps =
+        await _repository.readFollowUpsByType(FollowUpType.relapse);
+    if (followUps.isEmpty) return 0;
+
+    followUps.sort((a, b) => a.time.compareTo(b.time));
+    int longestStreak = 0;
+    int currentStreak = 1;
+
+    for (int i = 1; i < followUps.length; i++) {
+      if (followUps[i].time.difference(followUps[i - 1].time).inDays == 1) {
+        currentStreak++;
+      } else {
+        if (currentStreak > longestStreak) {
+          longestStreak = currentStreak;
+        }
+        currentStreak = 1;
+      }
+    }
+
+    return longestStreak > currentStreak ? longestStreak : currentStreak;
   }
 }

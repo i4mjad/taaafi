@@ -21,12 +21,12 @@ final followUpServiceProvider = Provider<FollowUpService>.internal(
 );
 
 typedef FollowUpServiceRef = ProviderRef<FollowUpService>;
-String _$followUpNotifierHash() => r'a33171278c8d12ff4fdaa2a246214154eb5072af';
+String _$followUpNotifierHash() => r'eb21deedbece0f8c838cf4786a67cda23d49a806';
 
 /// See also [FollowUpNotifier].
 @ProviderFor(FollowUpNotifier)
-final followUpNotifierProvider =
-    AutoDisposeAsyncNotifierProvider<FollowUpNotifier, UserStatistics>.internal(
+final followUpNotifierProvider = AutoDisposeAsyncNotifierProvider<
+    FollowUpNotifier, UserStatisticsModel>.internal(
   FollowUpNotifier.new,
   name: r'followUpNotifierProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
@@ -36,6 +36,6 @@ final followUpNotifierProvider =
   allTransitiveDependencies: null,
 );
 
-typedef _$FollowUpNotifier = AutoDisposeAsyncNotifier<UserStatistics>;
+typedef _$FollowUpNotifier = AutoDisposeAsyncNotifier<UserStatisticsModel>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

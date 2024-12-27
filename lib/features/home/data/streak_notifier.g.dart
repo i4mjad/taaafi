@@ -21,7 +21,22 @@ final streakServiceProvider = Provider<StreakService>.internal(
 );
 
 typedef StreakServiceRef = ProviderRef<StreakService>;
-String _$streakNotifierHash() => r'4244e77cd3c79f30254ccdd965fd8e73c55a4474';
+String _$streakStreamHash() => r'b38affac66697b26cfbaaab6872f4622b0b90a61';
+
+/// See also [streakStream].
+@ProviderFor(streakStream)
+final streakStreamProvider =
+    AutoDisposeStreamProvider<StreakStatistics>.internal(
+  streakStream,
+  name: r'streakStreamProvider',
+  debugGetCreateSourceHash:
+      const bool.fromEnvironment('dart.vm.product') ? null : _$streakStreamHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef StreakStreamRef = AutoDisposeStreamProviderRef<StreakStatistics>;
+String _$streakNotifierHash() => r'e00408ba948e9547a8dfefb45d82da88fd702e05';
 
 /// See also [StreakNotifier].
 @ProviderFor(StreakNotifier)

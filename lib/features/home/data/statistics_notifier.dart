@@ -1,6 +1,9 @@
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:reboot_app_3/features/home/application/statistics_service.dart';
+import 'package:reboot_app_3/features/home/data/models/user_statistics.dart'
+    as models;
+import 'package:reboot_app_3/features/home/data/models/user_statistics.dart';
 import 'package:reboot_app_3/features/shared/models/follow_up.dart';
 import 'package:reboot_app_3/features/home/data/repos/statistics_repository.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -17,6 +20,14 @@ class UserStatistics {
     required this.totalDaysFromFirstDate,
     required this.longestRelapseStreak,
   });
+
+  factory UserStatistics.fromModel(models.UserStatisticsModel model) {
+    return UserStatistics(
+      daysWithoutRelapse: model.daysWithoutRelapse,
+      totalDaysFromFirstDate: model.totalDaysFromFirstDate,
+      longestRelapseStreak: model.longestRelapseStreak,
+    );
+  }
 }
 
 @riverpod
@@ -100,4 +111,10 @@ StatisticsService statisticsService(StatisticsServiceRef ref) {
   final firestore = FirebaseFirestore.instance;
   final repository = StatisticsRepository(firestore);
   return StatisticsService(repository);
+}
+
+@riverpod
+Stream<UserStatisticsModel> statisticsStream(StatisticsStreamRef ref) {
+  final service = ref.read(statisticsServiceProvider);
+  return service.userStatisticsStream();
 }

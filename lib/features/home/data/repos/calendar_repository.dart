@@ -12,6 +12,11 @@ class CalendarRepository {
     return FirebaseAuth.instance.currentUser?.uid;
   }
 
+  Future<List<FollowUpModel>> getFollowUps() async {
+    final snapshot = await _firestore.collection('followUps').get();
+    return snapshot.docs.map((doc) => FollowUpModel.fromDoc(doc)).toList();
+  }
+
   /// Read follow-ups for a specific date range.
   Future<List<FollowUpModel>> readFollowUpsForDateRange(
       DateTime start, DateTime end) async {
@@ -25,6 +30,18 @@ class CalendarRepository {
         .where('time', isLessThanOrEqualTo: Timestamp.fromDate(end))
         .get();
     return querySnapshot.docs.map((doc) => FollowUpModel.fromDoc(doc)).toList();
+  }
+
+  Stream<List<FollowUpModel>> followUpsStream() {
+    final uid = _getUserId();
+    return _firestore
+        .collection('users')
+        .doc(uid)
+        .collection('followUps')
+        .snapshots()
+        .map((snapshot) {
+      return snapshot.docs.map((doc) => FollowUpModel.fromDoc(doc)).toList();
+    });
   }
 
   /// Read follow-ups for a set of dates.

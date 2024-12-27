@@ -8,14 +8,27 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'calendar_notifier.g.dart';
 
 @riverpod
+Stream<List<FollowUpModel>> calendarStream(CalendarStreamRef ref) {
+  final service = ref.read(calendarServiceProvider);
+  return service.followUpsStream();
+}
+
+/// A provider for the [CalendarService].
+@Riverpod(keepAlive: true)
+CalendarService calendarService(CalendarServiceRef ref) {
+  final firestore = FirebaseFirestore.instance;
+  final repository = CalendarRepository(firestore);
+  return CalendarService(repository);
+}
+
+@Riverpod(keepAlive: true)
 class CalendarNotifier extends _$CalendarNotifier {
   late final CalendarService _service;
 
   @override
   FutureOr<List<FollowUpModel>> build() async {
     _service = ref.read(calendarServiceProvider);
-    final now = DateTime.now();
-    return await fetchFollowUpsForMonth(now);
+    return await _service.getFollowUps();
   }
 
   Future<void> fetchFollowUpsForDates(List<DateTime> dates) async {
@@ -37,12 +50,4 @@ class CalendarNotifier extends _$CalendarNotifier {
   Future<DateTime> getUserFirstDate() async {
     return await _service.getUserFirstDate();
   }
-}
-
-/// A provider for the [CalendarService].
-@Riverpod(keepAlive: true)
-CalendarService calendarService(CalendarServiceRef ref) {
-  final firestore = FirebaseFirestore.instance;
-  final repository = CalendarRepository(firestore);
-  return CalendarService(repository);
 }

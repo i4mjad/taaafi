@@ -21,8 +21,24 @@ final statisticsServiceProvider = Provider<StatisticsService>.internal(
 );
 
 typedef StatisticsServiceRef = ProviderRef<StatisticsService>;
+String _$statisticsStreamHash() => r'89d2b69231698348f8427f114e52cc66639c691c';
+
+/// See also [statisticsStream].
+@ProviderFor(statisticsStream)
+final statisticsStreamProvider =
+    AutoDisposeStreamProvider<UserStatisticsModel>.internal(
+  statisticsStream,
+  name: r'statisticsStreamProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$statisticsStreamHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef StatisticsStreamRef = AutoDisposeStreamProviderRef<UserStatisticsModel>;
 String _$statisticsNotifierHash() =>
-    r'e187e0b9c512bcdcf26d50943a805fc8996cb2b0';
+    r'037b299fe56d12826d112e10951d3401a01c52a4';
 
 /// See also [StatisticsNotifier].
 @ProviderFor(StatisticsNotifier)

@@ -1,3 +1,4 @@
+import 'package:reboot_app_3/features/home/data/models/streak_statistics.dart';
 import 'package:reboot_app_3/features/shared/models/follow_up.dart';
 import 'package:reboot_app_3/features/home/data/repos/streak_repository.dart';
 
@@ -62,6 +63,43 @@ class StreakService {
     } else {
       slipUpFollowUps.sort((a, b) => b.time.compareTo(a.time));
       final lastFollowUpDate = _onlyDate(slipUpFollowUps.first.time);
+      return DateTime.now().difference(lastFollowUpDate).inDays;
+    }
+  }
+
+  Stream<StreakStatistics> streakStatisticsStream() async* {
+    while (true) {
+      final userFirstDate = await getUserFirstDate();
+      final followUps = await Future.wait([
+        _repository.readFollowUpsByType(FollowUpType.relapse),
+        _repository.readFollowUpsByType(FollowUpType.pornOnly),
+        _repository.readFollowUpsByType(FollowUpType.mastOnly),
+        _repository.readFollowUpsByType(FollowUpType.slipUp),
+      ]);
+
+      final relapseStreak = _calculateStreak(followUps[0], userFirstDate);
+      final pornOnlyStreak = _calculateStreak(followUps[1], userFirstDate);
+      final mastOnlyStreak = _calculateStreak(followUps[2], userFirstDate);
+      final slipUpStreak = _calculateStreak(followUps[3], userFirstDate);
+
+      yield StreakStatistics(
+        userFirstDate: userFirstDate,
+        relapseStreak: relapseStreak,
+        pornOnlyStreak: pornOnlyStreak,
+        mastOnlyStreak: mastOnlyStreak,
+        slipUpStreak: slipUpStreak,
+      );
+
+      await Future.delayed(Duration(minutes: 1));
+    }
+  }
+
+  int _calculateStreak(List<FollowUpModel> followUps, DateTime userFirstDate) {
+    if (followUps.isEmpty) {
+      return DateTime.now().difference(_onlyDate(userFirstDate)).inDays;
+    } else {
+      followUps.sort((a, b) => b.time.compareTo(a.time));
+      final lastFollowUpDate = _onlyDate(followUps.first.time);
       return DateTime.now().difference(lastFollowUpDate).inDays;
     }
   }

@@ -6,6 +6,22 @@ part of 'calendar_notifier.dart';
 // RiverpodGenerator
 // **************************************************************************
 
+String _$calendarStreamHash() => r'e781431137b27db7f508c98366afdecd392f9e00';
+
+/// See also [calendarStream].
+@ProviderFor(calendarStream)
+final calendarStreamProvider =
+    AutoDisposeStreamProvider<List<FollowUpModel>>.internal(
+  calendarStream,
+  name: r'calendarStreamProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$calendarStreamHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef CalendarStreamRef = AutoDisposeStreamProviderRef<List<FollowUpModel>>;
 String _$calendarServiceHash() => r'713b24b15d9cf0a5f04753ee02832021a0ed2ad6';
 
 /// A provider for the [CalendarService].
@@ -23,12 +39,12 @@ final calendarServiceProvider = Provider<CalendarService>.internal(
 );
 
 typedef CalendarServiceRef = ProviderRef<CalendarService>;
-String _$calendarNotifierHash() => r'238555ae21d00c44ec91782702c78e4cf3653eed';
+String _$calendarNotifierHash() => r'1d6990165e2512eab7dea246427c78528ba71921';
 
 /// See also [CalendarNotifier].
 @ProviderFor(CalendarNotifier)
-final calendarNotifierProvider = AutoDisposeAsyncNotifierProvider<
-    CalendarNotifier, List<FollowUpModel>>.internal(
+final calendarNotifierProvider =
+    AsyncNotifierProvider<CalendarNotifier, List<FollowUpModel>>.internal(
   CalendarNotifier.new,
   name: r'calendarNotifierProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
@@ -38,6 +54,6 @@ final calendarNotifierProvider = AutoDisposeAsyncNotifierProvider<
   allTransitiveDependencies: null,
 );
 
-typedef _$CalendarNotifier = AutoDisposeAsyncNotifier<List<FollowUpModel>>;
+typedef _$CalendarNotifier = AsyncNotifier<List<FollowUpModel>>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

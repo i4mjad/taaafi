@@ -12,6 +12,14 @@ class CalendarService {
     return await _repository.readFollowUpsForDateRange(start, end);
   }
 
+  Stream<List<FollowUpModel>> followUpsStream() {
+    return _repository.followUpsStream();
+  }
+
+  Future<List<FollowUpModel>> getFollowUps() async {
+    return await _repository.getFollowUps();
+  }
+
   Future<List<FollowUpModel>> fetchFollowUpsForDates(
       List<DateTime> dates) async {
     return await _repository.readFollowUpsForDates(dates);

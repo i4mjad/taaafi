@@ -1,5 +1,6 @@
 import 'package:reboot_app_3/features/shared/models/follow_up.dart';
 import 'package:reboot_app_3/features/home/data/repos/statistics_repository.dart';
+import 'package:reboot_app_3/features/home/data/models/user_statistics.dart';
 
 /// A service that contains business logic or computation related to FollowUps.
 class StatisticsService {
@@ -94,6 +95,24 @@ class StatisticsService {
     }
 
     return longest;
+  }
+
+  Stream<UserStatisticsModel> userStatisticsStream() async* {
+    while (true) {
+      final futures = await Future.wait([
+        calculateDaysWithoutRelapse(),
+        calculateTotalDaysFromFirstDate(),
+        calculateLongestRelapseStreak(),
+      ]);
+
+      yield UserStatisticsModel(
+        daysWithoutRelapse: futures[0],
+        totalDaysFromFirstDate: futures[1],
+        longestRelapseStreak: futures[2],
+      );
+
+      await Future.delayed(Duration(minutes: 1));
+    }
   }
 
   DateTime _onlyDate(DateTime dt) {

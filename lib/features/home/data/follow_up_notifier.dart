@@ -1,40 +1,30 @@
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:reboot_app_3/features/home/application/follow_up_service.dart';
-import 'package:reboot_app_3/features/home/data/calendar_notifier.dart';
-import 'package:reboot_app_3/features/home/data/statistics_notifier.dart';
-import 'package:reboot_app_3/features/home/data/streak_notifier.dart';
+import 'package:reboot_app_3/features/home/data/models/user_statistics.dart';
 import 'package:reboot_app_3/features/shared/models/follow_up.dart';
 import 'package:reboot_app_3/features/home/data/repos/follow_up_repository.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:riverpod/riverpod.dart';
 
 part 'follow_up_notifier.g.dart';
 
-class UserStatistics {
-  final int daysWithoutRelapse;
-  final int totalDaysFromFirstDate;
-
-  UserStatistics({
-    required this.daysWithoutRelapse,
-    required this.totalDaysFromFirstDate,
-  });
-}
-
-@riverpod
 @riverpod
 class FollowUpNotifier extends _$FollowUpNotifier {
   late final FollowUpService _service;
 
   @override
-  FutureOr<UserStatistics> build() async {
+  FutureOr<UserStatisticsModel> build() async {
     _service = ref.read(followUpServiceProvider);
     final daysWithoutRelapse = await _service.calculateDaysWithoutRelapse();
     final totalDaysFromFirstDate =
         await _service.calculateTotalDaysFromFirstDate();
 
-    return UserStatistics(
+    final longestRelapseStreak = await _service.calculateLongestRelapseStreak();
+    return UserStatisticsModel(
       daysWithoutRelapse: daysWithoutRelapse,
       totalDaysFromFirstDate: totalDaysFromFirstDate,
+      longestRelapseStreak: longestRelapseStreak,
     );
   }
 
@@ -43,13 +33,6 @@ class FollowUpNotifier extends _$FollowUpNotifier {
     try {
       await _service.createFollowUp(followUp: followUp);
       state = AsyncValue.data(await build());
-
-      // Refresh other notifiers
-      ref.read(streakNotifierProvider.notifier).refreshStreakStatistics();
-      ref.read(statisticsNotifierProvider.notifier).refreshUserStatistics();
-      ref
-          .read(calendarNotifierProvider.notifier)
-          .fetchFollowUpsForMonth(DateTime.now());
     } catch (e, st) {
       state = AsyncValue.error(e, st);
     }
@@ -60,13 +43,6 @@ class FollowUpNotifier extends _$FollowUpNotifier {
     try {
       await _service.updateFollowUp(followUp: followUp);
       state = AsyncValue.data(await build());
-
-      // Refresh other notifiers
-      ref.read(streakNotifierProvider.notifier).refreshStreakStatistics();
-      ref.read(statisticsNotifierProvider.notifier).refreshUserStatistics();
-      ref
-          .read(calendarNotifierProvider.notifier)
-          .fetchFollowUpsForMonth(DateTime.now());
     } catch (e, st) {
       state = AsyncValue.error(e, st);
     }
@@ -77,13 +53,6 @@ class FollowUpNotifier extends _$FollowUpNotifier {
     try {
       await _service.deleteFollowUp(followUpId: followUpId);
       state = AsyncValue.data(await build());
-
-      // Refresh other notifiers
-      ref.read(streakNotifierProvider.notifier).refreshStreakStatistics();
-      ref.read(statisticsNotifierProvider.notifier).refreshUserStatistics();
-      ref
-          .read(calendarNotifierProvider.notifier)
-          .fetchFollowUpsForMonth(DateTime.now());
     } catch (e, st) {
       state = AsyncValue.error(e, st);
     }
@@ -94,13 +63,6 @@ class FollowUpNotifier extends _$FollowUpNotifier {
     try {
       await _service.deleteAllFollowUps();
       state = AsyncValue.data(await build());
-
-      // Refresh other notifiers
-      ref.read(streakNotifierProvider.notifier).refreshStreakStatistics();
-      ref.read(statisticsNotifierProvider.notifier).refreshUserStatistics();
-      ref
-          .read(calendarNotifierProvider.notifier)
-          .fetchFollowUpsForMonth(DateTime.now());
     } catch (e, st) {
       state = AsyncValue.error(e, st);
     }
@@ -113,11 +75,6 @@ class FollowUpNotifier extends _$FollowUpNotifier {
       state = AsyncValue.data(await build());
 
       // Refresh other notifiers
-      ref.read(streakNotifierProvider.notifier).refreshStreakStatistics();
-      ref.read(statisticsNotifierProvider.notifier).refreshUserStatistics();
-      ref
-          .read(calendarNotifierProvider.notifier)
-          .fetchFollowUpsForMonth(DateTime.now());
     } catch (e, st) {
       state = AsyncValue.error(e, st);
     }
