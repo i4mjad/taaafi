@@ -21,7 +21,7 @@ final emotionServiceProvider = Provider<EmotionService>.internal(
 );
 
 typedef EmotionServiceRef = ProviderRef<EmotionService>;
-String _$emotionNotifierHash() => r'4497635a480528e1592a90e028f13aa311094db4';
+String _$emotionNotifierHash() => r'8d6b8f6bedb19014233bf1d8c3c3b73038541410';
 
 /// See also [EmotionNotifier].
 @ProviderFor(EmotionNotifier)

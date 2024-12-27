@@ -10,6 +10,7 @@ import 'package:reboot_app_3/core/shared_widgets/custom_textfield.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
+import 'package:reboot_app_3/features/vault/data/diaries/diaries_notifier.dart';
 import 'package:reboot_app_3/features/vault/data/diaries/diary.dart';
 
 class DiariesScreen extends ConsumerStatefulWidget {
@@ -21,63 +22,29 @@ class DiariesScreen extends ConsumerStatefulWidget {
 
 class _DiariesScreenState extends ConsumerState<DiariesScreen> {
   final searchController = TextEditingController();
-  List<Diary> filteredDiaryEntries = [];
+  List<Diary> filteredDiaries = [];
 
   @override
   void initState() {
     super.initState();
-    // Initially, show all diary entries
-    filteredDiaryEntries = diaryEntries;
-
-    // Add listener to searchController to filter the list
-    searchController.addListener(_filterDiaries);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(diariesNotifierProvider.notifier).fetchDiaries();
+    });
+    searchController.addListener(_handleSearch);
   }
 
   @override
   void dispose() {
-    searchController.removeListener(_filterDiaries);
     searchController.dispose();
     super.dispose();
   }
 
-  void _filterDiaries() {
-    final query = searchController.text.toLowerCase();
-    setState(() {
-      // Filter the list based on the search query
-      filteredDiaryEntries = diaryEntries.where((diary) {
-        return diary.title.toLowerCase().contains(query) ||
-            diary.body.toLowerCase().contains(query);
-      }).toList();
-    });
+  Future<void> _handleSearch() async {
+    final diariesNotifier = ref.read(diariesNotifierProvider.notifier);
+    filteredDiaries =
+        await diariesNotifier.searchDiaries(searchController.text);
+    setState(() {});
   }
-
-  final List<Diary> diaryEntries = [
-    Diary(
-        "خطة عطلة نهاية الأسبوع",
-        "استمتعت بيوم مريح على الشاطئ مع الأصدقاء. قضينا الوقت في السباحة والاستمتاع بأشعة الشمس. كانت هذه فرصة مثالية للابتعاد عن ضغوط العمل والاسترخاء التام. تناولنا وجبة غداء لذيذة في أحد المطاعم القريبة وتحدثنا عن خططنا للأيام القادمة.",
-        DateTime.parse("2024-08-20 10:09:49.972123"),
-        ["تمرين", "عمل", "قراءة"]),
-    Diary(
-        "ملخص يوم العمل",
-        "أعددت خطة للأنشطة القادمة في عطلة نهاية الأسبوع. عقدنا اجتماعاً طويلاً ولكن مثمراً حيث ناقشنا الأهداف الرئيسية للفريق خلال الأسابيع القادمة. على الرغم من التحديات التي واجهناها، إلا أننا توصلنا إلى حلول فعالة لتحسين الأداء وضمان الالتزام بالمواعيد النهائية.",
-        DateTime.parse("2024-08-26 10:09:49.972150"),
-        ["اجتماع", "بريد إلكتروني"]),
-    Diary(
-        "قائمة القراءة",
-        "استمتعت بيوم مريح على الشاطئ مع الأصدقاء. قضيت معظم الوقت في قراءة كتاب جديد يتحدث عن التنمية الذاتية وكيفية تحسين جودة الحياة. الكتاب كان ملهمًا وساعدني في التفكير بشكل أعمق في أهدافي المستقبلية وكيفية تحقيق التوازن بين العمل والحياة الشخصية.",
-        DateTime.parse("2024-08-18 10:09:49.972164"),
-        ["استرخاء", "تأمل"]),
-    Diary(
-        "قائمة القراءة",
-        "كان اليوم مثمراً، تمكنت من إكمال جميع المهام المحددة لليوم. بدأت صباحي بقراءة كتاب عن تاريخ الحضارات القديمة والذي أعطاني الكثير من الأفكار حول كيفية تطور المجتمعات عبر الزمن. أنهيت يومي بكتابة ملاحظاتي وتخطيطي لليوم التالي.",
-        DateTime.parse("2024-09-04 10:09:49.972173"),
-        ["قراءة", "كتابة"]),
-    Diary(
-        "روتين الصباح",
-        "كانت جلسة رائعة في صالة الألعاب الرياضية اليوم، أشعر بالقوة والنشاط. بدأت اليوم بممارسة التمارين المعتادة ولكن مع زيادة في شدة التدريب. أشعر أنني أحرز تقدمًا كبيرًا في أهدافي الصحية. بعد التدريب، استمتعت بتناول وجبة إفطار صحية وشعرت بطاقة إيجابية لبقية اليوم.",
-        DateTime.parse("2024-09-12 10:09:49.972181"),
-        ["شاطئ", "سباحة"])
-  ];
 
   @override
   Widget build(BuildContext context) {
@@ -105,9 +72,7 @@ class _DiariesScreenState extends ConsumerState<DiariesScreen> {
                           prefixIcon: LucideIcons.search,
                           inputType: TextInputType.text,
                           width: width * 0.75,
-                          validator: (value) {
-                            return null;
-                          },
+                          validator: (value) => null,
                         ),
                       ),
                       horizontalSpace(Spacing.points24),
@@ -115,27 +80,46 @@ class _DiariesScreenState extends ConsumerState<DiariesScreen> {
                     ],
                   ),
                   verticalSpace(Spacing.points16),
-                  Builder(builder: (BuildContext context) {
-                    if (filteredDiaryEntries.isEmpty) {
-                      return Center(
-                        child: Text("There is no data matching your search"),
-                      );
-                    } else {
-                      return ListView.separated(
-                        shrinkWrap: true,
-                        physics: NeverScrollableScrollPhysics(),
-                        itemBuilder: (BuildContext context, int index) {
-                          return DiaryWidget(
-                            diary: filteredDiaryEntries[index],
-                            index: index + 1,
+                  ref.watch(diariesNotifierProvider).when(
+                        data: (diaries) {
+                          final displayDiaries = searchController.text.isEmpty
+                              ? diaries
+                              : filteredDiaries;
+
+                          if (diaries.isEmpty) {
+                            return Center(
+                              child: Text("No diary entries yet"),
+                            );
+                          } else if (displayDiaries.isEmpty &&
+                              searchController.text.isNotEmpty) {
+                            return Center(
+                              child:
+                                  Text("There is no data matching your search"),
+                            );
+                          }
+
+                          return ListView.separated(
+                            shrinkWrap: true,
+                            physics: NeverScrollableScrollPhysics(),
+                            itemBuilder: (BuildContext context, int index) {
+                              return DiaryWidget(
+                                diary: displayDiaries[index],
+                                index: index + 1,
+                              );
+                            },
+                            separatorBuilder:
+                                (BuildContext context, int index) =>
+                                    verticalSpace(Spacing.points8),
+                            itemCount: displayDiaries.length,
                           );
                         },
-                        separatorBuilder: (BuildContext context, int index) =>
-                            verticalSpace(Spacing.points8),
-                        itemCount: filteredDiaryEntries.length,
-                      );
-                    }
-                  })
+                        loading: () => const Center(
+                          child: CircularProgressIndicator(),
+                        ),
+                        error: (error, stack) => Center(
+                          child: Text('Error: ${error.toString()}'),
+                        ),
+                      ),
                 ],
               ),
             ),

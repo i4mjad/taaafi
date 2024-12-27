@@ -53,10 +53,10 @@ class _DiaryScreenState extends ConsumerState<DiaryScreen> {
       "التحدي الأول: البداية الجديدة في التعافي",
       _controller.document.toPlainText(),
       DateTime.now(),
-      [
-        "تمرين المتابعة اليومية",
-        "تمرين المتابعة اليومية",
-      ],
+      // [
+      //   "تمرين المتابعة اليومية",
+      //   "تمرين المتابعة اليومية",
+      // ],
     );
 
     return Scaffold(
@@ -80,45 +80,46 @@ class _DiaryScreenState extends ConsumerState<DiaryScreen> {
                           style: TextStyles.h6,
                         ),
                         horizontalSpace(Spacing.points12),
-                        Flexible(
-                          child: Wrap(
-                            spacing: 4,
-                            children: diary.linkedActivites.map((activity) {
-                              return WidgetsContainer(
-                                borderRadius: BorderRadius.circular(6),
-                                padding: EdgeInsets.fromLTRB(8, 2, 8, 2),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Color.fromRGBO(0, 0, 0, 0.1),
-                                    blurRadius: 5,
-                                    spreadRadius: 0,
-                                    offset: Offset(
-                                      0,
-                                      0,
-                                    ),
-                                  ),
-                                  BoxShadow(
-                                    color: Color.fromRGBO(0, 0, 0, 0.1),
-                                    blurRadius: 1,
-                                    spreadRadius: 0,
-                                    offset: Offset(
-                                      0,
-                                      0,
-                                    ),
-                                  ),
-                                ],
-                                child: Text(
-                                  activity,
-                                  style: TextStyles.tiny
-                                      .copyWith(color: theme.grey[900]),
-                                ),
-                                backgroundColor: theme.backgroundColor,
-                                borderSide: BorderSide(
-                                    color: theme.grey[600]!, width: 0.25),
-                              );
-                            }).toList(),
-                          ),
-                        ),
+                        // TODO: this is to be implemented when it's ready
+                        // Flexible(
+                        //   child: Wrap(
+                        //     spacing: 4,
+                        //     children: diary.linkedActivites.map((activity) {
+                        //       return WidgetsContainer(
+                        //         borderRadius: BorderRadius.circular(6),
+                        //         padding: EdgeInsets.fromLTRB(8, 2, 8, 2),
+                        //         boxShadow: [
+                        //           BoxShadow(
+                        //             color: Color.fromRGBO(0, 0, 0, 0.1),
+                        //             blurRadius: 5,
+                        //             spreadRadius: 0,
+                        //             offset: Offset(
+                        //               0,
+                        //               0,
+                        //             ),
+                        //           ),
+                        //           BoxShadow(
+                        //             color: Color.fromRGBO(0, 0, 0, 0.1),
+                        //             blurRadius: 1,
+                        //             spreadRadius: 0,
+                        //             offset: Offset(
+                        //               0,
+                        //               0,
+                        //             ),
+                        //           ),
+                        //         ],
+                        //         child: Text(
+                        //           activity,
+                        //           style: TextStyles.tiny
+                        //               .copyWith(color: theme.grey[900]),
+                        //         ),
+                        //         backgroundColor: theme.backgroundColor,
+                        //         borderSide: BorderSide(
+                        //             color: theme.grey[600]!, width: 0.25),
+                        //       );
+                        //     }).toList(),
+                        //   ),
+                        // ),
                       ],
                     ),
                   ),
