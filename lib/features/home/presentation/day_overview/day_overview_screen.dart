@@ -307,7 +307,7 @@ class DailyRecordWidget extends ConsumerWidget {
     final theme = AppTheme.of(context);
     final locale = ref.watch(localeNotifierProvider);
     return WidgetsContainer(
-      padding: EdgeInsets.fromLTRB(12, 10, 12, 10),
+      padding: EdgeInsets.all(12),
       backgroundColor: theme.backgroundColor,
       boxShadow: Shadows.mainShadows,
       borderSide: BorderSide(width: 0.25, color: theme.grey[100]!),
@@ -352,7 +352,7 @@ class EmotionDailyRecordWidget extends ConsumerWidget {
     final theme = AppTheme.of(context);
     final locale = ref.watch(localeNotifierProvider);
     return WidgetsContainer(
-      padding: EdgeInsets.fromLTRB(12, 10, 12, 10),
+      padding: EdgeInsets.all(12),
       backgroundColor: theme.backgroundColor,
       boxShadow: Shadows.mainShadows,
       borderSide: BorderSide(width: 0.25, color: theme.grey[100]!),
