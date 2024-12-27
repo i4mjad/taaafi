@@ -315,10 +315,6 @@ class DailyRecordWidget extends ConsumerWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          // Text(
-          //   dailyRecord.heading,
-          //   style: TextStyles.h6.copyWith(color: theme.grey[900], fontSize: 18),
-          // ),
           Container(
             width: 16,
             height: 16,
