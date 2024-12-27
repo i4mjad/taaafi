@@ -7,6 +7,7 @@ abstract class DiariesRepository {
   Future<void> addDiary(Diary diary);
   Future<void> updateDiary(String diaryId, Diary diary);
   Future<void> deleteDiary(String diaryId);
+  Future<Diary?> getDiaryById(String diaryId);
 }
 
 class FirebaseDiariesRepository implements DiariesRepository {
@@ -34,33 +35,29 @@ class FirebaseDiariesRepository implements DiariesRepository {
           .collection('userNotes')
           .get();
 
-      return snapshot.docs.map((doc) {
-        final data = doc.data();
-        return Diary(
-          data['title'] as String,
-          data['body'] as String,
-          (data['timestamp'] as Timestamp).toDate(),
-        );
-      }).toList();
+      return snapshot.docs
+          .map((doc) => Diary.fromFirestore(doc.id, doc.data()))
+          .toList();
     } catch (e) {
       throw Exception('Failed to fetch diaries: $e');
     }
   }
 
   @override
-  Future<void> addDiary(Diary diary) async {
+  Future<Diary?> getDiaryById(String diaryId) async {
     try {
-      await _firestore
+      final doc = await _firestore
           .collection('users')
           .doc(_userId)
           .collection('userNotes')
-          .add({
-        'title': diary.title,
-        'body': diary.body,
-        'timestamp': diary.date,
-      });
+          .doc(diaryId)
+          .get();
+
+      if (!doc.exists) return null;
+
+      return Diary.fromFirestore(doc.id, doc.data()!);
     } catch (e) {
-      throw Exception('Failed to add diary: $e');
+      throw Exception('Failed to fetch diary: $e');
     }
   }
 
@@ -72,13 +69,22 @@ class FirebaseDiariesRepository implements DiariesRepository {
           .doc(_userId)
           .collection('userNotes')
           .doc(diaryId)
-          .update({
-        'title': diary.title,
-        'body': diary.body,
-        'timestamp': diary.date,
-      });
+          .update(diary.toFirestore());
     } catch (e) {
       throw Exception('Failed to update diary: $e');
+    }
+  }
+
+  @override
+  Future<void> addDiary(Diary diary) async {
+    try {
+      await _firestore
+          .collection('users')
+          .doc(_userId)
+          .collection('userNotes')
+          .add(diary.toFirestore());
+    } catch (e) {
+      throw Exception('Failed to add diary: $e');
     }
   }
 

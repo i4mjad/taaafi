@@ -21,4 +21,8 @@ class DiariesService {
   Future<void> deleteDiary(String diaryId) async {
     await _repository.deleteDiary(diaryId);
   }
+
+  Future<Diary?> getDiaryById(String diaryId) async {
+    return await _repository.getDiaryById(diaryId);
+  }
 }

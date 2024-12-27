@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:reboot_app_3/features/vault/application/diaries/diaries_service.dart';
 import 'package:reboot_app_3/features/vault/data/diaries/diaries_repository.dart';
 import 'package:reboot_app_3/features/vault/data/diaries/diary.dart';
@@ -67,7 +66,7 @@ class DiariesNotifier extends _$DiariesNotifier {
     final lowercaseQuery = query.toLowerCase();
     return currentState.where((diary) {
       return diary.title.toLowerCase().contains(lowercaseQuery) ||
-          diary.body.toLowerCase().contains(lowercaseQuery);
+          diary.plainText.toLowerCase().contains(lowercaseQuery);
     }).toList();
   }
 }
