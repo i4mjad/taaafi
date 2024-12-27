@@ -39,47 +39,65 @@ class DayOverviewScreen extends ConsumerWidget {
       appBar: plainAppBar(context, ref,
           getDisplayDate(date, locale!.languageCode), false, true),
       backgroundColor: theme.backgroundColor,
-      body: Padding(
-        padding: EdgeInsets.all(16),
-        child: SingleChildScrollView(
-          child: Container(
-            width: MediaQuery.of(context).size.width - 32,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                FutureBuilder(
-                  future: followUpsFuture,
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return Center(child: CircularProgressIndicator());
-                    } else if (snapshot.hasError) {
-                      return Center(child: Text('Error: ${snapshot.error}'));
-                    } else {
-                      final followUps =
-                          snapshot.data as List<FollowUpModel>? ?? [];
-                      return DayFollowUps(date: date, followUps: followUps);
-                    }
-                  },
-                ),
-                verticalSpace(Spacing.points32),
-                DayNotes(date: date),
-                verticalSpace(Spacing.points32),
-                StreamBuilder<List<EmotionModel>>(
-                  stream: emotionsStream,
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return Center(child: CircularProgressIndicator());
-                    } else if (snapshot.hasError) {
-                      return Center(child: Text('Error: ${snapshot.error}'));
-                    } else {
-                      final emotions = snapshot.data ?? [];
-                      return DayEmotions(date: date, emotions: emotions);
-                    }
-                  },
-                ),
-              ],
-            ),
+      body: SingleChildScrollView(
+        child: Container(
+          width: MediaQuery.of(context).size.width,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              FutureBuilder(
+                future: followUpsFuture,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Center(child: CircularProgressIndicator()),
+                    );
+                  } else if (snapshot.hasError) {
+                    return Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Center(child: Text('Error: ${snapshot.error}')),
+                    );
+                  } else {
+                    final followUps =
+                        snapshot.data as List<FollowUpModel>? ?? [];
+                    return Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: DayFollowUps(date: date, followUps: followUps),
+                    );
+                  }
+                },
+              ),
+              verticalSpace(Spacing.points32),
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: DayNotes(date: date),
+              ),
+              verticalSpace(Spacing.points32),
+              StreamBuilder<List<EmotionModel>>(
+                stream: emotionsStream,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Center(child: CircularProgressIndicator()),
+                    );
+                  } else if (snapshot.hasError) {
+                    return Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Center(child: Text('Error: ${snapshot.error}')),
+                    );
+                  } else {
+                    final emotions = snapshot.data ?? [];
+                    return Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: DayEmotions(date: date, emotions: emotions),
+                    );
+                  }
+                },
+              ),
+            ],
           ),
         ),
       ),
