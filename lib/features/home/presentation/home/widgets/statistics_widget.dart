@@ -137,7 +137,7 @@ class _FirstPageWidget extends ConsumerWidget {
                   boxShadow: Shadows.mainShadows,
                   shape: BoxShape.circle,
                   border: Border.all(
-                    width: 0.5,
+                    width: 0.75,
                     color: theme.grey[600]!,
                   ),
                 ),

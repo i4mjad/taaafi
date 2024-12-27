@@ -470,7 +470,7 @@ class DailyRecordWidget extends ConsumerWidget {
       padding: EdgeInsets.all(12),
       backgroundColor: theme.backgroundColor,
       boxShadow: Shadows.mainShadows,
-      borderSide: BorderSide(width: 0.25, color: theme.grey[100]!),
+      borderSide: BorderSide(width: 0.5, color: theme.grey[600]!),
       borderRadius: BorderRadius.circular(8),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -511,7 +511,7 @@ class NoteDailyRecordWidget extends ConsumerWidget {
       padding: EdgeInsets.all(12),
       backgroundColor: theme.backgroundColor,
       boxShadow: Shadows.mainShadows,
-      borderSide: BorderSide(width: 0.25, color: theme.grey[100]!),
+      borderSide: BorderSide(width: 0.5, color: theme.grey[600]!),
       borderRadius: BorderRadius.circular(8),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -552,7 +552,7 @@ class EmotionDailyRecordWidget extends ConsumerWidget {
       padding: EdgeInsets.all(12),
       backgroundColor: theme.backgroundColor,
       boxShadow: Shadows.mainShadows,
-      borderSide: BorderSide(width: 0.25, color: theme.grey[100]!),
+      borderSide: BorderSide(width: 0.5, color: theme.grey[600]!),
       borderRadius: BorderRadius.circular(8),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
