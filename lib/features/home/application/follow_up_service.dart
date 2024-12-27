@@ -26,6 +26,11 @@ class FollowUpService {
     return await _repository.readAllFollowUps();
   }
 
+  /// Retrieves all follow-ups.
+  Future<List<FollowUpModel>> getFollowUps() async {
+    return await _repository.readAllFollowUps();
+  }
+
   /// Updates an existing follow-up.
   Future<void> updateFollowUp({
     required FollowUpModel followUp,

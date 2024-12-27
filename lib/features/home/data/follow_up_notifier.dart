@@ -1,11 +1,9 @@
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:reboot_app_3/features/home/application/follow_up_service.dart';
-import 'package:reboot_app_3/features/home/data/models/user_statistics.dart';
 import 'package:reboot_app_3/features/shared/models/follow_up.dart';
 import 'package:reboot_app_3/features/home/data/repos/follow_up_repository.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:riverpod/riverpod.dart';
 
 part 'follow_up_notifier.g.dart';
 
@@ -14,18 +12,10 @@ class FollowUpNotifier extends _$FollowUpNotifier {
   late final FollowUpService _service;
 
   @override
-  FutureOr<UserStatisticsModel> build() async {
+  FutureOr<List<FollowUpModel>> build() async {
     _service = ref.read(followUpServiceProvider);
-    final daysWithoutRelapse = await _service.calculateDaysWithoutRelapse();
-    final totalDaysFromFirstDate =
-        await _service.calculateTotalDaysFromFirstDate();
-
-    final longestRelapseStreak = await _service.calculateLongestRelapseStreak();
-    return UserStatisticsModel(
-      daysWithoutRelapse: daysWithoutRelapse,
-      totalDaysFromFirstDate: totalDaysFromFirstDate,
-      longestRelapseStreak: longestRelapseStreak,
-    );
+    final followUps = await _service.getFollowUps();
+    return followUps;
   }
 
   Future<void> createFollowUp(FollowUpModel followUp) async {
