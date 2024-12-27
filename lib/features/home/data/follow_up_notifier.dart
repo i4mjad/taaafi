@@ -69,6 +69,10 @@ class FollowUpNotifier extends _$FollowUpNotifier {
       state = AsyncValue.error(e, st);
     }
   }
+
+  Future<List<FollowUpModel>> getFollowUpsByDate(DateTime date) async {
+    return await _service.getFollowUpsByDate(date);
+  }
 }
 
 @Riverpod(keepAlive: true)

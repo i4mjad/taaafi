@@ -10,12 +10,14 @@ import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/features/home/data/models/daily_record.dart';
-import 'package:reboot_app_3/features/home/data/models/emotion_model.dart';
+
 import 'package:reboot_app_3/features/home/data/emotion_notifier.dart';
 import 'package:reboot_app_3/features/home/data/follow_up_notifier.dart';
+import 'package:reboot_app_3/features/home/data/models/emotion_model.dart';
+import 'package:reboot_app_3/features/home/data/models/follow_up_colors.dart';
 import 'package:reboot_app_3/features/home/presentation/home/widgets/follow_up_sheet.dart';
+import 'package:reboot_app_3/features/shared/models/follow_up.dart';
 
-//TODO: make sure to fetch only the date related to the current date
 class DayOverviewScreen extends ConsumerWidget {
   final DateTime date;
 
@@ -28,6 +30,11 @@ class DayOverviewScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final locale = ref.watch(localeNotifierProvider);
     final theme = AppTheme.of(context);
+    final followUpsFuture =
+        ref.watch(followUpNotifierProvider.notifier).getFollowUpsByDate(date);
+    final emotionsStream =
+        ref.watch(emotionNotifierProvider.notifier).watchEmotionsByDate(date);
+
     return Scaffold(
       appBar: plainAppBar(context, ref,
           getDisplayDate(date, locale!.languageCode), false, true),
@@ -41,11 +48,36 @@ class DayOverviewScreen extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                DayFollowUps(date: date),
+                FutureBuilder(
+                  future: followUpsFuture,
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Center(child: CircularProgressIndicator());
+                    } else if (snapshot.hasError) {
+                      return Center(child: Text('Error: ${snapshot.error}'));
+                    } else {
+                      final followUps =
+                          snapshot.data as List<FollowUpModel>? ?? [];
+                      return DayFollowUps(date: date, followUps: followUps);
+                    }
+                  },
+                ),
                 verticalSpace(Spacing.points32),
                 DayNotes(date: date),
                 verticalSpace(Spacing.points32),
-                DayEmotions(date: date),
+                StreamBuilder<List<EmotionModel>>(
+                  stream: emotionsStream,
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Center(child: CircularProgressIndicator());
+                    } else if (snapshot.hasError) {
+                      return Center(child: Text('Error: ${snapshot.error}'));
+                    } else {
+                      final emotions = snapshot.data ?? [];
+                      return DayEmotions(date: date, emotions: emotions);
+                    }
+                  },
+                ),
               ],
             ),
           ),
@@ -55,18 +87,19 @@ class DayOverviewScreen extends ConsumerWidget {
   }
 }
 
-class DayEmotions extends ConsumerWidget {
+class DayEmotions extends StatelessWidget {
   DayEmotions({
     super.key,
     required this.date,
+    required this.emotions,
   });
 
   final DateTime date;
+  final List<EmotionModel> emotions;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final theme = AppTheme.of(context);
-    final emotionsAsyncValue = ref.watch(emotionNotifierProvider);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -77,113 +110,84 @@ class DayEmotions extends ConsumerWidget {
           style: TextStyles.h6,
         ),
         verticalSpace(Spacing.points12),
-        emotionsAsyncValue.when(
-          data: (emotions) {
-            if (emotions.isEmpty) {
-              return Column(
-                children: [
-                  Container(
-                    width: MediaQuery.of(context).size.width - 32,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          AppLocalizations.of(context).translate('no-emotions'),
-                          style: TextStyles.footnote,
-                        )
-                      ],
-                    ),
-                  ),
-                  verticalSpace(Spacing.points16),
-                  GestureDetector(
-                    onTap: () {
-                      showModalBottomSheet<void>(
-                          context: context,
-                          isScrollControlled: true,
-                          builder: (BuildContext context) {
-                            return FollowUpSheet(date);
-                          });
-                    },
-                    child: WidgetsContainer(
-                      backgroundColor: theme.backgroundColor,
-                      borderSide:
-                          BorderSide(color: theme.grey[900]!, width: 0.25),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Color.fromRGBO(9, 30, 66, 0.25),
-                          blurRadius: 8,
-                          spreadRadius: -2,
-                          offset: Offset(
-                            0,
-                            4,
-                          ),
-                        ),
-                        BoxShadow(
-                          color: Color.fromRGBO(9, 30, 66, 0.08),
-                          blurRadius: 0,
-                          spreadRadius: 1,
-                          offset: Offset(
-                            0,
-                            0,
-                          ),
-                        ),
-                      ],
-                      child: Center(
-                        child: Text(
-                          AppLocalizations.of(context)
-                              .translate('add-emotions'),
-                          style: TextStyles.h6.copyWith(
-                            color: theme.secondary[600],
-                          ),
-                        ),
+        if (emotions.isEmpty)
+          Column(
+            children: [
+              Container(
+                width: MediaQuery.of(context).size.width - 32,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      AppLocalizations.of(context).translate('no-emotions'),
+                      style: TextStyles.footnote,
+                    )
+                  ],
+                ),
+              ),
+              verticalSpace(Spacing.points16),
+              GestureDetector(
+                onTap: () {
+                  showModalBottomSheet<void>(
+                      context: context,
+                      isScrollControlled: true,
+                      builder: (BuildContext context) {
+                        return FollowUpSheet(date);
+                      });
+                },
+                child: WidgetsContainer(
+                  backgroundColor: theme.backgroundColor,
+                  borderSide: BorderSide(color: theme.grey[900]!, width: 0.25),
+                  boxShadow: Shadows.mainShadows,
+                  child: Center(
+                    child: Text(
+                      AppLocalizations.of(context).translate('add-emotions'),
+                      style: TextStyles.h6.copyWith(
+                        color: theme.secondary[600],
                       ),
                     ),
                   ),
-                ],
+                ),
+              ),
+            ],
+          )
+        else
+          ListView.separated(
+            shrinkWrap: true,
+            physics: NeverScrollableScrollPhysics(),
+            itemBuilder: (BuildContext context, int index) {
+              final emotion = emotions[index];
+              return EmotionDailyRecordWidget(
+                dailyRecord: DailyRecord(
+                  emotion.emotionEmoji,
+                  emotion.emotionName,
+                  emotion.date,
+                ),
               );
-            } else {
-              return ListView.separated(
-                shrinkWrap:
-                    true, // This makes the ListView take up only the needed space
-                physics: NeverScrollableScrollPhysics(),
-                itemBuilder: (BuildContext context, int index) {
-                  final emotion = emotions[index];
-                  return DailyRecordWidget(
-                    dailyRecord: DailyRecord(
-                      emotion.emotionEmoji,
-                      AppLocalizations.of(context)
-                          .translate(emotion.emotionName),
-                      emotion.date,
-                    ),
-                  );
-                },
-                separatorBuilder: (BuildContext context, int index) =>
-                    verticalSpace(Spacing.points8),
-                itemCount: emotions.length,
-              );
-            }
-          },
-          loading: () => Center(child: CircularProgressIndicator()),
-          error: (error, stack) => Center(child: Text('Error: $error')),
-        ),
+            },
+            separatorBuilder: (BuildContext context, int index) =>
+                verticalSpace(Spacing.points8),
+            itemCount: emotions.length,
+          ),
       ],
     );
   }
 }
 
-class DayFollowUps extends ConsumerWidget {
+class DayFollowUps extends StatelessWidget {
   const DayFollowUps({
     super.key,
     required this.date,
+    required this.followUps,
   });
 
   final DateTime date;
+  final List<FollowUpModel> followUps;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final theme = AppTheme.of(context);
-    final followUpsAsyncValue = ref.watch(followUpNotifierProvider);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -194,103 +198,83 @@ class DayFollowUps extends ConsumerWidget {
           style: TextStyles.h6,
         ),
         verticalSpace(Spacing.points12),
-        followUpsAsyncValue.when(
-          data: (followUpssds) {
-            final followUps = followUpssds
-                .where((followUp) =>
-                    followUp.time.year == date.year &&
-                    followUp.time.month == date.month &&
-                    followUp.time.day == date.day)
-                .toList();
-
-            if (followUps.isEmpty) {
-              return Column(
-                children: [
-                  Container(
-                    width: MediaQuery.of(context).size.width - 32,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          AppLocalizations.of(context)
-                              .translate('no-follow-ups'),
-                          style: TextStyles.footnote,
-                        )
-                      ],
-                    ),
-                  ),
-                  verticalSpace(Spacing.points12),
-                  GestureDetector(
-                    onTap: () {
-                      showModalBottomSheet<void>(
-                          context: context,
-                          isScrollControlled: true,
-                          builder: (BuildContext context) {
-                            return FollowUpSheet(date);
-                          });
-                    },
-                    child: WidgetsContainer(
-                      backgroundColor: theme.backgroundColor,
-                      borderSide:
-                          BorderSide(color: theme.grey[900]!, width: 0.25),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Color.fromRGBO(9, 30, 66, 0.25),
-                          blurRadius: 8,
-                          spreadRadius: -2,
-                          offset: Offset(
-                            0,
-                            4,
-                          ),
-                        ),
-                        BoxShadow(
-                          color: Color.fromRGBO(9, 30, 66, 0.08),
-                          blurRadius: 0,
-                          spreadRadius: 1,
-                          offset: Offset(
-                            0,
-                            0,
-                          ),
-                        ),
-                      ],
-                      child: Center(
-                        child: Text(
-                          AppLocalizations.of(context)
-                              .translate('add-follow-ups'),
-                          style:
-                              TextStyles.h6.copyWith(color: theme.primary[600]),
-                        ),
+        if (followUps.isEmpty)
+          Column(
+            children: [
+              Container(
+                width: MediaQuery.of(context).size.width - 32,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      AppLocalizations.of(context).translate('no-follow-ups'),
+                      style: TextStyles.footnote,
+                    )
+                  ],
+                ),
+              ),
+              verticalSpace(Spacing.points12),
+              GestureDetector(
+                onTap: () {
+                  showModalBottomSheet<void>(
+                      context: context,
+                      isScrollControlled: true,
+                      builder: (BuildContext context) {
+                        return FollowUpSheet(date);
+                      });
+                },
+                child: WidgetsContainer(
+                  backgroundColor: theme.backgroundColor,
+                  borderSide: BorderSide(color: theme.grey[900]!, width: 0.25),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Color.fromRGBO(9, 30, 66, 0.25),
+                      blurRadius: 8,
+                      spreadRadius: -2,
+                      offset: Offset(
+                        0,
+                        4,
                       ),
                     ),
-                  ),
-                ],
-              );
-            } else {
-              return ListView.separated(
-                shrinkWrap:
-                    true, // This makes the ListView take up only the needed space
-                physics: NeverScrollableScrollPhysics(),
-                itemBuilder: (BuildContext context, int index) {
-                  final followUp = followUps[index];
-                  return DailyRecordWidget(
-                    dailyRecord: DailyRecord(
-                      (index + 1).toString(),
-                      AppLocalizations.of(context)
-                          .translate(followUp.type.name),
-                      followUp.time,
+                    BoxShadow(
+                      color: Color.fromRGBO(9, 30, 66, 0.08),
+                      blurRadius: 0,
+                      spreadRadius: 1,
+                      offset: Offset(
+                        0,
+                        0,
+                      ),
                     ),
-                  );
-                },
-                separatorBuilder: (BuildContext context, int index) =>
-                    verticalSpace(Spacing.points8),
-                itemCount: followUps.length,
+                  ],
+                  child: Center(
+                    child: Text(
+                      AppLocalizations.of(context).translate('add-follow-ups'),
+                      style: TextStyles.h6.copyWith(color: theme.primary[600]),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          )
+        else
+          ListView.separated(
+            shrinkWrap: true,
+            physics: NeverScrollableScrollPhysics(),
+            itemBuilder: (BuildContext context, int index) {
+              final followUp = followUps[index];
+              return DailyRecordWidget(
+                dailyRecord: DailyRecord(
+                  (index + 1).toString(),
+                  followUp.type.name,
+                  followUp.time,
+                ),
               );
-            }
-          },
-          loading: () => Center(child: CircularProgressIndicator()),
-          error: (error, stack) => Center(child: Text('Error: $error')),
-        ),
+            },
+            separatorBuilder: (BuildContext context, int index) =>
+                verticalSpace(Spacing.points8),
+            itemCount: followUps.length,
+          ),
       ],
     );
   }
@@ -306,8 +290,54 @@ class DailyRecordWidget extends ConsumerWidget {
     final locale = ref.watch(localeNotifierProvider);
     return WidgetsContainer(
       padding: EdgeInsets.fromLTRB(12, 10, 12, 10),
-      backgroundColor: theme.primary[50],
-      borderSide: BorderSide(color: theme.primary[100]!),
+      backgroundColor: theme.backgroundColor,
+      boxShadow: Shadows.mainShadows,
+      borderSide: BorderSide(width: 0.25, color: theme.grey[100]!),
+      borderRadius: BorderRadius.circular(8),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          // Text(
+          //   dailyRecord.heading,
+          //   style: TextStyles.h6.copyWith(color: theme.grey[900], fontSize: 18),
+          // ),
+          Container(
+            width: 16,
+            height: 16,
+            decoration: BoxDecoration(
+              color: followUpNamesColors[dailyRecord.title]!,
+              shape: BoxShape.circle,
+            ),
+          ),
+          horizontalSpace(Spacing.points12),
+          Text(
+            AppLocalizations.of(context).translate(dailyRecord.title),
+            style: TextStyles.bodyLarge.copyWith(color: theme.grey[800]),
+          ),
+          Spacer(),
+          Text(
+            getDisplayTime(dailyRecord.time, locale!.languageCode),
+            style: TextStyles.footnoteSelected.copyWith(color: theme.grey[900]),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class EmotionDailyRecordWidget extends ConsumerWidget {
+  const EmotionDailyRecordWidget({super.key, required this.dailyRecord});
+
+  final DailyRecord dailyRecord;
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = AppTheme.of(context);
+    final locale = ref.watch(localeNotifierProvider);
+    return WidgetsContainer(
+      padding: EdgeInsets.fromLTRB(12, 10, 12, 10),
+      backgroundColor: theme.backgroundColor,
+      boxShadow: Shadows.mainShadows,
+      borderSide: BorderSide(width: 0.25, color: theme.grey[100]!),
       borderRadius: BorderRadius.circular(8),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -318,7 +348,7 @@ class DailyRecordWidget extends ConsumerWidget {
           ),
           horizontalSpace(Spacing.points12),
           Text(
-            dailyRecord.title,
+            AppLocalizations.of(context).translate(dailyRecord.title),
             style: TextStyles.bodyLarge.copyWith(color: theme.grey[800]),
           ),
           Spacer(),

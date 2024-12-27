@@ -74,6 +74,22 @@ class FollowUpRepository {
     return querySnapshot.docs.map((doc) => FollowUpModel.fromDoc(doc)).toList();
   }
 
+  /// Read all follow-ups for a specific date.
+  Future<List<FollowUpModel>> readFollowUpsByDate(DateTime date) async {
+    final uid = _getUserId();
+    if (uid == null) throw Exception('User not logged in');
+    final querySnapshot = await _firestore
+        .collection('users')
+        .doc(uid)
+        .collection('followUps')
+        .where('time',
+            isGreaterThanOrEqualTo: DateTime(date.year, date.month, date.day))
+        .where('time',
+            isLessThan: DateTime(date.year, date.month, date.day + 1))
+        .get();
+    return querySnapshot.docs.map((doc) => FollowUpModel.fromDoc(doc)).toList();
+  }
+
   /// Update an existing follow-up.
   Future<void> updateFollowUp({
     required FollowUpModel followUp,

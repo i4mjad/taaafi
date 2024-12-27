@@ -212,25 +212,73 @@ class _UpdateUserProfileModalSheetState
                   },
                 ),
                 Spacer(),
-                GestureDetector(
-                  onTap: () {
-                    _showConfirmationDialog(context);
-                  },
-                  child: WidgetsContainer(
-                    backgroundColor: theme.primary[600],
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          AppLocalizations.of(context)
-                              .translate('update-profile'),
-                          style: TextStyles.caption
-                              .copyWith(color: theme.grey[50]),
+                Row(
+                  children: [
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () {
+                          _showConfirmationDialog(context);
+                        },
+                        child: WidgetsContainer(
+                          backgroundColor: theme.primary[600],
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                AppLocalizations.of(context)
+                                    .translate('update-profile'),
+                                style: TextStyles.caption
+                                    .copyWith(color: theme.grey[50]),
+                              ),
+                            ],
+                          ),
                         ),
-                      ],
+                      ),
                     ),
-                  ),
+                    horizontalSpace(Spacing.points8),
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () {
+                          Navigator.pop(context);
+                        },
+                        child: WidgetsContainer(
+                          borderRadius: BorderRadius.circular(10),
+                          backgroundColor: theme.backgroundColor,
+                          borderSide:
+                              BorderSide(color: theme.grey[600]!, width: 0.25),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Color.fromRGBO(50, 50, 93, 0.25),
+                              blurRadius: 5,
+                              spreadRadius: -1,
+                              offset: Offset(
+                                0,
+                                2,
+                              ),
+                            ),
+                            BoxShadow(
+                              color: Color.fromRGBO(0, 0, 0, 0.3),
+                              blurRadius: 3,
+                              spreadRadius: -1,
+                              offset: Offset(
+                                0,
+                                1,
+                              ),
+                            ),
+                          ],
+                          child: Center(
+                            child: Text(
+                              AppLocalizations.of(context).translate('cancel'),
+                              style: TextStyles.caption.copyWith(
+                                color: theme.grey[900],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
                 verticalSpace(Spacing.points36)
               ],

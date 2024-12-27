@@ -31,6 +31,11 @@ class FollowUpService {
     return await _repository.readAllFollowUps();
   }
 
+  /// Retrieves all follow-ups for a specific date.
+  Future<List<FollowUpModel>> getFollowUpsByDate(DateTime date) async {
+    return await _repository.readFollowUpsByDate(date);
+  }
+
   /// Updates an existing follow-up.
   Future<void> updateFollowUp({
     required FollowUpModel followUp,

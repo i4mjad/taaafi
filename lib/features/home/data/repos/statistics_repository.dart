@@ -119,15 +119,47 @@ class StatisticsRepository {
   /// Calculate the days without relapse.
   Future<int> calculateDaysWithoutRelapse() async {
     final userFirstDate = await getUserFirstDate();
-    final relapseFollowUps = await readFollowUpsByType(FollowUpType.relapse);
+    final allFollowUps = await readAllFollowUps();
+    final relapseFollowUps = allFollowUps
+        .where((followUp) => followUp.type == FollowUpType.relapse)
+        .toList();
 
-    if (relapseFollowUps.isEmpty) {
-      return DateTime.now().difference(_onlyDate(userFirstDate)).inDays;
-    } else {
-      relapseFollowUps.sort((a, b) => b.time.compareTo(a.time));
-      final lastFollowUpDate = _onlyDate(relapseFollowUps.first.time);
-      return DateTime.now().difference(lastFollowUpDate).inDays;
+    int daysWithoutRelapses = 0;
+    DateTime currentDate = _onlyDate(userFirstDate);
+
+    while (currentDate.isBefore(DateTime.now())) {
+      final hasRelapse = relapseFollowUps
+          .any((followUp) => _onlyDate(followUp.time) == currentDate);
+      if (!hasRelapse) {
+        daysWithoutRelapses++;
+      }
+      currentDate = currentDate.add(Duration(days: 1));
     }
+
+    return daysWithoutRelapses;
+  }
+
+  /// Calculate the number of days from the first date until today that do not have any follow-up of type relapse.
+  Future<int> calculateDaysWithoutRelapses() async {
+    final userFirstDate = await getUserFirstDate();
+    final allFollowUps = await readAllFollowUps();
+    final relapseFollowUps = allFollowUps
+        .where((followUp) => followUp.type == FollowUpType.relapse)
+        .toList();
+
+    int daysWithoutRelapses = 0;
+    DateTime currentDate = _onlyDate(userFirstDate);
+
+    while (currentDate.isBefore(DateTime.now())) {
+      final hasRelapse = relapseFollowUps
+          .any((followUp) => _onlyDate(followUp.time) == currentDate);
+      if (!hasRelapse) {
+        daysWithoutRelapses++;
+      }
+      currentDate = currentDate.add(Duration(days: 1));
+    }
+
+    return daysWithoutRelapses;
   }
 
   Future<List<FollowUpModel>> readFollowUpsByType(FollowUpType type) async {

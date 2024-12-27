@@ -6,7 +6,7 @@ part of 'emotion_notifier.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$emotionServiceHash() => r'2b6b7e5acb37033a3930c6de7e08126fea1fc3cd';
+String _$emotionServiceHash() => r'16746dd008b4805e91a0be2550fa39f4cf356ab4';
 
 /// See also [emotionService].
 @ProviderFor(emotionService)
@@ -21,7 +21,7 @@ final emotionServiceProvider = Provider<EmotionService>.internal(
 );
 
 typedef EmotionServiceRef = ProviderRef<EmotionService>;
-String _$emotionNotifierHash() => r'1d3aa55a0780f669018f413cae8a385edf92f234';
+String _$emotionNotifierHash() => r'4497635a480528e1592a90e028f13aa311094db4';
 
 /// See also [EmotionNotifier].
 @ProviderFor(EmotionNotifier)

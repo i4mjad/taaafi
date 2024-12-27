@@ -8,3 +8,11 @@ final followUpColors = {
   FollowUpType.slipUp: Color(0xFF5F8A8D),
   FollowUpType.none: Colors.green,
 };
+
+final followUpNamesColors = {
+  FollowUpType.relapse.name: Colors.grey,
+  FollowUpType.pornOnly.name: Colors.purple,
+  FollowUpType.mastOnly.name: Color(0xFFD9AF9B),
+  FollowUpType.slipUp.name: Color(0xFF5F8A8D),
+  FollowUpType.none.name: Colors.green,
+};
