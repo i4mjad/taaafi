@@ -49,7 +49,7 @@ class _DiaryScreenState extends ConsumerState<DiaryScreen> {
         }
 
         doc = Document.fromDelta(delta);
-      } catch (e, stackTrace) {
+      } catch (e) {
         doc = Document()..insert(0, diary.plainText);
       }
     } else {
