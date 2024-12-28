@@ -192,14 +192,15 @@ class _DiaryScreenState extends ConsumerState<DiaryScreen> {
                                 focusNode: _focusNode,
                                 scrollController: ScrollController(),
                                 configurations: QuillEditorConfigurations(
-                                  onTapOutside: (event, focusNode) {
-                                    if (event.position.dy <
-                                        MediaQuery.of(context).size.height -
-                                            150) {
-                                      focusNode.unfocus();
-                                    }
-                                  },
                                   autoFocus: false,
+                                  onTapOutside: (event, focusNode) {
+                                    _controller.updateSelection(
+                                      TextSelection.collapsed(
+                                          offset:
+                                              _controller.selection.baseOffset),
+                                      ChangeSource.local,
+                                    );
+                                  },
                                   customStyles: DefaultStyles(
                                     paragraph: DefaultTextBlockStyle(
                                       TextStyles.body

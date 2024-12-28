@@ -176,7 +176,7 @@ class DiaryWidget extends ConsumerWidget {
                     Text(
                       diary.plainText,
                       style: TextStyles.small.copyWith(color: theme.grey[700]),
-                      maxLines: 3,
+                      maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
                   ],
