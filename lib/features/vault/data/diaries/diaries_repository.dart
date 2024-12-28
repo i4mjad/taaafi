@@ -92,6 +92,7 @@ class FirebaseDiariesRepository implements DiariesRepository {
         'title': diary.title,
         'body': diary.plainText,
         'formattedContent': diary.formattedContent,
+        'timestamp': Timestamp.fromDate(diary.date),
         'updatedAt': FieldValue.serverTimestamp(),
       });
     } catch (e) {

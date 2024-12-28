@@ -501,21 +501,12 @@ class _DiaryScreenState extends ConsumerState<DiaryScreen> {
       leadingWidth: 16,
       automaticallyImplyLeading: true,
       actions: [
-        if (_isKeyboardVisible)
-          GestureDetector(
-            onTap: () {
-              _focusNode.unfocus();
-            },
-            child: Padding(
-              padding: const EdgeInsets.only(right: 16),
-              child: Icon(LucideIcons.doorClosed),
-            ),
-          ),
         GestureDetector(
           onTap: () {
             showModalBottomSheet<void>(
               context: context,
               isScrollControlled: true,
+              useSafeArea: true,
               builder: (BuildContext context) {
                 return DiarySettingsSheet(diary);
               },
