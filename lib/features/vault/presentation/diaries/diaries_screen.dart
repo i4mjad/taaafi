@@ -65,18 +65,15 @@ class _DiariesScreenState extends ConsumerState<DiariesScreen> {
                 children: [
                   Row(
                     children: [
-                      Padding(
-                        padding: const EdgeInsets.all(1.0),
-                        child: CustomTextField(
-                          controller: searchController,
-                          prefixIcon: LucideIcons.search,
-                          inputType: TextInputType.text,
-                          width: width * 0.75,
-                          validator: (value) => null,
-                        ),
+                      CustomTextField(
+                        controller: searchController,
+                        prefixIcon: LucideIcons.search,
+                        inputType: TextInputType.text,
+                        width: width - 32,
+                        validator: (value) => null,
                       ),
-                      horizontalSpace(Spacing.points24),
-                      Icon(LucideIcons.slidersHorizontal)
+                      // horizontalSpace(Spacing.points24),
+                      // Icon(LucideIcons.slidersHorizontal)
                     ],
                   ),
                   verticalSpace(Spacing.points16),
