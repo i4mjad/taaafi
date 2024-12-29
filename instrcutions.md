@@ -1,12 +1,6 @@
-Sure, I’ve updated your `.md` file based on your comments. Below is the revised version incorporating all your specifications:
+## Implementation Guidelines
 
----
-
-### Implementation Guidelines
-
-### Overview
-
-This document guides AI tools to implement any feature in this app. I'm using Firebase as my backend.
+### Overview: This document guides AI tools to implement any feature in this app. I'm using Firebase as my backend.
 
 1. **Project Architecture**:
    Each feature in the app should follow a three-layer architecture:
@@ -126,21 +120,8 @@ This document guides AI tools to implement any feature in this app. I'm using Fi
 2. **Error Handling**:
 
    - Always wrap Firestore operations in try-catch blocks.
-   - Use predefined snackbars from `lib/core/shared_widgets/snackbar.dart`.
    - Propagate errors up through the layers appropriately.
    - **Future Implementation**: Structure code to facilitate easy addition of error logging in the future.
-   - Errors should be shown through a snackbar with a proper, translated message.
-   - Example usage:
-
-   ```dart
-   try {
-       // Firestore operation
-   } catch (e, st) {
-       // Show error snackbar with a translated message
-       showErrorSnackbar(AppLocalization.of(context).translate('error_message_key'));
-       // Optionally rethrow or handle the error
-   }
-   ```
 
 3. **UI Guidelines**:
 
@@ -200,26 +181,3 @@ This document guides AI tools to implement any feature in this app. I'm using Fi
 9. **Testing**:
 
    - _Testing guidelines are not required at this time._
-
----
-
-### Additional Recommendations
-
-2. **Documentation Standards:**
-
-   - Encourage writing comprehensive documentation for each feature, including API contracts, data models, and usage instructions.
-
-3. **Code Quality:**
-
-   - Recommend using linters and formatters to maintain code quality and consistency across the project.
-
-4. **Dependency Management:**
-
-   - Provide instructions on managing dependencies, including version constraints and updates.
-
-5. **Deployment Guidelines:**
-
-   - Outline steps for deploying new features, including any necessary configurations or migrations.
-
-6. **Security Best Practices:**
-   - Beyond Firestore security rules, address other security aspects such as authentication, authorization, and data encryption.

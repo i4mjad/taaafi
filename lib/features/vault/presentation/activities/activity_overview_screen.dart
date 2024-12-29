@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:go_router/go_router.dart';
 import 'package:reboot_app_3/core/helpers/date_display_formater.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
+import 'package:reboot_app_3/core/routing/route_names.dart';
 import 'package:reboot_app_3/core/shared_widgets/app_bar.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
 import 'package:reboot_app_3/core/shared_widgets/custom_textfield.dart';
@@ -10,6 +12,9 @@ import 'package:reboot_app_3/core/shared_widgets/snackbar.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
+import 'package:reboot_app_3/features/vault/application/activities/activity_details_provider.dart';
+import 'package:reboot_app_3/features/vault/application/activities/activity_notifier.dart';
+import 'package:reboot_app_3/features/vault/data/activities/activity.dart';
 import 'package:reboot_app_3/features/vault/data/activities/activity_task.dart';
 import 'package:reboot_app_3/features/vault/presentation/activities/shared_widgets/task_widget.dart';
 
@@ -21,139 +26,115 @@ class ActivityOverviewScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = AppTheme.of(context);
-    final width = MediaQuery.of(context).size.width;
-    final height = MediaQuery.of(context).size.height;
+    final activityState = ref.watch(activityDetailsProvider(activityId));
 
-    var records = [
-      ActivityTask(
-          "1",
-          'كتابة اليوميات',
-          "تدوين الرحلة",
-          "1",
-          true,
-          DateTime(2024, 5, 2),
-          "هذا توصيف للمهمة التي تم اختيارها في الصفحة السابقة، يتم عرض توضيح للفائدة المرجوة من هذه المهمة هنا في هذا النص. كما سيتم إضافة بعض الروابط عن المهمة إن تطلب ذلك"),
-      ActivityTask("2", 'كتابة اليوميات', "تدوين الرحلة", "12", false,
-          DateTime(2024, 5, 2), ""),
-      ActivityTask("3", 'كتابة اليوميات', "تدوين الرحلة", "134", false,
-          DateTime(2024, 5, 2), ""),
-    ];
-
-    return Scaffold(
-      backgroundColor: theme.backgroundColor,
-      appBar: plainAppBar(context, ref, activityId, false, true),
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Container(
-            width: width,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                ActivityDescriptionAndStatisticsWidget(),
-                verticalSpace(Spacing.points16),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Text(
-                      AppLocalizations.of(context).translate('activity-tasks'),
-                      style: TextStyles.h6,
-                    ),
-                    verticalSpace(Spacing.points8),
-                    SizedBox(
-                      height: height * 0.336,
-                      child: ListView.separated(
-                        itemBuilder: (BuildContext context, int index) {
-                          return TaskWidget(
-                            records[index],
-                          );
-                        },
-                        separatorBuilder: (BuildContext context, int index) =>
-                            verticalSpace(Spacing.points8),
-                        itemCount: records.length,
+    return activityState.when(
+      data: (activity) {
+        return Scaffold(
+          backgroundColor: theme.backgroundColor,
+          appBar: plainAppBar(context, ref, activity.name, false, true),
+          body: SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  ActivityDescriptionWidget(activity: activity),
+                  verticalSpace(Spacing.points16),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Text(
+                        AppLocalizations.of(context)
+                            .translate('activity-tasks'),
+                        style: TextStyles.h6.copyWith(
+                          color: theme.grey[900],
+                        ),
                       ),
-                    )
-                  ],
-                ),
-                Spacer(),
-                GestureDetector(
-                  onTap: () {
-                    showModalBottomSheet<void>(
+                      verticalSpace(Spacing.points8),
+                      ListView.separated(
+                        shrinkWrap: true,
+                        physics: NeverScrollableScrollPhysics(),
+                        itemCount: activity.tasks.length,
+                        separatorBuilder: (_, __) =>
+                            verticalSpace(Spacing.points8),
+                        itemBuilder: (context, index) => TaskWidget(
+                          activity.tasks[index],
+                        ),
+                      ),
+                      verticalSpace(Spacing.points16),
+                    ],
+                  ),
+                  Spacer(),
+                  GestureDetector(
+                    onTap: () {
+                      showModalBottomSheet<void>(
                         context: context,
                         isScrollControlled: true,
                         builder: (BuildContext context) {
                           return AddTheActivitySheet(activityId);
-                        });
-                  },
-                  child: WidgetsContainer(
-                    backgroundColor: theme.primary[700],
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
+                        },
+                      );
+                    },
+                    child: WidgetsContainer(
+                      backgroundColor: theme.primary[400],
+                      boxShadow: Shadows.mainShadows,
+                      borderSide:
+                          BorderSide(color: theme.grey[600]!, width: 0.5),
+                      width: MediaQuery.of(context).size.width,
+                      padding: EdgeInsets.all(16),
+                      child: Center(
+                        child: Text(
                           AppLocalizations.of(context)
-                              .translate("add-the-activity"),
-                          style: TextStyles.body.copyWith(
-                            color: theme.grey[50],
-                          ),
+                              .translate('add-the-activity'),
+                          style: TextStyles.body,
                         ),
-                      ],
+                      ),
                     ),
                   ),
-                )
-              ],
+                ],
+              ),
             ),
           ),
-        ),
+        );
+      },
+      loading: () => Scaffold(
+        backgroundColor: theme.backgroundColor,
+        body: const Center(child: CircularProgressIndicator()),
+      ),
+      error: (error, _) => Scaffold(
+        backgroundColor: theme.backgroundColor,
+        body: Center(child: Text(error.toString())),
       ),
     );
   }
 }
 
-class ActivityDescriptionAndStatisticsWidget extends ConsumerWidget {
-  const ActivityDescriptionAndStatisticsWidget({
+class ActivityDescriptionWidget extends StatelessWidget {
+  const ActivityDescriptionWidget({
+    required this.activity,
     super.key,
   });
 
+  final Activity activity;
+
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final theme = AppTheme.of(context);
-    final width = MediaQuery.of(context).size.width;
-    final height = MediaQuery.of(context).size.height;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisAlignment: MainAxisAlignment.start,
       children: [
         WidgetsContainer(
           backgroundColor: theme.backgroundColor,
-          padding: EdgeInsets.fromLTRB(16, 12, 16, 12),
-          borderSide: BorderSide(color: theme.grey[600]!, width: 0.5),
-          boxShadow: [
-            BoxShadow(
-              color: Color.fromRGBO(50, 50, 93, 0.25),
-              blurRadius: 5,
-              spreadRadius: -1,
-              offset: Offset(
-                0,
-                2,
-              ),
-            ),
-            BoxShadow(
-              color: Color.fromRGBO(0, 0, 0, 0.3),
-              blurRadius: 3,
-              spreadRadius: -1,
-              offset: Offset(
-                0,
-                1,
-              ),
-            ),
-          ],
-          width: width,
+          width: MediaQuery.of(context).size.width,
+          boxShadow: Shadows.mainShadows,
+          borderSide: BorderSide(color: theme.grey[600]!, width: 0.25),
+          padding: EdgeInsets.all(16),
           child: Text(
-            'هذا توصيف للقائمة والفكرة منها وطبيعة المحتوى الموجود في هذه القائمة. مثال: قائمة كيف أبدأ تحتوي على بعض المصادر لمساعدة المتعافي للبدء في التعافي وكيف يدخل لهذا العالم. سيتم إضافة التوصيف عند إضافة القائمة.',
+            activity.description,
             style: TextStyles.small.copyWith(
               color: theme.grey[900],
             ),
@@ -168,7 +149,8 @@ class ActivityDescriptionAndStatisticsWidget extends ConsumerWidget {
                 Icon(LucideIcons.lineChart, color: theme.primary[600]),
                 verticalSpace(Spacing.points4),
                 Text(
-                  AppLocalizations.of(context).translate('easy'),
+                  AppLocalizations.of(context)
+                      .translate(activity.difficulty.name),
                   style: TextStyles.small,
                 )
               ],
@@ -178,35 +160,23 @@ class ActivityDescriptionAndStatisticsWidget extends ConsumerWidget {
                 Icon(LucideIcons.users, color: theme.primary[600]),
                 verticalSpace(Spacing.points4),
                 Text(
-                  "2808 " +
-                      AppLocalizations.of(context).translate('subscriber'),
+                  "${activity.subscriberCount} ${AppLocalizations.of(context).translate('subscriber')}",
                   style: TextStyles.small,
                 )
               ],
             ),
             Column(
-              //TODO: this will represent the best period to do this activity
               children: [
                 Icon(LucideIcons.calendarRange, color: theme.primary[600]),
                 verticalSpace(Spacing.points4),
                 Text(
-                  "3 " + AppLocalizations.of(context).translate('month'),
-                  style: TextStyles.small,
-                )
-              ],
-            ),
-            Column(
-              children: [
-                Icon(LucideIcons.panelLeftInactive, color: theme.primary[600]),
-                verticalSpace(Spacing.points4),
-                Text(
-                  AppLocalizations.of(context).translate('all-levels'),
+                  "3 ${AppLocalizations.of(context).translate('month')}",
                   style: TextStyles.small,
                 )
               ],
             ),
           ],
-        )
+        ),
       ],
     );
   }
@@ -231,7 +201,7 @@ class TaskDescriptionSheet extends ConsumerWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(task.taskName,
+              Text(task.name,
                   style: TextStyles.h6.copyWith(color: theme.grey[900])),
               GestureDetector(
                 onTap: () {
@@ -376,6 +346,29 @@ class _AddTheActivitySheetState extends ConsumerState<AddTheActivitySheet> {
             activityEndingDateTime = pickedEnding.date;
           });
         }
+      }
+    }
+  }
+
+  Future<void> _handleSubscribe() async {
+    if (!_formKey.currentState!.validate()) {
+      getErrorSnackBar(context, "please-add-all-required-data");
+      return;
+    }
+
+    try {
+      await ref.read(activityNotifierProvider.notifier).subscribeToActivity(
+            widget.activityId,
+            activityStartingDateTime,
+            activityEndingDateTime,
+          );
+
+      if (context.mounted) {
+        context.goNamed(RouteNames.activities.name);
+      }
+    } catch (e) {
+      if (context.mounted) {
+        getErrorSnackBar(context, e.toString());
       }
     }
   }
@@ -535,15 +528,7 @@ class _AddTheActivitySheetState extends ConsumerState<AddTheActivitySheet> {
             ),
             verticalSpace(Spacing.points16),
             GestureDetector(
-              onTap: () {
-                if (!_formKey.currentState!.validate()) {
-                  getErrorSnackBar(context, "please-add-all-required-data");
-                } else {
-                  print(widget.activityId);
-                  print(activityStartingDateTime);
-                  print(activityEndingDateTime);
-                }
-              },
+              onTap: _handleSubscribe,
               child: WidgetsContainer(
                 backgroundColor: theme.primary[600],
                 child: Row(

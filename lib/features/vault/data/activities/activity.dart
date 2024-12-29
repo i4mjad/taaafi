@@ -1,16 +1,48 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:reboot_app_3/features/vault/data/activities/activity_task.dart';
+
+enum Difficulty { easy, medium, intermediate }
+
 class Activity {
-  //TODO: this is inital strcture, do update it when you work in the Activities feature
   final String id;
   final String name;
-  final Difficulties difficulty;
-  final String describition;
-  final DateTime subscribeDate;
-  final List<UsersLevels> levels;
+  final String description;
+  final Difficulty difficulty;
+  final List<ActivityTask> tasks;
+  final int subscriberCount;
 
-  Activity(this.id, this.name, this.difficulty, this.describition,
-      this.subscribeDate, this.levels);
+  Activity({
+    required this.id,
+    required this.name,
+    required this.description,
+    required this.difficulty,
+    required this.tasks,
+    this.subscriberCount = 0,
+  });
+
+  /// Creates an Activity from a Firestore document
+  factory Activity.fromFirestore(DocumentSnapshot doc) {
+    final data = doc.data() as Map<String, dynamic>;
+    return Activity(
+      id: doc.id,
+      name: data['activityName'] as String,
+      description: data['activityDescription'] as String,
+      difficulty: _difficultyFromString(data['activityDifficulty'] as String),
+      tasks: [], // Tasks are loaded separately from subcollection
+      subscriberCount: data['subscriberCount'] as int? ?? 0,
+    );
+  }
+
+  static Difficulty _difficultyFromString(String difficulty) {
+    switch (difficulty.toLowerCase()) {
+      case 'easy':
+        return Difficulty.easy;
+      case 'medium':
+        return Difficulty.medium;
+      case 'intermediate':
+        return Difficulty.intermediate;
+      default:
+        throw ArgumentError('Invalid difficulty: $difficulty');
+    }
+  }
 }
-
-enum Difficulties { easy, medium, hard }
-
-enum UsersLevels { starter, intermediate, advanced, expert }

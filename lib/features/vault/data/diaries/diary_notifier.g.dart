@@ -6,7 +6,22 @@ part of 'diary_notifier.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$diaryNotifierHash() => r'6e1d109de49e4c584f3d0bddf164eab3a30514cf';
+String _$diariesServiceHash() => r'e8e29332a823cff24c81a6756a4a011cf27d3acc';
+
+/// See also [diariesService].
+@ProviderFor(diariesService)
+final diariesServiceProvider = AutoDisposeProvider<DiariesService>.internal(
+  diariesService,
+  name: r'diariesServiceProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$diariesServiceHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef DiariesServiceRef = AutoDisposeProviderRef<DiariesService>;
+String _$diaryNotifierHash() => r'fc8e4a9ad4634270c8ef323b2ad5c08bb4489fbb';
 
 /// Copied from Dart SDK
 class _SystemHash {

@@ -2,98 +2,92 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
+import 'package:reboot_app_3/core/shared_widgets/snackbar.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
+import 'package:reboot_app_3/features/vault/application/activities/ongoing_activity_details_provider.dart';
 import 'package:reboot_app_3/features/vault/data/activities/activity_task.dart';
+import 'package:reboot_app_3/features/vault/data/activities/ongoing_activity_task.dart';
 
-class DayTaskWidget extends ConsumerStatefulWidget {
-  const DayTaskWidget(this.dailyRecord, {super.key});
-  final ActivityTask dailyRecord;
+class DayTaskWidget extends ConsumerWidget {
+  const DayTaskWidget(
+    this.task, {
+    required this.activityId,
+    super.key,
+  });
 
-  @override
-  ConsumerState<ConsumerStatefulWidget> createState() =>
-      _DayActivityWidgetState();
-}
-
-class _DayActivityWidgetState extends ConsumerState<DayTaskWidget> {
-  bool isLinkedToADiary = false;
-
-  @override
-  void initState() {
-    super.initState();
-    isLinkedToADiary = widget.dailyRecord.isLinkedToADiary;
-  }
+  final OngoingActivityTask task;
+  final String activityId;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = AppTheme.of(context);
-    final locale = ref.watch(localeNotifierProvider);
 
     return WidgetsContainer(
-      padding: EdgeInsets.fromLTRB(8, 6, 8, 6),
       backgroundColor: theme.backgroundColor,
-      borderSide: BorderSide(
-        color: theme.grey[600]!,
-        width: 0.25,
-      ),
-      boxShadow: [
-        BoxShadow(
-          color: Color.fromRGBO(60, 64, 67, 0.3),
-          blurRadius: 2,
-          spreadRadius: 0,
-          offset: Offset(
-            0,
-            1,
-          ),
-        ),
-        BoxShadow(
-          color: Color.fromRGBO(60, 64, 67, 0.15),
-          blurRadius: 6,
-          spreadRadius: 2,
-          offset: Offset(
-            0,
-            2,
-          ),
-        ),
-      ],
-      borderRadius: BorderRadius.circular(8),
+      padding: EdgeInsets.fromLTRB(16, 12, 16, 12),
+      borderSide: BorderSide(color: theme.grey[600]!, width: 0.5),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Text(
-            widget.dailyRecord.id,
-            style: TextStyles.h6.copyWith(color: theme.grey[900], fontSize: 18),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  task.task.name,
+                  style: TextStyles.footnoteSelected.copyWith(
+                    color: theme.grey[900],
+                  ),
+                ),
+                verticalSpace(Spacing.points4),
+                Text(
+                  _getFrequencyText(context, task.task.frequency),
+                  style: TextStyles.small.copyWith(
+                    color: theme.grey[700],
+                  ),
+                ),
+              ],
+            ),
           ),
-          horizontalSpace(Spacing.points12),
-          Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                widget.dailyRecord.taskName,
-                style: TextStyles.body.copyWith(color: theme.grey[900]),
-              ),
-              // verticalSpace(Spacing.points4),
-              Text(
-                widget.dailyRecord.activityName,
-                style: TextStyles.small.copyWith(color: theme.grey[600]),
-              ),
-            ],
-          ),
-          Spacer(),
           Checkbox(
-            value: isLinkedToADiary,
-            checkColor: theme.grey[50],
-            activeColor: theme.success[600],
-            onChanged: (value) {
-              setState(() {
-                isLinkedToADiary = !isLinkedToADiary;
-              });
+            value: task.isCompleted,
+            onChanged: (bool? value) async {
+              try {
+                print(
+                    'Attempting to update scheduled task: ${task.scheduledTaskId}');
+                print('Activity ID: $activityId');
+                print('Current completion status: ${task.isCompleted}');
+                print('New completion status: ${value ?? false}');
+
+                await ref
+                    .read(ongoingActivityDetailsNotifierProvider(activityId)
+                        .notifier)
+                    .updateTaskCompletion(task.scheduledTaskId, value ?? false);
+
+                print('Task update completed successfully');
+              } catch (e) {
+                print('Error updating task: $e');
+                if (context.mounted) {
+                  getErrorSnackBar(context, e.toString());
+                }
+              }
             },
+            activeColor: theme.primary[600],
           ),
         ],
       ),
     );
+  }
+
+  String _getFrequencyText(BuildContext context, TaskFrequency frequency) {
+    switch (frequency) {
+      case TaskFrequency.daily:
+        return AppLocalizations.of(context).translate('daily');
+      case TaskFrequency.weekly:
+        return AppLocalizations.of(context).translate('weekly');
+      case TaskFrequency.monthly:
+        return AppLocalizations.of(context).translate('monthly');
+    }
   }
 }

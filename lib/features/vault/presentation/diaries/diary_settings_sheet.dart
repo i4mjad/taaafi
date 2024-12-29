@@ -104,14 +104,7 @@ class _DiarySettingsSheetState extends ConsumerState<DiarySettingsSheet> {
     final theme = AppTheme.of(context);
     final locale = ref.watch(localeNotifierProvider);
 
-    var records = [
-      ActivityTask("1", 'كتابة اليوميات', "تدوين الرحلة", "1", true,
-          DateTime(2024, 5, 2), ""),
-      ActivityTask("2", 'كتابة اليوميات', "تدوين الرحلة", "12", false,
-          DateTime(2024, 5, 2), ""),
-      ActivityTask("3", 'كتابة اليوميات', "تدوين الرحلة", "134", false,
-          DateTime(2024, 5, 2), ""),
-    ];
+    List<ActivityTask> records = [];
     return Container(
       color: theme.backgroundColor,
       padding: EdgeInsets.all(16),
@@ -278,8 +271,14 @@ class _DiarySettingsSheetState extends ConsumerState<DiarySettingsSheet> {
 }
 
 class DayActivityWidget extends ConsumerStatefulWidget {
-  const DayActivityWidget(this.dailyRecord, {super.key});
+  const DayActivityWidget(
+    this.dailyRecord, {
+    this.isLinked = false,
+    super.key,
+  });
+
   final ActivityTask dailyRecord;
+  final bool isLinked;
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() =>
@@ -287,12 +286,12 @@ class DayActivityWidget extends ConsumerStatefulWidget {
 }
 
 class _DayActivityWidgetState extends ConsumerState<DayActivityWidget> {
-  bool isLinkedToADiary = false;
+  late bool isLinkedToADiary;
 
   @override
   void initState() {
     super.initState();
-    isLinkedToADiary = widget.dailyRecord.isLinkedToADiary;
+    isLinkedToADiary = widget.isLinked;
   }
 
   @override
@@ -338,12 +337,12 @@ class _DayActivityWidgetState extends ConsumerState<DayActivityWidget> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                widget.dailyRecord.taskName,
+                widget.dailyRecord.name,
                 style: TextStyles.body.copyWith(color: theme.grey[900]),
               ),
               // verticalSpace(Spacing.points4),
               Text(
-                widget.dailyRecord.activityName,
+                widget.dailyRecord.description,
                 style: TextStyles.small.copyWith(color: theme.grey[600]),
               ),
             ],

@@ -20,7 +20,7 @@ lib/
         activities/
 ```
 
-- data folder: this will contain anything related to the data like the models and repositories.
+- data folder: this will contain anything related to the data like the models or repositories.
 - application folder: this will contain anything related to business logic like the services. This could also hold the riverpod notifiers.
 - presentation folder: this will contain all UI-related stuff.
 

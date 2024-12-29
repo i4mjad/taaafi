@@ -9,56 +9,56 @@ import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/features/vault/data/activities/activity_task.dart';
 import 'package:reboot_app_3/features/vault/presentation/activities/shared_widgets/task_widget.dart';
+import 'package:reboot_app_3/features/vault/data/activities/ongoing_activity_details.dart';
+import 'package:reboot_app_3/features/vault/application/activities/ongoing_activity_details_provider.dart';
 
 class OngoingActivitiyScreen extends ConsumerWidget {
-  const OngoingActivitiyScreen(this.ongoingActivitiyId, {super.key});
+  const OngoingActivitiyScreen(this.ongoingActivityId, {super.key});
 
-  final String ongoingActivitiyId;
+  final String ongoingActivityId;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = AppTheme.of(context);
-    final width = MediaQuery.of(context).size.width;
-    final height = MediaQuery.of(context).size.height;
+    final activityState =
+        ref.watch(ongoingActivityDetailsNotifierProvider(ongoingActivityId));
 
-    var records = [
-      ActivityTask(
-          "1",
-          'كتابة اليوميات',
-          "تدوين الرحلة",
-          "1",
-          true,
-          DateTime(2024, 5, 2),
-          "هذا توصيف للمهمة التي تم اختيارها في الصفحة السابقة، يتم عرض توضيح للفائدة المرجوة من هذه المهمة هنا في هذا النص. كما سيتم إضافة بعض الروابط عن المهمة إن تطلب ذلك"),
-      ActivityTask("2", 'كتابة اليوميات', "تدوين الرحلة", "12", false,
-          DateTime(2024, 5, 2), ""),
-      ActivityTask("3", 'كتابة اليوميات', "تدوين الرحلة", "134", false,
-          DateTime(2024, 5, 2), ""),
-    ];
-
-    return Scaffold(
-      backgroundColor: theme.backgroundColor,
-      appBar: appBar(context, ref, ongoingActivitiyId),
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Container(
-            width: width,
-            child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  OngoingActivityDescriptionAndUserStatisticsWidget(),
-                  verticalSpace(Spacing.points16),
-                  OngoingActivityTasksWidget(),
-                  verticalSpace(Spacing.points16),
-                  OngoingActivityPerformanceWidget()
-                ],
+    return activityState.when(
+      data: (details) {
+        return Scaffold(
+          backgroundColor: theme.backgroundColor,
+          appBar: appBar(context, ref, details.activity.name),
+          body: SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    OngoingActivityDescriptionAndUserStatisticsWidget(
+                        details: details),
+                    verticalSpace(Spacing.points16),
+                    OngoingActivityTasksWidget(tasks: details.tasks),
+                    verticalSpace(Spacing.points16),
+                    OngoingActivityPerformanceWidget(
+                      tasks: details.tasks,
+                      performance: details.taskPerformance,
+                    )
+                  ],
+                ),
               ),
             ),
           ),
-        ),
+        );
+      },
+      loading: () => Scaffold(
+        backgroundColor: theme.backgroundColor,
+        body: const Center(child: CircularProgressIndicator()),
+      ),
+      error: (error, _) => Scaffold(
+        backgroundColor: theme.backgroundColor,
+        body: Center(child: Text(error.toString())),
       ),
     );
   }
@@ -90,7 +90,7 @@ class OngoingActivitiyScreen extends ConsumerWidget {
                   context: context,
                   isScrollControlled: true,
                   builder: (BuildContext context) {
-                    return OngoingActivitySettingsSheet(ongoingActivitiyId);
+                    return OngoingActivitySettingsSheet(ongoingActivityId);
                   });
             },
             child: Icon(
@@ -246,12 +246,18 @@ class OngoingActivitySettingsSheet extends ConsumerWidget {
 
 class OngoingActivityPerformanceWidget extends StatelessWidget {
   const OngoingActivityPerformanceWidget({
+    required this.tasks,
+    required this.performance,
     super.key,
   });
+
+  final List<ActivityTask> tasks;
+  final Map<String, List<bool>> performance;
 
   @override
   Widget build(BuildContext context) {
     final theme = AppTheme.of(context);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.start,
@@ -263,17 +269,30 @@ class OngoingActivityPerformanceWidget extends StatelessWidget {
           ),
         ),
         verticalSpace(Spacing.points8),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            OngoingActivityDayPerformanceWidget(true),
-            OngoingActivityDayPerformanceWidget(true),
-            OngoingActivityDayPerformanceWidget(false),
-            OngoingActivityDayPerformanceWidget(true),
-            OngoingActivityDayPerformanceWidget(false),
-            OngoingActivityDayPerformanceWidget(false),
-            OngoingActivityDayPerformanceWidget(true),
-          ],
+        ListView.separated(
+          shrinkWrap: true,
+          physics: NeverScrollableScrollPhysics(),
+          itemCount: tasks.length,
+          separatorBuilder: (_, __) => verticalSpace(Spacing.points8),
+          itemBuilder: (context, index) {
+            final task = tasks[index];
+            final taskPerformance = performance[task.id] ?? [];
+
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(task.name, style: TextStyles.small),
+                verticalSpace(Spacing.points4),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    for (var isCompleted in taskPerformance)
+                      OngoingActivityDayPerformanceWidget(isCompleted),
+                  ],
+                ),
+              ],
+            );
+          },
         )
       ],
     );
@@ -338,29 +357,15 @@ class OngoingActivityDayPerformanceWidget extends StatelessWidget {
 
 class OngoingActivityTasksWidget extends StatelessWidget {
   const OngoingActivityTasksWidget({
+    required this.tasks,
     super.key,
   });
+
+  final List<ActivityTask> tasks;
 
   @override
   Widget build(BuildContext context) {
     final theme = AppTheme.of(context);
-    final width = MediaQuery.of(context).size.width;
-    final height = MediaQuery.of(context).size.height;
-
-    var records = [
-      ActivityTask(
-          "1",
-          'كتابة اليوميات',
-          "تدوين الرحلة",
-          "1",
-          true,
-          DateTime(2024, 5, 2),
-          "هذا توصيف للمهمة التي تم اختيارها في الصفحة السابقة، يتم عرض توضيح للفائدة المرجوة من هذه المهمة هنا في هذا النص. كما سيتم إضافة بعض الروابط عن المهمة إن تطلب ذلك"),
-      ActivityTask("2", 'كتابة اليوميات', "تدوين الرحلة", "12", false,
-          DateTime(2024, 5, 2), ""),
-      ActivityTask("3", 'كتابة اليوميات', "تدوين الرحلة", "134", false,
-          DateTime(2024, 5, 2), ""),
-    ];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -375,13 +380,11 @@ class OngoingActivityTasksWidget extends StatelessWidget {
           shrinkWrap: true,
           physics: NeverScrollableScrollPhysics(),
           itemBuilder: (BuildContext context, int index) {
-            return TaskWidget(
-              records[index],
-            );
+            return TaskWidget(tasks[index]);
           },
           separatorBuilder: (BuildContext context, int index) =>
               verticalSpace(Spacing.points8),
-          itemCount: records.length,
+          itemCount: tasks.length,
         )
       ],
     );
@@ -390,15 +393,17 @@ class OngoingActivityTasksWidget extends StatelessWidget {
 
 class OngoingActivityDescriptionAndUserStatisticsWidget extends ConsumerWidget {
   const OngoingActivityDescriptionAndUserStatisticsWidget({
+    required this.details,
     super.key,
   });
+
+  final OngoingActivityDetails details;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = AppTheme.of(context);
-    final width = MediaQuery.of(context).size.width;
-    final height = MediaQuery.of(context).size.height;
     final locale = ref.watch(localeNotifierProvider);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.start,
@@ -406,29 +411,24 @@ class OngoingActivityDescriptionAndUserStatisticsWidget extends ConsumerWidget {
         WidgetsContainer(
           backgroundColor: theme.backgroundColor,
           padding: EdgeInsets.fromLTRB(16, 12, 16, 12),
+          width: MediaQuery.of(context).size.width,
           borderSide: BorderSide(color: theme.grey[600]!, width: 0.5),
           boxShadow: [
             BoxShadow(
               color: Color.fromRGBO(50, 50, 93, 0.25),
               blurRadius: 5,
               spreadRadius: -1,
-              offset: Offset(
-                0,
-                2,
-              ),
+              offset: Offset(0, 2),
             ),
             BoxShadow(
               color: Color.fromRGBO(0, 0, 0, 0.3),
               blurRadius: 3,
               spreadRadius: -1,
-              offset: Offset(
-                0,
-                1,
-              ),
+              offset: Offset(0, 1),
             ),
           ],
           child: Text(
-            'هذا توصيف للقائمة والفكرة منها وطبيعة المحتوى الموجود في هذه القائمة. مثال: قائمة كيف أبدأ تحتوي على بعض المصادر لمساعدة المتعافي للبدء في التعافي وكيف يدخل لهذا العالم. سيتم إضافة التوصيف عند إضافة القائمة.',
+            details.activity.description,
             style: TextStyles.small.copyWith(
               color: theme.grey[900],
             ),
@@ -443,7 +443,8 @@ class OngoingActivityDescriptionAndUserStatisticsWidget extends ConsumerWidget {
                 Icon(LucideIcons.lineChart, color: theme.primary[600]),
                 verticalSpace(Spacing.points4),
                 Text(
-                  AppLocalizations.of(context).translate('easy'),
+                  AppLocalizations.of(context)
+                      .translate(details.activity.difficulty.name),
                   style: TextStyles.small,
                 )
               ],
@@ -453,18 +454,17 @@ class OngoingActivityDescriptionAndUserStatisticsWidget extends ConsumerWidget {
                 Icon(LucideIcons.calendar, color: theme.primary[600]),
                 verticalSpace(Spacing.points4),
                 Text(
-                  getDisplayDate(DateTime.now(), locale!.languageCode),
+                  getDisplayDate(details.startDate, locale!.languageCode),
                   style: TextStyles.small,
                 )
               ],
             ),
             Column(
-              //TODO: this will represent the best period to do this activity
               children: [
                 Icon(LucideIcons.calendarRange, color: theme.primary[600]),
                 verticalSpace(Spacing.points4),
                 Text(
-                  "3 " + AppLocalizations.of(context).translate('month'),
+                  "${details.endDate.difference(details.startDate).inDays} ${AppLocalizations.of(context).translate('day')}",
                   style: TextStyles.small,
                 )
               ],
@@ -474,7 +474,7 @@ class OngoingActivityDescriptionAndUserStatisticsWidget extends ConsumerWidget {
                 Icon(LucideIcons.loader2, color: theme.primary[600]),
                 verticalSpace(Spacing.points4),
                 Text(
-                  "29%",
+                  "${details.progress.toStringAsFixed(0)}%",
                   style: TextStyles.small,
                 )
               ],

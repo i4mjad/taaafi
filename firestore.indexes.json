@@ -1,0 +1,18 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "activities",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "activityName", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "activityTasks",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "taskName", "order": "ASCENDING" }
+      ]
+    }
+  ]
+} 

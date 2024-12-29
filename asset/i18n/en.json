@@ -94,7 +94,7 @@
   "delete": "Delete",
   "save": "Save",
   "changes-has-been-saved":"Changes has been saved",
-  "library-search-placeholder":"Search for a book, podcast ...etc",
+  "library-search-placeholder":"Search for a video, book ...etc",
 
   "latest-additions": "Latest Additions",
 
@@ -230,7 +230,7 @@
   "contact-us": "Reach Me",
 
   "new-note": "New Note",
-  "ta3afi": "Reboot App",
+  "ta3afi": "Ta'aafi App",
   "taaafi-platform": "Ta'aafi Platform",
 
   "diaries":"Diaries",

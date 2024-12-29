@@ -11,70 +11,66 @@ import 'package:reboot_app_3/features/vault/presentation/activities/activity_ove
 
 class TaskWidget extends ConsumerWidget {
   const TaskWidget(this.task, {super.key});
+
   final ActivityTask task;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = AppTheme.of(context);
-    final locale = ref.watch(localeNotifierProvider);
 
     return WidgetsContainer(
-      padding: EdgeInsets.all(16),
       backgroundColor: theme.backgroundColor,
+      padding: EdgeInsets.fromLTRB(16, 12, 16, 12),
       borderSide: BorderSide(color: theme.grey[600]!, width: 0.5),
-      boxShadow: [
-        BoxShadow(
-          color: Color.fromRGBO(50, 50, 93, 0.25),
-          blurRadius: 5,
-          spreadRadius: -1,
-          offset: Offset(
-            0,
-            2,
-          ),
-        ),
-        BoxShadow(
-          color: Color.fromRGBO(0, 0, 0, 0.3),
-          blurRadius: 3,
-          spreadRadius: -1,
-          offset: Offset(
-            0,
-            1,
-          ),
-        ),
-      ],
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Text(
-            task.id,
-            style: TextStyles.h6.copyWith(color: theme.grey[900], fontSize: 18),
-          ),
-          horizontalSpace(Spacing.points12),
           Column(
-            mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                task.taskName,
-                style: TextStyles.body.copyWith(color: theme.grey[900]),
+                task.name,
+                style: TextStyles.footnoteSelected.copyWith(
+                  color: theme.grey[900],
+                ),
               ),
-              // verticalSpace(Spacing.points4),
+              verticalSpace(Spacing.points4),
+              Text(
+                _getFrequencyText(context, task.frequency),
+                style: TextStyles.small.copyWith(
+                  color: theme.grey[700],
+                ),
+              ),
             ],
           ),
           Spacer(),
           GestureDetector(
             onTap: () {
               showModalBottomSheet<void>(
-                  context: context,
-                  isScrollControlled: true,
-                  builder: (BuildContext context) {
-                    return TaskDescriptionSheet(task);
-                  });
+                context: context,
+                isScrollControlled: true,
+                builder: (BuildContext context) {
+                  return TaskDescriptionSheet(task);
+                },
+              );
             },
-            child: Icon(LucideIcons.info, color: theme.primary[700]),
-          )
+            child: Icon(
+              LucideIcons.info,
+              color: theme.grey[500],
+            ),
+          ),
         ],
       ),
     );
+  }
+
+  String _getFrequencyText(BuildContext context, TaskFrequency frequency) {
+    switch (frequency) {
+      case TaskFrequency.daily:
+        return AppLocalizations.of(context).translate('daily');
+      case TaskFrequency.weekly:
+        return AppLocalizations.of(context).translate('weekly');
+      case TaskFrequency.monthly:
+        return AppLocalizations.of(context).translate('monthly');
+    }
   }
 }

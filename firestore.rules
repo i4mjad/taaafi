@@ -1,0 +1,31 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Activities collection is readable by all authenticated users
+    match /activities/{activityId} {
+      allow read: if request.auth != null;
+      allow write: if false; // Only admins can modify activities
+      
+      // Activity tasks are readable by all authenticated users
+      match /activityTasks/{taskId} {
+        allow read: if request.auth != null;
+        allow write: if false;
+      }
+    }
+    
+    // User-specific data
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+      
+      // Ongoing activities subcollection
+      match /ongoing_activities/{activityId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+        
+        // Task completions for each activity
+        match /taskCompletions/{taskId} {
+          allow read, write: if request.auth != null && request.auth.uid == userId;
+        }
+      }
+    }
+  }
+} 

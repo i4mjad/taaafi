@@ -1,5 +1,4 @@
 import 'package:reboot_app_3/features/vault/application/diaries/diaries_service.dart';
-import 'package:reboot_app_3/features/vault/data/diaries/diaries_notifier.dart';
 import 'package:reboot_app_3/features/vault/data/diaries/diaries_repository.dart';
 import 'package:reboot_app_3/features/vault/data/diaries/diary.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';

@@ -10,9 +10,10 @@ import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/custom_theme_data.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
-import 'package:reboot_app_3/features/vault/data/activities/activity_task.dart';
 import 'package:reboot_app_3/features/vault/data/activities/ongoing_activity.dart';
 import 'package:reboot_app_3/features/vault/presentation/activities/shared_widgets/day_task_widget.dart';
+import 'package:reboot_app_3/features/vault/application/activities/ongoing_activities_notifier.dart';
+import 'package:reboot_app_3/features/vault/application/activities/today_tasks_notifier.dart';
 
 class ActivitiesScreen extends ConsumerWidget {
   const ActivitiesScreen({super.key});
@@ -86,88 +87,58 @@ class ActivitiesScreen extends ConsumerWidget {
   }
 }
 
-class OngoingActivitiesWidget extends StatelessWidget {
-  const OngoingActivitiesWidget({super.key});
-
+class OngoingActivitiesWidget extends ConsumerWidget {
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = AppTheme.of(context);
+    final ongoingActivitiesState = ref.watch(ongoingActivitiesNotifierProvider);
 
-    var records = [
-      OngoingActivity(
-        "1",
-        'تمرين المتابعة اليومية',
-        DateTime(2022, 8, 28),
-        59,
-      ),
-      OngoingActivity(
-        "2",
-        'تمرين الامتنان',
-        DateTime(2024, 9, 20),
-        0,
-      ),
-      OngoingActivity(
-        "3",
-        'كتابة اليوميات',
-        DateTime(2022, 5, 2),
-        100,
-      ),
-    ];
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisAlignment: MainAxisAlignment.start,
       children: [
         Text(
           AppLocalizations.of(context).translate('ongoing-activities'),
-          style: TextStyles.h6.copyWith(
-            color: theme.grey[900],
-          ),
+          style: TextStyles.h6.copyWith(color: theme.grey[900]),
         ),
         verticalSpace(Spacing.points8),
-        ListView.separated(
-          shrinkWrap: true,
-          physics: NeverScrollableScrollPhysics(),
-          itemBuilder: (BuildContext context, int index) {
-            return OngoingActivitiyWidget(
-              index + 1,
-              records[index],
+        ongoingActivitiesState.when(
+          data: (activities) {
+            print(activities.length);
+            return ListView.separated(
+              shrinkWrap: true,
+              physics: NeverScrollableScrollPhysics(),
+              itemCount: activities.length,
+              separatorBuilder: (_, __) => verticalSpace(Spacing.points8),
+              itemBuilder: (context, index) => OngoingActivityWidget(
+                index + 1,
+                activities[index],
+              ),
             );
           },
-          separatorBuilder: (BuildContext context, int index) =>
-              verticalSpace(Spacing.points8),
-          itemCount: records.length,
-        )
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (error, _) => Center(child: Text(error.toString())),
+        ),
       ],
     );
   }
 }
 
-class TodayTasksWidget extends StatelessWidget {
-  const TodayTasksWidget({
-    super.key,
-  });
-
+class TodayTasksWidget extends ConsumerWidget {
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = AppTheme.of(context);
-    var records = [
-      ActivityTask("1", 'كتابة اليوميات', "تدوين الرحلة", "1", true,
-          DateTime(2024, 5, 2), ""),
-      ActivityTask("2", 'كتابة اليوميات', "تدوين الرحلة", "12", false,
-          DateTime(2024, 5, 2), ""),
-      ActivityTask("3", 'كتابة اليوميات', "تدوين الرحلة", "134", false,
-          DateTime(2024, 5, 2), ""),
-    ];
+    final todayTasksState = ref.watch(todayTasksNotifierProvider);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisAlignment: MainAxisAlignment.start,
       children: [
         Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Text(AppLocalizations.of(context).translate('today-tasks'),
-                style: TextStyles.h6.copyWith(color: theme.primary[900])),
+            Text(
+              AppLocalizations.of(context).translate('today-tasks'),
+              style: TextStyles.h6.copyWith(color: theme.primary[900]),
+            ),
             horizontalSpace(Spacing.points8),
             RichText(
               text: TextSpan(
@@ -209,26 +180,27 @@ class TodayTasksWidget extends StatelessWidget {
           ],
         ),
         verticalSpace(Spacing.points16),
-        ListView.separated(
-          shrinkWrap:
-              true, // This makes the ListView take up only the needed space
-          physics: NeverScrollableScrollPhysics(),
-          itemBuilder: (BuildContext context, int index) {
-            return DayTaskWidget(
-              records[index],
-            );
-          },
-          separatorBuilder: (BuildContext context, int index) =>
-              verticalSpace(Spacing.points8),
-          itemCount: records.length,
-        )
+        todayTasksState.when(
+          data: (tasks) => ListView.separated(
+            shrinkWrap: true,
+            physics: NeverScrollableScrollPhysics(),
+            itemCount: tasks.length,
+            separatorBuilder: (_, __) => verticalSpace(Spacing.points8),
+            itemBuilder: (context, index) => DayTaskWidget(
+              tasks[index],
+              activityId: tasks[index].activityId,
+            ),
+          ),
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (error, _) => Center(child: Text(error.toString())),
+        ),
       ],
     );
   }
 }
 
-class OngoingActivitiyWidget extends ConsumerWidget {
-  const OngoingActivitiyWidget(
+class OngoingActivityWidget extends ConsumerWidget {
+  const OngoingActivityWidget(
     this.order,
     this.activity, {
     super.key,
@@ -282,7 +254,7 @@ class OngoingActivitiyWidget extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  activity.title,
+                  activity.activity?.name ?? '',
                   style: TextStyles.footnoteSelected.copyWith(
                     color: theme.grey[900],
                   ),
@@ -296,8 +268,7 @@ class OngoingActivitiyWidget extends ConsumerWidget {
                       style: TextStyles.small.copyWith(color: theme.grey[700]),
                     ),
                     Text(
-                      getDisplayDate(
-                          activity.startingDate, locale!.languageCode),
+                      getDisplayDate(activity.startDate, locale!.languageCode),
                       style: TextStyles.small.copyWith(color: theme.grey[700]),
                     ),
                   ],
@@ -310,10 +281,10 @@ class OngoingActivitiyWidget extends ConsumerWidget {
                       style: TextStyles.small.copyWith(color: theme.grey[700]),
                     ),
                     Text(
-                      "${activity.activityProgress} %",
+                      "${activity.progress.toInt()} %",
                       style: TextStyles.smallBold.copyWith(
                         color: getPercentageColor(
-                            activity.activityProgress, theme),
+                            activity.progress.toInt(), theme),
                       ),
                     ),
                   ],
