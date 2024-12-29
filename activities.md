@@ -20,7 +20,7 @@ lib/
         activities/
 ```
 
-- data folder: this will contain anything related to the data like the models or repositories.
+- data folder: this will contain anything related to the data like the models and repositories.
 - application folder: this will contain anything related to business logic like the services. This could also hold the riverpod notifiers.
 - presentation folder: this will contain all UI-related stuff.
 
@@ -105,28 +105,3 @@ With the details above, you are required to implement the following functionalit
       - taskDescription
       - taskFrequency
       - taskName
-
-### Additional Requirements
-
-1. **Error Handling**:
-
-   - Implement proper error handling for network issues or Firestore query failures, providing meaningful feedback to users via snackbars or other UI elements.
-
-2. **Firestore Optimization**:
-
-   - Optimize Firestore queries by ensuring appropriate indexes are created for frequent queries.
-
-3. **Performance Metrics**:
-   - For the performance section in `ongoing_activity_screen`, implement efficient data fetching to calculate user progress over the last 7 occurrences of each task.
-
-### Notes
-
-- You do not have to create any UI, as you can see, all the screens are ready with hardcoded data.
-- You should strictly use Riverpod for dependency injection and always create Riverpod providers using the `@riverpod` annotation.
-- The core folder (lib/core) contains the following:
-  - shared_widgets folder: This folder contains reusable components such as:
-    1. snackbar.dart: Use the predefined snackbars (success, error, etc.) when required.
-  - theming folder: Use the color conventions from `lib/core/theming/custom_theme_data.dart`.
-    1. Define the theme in the widget with `final theme = AppTheme.of(context)`.
-    2. Set colors using, for example, `theme.primary[600]`.
-- Any text you create should be defined as a key in two JSON files, one for Arabic (`assets/i18n/ar.json`) and one for English (`assets/i18n/en.json`). Use them in the app as follows: `AppLocalization.of(context).translate(key)`.
