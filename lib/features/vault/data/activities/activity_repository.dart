@@ -541,7 +541,6 @@ class ActivityRepository {
   ) async {
     try {
       final userId = _getCurrentUserId();
-
       final docRef = _firestore
           .collection('users')
           .doc(userId)
@@ -553,6 +552,19 @@ class ActivityRepository {
       final doc = await docRef.get();
       if (!doc.exists) {
         throw Exception('Scheduled task document not found');
+      }
+
+      // Check if task is scheduled for future
+      final scheduledDate =
+          (doc.data()?['scheduledDate'] as Timestamp).toDate();
+      final today = DateTime(
+        DateTime.now().year,
+        DateTime.now().month,
+        DateTime.now().day,
+      );
+
+      if (scheduledDate.isAfter(today)) {
+        throw Exception('Cannot complete future tasks');
       }
 
       await docRef.update({

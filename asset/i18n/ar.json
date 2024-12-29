@@ -458,7 +458,7 @@
 
   "personal-data": "البيانات الشخصية",
   "reset-your-password": "إعادة تعيين كلمة المرور",
-  "daily": "يوميًا",
-  "weekly": "أسبوعيًا",
-  "monthly": "شهريًا"
+ 
+  "already-subscribed-to-activity": "أنت مشترك بالفعل في هذا النشاط",
+  "cannot-complete-future-tasks": "لا يمكن إكمال المهام المجدولة للتواريخ المستقبلية"
 }

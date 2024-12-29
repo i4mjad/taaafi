@@ -1,4 +1,10 @@
 {
+  
+  "daily": "Daily",
+  "weekly": "Weekly",
+  "monthly": "Monthly",
+  "cannot-complete-future-tasks": "Cannot complete tasks scheduled for future dates",
+  "already-subscribed-to-activity": "You are already subscribed to this activity",
   "welcome": "Welcome!",
   "home": "Home",
   "community": "Community",

@@ -1,17 +1,45 @@
 {
   "indexes": [
     {
-      "collectionGroup": "activities",
-      "queryScope": "COLLECTION",
+      "collectionGroup": "scheduledTasks",
+      "queryScope": "COLLECTION_GROUP",
       "fields": [
-        { "fieldPath": "activityName", "order": "ASCENDING" }
+        {
+          "fieldPath": "scheduledDate",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "isCompleted",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "scheduledTasks",
+      "queryScope": "COLLECTION_GROUP",
+      "fields": [
+        {
+          "fieldPath": "scheduledDate",
+          "order": "DESCENDING"
+        },
+        {
+          "fieldPath": "taskId",
+          "order": "ASCENDING"
+        }
       ]
     },
     {
       "collectionGroup": "activityTasks",
       "queryScope": "COLLECTION",
       "fields": [
-        { "fieldPath": "taskName", "order": "ASCENDING" }
+        {
+          "fieldPath": "taskName",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "taskFrequency",
+          "order": "ASCENDING"
+        }
       ]
     }
   ]

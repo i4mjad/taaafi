@@ -29,7 +29,7 @@ class DayTaskWidget extends ConsumerWidget {
 
     return WidgetsContainer(
       backgroundColor: theme.backgroundColor,
-      padding: EdgeInsets.fromLTRB(16, 12, 16, 12),
+      padding: EdgeInsets.fromLTRB(12, 8, 12, 8),
       borderSide: BorderSide(color: theme.grey[600]!, width: 0.5),
       child: Row(
         children: [
@@ -45,7 +45,7 @@ class DayTaskWidget extends ConsumerWidget {
                 ),
                 verticalSpace(Spacing.points4),
                 Text(
-                  _getFrequencyText(context, task.task.frequency),
+                  task.task.description,
                   style: TextStyles.small.copyWith(
                     color: theme.grey[700],
                   ),
@@ -57,6 +57,20 @@ class DayTaskWidget extends ConsumerWidget {
             value: task.isCompleted,
             onChanged: (bool? value) async {
               try {
+                // Check if task is scheduled for future
+                final today = DateTime(
+                  DateTime.now().year,
+                  DateTime.now().month,
+                  DateTime.now().day,
+                );
+
+                if (task.taskDatetime.isAfter(today)) {
+                  if (context.mounted) {
+                    getErrorSnackBar(context, "cannot-complete-future-tasks");
+                  }
+                  return;
+                }
+
                 await ref
                     .read(ongoingActivityDetailsNotifierProvider(activityId)
                         .notifier)

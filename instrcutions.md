@@ -173,8 +173,8 @@
 8. **Localization**:
 
    - Add all strings to:
-     - `assets/i18n/ar.json` (Arabic)
-     - `assets/i18n/en.json` (English)
+     - `asset/i18n/ar.json` (Arabic)
+     - `asset/i18n/en.json` (English)
    - Never hardcode strings in the UI.
    - **Follow the existing localization implementation strictly**.
 
