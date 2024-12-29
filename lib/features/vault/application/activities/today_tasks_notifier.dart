@@ -12,18 +12,14 @@ class TodayTasksNotifier extends _$TodayTasksNotifier {
   @override
   FutureOr<List<OngoingActivityTask>> build() async {
     _service = ref.read(activityServiceProvider);
-    return _getTodayTasks();
-  }
-
-  Future<List<OngoingActivityTask>> _getTodayTasks() async {
     return await _service.getTodayTasks();
   }
 
-  Future<void> completeTask(String taskId) async {
+  Future<void> refreshTasks() async {
     state = const AsyncValue.loading();
     try {
-      await _service.completeTask(taskId);
-      state = AsyncValue.data(await _getTodayTasks());
+      final tasks = await _service.getTodayTasks();
+      state = AsyncValue.data(tasks);
     } catch (e, st) {
       state = AsyncValue.error(e, st);
     }

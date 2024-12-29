@@ -12,22 +12,14 @@ class AllTasksNotifier extends _$AllTasksNotifier {
   @override
   FutureOr<List<OngoingActivityTask>> build() async {
     _service = ref.read(activityServiceProvider);
-    return _getAllTasks();
+    return await _service.getAllTasks();
   }
 
-  Future<List<OngoingActivityTask>> _getAllTasks() async {
-    try {
-      return await _service.getAllTasks();
-    } catch (e, st) {
-      state = AsyncValue.error(e, st);
-      rethrow;
-    }
-  }
-
-  Future<void> refresh() async {
+  Future<void> refreshTasks() async {
     state = const AsyncValue.loading();
     try {
-      state = AsyncValue.data(await _getAllTasks());
+      final tasks = await _service.getAllTasks();
+      state = AsyncValue.data(tasks);
     } catch (e, st) {
       state = AsyncValue.error(e, st);
     }

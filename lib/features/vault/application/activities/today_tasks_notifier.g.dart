@@ -7,7 +7,7 @@ part of 'today_tasks_notifier.dart';
 // **************************************************************************
 
 String _$todayTasksNotifierHash() =>
-    r'ec8caf2632e9f00d0f966aa7176a9566d593010b';
+    r'a33e9577c64fa11107055e570b84fad7ae8487f0';
 
 /// See also [TodayTasksNotifier].
 @ProviderFor(TodayTasksNotifier)

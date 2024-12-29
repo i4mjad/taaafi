@@ -1,4 +1,7 @@
+import 'package:reboot_app_3/features/vault/application/activities/all_tasks_notifier.dart';
+import 'package:reboot_app_3/features/vault/application/activities/ongoing_activities_notifier.dart';
 import 'package:reboot_app_3/features/vault/application/activities/providers.dart';
+import 'package:reboot_app_3/features/vault/application/activities/today_tasks_notifier.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:reboot_app_3/features/vault/data/activities/ongoing_activity_details.dart';
 import 'package:reboot_app_3/features/vault/application/activities/activity_service.dart';
@@ -11,11 +14,8 @@ class OngoingActivityDetailsNotifier extends _$OngoingActivityDetailsNotifier {
 
   @override
   FutureOr<OngoingActivityDetails> build(String activityId) async {
-    // Inject the service using ref.read
     _service = ref.read(activityServiceProvider);
-
-    // Fetch initial data
-    return _getOngoingActivityDetails(activityId);
+    return await _getOngoingActivityDetails(activityId);
   }
 
   /// Fetches ongoing activity details including performance data
@@ -30,25 +30,25 @@ class OngoingActivityDetailsNotifier extends _$OngoingActivityDetailsNotifier {
     }
   }
 
-  /// Refreshes the activity details
-  Future<void> refresh() async {
-    // Set state to loading
-    state = const AsyncValue.loading();
-    try {
-      // Update state with new data
-      state = AsyncValue.data(await build(activityId));
-    } catch (e, st) {
-      // Set state to error with proper error handling
-      state = AsyncValue.error(e, st);
-    }
-  }
-
   /// Updates task completion status
-  Future<void> updateTaskCompletion(String taskId, bool isCompleted) async {
+  Future<void> updateTaskCompletion(
+      String scheduledTaskId, bool isCompleted) async {
     state = const AsyncValue.loading();
     try {
-      await _service.updateTaskCompletion(activityId, taskId, isCompleted);
-      state = AsyncValue.data(await _getOngoingActivityDetails(activityId));
+      await _service.updateTaskCompletion(
+          activityId, scheduledTaskId, isCompleted);
+
+      // Update state with fresh data
+      final updatedDetails =
+          await _service.getOngoingActivityDetails(activityId);
+      state = AsyncValue.data(updatedDetails);
+
+      // Notify other providers to refresh their data
+      await ref.read(todayTasksNotifierProvider.notifier).refreshTasks();
+      await ref.read(allTasksNotifierProvider.notifier).refreshTasks();
+      await ref
+          .read(ongoingActivitiesNotifierProvider.notifier)
+          .refreshActivities();
     } catch (e, st) {
       state = AsyncValue.error(e, st);
     }

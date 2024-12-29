@@ -6,7 +6,10 @@ import 'package:reboot_app_3/core/shared_widgets/snackbar.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
+import 'package:reboot_app_3/features/vault/application/activities/all_tasks_notifier.dart';
+import 'package:reboot_app_3/features/vault/application/activities/ongoing_activities_notifier.dart';
 import 'package:reboot_app_3/features/vault/application/activities/ongoing_activity_details_provider.dart';
+import 'package:reboot_app_3/features/vault/application/activities/today_tasks_notifier.dart';
 import 'package:reboot_app_3/features/vault/data/activities/activity_task.dart';
 import 'package:reboot_app_3/features/vault/data/activities/ongoing_activity_task.dart';
 
@@ -54,20 +57,17 @@ class DayTaskWidget extends ConsumerWidget {
             value: task.isCompleted,
             onChanged: (bool? value) async {
               try {
-                print(
-                    'Attempting to update scheduled task: ${task.scheduledTaskId}');
-                print('Activity ID: $activityId');
-                print('Current completion status: ${task.isCompleted}');
-                print('New completion status: ${value ?? false}');
-
                 await ref
                     .read(ongoingActivityDetailsNotifierProvider(activityId)
                         .notifier)
                     .updateTaskCompletion(task.scheduledTaskId, value ?? false);
 
-                print('Task update completed successfully');
+                // Refresh all providers that show tasks
+                ref.invalidate(todayTasksNotifierProvider);
+                ref.invalidate(allTasksNotifierProvider);
+                ref.invalidate(
+                    ongoingActivitiesNotifierProvider); // For progress updates
               } catch (e) {
-                print('Error updating task: $e');
                 if (context.mounted) {
                   getErrorSnackBar(context, e.toString());
                 }

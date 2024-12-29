@@ -190,7 +190,6 @@ class ActivityRepository {
       String activityId, DateTime startDate) async {
     try {
       final userId = _getCurrentUserId();
-      print('Calculating progress for activity: $activityId');
 
       // Get all scheduled tasks for this activity
       final scheduledTasksSnapshot = await _firestore
@@ -200,8 +199,6 @@ class ActivityRepository {
           .doc(activityId)
           .collection('scheduledTasks')
           .get();
-
-      print('Found ${scheduledTasksSnapshot.docs.length} scheduled tasks');
 
       if (scheduledTasksSnapshot.docs.isEmpty) return 0;
 
@@ -214,8 +211,6 @@ class ActivityRepository {
         return scheduledDate.isBefore(today);
       }).length;
 
-      print('Total scheduled tasks up to now: $totalScheduledTasks');
-
       // Count completed tasks
       final completedTasks = scheduledTasksSnapshot.docs.where((doc) {
         final scheduledDate =
@@ -224,12 +219,9 @@ class ActivityRepository {
             doc.data()['isCompleted'] == true;
       }).length;
 
-      print('Completed tasks: $completedTasks');
-
       if (totalScheduledTasks == 0) return 0;
 
       final progress = (completedTasks / totalScheduledTasks) * 100;
-      print('Calculated progress: $progress%');
 
       return progress;
     } catch (e, st) {
@@ -255,7 +247,6 @@ class ActivityRepository {
   Future<List<OngoingActivity>> getOngoingActivities() async {
     try {
       final userId = _getCurrentUserId();
-      print('Fetching ongoing activities for user: $userId');
 
       // Get ongoing activities
       final ongoingSnapshot = await _firestore
@@ -264,37 +255,28 @@ class ActivityRepository {
           .collection('ongoing_activities')
           .get();
 
-      print('Found ${ongoingSnapshot.docs.length} ongoing activities');
-
       // Get activities and their progress in parallel
       final ongoingActivities = await Future.wait(
         ongoingSnapshot.docs.map((doc) async {
-          print('Processing ongoing activity document: ${doc.id}');
           final ongoingActivity = OngoingActivity.fromFirestore(doc);
-          print('Ongoing activity data: ${doc.data()}');
 
           // Get the activity details
-          print('Fetching activity details for: ${ongoingActivity.activityId}');
           final activityDoc = await _firestore
               .collection('activities')
               .doc(ongoingActivity.activityId)
               .get();
 
           if (!activityDoc.exists) {
-            print('Warning: Activity ${ongoingActivity.activityId} not found');
             return null;
           }
 
           final activity = Activity.fromFirestore(activityDoc);
-          print('Activity details fetched: ${activity.name}');
 
           // Calculate progress
-          print('Calculating progress for activity: ${activity.id}');
           final progress = await calculateActivityProgress(
             ongoingActivity.activityId,
             ongoingActivity.startDate,
           );
-          print('Progress calculated: $progress%');
 
           return OngoingActivity(
             id: ongoingActivity.id,
@@ -311,7 +293,6 @@ class ActivityRepository {
       // Filter out null values and return
       final validActivities =
           ongoingActivities.whereType<OngoingActivity>().toList();
-      print('Returning ${validActivities.length} valid ongoing activities');
       return validActivities;
     } catch (e, st) {
       print('Error in getOngoingActivities: $e');
@@ -325,7 +306,6 @@ class ActivityRepository {
     try {
       final userId = _getCurrentUserId();
       final today = DateTime.now();
-      print('Fetching today\'s tasks for user: $userId');
 
       // Get all ongoing activities
       final ongoingSnapshot = await _firestore
@@ -334,17 +314,14 @@ class ActivityRepository {
           .collection('ongoing_activities')
           .get();
 
-      print('Found ${ongoingSnapshot.docs.length} ongoing activities');
       List<OngoingActivityTask> todayTasks = [];
 
       for (var activityDoc in ongoingSnapshot.docs) {
         final ongoingActivity = OngoingActivity.fromFirestore(activityDoc);
-        print('Processing activity: ${ongoingActivity.activityId}');
 
         // Skip if activity hasn't started or has ended
         if (today.isBefore(ongoingActivity.startDate) ||
             today.isAfter(ongoingActivity.endDate)) {
-          print('Activity outside date range, skipping');
           continue;
         }
 
@@ -355,19 +332,14 @@ class ActivityRepository {
             .collection('activityTasks')
             .get();
 
-        print('Found ${tasksSnapshot.docs.length} base tasks');
-
         // Map tasks for lookup
         final tasks = {
           for (var doc in tasksSnapshot.docs)
             doc.id: ActivityTask.fromFirestore(doc)
         };
-        print('Base tasks mapped: ${tasks.length}');
 
         // Get scheduled tasks for today
         final todayDate = DateTime(today.year, today.month, today.day);
-        print('Querying scheduled tasks for date: $todayDate');
-
         final startOfDay = Timestamp.fromDate(
             DateTime(today.year, today.month, today.day, 0, 0, 0));
         final endOfDay = Timestamp.fromDate(
@@ -379,18 +351,11 @@ class ActivityRepository {
             .where('scheduledDate', isLessThanOrEqualTo: endOfDay)
             .get();
 
-        print(
-            'Found ${scheduledTasksSnapshot.docs.length} scheduled tasks for today');
-
         // Add tasks with their scheduled IDs
         for (var scheduledDoc in scheduledTasksSnapshot.docs) {
           final data = scheduledDoc.data();
-          print('Processing scheduled task: ${scheduledDoc.id}');
-          print('Task data: $data');
-
           final baseTask = tasks[data['taskId']];
           if (baseTask != null) {
-            print('Found matching base task: ${baseTask.name}');
             todayTasks.add(OngoingActivityTask(
               task: baseTask,
               taskDatetime: today,
@@ -398,17 +363,12 @@ class ActivityRepository {
               scheduledTaskId: scheduledDoc.id,
               activityId: ongoingActivity.activityId,
             ));
-            print('Task added to today\'s tasks');
-          } else {
-            print('No matching base task found for taskId: ${data['taskId']}');
           }
         }
       }
 
-      print('Returning ${todayTasks.length} tasks for today');
       return todayTasks;
     } catch (e) {
-      print('Error in getTodayTasks: $e');
       throw Exception('Failed to fetch today\'s tasks: $e');
     }
   }
@@ -417,8 +377,6 @@ class ActivityRepository {
   Future<void> completeTask(String scheduledTaskId) async {
     try {
       final userId = _getCurrentUserId();
-      print('Completing scheduled task:');
-      print('Scheduled Task ID: $scheduledTaskId');
 
       // Find the ongoing activity that contains this scheduled task
       final ongoingSnapshot = await _firestore
@@ -443,7 +401,6 @@ class ActivityRepository {
         }
       }
     } catch (e) {
-      print('Error completing task: $e');
       throw Exception('Failed to complete task: $e');
     }
   }

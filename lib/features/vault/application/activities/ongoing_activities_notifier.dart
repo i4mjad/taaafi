@@ -12,10 +12,16 @@ class OngoingActivitiesNotifier extends _$OngoingActivitiesNotifier {
   @override
   FutureOr<List<OngoingActivity>> build() async {
     _service = ref.read(activityServiceProvider);
-    return await _getOngoingActivities();
+    return await _service.getOngoingActivities();
   }
 
-  Future<List<OngoingActivity>> _getOngoingActivities() async {
-    return await _service.getOngoingActivities();
+  Future<void> refreshActivities() async {
+    state = const AsyncValue.loading();
+    try {
+      final activities = await _service.getOngoingActivities();
+      state = AsyncValue.data(activities);
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+    }
   }
 }
