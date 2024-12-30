@@ -72,6 +72,21 @@ With the details above, you are required to implement the following functionalit
       4. Performance: Show how the user performed in the last 7 occurrences of this activity's ongoing tasks. Since activities' tasks have different frequencies, display the last 7 occurrences based on the activity.
    3. The user can see the settings for the activity, where they can restart the activity or remove the subscription.
 
+   - restart the activity: when user is trying to restart an activity, you should show a modal similer to the one the user saw when subscribing to the activity for the first time (AddTheActivitySheet in lib/features/vault/presentation/activities/activity_overview_screen.dart) this to enter the new start and end date. you should create a new one with the same ui, you can call it (UpdateOngoingActivitySheet) you can have inital values for starting date as the current start and end date, you should validate if the user is trying to update with the same date, for example: the start date is 12/12/2020 10:00PM and the end date is 31/12/2020 10:00PM, if the user is trying to select the starting date or end date the same as current dates you should not allow them to do so, even in it is the same date with different time. After updating the start and end date of the ongoing activity, mark all the scedhuled tasks flag isDeleted to true. and schedule new tasks for this activity based on the new period the user will enter, a warnining message should be shown to the user that this action cannot be undone.
+   - delete the activity: perform a soft delete by marking the isDeleted flag under ongoing activity document under the ongoing_activities collection under user document, alongisde with the scheduled tasks, you should update isDeleted to true to all scheduled tasks. a warnining message should be shown to the user that this action cannot be undone.
+   - Those settings are accesses by a button in the (ongoing_activitiy_screen.dart) in the app bar as the following:
+
+   ```
+              showModalBottomSheet<void>(
+                  context: context,
+                  isScrollControlled: true,
+                  builder: (BuildContext context) {
+                    return OngoingActivitySettingsSheet(ongoingActivityId);
+                  });
+   ```
+
+   - there is two buttons one to perform update, with this you will open the newly created sheet and do as explained, for the delete, when the user click on the delete, it will show the alert explaining what happened, with a localized message
+
 4. add activity screen (lib/features/vault/presentation/activities/add_activity_screen.dart):
 
    1. The user can see the available activities to subscribe to.

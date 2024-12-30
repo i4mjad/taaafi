@@ -53,4 +53,34 @@ class OngoingActivityDetailsNotifier extends _$OngoingActivityDetailsNotifier {
       state = AsyncValue.error(e, st);
     }
   }
+
+  /// Deletes the activity by marking it and its scheduled tasks as deleted
+  Future<void> deleteActivity() async {
+    state = const AsyncValue.loading();
+    try {
+      await _service.deleteActivity(activityId);
+
+      state = AsyncValue.data(await build(activityId));
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+    }
+  }
+
+  /// Updates activity dates and reschedules tasks
+  Future<void> updateActivityDates(DateTime startDate, DateTime endDate) async {
+    state = const AsyncValue.loading();
+    try {
+      await _service.updateActivityDates(activityId, startDate, endDate);
+      state = AsyncValue.data(await build(activityId));
+
+      // Refresh other providers
+      await ref.read(todayTasksNotifierProvider.notifier).refreshTasks();
+      await ref.read(allTasksNotifierProvider.notifier).refreshTasks();
+      await ref
+          .read(ongoingActivitiesNotifierProvider.notifier)
+          .refreshActivities();
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+    }
+  }
 }

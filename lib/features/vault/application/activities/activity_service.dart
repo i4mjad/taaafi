@@ -126,4 +126,26 @@ class ActivityService {
       rethrow;
     }
   }
+
+  /// Marks an activity and its scheduled tasks as deleted
+  Future<void> deleteActivity(String activityId) async {
+    try {
+      await _repository.deleteActivity(activityId);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  /// Updates activity dates and reschedules tasks
+  Future<void> updateActivityDates(
+    String activityId,
+    DateTime startDate,
+    DateTime endDate,
+  ) async {
+    try {
+      await _repository.updateActivityDates(activityId, startDate, endDate);
+    } catch (e) {
+      rethrow;
+    }
+  }
 }

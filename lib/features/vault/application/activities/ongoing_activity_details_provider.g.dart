@@ -7,7 +7,7 @@ part of 'ongoing_activity_details_provider.dart';
 // **************************************************************************
 
 String _$ongoingActivityDetailsNotifierHash() =>
-    r'bb6e55e20fd794a6ca30ed15982780152d674fc6';
+    r'77d59ca5c60ee135a1e6f00cfb802547c3f0e67a';
 
 /// Copied from Dart SDK
 class _SystemHash {

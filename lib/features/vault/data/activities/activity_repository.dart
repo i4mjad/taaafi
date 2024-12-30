@@ -185,61 +185,60 @@ class ActivityRepository {
     }
   }
 
-  /// Calculates activity progress based on completed tasks
+  /// Calculate activity progress considering only non-deleted tasks
   Future<double> calculateActivityProgress(
-      String activityId, DateTime startDate) async {
+    String activityId,
+    DateTime startDate,
+  ) async {
     try {
       final userId = _getCurrentUserId();
+      final now = DateTime.now().add(const Duration(days: 1));
+      print('Calculating progress for activity: $activityId');
 
-      // Get all scheduled tasks for this activity
+      // Get all scheduled tasks up to now that aren't deleted
       final scheduledTasksSnapshot = await _firestore
           .collection('users')
           .doc(userId)
           .collection('ongoing_activities')
           .doc(activityId)
           .collection('scheduledTasks')
+          .where('isDeleted', isEqualTo: false)
+          .where('scheduledDate',
+              isLessThanOrEqualTo:
+                  Timestamp.fromDate(DateTime(now.year, now.month, now.day)))
           .get();
 
-      if (scheduledTasksSnapshot.docs.isEmpty) return 0;
+      print('Total tasks found: ${scheduledTasksSnapshot.docs.length}');
 
-      final today = DateTime.now();
+      if (scheduledTasksSnapshot.docs.isEmpty) {
+        print('No tasks found, returning 0 progress');
+        return 0.0;
+      }
 
-      // Count tasks that were scheduled up until now
-      final totalScheduledTasks = scheduledTasksSnapshot.docs.where((doc) {
-        final scheduledDate =
-            (doc.data()['scheduledDate'] as Timestamp).toDate();
-        return scheduledDate.isBefore(today);
-      }).length;
-
-      // Count completed tasks
+      // Count completed tasks from past and today only
       final completedTasks = scheduledTasksSnapshot.docs.where((doc) {
-        final scheduledDate =
-            (doc.data()['scheduledDate'] as Timestamp).toDate();
-        return scheduledDate.isBefore(today) &&
-            doc.data()['isCompleted'] == true;
+        final taskDate = (doc.data()['scheduledDate'] as Timestamp).toDate();
+        return !taskDate.isAfter(now) && doc.data()['isCompleted'] == true;
       }).length;
 
-      if (totalScheduledTasks == 0) return 0;
+      // Count total tasks up to now (excluding future tasks)
+      final totalTasksUntilNow = scheduledTasksSnapshot.docs.where((doc) {
+        final taskDate = (doc.data()['scheduledDate'] as Timestamp).toDate();
+        return !taskDate.isAfter(now);
+      }).length;
 
-      final progress = (completedTasks / totalScheduledTasks) * 100;
+      print('Completed tasks: $completedTasks');
+      print('Total tasks until now: $totalTasksUntilNow');
+
+      // Calculate progress percentage
+      final progress = completedTasks / totalTasksUntilNow * 100;
+      print('Calculated progress: $progress');
 
       return progress;
     } catch (e, st) {
       print('Error calculating progress: $e');
       print('Stack trace: $st');
-      throw Exception('Failed to calculate progress: $e');
-    }
-  }
-
-  int _calculateExpectedCompletions(
-      TaskFrequency frequency, int daysSinceStart) {
-    switch (frequency) {
-      case TaskFrequency.daily:
-        return daysSinceStart;
-      case TaskFrequency.weekly:
-        return (daysSinceStart / 7).floor();
-      case TaskFrequency.monthly:
-        return (daysSinceStart / 30).floor();
+      throw Exception('Failed to calculate activity progress: $e');
     }
   }
 
@@ -306,13 +305,16 @@ class ActivityRepository {
     try {
       final userId = _getCurrentUserId();
       final today = DateTime.now();
+      print('Fetching tasks for user: $userId on date: $today');
 
-      // Get all ongoing activities
       final ongoingSnapshot = await _firestore
           .collection('users')
           .doc(userId)
           .collection('ongoing_activities')
+          .where('isDeleted', isEqualTo: null)
           .get();
+
+      print('Found ${ongoingSnapshot.docs.length} ongoing activities');
 
       List<OngoingActivityTask> todayTasks = [];
 
@@ -320,45 +322,40 @@ class ActivityRepository {
         final ongoingActivity = OngoingActivity.fromFirestore(activityDoc);
 
         // Skip if activity hasn't started or has ended
-        if (today.isBefore(ongoingActivity.startDate) ||
-            today.isAfter(ongoingActivity.endDate)) {
+        if (today.isBefore(DateTime(
+                ongoingActivity.startDate.year,
+                ongoingActivity.startDate.month,
+                ongoingActivity.startDate.day)) ||
+            today.isAfter(DateTime(ongoingActivity.endDate.year,
+                ongoingActivity.endDate.month, ongoingActivity.endDate.day))) {
           continue;
         }
 
-        // Get base tasks
-        final tasksSnapshot = await _firestore
-            .collection('activities')
-            .doc(ongoingActivity.activityId)
-            .collection('activityTasks')
-            .get();
+        final startOfDay = DateTime(today.year, today.month, today.day);
+        final endOfDay =
+            DateTime(today.year, today.month, today.day, 23, 59, 59);
 
-        // Map tasks for lookup
-        final tasks = {
-          for (var doc in tasksSnapshot.docs)
-            doc.id: ActivityTask.fromFirestore(doc)
-        };
-
-        // Get scheduled tasks for today
-        final todayDate = DateTime(today.year, today.month, today.day);
-        final startOfDay = Timestamp.fromDate(
-            DateTime(today.year, today.month, today.day, 0, 0, 0));
-        final endOfDay = Timestamp.fromDate(
-            DateTime(today.year, today.month, today.day, 23, 59, 59));
-
-        final scheduledTasksSnapshot = await activityDoc.reference
+        final tasksQuery = activityDoc.reference
             .collection('scheduledTasks')
-            .where('scheduledDate', isGreaterThanOrEqualTo: startOfDay)
-            .where('scheduledDate', isLessThanOrEqualTo: endOfDay)
-            .get();
+            .where('isDeleted', isEqualTo: false)
+            .where('scheduledDate',
+                isGreaterThanOrEqualTo: Timestamp.fromDate(startOfDay))
+            .where('scheduledDate',
+                isLessThanOrEqualTo: Timestamp.fromDate(endOfDay));
+
+        final scheduledTasksSnapshot = await tasksQuery.get();
+
+        // Get base tasks for mapping
+        final baseTasks = await _getBaseTasksMap(ongoingActivity.activityId);
 
         // Add tasks with their scheduled IDs
         for (var scheduledDoc in scheduledTasksSnapshot.docs) {
           final data = scheduledDoc.data();
-          final baseTask = tasks[data['taskId']];
+          final baseTask = baseTasks[data['taskId']];
           if (baseTask != null) {
             todayTasks.add(OngoingActivityTask(
               task: baseTask,
-              taskDatetime: today,
+              taskDatetime: (data['scheduledDate'] as Timestamp).toDate(),
               isCompleted: data['isCompleted'] ?? false,
               scheduledTaskId: scheduledDoc.id,
               activityId: ongoingActivity.activityId,
@@ -368,7 +365,7 @@ class ActivityRepository {
       }
 
       return todayTasks;
-    } catch (e) {
+    } catch (e, st) {
       throw Exception('Failed to fetch today\'s tasks: $e');
     }
   }
@@ -485,10 +482,10 @@ class ActivityRepository {
       final activity = Activity.fromFirestore(activityDoc);
       final subscription = OngoingActivity.fromFirestore(subscriptionDoc);
 
-      // Get all scheduled tasks
+      // Get all scheduled tasks with isDeleted filter
       final scheduledTasksSnapshot = await subscriptionDoc.reference
           .collection('scheduledTasks')
-          .orderBy('scheduledDate', descending: true)
+          .where('isDeleted', isEqualTo: false)
           .get();
 
       // Get base tasks for mapping
@@ -605,9 +602,10 @@ class ActivityRepository {
         // Get base tasks and map them by ID
         final baseTasks = await _getBaseTasksMap(activityId);
 
-        // Get and process scheduled tasks
+        // Get and process scheduled tasks with isDeleted filter
         final scheduledTasks = await activityDoc.reference
             .collection('scheduledTasks')
+            .where('isDeleted', isEqualTo: false)
             .orderBy('scheduledDate', descending: true)
             .get();
 
@@ -661,5 +659,103 @@ class ActivityRepository {
         ));
       }
     }
+  }
+
+  /// Marks an activity and its scheduled tasks as deleted
+  Future<void> deleteActivity(String activityId) async {
+    final userId = _auth.currentUser?.uid;
+    if (userId == null) throw Exception('User not authenticated');
+
+    final batch = _firestore.batch();
+
+    // Mark ongoing activity as deleted
+    final activityRef = _firestore
+        .collection('users')
+        .doc(userId)
+        .collection('ongoing_activities')
+        .doc(activityId);
+
+    batch.update(activityRef, {'isDeleted': true});
+
+    // Mark all scheduled tasks as deleted
+    final tasksSnapshot = await _firestore
+        .collection('users')
+        .doc(userId)
+        .collection('ongoing_activities')
+        .doc(activityId)
+        .collection('scheduled_tasks')
+        .get();
+
+    for (var doc in tasksSnapshot.docs) {
+      batch.update(doc.reference, {'isDeleted': true});
+    }
+
+    await batch.commit();
+  }
+
+  /// Updates activity dates and reschedules tasks
+  Future<void> updateActivityDates(
+    String activityId,
+    DateTime startDate,
+    DateTime endDate,
+  ) async {
+    final userId = _getCurrentUserId();
+    final batch = _firestore.batch();
+
+    // Get activity reference
+    final activityRef = _firestore
+        .collection('users')
+        .doc(userId)
+        .collection('ongoing_activities')
+        .doc(activityId);
+
+    // Update activity dates
+    batch.update(activityRef, {
+      'startDate': startDate,
+      'endDate': endDate,
+    });
+
+    // Mark existing scheduled tasks as deleted
+    final existingTasksSnapshot =
+        await activityRef.collection('scheduledTasks').get();
+    for (var doc in existingTasksSnapshot.docs) {
+      batch.update(doc.reference, {'isDeleted': true});
+    }
+
+    await batch.commit();
+
+    // Get tasks and create new scheduled occurrences
+    final tasksSnapshot = await _firestore
+        .collection('activities')
+        .doc(activityId)
+        .collection('activityTasks')
+        .get();
+
+    final periodInDays = endDate.difference(startDate).inDays;
+
+    // Create new scheduled tasks
+    final newBatch = _firestore.batch();
+    for (var task in tasksSnapshot.docs) {
+      final frequencyStr = task.data()['taskFrequency'] as String;
+      final frequency = _parseTaskFrequency(frequencyStr);
+      final scheduledDates = _generateScheduledDates(
+        startDate,
+        periodInDays,
+        frequency,
+      );
+
+      for (var date in scheduledDates) {
+        final taskDocRef = activityRef.collection('scheduledTasks').doc();
+        newBatch.set(taskDocRef, {
+          'taskId': task.id,
+          'scheduledDate': date,
+          'isCompleted': false,
+          'completedAt': null,
+          'isDeleted': false,
+        });
+      }
+    }
+
+    await newBatch.commit();
   }
 }

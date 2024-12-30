@@ -3,6 +3,16 @@
   "daily": "Daily",
   "weekly": "Weekly",
   "monthly": "Monthly",
+  
+  "warning": "Warning",
+  "delete-activity-warning": "This action cannot be undone. All progress for this activity will be permanently deleted.",
+  
+  "update-activity-dates": "Update Activity Dates",
+  "update-activity-warning": "Warning: This will reset all your scheduled tasks. Your previous progress will be marked as deleted.",
+  "start-date": "Start Date",
+  "end-date": "End Date",
+  "update": "Update",
+  "dates-must-be-different": "New dates must be different from current dates",
   "cannot-complete-future-tasks": "Cannot complete tasks scheduled for future dates",
   "already-subscribed-to-activity": "You are already subscribed to this activity",
   "welcome": "Welcome!",

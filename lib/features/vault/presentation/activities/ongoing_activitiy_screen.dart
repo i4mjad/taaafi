@@ -13,6 +13,7 @@ import 'package:reboot_app_3/features/vault/data/activities/ongoing_activity_tas
 import 'package:reboot_app_3/features/vault/presentation/activities/shared_widgets/task_widget.dart';
 import 'package:reboot_app_3/features/vault/data/activities/ongoing_activity_details.dart';
 import 'package:reboot_app_3/features/vault/application/activities/ongoing_activity_details_provider.dart';
+import 'package:reboot_app_3/features/vault/presentation/activities/update_ongoing_activity_sheet.dart';
 
 class OngoingActivitiyScreen extends ConsumerWidget {
   const OngoingActivitiyScreen(this.ongoingActivityId, {super.key});
@@ -109,9 +110,10 @@ class OngoingActivitiyScreen extends ConsumerWidget {
 }
 
 class OngoingActivitySettingsSheet extends ConsumerWidget {
-  const OngoingActivitySettingsSheet(this.ongoingActivitiyId, {super.key});
+  const OngoingActivitySettingsSheet(this.ongoingActivityId, {super.key});
 
-  final String ongoingActivitiyId;
+  final String ongoingActivityId;
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = AppTheme.of(context);
@@ -133,9 +135,7 @@ class OngoingActivitySettingsSheet extends ConsumerWidget {
                 ),
               ),
               GestureDetector(
-                onTap: () {
-                  Navigator.pop(context);
-                },
+                onTap: () => Navigator.pop(context),
                 child: Icon(
                   LucideIcons.xCircle,
                   color: theme.grey[900],
@@ -144,53 +144,60 @@ class OngoingActivitySettingsSheet extends ConsumerWidget {
             ],
           ),
           verticalSpace(Spacing.points16),
-          WidgetsContainer(
-            backgroundColor: theme.warn[100],
-            borderSide: BorderSide(color: theme.warn[600]!, width: 0.5),
-            boxShadow: [
-              BoxShadow(
-                color: Color.fromRGBO(0, 0, 0, 0.05),
-                blurRadius: 24,
-                spreadRadius: 0,
-                offset: Offset(
-                  0,
-                  6,
+          GestureDetector(
+            onTap: () {
+              Navigator.pop(context);
+              showModalBottomSheet<void>(
+                context: context,
+                isScrollControlled: true,
+                builder: (BuildContext context) {
+                  return UpdateOngoingActivitySheet(ongoingActivityId);
+                },
+              );
+            },
+            child: WidgetsContainer(
+              backgroundColor: theme.warn[100],
+              borderSide: BorderSide(color: theme.warn[600]!, width: 0.5),
+              boxShadow: [
+                BoxShadow(
+                  color: Color.fromRGBO(0, 0, 0, 0.05),
+                  blurRadius: 24,
+                  spreadRadius: 0,
+                  offset: Offset(0, 6),
                 ),
-              ),
-              BoxShadow(
-                color: Color.fromRGBO(0, 0, 0, 0.08),
-                blurRadius: 0,
-                spreadRadius: 1,
-                offset: Offset(
-                  0,
-                  0,
+                BoxShadow(
+                  color: Color.fromRGBO(0, 0, 0, 0.08),
+                  blurRadius: 0,
+                  spreadRadius: 1,
+                  offset: Offset(0, 0),
                 ),
-              ),
-            ],
-            child: Center(
-              child: Text(
-                AppLocalizations.of(context).translate('new-begining'),
-                style: TextStyles.body.copyWith(color: theme.warn[800]),
+              ],
+              child: Center(
+                child: Text(
+                  AppLocalizations.of(context).translate('new-begining'),
+                  style: TextStyles.body.copyWith(color: theme.warn[800]),
+                ),
               ),
             ),
           ),
           verticalSpace(Spacing.points8),
-          WidgetsContainer(
-            backgroundColor: theme.error[50],
-            borderSide: BorderSide(color: theme.error[100]!),
-            boxShadow: Shadows.mainShadows,
-            child: Center(
-              child: Text(
-                AppLocalizations.of(context).translate('remove-activity'),
-                style: TextStyles.body.copyWith(color: theme.error[700]),
+          GestureDetector(
+            onTap: () => _showDeleteConfirmation(context, ref),
+            child: WidgetsContainer(
+              backgroundColor: theme.error[50],
+              borderSide: BorderSide(color: theme.error[100]!),
+              boxShadow: Shadows.mainShadows,
+              child: Center(
+                child: Text(
+                  AppLocalizations.of(context).translate('remove-activity'),
+                  style: TextStyles.body.copyWith(color: theme.error[700]),
+                ),
               ),
             ),
           ),
           verticalSpace(Spacing.points32),
           GestureDetector(
-            onTap: () {
-              Navigator.pop(context);
-            },
+            onTap: () => Navigator.pop(context),
             child: WidgetsContainer(
               backgroundColor: theme.primary[50],
               borderSide: BorderSide(color: theme.primary[100]!),
@@ -201,6 +208,56 @@ class OngoingActivitySettingsSheet extends ConsumerWidget {
                   style: TextStyles.body.copyWith(color: theme.primary[900]),
                 ),
               ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _showDeleteConfirmation(
+      BuildContext context, WidgetRef ref) async {
+    final theme = AppTheme.of(context);
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(
+          AppLocalizations.of(context).translate('warning'),
+          style: TextStyles.h6.copyWith(color: theme.error[700]),
+        ),
+        content: Text(
+          AppLocalizations.of(context).translate('delete-activity-warning'),
+          style: TextStyles.body,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(
+              AppLocalizations.of(context).translate('cancel'),
+              style: TextStyles.body.copyWith(color: theme.grey[600]),
+            ),
+          ),
+          TextButton(
+            onPressed: () async {
+              Navigator.pop(context); // Close dialog
+              Navigator.pop(context); // Close settings sheet
+
+              // Delete the activity
+              await ref
+                  .read(
+                      ongoingActivityDetailsNotifierProvider(ongoingActivityId)
+                          .notifier)
+                  .deleteActivity();
+
+              // Navigate back to activities screen
+              if (context.mounted) {
+                Navigator.pop(context);
+              }
+            },
+            child: Text(
+              AppLocalizations.of(context).translate('delete'),
+              style: TextStyles.body.copyWith(color: theme.error[700]),
             ),
           ),
         ],
