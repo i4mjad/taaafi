@@ -223,7 +223,7 @@ class OngoingActivitySettingsSheet extends ConsumerWidget {
 
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         title: Text(
           AppLocalizations.of(context).translate('warning'),
           style: TextStyles.h6.copyWith(color: theme.error[700]),
@@ -234,7 +234,7 @@ class OngoingActivitySettingsSheet extends ConsumerWidget {
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.pop(dialogContext),
             child: Text(
               AppLocalizations.of(context).translate('cancel'),
               style: TextStyles.body.copyWith(color: theme.grey[600]),
@@ -242,18 +242,24 @@ class OngoingActivitySettingsSheet extends ConsumerWidget {
           ),
           TextButton(
             onPressed: () async {
+              // First pop the dialog
+              Navigator.pop(dialogContext);
+              // Then pop the settings sheet
+              Navigator.pop(context);
+
               // Delete the activity
               await ref
                   .read(
                       ongoingActivityDetailsNotifierProvider(ongoingActivityId)
                           .notifier)
-                  .deleteActivity()
-                  .then((onValue) {
-                Navigator.pop(context); // Close dialog
-                Navigator.pop(context); // Close settings sheet
+                  .deleteActivity();
 
-                context.goNamed(RouteNames.vault.name);
-              });
+              // Navigate using a delayed call to ensure previous operations are complete
+              if (context.mounted) {
+                Future.microtask(() {
+                  context.goNamed(RouteNames.activities.name);
+                });
+              }
             },
             child: Text(
               AppLocalizations.of(context).translate('delete'),

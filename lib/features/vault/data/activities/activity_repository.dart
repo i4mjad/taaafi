@@ -674,34 +674,33 @@ class ActivityRepository {
 
   /// Marks an activity and its scheduled tasks as deleted
   Future<void> deleteActivity(String activityId) async {
-    final userId = _auth.currentUser?.uid;
-    if (userId == null) throw Exception('User not authenticated');
+    try {
+      final userId = _auth.currentUser?.uid;
+      if (userId == null) throw Exception('User not authenticated');
 
-    final batch = _firestore.batch();
+      final batch = _firestore.batch();
 
-    // Mark ongoing activity as deleted
-    final activityRef = _firestore
-        .collection('users')
-        .doc(userId)
-        .collection('ongoing_activities')
-        .doc(activityId);
+      // Reference to the ongoing activity document
+      final activityRef = _firestore
+          .collection('users')
+          .doc(userId)
+          .collection('ongoing_activities')
+          .doc(activityId);
 
-    batch.update(activityRef, {'isDeleted': true});
+      // Get all scheduled tasks and delete them
+      final scheduledTasksSnapshot =
+          await activityRef.collection('scheduledTasks').get();
+      for (var doc in scheduledTasksSnapshot.docs) {
+        batch.delete(doc.reference);
+      }
 
-    // Mark all scheduled tasks as deleted
-    final tasksSnapshot = await _firestore
-        .collection('users')
-        .doc(userId)
-        .collection('ongoing_activities')
-        .doc(activityId)
-        .collection('scheduled_tasks')
-        .get();
+      // Delete the ongoing activity document
+      batch.delete(activityRef);
 
-    for (var doc in tasksSnapshot.docs) {
-      batch.update(doc.reference, {'isDeleted': true});
+      await batch.commit();
+    } catch (e) {
+      throw Exception('Failed to delete activity: $e');
     }
-
-    await batch.commit();
   }
 
   /// Updates activity dates by modifying the existing document
