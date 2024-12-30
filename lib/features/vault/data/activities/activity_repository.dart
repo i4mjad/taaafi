@@ -87,6 +87,7 @@ class ActivityRepository {
         'activityId': activityId,
         'startDate': startDate,
         'endDate': endDate,
+        'isDeleted': false,
         'createdAt': FieldValue.serverTimestamp(),
       });
 
@@ -117,6 +118,7 @@ class ActivityRepository {
             {
               'taskId': task.id,
               'scheduledDate': date,
+              'isDeleted': false,
               'isCompleted': false,
               'completedAt': null,
             },
@@ -252,6 +254,7 @@ class ActivityRepository {
           .collection('users')
           .doc(userId)
           .collection('ongoing_activities')
+          .where('isDeleted', isEqualTo: false)
           .get();
 
       // Get activities and their progress in parallel
@@ -311,7 +314,7 @@ class ActivityRepository {
           .collection('users')
           .doc(userId)
           .collection('ongoing_activities')
-          .where('isDeleted', isEqualTo: null)
+          .where('isDeleted', isEqualTo: false)
           .get();
 
       print('Found ${ongoingSnapshot.docs.length} ongoing activities');
@@ -365,7 +368,7 @@ class ActivityRepository {
       }
 
       return todayTasks;
-    } catch (e, st) {
+    } catch (e) {
       throw Exception('Failed to fetch today\'s tasks: $e');
     }
   }
