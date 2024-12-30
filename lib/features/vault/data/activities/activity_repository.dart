@@ -181,6 +181,12 @@ class ActivityRepository {
           .doc(activityId)
           .get();
 
+      if (docSnapshot.exists && docSnapshot.data()?['isDeleted'] == false) {
+        return true;
+      } else {
+        return false;
+      }
+
       return docSnapshot.exists;
     } catch (e) {
       throw Exception('Failed to check subscription status: $e');
@@ -476,8 +482,10 @@ class ActivityRepository {
       }
 
       // Get activity details
-      final activityDoc =
-          await _firestore.collection('activities').doc(activityId).get();
+      final activityDoc = await _firestore
+          .collection('activities')
+          .doc(subscriptionDoc.data()?['activityId'] as String)
+          .get();
       if (!activityDoc.exists) {
         throw Exception('Activity not found');
       }
@@ -696,69 +704,86 @@ class ActivityRepository {
     await batch.commit();
   }
 
-  /// Updates activity dates and reschedules tasks
+  /// Updates activity dates by modifying the existing document
   Future<void> updateActivityDates(
     String activityId,
     DateTime startDate,
     DateTime endDate,
   ) async {
-    final userId = _getCurrentUserId();
-    final batch = _firestore.batch();
+    try {
+      final userId = _getCurrentUserId();
+      final batch = _firestore.batch();
 
-    // Get activity reference
-    final activityRef = _firestore
-        .collection('users')
-        .doc(userId)
-        .collection('ongoing_activities')
-        .doc(activityId);
+      // Get activity reference
+      final activityRef = _firestore
+          .collection('users')
+          .doc(userId)
+          .collection('ongoing_activities')
+          .doc(activityId);
 
-    // Update activity dates
-    batch.update(activityRef, {
-      'startDate': startDate,
-      'endDate': endDate,
-    });
-
-    // Mark existing scheduled tasks as deleted
-    final existingTasksSnapshot =
-        await activityRef.collection('scheduledTasks').get();
-    for (var doc in existingTasksSnapshot.docs) {
-      batch.update(doc.reference, {'isDeleted': true});
-    }
-
-    await batch.commit();
-
-    // Get tasks and create new scheduled occurrences
-    final tasksSnapshot = await _firestore
-        .collection('activities')
-        .doc(activityId)
-        .collection('activityTasks')
-        .get();
-
-    final periodInDays = endDate.difference(startDate).inDays;
-
-    // Create new scheduled tasks
-    final newBatch = _firestore.batch();
-    for (var task in tasksSnapshot.docs) {
-      final frequencyStr = task.data()['taskFrequency'] as String;
-      final frequency = _parseTaskFrequency(frequencyStr);
-      final scheduledDates = _generateScheduledDates(
-        startDate,
-        periodInDays,
-        frequency,
-      );
-
-      for (var date in scheduledDates) {
-        final taskDocRef = activityRef.collection('scheduledTasks').doc();
-        newBatch.set(taskDocRef, {
-          'taskId': task.id,
-          'scheduledDate': date,
-          'isCompleted': false,
-          'completedAt': null,
-          'isDeleted': false,
-        });
+      final activityDoc = await activityRef.get();
+      if (!activityDoc.exists) {
+        throw Exception('Activity not found');
       }
-    }
 
-    await newBatch.commit();
+      // Get the base activityId
+      final baseActivityId = activityDoc.data()?['activityId'] as String;
+
+      // Update activity dates
+      batch.update(activityRef, {
+        'startDate': startDate,
+        'endDate': endDate,
+        'updatedAt': FieldValue.serverTimestamp(),
+      });
+
+      // Delete existing scheduled tasks
+      final existingTasks =
+          await activityRef.collection('scheduledTasks').get();
+      for (var doc in existingTasks.docs) {
+        batch.delete(doc.reference);
+      }
+
+      await batch.commit();
+
+      // Get tasks from base activity and create new scheduled occurrences
+      final baseActivityDoc =
+          await _firestore.collection('activities').doc(baseActivityId).get();
+
+      if (!baseActivityDoc.exists) {
+        throw Exception('Base activity not found');
+      }
+
+      final tasksSnapshot =
+          await baseActivityDoc.reference.collection('activityTasks').get();
+
+      final periodInDays = endDate.difference(startDate).inDays;
+
+      // Create new scheduled tasks
+      final newBatch = _firestore.batch();
+      for (var task in tasksSnapshot.docs) {
+        final frequencyStr = task.data()['taskFrequency'] as String;
+        final frequency = _parseTaskFrequency(frequencyStr);
+        final scheduledDates = _generateScheduledDates(
+          startDate,
+          periodInDays,
+          frequency,
+        );
+
+        for (var date in scheduledDates) {
+          final taskDocRef = activityRef.collection('scheduledTasks').doc();
+          newBatch.set(taskDocRef, {
+            'taskId': task.id,
+            'scheduledDate': date,
+            'isCompleted': false,
+            'completedAt': null,
+            'isDeleted': false,
+          });
+        }
+      }
+
+      await newBatch.commit();
+    } catch (e) {
+      throw Exception('Failed to update activity: $e');
+    }
   }
 }

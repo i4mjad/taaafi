@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/helpers/date_display_formater.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
+import 'package:reboot_app_3/core/routing/route_names.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/custom_theme_data.dart';
@@ -240,20 +242,18 @@ class OngoingActivitySettingsSheet extends ConsumerWidget {
           ),
           TextButton(
             onPressed: () async {
-              Navigator.pop(context); // Close dialog
-              Navigator.pop(context); // Close settings sheet
-
               // Delete the activity
               await ref
                   .read(
                       ongoingActivityDetailsNotifierProvider(ongoingActivityId)
                           .notifier)
-                  .deleteActivity();
+                  .deleteActivity()
+                  .then((onValue) {
+                Navigator.pop(context); // Close dialog
+                Navigator.pop(context); // Close settings sheet
 
-              // Navigate back to activities screen
-              if (context.mounted) {
-                Navigator.pop(context);
-              }
+                context.goNamed(RouteNames.vault.name);
+              });
             },
             child: Text(
               AppLocalizations.of(context).translate('delete'),

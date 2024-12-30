@@ -129,59 +129,62 @@ class TodayTasksWidget extends ConsumerWidget {
     final theme = AppTheme.of(context);
     final todayTasksState = ref.watch(todayTasksNotifierProvider);
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Text(
-              AppLocalizations.of(context).translate('today-tasks'),
-              style: TextStyles.h6.copyWith(color: theme.primary[900]),
-            ),
-            horizontalSpace(Spacing.points8),
-            RichText(
-              text: TextSpan(
-                style: TextStyles.h6,
-                children: [
-                  TextSpan(
-                    text: '2',
-                    style: TextStyle(
-                      color: theme.success[600],
-                    ),
-                  ),
-                  TextSpan(
-                    text: '/',
-                    style: TextStyle(
-                      color: theme.grey[600],
-                    ),
-                  ),
-                  TextSpan(
-                    text: '3',
-                    style: TextStyle(
-                      color: theme.tint[800],
-                    ),
-                  ),
-                ],
+    return todayTasksState.when(
+      data: (tasks) => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Text(
+                AppLocalizations.of(context).translate('today-tasks'),
+                style: TextStyles.h6.copyWith(color: theme.primary[900]),
               ),
-            ),
-            Spacer(),
-            GestureDetector(
-              onTap: () {
-                context.goNamed(RouteNames.allTasks.name);
-              },
-              child: Text(
-                AppLocalizations.of(context).translate('show-all'),
-                style: TextStyles.footnoteSelected.copyWith(
-                  color: theme.grey[500],
+              horizontalSpace(Spacing.points8),
+              RichText(
+                text: TextSpan(
+                  style: TextStyles.h6,
+                  children: [
+                    TextSpan(
+                      text: tasks
+                          .where((task) => task.isCompleted)
+                          .length
+                          .toString(),
+                      style: TextStyle(
+                        color: theme.success[600],
+                      ),
+                    ),
+                    TextSpan(
+                      text: '/',
+                      style: TextStyle(
+                        color: theme.grey[600],
+                      ),
+                    ),
+                    TextSpan(
+                      text: tasks.length.toString(),
+                      style: TextStyle(
+                        color: theme.tint[800],
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ),
-          ],
-        ),
-        verticalSpace(Spacing.points16),
-        todayTasksState.when(
-          data: (tasks) => ListView.separated(
+              Spacer(),
+              GestureDetector(
+                onTap: () {
+                  context.goNamed(RouteNames.allTasks.name);
+                },
+                child: Text(
+                  AppLocalizations.of(context).translate('show-all'),
+                  style: TextStyles.footnoteSelected.copyWith(
+                    color: theme.grey[500],
+                  ),
+                ),
+              ),
+            ],
+          ),
+          verticalSpace(Spacing.points16),
+          ListView.separated(
             shrinkWrap: true,
             physics: NeverScrollableScrollPhysics(),
             itemCount: tasks.length,
@@ -191,10 +194,10 @@ class TodayTasksWidget extends ConsumerWidget {
               activityId: tasks[index].activityId,
             ),
           ),
-          loading: () => const Center(child: CircularProgressIndicator()),
-          error: (error, _) => Center(child: Text(error.toString())),
-        ),
-      ],
+        ],
+      ),
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (error, _) => Center(child: Text(error.toString())),
     );
   }
 }
