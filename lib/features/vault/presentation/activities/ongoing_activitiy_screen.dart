@@ -268,16 +268,13 @@ class OngoingActivityPerformanceWidget extends StatelessWidget {
                   ),
                 ),
                 verticalSpace(Spacing.points8),
-                SizedBox(
-                  height: 32, // Fixed height for the scrollable row
-                  child: ScrollConfiguration(
-                    behavior: ScrollConfiguration.of(context).copyWith(
-                      scrollbars: false,
-                    ),
-                    child: ScheduledDatesRow(
-                      scheduledInstances: scheduledInstances,
-                      performance: performance,
-                    ),
+                ScrollConfiguration(
+                  behavior: ScrollConfiguration.of(context).copyWith(
+                    scrollbars: false,
+                  ),
+                  child: ScheduledDatesRow(
+                    scheduledInstances: scheduledInstances,
+                    performance: performance,
                   ),
                 ),
               ],
@@ -353,10 +350,7 @@ class _ScheduledDatesRowState extends State<ScheduledDatesRow> {
             Padding(
               padding: EdgeInsets.only(top: 1, bottom: 1, right: 4),
               child: WidgetsContainer(
-                padding: EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 6,
-                ),
+                padding: EdgeInsets.all(8),
                 backgroundColor: theme.backgroundColor,
                 borderSide: BorderSide(
                   color: _getBorderColor(
@@ -366,18 +360,42 @@ class _ScheduledDatesRowState extends State<ScheduledDatesRow> {
                   ),
                   width: 0.5,
                 ),
-                child: Text(
-                  getDisplayDate(
-                    scheduledTask.taskDatetime,
-                    Localizations.localeOf(context).languageCode,
-                  ),
-                  style: TextStyles.small.copyWith(
-                    color: _getBorderColor(
-                      scheduledTask,
-                      widget.performance[scheduledTask.task.id] ?? [],
-                      theme,
+                child: Column(
+                  children: [
+                    Text(
+                      scheduledTask.taskDatetime.day.toString(),
+                      style: TextStyles.small.copyWith(
+                        color: _getBorderColor(
+                          scheduledTask,
+                          widget.performance[scheduledTask.task.id] ?? [],
+                          theme,
+                        ),
+                      ),
                     ),
-                  ),
+                    Text(
+                      getDisplayMonth(
+                        scheduledTask.taskDatetime,
+                        Localizations.localeOf(context).languageCode,
+                      ),
+                      style: TextStyles.small.copyWith(
+                        color: _getBorderColor(
+                          scheduledTask,
+                          widget.performance[scheduledTask.task.id] ?? [],
+                          theme,
+                        ),
+                      ),
+                    ),
+                    Text(
+                      scheduledTask.taskDatetime.year.toString(),
+                      style: TextStyles.small.copyWith(
+                        color: _getBorderColor(
+                          scheduledTask,
+                          widget.performance[scheduledTask.task.id] ?? [],
+                          theme,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -394,7 +412,7 @@ class _ScheduledDatesRowState extends State<ScheduledDatesRow> {
     final now = DateTime.now();
     final tomorrow = DateTime(now.year, now.month, now.day + 1);
     if (scheduledTask.taskDatetime.isAfter(tomorrow)) {
-      return Colors.grey[600]!;
+      return Colors.grey[400]!;
     }
 
     final isCompleted = scheduledTask.isCompleted;
