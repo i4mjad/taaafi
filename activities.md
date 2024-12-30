@@ -69,7 +69,7 @@ With the details above, you are required to implement the following functionalit
          c. Activity difficulty (this comes from the activity definition, not specific to the user)
          d. Subscription period
       3. Activity tasks: Each task should have a button to show a modal that contains its details.
-      4. Performance: Show how the user performed in the last 7 occurrences of this activity's tasks. Since activities' tasks have different frequencies, display the last 7 occurrences based on the activity.
+      4. Performance: Show how the user performed in the last 7 occurrences of this activity's ongoing tasks. Since activities' tasks have different frequencies, display the last 7 occurrences based on the activity.
    3. The user can see the settings for the activity, where they can restart the activity or remove the subscription.
 
 4. add activity screen (lib/features/vault/presentation/activities/add_activity_screen.dart):

@@ -13,6 +13,20 @@ class ActivityTask {
     required this.frequency,
   });
 
+  ActivityTask copyWith({
+    String? id,
+    String? name,
+    String? description,
+    TaskFrequency? frequency,
+  }) {
+    return ActivityTask(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      description: description ?? this.description,
+      frequency: frequency ?? this.frequency,
+    );
+  }
+
   factory ActivityTask.fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
     return ActivityTask(

@@ -36,4 +36,20 @@ class OngoingActivityTask {
         'isCompleted': isCompleted,
         'completedAt': null,
       };
+
+  OngoingActivityTask copyWith({
+    ActivityTask? task,
+    DateTime? taskDatetime,
+    bool? isCompleted,
+    String? scheduledTaskId,
+    String? activityId,
+  }) {
+    return OngoingActivityTask(
+      task: task ?? this.task,
+      taskDatetime: taskDatetime ?? this.taskDatetime,
+      isCompleted: isCompleted ?? this.isCompleted,
+      scheduledTaskId: scheduledTaskId ?? this.scheduledTaskId,
+      activityId: activityId ?? this.activityId,
+    );
+  }
 }

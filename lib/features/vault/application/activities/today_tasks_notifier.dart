@@ -24,4 +24,17 @@ class TodayTasksNotifier extends _$TodayTasksNotifier {
       state = AsyncValue.error(e, st);
     }
   }
+
+  void updateTaskLocally(String scheduledTaskId, bool isCompleted) {
+    state.whenData((tasks) {
+      final updatedTasks = tasks.map((task) {
+        if (task.scheduledTaskId == scheduledTaskId) {
+          return task.copyWith(isCompleted: isCompleted);
+        }
+        return task;
+      }).toList();
+
+      state = AsyncValue.data(updatedTasks);
+    });
+  }
 }

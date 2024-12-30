@@ -5,9 +5,11 @@ import 'package:reboot_app_3/core/helpers/date_display_formater.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
+import 'package:reboot_app_3/core/theming/custom_theme_data.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/features/vault/data/activities/activity_task.dart';
+import 'package:reboot_app_3/features/vault/data/activities/ongoing_activity_task.dart';
 import 'package:reboot_app_3/features/vault/presentation/activities/shared_widgets/task_widget.dart';
 import 'package:reboot_app_3/features/vault/data/activities/ongoing_activity_details.dart';
 import 'package:reboot_app_3/features/vault/application/activities/ongoing_activity_details_provider.dart';
@@ -36,13 +38,14 @@ class OngoingActivitiyScreen extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
+                    verticalSpace(Spacing.points4),
                     OngoingActivityDescriptionAndUserStatisticsWidget(
                         details: details),
                     verticalSpace(Spacing.points16),
-                    OngoingActivityTasksWidget(tasks: details.tasks),
+                    OngoingActivityTasksWidget(tasks: details.activityTasks),
                     verticalSpace(Spacing.points16),
                     OngoingActivityPerformanceWidget(
-                      tasks: details.tasks,
+                      scheduledTasks: details.scheduledTasks,
                       performance: details.taskPerformance,
                     )
                   ],
@@ -175,26 +178,7 @@ class OngoingActivitySettingsSheet extends ConsumerWidget {
           WidgetsContainer(
             backgroundColor: theme.error[50],
             borderSide: BorderSide(color: theme.error[100]!),
-            boxShadow: [
-              BoxShadow(
-                color: Color.fromRGBO(0, 0, 0, 0.05),
-                blurRadius: 24,
-                spreadRadius: 0,
-                offset: Offset(
-                  0,
-                  6,
-                ),
-              ),
-              BoxShadow(
-                color: Color.fromRGBO(0, 0, 0, 0.08),
-                blurRadius: 0,
-                spreadRadius: 1,
-                offset: Offset(
-                  0,
-                  0,
-                ),
-              ),
-            ],
+            boxShadow: Shadows.mainShadows,
             child: Center(
               child: Text(
                 AppLocalizations.of(context).translate('remove-activity'),
@@ -210,26 +194,7 @@ class OngoingActivitySettingsSheet extends ConsumerWidget {
             child: WidgetsContainer(
               backgroundColor: theme.primary[50],
               borderSide: BorderSide(color: theme.primary[100]!),
-              boxShadow: [
-                BoxShadow(
-                  color: Color.fromRGBO(0, 0, 0, 0.05),
-                  blurRadius: 24,
-                  spreadRadius: 0,
-                  offset: Offset(
-                    0,
-                    6,
-                  ),
-                ),
-                BoxShadow(
-                  color: Color.fromRGBO(0, 0, 0, 0.08),
-                  blurRadius: 0,
-                  spreadRadius: 1,
-                  offset: Offset(
-                    0,
-                    0,
-                  ),
-                ),
-              ],
+              boxShadow: Shadows.mainShadows,
               child: Center(
                 child: Text(
                   AppLocalizations.of(context).translate('close'),
@@ -246,49 +211,74 @@ class OngoingActivitySettingsSheet extends ConsumerWidget {
 
 class OngoingActivityPerformanceWidget extends StatelessWidget {
   const OngoingActivityPerformanceWidget({
-    required this.tasks,
+    required this.scheduledTasks,
     required this.performance,
     super.key,
   });
 
-  final List<ActivityTask> tasks;
+  final List<OngoingActivityTask> scheduledTasks;
   final Map<String, List<bool>> performance;
+
+  Map<ActivityTask, List<OngoingActivityTask>> _groupTasksByActivityTask() {
+    final groupedTasks = <ActivityTask, List<OngoingActivityTask>>{};
+
+    for (var scheduledTask in scheduledTasks) {
+      final activityTask = scheduledTask.task;
+      groupedTasks.putIfAbsent(activityTask, () => []);
+      groupedTasks[activityTask]!.add(scheduledTask);
+    }
+
+    // Sort each group's scheduled tasks by date (earliest first)
+    for (var tasks in groupedTasks.values) {
+      tasks.sort((a, b) => a.taskDatetime.compareTo(b.taskDatetime));
+    }
+
+    return groupedTasks;
+  }
 
   @override
   Widget build(BuildContext context) {
+    final groupedTasks = _groupTasksByActivityTask();
     final theme = AppTheme.of(context);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisAlignment: MainAxisAlignment.start,
       children: [
         Text(
           AppLocalizations.of(context).translate('activity-performance'),
-          style: TextStyles.h6.copyWith(
-            color: theme.grey[900],
-          ),
+          style: TextStyles.h6,
         ),
-        verticalSpace(Spacing.points8),
+        verticalSpace(Spacing.points16),
         ListView.separated(
           shrinkWrap: true,
           physics: NeverScrollableScrollPhysics(),
-          itemCount: tasks.length,
-          separatorBuilder: (_, __) => verticalSpace(Spacing.points8),
+          itemCount: groupedTasks.length,
+          separatorBuilder: (_, __) => verticalSpace(Spacing.points16),
           itemBuilder: (context, index) {
-            final task = tasks[index];
-            final taskPerformance = performance[task.id] ?? [];
+            final activityTask = groupedTasks.keys.elementAt(index);
+            final scheduledInstances = groupedTasks[activityTask]!;
 
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(task.name, style: TextStyles.small),
-                verticalSpace(Spacing.points4),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    for (var isCompleted in taskPerformance)
-                      OngoingActivityDayPerformanceWidget(isCompleted),
-                  ],
+                Text(
+                  activityTask.name,
+                  style: TextStyles.smallBold.copyWith(
+                    color: theme.grey[900],
+                  ),
+                ),
+                verticalSpace(Spacing.points8),
+                SizedBox(
+                  height: 32, // Fixed height for the scrollable row
+                  child: ScrollConfiguration(
+                    behavior: ScrollConfiguration.of(context).copyWith(
+                      scrollbars: false,
+                    ),
+                    child: ScheduledDatesRow(
+                      scheduledInstances: scheduledInstances,
+                      performance: performance,
+                    ),
+                  ),
                 ),
               ],
             );
@@ -299,59 +289,116 @@ class OngoingActivityPerformanceWidget extends StatelessWidget {
   }
 }
 
-class OngoingActivityDayPerformanceWidget extends StatelessWidget {
-  const OngoingActivityDayPerformanceWidget(
-    this.isFinished, {
+class ScheduledDatesRow extends StatefulWidget {
+  const ScheduledDatesRow({
+    required this.scheduledInstances,
+    required this.performance,
     super.key,
   });
 
-  final bool isFinished;
+  final List<OngoingActivityTask> scheduledInstances;
+  final Map<String, List<bool>> performance;
+
+  @override
+  State<ScheduledDatesRow> createState() => _ScheduledDatesRowState();
+}
+
+class _ScheduledDatesRowState extends State<ScheduledDatesRow> {
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _scrollToToday();
+    });
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _scrollToToday() {
+    final today = DateTime.now();
+    final todayStart = DateTime(today.year, today.month, today.day);
+
+    // Find today's index
+    final todayIndex = widget.scheduledInstances
+        .indexWhere((task) => task.taskDatetime.isAtSameMomentAs(todayStart));
+
+    if (todayIndex != -1) {
+      // Approximate position (assuming each date item is about 100 pixels wide)
+      final scrollPosition =
+          (todayIndex * 100.0) - (MediaQuery.of(context).size.width / 2) + 50;
+      _scrollController.animateTo(
+        scrollPosition.clamp(0.0, _scrollController.position.maxScrollExtent),
+        duration: Duration(milliseconds: 300),
+        curve: Curves.easeOut,
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = AppTheme.of(context);
-    return WidgetsContainer(
-        padding: EdgeInsets.all(6),
-        backgroundColor: theme.backgroundColor,
-        borderSide: BorderSide(
-            color: isFinished ? theme.success[300]! : theme.error[300]!,
-            width: 0.5),
-        boxShadow: [
-          BoxShadow(
-            color: Color.fromRGBO(50, 50, 93, 0.25),
-            blurRadius: 5,
-            spreadRadius: -1,
-            offset: Offset(
-              0,
-              2,
+
+    return SingleChildScrollView(
+      controller: _scrollController,
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        children: [
+          for (var scheduledTask in widget.scheduledInstances)
+            Padding(
+              padding: EdgeInsets.only(top: 1, bottom: 1, right: 4),
+              child: WidgetsContainer(
+                padding: EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
+                backgroundColor: theme.backgroundColor,
+                borderSide: BorderSide(
+                  color: _getBorderColor(
+                    scheduledTask,
+                    widget.performance[scheduledTask.task.id] ?? [],
+                    theme,
+                  ),
+                  width: 0.5,
+                ),
+                child: Text(
+                  getDisplayDate(
+                    scheduledTask.taskDatetime,
+                    Localizations.localeOf(context).languageCode,
+                  ),
+                  style: TextStyles.small.copyWith(
+                    color: _getBorderColor(
+                      scheduledTask,
+                      widget.performance[scheduledTask.task.id] ?? [],
+                      theme,
+                    ),
+                  ),
+                ),
+              ),
             ),
-          ),
-          BoxShadow(
-            color: Color.fromRGBO(0, 0, 0, 0.3),
-            blurRadius: 3,
-            spreadRadius: -1,
-            offset: Offset(
-              0,
-              1,
-            ),
-          ),
         ],
-        child: Column(
-          children: [
-            Text(
-              "28",
-              style: TextStyles.smallBold.copyWith(
-                color: theme.grey[900],
-              ),
-            ),
-            verticalSpace(Spacing.points4),
-            Text(
-              "أغسطس",
-              style: TextStyles.tinyBold.copyWith(
-                color: theme.grey[900],
-              ),
-            ),
-          ],
-        ));
+      ),
+    );
+  }
+
+  Color _getBorderColor(
+    OngoingActivityTask scheduledTask,
+    List<bool> taskPerformance,
+    CustomThemeData theme,
+  ) {
+    final now = DateTime.now();
+    final tomorrow = DateTime(now.year, now.month, now.day + 1);
+    if (scheduledTask.taskDatetime.isAfter(tomorrow)) {
+      return Colors.grey[600]!;
+    }
+
+    final isCompleted = scheduledTask.isCompleted;
+    return isCompleted ? theme.success[300]! : theme.error[300]!;
   }
 }
 
@@ -365,11 +412,8 @@ class OngoingActivityTasksWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = AppTheme.of(context);
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisAlignment: MainAxisAlignment.start,
       children: [
         Text(
           AppLocalizations.of(context).translate('activity-tasks'),
@@ -380,14 +424,75 @@ class OngoingActivityTasksWidget extends StatelessWidget {
           shrinkWrap: true,
           physics: NeverScrollableScrollPhysics(),
           itemBuilder: (BuildContext context, int index) {
-            return TaskWidget(tasks[index]);
+            final task = tasks[index];
+            return GestureDetector(
+              onTap: () => _showTaskDetails(context, task),
+              child: TaskWidget(task),
+            );
           },
-          separatorBuilder: (BuildContext context, int index) =>
-              verticalSpace(Spacing.points8),
+          separatorBuilder: (_, __) => verticalSpace(Spacing.points8),
           itemCount: tasks.length,
         )
       ],
     );
+  }
+
+  void _showTaskDetails(BuildContext context, ActivityTask task) {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) => TaskDetailsModal(task: task),
+    );
+  }
+}
+
+class TaskDetailsModal extends StatelessWidget {
+  final ActivityTask task;
+
+  const TaskDetailsModal({required this.task, super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = AppTheme.of(context);
+
+    return Container(
+      padding: EdgeInsets.all(16),
+      color: theme.backgroundColor,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(task.name, style: TextStyles.h6),
+          verticalSpace(Spacing.points8),
+          Text(task.description, style: TextStyles.body),
+          verticalSpace(Spacing.points8),
+          Text(
+            '${AppLocalizations.of(context).translate('frequency')}: ${_getFrequencyText(context, task.frequency)}',
+            style: TextStyles.small,
+          ),
+          verticalSpace(Spacing.points16),
+          GestureDetector(
+            onTap: () => Navigator.pop(context),
+            child: Center(
+              child: Text(
+                AppLocalizations.of(context).translate('close'),
+                style: TextStyles.body.copyWith(color: theme.primary[600]),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _getFrequencyText(BuildContext context, TaskFrequency frequency) {
+    switch (frequency) {
+      case TaskFrequency.daily:
+        return AppLocalizations.of(context).translate('daily');
+      case TaskFrequency.weekly:
+        return AppLocalizations.of(context).translate('weekly');
+      case TaskFrequency.monthly:
+        return AppLocalizations.of(context).translate('monthly');
+    }
   }
 }
 

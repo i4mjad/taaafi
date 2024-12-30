@@ -40,6 +40,19 @@ String getDisplayDate(dynamic date, String language) {
   return formattedDate;
 }
 
+String getDisplayDayAndMonth(dynamic date, String language) {
+  if (date is Timestamp) {
+    date = date.toDate();
+  }
+
+  String locale = getLocale(language);
+  String formattedDate = DateFormat('d - MMMM', locale).format(date);
+  if (language == 'arabic' || language == 'ar') {
+    formattedDate = replaceWesternWithEasternArabicNumerals(formattedDate);
+  }
+  return formattedDate;
+}
+
 Timestamp parseDisplayDateTime(String dateStr, String language) {
   if (language == 'arabic' || language == 'ar') {
     dateStr = replaceEasternWithWesternArabicNumerals(dateStr);

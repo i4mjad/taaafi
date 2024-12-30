@@ -478,7 +478,6 @@ class ActivityRepository {
       // Get activity details
       final activityDoc =
           await _firestore.collection('activities').doc(activityId).get();
-
       if (!activityDoc.exists) {
         throw Exception('Activity not found');
       }
@@ -486,46 +485,59 @@ class ActivityRepository {
       final activity = Activity.fromFirestore(activityDoc);
       final subscription = OngoingActivity.fromFirestore(subscriptionDoc);
 
-      // Get tasks with their scheduled occurrences
-      final tasksSnapshot = await activityDoc.reference
-          .collection('activityTasks')
-          .orderBy('taskName')
-          .get();
-
-      final tasks = tasksSnapshot.docs
-          .map((doc) => ActivityTask.fromFirestore(doc))
-          .toList();
-
-      // Get last 7 occurrences performance for each task
+      // Get all scheduled tasks
       final scheduledTasksSnapshot = await subscriptionDoc.reference
           .collection('scheduledTasks')
           .orderBy('scheduledDate', descending: true)
           .get();
 
-      final taskPerformance = <String, List<bool>>{};
+      // Get base tasks for mapping
+      final tasksSnapshot = await activityDoc.reference
+          .collection('activityTasks')
+          .orderBy('taskName')
+          .get();
 
-      for (var task in tasks) {
+      final baseTasks = {
+        for (var doc in tasksSnapshot.docs)
+          doc.id: ActivityTask.fromFirestore(doc)
+      };
+
+      // Create OngoingActivityTasks
+      final tasks = scheduledTasksSnapshot.docs.map((doc) {
+        final data = doc.data();
+        final baseTask = baseTasks[data['taskId']]!;
+        return OngoingActivityTask(
+          task: baseTask,
+          taskDatetime: (data['scheduledDate'] as Timestamp).toDate(),
+          isCompleted: data['isCompleted'] ?? false,
+          scheduledTaskId: doc.id,
+          activityId: activityId,
+        );
+      }).toList();
+
+      // Calculate progress
+      final progress =
+          await calculateActivityProgress(activityId, subscription.startDate);
+
+      // Get performance data
+      final taskPerformance = <String, List<bool>>{};
+      for (var task in baseTasks.values) {
         final taskOccurrences = scheduledTasksSnapshot.docs
             .where((doc) => doc.data()['taskId'] == task.id)
             .take(7)
-            .map((doc) => doc.data()['isCompleted'] as bool)
+            .map((doc) => doc.data()['isCompleted'] as bool? ?? false)
             .toList();
 
         taskPerformance[task.id] = taskOccurrences;
       }
-
-      // Calculate overall progress
-      final progress = await calculateActivityProgress(
-        activityId,
-        subscription.startDate,
-      );
 
       return OngoingActivityDetails(
         activity: activity,
         startDate: subscription.startDate,
         endDate: subscription.endDate,
         progress: progress,
-        tasks: tasks,
+        activityTasks: baseTasks.values.toList(),
+        scheduledTasks: tasks,
         taskPerformance: taskPerformance,
       );
     } catch (e) {
@@ -554,16 +566,13 @@ class ActivityRepository {
         throw Exception('Scheduled task document not found');
       }
 
-      // Check if task is scheduled for future
+      // Prevent completing future tasks
       final scheduledDate =
           (doc.data()?['scheduledDate'] as Timestamp).toDate();
-      final today = DateTime(
-        DateTime.now().year,
-        DateTime.now().month,
-        DateTime.now().day,
-      );
+      final now = DateTime.now();
+      final endOfToday = DateTime(now.year, now.month, now.day, 23, 59, 59);
 
-      if (scheduledDate.isAfter(today)) {
+      if (scheduledDate.isAfter(endOfToday)) {
         throw Exception('Cannot complete future tasks');
       }
 

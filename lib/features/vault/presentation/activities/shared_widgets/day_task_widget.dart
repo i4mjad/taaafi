@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:reboot_app_3/core/helpers/date_display_formater.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
 import 'package:reboot_app_3/core/shared_widgets/snackbar.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
-import 'package:reboot_app_3/features/vault/application/activities/all_tasks_notifier.dart';
-import 'package:reboot_app_3/features/vault/application/activities/ongoing_activities_notifier.dart';
 import 'package:reboot_app_3/features/vault/application/activities/ongoing_activity_details_provider.dart';
-import 'package:reboot_app_3/features/vault/application/activities/today_tasks_notifier.dart';
 import 'package:reboot_app_3/features/vault/data/activities/activity_task.dart';
 import 'package:reboot_app_3/features/vault/data/activities/ongoing_activity_task.dart';
 
@@ -26,6 +25,7 @@ class DayTaskWidget extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = AppTheme.of(context);
+    final locale = Localizations.localeOf(context);
 
     return WidgetsContainer(
       backgroundColor: theme.backgroundColor,
@@ -45,7 +45,9 @@ class DayTaskWidget extends ConsumerWidget {
                 ),
                 verticalSpace(Spacing.points4),
                 Text(
-                  task.task.description,
+                  task.task.description +
+                      ' • ' +
+                      getDisplayTime(task.taskDatetime, locale.languageCode),
                   style: TextStyles.small.copyWith(
                     color: theme.grey[700],
                   ),
@@ -56,17 +58,20 @@ class DayTaskWidget extends ConsumerWidget {
           Checkbox(
             value: task.isCompleted,
             onChanged: (bool? value) async {
+              HapticFeedback.lightImpact();
               try {
                 // Check if task is scheduled for future
-                final today = DateTime(
-                  DateTime.now().year,
-                  DateTime.now().month,
-                  DateTime.now().day,
-                );
+                final now = DateTime.now();
+                final endOfToday =
+                    DateTime(now.year, now.month, now.day, 23, 59, 59);
 
-                if (task.taskDatetime.isAfter(today)) {
+                if (task.taskDatetime.isAfter(endOfToday)) {
                   if (context.mounted) {
-                    getErrorSnackBar(context, "cannot-complete-future-tasks");
+                    HapticFeedback.heavyImpact();
+                    getErrorSnackBar(
+                      context,
+                      "cannot-complete-future-tasks",
+                    );
                   }
                   return;
                 }
@@ -75,12 +80,6 @@ class DayTaskWidget extends ConsumerWidget {
                     .read(ongoingActivityDetailsNotifierProvider(activityId)
                         .notifier)
                     .updateTaskCompletion(task.scheduledTaskId, value ?? false);
-
-                // Refresh all providers that show tasks
-                ref.invalidate(todayTasksNotifierProvider);
-                ref.invalidate(allTasksNotifierProvider);
-                ref.invalidate(
-                    ongoingActivitiesNotifierProvider); // For progress updates
               } catch (e) {
                 if (context.mounted) {
                   getErrorSnackBar(context, e.toString());

@@ -35,7 +35,8 @@ class TaskWidget extends ConsumerWidget {
               ),
               verticalSpace(Spacing.points4),
               Text(
-                _getFrequencyText(context, task.frequency),
+                AppLocalizations.of(context)
+                    .translate('${task.frequency.name}'),
                 style: TextStyles.small.copyWith(
                   color: theme.grey[700],
                 ),
