@@ -17,12 +17,11 @@
       ```
         @riverpod
         class MyNotifier extends _$MyNotifier {
-            late final MyService _service;
+              Service get service => ref.read(ServiceProvider);
 
             @override
             FutureOr<AsyncValue<List<MyModel>>> build() async {
-                // Inject the service using ref.read
-                _service = ref.read(myServiceProvider);
+
                 // Fetch initial data
                 return AsyncValue.data(await _service.getData());
             }

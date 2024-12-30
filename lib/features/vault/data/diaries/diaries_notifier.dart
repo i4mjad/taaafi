@@ -8,19 +8,18 @@ part 'diaries_notifier.g.dart';
 
 @riverpod
 class DiariesNotifier extends _$DiariesNotifier {
-  late final DiariesService _service;
+  DiariesService get service => ref.read(diariesServiceProvider);
 
   @override
   FutureOr<List<Diary>> build() async {
-    _service = ref.read(diariesServiceProvider);
-    final diaries = await _service.getDiaries();
+    final diaries = await service.getDiaries();
     return diaries;
   }
 
   Future<void> fetchDiaries() async {
     state = const AsyncValue.loading();
     try {
-      final diaries = await _service.getDiaries();
+      final diaries = await service.getDiaries();
       state = AsyncValue.data(diaries);
     } catch (e, st) {
       state = AsyncValue.error(e, st);
@@ -30,8 +29,9 @@ class DiariesNotifier extends _$DiariesNotifier {
   Future<void> addDiary(Diary diary) async {
     state = const AsyncValue.loading();
     try {
-      await _service.addDiary(diary);
-      state = AsyncValue.data(await build());
+      await service.addDiary(diary);
+      final diaries = await service.getDiaries();
+      state = AsyncValue.data(diaries);
     } catch (e, st) {
       state = AsyncValue.error(e, st);
     }
@@ -40,8 +40,9 @@ class DiariesNotifier extends _$DiariesNotifier {
   Future<void> updateDiary(String diaryId, Diary diary) async {
     state = const AsyncValue.loading();
     try {
-      await _service.updateDiary(diaryId, diary);
-      state = AsyncValue.data(await build());
+      await service.updateDiary(diaryId, diary);
+      final diaries = await service.getDiaries();
+      state = AsyncValue.data(diaries);
     } catch (e, st) {
       state = AsyncValue.error(e, st);
     }
@@ -50,8 +51,9 @@ class DiariesNotifier extends _$DiariesNotifier {
   Future<void> deleteDiary(String diaryId) async {
     state = const AsyncValue.loading();
     try {
-      await _service.deleteDiary(diaryId);
-      state = AsyncValue.data(await build());
+      await service.deleteDiary(diaryId);
+      final diaries = await service.getDiaries();
+      state = AsyncValue.data(diaries);
     } catch (e, st) {
       state = AsyncValue.error(e, st);
     }

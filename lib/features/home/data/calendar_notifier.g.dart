@@ -39,7 +39,7 @@ final calendarServiceProvider = Provider<CalendarService>.internal(
 );
 
 typedef CalendarServiceRef = ProviderRef<CalendarService>;
-String _$calendarNotifierHash() => r'1d6990165e2512eab7dea246427c78528ba71921';
+String _$calendarNotifierHash() => r'14f8c0550e5676c662d2f6c6fa94ed34b9ecda1d';
 
 /// See also [CalendarNotifier].
 @ProviderFor(CalendarNotifier)

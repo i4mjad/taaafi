@@ -6,7 +6,7 @@ part of 'activity_notifier.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$activityNotifierHash() => r'5d3dce8ddf96319924710266f60282e9d41dceae';
+String _$activityNotifierHash() => r'9be668a5ed4f1e40ce12b433c0789d73e97e1f94';
 
 /// See also [ActivityNotifier].
 @ProviderFor(ActivityNotifier)

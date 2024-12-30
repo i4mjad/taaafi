@@ -7,17 +7,16 @@ part 'activity_notifier.g.dart';
 
 @riverpod
 class ActivityNotifier extends _$ActivityNotifier {
-  late final ActivityService _service;
+  ActivityService get service => ref.read(activityServiceProvider);
 
   @override
   FutureOr<List<Activity>> build() async {
-    _service = ref.read(activityServiceProvider);
     return _getAvailableActivities();
   }
 
   /// Fetches available activities
   Future<List<Activity>> _getAvailableActivities() async {
-    return await _service.getAvailableActivities();
+    return await service.getAvailableActivities();
   }
 
   /// Subscribes to activity
@@ -25,7 +24,7 @@ class ActivityNotifier extends _$ActivityNotifier {
       String activityId, DateTime startDate, DateTime endDate) async {
     state = const AsyncValue.loading();
     try {
-      await _service.subscribeToActivity(startDate, endDate, activityId);
+      await service.subscribeToActivity(startDate, endDate, activityId);
       state = AsyncValue.data(await _getAvailableActivities());
     } catch (e, st) {
       state = AsyncValue.error(e, st);
@@ -35,7 +34,7 @@ class ActivityNotifier extends _$ActivityNotifier {
   /// Checks if user is subscribed to an activity
   Future<bool> checkSubscription(String activityId) async {
     try {
-      return await _service.isUserSubscribed(activityId);
+      return await service.isUserSubscribed(activityId);
     } catch (e, st) {
       state = AsyncValue.error(e, st);
       rethrow;

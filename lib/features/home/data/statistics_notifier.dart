@@ -32,16 +32,14 @@ class UserStatistics {
 
 @riverpod
 class StatisticsNotifier extends _$StatisticsNotifier {
-  late final StatisticsService _service;
+  StatisticsService get service => ref.read(statisticsServiceProvider);
 
   @override
   FutureOr<UserStatistics> build() async {
-    _service = ref.read(statisticsServiceProvider);
-
-    final daysWithoutRelapseFuture = _service.calculateDaysWithoutRelapse();
+    final daysWithoutRelapseFuture = service.calculateDaysWithoutRelapse();
     final totalDaysFromFirstDateFuture =
-        _service.calculateTotalDaysFromFirstDate();
-    final longestRelapseStreakFuture = _service.calculateLongestRelapseStreak();
+        service.calculateTotalDaysFromFirstDate();
+    final longestRelapseStreakFuture = service.calculateLongestRelapseStreak();
 
     final results = await Future.wait([
       daysWithoutRelapseFuture,
@@ -59,7 +57,7 @@ class StatisticsNotifier extends _$StatisticsNotifier {
   Future<void> createFollowUp(FollowUpModel followUp) async {
     state = const AsyncValue.loading();
     try {
-      await _service.createFollowUp(followUp: followUp);
+      await service.createFollowUp(followUp: followUp);
       state = AsyncValue.data(await build());
     } catch (e, st) {
       state = AsyncValue.error(e, st);
@@ -69,7 +67,7 @@ class StatisticsNotifier extends _$StatisticsNotifier {
   Future<void> updateFollowUp(FollowUpModel followUp) async {
     state = const AsyncValue.loading();
     try {
-      await _service.updateFollowUp(followUp: followUp);
+      await service.updateFollowUp(followUp: followUp);
       state = AsyncValue.data(await build());
     } catch (e, st) {
       state = AsyncValue.error(e, st);
@@ -79,7 +77,7 @@ class StatisticsNotifier extends _$StatisticsNotifier {
   Future<void> deleteFollowUp(String followUpId) async {
     state = const AsyncValue.loading();
     try {
-      await _service.deleteFollowUp(followUpId: followUpId);
+      await service.deleteFollowUp(followUpId: followUpId);
       state = AsyncValue.data(await build());
     } catch (e, st) {
       state = AsyncValue.error(e, st);
@@ -89,7 +87,7 @@ class StatisticsNotifier extends _$StatisticsNotifier {
   Future<void> deleteAllFollowUps() async {
     state = const AsyncValue.loading();
     try {
-      await _service.deleteAllFollowUps();
+      await service.deleteAllFollowUps();
       state = AsyncValue.data(await build());
     } catch (e, st) {
       state = AsyncValue.error(e, st);

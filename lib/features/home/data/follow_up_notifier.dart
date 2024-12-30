@@ -9,19 +9,18 @@ part 'follow_up_notifier.g.dart';
 
 @riverpod
 class FollowUpNotifier extends _$FollowUpNotifier {
-  late final FollowUpService _service;
+  FollowUpService get service => ref.read(followUpServiceProvider);
 
   @override
   FutureOr<List<FollowUpModel>> build() async {
-    _service = ref.read(followUpServiceProvider);
-    final followUps = await _service.getFollowUps();
+    final followUps = await service.getFollowUps();
     return followUps;
   }
 
   Future<void> createFollowUp(FollowUpModel followUp) async {
     state = const AsyncValue.loading();
     try {
-      await _service.createFollowUp(followUp: followUp);
+      await service.createFollowUp(followUp: followUp);
       state = AsyncValue.data(await build());
     } catch (e, st) {
       state = AsyncValue.error(e, st);
@@ -31,7 +30,7 @@ class FollowUpNotifier extends _$FollowUpNotifier {
   Future<void> updateFollowUp(FollowUpModel followUp) async {
     state = const AsyncValue.loading();
     try {
-      await _service.updateFollowUp(followUp: followUp);
+      await service.updateFollowUp(followUp: followUp);
       state = AsyncValue.data(await build());
     } catch (e, st) {
       state = AsyncValue.error(e, st);
@@ -41,7 +40,7 @@ class FollowUpNotifier extends _$FollowUpNotifier {
   Future<void> deleteFollowUp(String followUpId) async {
     state = const AsyncValue.loading();
     try {
-      await _service.deleteFollowUp(followUpId: followUpId);
+      await service.deleteFollowUp(followUpId: followUpId);
       state = AsyncValue.data(await build());
     } catch (e, st) {
       state = AsyncValue.error(e, st);
@@ -51,7 +50,7 @@ class FollowUpNotifier extends _$FollowUpNotifier {
   Future<void> deleteAllFollowUps() async {
     state = const AsyncValue.loading();
     try {
-      await _service.deleteAllFollowUps();
+      await service.deleteAllFollowUps();
       state = AsyncValue.data(await build());
     } catch (e, st) {
       state = AsyncValue.error(e, st);
@@ -61,7 +60,7 @@ class FollowUpNotifier extends _$FollowUpNotifier {
   Future<void> createMultipleFollowUps(List<FollowUpModel> followUps) async {
     state = const AsyncValue.loading();
     try {
-      await _service.createMultipleFollowUps(followUps: followUps);
+      await service.createMultipleFollowUps(followUps: followUps);
       state = AsyncValue.data(await build());
 
       // Refresh other notifiers
@@ -71,11 +70,11 @@ class FollowUpNotifier extends _$FollowUpNotifier {
   }
 
   Future<List<FollowUpModel>> getFollowUpsByDate(DateTime date) async {
-    return await _service.getFollowUpsByDate(date);
+    return await service.getFollowUpsByDate(date);
   }
 
   Stream<List<FollowUpModel>> watchFollowUpsByDate(DateTime date) {
-    return _service.getFollowUpsByDateStream(date);
+    return service.getFollowUpsByDateStream(date);
   }
 }
 

@@ -23,18 +23,17 @@ CalendarService calendarService(CalendarServiceRef ref) {
 
 @Riverpod(keepAlive: true)
 class CalendarNotifier extends _$CalendarNotifier {
-  late final CalendarService _service;
+  CalendarService get service => ref.read(calendarServiceProvider);
 
   @override
   FutureOr<List<FollowUpModel>> build() async {
-    _service = ref.read(calendarServiceProvider);
-    return await _service.getFollowUps();
+    return await service.getFollowUps();
   }
 
   Future<void> fetchFollowUpsForDates(List<DateTime> dates) async {
     state = const AsyncValue.loading();
     try {
-      final followUps = await _service.fetchFollowUpsForDates(dates);
+      final followUps = await service.fetchFollowUpsForDates(dates);
       state = AsyncValue.data(followUps);
     } catch (e, st) {
       state = AsyncValue.error(e, st);
@@ -44,10 +43,10 @@ class CalendarNotifier extends _$CalendarNotifier {
   Future<List<FollowUpModel>> fetchFollowUpsForMonth(DateTime month) async {
     final startOfMonth = DateTime(month.year, month.month, 1);
     final endOfMonth = DateTime(month.year, month.month + 1, 0);
-    return await _service.fetchFollowUpsForDateRange(startOfMonth, endOfMonth);
+    return await service.fetchFollowUpsForDateRange(startOfMonth, endOfMonth);
   }
 
   Future<DateTime> getUserFirstDate() async {
-    return await _service.getUserFirstDate();
+    return await service.getUserFirstDate();
   }
 }

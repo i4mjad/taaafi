@@ -9,17 +9,15 @@ part 'streak_notifier.g.dart';
 
 @riverpod
 class StreakNotifier extends _$StreakNotifier {
-  late final StreakService _service;
+  StreakService get service => ref.read(streakServiceProvider);
 
   @override
   FutureOr<StreakStatistics> build() async {
-    _service = ref.read(streakServiceProvider);
-
-    final userFirstDateFuture = _service.getUserFirstDate();
-    final relapseStreakFuture = _service.calculateRelapseStreak();
-    final pornOnlyStreakFuture = _service.calculatePornOnlyStreak();
-    final mastOnlyStreakFuture = _service.calculateMastOnlyStreak();
-    final slipUpStreakFuture = _service.calculateSlipUpStreak();
+    final userFirstDateFuture = service.getUserFirstDate();
+    final relapseStreakFuture = service.calculateRelapseStreak();
+    final pornOnlyStreakFuture = service.calculatePornOnlyStreak();
+    final mastOnlyStreakFuture = service.calculateMastOnlyStreak();
+    final slipUpStreakFuture = service.calculateSlipUpStreak();
 
     final results = await Future.wait([
       userFirstDateFuture,
@@ -40,11 +38,11 @@ class StreakNotifier extends _$StreakNotifier {
 
   Future<void> refreshStreakStatistics() async {
     state = const AsyncValue.loading();
-    final userFirstDateFuture = _service.getUserFirstDate();
-    final relapseStreakFuture = _service.calculateRelapseStreak();
-    final pornOnlyStreakFuture = _service.calculatePornOnlyStreak();
-    final mastOnlyStreakFuture = _service.calculateMastOnlyStreak();
-    final slipUpStreakFuture = _service.calculateSlipUpStreak();
+    final userFirstDateFuture = service.getUserFirstDate();
+    final relapseStreakFuture = service.calculateRelapseStreak();
+    final pornOnlyStreakFuture = service.calculatePornOnlyStreak();
+    final mastOnlyStreakFuture = service.calculateMastOnlyStreak();
+    final slipUpStreakFuture = service.calculateSlipUpStreak();
 
     final results = await Future.wait([
       userFirstDateFuture,

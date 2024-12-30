@@ -10,11 +10,10 @@ part 'ongoing_activity_details_provider.g.dart';
 
 @riverpod
 class OngoingActivityDetailsNotifier extends _$OngoingActivityDetailsNotifier {
-  late final ActivityService _service;
+  ActivityService get service => ref.read(activityServiceProvider);
 
   @override
   FutureOr<OngoingActivityDetails> build(String activityId) async {
-    _service = ref.read(activityServiceProvider);
     return await _getOngoingActivityDetails(activityId);
   }
 
@@ -22,7 +21,7 @@ class OngoingActivityDetailsNotifier extends _$OngoingActivityDetailsNotifier {
   Future<OngoingActivityDetails> _getOngoingActivityDetails(
       String activityId) async {
     try {
-      return await _service.getOngoingActivityDetails(activityId);
+      return await service.getOngoingActivityDetails(activityId);
     } catch (e, st) {
       // Set state to error with proper error handling
       state = AsyncValue.error(e, st);
@@ -35,12 +34,12 @@ class OngoingActivityDetailsNotifier extends _$OngoingActivityDetailsNotifier {
       String scheduledTaskId, bool isCompleted) async {
     state = const AsyncValue.loading();
     try {
-      await _service.updateTaskCompletion(
+      await service.updateTaskCompletion(
           activityId, scheduledTaskId, isCompleted);
 
       // Update state with fresh data
       final updatedDetails =
-          await _service.getOngoingActivityDetails(activityId);
+          await service.getOngoingActivityDetails(activityId);
       state = AsyncValue.data(updatedDetails);
 
       // Notify other providers to refresh their data
@@ -58,7 +57,7 @@ class OngoingActivityDetailsNotifier extends _$OngoingActivityDetailsNotifier {
   Future<void> deleteActivity() async {
     state = const AsyncValue.loading();
     try {
-      await _service.deleteActivity(activityId);
+      await service.deleteActivity(activityId);
 
       state = AsyncValue.data(await build(activityId));
     } catch (e, st) {
@@ -70,7 +69,7 @@ class OngoingActivityDetailsNotifier extends _$OngoingActivityDetailsNotifier {
   Future<void> updateActivityDates(DateTime startDate, DateTime endDate) async {
     state = const AsyncValue.loading();
     try {
-      await _service.updateActivityDates(activityId, startDate, endDate);
+      await service.updateActivityDates(activityId, startDate, endDate);
       state = AsyncValue.data(await build(activityId));
 
       // Refresh other providers

@@ -7,18 +7,17 @@ part 'today_tasks_notifier.g.dart';
 
 @riverpod
 class TodayTasksNotifier extends _$TodayTasksNotifier {
-  late final ActivityService _service;
+  ActivityService get service => ref.read(activityServiceProvider);
 
   @override
   FutureOr<List<OngoingActivityTask>> build() async {
-    _service = ref.read(activityServiceProvider);
-    return await _service.getTodayTasks();
+    return await service.getTodayTasks();
   }
 
   Future<void> refreshTasks() async {
     state = const AsyncValue.loading();
     try {
-      final tasks = await _service.getTodayTasks();
+      final tasks = await service.getTodayTasks();
       state = AsyncValue.data(tasks);
     } catch (e, st) {
       state = AsyncValue.error(e, st);

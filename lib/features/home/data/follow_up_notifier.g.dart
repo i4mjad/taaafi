@@ -21,7 +21,7 @@ final followUpServiceProvider = Provider<FollowUpService>.internal(
 );
 
 typedef FollowUpServiceRef = ProviderRef<FollowUpService>;
-String _$followUpNotifierHash() => r'f3f73d984fc4e02a61e11ff3e1dc1cb52e5f9427';
+String _$followUpNotifierHash() => r'6b878a9410c989337654068224ef230a31cde10c';
 
 /// See also [FollowUpNotifier].
 @ProviderFor(FollowUpNotifier)

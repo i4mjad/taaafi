@@ -10,19 +10,18 @@ part 'emotion_notifier.g.dart';
 
 @riverpod
 class EmotionNotifier extends _$EmotionNotifier {
-  late final EmotionService _service;
+  EmotionService get service => ref.read(emotionServiceProvider);
 
   @override
   FutureOr<List<EmotionModel>> build() async {
     final date = DateTime.now(); // or any default date
-    _service = ref.read(emotionServiceProvider);
-    return await _service.readEmotionsByDate(date);
+    return await service.readEmotionsByDate(date);
   }
 
   Future<void> createEmotion(EmotionModel emotion) async {
     state = const AsyncValue.loading();
     try {
-      await _service.createEmotion(emotion: emotion);
+      await service.createEmotion(emotion: emotion);
       state = AsyncValue.data(await build());
     } catch (e, st) {
       state = AsyncValue.error(e, st);
@@ -30,13 +29,13 @@ class EmotionNotifier extends _$EmotionNotifier {
   }
 
   Future<List<EmotionModel>> getEmotionsByDate(DateTime date) async {
-    return await _service.readEmotionsByDate(date);
+    return await service.readEmotionsByDate(date);
   }
 
   Future<void> updateEmotion(EmotionModel emotion) async {
     state = const AsyncValue.loading();
     try {
-      await _service.updateEmotion(emotion: emotion);
+      await service.updateEmotion(emotion: emotion);
       state = AsyncValue.data(await build());
     } catch (e, st) {
       state = AsyncValue.error(e, st);
@@ -46,7 +45,7 @@ class EmotionNotifier extends _$EmotionNotifier {
   Future<void> deleteEmotion(String emotionId) async {
     state = const AsyncValue.loading();
     try {
-      await _service.deleteEmotion(emotionId: emotionId);
+      await service.deleteEmotion(emotionId: emotionId);
       state = AsyncValue.data(await build());
     } catch (e, st) {
       state = AsyncValue.error(e, st);
@@ -56,7 +55,7 @@ class EmotionNotifier extends _$EmotionNotifier {
   Future<void> deleteAllEmotions(DateTime date) async {
     state = const AsyncValue.loading();
     try {
-      await _service.deleteAllEmotions();
+      await service.deleteAllEmotions();
       state = AsyncValue.data(await build());
     } catch (e, st) {
       state = AsyncValue.error(e, st);
@@ -66,7 +65,7 @@ class EmotionNotifier extends _$EmotionNotifier {
   Future<void> createMultipleEmotions(List<EmotionModel> emotions) async {
     state = const AsyncValue.loading();
     try {
-      await _service.createMultipleEmotions(emotions: emotions);
+      await service.createMultipleEmotions(emotions: emotions);
       state = AsyncValue.data(await build());
     } catch (e, st) {
       state = AsyncValue.error(e, st);
@@ -74,7 +73,7 @@ class EmotionNotifier extends _$EmotionNotifier {
   }
 
   Stream<List<EmotionModel>> watchEmotionsByDate(DateTime date) {
-    return _service.watchEmotionsByDate(date);
+    return service.watchEmotionsByDate(date);
   }
 }
 
