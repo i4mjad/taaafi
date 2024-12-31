@@ -162,7 +162,9 @@ export class ContentListService {
 
   // Method to create a new content list
   createContentList(contentListData: ContentListDataModel): Observable<void> {
-    return from(this.contentListsRef.add(contentListData)).pipe(map(() => {}));
+    const docRef = this.contentListsRef.doc();
+    const id = docRef.ref.id;
+    return from(docRef.set({ ...contentListData, id })).pipe(map(() => {}));
   }
 
   // Method to update a content list
