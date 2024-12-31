@@ -1,10 +1,7 @@
-import 'package:flutter/material.dart';
-
 class FeaturedListItem {
-  //TODO: update this based on the needs later
-  final IconData icon;
+  final String iconName;
   final String listName;
-  final String description;
+  final String id;
 
-  FeaturedListItem(this.icon, this.listName, [this.description = '']);
+  FeaturedListItem(this.iconName, this.listName, this.id);
 }

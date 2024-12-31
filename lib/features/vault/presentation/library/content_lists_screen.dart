@@ -10,7 +10,8 @@ import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/core/utils/icon_mapper.dart';
-import 'package:reboot_app_3/features/vault/data/library/featured_list_item.dart';
+import 'package:reboot_app_3/features/vault/application/library/library_notifier.dart';
+import 'package:reboot_app_3/features/vault/data/library/models/cursor_content_list.dart';
 
 class ContentListsScreen extends ConsumerStatefulWidget {
   const ContentListsScreen({super.key});
@@ -22,39 +23,15 @@ class ContentListsScreen extends ConsumerStatefulWidget {
 class _ContentScreenState extends ConsumerState<ContentListsScreen> {
   final TextEditingController searchController = TextEditingController();
 
-  final content = [
-    FeaturedListItem(
-        IconMapper.getIconFromString("airVent"),
-        "التعامل مع الانتكاسة",
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit."),
-    FeaturedListItem(LucideIcons.planeTakeoff, "كيف أبدأ؟",
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit."),
-    FeaturedListItem(LucideIcons.heart, "ما هو الأدمان؟",
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit."),
-    FeaturedListItem(LucideIcons.airVent, "قائمة عوالم",
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit."),
-    FeaturedListItem(LucideIcons.brain, "العقل والإدمان",
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit."),
-    FeaturedListItem(LucideIcons.heartHandshake, "الدعم والمساندة",
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit."),
-    FeaturedListItem(LucideIcons.target, "تحديد الأهداف",
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit."),
-    FeaturedListItem(LucideIcons.smile, "الصحة النفسية",
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit."),
-    FeaturedListItem(LucideIcons.users, "قصص نجاح",
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit."),
-    FeaturedListItem(LucideIcons.bookOpen, "مصادر تعليمية",
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit."),
-  ];
-
-  List<FeaturedListItem> filteredData = [];
-
+  List<CursorContentList> content = [];
+  List<CursorContentList> filteredData = [];
   final FocusNode _focusNode = FocusNode();
+  bool _isLoading = true;
+
   @override
   void initState() {
     super.initState();
-
-    filteredData = content;
+    _loadLists();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _focusNode.requestFocus();
@@ -62,13 +39,28 @@ class _ContentScreenState extends ConsumerState<ContentListsScreen> {
     searchController.addListener(_onSearchChanged);
   }
 
+  Future<void> _loadLists() async {
+    try {
+      final lists =
+          await ref.read(libraryNotifierProvider.notifier).getAllLists();
+      setState(() {
+        content = lists;
+        filteredData = lists;
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+      // You might want to show an error message here
+    }
+  }
+
   void _onSearchChanged() {
     setState(() {
       String searchQuery = searchController.text.toLowerCase();
       filteredData = content
-          .where((item) =>
-              item.listName.toLowerCase().contains(searchQuery) ||
-              item.description.toLowerCase().contains(searchQuery))
+          .where((item) => item.name.toLowerCase().contains(searchQuery))
           .toList();
     });
   }
@@ -84,18 +76,6 @@ class _ContentScreenState extends ConsumerState<ContentListsScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = AppTheme.of(context);
-    final width = MediaQuery.of(context).size.width;
-
-    final content = [
-      FeaturedListItem(LucideIcons.planeLanding, "التعامل مع الانتكاسة",
-          "Lorem ipsum dolor sit amet, consectetur adipiscing elit."),
-      FeaturedListItem(LucideIcons.planeTakeoff, "كيف أبدأ؟",
-          "Lorem ipsum dolor sit amet, consectetur adipiscing elit."),
-      FeaturedListItem(LucideIcons.heart, "ما هو الأدمان؟",
-          "Lorem ipsum dolor sit amet, consectetur adipiscing elit."),
-      FeaturedListItem(LucideIcons.airVent, "قائمة عوالم",
-          "Lorem ipsum dolor sit amet, consectetur adipiscing elit."),
-    ];
 
     return Scaffold(
       backgroundColor: theme.backgroundColor,
@@ -107,28 +87,43 @@ class _ContentScreenState extends ConsumerState<ContentListsScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               CustomTextField(
-                validator: (data) {
-                  return null;
-                },
+                validator: (data) => null,
                 controller: searchController,
                 prefixIcon: LucideIcons.search,
                 inputType: TextInputType.text,
                 focusNode: _focusNode,
               ),
               verticalSpace(Spacing.points16),
-              GridView.builder(
-                shrinkWrap: true,
-                physics: NeverScrollableScrollPhysics(),
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  childAspectRatio: 3.5 / 1,
-                  crossAxisSpacing: 10,
-                  mainAxisSpacing: 10,
-                ),
-                itemCount: filteredData.length,
-                itemBuilder: (context, index) {
-                  return FeaturedListItemWidget(filteredData[index]);
-                },
+              Expanded(
+                child: _isLoading
+                    ? Center(
+                        child: CircularProgressIndicator(
+                          color: theme.primary[700],
+                        ),
+                      )
+                    : filteredData.isEmpty
+                        ? Center(
+                            child: Text(
+                              'No lists found',
+                              style: TextStyles.body.copyWith(
+                                color: theme.grey[600],
+                              ),
+                            ),
+                          )
+                        : GridView.builder(
+                            gridDelegate:
+                                const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2,
+                              childAspectRatio: 3.5 / 1,
+                              crossAxisSpacing: 10,
+                              mainAxisSpacing: 10,
+                            ),
+                            itemCount: filteredData.length,
+                            itemBuilder: (context, index) {
+                              return FeaturedListItemWidget(
+                                  filteredData[index]);
+                            },
+                          ),
               ),
             ],
           ),
@@ -141,14 +136,15 @@ class _ContentScreenState extends ConsumerState<ContentListsScreen> {
 class FeaturedListItemWidget extends StatelessWidget {
   const FeaturedListItemWidget(this.listItem, {super.key});
 
-  final FeaturedListItem listItem;
+  final CursorContentList listItem;
+
   @override
   Widget build(BuildContext context) {
     final theme = AppTheme.of(context);
     return GestureDetector(
       onTap: () {
         context.goNamed(RouteNames.libraryList.name, pathParameters: {
-          "name": listItem.listName,
+          "name": listItem.name,
         });
       },
       child: WidgetsContainer(
@@ -160,32 +156,26 @@ class FeaturedListItemWidget extends StatelessWidget {
             color: Color.fromRGBO(0, 0, 0, 0.1),
             blurRadius: 5,
             spreadRadius: 0,
-            offset: Offset(
-              0,
-              0,
-            ),
+            offset: Offset(0, 0),
           ),
           BoxShadow(
             color: Color.fromRGBO(0, 0, 0, 0.1),
             blurRadius: 1,
             spreadRadius: 0,
-            offset: Offset(
-              0,
-              0,
-            ),
+            offset: Offset(0, 0),
           ),
         ],
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Icon(
-              listItem.icon,
+              IconMapper.getIconFromString(listItem.iconName),
               color: theme.primary[700],
             ),
             horizontalSpace(Spacing.points4),
             Expanded(
               child: Text(
-                listItem.listName,
+                listItem.name,
                 style: TextStyles.small.copyWith(
                   color: theme.grey[900],
                 ),

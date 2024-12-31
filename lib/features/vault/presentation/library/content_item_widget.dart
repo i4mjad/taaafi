@@ -4,14 +4,14 @@ import 'package:reboot_app_3/core/shared_widgets/container.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
+import 'package:reboot_app_3/core/utils/icon_mapper.dart';
+import 'package:reboot_app_3/features/vault/data/library/models/cursor_content.dart';
 
 class ContentItem extends StatelessWidget {
-  final String title;
-  final String description;
+  final CursorContent content;
 
   const ContentItem({
-    required this.title,
-    required this.description,
+    required this.content,
     super.key,
   });
 
@@ -19,6 +19,7 @@ class ContentItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = AppTheme.of(context);
 
+    print(content.type.iconName);
     return WidgetsContainer(
       backgroundColor: theme.backgroundColor,
       borderSide: BorderSide(color: theme.grey[600]!, width: 0.25),
@@ -37,7 +38,7 @@ class ContentItem extends StatelessWidget {
       child: Row(
         children: [
           Icon(
-            LucideIcons.playCircle,
+            IconMapper.getIconFromString(content.type.iconName),
             color: theme.primary[600],
           ),
           horizontalSpace(Spacing.points8),
@@ -45,14 +46,14 @@ class ContentItem extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                title,
+                content.name,
                 style: TextStyles.footnote.copyWith(
                   color: theme.grey[900],
                 ),
               ),
               verticalSpace(Spacing.points4),
               Text(
-                description,
+                '${content.type.name} • ${content.category.name} • ${content.owner.name}',
                 style: TextStyles.small.copyWith(
                   color: theme.grey[700],
                 ),

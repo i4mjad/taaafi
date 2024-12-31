@@ -10,9 +10,12 @@ import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/custom_theme_data.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
-import 'package:reboot_app_3/features/vault/data/library/content_type_item.dart';
-import 'package:reboot_app_3/features/vault/data/library/featured_list_item.dart';
+import 'package:reboot_app_3/core/utils/icon_mapper.dart';
+import 'package:reboot_app_3/features/vault/application/library/library_notifier.dart';
 import 'package:reboot_app_3/features/vault/data/library/latest_addition_item.dart';
+import 'package:reboot_app_3/features/vault/data/library/models/cursor_content.dart';
+import 'package:reboot_app_3/features/vault/data/library/models/cursor_content_list.dart';
+import 'package:reboot_app_3/features/vault/data/library/models/cursor_content_type.dart';
 
 class LibraryScreen extends ConsumerWidget {
   const LibraryScreen({super.key});
@@ -22,53 +25,58 @@ class LibraryScreen extends ConsumerWidget {
     final theme = AppTheme.of(context);
     final width = MediaQuery.of(context).size.width;
     final height = MediaQuery.of(context).size.height;
+
+    final libraryNotifier = ref.watch(libraryNotifierProvider);
     return Scaffold(
-      backgroundColor: theme.backgroundColor,
-      appBar: AppBar(
-        title: Text(
-          AppLocalizations.of(context).translate("library"),
-          style: TextStyles.screenHeadding.copyWith(
-            color: theme.grey[900],
-            height: 1,
-          ),
-        ),
         backgroundColor: theme.backgroundColor,
-        surfaceTintColor: theme.backgroundColor,
-        centerTitle: false,
-        shadowColor: theme.grey[100],
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 16.0, left: 16),
-            child: Icon(LucideIcons.bookmark, color: theme.grey[900]),
-          )
-        ],
-        leadingWidth: 16,
-        automaticallyImplyLeading: true,
-      ),
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Container(
-            width: width,
-            child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  _searchWidget(theme, context),
-                  verticalSpace(Spacing.points16),
-                  LatestAdditionsWidget(),
-                  verticalSpace(Spacing.points16),
-                  FeaturedListsWidget(),
-                  verticalSpace(Spacing.points16),
-                  ContentTypesWidget()
-                ],
+        appBar: AppBar(
+          title: Text(
+            AppLocalizations.of(context).translate("library"),
+            style: TextStyles.screenHeadding.copyWith(
+              color: theme.grey[900],
+              height: 1,
+            ),
+          ),
+          backgroundColor: theme.backgroundColor,
+          surfaceTintColor: theme.backgroundColor,
+          centerTitle: false,
+          shadowColor: theme.grey[100],
+          actions: [
+            Padding(
+              padding: const EdgeInsets.only(right: 16.0, left: 16),
+              child: Icon(LucideIcons.bookmark, color: theme.grey[900]),
+            )
+          ],
+          leadingWidth: 16,
+          automaticallyImplyLeading: true,
+        ),
+        body: libraryNotifier.when(
+          data: (library) => SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Container(
+                width: width,
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      _searchWidget(theme, context),
+                      verticalSpace(Spacing.points16),
+                      LatestAdditionsWidget(library.latestContent),
+                      verticalSpace(Spacing.points16),
+                      FeaturedListsWidget(library.featuredLists),
+                      verticalSpace(Spacing.points16),
+                      ContentTypesWidget(library.contentTypes)
+                    ],
+                  ),
+                ),
               ),
             ),
           ),
-        ),
-      ),
-    );
+          error: (error, stackTrace) => Center(child: Text('Error: $error')),
+          loading: () => Center(child: CircularProgressIndicator()),
+        ));
   }
 
   Widget _searchWidget(CustomThemeData theme, BuildContext context) {
@@ -124,19 +132,16 @@ class LibraryScreen extends ConsumerWidget {
 }
 
 class ContentTypesWidget extends StatelessWidget {
-  const ContentTypesWidget({
+  const ContentTypesWidget(
+    this.content, {
     super.key,
   });
+
+  final List<CursorContentType> content;
 
   @override
   Widget build(BuildContext context) {
     final theme = AppTheme.of(context);
-    final content = [
-      ContentTypeItem(LucideIcons.book, "Article"),
-      ContentTypeItem(LucideIcons.video, "Video"),
-      ContentTypeItem(LucideIcons.paperclip, "Book"),
-      ContentTypeItem(LucideIcons.pencil, "Blog"),
-    ];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -195,7 +200,7 @@ class ContentTypeWidget extends StatelessWidget {
     super.key,
   });
 
-  final ContentTypeItem contentTypeItem;
+  final CursorContentType contentTypeItem;
 
   @override
   Widget build(BuildContext context) {
@@ -206,7 +211,8 @@ class ContentTypeWidget extends StatelessWidget {
         context.goNamed(
           RouteNames.contentType.name,
           pathParameters: {
-            'name': contentTypeItem.contentTypeNameTranslationKey.toString()
+            'typeId': contentTypeItem.id,
+            'typeName': contentTypeItem.name
           },
         );
       },
@@ -241,11 +247,11 @@ class ContentTypeWidget extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Icon(contentTypeItem.icon, color: theme.primary[700]),
+              Icon(IconMapper.getIconFromString(contentTypeItem.iconName),
+                  color: theme.primary[700]),
               verticalSpace(Spacing.points8),
               Text(
-                AppLocalizations.of(context)
-                    .translate(contentTypeItem.contentTypeNameTranslationKey),
+                AppLocalizations.of(context).translate(contentTypeItem.name),
                 textAlign: TextAlign.center,
                 style: TextStyles.caption.copyWith(
                   color: theme.grey[900],
@@ -261,45 +267,53 @@ class ContentTypeWidget extends StatelessWidget {
 }
 
 class LatestAdditionsWidget extends ConsumerWidget {
-  const LatestAdditionsWidget({
+  const LatestAdditionsWidget(
+    this.latestContent, {
     super.key,
   });
+
+  final List<CursorContent> latestContent;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = AppTheme.of(context);
-    final items = [
-      LatestAdditionItem(
+    final items = latestContent.map((content) {
+      return LatestAdditionItem(
         LucideIcons.playCircle,
-        "كيف أتعامل مع الانتكاسة؟",
-        "قناة واعي",
-      ),
-      LatestAdditionItem(
-        LucideIcons.playCircle,
-        "تمارين وتأملات التعافي",
-        "محمد القطان",
-      ),
-      LatestAdditionItem(
-        LucideIcons.text,
-        "تمارين بعد الانتكاسة",
-        "قناة واعي",
-      ),
-      LatestAdditionItem(
-        LucideIcons.playCircle,
-        "كيف أستفيد من منصة تعافي؟",
-        "منصة تعافي",
-      ),
-      LatestAdditionItem(
-        LucideIcons.playCircle,
-        "مراجعة كتاب ممتلئ بالفراغ",
-        "عماد رشاد عثمان",
-      ),
-      LatestAdditionItem(
-        LucideIcons.playCircle,
-        "كيف تبدأ؟ دليل التعافي",
-        "قناة واعي",
-      ),
-    ];
+        content.name,
+        content.owner.name,
+      );
+    }).toList();
+    // return Column(
+    //     "كيف أتعامل مع الانتكاسة؟",
+    //     "قناة واعي",
+    //   ),
+    //   LatestAdditionItem(
+    //     LucideIcons.playCircle,
+    //     "تمارين وتأملات التعافي",
+    //     "محمد القطان",
+    //   ),
+    //   LatestAdditionItem(
+    //     LucideIcons.text,
+    //     "تمارين بعد الانتكاسة",
+    //     "قناة واعي",
+    //   ),
+    //   LatestAdditionItem(
+    //     LucideIcons.playCircle,
+    //     "كيف أستفيد من منصة تعافي؟",
+    //     "منصة تعافي",
+    //   ),
+    //   LatestAdditionItem(
+    //     LucideIcons.playCircle,
+    //     "مراجعة كتاب ممتلئ بالفراغ",
+    //     "عماد رشاد عثمان",
+    //   ),
+    //   LatestAdditionItem(
+    //     LucideIcons.playCircle,
+    //     "كيف تبدأ؟ دليل التعافي",
+    //     "قناة واعي",
+    //   ),
+    // ];
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.start,
@@ -423,19 +437,17 @@ class LastAdditionItemWidget extends StatelessWidget {
 }
 
 class FeaturedListsWidget extends ConsumerWidget {
-  const FeaturedListsWidget({
+  const FeaturedListsWidget(
+    this.featuredLists, {
     super.key,
   });
+
+  final List<CursorContentList> featuredLists;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = AppTheme.of(context);
-    final content = [
-      FeaturedListItem(LucideIcons.planeLanding, "التعامل مع الانتكاسة"),
-      FeaturedListItem(LucideIcons.planeTakeoff, "كيف أبدأ؟"),
-      FeaturedListItem(LucideIcons.heart, "ما هو الأدمان؟"),
-      FeaturedListItem(LucideIcons.airVent, "قائمة عوالم"),
-    ];
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.start,
@@ -472,9 +484,9 @@ class FeaturedListsWidget extends ConsumerWidget {
             crossAxisSpacing: 10,
             mainAxisSpacing: 10,
           ),
-          itemCount: content.length,
+          itemCount: featuredLists.length,
           itemBuilder: (context, index) {
-            return FeaturedListItemWidget(content[index]);
+            return FeaturedListItemWidget(featuredLists[index]);
           },
         ),
       ],
@@ -485,14 +497,14 @@ class FeaturedListsWidget extends ConsumerWidget {
 class FeaturedListItemWidget extends StatelessWidget {
   const FeaturedListItemWidget(this.listItem, {super.key});
 
-  final FeaturedListItem listItem;
+  final CursorContentList listItem;
   @override
   Widget build(BuildContext context) {
     final theme = AppTheme.of(context);
     return GestureDetector(
       onTap: () {
-        print(listItem.listName);
-        context.go('/vault/library/list/${listItem.listName}');
+        print(listItem.name);
+        context.go('/vault/library/list/${listItem.id}');
       },
       child: WidgetsContainer(
         padding: EdgeInsets.all(8),
@@ -522,13 +534,13 @@ class FeaturedListItemWidget extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Icon(
-              listItem.icon,
+              IconMapper.getIconFromString(listItem.iconName),
               color: theme.primary[700],
             ),
             horizontalSpace(Spacing.points4),
             Expanded(
               child: Text(
-                listItem.listName,
+                listItem.name,
                 style: TextStyles.small.copyWith(
                   color: theme.grey[900],
                 ),

@@ -245,10 +245,10 @@ GoRouter goRouter(GoRouterRef ref) {
                     builder: (context, state) => LibraryScreen(),
                     routes: [
                       GoRoute(
-                        path: "list/:name",
+                        path: "list/:id",
                         name: RouteNames.libraryList.name,
                         builder: (context, state) => ListScreen(
-                          state.pathParameters["name"]!,
+                          state.pathParameters["id"]!,
                         ),
                       ),
                       GoRoute(
@@ -262,10 +262,12 @@ GoRouter goRouter(GoRouterRef ref) {
                         builder: (context, state) => ContentListsScreen(),
                       ),
                       GoRoute(
-                        path: "contentType/:name",
+                        path: "contentType/:typeId/:typeName",
                         name: RouteNames.contentType.name,
-                        builder: (context, state) =>
-                            ContentTypeScreen(state.pathParameters["name"]!),
+                        builder: (context, state) => ContentTypeScreen(
+                          state.pathParameters["typeId"]!,
+                          state.pathParameters["typeName"]!,
+                        ),
                       )
                     ],
                   ),
