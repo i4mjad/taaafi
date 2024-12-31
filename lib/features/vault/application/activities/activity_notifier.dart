@@ -11,7 +11,7 @@ class ActivityNotifier extends _$ActivityNotifier {
 
   @override
   FutureOr<List<Activity>> build() async {
-    return _getAvailableActivities();
+    return await _getAvailableActivities();
   }
 
   /// Fetches available activities

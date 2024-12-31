@@ -1,0 +1,42 @@
+- I will list multipule firestore collections , and I will specify the the strcture of the documents inside those, and how are they realted to each other:
+
+  - contentTypes:
+    - contentTypeName (string)
+    - contentTypeIconName
+    - isActive (boolean)
+  - contentOwners:
+    - ownerName (string)
+    - ownerSource (string)
+    - isActive (boolean)
+  - contentCategories:
+    - categoryName (string)
+    - contentCategoryIconName
+    - isActive (boolean)
+  - content:
+    - contentCategoryId (string)
+    - contentLanguage (string)
+    - contentLink (string)
+    - contentName (string)
+    - contentOwnerId (string)
+    - contentTypeId (string)
+    - createdAt(timestamp)
+    - isActive (boolean)
+    - isDeleted (boolean)
+    - updatedAt (timestamp)
+  - contentLists:
+    - id (string)
+    - contentListIconName
+    - isActive (boolean)
+    - isFeatured (boolean)
+    - listContentIds (array)
+    - listDescription (string)
+    - listName (string)
+
+- I need you to create a full slice (notifier/service/repository) considering the following requirements:
+
+- The user should be able to get the latest 6 added contents.
+- The user should be able to get the featured lists
+- The user should be able to see all lists
+- The user should be able to view the details of a list
+- The user should be able to get all content types, and based on this information, the user can see all of the content related to this content type.
+- The user should be able to search, based on a text, this should look in all realted details to contents and content lists so the returned values in this case a list of content and a list of content lists

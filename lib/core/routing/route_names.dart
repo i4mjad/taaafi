@@ -5,7 +5,7 @@ enum RouteNames {
   account,
   vault,
   ta3afiPlus,
-  content,
+  contents,
   onboarding,
   login,
   signup,
@@ -25,4 +25,5 @@ enum RouteNames {
   activityOverview,
   ongoingActivity,
   accountDelete,
+  contentLists,
 }

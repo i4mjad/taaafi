@@ -8,6 +8,7 @@ import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/features/vault/presentation/library/content_item_widget.dart';
 
+//TODO: UPDATE THIS TO TAKE THE LIST ID INSTEAD OF THE TITLE
 class ListScreen extends ConsumerWidget {
   const ListScreen(this.title, {super.key});
 

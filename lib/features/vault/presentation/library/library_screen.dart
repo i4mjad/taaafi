@@ -75,7 +75,7 @@ class LibraryScreen extends ConsumerWidget {
     return GestureDetector(
       onTap: () {
         HapticFeedback.lightImpact();
-        context.goNamed(RouteNames.content.name);
+        context.goNamed(RouteNames.contents.name);
       },
       child: WidgetsContainer(
         backgroundColor: theme.backgroundColor,
@@ -315,7 +315,7 @@ class LatestAdditionsWidget extends ConsumerWidget {
             ),
             GestureDetector(
               onTap: () {
-                context.goNamed(RouteNames.content.name);
+                context.goNamed(RouteNames.contents.name);
               },
               child: Text(
                 AppLocalizations.of(context).translate('show-all'),
@@ -451,7 +451,7 @@ class FeaturedListsWidget extends ConsumerWidget {
             ),
             GestureDetector(
               onTap: () {
-                context.goNamed(RouteNames.content.name);
+                context.goNamed(RouteNames.contentLists.name);
               },
               child: Text(
                 AppLocalizations.of(context).translate('show-all'),

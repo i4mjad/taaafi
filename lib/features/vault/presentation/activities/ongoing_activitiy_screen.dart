@@ -158,26 +158,13 @@ class OngoingActivitySettingsSheet extends ConsumerWidget {
               );
             },
             child: WidgetsContainer(
-              backgroundColor: theme.warn[100],
-              borderSide: BorderSide(color: theme.warn[600]!, width: 0.5),
-              boxShadow: [
-                BoxShadow(
-                  color: Color.fromRGBO(0, 0, 0, 0.05),
-                  blurRadius: 24,
-                  spreadRadius: 0,
-                  offset: Offset(0, 6),
-                ),
-                BoxShadow(
-                  color: Color.fromRGBO(0, 0, 0, 0.08),
-                  blurRadius: 0,
-                  spreadRadius: 1,
-                  offset: Offset(0, 0),
-                ),
-              ],
+              backgroundColor: theme.backgroundColor,
+              borderSide: BorderSide(color: theme.warn[700]!, width: 0.5),
+              // boxShadow: Shadows.mainShadows,
               child: Center(
                 child: Text(
                   AppLocalizations.of(context).translate('new-begining'),
-                  style: TextStyles.body.copyWith(color: theme.warn[800]),
+                  style: TextStyles.body.copyWith(color: theme.warn[700]),
                 ),
               ),
             ),
@@ -186,9 +173,9 @@ class OngoingActivitySettingsSheet extends ConsumerWidget {
           GestureDetector(
             onTap: () => _showDeleteConfirmation(context, ref),
             child: WidgetsContainer(
-              backgroundColor: theme.error[50],
-              borderSide: BorderSide(color: theme.error[100]!),
-              boxShadow: Shadows.mainShadows,
+              backgroundColor: theme.backgroundColor,
+              borderSide: BorderSide(color: theme.error[700]!, width: 0.5),
+              // boxShadow: Shadows.mainShadows,
               child: Center(
                 child: Text(
                   AppLocalizations.of(context).translate('remove-activity'),
@@ -201,8 +188,8 @@ class OngoingActivitySettingsSheet extends ConsumerWidget {
           GestureDetector(
             onTap: () => Navigator.pop(context),
             child: WidgetsContainer(
-              backgroundColor: theme.primary[50],
-              borderSide: BorderSide(color: theme.primary[100]!),
+              backgroundColor: theme.backgroundColor,
+              borderSide: BorderSide(color: theme.grey[900]!, width: 0.5),
               boxShadow: Shadows.mainShadows,
               child: Center(
                 child: Text(

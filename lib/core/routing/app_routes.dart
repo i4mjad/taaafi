@@ -25,6 +25,7 @@ import 'package:reboot_app_3/features/vault/presentation/activities/all_tasks_sc
 import 'package:reboot_app_3/features/vault/presentation/activities/ongoing_activitiy_screen.dart';
 import 'package:reboot_app_3/features/vault/presentation/diaries/diaries_screen.dart';
 import 'package:reboot_app_3/features/vault/presentation/diaries/diary_screen.dart';
+import 'package:reboot_app_3/features/vault/presentation/library/content_lists_screen.dart';
 import 'package:reboot_app_3/features/vault/presentation/library/content_screen.dart';
 import 'package:reboot_app_3/features/vault/presentation/library/content_type_screen.dart';
 import 'package:reboot_app_3/features/vault/presentation/library/library_screen.dart';
@@ -252,8 +253,13 @@ GoRouter goRouter(GoRouterRef ref) {
                       ),
                       GoRoute(
                         path: "content",
-                        name: RouteNames.content.name,
+                        name: RouteNames.contents.name,
                         builder: (context, state) => ContentScreen(),
+                      ),
+                      GoRoute(
+                        path: "lists",
+                        name: RouteNames.contentLists.name,
+                        builder: (context, state) => ContentListsScreen(),
                       ),
                       GoRoute(
                         path: "contentType/:name",
