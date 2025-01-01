@@ -202,45 +202,51 @@ class VaultScreen extends ConsumerWidget {
                     ),
                     horizontalSpace(Spacing.points8),
                     Expanded(
-                      child: WidgetsContainer(
-                        backgroundColor: theme.backgroundColor,
-                        borderSide:
-                            BorderSide(color: theme.grey[600]!, width: 0.5),
-                        padding: EdgeInsets.all(14),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Color.fromRGBO(60, 64, 67, 0.3),
-                            blurRadius: 2,
-                            spreadRadius: 0,
-                            offset: Offset(
-                              0,
-                              1,
-                            ),
-                          ),
-                          BoxShadow(
-                            color: Color.fromRGBO(60, 64, 67, 0.15),
-                            blurRadius: 6,
-                            spreadRadius: 2,
-                            offset: Offset(
-                              0,
-                              2,
-                            ),
-                          ),
-                        ],
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Icon(LucideIcons.settings2, color: theme.grey[900]),
-                            verticalSpace(Spacing.points28),
-                            Text(
-                              AppLocalizations.of(context)
-                                  .translate('settings'),
-                              style: TextStyles.h3.copyWith(
-                                color: theme.grey[900],
+                      child: GestureDetector(
+                        onTap: () {
+                          context.goNamed(RouteNames.vaultSettings.name);
+                        },
+                        child: WidgetsContainer(
+                          backgroundColor: theme.backgroundColor,
+                          borderSide:
+                              BorderSide(color: theme.grey[600]!, width: 0.5),
+                          padding: EdgeInsets.all(14),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Color.fromRGBO(60, 64, 67, 0.3),
+                              blurRadius: 2,
+                              spreadRadius: 0,
+                              offset: Offset(
+                                0,
+                                1,
                               ),
-                            )
+                            ),
+                            BoxShadow(
+                              color: Color.fromRGBO(60, 64, 67, 0.15),
+                              blurRadius: 6,
+                              spreadRadius: 2,
+                              offset: Offset(
+                                0,
+                                2,
+                              ),
+                            ),
                           ],
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Icon(LucideIcons.settings2,
+                                  color: theme.grey[900]),
+                              verticalSpace(Spacing.points28),
+                              Text(
+                                AppLocalizations.of(context)
+                                    .translate('settings'),
+                                style: TextStyles.h3.copyWith(
+                                  color: theme.grey[900],
+                                ),
+                              )
+                            ],
+                          ),
                         ),
                       ),
                     ),

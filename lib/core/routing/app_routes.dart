@@ -30,6 +30,7 @@ import 'package:reboot_app_3/features/vault/presentation/library/content_screen.
 import 'package:reboot_app_3/features/vault/presentation/library/content_type_screen.dart';
 import 'package:reboot_app_3/features/vault/presentation/library/library_screen.dart';
 import 'package:reboot_app_3/features/vault/presentation/library/list_screen.dart';
+import 'package:reboot_app_3/features/vault/presentation/library/vault_settings_screen.dart';
 import 'package:reboot_app_3/features/vault/presentation/vault_screen.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -270,6 +271,11 @@ GoRouter goRouter(GoRouterRef ref) {
                         ),
                       )
                     ],
+                  ),
+                  GoRoute(
+                    path: "settings",
+                    name: RouteNames.vaultSettings.name,
+                    builder: (context, state) => VaultSettingsScreen(),
                   ),
                 ],
               ),

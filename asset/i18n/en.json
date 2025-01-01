@@ -3,6 +3,8 @@
   "daily": "Daily",
   "weekly": "Weekly",
   "monthly": "Monthly",
+
+  "vault-settings": "Vault Settings",
   
   "warning": "Warning",
   "delete-activity-warning": "This action cannot be undone. All progress for this activity will be permanently deleted.",
