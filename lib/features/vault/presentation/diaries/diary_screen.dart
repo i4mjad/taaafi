@@ -29,6 +29,7 @@ class _DiaryScreenState extends ConsumerState<DiaryScreen> {
   final FocusNode _focusNode = FocusNode();
   bool _isKeyboardVisible = false;
   bool _isInitialized = false;
+  bool _isSettingsSheetOpen = false;
 
   void _initializeEditor(Diary diary) {
     Document doc;
@@ -111,63 +112,60 @@ class _DiaryScreenState extends ConsumerState<DiaryScreen> {
             backgroundColor: theme.backgroundColor,
             appBar: _appBar(diary, theme),
             body: SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Flexible(
-                          child: Row(
-                            children: [
-                              Text(
-                                AppLocalizations.of(context)
-                                        .translate('linked-activities') +
-                                    ": ",
-                                style: TextStyles.h6,
-                              ),
-                              horizontalSpace(Spacing.points4),
-                              // TODO: this is to be implemented when it's ready
-                              Flexible(
-                                child: Wrap(
-                                  spacing: 4,
-                                  children: diary.linkedTasks.map((activity) {
-                                    return WidgetsContainer(
-                                      borderRadius: BorderRadius.circular(6),
-                                      padding: EdgeInsets.fromLTRB(8, 2, 8, 2),
-                                      child: Text(
-                                        activity.task.name,
-                                        style: TextStyles.tiny
-                                            .copyWith(color: theme.grey[900]),
-                                      ),
-                                      backgroundColor: theme.backgroundColor,
-                                      borderSide: BorderSide(
-                                          color: theme.grey[600]!, width: 0.5),
-                                    );
-                                  }).toList(),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                    Divider(),
-                    Expanded(
-                      child: Stack(
+              child: AbsorbPointer(
+                absorbing: _isSettingsSheetOpen,
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Padding(
-                            padding: const EdgeInsets.only(
-                                bottom:
-                                    80), // Adjust this value according to your control's height
-                            child: GestureDetector(
-                              onTap: () {
-                                if (!_focusNode.hasFocus) {
-                                  _focusNode.requestFocus();
-                                }
-                              },
+                          Flexible(
+                            child: Row(
+                              children: [
+                                Text(
+                                  AppLocalizations.of(context)
+                                          .translate('linked-activities') +
+                                      ": ",
+                                  style: TextStyles.h6,
+                                ),
+                                horizontalSpace(Spacing.points4),
+                                Flexible(
+                                  child: Wrap(
+                                    spacing: 4,
+                                    children: diary.linkedTasks.map((activity) {
+                                      return WidgetsContainer(
+                                        borderRadius: BorderRadius.circular(6),
+                                        padding:
+                                            EdgeInsets.fromLTRB(8, 2, 8, 2),
+                                        child: Text(
+                                          activity.task.name,
+                                          style: TextStyles.tiny
+                                              .copyWith(color: theme.grey[900]),
+                                        ),
+                                        backgroundColor: theme.backgroundColor,
+                                        borderSide: BorderSide(
+                                            color: theme.grey[600]!,
+                                            width: 0.5),
+                                      );
+                                    }).toList(),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      Divider(),
+                      Expanded(
+                        child: Stack(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                  bottom:
+                                      80), // Adjust this value according to your control's height
                               child: QuillEditor.basic(
                                 controller: _controller,
                                 focusNode: _focusNode,
@@ -221,231 +219,245 @@ class _DiaryScreenState extends ConsumerState<DiaryScreen> {
                                 ),
                               ),
                             ),
-                          ),
-                          Positioned(
-                            bottom: 0,
-                            left: 0,
-                            right: 0,
-                            child: Row(
-                              children: [
-                                if (_isKeyboardVisible) ...[
-                                  GestureDetector(
-                                    onTap: () {
-                                      HapticFeedback.mediumImpact();
-                                      _focusNode.unfocus();
-                                    },
-                                    child: Container(
-                                      padding: const EdgeInsets.all(16),
-                                      decoration: BoxDecoration(
-                                        boxShadow: Shadows.mainShadows,
-                                        color: theme.backgroundColor,
-                                        borderRadius: BorderRadius.circular(50),
-                                        border: Border.all(
-                                          color: theme.grey[600]!,
-                                          width: 0.125,
+                            Positioned(
+                              bottom: 0,
+                              left: 0,
+                              right: 0,
+                              child: Row(
+                                children: [
+                                  if (_isKeyboardVisible) ...[
+                                    GestureDetector(
+                                      onTap: () {
+                                        HapticFeedback.mediumImpact();
+                                        _focusNode.unfocus();
+                                      },
+                                      child: Container(
+                                        padding: const EdgeInsets.all(16),
+                                        decoration: BoxDecoration(
+                                          boxShadow: Shadows.mainShadows,
+                                          color: theme.backgroundColor,
+                                          borderRadius:
+                                              BorderRadius.circular(50),
+                                          border: Border.all(
+                                            color: theme.grey[600]!,
+                                            width: 0.125,
+                                          ),
+                                        ),
+                                        child: Icon(
+                                          LucideIcons.keyboard,
+                                          size: 16,
+                                          color: theme.grey[900],
                                         ),
                                       ),
-                                      child: Icon(
-                                        LucideIcons.keyboard,
-                                        size: 16,
-                                        color: theme.grey[900],
-                                      ),
                                     ),
-                                  ),
-                                  horizontalSpace(Spacing.points8),
-                                ],
-                                Expanded(
-                                  child: WidgetsContainer(
-                                    backgroundColor: theme.backgroundColor,
-                                    boxShadow: Shadows.mainShadows,
-                                    borderSide: BorderSide(
-                                        color: theme.grey[600]!, width: 0.125),
-                                    borderRadius: BorderRadius.circular(10.5),
-                                    padding: const EdgeInsets.all(8),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Row(
-                                          children: [
-                                            GestureDetector(
-                                              onTap: () {
-                                                HapticFeedback.mediumImpact();
-                                                if (!_focusNode.hasFocus) {
-                                                  _focusNode.requestFocus();
-                                                }
-                                                // Toggle heading style
-                                                final isHeading = _controller
-                                                    .getSelectionStyle()
-                                                    .attributes
-                                                    .containsKey('h4');
-                                                _controller.formatSelection(
-                                                  isHeading
-                                                      ? Attribute.fromKeyValue(
-                                                          Attribute.h4.key,
-                                                          null)
-                                                      : Attribute.h4,
-                                                );
-                                              },
-                                              child: Padding(
-                                                padding:
-                                                    const EdgeInsets.all(8),
-                                                child: Text(
-                                                  AppLocalizations.of(context)
-                                                      .translate('heading'),
-                                                  style: TextStyles.small,
+                                    horizontalSpace(Spacing.points8),
+                                  ],
+                                  Expanded(
+                                    child: WidgetsContainer(
+                                      backgroundColor: theme.backgroundColor,
+                                      boxShadow: Shadows.mainShadows,
+                                      borderSide: BorderSide(
+                                          color: theme.grey[600]!,
+                                          width: 0.125),
+                                      borderRadius: BorderRadius.circular(10.5),
+                                      padding: const EdgeInsets.all(8),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Row(
+                                            children: [
+                                              GestureDetector(
+                                                onTap: () {
+                                                  HapticFeedback.mediumImpact();
+                                                  if (!_focusNode.hasFocus) {
+                                                    _focusNode.requestFocus();
+                                                  }
+                                                  // Toggle heading style
+                                                  final isHeading = _controller
+                                                      .getSelectionStyle()
+                                                      .attributes
+                                                      .containsKey('h4');
+                                                  _controller.formatSelection(
+                                                    isHeading
+                                                        ? Attribute
+                                                            .fromKeyValue(
+                                                                Attribute
+                                                                    .h4.key,
+                                                                null)
+                                                        : Attribute.h4,
+                                                  );
+                                                },
+                                                child: Padding(
+                                                  padding:
+                                                      const EdgeInsets.all(8),
+                                                  child: Text(
+                                                    AppLocalizations.of(context)
+                                                        .translate('heading'),
+                                                    style: TextStyles.small,
+                                                  ),
                                                 ),
                                               ),
-                                            ),
-                                            GestureDetector(
-                                              onTap: () {
-                                                HapticFeedback.mediumImpact();
-                                                if (!_focusNode.hasFocus) {
-                                                  _focusNode.requestFocus();
-                                                }
-                                                final isBold = _controller
-                                                    .getSelectionStyle()
-                                                    .attributes
-                                                    .containsKey('bold');
-                                                _controller.formatSelection(
-                                                    isBold
+                                              GestureDetector(
+                                                onTap: () {
+                                                  HapticFeedback.mediumImpact();
+                                                  if (!_focusNode.hasFocus) {
+                                                    _focusNode.requestFocus();
+                                                  }
+                                                  final isBold = _controller
+                                                      .getSelectionStyle()
+                                                      .attributes
+                                                      .containsKey('bold');
+                                                  _controller.formatSelection(
+                                                      isBold
+                                                          ? Attribute
+                                                              .fromKeyValue(
+                                                                  Attribute
+                                                                      .bold.key,
+                                                                  null)
+                                                          : Attribute.bold);
+                                                },
+                                                child: Padding(
+                                                  padding:
+                                                      const EdgeInsets.all(8),
+                                                  child: Text(
+                                                      AppLocalizations.of(
+                                                              context)
+                                                          .translate('bold'),
+                                                      style:
+                                                          TextStyles.smallBold),
+                                                ),
+                                              ),
+                                              GestureDetector(
+                                                onTap: () {
+                                                  HapticFeedback.mediumImpact();
+                                                  if (!_focusNode.hasFocus) {
+                                                    _focusNode.requestFocus();
+                                                  }
+                                                  final isItalic = _controller
+                                                      .getSelectionStyle()
+                                                      .attributes
+                                                      .containsKey('italic');
+                                                  _controller.formatSelection(
+                                                      isItalic
+                                                          ? Attribute
+                                                              .fromKeyValue(
+                                                                  Attribute
+                                                                      .italic
+                                                                      .key,
+                                                                  null)
+                                                          : Attribute.italic);
+                                                },
+                                                child: Padding(
+                                                  padding:
+                                                      const EdgeInsets.all(8),
+                                                  child: Text(
+                                                      AppLocalizations.of(
+                                                              context)
+                                                          .translate('italic'),
+                                                      style: TextStyles.small),
+                                                ),
+                                              ),
+                                              // Adding Quote
+                                              GestureDetector(
+                                                onTap: () {
+                                                  HapticFeedback.mediumImpact();
+                                                  if (!_focusNode.hasFocus) {
+                                                    _focusNode.requestFocus();
+                                                  }
+                                                  final isQuote = _controller
+                                                      .getSelectionStyle()
+                                                      .attributes
+                                                      .containsKey(
+                                                          'blockquote');
+                                                  _controller.formatSelection(
+                                                    isQuote
                                                         ? Attribute
                                                             .fromKeyValue(
                                                                 Attribute
-                                                                    .bold.key,
+                                                                    .blockQuote
+                                                                    .key,
                                                                 null)
-                                                        : Attribute.bold);
-                                              },
-                                              child: Padding(
-                                                padding:
-                                                    const EdgeInsets.all(8),
-                                                child: Text(
-                                                    AppLocalizations.of(context)
-                                                        .translate('bold'),
-                                                    style:
-                                                        TextStyles.smallBold),
+                                                        : Attribute.blockQuote,
+                                                  );
+                                                },
+                                                child: Padding(
+                                                  padding:
+                                                      const EdgeInsets.all(8),
+                                                  child: Text(
+                                                      AppLocalizations.of(
+                                                              context)
+                                                          .translate('quote'),
+                                                      style: TextStyles.small),
+                                                ),
                                               ),
-                                            ),
-                                            GestureDetector(
-                                              onTap: () {
-                                                HapticFeedback.mediumImpact();
-                                                if (!_focusNode.hasFocus) {
-                                                  _focusNode.requestFocus();
-                                                }
-                                                final isItalic = _controller
-                                                    .getSelectionStyle()
-                                                    .attributes
-                                                    .containsKey('italic');
-                                                _controller.formatSelection(
-                                                    isItalic
+                                              // Adding List (unordered)
+                                              GestureDetector(
+                                                onTap: () {
+                                                  HapticFeedback.mediumImpact();
+                                                  if (!_focusNode.hasFocus) {
+                                                    _focusNode.requestFocus();
+                                                  }
+                                                  final isList = _controller
+                                                      .getSelectionStyle()
+                                                      .attributes
+                                                      .containsKey('list');
+                                                  _controller.formatSelection(
+                                                    isList
                                                         ? Attribute
                                                             .fromKeyValue(
                                                                 Attribute
-                                                                    .italic.key,
+                                                                    .ol.key,
                                                                 null)
-                                                        : Attribute.italic);
-                                              },
-                                              child: Padding(
-                                                padding:
-                                                    const EdgeInsets.all(8),
-                                                child: Text(
-                                                    AppLocalizations.of(context)
-                                                        .translate('italic'),
-                                                    style: TextStyles.small),
+                                                        : Attribute.ol,
+                                                  );
+                                                },
+                                                child: Padding(
+                                                  padding:
+                                                      const EdgeInsets.all(8),
+                                                  child: Text(
+                                                      AppLocalizations.of(
+                                                              context)
+                                                          .translate('list'),
+                                                      style: TextStyles.small),
+                                                ),
                                               ),
-                                            ),
-                                            // Adding Quote
-                                            GestureDetector(
-                                              onTap: () {
-                                                HapticFeedback.mediumImpact();
-                                                if (!_focusNode.hasFocus) {
-                                                  _focusNode.requestFocus();
-                                                }
-                                                final isQuote = _controller
-                                                    .getSelectionStyle()
-                                                    .attributes
-                                                    .containsKey('blockquote');
-                                                _controller.formatSelection(
-                                                  isQuote
-                                                      ? Attribute.fromKeyValue(
-                                                          Attribute
-                                                              .blockQuote.key,
-                                                          null)
-                                                      : Attribute.blockQuote,
-                                                );
-                                              },
-                                              child: Padding(
-                                                padding:
-                                                    const EdgeInsets.all(8),
-                                                child: Text(
-                                                    AppLocalizations.of(context)
-                                                        .translate('quote'),
-                                                    style: TextStyles.small),
-                                              ),
-                                            ),
-                                            // Adding List (unordered)
-                                            GestureDetector(
-                                              onTap: () {
-                                                HapticFeedback.mediumImpact();
-                                                if (!_focusNode.hasFocus) {
-                                                  _focusNode.requestFocus();
-                                                }
-                                                final isList = _controller
-                                                    .getSelectionStyle()
-                                                    .attributes
-                                                    .containsKey('list');
-                                                _controller.formatSelection(
-                                                  isList
-                                                      ? Attribute.fromKeyValue(
-                                                          Attribute.ol.key,
-                                                          null)
-                                                      : Attribute.ol,
-                                                );
-                                              },
-                                              child: Padding(
-                                                padding:
-                                                    const EdgeInsets.all(8),
-                                                child: Text(
-                                                    AppLocalizations.of(context)
-                                                        .translate('list'),
-                                                    style: TextStyles.small),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        GestureDetector(
-                                          onTap: () async {
-                                            HapticFeedback.heavyImpact();
-                                            await _saveDiary(diary);
-                                          },
-                                          child: WidgetsContainer(
-                                            backgroundColor:
-                                                theme.backgroundColor,
-                                            borderSide: BorderSide(
-                                                color: theme.grey[300]!,
-                                                width: 0.25),
-                                            boxShadow: Shadows.mainShadows,
-                                            padding: const EdgeInsets.all(8),
-                                            child: Icon(
-                                              LucideIcons.save,
-                                              size: 16,
-                                              color: theme.grey[900],
-                                            ),
+                                            ],
                                           ),
-                                        )
+                                          GestureDetector(
+                                            onTap: () async {
+                                              HapticFeedback.heavyImpact();
+                                              await _saveDiary(diary);
+                                            },
+                                            child: WidgetsContainer(
+                                              backgroundColor:
+                                                  theme.backgroundColor,
+                                              borderSide: BorderSide(
+                                                  color: theme.grey[300]!,
+                                                  width: 0.25),
+                                              boxShadow: Shadows.mainShadows,
+                                              padding: const EdgeInsets.all(8),
+                                              child: Icon(
+                                                LucideIcons.save,
+                                                size: 16,
+                                                color: theme.grey[900],
+                                              ),
+                                            ),
+                                          )
 
-                                        // Save button
-                                      ],
+                                          // Save button
+                                        ],
+                                      ),
                                     ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ));
@@ -483,8 +495,9 @@ class _DiaryScreenState extends ConsumerState<DiaryScreen> {
       automaticallyImplyLeading: true,
       actions: [
         GestureDetector(
-          onTap: () {
-            showModalBottomSheet<void>(
+          onTap: () async {
+            setState(() => _isSettingsSheetOpen = true);
+            await showModalBottomSheet<void>(
               context: context,
               isScrollControlled: true,
               useSafeArea: true,
@@ -492,6 +505,7 @@ class _DiaryScreenState extends ConsumerState<DiaryScreen> {
                 return DiarySettingsSheet(diary);
               },
             );
+            setState(() => _isSettingsSheetOpen = false);
           },
           child: Padding(
             padding: const EdgeInsets.only(right: 16, left: 16),

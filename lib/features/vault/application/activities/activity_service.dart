@@ -164,15 +164,10 @@ class ActivityService {
     DateTime endDate,
   ) async {
     try {
-      print('🔄 Service: Getting tasks for date range');
-      print('   Start: $startDate');
-      print('   End: $endDate');
-
       final tasks = await _repository.getTasksByDateRange(startDate, endDate);
-      print('✅ Service: Retrieved ${tasks.length} tasks');
+
       return tasks;
     } catch (e) {
-      print('❌ Service: Error getting tasks: $e');
       rethrow;
     }
   }

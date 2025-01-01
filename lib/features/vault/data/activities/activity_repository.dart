@@ -201,7 +201,6 @@ class ActivityRepository {
     try {
       final userId = _getCurrentUserId();
       final now = DateTime.now().add(const Duration(days: 1));
-      print('Calculating progress for activity: $activityId');
 
       // Get all scheduled tasks up to now that aren't deleted
       final scheduledTasksSnapshot = await _firestore
@@ -216,10 +215,7 @@ class ActivityRepository {
                   Timestamp.fromDate(DateTime(now.year, now.month, now.day)))
           .get();
 
-      print('Total tasks found: ${scheduledTasksSnapshot.docs.length}');
-
       if (scheduledTasksSnapshot.docs.isEmpty) {
-        print('No tasks found, returning 0 progress');
         return 0.0;
       }
 
@@ -235,17 +231,11 @@ class ActivityRepository {
         return !taskDate.isAfter(now);
       }).length;
 
-      print('Completed tasks: $completedTasks');
-      print('Total tasks until now: $totalTasksUntilNow');
-
       // Calculate progress percentage
       final progress = completedTasks / totalTasksUntilNow * 100;
-      print('Calculated progress: $progress');
 
       return progress;
-    } catch (e, st) {
-      print('Error calculating progress: $e');
-      print('Stack trace: $st');
+    } catch (e) {
       throw Exception('Failed to calculate activity progress: $e');
     }
   }
@@ -302,9 +292,7 @@ class ActivityRepository {
       final validActivities =
           ongoingActivities.whereType<OngoingActivity>().toList();
       return validActivities;
-    } catch (e, st) {
-      print('Error in getOngoingActivities: $e');
-      print('Stack trace: $st');
+    } catch (e) {
       throw Exception('Failed to fetch ongoing activities: $e');
     }
   }
@@ -314,7 +302,6 @@ class ActivityRepository {
     try {
       final userId = _getCurrentUserId();
       final today = DateTime.now();
-      print('Fetching tasks for user: $userId on date: $today');
 
       final ongoingSnapshot = await _firestore
           .collection('users')
@@ -322,8 +309,6 @@ class ActivityRepository {
           .collection('ongoing_activities')
           .where('isDeleted', isEqualTo: false)
           .get();
-
-      print('Found ${ongoingSnapshot.docs.length} ongoing activities');
 
       List<OngoingActivityTask> todayTasks = [];
 
@@ -409,20 +394,6 @@ class ActivityRepository {
       }
     } catch (e) {
       throw Exception('Failed to complete task: $e');
-    }
-  }
-
-  bool _isTaskDueToday(TaskFrequency frequency, DateTime startDate) {
-    final today = DateTime.now();
-    final daysSinceStart = today.difference(startDate).inDays;
-
-    switch (frequency) {
-      case TaskFrequency.daily:
-        return true;
-      case TaskFrequency.weekly:
-        return daysSinceStart % 7 == 0;
-      case TaskFrequency.monthly:
-        return daysSinceStart % 30 == 0;
     }
   }
 
@@ -846,10 +817,6 @@ class ActivityRepository {
   ) async {
     try {
       final userId = _getCurrentUserId();
-      print('🔍 Fetching tasks for date range:');
-      print('   Start: $startDate');
-      print('   End: $endDate');
-      print('   UserId: $userId');
 
       final ongoingActivities = await _firestore
           .collection('users')
@@ -858,13 +825,9 @@ class ActivityRepository {
           .where('isDeleted', isEqualTo: false)
           .get();
 
-      print('📋 Found ${ongoingActivities.docs.length} ongoing activities');
-
       List<OngoingActivityTask> tasks = [];
 
       for (var activityDoc in ongoingActivities.docs) {
-        print('🔄 Processing activity: ${activityDoc.id}');
-
         final scheduledTasks = await activityDoc.reference
             .collection('scheduledTasks')
             .where('scheduledDate',
@@ -874,10 +837,7 @@ class ActivityRepository {
             .where('isDeleted', isEqualTo: false)
             .get();
 
-        print('   📅 Found ${scheduledTasks.docs.length} scheduled tasks');
-
         final baseTasks = await _getBaseTasksMap(activityDoc.id);
-        print('   📚 Found ${baseTasks.length} base tasks');
 
         for (var taskDoc in scheduledTasks.docs) {
           final data = taskDoc.data();
@@ -891,18 +851,12 @@ class ActivityRepository {
               scheduledTaskId: taskDoc.id,
               activityId: activityDoc.id,
             ));
-            print('   ✅ Added task: ${baseTask.name} (${taskDoc.id})');
-          } else {
-            print('   ⚠️ Base task not found for taskId: ${data['taskId']}');
-          }
+          } else {}
         }
       }
 
-      print('🎯 Total tasks found: ${tasks.length}');
       return tasks;
-    } catch (e, st) {
-      print('❌ Error fetching tasks: $e');
-      print('Stack trace: $st');
+    } catch (e) {
       throw Exception('Failed to fetch tasks by date range: $e');
     }
   }
