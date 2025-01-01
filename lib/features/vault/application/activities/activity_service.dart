@@ -148,4 +148,32 @@ class ActivityService {
       rethrow;
     }
   }
+
+  /// Gets tasks scheduled for a specific date
+  Future<List<OngoingActivityTask>> getTasksByDate(DateTime date) async {
+    try {
+      return await _repository.getTasksByDate(date);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  /// Gets tasks scheduled for a specific date range
+  Future<List<OngoingActivityTask>> getTasksByDateRange(
+    DateTime startDate,
+    DateTime endDate,
+  ) async {
+    try {
+      print('🔄 Service: Getting tasks for date range');
+      print('   Start: $startDate');
+      print('   End: $endDate');
+
+      final tasks = await _repository.getTasksByDateRange(startDate, endDate);
+      print('✅ Service: Retrieved ${tasks.length} tasks');
+      return tasks;
+    } catch (e) {
+      print('❌ Service: Error getting tasks: $e');
+      rethrow;
+    }
+  }
 }

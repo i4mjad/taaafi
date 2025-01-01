@@ -1,3 +1,5 @@
+import 'package:reboot_app_3/features/vault/data/activities/ongoing_activity_task.dart';
+
 class Diary {
   final String id;
   final String title;
@@ -5,6 +7,8 @@ class Diary {
   final DateTime date;
   final List<dynamic>? formattedContent;
   final DateTime? updatedAt;
+  final List<String> linkedTaskIds;
+  final List<OngoingActivityTask> linkedTasks;
 
   Diary(
     this.id,
@@ -13,9 +17,10 @@ class Diary {
     this.date, {
     this.formattedContent,
     this.updatedAt,
+    this.linkedTaskIds = const [],
+    this.linkedTasks = const [],
   });
 
-  // Update toJson to handle List directly
   Map<String, dynamic> toJson() => {
         'id': id,
         'title': title,
@@ -23,9 +28,9 @@ class Diary {
         'date': date.toIso8601String(),
         'formattedContent': formattedContent,
         'updatedAt': updatedAt?.toIso8601String(),
+        'linkedTaskIds': linkedTaskIds,
       };
 
-  // Update fromJson to handle List directly
   factory Diary.fromJson(Map<String, dynamic> json) => Diary(
         json['id'] as String,
         json['title'] as String,
@@ -35,5 +40,29 @@ class Diary {
         updatedAt: json['updatedAt'] != null
             ? DateTime.parse(json['updatedAt'] as String)
             : null,
+        linkedTaskIds: (json['linkedTaskIds'] as List<dynamic>?)
+                ?.map((e) => e as String)
+                .toList() ??
+            [],
       );
+
+  Diary copyWith({
+    String? id,
+    String? title,
+    String? plainText,
+    DateTime? date,
+    List<dynamic>? formattedContent,
+    DateTime? updatedAt,
+    List<String>? linkedTaskIds,
+  }) {
+    return Diary(
+      id ?? this.id,
+      title ?? this.title,
+      plainText ?? this.plainText,
+      date ?? this.date,
+      formattedContent: formattedContent ?? this.formattedContent,
+      updatedAt: updatedAt ?? this.updatedAt,
+      linkedTaskIds: linkedTaskIds ?? this.linkedTaskIds,
+    );
+  }
 }

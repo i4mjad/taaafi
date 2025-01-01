@@ -37,6 +37,24 @@ class ActivityTask {
     );
   }
 
+  factory ActivityTask.fromJson(Map<String, dynamic> json) {
+    return ActivityTask(
+      id: json['id'] as String,
+      name: json['name'] as String,
+      description: json['description'] as String,
+      frequency: TaskFrequency.values.firstWhere(
+        (f) => f.toString() == json['frequency'] as String,
+      ),
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'name': name,
+        'description': description,
+        'frequency': frequency.toString(),
+      };
+
   static TaskFrequency _frequencyFromString(String frequency) {
     switch (frequency.toLowerCase()) {
       case 'daily':

@@ -1,3 +1,4 @@
+import 'package:reboot_app_3/features/vault/data/activities/ongoing_activity_task.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:reboot_app_3/features/vault/data/activities/activity.dart';
 import 'package:reboot_app_3/features/vault/application/activities/activity_service.dart';
@@ -38,6 +39,28 @@ class ActivityNotifier extends _$ActivityNotifier {
     } catch (e, st) {
       state = AsyncValue.error(e, st);
       rethrow;
+    }
+  }
+
+  /// Gets tasks for a specific date
+  Future<List<OngoingActivityTask>> getTasksByDate(DateTime date) async {
+    try {
+      return await service.getTasksByDate(date);
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+      rethrow;
+    }
+  }
+
+  /// Gets tasks for a specific date range
+  Future<List<OngoingActivityTask>> getTasksByDateRange(
+    DateTime startDate,
+    DateTime endDate,
+  ) async {
+    try {
+      return await service.getTasksByDateRange(startDate, endDate);
+    } catch (e) {
+      throw Exception('Failed to fetch tasks: $e');
     }
   }
 }

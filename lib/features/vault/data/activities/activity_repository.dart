@@ -363,6 +363,7 @@ class ActivityRepository {
           final baseTask = baseTasks[data['taskId']];
           if (baseTask != null) {
             todayTasks.add(OngoingActivityTask(
+              id: scheduledDoc.id,
               task: baseTask,
               taskDatetime: (data['scheduledDate'] as Timestamp).toDate(),
               isCompleted: data['isCompleted'] ?? false,
@@ -515,6 +516,7 @@ class ActivityRepository {
         final data = doc.data();
         final baseTask = baseTasks[data['taskId']]!;
         return OngoingActivityTask(
+          id: doc.id,
           task: baseTask,
           taskDatetime: (data['scheduledDate'] as Timestamp).toDate(),
           isCompleted: data['isCompleted'] ?? false,
@@ -662,6 +664,7 @@ class ActivityRepository {
 
       if (baseTask != null) {
         allTasks.add(OngoingActivityTask(
+          id: doc.id,
           task: baseTask,
           taskDatetime: (data['scheduledDate'] as Timestamp).toDate(),
           isCompleted: data['isCompleted'] as bool,
@@ -783,6 +786,124 @@ class ActivityRepository {
       await newBatch.commit();
     } catch (e) {
       throw Exception('Failed to update activity: $e');
+    }
+  }
+
+  /// Gets tasks scheduled for a specific date
+  Future<List<OngoingActivityTask>> getTasksByDate(DateTime date) async {
+    try {
+      final userId = _getCurrentUserId();
+      final startOfDay = DateTime(date.year, date.month, date.day);
+      final endOfDay = DateTime(date.year, date.month, date.day, 23, 59, 59);
+
+      final ongoingActivities = await _firestore
+          .collection('users')
+          .doc(userId)
+          .collection('ongoing_activities')
+          .where('isDeleted', isEqualTo: false)
+          .get();
+
+      List<OngoingActivityTask> tasks = [];
+
+      for (var activityDoc in ongoingActivities.docs) {
+        final scheduledTasks = await activityDoc.reference
+            .collection('scheduledTasks')
+            .where('scheduledDate',
+                isGreaterThanOrEqualTo: Timestamp.fromDate(startOfDay))
+            .where('scheduledDate',
+                isLessThanOrEqualTo: Timestamp.fromDate(endOfDay))
+            .where('isDeleted', isEqualTo: false)
+            .get();
+
+        final baseTasks = await _getBaseTasksMap(activityDoc.id);
+
+        for (var taskDoc in scheduledTasks.docs) {
+          final data = taskDoc.data();
+          final baseTask = baseTasks[data['taskId']];
+          if (baseTask != null) {
+            tasks.add(OngoingActivityTask(
+              id: taskDoc.id,
+              task: baseTask,
+              taskDatetime: (data['scheduledDate'] as Timestamp).toDate(),
+              isCompleted: data['isCompleted'] ?? false,
+              scheduledTaskId: taskDoc.id,
+              activityId: activityDoc.id,
+            ));
+          }
+        }
+      }
+
+      return tasks;
+    } catch (e) {
+      throw Exception('Failed to fetch tasks by date: $e');
+    }
+  }
+
+  /// Gets tasks scheduled for a specific date range
+  Future<List<OngoingActivityTask>> getTasksByDateRange(
+    DateTime startDate,
+    DateTime endDate,
+  ) async {
+    try {
+      final userId = _getCurrentUserId();
+      print('🔍 Fetching tasks for date range:');
+      print('   Start: $startDate');
+      print('   End: $endDate');
+      print('   UserId: $userId');
+
+      final ongoingActivities = await _firestore
+          .collection('users')
+          .doc(userId)
+          .collection('ongoing_activities')
+          .where('isDeleted', isEqualTo: false)
+          .get();
+
+      print('📋 Found ${ongoingActivities.docs.length} ongoing activities');
+
+      List<OngoingActivityTask> tasks = [];
+
+      for (var activityDoc in ongoingActivities.docs) {
+        print('🔄 Processing activity: ${activityDoc.id}');
+
+        final scheduledTasks = await activityDoc.reference
+            .collection('scheduledTasks')
+            .where('scheduledDate',
+                isGreaterThanOrEqualTo: Timestamp.fromDate(startDate))
+            .where('scheduledDate',
+                isLessThanOrEqualTo: Timestamp.fromDate(endDate))
+            .where('isDeleted', isEqualTo: false)
+            .get();
+
+        print('   📅 Found ${scheduledTasks.docs.length} scheduled tasks');
+
+        final baseTasks = await _getBaseTasksMap(activityDoc.id);
+        print('   📚 Found ${baseTasks.length} base tasks');
+
+        for (var taskDoc in scheduledTasks.docs) {
+          final data = taskDoc.data();
+          final baseTask = baseTasks[data['taskId']];
+          if (baseTask != null) {
+            tasks.add(OngoingActivityTask(
+              id: taskDoc.id,
+              task: baseTask,
+              taskDatetime: (data['scheduledDate'] as Timestamp).toDate(),
+              isCompleted: data['isCompleted'] ?? false,
+              scheduledTaskId: taskDoc.id,
+              activityId: activityDoc.id,
+            ));
+            print('   ✅ Added task: ${baseTask.name} (${taskDoc.id})');
+          } else {
+            print('   ⚠️ Base task not found for taskId: ${data['taskId']}');
+          }
+        }
+      }
+
+      print('🎯 Total tasks found: ${tasks.length}');
+      return tasks;
+    } catch (e, st) {
+      print('❌ Error fetching tasks: $e');
+      print('Stack trace: $st');
+      throw Exception('Failed to fetch tasks by date range: $e');
     }
   }
 }
