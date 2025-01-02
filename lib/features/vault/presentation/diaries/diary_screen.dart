@@ -270,9 +270,9 @@ class _DiaryScreenState extends ConsumerState<DiaryScreen> {
                                               GestureDetector(
                                                 onTap: () {
                                                   HapticFeedback.mediumImpact();
-                                                  if (!_focusNode.hasFocus) {
-                                                    _focusNode.requestFocus();
-                                                  }
+                                                  // if (!_focusNode.hasFocus) {
+                                                  //   _focusNode.requestFocus();
+                                                  // }
                                                   // Toggle heading style
                                                   final isHeading = _controller
                                                       .getSelectionStyle()
@@ -301,9 +301,9 @@ class _DiaryScreenState extends ConsumerState<DiaryScreen> {
                                               GestureDetector(
                                                 onTap: () {
                                                   HapticFeedback.mediumImpact();
-                                                  if (!_focusNode.hasFocus) {
-                                                    _focusNode.requestFocus();
-                                                  }
+                                                  // if (!_focusNode.hasFocus) {
+                                                  //   _focusNode.requestFocus();
+                                                  // }
                                                   final isBold = _controller
                                                       .getSelectionStyle()
                                                       .attributes
@@ -331,9 +331,9 @@ class _DiaryScreenState extends ConsumerState<DiaryScreen> {
                                               GestureDetector(
                                                 onTap: () {
                                                   HapticFeedback.mediumImpact();
-                                                  if (!_focusNode.hasFocus) {
-                                                    _focusNode.requestFocus();
-                                                  }
+                                                  // if (!_focusNode.hasFocus) {
+                                                  //   _focusNode.requestFocus();
+                                                  // }
                                                   final isItalic = _controller
                                                       .getSelectionStyle()
                                                       .attributes
@@ -362,9 +362,9 @@ class _DiaryScreenState extends ConsumerState<DiaryScreen> {
                                               GestureDetector(
                                                 onTap: () {
                                                   HapticFeedback.mediumImpact();
-                                                  if (!_focusNode.hasFocus) {
-                                                    _focusNode.requestFocus();
-                                                  }
+                                                  // if (!_focusNode.hasFocus) {
+                                                  //   _focusNode.requestFocus();
+                                                  // }
                                                   final isQuote = _controller
                                                       .getSelectionStyle()
                                                       .attributes
@@ -395,9 +395,9 @@ class _DiaryScreenState extends ConsumerState<DiaryScreen> {
                                               GestureDetector(
                                                 onTap: () {
                                                   HapticFeedback.mediumImpact();
-                                                  if (!_focusNode.hasFocus) {
-                                                    _focusNode.requestFocus();
-                                                  }
+                                                  // if (!_focusNode.hasFocus) {
+                                                  //   _focusNode.requestFocus();
+                                                  // }
                                                   final isList = _controller
                                                       .getSelectionStyle()
                                                       .attributes
