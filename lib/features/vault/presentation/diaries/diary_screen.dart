@@ -165,7 +165,7 @@ class _DiaryScreenState extends ConsumerState<DiaryScreen> {
                             Padding(
                               padding: const EdgeInsets.only(
                                   bottom:
-                                      80), // Adjust this value according to your control's height
+                                      64), // Adjust this value according to your control's height
                               child: QuillEditor.basic(
                                 controller: _controller,
                                 focusNode: _focusNode,
@@ -498,11 +498,12 @@ class _DiaryScreenState extends ConsumerState<DiaryScreen> {
           onTap: () async {
             setState(() => _isSettingsSheetOpen = true);
             // todo : experiment with this
-            _focusNode.dispose();
 
             await showModalBottomSheet<void>(
               context: context,
               isScrollControlled: true,
+              isDismissible: false,
+              enableDrag: false,
               useSafeArea: true,
               builder: (BuildContext context) {
                 return DiarySettingsSheet(diary);
