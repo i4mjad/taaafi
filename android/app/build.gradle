@@ -76,18 +76,6 @@ android {
         }
     }
 
-    flavorDimensions "track"
-        productFlavors {
-            internal {
-                dimension "track"
-                applicationIdSuffix ".internal"
-                manifestPlaceholders = [applicationLabel: "[Internal] Shorebird Example"]
-            }
-            stable {
-                dimension "track"
-                manifestPlaceholders = [applicationLabel: "Shorebird Example"]
-            }
-        }
 
     buildTypes {
         release {
