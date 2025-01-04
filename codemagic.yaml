@@ -8,17 +8,25 @@ workflows:
       flutter: 3.24.3
       groups:
         - google_credentials
+        - shorebird
       vars:
         PACKAGE_NAME: "com.amjadkhalfan.reboot_app_3"
         GOOGLE_PLAY_TRACK: alpha
     scripts:
+      - name: Install Shorebird
+        script: |
+          # Install Shorebird
+          curl --proto '=https' --tlsv1.2 https://raw.githubusercontent.com/shorebirdtech/install/main/install.sh -sSf | bash
+
+          # Add Shorebird to PATH
+          echo PATH="$HOME/.shorebird/bin:$PATH" >> $CM_ENV
       - name: Set up local.properties
         script: |
           echo "flutter.sdk=$HOME/programs/flutter" > "$CM_BUILD_DIR/android/local.properties"
       - name: Get Flutter packages
         script: |
           flutter packages pub get
-      - name: Build AAB file
+      - name: Build AAB file (Shorebird)
         script: |
           VERSION=$(cat pubspec.yaml | grep 'version:' | head -1 | awk '{print $2}' | cut -d '+' -f 1)
           LATEST_BUILD_NUMBER=$(google-play get-latest-build-number --package-name "$PACKAGE_NAME" --tracks="$GOOGLE_PLAY_TRACK")
@@ -26,7 +34,7 @@ workflows:
           if [ $BUILD_NUMBER -lt 10 ]; then
             BUILD_NUMBER="0$BUILD_NUMBER"
           fi
-          flutter build appbundle --release \
+          shorebird release android --release \
             --build-name=$VERSION \
             --build-number=$BUILD_NUMBER \
             -PVERSION_CODE=$BUILD_NUMBER \
@@ -49,6 +57,8 @@ workflows:
         distribution_type: app_store
         bundle_identifier: com.amjadkhalfan.RebootApp
       flutter: 3.24.3
+      groups:
+        - shorebird
       vars:
         APP_STORE_APPLE_ID: 1531562469
     scripts:
@@ -77,7 +87,8 @@ workflows:
         script: |
           VERSION=$(cat pubspec.yaml | grep 'version:' | head -1 | awk '{print $2}' | cut -d '+' -f 1)
           BUILD_NUMBER=$(app-store-connect get-latest-testflight-build-number "$APP_STORE_APPLE_ID")
-          flutter build ipa --release --export-options-plist=ios/buildInfo.plist
+          shorebird release ios
+          --export-options-plist=ios/buildInfo.plist
     artifacts:
       - build/ios/ipa/*.ipa
       - /tmp/xcodebuild_logs/*.log
