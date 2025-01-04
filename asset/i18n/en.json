@@ -28,8 +28,15 @@
   "relapses-number": "Relapses Count: ",
   "start-your-journy": "Start Your Journy",
   "start-your-journy-p": "To start, please select the day you want to start from. If you want to start today click on Today button",
-
+  "diaries-settings": "Diaries Settings",
+  "erase-all-activities": "Erase All Activities",
+  "erase-all-bookmarks": "Erase All Bookmarks",
+  "erase-all-diaries": "Erase All Diaries",
   "featured-lists":"Featured Lists",
+  "new-diary": "New Diary",
+  "activities-settings": "Activities Settings",
+  "activities-reminders": "Activities Reminders",
+  "bookmarks-settings": "Bookmarks Settings",
 
   "explore-content-lists": "Explore Content Lists",
 

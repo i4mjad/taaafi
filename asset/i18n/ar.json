@@ -134,12 +134,20 @@
 
   "latest-additions": "آخر الإضافات",
 
-  "library-search-placeholder":"ابحث عن مقطع مرئي، كتاب ...إلخ",
+  "activities-reminders": "تذكيرات التمارين",
+  "erase-all-activities": "إزالة جميع التمارين",
 
+  "library-search-placeholder":"ابحث عن مقطع مرئي، كتاب ...إلخ",
+  "bookmarks-settings": "إعدادات المحفوظات",
+  "diaries-settings": "إعدادات المذكرات",
   "not-login": "لمشاهدة ملخص لرحلة التعافي يجب عليك تسجيل الدخول من صفحة تابع تعافيك",
 
+  "erase-all-bookmarks": "إزالة جميع المحفوظات",
+  "erase-all-diaries": "إزالة جميع المذكرات",
   "new-note": "ملاحظة جديدة",
+  "new-diary": "مذكرة جديدة",
   "ta3afi": "تطبيق تعافي",
+  "activities-settings": "إعدادات التمارين",
 
   "vault": "الخزنة",
   "fellowship": "الزمالة",

@@ -19,7 +19,6 @@ class ContentItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = AppTheme.of(context);
 
-    print(content.type.iconName);
     return WidgetsContainer(
       backgroundColor: theme.backgroundColor,
       borderSide: BorderSide(color: theme.grey[600]!, width: 0.25),

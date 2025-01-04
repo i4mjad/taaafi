@@ -142,7 +142,6 @@ class _CalenderWidgetState extends ConsumerState<CalenderWidget> {
       if (date.isAfter(now)) break; // Avoid adding anything after today's date
       if (!followUpDates.contains(date) && date != now) {
         if (date != now || !hasFollowUpToday) {
-          print("date: $date");
           appointments.add(Appointment(
             startTime: date,
             endTime: date.add(Duration(minutes: 10)),

@@ -1,4 +1,5 @@
 import 'package:reboot_app_3/features/vault/application/diaries/diaries_service.dart';
+import 'package:reboot_app_3/features/vault/data/diaries/diaries_notifier.dart';
 import 'package:reboot_app_3/features/vault/data/diaries/diaries_repository.dart';
 import 'package:reboot_app_3/features/vault/data/diaries/diary.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -27,6 +28,7 @@ class DiaryNotifier extends _$DiaryNotifier {
 
       // After successful update, refresh the diary data
       final updatedDiary = await _fetchDiary(diaryId);
+      await ref.read(diariesNotifierProvider.notifier).updateDiariesState();
       state = AsyncValue.data(updatedDiary);
     } catch (e, stack) {
       state = AsyncValue.error(e, stack);

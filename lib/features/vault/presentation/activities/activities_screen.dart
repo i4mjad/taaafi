@@ -103,7 +103,6 @@ class OngoingActivitiesWidget extends ConsumerWidget {
         verticalSpace(Spacing.points8),
         ongoingActivitiesState.when(
           data: (activities) {
-            print(activities.length);
             return ListView.separated(
               shrinkWrap: true,
               physics: NeverScrollableScrollPhysics(),

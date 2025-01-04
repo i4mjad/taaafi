@@ -26,6 +26,16 @@ class DiariesNotifier extends _$DiariesNotifier {
     }
   }
 
+  Future<void> updateDiariesState() async {
+    state = const AsyncValue.loading();
+    try {
+      final diaries = await service.getDiaries();
+      state = AsyncValue.data(diaries);
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+    }
+  }
+
   Future<void> addDiary(Diary diary) async {
     state = const AsyncValue.loading();
     try {
@@ -70,6 +80,27 @@ class DiariesNotifier extends _$DiariesNotifier {
       return diary.title.toLowerCase().contains(lowercaseQuery) ||
           diary.plainText.toLowerCase().contains(lowercaseQuery);
     }).toList();
+  }
+
+  Future<String> createEmptyDiary() async {
+    state = const AsyncValue.loading();
+    try {
+      final emptyDiary = Diary(
+        '', // ID will be assigned by Firebase
+        '', // Empty title
+        '', // Empty content
+        DateTime.now(), // Current timestamp
+        formattedContent: [], // Empty formatted content
+      );
+
+      final diaryId = await service.createEmptyDiary(emptyDiary);
+      final diaries = await service.getDiaries();
+      state = AsyncValue.data(diaries);
+      return diaryId;
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+      rethrow;
+    }
   }
 }
 

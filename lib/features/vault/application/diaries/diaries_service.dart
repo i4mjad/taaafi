@@ -25,4 +25,8 @@ class DiariesService {
   Future<Diary?> getDiaryById(String diaryId) async {
     return await _repository.getDiaryById(diaryId);
   }
+
+  Future<String> createEmptyDiary(Diary diary) async {
+    return await _repository.createEmptyDiary(diary);
+  }
 }

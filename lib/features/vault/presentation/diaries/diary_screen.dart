@@ -478,7 +478,9 @@ class _DiaryScreenState extends ConsumerState<DiaryScreen> {
   AppBar _appBar(Diary diary, CustomThemeData theme) {
     return AppBar(
       title: Text(
-        diary.title,
+        diary.title == ""
+            ? AppLocalizations.of(context).translate('new-diary')
+            : diary.title,
         style: TextStyles.h5.copyWith(
           color: theme.grey[900],
           height: 1.2,

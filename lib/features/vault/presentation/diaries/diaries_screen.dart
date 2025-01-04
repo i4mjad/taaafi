@@ -123,6 +123,30 @@ class _DiariesScreenState extends ConsumerState<DiariesScreen> {
           ),
         ),
       ),
+      floatingActionButton: FloatingActionButton.extended(
+        backgroundColor: theme.primary[700],
+        onPressed: () async {
+          try {
+            final diaryId = await ref
+                .read(diariesNotifierProvider.notifier)
+                .createEmptyDiary();
+            if (mounted) {
+              context.go('/vault/diaries/diary/$diaryId');
+            }
+          } catch (e) {
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Failed to create diary: $e')),
+              );
+            }
+          }
+        },
+        label: Text(
+          AppLocalizations.of(context).translate("new-diary"),
+          style: TextStyles.caption.copyWith(color: theme.grey[50]),
+        ),
+        icon: Icon(LucideIcons.pencil, color: theme.grey[50]),
+      ),
     );
   }
 }

@@ -503,7 +503,6 @@ class FeaturedListItemWidget extends StatelessWidget {
     final theme = AppTheme.of(context);
     return GestureDetector(
       onTap: () {
-        print(listItem.name);
         context.go('/vault/library/list/${listItem.id}');
       },
       child: WidgetsContainer(

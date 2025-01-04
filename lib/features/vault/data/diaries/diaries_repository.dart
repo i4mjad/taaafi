@@ -10,6 +10,7 @@ abstract class DiariesRepository {
   Future<void> updateDiary(String diaryId, Diary diary);
   Future<void> deleteDiary(String diaryId);
   Future<Diary?> getDiaryById(String diaryId);
+  Future<String> createEmptyDiary(Diary diary);
 }
 
 class FirebaseDiariesRepository implements DiariesRepository {
@@ -148,7 +149,6 @@ class FirebaseDiariesRepository implements DiariesRepository {
   @override
   Future<void> updateDiary(String diaryId, Diary diary) async {
     try {
-      print('Updating diary: ${diary.linkedTaskIds}');
       await _firestore
           .collection('users')
           .doc(_userId)
@@ -197,6 +197,27 @@ class FirebaseDiariesRepository implements DiariesRepository {
           .delete();
     } catch (e) {
       throw Exception('Failed to delete diary: $e');
+    }
+  }
+
+  @override
+  Future<String> createEmptyDiary(Diary diary) async {
+    try {
+      final docRef = await _firestore
+          .collection('users')
+          .doc(_userId)
+          .collection('userNotes')
+          .add({
+        'title': diary.title,
+        'body': diary.plainText,
+        'timestamp': Timestamp.fromDate(diary.date),
+        'formattedContent': diary.formattedContent,
+        'updatedAt': FieldValue.serverTimestamp(),
+      });
+
+      return docRef.id;
+    } catch (e) {
+      throw Exception('Failed to create empty diary: $e');
     }
   }
 }
