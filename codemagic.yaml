@@ -8,7 +8,7 @@ workflows:
       flutter: 3.24.3
       groups:
         - google_credentials
-        - shorebird
+        - SHOREBIRD
       vars:
         PACKAGE_NAME: "com.amjadkhalfan.reboot_app_3"
         GOOGLE_PLAY_TRACK: alpha
@@ -58,7 +58,7 @@ workflows:
         bundle_identifier: com.amjadkhalfan.RebootApp
       flutter: 3.24.3
       groups:
-        - shorebird
+        - SHOREBIRD
       vars:
         APP_STORE_APPLE_ID: 1531562469
     scripts:
