@@ -1,7 +1,7 @@
 workflows:
-  android-internal-test-workflow:
+  android-release-workflow:
     max_build_duration: 120
-    name: Android Workflow
+    name: Android Release Workflow
     environment:
       android_signing:
         - android-signing-key
@@ -50,8 +50,8 @@ workflows:
         track: closed
         submit_as_draft: true
 
-  ios-testflight-workflow:
-    name: iOS Workflow
+  ios-release-workflow:
+    name: iOS Release Workflow
     environment:
       ios_signing:
         distribution_type: app_store
