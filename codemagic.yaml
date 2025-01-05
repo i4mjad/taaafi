@@ -34,7 +34,7 @@ workflows:
           if [ $BUILD_NUMBER -lt 10 ]; then
             BUILD_NUMBER="0$BUILD_NUMBER"
           fi
-          shorebird release android --release \
+          shorebird release android --flutter-version=3.24.3 --release \
             --build-name=$VERSION \
             --build-number=$BUILD_NUMBER \
             -PVERSION_CODE=$BUILD_NUMBER \
@@ -94,8 +94,7 @@ workflows:
         script: |
           VERSION=$(cat pubspec.yaml | grep 'version:' | head -1 | awk '{print $2}' | cut -d '+' -f 1)
           BUILD_NUMBER=$(app-store-connect get-latest-testflight-build-number "$APP_STORE_APPLE_ID")
-          shorebird release ios
-          --export-options-plist=ios/buildInfo.plist
+          shorebird release ios --flutter-version=3.24.3 --export-options-plist=ios/buildInfo.plist
     artifacts:
       - build/ios/ipa/*.ipa
       - /tmp/xcodebuild_logs/*.log
