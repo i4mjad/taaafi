@@ -457,8 +457,12 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 2D4177E8CE79A0B34A3F33F1 /* Pods-Runner.debug-prod.xcconfig */;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = "Runner/RunnerDebug-prod.entitlements";
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = JA8SVE4GX4;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 5.0.0;
 				PRODUCT_NAME = Runner;
 			};
 			name = "Debug-prod";
@@ -467,8 +471,12 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 6C94F5B8D91966985A1B1C69 /* Pods-Runner.profile-prod.xcconfig */;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = "Runner/RunnerProfile-prod.entitlements";
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = JA8SVE4GX4;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 5.0.0;
 				PRODUCT_NAME = Runner;
 			};
 			name = "Profile-prod";
@@ -477,8 +485,12 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 2A16D44B3FB4FC03846AF0DE /* Pods-Runner.release-prod.xcconfig */;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = "Runner/RunnerRelease-prod.entitlements";
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = JA8SVE4GX4;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 5.0.0;
 				PRODUCT_NAME = Runner;
 			};
 			name = "Release-prod";
