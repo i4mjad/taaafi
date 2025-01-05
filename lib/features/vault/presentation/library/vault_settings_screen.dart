@@ -50,6 +50,7 @@ class VaultSettingsScreen extends ConsumerWidget {
                   VaultSettingsButton(
                     icon: LucideIcons.trash2,
                     textKey: 'erase-all-activities',
+                    type: 'warn',
                   ),
                   verticalSpace(Spacing.points16),
                   Text(
@@ -61,6 +62,7 @@ class VaultSettingsScreen extends ConsumerWidget {
                   VaultSettingsButton(
                     icon: LucideIcons.trash2,
                     textKey: 'erase-all-bookmarks',
+                    type: 'warn',
                   ),
                   verticalSpace(Spacing.points16),
                   Text(
@@ -71,6 +73,7 @@ class VaultSettingsScreen extends ConsumerWidget {
                   VaultSettingsButton(
                     icon: LucideIcons.trash2,
                     textKey: 'erase-all-diaries',
+                    type: 'warn',
                   ),
                 ],
               ),
@@ -104,14 +107,16 @@ class VaultSettingsButton extends StatelessWidget {
         child: WidgetsContainer(
           padding: EdgeInsets.all(16),
           backgroundColor: theme.backgroundColor,
-          borderSide: BorderSide(color: theme.grey[600]!, width: 0.5),
+          borderSide: BorderSide(
+              color: type == 'warn' ? theme.error[500]! : theme.grey[600]!,
+              width: 0.5),
           borderRadius: BorderRadius.circular(10.5),
           boxShadow: Shadows.mainShadows,
           child: Row(
             children: [
               Icon(
                 icon,
-                color: theme.grey[900],
+                color: type == 'warn' ? theme.error[500] : Colors.pink[500],
               ),
               horizontalSpace(Spacing.points8),
               Text(
@@ -128,6 +133,8 @@ class VaultSettingsButton extends StatelessWidget {
 
   Color _getTextColor(String? type, CustomThemeData theme) {
     switch (type) {
+      case 'warn':
+        return theme.error[500] as Color;
       case 'app':
         return theme.primary[600] as Color;
       default:

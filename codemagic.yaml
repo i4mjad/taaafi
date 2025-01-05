@@ -90,11 +90,64 @@ workflows:
           /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $VERSION" "$PLIST_PATH"
           /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $BUILD_NUMBER" "$PLIST_PATH"
 
-      - name: Flutter build ipa
+      - name: Flutter build ipa (Shorebird release)
         script: |
           VERSION=$(cat pubspec.yaml | grep 'version:' | head -1 | awk '{print $2}' | cut -d '+' -f 1)
           BUILD_NUMBER=$(app-store-connect get-latest-testflight-build-number "$APP_STORE_APPLE_ID")
           shorebird release ios --flavor prod --flutter-version=3.24.3 --export-options-plist=ios/buildInfo.plist
+    artifacts:
+      - build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
+      - flutter_drive.log
+    integrations:
+      app_store_connect: Taa'afi Codemagic
+    publishing:
+      email:
+        recipients:
+          - i4mjad@gmail.com
+        notify:
+          success: true
+          failure: true
+      app_store_connect:
+        auth: integration
+        submit_to_testflight: false
+
+  ios-patch-workflow:
+    name: iOS Patch Workflow
+    environment:
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.amjadkhalfan.RebootApp
+      flutter: 3.24.3
+      groups:
+        - SHOREBIRD
+      vars:
+        APP_STORE_APPLE_ID: 1531562469
+    inputs:
+      release_version:
+        description: The release version to patch
+    scripts:
+      - name: Install Shorebird
+        script: |
+          # Install Shorebird
+          curl --proto '=https' --tlsv1.2 https://raw.githubusercontent.com/shorebirdtech/install/main/install.sh -sSf | bash
+
+          # Add Shorebird to PATH
+          echo PATH="$HOME/.shorebird/bin:$PATH" >> $CM_ENV
+      - name: Set up code signing settings on Xcode project
+        script: xcode-project use-profiles
+      - name: Get Flutter packages
+        script: |
+          flutter packages pub get
+      - name: Install pods
+        script: |
+          find . -name "Podfile" -execdir pod install \;
+      - name: Shorebird Patch
+        # Run `shorebird patch ios` to patch the specified release.
+        script: |
+          shorebird patch ios --flavor prod \
+            --release-version=${{ inputs.release_version }} \
+            --export-options-plist=/Users/builder/export_options.plist
     artifacts:
       - build/ios/ipa/*.ipa
       - /tmp/xcodebuild_logs/*.log
