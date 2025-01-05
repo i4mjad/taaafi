@@ -116,7 +116,7 @@ class VaultSettingsButton extends StatelessWidget {
             children: [
               Icon(
                 icon,
-                color: type == 'warn' ? theme.error[500] : Colors.pink[500],
+                color: type == 'warn' ? theme.error[500] : theme.primary[900],
               ),
               horizontalSpace(Spacing.points8),
               Text(
