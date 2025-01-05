@@ -66,14 +66,6 @@ flavorizr:
       flavorDimensions: "flavor-type"
     
   flavors:
-    dev:
-      app:
-        name: "Ta'aafi Platform Dev"
-      android:
-        applicationId: "com.amjadkhalfan.reboot_app_3.dev"
-      ios:
-        bundleId: "com.amjadkhalfan.RebootApp.dev"
-    
     prod:
       app:
         name: "Ta'aafi Platform"
