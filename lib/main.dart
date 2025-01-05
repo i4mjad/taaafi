@@ -13,7 +13,7 @@ import 'package:reboot_app_3/core/monitoring/analytics_facade.dart';
 import 'package:reboot_app_3/firebase_options.dart';
 
 FirebaseMessaging messaging = FirebaseMessaging.instance;
-Future<void> main() async {
+Future<void> runMainApp() async {
   WidgetsFlutterBinding.ensureInitialized();
   //Initalize Firebase
   await initFirebase();
