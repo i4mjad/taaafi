@@ -39,6 +39,14 @@ class ActivityRepository {
       final activities = await Future.wait(
         activitiesSnapshot.docs.map((doc) async {
           final activity = Activity.fromFirestore(doc);
+
+          // Get subscriber count from subscriptionSessions collection
+          final subscriberCount = await doc.reference
+              .collection('subscriptionSessions')
+              .count()
+              .get()
+              .then((value) => value.count);
+
           final tasksSnapshot = await doc.reference
               .collection('activityTasks')
               .orderBy('taskName')
@@ -53,7 +61,7 @@ class ActivityRepository {
             name: activity.name,
             description: activity.description,
             difficulty: activity.difficulty,
-            subscriberCount: activity.subscriberCount,
+            subscriberCount: subscriberCount ?? 0, // Use actual count
             tasks: tasks,
           );
         }),
@@ -75,14 +83,17 @@ class ActivityRepository {
       String activityId, DateTime startDate, DateTime endDate) async {
     try {
       final userId = _getCurrentUserId();
+      // Create a batch to handle multiple writes atomically
       final batch = _firestore.batch();
+
+      // Reference to the user's ongoing activity document
       final subscriptionRef = _firestore
           .collection('users')
           .doc(userId)
           .collection('ongoing_activities')
           .doc(activityId);
 
-      // Create subscription document
+      // Create the main subscription document with activity metadata
       batch.set(subscriptionRef, {
         'activityId': activityId,
         'startDate': startDate,
@@ -91,26 +102,45 @@ class ActivityRepository {
         'createdAt': FieldValue.serverTimestamp(),
       });
 
-      // Get tasks and create scheduled occurrences
+      // Create subscription tracking document in the base activity
+      final sessionRef = _firestore
+          .collection('activities')
+          .doc(activityId)
+          .collection('subscriptionSessions')
+          .doc(userId);
+
+      // Store user's subscription session details
+      batch.set(sessionRef, {
+        'userId': userId,
+        'startDate': startDate,
+        'endDate': endDate,
+        'createdAt': FieldValue.serverTimestamp(),
+      });
+
+      // Fetch all tasks associated with this activity
       final tasksSnapshot = await _firestore
           .collection('activities')
           .doc(activityId)
           .collection('activityTasks')
           .get();
 
+      // Calculate total subscription period
       final periodInDays = endDate.difference(startDate).inDays;
 
-      // Create scheduled documents for each task
+      // For each task in the activity
       for (var task in tasksSnapshot.docs) {
+        // Get task frequency from the task document
         final frequencyStr = task.data()['taskFrequency'] as String;
+        // Convert string frequency to enum
         final frequency = _parseTaskFrequency(frequencyStr);
+        // Generate all dates this task should occur on
         final scheduledDates = _generateScheduledDates(
           startDate,
           periodInDays,
           frequency,
         );
 
-        // Create documents for each scheduled date
+        // Create a scheduled task document for each occurrence date
         for (var date in scheduledDates) {
           final taskDocRef = subscriptionRef.collection('scheduledTasks').doc();
           batch.set(
@@ -126,6 +156,7 @@ class ActivityRepository {
         }
       }
 
+      // Commit all the batch operations
       await batch.commit();
     } catch (e) {
       throw Exception('Failed to subscribe to activity: $e');
@@ -402,7 +433,6 @@ class ActivityRepository {
   /// Uses an optimized query to fetch the activity and its tasks in parallel
   Future<Activity> getActivityById(String activityId) async {
     try {
-      // Get activity document
       final activityDoc =
           await _firestore.collection('activities').doc(activityId).get();
 
@@ -412,7 +442,13 @@ class ActivityRepository {
 
       final activity = Activity.fromFirestore(activityDoc);
 
-      // Get tasks for this activity
+      // Get subscriber count from subscriptionSessions collection
+      final subscriberCount = await activityDoc.reference
+          .collection('subscriptionSessions')
+          .count()
+          .get()
+          .then((value) => value.count);
+
       final tasksSnapshot = await activityDoc.reference
           .collection('activityTasks')
           .orderBy('taskName')
@@ -427,7 +463,7 @@ class ActivityRepository {
         name: activity.name,
         description: activity.description,
         difficulty: activity.difficulty,
-        subscriberCount: activity.subscriberCount,
+        subscriberCount: subscriberCount ?? 0, // Use actual count
         tasks: tasks,
       );
     } catch (e) {
@@ -440,39 +476,39 @@ class ActivityRepository {
       String activityId) async {
     try {
       final userId = _getCurrentUserId();
-
-      // Get subscription document
-      final subscriptionDoc = await _firestore
+      final activityDoc = await _firestore
           .collection('users')
           .doc(userId)
           .collection('ongoing_activities')
           .doc(activityId)
           .get();
 
-      if (!subscriptionDoc.exists) {
-        throw Exception('Activity subscription not found');
-      }
-
-      // Get activity details
-      final activityDoc = await _firestore
-          .collection('activities')
-          .doc(subscriptionDoc.data()?['activityId'] as String)
-          .get();
       if (!activityDoc.exists) {
         throw Exception('Activity not found');
       }
 
-      final activity = Activity.fromFirestore(activityDoc);
-      final subscription = OngoingActivity.fromFirestore(subscriptionDoc);
+      final baseActivityId = activityDoc.data()?['activityId'] as String;
+      final baseActivityDoc =
+          await _firestore.collection('activities').doc(baseActivityId).get();
+
+      // Get subscriber count from subscriptionSessions collection
+      final subscriberCount = await baseActivityDoc.reference
+          .collection('subscriptionSessions')
+          .count()
+          .get()
+          .then((value) => value.count ?? 0);
+
+      final activity = Activity.fromFirestore(baseActivityDoc);
+      final subscription = OngoingActivity.fromFirestore(activityDoc);
 
       // Get all scheduled tasks with isDeleted filter
-      final scheduledTasksSnapshot = await subscriptionDoc.reference
+      final scheduledTasksSnapshot = await activityDoc.reference
           .collection('scheduledTasks')
           .where('isDeleted', isEqualTo: false)
           .get();
 
       // Get base tasks for mapping
-      final tasksSnapshot = await activityDoc.reference
+      final tasksSnapshot = await baseActivityDoc.reference
           .collection('activityTasks')
           .orderBy('taskName')
           .get();
@@ -520,6 +556,7 @@ class ActivityRepository {
         activityTasks: baseTasks.values.toList(),
         scheduledTasks: tasks,
         taskPerformance: taskPerformance,
+        subscriberCount: subscriberCount,
       );
     } catch (e) {
       throw Exception('Failed to fetch ongoing activity details: $e');
@@ -646,12 +683,15 @@ class ActivityRepository {
     }
   }
 
-  /// Marks an activity and its scheduled tasks as deleted
-  Future<void> deleteActivity(String activityId) async {
+  /// Updates activity dates and recreates scheduled tasks
+  Future<void> updateActivityDates(
+    String activityId,
+    DateTime startDate,
+    DateTime endDate,
+  ) async {
     try {
-      final userId = _auth.currentUser?.uid;
-      if (userId == null) throw Exception('User not authenticated');
-
+      final userId = _getCurrentUserId();
+      // Create batch for atomic operations
       final batch = _firestore.batch();
 
       // Reference to the ongoing activity document
@@ -661,64 +701,33 @@ class ActivityRepository {
           .collection('ongoing_activities')
           .doc(activityId);
 
-      // Get all scheduled tasks and delete them
-      final scheduledTasksSnapshot =
-          await activityRef.collection('scheduledTasks').get();
-      for (var doc in scheduledTasksSnapshot.docs) {
-        batch.delete(doc.reference);
-      }
-
-      // Delete the ongoing activity document
-      batch.delete(activityRef);
-
-      await batch.commit();
-    } catch (e) {
-      throw Exception('Failed to delete activity: $e');
-    }
-  }
-
-  /// Updates activity dates by modifying the existing document
-  Future<void> updateActivityDates(
-    String activityId,
-    DateTime startDate,
-    DateTime endDate,
-  ) async {
-    try {
-      final userId = _getCurrentUserId();
-      final batch = _firestore.batch();
-
-      // Get activity reference
-      final activityRef = _firestore
-          .collection('users')
-          .doc(userId)
-          .collection('ongoing_activities')
-          .doc(activityId);
-
+      // Verify activity exists
       final activityDoc = await activityRef.get();
       if (!activityDoc.exists) {
         throw Exception('Activity not found');
       }
 
-      // Get the base activityId
+      // Get the original activity ID
       final baseActivityId = activityDoc.data()?['activityId'] as String;
 
-      // Update activity dates
+      // Update the activity dates
       batch.update(activityRef, {
         'startDate': startDate,
         'endDate': endDate,
         'updatedAt': FieldValue.serverTimestamp(),
       });
 
-      // Delete existing scheduled tasks
+      // Delete all existing scheduled tasks
       final existingTasks =
           await activityRef.collection('scheduledTasks').get();
       for (var doc in existingTasks.docs) {
         batch.delete(doc.reference);
       }
 
+      // Commit the deletion batch
       await batch.commit();
 
-      // Get tasks from base activity and create new scheduled occurrences
+      // Get tasks from the original activity template
       final baseActivityDoc =
           await _firestore.collection('activities').doc(baseActivityId).get();
 
@@ -726,22 +735,27 @@ class ActivityRepository {
         throw Exception('Base activity not found');
       }
 
+      // Fetch all task templates
       final tasksSnapshot =
           await baseActivityDoc.reference.collection('activityTasks').get();
 
       final periodInDays = endDate.difference(startDate).inDays;
 
-      // Create new scheduled tasks
+      // Create new batch for creating new tasks
       final newBatch = _firestore.batch();
+
+      // Create new scheduled tasks for each task template
       for (var task in tasksSnapshot.docs) {
         final frequencyStr = task.data()['taskFrequency'] as String;
         final frequency = _parseTaskFrequency(frequencyStr);
+        // Generate new schedule dates
         final scheduledDates = _generateScheduledDates(
           startDate,
           periodInDays,
           frequency,
         );
 
+        // Create new task documents for each date
         for (var date in scheduledDates) {
           final taskDocRef = activityRef.collection('scheduledTasks').doc();
           newBatch.set(taskDocRef, {
@@ -754,9 +768,72 @@ class ActivityRepository {
         }
       }
 
+      // Commit the new tasks batch
       await newBatch.commit();
+
+      // Update the subscription session document
+      final sessionRef = _firestore
+          .collection('activities')
+          .doc(baseActivityId)
+          .collection('subscriptionSessions')
+          .doc(userId);
+
+      batch.update(sessionRef, {
+        'startDate': startDate,
+        'endDate': endDate,
+        'updatedAt': FieldValue.serverTimestamp(),
+      });
     } catch (e) {
       throw Exception('Failed to update activity: $e');
+    }
+  }
+
+  /// Deletes an activity and all associated documents
+  Future<void> deleteActivity(String activityId) async {
+    try {
+      final userId = _getCurrentUserId();
+      final batch = _firestore.batch();
+
+      // Get the original activity document to find base activity ID
+      final activityDoc = await _firestore
+          .collection('users')
+          .doc(userId)
+          .collection('ongoing_activities')
+          .doc(activityId)
+          .get();
+
+      final baseActivityId = activityDoc.data()?['activityId'] as String;
+
+      // Delete the subscription session document
+      final sessionRef = _firestore
+          .collection('activities')
+          .doc(baseActivityId)
+          .collection('subscriptionSessions')
+          .doc(userId);
+
+      batch.delete(sessionRef);
+
+      // Reference to the ongoing activity
+      final activityRef = _firestore
+          .collection('users')
+          .doc(userId)
+          .collection('ongoing_activities')
+          .doc(activityId);
+
+      // Delete all scheduled tasks
+      final scheduledTasksSnapshot =
+          await activityRef.collection('scheduledTasks').get();
+      for (var doc in scheduledTasksSnapshot.docs) {
+        batch.delete(doc.reference);
+      }
+
+      // Delete the main activity document
+      batch.delete(activityRef);
+
+      // Commit all deletions
+      await batch.commit();
+    } catch (e) {
+      throw Exception('Failed to delete activity: $e');
     }
   }
 
@@ -859,5 +936,109 @@ class ActivityRepository {
     } catch (e) {
       throw Exception('Failed to fetch tasks by date range: $e');
     }
+  }
+
+  /// Stream of today's tasks
+  Stream<List<OngoingActivityTask>> getTodayTasksStream() {
+    final userId = _getCurrentUserId();
+    final today = DateTime.now();
+    final startOfDay = DateTime(today.year, today.month, today.day);
+    final endOfDay = DateTime(today.year, today.month, today.day, 23, 59, 59);
+
+    return _firestore
+        .collection('users')
+        .doc(userId)
+        .collection('ongoing_activities')
+        .where('isDeleted', isEqualTo: false)
+        .snapshots()
+        .asyncMap((activities) async {
+      List<OngoingActivityTask> todayTasks = [];
+
+      for (var activityDoc in activities.docs) {
+        final ongoingActivity = OngoingActivity.fromFirestore(activityDoc);
+
+        if (!_isActivityActive(ongoingActivity, today)) continue;
+
+        final tasksStream = await activityDoc.reference
+            .collection('scheduledTasks')
+            .where('isDeleted', isEqualTo: false)
+            .where('scheduledDate',
+                isGreaterThanOrEqualTo: Timestamp.fromDate(startOfDay))
+            .where('scheduledDate',
+                isLessThanOrEqualTo: Timestamp.fromDate(endOfDay))
+            .get();
+
+        final baseTasks = await _getBaseTasksMap(ongoingActivity.activityId);
+
+        for (var scheduledDoc in tasksStream.docs) {
+          final data = scheduledDoc.data();
+          final baseTask = baseTasks[data['taskId']];
+          if (baseTask != null) {
+            todayTasks.add(OngoingActivityTask(
+              id: scheduledDoc.id,
+              task: baseTask,
+              taskDatetime: (data['scheduledDate'] as Timestamp).toDate(),
+              isCompleted: data['isCompleted'] ?? false,
+              scheduledTaskId: scheduledDoc.id,
+              activityId: ongoingActivity.activityId,
+            ));
+          }
+        }
+      }
+
+      return todayTasks;
+    });
+  }
+
+  /// Stream of ongoing activities
+  Stream<List<OngoingActivity>> getOngoingActivitiesStream() {
+    final userId = _getCurrentUserId();
+
+    return _firestore
+        .collection('users')
+        .doc(userId)
+        .collection('ongoing_activities')
+        .where('isDeleted', isEqualTo: false)
+        .snapshots()
+        .asyncMap((snapshot) async {
+      final ongoingActivities = await Future.wait(
+        snapshot.docs.map((doc) async {
+          final ongoingActivity = OngoingActivity.fromFirestore(doc);
+
+          final activityDoc = await _firestore
+              .collection('activities')
+              .doc(ongoingActivity.activityId)
+              .get();
+
+          if (!activityDoc.exists) return null;
+
+          final activity = Activity.fromFirestore(activityDoc);
+          final progress = await calculateActivityProgress(
+            ongoingActivity.activityId,
+            ongoingActivity.startDate,
+          );
+
+          return OngoingActivity(
+            id: ongoingActivity.id,
+            activityId: ongoingActivity.activityId,
+            startDate: ongoingActivity.startDate,
+            endDate: ongoingActivity.endDate,
+            createdAt: ongoingActivity.createdAt,
+            activity: activity,
+            progress: progress,
+          );
+        }),
+      );
+
+      return ongoingActivities.whereType<OngoingActivity>().toList();
+    });
+  }
+
+  bool _isActivityActive(OngoingActivity activity, DateTime date) {
+    final startOfDay = DateTime(activity.startDate.year,
+        activity.startDate.month, activity.startDate.day);
+    final endOfDay = DateTime(
+        activity.endDate.year, activity.endDate.month, activity.endDate.day);
+    return !date.isBefore(startOfDay) && !date.isAfter(endOfDay);
   }
 }

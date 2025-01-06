@@ -11,6 +11,7 @@ import 'package:reboot_app_3/core/theming/custom_theme_data.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/features/vault/data/activities/ongoing_activity.dart';
+import 'package:reboot_app_3/features/vault/data/activities/ongoing_activity_task.dart';
 import 'package:reboot_app_3/features/vault/presentation/activities/shared_widgets/day_task_widget.dart';
 import 'package:reboot_app_3/features/vault/application/activities/ongoing_activities_notifier.dart';
 import 'package:reboot_app_3/features/vault/application/activities/today_tasks_notifier.dart';
@@ -91,33 +92,37 @@ class OngoingActivitiesWidget extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = AppTheme.of(context);
-    final ongoingActivitiesState = ref.watch(ongoingActivitiesNotifierProvider);
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          AppLocalizations.of(context).translate('ongoing-activities'),
-          style: TextStyles.h6.copyWith(color: theme.grey[900]),
-        ),
-        verticalSpace(Spacing.points8),
-        ongoingActivitiesState.when(
-          data: (activities) {
-            return ListView.separated(
-              shrinkWrap: true,
-              physics: NeverScrollableScrollPhysics(),
-              itemCount: activities.length,
-              separatorBuilder: (_, __) => verticalSpace(Spacing.points8),
-              itemBuilder: (context, index) => OngoingActivityWidget(
-                index + 1,
-                activities[index],
+    return StreamBuilder<List<OngoingActivity>>(
+      stream: ref
+          .watch(ongoingActivitiesNotifierProvider.notifier)
+          .activitiesStream(),
+      builder: (context, snapshot) {
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              AppLocalizations.of(context).translate('ongoing-activities'),
+              style: TextStyles.h6.copyWith(color: theme.grey[900]),
+            ),
+            verticalSpace(Spacing.points8),
+            if (snapshot.hasError)
+              Center(child: Text(snapshot.error.toString()))
+            else if (!snapshot.hasData)
+              const Center(child: CircularProgressIndicator())
+            else
+              ListView.separated(
+                shrinkWrap: true,
+                physics: NeverScrollableScrollPhysics(),
+                itemCount: snapshot.data!.length,
+                separatorBuilder: (_, __) => verticalSpace(Spacing.points8),
+                itemBuilder: (context, index) => OngoingActivityWidget(
+                  index + 1,
+                  snapshot.data![index],
+                ),
               ),
-            );
-          },
-          loading: () => const Center(child: CircularProgressIndicator()),
-          error: (error, _) => Center(child: Text(error.toString())),
-        ),
-      ],
+          ],
+        );
+      },
     );
   }
 }
@@ -126,77 +131,84 @@ class TodayTasksWidget extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = AppTheme.of(context);
-    final todayTasksState = ref.watch(todayTasksNotifierProvider);
+    return StreamBuilder<List<OngoingActivityTask>>(
+      stream: ref.watch(todayTasksNotifierProvider.notifier).tasksStream(),
+      builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          return Center(child: Text(snapshot.error.toString()));
+        }
+        if (!snapshot.hasData) {
+          return const Center(child: CircularProgressIndicator());
+        }
 
-    return todayTasksState.when(
-      data: (tasks) => Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Text(
-                AppLocalizations.of(context).translate('today-tasks'),
-                style: TextStyles.h6.copyWith(color: theme.primary[900]),
-              ),
-              horizontalSpace(Spacing.points8),
-              RichText(
-                text: TextSpan(
-                  style: TextStyles.h6,
-                  children: [
-                    TextSpan(
-                      text: tasks
-                          .where((task) => task.isCompleted)
-                          .length
-                          .toString(),
-                      style: TextStyle(
-                        color: theme.success[600],
-                      ),
-                    ),
-                    TextSpan(
-                      text: '/',
-                      style: TextStyle(
-                        color: theme.grey[600],
-                      ),
-                    ),
-                    TextSpan(
-                      text: tasks.length.toString(),
-                      style: TextStyle(
-                        color: theme.tint[800],
-                      ),
-                    ),
-                  ],
+        final tasks = snapshot.data!;
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text(
+                  AppLocalizations.of(context).translate('today-tasks'),
+                  style: TextStyles.h6.copyWith(color: theme.primary[900]),
                 ),
-              ),
-              Spacer(),
-              GestureDetector(
-                onTap: () {
-                  context.goNamed(RouteNames.allTasks.name);
-                },
-                child: Text(
-                  AppLocalizations.of(context).translate('show-all'),
-                  style: TextStyles.footnoteSelected.copyWith(
-                    color: theme.grey[500],
+                horizontalSpace(Spacing.points8),
+                RichText(
+                  text: TextSpan(
+                    style: TextStyles.h6,
+                    children: [
+                      TextSpan(
+                        text: tasks
+                            .where((task) => task.isCompleted)
+                            .length
+                            .toString(),
+                        style: TextStyle(
+                          color: theme.success[600],
+                        ),
+                      ),
+                      TextSpan(
+                        text: '/',
+                        style: TextStyle(
+                          color: theme.grey[600],
+                        ),
+                      ),
+                      TextSpan(
+                        text: tasks.length.toString(),
+                        style: TextStyle(
+                          color: theme.tint[800],
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-              ),
-            ],
-          ),
-          verticalSpace(Spacing.points16),
-          ListView.separated(
-            shrinkWrap: true,
-            physics: NeverScrollableScrollPhysics(),
-            itemCount: tasks.length,
-            separatorBuilder: (_, __) => verticalSpace(Spacing.points8),
-            itemBuilder: (context, index) => DayTaskWidget(
-              tasks[index],
-              activityId: tasks[index].activityId,
+                Spacer(),
+                GestureDetector(
+                  onTap: () {
+                    context.goNamed(RouteNames.allTasks.name);
+                  },
+                  child: Text(
+                    AppLocalizations.of(context).translate('show-all'),
+                    style: TextStyles.footnoteSelected.copyWith(
+                      color: theme.grey[500],
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ),
-        ],
-      ),
-      loading: () => const Center(child: CircularProgressIndicator()),
-      error: (error, _) => Center(child: Text(error.toString())),
+            verticalSpace(Spacing.points16),
+            ListView.separated(
+              shrinkWrap: true,
+              physics: NeverScrollableScrollPhysics(),
+              itemCount: tasks.length,
+              separatorBuilder: (_, __) => verticalSpace(Spacing.points8),
+              itemBuilder: (context, index) => DayTaskWidget(
+                tasks[index],
+                activityId: tasks[index].activityId,
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }

@@ -21,7 +21,7 @@ final diariesServiceProvider = AutoDisposeProvider<DiariesService>.internal(
 );
 
 typedef DiariesServiceRef = AutoDisposeProviderRef<DiariesService>;
-String _$diaryNotifierHash() => r'fc8e4a9ad4634270c8ef323b2ad5c08bb4489fbb';
+String _$diaryNotifierHash() => r'f6e4104991ee6b0de8dd53badeea36f4a50fe22e';
 
 /// Copied from Dart SDK
 class _SystemHash {

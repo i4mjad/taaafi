@@ -1,7 +1,5 @@
 import 'package:reboot_app_3/features/vault/application/activities/all_tasks_notifier.dart';
-import 'package:reboot_app_3/features/vault/application/activities/ongoing_activities_notifier.dart';
 import 'package:reboot_app_3/features/vault/application/activities/providers.dart';
-import 'package:reboot_app_3/features/vault/application/activities/today_tasks_notifier.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:reboot_app_3/features/vault/data/activities/ongoing_activity_details.dart';
 import 'package:reboot_app_3/features/vault/application/activities/activity_service.dart';
@@ -43,11 +41,7 @@ class OngoingActivityDetailsNotifier extends _$OngoingActivityDetailsNotifier {
       state = AsyncValue.data(updatedDetails);
 
       // Notify other providers to refresh their data
-      await ref.read(todayTasksNotifierProvider.notifier).refreshTasks();
       await ref.read(allTasksNotifierProvider.notifier).refreshTasks();
-      await ref
-          .read(ongoingActivitiesNotifierProvider.notifier)
-          .refreshActivities();
     } catch (e, st) {
       state = AsyncValue.error(e, st);
     }
@@ -73,11 +67,8 @@ class OngoingActivityDetailsNotifier extends _$OngoingActivityDetailsNotifier {
       state = AsyncValue.data(await build(activityId));
 
       // Refresh other providers
-      await ref.read(todayTasksNotifierProvider.notifier).refreshTasks();
+
       await ref.read(allTasksNotifierProvider.notifier).refreshTasks();
-      await ref
-          .read(ongoingActivitiesNotifierProvider.notifier)
-          .refreshActivities();
     } catch (e, st) {
       state = AsyncValue.error(e, st);
     }

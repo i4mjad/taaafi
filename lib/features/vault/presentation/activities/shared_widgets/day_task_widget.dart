@@ -33,6 +33,13 @@ class DayTaskWidget extends ConsumerWidget {
       borderSide: BorderSide(color: theme.grey[600]!, width: 0.5),
       child: Row(
         children: [
+          Text(
+            getDisplayTime(task.taskDatetime, locale.languageCode),
+            style: TextStyles.small.copyWith(
+              color: theme.grey[900],
+            ),
+          ),
+          horizontalSpace(Spacing.points8),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -45,9 +52,7 @@ class DayTaskWidget extends ConsumerWidget {
                 ),
                 verticalSpace(Spacing.points4),
                 Text(
-                  task.task.description +
-                      ' • ' +
-                      getDisplayTime(task.taskDatetime, locale.languageCode),
+                  task.task.description,
                   style: TextStyles.small.copyWith(
                     color: theme.grey[700],
                   ),

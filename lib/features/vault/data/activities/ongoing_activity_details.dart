@@ -10,6 +10,7 @@ class OngoingActivityDetails {
   final List<ActivityTask> activityTasks;
   final List<OngoingActivityTask> scheduledTasks;
   final Map<String, List<bool>> taskPerformance;
+  final int subscriberCount;
 
   OngoingActivityDetails({
     required this.activity,
@@ -19,6 +20,7 @@ class OngoingActivityDetails {
     required this.activityTasks,
     required this.scheduledTasks,
     required this.taskPerformance,
+    required this.subscriberCount,
   });
 
   OngoingActivityDetails copyWith({
@@ -29,6 +31,7 @@ class OngoingActivityDetails {
     List<ActivityTask>? activityTasks,
     List<OngoingActivityTask>? scheduledTasks,
     Map<String, List<bool>>? taskPerformance,
+    int? subscriberCount,
   }) {
     return OngoingActivityDetails(
       activity: activity ?? this.activity,
@@ -38,6 +41,7 @@ class OngoingActivityDetails {
       activityTasks: activityTasks ?? this.activityTasks,
       scheduledTasks: scheduledTasks ?? this.scheduledTasks,
       taskPerformance: taskPerformance ?? this.taskPerformance,
+      subscriberCount: subscriberCount ?? this.subscriberCount,
     );
   }
 }

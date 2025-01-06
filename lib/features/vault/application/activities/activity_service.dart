@@ -171,4 +171,22 @@ class ActivityService {
       rethrow;
     }
   }
+
+  /// Gets stream of today's tasks
+  Stream<List<OngoingActivityTask>> getTodayTasksStream() {
+    try {
+      return _repository.getTodayTasksStream();
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  /// Gets stream of ongoing activities
+  Stream<List<OngoingActivity>> getOngoingActivitiesStream() {
+    try {
+      return _repository.getOngoingActivitiesStream();
+    } catch (e) {
+      rethrow;
+    }
+  }
 }

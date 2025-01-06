@@ -14,13 +14,17 @@ class OngoingActivitiesNotifier extends _$OngoingActivitiesNotifier {
     return await service.getOngoingActivities();
   }
 
-  Future<void> refreshActivities() async {
-    state = const AsyncValue.loading();
+  Stream<List<OngoingActivity>> activitiesStream() {
+    return service.getOngoingActivitiesStream();
+  }
+
+  Future<void> deleteActivity(String activityId) async {
     try {
-      final activities = await service.getOngoingActivities();
-      state = AsyncValue.data(activities);
-    } catch (e, st) {
-      state = AsyncValue.error(e, st);
+      await service.deleteActivity(activityId);
+      state = const AsyncValue.loading();
+      state = AsyncValue.data(await service.getOngoingActivities());
+    } catch (e) {
+      state = AsyncError(e, StackTrace.current);
     }
   }
 }

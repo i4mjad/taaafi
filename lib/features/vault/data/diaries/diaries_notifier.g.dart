@@ -21,7 +21,7 @@ final diariesServiceProvider = Provider<DiariesService>.internal(
 );
 
 typedef DiariesServiceRef = ProviderRef<DiariesService>;
-String _$diariesNotifierHash() => r'eda4303a3fb70fb612b4b271a775098549d16200';
+String _$diariesNotifierHash() => r'4f863a9e50437c25507d9e952525af57ed2b1fdd';
 
 /// See also [DiariesNotifier].
 @ProviderFor(DiariesNotifier)

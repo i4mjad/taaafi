@@ -105,13 +105,12 @@ class ActivityListItem extends StatelessWidget {
                   verticalSpace(Spacing.points4),
                   Row(
                     children: [
-                      Text(
-                        AppLocalizations.of(context)
-                            .translate('activity-level'),
-                        style: TextStyles.small.copyWith(
-                          color: theme.grey[700],
-                        ),
+                      Icon(
+                        LucideIcons.barChart,
+                        color: theme.primary[700],
+                        size: 16,
                       ),
+                      horizontalSpace(Spacing.points4),
                       Text(
                         AppLocalizations.of(context)
                             .translate(activity.difficulty.name),
@@ -119,6 +118,23 @@ class ActivityListItem extends StatelessWidget {
                           color:
                               _getDifficultyColor(activity.difficulty, theme),
                         ),
+                      ),
+                      horizontalSpace(Spacing.points4),
+                      Text("•"),
+                      horizontalSpace(Spacing.points4),
+                      Row(
+                        children: [
+                          Icon(
+                            LucideIcons.users,
+                            color: theme.primary[700],
+                            size: 16,
+                          ),
+                          horizontalSpace(Spacing.points4),
+                          Text(
+                            activity.subscriberCount.toString(),
+                            style: TextStyles.smallBold,
+                          ),
+                        ],
                       ),
                     ],
                   ),

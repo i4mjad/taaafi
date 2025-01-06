@@ -229,17 +229,16 @@ class OngoingActivitySettingsSheet extends ConsumerWidget {
           ),
           TextButton(
             onPressed: () async {
-              // First pop the dialog
-              Navigator.pop(dialogContext);
-              // Then pop the settings sheet
-              Navigator.pop(context);
-
               // Delete the activity
               await ref
                   .read(
                       ongoingActivityDetailsNotifierProvider(ongoingActivityId)
                           .notifier)
                   .deleteActivity();
+              // First pop the dialog
+              Navigator.pop(dialogContext);
+              // Then pop the settings sheet
+              Navigator.pop(context);
 
               // Navigate using a delayed call to ensure previous operations are complete
               if (context.mounted) {
@@ -586,20 +585,7 @@ class OngoingActivityDescriptionAndUserStatisticsWidget extends ConsumerWidget {
           padding: EdgeInsets.fromLTRB(16, 12, 16, 12),
           width: MediaQuery.of(context).size.width,
           borderSide: BorderSide(color: theme.grey[600]!, width: 0.5),
-          boxShadow: [
-            BoxShadow(
-              color: Color.fromRGBO(50, 50, 93, 0.25),
-              blurRadius: 5,
-              spreadRadius: -1,
-              offset: Offset(0, 2),
-            ),
-            BoxShadow(
-              color: Color.fromRGBO(0, 0, 0, 0.3),
-              blurRadius: 3,
-              spreadRadius: -1,
-              offset: Offset(0, 1),
-            ),
-          ],
+          boxShadow: Shadows.mainShadows,
           child: Text(
             details.activity.description,
             style: TextStyles.small.copyWith(
@@ -624,10 +610,10 @@ class OngoingActivityDescriptionAndUserStatisticsWidget extends ConsumerWidget {
             ),
             Column(
               children: [
-                Icon(LucideIcons.calendar, color: theme.primary[600]),
+                Icon(LucideIcons.users, color: theme.primary[600]),
                 verticalSpace(Spacing.points4),
                 Text(
-                  getDisplayDate(details.startDate, locale!.languageCode),
+                  details.subscriberCount.toString(),
                   style: TextStyles.small,
                 )
               ],

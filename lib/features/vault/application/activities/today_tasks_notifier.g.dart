@@ -7,11 +7,11 @@ part of 'today_tasks_notifier.dart';
 // **************************************************************************
 
 String _$todayTasksNotifierHash() =>
-    r'3584a3560337fc3eba7d31fd901f910f2c0c4b2c';
+    r'38cbf28cf7f8a032979ee9412ac6dde6aec12bf1';
 
 /// See also [TodayTasksNotifier].
 @ProviderFor(TodayTasksNotifier)
-final todayTasksNotifierProvider = AutoDisposeAsyncNotifierProvider<
+final todayTasksNotifierProvider = AutoDisposeStreamNotifierProvider<
     TodayTasksNotifier, List<OngoingActivityTask>>.internal(
   TodayTasksNotifier.new,
   name: r'todayTasksNotifierProvider',
@@ -23,6 +23,6 @@ final todayTasksNotifierProvider = AutoDisposeAsyncNotifierProvider<
 );
 
 typedef _$TodayTasksNotifier
-    = AutoDisposeAsyncNotifier<List<OngoingActivityTask>>;
+    = AutoDisposeStreamNotifier<List<OngoingActivityTask>>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member
