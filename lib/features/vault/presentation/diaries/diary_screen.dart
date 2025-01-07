@@ -173,12 +173,22 @@ class _DiaryScreenState extends ConsumerState<DiaryScreen> {
                                 configurations: QuillEditorConfigurations(
                                   autoFocus: false,
                                   onTapOutside: (event, focusNode) {
+                                    //! this is commented to test why it is causing the focus is always gained when tapping outside
+                                    // _controller.updateSelection(
+                                    //   TextSelection.collapsed(
+                                    //       offset:
+                                    //           _controller.selection.baseOffset),
+                                    //   ChangeSource.local,
+                                    // );
+
+                                    // Collapsing the selection:
                                     _controller.updateSelection(
-                                      TextSelection.collapsed(
-                                          offset:
-                                              _controller.selection.baseOffset),
+                                      const TextSelection.collapsed(
+                                          offset: 0), // or 0
                                       ChangeSource.local,
                                     );
+                                    // Or if you want to simply unfocus:
+                                    focusNode.unfocus();
                                   },
                                   customStyles: DefaultStyles(
                                     paragraph: DefaultTextBlockStyle(

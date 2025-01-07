@@ -476,6 +476,7 @@
   "add-all-follow-ups-desc": "If selected, all streaks will be restarted",
   "edit-follow-up": "Edit Follow up",
   "delete-follow-up": "Delete Follow up",
-  "edit-emotion": "Edit Emotion"
+  "edit-emotion": "Edit Emotion",
+  "no-tasks-for-date": "No tasks for this date"
 
 }
