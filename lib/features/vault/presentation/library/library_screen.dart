@@ -42,10 +42,10 @@ class LibraryScreen extends ConsumerWidget {
           centerTitle: false,
           shadowColor: theme.grey[100],
           actions: [
-            Padding(
-              padding: const EdgeInsets.only(right: 16.0, left: 16),
-              child: Icon(LucideIcons.bookmark, color: theme.grey[900]),
-            )
+            // Padding(
+            //   padding: const EdgeInsets.only(right: 16.0, left: 16),
+            //   child: Icon(LucideIcons.bookmark, color: theme.grey[900]),
+            // )
           ],
           leadingWidth: 16,
           automaticallyImplyLeading: true,

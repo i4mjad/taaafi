@@ -52,18 +52,18 @@ class VaultSettingsScreen extends ConsumerWidget {
                     textKey: 'erase-all-activities',
                     type: 'warn',
                   ),
-                  verticalSpace(Spacing.points16),
-                  Text(
-                    AppLocalizations.of(context)
-                        .translate('bookmarks-settings'),
-                    style: TextStyles.h6,
-                  ),
-                  verticalSpace(Spacing.points8),
-                  VaultSettingsButton(
-                    icon: LucideIcons.trash2,
-                    textKey: 'erase-all-bookmarks',
-                    type: 'warn',
-                  ),
+                  // verticalSpace(Spacing.points16),
+                  // Text(
+                  //   AppLocalizations.of(context)
+                  //       .translate('bookmarks-settings'),
+                  //   style: TextStyles.h6,
+                  // ),
+                  // verticalSpace(Spacing.points8),
+                  // VaultSettingsButton(
+                  //   icon: LucideIcons.trash2,
+                  //   textKey: 'erase-all-bookmarks',
+                  //   type: 'warn',
+                  // ),
                   verticalSpace(Spacing.points16),
                   Text(
                     AppLocalizations.of(context).translate('diaries-settings'),
