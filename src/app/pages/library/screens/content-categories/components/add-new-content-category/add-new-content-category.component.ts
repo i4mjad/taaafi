@@ -22,16 +22,22 @@ export class AddNewContentCategoryComponent implements OnInit {
   ngOnInit(): void {
     this.contentTypeForm = this.fb.group({
       contentTypeName: ['', [Validators.required]],
+      contentCategoryIconName: ['', [Validators.required]], // New form control
       isActive: [false],
     });
   }
 
   onSubmit(): void {
     if (this.contentTypeForm.valid) {
-      const { contentTypeName, isActive } = this.contentTypeForm.value;
+      const { contentTypeName, contentCategoryIconName, isActive } =
+        this.contentTypeForm.value;
 
       this.store.dispatch(
-        new CreateContentCategoryAction(contentTypeName, isActive)
+        new CreateContentCategoryAction(
+          contentTypeName,
+          contentCategoryIconName,
+          isActive
+        )
       );
       this._bottomSheetRef.dismiss();
     }

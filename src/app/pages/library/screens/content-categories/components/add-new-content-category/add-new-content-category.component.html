@@ -13,7 +13,15 @@
             placeholder="مثال: مقطع مرئي"
           />
         </mat-form-field>
-
+        <!-- New input field for contentCategoryIconName -->
+        <mat-form-field appearance="fill" class="w-1/2">
+          <mat-label>إسم أيقونة نوع المحتوى</mat-label>
+          <input
+            matInput
+            formControlName="contentCategoryIconName"
+            placeholder="مثال: icon-name"
+          />
+        </mat-form-field>
         <mat-slide-toggle formControlName="isActive" class="w-1/2 mb-4">
           تفعيل
         </mat-slide-toggle>

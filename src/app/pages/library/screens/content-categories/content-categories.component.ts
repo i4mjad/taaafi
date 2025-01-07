@@ -24,7 +24,13 @@ export class ContentCategoriesComponent implements OnInit {
   contentCategories$: Observable<ContentCategory[]> = inject(Store).select(
     LibraryState.contentCategories
   );
-  tableColumns: String[] = ['id', 'contentTypeName', 'enable', 'actions'];
+  tableColumns: String[] = [
+    'id',
+    'contentTypeName',
+    'contentCategoryIconName',
+    'enable',
+    'actions',
+  ];
 
   categories: ContentCategory[];
 

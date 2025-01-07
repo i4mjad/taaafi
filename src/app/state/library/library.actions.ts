@@ -55,7 +55,11 @@ export class ToggleContentTypeStatusAction {
 
 export class CreateContentTypeAction {
   static readonly type = '[Library] Create Content Type Action';
-  constructor(public contentTypeName: string, public isActive: boolean) {}
+  constructor(
+    public contentTypeName: string,
+    public contentTypeIconName: string,
+    public isActive: boolean
+  ) {}
 }
 
 export class UpdateContentTypeAction {
@@ -86,7 +90,12 @@ export class GetContentListByIdAction {
 
 export class CreateContentCategoryAction {
   static readonly type = '[Library] Create Content Category Action';
-  constructor(public categoryName: string, public isActive: boolean) {}
+
+  constructor(
+    public categoryName: string,
+    public contentCategoryIconName: string,
+    public isActive: boolean
+  ) {}
 }
 
 export class UpdateContentCategoryAction {
@@ -139,7 +148,8 @@ export class CreateContentListAction {
     public listDescription: string,
     public listContentIds: string[],
     public isActive: boolean,
-    public isFeatured: boolean
+    public isFeatured: boolean,
+    public contentListIconName: string
   ) {}
 }
 

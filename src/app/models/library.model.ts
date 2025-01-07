@@ -1,11 +1,13 @@
 export interface ContentType {
   id: string;
+  contentTypeIconName: string;
   contentTypeName: string;
   isActive: boolean;
 }
 
 export interface ContentTypeDataModel {
   contentTypeName: string;
+  contentTypeIconName: string;
   isActive: boolean;
 }
 export interface Content {
@@ -38,11 +40,13 @@ export interface ContentDateModel {
 export interface ContentCategory {
   id: string;
   categoryName: string;
+  contentCategoryIconName: string;
   isActive: boolean;
 }
 
 export interface ContentCategoryDataModel {
   categoryName: string;
+  contentCategoryIconName: string;
   isActive: boolean;
 }
 
@@ -63,6 +67,7 @@ export interface ContentList {
   id: string;
   listName: string;
   listDescription: string;
+  contentListIconName: string;
   listContent: Content[];
   isActive: boolean;
   isFeatured: boolean;
@@ -72,6 +77,7 @@ export interface ContentListViewModel {
   listName: string;
   listDescription: string;
   listContentCount: number;
+  contentListIconName: string;
   isActive: boolean;
   isFeatured: boolean;
 }
@@ -79,6 +85,7 @@ export interface ContentListDataModel {
   id: string;
   listName: string;
   listDescription: string;
+  contentListIconName: string;
   listContentIds: string[];
   isActive: boolean;
   isFeatured: boolean;

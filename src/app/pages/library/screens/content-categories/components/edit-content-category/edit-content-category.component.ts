@@ -29,10 +29,12 @@ export class EditContentCategoryComponent {
 
   onSubmit(): void {
     if (this.contentCategoryForm.valid) {
-      const { categoryName, isActive } = this.contentCategoryForm.value;
+      const { categoryName, contentCategoryIconName, isActive } =
+        this.contentCategoryForm.value;
       const updatedContentCategory: ContentCategory = {
         id: this.data.id,
         categoryName,
+        contentCategoryIconName,
         isActive,
       };
 

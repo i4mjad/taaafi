@@ -24,16 +24,22 @@ export class EditContentTypeComponent {
     this.contentTypeForm = this.fb.group({
       contentTypeName: [this.data.contentTypeName, [Validators.required]],
       isActive: [this.data.isActive],
+      contentTypeIconName: [
+        this.data.contentTypeIconName,
+        [Validators.required],
+      ],
     });
   }
 
   onSubmit(): void {
     if (this.contentTypeForm.valid) {
-      const { contentTypeName, isActive } = this.contentTypeForm.value;
+      const { contentTypeName, isActive, contentTypeIconName } =
+        this.contentTypeForm.value;
       const updatedContentType: ContentType = {
         id: this.data.id,
         contentTypeName,
         isActive,
+        contentTypeIconName,
       };
 
       this.store.dispatch(new UpdateContentTypeAction(updatedContentType));

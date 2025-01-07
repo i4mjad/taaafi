@@ -22,6 +22,14 @@
           <td mat-cell *matCellDef="let list">{{ list.listName }}</td>
         </ng-container>
 
+        <!-- List Name Column -->
+        <ng-container matColumnDef="contentListIconName">
+          <th mat-header-cell *matHeaderCellDef>الأيقونة</th>
+          <td mat-cell *matCellDef="let list">
+            {{ list.contentListIconName }}
+          </td>
+        </ng-container>
+
         <!-- Number of Content Items Column -->
         <ng-container matColumnDef="contentCount">
           <th mat-header-cell *matHeaderCellDef>عدد المحتويات</th>

@@ -21,15 +21,21 @@ export class AddNewContentTypeComponent {
     this.contentTypeForm = this.fb.group({
       contentTypeName: ['', [Validators.required]],
       isActive: [false],
+      contentTypeIconName: ['', [Validators.required]],
     });
   }
 
   onSubmit(): void {
     if (this.contentTypeForm.valid) {
-      const { contentTypeName, isActive } = this.contentTypeForm.value;
+      const { contentTypeName, isActive, contentTypeIconName } =
+        this.contentTypeForm.value;
 
       this.store.dispatch(
-        new CreateContentTypeAction(contentTypeName, isActive)
+        new CreateContentTypeAction(
+          contentTypeName,
+          isActive,
+          contentTypeIconName
+        )
       );
       this._bottomSheetRef.dismiss();
     }

@@ -72,6 +72,7 @@ interface LibraryStateModel {
       listContent: [],
       listName: '',
       listDescription: '',
+      contentListIconName: '',
       isActive: false,
       isFeatured: false,
     },
@@ -193,6 +194,7 @@ export class LibraryState {
   ) {
     const newContentCategory: ContentCategoryDataModel = {
       categoryName: action.categoryName,
+      contentCategoryIconName: action.contentCategoryIconName,
       isActive: action.isActive,
     };
     return this.contentCategoryService
@@ -294,6 +296,7 @@ export class LibraryState {
   ) {
     const newContentType: ContentTypeDataModel = {
       contentTypeName: action.contentTypeName,
+      contentTypeIconName: action.contentTypeIconName,
       isActive: action.isActive,
     };
     return this.contentTypeService.createContentType(newContentType).pipe(
@@ -592,6 +595,7 @@ export class LibraryState {
       listName: action.listName,
       listDescription: action.listDescription,
       listContentIds: action.listContentIds,
+      contentListIconName: action.contentListIconName,
       isActive: action.isActive,
       isFeatured: action.isFeatured,
     };

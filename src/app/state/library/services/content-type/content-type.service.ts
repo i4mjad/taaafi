@@ -52,7 +52,14 @@ export class ContentTypeService {
     contentType: ContentTypeDataModel
   ): Observable<ContentType> {
     return from(this.contentTypesCollectionsRef.add(contentType)).pipe(
-      map((docRef) => ({ id: docRef.id, ...contentType } as ContentType))
+      map(
+        (docRef) =>
+          ({
+            id: docRef.id,
+            ...contentType,
+            contentTypeIconName: contentType.contentTypeIconName,
+          } as ContentType)
+      )
     );
   }
 
@@ -61,6 +68,7 @@ export class ContentTypeService {
       this.contentTypesCollectionsRef.doc(contentType.id).update({
         contentTypeName: contentType.contentTypeName,
         isActive: contentType.isActive,
+        contentTypeIconName: contentType.contentTypeIconName,
       })
     );
   }

@@ -44,6 +44,7 @@ export class EditContentListComponent {
       listDescription: ['', [Validators.required]],
       isActive: [false],
       isFeatured: [false],
+      contentListIconName: ['', [Validators.required]], // New field added
     });
 
     this.store.dispatch(new GetActiveContentAction());
@@ -57,6 +58,7 @@ export class EditContentListComponent {
           listDescription: contentList.listDescription,
           isActive: contentList.isActive,
           isFeatured: contentList.isFeatured,
+          contentListIconName: contentList.contentListIconName, // New field added
         });
 
         contentList.listContent.forEach((content) =>
@@ -127,8 +129,13 @@ export class EditContentListComponent {
 
   onSubmit() {
     if (this.contentListForm.valid) {
-      const { listName, listDescription, isActive, isFeatured } =
-        this.contentListForm.value;
+      const {
+        listName,
+        listDescription,
+        isActive,
+        isFeatured,
+        contentListIconName,
+      } = this.contentListForm.value;
 
       const contentListData = {
         id: this.data.id,
@@ -137,6 +144,7 @@ export class EditContentListComponent {
         listContentIds: Array.from(this.selection),
         isActive,
         isFeatured,
+        contentListIconName, // New field added
       };
 
       this.store.dispatch(

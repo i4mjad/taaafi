@@ -20,6 +20,13 @@
           <td mat-cell *matCellDef="let type">{{ type.contentTypeName }}</td>
         </ng-container>
 
+        <ng-container matColumnDef="contentTypeIconName">
+          <th mat-header-cell *matHeaderCellDef>أيقونة</th>
+          <td mat-cell *matCellDef="let type">
+            {{ type.contentTypeIconName }}
+          </td>
+        </ng-container>
+
         <ng-container matColumnDef="enable">
           <th mat-header-cell *matHeaderCellDef>تفعيل</th>
           <td mat-cell *matCellDef="let type">

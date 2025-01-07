@@ -41,6 +41,7 @@ export class AddNewContentListComponent {
     this.contentListForm = this.fb.group({
       listName: ['', [Validators.required]],
       listDescription: ['', [Validators.required]],
+      contentListIconName: ['', [Validators.required]], // Add this line
       isActive: [true],
       isFeatured: [false],
     });
@@ -101,8 +102,13 @@ export class AddNewContentListComponent {
   // Handle form submission
   onSubmit() {
     if (this.contentListForm.valid) {
-      const { listName, listDescription, isActive, isFeatured } =
-        this.contentListForm.value;
+      const {
+        listName,
+        listDescription,
+        contentListIconName,
+        isActive,
+        isFeatured,
+      } = this.contentListForm.value;
 
       // Dispatch the action to add the new content list
       this.store.dispatch(
@@ -110,6 +116,7 @@ export class AddNewContentListComponent {
           listName,
           listDescription,
           Array.from(this.selection), // Convert Set to Array
+          contentListIconName, // Add this line
           isActive,
           isFeatured
         )

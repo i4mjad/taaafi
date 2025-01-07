@@ -39,10 +39,7 @@ export class ContentListService {
   private contentCategoriesRef: AngularFirestoreCollection<ContentCategoryDataModel>;
   private contentOwnersRef: AngularFirestoreCollection<ContentOwnerDataModel>;
 
-  constructor(
-    private firestore: AngularFirestore,
-    private contentService: ContentService
-  ) {
+  constructor(private firestore: AngularFirestore) {
     this.contentCollectionsRef =
       this.firestore.collection<ContentDateModel>('content');
     this.contentTypesRef =
@@ -74,6 +71,7 @@ export class ContentListService {
             listName: data.listName,
             listDescription: data.listDescription,
             listContentCount: data.listContentIds.length, // Use length for content count
+            contentListIconName: data.contentListIconName, // Add this line
             isActive: data.isActive,
             isFeatured: data.isFeatured,
           } as ContentListViewModel;
@@ -102,6 +100,7 @@ export class ContentListService {
               listName: '',
               listDescription: '',
               listContent: [], // Empty listContent if not found
+              contentListIconName: '', // Add this line
               isActive: false,
               isFeatured: false,
             } as ContentList); // Return an empty ContentList object if not found
@@ -119,6 +118,7 @@ export class ContentListService {
               listName: data.listName,
               listDescription: data.listDescription,
               listContent: [], // Empty listContent if no contentIds
+              contentListIconName: data.contentListIconName, // Add this line
               isActive: data.isActive,
               isFeatured: data.isFeatured,
             } as ContentList);
@@ -140,6 +140,7 @@ export class ContentListService {
                 listName: data.listName,
                 listDescription: data.listDescription,
                 listContent: validListContent,
+                contentListIconName: data.contentListIconName, // Add this line
                 isActive: data.isActive,
                 isFeatured: data.isFeatured,
               } as ContentList;
@@ -153,6 +154,7 @@ export class ContentListService {
             listName: '',
             listDescription: '',
             listContent: [], // Return an empty listContent on error
+            contentListIconName: '', // Add this line
             isActive: false,
             isFeatured: false,
           } as ContentList); // Return an empty ContentList object on error
@@ -177,6 +179,7 @@ export class ContentListService {
         listName: contentListData.listName,
         listDescription: contentListData.listDescription,
         listContentIds: contentListData.listContentIds,
+        contentListIconName: contentListData.contentListIconName,
         isActive: contentListData.isActive,
         isFeatured: contentListData.isFeatured,
       })

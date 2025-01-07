@@ -24,7 +24,13 @@ export class ContentTypesComponent implements OnInit {
   contentTypes$: Observable<ContentType[]> = inject(Store).select(
     LibraryState.contentTypes
   );
-  tableColumns: String[] = ['id', 'contentTypeName', 'enable', 'actions'];
+  tableColumns: String[] = [
+    'id',
+    'contentTypeName',
+    'contentTypeIconName', // Added this line
+    'enable',
+    'actions',
+  ];
 
   types: ContentType[];
 

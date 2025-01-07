@@ -32,6 +32,7 @@ export class ContentListsComponent implements OnInit {
     'id',
     'listName',
     'contentCount',
+    'contentListIconName', // Add this line
     'isActive',
     'isFeatured',
     'actions',
