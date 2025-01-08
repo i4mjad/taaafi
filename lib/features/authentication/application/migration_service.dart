@@ -122,17 +122,31 @@ class MigrationService {
   }
 
   Future<String> _getDeviceId() async {
-    DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
-    String deviceInfoStr = '';
-    if (Platform.isAndroid) {
-      AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
-      deviceInfoStr = androidInfo.id;
-    } else if (Platform.isIOS) {
-      IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
-      deviceInfoStr = iosInfo.identifierForVendor != null
-          ? iosInfo.identifierForVendor as String
-          : "";
+    try {
+      final DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+
+      if (Platform.isAndroid) {
+        final AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+        if (androidInfo.id.isEmpty) {
+          throw Exception('Failed to get Android device ID');
+        }
+        return androidInfo.id;
+      }
+
+      if (Platform.isIOS) {
+        final IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
+        final String? vendorId = iosInfo.identifierForVendor;
+        if (vendorId == null || vendorId.isEmpty) {
+          throw Exception('Failed to get iOS vendor ID');
+        }
+        return vendorId;
+      }
+
+      throw UnsupportedError('Unsupported platform for device ID');
+    } catch (e) {
+      print('Error getting device ID: $e');
+      // Return a fallback value or rethrow based on requirements
+      return '';
     }
-    return deviceInfoStr;
   }
 }

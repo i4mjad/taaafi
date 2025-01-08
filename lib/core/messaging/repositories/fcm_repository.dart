@@ -55,8 +55,11 @@ class FCMRepository {
 
 @Riverpod(keepAlive: true)
 FCMRepository fcmRepository(FcmRepositoryRef ref) {
-  return FCMRepository(ref.watch(fcmProvider), ref.watch(fcmAuthProvider),
-      ref.watch(fcmFirestoreProvider));
+  return FCMRepository(
+    ref.watch(fcmProvider),
+    ref.watch(fcmAuthProvider),
+    ref.watch(fcmFirestoreProvider),
+  );
 }
 
 @Riverpod(keepAlive: true)
