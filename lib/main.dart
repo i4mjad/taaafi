@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:reboot_app_3/app.dart';
+import 'package:reboot_app_3/core/messaging/services/fcm_service.dart';
 import 'package:reboot_app_3/core/monitoring/analytics_facade.dart';
 import 'package:reboot_app_3/firebase_options.dart';
 
@@ -25,13 +26,9 @@ Future<void> runMainApp() async {
   final notificationSettings =
       await messaging.requestPermission(provisional: true);
 
-  //TODO: Investigate about what is the best way to update the user FCM token every time the app got initailized
-
   //TODO: Investigate about a way to update the devices list in user document
-
   //Initialize Notification settings
-  InitializationSettings initializationSettings = await setupNotifications();
-  await setupFirebaseMesagging(initializationSettings);
+  await MessagingService.instance.init();
 
   //Setup error handeling pages
   registerErrorHandlers();
@@ -59,39 +56,6 @@ Future<void> runMainApp() async {
       child: MyApp(),
     ),
   );
-}
-
-Future<void> setupFirebaseMesagging(
-    InitializationSettings initializationSettings) async {
-  // CustomerIO.registerDeviceToken(deviceToken: firbaseMessagingToken);
-}
-
-Future<void> _backgroundHandler(RemoteMessage message) async {
-  // Handle background message
-}
-
-Future<InitializationSettings> setupNotifications() async {
-  var initializationSettingsAndroid = AndroidInitializationSettings('app_icon');
-  var initializationSettingsiOS = DarwinInitializationSettings(
-    requestAlertPermission: true,
-    requestBadgePermission: true,
-    requestSoundPermission: true,
-  );
-
-  var initializationSettings = InitializationSettings(
-      iOS: initializationSettingsiOS, android: initializationSettingsAndroid);
-  // ignore: unused_local_variable
-  NotificationSettings settings = await messaging.requestPermission(
-    alert: true,
-    announcement: false,
-    badge: true,
-    carPlay: false,
-    criticalAlert: false,
-    provisional: false,
-    sound: true,
-  );
-
-  return initializationSettings;
 }
 
 void registerErrorHandlers() {

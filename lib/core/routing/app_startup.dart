@@ -1,6 +1,6 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:reboot_app_3/core/messaging/services/fcm_service.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/features/home/data/follow_up_notifier.dart';
@@ -27,23 +27,35 @@ Future<void> appStartup(Ref ref) async {
   });
   // TODO: Uncomment this to test that URL-based navigation and deep linking works
   //       even when there's a delay in the app startup logic
-  await Future.delayed(Duration(milliseconds: 1000));
-  await ref.watch(fcmServiceProvider).updateFCMToken();
+  await Future.delayed(Duration(milliseconds: 500));
+
   // await for all initialization code to be complete before returning
   // await ref.watch(sharedPreferencesProvider.future);
   // await ref.watch(onboardingRepositoryProvider.future);
 }
 
 /// Widget class to manage asynchronous app initialization
-class AppStartupWidget extends ConsumerWidget {
+class AppStartupWidget extends ConsumerStatefulWidget {
   const AppStartupWidget({super.key, required this.onLoaded});
   final WidgetBuilder onLoaded;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  _AppStartupWidgetState createState() => _AppStartupWidgetState();
+}
+
+class _AppStartupWidgetState extends ConsumerState<AppStartupWidget> {
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final appStartupState = ref.watch(appStartupProvider);
     return appStartupState.when(
-      data: (_) => onLoaded(context),
+      data: (_) {
+        return widget.onLoaded(context);
+      },
       loading: () => const AppStartupLoadingWidget(),
       error: (e, st) => AppStartupErrorWidget(
         message: e.toString(),

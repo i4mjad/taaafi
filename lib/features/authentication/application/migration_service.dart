@@ -116,6 +116,9 @@ class MigrationService {
       role: role,
       messagingToken: fcmToken,
       bookmarkedContentIds: [],
+      userRelapses: document.userRelapses,
+      userWatchingWithoutMasturbating: document.userWatchingWithoutMasturbating,
+      userMasturbatingWithoutWatching: document.userMasturbatingWithoutWatching,
     );
 
     await _migerationRepository.updateUserDocument(newDocuemnt);

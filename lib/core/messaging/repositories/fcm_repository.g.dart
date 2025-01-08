@@ -6,7 +6,7 @@ part of 'fcm_repository.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$fcmRepositoryHash() => r'd6e2281c1500a69d99170ed3daea780cb58fe033';
+String _$fcmRepositoryHash() => r'c9cadbfdad57594eab68252b7e90f25ecf672286';
 
 /// See also [fcmRepository].
 @ProviderFor(fcmRepository)
@@ -21,7 +21,7 @@ final fcmRepositoryProvider = Provider<FCMRepository>.internal(
 );
 
 typedef FcmRepositoryRef = ProviderRef<FCMRepository>;
-String _$fcmHash() => r'8af107ce8b7d6a6b400981a32a252885bd1d9d93';
+String _$fcmHash() => r'9253f6c87f78b25ba2e48c0a8bbb65d6f5d988c0';
 
 /// See also [fcm].
 @ProviderFor(fcm)
@@ -35,7 +35,7 @@ final fcmProvider = Provider<FirebaseMessaging>.internal(
 );
 
 typedef FcmRef = ProviderRef<FirebaseMessaging>;
-String _$fcmAuthHash() => r'b36da5b8e41bb9246a1566970da84036c633e8d2';
+String _$fcmAuthHash() => r'a37eda7b1774b8c298dc8637814e6b4c152c7e7d';
 
 /// See also [fcmAuth].
 @ProviderFor(fcmAuth)
@@ -49,7 +49,7 @@ final fcmAuthProvider = Provider<FirebaseAuth>.internal(
 );
 
 typedef FcmAuthRef = ProviderRef<FirebaseAuth>;
-String _$fcmFirestoreHash() => r'9bade8377b97cf8a4e9e2cb4afe540b3ecfcabf4';
+String _$fcmFirestoreHash() => r'5eec802e2b95c674a67f61244886701d0f221563';
 
 /// See also [fcmFirestore].
 @ProviderFor(fcmFirestore)
