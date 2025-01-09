@@ -6,73 +6,86 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'fcm_repository.g.dart';
 
-class FCMRepository {
+class FirebaseMessagingRepository {
   final FirebaseMessaging _messaging;
   final FirebaseAuth _auth;
   final FirebaseFirestore _firestore;
 
-  FCMRepository(this._messaging, this._auth, this._firestore);
+  FirebaseMessagingRepository(this._messaging, this._auth, this._firestore);
 
   Future<String?> getMessagingToken() async {
-    print('Getting messaging token...');
     try {
       if (Platform.isIOS) {
-        print('Platform is iOS, getting APNS token...');
-        final token = await _messaging.getAPNSToken();
-        print('Got APNS token: $token');
+        final settings = await _messaging.getNotificationSettings();
+
+        // Check if notifications are authorized
+        if (settings.authorizationStatus != AuthorizationStatus.authorized) {
+          final permissionSettings = await _messaging.requestPermission(
+            alert: true,
+            badge: true,
+            sound: true,
+            provisional: true,
+            criticalAlert: true,
+            announcement: true,
+          );
+
+          if (permissionSettings.authorizationStatus !=
+              AuthorizationStatus.authorized) {
+            return null;
+          }
+        }
+
+        // Try getting APNS token multiple times with delay
+        String? token;
+        for (int i = 0; i < 5; i++) {
+          token = await _messaging.getAPNSToken();
+
+          if (token != null) break;
+          await Future.delayed(Duration(seconds: 2));
+        }
         return token;
       } else {
-        print('Platform is Android, getting FCM token...');
+        final settings = await _messaging.getNotificationSettings();
+
         final token = await _messaging.getToken();
-        print('Got FCM token: $token');
+
         return token;
       }
-    } catch (e) {
-      print('Error getting messaging token: $e');
+    } catch (e, stackTrace) {
+      throw Exception('Failed to get messaging token: $e');
       return null;
     }
   }
 
   Future<void> updateUserMessagingToken() async {
-    print('Starting to update user messaging token...');
     try {
-      print('Getting messaging token...');
       final token = await getMessagingToken();
       if (token == null) {
-        print('Failed to get messaging token');
         throw Exception('Failed to get messaging token');
       }
-      print('Successfully got messaging token: $token');
 
-      print('Getting current user ID...');
       final uid = _auth.currentUser?.uid;
       if (uid == null) {
-        print('No user signed in');
         throw FirebaseAuthException(
           code: 'user-not-signed-in',
           message: 'User must be signed in to update messaging token',
         );
       }
-      print('Got user ID: $uid');
 
-      print('Updating Firestore document...');
       await _firestore.collection('users').doc(uid).set({
         'messagingToken': token,
         'lastTokenUpdate': FieldValue.serverTimestamp(),
         'platform': Platform.isIOS ? 'ios' : 'android',
       }, SetOptions(merge: true));
-      print('Successfully updated messaging token in Firestore');
     } catch (e) {
-      print('Error updating messaging token: $e');
       rethrow;
     }
   }
 }
 
 @Riverpod(keepAlive: true)
-FCMRepository fcmRepository(FcmRepositoryRef ref) {
-  print('Creating new FCMRepository instance');
-  return FCMRepository(
+FirebaseMessagingRepository fcmRepository(FcmRepositoryRef ref) {
+  return FirebaseMessagingRepository(
     ref.watch(fcmProvider),
     ref.watch(fcmAuthProvider),
     ref.watch(fcmFirestoreProvider),
@@ -81,18 +94,15 @@ FCMRepository fcmRepository(FcmRepositoryRef ref) {
 
 @Riverpod(keepAlive: true)
 FirebaseMessaging fcm(FcmRef ref) {
-  print('Getting FirebaseMessaging instance');
   return FirebaseMessaging.instance;
 }
 
 @Riverpod(keepAlive: true)
 FirebaseAuth fcmAuth(FcmAuthRef ref) {
-  print('Getting FirebaseAuth instance');
   return FirebaseAuth.instance;
 }
 
 @Riverpod(keepAlive: true)
 FirebaseFirestore fcmFirestore(FcmFirestoreRef ref) {
-  print('Getting FirebaseFirestore instance');
   return FirebaseFirestore.instance;
 }

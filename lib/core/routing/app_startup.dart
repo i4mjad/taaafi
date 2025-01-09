@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:reboot_app_3/core/messaging/repositories/fcm_repository.dart';
+import 'package:reboot_app_3/core/messaging/services/fcm_service.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/features/home/data/follow_up_notifier.dart';
@@ -28,7 +30,7 @@ Future<void> appStartup(Ref ref) async {
   // TODO: Uncomment this to test that URL-based navigation and deep linking works
   //       even when there's a delay in the app startup logic
   await Future.delayed(Duration(milliseconds: 500));
-
+  await ref.watch(fcmProvider);
   // await for all initialization code to be complete before returning
   // await ref.watch(sharedPreferencesProvider.future);
   // await ref.watch(onboardingRepositoryProvider.future);
@@ -47,6 +49,11 @@ class _AppStartupWidgetState extends ConsumerState<AppStartupWidget> {
   @override
   void initState() {
     super.initState();
+    unawaited(_initFCM());
+  }
+
+  _initFCM() async {
+    await MessagingService.instance.init();
   }
 
   @override

@@ -3,17 +3,14 @@ import 'dart:async';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:reboot_app_3/app.dart';
 import 'package:reboot_app_3/core/messaging/services/fcm_service.dart';
 import 'package:reboot_app_3/core/monitoring/analytics_facade.dart';
 import 'package:reboot_app_3/firebase_options.dart';
 
-FirebaseMessaging messaging = FirebaseMessaging.instance;
 Future<void> runMainApp() async {
   WidgetsFlutterBinding.ensureInitialized();
   //Initalize Firebase
@@ -22,13 +19,10 @@ Future<void> runMainApp() async {
   // Track app opened event
   final container = ProviderContainer();
   unawaited(container.read(analyticsFacadeProvider).trackAppOpened());
-
-  final notificationSettings =
-      await messaging.requestPermission(provisional: true);
+  await MessagingService.instance.init();
 
   //TODO: Investigate about a way to update the devices list in user document
   //Initialize Notification settings
-  await MessagingService.instance.init();
 
   //Setup error handeling pages
   registerErrorHandlers();

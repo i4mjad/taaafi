@@ -12,7 +12,8 @@ class MessagingService {
 
   static final MessagingService instance = MessagingService._();
 
-  final FCMRepository _fcmRepository = FCMRepository(
+  final FirebaseMessagingRepository _fcmRepository =
+      FirebaseMessagingRepository(
     FirebaseMessaging.instance,
     FirebaseAuth.instance,
     FirebaseFirestore.instance,
@@ -31,7 +32,7 @@ class MessagingService {
     await _setupMessageHandler();
 
     //3. Update FCM token
-    await updateFCMToken();
+    await getFCMToken();
   }
 
   Future<void> requestPermission() async {
@@ -100,9 +101,7 @@ class MessagingService {
 
   Future<String?> getFCMToken() async {
     try {
-      var s = await _messaging.getAPNSToken();
-      print('s: $s');
-      return s;
+      return await _fcmRepository.getMessagingToken();
     } catch (e) {
       print('Error getting FCM token: $e');
       return null;
