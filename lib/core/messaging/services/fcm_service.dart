@@ -31,8 +31,11 @@ class MessagingService {
     //2. Setup message handler
     await _setupMessageHandler();
 
-    //3. Update FCM token
+    //3. Get FCM token
     await getFCMToken();
+
+    //4. Update FCM token
+    await updateFCMToken();
   }
 
   Future<void> requestPermission() async {
