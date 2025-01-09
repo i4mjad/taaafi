@@ -15,42 +15,8 @@ class FirebaseMessagingRepository {
 
   Future<String?> getMessagingToken() async {
     try {
-      if (Platform.isIOS) {
-        final settings = await _messaging.getNotificationSettings();
-
-        // Check if notifications are authorized
-        if (settings.authorizationStatus != AuthorizationStatus.authorized) {
-          final permissionSettings = await _messaging.requestPermission(
-            alert: true,
-            badge: true,
-            sound: true,
-            provisional: true,
-            criticalAlert: true,
-            announcement: true,
-          );
-
-          if (permissionSettings.authorizationStatus !=
-              AuthorizationStatus.authorized) {
-            return null;
-          }
-        }
-
-        // Try getting APNS token multiple times with delay
-        String? token;
-        for (int i = 0; i < 5; i++) {
-          token = await _messaging.getAPNSToken();
-
-          if (token != null) break;
-          await Future.delayed(Duration(seconds: 2));
-        }
-        return token;
-      } else {
-        final settings = await _messaging.getNotificationSettings();
-
-        final token = await _messaging.getToken();
-
-        return token;
-      }
+      final token = await _messaging.getToken();
+      return token;
     } catch (e, stackTrace) {
       throw Exception('Failed to get messaging token: $e');
       return null;
