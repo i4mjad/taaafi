@@ -48,7 +48,19 @@ class MessagingService {
       criticalAlert: false,
       announcement: false,
     );
-    print(settings.authorizationStatus);
+
+    if (settings.authorizationStatus == AuthorizationStatus.authorized) {
+      // Retrieve APNs token for iOS
+      final apnsToken = await _messaging.getAPNSToken();
+      if (apnsToken != null) {
+        print("APNs Token: $apnsToken");
+      } else {
+        print("Failed to retrieve APNs Token");
+      }
+    } else {
+      print(
+          "Notification permissions not granted: ${settings.authorizationStatus}");
+    }
   }
 
   Future<void> setupFlutterNotification(RemoteMessage message) async {
