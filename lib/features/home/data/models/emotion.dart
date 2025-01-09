@@ -5,7 +5,6 @@ class Emotion {
   Emotion(this.emotionEmoji, this.emotionNameTranslationKey);
 }
 
-//TODO: figure out what is the best way to name those two types
 var badEmotions = [
   Emotion("😠", "angry"),
   Emotion("😞", "sad"),

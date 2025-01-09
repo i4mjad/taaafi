@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:reboot_app_3/core/messaging/repositories/fcm_repository.dart';
-import 'package:reboot_app_3/core/messaging/services/fcm_service.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/features/home/data/follow_up_notifier.dart';
@@ -49,11 +48,6 @@ class _AppStartupWidgetState extends ConsumerState<AppStartupWidget> {
   @override
   void initState() {
     super.initState();
-    unawaited(_initFCM());
-  }
-
-  _initFCM() async {
-    await MessagingService.instance.init();
   }
 
   @override

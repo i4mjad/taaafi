@@ -63,15 +63,4 @@ class TaskWidget extends ConsumerWidget {
       ),
     );
   }
-
-  String _getFrequencyText(BuildContext context, TaskFrequency frequency) {
-    switch (frequency) {
-      case TaskFrequency.daily:
-        return AppLocalizations.of(context).translate('daily');
-      case TaskFrequency.weekly:
-        return AppLocalizations.of(context).translate('weekly');
-      case TaskFrequency.monthly:
-        return AppLocalizations.of(context).translate('monthly');
-    }
-  }
 }

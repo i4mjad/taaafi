@@ -2,14 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:reboot_app_3/core/helpers/date_display_formater.dart';
-import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
 import 'package:reboot_app_3/core/shared_widgets/snackbar.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/features/vault/application/activities/ongoing_activity_details_provider.dart';
-import 'package:reboot_app_3/features/vault/data/activities/activity_task.dart';
 import 'package:reboot_app_3/features/vault/data/activities/ongoing_activity_task.dart';
 
 class DayTaskWidget extends ConsumerWidget {
@@ -96,16 +94,5 @@ class DayTaskWidget extends ConsumerWidget {
         ],
       ),
     );
-  }
-
-  String _getFrequencyText(BuildContext context, TaskFrequency frequency) {
-    switch (frequency) {
-      case TaskFrequency.daily:
-        return AppLocalizations.of(context).translate('daily');
-      case TaskFrequency.weekly:
-        return AppLocalizations.of(context).translate('weekly');
-      case TaskFrequency.monthly:
-        return AppLocalizations.of(context).translate('monthly');
-    }
   }
 }

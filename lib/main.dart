@@ -19,10 +19,10 @@ Future<void> runMainApp() async {
   // Track app opened event
   final container = ProviderContainer();
   unawaited(container.read(analyticsFacadeProvider).trackAppOpened());
-  await MessagingService.instance.init();
 
   //TODO: Investigate about a way to update the devices list in user document
   //Initialize Notification settings
+  await MessagingService.instance.init();
 
   //Setup error handeling pages
   registerErrorHandlers();

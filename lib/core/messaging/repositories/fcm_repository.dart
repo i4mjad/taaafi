@@ -17,7 +17,7 @@ class FirebaseMessagingRepository {
     try {
       final token = await _messaging.getToken();
       return token;
-    } catch (e, stackTrace) {
+    } catch (e) {
       throw Exception('Failed to get messaging token: $e');
       return null;
     }
