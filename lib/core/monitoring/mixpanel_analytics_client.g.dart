@@ -1,25 +1,27 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'analytics_facade.dart';
+part of 'mixpanel_analytics_client.dart';
 
 // **************************************************************************
 // RiverpodGenerator
 // **************************************************************************
 
-String _$analyticsFacadeHash() => r'fe2fa1ad835115dd41cb28b525bf2c5a811d1835';
+String _$mixpanelAnalyticsClientHash() =>
+    r'28de6a2cdbf8c3fd46dbbe52988dd639408c4f23';
 
-/// See also [analyticsFacade].
-@ProviderFor(analyticsFacade)
-final analyticsFacadeProvider = Provider<AnalyticsFacade>.internal(
-  analyticsFacade,
-  name: r'analyticsFacadeProvider',
+/// See also [mixpanelAnalyticsClient].
+@ProviderFor(mixpanelAnalyticsClient)
+final mixpanelAnalyticsClientProvider =
+    FutureProvider<MixpanelAnalyticsClient>.internal(
+  mixpanelAnalyticsClient,
+  name: r'mixpanelAnalyticsClientProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
       ? null
-      : _$analyticsFacadeHash,
+      : _$mixpanelAnalyticsClientHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
 
-typedef AnalyticsFacadeRef = ProviderRef<AnalyticsFacade>;
+typedef MixpanelAnalyticsClientRef = FutureProviderRef<MixpanelAnalyticsClient>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

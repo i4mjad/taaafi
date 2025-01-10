@@ -12,4 +12,7 @@ abstract class AnalyticsClient {
   Future<void> trackUserSignup();
   Future<void> trackUserUpdateProfile();
   Future<void> trackUserDeleteAccount();
+  Future<void> trackScreenView(String routeName, String action);
+  Future<void> identifyUser(String userId);
+  Future<void> resetUser();
 }

@@ -9,6 +9,16 @@ class LoggerAnalyticsClient implements AnalyticsClient {
   static const _name = 'Event';
 
   @override
+  Future<void> identifyUser(String userId) async {
+    log('identifyUser($userId)', name: _name);
+  }
+
+  @override
+  Future<void> resetUser() async {
+    log('resetUser', name: _name);
+  }
+
+  @override
   Future<void> trackAppOpened() async {
     log('trackAppOpened', name: _name);
   }
@@ -71,5 +81,10 @@ class LoggerAnalyticsClient implements AnalyticsClient {
   @override
   Future<void> trackUserDeleteAccount() async {
     log('trackUserDeleteAccount', name: _name);
+  }
+
+  @override
+  Future<void> trackScreenView(String routeName, String action) async {
+    log('trackScreenView($routeName, $action)', name: 'Navigation');
   }
 }

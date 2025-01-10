@@ -1,4 +1,6 @@
 import 'package:go_router/go_router.dart';
+import 'package:reboot_app_3/core/monitoring/analytics_facade.dart';
+import 'package:reboot_app_3/core/monitoring/logger_navigator_observer.dart';
 import 'package:reboot_app_3/core/routing/go_router_refresh_stream.dart';
 import 'package:reboot_app_3/core/routing/loading_screen.dart';
 import 'package:reboot_app_3/core/routing/navigator_keys.dart';
@@ -33,6 +35,7 @@ import 'package:reboot_app_3/features/vault/presentation/library/list_screen.dar
 import 'package:reboot_app_3/features/vault/presentation/library/vault_settings_screen.dart';
 import 'package:reboot_app_3/features/vault/presentation/vault_screen.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 
 part 'app_routes.g.dart';
 
@@ -46,6 +49,10 @@ GoRouter goRouter(GoRouterRef ref) {
     initialLocation: '/home',
     navigatorKey: rootNavigatorKey,
     debugLogDiagnostics: false,
+    observers: [
+      GoRouterObserver(ref.read(analyticsFacadeProvider)),
+      SentryNavigatorObserver(),
+    ],
     refreshListenable: GoRouterRefreshStream(authStateChanges(ref)),
     redirect: (context, state) async {
       final isLoggedIn = authState.asData?.value != null;
@@ -115,14 +122,18 @@ GoRouter goRouter(GoRouterRef ref) {
       GoRoute(
         path: '/loading',
         name: RouteNames.loading.name,
-        pageBuilder: (context, state) => NoTransitionPage(
+        pageBuilder: (context, state) => NoTransitionPage<void>(
+          key: state.pageKey,
+          name: state.name,
           child: LoadingScreen(),
         ),
       ),
       GoRoute(
-        path: '/onboarding',
         name: RouteNames.onboarding.name,
-        pageBuilder: (context, state) => NoTransitionPage(
+        path: '/onboarding',
+        pageBuilder: (context, state) => NoTransitionPage<void>(
+          key: state.pageKey,
+          name: state.name,
           child: OnBoardingScreen(),
         ),
         routes: [
@@ -148,7 +159,9 @@ GoRouter goRouter(GoRouterRef ref) {
       GoRoute(
         path: '/completeAccountRegisteration',
         name: RouteNames.completeAccountRegisteration.name,
-        pageBuilder: (context, state) => NoTransitionPage(
+        pageBuilder: (context, state) => NoTransitionPage<void>(
+          key: state.pageKey,
+          name: state.name,
           child: CompleteAccountRegisterationScreen(),
         ),
       ),
@@ -171,6 +184,8 @@ GoRouter goRouter(GoRouterRef ref) {
                 name: RouteNames.home.name,
                 path: '/home',
                 pageBuilder: (context, state) => NoTransitionPage(
+                  key: state.pageKey,
+                  name: state.name,
                   child: HomeScreen(),
                 ),
                 routes: [
@@ -191,7 +206,9 @@ GoRouter goRouter(GoRouterRef ref) {
               GoRoute(
                 name: RouteNames.vault.name,
                 path: '/vault',
-                pageBuilder: (context, state) => NoTransitionPage(
+                pageBuilder: (context, state) => NoTransitionPage<void>(
+                  key: state.pageKey,
+                  name: state.name,
                   child: VaultScreen(),
                 ),
                 routes: [
@@ -287,7 +304,9 @@ GoRouter goRouter(GoRouterRef ref) {
               GoRoute(
                 name: RouteNames.ta3afiPlus.name,
                 path: '/ta3afi-plus',
-                pageBuilder: (context, state) => NoTransitionPage(
+                pageBuilder: (context, state) => NoTransitionPage<void>(
+                  key: state.pageKey,
+                  name: state.name,
                   child: TaaafiPlusScreen(),
                 ),
                 routes: [
@@ -302,7 +321,9 @@ GoRouter goRouter(GoRouterRef ref) {
               GoRoute(
                 path: '/account',
                 name: RouteNames.account.name,
-                pageBuilder: (context, state) => NoTransitionPage(
+                pageBuilder: (context, state) => NoTransitionPage<void>(
+                  key: state.pageKey,
+                  name: state.name,
                   child: AccountScreen(),
                 ),
                 routes: [
@@ -318,7 +339,9 @@ GoRouter goRouter(GoRouterRef ref) {
         ],
       ),
     ],
-    errorPageBuilder: (context, state) => NoTransitionPage(
+    errorPageBuilder: (context, state) => NoTransitionPage<void>(
+      key: state.pageKey,
+      name: state.name,
       child: NotFoundScreen(),
     ),
   );

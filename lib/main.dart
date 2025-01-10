@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:reboot_app_3/app.dart';
 import 'package:reboot_app_3/core/messaging/services/fcm_service.dart';
-import 'package:reboot_app_3/core/monitoring/analytics_facade.dart';
+import 'package:reboot_app_3/core/monitoring/mixpanel_analytics_client.dart';
 import 'package:reboot_app_3/firebase_options.dart';
 
 Future<void> runMainApp() async {
@@ -16,34 +16,17 @@ Future<void> runMainApp() async {
   //Initalize Firebase
   await initFirebase();
 
-  // Track app opened event
   final container = ProviderContainer();
-  unawaited(container.read(analyticsFacadeProvider).trackAppOpened());
+  // Track app opened event
 
-  //TODO: Investigate about a way to update the devices list in user document
+  // * Preload MixpanelAnalyticsClient, so we can make unawaited analytics calls
+  await container.read(mixpanelAnalyticsClientProvider.future);
+
   //Initialize Notification settings
   await MessagingService.instance.init();
 
   //Setup error handeling pages
   registerErrorHandlers();
-
-  // await SentryFlutter.init(
-  //   (options) {
-  //     options.dsn =
-  //         'https://8b5f32f9c6b6e9844338848ad1eadafa@o4507702647848960.ingest.de.sentry.io/4507702652108880';
-  //     // Set tracesSampleRate to 1.0 to capture 100% of transactions for tracing.
-  //     // We recommend adjusting this value in production.
-  //     options.tracesSampleRate = 1.0;
-  //     // The sampling rate for profiling is relative to tracesSampleRate
-  //     // Setting to 1.0 will profile 100% of sampled transactions:
-  //     options.profilesSampleRate = 1.0;
-  //   },
-  //   appRunner: () => runApp(
-  //     ProviderScope(
-  //       child: MyApp(),
-  //     ),
-  //   ),
-  // );
 
   runApp(
     ProviderScope(
@@ -77,8 +60,6 @@ void registerErrorHandlers() {
 }
 
 Future<void> initFirebase() async {
-  //TODO: investigate about a way to setup custom analytics events
-  //TODO: investigate about the best way to setup Crashalytics
   try {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,

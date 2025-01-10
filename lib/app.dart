@@ -38,7 +38,10 @@ class MyApp extends ConsumerWidget with WidgetsBindingObserver {
     return AppTheme(
       customThemeData: theme.darkTheme ? darkCustomTheme : lightCustomTheme,
       child: MaterialApp.router(
+        // routeInformationParser: goRouter.routeInformationParser,
+        // routerDelegate: goRouter.routerDelegate,
         routerConfig: goRouter,
+
         supportedLocales: [Locale('ar', ''), Locale('en', '')],
         locale: locale,
         localizationsDelegates: [

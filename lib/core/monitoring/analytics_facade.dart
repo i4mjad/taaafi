@@ -2,20 +2,40 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:reboot_app_3/core/monitoring/analytics_client.dart';
 import 'package:reboot_app_3/core/monitoring/logger_analytics_client.dart';
+import 'package:reboot_app_3/core/monitoring/mixpanel_analytics_client.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'analytics_facade.g.dart';
 
 @Riverpod(keepAlive: true)
-AnalyticsFacade analyticsFacade(Ref ref) {
-  return const AnalyticsFacade([
-    if (!kReleaseMode) LoggerAnalyticsClient(),
-  ]);
+AnalyticsFacade analyticsFacade(AnalyticsFacadeRef ref) {
+  final clients = <AnalyticsClient>[LoggerAnalyticsClient()];
+
+  ref.listen(
+    mixpanelAnalyticsClientProvider,
+    (previous, next) {
+      if (next.hasValue) {
+        clients.add(next.value!);
+      }
+    },
+  );
+
+  return AnalyticsFacade(clients);
 }
 
 class AnalyticsFacade implements AnalyticsClient {
   const AnalyticsFacade(this.clients);
   final List<AnalyticsClient> clients;
+
+  @override
+  Future<void> identifyUser(String userId) => _dispatch(
+        (c) => c.identifyUser(userId),
+      );
+
+  @override
+  Future<void> resetUser() => _dispatch(
+        (c) => c.resetUser(),
+      );
 
   @override
   Future<void> trackAppOpened() => _dispatch(
@@ -80,6 +100,11 @@ class AnalyticsFacade implements AnalyticsClient {
   @override
   Future<void> trackUserDeleteAccount() => _dispatch(
         (c) => c.trackUserDeleteAccount(),
+      );
+
+  @override
+  Future<void> trackScreenView(String routeName, String action) => _dispatch(
+        (c) => c.trackScreenView(routeName, action),
       );
 
   Future<void> _dispatch(
