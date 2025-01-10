@@ -284,36 +284,7 @@ class LatestAdditionsWidget extends ConsumerWidget {
         content.owner.name,
       );
     }).toList();
-    // return Column(
-    //     "كيف أتعامل مع الانتكاسة؟",
-    //     "قناة واعي",
-    //   ),
-    //   LatestAdditionItem(
-    //     LucideIcons.playCircle,
-    //     "تمارين وتأملات التعافي",
-    //     "محمد القطان",
-    //   ),
-    //   LatestAdditionItem(
-    //     LucideIcons.text,
-    //     "تمارين بعد الانتكاسة",
-    //     "قناة واعي",
-    //   ),
-    //   LatestAdditionItem(
-    //     LucideIcons.playCircle,
-    //     "كيف أستفيد من منصة تعافي؟",
-    //     "منصة تعافي",
-    //   ),
-    //   LatestAdditionItem(
-    //     LucideIcons.playCircle,
-    //     "مراجعة كتاب ممتلئ بالفراغ",
-    //     "عماد رشاد عثمان",
-    //   ),
-    //   LatestAdditionItem(
-    //     LucideIcons.playCircle,
-    //     "كيف تبدأ؟ دليل التعافي",
-    //     "قناة واعي",
-    //   ),
-    // ];
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.start,

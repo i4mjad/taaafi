@@ -346,12 +346,10 @@ class _UpdateUserProfileModalSheetState
             TextButton(
               onPressed: () async {
                 _updateUserProfile();
-                //TODO: Analytics
                 unawaited(
                     ref.read(analyticsFacadeProvider).trackUserUpdateProfile());
                 Navigator.of(context).pop(); // Close the dialog
                 Navigator.of(context).pop(); // Close the dialog
-                // TODO: show a snackbar
                 getSnackBar(context, "profile-updated");
               },
               child: Text(

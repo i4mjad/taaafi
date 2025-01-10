@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:reboot_app_3/features/vault/data/activities/activity.dart';
@@ -5,6 +7,7 @@ import 'package:reboot_app_3/features/vault/data/activities/activity_task.dart';
 import 'package:reboot_app_3/features/vault/data/activities/ongoing_activity.dart';
 import 'package:reboot_app_3/features/vault/data/activities/ongoing_activity_details.dart';
 import 'package:reboot_app_3/features/vault/data/activities/ongoing_activity_task.dart';
+import 'package:reboot_app_3/core/monitoring/analytics_facade.dart';
 
 /// Repository for managing activities and user subscriptions in Firestore
 ///
@@ -16,8 +19,9 @@ import 'package:reboot_app_3/features/vault/data/activities/ongoing_activity_tas
 class ActivityRepository {
   final FirebaseFirestore _firestore;
   final FirebaseAuth _auth;
+  final AnalyticsFacade _analytics;
 
-  ActivityRepository(this._firestore, this._auth);
+  ActivityRepository(this._firestore, this._auth, this._analytics);
 
   /// Gets the current user ID or throws if not authenticated
   String _getCurrentUserId() {
@@ -30,6 +34,7 @@ class ActivityRepository {
   ///
   /// Uses parallel queries to optimize fetching activities and their tasks
   Future<List<Activity>> getAvailableActivities() async {
+    unawaited(_analytics.trackActivityFetchStarted());
     try {
       final activitiesSnapshot = await _firestore
           .collection('activities')
@@ -67,8 +72,10 @@ class ActivityRepository {
         }),
       );
 
+      unawaited(_analytics.trackActivityFetchFinished());
       return activities;
     } catch (e) {
+      unawaited(_analytics.trackActivityFetchFailed());
       throw Exception('Failed to fetch activities: $e');
     }
   }
@@ -81,6 +88,7 @@ class ActivityRepository {
   /// - Updates activity subscriber count
   Future<void> subscribeToActivity(
       String activityId, DateTime startDate, DateTime endDate) async {
+    unawaited(_analytics.trackActivitySubscriptionStarted());
     try {
       final userId = _getCurrentUserId();
       // Create a batch to handle multiple writes atomically
@@ -158,7 +166,10 @@ class ActivityRepository {
 
       // Commit all the batch operations
       await batch.commit();
+
+      unawaited(_analytics.trackActivitySubscriptionFinished());
     } catch (e) {
+      unawaited(_analytics.trackActivitySubscriptionFailed());
       throw Exception('Failed to subscribe to activity: $e');
     }
   }
@@ -229,6 +240,7 @@ class ActivityRepository {
     String activityId,
     DateTime startDate,
   ) async {
+    unawaited(_analytics.trackProgressCalculationStarted());
     try {
       final userId = _getCurrentUserId();
       final now = DateTime.now().add(const Duration(days: 1));
@@ -265,8 +277,10 @@ class ActivityRepository {
       // Calculate progress percentage
       final progress = completedTasks / totalTasksUntilNow * 100;
 
+      unawaited(_analytics.trackProgressCalculationFinished());
       return progress;
     } catch (e) {
+      unawaited(_analytics.trackProgressCalculationFailed());
       throw Exception('Failed to calculate activity progress: $e');
     }
   }

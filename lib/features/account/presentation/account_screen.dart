@@ -75,7 +75,9 @@ class AccountScreen extends ConsumerWidget {
                       verticalSpace(Spacing.points8),
                       GestureDetector(
                         onTap: () {
-                          //TODO: analytics: delete data proccess started
+                          unawaited(ref
+                              .read(analyticsFacadeProvider)
+                              .trackUserResetDataStarted());
 
                           _showDeleteDataDialog(context, ref);
                         },

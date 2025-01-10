@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:reboot_app_3/core/monitoring/analytics_facade.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:reboot_app_3/features/vault/data/activities/activity_repository.dart';
@@ -11,6 +12,7 @@ ActivityRepository activityRepository(ActivityRepositoryRef ref) {
   return ActivityRepository(
     ref.watch(firestoreProvider),
     ref.watch(firebaseAuthProvider),
+    ref.watch(analyticsFacadeProvider),
   );
 }
 

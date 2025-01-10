@@ -15,4 +15,24 @@ abstract class AnalyticsClient {
   Future<void> trackScreenView(String routeName, String action);
   Future<void> identifyUser(String userId);
   Future<void> resetUser();
+  Future<void> trackUserResetDataStarted();
+  Future<void> trackUserResetDataFinished();
+  Future<void> trackActivityFetchStarted();
+  Future<void> trackActivityFetchFinished();
+  Future<void> trackActivityFetchFailed();
+  Future<void> trackActivitySubscriptionStarted();
+  Future<void> trackActivitySubscriptionFinished();
+  Future<void> trackActivitySubscriptionFailed();
+  Future<void> trackProgressCalculationStarted();
+  Future<void> trackProgressCalculationFinished();
+  Future<void> trackProgressCalculationFailed();
+  Future<void> trackTaskCompletionStarted();
+  Future<void> trackTaskCompletionFinished();
+  Future<void> trackTaskCompletionFailed();
+  Future<void> trackActivityUpdateStarted();
+  Future<void> trackActivityUpdateFinished();
+  Future<void> trackActivityUpdateFailed();
+  Future<void> trackActivityDeleteStarted();
+  Future<void> trackActivityDeleteFinished();
+  Future<void> trackActivityDeleteFailed();
 }

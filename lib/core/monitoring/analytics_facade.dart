@@ -1,7 +1,4 @@
-import 'package:flutter/foundation.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:reboot_app_3/core/monitoring/analytics_client.dart';
-import 'package:reboot_app_3/core/monitoring/logger_analytics_client.dart';
 import 'package:reboot_app_3/core/monitoring/mixpanel_analytics_client.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -9,7 +6,7 @@ part 'analytics_facade.g.dart';
 
 @Riverpod(keepAlive: true)
 AnalyticsFacade analyticsFacade(AnalyticsFacadeRef ref) {
-  final clients = <AnalyticsClient>[LoggerAnalyticsClient()];
+  final clients = <AnalyticsClient>[];
 
   ref.listen(
     mixpanelAnalyticsClientProvider,
@@ -105,6 +102,108 @@ class AnalyticsFacade implements AnalyticsClient {
   @override
   Future<void> trackScreenView(String routeName, String action) => _dispatch(
         (c) => c.trackScreenView(routeName, action),
+      );
+
+  @override
+  Future<void> trackUserResetDataStarted() {
+    return _dispatch(
+      (c) => c.trackUserResetDataStarted(),
+    );
+  }
+
+  @override
+  Future<void> trackUserResetDataFinished() => _dispatch(
+        (c) => c.trackUserResetDataFinished(),
+      );
+
+  @override
+  Future<void> trackActivityFetchStarted() => _dispatch(
+        (c) => c.trackActivityFetchStarted(),
+      );
+
+  @override
+  Future<void> trackActivityFetchFinished() => _dispatch(
+        (c) => c.trackActivityFetchFinished(),
+      );
+
+  @override
+  Future<void> trackActivityFetchFailed() => _dispatch(
+        (c) => c.trackActivityFetchFailed(),
+      );
+
+  @override
+  Future<void> trackActivityDeleteFailed() => _dispatch(
+        (c) => c.trackActivityDeleteFailed(),
+      );
+
+  @override
+  Future<void> trackActivityDeleteFinished() => _dispatch(
+        (c) => c.trackActivityDeleteFinished(),
+      );
+
+  @override
+  Future<void> trackActivityDeleteStarted() => _dispatch(
+        (c) => c.trackActivityDeleteStarted(),
+      );
+
+  @override
+  Future<void> trackActivitySubscriptionFailed() => _dispatch(
+        (c) => c.trackActivitySubscriptionFailed(),
+      );
+
+  @override
+  Future<void> trackActivitySubscriptionFinished() => _dispatch(
+        (c) => c.trackActivitySubscriptionFinished(),
+      );
+
+  @override
+  Future<void> trackActivitySubscriptionStarted() => _dispatch(
+        (c) => c.trackActivitySubscriptionStarted(),
+      );
+
+  @override
+  Future<void> trackActivityUpdateFailed() => _dispatch(
+        (c) => c.trackActivityUpdateFailed(),
+      );
+
+  @override
+  Future<void> trackActivityUpdateFinished() => _dispatch(
+        (c) => c.trackActivityUpdateFinished(),
+      );
+
+  @override
+  Future<void> trackActivityUpdateStarted() => _dispatch(
+        (c) => c.trackActivityUpdateStarted(),
+      );
+
+  @override
+  Future<void> trackProgressCalculationFailed() => _dispatch(
+        (c) => c.trackProgressCalculationFailed(),
+      );
+
+  @override
+  Future<void> trackProgressCalculationFinished() => _dispatch(
+        (c) => c.trackProgressCalculationFinished(),
+      );
+
+  @override
+  Future<void> trackProgressCalculationStarted() => _dispatch(
+        (c) => c.trackProgressCalculationStarted(),
+      );
+
+  @override
+  Future<void> trackTaskCompletionFailed() => _dispatch(
+        (c) => c.trackTaskCompletionFailed(),
+      );
+
+  @override
+  Future<void> trackTaskCompletionFinished() => _dispatch(
+        (c) => c.trackTaskCompletionFinished(),
+      );
+
+  @override
+  Future<void> trackTaskCompletionStarted() => _dispatch(
+        (c) => c.trackTaskCompletionStarted(),
       );
 
   Future<void> _dispatch(

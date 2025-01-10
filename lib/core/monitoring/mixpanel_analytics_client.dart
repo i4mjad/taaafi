@@ -88,6 +88,106 @@ class MixpanelAnalyticsClient implements AnalyticsClient {
   Future<void> trackUserUpdateProfile() async {
     await _mixpanel.track('User Update Profile');
   }
+
+  @override
+  Future<void> trackUserResetDataStarted() async {
+    await _mixpanel.track('User Reset Data Started');
+  }
+
+  @override
+  Future<void> trackUserResetDataFinished() async {
+    await _mixpanel.track('User Reset Data Finished');
+  }
+
+  @override
+  Future<void> trackActivityFetchStarted() async {
+    await _mixpanel.track('Activity Fetch Started');
+  }
+
+  @override
+  Future<void> trackActivityFetchFinished() async {
+    await _mixpanel.track('Activity Fetch Finished');
+  }
+
+  @override
+  Future<void> trackActivityFetchFailed() async {
+    await _mixpanel.track('Activity Fetch Failed');
+  }
+
+  @override
+  Future<void> trackActivitySubscriptionStarted() async {
+    await _mixpanel.track('Activity Subscription Started');
+  }
+
+  @override
+  Future<void> trackActivitySubscriptionFinished() async {
+    await _mixpanel.track('Activity Subscription Finished');
+  }
+
+  @override
+  Future<void> trackActivitySubscriptionFailed() async {
+    await _mixpanel.track('Activity Subscription Failed');
+  }
+
+  @override
+  Future<void> trackProgressCalculationStarted() async {
+    await _mixpanel.track('Progress Calculation Started');
+  }
+
+  @override
+  Future<void> trackProgressCalculationFinished() async {
+    await _mixpanel.track('Progress Calculation Finished');
+  }
+
+  @override
+  Future<void> trackProgressCalculationFailed() async {
+    await _mixpanel.track('Progress Calculation Failed');
+  }
+
+  @override
+  Future<void> trackTaskCompletionStarted() async {
+    await _mixpanel.track('Task Completion Started');
+  }
+
+  @override
+  Future<void> trackTaskCompletionFinished() async {
+    await _mixpanel.track('Task Completion Finished');
+  }
+
+  @override
+  Future<void> trackTaskCompletionFailed() async {
+    await _mixpanel.track('Task Completion Failed');
+  }
+
+  @override
+  Future<void> trackActivityUpdateStarted() async {
+    await _mixpanel.track('Activity Update Started');
+  }
+
+  @override
+  Future<void> trackActivityDeleteFailed() async {
+    await _mixpanel.track('Activity Delete Failed');
+  }
+
+  @override
+  Future<void> trackActivityDeleteFinished() async {
+    await _mixpanel.track('Activity Delete Finished');
+  }
+
+  @override
+  Future<void> trackActivityDeleteStarted() async {
+    await _mixpanel.track('Activity Delete Started');
+  }
+
+  @override
+  Future<void> trackActivityUpdateFailed() async {
+    await _mixpanel.track('Activity Update Failed');
+  }
+
+  @override
+  Future<void> trackActivityUpdateFinished() async {
+    await _mixpanel.track('Activity Update Finished');
+  }
 }
 
 @Riverpod(keepAlive: true)
@@ -99,11 +199,3 @@ Future<MixpanelAnalyticsClient> mixpanelAnalyticsClient(
   );
   return MixpanelAnalyticsClient(mixpanel);
 }
-
-
-// ════════ Exception caught by widgets library ═══════════════════════════════════
-// The following StateError was thrown building MyApp(dirty, dependencies: [UncontrolledProviderScope], state: _ConsumerState#e7866):
-// Bad state: Tried to call `requireValue` on an `AsyncValue` that has no value: AsyncLoading<MixpanelAnalyticsClient>()
-
-// The relevant error-causing widget was:
-//     MyApp MyApp:file:///Users/amjadkhalfan/StudioProjects/ta3afi/lib/main.dart:33:14
