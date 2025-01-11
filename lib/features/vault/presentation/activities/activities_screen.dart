@@ -107,8 +107,42 @@ class OngoingActivitiesWidget extends ConsumerWidget {
             verticalSpace(Spacing.points8),
             if (snapshot.hasError)
               Center(child: Text(snapshot.error.toString()))
-            else if (!snapshot.hasData)
+            else if (snapshot.connectionState == ConnectionState.waiting)
               const Center(child: CircularProgressIndicator())
+            else if (snapshot.data!.isEmpty)
+              Column(
+                children: [
+                  verticalSpace(Spacing.points16),
+                  Text(
+                    AppLocalizations.of(context)
+                        .translate('no-ongoing-activities'),
+                    style: TextStyles.h6.copyWith(color: theme.grey[900]),
+                  ),
+                  verticalSpace(Spacing.points8),
+                  GestureDetector(
+                    onTap: () {
+                      context.goNamed(RouteNames.addActivity.name);
+                    },
+                    child: WidgetsContainer(
+                      width: MediaQuery.of(context).size.width - 32,
+                      boxShadow: Shadows.mainShadows,
+                      backgroundColor: theme.backgroundColor,
+                      borderSide: BorderSide(
+                        color: theme.grey[600]!,
+                        width: 0.5,
+                      ),
+                      child: Center(
+                        child: Text(
+                          AppLocalizations.of(context)
+                              .translate('add-activity'),
+                          style: TextStyles.caption
+                              .copyWith(color: theme.primary[600]),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              )
             else
               ListView.separated(
                 shrinkWrap: true,
@@ -137,11 +171,12 @@ class TodayTasksWidget extends ConsumerWidget {
         if (snapshot.hasError) {
           return Center(child: Text(snapshot.error.toString()));
         }
-        if (!snapshot.hasData) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
         }
 
         final tasks = snapshot.data!;
+
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -196,6 +231,16 @@ class TodayTasksWidget extends ConsumerWidget {
               ],
             ),
             verticalSpace(Spacing.points16),
+            if (tasks.isEmpty)
+              Container(
+                height: 100,
+                child: Center(
+                  child: Text(
+                    AppLocalizations.of(context).translate('no-tasks-today'),
+                    style: TextStyles.h6.copyWith(color: theme.grey[900]),
+                  ),
+                ),
+              ),
             ListView.separated(
               shrinkWrap: true,
               physics: NeverScrollableScrollPhysics(),

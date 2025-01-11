@@ -477,6 +477,7 @@
   "edit-follow-up": "Edit Follow up",
   "delete-follow-up": "Delete Follow up",
   "edit-emotion": "Edit Emotion",
-  "no-tasks-for-date": "No tasks for this date"
-
+  "no-tasks-for-date": "No tasks for this date",
+  "no-tasks-today": "No tasks for today!",
+  "no-ongoing-activities": "No ongoing activities!"
 }

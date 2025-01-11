@@ -12,6 +12,10 @@
   "library":"المكتبة",
   "no-tasks-for-date": "لا توجد مهام في هذا التاريخ",
 
+  "no-tasks-today": "لا توجد مهام لهذا اليوم",
+
+  "no-ongoing-activities": "لا توجد تمارين حاليا",
+
   "diary-settings":"إعدادات المذكرة",
 
   "list-content":"محتوى القائمة",

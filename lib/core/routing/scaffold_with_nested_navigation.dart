@@ -35,9 +35,10 @@ class ScaffoldWithNestedNavigation extends StatelessWidget {
             ),
           ),
           child: NavigationBar(
-            height: 58,
-            surfaceTintColor: theme.primary[200],
-            indicatorColor: theme.primary[100],
+            // height: 58,
+            surfaceTintColor: theme.backgroundColor,
+            shadowColor: theme.primary[900],
+            indicatorColor: theme.primary[50],
             indicatorShape: CircleBorder(),
             selectedIndex: navigationShell.currentIndex,
             backgroundColor: theme.backgroundColor,
@@ -56,13 +57,13 @@ class ScaffoldWithNestedNavigation extends StatelessWidget {
                   size: 20,
                 ),
               ),
-              NavigationDestination(
-                label: AppLocalizations.of(context).translate("group"),
-                icon: Icon(
-                  LucideIcons.users,
-                  size: 20,
-                ),
-              ),
+              // NavigationDestination(
+              //   label: AppLocalizations.of(context).translate("group"),
+              //   icon: Icon(
+              //     LucideIcons.users,
+              //     size: 20,
+              //   ),
+              // ),
               NavigationDestination(
                 label: AppLocalizations.of(context).translate("account"),
                 icon: Icon(

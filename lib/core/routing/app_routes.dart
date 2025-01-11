@@ -298,23 +298,24 @@ GoRouter goRouter(GoRouterRef ref) {
               ),
             ],
           ),
-          StatefulShellBranch(
-            navigatorKey: shellNavigatorFellowshipKey,
-            routes: [
-              GoRoute(
-                name: RouteNames.ta3afiPlus.name,
-                path: '/ta3afi-plus',
-                pageBuilder: (context, state) => NoTransitionPage<void>(
-                  key: state.pageKey,
-                  name: state.name,
-                  child: TaaafiPlusScreen(),
-                ),
-                routes: [
-                  //! Add Pages
-                ],
-              ),
-            ],
-          ),
+          // StatefulShellBranch(
+          //   navigatorKey: shellNavigatorFellowshipKey,
+          //   routes: [
+          //     GoRoute(
+          //       name: RouteNames.ta3afiPlus.name,
+          //       path: '/ta3afi-plus',
+          //       pageBuilder: (context, state) => NoTransitionPage<void>(
+          //         key: state.pageKey,
+          //         name: state.name,
+          //         child: TaaafiPlusScreen(),
+          //       ),
+          //       routes: [
+          //         //! Add Pages
+          //       ],
+          //     ),
+          //   ],
+          // ),
+
           StatefulShellBranch(
             navigatorKey: shellNavigatorAccountKey,
             routes: [
