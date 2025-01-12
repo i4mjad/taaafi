@@ -17,7 +17,6 @@ import 'package:reboot_app_3/features/authentication/presentation/signup_screen.
 import 'package:reboot_app_3/features/authentication/providers/user_document_provider.dart';
 import 'package:reboot_app_3/features/authentication/data/repositories/auth_repository.dart';
 import 'package:reboot_app_3/features/home/presentation/day_overview/day_overview_screen.dart';
-import 'package:reboot_app_3/features/plus/presentation/taaafi_plus_screen.dart';
 import 'package:reboot_app_3/features/home/presentation/home/home_screen.dart';
 import 'package:reboot_app_3/features/onboarding/presentation/onboarding_screen.dart';
 import 'package:reboot_app_3/features/vault/presentation/activities/activities_screen.dart';
@@ -123,8 +122,7 @@ GoRouter goRouter(GoRouterRef ref) {
         path: '/loading',
         name: RouteNames.loading.name,
         pageBuilder: (context, state) => NoTransitionPage<void>(
-          key: state.pageKey,
-          name: state.name,
+          name: RouteNames.loading.name,
           child: LoadingScreen(),
         ),
       ),
@@ -132,25 +130,33 @@ GoRouter goRouter(GoRouterRef ref) {
         name: RouteNames.onboarding.name,
         path: '/onboarding',
         pageBuilder: (context, state) => NoTransitionPage<void>(
-          key: state.pageKey,
-          name: state.name,
+          name: RouteNames.onboarding.name,
           child: OnBoardingScreen(),
         ),
         routes: [
           GoRoute(
             path: 'login',
             name: RouteNames.login.name,
-            builder: (context, state) => LogInScreen(),
+            pageBuilder: (context, state) => NoTransitionPage<void>(
+              name: RouteNames.login.name,
+              child: LogInScreen(),
+            ),
             routes: [
               GoRoute(
                 path: 'forgetPassword',
                 name: RouteNames.forgotPassword.name,
-                builder: (context, state) => ForgotPasswordScreen(),
+                pageBuilder: (context, state) => NoTransitionPage<void>(
+                  name: RouteNames.forgotPassword.name,
+                  child: ForgotPasswordScreen(),
+                ),
               ),
               GoRoute(
                 path: 'signup',
                 name: RouteNames.signup.name,
-                builder: (context, state) => SignUpScreen(),
+                pageBuilder: (context, state) => NoTransitionPage<void>(
+                  name: RouteNames.signup.name,
+                  child: SignUpScreen(),
+                ),
               ),
             ],
           ),
@@ -160,8 +166,7 @@ GoRouter goRouter(GoRouterRef ref) {
         path: '/completeAccountRegisteration',
         name: RouteNames.completeAccountRegisteration.name,
         pageBuilder: (context, state) => NoTransitionPage<void>(
-          key: state.pageKey,
-          name: state.name,
+          name: RouteNames.completeAccountRegisteration.name,
           child: CompleteAccountRegisterationScreen(),
         ),
       ),
@@ -169,31 +174,38 @@ GoRouter goRouter(GoRouterRef ref) {
         path: '/confirmProfileDetails',
         name: RouteNames.confirmUserDetails.name,
         pageBuilder: (context, state) => NoTransitionPage(
+          name: RouteNames.confirmUserDetails.name,
           child: ConfirmUserDetailsScreen(),
         ),
       ),
       StatefulShellRoute.indexedStack(
         pageBuilder: (context, state, navigationShell) => NoTransitionPage(
+          name: 'main',
           child: ScaffoldWithNestedNavigation(navigationShell: navigationShell),
         ),
         branches: [
           StatefulShellBranch(
+            observers: [
+              GoRouterObserver(ref.read(analyticsFacadeProvider)),
+            ],
             navigatorKey: shellNavigatorHomeKey,
             routes: [
               GoRoute(
                 name: RouteNames.home.name,
                 path: '/home',
                 pageBuilder: (context, state) => NoTransitionPage(
-                  key: state.pageKey,
-                  name: state.name,
+                  name: RouteNames.home.name,
                   child: HomeScreen(),
                 ),
                 routes: [
                   GoRoute(
                     path: "dayOverview/:date",
                     name: RouteNames.dayOverview.name,
-                    builder: (context, state) => DayOverviewScreen(
-                      date: DateTime.parse(state.pathParameters["date"]!),
+                    pageBuilder: (context, state) => NoTransitionPage(
+                      name: RouteNames.dayOverview.name,
+                      child: DayOverviewScreen(
+                        date: DateTime.parse(state.pathParameters["date"]!),
+                      ),
                     ),
                   )
                 ],
@@ -202,57 +214,81 @@ GoRouter goRouter(GoRouterRef ref) {
           ),
           StatefulShellBranch(
             navigatorKey: shellNavigatorVaultKey,
+            observers: [
+              GoRouterObserver(ref.read(analyticsFacadeProvider)),
+            ],
             routes: [
               GoRoute(
                 name: RouteNames.vault.name,
                 path: '/vault',
                 pageBuilder: (context, state) => NoTransitionPage<void>(
-                  key: state.pageKey,
-                  name: state.name,
+                  name: RouteNames.vault.name,
                   child: VaultScreen(),
                 ),
                 routes: [
                   GoRoute(
                     path: "activities",
                     name: RouteNames.activities.name,
-                    builder: (context, state) => ActivitiesScreen(),
+                    pageBuilder: (context, state) => NoTransitionPage<void>(
+                      name: RouteNames.activities.name,
+                      child: ActivitiesScreen(),
+                    ),
                     routes: [
                       GoRoute(
                         path: "allTasks",
                         name: RouteNames.allTasks.name,
-                        builder: (context, state) => AllTasksScreen(),
+                        pageBuilder: (context, state) => NoTransitionPage<void>(
+                          name: RouteNames.allTasks.name,
+                          child: AllTasksScreen(),
+                        ),
                       ),
                       GoRoute(
                         path: "ongoingActivity/:id",
                         name: RouteNames.ongoingActivity.name,
-                        builder: (context, state) =>
-                            OngoingActivitiyScreen(state.pathParameters["id"]!),
+                        pageBuilder: (context, state) => NoTransitionPage<void>(
+                          name: RouteNames.ongoingActivity.name,
+                          child: OngoingActivitiyScreen(
+                              state.pathParameters["id"]!),
+                        ),
                       ),
                       GoRoute(
-                          path: "addActivity",
+                        path: "addActivity",
+                        name: RouteNames.addActivity.name,
+                        pageBuilder: (context, state) => NoTransitionPage<void>(
                           name: RouteNames.addActivity.name,
-                          builder: (context, state) => AddActivityScreen(),
-                          routes: [
-                            GoRoute(
-                              path: "activityOverview/:id",
+                          child: AddActivityScreen(),
+                        ),
+                        routes: [
+                          GoRoute(
+                            path: "activityOverview/:id",
+                            name: RouteNames.activityOverview.name,
+                            pageBuilder: (context, state) =>
+                                NoTransitionPage<void>(
                               name: RouteNames.activityOverview.name,
-                              builder: (context, state) =>
-                                  ActivityOverviewScreen(
-                                      state.pathParameters["id"]!),
-                            )
-                          ])
+                              child: ActivityOverviewScreen(
+                                  state.pathParameters["id"]!),
+                            ),
+                          )
+                        ],
+                      )
                     ],
                   ),
                   GoRoute(
                     path: "diaries",
                     name: RouteNames.diaries.name,
-                    builder: (context, state) => DiariesScreen(),
+                    pageBuilder: (context, state) => NoTransitionPage<void>(
+                      name: RouteNames.diaries.name,
+                      child: DiariesScreen(),
+                    ),
                     routes: [
                       GoRoute(
                         path: "diary/:id",
                         name: RouteNames.diary.name,
-                        builder: (context, state) => DiaryScreen(
-                          diaryId: state.pathParameters["id"]!,
+                        pageBuilder: (context, state) => NoTransitionPage<void>(
+                          name: RouteNames.diary.name,
+                          child: DiaryScreen(
+                            diaryId: state.pathParameters["id"]!,
+                          ),
                         ),
                       )
                     ],
@@ -260,31 +296,44 @@ GoRouter goRouter(GoRouterRef ref) {
                   GoRoute(
                     path: "library",
                     name: RouteNames.library.name,
-                    builder: (context, state) => LibraryScreen(),
+                    pageBuilder: (context, state) => NoTransitionPage<void>(
+                      name: RouteNames.library.name,
+                      child: LibraryScreen(),
+                    ),
                     routes: [
                       GoRoute(
                         path: "list/:id",
                         name: RouteNames.libraryList.name,
-                        builder: (context, state) => ListScreen(
-                          state.pathParameters["id"]!,
+                        pageBuilder: (context, state) => NoTransitionPage<void>(
+                          name: RouteNames.libraryList.name,
+                          child: ListScreen(state.pathParameters["id"]!),
                         ),
                       ),
                       GoRoute(
                         path: "content",
                         name: RouteNames.contents.name,
-                        builder: (context, state) => ContentScreen(),
+                        pageBuilder: (context, state) => NoTransitionPage<void>(
+                          name: RouteNames.contents.name,
+                          child: ContentScreen(),
+                        ),
                       ),
                       GoRoute(
                         path: "lists",
                         name: RouteNames.contentLists.name,
-                        builder: (context, state) => ContentListsScreen(),
+                        pageBuilder: (context, state) => NoTransitionPage<void>(
+                          name: RouteNames.contentLists.name,
+                          child: ContentListsScreen(),
+                        ),
                       ),
                       GoRoute(
                         path: "contentType/:typeId/:typeName",
                         name: RouteNames.contentType.name,
-                        builder: (context, state) => ContentTypeScreen(
-                          state.pathParameters["typeId"]!,
-                          state.pathParameters["typeName"]!,
+                        pageBuilder: (context, state) => NoTransitionPage<void>(
+                          name: RouteNames.contentType.name,
+                          child: ContentTypeScreen(
+                            state.pathParameters["typeId"]!,
+                            state.pathParameters["typeName"]!,
+                          ),
                         ),
                       )
                     ],
@@ -292,7 +341,10 @@ GoRouter goRouter(GoRouterRef ref) {
                   GoRoute(
                     path: "settings",
                     name: RouteNames.vaultSettings.name,
-                    builder: (context, state) => VaultSettingsScreen(),
+                    pageBuilder: (context, state) => NoTransitionPage<void>(
+                      name: RouteNames.vaultSettings.name,
+                      child: VaultSettingsScreen(),
+                    ),
                   ),
                 ],
               ),
@@ -318,20 +370,25 @@ GoRouter goRouter(GoRouterRef ref) {
 
           StatefulShellBranch(
             navigatorKey: shellNavigatorAccountKey,
+            observers: [
+              GoRouterObserver(ref.read(analyticsFacadeProvider)),
+            ],
             routes: [
               GoRoute(
                 path: '/account',
                 name: RouteNames.account.name,
                 pageBuilder: (context, state) => NoTransitionPage<void>(
-                  key: state.pageKey,
-                  name: state.name,
+                  name: RouteNames.account.name,
                   child: AccountScreen(),
                 ),
                 routes: [
                   GoRoute(
                     path: 'account-delete',
                     name: RouteNames.accountDelete.name,
-                    builder: (context, state) => DeleteAccountScreen(),
+                    pageBuilder: (context, state) => NoTransitionPage<void>(
+                      name: RouteNames.accountDelete.name,
+                      child: DeleteAccountScreen(),
+                    ),
                   ),
                 ],
               ),

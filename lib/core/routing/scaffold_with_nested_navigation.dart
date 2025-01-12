@@ -35,13 +35,14 @@ class ScaffoldWithNestedNavigation extends StatelessWidget {
             ),
           ),
           child: NavigationBar(
-            // height: 58,
-            surfaceTintColor: theme.backgroundColor,
-            shadowColor: theme.primary[900],
+            height: 58,
+            surfaceTintColor: theme.primary[50],
             indicatorColor: theme.primary[50],
             indicatorShape: CircleBorder(),
             selectedIndex: navigationShell.currentIndex,
             backgroundColor: theme.backgroundColor,
+            shadowColor: theme.primary[900],
+            elevation: 4,
             destinations: [
               NavigationDestination(
                 label: AppLocalizations.of(context).translate("home"),

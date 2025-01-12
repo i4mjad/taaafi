@@ -116,7 +116,7 @@ class OngoingActivitiesWidget extends ConsumerWidget {
                   Text(
                     AppLocalizations.of(context)
                         .translate('no-ongoing-activities'),
-                    style: TextStyles.h6.copyWith(color: theme.grey[900]),
+                    style: TextStyles.body.copyWith(color: theme.grey[500]),
                   ),
                   verticalSpace(Spacing.points8),
                   GestureDetector(
@@ -224,7 +224,7 @@ class TodayTasksWidget extends ConsumerWidget {
                   child: Text(
                     AppLocalizations.of(context).translate('show-all'),
                     style: TextStyles.footnoteSelected.copyWith(
-                      color: theme.grey[500],
+                      color: theme.grey[600],
                     ),
                   ),
                 ),
@@ -237,7 +237,8 @@ class TodayTasksWidget extends ConsumerWidget {
                 child: Center(
                   child: Text(
                     AppLocalizations.of(context).translate('no-tasks-today'),
-                    style: TextStyles.h6.copyWith(color: theme.grey[900]),
+                    style:
+                        TextStyles.bodyLarge.copyWith(color: theme.grey[500]),
                   ),
                 ),
               ),

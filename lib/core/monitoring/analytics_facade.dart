@@ -1,4 +1,6 @@
 import 'package:reboot_app_3/core/monitoring/analytics_client.dart';
+import 'package:reboot_app_3/core/monitoring/google_analytics_client.dart';
+import 'package:reboot_app_3/core/monitoring/logger_analytics_client.dart';
 import 'package:reboot_app_3/core/monitoring/mixpanel_analytics_client.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -6,16 +8,19 @@ part 'analytics_facade.g.dart';
 
 @Riverpod(keepAlive: true)
 AnalyticsFacade analyticsFacade(AnalyticsFacadeRef ref) {
-  final clients = <AnalyticsClient>[];
+  final clients = <AnalyticsClient>[
+    LoggerAnalyticsClient(),
+    ref.read(googleAnalyticsClientProvider),
+  ];
 
-  ref.listen(
-    mixpanelAnalyticsClientProvider,
-    (previous, next) {
-      if (next.hasValue) {
-        clients.add(next.value!);
-      }
-    },
-  );
+  // ref.listen(
+  //   mixpanelAnalyticsClientProvider,
+  //   (previous, next) {
+  //     if (next.hasValue) {
+  //       clients.add(next.value!);
+  //     }
+  //   },
+  // );
 
   return AnalyticsFacade(clients);
 }
