@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -49,14 +51,10 @@ class MessagingService {
       announcement: false,
     );
 
-    if (settings.authorizationStatus == AuthorizationStatus.authorized) {
-      // Retrieve APNs token for iOS
-      final apnsToken = await _messaging.getAPNSToken();
-      if (apnsToken != null) {
-        print("APNs Token: $apnsToken");
-      } else {
-        print("Failed to retrieve APNs Token");
-      }
+    // Retrieve APNs token for iOS
+    if (settings.authorizationStatus == AuthorizationStatus.authorized &&
+        Platform.isIOS) {
+      await _messaging.getAPNSToken();
     } else {
       print(
           "Notification permissions not granted: ${settings.authorizationStatus}");
