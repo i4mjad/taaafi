@@ -78,7 +78,6 @@ class MessagingService {
             AndroidFlutterLocalNotificationsPlugin>()
         ?.createNotificationChannel(channel);
 
-    //TODO: figure out how to change this to the actual app icon
     const initalAndroidSettings =
         AndroidInitializationSettings('@mipmap/ic_launcher');
 

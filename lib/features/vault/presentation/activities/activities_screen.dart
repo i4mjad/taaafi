@@ -282,26 +282,7 @@ class OngoingActivityWidget extends ConsumerWidget {
         backgroundColor: theme.backgroundColor,
         padding: EdgeInsets.fromLTRB(16, 12, 16, 12),
         borderSide: BorderSide(color: theme.grey[600]!, width: 0.5),
-        boxShadow: [
-          BoxShadow(
-            color: Color.fromRGBO(50, 50, 93, 0.25),
-            blurRadius: 5,
-            spreadRadius: -1,
-            offset: Offset(
-              0,
-              2,
-            ),
-          ),
-          BoxShadow(
-            color: Color.fromRGBO(0, 0, 0, 0.3),
-            blurRadius: 3,
-            spreadRadius: -1,
-            offset: Offset(
-              0,
-              1,
-            ),
-          ),
-        ],
+        boxShadow: Shadows.mainShadows,
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
@@ -341,10 +322,33 @@ class OngoingActivityWidget extends ConsumerWidget {
                       style: TextStyles.small.copyWith(color: theme.grey[700]),
                     ),
                     Text(
-                      "${activity.progress.toInt()} %",
+                      activity.startDate.isAfter(
+                        DateTime(
+                          DateTime.now().year,
+                          DateTime.now().month,
+                          DateTime.now().day,
+                          23,
+                          59,
+                          59,
+                        ),
+                      )
+                          ? AppLocalizations.of(context)
+                              .translate('not-started')
+                          : "${activity.progress.toInt()} %",
                       style: TextStyles.smallBold.copyWith(
-                        color: getPercentageColor(
-                            activity.progress.toInt(), theme),
+                        color: activity.startDate.isAfter(
+                          DateTime(
+                            DateTime.now().year,
+                            DateTime.now().month,
+                            DateTime.now().day,
+                            23,
+                            59,
+                            59,
+                          ),
+                        )
+                            ? theme.grey[700]
+                            : getPercentageColor(
+                                activity.progress.toInt(), theme),
                       ),
                     ),
                   ],

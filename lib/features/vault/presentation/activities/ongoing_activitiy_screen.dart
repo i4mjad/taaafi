@@ -32,7 +32,11 @@ class OngoingActivitiyScreen extends ConsumerWidget {
       data: (details) {
         return Scaffold(
           backgroundColor: theme.backgroundColor,
-          appBar: appBar(context, ref, details.activity.name),
+          appBar: appBar(
+            context,
+            ref,
+            details.activity.name,
+          ),
           body: SafeArea(
             child: Padding(
               padding: const EdgeInsets.all(16),
@@ -90,19 +94,23 @@ class OngoingActivitiyScreen extends ConsumerWidget {
       actions: [
         Padding(
           padding: EdgeInsets.only(right: 16, left: 16),
-          child: GestureDetector(
-            onTap: () {
-              showModalBottomSheet<void>(
-                  context: context,
-                  isScrollControlled: true,
-                  builder: (BuildContext context) {
-                    return OngoingActivitySettingsSheet(ongoingActivityId);
-                  });
-            },
-            child: Icon(
-              LucideIcons.settings,
-              color: theme.grey[900],
-            ),
+          child: Row(
+            children: [
+              GestureDetector(
+                onTap: () {
+                  showModalBottomSheet<void>(
+                      context: context,
+                      isScrollControlled: true,
+                      builder: (BuildContext context) {
+                        return OngoingActivitySettingsSheet(ongoingActivityId);
+                      });
+                },
+                child: Icon(
+                  LucideIcons.settings,
+                  color: theme.primary[600],
+                ),
+              ),
+            ],
           ),
         )
       ],
@@ -149,6 +157,25 @@ class OngoingActivitySettingsSheet extends ConsumerWidget {
           GestureDetector(
             onTap: () {
               Navigator.pop(context);
+              context.goNamed(RouteNames.activitiesNotifications.name);
+            },
+            child: WidgetsContainer(
+              backgroundColor: theme.backgroundColor,
+              borderSide: BorderSide(color: theme.secondary[600]!, width: 0.5),
+              // boxShadow: Shadows.mainShadows,
+              child: Center(
+                child: Text(
+                  AppLocalizations.of(context)
+                      .translate('activities-notifications-settings'),
+                  style: TextStyles.body.copyWith(color: theme.secondary[600]),
+                ),
+              ),
+            ),
+          ),
+          verticalSpace(Spacing.points8),
+          GestureDetector(
+            onTap: () {
+              Navigator.pop(context);
               showModalBottomSheet<void>(
                 context: context,
                 isScrollControlled: true,
@@ -174,12 +201,12 @@ class OngoingActivitySettingsSheet extends ConsumerWidget {
             onTap: () => _showDeleteConfirmation(context, ref),
             child: WidgetsContainer(
               backgroundColor: theme.backgroundColor,
-              borderSide: BorderSide(color: theme.error[700]!, width: 0.5),
+              borderSide: BorderSide(color: theme.error[500]!, width: 0.5),
               // boxShadow: Shadows.mainShadows,
               child: Center(
                 child: Text(
                   AppLocalizations.of(context).translate('remove-activity'),
-                  style: TextStyles.body.copyWith(color: theme.error[700]),
+                  style: TextStyles.body.copyWith(color: theme.error[500]),
                 ),
               ),
             ),
@@ -211,6 +238,7 @@ class OngoingActivitySettingsSheet extends ConsumerWidget {
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
+        backgroundColor: theme.backgroundColor,
         title: Text(
           AppLocalizations.of(context).translate('warning'),
           style: TextStyles.h6.copyWith(color: theme.error[700]),

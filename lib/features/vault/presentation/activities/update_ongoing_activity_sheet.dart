@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/helpers/date_display_formater.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
+import 'package:reboot_app_3/core/notifications/notifications_scheduler.dart';
+import 'package:reboot_app_3/core/routing/route_names.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
 import 'package:reboot_app_3/core/shared_widgets/custom_textfield.dart';
 import 'package:reboot_app_3/core/shared_widgets/snackbar.dart';
@@ -137,8 +140,21 @@ class _UpdateOngoingActivitySheetState
           .updateActivityDates(
               activityStartingDateTime, activityEndingDateTime);
 
+      // if (context.mounted) {
+      //   Navigator.pop(context);
+      // }
+
+      //TODO: clear the scedhuled notifications for this activity
+      await NotificationsScheduler.instance
+          .cancelNotificationsForActivity(widget.ongoingActivityId);
+
+      // Navigate using a delayed call to ensure previous operations are complete
       if (context.mounted) {
-        Navigator.pop(context);
+        Future.microtask(() {
+          context.goNamed(
+            RouteNames.activities.name,
+          );
+        });
       }
     } catch (e) {
       if (context.mounted) {

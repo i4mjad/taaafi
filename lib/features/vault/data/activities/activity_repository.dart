@@ -321,6 +321,8 @@ class ActivityRepository {
             ongoingActivity.startDate,
           );
 
+          final scheduledTasks = await _getScheduledTasks(ongoingActivity.id);
+
           return OngoingActivity(
             id: ongoingActivity.id,
             activityId: ongoingActivity.activityId,
@@ -328,6 +330,7 @@ class ActivityRepository {
             endDate: ongoingActivity.endDate,
             createdAt: ongoingActivity.createdAt,
             activity: activity,
+            scheduledTasks: scheduledTasks,
             progress: progress,
           );
         }),
@@ -1054,5 +1057,38 @@ class ActivityRepository {
     final endOfDay = DateTime(
         activity.endDate.year, activity.endDate.month, activity.endDate.day);
     return !date.isBefore(startOfDay) && !date.isAfter(endOfDay);
+  }
+
+  Future<List<OngoingActivityTask>> _getScheduledTasks(
+      String activityId) async {
+    final userId = _getCurrentUserId();
+    final scheduledTasksSnapshot = await _firestore
+        .collection('users')
+        .doc(userId)
+        .collection('ongoing_activities')
+        .doc(activityId)
+        .collection('scheduledTasks')
+        .where('isDeleted', isEqualTo: false)
+        .get();
+
+    final baseTasks = await _getBaseTasksMap(activityId);
+    final tasks = <OngoingActivityTask>[];
+
+    for (var doc in scheduledTasksSnapshot.docs) {
+      final data = doc.data();
+      final baseTask = baseTasks[data['taskId']];
+      if (baseTask != null) {
+        tasks.add(OngoingActivityTask(
+          id: doc.id,
+          task: baseTask,
+          taskDatetime: (data['scheduledDate'] as Timestamp).toDate(),
+          isCompleted: data['isCompleted'] ?? false,
+          scheduledTaskId: doc.id,
+          activityId: activityId,
+        ));
+      }
+    }
+
+    return tasks;
   }
 }

@@ -50,12 +50,12 @@ android {
     }
 
     defaultConfig {
+        multiDexEnabled true
         applicationId "com.amjadkhalfan.reboot_app_3"
         targetSdkVersion 34
         minSdkVersion 23
         versionCode flutterVersionCode
         versionName flutterVersionName
-        multiDexEnabled true
     }
 
     buildFeatures {

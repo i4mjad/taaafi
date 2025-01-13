@@ -176,7 +176,7 @@
   "years": "Years",
   "admin": "Admin",
   "user": "User",
-  "confirm": "Confirm",
+  
 
   "cant-be-empty": "This field can't be empty",
   "enter-a-valid-dob": "Enter a valid Day of Birth",
@@ -388,7 +388,7 @@
   "content-category": "Contant Category",
   "content-type": "Contant Type",
   "apply-filters": "Apply",
-  "cancel": "Cancel",
+  
   "lock-app": "Lock Screen",
 
   "no-data":"No data",
@@ -483,5 +483,15 @@
   "activities-notifications-settings": "Activities Notifications",
   "allow-notifications": "Allow Notifications",
   "allow-notifications-desc": "To get daily reminders for activities, you must allow the app to send notifications",
-  "please-select-starting-date-first": "Please select the starting date first"
+  "please-select-starting-date-first": "Please select the starting date first",
+  "notifications-allowed": "Notifications are allowed",
+  "notifications-disabled": "Notifications disabled. You can enable them in the settings of the device",
+  "cancel-notifications": "Cancel Notifications",
+  "activate-notifications": "Activate Notifications",
+  "activate-notifications-confirmation": "Are you sure you want to activate notifications for this activity?",
+  "cancel-notifications-confirmation": "Are you sure you want to cancel notifications for this activity?",
+  "confirm": "Confirm",
+  "cancel": "Cancel",
+  "not-started": "Not Started"
+
 }

@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:reboot_app_3/features/vault/data/activities/activity.dart';
+import 'package:reboot_app_3/features/vault/data/activities/ongoing_activity_task.dart';
 
 class OngoingActivity {
   final String id;
@@ -7,8 +8,9 @@ class OngoingActivity {
   final DateTime startDate;
   final DateTime endDate;
   final DateTime createdAt;
-  final Activity? activity; // Populated when needed
-  final double progress; // Calculated, not stored
+  final Activity? activity;
+  final List<OngoingActivityTask> scheduledTasks;
+  final double progress;
 
   OngoingActivity({
     required this.id,
@@ -16,6 +18,7 @@ class OngoingActivity {
     required this.startDate,
     required this.endDate,
     required this.createdAt,
+    this.scheduledTasks = const [],
     this.activity,
     this.progress = 0,
   });

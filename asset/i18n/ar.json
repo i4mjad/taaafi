@@ -15,10 +15,14 @@
   "no-tasks-today": "لا توجد مهام لهذا اليوم",
 
   "no-ongoing-activities": "لا توجد تمارين حاليا",
+  "not-started": "لم يبدأ بعد",
 
   "activities-notifications-settings": "تذكيرات التمارين",
+  "cancel-notifications": "إيقاف التنبيهات",
   "allow-notifications": "السماح بالاشعارات",
   "allow-notifications-desc": "للحصول على تذكيرات للتمارين اليومية، يجب السماح للتطبيق بإرسال الإشعارات",
+
+  "cancel-notifications-confirmation": "هل أنت متأكد أنك تريد إيقاف الإشعارات لهذا التمرين؟",
 
   "diary-settings":"إعدادات المذكرة",
 
@@ -309,6 +313,8 @@
   "content-type": "تصنيفات المحتوى",
   "apply-filters": "تطبيق",
   "cancel": "إلغاء",
+  "activate-notifications-confirmation": "هل أنت متأكد بأنك تريد تفعيل الإشعارات لهذا التمرين؟",
+  "activate-notifications": "تفعيل الإشعارات",
 
   "english": "English",
   "arabic": "العربية",
@@ -385,6 +391,9 @@
   "activity-level":"مستوى التمرين: ",
   "ongoing-activity-starting-date": "تاريخ البداية: ",
   "activity-progress":"نسبة الانجاز: ",
+
+  "notifications-allowed":"تم تفعيل الإشعارات",
+  "notifications-disabled":"تم تعطيل الإشعارات، يمكنك تفعيلها في إعدادات الجهاز",
 
   "subscriber":"مشترك",
   "month":"شهر/أشهر",
