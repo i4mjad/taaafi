@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:reboot_app_3/core/monitoring/analytics_facade.dart';
 import 'package:reboot_app_3/core/monitoring/logger_navigator_observer.dart';
@@ -31,7 +32,8 @@ import 'package:reboot_app_3/features/vault/presentation/library/content_screen.
 import 'package:reboot_app_3/features/vault/presentation/library/content_type_screen.dart';
 import 'package:reboot_app_3/features/vault/presentation/library/library_screen.dart';
 import 'package:reboot_app_3/features/vault/presentation/library/list_screen.dart';
-import 'package:reboot_app_3/features/vault/presentation/library/vault_settings_screen.dart';
+import 'package:reboot_app_3/features/vault/presentation/vault_settings/activities_notifications_settings_screen.dart';
+import 'package:reboot_app_3/features/vault/presentation/vault_settings/vault_settings_screen.dart';
 import 'package:reboot_app_3/features/vault/presentation/vault_screen.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
@@ -193,7 +195,7 @@ GoRouter goRouter(GoRouterRef ref) {
               GoRoute(
                 name: RouteNames.home.name,
                 path: '/home',
-                pageBuilder: (context, state) => NoTransitionPage(
+                pageBuilder: (context, state) => MaterialPage(
                   name: RouteNames.home.name,
                   child: HomeScreen(),
                 ),
@@ -201,7 +203,7 @@ GoRouter goRouter(GoRouterRef ref) {
                   GoRoute(
                     path: "dayOverview/:date",
                     name: RouteNames.dayOverview.name,
-                    pageBuilder: (context, state) => NoTransitionPage(
+                    pageBuilder: (context, state) => MaterialPage(
                       name: RouteNames.dayOverview.name,
                       child: DayOverviewScreen(
                         date: DateTime.parse(state.pathParameters["date"]!),
@@ -229,7 +231,7 @@ GoRouter goRouter(GoRouterRef ref) {
                   GoRoute(
                     path: "activities",
                     name: RouteNames.activities.name,
-                    pageBuilder: (context, state) => NoTransitionPage<void>(
+                    pageBuilder: (context, state) => MaterialPage(
                       name: RouteNames.activities.name,
                       child: ActivitiesScreen(),
                     ),
@@ -237,7 +239,7 @@ GoRouter goRouter(GoRouterRef ref) {
                       GoRoute(
                         path: "allTasks",
                         name: RouteNames.allTasks.name,
-                        pageBuilder: (context, state) => NoTransitionPage<void>(
+                        pageBuilder: (context, state) => MaterialPage(
                           name: RouteNames.allTasks.name,
                           child: AllTasksScreen(),
                         ),
@@ -245,7 +247,7 @@ GoRouter goRouter(GoRouterRef ref) {
                       GoRoute(
                         path: "ongoingActivity/:id",
                         name: RouteNames.ongoingActivity.name,
-                        pageBuilder: (context, state) => NoTransitionPage<void>(
+                        pageBuilder: (context, state) => MaterialPage(
                           name: RouteNames.ongoingActivity.name,
                           child: OngoingActivitiyScreen(
                               state.pathParameters["id"]!),
@@ -254,7 +256,7 @@ GoRouter goRouter(GoRouterRef ref) {
                       GoRoute(
                         path: "addActivity",
                         name: RouteNames.addActivity.name,
-                        pageBuilder: (context, state) => NoTransitionPage<void>(
+                        pageBuilder: (context, state) => MaterialPage(
                           name: RouteNames.addActivity.name,
                           child: AddActivityScreen(),
                         ),
@@ -262,8 +264,7 @@ GoRouter goRouter(GoRouterRef ref) {
                           GoRoute(
                             path: "activityOverview/:id",
                             name: RouteNames.activityOverview.name,
-                            pageBuilder: (context, state) =>
-                                NoTransitionPage<void>(
+                            pageBuilder: (context, state) => MaterialPage(
                               name: RouteNames.activityOverview.name,
                               child: ActivityOverviewScreen(
                                   state.pathParameters["id"]!),
@@ -276,7 +277,7 @@ GoRouter goRouter(GoRouterRef ref) {
                   GoRoute(
                     path: "diaries",
                     name: RouteNames.diaries.name,
-                    pageBuilder: (context, state) => NoTransitionPage<void>(
+                    pageBuilder: (context, state) => MaterialPage(
                       name: RouteNames.diaries.name,
                       child: DiariesScreen(),
                     ),
@@ -284,7 +285,7 @@ GoRouter goRouter(GoRouterRef ref) {
                       GoRoute(
                         path: "diary/:id",
                         name: RouteNames.diary.name,
-                        pageBuilder: (context, state) => NoTransitionPage<void>(
+                        pageBuilder: (context, state) => MaterialPage(
                           name: RouteNames.diary.name,
                           child: DiaryScreen(
                             diaryId: state.pathParameters["id"]!,
@@ -296,7 +297,7 @@ GoRouter goRouter(GoRouterRef ref) {
                   GoRoute(
                     path: "library",
                     name: RouteNames.library.name,
-                    pageBuilder: (context, state) => NoTransitionPage<void>(
+                    pageBuilder: (context, state) => MaterialPage(
                       name: RouteNames.library.name,
                       child: LibraryScreen(),
                     ),
@@ -304,7 +305,7 @@ GoRouter goRouter(GoRouterRef ref) {
                       GoRoute(
                         path: "list/:id",
                         name: RouteNames.libraryList.name,
-                        pageBuilder: (context, state) => NoTransitionPage<void>(
+                        pageBuilder: (context, state) => MaterialPage(
                           name: RouteNames.libraryList.name,
                           child: ListScreen(state.pathParameters["id"]!),
                         ),
@@ -312,7 +313,7 @@ GoRouter goRouter(GoRouterRef ref) {
                       GoRoute(
                         path: "content",
                         name: RouteNames.contents.name,
-                        pageBuilder: (context, state) => NoTransitionPage<void>(
+                        pageBuilder: (context, state) => MaterialPage(
                           name: RouteNames.contents.name,
                           child: ContentScreen(),
                         ),
@@ -320,7 +321,7 @@ GoRouter goRouter(GoRouterRef ref) {
                       GoRoute(
                         path: "lists",
                         name: RouteNames.contentLists.name,
-                        pageBuilder: (context, state) => NoTransitionPage<void>(
+                        pageBuilder: (context, state) => MaterialPage(
                           name: RouteNames.contentLists.name,
                           child: ContentListsScreen(),
                         ),
@@ -328,7 +329,7 @@ GoRouter goRouter(GoRouterRef ref) {
                       GoRoute(
                         path: "contentType/:typeId/:typeName",
                         name: RouteNames.contentType.name,
-                        pageBuilder: (context, state) => NoTransitionPage<void>(
+                        pageBuilder: (context, state) => MaterialPage(
                           name: RouteNames.contentType.name,
                           child: ContentTypeScreen(
                             state.pathParameters["typeId"]!,
@@ -341,10 +342,20 @@ GoRouter goRouter(GoRouterRef ref) {
                   GoRoute(
                     path: "settings",
                     name: RouteNames.vaultSettings.name,
-                    pageBuilder: (context, state) => NoTransitionPage<void>(
+                    pageBuilder: (context, state) => MaterialPage(
                       name: RouteNames.vaultSettings.name,
                       child: VaultSettingsScreen(),
                     ),
+                    routes: [
+                      GoRoute(
+                        path: "activitiesNotifications",
+                        name: RouteNames.activitiesNotifications.name,
+                        pageBuilder: (context, state) => MaterialPage(
+                          name: RouteNames.activitiesNotifications.name,
+                          child: ActivitiesNotificationsSettingsScreen(),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),

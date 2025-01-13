@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
+import 'package:reboot_app_3/core/routing/route_names.dart';
 import 'package:reboot_app_3/core/shared_widgets/app_bar.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
@@ -21,7 +23,7 @@ class VaultSettingsScreen extends ConsumerWidget {
       appBar: appBar(
         context,
         ref,
-        "vault-settings",
+        "activities-notifications-settings",
         false,
         true,
       ),
@@ -42,9 +44,13 @@ class VaultSettingsScreen extends ConsumerWidget {
                     style: TextStyles.h6,
                   ),
                   verticalSpace(Spacing.points8),
-                  VaultSettingsButton(
-                    icon: LucideIcons.bell,
-                    textKey: 'activities-reminders',
+                  GestureDetector(
+                    onTap: () => context
+                        .goNamed(RouteNames.activitiesNotifications.name),
+                    child: VaultSettingsButton(
+                      icon: LucideIcons.bell,
+                      textKey: 'activities-reminders',
+                    ),
                   ),
                   verticalSpace(Spacing.points4),
                   VaultSettingsButton(

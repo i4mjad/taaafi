@@ -10,6 +10,7 @@ import 'package:reboot_app_3/core/shared_widgets/container.dart';
 import 'package:reboot_app_3/core/shared_widgets/custom_textfield.dart';
 import 'package:reboot_app_3/core/shared_widgets/snackbar.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
+import 'package:reboot_app_3/core/theming/custom_theme_data.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/features/vault/application/activities/activity_details_provider.dart';
@@ -79,8 +80,7 @@ class ActivityOverviewScreen extends ConsumerWidget {
                       );
                     },
                     child: WidgetsContainer(
-                      backgroundColor: theme.primary[400],
-                      boxShadow: Shadows.mainShadows,
+                      backgroundColor: theme.primary[600],
                       borderSide:
                           BorderSide(color: theme.grey[600]!, width: 0.5),
                       width: MediaQuery.of(context).size.width,
@@ -89,7 +89,9 @@ class ActivityOverviewScreen extends ConsumerWidget {
                         child: Text(
                           AppLocalizations.of(context)
                               .translate('add-the-activity'),
-                          style: TextStyles.body,
+                          style: TextStyles.body.copyWith(
+                            color: theme.grey[50],
+                          ),
                         ),
                       ),
                     ),
@@ -277,9 +279,9 @@ class _AddTheActivitySheetState extends ConsumerState<AddTheActivitySheet> {
   final _formKey = GlobalKey<FormState>();
 
   final activityStartingDateController = TextEditingController();
-  late DateTime activityStartingDateTime = DateTime(1900);
+  DateTime activityStartingDateTime = DateTime.now();
   final activityEndingDateController = TextEditingController();
-  late DateTime activityEndingDateTime = DateTime(1900);
+  late DateTime activityEndingDateTime;
 
   bool nowIsStartingDate = false;
 
@@ -351,26 +353,50 @@ class _AddTheActivitySheetState extends ConsumerState<AddTheActivitySheet> {
   }
 
   Future<void> _handleSubscribe() async {
-    if (!_formKey.currentState!.validate()) {
+    print(activityEndingDateController.text);
+    if (!_formKey.currentState!.validate() ||
+        activityEndingDateController.text.isEmpty ||
+        activityStartingDateController.text.isEmpty) {
       getErrorSnackBar(context, "please-add-all-required-data");
+    } else {
+      try {
+        await ref.read(activityNotifierProvider.notifier).subscribeToActivity(
+              widget.activityId,
+              activityStartingDateTime,
+              activityEndingDateTime,
+            );
+
+        if (context.mounted) {
+          context.goNamed(RouteNames.activities.name);
+        }
+      } catch (e) {
+        if (context.mounted) {
+          getErrorSnackBar(context, e.toString());
+        }
+      }
+    }
+  }
+
+  void _handlePeriodSelection(int days) {
+    if (activityStartingDateTime == DateTime(1900)) {
+      getErrorSnackBar(context, 'please-select-starting-date-first');
       return;
     }
 
-    try {
-      await ref.read(activityNotifierProvider.notifier).subscribeToActivity(
-            widget.activityId,
-            activityStartingDateTime,
-            activityEndingDateTime,
-          );
+    final endDate = activityStartingDateTime.add(Duration(days: days));
+    final displayEndDate = DisplayDateTime(
+        endDate, ref.read(localeNotifierProvider)!.languageCode);
 
-      if (context.mounted) {
-        context.goNamed(RouteNames.activities.name);
-      }
-    } catch (e) {
-      if (context.mounted) {
-        getErrorSnackBar(context, e.toString());
-      }
-    }
+    setState(() {
+      activityEndingDateController.text = displayEndDate.displayDateTime;
+      activityEndingDateTime = displayEndDate.date;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    activityStartingDateTime = DateTime.now();
   }
 
   @override
@@ -493,17 +519,42 @@ class _AddTheActivitySheetState extends ConsumerState<AddTheActivitySheet> {
                       setState(() {
                         nowIsStartingDate = value;
                         if (nowIsStartingDate) {
-                          final selectedDate = DisplayDateTime(
+                          final selectedStartingDateDisplay = DisplayDateTime(
                               DateTime.now(), locale!.languageCode);
                           activityStartingDateController.text =
-                              selectedDate.displayDateTime;
-                          activityStartingDateTime = selectedDate.date;
+                              selectedStartingDateDisplay.displayDateTime;
+                          activityStartingDateTime =
+                              selectedStartingDateDisplay.date;
                         }
                       });
                     },
                   ),
                 ],
               ),
+            ),
+            verticalSpace(Spacing.points16),
+            Row(
+              children: [
+                Text(
+                  AppLocalizations.of(context).translate('activity-period') +
+                      ": ",
+                  style: TextStyles.smallBold.copyWith(color: theme.grey[900]),
+                ),
+                PeriodWidget(
+                  periodText: '7-days',
+                  onTap: () => _handlePeriodSelection(7),
+                ),
+                horizontalSpace(Spacing.points8),
+                PeriodWidget(
+                  periodText: '28-days',
+                  onTap: () => _handlePeriodSelection(28),
+                ),
+                horizontalSpace(Spacing.points8),
+                PeriodWidget(
+                  periodText: '90-days',
+                  onTap: () => _handlePeriodSelection(90),
+                ),
+              ],
             ),
             verticalSpace(Spacing.points16),
             GestureDetector(
@@ -547,6 +598,42 @@ class _AddTheActivitySheetState extends ConsumerState<AddTheActivitySheet> {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class PeriodWidget extends ConsumerWidget {
+  const PeriodWidget({
+    super.key,
+    required this.periodText,
+    required this.onTap,
+  });
+
+  final String periodText;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = AppTheme.of(context);
+    return GestureDetector(
+      onTap: onTap,
+      child: WidgetsContainer(
+        padding: EdgeInsets.all(8),
+        backgroundColor: theme.backgroundColor,
+        boxShadow: Shadows.mainShadows,
+        borderSide: BorderSide(
+          color: theme.grey[600]!,
+          width: 0.5,
+        ),
+        child: Center(
+          child: Text(
+            AppLocalizations.of(context).translate(periodText),
+            style: TextStyles.small.copyWith(
+              color: theme.grey[900],
+            ),
+          ),
         ),
       ),
     );

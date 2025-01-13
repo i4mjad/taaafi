@@ -70,7 +70,7 @@ class AddActivityScreen extends ConsumerWidget {
   }
 }
 
-class ActivityListItem extends StatelessWidget {
+class ActivityListItem extends ConsumerWidget {
   const ActivityListItem({
     required this.activity,
     required this.onTap,
@@ -81,9 +81,9 @@ class ActivityListItem extends StatelessWidget {
   final VoidCallback onTap;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = AppTheme.of(context);
-
+    final locale = ref.watch(localeNotifierProvider);
     return GestureDetector(
       onTap: onTap,
       child: WidgetsContainer(
@@ -142,7 +142,9 @@ class ActivityListItem extends StatelessWidget {
               ),
             ),
             Icon(
-              LucideIcons.chevronRight,
+              locale == Locale('en')
+                  ? LucideIcons.chevronRight
+                  : LucideIcons.chevronLeft,
               color: theme.grey[500],
             ),
           ],
