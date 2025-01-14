@@ -492,6 +492,8 @@
   "cancel-notifications-confirmation": "Are you sure you want to cancel notifications for this activity?",
   "confirm": "Confirm",
   "cancel": "Cancel",
-  "not-started": "Not Started"
+  "not-started": "Not Started",
+  "extend-activity": "Extend Activity",
+  "activity-notifications": "Activity Reminders"
 
 }

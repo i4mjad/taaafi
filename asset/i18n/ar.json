@@ -16,6 +16,8 @@
 
   "no-ongoing-activities": "لا توجد تمارين حاليا",
   "not-started": "لم يبدأ بعد",
+  "extend-activity": "تمديد التمرين",
+  "activity-notifications": "تنبيهات التمرين",
 
   "activities-notifications-settings": "تذكيرات التمارين",
   "cancel-notifications": "إيقاف التنبيهات",

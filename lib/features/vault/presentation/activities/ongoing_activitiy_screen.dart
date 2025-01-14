@@ -154,26 +154,26 @@ class OngoingActivitySettingsSheet extends ConsumerWidget {
             ],
           ),
           verticalSpace(Spacing.points16),
-          GestureDetector(
+          SettingsOption(
             onTap: () {
               Navigator.pop(context);
               context.goNamed(RouteNames.activitiesNotifications.name);
             },
-            child: WidgetsContainer(
-              backgroundColor: theme.backgroundColor,
-              borderSide: BorderSide(color: theme.secondary[600]!, width: 0.5),
-              // boxShadow: Shadows.mainShadows,
-              child: Center(
-                child: Text(
-                  AppLocalizations.of(context)
-                      .translate('activities-notifications-settings'),
-                  style: TextStyles.body.copyWith(color: theme.secondary[600]),
-                ),
-              ),
-            ),
+            text: "activity-notifications",
+            icon: LucideIcons.alarmPlus,
+            type: "primary",
           ),
           verticalSpace(Spacing.points8),
-          GestureDetector(
+          SettingsOption(
+            onTap: () {
+              //TODO: handle exteneding the activity
+            },
+            text: "extend-activity",
+            icon: LucideIcons.calendarPlus,
+            type: "normal",
+          ),
+          verticalSpace(Spacing.points8),
+          SettingsOption(
             onTap: () {
               Navigator.pop(context);
               showModalBottomSheet<void>(
@@ -184,32 +184,16 @@ class OngoingActivitySettingsSheet extends ConsumerWidget {
                 },
               );
             },
-            child: WidgetsContainer(
-              backgroundColor: theme.backgroundColor,
-              borderSide: BorderSide(color: theme.warn[700]!, width: 0.5),
-              // boxShadow: Shadows.mainShadows,
-              child: Center(
-                child: Text(
-                  AppLocalizations.of(context).translate('new-begining'),
-                  style: TextStyles.body.copyWith(color: theme.warn[700]),
-                ),
-              ),
-            ),
+            text: "new-begining",
+            icon: LucideIcons.listStart,
+            type: "warn",
           ),
           verticalSpace(Spacing.points8),
-          GestureDetector(
+          SettingsOption(
             onTap: () => _showDeleteConfirmation(context, ref),
-            child: WidgetsContainer(
-              backgroundColor: theme.backgroundColor,
-              borderSide: BorderSide(color: theme.error[500]!, width: 0.5),
-              // boxShadow: Shadows.mainShadows,
-              child: Center(
-                child: Text(
-                  AppLocalizations.of(context).translate('remove-activity'),
-                  style: TextStyles.body.copyWith(color: theme.error[500]),
-                ),
-              ),
-            ),
+            text: "remove-activity",
+            icon: LucideIcons.trash2,
+            type: "error",
           ),
           verticalSpace(Spacing.points32),
           GestureDetector(
@@ -283,6 +267,62 @@ class OngoingActivitySettingsSheet extends ConsumerWidget {
         ],
       ),
     );
+  }
+}
+
+class SettingsOption extends StatelessWidget {
+  const SettingsOption({
+    required this.onTap,
+    required this.text,
+    required this.icon,
+    required this.type,
+    super.key,
+  });
+
+  final VoidCallback onTap;
+  final String text;
+  final IconData icon;
+  final String type;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = AppTheme.of(context);
+    return GestureDetector(
+      onTap: onTap,
+      child: WidgetsContainer(
+        backgroundColor: theme.backgroundColor,
+        borderSide: BorderSide(color: theme.grey[600]!, width: 0.5),
+        boxShadow: Shadows.mainShadows,
+        child: Center(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Icon(icon, color: _getIconAndTextColor(type, theme)),
+              horizontalSpace(Spacing.points16),
+              Text(
+                AppLocalizations.of(context).translate(text),
+                style: TextStyles.body
+                    .copyWith(color: _getIconAndTextColor(type, theme)),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Color _getIconAndTextColor(String type, CustomThemeData theme) {
+    switch (type) {
+      case 'error':
+        return theme.error[600]!;
+      case 'primary':
+        return theme.primary[600]!;
+      case 'warn':
+        return theme.warn[600]!;
+      case 'normal':
+      default:
+        return theme.grey[800]!;
+    }
   }
 }
 
