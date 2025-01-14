@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/helpers/date_display_formater.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
-import 'package:reboot_app_3/core/routing/route_names.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/custom_theme_data.dart';
@@ -12,10 +10,10 @@ import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/features/vault/data/activities/activity_task.dart';
 import 'package:reboot_app_3/features/vault/data/activities/ongoing_activity_task.dart';
+import 'package:reboot_app_3/features/vault/presentation/activities/ongoing_activity_settings_sheet.dart';
 import 'package:reboot_app_3/features/vault/presentation/activities/shared_widgets/task_widget.dart';
 import 'package:reboot_app_3/features/vault/data/activities/ongoing_activity_details.dart';
 import 'package:reboot_app_3/features/vault/application/activities/ongoing_activity_details_provider.dart';
-import 'package:reboot_app_3/features/vault/presentation/activities/update_ongoing_activity_sheet.dart';
 
 class OngoingActivitiyScreen extends ConsumerWidget {
   const OngoingActivitiyScreen(this.ongoingActivityId, {super.key});
@@ -115,157 +113,6 @@ class OngoingActivitiyScreen extends ConsumerWidget {
         )
       ],
       leadingWidth: 16,
-    );
-  }
-}
-
-class OngoingActivitySettingsSheet extends ConsumerWidget {
-  const OngoingActivitySettingsSheet(this.ongoingActivityId, {super.key});
-
-  final String ongoingActivityId;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final theme = AppTheme.of(context);
-    return Container(
-      color: theme.backgroundColor,
-      padding: EdgeInsets.all(16),
-      width: MediaQuery.of(context).size.width,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                AppLocalizations.of(context).translate('activity-settings'),
-                style: TextStyles.h6.copyWith(
-                  color: theme.grey[900],
-                ),
-              ),
-              GestureDetector(
-                onTap: () => Navigator.pop(context),
-                child: Icon(
-                  LucideIcons.xCircle,
-                  color: theme.grey[900],
-                ),
-              )
-            ],
-          ),
-          verticalSpace(Spacing.points16),
-          SettingsOption(
-            onTap: () {
-              Navigator.pop(context);
-              context.goNamed(RouteNames.activitiesNotifications.name);
-            },
-            text: "activity-notifications",
-            icon: LucideIcons.alarmPlus,
-            type: "primary",
-          ),
-          verticalSpace(Spacing.points8),
-          SettingsOption(
-            onTap: () {
-              //TODO: handle exteneding the activity
-            },
-            text: "extend-activity",
-            icon: LucideIcons.calendarPlus,
-            type: "normal",
-          ),
-          verticalSpace(Spacing.points8),
-          SettingsOption(
-            onTap: () {
-              Navigator.pop(context);
-              showModalBottomSheet<void>(
-                context: context,
-                isScrollControlled: true,
-                builder: (BuildContext context) {
-                  return UpdateOngoingActivitySheet(ongoingActivityId);
-                },
-              );
-            },
-            text: "new-begining",
-            icon: LucideIcons.listStart,
-            type: "warn",
-          ),
-          verticalSpace(Spacing.points8),
-          SettingsOption(
-            onTap: () => _showDeleteConfirmation(context, ref),
-            text: "remove-activity",
-            icon: LucideIcons.trash2,
-            type: "error",
-          ),
-          verticalSpace(Spacing.points32),
-          GestureDetector(
-            onTap: () => Navigator.pop(context),
-            child: WidgetsContainer(
-              backgroundColor: theme.backgroundColor,
-              borderSide: BorderSide(color: theme.grey[900]!, width: 0.5),
-              boxShadow: Shadows.mainShadows,
-              child: Center(
-                child: Text(
-                  AppLocalizations.of(context).translate('close'),
-                  style: TextStyles.body.copyWith(color: theme.primary[900]),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Future<void> _showDeleteConfirmation(
-      BuildContext context, WidgetRef ref) async {
-    final theme = AppTheme.of(context);
-
-    showDialog(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        backgroundColor: theme.backgroundColor,
-        title: Text(
-          AppLocalizations.of(context).translate('warning'),
-          style: TextStyles.h6.copyWith(color: theme.error[700]),
-        ),
-        content: Text(
-          AppLocalizations.of(context).translate('delete-activity-warning'),
-          style: TextStyles.body,
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext),
-            child: Text(
-              AppLocalizations.of(context).translate('cancel'),
-              style: TextStyles.body.copyWith(color: theme.grey[600]),
-            ),
-          ),
-          TextButton(
-            onPressed: () async {
-              // Delete the activity
-              await ref
-                  .read(
-                      ongoingActivityDetailsNotifierProvider(ongoingActivityId)
-                          .notifier)
-                  .deleteActivity();
-              // First pop the dialog
-              Navigator.pop(dialogContext);
-              // Then pop the settings sheet
-              Navigator.pop(context);
-
-              // Navigate using a delayed call to ensure previous operations are complete
-              if (context.mounted) {
-                Future.microtask(() {
-                  context.goNamed(RouteNames.activities.name);
-                });
-              }
-            },
-            child: Text(
-              AppLocalizations.of(context).translate('delete'),
-              style: TextStyles.body.copyWith(color: theme.error[700]),
-            ),
-          ),
-        ],
-      ),
     );
   }
 }

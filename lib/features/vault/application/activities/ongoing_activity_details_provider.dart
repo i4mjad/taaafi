@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:reboot_app_3/features/vault/application/activities/all_tasks_notifier.dart';
 import 'package:reboot_app_3/features/vault/application/activities/providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -23,6 +24,40 @@ class OngoingActivityDetailsNotifier extends _$OngoingActivityDetailsNotifier {
     } catch (e, st) {
       // Set state to error with proper error handling
       state = AsyncValue.error(e, st);
+      rethrow;
+    }
+  }
+
+  Future<bool> extendActivity(
+      Duration period, Locale locale, BuildContext context) async {
+    try {
+      final currentDetails = state.value;
+      if (currentDetails == null) {
+        throw Exception('Activity details not found');
+      }
+
+      // Check if we're in the first half of the activity period
+      final activityDuration =
+          currentDetails.endDate.difference(currentDetails.startDate);
+      final halfwayPoint = currentDetails.startDate.add(activityDuration ~/ 2);
+
+      if (DateTime.now().isBefore(halfwayPoint)) {
+        return false; // Return false to indicate extension not allowed
+      }
+
+      // Set loading state before extension
+      state = const AsyncValue.loading();
+
+      // Proceed with extension
+      await service.extendActivity(
+        currentDetails.activity.id,
+        period,
+        locale,
+      );
+
+      return true; // Return true to indicate successful extension
+    } catch (e) {
+      state = AsyncError(e, StackTrace.current);
       rethrow;
     }
   }

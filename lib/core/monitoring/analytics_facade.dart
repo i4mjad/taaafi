@@ -13,15 +13,14 @@ AnalyticsFacade analyticsFacade(AnalyticsFacadeRef ref) {
     ref.read(googleAnalyticsClientProvider),
   ];
 
-  // TODO: This seems costly, commented for now to figure out if it's needed
-  // ref.listen(
-  //   mixpanelAnalyticsClientProvider,
-  //   (previous, next) {
-  //     if (next.hasValue) {
-  //       clients.add(next.value!);
-  //     }
-  //   },
-  // );
+  ref.listen(
+    mixpanelAnalyticsClientProvider,
+    (previous, next) {
+      if (next.hasValue) {
+        clients.add(next.value!);
+      }
+    },
+  );
 
   return AnalyticsFacade(clients);
 }

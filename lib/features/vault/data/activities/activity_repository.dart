@@ -1,7 +1,9 @@
 import 'dart:async';
+import 'dart:ui';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:reboot_app_3/core/notifications/notifications_scheduler.dart';
 import 'package:reboot_app_3/features/vault/data/activities/activity.dart';
 import 'package:reboot_app_3/features/vault/data/activities/activity_task.dart';
 import 'package:reboot_app_3/features/vault/data/activities/ongoing_activity.dart';
@@ -491,6 +493,7 @@ class ActivityRepository {
   /// Gets detailed information about an ongoing activity including performance
   Future<OngoingActivityDetails> getOngoingActivityDetails(
       String activityId) async {
+    print("entered here");
     try {
       final userId = _getCurrentUserId();
       final activityDoc = await _firestore
@@ -1090,5 +1093,107 @@ class ActivityRepository {
     }
 
     return tasks;
+  }
+
+  Future<void> extendActivity(
+    String activityId,
+    DateTime startDate,
+    DateTime newEndDate,
+    List<OngoingActivityTask> existingTasks,
+    Locale locale,
+  ) async {
+    try {
+      final userId = _getCurrentUserId();
+      final batch = _firestore.batch();
+      final activityRef = _firestore
+          .collection('users')
+          .doc(userId)
+          .collection('ongoing_activities')
+          .doc(activityId);
+
+      // Get the base activity tasks
+      final baseActivityId =
+          (await activityRef.get()).data()?['activityId'] as String;
+      final tasksSnapshot = await _firestore
+          .collection('activities')
+          .doc(baseActivityId)
+          .collection('activityTasks')
+          .get();
+
+      // Update activity end date
+      batch.update(activityRef, {
+        'endDate': newEndDate,
+        'updatedAt': FieldValue.serverTimestamp(),
+      });
+
+      // Get the last scheduled date for each task
+      final lastScheduledDates = <String, DateTime>{};
+      for (var task in existingTasks) {
+        final currentLastDate = lastScheduledDates[task.task.id] ?? DateTime(0);
+        if (task.taskDatetime.isAfter(currentLastDate)) {
+          lastScheduledDates[task.task.id] = task.taskDatetime;
+        }
+      }
+
+      // Schedule new tasks
+      for (var taskDoc in tasksSnapshot.docs) {
+        final taskId = taskDoc.id;
+        final frequency =
+            _parseTaskFrequency(taskDoc.data()['taskFrequency'] as String);
+
+        DateTime startingPoint;
+        if (DateTime.now().isAfter(lastScheduledDates[taskId] ?? DateTime(0))) {
+          startingPoint = DateTime.now();
+        } else {
+          startingPoint = lastScheduledDates[taskId]!;
+        }
+
+        final scheduledDates = _generateScheduledDates(
+          startingPoint,
+          newEndDate.difference(startingPoint).inDays,
+          frequency,
+        );
+
+        for (var date in scheduledDates) {
+          if (date.isAfter(startingPoint)) {
+            final taskDocRef = activityRef.collection('scheduledTasks').doc();
+            batch.set(taskDocRef, {
+              'taskId': taskId,
+              'scheduledDate': date,
+              'isCompleted': false,
+              'completedAt': null,
+              'isDeleted': false,
+            });
+          }
+        }
+      }
+
+      await batch.commit();
+
+      // Reset and reschedule notifications
+      await NotificationsScheduler.instance
+          .cancelNotificationsForActivity(activityId);
+
+      // Get updated scheduled tasks
+      final updatedTasks = await getOngoingActivityDetails(activityId);
+
+      // Schedule new notifications only for future tasks
+      await NotificationsScheduler.instance
+          .scheduleNotificationsForOngoingActivity(
+        OngoingActivity(
+          id: activityId,
+          activityId: baseActivityId,
+          startDate: startDate,
+          endDate: newEndDate,
+          scheduledTasks: updatedTasks.scheduledTasks,
+          activity: updatedTasks.activity,
+          createdAt: DateTime.now(),
+        ),
+        // You'll need to pass the current locale here
+        locale,
+      );
+    } catch (e) {
+      throw Exception('Failed to extend activity: $e');
+    }
   }
 }

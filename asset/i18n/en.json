@@ -388,7 +388,11 @@
   "content-category": "Contant Category",
   "content-type": "Contant Type",
   "apply-filters": "Apply",
-  
+
+  "one-week":"1 Week",
+  "one-month":"1Month",
+  "three-months":"3 Months",
+
   "lock-app": "Lock Screen",
 
   "no-data":"No data",
@@ -494,6 +498,8 @@
   "cancel": "Cancel",
   "not-started": "Not Started",
   "extend-activity": "Extend Activity",
-  "activity-notifications": "Activity Reminders"
-
+  "activity-notifications": "Activity Reminders",
+  "select-extension-period": "Select extension period",
+  "error-extend-activity": "Cannot extend activity during the first half of its period",
+  "activity-extended": "Activity extended successfully"
 }

@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:reboot_app_3/features/vault/data/activities/activity.dart';
 import 'package:reboot_app_3/features/vault/data/activities/activity_repository.dart';
 import 'package:reboot_app_3/features/vault/data/activities/ongoing_activity.dart';
@@ -185,6 +187,28 @@ class ActivityService {
   Stream<List<OngoingActivity>> getOngoingActivitiesStream() {
     try {
       return _repository.getOngoingActivitiesStream();
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<void> extendActivity(
+      String activityId, Duration period, Locale locale) async {
+    try {
+      final details = await getOngoingActivityDetails(activityId);
+      final now = DateTime.now();
+
+      DateTime newEndDate;
+      if (now.isAfter(details.endDate)) {
+        // If activity has ended, extend from today
+        newEndDate = now.add(period);
+      } else {
+        // If activity is ongoing, extend from end date
+        newEndDate = details.endDate.add(period);
+      }
+
+      await _repository.extendActivity(activityId, details.startDate,
+          newEndDate, details.scheduledTasks, locale);
     } catch (e) {
       rethrow;
     }
