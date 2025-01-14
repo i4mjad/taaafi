@@ -104,10 +104,6 @@ class UserProfileNotifier extends _$UserProfileNotifier {
       await _deleteUserCollection('followUps');
       final uid = await _getUserId();
       if (uid == null) return;
-
-      await _firestore.collection('users').doc(uid).update({
-        'userFirstDate': FieldValue.serverTimestamp(),
-      });
     } catch (e) {
       state = AsyncValue.error(e, StackTrace.current); // Handle error
     }
@@ -132,5 +128,14 @@ class UserProfileNotifier extends _$UserProfileNotifier {
     } catch (e) {
       state = AsyncValue.error(e, StackTrace.current); // Handle error
     }
+  }
+
+  Future<void> updateUserFirstDate(DateTime dateTime) async {
+    final uid = await _getUserId();
+    if (uid == null) return;
+
+    await _firestore.collection('users').doc(uid).update({
+      'userFirstDate': dateTime,
+    });
   }
 }

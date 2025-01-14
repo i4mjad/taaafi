@@ -232,27 +232,49 @@ class OngoingActivitySettingsSheet extends ConsumerWidget {
             },
           ),
           actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(dialogContext),
-              child: Text(
-                AppLocalizations.of(context).translate('cancel'),
-                style: TextStyles.body.copyWith(color: theme.grey[600]),
-              ),
-            ),
-            TextButton(
-              onPressed: selectedDuration == null
-                  ? null
-                  : () {
-                      _handleExtension(context, ref, selectedDuration!, locale);
-                    },
-              child: Text(
-                AppLocalizations.of(context).translate('confirm'),
-                style: TextStyles.body.copyWith(
-                  color: selectedDuration == null
-                      ? theme.grey[400]
-                      : theme.primary[600],
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                GestureDetector(
+                  onTap: () => Navigator.pop(context),
+                  child: WidgetsContainer(
+                    backgroundColor: theme.backgroundColor,
+                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    borderSide: BorderSide(color: theme.grey[400]!, width: 0.5),
+                    child: Text(
+                      AppLocalizations.of(context).translate('cancel'),
+                      style: TextStyles.body.copyWith(color: theme.grey[600]),
+                    ),
+                  ),
                 ),
-              ),
+                horizontalSpace(Spacing.points8),
+                GestureDetector(
+                  onTap: selectedDuration == null
+                      ? null
+                      : () => _handleExtension(
+                          context, ref, selectedDuration!, locale),
+                  child: WidgetsContainer(
+                    backgroundColor: selectedDuration == null
+                        ? theme.grey[200]
+                        : theme.backgroundColor,
+                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    borderSide: BorderSide(
+                      color: selectedDuration == null
+                          ? theme.grey[400]!
+                          : theme.primary[600]!,
+                      width: 0.5,
+                    ),
+                    child: Text(
+                      AppLocalizations.of(context).translate('confirm'),
+                      style: TextStyles.body.copyWith(
+                        color: selectedDuration == null
+                            ? theme.grey[400]
+                            : theme.primary[600],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ],
         ),

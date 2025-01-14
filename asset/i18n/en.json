@@ -225,10 +225,12 @@
   "role":"Account Type",
   "required-update-p":"You can't use this version, update to the latest version.",
 
+
+  "data-updated-successfully": "Data updated successfully",
   "followups":"Followups",
   "daily-follow-ups": "Daily follow ups",
 
-  "daily-follow-ups-delete-desc": "All previous daily follow-ups will be deleted and the counter start date will be updated to the deletion time",
+  "daily-follow-ups-delete-desc": "All previous daily follow-ups will be deleted",
 
   "emotions-delete-desc": "All recorded emotions will be deleted",
 
@@ -507,5 +509,7 @@
   "diaries-deleted": "All diaries deleted successfully",
   "delete-activities-confirmation-title": "Delete All Activities",
   "delete-activities-confirmation-message": "Are you sure you want to delete all activities? This action cannot be undone.",
-  "activities-deleted": "All activities deleted successfully"
+  "activities-deleted": "All activities deleted successfully",
+  "reset-data-desc": "You can reset the start date or delete follow-ups separately. This action cannot be undone. You can delete follow-ups and emotions without resetting the date. If you want a fresh start, select all options and enter the new start date.",
+  "reset-to-today": "Reset start date to today"
 }
