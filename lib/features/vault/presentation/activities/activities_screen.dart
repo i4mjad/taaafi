@@ -161,9 +161,14 @@ class OngoingActivitiesWidget extends ConsumerWidget {
   }
 }
 
-class TodayTasksWidget extends ConsumerWidget {
+class TodayTasksWidget extends ConsumerStatefulWidget {
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  _TodayTasksWidgetState createState() => _TodayTasksWidgetState();
+}
+
+class _TodayTasksWidgetState extends ConsumerState<TodayTasksWidget> {
+  @override
+  Widget build(BuildContext context) {
     final theme = AppTheme.of(context);
     return StreamBuilder<List<OngoingActivityTask>>(
       stream: ref.watch(todayTasksNotifierProvider.notifier).tasksStream(),
