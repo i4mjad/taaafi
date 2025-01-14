@@ -13,6 +13,8 @@ import 'package:reboot_app_3/features/vault/data/activities/ongoing_activity.dar
 import 'package:app_settings/app_settings.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 
+final notificationsEnabledProvider = StateProvider<bool>((ref) => false);
+
 class ActivitiesNotificationsSettingsScreen extends ConsumerWidget {
   const ActivitiesNotificationsSettingsScreen({super.key});
 
@@ -41,32 +43,50 @@ class ActivitiesNotificationsSettingsScreen extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  ActivateNotification(),
-                  verticalSpace(Spacing.points16),
-                  Text(
-                    AppLocalizations.of(context)
-                        .translate('ongoing-activities'),
-                    style: TextStyles.h6.copyWith(color: theme.grey[900]),
+                  ActivateNotification(
+                    onNotificationStateChanged: (bool enabled) {
+                      ref.invalidate(ongoingActivitiesNotifierProvider);
+                    },
                   ),
-                  verticalSpace(Spacing.points8),
-                  ongoingActivities.when(
-                    data: (ongoingActivities) {
-                      return ListView.builder(
-                        shrinkWrap: true,
-                        physics: NeverScrollableScrollPhysics(),
-                        itemCount: ongoingActivities.length,
-                        itemBuilder: (context, index) {
-                          return OngoingActivityCard(
-                            ongoingActivity: ongoingActivities[index],
-                          );
-                        },
+                  Consumer(
+                    builder: (context, ref, child) {
+                      final notificationsEnabled =
+                          ref.watch(notificationsEnabledProvider);
+
+                      if (!notificationsEnabled) {
+                        return SizedBox.shrink();
+                      }
+
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          verticalSpace(Spacing.points16),
+                          Text(
+                            AppLocalizations.of(context)
+                                .translate('ongoing-activities'),
+                            style:
+                                TextStyles.h6.copyWith(color: theme.grey[900]),
+                          ),
+                          verticalSpace(Spacing.points8),
+                          ongoingActivities.when(
+                            data: (ongoingActivities) {
+                              return ListView.builder(
+                                shrinkWrap: true,
+                                physics: NeverScrollableScrollPhysics(),
+                                itemCount: ongoingActivities.length,
+                                itemBuilder: (context, index) {
+                                  return OngoingActivityCard(
+                                    ongoingActivity: ongoingActivities[index],
+                                  );
+                                },
+                              );
+                            },
+                            error: (error, stackTrace) =>
+                                Text(error.toString()),
+                            loading: () => Text('Loading...'),
+                          ),
+                        ],
                       );
-                    },
-                    error: (error, stackTrace) {
-                      return Text(error.toString());
-                    },
-                    loading: () {
-                      return Text('Loading...');
                     },
                   ),
                 ],
@@ -266,7 +286,10 @@ class _OngoingActivityCardState extends ConsumerState<OngoingActivityCard> {
 }
 
 class ActivateNotification extends ConsumerStatefulWidget {
+  final Function(bool)? onNotificationStateChanged;
+
   const ActivateNotification({
+    this.onNotificationStateChanged,
     super.key,
   });
 
@@ -286,10 +309,13 @@ class _ActivateNotificationState extends ConsumerState<ActivateNotification> {
 
   Future<void> _checkNotificationPermission() async {
     final settings = await FirebaseMessaging.instance.getNotificationSettings();
+    final isEnabled =
+        settings.authorizationStatus == AuthorizationStatus.authorized;
     setState(() {
-      _notificationsEnabled =
-          settings.authorizationStatus == AuthorizationStatus.authorized;
+      _notificationsEnabled = isEnabled;
     });
+    ref.read(notificationsEnabledProvider.notifier).state = isEnabled;
+    widget.onNotificationStateChanged?.call(isEnabled);
   }
 
   Future<void> _handleSwitchChange(bool value) async {
