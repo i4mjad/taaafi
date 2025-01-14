@@ -32,6 +32,41 @@ class ActivityRepository {
     return user.uid;
   }
 
+  /// Deletes all ongoing activities and their subscription sessions
+  Future<void> deleteAllOngoingActivities() async {
+    try {
+      final userId = _getCurrentUserId();
+      final batch = _firestore.batch();
+
+      // Get all ongoing activities
+      final ongoingActivities = await _firestore
+          .collection('users')
+          .doc(userId)
+          .collection('ongoing_activities')
+          .get();
+
+      // For each ongoing activity
+      for (var activityDoc in ongoingActivities.docs) {
+        // Delete the ongoing activity document
+        batch.delete(activityDoc.reference);
+
+        // Delete the subscription session for this activity
+        final activityId = activityDoc.data()['activityId'] as String;
+        final subscriptionRef = _firestore
+            .collection('activities')
+            .doc(activityId)
+            .collection('subscriptionSessions')
+            .doc(userId);
+
+        batch.delete(subscriptionRef);
+      }
+
+      await batch.commit();
+    } catch (e) {
+      throw Exception('Failed to delete all activities: $e');
+    }
+  }
+
   /// Fetches all available activities with their tasks
   ///
   /// Uses parallel queries to optimize fetching activities and their tasks

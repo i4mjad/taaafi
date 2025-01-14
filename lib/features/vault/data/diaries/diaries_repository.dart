@@ -11,6 +11,7 @@ abstract class DiariesRepository {
   Future<void> deleteDiary(String diaryId);
   Future<Diary?> getDiaryById(String diaryId);
   Future<String> createEmptyDiary(Diary diary);
+  Future<void> deleteAllDiaries();
 }
 
 class FirebaseDiariesRepository implements DiariesRepository {
@@ -218,6 +219,26 @@ class FirebaseDiariesRepository implements DiariesRepository {
       return docRef.id;
     } catch (e) {
       throw Exception('Failed to create empty diary: $e');
+    }
+  }
+
+  @override
+  Future<void> deleteAllDiaries() async {
+    try {
+      final batch = _firestore.batch();
+      final snapshots = await _firestore
+          .collection('users')
+          .doc(_userId)
+          .collection('userNotes')
+          .get();
+
+      for (var doc in snapshots.docs) {
+        batch.delete(doc.reference);
+      }
+
+      await batch.commit();
+    } catch (e) {
+      throw Exception('Failed to delete all diaries: $e');
     }
   }
 }

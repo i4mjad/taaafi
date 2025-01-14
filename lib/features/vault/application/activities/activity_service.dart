@@ -20,6 +20,15 @@ class ActivityService {
     }
   }
 
+  /// Deletes all ongoing activities
+  Future<void> deleteAllOngoingActivities() async {
+    try {
+      await _repository.deleteAllOngoingActivities();
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   /// Subscribes to an activity
   Future<void> subscribeToActivity(
       DateTime startDate, DateTime endDate, String activityId) async {

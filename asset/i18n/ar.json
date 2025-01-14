@@ -507,5 +507,13 @@
   "reset-your-password": "إعادة تعيين كلمة المرور",
  
   "already-subscribed-to-activity": "أنت مشترك بالفعل في هذا النشاط",
-  "cannot-complete-future-tasks": "لا يمكن إكمال المهام المجدولة للتواريخ المستقبلية"
+  "cannot-complete-future-tasks": "لا يمكن إكمال المهام المجدولة للتواريخ المستقبلية",
+
+  "delete-diaries-confirmation-title": "حذف جميع المذكرات",
+  "delete-diaries-confirmation-message": "هل أنت متأكد من حذف جميع المذكرات؟ لا يمكن التراجع عن هذا الإجراء.",
+  "diaries-deleted": "تم حذف جميع المذكرات بنجاح",
+
+  "delete-activities-confirmation-title": "حذف جميع التمارين",
+  "delete-activities-confirmation-message": "هل أنت متأكد من حذف جميع التمارين؟ لا يمكن التراجع عن هذا الإجراء.",
+  "activities-deleted": "تم حذف جميع التمارين بنجاح"
 }

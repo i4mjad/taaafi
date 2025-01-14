@@ -6,10 +6,13 @@ import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/routing/route_names.dart';
 import 'package:reboot_app_3/core/shared_widgets/app_bar.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
+import 'package:reboot_app_3/core/shared_widgets/snackbar.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/custom_theme_data.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
+import 'package:reboot_app_3/features/vault/application/activities/ongoing_activities_notifier.dart';
+import 'package:reboot_app_3/features/vault/data/diaries/diaries_notifier.dart';
 
 class VaultSettingsScreen extends ConsumerWidget {
   const VaultSettingsScreen({super.key});
@@ -53,12 +56,63 @@ class VaultSettingsScreen extends ConsumerWidget {
                     ),
                   ),
                   verticalSpace(Spacing.points4),
-                  VaultSettingsButton(
-                    icon: LucideIcons.trash2,
-                    textKey: 'erase-all-activities',
-                    type: 'warn',
+                  GestureDetector(
+                    onTap: () async {
+                      final shouldDelete = await showDialog<bool>(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          backgroundColor: theme.backgroundColor,
+                          title: Text(
+                            AppLocalizations.of(context).translate(
+                                'delete-activities-confirmation-title'),
+                            style: TextStyles.h6.copyWith(
+                              color: theme.error[600],
+                            ),
+                          ),
+                          content: Text(
+                            AppLocalizations.of(context).translate(
+                                'delete-activities-confirmation-message'),
+                            style: TextStyles.body,
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.of(context).pop(false),
+                              child: Text(
+                                AppLocalizations.of(context)
+                                    .translate('cancel'),
+                                style: TextStyles.footnote.copyWith(
+                                  color: theme.grey[600],
+                                ),
+                              ),
+                            ),
+                            TextButton(
+                              onPressed: () => Navigator.of(context).pop(true),
+                              child: Text(
+                                AppLocalizations.of(context)
+                                    .translate('confirm'),
+                                style: TextStyles.footnote.copyWith(
+                                  color: theme.error[600],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+
+                      if (shouldDelete == true) {
+                        await ref
+                            .read(ongoingActivitiesNotifierProvider.notifier)
+                            .deleteAllActivities();
+                        getSuccessSnackBar(context, 'activities-deleted');
+                      }
+                    },
+                    child: VaultSettingsButton(
+                      icon: LucideIcons.trash2,
+                      textKey: 'erase-all-activities',
+                      type: 'warn',
+                    ),
                   ),
-                  // verticalSpace(Spacing.points16),
+
                   // Text(
                   //   AppLocalizations.of(context)
                   //       .translate('bookmarks-settings'),
@@ -76,10 +130,61 @@ class VaultSettingsScreen extends ConsumerWidget {
                     style: TextStyles.h6,
                   ),
                   verticalSpace(Spacing.points8),
-                  VaultSettingsButton(
-                    icon: LucideIcons.trash2,
-                    textKey: 'erase-all-diaries',
-                    type: 'warn',
+                  GestureDetector(
+                    onTap: () async {
+                      final shouldDelete = await showDialog<bool>(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          backgroundColor: theme.backgroundColor,
+                          title: Text(
+                            AppLocalizations.of(context)
+                                .translate('delete-diaries-confirmation-title'),
+                            style: TextStyles.h6.copyWith(
+                              color: theme.error[600],
+                            ),
+                          ),
+                          content: Text(
+                            AppLocalizations.of(context).translate(
+                                'delete-diaries-confirmation-message'),
+                            style: TextStyles.body,
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.of(context).pop(false),
+                              child: Text(
+                                AppLocalizations.of(context)
+                                    .translate('cancel'),
+                                style: TextStyles.footnote.copyWith(
+                                  color: theme.grey[600],
+                                ),
+                              ),
+                            ),
+                            TextButton(
+                              onPressed: () => Navigator.of(context).pop(true),
+                              child: Text(
+                                AppLocalizations.of(context)
+                                    .translate('confirm'),
+                                style: TextStyles.footnote.copyWith(
+                                  color: theme.error[600],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+
+                      if (shouldDelete == true) {
+                        await ref
+                            .read(diariesNotifierProvider.notifier)
+                            .deleteAllDiaries();
+                        getSuccessSnackBar(context, 'diaries-deleted');
+                      }
+                    },
+                    child: VaultSettingsButton(
+                      icon: LucideIcons.trash2,
+                      textKey: 'erase-all-diaries',
+                      type: 'warn',
+                    ),
                   ),
                 ],
               ),

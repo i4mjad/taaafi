@@ -14,6 +14,10 @@ class DiariesService {
     await _repository.addDiary(diary);
   }
 
+  Future<void> deleteAllDiaries() async {
+    await _repository.deleteAllDiaries();
+  }
+
   Future<void> updateDiary(String diaryId, Diary diary) async {
     await _repository.updateDiary(diaryId, diary);
   }

@@ -26,6 +26,17 @@ class DiariesNotifier extends _$DiariesNotifier {
     }
   }
 
+  Future<void> deleteAllDiaries() async {
+    state = const AsyncValue.loading();
+    try {
+      await service.deleteAllDiaries();
+
+      state = AsyncValue.data([]);
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+    }
+  }
+
   Future<void> updateDiariesState() async {
     state = const AsyncValue.loading();
     try {

@@ -501,5 +501,11 @@
   "activity-notifications": "Activity Reminders",
   "select-extension-period": "Select extension period",
   "error-extend-activity": "Cannot extend activity during the first half of its period",
-  "activity-extended": "Activity extended successfully"
+  "activity-extended": "Activity extended successfully",
+  "delete-diaries-confirmation-title": "Delete All Diaries",
+  "delete-diaries-confirmation-message": "Are you sure you want to delete all diaries? This action cannot be undone.",
+  "diaries-deleted": "All diaries deleted successfully",
+  "delete-activities-confirmation-title": "Delete All Activities",
+  "delete-activities-confirmation-message": "Are you sure you want to delete all activities? This action cannot be undone.",
+  "activities-deleted": "All activities deleted successfully"
 }
