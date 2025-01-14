@@ -113,20 +113,72 @@ class UserProfileNotifier extends _$UserProfileNotifier {
     await _deleteUserCollection('emotions');
   }
 
+  Future<void> deleteAllOngoingActivities() async {
+    try {
+      final uid = await _getUserId();
+      if (uid == null) return;
+
+      final batch = _firestore.batch();
+
+      // Get all ongoing activities
+      final ongoingActivities = await _firestore
+          .collection('users')
+          .doc(uid)
+          .collection('ongoing_activities')
+          .get();
+
+      // For each ongoing activity
+      for (var activityDoc in ongoingActivities.docs) {
+        final activityId = activityDoc.data()['activityId'] as String;
+
+        // Delete the subscription session for this activity
+        final subscriptionRef = _firestore
+            .collection('activities')
+            .doc(activityId)
+            .collection('subscriptionSessions')
+            .doc(uid);
+        batch.delete(subscriptionRef);
+
+        // Delete all scheduled tasks for this activity
+        final scheduledTasksSnapshot =
+            await activityDoc.reference.collection('scheduledTasks').get();
+
+        for (var taskDoc in scheduledTasksSnapshot.docs) {
+          batch.delete(taskDoc.reference);
+        }
+
+        // Delete the ongoing activity document itself
+        batch.delete(activityDoc.reference);
+      }
+
+      await batch.commit();
+    } catch (e) {
+      throw Exception('Failed to delete all activities: $e');
+    }
+  }
+
   Future<void> handleUserDeletion() async {
     try {
       final uid = await _getUserId();
       if (uid == null) return;
 
-      // TODO: Implement the user deletion process
-      // This should include deleting user data from Firestore and any other necessary cleanup
+      // Step 1: Delete all ongoing activities and their related data
+      await deleteAllOngoingActivities();
 
-      //TODO: uncomment this when every things is done, for now we will sign the user out
-      await FirebaseAuth.instance.signOut();
+      // Step 2: Delete all user data collections
+      await deleteDailyFollowUps();
+      await deleteEmotions();
 
-      state = AsyncValue.data(null); // Update state
+      // Step 3: Delete the user document
+      await _firestore.collection('users').doc(uid).delete();
+
+      // Step 4: Delete the Firebase Auth user
+      await FirebaseAuth.instance.currentUser?.delete();
+
+      state = AsyncValue.data(null); // Update state to reflect user deletion
     } catch (e) {
-      state = AsyncValue.error(e, StackTrace.current); // Handle error
+      state = AsyncValue.error(e, StackTrace.current);
+      rethrow; // Rethrow to handle navigation and snackbar in the UI layer
     }
   }
 

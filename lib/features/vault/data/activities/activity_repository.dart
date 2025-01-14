@@ -47,18 +47,26 @@ class ActivityRepository {
 
       // For each ongoing activity
       for (var activityDoc in ongoingActivities.docs) {
-        // Delete the ongoing activity document
-        batch.delete(activityDoc.reference);
+        final activityId = activityDoc.data()['activityId'] as String;
 
         // Delete the subscription session for this activity
-        final activityId = activityDoc.data()['activityId'] as String;
         final subscriptionRef = _firestore
             .collection('activities')
             .doc(activityId)
             .collection('subscriptionSessions')
             .doc(userId);
-
         batch.delete(subscriptionRef);
+
+        // Delete all scheduled tasks for this activity
+        final scheduledTasksSnapshot =
+            await activityDoc.reference.collection('scheduledTasks').get();
+
+        for (var taskDoc in scheduledTasksSnapshot.docs) {
+          batch.delete(taskDoc.reference);
+        }
+
+        // Delete the ongoing activity document itself
+        batch.delete(activityDoc.reference);
       }
 
       await batch.commit();

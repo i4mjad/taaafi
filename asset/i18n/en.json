@@ -225,6 +225,9 @@
   "role":"Account Type",
   "required-update-p":"You can't use this version, update to the latest version.",
 
+  "account-deleted":"Account deleted successfully",
+  
+
   "logged-out-successfully": "Logged out successfully",
   "data-updated-successfully": "Data updated successfully",
   "followups":"Followups",

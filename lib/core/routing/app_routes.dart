@@ -64,18 +64,18 @@ GoRouter goRouter(GoRouterRef ref) {
         final hasError = userDocumentState is AsyncError;
         final userDocument = userDocumentState.valueOrNull;
 
-        // Always navigate to the loading screen if the document state is loading
-        if (isLoading) {
-          if (state.matchedLocation != '/loading') {
-            return '/loading';
-          }
-          return null;
-        }
-
         // If document is null or has errors, redirect to complete account registration
         if (userDocument == null || hasError) {
           if (state.matchedLocation != '/completeAccountRegisteration') {
             return '/completeAccountRegisteration';
+          }
+          return null;
+        }
+
+        // Always navigate to the loading screen if the document state is loading
+        if (isLoading) {
+          if (state.matchedLocation != '/loading') {
+            return '/loading';
           }
           return null;
         }

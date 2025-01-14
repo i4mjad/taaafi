@@ -20,6 +20,7 @@ class OngoingActivitiesNotifier extends _$OngoingActivitiesNotifier {
 
   Future<void> deleteAllActivities() async {
     try {
+      print("get here");
       await service.deleteAllOngoingActivities();
     } catch (e) {
       throw Exception('Failed to delete all activities: $e');
