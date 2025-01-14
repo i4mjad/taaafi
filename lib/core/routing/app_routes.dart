@@ -396,7 +396,7 @@ GoRouter goRouter(GoRouterRef ref) {
                   GoRoute(
                     path: 'account-delete',
                     name: RouteNames.accountDelete.name,
-                    pageBuilder: (context, state) => NoTransitionPage<void>(
+                    pageBuilder: (context, state) => MaterialPage(
                       name: RouteNames.accountDelete.name,
                       child: DeleteAccountScreen(),
                     ),

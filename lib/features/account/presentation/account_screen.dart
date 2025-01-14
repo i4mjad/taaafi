@@ -22,6 +22,7 @@ import 'package:reboot_app_3/features/account/data/models/user_profile.dart';
 import 'package:reboot_app_3/features/account/data/user_profile_notifier.dart';
 import 'package:reboot_app_3/features/account/presentation/update_user_profile_modal_sheet.dart';
 import 'package:reboot_app_3/features/authentication/application/auth_service.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class AccountScreen extends ConsumerWidget {
   const AccountScreen({super.key});
@@ -94,6 +95,8 @@ class AccountScreen extends ConsumerWidget {
                         textKey: 'log-out',
                         action: () async {
                           await authService.signOut(context, ref);
+                          getSuccessSnackBar(
+                              context, 'logged-out-successfully');
                         },
                       ),
                       verticalSpace(Spacing.points8),
@@ -121,34 +124,17 @@ class AccountScreen extends ConsumerWidget {
                         icon: LucideIcons.heart,
                         textKey: 'version-number',
                         type: 'app',
+                        action: () {
+                          launchUrl(Uri.parse('https://ta3afi.app'));
+                        },
                       ),
                       verticalSpace(Spacing.points8),
                       SettingsButton(
                         icon: LucideIcons.laptop,
                         textKey: 'contact-us-through-this-channels',
-                      ),
-                      verticalSpace(Spacing.points12),
-                      Container(
-                        width: MediaQuery.of(context).size.width - 32,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              AppLocalizations.of(context)
-                                  .translate('sponsored-by'),
-                              style: TextStyles.bodyLarge
-                                  .copyWith(color: theme.primary[600]),
-                            ),
-                            verticalSpace(Spacing.points8),
-                            //TODO: update the text to be Awalim logo
-                            Text(
-                              'منصة عوالم',
-                              style: TextStyles.body
-                                  .copyWith(color: theme.secondary[500]),
-                            ),
-                          ],
-                        ),
+                        action: () {
+                          launchUrl(Uri.parse('https://amjad.om'));
+                        },
                       ),
                       verticalSpace(Spacing.points12),
                     ],

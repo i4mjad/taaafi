@@ -225,7 +225,7 @@
   "role":"Account Type",
   "required-update-p":"You can't use this version, update to the latest version.",
 
-
+  "logged-out-successfully": "Logged out successfully",
   "data-updated-successfully": "Data updated successfully",
   "followups":"Followups",
   "daily-follow-ups": "Daily follow ups",
