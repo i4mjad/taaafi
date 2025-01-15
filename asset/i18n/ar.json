@@ -106,6 +106,9 @@
   "relapses-by-day-of-week": "الانتكاسات حسب أيام الأسبوع",
   "streaks": "إحصائيات عامة",
 
+  "delete-account-activities":"حذف التمارين",
+  "delete-account-activities-desc":"سيتم حذف جميع التمارين المسجلة",
+
   "logged-out-successfully": "تم تسجيل الخروج بنجاح",
   "account-deleted":"تم حذف الحساب بنجاح",
   "data-updated-successfully": "تم تحديث البيانات بنجاح",
@@ -488,8 +491,8 @@
   "delete-account-info": "عند حذف حسابك، سيحدث ما يلي:",
   "delete-account-data": "حذف بيانات الحساب",
   "delete-account-data-desc": "سيتم حذف جميع بيانات حسابك بشكل دائم.",
-  "delete-account-followups": "حذف المتابعات",
-  "delete-account-followups-desc": "سيتم حذف جميع المتابعات وتحديث تاريخ بداية العداد ليكون من توقيت الحذف.",
+  "delete-account-followups": "حذف بيانات المتابعة اليومية",
+  "delete-account-followups-desc": "سيتم حذف جميع بيانات المتابعة اليومية.",
   "delete-account-emotions": "حذف المشاعر",
   "delete-account-emotions-desc": "سيتم حذف جميع المشاعر المسجلة.",
   "delete-account-warning": "تحذير: لا يمكن التراجع عن هذا الإجراء.",

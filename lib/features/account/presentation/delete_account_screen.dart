@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
@@ -36,8 +37,8 @@ class DeleteAccountScreen extends ConsumerWidget {
               ),
               verticalSpace(Spacing.points8),
               WidgetsContainer(
-                backgroundColor: theme.primary[50],
-                borderSide: BorderSide(color: theme.grey[100]!, width: 0.25),
+                backgroundColor: theme.backgroundColor,
+                borderSide: BorderSide(color: theme.primary[600]!, width: 0.25),
                 boxShadow: Shadows.mainShadows,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -65,10 +66,18 @@ class DeleteAccountScreen extends ConsumerWidget {
                       description: AppLocalizations.of(context)
                           .translate('delete-account-emotions-desc'),
                     ),
+                    verticalSpace(Spacing.points16),
+                    OnboardingSection(
+                      icon: LucideIcons.activity,
+                      title: AppLocalizations.of(context)
+                          .translate('delete-account-activities'),
+                      description: AppLocalizations.of(context)
+                          .translate('delete-account-activities-desc'),
+                    ),
                   ],
                 ),
               ),
-              Divider(),
+              verticalSpace(Spacing.points16),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
@@ -117,7 +126,7 @@ class OnboardingSection extends ConsumerWidget {
         children: [
           Icon(
             icon,
-            color: theme.primary[600],
+            color: theme.error[600],
             weight: 100,
           ),
           horizontalSpace(Spacing.points16),
@@ -128,7 +137,7 @@ class OnboardingSection extends ConsumerWidget {
                 Text(
                   title,
                   style: TextStyles.h6.copyWith(
-                    color: theme.primary[600],
+                    color: theme.error[600],
                   ),
                 ),
                 verticalSpace(Spacing.points8),
@@ -215,6 +224,7 @@ class _ReLoginFormState extends ConsumerState<ReLoginForm> {
                   password,
                 );
                 if (result) {
+                  HapticFeedback.mediumImpact();
                   await userProfileNotifier.handleUserDeletion();
                   context.goNamed(RouteNames.onboarding.name);
                   getSuccessSnackBar(context, 'account-deleted');
@@ -222,18 +232,19 @@ class _ReLoginFormState extends ConsumerState<ReLoginForm> {
               }
             },
             child: WidgetsContainer(
-              backgroundColor: theme.primary[600],
-              width: MediaQuery.of(context).size.width - (16 + 16),
-              padding: EdgeInsets.only(top: 12, bottom: 12),
-              boxShadow: Shadows.mainShadows,
-              borderRadius: BorderRadius.circular(10.5),
+              backgroundColor: theme.error[600],
+              width: MediaQuery.of(context).size.width - 32,
+              padding: EdgeInsets.all(16),
+              // boxShadow: Shadows.mainShadows,
+              // borderRadius: BorderRadius.circular(10.5),
+              borderSide: BorderSide(width: 0, color: theme.error[900]!),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
                     AppLocalizations.of(context).translate('delete-account'),
                     style: TextStyles.footnoteSelected
-                        .copyWith(color: theme.grey[50]),
+                        .copyWith(color: Colors.white),
                   ),
                 ],
               ),
@@ -250,6 +261,7 @@ class _ReLoginFormState extends ConsumerState<ReLoginForm> {
             children: [
               GestureDetector(
                 onTap: () async {
+                  HapticFeedback.mediumImpact();
                   await authService.reSignInWithApple(context);
                   await userProfileNotifier.handleUserDeletion();
                   context.goNamed(RouteNames.onboarding.name);
@@ -260,11 +272,12 @@ class _ReLoginFormState extends ConsumerState<ReLoginForm> {
                   width: 60,
                   padding: EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                      color: theme.primary[50],
+                      color: theme.backgroundColor,
                       borderRadius: BorderRadius.circular(150),
+                      boxShadow: Shadows.mainShadows,
                       border: Border.all(
-                        color: theme.primary[100]!,
-                        width: 1,
+                        color: theme.grey[600]!,
+                        width: 0.25,
                       )),
                   child: SvgPicture.asset(
                     'asset/icons/apple-icon.svg',
@@ -275,6 +288,7 @@ class _ReLoginFormState extends ConsumerState<ReLoginForm> {
               horizontalSpace(Spacing.points4),
               GestureDetector(
                 onTap: () async {
+                  HapticFeedback.mediumImpact();
                   await authService.reSignInWithGoogle(context);
                   await userProfileNotifier.handleUserDeletion();
                   context.goNamed(RouteNames.onboarding.name);
@@ -285,11 +299,12 @@ class _ReLoginFormState extends ConsumerState<ReLoginForm> {
                   width: 60,
                   padding: EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                      color: theme.primary[50],
+                      color: theme.backgroundColor,
                       borderRadius: BorderRadius.circular(150),
+                      boxShadow: Shadows.mainShadows,
                       border: Border.all(
-                        color: theme.primary[100]!,
-                        width: 1,
+                        color: theme.grey[600]!,
+                        width: 0.25,
                       )),
                   child: SvgPicture.asset(
                     'asset/icons/google-icon.svg',

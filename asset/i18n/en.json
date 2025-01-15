@@ -226,7 +226,8 @@
   "required-update-p":"You can't use this version, update to the latest version.",
 
   "account-deleted":"Account deleted successfully",
-  
+  "delete-account-activities":"Delete Activities",
+  "delete-account-activities-desc":"All activities will be deleted",
 
   "logged-out-successfully": "Logged out successfully",
   "data-updated-successfully": "Data updated successfully",
