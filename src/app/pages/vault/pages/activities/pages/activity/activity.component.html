@@ -53,7 +53,18 @@
   </mat-card>
 
   <mat-card appearance="outlined">
-    <mat-card-title>مهام التمرين</mat-card-title>
+    <mat-card-header>
+      <div class="flex flex-row gap-2">
+        <mat-card-title>مهام التمرين</mat-card-title>
+        <!-- <button
+          mat-flat-button
+          color="secondery"
+          (click)="openAddTaskToActivityDialog()"
+        >
+          تعديل التمرين
+        </button> -->
+      </div>
+    </mat-card-header>
     <mat-card-content>
       <table
         mat-table

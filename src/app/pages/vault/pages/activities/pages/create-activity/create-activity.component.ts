@@ -54,6 +54,9 @@ export class CreateActivityComponent implements OnInit {
   }
 
   onSubmit(): void {
+    if (!this.activityForm.valid) {
+      console.log(this.activityForm.value);
+    }
     if (this.activityForm.valid) {
       this.store
         .dispatch(new CreateActivityAction(this.activityForm.value))
