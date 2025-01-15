@@ -67,7 +67,7 @@ class StreakNotifier extends _$StreakNotifier {
 @Riverpod(keepAlive: true)
 StreakService streakService(StreakServiceRef ref) {
   final firestore = FirebaseFirestore.instance;
-  final repository = StreakRepository(firestore);
+  final repository = StreakRepository(firestore, ref);
   return StreakService(repository);
 }
 

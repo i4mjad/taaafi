@@ -1,8 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:reboot_app_3/core/monitoring/error_logger.dart';
 import 'package:reboot_app_3/features/vault/data/activities/activity_task.dart';
 import 'package:reboot_app_3/features/vault/data/activities/ongoing_activity_task.dart';
 import 'package:reboot_app_3/features/vault/data/diaries/diary.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 abstract class DiariesRepository {
   Future<List<Diary>> getDiaries();
@@ -17,10 +19,12 @@ abstract class DiariesRepository {
 class FirebaseDiariesRepository implements DiariesRepository {
   final FirebaseFirestore _firestore;
   final FirebaseAuth _auth;
+  final Ref ref;
 
   FirebaseDiariesRepository({
     FirebaseFirestore? firestore,
     FirebaseAuth? auth,
+    required this.ref,
   })  : _firestore = firestore ?? FirebaseFirestore.instance,
         _auth = auth ?? FirebaseAuth.instance;
 
@@ -52,7 +56,8 @@ class FirebaseDiariesRepository implements DiariesRepository {
                     : null,
               ))
           .toList();
-    } catch (e) {
+    } catch (e, stackTrace) {
+      ref.read(errorLoggerProvider).logException(e, stackTrace);
       throw Exception('Failed to fetch diaries: $e');
     }
   }
@@ -93,7 +98,8 @@ class FirebaseDiariesRepository implements DiariesRepository {
         linkedTaskIds: linkedTaskIds,
         linkedTasks: linkedTasks.whereType<OngoingActivityTask>().toList(),
       );
-    } catch (e) {
+    } catch (e, stackTrace) {
+      ref.read(errorLoggerProvider).logException(e, stackTrace);
       throw Exception('Failed to fetch diary: $e');
     }
   }
@@ -126,7 +132,8 @@ class FirebaseDiariesRepository implements DiariesRepository {
         }
       }
       return null;
-    } catch (e) {
+    } catch (e, stackTrace) {
+      ref.read(errorLoggerProvider).logException(e, stackTrace);
       return null;
     }
   }
@@ -142,7 +149,8 @@ class FirebaseDiariesRepository implements DiariesRepository {
 
       if (!taskDoc.exists) return null;
       return ActivityTask.fromFirestore(taskDoc);
-    } catch (e) {
+    } catch (e, stackTrace) {
+      ref.read(errorLoggerProvider).logException(e, stackTrace);
       return null;
     }
   }
@@ -163,7 +171,8 @@ class FirebaseDiariesRepository implements DiariesRepository {
         'updatedAt': FieldValue.serverTimestamp(),
         'linkedTaskIds': diary.linkedTaskIds,
       });
-    } catch (e) {
+    } catch (e, stackTrace) {
+      ref.read(errorLoggerProvider).logException(e, stackTrace);
       throw Exception('Failed to update diary: $e');
     }
   }
@@ -182,7 +191,8 @@ class FirebaseDiariesRepository implements DiariesRepository {
         'formattedContent': diary.formattedContent,
         'updatedAt': FieldValue.serverTimestamp(),
       });
-    } catch (e) {
+    } catch (e, stackTrace) {
+      ref.read(errorLoggerProvider).logException(e, stackTrace);
       throw Exception('Failed to add diary: $e');
     }
   }
@@ -196,7 +206,8 @@ class FirebaseDiariesRepository implements DiariesRepository {
           .collection('userNotes')
           .doc(diaryId)
           .delete();
-    } catch (e) {
+    } catch (e, stackTrace) {
+      ref.read(errorLoggerProvider).logException(e, stackTrace);
       throw Exception('Failed to delete diary: $e');
     }
   }
@@ -217,7 +228,8 @@ class FirebaseDiariesRepository implements DiariesRepository {
       });
 
       return docRef.id;
-    } catch (e) {
+    } catch (e, stackTrace) {
+      ref.read(errorLoggerProvider).logException(e, stackTrace);
       throw Exception('Failed to create empty diary: $e');
     }
   }
@@ -237,7 +249,8 @@ class FirebaseDiariesRepository implements DiariesRepository {
       }
 
       await batch.commit();
-    } catch (e) {
+    } catch (e, stackTrace) {
+      ref.read(errorLoggerProvider).logException(e, stackTrace);
       throw Exception('Failed to delete all diaries: $e');
     }
   }

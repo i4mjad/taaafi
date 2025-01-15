@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:reboot_app_3/core/monitoring/error_logger.dart';
 import 'package:reboot_app_3/features/authentication/application/migration_service.dart';
 import 'package:reboot_app_3/features/authentication/data/models/user_document.dart';
 import 'package:reboot_app_3/features/authentication/data/repositories/auth_repository.dart';
@@ -16,6 +18,7 @@ MigerationRepository migerationRepository(ref) {
   return MigerationRepository(
     ref.watch(firestoreInstanceProvider),
     ref.watch(firebaseAuthProvider),
+    ref,
   );
 }
 
@@ -29,13 +32,19 @@ FCMRepository fcmRepository(ref) {
 class MigerationRepository {
   FirebaseFirestore _firestore;
   FirebaseAuth _auth;
-  MigerationRepository(this._firestore, this._auth);
+  Ref ref;
+  MigerationRepository(this._firestore, this._auth, this.ref);
 
   Future<DocumentSnapshot<Map<String, dynamic>>> getUserDocMap() async {
-    return await _firestore
-        .collection('users')
-        .doc(_auth.currentUser?.uid)
-        .get();
+    try {
+      return await _firestore
+          .collection('users')
+          .doc(_auth.currentUser?.uid)
+          .get();
+    } catch (e, stackTrace) {
+      ref.read(errorLoggerProvider).logException(e, stackTrace);
+      rethrow;
+    }
   }
 
   Future<void> bulkFollowUpsInsertion(List<FollowUpModel> followUps) async {
@@ -46,12 +55,17 @@ class MigerationRepository {
 
     WriteBatch batch = FirebaseFirestore.instance.batch();
 
-    for (var followUp in followUps) {
-      var docRef = collectionRef.doc(); // Use Firebase auto-generated ID
-      batch.set(docRef, followUp.toMap());
-    }
+    try {
+      for (var followUp in followUps) {
+        var docRef = collectionRef.doc(); // Use Firebase auto-generated ID
+        batch.set(docRef, followUp.toMap());
+      }
 
-    return await batch.commit();
+      return await batch.commit();
+    } catch (e, stackTrace) {
+      ref.read(errorLoggerProvider).logException(e, stackTrace);
+      rethrow;
+    }
   }
 
   Future<void> updateUserDocument(UserDocument newDocument) async {
@@ -70,9 +84,8 @@ class MigerationRepository {
       var updatedDocument = newDocument.toFirestore();
 
       await docRef.set(updatedDocument, SetOptions(merge: true));
-    } catch (e) {
-      // Handle potential errors
-      print('Failed to update user document: $e');
+    } catch (e, stackTrace) {
+      ref.read(errorLoggerProvider).logException(e, stackTrace);
       rethrow; // Optionally rethrow the error to handle it further up the call stack
     }
   }
@@ -85,9 +98,8 @@ class FCMRepository {
 
   Future<String> getMessagingToken() async {
     if (Platform.isIOS) {
-      return await _messaging.getAPNSToken() as String;
-    } else {
-      return await _messaging.getToken() as String;
+      await _messaging.getAPNSToken() as String;
     }
+    return await _messaging.getToken() as String;
   }
 }

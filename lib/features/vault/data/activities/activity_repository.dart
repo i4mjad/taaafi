@@ -3,6 +3,8 @@ import 'dart:ui';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:reboot_app_3/core/monitoring/error_logger.dart';
 import 'package:reboot_app_3/core/notifications/notifications_scheduler.dart';
 import 'package:reboot_app_3/features/vault/data/activities/activity.dart';
 import 'package:reboot_app_3/features/vault/data/activities/activity_task.dart';
@@ -22,8 +24,9 @@ class ActivityRepository {
   final FirebaseFirestore _firestore;
   final FirebaseAuth _auth;
   final AnalyticsFacade _analytics;
+  final Ref ref;
 
-  ActivityRepository(this._firestore, this._auth, this._analytics);
+  ActivityRepository(this._firestore, this._auth, this._analytics, this.ref);
 
   /// Gets the current user ID or throws if not authenticated
   String _getCurrentUserId() {
@@ -119,9 +122,10 @@ class ActivityRepository {
 
       unawaited(_analytics.trackActivityFetchFinished());
       return activities;
-    } catch (e) {
+    } catch (e, stackTrace) {
+      ref.read(errorLoggerProvider).logException(e, stackTrace);
       unawaited(_analytics.trackActivityFetchFailed());
-      throw Exception('Failed to fetch activities: $e');
+      rethrow;
     }
   }
 
@@ -213,7 +217,8 @@ class ActivityRepository {
       await batch.commit();
 
       unawaited(_analytics.trackActivitySubscriptionFinished());
-    } catch (e) {
+    } catch (e, stackTrace) {
+      ref.read(errorLoggerProvider).logException(e, stackTrace);
       unawaited(_analytics.trackActivitySubscriptionFailed());
       throw Exception('Failed to subscribe to activity: $e');
     }
@@ -228,7 +233,8 @@ class ActivityRepository {
             frequencyStr.toLowerCase(),
         orElse: () => TaskFrequency.daily,
       );
-    } catch (_) {
+    } catch (e, stackTrace) {
+      ref.read(errorLoggerProvider).logException(e, stackTrace);
       return TaskFrequency.daily;
     }
   }
@@ -275,7 +281,8 @@ class ActivityRepository {
       }
 
       return docSnapshot.exists;
-    } catch (e) {
+    } catch (e, stackTrace) {
+      ref.read(errorLoggerProvider).logException(e, stackTrace);
       throw Exception('Failed to check subscription status: $e');
     }
   }
@@ -324,7 +331,8 @@ class ActivityRepository {
 
       unawaited(_analytics.trackProgressCalculationFinished());
       return progress;
-    } catch (e) {
+    } catch (e, stackTrace) {
+      ref.read(errorLoggerProvider).logException(e, stackTrace);
       unawaited(_analytics.trackProgressCalculationFailed());
       throw Exception('Failed to calculate activity progress: $e');
     }
@@ -385,7 +393,8 @@ class ActivityRepository {
       final validActivities =
           ongoingActivities.whereType<OngoingActivity>().toList();
       return validActivities;
-    } catch (e) {
+    } catch (e, stackTrace) {
+      ref.read(errorLoggerProvider).logException(e, stackTrace);
       throw Exception('Failed to fetch ongoing activities: $e');
     }
   }
@@ -453,7 +462,8 @@ class ActivityRepository {
       }
 
       return todayTasks;
-    } catch (e) {
+    } catch (e, stackTrace) {
+      ref.read(errorLoggerProvider).logException(e, stackTrace);
       throw Exception('Failed to fetch today\'s tasks: $e');
     }
   }
@@ -485,7 +495,8 @@ class ActivityRepository {
           break;
         }
       }
-    } catch (e) {
+    } catch (e, stackTrace) {
+      ref.read(errorLoggerProvider).logException(e, stackTrace);
       throw Exception('Failed to complete task: $e');
     }
   }
@@ -528,7 +539,8 @@ class ActivityRepository {
         subscriberCount: subscriberCount ?? 0, // Use actual count
         tasks: tasks,
       );
-    } catch (e) {
+    } catch (e, stackTrace) {
+      ref.read(errorLoggerProvider).logException(e, stackTrace);
       throw Exception('Failed to fetch activity: $e');
     }
   }
@@ -621,7 +633,8 @@ class ActivityRepository {
         taskPerformance: taskPerformance,
         subscriberCount: subscriberCount,
       );
-    } catch (e) {
+    } catch (e, stackTrace) {
+      ref.read(errorLoggerProvider).logException(e, stackTrace);
       throw Exception('Failed to fetch ongoing activity details: $e');
     }
   }
@@ -661,7 +674,8 @@ class ActivityRepository {
         'isCompleted': isCompleted,
         'completedAt': isCompleted ? FieldValue.serverTimestamp() : null,
       });
-    } catch (e) {
+    } catch (e, stackTrace) {
+      ref.read(errorLoggerProvider).logException(e, stackTrace);
       throw Exception('Failed to update task completion: $e');
     }
   }
@@ -703,7 +717,8 @@ class ActivityRepository {
       }
 
       return allTasks;
-    } catch (e) {
+    } catch (e, stackTrace) {
+      ref.read(errorLoggerProvider).logException(e, stackTrace);
       throw Exception('Failed to fetch all tasks: $e');
     }
   }
@@ -846,7 +861,8 @@ class ActivityRepository {
         'endDate': endDate,
         'updatedAt': FieldValue.serverTimestamp(),
       });
-    } catch (e) {
+    } catch (e, stackTrace) {
+      ref.read(errorLoggerProvider).logException(e, stackTrace);
       throw Exception('Failed to update activity: $e');
     }
   }
@@ -895,7 +911,8 @@ class ActivityRepository {
 
       // Commit all deletions
       await batch.commit();
-    } catch (e) {
+    } catch (e, stackTrace) {
+      ref.read(errorLoggerProvider).logException(e, stackTrace);
       throw Exception('Failed to delete activity: $e');
     }
   }
@@ -945,7 +962,8 @@ class ActivityRepository {
       }
 
       return tasks;
-    } catch (e) {
+    } catch (e, stackTrace) {
+      ref.read(errorLoggerProvider).logException(e, stackTrace);
       throw Exception('Failed to fetch tasks by date: $e');
     }
   }
@@ -996,7 +1014,8 @@ class ActivityRepository {
       }
 
       return tasks;
-    } catch (e) {
+    } catch (e, stackTrace) {
+      ref.read(errorLoggerProvider).logException(e, stackTrace);
       throw Exception('Failed to fetch tasks by date range: $e');
     }
   }
@@ -1235,7 +1254,8 @@ class ActivityRepository {
         // You'll need to pass the current locale here
         locale,
       );
-    } catch (e) {
+    } catch (e, stackTrace) {
+      ref.read(errorLoggerProvider).logException(e, stackTrace);
       throw Exception('Failed to extend activity: $e');
     }
   }

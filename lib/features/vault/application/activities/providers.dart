@@ -13,6 +13,7 @@ ActivityRepository activityRepository(ActivityRepositoryRef ref) {
     ref.watch(firestoreProvider),
     ref.watch(firebaseAuthProvider),
     ref.watch(analyticsFacadeProvider),
+    ref,
   );
 }
 

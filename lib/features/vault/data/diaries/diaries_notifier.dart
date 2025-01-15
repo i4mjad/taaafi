@@ -117,5 +117,5 @@ class DiariesNotifier extends _$DiariesNotifier {
 
 @Riverpod(keepAlive: true)
 DiariesService diariesService(DiariesServiceRef ref) {
-  return DiariesService(FirebaseDiariesRepository());
+  return DiariesService(FirebaseDiariesRepository(ref: ref));
 }

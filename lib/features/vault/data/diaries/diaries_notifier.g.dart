@@ -6,7 +6,7 @@ part of 'diaries_notifier.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$diariesServiceHash() => r'e050d098e6d361c04588447148f8098028aecef2';
+String _$diariesServiceHash() => r'6d406616bc324d049e44c6ea236f1ea312cef3fb';
 
 /// See also [diariesService].
 @ProviderFor(diariesService)
@@ -21,7 +21,7 @@ final diariesServiceProvider = Provider<DiariesService>.internal(
 );
 
 typedef DiariesServiceRef = ProviderRef<DiariesService>;
-String _$diariesNotifierHash() => r'4f863a9e50437c25507d9e952525af57ed2b1fdd';
+String _$diariesNotifierHash() => r'3fc960ab0c5dd2d5faee177cb1ffed7e65308dab';
 
 /// See also [DiariesNotifier].
 @ProviderFor(DiariesNotifier)

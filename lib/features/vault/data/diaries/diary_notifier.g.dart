@@ -6,7 +6,7 @@ part of 'diary_notifier.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$diariesServiceHash() => r'e8e29332a823cff24c81a6756a4a011cf27d3acc';
+String _$diariesServiceHash() => r'0ba14d35e9220653ddba2058b5ca4b32388b42c5';
 
 /// See also [diariesService].
 @ProviderFor(diariesService)

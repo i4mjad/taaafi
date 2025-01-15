@@ -7,7 +7,7 @@ part of 'providers.dart';
 // **************************************************************************
 
 String _$activityRepositoryHash() =>
-    r'e8e26feaec4381f4c4a181c2418b778eff177378';
+    r'5379e0ff6555b845700abf5913c39d372551214a';
 
 /// See also [activityRepository].
 @ProviderFor(activityRepository)

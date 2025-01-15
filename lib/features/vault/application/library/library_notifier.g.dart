@@ -21,7 +21,7 @@ final libraryServiceProvider = AutoDisposeProvider<LibraryService>.internal(
 );
 
 typedef LibraryServiceRef = AutoDisposeProviderRef<LibraryService>;
-String _$libraryRepositoryHash() => r'23e5b59af4d5f57dd51d3d1002b480b360f6a5cd';
+String _$libraryRepositoryHash() => r'305912e3737fbe1883d6078cd167ad5fa50a0df8';
 
 /// See also [libraryRepository].
 @ProviderFor(libraryRepository)

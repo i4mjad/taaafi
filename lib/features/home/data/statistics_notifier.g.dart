@@ -6,7 +6,7 @@ part of 'statistics_notifier.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$statisticsServiceHash() => r'f597bc53b0e59b306ce033a594a8fa001f5219c7';
+String _$statisticsServiceHash() => r'dee11fd0db4c96c9b837b10aa8aa0d4e14f7579c';
 
 /// See also [statisticsService].
 @ProviderFor(statisticsService)

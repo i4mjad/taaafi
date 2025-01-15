@@ -6,7 +6,7 @@ part of 'streak_notifier.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$streakServiceHash() => r'26433ed34647705798d21f3c7881a9a8dcadb582';
+String _$streakServiceHash() => r'08a66e159804428a944d4e84b7cf7a61a66a3cef';
 
 /// See also [streakService].
 @ProviderFor(streakService)

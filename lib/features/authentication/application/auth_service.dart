@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:reboot_app_3/core/monitoring/error_logger.dart';
 import 'package:reboot_app_3/features/authentication/data/repositories/auth_repository.dart';
 import 'package:reboot_app_3/features/authentication/data/repositories/migeration_repository.dart';
 import 'package:reboot_app_3/features/authentication/providers/user_document_provider.dart';
@@ -20,6 +21,7 @@ AuthService authService(ref) {
     ref.watch(firebaseAuthProvider),
     ref.watch(authRepositoryProvider),
     ref.watch(fcmRepositoryProvider),
+    ref,
   );
 }
 
@@ -27,8 +29,9 @@ class AuthService {
   final FirebaseAuth _auth;
   final AuthRepository _authRepository;
   final FCMRepository _fcmRepository;
+  final Ref ref;
 
-  AuthService(this._auth, this._authRepository, this._fcmRepository);
+  AuthService(this._auth, this._authRepository, this._fcmRepository, this.ref);
 
   Future<void> signUpWithEmail(
     BuildContext context,
@@ -62,7 +65,8 @@ class AuthService {
       );
     } on FirebaseAuthException catch (e) {
       getSnackBar(context, e.code);
-    } catch (e) {
+    } catch (e, stackTrace) {
+      ref.read(errorLoggerProvider).logException(e, stackTrace);
       getSystemSnackBar(
         context,
         e.toString(),
@@ -71,18 +75,23 @@ class AuthService {
   }
 
   Future<String> _getDeviceId() async {
-    DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
-    String deviceInfoStr = '';
-    if (Platform.isAndroid) {
-      AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
-      deviceInfoStr = androidInfo.id;
-    } else if (Platform.isIOS) {
-      IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
-      deviceInfoStr = iosInfo.identifierForVendor != null
-          ? iosInfo.identifierForVendor as String
-          : "";
+    try {
+      DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+      String deviceInfoStr = '';
+      if (Platform.isAndroid) {
+        AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+        deviceInfoStr = androidInfo.id;
+      } else if (Platform.isIOS) {
+        IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
+        deviceInfoStr = iosInfo.identifierForVendor != null
+            ? iosInfo.identifierForVendor as String
+            : "";
+      }
+      return deviceInfoStr;
+    } catch (e, stackTrace) {
+      ref.read(errorLoggerProvider).logException(e, stackTrace);
+      return '';
     }
-    return deviceInfoStr;
   }
 
   Future<void> signInWithGoogle(BuildContext context) async {
@@ -99,7 +108,8 @@ class AuthService {
 
         final userCredential = await _auth.signInWithCredential(credential);
       }
-    } on FirebaseAuthException catch (e) {
+    } on FirebaseAuthException catch (e, stackTrace) {
+      ref.read(errorLoggerProvider).logException(e, stackTrace);
       getSystemSnackBar(context, e.toString());
     }
   }
@@ -108,7 +118,8 @@ class AuthService {
     try {
       final appleProvider = AppleAuthProvider();
       final credential = await _auth.signInWithProvider(appleProvider);
-    } on FirebaseAuthException catch (e) {
+    } on FirebaseAuthException catch (e, stackTrace) {
+      ref.read(errorLoggerProvider).logException(e, stackTrace);
       getSystemSnackBar(context, e.toString());
     }
   }
@@ -125,7 +136,8 @@ class AuthService {
       );
     } on FirebaseAuthException catch (e) {
       getSnackBar(context, e.code);
-    } catch (e) {
+    } catch (e, stackTrace) {
+      ref.read(errorLoggerProvider).logException(e, stackTrace);
       getSystemSnackBar(context, e.toString());
     }
   }
@@ -134,7 +146,8 @@ class AuthService {
     try {
       final appleProvider = AppleAuthProvider();
       await _auth.currentUser?.reauthenticateWithProvider(appleProvider);
-    } on FirebaseAuthException catch (e) {
+    } on FirebaseAuthException catch (e, stackTrace) {
+      ref.read(errorLoggerProvider).logException(e, stackTrace);
       getSystemSnackBar(context, e.toString());
     }
   }
@@ -153,7 +166,8 @@ class AuthService {
 
         await _auth.currentUser?.reauthenticateWithCredential(credential);
       }
-    } on FirebaseAuthException catch (e) {
+    } on FirebaseAuthException catch (e, stackTrace) {
+      ref.read(errorLoggerProvider).logException(e, stackTrace);
       getSystemSnackBar(context, e.toString());
     }
   }
@@ -168,8 +182,8 @@ class AuthService {
           EmailAuthProvider.credential(email: email, password: password);
       await user.reauthenticateWithCredential(credential);
       return true;
-    } catch (e) {
-      // Handle error
+    } catch (e, stackTrace) {
+      ref.read(errorLoggerProvider).logException(e, stackTrace);
       return false;
     }
   }
@@ -180,7 +194,9 @@ class AuthService {
 
       // ref.invalidate(userNotifierProvider);
       ref.invalidate(userDocumentsNotifierProvider);
-    } catch (e) {}
+    } catch (e, stackTrace) {
+      ref.read(errorLoggerProvider).logException(e, stackTrace);
+    }
   }
 
   Future<void> deleteAccount(BuildContext context, WidgetRef ref) async {
@@ -191,7 +207,8 @@ class AuthService {
       ref.invalidate(userNotifierProvider);
 
       ref.invalidate(userDocumentsNotifierProvider);
-    } on FirebaseAuthException catch (e) {
+    } on FirebaseAuthException catch (e, stackTrace) {
+      ref.read(errorLoggerProvider).logException(e, stackTrace);
       getErrorSnackBar(context, e.code);
     }
   }
@@ -203,13 +220,19 @@ class AuthService {
       getSnackBar(context, "password-link-has-been-sent-to");
     } on FirebaseAuthException catch (e) {
       getErrorSnackBar(context, e.code);
-    } catch (e) {
+    } catch (e, stackTrace) {
+      ref.read(errorLoggerProvider).logException(e, stackTrace);
       getSystemSnackBar(context, e.toString());
     }
   }
 
   Future<User?> getUser() async {
-    return await _authRepository.currentUser;
+    try {
+      return await _authRepository.currentUser;
+    } catch (e, stackTrace) {
+      ref.read(errorLoggerProvider).logException(e, stackTrace);
+      return null;
+    }
   }
 
   Future<void> completeAccountRegiseration(
@@ -220,19 +243,23 @@ class AuthService {
     String locale,
     DateTime firstDate,
   ) async {
-    final user = await _authRepository.currentUser;
-    final fcmToken = await _fcmRepository.getMessagingToken();
-    final deviceId = await _getDeviceId();
-    await _authRepository.creatUserDocuemnt(
-      context,
-      user,
-      name,
-      dob,
-      gender,
-      locale,
-      firstDate,
-      fcmToken,
-      deviceId,
-    );
+    try {
+      final user = await _authRepository.currentUser;
+      final fcmToken = await _fcmRepository.getMessagingToken();
+      final deviceId = await _getDeviceId();
+      await _authRepository.creatUserDocuemnt(
+        context,
+        user,
+        name,
+        dob,
+        gender,
+        locale,
+        firstDate,
+        fcmToken,
+        deviceId,
+      );
+    } catch (e, stackTrace) {
+      ref.read(errorLoggerProvider).logException(e, stackTrace);
+    }
   }
 }

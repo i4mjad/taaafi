@@ -71,7 +71,7 @@ LibraryService libraryService(LibraryServiceRef ref) {
 
 @riverpod
 LibraryRepository libraryRepository(LibraryRepositoryRef ref) {
-  return LibraryRepository(FirebaseFirestore.instance);
+  return LibraryRepository(FirebaseFirestore.instance, ref);
 }
 
 @riverpod

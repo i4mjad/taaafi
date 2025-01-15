@@ -1,12 +1,15 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:reboot_app_3/core/monitoring/error_logger.dart';
 import 'package:reboot_app_3/features/shared/models/follow_up.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// Responsible for all Firestore interactions related to followUps.
 class StatisticsRepository {
   final FirebaseFirestore _firestore;
+  final Ref ref;
 
-  StatisticsRepository(this._firestore);
+  StatisticsRepository(this._firestore, this.ref);
 
   String? _getUserId() {
     return FirebaseAuth.instance.currentUser?.uid;
@@ -16,168 +19,232 @@ class StatisticsRepository {
   Future<void> createFollowUp({
     required FollowUpModel followUp,
   }) async {
-    final uid = _getUserId();
-    if (uid == null) throw Exception('User not logged in');
-    final docRef = _firestore
-        .collection('users')
-        .doc(uid)
-        .collection('followUps')
-        .doc(followUp.id);
-    await docRef.set(followUp.toMap());
+    try {
+      final uid = _getUserId();
+      if (uid == null) throw Exception('User not logged in');
+      final docRef = _firestore
+          .collection('users')
+          .doc(uid)
+          .collection('followUps')
+          .doc(followUp.id);
+      await docRef.set(followUp.toMap());
+    } catch (e, stackTrace) {
+      ref.read(errorLoggerProvider).logException(e, stackTrace);
+      rethrow;
+    }
   }
 
   /// Read a single follow-up by its ID.
   Future<FollowUpModel?> readFollowUp({
     required String followUpId,
   }) async {
-    final uid = _getUserId();
-    if (uid == null) throw Exception('User not logged in');
-    final docRef = _firestore
-        .collection('users')
-        .doc(uid)
-        .collection('followUps')
-        .doc(followUpId);
-    final doc = await docRef.get();
-    if (doc.exists) {
-      return FollowUpModel.fromDoc(doc);
+    try {
+      final uid = _getUserId();
+      if (uid == null) throw Exception('User not logged in');
+      final docRef = _firestore
+          .collection('users')
+          .doc(uid)
+          .collection('followUps')
+          .doc(followUpId);
+      final doc = await docRef.get();
+      if (doc.exists) {
+        return FollowUpModel.fromDoc(doc);
+      }
+      return null;
+    } catch (e, stackTrace) {
+      ref.read(errorLoggerProvider).logException(e, stackTrace);
+      rethrow;
     }
-    return null;
   }
 
   /// Read all follow-ups for the user.
   Future<List<FollowUpModel>> readAllFollowUps() async {
-    final uid = _getUserId();
-    if (uid == null) throw Exception('User not logged in');
-    final querySnapshot = await _firestore
-        .collection('users')
-        .doc(uid)
-        .collection('followUps')
-        .get();
-    return querySnapshot.docs.map((doc) => FollowUpModel.fromDoc(doc)).toList();
+    try {
+      final uid = _getUserId();
+      if (uid == null) throw Exception('User not logged in');
+      final querySnapshot = await _firestore
+          .collection('users')
+          .doc(uid)
+          .collection('followUps')
+          .get();
+      return querySnapshot.docs
+          .map((doc) => FollowUpModel.fromDoc(doc))
+          .toList();
+    } catch (e, stackTrace) {
+      ref.read(errorLoggerProvider).logException(e, stackTrace);
+      rethrow;
+    }
   }
 
   /// Update an existing follow-up.
   Future<void> updateFollowUp({
     required FollowUpModel followUp,
   }) async {
-    final uid = _getUserId();
-    if (uid == null) throw Exception('User not logged in');
-    final docRef = _firestore
-        .collection('users')
-        .doc(uid)
-        .collection('followUps')
-        .doc(followUp.id);
-    await docRef.update(followUp.toMap());
+    try {
+      final uid = _getUserId();
+      if (uid == null) throw Exception('User not logged in');
+      final docRef = _firestore
+          .collection('users')
+          .doc(uid)
+          .collection('followUps')
+          .doc(followUp.id);
+      await docRef.update(followUp.toMap());
+    } catch (e, stackTrace) {
+      ref.read(errorLoggerProvider).logException(e, stackTrace);
+      rethrow;
+    }
   }
 
   /// Delete a single follow-up by its ID.
   Future<void> deleteFollowUp({
     required String followUpId,
   }) async {
-    final uid = _getUserId();
-    if (uid == null) throw Exception('User not logged in');
-    final docRef = _firestore
-        .collection('users')
-        .doc(uid)
-        .collection('followUps')
-        .doc(followUpId);
-    await docRef.delete();
+    try {
+      final uid = _getUserId();
+      if (uid == null) throw Exception('User not logged in');
+      final docRef = _firestore
+          .collection('users')
+          .doc(uid)
+          .collection('followUps')
+          .doc(followUpId);
+      await docRef.delete();
+    } catch (e, stackTrace) {
+      ref.read(errorLoggerProvider).logException(e, stackTrace);
+      rethrow;
+    }
   }
 
   /// Delete the entire `followUps` sub-collection for the user.
   Future<void> deleteAllFollowUps() async {
-    final uid = _getUserId();
-    if (uid == null) throw Exception('User not logged in');
-    final collectionRef =
-        _firestore.collection('users').doc(uid).collection('followUps');
-    final querySnapshot = await collectionRef.get();
-    for (var doc in querySnapshot.docs) {
-      await doc.reference.delete();
+    try {
+      final uid = _getUserId();
+      if (uid == null) throw Exception('User not logged in');
+      final collectionRef =
+          _firestore.collection('users').doc(uid).collection('followUps');
+      final querySnapshot = await collectionRef.get();
+      for (var doc in querySnapshot.docs) {
+        await doc.reference.delete();
+      }
+    } catch (e, stackTrace) {
+      ref.read(errorLoggerProvider).logException(e, stackTrace);
+      rethrow;
     }
   }
 
   Future<DateTime> getUserFirstDate() async {
-    final uid = _getUserId();
-    if (uid == null) throw Exception('User not logged in');
-    final docRef = _firestore.collection('users').doc(uid);
-    final doc = await docRef.get();
-    if (doc.exists) {
-      final data = doc.data();
-      if (data != null && data.containsKey('userFirstDate')) {
-        return (data['userFirstDate'] as Timestamp).toDate();
+    try {
+      final uid = _getUserId();
+      if (uid == null) throw Exception('User not logged in');
+      final docRef = _firestore.collection('users').doc(uid);
+      final doc = await docRef.get();
+      if (doc.exists) {
+        final data = doc.data();
+        if (data != null && data.containsKey('userFirstDate')) {
+          return (data['userFirstDate'] as Timestamp).toDate();
+        }
       }
+      throw Exception('User first date not found');
+    } catch (e, stackTrace) {
+      ref.read(errorLoggerProvider).logException(e, stackTrace);
+      rethrow;
     }
-    throw Exception('User first date not found');
   }
 
   /// Calculate the total number of follow-ups for the user.
   Future<int> calculateTotalFollowUps() async {
-    final followUps = await readAllFollowUps();
-    return followUps.length;
+    try {
+      final followUps = await readAllFollowUps();
+      return followUps.length;
+    } catch (e, stackTrace) {
+      ref.read(errorLoggerProvider).logException(e, stackTrace);
+      rethrow;
+    }
   }
 
   /// Calculate the days without relapse.
   Future<int> calculateDaysWithoutRelapse() async {
-    final userFirstDate = await getUserFirstDate();
-    final allFollowUps = await readAllFollowUps();
-    final relapseFollowUps = allFollowUps
-        .where((followUp) => followUp.type == FollowUpType.relapse)
-        .toList();
+    try {
+      final userFirstDate = await getUserFirstDate();
+      final allFollowUps = await readAllFollowUps();
+      final relapseFollowUps = allFollowUps
+          .where((followUp) => followUp.type == FollowUpType.relapse)
+          .toList();
 
-    int daysWithoutRelapses = 0;
-    DateTime currentDate = _onlyDate(userFirstDate);
+      int daysWithoutRelapses = 0;
+      DateTime currentDate = _onlyDate(userFirstDate);
 
-    while (currentDate.isBefore(DateTime.now())) {
-      final hasRelapse = relapseFollowUps
-          .any((followUp) => _onlyDate(followUp.time) == currentDate);
-      if (!hasRelapse) {
-        daysWithoutRelapses++;
+      while (currentDate.isBefore(DateTime.now())) {
+        final hasRelapse = relapseFollowUps
+            .any((followUp) => _onlyDate(followUp.time) == currentDate);
+        if (!hasRelapse) {
+          daysWithoutRelapses++;
+        }
+        currentDate = currentDate.add(Duration(days: 1));
       }
-      currentDate = currentDate.add(Duration(days: 1));
-    }
 
-    return daysWithoutRelapses;
+      return daysWithoutRelapses;
+    } catch (e, stackTrace) {
+      ref.read(errorLoggerProvider).logException(e, stackTrace);
+      rethrow;
+    }
   }
 
   /// Calculate the number of days from the first date until today that do not have any follow-up of type relapse.
   Future<int> calculateDaysWithoutRelapses() async {
-    final userFirstDate = await getUserFirstDate();
-    final allFollowUps = await readAllFollowUps();
-    final relapseFollowUps = allFollowUps
-        .where((followUp) => followUp.type == FollowUpType.relapse)
-        .toList();
+    try {
+      final userFirstDate = await getUserFirstDate();
+      final allFollowUps = await readAllFollowUps();
+      final relapseFollowUps = allFollowUps
+          .where((followUp) => followUp.type == FollowUpType.relapse)
+          .toList();
 
-    int daysWithoutRelapses = 0;
-    DateTime currentDate = _onlyDate(userFirstDate);
+      int daysWithoutRelapses = 0;
+      DateTime currentDate = _onlyDate(userFirstDate);
 
-    while (currentDate.isBefore(DateTime.now())) {
-      final hasRelapse = relapseFollowUps
-          .any((followUp) => _onlyDate(followUp.time) == currentDate);
-      if (!hasRelapse) {
-        daysWithoutRelapses++;
+      while (currentDate.isBefore(DateTime.now())) {
+        final hasRelapse = relapseFollowUps
+            .any((followUp) => _onlyDate(followUp.time) == currentDate);
+        if (!hasRelapse) {
+          daysWithoutRelapses++;
+        }
+        currentDate = currentDate.add(Duration(days: 1));
       }
-      currentDate = currentDate.add(Duration(days: 1));
-    }
 
-    return daysWithoutRelapses;
+      return daysWithoutRelapses;
+    } catch (e, stackTrace) {
+      ref.read(errorLoggerProvider).logException(e, stackTrace);
+      rethrow;
+    }
   }
 
   Future<List<FollowUpModel>> readFollowUpsByType(FollowUpType type) async {
-    final uid = _getUserId();
-    if (uid == null) throw Exception('User not logged in');
-    final querySnapshot = await _firestore
-        .collection('users')
-        .doc(uid)
-        .collection('followUps')
-        .where('type', isEqualTo: type.name)
-        .get();
-    return querySnapshot.docs.map((doc) => FollowUpModel.fromDoc(doc)).toList();
+    try {
+      final uid = _getUserId();
+      if (uid == null) throw Exception('User not logged in');
+      final querySnapshot = await _firestore
+          .collection('users')
+          .doc(uid)
+          .collection('followUps')
+          .where('type', isEqualTo: type.name)
+          .get();
+      return querySnapshot.docs
+          .map((doc) => FollowUpModel.fromDoc(doc))
+          .toList();
+    } catch (e, stackTrace) {
+      ref.read(errorLoggerProvider).logException(e, stackTrace);
+      rethrow;
+    }
   }
 
   /// Calculate the total days from the user's first date.
   Future<int> calculateTotalDaysFromFirstDate() async {
-    final userFirstDate = await getUserFirstDate();
-    return DateTime.now().difference(_onlyDate(userFirstDate)).inDays;
+    try {
+      final userFirstDate = await getUserFirstDate();
+      return DateTime.now().difference(_onlyDate(userFirstDate)).inDays;
+    } catch (e, stackTrace) {
+      ref.read(errorLoggerProvider).logException(e, stackTrace);
+      rethrow;
+    }
   }
 
   /// A helper function that strips the time portion from a DateTime

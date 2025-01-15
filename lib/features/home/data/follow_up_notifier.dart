@@ -81,6 +81,6 @@ class FollowUpNotifier extends _$FollowUpNotifier {
 @Riverpod(keepAlive: true)
 FollowUpService followUpService(FollowUpServiceRef ref) {
   final firestore = FirebaseFirestore.instance;
-  final repository = FollowUpRepository(firestore);
+  final repository = FollowUpRepository(firestore, ref);
   return FollowUpService(repository);
 }

@@ -6,7 +6,7 @@ part of 'follow_up_notifier.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$followUpServiceHash() => r'7ccd2d00203752adf99ee2e2824451649369b73e';
+String _$followUpServiceHash() => r'39d8733ce0b0195e1201784890f539af2b528339';
 
 /// See also [followUpService].
 @ProviderFor(followUpService)

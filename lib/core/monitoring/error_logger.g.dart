@@ -1,24 +1,24 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'app_routes.dart';
+part of 'error_logger.dart';
 
 // **************************************************************************
 // RiverpodGenerator
 // **************************************************************************
 
-String _$goRouterHash() => r'11fa429afc47464127667a7dea961e4a1704a775';
+String _$errorLoggerHash() => r'a303f2fd073af926d8e2e54e2f7e8ecb843401e9';
 
-/// See also [goRouter].
-@ProviderFor(goRouter)
-final goRouterProvider = AutoDisposeProvider<GoRouter>.internal(
-  goRouter,
-  name: r'goRouterProvider',
+/// See also [errorLogger].
+@ProviderFor(errorLogger)
+final errorLoggerProvider = Provider<ErrorLogger>.internal(
+  errorLogger,
+  name: r'errorLoggerProvider',
   debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product') ? null : _$goRouterHash,
+      const bool.fromEnvironment('dart.vm.product') ? null : _$errorLoggerHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
 
-typedef GoRouterRef = AutoDisposeProviderRef<GoRouter>;
+typedef ErrorLoggerRef = ProviderRef<ErrorLogger>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

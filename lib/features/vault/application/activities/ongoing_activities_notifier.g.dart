@@ -7,7 +7,7 @@ part of 'ongoing_activities_notifier.dart';
 // **************************************************************************
 
 String _$ongoingActivitiesNotifierHash() =>
-    r'f3d2da93ed870b7f91752d0e817d020a7d702563';
+    r'c37a23d64919a4fe7c8cdf8da8289863e10abe79';
 
 /// See also [OngoingActivitiesNotifier].
 @ProviderFor(OngoingActivitiesNotifier)

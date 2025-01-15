@@ -107,7 +107,7 @@ class StatisticsNotifier extends _$StatisticsNotifier {
 @Riverpod(keepAlive: true)
 StatisticsService statisticsService(StatisticsServiceRef ref) {
   final firestore = FirebaseFirestore.instance;
-  final repository = StatisticsRepository(firestore);
+  final repository = StatisticsRepository(firestore, ref);
   return StatisticsService(repository);
 }
 
