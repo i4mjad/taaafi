@@ -144,7 +144,6 @@ class _UpdateOngoingActivitySheetState
       //   Navigator.pop(context);
       // }
 
-      //TODO: clear the scedhuled notifications for this activity
       await NotificationsScheduler.instance
           .cancelNotificationsForActivity(widget.ongoingActivityId);
 

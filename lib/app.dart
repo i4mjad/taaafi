@@ -8,6 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:force_update_helper/force_update_helper.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/monitoring/analytics_facade.dart';
+import 'package:reboot_app_3/core/monitoring/error_logger.dart';
 import 'package:reboot_app_3/core/routing/app_routes.dart';
 import 'package:reboot_app_3/core/routing/app_startup.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
@@ -92,8 +93,7 @@ class MyApp extends ConsumerWidget with WidgetsBindingObserver {
                     );
               },
               onException: (e, st) {
-                // TODO: add this later
-                // ref.read(errorLoggerProvider).logException(e, st);
+                ref.read(errorLoggerProvider).logException(e, st);
               },
               child: child!,
             ),
