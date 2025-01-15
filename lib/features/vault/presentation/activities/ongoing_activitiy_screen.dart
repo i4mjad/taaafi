@@ -200,9 +200,29 @@ class OngoingActivityPerformanceWidget extends StatelessWidget {
     return groupedTasks;
   }
 
+  List<ActivityTask> _sortTasksByFrequency(List<ActivityTask> tasks) {
+    tasks.sort((a, b) {
+      int frequencyOrder(TaskFrequency frequency) {
+        switch (frequency) {
+          case TaskFrequency.daily:
+            return 0;
+          case TaskFrequency.weekly:
+            return 1;
+          case TaskFrequency.monthly:
+            return 2;
+        }
+      }
+
+      return frequencyOrder(a.frequency).compareTo(frequencyOrder(b.frequency));
+    });
+
+    return tasks;
+  }
+
   @override
   Widget build(BuildContext context) {
     final groupedTasks = _groupTasksByActivityTask();
+    final sortedTasks = _sortTasksByFrequency(groupedTasks.keys.toList());
     final theme = AppTheme.of(context);
 
     return Column(
@@ -216,10 +236,10 @@ class OngoingActivityPerformanceWidget extends StatelessWidget {
         ListView.separated(
           shrinkWrap: true,
           physics: NeverScrollableScrollPhysics(),
-          itemCount: groupedTasks.length,
+          itemCount: sortedTasks.length,
           separatorBuilder: (_, __) => verticalSpace(Spacing.points16),
           itemBuilder: (context, index) {
-            final activityTask = groupedTasks.keys.elementAt(index);
+            final activityTask = sortedTasks[index];
             final scheduledInstances = groupedTasks[activityTask]!;
 
             return Column(

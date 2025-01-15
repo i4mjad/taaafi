@@ -155,11 +155,11 @@ class ActivityListItem extends ConsumerWidget {
 
   Color _getDifficultyColor(Difficulty difficulty, CustomThemeData theme) {
     switch (difficulty) {
-      case Difficulty.easy:
+      case Difficulty.starter:
         return theme.success[700]!;
-      case Difficulty.medium:
-        return theme.warn[500]!;
       case Difficulty.intermediate:
+        return theme.warn[500]!;
+      case Difficulty.advanced:
         return theme.error[800]!;
     }
   }

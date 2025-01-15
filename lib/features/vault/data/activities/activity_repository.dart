@@ -243,8 +243,20 @@ class ActivityRepository {
   List<DateTime> _generateScheduledDates(
       DateTime startDate, int periodInDays, TaskFrequency frequency) {
     final dates = <DateTime>[];
-    var currentDate = startDate;
+    DateTime currentDate;
     final endDate = startDate.add(Duration(days: periodInDays));
+
+    // Set initial date based on frequency
+    switch (frequency) {
+      case TaskFrequency.daily:
+        currentDate = startDate;
+      case TaskFrequency.weekly:
+        // Start after a week from the start date
+        currentDate = startDate.add(const Duration(days: 7));
+      case TaskFrequency.monthly:
+        // Start after a month from the start date
+        currentDate = startDate.add(const Duration(days: 30));
+    }
 
     while (currentDate.isBefore(endDate)) {
       dates.add(currentDate);

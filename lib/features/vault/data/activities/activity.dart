@@ -1,7 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:reboot_app_3/features/vault/data/activities/activity_task.dart';
 
-enum Difficulty { easy, medium, intermediate }
+enum Difficulty {
+  starter,
+  intermediate,
+  advanced,
+}
 
 class Activity {
   final String id;
@@ -35,12 +39,12 @@ class Activity {
 
   static Difficulty _difficultyFromString(String difficulty) {
     switch (difficulty.toLowerCase()) {
-      case 'easy':
-        return Difficulty.easy;
-      case 'medium':
-        return Difficulty.medium;
+      case 'starter':
+        return Difficulty.starter;
       case 'intermediate':
         return Difficulty.intermediate;
+      case 'advanced':
+        return Difficulty.advanced;
       default:
         throw ArgumentError('Invalid difficulty: $difficulty');
     }
