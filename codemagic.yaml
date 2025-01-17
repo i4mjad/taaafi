@@ -37,8 +37,8 @@ workflows:
           shorebird release android --flavor prod --flutter-version=3.24.3 \
             --build-name=$VERSION \
             --build-number=$BUILD_NUMBER \
-            -PVERSION_CODE=$BUILD_NUMBER \
-            -PVERSION_NAME="$BUILD_NUMBER ($VERSION)"
+            -VERSION_CODE=$BUILD_NUMBER \
+            -VERSION_NAME="$BUILD_NUMBER ($VERSION)"
 
     artifacts:
       - build/**/outputs/**/*.aab
