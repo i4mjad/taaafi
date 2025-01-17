@@ -53,6 +53,7 @@ workflows:
       google_play:
         credentials: $GCLOUD_SERVICE_ACCOUNT_CREDENTIALS
         track: closed
+        changes_not_sent_for_review: true
         submit_as_draft: true
 
   ios-release-workflow:
