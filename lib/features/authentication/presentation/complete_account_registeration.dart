@@ -61,9 +61,9 @@ class _CompleteAccountRegisterationScreenState
   Future<void> _selectDob(BuildContext context, String language) async {
     DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: DateTime(2012),
-      firstDate: DateTime(1950),
-      lastDate: DateTime(2012),
+      initialDate: DateTime.now(),
+      firstDate: DateTime(1960),
+      lastDate: DateTime.now(),
     );
 
     if (picked != null) {

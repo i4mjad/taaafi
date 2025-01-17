@@ -70,7 +70,7 @@ flavorizr:
   flavors:
     prod:
       app:
-        name: "Ta'aafi Platform"
+        name: "Taaafi Platform"
       android:
         applicationId: "com.amjadkhalfan.reboot_app_3"  
       ios:

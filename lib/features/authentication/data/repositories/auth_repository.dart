@@ -81,9 +81,10 @@ class AuthRepository {
           );
 
       final documentExist = await isUserDocumentExist();
-      if (documentExist == true) {
-        context.goNamed(RouteNames.home.name);
-      }
+      // TODO: test this and make sure it works
+      // if (documentExist == true) {
+      //   context.goNamed(RouteNames.home.name);
+      // }
     } catch (e, stackTrace) {
       ref.read(errorLoggerProvider).logException(e, stackTrace);
     }
