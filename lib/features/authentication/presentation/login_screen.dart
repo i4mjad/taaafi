@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -12,10 +13,12 @@ import 'package:reboot_app_3/core/routing/route_names.dart';
 import 'package:reboot_app_3/core/shared_widgets/app_bar.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
 import 'package:reboot_app_3/core/shared_widgets/custom_textfield.dart';
+import 'package:reboot_app_3/core/shared_widgets/snackbar.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/features/authentication/application/auth_service.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 
 class LogInScreen extends ConsumerWidget {
   const LogInScreen({super.key});
@@ -68,9 +71,18 @@ class LogInScreen extends ConsumerWidget {
                 children: [
                   GestureDetector(
                     onTap: () async {
+                      if (!Platform.isIOS) {
+                        getErrorSnackBar(context, "cannot-login-with-apple");
+                        return;
+                      }
                       unawaited(
                           ref.read(analyticsFacadeProvider).trackUserLogin());
-                      await authService.signInWithApple(context);
+                      final user = await authService.signInWithApple(context);
+                      if (user != null) {
+                        await Sentry.configureScope(
+                          (scope) => scope.setUser(SentryUser(id: user.uid)),
+                        );
+                      }
                     },
                     child: Container(
                       height: 60,
@@ -94,7 +106,12 @@ class LogInScreen extends ConsumerWidget {
                     onTap: () async {
                       unawaited(
                           ref.read(analyticsFacadeProvider).trackUserLogin());
-                      await authService.signInWithGoogle(context);
+                      final user = await authService.signInWithGoogle(context);
+                      if (user != null) {
+                        await Sentry.configureScope(
+                          (scope) => scope.setUser(SentryUser(id: user.uid)),
+                        );
+                      }
                     },
                     child: Container(
                       height: 60,
@@ -214,11 +231,16 @@ class _SignInFormState extends ConsumerState<SignInForm> {
 
               if (_formKey.currentState!.validate()) {
                 unawaited(ref.read(analyticsFacadeProvider).trackUserLogin());
-                await authService.signInWithEmail(
+                final user = await authService.signInWithEmail(
                   context,
                   email,
                   password,
                 );
+                if (user != null) {
+                  await Sentry.configureScope(
+                    (scope) => scope.setUser(SentryUser(id: user.uid)),
+                  );
+                }
               }
             },
             child: WidgetsContainer(

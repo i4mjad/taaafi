@@ -22,7 +22,8 @@ Future<void> runMainApp() async {
 
   // * Preload MixpanelAnalyticsClient, so we can make unawaited analytics calls
   await container.read(mixpanelAnalyticsClientProvider.future);
-
+  // * Preload SentryUserInit
+  await container.read(sentryUserInitProvider.future);
   //Initialize Notification settings
   await MessagingService.instance.init();
 

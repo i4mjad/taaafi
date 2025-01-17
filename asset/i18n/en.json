@@ -229,6 +229,8 @@
   "delete-account-activities":"Delete Activities",
   "delete-account-activities-desc":"All activities will be deleted",
 
+  "cannot-login-with-apple":"You can't login with Apple",
+
   "logged-out-successfully": "Logged out successfully",
   "data-updated-successfully": "Data updated successfully",
   "followups":"Followups",

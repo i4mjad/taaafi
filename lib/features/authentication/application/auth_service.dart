@@ -94,7 +94,7 @@ class AuthService {
     }
   }
 
-  Future<void> signInWithGoogle(BuildContext context) async {
+  Future<User?> signInWithGoogle(BuildContext context) async {
     try {
       final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
       final GoogleSignInAuthentication googleAuth =
@@ -107,38 +107,45 @@ class AuthService {
         );
 
         final userCredential = await _auth.signInWithCredential(credential);
+        return userCredential.user;
       }
+      return null;
     } on FirebaseAuthException catch (e, stackTrace) {
       ref.read(errorLoggerProvider).logException(e, stackTrace);
       getSystemSnackBar(context, e.toString());
+      return null;
     }
   }
 
-  Future<void> signInWithApple(BuildContext context) async {
+  Future<User?> signInWithApple(BuildContext context) async {
     try {
       final appleProvider = AppleAuthProvider();
       final credential = await _auth.signInWithProvider(appleProvider);
+      return credential.user;
     } on FirebaseAuthException catch (e, stackTrace) {
       ref.read(errorLoggerProvider).logException(e, stackTrace);
       getSystemSnackBar(context, e.toString());
+      return null;
     }
   }
 
-  Future<void> signInWithEmail(
+  Future<User?> signInWithEmail(
     BuildContext context,
     String emailAddress,
     String password,
   ) async {
     try {
-      await _auth.signInWithEmailAndPassword(
+      final userCredential = await _auth.signInWithEmailAndPassword(
         email: emailAddress,
         password: password,
       );
+      return userCredential.user;
     } on FirebaseAuthException catch (e) {
       getSnackBar(context, e.code);
+      return null;
     } catch (e, stackTrace) {
       ref.read(errorLoggerProvider).logException(e, stackTrace);
-      getSystemSnackBar(context, e.toString());
+      return null;
     }
   }
 

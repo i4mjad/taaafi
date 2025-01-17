@@ -52,7 +52,7 @@ GoRouter goRouter(GoRouterRef ref) {
     debugLogDiagnostics: false,
     observers: [
       GoRouterObserver(ref.read(analyticsFacadeProvider)),
-      SentryNavigatorObserver(),
+      SentryNavigatorObserver()
     ],
     refreshListenable: GoRouterRefreshStream(authStateChanges(ref)),
     redirect: (context, state) async {
@@ -65,7 +65,7 @@ GoRouter goRouter(GoRouterRef ref) {
         final userDocument = userDocumentState.valueOrNull;
 
         // If document is null or has errors, redirect to complete account registration
-        if (userDocument == null || hasError) {
+        if (isLoading == false && (userDocument == null || hasError)) {
           if (state.matchedLocation != '/completeAccountRegisteration') {
             return '/completeAccountRegisteration';
           }
@@ -82,7 +82,7 @@ GoRouter goRouter(GoRouterRef ref) {
 
         // Check if the user document is legacy or new
         final isLegacy =
-            userDocumentNotifier.isLegacyUserDocument(userDocument);
+            userDocumentNotifier.isLegacyUserDocument(userDocument!);
         final isNew = userDocumentNotifier.isNewUserDocument(userDocument);
 
         // Check for missing required data
@@ -189,6 +189,7 @@ GoRouter goRouter(GoRouterRef ref) {
           StatefulShellBranch(
             observers: [
               GoRouterObserver(ref.read(analyticsFacadeProvider)),
+              SentryNavigatorObserver()
             ],
             navigatorKey: shellNavigatorHomeKey,
             routes: [
@@ -218,6 +219,7 @@ GoRouter goRouter(GoRouterRef ref) {
             navigatorKey: shellNavigatorVaultKey,
             observers: [
               GoRouterObserver(ref.read(analyticsFacadeProvider)),
+              SentryNavigatorObserver()
             ],
             routes: [
               GoRoute(
@@ -383,6 +385,7 @@ GoRouter goRouter(GoRouterRef ref) {
             navigatorKey: shellNavigatorAccountKey,
             observers: [
               GoRouterObserver(ref.read(analyticsFacadeProvider)),
+              SentryNavigatorObserver()
             ],
             routes: [
               GoRoute(
