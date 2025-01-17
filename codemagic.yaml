@@ -34,7 +34,7 @@ workflows:
           if [ $BUILD_NUMBER -lt 10 ]; then
             BUILD_NUMBER="0$BUILD_NUMBER"
           fi
-          shorebird release android --flavor prod --flutter-version=3.24.3 --release \
+          shorebird release android --flavor prod --flutter-version=3.24.3  \
             --build-name=$VERSION \
             --build-number=$BUILD_NUMBER \
             -PVERSION_CODE=$BUILD_NUMBER \
