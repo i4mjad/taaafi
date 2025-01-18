@@ -5,9 +5,9 @@ import 'package:flutter_quill/quill_delta.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
+import 'package:reboot_app_3/core/shared_widgets/app_bar.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
-import 'package:reboot_app_3/core/theming/custom_theme_data.dart';
 import 'package:reboot_app_3/core/theming/font_weights.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
@@ -110,7 +110,25 @@ class _DiaryScreenState extends ConsumerState<DiaryScreen> {
 
         return Scaffold(
             backgroundColor: theme.backgroundColor,
-            appBar: _appBar(diary, theme),
+            appBar:
+                plainAppBar(context, ref, diary.title, false, true, actions: [
+              Padding(
+                padding: const EdgeInsets.only(left: 16, right: 16),
+                child: GestureDetector(
+                  onTap: () async {
+                    setState(() => _isSettingsSheetOpen = true);
+                    await showModalBottomSheet<void>(
+                      context: context,
+                      isScrollControlled: true,
+                      builder: (BuildContext context) {
+                        return DiarySettingsSheet(diary);
+                      },
+                    );
+                  },
+                  child: Icon(LucideIcons.settings),
+                ),
+              ),
+            ]),
             body: SafeArea(
               child: AbsorbPointer(
                 absorbing: _isSettingsSheetOpen,
@@ -482,53 +500,6 @@ class _DiaryScreenState extends ConsumerState<DiaryScreen> {
           child: Text('Error: $error'),
         ),
       ),
-    );
-  }
-
-  AppBar _appBar(Diary diary, CustomThemeData theme) {
-    return AppBar(
-      title: Text(
-        diary.title == ""
-            ? AppLocalizations.of(context).translate('new-diary')
-            : diary.title,
-        style: TextStyles.h5.copyWith(
-          color: theme.grey[900],
-          height: 1.2,
-        ),
-        maxLines: 2,
-        softWrap: true,
-        overflow: TextOverflow.visible,
-      ),
-      backgroundColor: theme.backgroundColor,
-      surfaceTintColor: theme.backgroundColor,
-      centerTitle: false,
-      shadowColor: theme.grey[100],
-      leadingWidth: 16,
-      automaticallyImplyLeading: true,
-      actions: [
-        GestureDetector(
-          onTap: () async {
-            setState(() => _isSettingsSheetOpen = true);
-            // todo : experiment with this
-
-            await showModalBottomSheet<void>(
-              context: context,
-              isScrollControlled: true,
-              isDismissible: false,
-              enableDrag: false,
-              useSafeArea: true,
-              builder: (BuildContext context) {
-                return DiarySettingsSheet(diary);
-              },
-            );
-            setState(() => _isSettingsSheetOpen = false);
-          },
-          child: Padding(
-            padding: const EdgeInsets.only(right: 16, left: 16),
-            child: Icon(LucideIcons.settings),
-          ),
-        ),
-      ],
     );
   }
 

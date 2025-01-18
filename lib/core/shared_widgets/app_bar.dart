@@ -6,8 +6,12 @@ import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 
 AppBar appBar(BuildContext context, WidgetRef ref, String? titleTranslationKey,
-    bool showLocaleChangeIcon, bool automaticallyImplyLeading) {
+    bool showLocaleChangeIcon, bool automaticallyImplyLeading,
+    {List<Widget>? actions}) {
   final theme = AppTheme.of(context);
+  final canPop = Navigator.of(context).canPop();
+  final showBackButton = canPop && automaticallyImplyLeading;
+
   return AppBar(
     title: Text(
       titleTranslationKey != null
@@ -22,15 +26,26 @@ AppBar appBar(BuildContext context, WidgetRef ref, String? titleTranslationKey,
     surfaceTintColor: theme.backgroundColor,
     centerTitle: false,
     shadowColor: theme.grey[100],
-    actions: loadedActions(ref, showLocaleChangeIcon),
-    leadingWidth: 16,
-    automaticallyImplyLeading: automaticallyImplyLeading,
+    actions: loadedActions(ref, showLocaleChangeIcon, actions),
+    leading: showBackButton
+        ? IconButton(
+            icon: const Icon(Icons.arrow_back),
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            onPressed: () => Navigator.of(context).pop(),
+          )
+        : null,
+    titleSpacing: showBackButton ? -12 : 16,
+    automaticallyImplyLeading: false,
   );
 }
 
 AppBar plainAppBar(BuildContext context, WidgetRef ref, String? title,
-    bool showLocaleChangeIcon, bool automaticallyImplyLeading) {
+    bool showLocaleChangeIcon, bool automaticallyImplyLeading,
+    {List<Widget>? actions}) {
   final theme = AppTheme.of(context);
+  final canPop = Navigator.of(context).canPop();
+  final showBackButton = canPop && automaticallyImplyLeading;
+
   return AppBar(
     title: Text(
       title != null ? title : '',
@@ -43,16 +58,23 @@ AppBar plainAppBar(BuildContext context, WidgetRef ref, String? title,
     surfaceTintColor: theme.backgroundColor,
     centerTitle: false,
     shadowColor: theme.grey[100],
-    actions: loadedActions(ref, showLocaleChangeIcon),
-    leadingWidth: 16,
-    automaticallyImplyLeading: automaticallyImplyLeading,
+    actions: loadedActions(ref, showLocaleChangeIcon, actions),
+    leading: showBackButton
+        ? IconButton(
+            icon: const Icon(Icons.arrow_back),
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            onPressed: () => Navigator.of(context).pop(),
+          )
+        : null,
+    titleSpacing: showBackButton ? -12 : 16,
+    automaticallyImplyLeading: false,
   );
 }
 
-List<Widget> loadedActions(WidgetRef ref, bool showLocaleChangeIcon) {
-  List<Widget> widgets = [];
+List<Widget> loadedActions(
+    WidgetRef ref, bool showLocaleChangeIcon, List<Widget>? actions) {
   if (showLocaleChangeIcon) {
-    widgets.add(
+    actions?.add(
       GestureDetector(
         onTap: () {
           ref.watch(localeNotifierProvider.notifier).toggleLocale();
@@ -66,23 +88,5 @@ List<Widget> loadedActions(WidgetRef ref, bool showLocaleChangeIcon) {
       ),
     );
   }
-  return widgets;
+  return actions ?? [];
 }
-
-
-
-//TODO: check this later
-// class MyAppBar extends ConsumerWidget implements PreferredSizeWidget {
-//   const MyAppBar({super.key});
-
-//   @override
-//   Widget build(BuildContext context,WidgetRef ref) {
-//     return Padding(
-//       padding: EdgeInsets.only(left: 10,right:10),//adjust the padding as you want
-//       child: appBar(), //or row/any widget
-//     );
-//   }
-
-//   @override
-//   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
-// }

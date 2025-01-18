@@ -2,9 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:reboot_app_3/core/monitoring/error_logger.dart';
-import 'package:reboot_app_3/core/routing/route_names.dart';
 import 'package:reboot_app_3/features/authentication/application/migration_service.dart';
 import 'package:reboot_app_3/features/authentication/data/models/user_document.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -79,12 +77,6 @@ class AuthRepository {
       await _firestore.collection("users").doc(userDocument.uid).set(
             userDocument.toFirestore(),
           );
-
-      final documentExist = await isUserDocumentExist();
-      // TODO: test this and make sure it works
-      // if (documentExist == true) {
-      //   context.goNamed(RouteNames.home.name);
-      // }
     } catch (e, stackTrace) {
       ref.read(errorLoggerProvider).logException(e, stackTrace);
     }

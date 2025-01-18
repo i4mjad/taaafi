@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/helpers/date_display_formater.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
+import 'package:reboot_app_3/core/shared_widgets/app_bar.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/custom_theme_data.dart';
@@ -30,10 +31,36 @@ class OngoingActivitiyScreen extends ConsumerWidget {
       data: (details) {
         return Scaffold(
           backgroundColor: theme.backgroundColor,
-          appBar: appBar(
+          appBar: plainAppBar(
             context,
             ref,
             details.activity.name,
+            false,
+            true,
+            actions: [
+              Padding(
+                padding: EdgeInsets.only(right: 16, left: 16),
+                child: Row(
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        showModalBottomSheet<void>(
+                            context: context,
+                            isScrollControlled: true,
+                            builder: (BuildContext context) {
+                              return OngoingActivitySettingsSheet(
+                                  ongoingActivityId);
+                            });
+                      },
+                      child: Icon(
+                        LucideIcons.settings,
+                        color: theme.primary[600],
+                      ),
+                    ),
+                  ],
+                ),
+              )
+            ],
           ),
           body: SafeArea(
             child: Padding(
@@ -68,51 +95,6 @@ class OngoingActivitiyScreen extends ConsumerWidget {
         backgroundColor: theme.backgroundColor,
         body: Center(child: Text(error.toString())),
       ),
-    );
-  }
-
-  AppBar appBar(
-    BuildContext context,
-    WidgetRef ref,
-    String title,
-  ) {
-    final theme = AppTheme.of(context);
-    return AppBar(
-      title: Text(
-        title,
-        style: TextStyles.screenHeadding.copyWith(
-          color: theme.grey[900],
-          height: 1,
-        ),
-      ),
-      backgroundColor: theme.backgroundColor,
-      surfaceTintColor: theme.backgroundColor,
-      centerTitle: false,
-      shadowColor: theme.grey[100],
-      actions: [
-        Padding(
-          padding: EdgeInsets.only(right: 16, left: 16),
-          child: Row(
-            children: [
-              GestureDetector(
-                onTap: () {
-                  showModalBottomSheet<void>(
-                      context: context,
-                      isScrollControlled: true,
-                      builder: (BuildContext context) {
-                        return OngoingActivitySettingsSheet(ongoingActivityId);
-                      });
-                },
-                child: Icon(
-                  LucideIcons.settings,
-                  color: theme.primary[600],
-                ),
-              ),
-            ],
-          ),
-        )
-      ],
-      leadingWidth: 16,
     );
   }
 }

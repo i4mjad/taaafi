@@ -5,6 +5,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/helpers/date_display_formater.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/routing/route_names.dart';
+import 'package:reboot_app_3/core/shared_widgets/app_bar.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/custom_theme_data.dart';
@@ -26,7 +27,14 @@ class ActivitiesScreen extends ConsumerWidget {
     final height = MediaQuery.of(context).size.height;
     return Scaffold(
       backgroundColor: theme.backgroundColor,
-      appBar: appBar(context, ref, "activities"),
+      appBar: appBar(context, ref, "activities", false, true, actions: [
+        IconButton(
+          onPressed: () {
+            context.goNamed(RouteNames.addActivity.name);
+          },
+          icon: Icon(LucideIcons.plus),
+        )
+      ]),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16),
@@ -46,44 +54,6 @@ class ActivitiesScreen extends ConsumerWidget {
           ),
         ),
       ),
-    );
-  }
-
-  AppBar appBar(
-    BuildContext context,
-    WidgetRef ref,
-    String? titleTranslationKey,
-  ) {
-    final theme = AppTheme.of(context);
-    return AppBar(
-      title: Text(
-        titleTranslationKey != null
-            ? AppLocalizations.of(context).translate(titleTranslationKey)
-            : '',
-        style: TextStyles.screenHeadding.copyWith(
-          color: theme.grey[900],
-          height: 1,
-        ),
-      ),
-      backgroundColor: theme.backgroundColor,
-      surfaceTintColor: theme.backgroundColor,
-      centerTitle: false,
-      shadowColor: theme.grey[100],
-      actions: [
-        Padding(
-          padding: EdgeInsets.only(right: 16, left: 16),
-          child: GestureDetector(
-            onTap: () {
-              context.goNamed(RouteNames.addActivity.name);
-            },
-            child: Icon(
-              LucideIcons.plus,
-              color: theme.grey[900],
-            ),
-          ),
-        )
-      ],
-      leadingWidth: 16,
     );
   }
 }
