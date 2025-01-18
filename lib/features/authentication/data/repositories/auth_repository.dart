@@ -96,7 +96,7 @@ class AuthRepository {
     await ref.read(sentryUserInitProvider.future);
 
     // * add google analytics user
-    final googleAnalyticsClient = await ref.read(googleAnalyticsProvider);
+    final googleAnalyticsClient = await ref.read(firebaseAnalyticsProvider);
     googleAnalyticsClient.setUserId(id: user.uid);
   }
 
