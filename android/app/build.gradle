@@ -58,14 +58,20 @@ android {
         versionName flutterVersionName
     }
 
+    // compileOptions {
+    //     // Flag to enable support for the new language APIs
+    //     coreLibraryDesugaringEnabled true
+    //     // Sets Java compatibility to Java 8
+    //     sourceCompatibility JavaVersion.VERSION_17
+    //     targetCompatibility JavaVersion.VERSION_17
+    // }
+
     compileOptions {
-        // Flag to enable support for the new language APIs
+    // Flag to enable support for the new language APIs
         coreLibraryDesugaringEnabled true
-        // Sets Java compatibility to Java 8
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
     }
-
     kotlinOptions {
         jvmTarget = "17"
     }

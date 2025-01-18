@@ -55,9 +55,6 @@ class MessagingService {
     if (settings.authorizationStatus == AuthorizationStatus.authorized &&
         Platform.isIOS) {
       await _messaging.getAPNSToken();
-    } else {
-      print(
-          "Notification permissions not granted: ${settings.authorizationStatus}");
     }
   }
 
