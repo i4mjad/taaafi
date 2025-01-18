@@ -201,5 +201,11 @@ class GoogleAnalyticsClient implements AnalyticsClient {
 }
 
 @Riverpod(keepAlive: true)
-GoogleAnalyticsClient googleAnalyticsClient(GoogleAnalyticsClientRef ref) =>
-    GoogleAnalyticsClient(FirebaseAnalytics.instance);
+GoogleAnalyticsClient googleAnalyticsClient(GoogleAnalyticsClientRef ref) {
+  return GoogleAnalyticsClient(ref.watch(googleAnalyticsProvider));
+}
+
+@Riverpod(keepAlive: true)
+FirebaseAnalytics googleAnalytics(GoogleAnalyticsClientRef ref) {
+  return FirebaseAnalytics.instance;
+}

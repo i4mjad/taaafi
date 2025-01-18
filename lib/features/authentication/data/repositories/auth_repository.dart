@@ -3,6 +3,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:reboot_app_3/core/monitoring/error_logger.dart';
+import 'package:reboot_app_3/core/monitoring/google_analytics_client.dart';
+import 'package:reboot_app_3/core/monitoring/mixpanel_analytics_client.dart';
 import 'package:reboot_app_3/features/authentication/application/migration_service.dart';
 import 'package:reboot_app_3/features/authentication/data/models/user_document.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -74,12 +76,28 @@ class AuthRepository {
         bookmarkedContentIds: [],
       );
 
-      await _firestore.collection("users").doc(userDocument.uid).set(
-            userDocument.toFirestore(),
-          );
+      var userDocumentMap = userDocument.toFirestore();
+      await addUserIdentifierToTrackers(user);
+      await _firestore
+          .collection("users")
+          .doc(userDocument.uid)
+          .set(userDocumentMap);
     } catch (e, stackTrace) {
       ref.read(errorLoggerProvider).logException(e, stackTrace);
     }
+  }
+
+  Future<void> addUserIdentifierToTrackers(User user) async {
+    // * add mixpanel user
+    final mixPanelClient = await ref.read(mixpanelProvider.future);
+    await mixPanelClient.identify(user.uid);
+
+    // * add sentry user
+    await ref.read(sentryUserInitProvider.future);
+
+    // * add google analytics user
+    final googleAnalyticsClient = await ref.read(googleAnalyticsProvider);
+    googleAnalyticsClient.setUserId(id: user.uid);
   }
 
   Future<void> deleteUserDocument() async {

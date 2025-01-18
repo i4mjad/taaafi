@@ -83,6 +83,9 @@ class MigerationRepository {
     try {
       var updatedDocument = newDocument.toFirestore();
 
+      //TODO: add mixpanel user here
+      //TODO: add sentry user here
+      //TODO: add google analytics user here
       await docRef.set(updatedDocument, SetOptions(merge: true));
     } catch (e, stackTrace) {
       ref.read(errorLoggerProvider).logException(e, stackTrace);

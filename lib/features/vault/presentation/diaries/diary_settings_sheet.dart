@@ -344,22 +344,25 @@ class _DayActivityWidgetState extends ConsumerState<DayActivityWidget> {
             style: TextStyles.h6.copyWith(color: theme.grey[900], fontSize: 18),
           ),
           horizontalSpace(Spacing.points12),
-          Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                widget.task.task.name,
-                style: TextStyles.body.copyWith(color: theme.grey[900]),
-              ),
-              // verticalSpace(Spacing.points4),
-              Text(
-                widget.task.task.description,
-                style: TextStyles.small.copyWith(color: theme.grey[600]),
-              ),
-            ],
+          Expanded(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  widget.task.task.name,
+                  style: TextStyles.body.copyWith(color: theme.grey[900]),
+                ),
+                // verticalSpace(Spacing.points4),
+                Text(
+                  widget.task.task.description,
+                  // softWrap: true,
+                  style: TextStyles.small.copyWith(color: theme.grey[600]),
+                ),
+              ],
+            ),
           ),
-          Spacer(),
+          horizontalSpace(Spacing.points8),
           Checkbox(
             value: widget.isLinked,
             checkColor: theme.grey[50],
