@@ -12,11 +12,13 @@ import 'package:reboot_app_3/core/theming/custom_theme_data.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/core/utils/icon_mapper.dart';
+import 'package:reboot_app_3/core/utils/url_launcher_provider.dart';
 import 'package:reboot_app_3/features/vault/application/library/library_notifier.dart';
 import 'package:reboot_app_3/features/vault/data/library/latest_addition_item.dart';
 import 'package:reboot_app_3/features/vault/data/library/models/cursor_content.dart';
 import 'package:reboot_app_3/features/vault/data/library/models/cursor_content_list.dart';
 import 'package:reboot_app_3/features/vault/data/library/models/cursor_content_type.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class LibraryScreen extends ConsumerWidget {
   const LibraryScreen({super.key});
@@ -148,6 +150,7 @@ class ContentTypesWidget extends StatelessWidget {
               ),
               itemCount: content.length,
               itemBuilder: (context, index) {
+                print(content[index].name);
                 return ContentTypeWidget(content[index]);
               },
             );
@@ -258,13 +261,6 @@ class LatestAdditionsWidget extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = AppTheme.of(context);
-    final items = latestContent.map((content) {
-      return LatestAdditionItem(
-        LucideIcons.playCircle,
-        content.name,
-        content.owner.name,
-      );
-    }).toList();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -302,9 +298,9 @@ class LatestAdditionsWidget extends ConsumerWidget {
             crossAxisSpacing: 8,
             mainAxisSpacing: 8,
           ),
-          itemCount: items.length,
+          itemCount: latestContent.length,
           itemBuilder: (context, index) {
-            return LastAdditionItemWidget(items[index]);
+            return LastAdditionItemWidget(latestContent[index]);
           },
         ),
       ],
@@ -312,78 +308,86 @@ class LatestAdditionsWidget extends ConsumerWidget {
   }
 }
 
-class LastAdditionItemWidget extends StatelessWidget {
-  const LastAdditionItemWidget(this.latestAdditionItem, {super.key});
-  final LatestAdditionItem latestAdditionItem;
+class LastAdditionItemWidget extends ConsumerWidget {
+  const LastAdditionItemWidget(this.contentItem, {super.key});
+  final CursorContent contentItem;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = AppTheme.of(context);
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.start,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        WidgetsContainer(
-          backgroundColor: theme.backgroundColor,
-          borderSide: BorderSide(color: theme.grey[600]!, width: 0.25),
-          boxShadow: [
-            BoxShadow(
-              color: Color.fromRGBO(0, 0, 0, 0.1),
-              blurRadius: 5,
-              spreadRadius: 0,
-              offset: Offset(
-                0,
-                0,
-              ),
-            ),
-            BoxShadow(
-              color: Color.fromRGBO(0, 0, 0, 0.1),
-              blurRadius: 1,
-              spreadRadius: 0,
-              offset: Offset(
-                0,
-                0,
-              ),
-            ),
-          ],
-          child: Center(
-            child: Icon(
-              latestAdditionItem.icon,
-              color: theme.primary[700],
-            ),
-          ),
-        ),
-        horizontalSpace(Spacing.points8),
-        Expanded(
-          // Ensures the text uses the available width without overflowing
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // This handles long text with ellipsis and restricts it to one line
-              Text(
-                latestAdditionItem.primaryTitle,
-                style: TextStyles.footnote.copyWith(
-                  color: theme.grey[800],
+    return GestureDetector(
+      onTap: () {
+        ref.read(urlLauncherProvider).launch(
+              Uri.parse(contentItem.link),
+              mode: LaunchMode.externalApplication,
+            );
+      },
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          WidgetsContainer(
+            backgroundColor: theme.backgroundColor,
+            borderSide: BorderSide(color: theme.grey[600]!, width: 0.25),
+            boxShadow: [
+              BoxShadow(
+                color: Color.fromRGBO(0, 0, 0, 0.1),
+                blurRadius: 5,
+                spreadRadius: 0,
+                offset: Offset(
+                  0,
+                  0,
                 ),
-                maxLines: 2, // Restrict to one line
-                overflow: TextOverflow
-                    .ellipsis, // Add ellipsis at the end of the text
               ),
-              Spacer(),
-              Text(
-                latestAdditionItem.seconderyTitle,
-                style: TextStyles.small.copyWith(
-                  color: theme.grey[500],
+              BoxShadow(
+                color: Color.fromRGBO(0, 0, 0, 0.1),
+                blurRadius: 1,
+                spreadRadius: 0,
+                offset: Offset(
+                  0,
+                  0,
                 ),
-                maxLines: 1, // Restrict to one line
-                overflow:
-                    TextOverflow.ellipsis, // Add ellipsis for the subtitle
               ),
             ],
+            child: Center(
+              child: Icon(
+                IconMapper.getIconFromString(contentItem.type.iconName),
+                color: theme.primary[700],
+              ),
+            ),
           ),
-        ),
-      ],
+          horizontalSpace(Spacing.points8),
+          Expanded(
+            // Ensures the text uses the available width without overflowing
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // This handles long text with ellipsis and restricts it to one line
+                Text(
+                  contentItem.name,
+                  style: TextStyles.footnote.copyWith(
+                    color: theme.grey[800],
+                  ),
+                  maxLines: 2, // Restrict to one line
+                  overflow: TextOverflow
+                      .ellipsis, // Add ellipsis at the end of the text
+                ),
+                Spacer(),
+                Text(
+                  contentItem.owner.name,
+                  style: TextStyles.small.copyWith(
+                    color: theme.grey[500],
+                  ),
+                  maxLines: 1, // Restrict to one line
+                  overflow:
+                      TextOverflow.ellipsis, // Add ellipsis for the subtitle
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

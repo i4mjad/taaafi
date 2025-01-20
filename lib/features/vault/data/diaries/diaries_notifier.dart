@@ -26,6 +26,10 @@ class DiariesNotifier extends _$DiariesNotifier {
     }
   }
 
+  Future<List<Diary>> fetchDiariesForDate(DateTime date) async {
+    return await service.getDiariesForDate(date);
+  }
+
   Future<void> deleteAllDiaries() async {
     state = const AsyncValue.loading();
     try {

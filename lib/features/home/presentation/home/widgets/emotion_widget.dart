@@ -57,7 +57,7 @@ class EmotionWidget extends StatelessWidget {
           verticalSpace(Spacing.points8),
           Text(
             AppLocalizations.of(context).translate(emotionNameTranslationKey),
-            style: TextStyles.footnote.copyWith(color: theme.tint[900]),
+            style: TextStyles.smallBold.copyWith(color: theme.tint[900]),
           ),
         ],
       ),

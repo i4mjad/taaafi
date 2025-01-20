@@ -17,7 +17,7 @@ class HomeScreen extends ConsumerWidget {
     final theme = AppTheme.of(context);
     return Scaffold(
       backgroundColor: theme.backgroundColor,
-      appBar: appBar(context, ref, 'home', false, true),
+      appBar: appBar(context, ref, 'home', false, false),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

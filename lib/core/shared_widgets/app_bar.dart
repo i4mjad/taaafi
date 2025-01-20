@@ -29,6 +29,7 @@ AppBar appBar(BuildContext context, WidgetRef ref, String? titleTranslationKey,
     actions: loadedActions(ref, showLocaleChangeIcon, actions),
     leading: showBackButton
         ? IconButton(
+            color: theme.grey[600],
             icon: const Icon(Icons.arrow_back),
             padding: const EdgeInsets.symmetric(horizontal: 8),
             onPressed: () => Navigator.of(context).pop(),

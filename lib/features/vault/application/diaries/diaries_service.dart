@@ -10,6 +10,10 @@ class DiariesService {
     return await _repository.getDiaries();
   }
 
+  Future<List<Diary>> getDiariesForDate(DateTime date) async {
+    return await _repository.getDiariesForDate(date);
+  }
+
   Future<void> addDiary(Diary diary) async {
     await _repository.addDiary(diary);
   }

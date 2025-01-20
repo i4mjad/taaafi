@@ -36,7 +36,7 @@ class VaultScreen extends ConsumerWidget {
                 Text(
                   AppLocalizations.of(context).translate('vault'),
                   style: TextStyles.h1.copyWith(
-                    color: theme.primary[700],
+                    color: theme.grey[700],
                   ),
                 ),
                 verticalSpace(Spacing.points12),

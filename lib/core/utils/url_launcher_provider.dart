@@ -11,6 +11,7 @@ class UrlLauncher {
 
   static const _name = 'URL Launcher';
 
+// TODO: might need to show a snackbar
   Future<bool> launch(Uri uri,
       {LaunchMode mode = LaunchMode.platformDefault}) async {
     if (await canLaunchUrl(uri)) {

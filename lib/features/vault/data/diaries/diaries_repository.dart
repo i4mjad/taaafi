@@ -8,6 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 abstract class DiariesRepository {
   Future<List<Diary>> getDiaries();
+  Future<List<Diary>> getDiariesForDate(DateTime date);
   Future<void> addDiary(Diary diary);
   Future<void> updateDiary(String diaryId, Diary diary);
   Future<void> deleteDiary(String diaryId);
@@ -41,6 +42,7 @@ class FirebaseDiariesRepository implements DiariesRepository {
           .collection('users')
           .doc(_userId)
           .collection('userNotes')
+          .orderBy('timestamp', descending: true)
           .get();
 
       return snapshot.docs
@@ -253,5 +255,34 @@ class FirebaseDiariesRepository implements DiariesRepository {
       ref.read(errorLoggerProvider).logException(e, stackTrace);
       throw Exception('Failed to delete all diaries: $e');
     }
+  }
+
+  @override
+  Future<List<Diary>> getDiariesForDate(DateTime date) async {
+    final firstOfDate = DateTime(date.year, date.month, date.day, 0, 0, 0);
+    final lastOfDate = DateTime(date.year, date.month, date.day, 23, 59, 59);
+    final snapshot = await _firestore
+        .collection('users')
+        .doc(_userId)
+        .collection('userNotes')
+        .where('timestamp',
+            isGreaterThanOrEqualTo: Timestamp.fromDate(firstOfDate))
+        .where('timestamp', isLessThan: Timestamp.fromDate(lastOfDate))
+        .orderBy('timestamp', descending: true)
+        .get();
+
+    return snapshot.docs
+        .map((doc) => Diary(
+              doc.id,
+              doc.data()['title'] as String,
+              doc.data()['body'] as String, // Using body for plainText
+              (doc.data()['timestamp'] as Timestamp).toDate(),
+              formattedContent:
+                  doc.data()['formattedContent'] as List<dynamic>?,
+              updatedAt: doc.data()['updatedAt'] != null
+                  ? (doc.data()['updatedAt'] as Timestamp).toDate()
+                  : null,
+            ))
+        .toList();
   }
 }

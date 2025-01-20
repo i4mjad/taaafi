@@ -7,7 +7,7 @@ import 'package:reboot_app_3/features/vault/application/activities/activity_serv
 
 part 'providers.g.dart';
 
-@riverpod
+@Riverpod(keepAlive: true)
 ActivityRepository activityRepository(ActivityRepositoryRef ref) {
   return ActivityRepository(
     ref.watch(firestoreProvider),
@@ -17,13 +17,13 @@ ActivityRepository activityRepository(ActivityRepositoryRef ref) {
   );
 }
 
-@riverpod
+@Riverpod(keepAlive: true)
 FirebaseAuth firebaseAuth(FirebaseAuthRef ref) {
   return FirebaseAuth.instance;
 }
 
-@riverpod
-FirebaseFirestore firestore(ref) {
+@Riverpod(keepAlive: true)
+FirebaseFirestore firestore(FirestoreRef ref) {
   return FirebaseFirestore.instance;
 }
 

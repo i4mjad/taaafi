@@ -18,6 +18,8 @@ import 'package:reboot_app_3/features/home/data/models/emotion_model.dart';
 import 'package:reboot_app_3/features/home/data/models/follow_up_colors.dart';
 import 'package:reboot_app_3/features/home/presentation/home/widgets/follow_up_sheet.dart';
 import 'package:reboot_app_3/features/shared/models/follow_up.dart';
+import 'package:reboot_app_3/features/vault/data/diaries/diaries_notifier.dart';
+import 'package:reboot_app_3/features/vault/data/diaries/diary.dart';
 
 class DayOverviewScreen extends ConsumerWidget {
   final DateTime date;
@@ -41,63 +43,41 @@ class DayOverviewScreen extends ConsumerWidget {
           getDisplayDate(date, locale!.languageCode), false, true),
       backgroundColor: theme.backgroundColor,
       body: SingleChildScrollView(
-        child: Container(
-          width: MediaQuery.of(context).size.width,
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.start,
             children: [
               StreamBuilder<List<FollowUpModel>>(
                 stream: followUpsStream,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Center(child: CircularProgressIndicator()),
-                    );
+                    return const Center(child: CircularProgressIndicator());
                   } else if (snapshot.hasError) {
-                    return Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Center(child: Text('Error: ${snapshot.error}')),
-                    );
+                    return Center(child: Text('Error: ${snapshot.error}'));
                   } else {
                     final followUps = snapshot.data ?? [];
-
-                    return Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: DayFollowUps(date: date, followUps: followUps),
-                    );
+                    return DayFollowUps(date: date, followUps: followUps);
                   }
                 },
               ),
               verticalSpace(Spacing.points32),
-              Padding(
-                padding: const EdgeInsets.all(16),
-                child: DayNotes(date: date),
-              ),
+              DayNotes(date: date),
               verticalSpace(Spacing.points32),
               StreamBuilder<List<EmotionModel>>(
                 stream: emotionsStream,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Center(child: CircularProgressIndicator()),
-                    );
+                    return const Center(child: CircularProgressIndicator());
                   } else if (snapshot.hasError) {
-                    return Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Center(child: Text('Error: ${snapshot.error}')),
-                    );
+                    return Center(child: Text('Error: ${snapshot.error}'));
                   } else {
                     final emotions = snapshot.data ?? [];
-                    return Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: DayEmotions(date: date, emotions: emotions),
-                    );
+                    return DayEmotions(date: date, emotions: emotions);
                   }
                 },
               ),
+              verticalSpace(Spacing.points32),
             ],
           ),
         ),
@@ -500,41 +480,44 @@ class DailyRecordWidget extends ConsumerWidget {
 }
 
 class NoteDailyRecordWidget extends ConsumerWidget {
-  const NoteDailyRecordWidget({super.key, required this.dailyRecord});
+  const NoteDailyRecordWidget(
+      {super.key, required this.note, required this.index});
 
-  final DailyRecord dailyRecord;
+  final Diary note;
+  final int index;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = AppTheme.of(context);
     final locale = ref.watch(localeNotifierProvider);
-    return WidgetsContainer(
-      padding: EdgeInsets.all(12),
-      backgroundColor: theme.backgroundColor,
-      boxShadow: Shadows.mainShadows,
-      borderSide: BorderSide(width: 0.5, color: theme.grey[600]!),
-      borderRadius: BorderRadius.circular(8),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Container(
-            width: 16,
-            height: 16,
-            decoration: BoxDecoration(
-              color: followUpNamesColors[dailyRecord.title]!,
-              shape: BoxShape.circle,
+    return GestureDetector(
+      onTap: () => context.go("/vault/diaries/diary/${note.id}"),
+      child: WidgetsContainer(
+        padding: EdgeInsets.all(12),
+        backgroundColor: theme.backgroundColor,
+        boxShadow: Shadows.mainShadows,
+        borderSide: BorderSide(width: 0.5, color: theme.grey[600]!),
+        borderRadius: BorderRadius.circular(8),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Text(
+              index.toString(),
+              style:
+                  TextStyles.h6.copyWith(color: theme.grey[900], fontSize: 18),
             ),
-          ),
-          horizontalSpace(Spacing.points12),
-          Text(
-            AppLocalizations.of(context).translate(dailyRecord.title),
-            style: TextStyles.bodyLarge.copyWith(color: theme.grey[800]),
-          ),
-          Spacer(),
-          Text(
-            getDisplayTime(dailyRecord.time, locale!.languageCode),
-            style: TextStyles.footnoteSelected.copyWith(color: theme.grey[900]),
-          ),
-        ],
+            horizontalSpace(Spacing.points12),
+            Text(
+              note.title,
+              style: TextStyles.bodyLarge.copyWith(color: theme.grey[800]),
+            ),
+            Spacer(),
+            Text(
+              getDisplayTime(note.date, locale!.languageCode),
+              style:
+                  TextStyles.footnoteSelected.copyWith(color: theme.grey[900]),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -577,7 +560,7 @@ class EmotionDailyRecordWidget extends ConsumerWidget {
   }
 }
 
-class DayNotes extends StatelessWidget {
+class DayNotes extends ConsumerWidget {
   const DayNotes({
     super.key,
     required this.date,
@@ -586,12 +569,9 @@ class DayNotes extends StatelessWidget {
   final DateTime date;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = AppTheme.of(context);
-    var records = [
-      DailyRecord("", "1", 'يوميات', date),
-      DailyRecord("", "2", 'تأملات', date),
-    ];
+    final records = ref.watch(diariesNotifierProvider.notifier);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.start,
@@ -601,79 +581,67 @@ class DayNotes extends StatelessWidget {
           style: TextStyles.h6,
         ),
         verticalSpace(Spacing.points12),
-        Builder(builder: (BuildContext context) {
-          final noData = true;
-          // ignore: dead_code
-          if (noData) {
-            return Column(
-              children: [
-                Container(
-                  width: MediaQuery.of(context).size.width - 32,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        AppLocalizations.of(context).translate('no-notes'),
-                        style: TextStyles.footnote,
-                      )
-                    ],
-                  ),
-                ),
-                verticalSpace(Spacing.points12),
-                GestureDetector(
-                  onTap: () => context.goNamed(RouteNames.diaries.name),
-                  child: WidgetsContainer(
-                    backgroundColor: theme.backgroundColor,
-                    borderSide:
-                        BorderSide(color: theme.grey[900]!, width: 0.25),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Color.fromRGBO(9, 30, 66, 0.25),
-                        blurRadius: 8,
-                        spreadRadius: -2,
-                        offset: Offset(
-                          0,
-                          4,
-                        ),
-                      ),
-                      BoxShadow(
-                        color: Color.fromRGBO(9, 30, 66, 0.08),
-                        blurRadius: 0,
-                        spreadRadius: 1,
-                        offset: Offset(
-                          0,
-                          0,
-                        ),
-                      ),
-                    ],
-                    child: Center(
-                      child: Text(
-                        AppLocalizations.of(context).translate('add-note'),
-                        style: TextStyles.h6.copyWith(color: theme.tint[700]),
+        FutureBuilder<List<Diary>>(
+          future: records.fetchDiariesForDate(date),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (snapshot.hasError) {
+              return Center(child: Text('Error: ${snapshot.error}'));
+            } else {
+              final records = snapshot.data ?? [];
+              if (records.isEmpty) {
+                return Column(
+                  children: [
+                    Container(
+                      width: MediaQuery.of(context).size.width - 32,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            AppLocalizations.of(context).translate('no-notes'),
+                            style: TextStyles.footnote,
+                          )
+                        ],
                       ),
                     ),
-                  ),
-                ),
-              ],
-            );
-            // ignore: dead_code
-          } else {
-            return ListView.separated(
-              shrinkWrap:
-                  true, // This makes the ListView take up only the needed space
-              physics: NeverScrollableScrollPhysics(),
-              itemBuilder: (BuildContext context, int index) {
-                return NoteDailyRecordWidget(
-                  dailyRecord: records[index],
+                    verticalSpace(Spacing.points12),
+                    GestureDetector(
+                      onTap: () => context.goNamed(RouteNames.diaries.name),
+                      child: WidgetsContainer(
+                        backgroundColor: theme.backgroundColor,
+                        borderSide:
+                            BorderSide(color: theme.grey[900]!, width: 0.25),
+                        boxShadow: Shadows.mainShadows,
+                        child: Center(
+                          child: Text(
+                            AppLocalizations.of(context).translate('add-note'),
+                            style:
+                                TextStyles.h6.copyWith(color: theme.tint[700]),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 );
-              },
-              separatorBuilder: (BuildContext context, int index) =>
-                  verticalSpace(Spacing.points8),
-              itemCount: records.length,
-            );
-          }
-        }),
+              } else {
+                return ListView.separated(
+                  shrinkWrap: true,
+                  physics: NeverScrollableScrollPhysics(),
+                  itemBuilder: (BuildContext context, int index) {
+                    final record = records[index];
+                    return NoteDailyRecordWidget(
+                        note: record, index: index + 1);
+                  },
+                  separatorBuilder: (BuildContext context, int index) =>
+                      verticalSpace(Spacing.points8),
+                  itemCount: records.length,
+                );
+              }
+            }
+          },
+        ),
       ],
     );
   }

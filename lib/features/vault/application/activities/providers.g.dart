@@ -7,12 +7,11 @@ part of 'providers.dart';
 // **************************************************************************
 
 String _$activityRepositoryHash() =>
-    r'5379e0ff6555b845700abf5913c39d372551214a';
+    r'51e136acf3d6521702b06237e2343c0adb3073b0';
 
 /// See also [activityRepository].
 @ProviderFor(activityRepository)
-final activityRepositoryProvider =
-    AutoDisposeProvider<ActivityRepository>.internal(
+final activityRepositoryProvider = Provider<ActivityRepository>.internal(
   activityRepository,
   name: r'activityRepositoryProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
@@ -22,12 +21,12 @@ final activityRepositoryProvider =
   allTransitiveDependencies: null,
 );
 
-typedef ActivityRepositoryRef = AutoDisposeProviderRef<ActivityRepository>;
-String _$firebaseAuthHash() => r'7791bf70ce0f01bf991a53a76abc915478673c0b';
+typedef ActivityRepositoryRef = ProviderRef<ActivityRepository>;
+String _$firebaseAuthHash() => r'46c40b7c5cf8ab936c0daa96a6af106bd2ae5d51';
 
 /// See also [firebaseAuth].
 @ProviderFor(firebaseAuth)
-final firebaseAuthProvider = AutoDisposeProvider<FirebaseAuth>.internal(
+final firebaseAuthProvider = Provider<FirebaseAuth>.internal(
   firebaseAuth,
   name: r'firebaseAuthProvider',
   debugGetCreateSourceHash:
@@ -36,12 +35,12 @@ final firebaseAuthProvider = AutoDisposeProvider<FirebaseAuth>.internal(
   allTransitiveDependencies: null,
 );
 
-typedef FirebaseAuthRef = AutoDisposeProviderRef<FirebaseAuth>;
-String _$firestoreHash() => r'46b3b25dab22652e7c662ecf91b5523348c28f2e';
+typedef FirebaseAuthRef = ProviderRef<FirebaseAuth>;
+String _$firestoreHash() => r'e271f8f7be694ee819f397232f4d140c15a5f921';
 
 /// See also [firestore].
 @ProviderFor(firestore)
-final firestoreProvider = AutoDisposeProvider<FirebaseFirestore>.internal(
+final firestoreProvider = Provider<FirebaseFirestore>.internal(
   firestore,
   name: r'firestoreProvider',
   debugGetCreateSourceHash:
@@ -50,7 +49,7 @@ final firestoreProvider = AutoDisposeProvider<FirebaseFirestore>.internal(
   allTransitiveDependencies: null,
 );
 
-typedef FirestoreRef = AutoDisposeProviderRef<FirebaseFirestore>;
+typedef FirestoreRef = ProviderRef<FirebaseFirestore>;
 String _$activityServiceHash() => r'6358733ef39d0d46e3cde95514ff4f2cc93cfd8c';
 
 /// See also [activityService].

@@ -114,7 +114,8 @@ class LibraryRepository {
         iconName: data['contentListIconName'] as String,
         isActive: data['isActive'] as bool,
         isFeatured: data['isFeatured'] as bool,
-        contents: contents,
+        contents:
+            contents.where((content) => content.isDeleted == false).toList(),
         description: data['listDescription'] as String,
         name: data['listName'] as String,
       );

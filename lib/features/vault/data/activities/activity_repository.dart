@@ -560,7 +560,6 @@ class ActivityRepository {
   /// Gets detailed information about an ongoing activity including performance
   Future<OngoingActivityDetails> getOngoingActivityDetails(
       String activityId) async {
-    print("entered here");
     try {
       final userId = _getCurrentUserId();
       final activityDoc = await _firestore
