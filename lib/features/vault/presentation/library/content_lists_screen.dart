@@ -33,9 +33,6 @@ class _ContentScreenState extends ConsumerState<ContentListsScreen> {
     super.initState();
     _loadLists();
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _focusNode.requestFocus();
-    });
     searchController.addListener(_onSearchChanged);
   }
 
@@ -145,6 +142,7 @@ class FeaturedListItemWidget extends StatelessWidget {
       onTap: () {
         context.goNamed(RouteNames.libraryList.name, pathParameters: {
           "name": listItem.name,
+          "id": listItem.id,
         });
       },
       child: WidgetsContainer(

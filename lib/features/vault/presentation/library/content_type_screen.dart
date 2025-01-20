@@ -33,9 +33,6 @@ class _ContentTypeScreenState extends ConsumerState<ContentTypeScreen> {
     super.initState();
     _loadContent();
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _focusNode.requestFocus();
-    });
     searchController.addListener(_onSearchChanged);
   }
 
