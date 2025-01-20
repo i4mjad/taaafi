@@ -33,8 +33,8 @@ export class AddNewContentTypeComponent {
       this.store.dispatch(
         new CreateContentTypeAction(
           contentTypeName,
-          isActive,
-          contentTypeIconName
+          contentTypeIconName,
+          isActive
         )
       );
       this._bottomSheetRef.dismiss();

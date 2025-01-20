@@ -57,7 +57,6 @@ export class ContentTypeService {
           ({
             id: docRef.id,
             ...contentType,
-            contentTypeIconName: contentType.contentTypeIconName,
           } as ContentType)
       )
     );
