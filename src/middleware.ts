@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 // List of supported languages
-const supportedLocales = ["en", "es", "fr", "de"];
+const supportedLocales = ["en", "ar"];
 const defaultLocale = "en";
 
 export function middleware(request: NextRequest) {
@@ -15,6 +15,15 @@ export function middleware(request: NextRequest) {
     pathname.startsWith("/api") ||
     pathname.includes(".")
   ) {
+    return;
+  }
+
+  // Check if the pathname starts with a supported locale
+  const pathnameParts = pathname.split("/");
+  const firstSegment = pathnameParts[1];
+
+  // If URL already has a supported locale, don't redirect
+  if (supportedLocales.includes(firstSegment)) {
     return;
   }
 
@@ -31,13 +40,6 @@ export function middleware(request: NextRequest) {
         .find((lang) => supportedLocales.includes(lang)) || defaultLocale;
   }
 
-  // Check if pathname already starts with locale
-  const pathnameHasLocale = supportedLocales.some(
-    (locale) => pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`
-  );
-
-  if (pathnameHasLocale) return;
-
   // Redirect to the same pathname with locale prefix
   return NextResponse.redirect(
     new URL(`/${browserLocale}${pathname === "/" ? "" : pathname}`, request.url)
@@ -45,10 +47,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: [
-    // Skip all internal paths (_next)
-    "/((?!_next|api|images).*)",
-    // Optional: Skip static files
-    // '/((?!_next|api|images|favicon.ico).*)',
-  ],
+  matcher: ["/((?!_next|api|images).*)"],
 };
