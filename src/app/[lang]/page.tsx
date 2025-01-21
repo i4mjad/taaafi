@@ -8,9 +8,9 @@ import Image from "next/image";
 export default async function ComingSoonPage({
   params,
 }: {
-  params: Promise<{ lang: Locale }>;
+  params: { lang: Locale };
 }) {
-  const { lang } = await params;
+  const { lang } = params;
   const dict = await getDictionary(lang || fallbackLng);
 
   return (
