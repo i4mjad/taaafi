@@ -27,12 +27,12 @@ export default async function ComingSoonPage({
             />
           </div>
           <h1 className="text-4xl font-bold mb-8">{dict.comingSoon}</h1>
-          <h2
+          {/* <h2
             className="text-2xl font-semibold mb-4"
             style={{ color: "#ff5733" }}
           >
             {dict.latestVersionAvailable}
-          </h2>
+          </h2> */}
           <div className="flex flex-col justify-center gap-2 mb-8 mx-auto">
             <Button asChild className="flex items-center justify-center">
               <a
