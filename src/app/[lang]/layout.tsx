@@ -5,32 +5,33 @@ export async function generateStaticParams() {
   return languages.map((lang) => ({ lang }));
 }
 
-export default function LocaleLayout({
+export default async function LocaleLayout({
   children,
   params,
 }: {
   children: React.ReactNode;
-  params: { lang: Locale };
+  params: Promise<{ lang: string }>;
 }) {
-  const dir = params.lang === "ar" ? "rtl" : "ltr";
-  const fontClass = params.lang === "ar" ? "font-arabic" : "font-sans";
-  const lang = params.lang || fallbackLng;
+  const { lang } = await params;
+  const dir = lang === "ar" ? "rtl" : "ltr";
+  const fontClass = lang === "ar" ? "font-arabic" : "font-sans";
+
   return (
-    <html lang={params.lang} dir={dir}>
+    <html lang={lang} dir={dir}>
       <body className={`flex min-h-screen flex-col antialiased ${fontClass}`}>
-        <header className="p-4 flex justify-end">
-          <nav>
-            {languages.map((l) => (
+        <nav className="p-4">
+          <div className="flex justify-center">
+            {["en", "ar"].map((l) => (
               <Link
                 key={l}
                 href={`/${l}`}
-                className={`mx-2 ${l === params.lang ? "font-bold" : ""}`}
+                className={`mx-2 ${l === lang ? "font-bold" : ""}`}
               >
                 {l.toUpperCase()}
               </Link>
             ))}
-          </nav>
-        </header>
+          </div>
+        </nav>
         <main className="flex-grow">{children}</main>
       </body>
     </html>

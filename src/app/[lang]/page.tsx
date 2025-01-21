@@ -8,15 +8,24 @@ import Image from "next/image";
 export default async function ComingSoonPage({
   params,
 }: {
-  params: { lang: Locale };
+  params: Promise<{ lang: Locale }>;
 }) {
-  const { lang } = params;
+  const { lang } = await params;
   const dict = await getDictionary(lang || fallbackLng);
 
   return (
     <div className="min-h-screen flex items-center">
       <div className="container mx-auto px-4 py-8 text-center">
         <div className="max-w-2xl mx-auto">
+          <div className="relative w-32 h-32 mx-auto mb-8">
+            <Image
+              src="/app-icon.png"
+              alt="App Icon"
+              fill
+              priority
+              className="object-contain"
+            />
+          </div>
           <h1 className="text-4xl font-bold mb-8">{dict.comingSoon}</h1>
           <h2
             className="text-2xl font-semibold mb-4"
