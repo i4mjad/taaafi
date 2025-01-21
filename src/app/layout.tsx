@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { type Locale, fallbackLng } from "./i18n/settings";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -19,12 +20,17 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
+  params,
+}: {
   children: React.ReactNode;
-}>) {
+  params: { lang: Locale };
+}) {
+  const lang = params.lang || fallbackLng;
   return (
     <html lang="en">
       <body
+        lang={lang}
+        dir={lang === "ar" ? "rtl" : "ltr"}
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         {children}
@@ -32,3 +38,27 @@ export default function RootLayout({
     </html>
   );
 }
+
+// import "./globals.css";
+// import type { Metadata } from "next";
+// import { type Locale, fallbackLng } from "./i18n/settings";
+
+// export const metadata: Metadata = {
+//   title: "Coming Soon",
+//   description: "Our app is coming soon!",
+// };
+
+// export default function RootLayout({
+//   children,
+//   params,
+// }: {
+//   children: React.ReactNode;
+//   params: { lang: Locale };
+// }) {
+//   const lang = params.lang || fallbackLng;
+//   return (
+//     <html lang={lang} dir={lang === "ar" ? "rtl" : "ltr"}>
+//       <body>{children}</body>
+//     </html>
+//   );
+// }
