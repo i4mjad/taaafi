@@ -14,7 +14,7 @@ export default function LocaleLayout({
 }) {
   const dir = params.lang === "ar" ? "rtl" : "ltr";
   const fontClass = params.lang === "ar" ? "font-arabic" : "font-sans";
-
+  const lang = params.lang || fallbackLng;
   return (
     <html lang={params.lang} dir={dir}>
       <body className={`flex min-h-screen flex-col antialiased ${fontClass}`}>
