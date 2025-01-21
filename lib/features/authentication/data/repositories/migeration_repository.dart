@@ -5,6 +5,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:reboot_app_3/core/monitoring/error_logger.dart';
+import 'package:reboot_app_3/core/monitoring/google_analytics_client.dart';
+import 'package:reboot_app_3/core/monitoring/mixpanel_analytics_client.dart';
 import 'package:reboot_app_3/features/authentication/application/migration_service.dart';
 import 'package:reboot_app_3/features/authentication/data/models/user_document.dart';
 import 'package:reboot_app_3/features/authentication/data/repositories/auth_repository.dart';
@@ -83,14 +85,25 @@ class MigerationRepository {
     try {
       var updatedDocument = newDocument.toFirestore();
 
-      //TODO: add mixpanel user here
-      //TODO: add sentry user here
-      //TODO: add google analytics user here
+      await addUserIdentifierToTrackers(_auth.currentUser!);
       await docRef.set(updatedDocument, SetOptions(merge: true));
     } catch (e, stackTrace) {
       ref.read(errorLoggerProvider).logException(e, stackTrace);
       rethrow; // Optionally rethrow the error to handle it further up the call stack
     }
+  }
+
+  Future<void> addUserIdentifierToTrackers(User user) async {
+    // * add mixpanel user
+    final mixPanelClient = await ref.read(mixpanelProvider.future);
+    await mixPanelClient.identify(user.uid);
+
+    // * add sentry user
+    await ref.read(sentryUserInitProvider.future);
+
+    // * add google analytics user
+    final googleAnalyticsClient = await ref.read(firebaseAnalyticsProvider);
+    googleAnalyticsClient.setUserId(id: user.uid);
   }
 }
 

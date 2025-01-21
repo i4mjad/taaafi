@@ -409,13 +409,13 @@ class _SignUpFormState extends ConsumerState<SignUpForm> {
                       horizontalSpace(Spacing.points4),
                       GestureDetector(
                         onTap: () {
-                          // TODO: Add terms of use
                           ref.read(urlLauncherProvider).launch(
                                 Uri.parse('https://www.ta3afi.app/ar/terms'),
                               );
                         },
                         child: Text(
-                          'أوافق على شروط الاستخدام',
+                          AppLocalizations.of(context)
+                              .translate('i-accept-terms-of-use'),
                           style: TextStyles.footnoteSelected.copyWith(
                             decoration: TextDecoration.underline,
                           ),
