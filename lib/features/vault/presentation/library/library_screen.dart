@@ -14,7 +14,6 @@ import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/core/utils/icon_mapper.dart';
 import 'package:reboot_app_3/core/utils/url_launcher_provider.dart';
 import 'package:reboot_app_3/features/vault/application/library/library_notifier.dart';
-import 'package:reboot_app_3/features/vault/data/library/latest_addition_item.dart';
 import 'package:reboot_app_3/features/vault/data/library/models/cursor_content.dart';
 import 'package:reboot_app_3/features/vault/data/library/models/cursor_content_list.dart';
 import 'package:reboot_app_3/features/vault/data/library/models/cursor_content_type.dart';
