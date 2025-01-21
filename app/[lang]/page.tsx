@@ -1,10 +1,9 @@
-import { type Locale, fallbackLng } from "../i18n/settings";
-import { getDictionary } from "../dictionaries/get-dictonaries";
-import { Button } from "../../components/ui/button";
-import { AppStoreIcon, GooglePlayIcon } from "../../components/ui/icons";
+import { type Locale, fallbackLng } from "@/app/i18n/settings";
+import { Button } from "@/components/ui/button";
+import { AppStoreIcon, GooglePlayIcon } from "@/components/ui/icons";
 import Link from "next/link";
 import Image from "next/image";
-
+import { getDictionary } from "@/app/dictionaries/get-dictonaries";
 export default async function ComingSoonPage({
   params,
 }: {

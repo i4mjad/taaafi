@@ -1,6 +1,6 @@
-import { Locale } from "@/app/i18n/settings";
-import { getDictionary } from "@/app/dictionaries/get-dictonaries";
-import { fallbackLng } from "@/app/i18n/settings";
+import { Locale } from "../../i18n/settings";
+import { getDictionary } from "../../dictionaries/get-dictonaries";
+import { fallbackLng } from "../../i18n/settings";
 
 export default async function TermsPage({
   params,

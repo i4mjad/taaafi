@@ -1,4 +1,4 @@
-import { type Locale, languages, fallbackLng } from "../i18n/settings";
+import { languages } from "@/app/i18n/settings";
 import Link from "next/link";
 
 export async function generateStaticParams() {
