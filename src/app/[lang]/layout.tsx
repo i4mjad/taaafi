@@ -10,7 +10,7 @@ export default function LocaleLayout({
   params,
 }: {
   children: React.ReactNode;
-  params: { lang: string };
+  params: { lang: Locale };
 }) {
   const dir = params.lang === "ar" ? "rtl" : "ltr";
   const fontClass = params.lang === "ar" ? "font-arabic" : "font-sans";
