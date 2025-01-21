@@ -5,10 +5,10 @@ import { fallbackLng } from "../../i18n/settings";
 export default async function TermsPage({
   params,
 }: {
-  params: { lang: Locale };
+  params: Promise<{ lang: Locale }>;
 }) {
-  const lang = params?.lang || fallbackLng;
-  const dict = await getDictionary(lang);
+  const { lang } = await params;
+  const dict = await getDictionary(lang || fallbackLng);
 
   return (
     <div className="min-h-screen py-12">
