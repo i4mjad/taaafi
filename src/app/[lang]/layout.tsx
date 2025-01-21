@@ -10,15 +10,14 @@ export default async function LocaleLayout({
   params,
 }: {
   children: React.ReactNode;
-  params: Promise<{ lang: string }>;
+  params: { lang: Locale };
 }) {
   const { lang } = await params;
   const dir = lang === "ar" ? "rtl" : "ltr";
-  const fontClass = lang === "ar" ? "font-arabic" : "font-sans";
 
   return (
     <html lang={lang} dir={dir}>
-      <body className={`flex min-h-screen flex-col antialiased ${fontClass}`}>
+      <body className={"flex min-h-screen flex-col font-kufam"}>
         <nav className="p-4">
           <div className="flex justify-center">
             {["en", "ar"].map((l) => (
