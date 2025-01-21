@@ -20,23 +20,10 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-  params,
 }: {
   children: React.ReactNode;
-  params: { lang: Locale };
 }) {
-  const lang = params.lang || fallbackLng;
-  return (
-    <html lang="en">
-      <body
-        lang={lang}
-        dir={lang === "ar" ? "rtl" : "ltr"}
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        {children}
-      </body>
-    </html>
-  );
+  return children; // Remove html and body tags from root layout
 }
 
 // import "./globals.css";

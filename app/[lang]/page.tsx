@@ -2,6 +2,8 @@ import { type Locale, fallbackLng } from "../i18n/settings";
 import { getDictionary } from "../dictionaries/get-dictonaries";
 import { Button } from "../../components/ui/button";
 import { AppStoreIcon, GooglePlayIcon } from "../../components/ui/icons";
+import Link from "next/link";
+import Image from "next/image";
 
 export default async function ComingSoonPage({
   params,
@@ -45,9 +47,11 @@ export default async function ComingSoonPage({
             </Button>
           </div>
 
-          <Button variant="outline" className="mb-12">
-            {dict.termsAndConditions}
-          </Button>
+          <Link href={`/${lang}/terms`}>
+            <Button variant="outline" className="mb-12">
+              {dict.termsAndConditions}
+            </Button>
+          </Link>
 
           <section className="max-w-2xl mx-auto">
             <h2 className="text-2xl font-semibold mb-4">{dict.contactUs}</h2>
@@ -58,3 +62,5 @@ export default async function ComingSoonPage({
     </div>
   );
 }
+
+export const dynamic = "force-dynamic";
