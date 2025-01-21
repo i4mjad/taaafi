@@ -25,27 +25,3 @@ export default function RootLayout({
 }) {
   return children; // Remove html and body tags from root layout
 }
-
-// import "./globals.css";
-// import type { Metadata } from "next";
-// import { type Locale, fallbackLng } from "./i18n/settings";
-
-// export const metadata: Metadata = {
-//   title: "Coming Soon",
-//   description: "Our app is coming soon!",
-// };
-
-// export default function RootLayout({
-//   children,
-//   params,
-// }: {
-//   children: React.ReactNode;
-//   params: { lang: Locale };
-// }) {
-//   const lang = params.lang || fallbackLng;
-//   return (
-//     <html lang={lang} dir={lang === "ar" ? "rtl" : "ltr"}>
-//       <body>{children}</body>
-//     </html>
-//   );
-// }
