@@ -14,6 +14,7 @@ import 'package:reboot_app_3/core/shared_widgets/custom_textfield.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
+import 'package:reboot_app_3/core/utils/url_launcher_provider.dart';
 import 'package:reboot_app_3/features/authentication/application/auth_service.dart';
 import 'package:reboot_app_3/features/authentication/data/repositories/auth_repository.dart';
 import 'package:reboot_app_3/features/authentication/providers/user_document_provider.dart';
@@ -406,9 +407,19 @@ class _SignUpFormState extends ConsumerState<SignUpForm> {
                         },
                       ),
                       horizontalSpace(Spacing.points4),
-                      Text(
-                        'أوافق على شروط الاستخدام',
-                        style: TextStyles.footnoteSelected,
+                      GestureDetector(
+                        onTap: () {
+                          // TODO: Add terms of use
+                          ref.read(urlLauncherProvider).launch(
+                                Uri.parse('https://www.ta3afi.app/ar/terms'),
+                              );
+                        },
+                        child: Text(
+                          'أوافق على شروط الاستخدام',
+                          style: TextStyles.footnoteSelected.copyWith(
+                            decoration: TextDecoration.underline,
+                          ),
+                        ),
                       ),
                     ],
                   ),
