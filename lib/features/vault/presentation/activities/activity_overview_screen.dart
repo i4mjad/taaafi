@@ -352,7 +352,6 @@ class _AddTheActivitySheetState extends ConsumerState<AddTheActivitySheet> {
   }
 
   Future<void> _handleSubscribe() async {
-    print(activityEndingDateController.text);
     if (!_formKey.currentState!.validate() ||
         activityEndingDateController.text.isEmpty ||
         activityStartingDateController.text.isEmpty) {

@@ -141,7 +141,6 @@ class FeaturedListItemWidget extends StatelessWidget {
     return GestureDetector(
       onTap: () {
         context.goNamed(RouteNames.libraryList.name, pathParameters: {
-          "name": listItem.name,
           "id": listItem.id,
         });
       },

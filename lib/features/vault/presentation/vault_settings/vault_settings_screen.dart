@@ -99,7 +99,6 @@ class VaultSettingsScreen extends ConsumerWidget {
                         ),
                       );
 
-                      print(shouldDelete);
                       if (shouldDelete == true) {
                         await ref
                             .read(ongoingActivitiesNotifierProvider.notifier)

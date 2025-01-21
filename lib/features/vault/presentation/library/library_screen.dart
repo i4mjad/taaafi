@@ -150,7 +150,6 @@ class ContentTypesWidget extends StatelessWidget {
               ),
               itemCount: content.length,
               itemBuilder: (context, index) {
-                print(content[index].name);
                 return ContentTypeWidget(content[index]);
               },
             );
