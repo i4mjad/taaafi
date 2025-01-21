@@ -36,7 +36,7 @@ export default async function ComingSoonPage({
           <div className="flex flex-col justify-center gap-2 mb-8 mx-auto">
             <Button asChild className="flex items-center justify-center">
               <a
-                href="https://play.google.com/store/apps/details?id=com.ta3afi.app"
+                href="https://play.google.com/store/apps/details?id=com.amjadkhalfan.reboot_app_3&hl=ar"
                 target="_blank"
                 rel="noopener noreferrer"
               >
