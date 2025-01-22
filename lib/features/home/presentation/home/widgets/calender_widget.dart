@@ -23,7 +23,7 @@ class CalenderWidget extends ConsumerStatefulWidget {
 }
 
 class _CalenderWidgetState extends ConsumerState<CalenderWidget> {
-  DateTime? userFirstDate;
+  late DateTime userFirstDate;
 
   @override
   void initState() {
@@ -31,6 +31,8 @@ class _CalenderWidgetState extends ConsumerState<CalenderWidget> {
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       final now = DateTime.now();
+      userFirstDate =
+          await ref.read(calendarNotifierProvider.notifier).getUserFirstDate();
       await ref
           .read(calendarNotifierProvider.notifier)
           .fetchFollowUpsForMonth(now);
@@ -107,7 +109,8 @@ class _CalenderWidgetState extends ConsumerState<CalenderWidget> {
                       getErrorSnackBar(context, "future-date-message");
                     } else if (selectedDate != null &&
                         userFirstDate != null &&
-                        selectedDate.isBefore(userFirstDate!)) {
+                        selectedDate.isBefore(DateTime(userFirstDate.year,
+                            userFirstDate.month, userFirstDate.day, 0, 0))) {
                       getErrorSnackBar(context, "past-date-message");
                     } else {
                       context.goNamed(RouteNames.dayOverview.name,
@@ -139,6 +142,9 @@ class _CalenderWidgetState extends ConsumerState<CalenderWidget> {
 
     for (int i = 1; i <= daysInMonth; i++) {
       final date = DateTime(now.year, now.month, i);
+      if (date.isBefore(
+          DateTime(userFirstDate.year, userFirstDate.month, userFirstDate.day)))
+        continue;
       if (date.isAfter(now)) break; // Avoid adding anything after today's date
       if (!followUpDates.contains(date) && date != now) {
         if (date != now || !hasFollowUpToday) {

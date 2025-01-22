@@ -39,7 +39,7 @@ class FirebaseMessagingRepository {
       }
 
       await _firestore.collection('users').doc(uid).set({
-        'messagingToken': token,
+        'messagingToken': await _messaging.getToken(),
         'lastTokenUpdate': FieldValue.serverTimestamp(),
         'platform': Platform.isIOS ? 'ios' : 'android',
       }, SetOptions(merge: true));
