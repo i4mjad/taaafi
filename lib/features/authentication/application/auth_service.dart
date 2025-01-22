@@ -9,8 +9,10 @@ import 'package:reboot_app_3/core/monitoring/error_logger.dart';
 import 'package:reboot_app_3/features/authentication/data/repositories/auth_repository.dart';
 import 'package:reboot_app_3/features/authentication/data/repositories/migeration_repository.dart';
 import 'package:reboot_app_3/features/authentication/providers/user_document_provider.dart';
-import 'package:reboot_app_3/features/authentication/providers/user_provider.dart';
 import 'package:reboot_app_3/core/shared_widgets/snackbar.dart';
+import 'package:reboot_app_3/features/authentication/providers/user_provider.dart';
+import 'package:reboot_app_3/features/home/data/repos/streak_repository.dart';
+import 'package:reboot_app_3/features/home/data/streak_notifier.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'auth_service.g.dart';
@@ -206,14 +208,18 @@ class AuthService {
     }
   }
 
-  Future<void> deleteAccount(BuildContext context, WidgetRef ref) async {
+  Future<void> deleteAccount(BuildContext context) async {
     try {
       await _authRepository.deleteUserDocument();
       await _auth.currentUser?.delete();
 
-      ref.invalidate(userNotifierProvider);
-
+      // Reset all providers
+      ProviderContainer().dispose();
       ref.invalidate(userDocumentsNotifierProvider);
+      ref.invalidate(userNotifierProvider);
+      ref.invalidate(streakRepositoryProvider);
+      ref.invalidate(streakRepositoryProvider);
+      ref.invalidate(streakNotifierProvider);
     } on FirebaseAuthException catch (e, stackTrace) {
       ref.read(errorLoggerProvider).logException(e, stackTrace);
       getErrorSnackBar(context, e.code);

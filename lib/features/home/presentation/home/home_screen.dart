@@ -6,6 +6,7 @@ import 'package:reboot_app_3/core/shared_widgets/app_bar.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
+import 'package:reboot_app_3/features/home/data/streak_notifier.dart';
 import 'package:reboot_app_3/features/home/presentation/home/widgets/calender_widget.dart';
 import 'package:reboot_app_3/features/home/presentation/home/widgets/follow_up_sheet.dart';
 import 'package:reboot_app_3/features/home/presentation/home/widgets/statistics_widget.dart';
@@ -15,6 +16,7 @@ class HomeScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = AppTheme.of(context);
+    final streaksState = ref.watch(streakNotifierProvider);
     return Scaffold(
       backgroundColor: theme.backgroundColor,
       appBar: appBar(context, ref, 'home', false, false),

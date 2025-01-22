@@ -225,6 +225,7 @@ class _ReLoginFormState extends ConsumerState<ReLoginForm> {
                 );
                 if (result) {
                   HapticFeedback.mediumImpact();
+                  //TODO: invalidate all providers
                   await userProfileNotifier.handleUserDeletion();
                   context.goNamed(RouteNames.onboarding.name);
                   getSuccessSnackBar(context, 'account-deleted');

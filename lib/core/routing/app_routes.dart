@@ -64,15 +64,7 @@ GoRouter goRouter(GoRouterRef ref) {
         final hasError = userDocumentState is AsyncError;
         final userDocument = userDocumentState.valueOrNull;
 
-        // If document is null or has errors, redirect to complete account registration
-        if (isLoading == false && (userDocument == null || hasError)) {
-          if (state.matchedLocation != '/completeAccountRegisteration') {
-            return '/completeAccountRegisteration';
-          }
-          return null;
-        }
-
-        // Always navigate to the loading screen if the document state is loading
+        // If we're loading, show loading screen
         if (isLoading) {
           if (state.matchedLocation != '/loading') {
             return '/loading';
@@ -80,9 +72,17 @@ GoRouter goRouter(GoRouterRef ref) {
           return null;
         }
 
-        // Check if the user document is legacy or new
+        // If document is null or has errors, redirect to complete account registration
+        if (userDocument == null || hasError) {
+          if (state.matchedLocation != '/completeAccountRegisteration') {
+            return '/completeAccountRegisteration';
+          }
+          return null;
+        }
+
+        // Now we can safely check the document properties since we know userDocument is not null
         final isLegacy =
-            userDocumentNotifier.isLegacyUserDocument(userDocument!);
+            userDocumentNotifier.isLegacyUserDocument(userDocument);
         final isNew = userDocumentNotifier.isNewUserDocument(userDocument);
 
         // Check for missing required data
@@ -107,7 +107,7 @@ GoRouter goRouter(GoRouterRef ref) {
               state.matchedLocation == '/loading') {
             return '/home';
           }
-          return null; // No redirection if already on a valid route
+          return null;
         }
       } else {
         // Non-logged-in user trying to access protected routes

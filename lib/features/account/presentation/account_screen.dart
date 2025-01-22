@@ -618,14 +618,16 @@ class SettingsButton extends StatelessWidget {
         child: WidgetsContainer(
           padding: EdgeInsets.all(16),
           backgroundColor: theme.backgroundColor,
-          borderSide: BorderSide(color: theme.grey[600]!, width: 0.5),
+          borderSide: BorderSide(
+              color: type == 'error' ? theme.error[600]! : theme.grey[600]!,
+              width: 0.5),
           borderRadius: BorderRadius.circular(10.5),
           boxShadow: Shadows.mainShadows,
           child: Row(
             children: [
               Icon(
                 icon,
-                color: theme.grey[900],
+                color: type == 'error' ? theme.error[600]! : theme.grey[900],
               ),
               horizontalSpace(Spacing.points8),
               Text(
@@ -644,6 +646,8 @@ class SettingsButton extends StatelessWidget {
     switch (type) {
       case 'app':
         return theme.primary[600] as Color;
+      case 'error':
+        return theme.error[600] as Color;
       default:
         return theme.grey[900] as Color;
     }

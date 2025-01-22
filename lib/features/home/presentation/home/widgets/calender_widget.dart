@@ -23,8 +23,7 @@ class CalenderWidget extends ConsumerStatefulWidget {
 }
 
 class _CalenderWidgetState extends ConsumerState<CalenderWidget> {
-  late DateTime userFirstDate;
-
+  DateTime userFirstDate = DateTime.now();
   @override
   void initState() {
     super.initState();

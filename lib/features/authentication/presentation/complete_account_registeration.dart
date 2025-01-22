@@ -13,6 +13,7 @@ import 'package:reboot_app_3/core/shared_widgets/custom_textfield.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
+import 'package:reboot_app_3/core/utils/url_launcher_provider.dart';
 import 'package:reboot_app_3/features/authentication/application/auth_service.dart';
 import 'package:reboot_app_3/features/authentication/providers/user_document_provider.dart';
 import 'package:reboot_app_3/features/authentication/providers/user_provider.dart';
@@ -61,9 +62,9 @@ class _CompleteAccountRegisterationScreenState
   Future<void> _selectDob(BuildContext context, String language) async {
     DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime(1960),
-      lastDate: DateTime.now(),
+      initialDate: DateTime(2010),
+      firstDate: DateTime(1980),
+      lastDate: DateTime(2017),
     );
 
     if (picked != null) {
@@ -110,10 +111,8 @@ class _CompleteAccountRegisterationScreenState
   @override
   Widget build(BuildContext context) {
     final locale = ref.watch(localeNotifierProvider);
-
     final authService = ref.watch(authServiceProvider);
     final theme = AppTheme.of(context);
-
     final userNotifer = ref.watch(userNotifierProvider);
 
     return Scaffold(
@@ -126,8 +125,12 @@ class _CompleteAccountRegisterationScreenState
               return Center(
                   child: Text("User not exist, please re-download the app"));
             }
-            nameController.text = user.displayName ?? "";
-            emailController.text = user.email ?? "";
+            if (nameController.text.isEmpty) {
+              nameController.text = user.displayName ?? "";
+            }
+            if (emailController.text.isEmpty) {
+              emailController.text = user.email ?? "";
+            }
             return SafeArea(
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
@@ -350,10 +353,21 @@ class _CompleteAccountRegisterationScreenState
                                       });
                                     },
                                   ),
-                                  horizontalSpace(Spacing.points4),
-                                  Text(
-                                    'أوافق على شروط الاستخدام',
-                                    style: TextStyles.footnoteSelected,
+                                  GestureDetector(
+                                    onTap: () {
+                                      ref.read(urlLauncherProvider).launch(
+                                            Uri.parse(
+                                                'https://www.ta3afi.app/ar/terms'),
+                                          );
+                                    },
+                                    child: Text(
+                                      AppLocalizations.of(context)
+                                          .translate('i-accept-terms-of-use'),
+                                      style:
+                                          TextStyles.footnoteSelected.copyWith(
+                                        decoration: TextDecoration.underline,
+                                      ),
+                                    ),
                                   ),
                                 ],
                               ),
