@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -122,7 +121,10 @@ class AuthService {
   Future<User?> signInWithApple(BuildContext context) async {
     try {
       final appleProvider = AppleAuthProvider();
+      appleProvider.scopes.add("email");
+
       final credential = await _auth.signInWithProvider(appleProvider);
+
       return credential.user;
     } on FirebaseAuthException catch (e, stackTrace) {
       ref.read(errorLoggerProvider).logException(e, stackTrace);
