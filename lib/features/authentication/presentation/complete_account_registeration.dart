@@ -208,7 +208,6 @@ class _CompleteAccountRegisterationScreenState
                                 controller: emailController,
                                 hint: AppLocalizations.of(context)
                                     .translate('email'),
-                                enabled: false,
                                 prefixIcon: LucideIcons.mail,
                                 inputType: TextInputType.emailAddress,
                                 validator: (value) {
