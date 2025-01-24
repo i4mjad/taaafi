@@ -9,6 +9,7 @@ import 'package:reboot_app_3/core/helpers/app_regex.dart';
 import 'package:reboot_app_3/core/helpers/date_display_formater.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/monitoring/analytics_facade.dart';
+import 'package:reboot_app_3/core/monitoring/error_logger.dart';
 import 'package:reboot_app_3/core/routing/route_names.dart';
 import 'package:reboot_app_3/core/shared_widgets/app_bar.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
@@ -283,7 +284,7 @@ class _ConfirmUserDetailsScreenState
                         return;
                       }
 
-                      final uid = userDocument.uid!;
+                      final uid = userDocument.uid;
                       final displayName = displayNameController.value.text;
                       final email = emailController.value.text;
                       final dateOfBirth = dateOfBirthController.value.text;
@@ -314,7 +315,10 @@ class _ConfirmUserDetailsScreenState
                             .read(analyticsFacadeProvider)
                             .trackOnboardingFinish());
                         context.goNamed(RouteNames.home.name);
-                      } catch (e) {
+                      } catch (e, stackTrace) {
+                        ref
+                            .read(errorLoggerProvider)
+                            .logException(e, stackTrace);
                         getErrorSnackBar(context, "something-went-wrong");
                       }
                     },
