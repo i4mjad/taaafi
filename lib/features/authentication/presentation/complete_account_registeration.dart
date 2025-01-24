@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/helpers/date_display_formater.dart';
@@ -60,11 +61,17 @@ class _CompleteAccountRegisterationScreenState
   }
 
   Future<void> _selectDob(BuildContext context, String language) async {
+    // Calculate the valid date range
+    final lastDate = DateTime(2010, 12, 31); // Must be before 2011
+    final firstDate = DateTime(1960);
+
+    DateTime initialDate = DateTime(2010);
+
     DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: DateTime(2010),
-      firstDate: DateTime(1980),
-      lastDate: DateTime(2017),
+      initialDate: initialDate,
+      firstDate: firstDate,
+      lastDate: lastDate,
     );
 
     if (picked != null) {
@@ -258,8 +265,11 @@ class _CompleteAccountRegisterationScreenState
                               ),
                               verticalSpace(Spacing.points8),
                               GestureDetector(
-                                onTap: () => _selectStartingDate(
-                                    context, locale!.languageCode),
+                                onTap: () {
+                                  HapticFeedback.lightImpact();
+                                  _selectStartingDate(
+                                      context, locale!.languageCode);
+                                },
                                 child: AbsorbPointer(
                                   child: CustomTextField(
                                     controller: startingDateController,
@@ -355,6 +365,7 @@ class _CompleteAccountRegisterationScreenState
                                   ),
                                   GestureDetector(
                                     onTap: () {
+                                      HapticFeedback.lightImpact();
                                       ref.read(urlLauncherProvider).launch(
                                             Uri.parse(
                                                 'https://www.ta3afi.app/ar/terms'),
@@ -377,9 +388,23 @@ class _CompleteAccountRegisterationScreenState
                       ),
                       GestureDetector(
                         onTap: () async {
+                          HapticFeedback.lightImpact();
                           if (isTermsAccepted == false) {
                             getErrorSnackBar(
                                 context, "terms-should-be-accepted");
+                            return;
+                          }
+
+                          if (nameController.text.trim().isEmpty) {
+                            getErrorSnackBar(
+                                context, "name-should-not-be-empty");
+                            return;
+                          }
+
+                          if (emailController.text.trim().isEmpty) {
+                            getErrorSnackBar(
+                                context, "email-should-not-be-empty");
+                            return;
                           }
 
                           if (_formKey.currentState!.validate() &&

@@ -14,7 +14,7 @@ class UserDocument {
   final Timestamp? userFirstDate;
   final String? role;
   final String? messagingToken;
-  final List<String>? bookmarkedContentIds;
+
   final List<String>? userRelapses;
   final List<String>? userMasturbatingWithoutWatching;
   final List<String>? userWatchingWithoutMasturbating;
@@ -30,7 +30,6 @@ class UserDocument {
     this.userFirstDate,
     this.role,
     this.messagingToken,
-    this.bookmarkedContentIds,
     this.userRelapses,
     this.userMasturbatingWithoutWatching,
     this.userWatchingWithoutMasturbating,
@@ -51,9 +50,6 @@ class UserDocument {
       userFirstDate: data['userFirstDate'],
       role: data['role'],
       messagingToken: data['messagingToken'],
-      bookmarkedContentIds: data['bookmarkedContentIds'] != null
-          ? List<String>.from(data['bookmarkedContentIds'])
-          : null,
       userRelapses: data['userRelapses'] != null
           ? List<String>.from(data['userRelapses'])
           : null,
@@ -80,7 +76,6 @@ class UserDocument {
       'userFirstDate': userFirstDate,
       'role': role,
       'messagingToken': messagingToken,
-      'bookmarkedContentIds': bookmarkedContentIds,
       'userRelapses': userRelapses ?? [],
       'userMasturbatingWithoutWatching': userMasturbatingWithoutWatching ?? [],
       'userWatchingWithoutMasturbating': userWatchingWithoutMasturbating ?? [],
@@ -94,7 +89,7 @@ class UserDocument {
 
   @override
   String toString() {
-    return 'UserDocument(uid: $uid, devicesIds: $devicesIds, displayName: $displayName, email: $email, gender: $gender, locale: $locale, dayOfBirth: $dayOfBirth, userFirstDate: $userFirstDate, role: $role, messagingToken: $messagingToken, bookmarkedContentIds: $bookmarkedContentIds, userRelapses: $userRelapses, userMasturbatingWithoutWatching: $userMasturbatingWithoutWatching, userWatchingWithoutMasturbating: $userWatchingWithoutMasturbating)';
+    return 'UserDocument( uid: $uid, devicesIds: $devicesIds, displayName: $displayName, email: $email, gender: $gender, locale: $locale, dayOfBirth: $dayOfBirth, userFirstDate: $userFirstDate, role: $role, messagingToken: $messagingToken, userRelapses: $userRelapses, userMasturbatingWithoutWatching: $userMasturbatingWithoutWatching, userWatchingWithoutMasturbating: $userWatchingWithoutMasturbating)';
   }
 
   @override
@@ -112,7 +107,6 @@ class UserDocument {
         other.userFirstDate == userFirstDate &&
         other.role == role &&
         other.messagingToken == messagingToken &&
-        listEquals(other.bookmarkedContentIds, bookmarkedContentIds) &&
         listEquals(other.userRelapses, userRelapses) &&
         listEquals(other.userMasturbatingWithoutWatching,
             userMasturbatingWithoutWatching) &&
@@ -132,7 +126,6 @@ class UserDocument {
         userFirstDate.hashCode ^
         role.hashCode ^
         messagingToken.hashCode ^
-        bookmarkedContentIds.hashCode ^
         userRelapses.hashCode ^
         userMasturbatingWithoutWatching.hashCode ^
         userWatchingWithoutMasturbating.hashCode;

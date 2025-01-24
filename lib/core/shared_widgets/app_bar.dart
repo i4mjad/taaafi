@@ -74,8 +74,9 @@ AppBar plainAppBar(BuildContext context, WidgetRef ref, String? title,
 
 List<Widget> loadedActions(
     WidgetRef ref, bool showLocaleChangeIcon, List<Widget>? actions) {
+  var actionsList = actions ?? [];
   if (showLocaleChangeIcon) {
-    actions?.add(
+    actionsList.add(
       GestureDetector(
         onTap: () {
           ref.watch(localeNotifierProvider.notifier).toggleLocale();
@@ -84,10 +85,12 @@ List<Widget> loadedActions(
           padding: const EdgeInsets.only(right: 16, left: 16),
           child: Icon(
             LucideIcons.languages,
+            color: Colors.black,
           ),
         ),
       ),
     );
   }
-  return actions ?? [];
+
+  return actionsList;
 }

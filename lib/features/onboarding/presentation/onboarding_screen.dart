@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
@@ -19,7 +20,13 @@ class OnBoardingScreen extends ConsumerWidget {
     final theme = AppTheme.of(context);
     return Scaffold(
       backgroundColor: theme.backgroundColor,
-      appBar: appBar(context, ref, null, true, true),
+      appBar: appBar(
+        context,
+        ref,
+        null,
+        true,
+        true,
+      ),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
@@ -30,18 +37,10 @@ class OnBoardingScreen extends ConsumerWidget {
                 child: SingleChildScrollView(
                   child: Column(
                     children: [
-                      Container(
-                        height: 150,
-                        width: 150,
-                        decoration: BoxDecoration(
-                            color: theme.primary[50],
-                            borderRadius: BorderRadius.circular(100),
-                            border: Border.all(
-                                color: theme.primary[100]!, width: 1.5)),
-                        child: Icon(
-                          LucideIcons.heart,
-                          size: 42,
-                        ),
+                      Image.asset(
+                        'asset/illustrations/app-logo.png',
+                        height: 125,
+                        width: 125,
                       ),
                       verticalSpace(Spacing.points28),
                       Text(
@@ -53,30 +52,35 @@ class OnBoardingScreen extends ConsumerWidget {
                       ),
                       verticalSpace(Spacing.points28),
                       OnboardingSection(
-                        icon: LucideIcons.users,
-                        title: 'تابع تعافيك',
-                        description:
-                            'تعرف على التجارب المختلفة وشارك تجربتك مع مجموعة من المتعافين لتبادل الخبرات واكتشاف التحديات في رحلة التعافي',
+                        icon: LucideIcons.lock,
+                        title: AppLocalizations.of(context)
+                            .translate('vault-title'),
+                        description: AppLocalizations.of(context)
+                            .translate('vault-description'),
                       ),
                       verticalSpace(Spacing.points32),
                       OnboardingSection(
-                          icon: LucideIcons.lock,
-                          title: 'الخزنة',
-                          description:
-                              'يمكنك مشاركة رحلة تعافيك والتحديات التي تواجهها بسرية تامة بدون إظهار هويتك'),
-                      verticalSpace(Spacing.points32),
-                      OnboardingSection(
-                        icon: LucideIcons.trophy,
-                        title: 'الزمالة',
-                        description:
-                            'تحدَ زملائك في رحلة التعافي لتحقيق مراحل متقدمة في رحلة التعافي',
+                        icon: LucideIcons.dumbbell,
+                        title: AppLocalizations.of(context)
+                            .translate('exercises-title'),
+                        description: AppLocalizations.of(context)
+                            .translate('exercises-description'),
                       ),
                       verticalSpace(Spacing.points32),
                       OnboardingSection(
-                        icon: LucideIcons.fileStack,
-                        title: 'تابع تحديثات زملائك',
-                        description:
-                            'تابع تحديثات من قبل زملائك في الزمالة وساعدهم واستفد من خبراتهم في التعافي',
+                        icon: LucideIcons.listChecks,
+                        title: AppLocalizations.of(context)
+                            .translate('lists-title'),
+                        description: AppLocalizations.of(context)
+                            .translate('lists-description'),
+                      ),
+                      verticalSpace(Spacing.points32),
+                      OnboardingSection(
+                        icon: LucideIcons.bell,
+                        title: AppLocalizations.of(context)
+                            .translate('reminders-title'),
+                        description: AppLocalizations.of(context)
+                            .translate('reminders-description'),
                       ),
                       verticalSpace(Spacing.points24),
                     ],
@@ -85,6 +89,7 @@ class OnBoardingScreen extends ConsumerWidget {
               ),
               GestureDetector(
                 onTap: () {
+                  HapticFeedback.lightImpact();
                   ref.read(analyticsFacadeProvider).trackOnboardingStart();
                   context.goNamed(RouteNames.login.name);
                 },
@@ -140,7 +145,7 @@ class OnboardingSection extends ConsumerWidget {
               children: [
                 Text(
                   title,
-                  style: TextStyles.h5.copyWith(
+                  style: TextStyles.h6.copyWith(
                     color: theme.primary[600],
                   ),
                 ),
@@ -148,7 +153,7 @@ class OnboardingSection extends ConsumerWidget {
                 // Second text
                 Text(
                   description,
-                  style: TextStyles.footnote.copyWith(
+                  style: TextStyles.small.copyWith(
                     color: theme.grey[700],
                   ),
                 ),

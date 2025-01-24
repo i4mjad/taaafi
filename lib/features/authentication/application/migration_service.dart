@@ -115,7 +115,6 @@ class MigrationService {
       userFirstDate: document.userFirstDate!,
       role: role,
       messagingToken: fcmToken,
-      bookmarkedContentIds: [],
       userRelapses: document.userRelapses,
       userWatchingWithoutMasturbating: document.userWatchingWithoutMasturbating,
       userMasturbatingWithoutWatching: document.userMasturbatingWithoutWatching,

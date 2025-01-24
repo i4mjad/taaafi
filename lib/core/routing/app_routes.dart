@@ -86,7 +86,7 @@ GoRouter goRouter(GoRouterRef ref) {
         final isNew = userDocumentNotifier.isNewUserDocument(userDocument);
 
         // Check for missing required data
-        if (userDocumentNotifier.hasMissingData(userDocument)) {
+        if (!isLegacy && userDocumentNotifier.hasMissingData(userDocument)) {
           if (state.matchedLocation != '/completeAccountRegisteration') {
             return '/completeAccountRegisteration';
           }

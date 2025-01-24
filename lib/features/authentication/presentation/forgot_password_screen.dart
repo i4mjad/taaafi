@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/helpers/app_regex.dart';
@@ -63,6 +64,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
               verticalSpace(Spacing.points32),
               GestureDetector(
                 onTap: () async {
+                  HapticFeedback.lightImpact();
                   if (_formKey.currentState!.validate()) {
                     await authService.sendForgotPasswordLink(
                         context, emailController.value.text);

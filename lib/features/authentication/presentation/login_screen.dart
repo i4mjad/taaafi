@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
@@ -71,6 +72,7 @@ class LogInScreen extends ConsumerWidget {
                 children: [
                   GestureDetector(
                     onTap: () async {
+                      HapticFeedback.lightImpact();
                       if (!Platform.isIOS) {
                         getErrorSnackBar(context, "cannot-login-with-apple");
                         return;
@@ -104,6 +106,7 @@ class LogInScreen extends ConsumerWidget {
                   horizontalSpace(Spacing.points4),
                   GestureDetector(
                     onTap: () async {
+                      HapticFeedback.lightImpact();
                       unawaited(
                           ref.read(analyticsFacadeProvider).trackUserLogin());
                       final user = await authService.signInWithGoogle(context);
@@ -205,7 +208,10 @@ class _SignInFormState extends ConsumerState<SignInForm> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               GestureDetector(
-                onTap: () => context.goNamed(RouteNames.forgotPassword.name),
+                onTap: () {
+                  HapticFeedback.lightImpact();
+                  context.goNamed(RouteNames.forgotPassword.name);
+                },
                 child: Text(
                   AppLocalizations.of(context).translate('forget-password'),
                   style: TextStyles.footnoteSelected.copyWith(
@@ -214,7 +220,10 @@ class _SignInFormState extends ConsumerState<SignInForm> {
                 ),
               ),
               GestureDetector(
-                onTap: () => context.goNamed(RouteNames.signup.name),
+                onTap: () {
+                  HapticFeedback.lightImpact();
+                  context.goNamed(RouteNames.signup.name);
+                },
                 child: Text(
                   AppLocalizations.of(context).translate('sign-up'),
                   style: TextStyles.footnoteSelected
@@ -226,6 +235,7 @@ class _SignInFormState extends ConsumerState<SignInForm> {
           verticalSpace(Spacing.points16),
           GestureDetector(
             onTap: () async {
+              HapticFeedback.lightImpact();
               final email = emailController.value.text;
               final password = passwordController.value.text;
 

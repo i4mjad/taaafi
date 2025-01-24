@@ -6,7 +6,7 @@
   "podcast": "Podcast",
   "guide": "Guide",
   "motivation": "Motivation",
-
+  "dob-too-young": "You can't select a date of birth before 2010",
   "i-accept-terms-of-use": "I accept the terms of use",
 
   "vault-settings": "Vault Settings",
@@ -220,7 +220,7 @@
 
 
   "day":"Day",
-  "today-is-last-relapse": "This day recorded as a Relapse, you can’t followup today",
+  "today-is-last-relapse": "This day recorded as a Relapse, you can't followup today",
   "how-is-this-day": "How was this day?",
 
   "what-you-want-to-add":"What do you want to add?",
@@ -522,5 +522,20 @@
   "delete-activities-confirmation-message": "Are you sure you want to delete all activities? This action cannot be undone.",
   "activities-deleted": "All activities deleted successfully",
   "reset-data-desc": "You can reset the start date or delete follow-ups separately. This action cannot be undone. You can delete follow-ups and emotions without resetting the date. If you want a fresh start, select all options and enter the new start date.",
-  "reset-to-today": "Reset start date to today"
+  "reset-to-today": "Reset start date to today",
+  "vault-title": "The Vault, Your Private Space",
+  "vault-description": "Recovery journey needs a safe space, that's why we added the vault—your private space to document your progress. Here, you'll find new diaries, exercises, and a rich library of inspiring content. The vault is your first step towards real and sustainable change.",
+
+  "exercises-title": "Activities, Step by Step Towards Recovery",
+  "exercises-description": "To face challenges, we offer you exercises, a set of tasks designed with multiple levels to suit your needs, whether daily, weekly, or monthly. Each exercise is another step that steadily brings you closer to your goal.",
+
+  "lists-title": "Lists, A Recovery Guide in Your Hands",
+  "lists-description": "Your journey towards recovery has become clearer with the lists—a carefully curated collection from the Ta'afi team, covering important topics that help increase your awareness and understanding of addiction challenges, giving you deeper insight and better support.",
+
+  "reminders-title": "Reminders, Don't Miss Any Step",
+  "reminders-description": "Now you can add reminders to easily follow up on exercise tasks. Set your schedules and let the app remind you of your next steps, making your recovery more regular and continuous.",
+
+  "name-should-not-be-empty": "Name field cannot be empty",
+  "email-should-not-be-empty": "Email field cannot be empty",
+  "something-went-wrong": "Something went wrong. Please try again."
 }

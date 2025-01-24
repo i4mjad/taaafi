@@ -15,6 +15,7 @@ import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/features/authentication/application/auth_service.dart';
 import 'package:reboot_app_3/features/account/data/user_profile_notifier.dart';
+import 'package:reboot_app_3/features/home/data/streak_notifier.dart';
 
 class DeleteAccountScreen extends ConsumerWidget {
   const DeleteAccountScreen({super.key});
@@ -217,18 +218,24 @@ class _ReLoginFormState extends ConsumerState<ReLoginForm> {
               final email = emailController.value.text;
               final password = passwordController.value.text;
 
-              if (_formKey.currentState!.validate()) {
-                final result = await authService.reSignInWithEmail(
-                  context,
-                  email,
-                  password,
-                );
-                if (result) {
-                  HapticFeedback.mediumImpact();
-                  //TODO: invalidate all providers
-                  await userProfileNotifier.handleUserDeletion();
-                  context.goNamed(RouteNames.onboarding.name);
-                  getSuccessSnackBar(context, 'account-deleted');
+              if (!email.isNotEmpty || !password.isNotEmpty) {
+                if (_formKey.currentState!.validate()) {
+                  final result = await authService.reSignInWithEmail(
+                    context,
+                    email,
+                    password,
+                  );
+                  if (result) {
+                    HapticFeedback.mediumImpact();
+
+                    //TODO: this needs to be checked
+                    ref.invalidate(streakNotifierProvider);
+                    ref.invalidate(streakServiceProvider);
+
+                    await userProfileNotifier.handleUserDeletion();
+                    context.goNamed(RouteNames.onboarding.name);
+                    getSuccessSnackBar(context, 'account-deleted');
+                  }
                 }
               }
             },

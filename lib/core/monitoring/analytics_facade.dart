@@ -8,19 +8,16 @@ part 'analytics_facade.g.dart';
 
 @Riverpod(keepAlive: true)
 AnalyticsFacade analyticsFacade(AnalyticsFacadeRef ref) {
+  final mixpanelAnalyticsClient =
+      ref.watch(mixpanelAnalyticsClientProvider).requireValue;
+
+  final googleAnalyticsClient = ref.watch(googleAnalyticsClientProvider);
+
   final clients = <AnalyticsClient>[
     LoggerAnalyticsClient(),
-    ref.read(googleAnalyticsClientProvider),
+    googleAnalyticsClient,
+    mixpanelAnalyticsClient,
   ];
-
-  ref.listen(
-    mixpanelAnalyticsClientProvider,
-    (previous, next) {
-      if (next.hasValue) {
-        clients.add(next.value!);
-      }
-    },
-  );
 
   return AnalyticsFacade(clients);
 }

@@ -1,7 +1,7 @@
 import 'dart:async';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
@@ -14,6 +14,7 @@ import 'package:reboot_app_3/core/shared_widgets/app_bar.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
 import 'package:reboot_app_3/core/shared_widgets/custom_segmented_button.dart';
 import 'package:reboot_app_3/core/shared_widgets/custom_textfield.dart';
+import 'package:reboot_app_3/core/shared_widgets/snackbar.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
@@ -59,12 +60,28 @@ class _ConfirmUserDetailsScreenState
   }
 
   Future<void> _selectDob(BuildContext context, String language) async {
+    // Calculate the valid date range
+    final lastDate = DateTime(2010, 12, 31); // Must be before 2011
+    final firstDate = DateTime(1950);
+
+    // Set initial date to a reasonable default regardless of existing dob
+    // This ensures users with invalid dates can still pick a new valid date
+    DateTime initialDate = DateTime(2010); // Default to year 2000
+
+    // Only use existing dob if it's within valid range
+    if (selectedBirthDate != null &&
+        selectedBirthDate.isBefore(lastDate) &&
+        !selectedBirthDate.isBefore(firstDate)) {
+      initialDate = selectedBirthDate;
+    }
+
     DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: selectedBirthDate,
-      firstDate: DateTime(1950),
-      lastDate: DateTime(2010),
+      initialDate: initialDate,
+      firstDate: firstDate,
+      lastDate: lastDate,
     );
+
     if (picked != null) {
       var date = DisplayDate(picked, language);
       setState(() {
@@ -83,7 +100,7 @@ class _ConfirmUserDetailsScreenState
 
     return Scaffold(
       backgroundColor: theme.backgroundColor,
-      appBar: appBar(context, ref, 'confirm-your-details', true, true),
+      appBar: appBar(context, ref, 'confirm-your-details', true, false),
       body: userDocumentAsyncValue.when(
         data: (userDocument) {
           if (userDocument == null) {
@@ -91,20 +108,22 @@ class _ConfirmUserDetailsScreenState
           }
 
           if (selectedGender == null) {
-            displayNameController.text = userDocument.displayName!;
-            emailController.text = userDocument.email!;
+            displayNameController.text = userDocument.displayName ?? "";
+            emailController.text = userDocument.email ?? "";
             var dob = DisplayDate(
                 userDocument.dayOfBirth!.toDate(), locale!.languageCode);
 
             dateOfBirthController.text = dob.displayDate;
             selectedBirthDate = dob.date;
 
-            var userFirstDate = userDocument.userFirstDate!.toDate();
+            var userFirstDate =
+                userDocument.userFirstDate?.toDate() ?? DateTime.now();
+
             var displayUserFirstDate =
                 DisplayDateTime(userFirstDate, locale.languageCode);
             userFirstDateController.text = displayUserFirstDate.displayDateTime;
-
             selectedUserFirstDate = displayUserFirstDate.date;
+
             selectedGender = _getGenderActualValue(userDocument.gender!);
             selectedLocale = SegmentedButtonOption(
               value: userDocument.locale!,
@@ -192,7 +211,9 @@ class _ConfirmUserDetailsScreenState
                   Consumer(builder: (context, ref, child) {
                     final locale = ref.watch(localeNotifierProvider);
                     return GestureDetector(
-                      onTap: () => _selectDob(context, locale!.languageCode),
+                      onTap: () {
+                        _selectDob(context, locale!.languageCode);
+                      },
                       child: AbsorbPointer(
                         child: CustomTextField(
                           controller: dateOfBirthController,
@@ -235,6 +256,33 @@ class _ConfirmUserDetailsScreenState
                   verticalSpace(Spacing.points32),
                   GestureDetector(
                     onTap: () async {
+                      HapticFeedback.lightImpact();
+
+                      // Check DOB validation first
+                      if (selectedBirthDate.isAfter(DateTime(2010, 12, 31))) {
+                        getErrorSnackBar(context, "dob-too-young");
+                        return;
+                      }
+
+                      // Check required fields
+                      if (displayNameController.text.trim().isEmpty) {
+                        getErrorSnackBar(context, "name-should-not-be-empty");
+                        return;
+                      }
+
+                      if (emailController.text.trim().isEmpty) {
+                        getErrorSnackBar(context, "email-should-not-be-empty");
+                        return;
+                      }
+
+                      // Check if gender and locale are selected
+                      if (this.selectedGender == null ||
+                          this.selectedLocale == null) {
+                        getErrorSnackBar(
+                            context, "please-add-all-required-data");
+                        return;
+                      }
+
                       final uid = userDocument.uid!;
                       final displayName = displayNameController.value.text;
                       final email = emailController.value.text;
@@ -242,21 +290,33 @@ class _ConfirmUserDetailsScreenState
                       final userFirstDate = userFirstDateController.value.text;
                       final selectedGender = this.selectedGender;
                       final selectedLocale = this.selectedLocale;
-                      await migrateService.migrateToNewDocuemntStrcture(
-                        UserDocument(
-                          uid: uid,
-                          displayName: displayName,
-                          dayOfBirth: Timestamp.fromDate(selectedBirthDate),
-                          userFirstDate: userDocument.userFirstDate,
-                          email: email,
-                          locale: selectedLocale?.value,
-                          gender: selectedGender?.value,
-                        ),
-                      );
-                      unawaited(ref
-                          .read(analyticsFacadeProvider)
-                          .trackOnboardingFinish());
-                      context.goNamed(RouteNames.home.name);
+
+                      try {
+                        await migrateService.migrateToNewDocuemntStrcture(
+                          UserDocument(
+                            uid: uid,
+                            displayName: displayName,
+                            dayOfBirth: Timestamp.fromDate(selectedBirthDate),
+                            userFirstDate: userDocument.userFirstDate,
+                            email: email,
+                            locale: selectedLocale?.value,
+                            gender: selectedGender?.value,
+                            userRelapses: userDocument.userRelapses,
+                            userWatchingWithoutMasturbating:
+                                userDocument.userWatchingWithoutMasturbating,
+                            userMasturbatingWithoutWatching:
+                                userDocument.userMasturbatingWithoutWatching,
+                          ),
+                        );
+
+                        // Only track analytics and navigate if migration succeeds
+                        unawaited(ref
+                            .read(analyticsFacadeProvider)
+                            .trackOnboardingFinish());
+                        context.goNamed(RouteNames.home.name);
+                      } catch (e) {
+                        getErrorSnackBar(context, "something-went-wrong");
+                      }
                     },
                     child: WidgetsContainer(
                       backgroundColor: theme.primary[600],

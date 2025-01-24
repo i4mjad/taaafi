@@ -85,7 +85,7 @@ class MigerationRepository {
     try {
       var updatedDocument = newDocument.toFirestore();
 
-      await addUserIdentifierToTrackers(_auth.currentUser!);
+      await _addUserIdentifierToTrackers(_auth.currentUser!);
       await docRef.set(updatedDocument, SetOptions(merge: true));
     } catch (e, stackTrace) {
       ref.read(errorLoggerProvider).logException(e, stackTrace);
@@ -93,7 +93,7 @@ class MigerationRepository {
     }
   }
 
-  Future<void> addUserIdentifierToTrackers(User user) async {
+  Future<void> _addUserIdentifierToTrackers(User user) async {
     // * add mixpanel user
     final mixPanelClient = await ref.read(mixpanelProvider.future);
     await mixPanelClient.identify(user.uid);

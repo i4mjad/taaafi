@@ -73,7 +73,6 @@ class AuthRepository {
         userFirstDate: Timestamp.fromDate(firstDate.toUtc()),
         role: "user",
         messagingToken: messagingToken,
-        bookmarkedContentIds: [],
       );
 
       var userDocumentMap = userDocument.toFirestore();

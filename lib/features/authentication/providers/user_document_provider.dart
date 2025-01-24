@@ -52,14 +52,12 @@ class UserDocumentsNotifier extends _$UserDocumentsNotifier {
   bool isLegacyUserDocument(UserDocument userDocument) {
     return userDocument.devicesIds == null ||
         userDocument.messagingToken == null ||
-        userDocument.bookmarkedContentIds == null ||
         userDocument.role == null;
   }
 
   bool isNewUserDocument(UserDocument userDocument) {
     return userDocument.devicesIds != null ||
         userDocument.messagingToken != null ||
-        userDocument.bookmarkedContentIds != null ||
         userDocument.role != null;
   }
 
