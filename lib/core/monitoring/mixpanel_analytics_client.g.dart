@@ -7,7 +7,7 @@ part of 'mixpanel_analytics_client.dart';
 // **************************************************************************
 
 String _$mixpanelAnalyticsClientHash() =>
-    r'4a615d73f23f4e60685cd798a402db4ede0bc53e';
+    r'28de6a2cdbf8c3fd46dbbe52988dd639408c4f23';
 
 /// See also [mixpanelAnalyticsClient].
 @ProviderFor(mixpanelAnalyticsClient)

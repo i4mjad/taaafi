@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:reboot_app_3/core/helpers/app_regex.dart';
 import 'package:reboot_app_3/core/helpers/date_display_formater.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/monitoring/analytics_facade.dart';
@@ -211,6 +212,13 @@ class _CompleteAccountRegisterationScreenState
                                 prefixIcon: LucideIcons.mail,
                                 inputType: TextInputType.emailAddress,
                                 validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return AppLocalizations.of(context)
+                                        .translate('cant-be-empty');
+                                  } else if (!AppRegex.isEmailValid(value)) {
+                                    return AppLocalizations.of(context)
+                                        .translate('enter-a-valid-email');
+                                  }
                                   return null;
                                 },
                               ),

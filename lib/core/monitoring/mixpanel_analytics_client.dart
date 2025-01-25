@@ -195,7 +195,10 @@ class MixpanelAnalyticsClient implements AnalyticsClient {
 @Riverpod(keepAlive: true)
 Future<MixpanelAnalyticsClient> mixpanelAnalyticsClient(
     MixpanelAnalyticsClientRef ref) async {
-  final mixpanel = await ref.read(mixpanelProvider.future);
+  final mixpanel = await Mixpanel.init(
+    "ac8731373dcf0a35a44d43ab1e3ea5f1",
+    trackAutomaticEvents: true,
+  );
   return MixpanelAnalyticsClient(mixpanel);
 }
 

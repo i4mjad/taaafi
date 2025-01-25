@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -7,7 +6,6 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:force_update_helper/force_update_helper.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
-import 'package:reboot_app_3/core/monitoring/analytics_facade.dart';
 import 'package:reboot_app_3/core/monitoring/error_logger.dart';
 import 'package:reboot_app_3/core/routing/app_routes.dart';
 import 'package:reboot_app_3/core/routing/app_startup.dart';
@@ -19,30 +17,16 @@ import 'package:reboot_app_3/core/utils/firebase_remote_config_provider.dart';
 import 'package:reboot_app_3/core/utils/url_launcher_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class MyApp extends ConsumerWidget with WidgetsBindingObserver {
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.detached ||
-        state == AppLifecycleState.paused) {
-      // Track app closed event
-      final container = ProviderContainer();
-      unawaited(container.read(analyticsFacadeProvider).trackAppClosed());
-    }
-  }
-
+class MyApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    WidgetsBinding.instance.addObserver(this);
     final goRouter = ref.watch(goRouterProvider);
     final theme = ref.watch(customThemeProvider);
     final locale = ref.watch(localeNotifierProvider);
     return AppTheme(
       customThemeData: theme.darkTheme ? darkCustomTheme : lightCustomTheme,
       child: MaterialApp.router(
-        // routeInformationParser: goRouter.routeInformationParser,
-        // routerDelegate: goRouter.routerDelegate,
         routerConfig: goRouter,
-
         supportedLocales: [Locale('ar', ''), Locale('en', '')],
         locale: locale,
         localizationsDelegates: [
@@ -145,18 +129,20 @@ Future<bool?> showAlertDialog({
     context: context,
     routeSettings: RouteSettings(name: routeName),
     builder: (context) => CupertinoAlertDialog(
-      title: Text(title),
-      content: Text(content),
+      title: Text(title,
+          style: TextStyles.h6.copyWith(color: theme?.primary[600])),
+      content: Text(content, style: TextStyles.body),
       actions: [
         if (cancelActionText != null)
           CupertinoDialogAction(
-            child: Text(cancelActionText),
+            child: Text(cancelActionText, style: TextStyles.small),
             onPressed: () => Navigator.of(context).pop(false),
           ),
         CupertinoDialogAction(
           isDestructiveAction: isDestructive,
           onPressed: () => Navigator.of(context).pop(true),
-          child: Text(defaultActionText),
+          child: Text(defaultActionText,
+              style: TextStyles.small.copyWith(color: theme?.primary[600])),
         ),
       ],
     ),
