@@ -30,13 +30,13 @@ class VaultScreen extends ConsumerWidget {
               // mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 SvgPicture.asset(
-                  'asset/illustrations/vault-hero-image.svg',
+                  'asset/illustrations/vault-hero-image-02.svg',
                 ),
                 verticalSpace(Spacing.points24),
                 Text(
                   AppLocalizations.of(context).translate('vault'),
                   style: TextStyles.h1.copyWith(
-                    color: theme.grey[700],
+                    color: theme.primary[700],
                   ),
                 ),
                 verticalSpace(Spacing.points12),
