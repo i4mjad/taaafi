@@ -64,7 +64,11 @@ export default async function ComingSoonPage({
 
           <section className="max-w-2xl mx-auto">
             <h2 className="text-2xl font-semibold mb-4">{dict.contactUs}</h2>
-            <p>{dict.contactUsDescription}</p>
+            <a href="mailto:admin@ta3afi.app">
+              <u>
+                <p>{dict.contactUsDescription}</p>
+              </u>
+            </a>
           </section>
         </div>
       </div>
