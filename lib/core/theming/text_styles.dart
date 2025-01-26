@@ -74,66 +74,6 @@ class TextStyles {
     letterSpacing: 0,
   );
 
-  static TextStyle bodyLarge = const TextStyle(
-    fontSize: 18,
-    decoration: TextDecoration.none,
-    fontFamily: 'Alexandria',
-    fontStyle: FontStyle.normal,
-    fontWeight: FontWeightHelper.book,
-    height: 27 / 18,
-    letterSpacing: 0,
-  );
-
-  static TextStyle body = const TextStyle(
-    fontSize: 16,
-    decoration: TextDecoration.none,
-    fontFamily: 'Alexandria',
-    fontStyle: FontStyle.normal,
-    fontWeight: FontWeightHelper.book,
-    height: 24 / 16,
-    letterSpacing: 0,
-  );
-
-  static TextStyle footnote = const TextStyle(
-    fontSize: 14,
-    decoration: TextDecoration.none,
-    fontFamily: 'Alexandria',
-    fontStyle: FontStyle.normal,
-    fontWeight: FontWeightHelper.book,
-    height: 20 / 14,
-    letterSpacing: 0,
-  );
-
-  static TextStyle caption = const TextStyle(
-    fontSize: 13,
-    decoration: TextDecoration.none,
-    fontFamily: 'Alexandria',
-    fontStyle: FontStyle.normal,
-    fontWeight: FontWeightHelper.book,
-    height: 20 / 13,
-    letterSpacing: 0,
-  );
-
-  static TextStyle small = const TextStyle(
-    fontSize: 12,
-    decoration: TextDecoration.none,
-    fontFamily: 'Alexandria',
-    fontStyle: FontStyle.normal,
-    fontWeight: FontWeightHelper.book,
-    height: 18 / 12,
-    letterSpacing: 0,
-  );
-
-  static TextStyle footnoteSelected = const TextStyle(
-    fontSize: 14,
-    decoration: TextDecoration.none,
-    fontFamily: 'Alexandria',
-    fontStyle: FontStyle.normal,
-    fontWeight: FontWeightHelper.medium,
-    height: 20 / 14,
-    letterSpacing: 0,
-  );
-
   static TextStyle bottomNavigationBarLabel = const TextStyle(
     fontSize: 11,
     decoration: TextDecoration.none,
@@ -144,10 +84,70 @@ class TextStyles {
     letterSpacing: 0,
   );
 
+  static TextStyle bodyLarge = const TextStyle(
+    fontSize: 18,
+    decoration: TextDecoration.none,
+    fontFamily: 'ExpoArabic',
+    fontStyle: FontStyle.normal,
+    fontWeight: FontWeightHelper.book,
+    height: 27 / 18,
+    letterSpacing: 0,
+  );
+
+  static TextStyle body = const TextStyle(
+    fontSize: 16,
+    decoration: TextDecoration.none,
+    fontFamily: 'ExpoArabic',
+    fontStyle: FontStyle.normal,
+    fontWeight: FontWeightHelper.book,
+    height: 24 / 16,
+    letterSpacing: 0,
+  );
+
+  static TextStyle footnote = const TextStyle(
+    fontSize: 14,
+    decoration: TextDecoration.none,
+    fontFamily: 'ExpoArabic',
+    fontStyle: FontStyle.normal,
+    fontWeight: FontWeightHelper.book,
+    height: 20 / 14,
+    letterSpacing: 0,
+  );
+
+  static TextStyle caption = const TextStyle(
+    fontSize: 13,
+    decoration: TextDecoration.none,
+    fontFamily: 'ExpoArabic',
+    fontStyle: FontStyle.normal,
+    fontWeight: FontWeightHelper.book,
+    height: 20 / 13,
+    letterSpacing: 0,
+  );
+
+  static TextStyle small = const TextStyle(
+    fontSize: 12,
+    decoration: TextDecoration.none,
+    fontFamily: 'ExpoArabic',
+    fontStyle: FontStyle.normal,
+    fontWeight: FontWeightHelper.book,
+    height: 18 / 12,
+    letterSpacing: 0,
+  );
+
+  static TextStyle footnoteSelected = const TextStyle(
+    fontSize: 14,
+    decoration: TextDecoration.none,
+    fontFamily: 'ExpoArabic',
+    fontStyle: FontStyle.normal,
+    fontWeight: FontWeightHelper.medium,
+    height: 20 / 14,
+    letterSpacing: 0,
+  );
+
   static TextStyle smallBold = const TextStyle(
     fontSize: 12,
     decoration: TextDecoration.none,
-    fontFamily: 'Alexandria',
+    fontFamily: 'ExpoArabic',
     fontStyle: FontStyle.normal,
     fontWeight: FontWeightHelper.semiBold,
     height: 18 / 12,
@@ -157,7 +157,7 @@ class TextStyles {
   static TextStyle tinyBold = const TextStyle(
     fontSize: 8,
     decoration: TextDecoration.none,
-    fontFamily: 'Alexandria',
+    fontFamily: 'ExpoArabic',
     fontStyle: FontStyle.normal,
     fontWeight: FontWeightHelper.semiBold,
     height: 18 / 8,
@@ -167,7 +167,7 @@ class TextStyles {
   static TextStyle tiny = const TextStyle(
     fontSize: 8,
     decoration: TextDecoration.none,
-    fontFamily: 'Alexandria',
+    fontFamily: 'ExpoArabic',
     fontStyle: FontStyle.normal,
     fontWeight: FontWeightHelper.medium,
     height: 18 / 8,
@@ -177,7 +177,7 @@ class TextStyles {
   static TextStyle bodyTiny = const TextStyle(
     fontSize: 10,
     decoration: TextDecoration.none,
-    fontFamily: 'Alexandria',
+    fontFamily: 'ExpoArabic',
     fontStyle: FontStyle.normal,
     fontWeight: FontWeightHelper.medium,
     height: 15 / 10,
