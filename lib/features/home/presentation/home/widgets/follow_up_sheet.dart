@@ -360,7 +360,6 @@ class _FollowUpSheetState extends ConsumerState<FollowUpSheet> {
                 child: GestureDetector(
                   onTap: () async {
                     await _saveFollowUpsAndEmotions();
-
                     Navigator.pop(context);
                   },
                   child: WidgetsContainer(
