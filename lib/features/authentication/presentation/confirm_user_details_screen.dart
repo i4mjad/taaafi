@@ -1,3 +1,5 @@
+//TODO: review those changes before code pushing it to prod
+
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -36,9 +38,9 @@ class _ConfirmUserDetailsScreenState
   late TextEditingController displayNameController;
   late TextEditingController emailController;
   late TextEditingController dateOfBirthController;
-  late DateTime selectedBirthDate;
+  DateTime? selectedBirthDate;
   late TextEditingController userFirstDateController;
-  late DateTime selectedUserFirstDate;
+  DateTime? selectedUserFirstDate;
   SegmentedButtonOption? selectedGender;
   SegmentedButtonOption? selectedLocale;
 
@@ -61,19 +63,14 @@ class _ConfirmUserDetailsScreenState
   }
 
   Future<void> _selectDob(BuildContext context, String language) async {
-    // Calculate the valid date range
-    final lastDate = DateTime(2010, 12, 31); // Must be before 2011
+    final lastDate = DateTime(2010, 12, 31);
     final firstDate = DateTime(1950);
+    DateTime initialDate = DateTime(2010);
 
-    // Set initial date to a reasonable default regardless of existing dob
-    // This ensures users with invalid dates can still pick a new valid date
-    DateTime initialDate = DateTime(2010); // Default to year 2000
-
-    // Only use existing dob if it's within valid range
     if (selectedBirthDate != null &&
-        selectedBirthDate.isBefore(lastDate) &&
-        !selectedBirthDate.isBefore(firstDate)) {
-      initialDate = selectedBirthDate;
+        selectedBirthDate!.isBefore(lastDate) &&
+        !selectedBirthDate!.isBefore(firstDate)) {
+      initialDate = selectedBirthDate!;
     }
 
     DateTime? picked = await showDatePicker(
@@ -111,24 +108,28 @@ class _ConfirmUserDetailsScreenState
           if (selectedGender == null) {
             displayNameController.text = userDocument.displayName ?? "";
             emailController.text = userDocument.email ?? "";
-            var dob = DisplayDate(
-                userDocument.dayOfBirth!.toDate(), locale!.languageCode);
 
-            dateOfBirthController.text = dob.displayDate;
-            selectedBirthDate = dob.date;
+            if (userDocument.dayOfBirth != null) {
+              var dob = DisplayDate(userDocument.dayOfBirth!.toDate(),
+                  locale?.languageCode ?? 'en');
+              dateOfBirthController.text = dob.displayDate;
+              selectedBirthDate = dob.date;
+            }
 
-            var userFirstDate =
+            final userFirstDate =
                 userDocument.userFirstDate?.toDate() ?? DateTime.now();
-
             var displayUserFirstDate =
-                DisplayDateTime(userFirstDate, locale.languageCode);
+                DisplayDateTime(userFirstDate, locale?.languageCode ?? 'en');
             userFirstDateController.text = displayUserFirstDate.displayDateTime;
             selectedUserFirstDate = displayUserFirstDate.date;
 
-            selectedGender = _getGenderActualValue(userDocument.gender!);
+            selectedGender = userDocument.gender != null
+                ? _getGenderActualValue(userDocument.gender!)
+                : SegmentedButtonOption(value: 'male', translationKey: 'male');
+
             selectedLocale = SegmentedButtonOption(
-              value: userDocument.locale!,
-              translationKey: userDocument.locale!,
+              value: userDocument.locale ?? 'english',
+              translationKey: userDocument.locale ?? 'english',
             );
           }
 
@@ -184,7 +185,9 @@ class _ConfirmUserDetailsScreenState
                       SegmentedButtonOption(
                           value: 'female', translationKey: 'female')
                     ],
-                    selectedOption: selectedGender!,
+                    selectedOption: selectedGender ??
+                        SegmentedButtonOption(
+                            value: 'male', translationKey: 'male'),
                     onChanged: (selection) {
                       setState(() {
                         selectedGender = _getGenderActualValue(selection.value);
@@ -201,7 +204,9 @@ class _ConfirmUserDetailsScreenState
                       SegmentedButtonOption(
                           value: 'arabic', translationKey: 'arabic')
                     ],
-                    selectedOption: selectedLocale!,
+                    selectedOption: selectedLocale ??
+                        SegmentedButtonOption(
+                            value: 'english', translationKey: 'english'),
                     onChanged: (selection) {
                       setState(() {
                         selectedLocale = selection;
@@ -213,7 +218,7 @@ class _ConfirmUserDetailsScreenState
                     final locale = ref.watch(localeNotifierProvider);
                     return GestureDetector(
                       onTap: () {
-                        _selectDob(context, locale!.languageCode);
+                        _selectDob(context, locale?.languageCode ?? 'en');
                       },
                       child: AbsorbPointer(
                         child: CustomTextField(
@@ -259,13 +264,12 @@ class _ConfirmUserDetailsScreenState
                     onTap: () async {
                       HapticFeedback.lightImpact();
 
-                      // Check DOB validation first
-                      if (selectedBirthDate.isAfter(DateTime(2010, 12, 31))) {
+                      if (selectedBirthDate != null &&
+                          selectedBirthDate!.isAfter(DateTime(2010, 12, 31))) {
                         getErrorSnackBar(context, "dob-too-young");
                         return;
                       }
 
-                      // Check required fields
                       if (displayNameController.text.trim().isEmpty) {
                         getErrorSnackBar(context, "name-should-not-be-empty");
                         return;
@@ -276,30 +280,22 @@ class _ConfirmUserDetailsScreenState
                         return;
                       }
 
-                      // Check if gender and locale are selected
-                      if (this.selectedGender == null ||
-                          this.selectedLocale == null) {
+                      if (selectedGender == null || selectedLocale == null) {
                         getErrorSnackBar(
                             context, "please-add-all-required-data");
                         return;
                       }
 
-                      final uid = userDocument.uid;
-                      final displayName = displayNameController.value.text;
-                      final email = emailController.value.text;
-                      final dateOfBirth = dateOfBirthController.value.text;
-                      final userFirstDate = userFirstDateController.value.text;
-                      final selectedGender = this.selectedGender;
-                      final selectedLocale = this.selectedLocale;
-
                       try {
                         await migrateService.migrateToNewDocuemntStrcture(
                           UserDocument(
-                            uid: uid,
-                            displayName: displayName,
-                            dayOfBirth: Timestamp.fromDate(selectedBirthDate),
+                            uid: userDocument.uid,
+                            displayName: displayNameController.text.trim(),
+                            dayOfBirth: selectedBirthDate != null
+                                ? Timestamp.fromDate(selectedBirthDate!)
+                                : null,
                             userFirstDate: userDocument.userFirstDate,
-                            email: email,
+                            email: emailController.text.trim(),
                             locale: selectedLocale?.value,
                             gender: selectedGender?.value,
                             userRelapses: userDocument.userRelapses,
@@ -310,7 +306,6 @@ class _ConfirmUserDetailsScreenState
                           ),
                         );
 
-                        // Only track analytics and navigate if migration succeeds
                         unawaited(ref
                             .read(analyticsFacadeProvider)
                             .trackOnboardingFinish());
