@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:reboot_app_3/app.dart';
 import 'package:reboot_app_3/core/messaging/services/fcm_service.dart';
+import 'package:reboot_app_3/core/monitoring/error_logger.dart';
 import 'package:reboot_app_3/core/monitoring/mixpanel_analytics_client.dart';
 import 'package:reboot_app_3/firebase_options.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
@@ -28,7 +29,7 @@ Future<void> runMainApp() async {
   await MessagingService.instance.init();
 
   //Setup error handeling pages
-  registerErrorHandlers();
+  registerErrorHandlers(container);
 
   await SentryFlutter.init(
     (options) {
@@ -48,11 +49,14 @@ Future<void> runMainApp() async {
   );
 }
 
-void registerErrorHandlers() {
+void registerErrorHandlers(ProviderContainer container) async {
   // * Show some error UI if any uncaught exception happens
   FlutterError.onError = (FlutterErrorDetails details) {
     FlutterError.presentError(details);
     FirebaseCrashlytics.instance.recordFlutterFatalError;
+    container
+        .read(errorLoggerProvider)
+        .logException(details.exception, details.stack);
     debugPrint(details.toString());
   };
   // * Handle errors from the underlying platform/OS
@@ -67,7 +71,24 @@ void registerErrorHandlers() {
         backgroundColor: Colors.red,
         title: Text('An error occurred'),
       ),
-      body: Center(child: Text(details.toString())),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'Error: ${details.exception}',
+              style: const TextStyle(fontSize: 16),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Stack trace:\n${details.stack}',
+              style: const TextStyle(fontSize: 12),
+              textAlign: TextAlign.left,
+            ),
+          ],
+        ),
+      ),
     );
   };
 }
