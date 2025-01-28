@@ -11,7 +11,6 @@ import 'package:reboot_app_3/core/messaging/services/fcm_service.dart';
 import 'package:reboot_app_3/core/monitoring/error_logger.dart';
 import 'package:reboot_app_3/core/monitoring/mixpanel_analytics_client.dart';
 import 'package:reboot_app_3/firebase_options.dart';
-import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -26,30 +25,16 @@ Future<void> runMainApp() async {
 
   // * Preload MixpanelAnalyticsClient, so we can make unawaited analytics calls
   await container.read(mixpanelAnalyticsClientProvider.future);
-  // * Preload SentryUserInit
-  await container.read(sentryUserInitProvider.future);
   //Initialize Notification settings
   await MessagingService.instance.init();
 
   //Setup error handeling pages
   registerErrorHandlers(container);
 
-  await SentryFlutter.init(
-    (options) {
-      options.dsn =
-          'https://8b5f32f9c6b6e9844338848ad1eadafa@o4507702647848960.ingest.de.sentry.io/4507702652108880';
-      // Set tracesSampleRate to 1.0 to capture 100% of transactions for performance monitoring.
-      // We recommend adjusting this value in production.
-      options.tracesSampleRate = 0.1;
-      // The sampling rate for profiling is relative to tracesSampleRate
-      // Setting to 1.0 will profile 100% of sampled transactions:
-      options.profilesSampleRate = 0.1;
-    },
-    appRunner: () => runApp(UncontrolledProviderScope(
-      container: container,
-      child: MyApp(),
-    )),
-  );
+  runApp(UncontrolledProviderScope(
+    container: container,
+    child: MyApp(),
+  ));
 }
 
 void registerErrorHandlers(ProviderContainer container) async {

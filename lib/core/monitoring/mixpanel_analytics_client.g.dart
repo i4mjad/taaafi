@@ -37,20 +37,5 @@ final mixpanelProvider = FutureProvider<Mixpanel>.internal(
 );
 
 typedef MixpanelRef = FutureProviderRef<Mixpanel>;
-String _$sentryUserInitHash() => r'fde0625fbf370c394336bf0d4d73bcba31db47a6';
-
-/// See also [sentryUserInit].
-@ProviderFor(sentryUserInit)
-final sentryUserInitProvider = FutureProvider<void>.internal(
-  sentryUserInit,
-  name: r'sentryUserInitProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$sentryUserInitHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
-
-typedef SentryUserInitRef = FutureProviderRef<void>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

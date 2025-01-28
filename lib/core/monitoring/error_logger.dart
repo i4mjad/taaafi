@@ -1,6 +1,6 @@
 import 'dart:developer';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:sentry_flutter/sentry_flutter.dart';
 
 part 'error_logger.g.dart';
 
@@ -9,7 +9,7 @@ class ErrorLogger {
 
   // ignore:avoid-unnecessary-futures,avoid-redundant-async
   FutureOr<void> logException(Object exception, StackTrace? stackTrace) async {
-    await Sentry.captureException(exception, stackTrace: stackTrace);
+    await FirebaseCrashlytics.instance.recordError(exception, stackTrace);
     log(exception.toString(),
         name: 'Exception', error: exception, stackTrace: stackTrace);
   }

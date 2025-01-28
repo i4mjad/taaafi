@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:reboot_app_3/core/monitoring/error_logger.dart';
@@ -99,7 +100,7 @@ class MigerationRepository {
     await mixPanelClient.identify(user.uid);
 
     // * add sentry user
-    await ref.read(sentryUserInitProvider.future);
+    FirebaseCrashlytics.instance.setUserIdentifier(user.uid);
 
     // * add google analytics user
     final googleAnalyticsClient = await ref.read(firebaseAnalyticsProvider);

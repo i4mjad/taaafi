@@ -1,8 +1,6 @@
 import 'package:mixpanel_flutter/mixpanel_flutter.dart';
 import 'package:reboot_app_3/core/monitoring/analytics_client.dart';
-import 'package:reboot_app_3/features/authentication/data/repositories/auth_repository.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:sentry_flutter/sentry_flutter.dart';
 
 part 'mixpanel_analytics_client.g.dart';
 
@@ -207,15 +205,5 @@ Future<Mixpanel> mixpanel(MixpanelRef ref) async {
   return await Mixpanel.init(
     "ac8731373dcf0a35a44d43ab1e3ea5f1",
     trackAutomaticEvents: true,
-  );
-}
-
-@Riverpod(keepAlive: true)
-Future<void> sentryUserInit(SentryUserInitRef ref) async {
-  final user = ref.read(authRepositoryProvider).currentUser;
-  Sentry.configureScope(
-    (scope) => scope.setUser(SentryUser(
-        id: user?.uid != null ? user!.uid : "User not found",
-        email: user?.email != null ? user!.email : "User email not found")),
   );
 }
