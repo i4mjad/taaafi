@@ -1,5 +1,3 @@
-//TODO: review those changes before code pushing it to prod
-
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -314,7 +312,6 @@ class _ConfirmUserDetailsScreenState
                         ref
                             .read(errorLoggerProvider)
                             .logException(e, stackTrace);
-                        getErrorSnackBar(context, "something-went-wrong");
                       }
                     },
                     child: WidgetsContainer(

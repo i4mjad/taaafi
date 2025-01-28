@@ -56,8 +56,8 @@ class UserDocumentsNotifier extends _$UserDocumentsNotifier {
   }
 
   bool isNewUserDocument(UserDocument userDocument) {
-    return userDocument.devicesIds != null ||
-        userDocument.messagingToken != null ||
+    return userDocument.devicesIds != null &&
+        userDocument.messagingToken != null &&
         userDocument.role != null;
   }
 
@@ -72,16 +72,12 @@ class UserDocumentsNotifier extends _$UserDocumentsNotifier {
   }
 
   Future<bool> hasOldStructure() async {
-    try {
-      final uid = _auth.currentUser?.uid;
-      if (uid == null) return false;
+    final uid = _auth.currentUser?.uid;
+    if (uid == null) return false;
 
-      final doc = await _firestore.collection('users').doc(uid).get();
-      final data = doc.data();
+    final doc = await _firestore.collection('users').doc(uid).get();
+    final data = UserDocument.fromFirestore(doc);
 
-      return data != null && !data.containsKey('devicesIds');
-    } catch (e) {
-      return false;
-    }
+    return data != null && data.role == null;
   }
 }

@@ -12,6 +12,9 @@ import 'package:reboot_app_3/core/monitoring/error_logger.dart';
 import 'package:reboot_app_3/core/monitoring/mixpanel_analytics_client.dart';
 import 'package:reboot_app_3/firebase_options.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:device_info_plus/device_info_plus.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 Future<void> runMainApp() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -69,22 +72,72 @@ void registerErrorHandlers(ProviderContainer container) async {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.red,
-        title: Text('An error occurred'),
+        title: const Text('An error occurred'),
       ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(
-              'Error: ${details.exception}',
-              style: const TextStyle(fontSize: 16),
+            const Text(
+              'Oops! Something went wrong.',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 16),
-            Text(
-              'Stack trace:\n${details.stack}',
-              style: const TextStyle(fontSize: 12),
-              textAlign: TextAlign.left,
+            ElevatedButton(
+              onPressed: () async {
+                final deviceInfo = DeviceInfoPlugin();
+                String deviceDetails = '';
+
+                if (defaultTargetPlatform == TargetPlatform.android) {
+                  final androidInfo = await deviceInfo.androidInfo;
+                  deviceDetails =
+                      'Android ${androidInfo.version.release} (SDK ${androidInfo.version.sdkInt})\n'
+                      'Device: ${androidInfo.manufacturer} ${androidInfo.model}';
+                } else if (defaultTargetPlatform == TargetPlatform.iOS) {
+                  final iosInfo = await deviceInfo.iosInfo;
+                  deviceDetails = 'iOS ${iosInfo.systemVersion}\n'
+                      'Device: ${iosInfo.name} ${iosInfo.model}';
+                }
+
+                String userInfo = 'Not logged in';
+                final currentUser = FirebaseAuth.instance.currentUser;
+                if (currentUser != null) {
+                  userInfo = 'User ID: ${currentUser.uid}\n'
+                      'Email: ${currentUser.email ?? "No email"}\n'
+                      'Display Name: ${currentUser.displayName ?? "No name"}';
+                }
+
+                final body = '''
+                              Error Report
+
+                              Device Information:
+                              $deviceDetails
+
+                              User Information:
+                              $userInfo
+
+                              Error Details:
+                              ${details.exception}
+
+                              Stack Trace:
+                              ${details.stack}
+                              ''';
+
+                final Uri emailLaunchUri = Uri(
+                  scheme: 'mailto',
+                  path: 'admin@ta3afi.app',
+                  queryParameters: {
+                    'subject': 'Error Report',
+                    'body': body,
+                  },
+                );
+
+                if (await canLaunchUrl(emailLaunchUri)) {
+                  await launchUrl(emailLaunchUri);
+                }
+              },
+              child: const Text('Report this error'),
             ),
           ],
         ),
