@@ -65,7 +65,7 @@ class _CalenderWidgetState extends ConsumerState<CalenderWidget> {
                   color: theme.grey[600]!,
                   width: 0.5,
                 ),
-                boxShadow: Shadows.mainShadows,
+                // boxShadow: Shadows.mainShadows,
                 child: SfCalendar(
                   dataSource: _getCalendarDataSource(followUps),
                   view: CalendarView.month,

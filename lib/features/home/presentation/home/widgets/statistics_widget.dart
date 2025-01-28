@@ -127,14 +127,14 @@ class _FirstPageWidget extends ConsumerWidget {
           backgroundColor: theme.backgroundColor,
           borderRadius: BorderRadius.circular(15),
           borderSide: BorderSide(color: theme.grey[600]!, width: 0.5),
-          boxShadow: Shadows.mainShadows,
+          // boxShadow: Shadows.mainShadows,
           child: Row(
             children: [
               Container(
                 padding: EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   color: theme.backgroundColor,
-                  boxShadow: Shadows.mainShadows,
+                  // boxShadow: Shadows.mainShadows,
                   shape: BoxShape.circle,
                   border: Border.all(
                     width: 0.75,
@@ -339,26 +339,6 @@ class _FirstPageWidget extends ConsumerWidget {
                   backgroundColor: theme.backgroundColor,
                   padding: EdgeInsets.fromLTRB(16, 12, 16, 12),
                   borderSide: BorderSide(color: theme.grey[600]!, width: 0.5),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Color.fromRGBO(50, 50, 93, 0.25),
-                      blurRadius: 5,
-                      spreadRadius: -1,
-                      offset: Offset(
-                        0,
-                        2,
-                      ),
-                    ),
-                    BoxShadow(
-                      color: Color.fromRGBO(0, 0, 0, 0.3),
-                      blurRadius: 3,
-                      spreadRadius: -1,
-                      offset: Offset(
-                        0,
-                        1,
-                      ),
-                    ),
-                  ],
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -401,7 +381,7 @@ class _SecondPageWidget extends ConsumerWidget {
                   padding: EdgeInsets.all(16),
                   backgroundColor: theme.backgroundColor,
                   borderSide: BorderSide(color: theme.grey[600]!, width: 0.5),
-                  boxShadow: Shadows.mainShadows,
+                  // boxShadow: Shadows.mainShadows,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisAlignment: MainAxisAlignment.start,
@@ -446,7 +426,7 @@ class _SecondPageWidget extends ConsumerWidget {
                       backgroundColor: theme.backgroundColor,
                       borderSide:
                           BorderSide(color: theme.grey[600]!, width: 0.5),
-                      boxShadow: Shadows.mainShadows,
+                      // boxShadow: Shadows.mainShadows,
                       child: Row(
                         children: [
                           Container(
@@ -485,7 +465,7 @@ class _SecondPageWidget extends ConsumerWidget {
                       backgroundColor: theme.backgroundColor,
                       borderSide:
                           BorderSide(color: theme.grey[600]!, width: 0.5),
-                      boxShadow: Shadows.mainShadows,
+                      // boxShadow: Shadows.mainShadows,
                       child: Row(
                         children: [
                           Container(
