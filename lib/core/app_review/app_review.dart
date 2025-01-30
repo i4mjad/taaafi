@@ -26,7 +26,7 @@ class InAppRatingService {
   Future<void> requestReview(BuildContext context) async {
       if (Platform.isIOS) {
         await _inAppReview.openStoreListing(
-          appStoreId: '6450408345',
+          appStoreId: '1531562469',
         );
       } else {
         await ref.read(urlLauncherProvider).launch(Uri.parse(
