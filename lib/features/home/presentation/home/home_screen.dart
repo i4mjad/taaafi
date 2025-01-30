@@ -113,8 +113,8 @@ class Activities extends ConsumerWidget {
                 ),
               ),
               Positioned(
-							  left: locale!.languageCode == 'ar' ? null : 40,
-							  right: locale!.languageCode == 'ar' ? 40 : null,
+							  left: locale!.languageCode == 'ar' ? 40 : null,
+							  right: locale!.languageCode == 'ar' ? null : 40,
 							  bottom: -20,
 							  child: Transform.rotate(
 							    angle: 15 * 3.141592653589793 / 180,
