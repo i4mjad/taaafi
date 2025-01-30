@@ -122,7 +122,7 @@ class AuthService {
     try {
       final appleProvider = AppleAuthProvider();
       appleProvider.scopes.add("email");
-
+			appleProvider.scopes.add("fullName");
       final credential = await _auth.signInWithProvider(appleProvider);
 
       return credential.user;
