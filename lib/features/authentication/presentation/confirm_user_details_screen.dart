@@ -161,6 +161,7 @@ class _ConfirmUserDetailsScreenState
                     controller: emailController,
                     hint: AppLocalizations.of(context).translate('email'),
                     prefixIcon: LucideIcons.mail,
+                    enabled: userDocument.email == null,
                     inputType: TextInputType.emailAddress,
                     validator: (value) {
                       if (value == null || value.isEmpty) {

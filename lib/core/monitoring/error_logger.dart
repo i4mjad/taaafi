@@ -7,7 +7,6 @@ part 'error_logger.g.dart';
 class ErrorLogger {
   const ErrorLogger();
 
-  // ignore:avoid-unnecessary-futures,avoid-redundant-async
   FutureOr<void> logException(Object exception, StackTrace? stackTrace) async {
     await FirebaseCrashlytics.instance.recordError(exception, stackTrace);
     log(exception.toString(),

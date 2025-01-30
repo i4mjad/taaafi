@@ -59,9 +59,22 @@ class MigerationRepository {
     WriteBatch batch = FirebaseFirestore.instance.batch();
 
     try {
+      // Create a map to track existing followups for each date
+      Map<String, Set<String>> dateTypeMap = {};
+
       for (var followUp in followUps) {
-        var docRef = collectionRef.doc(); // Use Firebase auto-generated ID
-        batch.set(docRef, followUp.toMap());
+        // Create a unique key for the date (assuming followUp has a dateTime field)
+        String dateKey = followUp.time.toString().split(' ')[0];
+
+        // Initialize set for this date if it doesn't exist
+        dateTypeMap[dateKey] ??= {};
+
+        // Check if this type already exists for this date
+        if (!dateTypeMap[dateKey]!.contains(followUp.type)) {
+          dateTypeMap[dateKey]!.add(followUp.type.name);
+          var docRef = collectionRef.doc();
+          batch.set(docRef, followUp.toMap());
+        }
       }
 
       return await batch.commit();

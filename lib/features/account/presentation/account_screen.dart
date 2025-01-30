@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:reboot_app_3/core/app_review/app_review.dart';
 import 'package:reboot_app_3/core/helpers/date_display_formater.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/monitoring/analytics_facade.dart';
@@ -18,6 +19,7 @@ import 'package:reboot_app_3/core/theming/custom_theme_data.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/core/theming/theme_provider.dart';
+import 'package:reboot_app_3/core/utils/url_launcher_provider.dart';
 import 'package:reboot_app_3/features/account/data/models/user_profile.dart';
 import 'package:reboot_app_3/features/account/data/user_profile_notifier.dart';
 import 'package:reboot_app_3/features/account/presentation/update_user_profile_modal_sheet.dart';
@@ -134,10 +136,22 @@ class AccountScreen extends ConsumerWidget {
                       ),
                       verticalSpace(Spacing.points8),
                       SettingsButton(
-                        icon: LucideIcons.laptop,
+                        icon: LucideIcons.contact,
                         textKey: 'contact-us-through-this-channels',
-                        action: () {
-                          launchUrl(Uri.parse('https://amjad.om'));
+                        action: () async {
+                          await ref
+                              .read(urlLauncherProvider)
+                              .launch(Uri.parse('https://t.me/Ta3afiApp'));
+                        },
+                      ),
+                      verticalSpace(Spacing.points8),
+                      SettingsButton(
+                        icon: LucideIcons.star,
+                        textKey: 'rate-app',
+                        action: () async {
+                          await ref
+                              .read(inAppRatingServiceProvider)
+                              .requestReview(context);
                         },
                       ),
                       verticalSpace(Spacing.points12),

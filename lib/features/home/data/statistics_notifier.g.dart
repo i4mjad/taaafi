@@ -38,7 +38,7 @@ final statisticsStreamProvider =
 
 typedef StatisticsStreamRef = AutoDisposeStreamProviderRef<UserStatisticsModel>;
 String _$statisticsNotifierHash() =>
-    r'e6af60aa58cad44649975659a62ec4d84baae95a';
+    r'5e321b39a86a49f51fa505a0e7913d4a581840f8';
 
 /// See also [StatisticsNotifier].
 @ProviderFor(StatisticsNotifier)

@@ -12,19 +12,19 @@ part 'statistics_notifier.g.dart';
 
 class UserStatistics {
   final int daysWithoutRelapse;
-  final int totalDaysFromFirstDate;
+  final int relapsesInLast30Days;
   final int longestRelapseStreak;
 
   UserStatistics({
     required this.daysWithoutRelapse,
-    required this.totalDaysFromFirstDate,
+    required this.relapsesInLast30Days,
     required this.longestRelapseStreak,
   });
 
   factory UserStatistics.fromModel(models.UserStatisticsModel model) {
     return UserStatistics(
       daysWithoutRelapse: model.daysWithoutRelapse,
-      totalDaysFromFirstDate: model.totalDaysFromFirstDate,
+      relapsesInLast30Days: model.totalDaysFromFirstDate,
       longestRelapseStreak: model.longestRelapseStreak,
     );
   }
@@ -37,19 +37,18 @@ class StatisticsNotifier extends _$StatisticsNotifier {
   @override
   FutureOr<UserStatistics> build() async {
     final daysWithoutRelapseFuture = service.calculateDaysWithoutRelapse();
-    final totalDaysFromFirstDateFuture =
-        service.calculateTotalDaysFromFirstDate();
+    final relapsesLast30DaysFuture = service.getRelapsesInLast30Days();
     final longestRelapseStreakFuture = service.calculateLongestRelapseStreak();
 
     final results = await Future.wait([
       daysWithoutRelapseFuture,
-      totalDaysFromFirstDateFuture,
+      relapsesLast30DaysFuture,
       longestRelapseStreakFuture,
     ]);
 
     return UserStatistics(
       daysWithoutRelapse: results[0],
-      totalDaysFromFirstDate: results[1],
+      relapsesInLast30Days: results[1],
       longestRelapseStreak: results[2],
     );
   }

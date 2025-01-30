@@ -111,7 +111,8 @@
   "Videos": "Videos",
   "Books": "Books",
   "Blogs": "Blogs",
-  "relapses-30-days": "Relapses in the last 30 days: ",
+  "relapses-30-days": "In last 30 days",
+  "rate-app": "Rate the app",
 
   "free-days-from-start": "Total free days!",
   "changed-to-en": "Language has been changed to English",
@@ -257,14 +258,15 @@
   "ta3afi-plus":"Ta'aafi +",
 
   "emotions":"Emotions",
-
+  "exercises-description-home-description": "Various Activities specially designed to help you in your recovery journey, step by step towards your goal",
+  "activities-home-headings": "Activities, Step by Step towards Recovery",
   "vault": "Vault",
   "fellowship": "Group",
   "about-app": "About the app",
   "about-ta3afi": "Spreading awareness about the consequences of porn & masturbation addiction by providing helpful resources and tools to overcome the addiction.",
-  "version-number": "v5.0.0",
+  "version-number": "v5.0.1",
   "dismiss": "Dismiss",
-  "contact-us-through-this-channels": "Contact Developer",
+  "contact-us-through-this-channels": "Contact Us",
   "support-app-development": "Support Development",
   "support-app-development-p": "The development of the app takes a lot of time and effort and all of its features are free. To support the app chose among these list",
   "contact-us": "Reach Me",

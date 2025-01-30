@@ -485,12 +485,12 @@ class _SecondPageWidget extends ConsumerWidget {
                             mainAxisAlignment: MainAxisAlignment.start,
                             children: [
                               Text(
-                                  "${data.totalDaysFromFirstDate} " +
-                                      localization.translate("day"),
+                                  "${data.relapsesInLast30Days} " +
+                                      localization.translate("relapse"),
                                   style: TextStyles.h6),
                               verticalSpace(Spacing.points8),
                               Text(
-                                localization.translate("total-days"),
+                                localization.translate("relapses-30-days"),
                                 overflow: TextOverflow.ellipsis,
                                 style: TextStyles.small,
                               ),

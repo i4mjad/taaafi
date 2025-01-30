@@ -237,10 +237,16 @@ class StatisticsRepository {
   }
 
   /// Calculate the total days from the user's first date.
-  Future<int> calculateTotalDaysFromFirstDate() async {
+  Future<int> getRelapsesInLast30Days() async {
     try {
-      final userFirstDate = await getUserFirstDate();
-      return DateTime.now().difference(_onlyDate(userFirstDate)).inDays;
+      final now = DateTime.now();
+      final thirtyDaysAgo = now.subtract(Duration(days: 30));
+
+      final relapses = await readFollowUpsByType(FollowUpType.relapse);
+
+      return relapses
+          .where((followUp) => followUp.time.isAfter(thirtyDaysAgo))
+          .length;
     } catch (e, stackTrace) {
       ref.read(errorLoggerProvider).logException(e, stackTrace);
       rethrow;

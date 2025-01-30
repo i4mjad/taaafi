@@ -50,8 +50,8 @@ class StatisticsService {
   }
 
   /// Calculate the total days from the user's first date.
-  Future<int> calculateTotalDaysFromFirstDate() async {
-    return await _repository.calculateTotalDaysFromFirstDate();
+  Future<int> getRelapsesInLast30Days() async {
+    return await _repository.getRelapsesInLast30Days();
   }
 
   /// Calculate the longest streak (in days) between two `relapse` follow-ups.
@@ -101,7 +101,7 @@ class StatisticsService {
     while (true) {
       final futures = await Future.wait([
         calculateDaysWithoutRelapse(),
-        calculateTotalDaysFromFirstDate(),
+        getRelapsesInLast30Days(),
         calculateLongestRelapseStreak(),
       ]);
 
