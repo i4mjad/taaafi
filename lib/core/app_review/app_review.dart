@@ -24,9 +24,6 @@ class InAppRatingService {
 
   /// Requests a review if certain conditions are met
   Future<void> requestReview(BuildContext context) async {
-    if (await _inAppReview.isAvailable()) {
-      await _inAppReview.requestReview();
-    } else {
       if (Platform.isIOS) {
         await _inAppReview.openStoreListing(
           appStoreId: '6450408345',
@@ -35,7 +32,6 @@ class InAppRatingService {
         await ref.read(urlLauncherProvider).launch(Uri.parse(
             'https://play.google.com/store/apps/details?id=com.amjadkhalfan.reboot_app_3&hl=ar'));
       }
-    }
   }
 }
 
