@@ -64,7 +64,7 @@ class Activities extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = AppTheme.of(context);
-
+    final locale = ref.watch(localeNotifierProvider); 
     return Padding(
       padding: EdgeInsets.only(left: 12, right: 12),
       child: GestureDetector(
@@ -113,17 +113,18 @@ class Activities extends ConsumerWidget {
                 ),
               ),
               Positioned(
-                left: 40,
-                bottom: -20,
-                child: Transform.rotate(
-                  angle: 15 * 3.141592653589793 / 180,
-                  child: Image.asset(
-                    'asset/illustrations/app-icon.png',
-                    height: 75,
-                    width: 75,
-                  ),
-                ),
-              ),
+							  left: locale.languageCode == 'ar' ? null : 40,
+							  right: locale.languageCode == 'ar' ? 40 : null,
+							  bottom: -20,
+							  child: Transform.rotate(
+							    angle: 15 * 3.141592653589793 / 180,
+							    child: Image.asset(
+							      'asset/illustrations/app-icon.png',
+							      height: 75,
+							      width: 75,
+							    ),
+							  ),
+							),
             ],
           ),
         ),
