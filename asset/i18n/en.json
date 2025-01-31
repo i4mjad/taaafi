@@ -539,5 +539,6 @@
 
   "name-should-not-be-empty": "Name field cannot be empty",
   "email-should-not-be-empty": "Email field cannot be empty",
-  "something-went-wrong": "Something went wrong. Please try again."
+  "something-went-wrong": "Something went wrong. Please try again.",
+  "email-already-in-use-different-provider": "This email is already associated with a different sign-in method. Please use the original sign-in method or a different email."
 }

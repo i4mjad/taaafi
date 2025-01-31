@@ -107,11 +107,32 @@ class AuthService {
           idToken: googleAuth.idToken,
         );
 
-        final userCredential = await _auth.signInWithCredential(credential);
-        return userCredential.user;
+        try {
+          await _auth.signOut();
+
+          final userCredential = await _auth.signInWithCredential(credential);
+          final user = userCredential.user;
+
+          final docExists = await _authRepository.isUserDocumentExist();
+          if (!docExists && user != null) {
+            await _auth.signOut();
+            getErrorSnackBar(
+                context, "email-already-in-use-different-provider");
+            return null;
+          }
+
+          return user;
+        } on FirebaseAuthException catch (e) {
+          if (e.code == 'account-exists-with-different-credential') {
+            getErrorSnackBar(
+                context, "email-already-in-use-different-provider");
+            return null;
+          }
+          rethrow;
+        }
       }
       return null;
-    } on FirebaseAuthException catch (e, stackTrace) {
+    } catch (e, stackTrace) {
       ref.read(errorLoggerProvider).logException(e, stackTrace);
       getSystemSnackBar(context, e.toString());
       return null;
@@ -122,11 +143,30 @@ class AuthService {
     try {
       final appleProvider = AppleAuthProvider();
       appleProvider.scopes.add("email");
-			appleProvider.scopes.add("name");
-      final credential = await _auth.signInWithProvider(appleProvider);
+      appleProvider.scopes.add("name");
 
-      return credential.user;
-    } on FirebaseAuthException catch (e, stackTrace) {
+      try {
+        await _auth.signOut();
+
+        final appleCredential = await _auth.signInWithProvider(appleProvider);
+        final user = appleCredential.user;
+
+        final docExists = await _authRepository.isUserDocumentExist();
+        if (!docExists && user != null) {
+          await _auth.signOut();
+          getErrorSnackBar(context, "email-already-in-use-different-provider");
+          return null;
+        }
+
+        return user;
+      } on FirebaseAuthException catch (e) {
+        if (e.code == 'account-exists-with-different-credential') {
+          getErrorSnackBar(context, "email-already-in-use-different-provider");
+          return null;
+        }
+        rethrow;
+      }
+    } catch (e, stackTrace) {
       ref.read(errorLoggerProvider).logException(e, stackTrace);
       getSystemSnackBar(context, e.toString());
       return null;
@@ -139,11 +179,22 @@ class AuthService {
     String password,
   ) async {
     try {
+      await _auth.signOut();
+
       final userCredential = await _auth.signInWithEmailAndPassword(
         email: emailAddress,
         password: password,
       );
-      return userCredential.user;
+      final user = userCredential.user;
+
+      final docExists = await _authRepository.isUserDocumentExist();
+      if (!docExists && user != null) {
+        await _auth.signOut();
+        getErrorSnackBar(context, "email-already-in-use-different-provider");
+        return null;
+      }
+
+      return user;
     } on FirebaseAuthException catch (e) {
       getSnackBar(context, e.code);
       return null;
