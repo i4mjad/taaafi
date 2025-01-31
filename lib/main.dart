@@ -137,6 +137,9 @@ Future<void> initFirebase() async {
       options: DefaultFirebaseOptions.currentPlatform,
     );
     FirebaseAnalytics.instance.setAnalyticsCollectionEnabled(true);
+    FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(true);
+    FirebaseCrashlytics.instance
+        .setUserIdentifier(FirebaseAuth.instance.currentUser?.uid ?? 'Unknown');
   } catch (e) {
     print("Failed to initialize Firebase: $e");
   }
