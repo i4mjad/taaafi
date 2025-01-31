@@ -273,22 +273,22 @@ class _SignUpFormState extends ConsumerState<SignUpForm> {
                       ),
                     ],
                   ),
-                  verticalSpace(Spacing.points8),
-                  CustomSegmentedButton(
-                    label: AppLocalizations.of(context).translate('gender'),
-                    options: [
-                      SegmentedButtonOption(
-                          value: 'male', translationKey: 'male'),
-                      SegmentedButtonOption(
-                          value: 'female', translationKey: 'female')
-                    ],
-                    selectedOption: selectedGender,
-                    onChanged: (selection) {
-                      setState(() {
-                        selectedGender = selection;
-                      });
-                    },
-                  ),
+                  // verticalSpace(Spacing.points8),
+                  // CustomSegmentedButton(
+                  //   label: AppLocalizations.of(context).translate('gender'),
+                  //   options: [
+                  //     SegmentedButtonOption(
+                  //         value: 'male', translationKey: 'male'),
+                  //     SegmentedButtonOption(
+                  //         value: 'female', translationKey: 'female')
+                  //   ],
+                  //   selectedOption: selectedGender,
+                  //   onChanged: (selection) {
+                  //     setState(() {
+                  //       selectedGender = selection;
+                  //     });
+                  //   },
+                  // ),
                   verticalSpace(Spacing.points8),
                   CustomSegmentedButton(
                     label: AppLocalizations.of(context)
@@ -432,7 +432,7 @@ class _SignUpFormState extends ConsumerState<SignUpForm> {
               if (_formKey.currentState!.validate() && isTermsAccepted) {
                 final name = nameController.value.text;
                 final selectedDob = dob;
-                final gender = selectedGender.value;
+                final gender = "";
                 final locale = selectedLanguage.value;
                 final firstDate = startingDate;
 

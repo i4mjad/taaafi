@@ -223,23 +223,23 @@ class _CompleteAccountRegisterationScreenState
                                 },
                               ),
                               verticalSpace(Spacing.points8),
-                              CustomSegmentedButton(
-                                label: AppLocalizations.of(context)
-                                    .translate('gender'),
-                                options: [
-                                  SegmentedButtonOption(
-                                      value: 'male', translationKey: 'male'),
-                                  SegmentedButtonOption(
-                                      value: 'female', translationKey: 'female')
-                                ],
-                                selectedOption: selectedGender,
-                                onChanged: (selection) {
-                                  setState(() {
-                                    selectedGender = selection;
-                                  });
-                                },
-                              ),
-                              verticalSpace(Spacing.points8),
+                              // CustomSegmentedButton(
+                              //   label: AppLocalizations.of(context)
+                              //       .translate('gender'),
+                              //   options: [
+                              //     SegmentedButtonOption(
+                              //         value: 'male', translationKey: 'male'),
+                              //     SegmentedButtonOption(
+                              //         value: 'female', translationKey: 'female')
+                              //   ],
+                              //   selectedOption: selectedGender,
+                              //   onChanged: (selection) {
+                              //     setState(() {
+                              //       selectedGender = selection;
+                              //     });
+                              //   },
+                              // ),
+                              // verticalSpace(Spacing.points8),
                               CustomSegmentedButton(
                                 label: AppLocalizations.of(context)
                                     .translate('preferred-language'),
@@ -418,7 +418,7 @@ class _CompleteAccountRegisterationScreenState
                               isTermsAccepted) {
                             final name = nameController.value.text;
                             final selectedDob = dob;
-                            final gender = selectedGender.value;
+                            final gender = "";
                             final locale = selectedLanguage.value;
                             final firstDate = startingDate;
 
