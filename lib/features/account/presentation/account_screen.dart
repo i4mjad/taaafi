@@ -716,10 +716,7 @@ class UserDetailsWidget extends StatelessWidget {
                     ),
                     verticalSpace(Spacing.points4),
                     Text(
-                      AppLocalizations.of(context)
-                              .translate(userProfile.gender) +
-                          " • " +
-                          userProfile.age.toString() +
+                      userProfile.age.toString() +
                           " " +
                           AppLocalizations.of(context).translate('years'),
                       style: TextStyles.caption.copyWith(
