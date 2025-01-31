@@ -1,10 +1,7 @@
 import 'dart:io';
-
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:in_app_review/in_app_review.dart';
-import 'package:reboot_app_3/core/shared_widgets/snackbar.dart';
 import 'package:reboot_app_3/core/utils/url_launcher_provider.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -24,14 +21,14 @@ class InAppRatingService {
 
   /// Requests a review if certain conditions are met
   Future<void> requestReview(BuildContext context) async {
-      if (Platform.isIOS) {
-        await _inAppReview.openStoreListing(
-          appStoreId: '1531562469',
-        );
-      } else {
-        await ref.read(urlLauncherProvider).launch(Uri.parse(
-            'https://play.google.com/store/apps/details?id=com.amjadkhalfan.reboot_app_3&hl=ar'));
-      }
+    if (Platform.isIOS) {
+      await _inAppReview.openStoreListing(
+        appStoreId: '1531562469',
+      );
+    } else {
+      await ref.read(urlLauncherProvider).launch(Uri.parse(
+          'https://play.google.com/store/apps/details?id=com.amjadkhalfan.reboot_app_3&hl=ar'));
+    }
   }
 }
 
