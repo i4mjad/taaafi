@@ -129,48 +129,45 @@ class _CalenderWidgetState extends ConsumerState<CalenderWidget> {
 
   _AppointmentDataSource _getCalendarDataSource(List<FollowUpModel> followUps) {
     final now = DateTime.now();
-    final daysInMonth = DateUtils.getDaysInMonth(now.year, now.month);
-    final followUpDates = followUps.map((followUp) => followUp.time).toSet();
+    final today = DateTime(now.year, now.month, now.day);
+    final startDate =
+        DateTime(userFirstDate.year, userFirstDate.month, userFirstDate.day);
+
+    // Group follow-ups by date (ignoring time)
+    final followUpDates = followUps
+        .map((followUp) => DateTime(
+            followUp.time.year, followUp.time.month, followUp.time.day))
+        .toSet();
 
     List<Appointment> appointments = [];
 
-    bool hasFollowUpToday = followUpDates.any((date) =>
-        date.year == now.year &&
-        date.month == now.month &&
-        date.day == now.day);
-
-    for (int i = 1; i <= daysInMonth; i++) {
-      final date = DateTime(now.year, now.month, i);
-      if (date.isBefore(
-          DateTime(userFirstDate.year, userFirstDate.month, userFirstDate.day)))
-        continue;
-      if (date.isAfter(now)) break; // Avoid adding anything after today's date
-      if (!followUpDates.contains(date) && date != now) {
-        if (date != now || !hasFollowUpToday) {
-          appointments.add(Appointment(
-            startTime: date,
-            endTime: date.add(Duration(minutes: 10)),
-            subject: 'No Follow-up',
-            color: followUpColors[FollowUpType.none]!,
-            startTimeZone: '',
-            endTimeZone: '',
-          ));
-        }
+    // Add "none" appointments for dates without follow-ups
+    for (var date = startDate;
+        date.isBefore(today);
+        date = date.add(Duration(days: 1))) {
+      if (!followUpDates.contains(date)) {
+        appointments.add(Appointment(
+          startTime: date,
+          endTime: date.add(Duration(minutes: 10)),
+          subject: 'No Follow-up',
+          color: followUpColors[FollowUpType.none]!,
+          startTimeZone: '',
+          endTimeZone: '',
+        ));
       }
     }
 
+    // Add actual follow-ups
     appointments.addAll(followUps.map((followUp) {
-      final color = followUpColors[followUp.type]!;
-      var appointment = Appointment(
+      return Appointment(
         startTime: followUp.time,
         endTime: followUp.time,
         subject: followUp.type.name,
-        color: color,
+        color: followUpColors[followUp.type]!,
         startTimeZone: '',
         endTimeZone: '',
       );
-      return appointment;
-    }).toList());
+    }));
 
     return _AppointmentDataSource(appointments);
   }
