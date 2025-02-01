@@ -10,7 +10,6 @@ import 'package:reboot_app_3/app.dart';
 import 'package:reboot_app_3/core/messaging/services/fcm_service.dart';
 import 'package:reboot_app_3/core/monitoring/error_logger.dart';
 import 'package:reboot_app_3/core/monitoring/mixpanel_analytics_client.dart';
-import 'package:reboot_app_3/features/home/presentation/home/statistics_visibility_notifier.dart';
 import 'package:reboot_app_3/firebase_options.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:device_info_plus/device_info_plus.dart';
@@ -26,8 +25,6 @@ Future<void> runMainApp() async {
 
   // * Preload MixpanelAnalyticsClient, so we can make unawaited analytics calls
   await container.read(mixpanelAnalyticsClientProvider.future);
-  // * Preload SharedPreferences, so we can make unawaited analytics calls
-  await container.read(sharedPreferencesProvider.future);
   //Initialize Notification settings
   await MessagingService.instance.init();
 

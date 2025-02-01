@@ -113,20 +113,11 @@ class AuthService {
           final userCredential = await _auth.signInWithCredential(credential);
           final user = userCredential.user;
 
-          final docExists = await _authRepository.isUserDocumentExist();
-          if (!docExists && user != null) {
-            await _auth.signOut();
-            getErrorSnackBar(
-                context, "email-already-in-use-different-provider");
-            return null;
-          }
-
           return user;
         } on FirebaseAuthException catch (e) {
           if (e.code == 'account-exists-with-different-credential') {
             getErrorSnackBar(
                 context, "email-already-in-use-different-provider");
-            return null;
           }
           rethrow;
         }
