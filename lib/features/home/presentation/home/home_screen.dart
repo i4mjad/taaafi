@@ -408,7 +408,7 @@ class SettingsOption extends StatelessWidget {
               ),
               Text(
                 AppLocalizations.of(context).translate(text),
-                style: TextStyles.body
+                style: TextStyles.small
                     .copyWith(color: _getIconAndTextColor(type, theme)),
               ),
             ],

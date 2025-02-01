@@ -111,7 +111,7 @@
   "Videos": "Videos",
   "Books": "Books",
   "Blogs": "Blogs",
-  "relapses-30-days": "In last 30 days",
+  "relapses-30-days": "In the last 30 days",
   "rate-app": "Rate the app",
 
   "free-days-from-start": "Total free days!",
@@ -211,8 +211,8 @@
   "current-streak-count": "28",
   "current-streak-text": "days",
   "free-relapse-days": "Days Without Relapses",
-  "free-porn-days": "Days Without Porn",
-  "free-mast-days": "Days Without Masturbation",
+  "free-porn-days": "Without Porn",
+  "free-mast-days": "Without Masturbation",
   "dairies": "Dairies",
   "daily-follow-up": "Follow-up",
   "reboot-calender": "Calender",
@@ -338,7 +338,7 @@
   "porn-only": "Porn Only",
   "mast-only": "Masturbation",
   "free-day": "Success Day!",
-  "slip-up": "Slip up",
+  "slip-up": "Without Slip up",
   "slipUp": "Slip up",
   "pornOnly": "Porn Only",
   "mastOnly": "Mast Only",
@@ -412,7 +412,7 @@
 
   "no-data":"No data",
 
-  "highest-streak": "Higest Streak",
+  "highest-streak": "Highest Streak",
   "relapses-average": "Relapses in The Last 7/28/90 Days",
   "relapses-count": "No-Relapses\nDays",
 

@@ -90,7 +90,7 @@ class _StatisticsWidgetState extends ConsumerState<StatisticsWidget> {
           ),
           verticalSpace(Spacing.points4),
           SizedBox(
-            height: MediaQuery.of(context).size.height * 0.17125,
+            height: MediaQuery.of(context).size.height * 0.15,
             child: PageView.builder(
               clipBehavior: Clip.none,
               controller: _pageController,
@@ -124,166 +124,134 @@ class _FirstPageWidget extends ConsumerWidget {
 
     return streakState.when(
       data: (data) {
-        return WidgetsContainer(
-          padding: EdgeInsets.all(16),
-          backgroundColor: theme.backgroundColor,
-          borderRadius: BorderRadius.circular(15),
-          borderSide: BorderSide(color: theme.grey[600]!, width: 0.5),
-          // boxShadow: Shadows.mainShadows,
-          child: Row(
-            children: [
-              if (visibilitySettings['relapse']!) ...[
-                Container(
-                  padding: EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: theme.backgroundColor,
-                    // boxShadow: Shadows.mainShadows,
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      width: 0.75,
-                      color: theme.grey[600]!,
-                    ),
-                  ),
+        return Row(
+          children: [
+            if (visibilitySettings['relapse']!)
+              Expanded(
+                child: WidgetsContainer(
+                  padding: EdgeInsets.all(12),
+                  backgroundColor: theme.backgroundColor,
+                  borderSide: BorderSide(
+                      color: followUpColors[FollowUpType.relapse]!, width: 0.5),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        "${data.relapseStreak.toString()} ",
-                        style: TextStyles.h5,
+                        "${data.relapseStreak}",
+                        style: TextStyles.h6,
                         textAlign: TextAlign.center,
                       ),
                       Text(
                         localization.translate("day"),
-                        style: TextStyles.h5,
+                        style: TextStyles.h6,
                         textAlign: TextAlign.center,
                       ),
-                      verticalSpace(Spacing.points8),
-                      Flexible(
-                        child: Text(
-                          localization.translate("current-streak"),
-                          textAlign: TextAlign.center,
-                          style: TextStyles.small,
-                        ),
+                      verticalSpace(Spacing.points4),
+                      Text(
+                        localization.translate("current-streak"),
+                        textAlign: TextAlign.center,
+                        style: TextStyles.small,
                       ),
                     ],
                   ),
                 ),
-              ],
-              horizontalSpace(Spacing.points16),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  if (visibilitySettings['pornOnly']!) ...[
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Container(
-                              width: 8,
-                              height: 8,
-                              decoration: BoxDecoration(
-                                color: followUpColors[FollowUpType.pornOnly],
-                                shape: BoxShape.circle,
-                              ),
-                            ),
-                            horizontalSpace(Spacing.points4),
-                            Text(
-                              "${data.pornOnlyStreak.toString()} " +
-                                  localization.translate("day"),
-                              style: TextStyles.h6,
-                              textAlign: TextAlign.center,
-                            ),
-                          ],
-                        ),
-                        horizontalSpace(Spacing.points8),
-                        Text(
-                          localization.translate("free-porn-days"),
-                          style: TextStyles.small,
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
-                    ),
-                  ],
-                  if (visibilitySettings['mastOnly']!) ...[
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Container(
-                              width: 8,
-                              height: 8,
-                              decoration: BoxDecoration(
-                                color: followUpColors[FollowUpType.mastOnly],
-                                shape: BoxShape.circle,
-                              ),
-                            ),
-                            horizontalSpace(Spacing.points4),
-                            Text(
-                              "${data.mastOnlyStreak.toString()} " +
-                                  localization.translate("day"),
-                              style: TextStyles.h6,
-                              textAlign: TextAlign.center,
-                            ),
-                          ],
-                        ),
-                        horizontalSpace(Spacing.points8),
-                        Text(
-                          localization.translate("free-mast-days"),
-                          style: TextStyles.small,
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
-                    ),
-                  ],
-                  if (visibilitySettings['slipUp']!) ...[
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Container(
-                              width: 8,
-                              height: 8,
-                              decoration: BoxDecoration(
-                                color: followUpColors[FollowUpType.slipUp],
-                                shape: BoxShape.circle,
-                              ),
-                            ),
-                            horizontalSpace(Spacing.points4),
-                            Text(
-                              "${data.slipUpStreak.toString()} " +
-                                  localization.translate("day"),
-                              style: TextStyles.h6,
-                              textAlign: TextAlign.center,
-                            ),
-                          ],
-                        ),
-                        horizontalSpace(Spacing.points8),
-                        Text(
-                          localization.translate("slip-up"),
-                          style: TextStyles.small,
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
-                    ),
-                  ],
-                ],
               ),
-              Spacer(),
-              GestureDetector(
-                onTap: () {
-                  _showOnboardingModal(context);
-                },
-                child: Icon(LucideIcons.badgeInfo, color: theme.grey[400]),
+            horizontalSpace(Spacing.points8),
+            if (visibilitySettings['pornOnly']!)
+              Expanded(
+                child: WidgetsContainer(
+                  padding: EdgeInsets.all(12),
+                  backgroundColor: theme.backgroundColor,
+                  borderSide: BorderSide(
+                      color: followUpColors[FollowUpType.pornOnly]!,
+                      width: 0.5),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        "${data.pornOnlyStreak}",
+                        style: TextStyles.h6,
+                        textAlign: TextAlign.center,
+                      ),
+                      Text(
+                        localization.translate("day"),
+                        style: TextStyles.h6,
+                        textAlign: TextAlign.center,
+                      ),
+                      verticalSpace(Spacing.points4),
+                      Text(
+                        localization.translate("free-porn-days"),
+                        style: TextStyles.small,
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
+                ),
               ),
-            ],
-          ),
+            horizontalSpace(Spacing.points8),
+            if (visibilitySettings['mastOnly']!)
+              Expanded(
+                child: WidgetsContainer(
+                  padding: EdgeInsets.all(12),
+                  backgroundColor: theme.backgroundColor,
+                  borderSide: BorderSide(
+                      color: followUpColors[FollowUpType.mastOnly]!,
+                      width: 0.5),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        "${data.mastOnlyStreak}",
+                        style: TextStyles.h6,
+                        textAlign: TextAlign.center,
+                      ),
+                      Text(
+                        localization.translate("day"),
+                        style: TextStyles.h6,
+                        textAlign: TextAlign.center,
+                      ),
+                      verticalSpace(Spacing.points4),
+                      Text(
+                        localization.translate("free-mast-days"),
+                        style: TextStyles.small,
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            horizontalSpace(Spacing.points8),
+            if (visibilitySettings['slipUp']!)
+              Expanded(
+                child: WidgetsContainer(
+                  padding: EdgeInsets.all(12),
+                  backgroundColor: theme.backgroundColor,
+                  borderSide: BorderSide(
+                      color: followUpColors[FollowUpType.slipUp]!, width: 0.5),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        "${data.slipUpStreak}",
+                        style: TextStyles.h6,
+                        textAlign: TextAlign.center,
+                      ),
+                      Text(
+                        localization.translate("day"),
+                        style: TextStyles.h6,
+                        textAlign: TextAlign.center,
+                      ),
+                      verticalSpace(Spacing.points4),
+                      Text(
+                        localization.translate("slip-up"),
+                        style: TextStyles.small,
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+          ],
         );
       },
       loading: () => Center(
@@ -291,82 +259,6 @@ class _FirstPageWidget extends ConsumerWidget {
         color: theme.grey[100],
       )),
       error: (error, stack) => Center(child: Text('Error: $error')),
-    );
-  }
-
-  void _showOnboardingModal(BuildContext context) {
-    final theme = AppTheme.of(context);
-    showModalBottomSheet(
-      backgroundColor: theme.backgroundColor,
-      context: context,
-      builder: (BuildContext context) {
-        return Container(
-          padding: EdgeInsets.all(16),
-          height: MediaQuery.of(context).size.height * 0.75,
-          child: Column(
-            children: [
-              verticalSpace(Spacing.points16),
-              FollowupDescriptionSection(
-                color: followUpColors[FollowUpType.relapse]!,
-                title: AppLocalizations.of(context).translate("relapse"),
-                description:
-                    AppLocalizations.of(context).translate("what-is-relapse"),
-              ),
-              verticalSpace(Spacing.points16),
-              FollowupDescriptionSection(
-                color: followUpColors[FollowUpType.pornOnly]!,
-                title: AppLocalizations.of(context).translate("porn-only"),
-                description:
-                    AppLocalizations.of(context).translate("what-is-no-porn"),
-              ),
-              verticalSpace(Spacing.points16),
-              FollowupDescriptionSection(
-                color: followUpColors[FollowUpType.mastOnly]!,
-                title: AppLocalizations.of(context).translate("mast-only"),
-                description:
-                    AppLocalizations.of(context).translate("what-is-no-mast"),
-              ),
-              verticalSpace(Spacing.points16),
-              FollowupDescriptionSection(
-                color: followUpColors[FollowUpType.slipUp]!,
-                title: AppLocalizations.of(context).translate("slipUp"),
-                description:
-                    AppLocalizations.of(context).translate("what-is-slip-up"),
-              ),
-              verticalSpace(Spacing.points16),
-              Spacer(),
-              Text(
-                "المصدر" + ": " + "nofap.com",
-                style: TextStyles.caption.copyWith(
-                  color: theme.grey[600],
-                ),
-              ),
-              GestureDetector(
-                onTap: () {
-                  Navigator.pop(context);
-                },
-                child: WidgetsContainer(
-                  backgroundColor: theme.backgroundColor,
-                  padding: EdgeInsets.fromLTRB(16, 12, 16, 12),
-                  borderSide: BorderSide(color: theme.grey[600]!, width: 0.5),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        AppLocalizations.of(context).translate("close"),
-                        style: TextStyles.body.copyWith(
-                          color: theme.primary[600],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              )
-            ],
-          ),
-        );
-      },
     );
   }
 }
@@ -383,31 +275,20 @@ class _SecondPageWidget extends ConsumerWidget {
         return IntrinsicHeight(
           child: Row(
             mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
+            // crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Expanded(
-                flex: 1,
                 child: WidgetsContainer(
                   padding: EdgeInsets.all(16),
                   backgroundColor: theme.backgroundColor,
                   borderSide: BorderSide(color: theme.grey[600]!, width: 0.5),
-                  // boxShadow: Shadows.mainShadows,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
-                      Container(
-                        padding: EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(50),
-                          border: Border.all(
-                            width: 1,
-                          ),
-                        ),
-                        child: Icon(
-                          LucideIcons.heart,
-                          size: 20,
-                        ),
+                      Icon(
+                        LucideIcons.heart,
+                        size: 25,
                       ),
                       verticalSpace(Spacing.points8),
                       Text(
@@ -426,90 +307,58 @@ class _SecondPageWidget extends ConsumerWidget {
               ),
               horizontalSpace(Spacing.points8),
               Expanded(
-                flex: 2,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    WidgetsContainer(
-                      padding: EdgeInsets.all(14),
-                      backgroundColor: theme.backgroundColor,
-                      borderSide:
-                          BorderSide(color: theme.grey[600]!, width: 0.5),
-                      // boxShadow: Shadows.mainShadows,
-                      child: Row(
-                        children: [
-                          Container(
-                            padding: EdgeInsets.all(10),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(50),
-                              border: Border.all(width: 1),
-                            ),
-                            child: Icon(
-                              LucideIcons.lineChart,
-                              size: 20,
-                            ),
-                          ),
-                          horizontalSpace(Spacing.points8),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              Text(
-                                  "${data.longestRelapseStreak} " +
-                                      localization.translate("day"),
-                                  style: TextStyles.h6),
-                              verticalSpace(Spacing.points8),
-                              Text(
-                                localization.translate("highest-streak"),
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyles.small,
-                              ),
-                            ],
-                          ),
-                        ],
+                child: WidgetsContainer(
+                  padding: EdgeInsets.all(16),
+                  backgroundColor: theme.backgroundColor,
+                  borderSide: BorderSide(color: theme.grey[600]!, width: 0.5),
+                  // boxShadow: Shadows.mainShadows,
+                  child: Column(
+                    children: [
+                      Icon(
+                        LucideIcons.lineChart,
+                        size: 25,
                       ),
-                    ),
-                    WidgetsContainer(
-                      padding: EdgeInsets.all(14),
-                      backgroundColor: theme.backgroundColor,
-                      borderSide:
-                          BorderSide(color: theme.grey[600]!, width: 0.5),
-                      // boxShadow: Shadows.mainShadows,
-                      child: Row(
-                        children: [
-                          Container(
-                            padding: EdgeInsets.all(10),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(50),
-                              border: Border.all(width: 1),
-                            ),
-                            child: Icon(
-                              LucideIcons.calendar,
-                              size: 20,
-                            ),
-                          ),
-                          horizontalSpace(Spacing.points8),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              Text(
-                                  "${data.relapsesInLast30Days} " +
-                                      localization.translate("relapse"),
-                                  style: TextStyles.h6),
-                              verticalSpace(Spacing.points8),
-                              Text(
-                                localization.translate("relapses-30-days"),
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyles.small,
-                              ),
-                            ],
-                          )
-                        ],
+                      verticalSpace(Spacing.points8),
+                      Text(
+                          "${data.longestRelapseStreak} " +
+                              localization.translate("day"),
+                          style: TextStyles.h6),
+                      verticalSpace(Spacing.points8),
+                      Text(
+                        localization.translate("highest-streak"),
+                        style: TextStyles.small,
+                        textAlign: TextAlign.center,
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
+                ),
+              ),
+              horizontalSpace(Spacing.points8),
+              Expanded(
+                child: WidgetsContainer(
+                  padding: EdgeInsets.all(16),
+                  backgroundColor: theme.backgroundColor,
+                  borderSide: BorderSide(color: theme.grey[600]!, width: 0.5),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Icon(
+                        LucideIcons.calendar,
+                        size: 25,
+                      ),
+                      verticalSpace(Spacing.points8),
+                      Text(
+                          "${data.relapsesInLast30Days} " +
+                              localization.translate("relapse"),
+                          style: TextStyles.h6),
+                      verticalSpace(Spacing.points8),
+                      Text(
+                        localization.translate("relapses-30-days"),
+                        style: TextStyles.small,
+                        textAlign: TextAlign.center,
+                      )
+                    ],
+                  ),
                 ),
               ),
             ],
