@@ -6,7 +6,7 @@ import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/features/home/data/follow_up_notifier.dart';
 import 'package:reboot_app_3/features/home/data/statistics_notifier.dart';
 import 'package:reboot_app_3/features/home/data/streak_notifier.dart';
-import 'package:reboot_app_3/features/home/presentation/home/home_screen.dart';
+import 'package:reboot_app_3/features/home/presentation/home/statistics_visibility_notifier.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'app_startup.g.dart';

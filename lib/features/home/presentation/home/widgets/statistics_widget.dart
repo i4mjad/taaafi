@@ -9,7 +9,7 @@ import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:reboot_app_3/features/home/data/statistics_notifier.dart';
 import 'package:reboot_app_3/features/home/data/streak_notifier.dart';
-import 'package:reboot_app_3/features/home/presentation/home/home_screen.dart';
+import 'package:reboot_app_3/features/home/presentation/home/statistics_visibility_notifier.dart';
 import 'package:reboot_app_3/features/shared/models/follow_up.dart';
 import 'package:reboot_app_3/features/home/data/models/follow_up_colors.dart';
 
