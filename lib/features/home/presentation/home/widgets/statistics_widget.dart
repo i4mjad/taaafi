@@ -288,6 +288,7 @@ class _SecondPageWidget extends ConsumerWidget {
                     children: [
                       Icon(
                         LucideIcons.heart,
+                        color: theme.primary[600],
                         size: 25,
                       ),
                       verticalSpace(Spacing.points8),
@@ -317,6 +318,7 @@ class _SecondPageWidget extends ConsumerWidget {
                       Icon(
                         LucideIcons.lineChart,
                         size: 25,
+                        color: theme.primary[600],
                       ),
                       verticalSpace(Spacing.points8),
                       Text(
@@ -343,8 +345,9 @@ class _SecondPageWidget extends ConsumerWidget {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Icon(
-                        LucideIcons.calendar,
+                        LucideIcons.calendarRange,
                         size: 25,
+                        color: theme.primary[600],
                       ),
                       verticalSpace(Spacing.points8),
                       Text(
