@@ -256,7 +256,7 @@
   "show-all": "View All",
 
   "ta3afi-plus":"Ta'aafi +",
-
+  "home-settings": "Home Settings",
   "emotions":"Emotions",
   "exercises-description-home-description": "Various Activities specially designed to help you in your recovery journey, step by step towards your goal",
   "activities-home-headings": "Activities, Step by Step towards Recovery",
@@ -264,7 +264,7 @@
   "fellowship": "Group",
   "about-app": "About the app",
   "about-ta3afi": "Spreading awareness about the consequences of porn & masturbation addiction by providing helpful resources and tools to overcome the addiction.",
-  "version-number": "v5.0.1",
+  "version-number": "v5.0.2",
   "dismiss": "Dismiss",
   "contact-us-through-this-channels": "Contact Us",
   "support-app-development": "Support Development",
@@ -540,5 +540,17 @@
   "name-should-not-be-empty": "Name field cannot be empty",
   "email-should-not-be-empty": "Email field cannot be empty",
   "something-went-wrong": "Something went wrong. Please try again.",
-  "email-already-in-use-different-provider": "This email is already associated with a different sign-in method. Please use the original sign-in method or a different email."
+  "email-already-in-use-different-provider": "This email is already associated with a different sign-in method. Please use the original sign-in method or a different email.",
+  "show-relapse-stats": "Show Relapse Stats",
+  "show-porn-stats": "Show Porn Stats",
+  "show-mast-stats": "Show Masturbation Stats",
+  "statistics-visibility": "Statistics Visibility",
+  "show-porn-only-stats": "Show Porn Only Stats",
+  "show-mast-only-stats": "Show Masturbation Only Stats",
+  "show-slip-up-stats": "Show Slip-up Stats",
+  "relapses": "Relapses",
+  "porn": "Porn Only",
+  "mast": "Masturbation Only",
+  "slips": "Slip-ups",
+  "statistics-visibility-description": "Choose the statistics you want to be visible on the home page"
 }

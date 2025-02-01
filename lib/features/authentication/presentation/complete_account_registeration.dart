@@ -163,6 +163,7 @@ class _CompleteAccountRegisterationScreenState
                                         .translate('first-name'),
                                     prefixIcon: LucideIcons.user,
                                     inputType: TextInputType.name,
+                                    enabled: user.displayName == null,
                                     width:
                                         MediaQuery.of(context).size.width / 2 -
                                             (16 + 2),
@@ -209,6 +210,7 @@ class _CompleteAccountRegisterationScreenState
                                 controller: emailController,
                                 hint: AppLocalizations.of(context)
                                     .translate('email'),
+                                enabled: user.email == null,
                                 prefixIcon: LucideIcons.mail,
                                 inputType: TextInputType.emailAddress,
                                 validator: (value) {
@@ -316,22 +318,16 @@ class _CompleteAccountRegisterationScreenState
                                               ),
                                             ),
                                             verticalSpace(Spacing.points4),
-                                            Builder(
-                                              builder: (BuildContext context) {
-                                                if (nowIsStartingDate) {
-                                                  return Text(
-                                                    getDisplayDateTime(
-                                                        DateTime.now(),
-                                                        locale!.languageCode),
-                                                    style: TextStyles.footnote
-                                                        .copyWith(
-                                                      color: theme.grey[400],
-                                                    ),
-                                                  );
-                                                }
-                                                return SizedBox.shrink();
-                                              },
-                                            ),
+                                            if (nowIsStartingDate)
+                                              Text(
+                                                getDisplayDateTime(
+                                                    DateTime.now(),
+                                                    locale!.languageCode),
+                                                style: TextStyles.footnote
+                                                    .copyWith(
+                                                  color: theme.grey[400],
+                                                ),
+                                              )
                                           ],
                                         ),
                                       ],
@@ -418,7 +414,7 @@ class _CompleteAccountRegisterationScreenState
                               isTermsAccepted) {
                             final name = nameController.value.text;
                             final selectedDob = dob;
-                            final gender = "";
+                            final gender = ""; //TODO: this to be added later
                             final locale = selectedLanguage.value;
                             final firstDate = startingDate;
 

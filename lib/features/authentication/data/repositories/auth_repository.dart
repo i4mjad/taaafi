@@ -41,6 +41,7 @@ class AuthRepository {
           .collection('users')
           .doc(_auth.currentUser?.uid)
           .get();
+      print(docRef.exists);
       return docRef.exists; // Correctly check if the document exists
     } catch (e, stackTrace) {
       ref.read(errorLoggerProvider).logException(e, stackTrace);

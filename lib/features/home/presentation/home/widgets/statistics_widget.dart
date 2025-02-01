@@ -9,6 +9,7 @@ import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:reboot_app_3/features/home/data/statistics_notifier.dart';
 import 'package:reboot_app_3/features/home/data/streak_notifier.dart';
+import 'package:reboot_app_3/features/home/presentation/home/home_screen.dart';
 import 'package:reboot_app_3/features/shared/models/follow_up.dart';
 import 'package:reboot_app_3/features/home/data/models/follow_up_colors.dart';
 
@@ -119,6 +120,7 @@ class _FirstPageWidget extends ConsumerWidget {
     final theme = AppTheme.of(context);
     final localization = AppLocalizations.of(context);
     final streakState = ref.watch(streakStreamProvider);
+    final visibilitySettings = ref.watch(statisticsVisibilityProvider);
 
     return streakState.when(
       data: (data) {
@@ -130,139 +132,147 @@ class _FirstPageWidget extends ConsumerWidget {
           // boxShadow: Shadows.mainShadows,
           child: Row(
             children: [
-              Container(
-                padding: EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: theme.backgroundColor,
-                  // boxShadow: Shadows.mainShadows,
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    width: 0.75,
-                    color: theme.grey[600]!,
+              if (visibilitySettings['relapse']!) ...[
+                Container(
+                  padding: EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: theme.backgroundColor,
+                    // boxShadow: Shadows.mainShadows,
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      width: 0.75,
+                      color: theme.grey[600]!,
+                    ),
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        "${data.relapseStreak.toString()} ",
+                        style: TextStyles.h5,
+                        textAlign: TextAlign.center,
+                      ),
+                      Text(
+                        localization.translate("day"),
+                        style: TextStyles.h5,
+                        textAlign: TextAlign.center,
+                      ),
+                      verticalSpace(Spacing.points8),
+                      Flexible(
+                        child: Text(
+                          localization.translate("current-streak"),
+                          textAlign: TextAlign.center,
+                          style: TextStyles.small,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      "${data.relapseStreak.toString()} ",
-                      style: TextStyles.h5,
-                      textAlign: TextAlign.center,
-                    ),
-                    Text(
-                      localization.translate("day"),
-                      style: TextStyles.h5,
-                      textAlign: TextAlign.center,
-                    ),
-                    verticalSpace(Spacing.points8),
-                    Flexible(
-                      child: Text(
-                        localization.translate("current-streak"),
-                        textAlign: TextAlign.center,
-                        style: TextStyles.small,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+              ],
               horizontalSpace(Spacing.points16),
               Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Container(
-                            width: 8,
-                            height: 8,
-                            decoration: BoxDecoration(
-                              color: followUpColors[FollowUpType.pornOnly],
-                              shape: BoxShape.circle,
+                  if (visibilitySettings['pornOnly']!) ...[
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Container(
+                              width: 8,
+                              height: 8,
+                              decoration: BoxDecoration(
+                                color: followUpColors[FollowUpType.pornOnly],
+                                shape: BoxShape.circle,
+                              ),
                             ),
-                          ),
-                          horizontalSpace(Spacing.points4),
-                          Text(
-                            "${data.pornOnlyStreak.toString()} " +
-                                localization.translate("day"),
-                            style: TextStyles.h6,
-                            textAlign: TextAlign.center,
-                          ),
-                        ],
-                      ),
-                      horizontalSpace(Spacing.points8),
-                      Text(
-                        localization.translate("free-porn-days"),
-                        style: TextStyles.small,
-                        textAlign: TextAlign.center,
-                      ),
-                    ],
-                  ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Container(
-                            width: 8,
-                            height: 8,
-                            decoration: BoxDecoration(
-                              color: followUpColors[FollowUpType.mastOnly],
-                              shape: BoxShape.circle,
+                            horizontalSpace(Spacing.points4),
+                            Text(
+                              "${data.pornOnlyStreak.toString()} " +
+                                  localization.translate("day"),
+                              style: TextStyles.h6,
+                              textAlign: TextAlign.center,
                             ),
-                          ),
-                          horizontalSpace(Spacing.points4),
-                          Text(
-                            "${data.mastOnlyStreak.toString()} " +
-                                localization.translate("day"),
-                            style: TextStyles.h6,
-                            textAlign: TextAlign.center,
-                          ),
-                        ],
-                      ),
-                      horizontalSpace(Spacing.points8),
-                      Text(
-                        localization.translate("free-mast-days"),
-                        style: TextStyles.small,
-                        textAlign: TextAlign.center,
-                      ),
-                    ],
-                  ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Container(
-                            width: 8,
-                            height: 8,
-                            decoration: BoxDecoration(
-                              color: followUpColors[FollowUpType.slipUp],
-                              shape: BoxShape.circle,
+                          ],
+                        ),
+                        horizontalSpace(Spacing.points8),
+                        Text(
+                          localization.translate("free-porn-days"),
+                          style: TextStyles.small,
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
+                    ),
+                  ],
+                  if (visibilitySettings['mastOnly']!) ...[
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Container(
+                              width: 8,
+                              height: 8,
+                              decoration: BoxDecoration(
+                                color: followUpColors[FollowUpType.mastOnly],
+                                shape: BoxShape.circle,
+                              ),
                             ),
-                          ),
-                          horizontalSpace(Spacing.points4),
-                          Text(
-                            "${data.slipUpStreak.toString()} " +
-                                localization.translate("day"),
-                            style: TextStyles.h6,
-                            textAlign: TextAlign.center,
-                          ),
-                        ],
-                      ),
-                      horizontalSpace(Spacing.points8),
-                      Text(
-                        localization.translate("slip-up"),
-                        style: TextStyles.small,
-                        textAlign: TextAlign.center,
-                      ),
-                    ],
-                  ),
+                            horizontalSpace(Spacing.points4),
+                            Text(
+                              "${data.mastOnlyStreak.toString()} " +
+                                  localization.translate("day"),
+                              style: TextStyles.h6,
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
+                        ),
+                        horizontalSpace(Spacing.points8),
+                        Text(
+                          localization.translate("free-mast-days"),
+                          style: TextStyles.small,
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
+                    ),
+                  ],
+                  if (visibilitySettings['slipUp']!) ...[
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Container(
+                              width: 8,
+                              height: 8,
+                              decoration: BoxDecoration(
+                                color: followUpColors[FollowUpType.slipUp],
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                            horizontalSpace(Spacing.points4),
+                            Text(
+                              "${data.slipUpStreak.toString()} " +
+                                  localization.translate("day"),
+                              style: TextStyles.h6,
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
+                        ),
+                        horizontalSpace(Spacing.points8),
+                        Text(
+                          localization.translate("slip-up"),
+                          style: TextStyles.small,
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
+                    ),
+                  ],
                 ],
               ),
               Spacer(),
@@ -319,7 +329,7 @@ class _FirstPageWidget extends ConsumerWidget {
               verticalSpace(Spacing.points16),
               FollowupDescriptionSection(
                 color: followUpColors[FollowUpType.slipUp]!,
-                title: AppLocalizations.of(context).translate("slip-up"),
+                title: AppLocalizations.of(context).translate("slipUp"),
                 description:
                     AppLocalizations.of(context).translate("what-is-slip-up"),
               ),

@@ -308,6 +308,7 @@ class _ConfirmUserDetailsScreenState
                         unawaited(ref
                             .read(analyticsFacadeProvider)
                             .trackOnboardingFinish());
+
                         context.goNamed(RouteNames.home.name);
                       } catch (e, stackTrace) {
                         ref

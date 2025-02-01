@@ -6,6 +6,7 @@ import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/features/home/data/follow_up_notifier.dart';
 import 'package:reboot_app_3/features/home/data/statistics_notifier.dart';
 import 'package:reboot_app_3/features/home/data/streak_notifier.dart';
+import 'package:reboot_app_3/features/home/presentation/home/home_screen.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'app_startup.g.dart';
@@ -24,7 +25,7 @@ Future<void> appStartup(Ref ref) async {
 
   await Future.delayed(Duration(milliseconds: 500));
   //! await for all initialization code to be complete before returning
-  // await ref.watch(sharedPreferencesProvider.future);
+  await ref.watch(sharedPreferencesProvider.future);
   // await ref.watch(mixpanelAnalyticsClientProvider.future);
   // await ref.watch(onboardingRepositoryProvider.future);
 }
