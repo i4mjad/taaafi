@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -113,6 +114,7 @@ class AuthService {
           final userCredential = await _auth.signInWithCredential(credential);
           final user = userCredential.user;
 
+          // We don't need any special checks here - let the routing handle it
           return user;
         } on FirebaseAuthException catch (e) {
           if (e.code == 'account-exists-with-different-credential') {
@@ -141,6 +143,14 @@ class AuthService {
 
         final appleCredential = await _auth.signInWithProvider(appleProvider);
         final user = appleCredential.user;
+
+        // Only check if document exists
+        final docExists = await _authRepository.isUserDocumentExist();
+        if (!docExists && user != null) {
+          await _auth.signOut();
+          getErrorSnackBar(context, "email-already-in-use-different-provider");
+          return null;
+        }
 
         return user;
       } on FirebaseAuthException catch (e) {
@@ -171,6 +181,7 @@ class AuthService {
       );
       final user = userCredential.user;
 
+      // Only check if document exists
       final docExists = await _authRepository.isUserDocumentExist();
       if (!docExists && user != null) {
         await _auth.signOut();
@@ -247,6 +258,15 @@ class AuthService {
 
   Future<void> deleteAccount(BuildContext context) async {
     try {
+      final uid = _auth.currentUser?.uid;
+      if (uid != null) {
+        final _firestore = FirebaseFirestore.instance;
+        // Track that this user has been deleted
+        await _firestore.collection('deletedUsers').doc(uid).set({
+          'deletedAt': FieldValue.serverTimestamp(),
+        });
+      }
+
       await _authRepository.deleteUserDocument();
       await _auth.currentUser?.delete();
 
@@ -254,7 +274,6 @@ class AuthService {
       ProviderContainer().dispose();
       ref.invalidate(userDocumentsNotifierProvider);
       ref.invalidate(userNotifierProvider);
-      ref.invalidate(streakRepositoryProvider);
       ref.invalidate(streakRepositoryProvider);
       ref.invalidate(streakNotifierProvider);
     } on FirebaseAuthException catch (e, stackTrace) {

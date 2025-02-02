@@ -3,9 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
-import 'package:reboot_app_3/features/home/data/follow_up_notifier.dart';
-import 'package:reboot_app_3/features/home/data/statistics_notifier.dart';
-import 'package:reboot_app_3/features/home/data/streak_notifier.dart';
+import 'package:reboot_app_3/features/authentication/providers/user_document_provider.dart';
 import 'package:reboot_app_3/features/home/presentation/home/statistics_visibility_notifier.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -15,16 +13,14 @@ part 'app_startup.g.dart';
 @Riverpod(keepAlive: true)
 Future<void> appStartup(Ref ref) async {
   ref.onDispose(() {
-    ref.invalidate(streakNotifierProvider);
-    ref.invalidate(statisticsNotifierProvider);
-    ref.invalidate(followUpNotifierProvider);
+    ref.invalidate(userDocumentsNotifierProvider);
     // ref.invalidate(firebaseRemoteConfigProvider);
     // ref.invalidate(sharedPreferencesProvider);
     // ref.invalidate(onboardingRepositoryProvider);
   });
 
   await Future.delayed(Duration(milliseconds: 500));
-  //! await for all initialization code to be complete before returning
+  //* await for all initialization code to be complete before returning
   await ref.watch(sharedPreferencesProvider.future);
   // await ref.watch(mixpanelAnalyticsClientProvider.future);
   // await ref.watch(onboardingRepositoryProvider.future);

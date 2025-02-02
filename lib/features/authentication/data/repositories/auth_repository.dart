@@ -111,6 +111,19 @@ class AuthRepository {
       ref.read(errorLoggerProvider).logException(e, stackTrace);
     }
   }
+
+  Future<bool> hasUserEverExisted(String? uid) async {
+    try {
+      if (uid == null) return false;
+
+      // Check in a separate collection or use another method to track deleted accounts
+      final docRef = await _firestore.collection('deletedUsers').doc(uid).get();
+      return docRef.exists;
+    } catch (e, stackTrace) {
+      ref.read(errorLoggerProvider).logException(e, stackTrace);
+      return false;
+    }
+  }
 }
 
 @riverpod

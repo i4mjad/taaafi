@@ -93,8 +93,9 @@ GoRouter goRouter(GoRouterRef ref) {
           return null;
         }
 
-        // Check for old document structure in the legacy document
-        if (isLegacy && await userDocumentNotifier.hasOldStructure()) {
+        // Only check for old structure if the document exists and is actually a legacy document
+        // This prevents redirecting new signups to confirmProfileDetails
+        if (isLegacy && userDocument.role == null) {
           if (state.matchedLocation != '/confirmProfileDetails') {
             return '/confirmProfileDetails';
           }
