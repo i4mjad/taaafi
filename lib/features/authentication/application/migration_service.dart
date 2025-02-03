@@ -105,14 +105,14 @@ class MigrationService {
 
     String role = "user";
     UserDocument newDocuemnt = UserDocument(
-      uid: document.uid!,
+      uid: document.uid,
       devicesIds: [deviceId],
-      displayName: document.displayName!,
-      email: document.email!,
-      gender: document.gender!,
-      locale: document.locale!,
-      dayOfBirth: document.dayOfBirth!,
-      userFirstDate: document.userFirstDate!,
+      displayName: document.displayName,
+      email: document.email,
+      gender: document.gender,
+      locale: document.locale,
+      dayOfBirth: document.dayOfBirth,
+      userFirstDate: document.userFirstDate,
       role: role,
       messagingToken: fcmToken,
       userRelapses: document.userRelapses,

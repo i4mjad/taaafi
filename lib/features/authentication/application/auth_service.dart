@@ -99,12 +99,12 @@ class AuthService {
   Future<User?> signInWithGoogle(BuildContext context) async {
     try {
       final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
-      final GoogleSignInAuthentication googleAuth =
-          await googleUser!.authentication;
+      final GoogleSignInAuthentication? googleAuth =
+          await googleUser?.authentication;
 
-      if (googleAuth.accessToken != null && googleAuth.idToken != null) {
+      if (googleAuth?.accessToken != null && googleAuth?.idToken != null) {
         final credential = GoogleAuthProvider.credential(
-          accessToken: googleAuth.accessToken,
+          accessToken: googleAuth!.accessToken,
           idToken: googleAuth.idToken,
         );
 
@@ -114,7 +114,6 @@ class AuthService {
           final userCredential = await _auth.signInWithCredential(credential);
           final user = userCredential.user;
 
-          // We don't need any special checks here - let the routing handle it
           return user;
         } on FirebaseAuthException catch (e) {
           if (e.code == 'account-exists-with-different-credential') {

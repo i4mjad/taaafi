@@ -19,9 +19,11 @@ import 'package:reboot_app_3/core/shared_widgets/snackbar.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
+import 'package:reboot_app_3/core/utils/url_launcher_provider.dart';
 import 'package:reboot_app_3/features/authentication/application/migration_service.dart';
 import 'package:reboot_app_3/features/authentication/data/models/user_document.dart';
 import 'package:reboot_app_3/features/authentication/providers/user_document_provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ConfirmUserDetailsScreen extends ConsumerStatefulWidget {
   const ConfirmUserDetailsScreen({Key? key}) : super(key: key);
@@ -41,6 +43,7 @@ class _ConfirmUserDetailsScreenState
   DateTime? selectedUserFirstDate;
   SegmentedButtonOption? selectedGender;
   SegmentedButtonOption? selectedLocale;
+  bool _hasError = false;
 
   @override
   void initState() {
@@ -314,18 +317,80 @@ class _ConfirmUserDetailsScreenState
                         ref
                             .read(errorLoggerProvider)
                             .logException(e, stackTrace);
+
+                        setState(() {
+                          _hasError = true;
+                        });
                       }
                     },
-                    child: WidgetsContainer(
-                      backgroundColor: theme.primary[600],
-                      child: Center(
-                        child: Text(
-                          AppLocalizations.of(context)
-                              .translate('start-your-journy'),
-                          style: TextStyles.caption
-                              .copyWith(color: theme.grey[50]),
+                    child: Column(
+                      children: [
+                        WidgetsContainer(
+                          backgroundColor: theme.primary[600],
+                          child: Center(
+                            child: Text(
+                              AppLocalizations.of(context)
+                                  .translate('start-your-journy'),
+                              style: TextStyles.caption
+                                  .copyWith(color: theme.grey[50]),
+                            ),
+                          ),
                         ),
-                      ),
+                        if (true) ...[
+                          verticalSpace(Spacing.points8),
+                          GestureDetector(
+                            onTap: () {
+                              final body = '''
+                                  Debug Information:
+                                  UID: ${userDocument.uid}
+                                  Original Document State:
+                                  - Display Name: ${userDocument.displayName}
+                                  - Email: ${userDocument.email}
+                                  - DOB: ${userDocument.dayOfBirth?.toDate()}
+                                  - Gender: ${userDocument.gender}
+                                  - Locale: ${userDocument.locale}
+
+                                  New Values Entered:
+                                  - Display Name: ${displayNameController.text}
+                                  - Email: ${emailController.text}
+                                  - DOB: $selectedBirthDate
+                                  - Gender: ${selectedGender?.value}
+                                  - Locale: ${selectedLocale?.value}
+                                  ''';
+
+                              final Uri emailLaunchUri = Uri(
+                                scheme: 'mailto',
+                                path: 'admin@ta3afi.app',
+                                query: encodeQueryParameters({
+                                  'subject': 'Migration Error Report',
+                                  'body': body,
+                                }),
+                              );
+
+                              ref
+                                  .read(urlLauncherProvider)
+                                  .launch(emailLaunchUri);
+                            },
+                            child: WidgetsContainer(
+                              backgroundColor: theme.backgroundColor,
+                              borderSide: BorderSide(
+                                color: theme.grey[500]!,
+                                width: 0.25,
+                              ),
+                              child: Center(
+                                child: Text(
+                                  AppLocalizations.of(context)
+                                      .translate('contact-support'),
+                                  style: TextStyles.small.copyWith(
+                                    color: theme.grey[500]!,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          verticalSpace(Spacing.points16),
+                        ],
+                      ],
                     ),
                   )
                 ],
@@ -349,5 +414,12 @@ class _ConfirmUserDetailsScreenState
     } else {
       return SegmentedButtonOption(value: value, translationKey: value);
     }
+  }
+
+  String? encodeQueryParameters(Map<String, String> params) {
+    return params.entries
+        .map((e) =>
+            '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}')
+        .join('&');
   }
 }
