@@ -23,7 +23,6 @@ import 'package:reboot_app_3/core/utils/url_launcher_provider.dart';
 import 'package:reboot_app_3/features/authentication/application/migration_service.dart';
 import 'package:reboot_app_3/features/authentication/data/models/user_document.dart';
 import 'package:reboot_app_3/features/authentication/providers/user_document_provider.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class ConfirmUserDetailsScreen extends ConsumerStatefulWidget {
   const ConfirmUserDetailsScreen({Key? key}) : super(key: key);
@@ -43,7 +42,6 @@ class _ConfirmUserDetailsScreenState
   DateTime? selectedUserFirstDate;
   SegmentedButtonOption? selectedGender;
   SegmentedButtonOption? selectedLocale;
-  bool _hasError = false;
 
   @override
   void initState() {
@@ -317,10 +315,6 @@ class _ConfirmUserDetailsScreenState
                         ref
                             .read(errorLoggerProvider)
                             .logException(e, stackTrace);
-
-                        setState(() {
-                          _hasError = true;
-                        });
                       }
                     },
                     child: Column(
