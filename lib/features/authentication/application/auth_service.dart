@@ -112,7 +112,8 @@ class AuthService {
           await _auth.signOut();
 
           final userCredential = await _auth.signInWithCredential(credential);
-          final user = userCredential.user;
+          await userCredential.user?.reload();
+          final user = _auth.currentUser;
 
           return user;
         } on FirebaseAuthException catch (e) {
@@ -141,16 +142,9 @@ class AuthService {
         await _auth.signOut();
 
         final appleCredential = await _auth.signInWithProvider(appleProvider);
-        final user = appleCredential.user;
 
-        // Only check if document exists
-        final docExists = await _authRepository.isUserDocumentExist();
-        if (!docExists && user != null) {
-          await _auth.signOut();
-          getErrorSnackBar(context, "email-already-in-use-different-provider");
-          return null;
-        }
-
+        await appleCredential.user?.reload();
+        final user = _auth.currentUser;
         return user;
       } on FirebaseAuthException catch (e) {
         if (e.code == 'account-exists-with-different-credential') {
@@ -178,7 +172,8 @@ class AuthService {
         email: emailAddress,
         password: password,
       );
-      final user = userCredential.user;
+      await userCredential.user?.reload();
+      final user = _auth.currentUser;
 
       // Only check if document exists
       final docExists = await _authRepository.isUserDocumentExist();
@@ -259,18 +254,23 @@ class AuthService {
     try {
       final uid = _auth.currentUser?.uid;
       if (uid != null) {
-        final _firestore = FirebaseFirestore.instance;
-        // Track that this user has been deleted
-        await _firestore.collection('deletedUsers').doc(uid).set({
+        final firestore = FirebaseFirestore.instance;
+        // Log that this user has been deleted
+        await firestore.collection('deletedUsers').doc(uid).set({
           'deletedAt': FieldValue.serverTimestamp(),
         });
       }
 
+      // Delete the user's Firestore document
       await _authRepository.deleteUserDocument();
+
+      // Delete the Firebase user account
       await _auth.currentUser?.delete();
 
-      // Reset all providers
-      ProviderContainer().dispose();
+      // IMPORTANT: Clear the cached auth state by signing out
+      await _auth.signOut();
+
+      // Invalidate your providers to refresh the app state
       ref.invalidate(userDocumentsNotifierProvider);
       ref.invalidate(userNotifierProvider);
       ref.invalidate(streakRepositoryProvider);

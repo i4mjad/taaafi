@@ -28,6 +28,7 @@ class AuthRepository {
 
   Future<User?> getLoggedInUser() async {
     try {
+      await _auth.currentUser?.reload();
       return await _auth.currentUser;
     } catch (e, stackTrace) {
       ref.read(errorLoggerProvider).logException(e, stackTrace);
@@ -40,9 +41,8 @@ class AuthRepository {
       final docRef = await _firestore
           .collection('users')
           .doc(_auth.currentUser?.uid)
-          .get();
-      print(docRef.exists);
-      return docRef.exists; // Correctly check if the document exists
+          .get(GetOptions(source: Source.server));
+      return docRef.exists;
     } catch (e, stackTrace) {
       ref.read(errorLoggerProvider).logException(e, stackTrace);
       return false;
@@ -68,7 +68,7 @@ class AuthRepository {
         uid: user.uid,
         devicesIds: [deviceId],
         displayName: name,
-        email: user.email!,
+        email: user.email ?? "Unknown",
         gender: gender,
         locale: locale,
         dayOfBirth: Timestamp.fromDate(dob.toUtc()),

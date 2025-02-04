@@ -33,7 +33,10 @@ class UserDocumentsNotifier extends _$UserDocumentsNotifier {
         throw Exception("User ID is null");
       }
 
-      final doc = await _firestore.collection('users').doc(uid).get();
+      final doc = await _firestore
+          .collection('users')
+          .doc(uid)
+          .get(GetOptions(source: Source.server));
       if (!doc.exists) {
         state = AsyncValue.data(null); // Update state with error
         return null; // No document found

@@ -55,55 +55,125 @@ GoRouter goRouter(GoRouterRef ref) {
       SentryNavigatorObserver()
     ],
     refreshListenable: GoRouterRefreshStream(authStateChanges(ref)),
+    // redirect: (context, state) async {
+    //   final isLoggedIn = authState.asData?.value != null;
+
+    //   if (isLoggedIn) {
+    //     // Fetch the user document state
+    //     final isLoading = userDocumentState is AsyncLoading;
+    //     final hasError = userDocumentState is AsyncError;
+    //     final userDocument = userDocumentState.valueOrNull;
+
+    //     // If we're loading, show loading screen
+    //     if (isLoading) {
+    //       if (state.matchedLocation != '/loading') {
+    //         return '/loading';
+    //       }
+    //       return null;
+    //     }
+
+    //     // If document is null or has errors, redirect to complete account registration
+    //     if (userDocument == null || hasError) {
+    //       if (state.matchedLocation != '/completeAccountRegisteration') {
+    //         return '/completeAccountRegisteration';
+    //       }
+    //       return null;
+    //     }
+
+    //     // Now we can safely check the document properties since we know userDocument is not null
+    //     final isLegacy =
+    //         userDocumentNotifier.isLegacyUserDocument(userDocument);
+    //     final isNew = userDocumentNotifier.isNewUserDocument(userDocument);
+
+    //     // Check for missing required data
+    //     if (!isLegacy && userDocumentNotifier.hasMissingData(userDocument)) {
+    //       if (state.matchedLocation != '/completeAccountRegisteration') {
+    //         return '/completeAccountRegisteration';
+    //       }
+    //       return null;
+    //     }
+
+    //     // Only check for old structure if the document exists and is actually a legacy document
+    //     // This prevents redirecting new signups to confirmProfileDetails
+    //     if (isLegacy && userDocument.role == null) {
+    //       if (state.matchedLocation != '/confirmProfileDetails') {
+    //         return '/confirmProfileDetails';
+    //       }
+    //       return null;
+    //     }
+
+    //     // Allow navigation to other routes if the user has the new document structure
+    //     if (isNew) {
+    //       if (state.matchedLocation.startsWith('/onboarding') ||
+    //           state.matchedLocation == '/loading') {
+    //         return '/home';
+    //       }
+    //       return null;
+    //     }
+    //   } else {
+    //     // Non-logged-in user trying to access protected routes
+    //     final isAuthRoute = state.matchedLocation.startsWith('/onboarding');
+    //     if (!isAuthRoute && state.matchedLocation != '/onboarding') {
+    //       return '/onboarding';
+    //     }
+    //   }
+
+    //   return null;
+    // },
     redirect: (context, state) async {
-      final isLoggedIn = authState.asData?.value != null;
+      final authData = ref.watch(authStateChangesProvider).asData?.value;
+      final isLoggedIn = authData != null;
 
       if (isLoggedIn) {
-        // Fetch the user document state
-        final isLoading = userDocumentState is AsyncLoading;
-        final hasError = userDocumentState is AsyncError;
+        // Force refresh your Firestore user document from the server.
         final userDocument = userDocumentState.valueOrNull;
 
-        // If we're loading, show loading screen
-        if (isLoading) {
-          if (state.matchedLocation != '/loading') {
-            return '/loading';
-          }
-          return null;
-        }
-
-        // If document is null or has errors, redirect to complete account registration
-        if (userDocument == null || hasError) {
+        // If no document is found, treat it as a new registration.
+        if (userDocument == null) {
           if (state.matchedLocation != '/completeAccountRegisteration') {
             return '/completeAccountRegisteration';
           }
           return null;
         }
 
-        // Now we can safely check the document properties since we know userDocument is not null
-        final isLegacy =
-            userDocumentNotifier.isLegacyUserDocument(userDocument);
-        final isNew = userDocumentNotifier.isNewUserDocument(userDocument);
+        // Compute legacy status based on your current check.
+        final isLegacy = ref
+            .read(userDocumentsNotifierProvider.notifier)
+            .isLegacyUserDocument(userDocument);
 
-        // Check for missing required data
-        if (!isLegacy && userDocumentNotifier.hasMissingData(userDocument)) {
-          if (state.matchedLocation != '/completeAccountRegisteration') {
-            return '/completeAccountRegisteration';
-          }
-          return null;
-        }
+        // Check the auth user's creation time.
+        final creationTime = authData.metadata.creationTime;
+        // Define a “new” threshold (for example, 5 minutes).
+        final isNewRegistration = creationTime != null &&
+            DateTime.now().difference(creationTime) < Duration(minutes: 5);
 
-        // Only check for old structure if the document exists and is actually a legacy document
-        // This prevents redirecting new signups to confirmProfileDetails
-        if (isLegacy && userDocument.role == null) {
+        // If the document exists but is legacy due to missing fields
+        // AND the user is not freshly registered, then send them to migration.
+        if (isLegacy && !isNewRegistration && userDocument.role == null) {
           if (state.matchedLocation != '/confirmProfileDetails') {
             return '/confirmProfileDetails';
           }
           return null;
         }
 
-        // Allow navigation to other routes if the user has the new document structure
-        if (isNew) {
+        // If there is missing data in the document, or if the user is new,
+        // route to complete registration.
+        if (userDocument == null ||
+            isNewRegistration ||
+            ref
+                .read(userDocumentsNotifierProvider.notifier)
+                .hasMissingData(userDocument)) {
+          if (state.matchedLocation != '/completeAccountRegisteration') {
+            return '/completeAccountRegisteration';
+          }
+          return null;
+        }
+
+        // Otherwise, if the document is complete (i.e. "new"),
+        // allow navigation to home.
+        if (ref
+            .read(userDocumentsNotifierProvider.notifier)
+            .isNewUserDocument(userDocument)) {
           if (state.matchedLocation.startsWith('/onboarding') ||
               state.matchedLocation == '/loading') {
             return '/home';
@@ -111,9 +181,9 @@ GoRouter goRouter(GoRouterRef ref) {
           return null;
         }
       } else {
-        // Non-logged-in user trying to access protected routes
-        final isAuthRoute = state.matchedLocation.startsWith('/onboarding');
-        if (!isAuthRoute && state.matchedLocation != '/onboarding') {
+        // User is not logged in; force onboarding.
+        if (!state.matchedLocation.startsWith('/onboarding') &&
+            state.matchedLocation != '/onboarding') {
           return '/onboarding';
         }
       }

@@ -296,6 +296,7 @@ class _ConfirmUserDetailsScreenState
                                 : null,
                             userFirstDate: userDocument.userFirstDate,
                             email: emailController.text.trim(),
+                            role: "user",
                             locale: selectedLocale?.value,
                             gender: selectedGender?.value,
                             userRelapses: userDocument.userRelapses,
