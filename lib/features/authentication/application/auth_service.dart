@@ -133,26 +133,18 @@ class AuthService {
   }
 
   Future<User?> signInWithApple(BuildContext context) async {
+    final appleProvider = AppleAuthProvider();
+    appleProvider.scopes.add("email");
+    appleProvider.scopes.add("name");
+
     try {
-      final appleProvider = AppleAuthProvider();
-      appleProvider.scopes.add("email");
-      appleProvider.scopes.add("name");
+      await _auth.signOut();
 
-      try {
-        await _auth.signOut();
+      final appleCredential = await _auth.signInWithProvider(appleProvider);
 
-        final appleCredential = await _auth.signInWithProvider(appleProvider);
-
-        await appleCredential.user?.reload();
-        final user = _auth.currentUser;
-        return user;
-      } on FirebaseAuthException catch (e) {
-        if (e.code == 'account-exists-with-different-credential') {
-          getErrorSnackBar(context, "email-already-in-use-different-provider");
-          return null;
-        }
-        rethrow;
-      }
+      await appleCredential.user?.reload();
+      final user = _auth.currentUser;
+      return user;
     } catch (e, stackTrace) {
       ref.read(errorLoggerProvider).logException(e, stackTrace);
       getSystemSnackBar(context, e.toString());

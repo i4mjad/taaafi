@@ -130,6 +130,6 @@ class FCMRepository {
     if (Platform.isIOS) {
       await _messaging.getAPNSToken() as String;
     }
-    return await _messaging.getToken() as String;
+    return await _messaging.getToken() ?? "Missing token";
   }
 }

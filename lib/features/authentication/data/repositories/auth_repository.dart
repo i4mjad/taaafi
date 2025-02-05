@@ -78,7 +78,7 @@ class AuthRepository {
       );
 
       var userDocumentMap = userDocument.toFirestore();
-      await addUserIdentifierToTrackers(user);
+      await _addUserIdentifierToTrackers(user);
       await _firestore
           .collection("users")
           .doc(userDocument.uid)
@@ -88,7 +88,7 @@ class AuthRepository {
     }
   }
 
-  Future<void> addUserIdentifierToTrackers(User user) async {
+  Future<void> _addUserIdentifierToTrackers(User user) async {
     // * add mixpanel user
     final mixPanelClient = await ref.read(mixpanelProvider.future);
     await mixPanelClient.identify(user.uid);
