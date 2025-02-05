@@ -54,11 +54,11 @@ android {
         applicationId "com.amjadkhalfan.reboot_app_3"
         targetSdkVersion 34
         minSdkVersion 23
-    //    versionCode flutterVersionCode
-    //    versionName flutterVersionName
+       versionCode flutterVersionCode
+       versionName flutterVersionName
         //TODO: uncomment this to create a new version
-        versionCode 50401
-        versionName "5.0.4"
+        // versionCode 50401
+        // versionName "5.0.4"
     }
 
     // compileOptions {
