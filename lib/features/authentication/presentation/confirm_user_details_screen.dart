@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:figma_squircle/figma_squircle.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
@@ -12,7 +12,6 @@ import 'package:reboot_app_3/core/monitoring/analytics_facade.dart';
 import 'package:reboot_app_3/core/monitoring/error_logger.dart';
 import 'package:reboot_app_3/core/routing/route_names.dart';
 import 'package:reboot_app_3/core/shared_widgets/app_bar.dart';
-import 'package:reboot_app_3/core/shared_widgets/container.dart';
 import 'package:reboot_app_3/core/shared_widgets/custom_segmented_button.dart';
 import 'package:reboot_app_3/core/shared_widgets/custom_textfield.dart';
 import 'package:reboot_app_3/core/shared_widgets/snackbar.dart';
@@ -42,6 +41,7 @@ class _ConfirmUserDetailsScreenState
   DateTime? selectedUserFirstDate;
   SegmentedButtonOption? selectedGender;
   SegmentedButtonOption? selectedLocale;
+  bool _isProcessing = false;
 
   @override
   void initState() {
@@ -104,13 +104,16 @@ class _ConfirmUserDetailsScreenState
             return Center(child: Text('No user document found.'));
           }
 
+          // Populate fields if not already set
           if (selectedGender == null) {
             displayNameController.text = userDocument.displayName ?? "";
             emailController.text = userDocument.email ?? "";
 
             if (userDocument.dayOfBirth != null) {
-              var dob = DisplayDate(userDocument.dayOfBirth!.toDate(),
-                  locale?.languageCode ?? 'en');
+              var dob = DisplayDate(
+                userDocument.dayOfBirth!.toDate(),
+                locale?.languageCode ?? 'en',
+              );
               dateOfBirthController.text = dob.displayDate;
               selectedBirthDate = dob.date;
             }
@@ -260,133 +263,198 @@ class _ConfirmUserDetailsScreenState
                     style: TextStyles.smallBold.copyWith(color: theme.grey),
                   ),
                   verticalSpace(Spacing.points32),
-                  GestureDetector(
-                    onTap: () async {
-                      HapticFeedback.lightImpact();
+                  Column(
+                    children: [
+                      ElevatedButton(
+                        onPressed: _isProcessing
+                            ? null
+                            : () async {
+                                setState(() => _isProcessing = true);
 
-                      if (selectedBirthDate != null &&
-                          selectedBirthDate!.isAfter(DateTime(2010, 12, 31))) {
-                        getErrorSnackBar(context, "dob-too-young");
-                        return;
-                      }
+                                // Validate date of birth
+                                if (selectedBirthDate != null &&
+                                    selectedBirthDate!
+                                        .isAfter(DateTime(2010, 12, 31))) {
+                                  getErrorSnackBar(context, "dob-too-young");
+                                  setState(() => _isProcessing = false);
+                                  return;
+                                }
 
-                      if (displayNameController.text.trim().isEmpty) {
-                        getErrorSnackBar(context, "name-should-not-be-empty");
-                        return;
-                      }
+                                // Validate display name
+                                if (displayNameController.text.trim().isEmpty) {
+                                  getErrorSnackBar(
+                                      context, "name-should-not-be-empty");
+                                  setState(() => _isProcessing = false);
+                                  return;
+                                }
 
-                      if (emailController.text.trim().isEmpty) {
-                        getErrorSnackBar(context, "email-should-not-be-empty");
-                        return;
-                      }
+                                // Validate email
+                                if (emailController.text.trim().isEmpty) {
+                                  getErrorSnackBar(
+                                      context, "email-should-not-be-empty");
+                                  setState(() => _isProcessing = false);
+                                  return;
+                                }
 
-                      if (selectedGender == null || selectedLocale == null) {
-                        getErrorSnackBar(
-                            context, "please-add-all-required-data");
-                        return;
-                      }
+                                // Validate gender and locale
+                                if (selectedGender == null ||
+                                    selectedLocale == null) {
+                                  getErrorSnackBar(
+                                      context, "please-add-all-required-data");
+                                  setState(() => _isProcessing = false);
+                                  return;
+                                }
 
-                      try {
-                        await migrateService.migrateToNewDocuemntStrcture(
-                          UserDocument(
-                            uid: userDocument.uid,
-                            displayName: displayNameController.text.trim(),
-                            dayOfBirth: selectedBirthDate != null
-                                ? Timestamp.fromDate(selectedBirthDate!)
-                                : null,
-                            userFirstDate: userDocument.userFirstDate,
-                            email: emailController.text.trim(),
-                            role: "user",
-                            locale: selectedLocale?.value,
-                            gender: selectedGender?.value,
-                            userRelapses: userDocument.userRelapses,
-                            userWatchingWithoutMasturbating:
-                                userDocument.userWatchingWithoutMasturbating,
-                            userMasturbatingWithoutWatching:
-                                userDocument.userMasturbatingWithoutWatching,
-                          ),
-                        );
+                                try {
+                                  await migrateService
+                                      .migrateToNewDocuemntStrcture(
+                                    UserDocument(
+                                      uid: userDocument.uid,
+                                      displayName:
+                                          displayNameController.text.trim(),
+                                      dayOfBirth: selectedBirthDate != null
+                                          ? Timestamp.fromDate(
+                                              selectedBirthDate!)
+                                          : null,
+                                      userFirstDate: userDocument.userFirstDate,
+                                      email: emailController.text.trim(),
+                                      role: "user",
+                                      locale: selectedLocale?.value,
+                                      gender: selectedGender?.value,
+                                      userRelapses: userDocument.userRelapses,
+                                      userWatchingWithoutMasturbating:
+                                          userDocument
+                                              .userWatchingWithoutMasturbating,
+                                      userMasturbatingWithoutWatching:
+                                          userDocument
+                                              .userMasturbatingWithoutWatching,
+                                    ),
+                                  );
 
-                        unawaited(ref
-                            .read(analyticsFacadeProvider)
-                            .trackOnboardingFinish());
+                                  unawaited(ref
+                                      .read(analyticsFacadeProvider)
+                                      .trackOnboardingFinish());
 
-                        context.goNamed(RouteNames.home.name);
-                      } catch (e, stackTrace) {
-                        ref
-                            .read(errorLoggerProvider)
-                            .logException(e, stackTrace);
-                      }
-                    },
-                    child: Column(
-                      children: [
-                        WidgetsContainer(
-                          backgroundColor: theme.primary[600],
-                          child: Center(
-                            child: Text(
-                              AppLocalizations.of(context)
-                                  .translate('start-your-journy'),
-                              style: TextStyles.caption
-                                  .copyWith(color: theme.grey[50]),
+                                  // Force a refresh of the user document provider so that
+                                  // the router's redirect logic sees the updated document.
+                                  // ignore: unused_result
+                                  await ref.refresh(
+                                      userDocumentsNotifierProvider.future);
+
+                                  if (!mounted) return;
+                                  context.goNamed(RouteNames.home.name);
+                                } catch (e, stackTrace) {
+                                  ref
+                                      .read(errorLoggerProvider)
+                                      .logException(e, stackTrace);
+                                  getErrorSnackBar(
+                                      context, "something-went-wrong");
+                                  if (mounted) {
+                                    setState(() => _isProcessing = false);
+                                  }
+                                }
+                              },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: _isProcessing
+                              ? theme.grey[400]
+                              : theme.primary[600],
+                          minimumSize: const Size.fromHeight(48),
+                          shape: SmoothRectangleBorder(
+                            borderRadius: SmoothBorderRadius(
+                              cornerRadius: 10.5,
+                              cornerSmoothing: 1,
                             ),
                           ),
                         ),
-                        if (true) ...[
-                          verticalSpace(Spacing.points8),
-                          GestureDetector(
-                            onTap: () {
-                              final body = '''
-                                  Debug Information:
-                                  UID: ${userDocument.uid}
-                                  Original Document State:
-                                  - Display Name: ${userDocument.displayName}
-                                  - Email: ${userDocument.email}
-                                  - DOB: ${userDocument.dayOfBirth?.toDate()}
-                                  - Gender: ${userDocument.gender}
-                                  - Locale: ${userDocument.locale}
+                        child: _isProcessing
+                            ? Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  SizedBox(
+                                    height: 20,
+                                    width: 20,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      valueColor: AlwaysStoppedAnimation<Color>(
+                                          theme.grey[50]!),
+                                    ),
+                                  ),
+                                  SizedBox(width: 8),
+                                  Text(
+                                    AppLocalizations.of(context)
+                                        .translate('processing'),
+                                    style: TextStyles.caption
+                                        .copyWith(color: theme.grey[50]),
+                                  ),
+                                ],
+                              )
+                            : Text(
+                                AppLocalizations.of(context)
+                                    .translate('start-your-journy'),
+                                style: TextStyles.caption
+                                    .copyWith(color: theme.grey[50]),
+                              ),
+                      ),
+                      if (true) ...[
+                        verticalSpace(Spacing.points8),
+                        ElevatedButton(
+                          onPressed: () {
+                            final body = '''
+                                Debug Information:
+                                UID: ${userDocument.uid}
+                                Original Document State:
+                                - Display Name: ${userDocument.displayName}
+                                - Email: ${userDocument.email}
+                                - DOB: ${userDocument.dayOfBirth?.toDate()}
+                                - Gender: ${userDocument.gender}
+                                - Locale: ${userDocument.locale}
 
-                                  New Values Entered:
-                                  - Display Name: ${displayNameController.text}
-                                  - Email: ${emailController.text}
-                                  - DOB: $selectedBirthDate
-                                  - Gender: ${selectedGender?.value}
-                                  - Locale: ${selectedLocale?.value}
-                                  ''';
+                                New Values Entered:
+                                - Display Name: ${displayNameController.text}
+                                - Email: ${emailController.text}
+                                - DOB: $selectedBirthDate
+                                - Gender: ${selectedGender?.value}
+                                - Locale: ${selectedLocale?.value}
+                                ''';
 
-                              final Uri emailLaunchUri = Uri(
-                                scheme: 'mailto',
-                                path: 'admin@ta3afi.app',
-                                query: encodeQueryParameters({
-                                  'subject': 'Migration Error Report',
-                                  'body': body,
-                                }),
-                              );
+                            final Uri emailLaunchUri = Uri(
+                              scheme: 'mailto',
+                              path: 'admin@ta3afi.app',
+                              query: encodeQueryParameters({
+                                'subject': 'Migration Error Report',
+                                'body': body,
+                              }),
+                            );
 
-                              ref
-                                  .read(urlLauncherProvider)
-                                  .launch(emailLaunchUri);
-                            },
-                            child: WidgetsContainer(
-                              backgroundColor: theme.backgroundColor,
-                              borderSide: BorderSide(
+                            ref
+                                .read(urlLauncherProvider)
+                                .launch(emailLaunchUri);
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: theme.backgroundColor,
+                            minimumSize: const Size.fromHeight(48),
+                            shape: SmoothRectangleBorder(
+                              borderRadius: SmoothBorderRadius(
+                                cornerRadius: 10.5,
+                                cornerSmoothing: 1,
+                              ),
+                              side: BorderSide(
                                 color: theme.grey[500]!,
                                 width: 0.25,
                               ),
-                              child: Center(
-                                child: Text(
-                                  AppLocalizations.of(context)
-                                      .translate('contact-support'),
-                                  style: TextStyles.small.copyWith(
-                                    color: theme.grey[500]!,
-                                  ),
-                                ),
-                              ),
                             ),
                           ),
-                          verticalSpace(Spacing.points16),
-                        ],
+                          child: Text(
+                            AppLocalizations.of(context)
+                                .translate('contact-support'),
+                            style: TextStyles.small.copyWith(
+                              color: theme.grey[500]!,
+                            ),
+                          ),
+                        ),
+                        verticalSpace(Spacing.points16),
                       ],
-                    ),
+                    ],
                   )
                 ],
               ),

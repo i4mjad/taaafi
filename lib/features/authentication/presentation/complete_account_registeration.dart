@@ -425,7 +425,6 @@ class _CompleteAccountRegisterationScreenState
                             await authService.completeAccountRegiseration(
                                 context, name, dob, gender, locale, firstDate);
 
-                            // Update the state and redirect to home
                             ref
                                 .read(userDocumentsNotifierProvider.notifier)
                                 .build();
