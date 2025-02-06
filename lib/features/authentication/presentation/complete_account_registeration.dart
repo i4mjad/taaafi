@@ -8,6 +8,7 @@ import 'package:reboot_app_3/core/helpers/app_regex.dart';
 import 'package:reboot_app_3/core/helpers/date_display_formater.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/monitoring/analytics_facade.dart';
+import 'package:reboot_app_3/core/monitoring/error_logger.dart';
 import 'package:reboot_app_3/core/shared_widgets/app_bar.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
 import 'package:reboot_app_3/core/shared_widgets/custom_segmented_button.dart';
@@ -50,6 +51,7 @@ class _CompleteAccountRegisterationScreenState
       SegmentedButtonOption(value: 'english', translationKey: 'english');
   bool nowIsStartingDate = false;
   bool isTermsAccepted = false;
+  bool _isProcessing = false;
 
   @override
   void dispose() {
@@ -390,51 +392,86 @@ class _CompleteAccountRegisterationScreenState
                         ),
                       ),
                       GestureDetector(
-                        onTap: () async {
-                          HapticFeedback.lightImpact();
-                          if (isTermsAccepted == false) {
-                            getErrorSnackBar(
-                                context, "terms-should-be-accepted");
-                            return;
-                          }
+                        onTap: _isProcessing
+                            ? null
+                            : () async {
+                                setState(() => _isProcessing = true);
 
-                          if (nameController.text.trim().isEmpty) {
-                            getErrorSnackBar(
-                                context, "name-should-not-be-empty");
-                            return;
-                          }
+                                if (isTermsAccepted == false) {
+                                  getErrorSnackBar(
+                                      context, "terms-should-be-accepted");
+                                  setState(() => _isProcessing = false);
+                                  return;
+                                }
 
-                          if (emailController.text.trim().isEmpty) {
-                            getErrorSnackBar(
-                                context, "email-should-not-be-empty");
-                            return;
-                          }
+                                if (nameController.text.trim().isEmpty) {
+                                  getErrorSnackBar(
+                                      context, "name-should-not-be-empty");
+                                  setState(() => _isProcessing = false);
+                                  return;
+                                }
 
-                          if (_formKey.currentState!.validate() &&
-                              isTermsAccepted) {
-                            final name = nameController.value.text;
-                            final selectedDob = dob;
-                            final gender = ""; //! TODO: this to be added later
-                            final locale = selectedLanguage.value;
-                            final firstDate = startingDate;
+                                if (emailController.text.trim().isEmpty) {
+                                  getErrorSnackBar(
+                                      context, "email-should-not-be-empty");
+                                  setState(() => _isProcessing = false);
+                                  return;
+                                }
 
-                            unawaited(ref
-                                .read(analyticsFacadeProvider)
-                                .trackOnboardingFinish());
+                                if (_formKey.currentState!.validate() &&
+                                    isTermsAccepted) {
+                                  try {
+                                    final name = nameController.value.text;
+                                    final selectedDob = dob;
+                                    final gender =
+                                        ""; //! TODO: this to be added later
+                                    final locale = selectedLanguage.value;
+                                    final firstDate = startingDate;
 
-                            await authService.completeAccountRegiseration(
-                                context, name, dob, gender, locale, firstDate);
+                                    // Track analytics before the async operations
+                                    unawaited(ref
+                                        .read(analyticsFacadeProvider)
+                                        .trackOnboardingFinish());
 
-                            ref
-                                .read(userDocumentsNotifierProvider.notifier)
-                                .build();
-                            context.goNamed(RouteNames.home.name);
-                          }
-                        },
+                                    // Complete the registration
+                                    await authService
+                                        .completeAccountRegiseration(
+                                            context,
+                                            name,
+                                            dob,
+                                            gender,
+                                            locale,
+                                            firstDate);
+
+                                    // Wait for the user document to be refreshed
+                                    await ref.refresh(
+                                        userDocumentsNotifierProvider.future);
+
+                                    if (!mounted) return;
+
+                                    // Navigate after ensuring the state is updated
+                                    WidgetsBinding.instance
+                                        .addPostFrameCallback((_) {
+                                      context.goNamed(RouteNames.home.name);
+                                    });
+                                  } catch (e, stackTrace) {
+                                    ref
+                                        .read(errorLoggerProvider)
+                                        .logException(e, stackTrace);
+                                    if (mounted) {
+                                      getErrorSnackBar(
+                                          context, "something-went-wrong");
+                                      setState(() => _isProcessing = false);
+                                    }
+                                  }
+                                }
+                              },
                         child: Padding(
                           padding: const EdgeInsets.only(top: 16.0),
                           child: WidgetsContainer(
-                            backgroundColor: theme.primary[600],
+                            backgroundColor: _isProcessing
+                                ? theme.grey[400]
+                                : theme.primary[600],
                             width:
                                 MediaQuery.of(context).size.width - (16 + 16),
                             padding: EdgeInsets.only(top: 12, bottom: 12),
@@ -442,12 +479,30 @@ class _CompleteAccountRegisterationScreenState
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Text(
-                                  AppLocalizations.of(context)
-                                      .translate('sign-up'),
-                                  style: TextStyles.footnoteSelected
-                                      .copyWith(color: theme.grey[50]),
-                                ),
+                                if (_isProcessing) ...[
+                                  SizedBox(
+                                    height: 20,
+                                    width: 20,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      valueColor: AlwaysStoppedAnimation<Color>(
+                                          theme.grey[50]!),
+                                    ),
+                                  ),
+                                  SizedBox(width: 8),
+                                  Text(
+                                    AppLocalizations.of(context)
+                                        .translate('processing-new-account'),
+                                    style: TextStyles.footnoteSelected
+                                        .copyWith(color: theme.grey[50]),
+                                  ),
+                                ] else
+                                  Text(
+                                    AppLocalizations.of(context)
+                                        .translate('sign-up'),
+                                    style: TextStyles.footnoteSelected
+                                        .copyWith(color: theme.grey[50]),
+                                  ),
                               ],
                             ),
                           ),

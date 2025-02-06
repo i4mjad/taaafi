@@ -144,6 +144,7 @@
   "processing": "جاري التحديث...",
   "delete-duplicates": "إزالة التكرارات",
   "duplicates-deleted": "تم حذف التكرارات بنجاح",
+  "processing-new-account": "جاري إنشاء الحساب...",
   "delete-duplicates-description": "بعض المستخدمين يوجد لديهم تكرارات في المتابعات اليومية، يمكنك إزالة التكرارات عن طريق الزر أدناه",
   "daily-notification-time": "التذكير اليومي",
   "delete-my-data": "إعادة تعيين بيانات الحساب",

@@ -217,7 +217,7 @@ class _ReLoginFormState extends ConsumerState<ReLoginForm> {
               final email = emailController.value.text;
               final password = passwordController.value.text;
 
-              if (!email.isNotEmpty || !password.isNotEmpty) {
+              if (email.isNotEmpty && password.isNotEmpty) {
                 if (_formKey.currentState!.validate()) {
                   final result = await authService.reSignInWithEmail(
                     context,
@@ -227,7 +227,7 @@ class _ReLoginFormState extends ConsumerState<ReLoginForm> {
                   if (result) {
                     HapticFeedback.mediumImpact();
 
-                    await userProfileNotifier.handleUserDeletion();
+                    await authService.deleteAccount(context);
                     context.goNamed(RouteNames.onboarding.name);
                     getSuccessSnackBar(context, 'account-deleted');
                   }

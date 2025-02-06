@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:reboot_app_3/core/monitoring/error_logger.dart';
 import 'package:reboot_app_3/features/authentication/data/models/user_document.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -48,6 +49,31 @@ class UserDocumentsNotifier extends _$UserDocumentsNotifier {
       return userDocument;
     } catch (e, stack) {
       state = AsyncValue.error(e, stack); // Update state with error
+      return null;
+    }
+  }
+
+  Future<UserDocument?> getUserDocument(String uid) async {
+    try {
+      if (uid == null) {
+        state = AsyncValue.data(null); // Update state with error
+        throw Exception("User ID is null");
+      }
+
+      final doc = await _firestore
+          .collection('users')
+          .doc(uid)
+          .get(GetOptions(source: Source.server));
+      if (!doc.exists) {
+        state = AsyncValue.data(null); // Update state with error
+        return null; // No document found
+      }
+
+      var userDocument = UserDocument.fromFirestore(doc);
+
+      return userDocument;
+    } catch (e, stackTrace) {
+      ref.read(errorLoggerProvider).logException(e, stackTrace);
       return null;
     }
   }

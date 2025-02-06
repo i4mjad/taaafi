@@ -175,6 +175,9 @@ class UserProfileNotifier extends _$UserProfileNotifier {
       // Step 4: Delete the Firebase Auth user
       await FirebaseAuth.instance.currentUser?.delete();
 
+      // Step 5: force logout
+      await FirebaseAuth.instance.signOut();
+
       state = AsyncValue.data(null); // Update state to reflect user deletion
     } catch (e) {
       state = AsyncValue.error(e, StackTrace.current);
