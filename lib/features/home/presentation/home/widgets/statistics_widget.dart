@@ -41,16 +41,51 @@ class _StatisticsWidgetState extends ConsumerState<StatisticsWidget> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           verticalSpace(Spacing.points16),
+          Padding(
+            padding: const EdgeInsets.only(right: 16.0, left: 16),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  localization.translate("statistics"),
+                  style: TextStyles.h6.copyWith(color: theme.grey[900]),
+                ),
+                GestureDetector(
+                  onTap: () {
+                    showModalBottomSheet(
+                      context: context,
+                      builder: (context) => InformationSheet(),
+                    );
+                  },
+                  child: Icon(
+                    LucideIcons.info,
+                    size: 24,
+                    color: theme.grey[600],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          verticalSpace(Spacing.points4),
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Padding(
                 padding: const EdgeInsets.only(right: 16.0, left: 16),
                 child: Text(
-                  localization.translate("statistics"),
-                  style: TextStyles.h6.copyWith(color: theme.grey[900]),
+                  localization.translate("starting-date") +
+                      ": " +
+                      (streaksState.value?.userFirstDate != null
+                          ? getDisplayDateTime(
+                              streaksState.value!.userFirstDate,
+                              locale!.languageCode)
+                          : "")
+                  // getDisplayDateTime(
+                  //     data.userFirstDate, locale!.languageCode),,
+                  ,
+                  style: TextStyles.small.copyWith(color: theme.grey[400]),
                 ),
               ),
+              Spacer(),
               Padding(
                 padding: const EdgeInsets.only(right: 16.0, left: 16),
                 child: Row(
@@ -71,22 +106,6 @@ class _StatisticsWidgetState extends ConsumerState<StatisticsWidget> {
                 ),
               ),
             ],
-          ),
-          verticalSpace(Spacing.points4),
-          Padding(
-            padding: const EdgeInsets.only(right: 16.0, left: 16),
-            child: Text(
-              localization.translate("starting-date") +
-                  ": " +
-                  (streaksState.value?.userFirstDate != null
-                      ? getDisplayDateTime(streaksState.value!.userFirstDate,
-                          locale!.languageCode)
-                      : "")
-              // getDisplayDateTime(
-              //     data.userFirstDate, locale!.languageCode),,
-              ,
-              style: TextStyles.small.copyWith(color: theme.grey[400]),
-            ),
           ),
           verticalSpace(Spacing.points4),
           SizedBox(
@@ -132,7 +151,8 @@ class _FirstPageWidget extends ConsumerWidget {
                   padding: EdgeInsets.all(12),
                   backgroundColor: theme.backgroundColor,
                   borderSide: BorderSide(
-                      color: followUpColors[FollowUpType.relapse]!, width: 0.5),
+                      color: followUpColors[FollowUpType.relapse]!,
+                      width: 0.75),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -156,7 +176,11 @@ class _FirstPageWidget extends ConsumerWidget {
                   ),
                 ),
               ),
-            horizontalSpace(Spacing.points8),
+            if (visibilitySettings['relapse']! &&
+                (visibilitySettings['pornOnly']! ||
+                    visibilitySettings['mastOnly']! ||
+                    visibilitySettings['slipUp']!))
+              horizontalSpace(Spacing.points8),
             if (visibilitySettings['pornOnly']!)
               Expanded(
                 child: WidgetsContainer(
@@ -164,7 +188,7 @@ class _FirstPageWidget extends ConsumerWidget {
                   backgroundColor: theme.backgroundColor,
                   borderSide: BorderSide(
                       color: followUpColors[FollowUpType.pornOnly]!,
-                      width: 0.5),
+                      width: 0.75),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -188,7 +212,10 @@ class _FirstPageWidget extends ConsumerWidget {
                   ),
                 ),
               ),
-            horizontalSpace(Spacing.points8),
+            if (visibilitySettings['pornOnly']! &&
+                (visibilitySettings['mastOnly']! ||
+                    visibilitySettings['slipUp']!))
+              horizontalSpace(Spacing.points8),
             if (visibilitySettings['mastOnly']!)
               Expanded(
                 child: WidgetsContainer(
@@ -196,7 +223,7 @@ class _FirstPageWidget extends ConsumerWidget {
                   backgroundColor: theme.backgroundColor,
                   borderSide: BorderSide(
                       color: followUpColors[FollowUpType.mastOnly]!,
-                      width: 0.5),
+                      width: 0.75),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -220,14 +247,16 @@ class _FirstPageWidget extends ConsumerWidget {
                   ),
                 ),
               ),
-            horizontalSpace(Spacing.points8),
+            if (visibilitySettings['mastOnly']! &&
+                visibilitySettings['slipUp']!)
+              horizontalSpace(Spacing.points8),
             if (visibilitySettings['slipUp']!)
               Expanded(
                 child: WidgetsContainer(
                   padding: EdgeInsets.all(12),
                   backgroundColor: theme.backgroundColor,
                   borderSide: BorderSide(
-                      color: followUpColors[FollowUpType.slipUp]!, width: 0.5),
+                      color: followUpColors[FollowUpType.slipUp]!, width: 0.75),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -377,55 +406,133 @@ class _SecondPageWidget extends ConsumerWidget {
   }
 }
 
-class FollowupDescriptionSection extends StatelessWidget {
-  const FollowupDescriptionSection({
-    super.key,
-    required this.color,
-    required this.title,
-    required this.description,
-  });
-
-  final Color color;
+class InformationSection extends StatelessWidget {
   final String title;
   final String description;
+  final Color? dotColor;
+
+  const InformationSection({
+    super.key,
+    required this.title,
+    required this.description,
+    this.dotColor,
+  });
 
   @override
   Widget build(BuildContext context) {
     final theme = AppTheme.of(context);
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          width: 16,
+          height: 16,
+          decoration: BoxDecoration(
+            color: dotColor ?? theme.primary[600],
+            shape: BoxShape.circle,
+          ),
+        ),
+        horizontalSpace(Spacing.points8),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                AppLocalizations.of(context).translate(title),
+                style: TextStyles.footnoteSelected,
+              ),
+              verticalSpace(Spacing.points4),
+              Text(
+                AppLocalizations.of(context).translate(description),
+                style: TextStyles.small,
+                softWrap: true,
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class InformationSheet extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = AppTheme.of(context);
+    final localization = AppLocalizations.of(context);
+
     return Container(
-      padding: EdgeInsets.only(right: 32, left: 32),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      color: theme.backgroundColor,
+      padding: EdgeInsets.all(16),
+      child: Column(
         children: [
-          Container(
-            width: 16,
-            height: 16,
-            decoration: BoxDecoration(
-              color: color,
-              shape: BoxShape.circle,
+          Row(
+            children: [
+              Text(
+                localization.translate("home"),
+                style: TextStyles.h6,
+              ),
+              Spacer(),
+              GestureDetector(
+                onTap: () {
+                  Navigator.pop(context);
+                },
+                child: Icon(
+                  LucideIcons.xCircle,
+                  size: 24,
+                  color: theme.grey[600],
+                ),
+              )
+            ],
+          ),
+          verticalSpace(Spacing.points16),
+          InformationSection(
+            title: "relapse",
+            description: "what-is-relapse",
+            dotColor: followUpColors[FollowUpType.relapse],
+          ),
+          verticalSpace(Spacing.points16),
+          InformationSection(
+            title: "slipUp",
+            description: "what-is-slip-up",
+            dotColor: followUpColors[FollowUpType.slipUp],
+          ),
+          verticalSpace(Spacing.points16),
+          InformationSection(
+            title: "porn-only",
+            description: "what-is-no-porn",
+            dotColor: followUpColors[FollowUpType.pornOnly],
+          ),
+          verticalSpace(Spacing.points16),
+          InformationSection(
+            title: "mast-only",
+            description: "what-is-no-mast",
+            dotColor: followUpColors[FollowUpType.mastOnly],
+          ),
+          Spacer(),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: theme.backgroundColor,
+              minimumSize: const Size.fromHeight(48),
+              shape: RoundedRectangleBorder(
+                side: BorderSide(
+                  color: theme.grey[500]!,
+                  width: 0.75,
+                ),
+                borderRadius: BorderRadius.circular(10.5),
+              ),
+            ),
+            child: Text(
+              localization.translate('close'),
+              style: TextStyles.small.copyWith(
+                color: theme.primary[600]!,
+              ),
             ),
           ),
-          horizontalSpace(Spacing.points16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: TextStyles.h6.copyWith(
-                    color: theme.primary[600],
-                  ),
-                ),
-                verticalSpace(Spacing.points8),
-                Text(
-                  description,
-                  style: TextStyles.small.copyWith(
-                    color: theme.grey[700],
-                  ),
-                ),
-              ],
-            ),
-          )
         ],
       ),
     );
