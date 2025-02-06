@@ -254,7 +254,9 @@
   "daily-notification-time": "Daily Reminder",
   "delete-my-data": "Delete My Data",
   "show-all": "View All",
-
+  "delete-duplicates": "Delete Duplicates",
+  "duplicates-deleted": "Duplicates deleted successfully",
+  "delete-duplicates-description": "Some users have duplicates in their daily follow-ups, you can delete the duplicates by clicking the button below",
   "ta3afi-plus":"Ta'aafi +",
   "home-settings": "Home Settings",
   "emotions":"Emotions",

@@ -1,3 +1,4 @@
+import 'package:figma_squircle/figma_squircle.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -7,10 +8,12 @@ import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/routing/route_names.dart';
 import 'package:reboot_app_3/core/shared_widgets/app_bar.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
+import 'package:reboot_app_3/core/shared_widgets/snackbar.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/custom_theme_data.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
+import 'package:reboot_app_3/features/home/data/follow_up_notifier.dart';
 import 'package:reboot_app_3/features/home/data/streak_notifier.dart';
 import 'package:reboot_app_3/features/home/presentation/home/statistics_visibility_notifier.dart';
 import 'package:reboot_app_3/features/home/presentation/home/widgets/calender_widget.dart';
@@ -270,6 +273,43 @@ class HomeSettingsSheet extends ConsumerWidget {
                 ),
               ),
             ],
+          ),
+          verticalSpace(Spacing.points16),
+          Text(
+            AppLocalizations.of(context).translate('delete-duplicates'),
+            style: TextStyles.body.copyWith(color: theme.grey[600]),
+          ),
+          verticalSpace(Spacing.points4),
+          Text(
+            AppLocalizations.of(context)
+                .translate('delete-duplicates-description'),
+            style: TextStyles.footnote.copyWith(color: theme.grey[400]),
+          ),
+          verticalSpace(Spacing.points8),
+          ElevatedButton(
+            onPressed: () {
+              HapticFeedback.mediumImpact();
+              ref
+                  .read(followUpNotifierProvider.notifier)
+                  .cleanupDuplicateFollowUps();
+              getSuccessSnackBar(context, "duplicates-deleted");
+              Navigator.pop(context);
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: theme.backgroundColor,
+              minimumSize: const Size.fromHeight(48),
+              shape: SmoothRectangleBorder(
+                side: BorderSide(color: theme.grey[600]!, width: 0.25),
+                borderRadius: SmoothBorderRadius(
+                  cornerRadius: 10.5,
+                  cornerSmoothing: 1,
+                ),
+              ),
+            ),
+            child: Text(
+              AppLocalizations.of(context).translate('delete-duplicates'),
+              style: TextStyles.caption.copyWith(color: theme.primary[600]),
+            ),
           ),
           verticalSpace(Spacing.points16),
           Row(

@@ -55,6 +55,12 @@ class FollowUpService {
     await _repository.deleteAllFollowUps();
   }
 
+  /// Cleans up duplicate follow-ups by ensuring only one document exists
+  /// for each combination of type and date (date only).
+  Future<void> cleanupDuplicateFollowUps() async {
+    await _repository.cleanupDuplicateFollowUps();
+  }
+
   // -------------------------------------------------------------------------
   // Calculation / Stats methods
   // -------------------------------------------------------------------------

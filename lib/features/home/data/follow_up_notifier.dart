@@ -57,6 +57,16 @@ class FollowUpNotifier extends _$FollowUpNotifier {
     }
   }
 
+  Future<void> cleanupDuplicateFollowUps() async {
+    state = const AsyncValue.loading();
+    try {
+      await service.cleanupDuplicateFollowUps();
+      state = AsyncValue.data(await build());
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+    }
+  }
+
   Future<void> createMultipleFollowUps(List<FollowUpModel> followUps) async {
     state = const AsyncValue.loading();
     try {

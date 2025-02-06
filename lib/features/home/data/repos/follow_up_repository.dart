@@ -277,4 +277,56 @@ class FollowUpRepository {
       rethrow;
     }
   }
+
+  /// Cleans up duplicate follow-ups by ensuring only one document exists
+  /// for each combination of type and time (date only).
+  Future<void> cleanupDuplicateFollowUps() async {
+    try {
+      final uid = _getUserId();
+      if (uid == null) throw Exception('User not logged in');
+
+      // Get all follow-ups
+      final followUps = await readAllFollowUps();
+
+      // Group follow-ups by type and date
+      final Map<String, List<FollowUpModel>> groupedFollowUps = {};
+
+      for (var followUp in followUps) {
+        // Create a unique key combining type and date (without time)
+        final dateOnly = _onlyDate(followUp.time);
+        final key = '${followUp.type.name}_${dateOnly.toIso8601String()}';
+
+        groupedFollowUps.putIfAbsent(key, () => []);
+        groupedFollowUps[key]!.add(followUp);
+      }
+
+      // Delete duplicates (keep only the first document for each group)
+      final batch = _firestore.batch();
+
+      for (var group in groupedFollowUps.values) {
+        if (group.length > 1) {
+          // Sort by creation time or ID to ensure consistent deletion
+          group.sort((a, b) => a.id.compareTo(b.id));
+
+          // Keep the first document, delete the rest
+          for (var i = 1; i < group.length; i++) {
+            final docRef = _firestore
+                .collection('users')
+                .doc(uid)
+                .collection('followUps')
+                .doc(group[i].id);
+            batch.delete(docRef);
+          }
+        }
+      }
+
+      // Commit the batch if there are any operations
+      if (batch.commit != null) {
+        await batch.commit();
+      }
+    } catch (e, stackTrace) {
+      ref.read(errorLoggerProvider).logException(e, stackTrace);
+      rethrow;
+    }
+  }
 }
