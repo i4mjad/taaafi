@@ -11,6 +11,16 @@ var badEmotions = [
   Emotion("😪", "regret"),
   Emotion("😥", "anxious"),
   Emotion("😰", "fear"),
+  Emotion("😖", "frustration"),
+  Emotion("😵", "overwhelmed"),
+  Emotion("🤢", "disgust"),
+  Emotion("😭", "despair"),
+  Emotion("😤", "resentment"),
+  Emotion("😔", "disappointment"),
+  Emotion("😨", "dread"),
+  Emotion("😵‍💫", "confusion"),
+  Emotion("😬", "awkwardness"),
+  Emotion("😩", "exhaustion"),
 ];
 
 var goodEmotions = [
@@ -19,4 +29,14 @@ var goodEmotions = [
   Emotion("🧘‍♂️", "serenity"),
   Emotion("💪", "confidence"),
   Emotion("😌", "satisfaction"),
+  Emotion("🤩", "excitement"),
+  Emotion("🥰", "love"),
+  Emotion("😊", "contentment"),
+  Emotion("🤗", "compassion"),
+  Emotion("😎", "pride"),
+  Emotion("🎉", "joy"),
+  Emotion("🌟", "inspiration"),
+  Emotion("🤝", "connection"),
+  Emotion("🎯", "determination"),
+  Emotion("🕊", "peace"),
 ];

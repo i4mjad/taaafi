@@ -12,8 +12,6 @@ import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/features/home/data/models/emotion.dart';
 import 'package:reboot_app_3/features/home/data/models/emotion_model.dart';
 import 'package:reboot_app_3/features/home/data/models/follow_up_option.dart';
-import 'package:reboot_app_3/features/home/presentation/home/widgets/emotion_widget.dart';
-import 'package:reboot_app_3/features/home/presentation/home/widgets/follow_up_widget.dart';
 import 'package:reboot_app_3/features/shared/models/follow_up.dart';
 import 'package:time_picker_spinner_pop_up/time_picker_spinner_pop_up.dart';
 import 'package:reboot_app_3/features/home/data/follow_up_notifier.dart';
@@ -31,6 +29,7 @@ class _FollowUpSheetState extends ConsumerState<FollowUpSheet> {
   Set<FollowUpOption> selectedFollowUps = {};
   Set<Emotion> selectedEmotions = {};
   bool addAllFollowUps = false; // New state for checkbox
+  bool _isProcessing = false;
 
   final List<FollowUpOption> followUpOptions = [
     FollowUpOption(icon: LucideIcons.planeLanding, translationKey: 'slipUp'),
@@ -48,6 +47,10 @@ class _FollowUpSheetState extends ConsumerState<FollowUpSheet> {
         }
       } else {
         selectedFollowUps.add(followUpOption);
+        if (followUpOption.translationKey == 'relapse') {
+          addAllFollowUps =
+              true; // Auto-select checkbox when relapse is selected
+        }
       }
     });
     HapticFeedback.selectionClick(); // Haptic feedback on selection
@@ -196,38 +199,36 @@ class _FollowUpSheetState extends ConsumerState<FollowUpSheet> {
             style: TextStyles.h6,
           ),
           verticalSpace(Spacing.points8),
-          Padding(
-            padding: const EdgeInsets.only(top: 5.0, bottom: 5),
-            child: Container(
-              height: 90,
-              child: ListView.separated(
-                scrollDirection: Axis.horizontal,
-                itemCount: followUpOptions.length,
-                shrinkWrap: true,
-                separatorBuilder: (BuildContext context, int index) =>
-                    horizontalSpace(Spacing.points4),
-                itemBuilder: (BuildContext context, int index) {
-                  final followUp = followUpOptions[index];
-                  final isSelected = selectedFollowUps.contains(followUp);
-
-                  return GestureDetector(
-                    onTap: () => toggleFollowUp(followUp),
-                    child: Padding(
-                      padding: const EdgeInsets.all(5.0),
-                      child: Container(
-                        width: 90,
-                        height: 80,
-                        child: FollowUpWidget(
-                          icon: followUp.icon,
-                          translationKey: followUp.translationKey,
-                          isSelected: isSelected,
+          Column(
+            children: [
+              for (int i = 0; i < followUpOptions.length; i += 2)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 8.0),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: FollowUpButton(
+                          followUpOption: followUpOptions[i],
+                          isSelected:
+                              selectedFollowUps.contains(followUpOptions[i]),
+                          onTap: () => toggleFollowUp(followUpOptions[i]),
                         ),
                       ),
-                    ),
-                  );
-                },
-              ),
-            ),
+                      if (i + 1 < followUpOptions.length) ...[
+                        horizontalSpace(Spacing.points8),
+                        Expanded(
+                          child: FollowUpButton(
+                            followUpOption: followUpOptions[i + 1],
+                            isSelected: selectedFollowUps
+                                .contains(followUpOptions[i + 1]),
+                            onTap: () => toggleFollowUp(followUpOptions[i + 1]),
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+            ],
           ),
           if (selectedFollowUps
               .any((option) => option.translationKey == 'relapse'))
@@ -282,38 +283,16 @@ class _FollowUpSheetState extends ConsumerState<FollowUpSheet> {
             ),
           ),
           verticalSpace(Spacing.points4),
-          Padding(
-            padding: const EdgeInsets.only(top: 5.0, bottom: 5),
-            child: Container(
-              height: 90,
-              child: ListView.separated(
-                scrollDirection: Axis.horizontal,
-                itemCount: badEmotions.length,
-                separatorBuilder: (BuildContext context, int index) =>
-                    horizontalSpace(Spacing.points4),
-                itemBuilder: (BuildContext context, int index) {
-                  final emotion = badEmotions[index];
-                  final isSelected = selectedEmotions.contains(emotion);
-
-                  return GestureDetector(
-                    onTap: () => toggleEmotion(emotion),
-                    child: Padding(
-                      padding: const EdgeInsets.all(5.0),
-                      child: Container(
-                        width: 90,
-                        height: 80,
-                        child: EmotionWidget(
-                          emotionEmoji: emotion.emotionEmoji,
-                          emotionNameTranslationKey:
-                              emotion.emotionNameTranslationKey,
-                          isSelected: isSelected,
-                        ),
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: badEmotions.map((emotion) {
+              return EmotionButton(
+                emotion: emotion,
+                isSelected: selectedEmotions.contains(emotion),
+                onTap: () => toggleEmotion(emotion),
+              );
+            }).toList(),
           ),
           verticalSpace(Spacing.points16),
           Text(
@@ -323,72 +302,84 @@ class _FollowUpSheetState extends ConsumerState<FollowUpSheet> {
             ),
           ),
           verticalSpace(Spacing.points4),
-          Container(
-            height: 90,
-            child: ListView.separated(
-              scrollDirection: Axis.horizontal,
-              itemCount: goodEmotions.length,
-              separatorBuilder: (BuildContext context, int index) =>
-                  horizontalSpace(Spacing.points4),
-              itemBuilder: (BuildContext context, int index) {
-                final emotion = goodEmotions[index];
-                final isSelected = selectedEmotions.contains(emotion);
-
-                return GestureDetector(
-                  onTap: () => toggleEmotion(emotion),
-                  child: Padding(
-                    padding: EdgeInsets.all(5),
-                    child: Container(
-                      width: 90,
-                      height: 80,
-                      child: EmotionWidget(
-                        emotionEmoji: emotion.emotionEmoji,
-                        emotionNameTranslationKey:
-                            emotion.emotionNameTranslationKey,
-                        isSelected: isSelected,
-                      ),
-                    ),
-                  ),
-                );
-              },
-            ),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: goodEmotions.map((emotion) {
+              return EmotionButton(
+                emotion: emotion,
+                isSelected: selectedEmotions.contains(emotion),
+                onTap: () => toggleEmotion(emotion),
+              );
+            }).toList(),
           ),
           verticalSpace(Spacing.points16),
           Row(
             children: [
               Expanded(
                 child: GestureDetector(
-                  onTap: () async {
-                    await _saveFollowUpsAndEmotions();
-                    Navigator.pop(context);
-                  },
+                  onTap: _isProcessing
+                      ? null
+                      : () async {
+                          setState(() => _isProcessing = true);
+
+                          try {
+                            await _saveFollowUpsAndEmotions();
+                            if (mounted) {
+                              Navigator.pop(context);
+                            }
+                          } catch (e) {
+                            if (mounted) {
+                              setState(() => _isProcessing = false);
+                            }
+                          }
+                        },
                   child: WidgetsContainer(
                     borderRadius: BorderRadius.circular(10),
-                    backgroundColor: theme.primary[600],
+                    backgroundColor:
+                        _isProcessing ? theme.grey[400] : theme.primary[600],
                     boxShadow: [
                       BoxShadow(
                         color: Color.fromRGBO(50, 50, 93, 0.25),
                         blurRadius: 5,
                         spreadRadius: -1,
-                        offset: Offset(
-                          0,
-                          2,
-                        ),
+                        offset: Offset(0, 2),
                       ),
                       BoxShadow(
                         color: Color.fromRGBO(0, 0, 0, 0.3),
                         blurRadius: 3,
                         spreadRadius: -1,
-                        offset: Offset(
-                          0,
-                          1,
-                        ),
+                        offset: Offset(0, 1),
                       ),
                     ],
                     child: Center(
-                      child: Text(
-                        AppLocalizations.of(context).translate('save'),
-                        style: TextStyles.h6.copyWith(color: theme.grey[50]),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          if (_isProcessing) ...[
+                            SizedBox(
+                              height: 20,
+                              width: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                  theme.grey[50]!,
+                                ),
+                              ),
+                            ),
+                            horizontalSpace(Spacing.points8),
+                            Text(
+                              AppLocalizations.of(context).translate('saving'),
+                              style: TextStyles.caption
+                                  .copyWith(color: theme.grey[50]),
+                            ),
+                          ] else
+                            Text(
+                              AppLocalizations.of(context).translate('save'),
+                              style: TextStyles.caption
+                                  .copyWith(color: theme.grey[50]),
+                            ),
+                        ],
                       ),
                     ),
                   ),
@@ -410,27 +401,20 @@ class _FollowUpSheetState extends ConsumerState<FollowUpSheet> {
                         color: Color.fromRGBO(50, 50, 93, 0.25),
                         blurRadius: 5,
                         spreadRadius: -1,
-                        offset: Offset(
-                          0,
-                          2,
-                        ),
+                        offset: Offset(0, 2),
                       ),
                       BoxShadow(
                         color: Color.fromRGBO(0, 0, 0, 0.3),
                         blurRadius: 3,
                         spreadRadius: -1,
-                        offset: Offset(
-                          0,
-                          1,
-                        ),
+                        offset: Offset(0, 1),
                       ),
                     ],
                     child: Center(
                       child: Text(
                         AppLocalizations.of(context).translate('cancel'),
-                        style: TextStyles.h6.copyWith(
-                          color: theme.grey[900],
-                        ),
+                        style:
+                            TextStyles.caption.copyWith(color: theme.grey[900]),
                       ),
                     ),
                   ),
@@ -439,6 +423,105 @@ class _FollowUpSheetState extends ConsumerState<FollowUpSheet> {
             ],
           ),
         ],
+      ),
+    );
+  }
+}
+
+class FollowUpButton extends StatelessWidget {
+  const FollowUpButton({
+    required this.followUpOption,
+    required this.isSelected,
+    required this.onTap,
+    super.key,
+  });
+
+  final FollowUpOption followUpOption;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = AppTheme.of(context);
+
+    return GestureDetector(
+      onTap: () {
+        HapticFeedback.selectionClick();
+        onTap();
+      },
+      child: WidgetsContainer(
+        padding: EdgeInsets.all(12),
+        backgroundColor: theme.backgroundColor,
+        borderSide: BorderSide(
+          color: isSelected ? theme.success[600]! : theme.grey[600]!,
+          width: isSelected ? 1 : 0.5,
+        ),
+        child: Row(
+          children: [
+            Icon(
+              followUpOption.icon,
+              color: theme.primary[600],
+              size: 20,
+            ),
+            horizontalSpace(Spacing.points8),
+            Text(
+              AppLocalizations.of(context)
+                  .translate(followUpOption.translationKey),
+              style: TextStyles.small,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class EmotionButton extends StatelessWidget {
+  const EmotionButton({
+    required this.emotion,
+    required this.isSelected,
+    required this.onTap,
+    super.key,
+  });
+
+  final Emotion emotion;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = AppTheme.of(context);
+
+    return IntrinsicWidth(
+      child: GestureDetector(
+        onTap: () {
+          HapticFeedback.selectionClick();
+          onTap();
+        },
+        child: WidgetsContainer(
+          padding: EdgeInsets.all(4),
+          backgroundColor: theme.backgroundColor,
+          borderSide: BorderSide(
+            color: isSelected ? theme.success[600]! : theme.grey[600]!,
+            width: isSelected ? 0.75 : 0.25,
+          ),
+          borderRadius: BorderRadius.circular(8),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Text(
+                emotion.emotionEmoji,
+                style: TextStyles.bodyLarge.copyWith(height: 1.2),
+              ),
+              horizontalSpace(Spacing.points4),
+              Text(
+                AppLocalizations.of(context)
+                    .translate(emotion.emotionNameTranslationKey),
+                style: TextStyles.small,
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

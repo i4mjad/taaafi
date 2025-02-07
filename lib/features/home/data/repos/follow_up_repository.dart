@@ -288,13 +288,19 @@ class FollowUpRepository {
       // Get all follow-ups
       final followUps = await readAllFollowUps();
 
-      // Group follow-ups by type and date
+      // Group follow-ups by type and time (up to minutes)
       final Map<String, List<FollowUpModel>> groupedFollowUps = {};
 
       for (var followUp in followUps) {
-        // Create a unique key combining type and date (without time)
-        final dateOnly = _onlyDate(followUp.time);
-        final key = '${followUp.type.name}_${dateOnly.toIso8601String()}';
+        // Create a unique key combining type and time (up to minutes)
+        final normalizedTime = DateTime(
+          followUp.time.year,
+          followUp.time.month,
+          followUp.time.day,
+          followUp.time.hour,
+          followUp.time.minute,
+        );
+        final key = '${followUp.type.name}_${normalizedTime.toIso8601String()}';
 
         groupedFollowUps.putIfAbsent(key, () => []);
         groupedFollowUps[key]!.add(followUp);
@@ -302,9 +308,11 @@ class FollowUpRepository {
 
       // Delete duplicates (keep only the first document for each group)
       final batch = _firestore.batch();
+      bool hasDuplicates = false;
 
       for (var group in groupedFollowUps.values) {
         if (group.length > 1) {
+          hasDuplicates = true;
           // Sort by creation time or ID to ensure consistent deletion
           group.sort((a, b) => a.id.compareTo(b.id));
 
@@ -320,8 +328,8 @@ class FollowUpRepository {
         }
       }
 
-      // Commit the batch if there are any operations
-      if (batch.commit != null) {
+      // Commit the batch only if there are duplicates to delete
+      if (hasDuplicates) {
         await batch.commit();
       }
     } catch (e, stackTrace) {

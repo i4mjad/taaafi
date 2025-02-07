@@ -145,6 +145,8 @@
   "delete-duplicates": "إزالة التكرارات",
   "duplicates-deleted": "تم حذف التكرارات بنجاح",
   "processing-new-account": "جاري إنشاء الحساب...",
+  "saving": "جاري الحفظ...",
+  
   "delete-duplicates-description": "بعض المستخدمين يوجد لديهم تكرارات في المتابعات اليومية، يمكنك إزالة التكرارات عن طريق الزر أدناه",
   "daily-notification-time": "التذكير اليومي",
   "delete-my-data": "إعادة تعيين بيانات الحساب",
@@ -567,6 +569,27 @@
   "porn": "إباحية فقط",
   "mast": "عادة سرية فقط",
   "slips": "الزلات",
-  "contact-support": "هل تواجه مشكلة؟ انقر هنا للاتصال بالدعم"
+  "contact-support": "هل تواجه مشكلة؟ انقر هنا للاتصال بالدعم",
+  "frustration": "إحباط",
+  "overwhelmed": "مشوش",
+  "disgust": "اشمئزاز",
+  "despair": "يأس",
+  "resentment": "استياء",
+  "disappointment": "خيبة أمل",
+  "dread": "رهبة",
+  "confusion": "ارتباك",
+  "awkwardness": "إحراج",
+  "exhaustion": "إرهاق",
+  "excitement": "حماس",
+  "love": "حب",
+  "contentment": "رضا",
+  "compassion": "تعاطف",
+  "pride": "فخر",
+  "joy": "فرح",
+  "inspiration": "إلهام",
+  "connection": "ارتباط",
+  "determination": "إصرار",
+  "peace": "سلام"
+
 }
 
