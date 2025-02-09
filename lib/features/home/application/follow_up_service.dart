@@ -106,4 +106,8 @@ class FollowUpService {
   Stream<List<FollowUpModel>> getFollowUpsByDateStream(DateTime date) {
     return _repository.watchFollowUpsByDate(date);
   }
+
+  Future<void> deleteFollowUpsByDate(DateTime date) async {
+    await _repository.deleteFollowUpsByDate(date);
+  }
 }

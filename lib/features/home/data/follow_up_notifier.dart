@@ -86,6 +86,16 @@ class FollowUpNotifier extends _$FollowUpNotifier {
   Stream<List<FollowUpModel>> watchFollowUpsByDate(DateTime date) {
     return service.getFollowUpsByDateStream(date);
   }
+
+  Future<void> deleteFollowUpsByDate(DateTime date) async {
+    state = const AsyncValue.loading();
+    try {
+      await service.deleteFollowUpsByDate(date);
+      state = AsyncValue.data(await build());
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+    }
+  }
 }
 
 @Riverpod(keepAlive: true)

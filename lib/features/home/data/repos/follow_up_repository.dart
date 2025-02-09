@@ -337,4 +337,31 @@ class FollowUpRepository {
       rethrow;
     }
   }
+
+  Future<void> deleteFollowUpsByDate(DateTime date) async {
+    try {
+      final uid = _getUserId();
+      if (uid == null) throw Exception('User not logged in');
+
+      final startOfDay = DateTime(date.year, date.month, date.day);
+      final endOfDay = DateTime(date.year, date.month, date.day, 23, 59, 59);
+
+      final querySnapshot = await _firestore
+          .collection('users')
+          .doc(uid)
+          .collection('followUps')
+          .where('time', isGreaterThanOrEqualTo: startOfDay)
+          .where('time', isLessThanOrEqualTo: endOfDay)
+          .get();
+
+      final batch = _firestore.batch();
+      for (var doc in querySnapshot.docs) {
+        batch.delete(doc.reference);
+      }
+      await batch.commit();
+    } catch (e, stackTrace) {
+      ref.read(errorLoggerProvider).logException(e, stackTrace);
+      rethrow;
+    }
+  }
 }

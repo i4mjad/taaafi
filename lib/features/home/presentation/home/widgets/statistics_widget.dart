@@ -56,7 +56,6 @@ class _StatisticsWidgetState extends ConsumerState<StatisticsWidget> {
             ),
           ),
           verticalSpace(Spacing.points4),
-          verticalSpace(Spacing.points4),
           Row(
             children: [
               Padding(
@@ -127,9 +126,11 @@ class _StatisticsWidgetState extends ConsumerState<StatisticsWidget> {
                   context: context,
                   isScrollControlled: true,
                   constraints: BoxConstraints(
-                    maxHeight: MediaQuery.of(context).size.height * 0.65,
+                    maxHeight: MediaQuery.of(context).size.height * 0.75,
                   ),
-                  builder: (context) => InformationSheet(),
+                  builder: (context) => SingleChildScrollView(
+                    child: InformationSheet(),
+                  ),
                 );
               },
               child: WidgetsContainer(
@@ -500,119 +501,117 @@ class InformationSheet extends ConsumerWidget {
 
     return Container(
       color: theme.backgroundColor,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // Fixed header
-          Padding(
-            padding: EdgeInsets.all(16),
-            child: Row(
-              children: [
-                Text(
-                  localization.translate("home"),
-                  style: TextStyles.h6,
-                ),
-                Spacer(),
-                GestureDetector(
-                  onTap: () {
-                    Navigator.pop(context);
-                  },
-                  child: Icon(
-                    LucideIcons.xCircle,
-                    size: 24,
-                    color: theme.grey[600],
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.of(context).viewInsets.bottom,
+      ),
+      child: IntrinsicHeight(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Fixed header
+            Padding(
+              padding: EdgeInsets.all(16),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text(
+                    localization.translate("what-is-all-of-those"),
+                    style: TextStyles.h6.copyWith(
+                      color: theme.primary[600],
+                    ),
                   ),
-                )
-              ],
+                ],
+              ),
             ),
-          ),
-          // Scrollable content
-          Expanded(
-            child: SingleChildScrollView(
-              child: Padding(
-                padding: EdgeInsets.fromLTRB(16, 0, 16, 0),
-                child: Column(
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        HapticFeedback.heavyImpact();
-                        showHomeSettings(context);
-                      },
-                      child: WidgetsContainer(
-                        padding: EdgeInsets.all(16),
-                        backgroundColor: theme.warn[50],
-                        borderRadius: BorderRadius.circular(10.5),
-                        width: MediaQuery.of(context).size.width,
-                        borderSide:
-                            BorderSide(color: theme.warn[300]!, width: 0.5),
-                        child: Center(
-                          child: Text(
-                            localization.translate("you-can-hide-any-of-those"),
-                            style: TextStyles.smallBold.copyWith(
-                              color: theme.warn[900],
+            // Scrollable content
+            Expanded(
+              child: SingleChildScrollView(
+                child: Padding(
+                  padding: EdgeInsets.fromLTRB(16, 0, 16, 0),
+                  child: Column(
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          HapticFeedback.heavyImpact();
+                          showHomeSettings(context);
+                        },
+                        child: WidgetsContainer(
+                          padding: EdgeInsets.all(16),
+                          backgroundColor: theme.warn[50],
+                          borderRadius: BorderRadius.circular(10.5),
+                          width: MediaQuery.of(context).size.width,
+                          borderSide:
+                              BorderSide(color: theme.warn[300]!, width: 0.5),
+                          child: Center(
+                            child: Text(
+                              localization
+                                  .translate("you-can-hide-any-of-those"),
+                              style: TextStyles.smallBold.copyWith(
+                                color: theme.warn[900],
+                              ),
+                              textAlign: TextAlign.center,
                             ),
-                            textAlign: TextAlign.center,
                           ),
                         ),
                       ),
-                    ),
-                    verticalSpace(Spacing.points8),
-                    InformationSection(
-                      title: "relapse",
-                      description: "what-is-relapse",
-                      dotColor: followUpColors[FollowUpType.relapse],
-                    ),
-                    verticalSpace(Spacing.points16),
-                    InformationSection(
-                      title: "slipUp",
-                      description: "what-is-slip-up",
-                      dotColor: followUpColors[FollowUpType.slipUp],
-                    ),
-                    verticalSpace(Spacing.points16),
-                    InformationSection(
-                      title: "porn-only",
-                      description: "what-is-no-porn",
-                      dotColor: followUpColors[FollowUpType.pornOnly],
-                    ),
-                    verticalSpace(Spacing.points16),
-                    InformationSection(
-                      title: "mast-only",
-                      description: "what-is-no-mast",
-                      dotColor: followUpColors[FollowUpType.mastOnly],
-                    ),
-                    verticalSpace(Spacing.points16),
-                  ],
-                ),
-              ),
-            ),
-          ),
-          // Fixed bottom button
-          Padding(
-            padding: EdgeInsets.all(16),
-            child: ElevatedButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: theme.backgroundColor,
-                minimumSize: const Size.fromHeight(48),
-                shape: RoundedRectangleBorder(
-                  side: BorderSide(
-                    color: theme.grey[500]!,
-                    width: 0.75,
+                      verticalSpace(Spacing.points8),
+                      InformationSection(
+                        title: "relapse",
+                        description: "what-is-relapse",
+                        dotColor: followUpColors[FollowUpType.relapse],
+                      ),
+                      verticalSpace(Spacing.points16),
+                      InformationSection(
+                        title: "slipUp",
+                        description: "what-is-slip-up",
+                        dotColor: followUpColors[FollowUpType.slipUp],
+                      ),
+                      verticalSpace(Spacing.points16),
+                      InformationSection(
+                        title: "porn-only",
+                        description: "what-is-no-porn",
+                        dotColor: followUpColors[FollowUpType.pornOnly],
+                      ),
+                      verticalSpace(Spacing.points16),
+                      InformationSection(
+                        title: "mast-only",
+                        description: "what-is-no-mast",
+                        dotColor: followUpColors[FollowUpType.mastOnly],
+                      ),
+                      verticalSpace(Spacing.points16),
+                    ],
                   ),
-                  borderRadius: BorderRadius.circular(10.5),
-                ),
-              ),
-              child: Text(
-                localization.translate('close'),
-                style: TextStyles.small.copyWith(
-                  color: theme.primary[600]!,
                 ),
               ),
             ),
-          ),
-        ],
+            // Fixed bottom button
+            Padding(
+              padding: EdgeInsets.all(16),
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: theme.backgroundColor,
+                  minimumSize: const Size.fromHeight(48),
+                  shape: RoundedRectangleBorder(
+                    side: BorderSide(
+                      color: theme.grey[500]!,
+                      width: 0.75,
+                    ),
+                    borderRadius: BorderRadius.circular(10.5),
+                  ),
+                ),
+                child: Text(
+                  localization.translate('close'),
+                  style: TextStyles.small.copyWith(
+                    color: theme.primary[600]!,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

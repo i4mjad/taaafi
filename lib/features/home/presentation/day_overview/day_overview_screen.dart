@@ -211,15 +211,21 @@ class DayFollowUps extends StatelessWidget {
         if (followUps.isEmpty)
           Column(
             children: [
-              Container(
+              WidgetsContainer(
                 width: MediaQuery.of(context).size.width - 32,
+                backgroundColor: theme.success[50],
+                borderSide: BorderSide(color: theme.success[300]!, width: 0.25),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      AppLocalizations.of(context).translate('no-follow-ups'),
-                      style: TextStyles.footnote,
+                      AppLocalizations.of(context)
+                          .translate('no-follow-ups-for-today'),
+                      style: TextStyles.footnote.copyWith(
+                        color: theme.success[800],
+                      ),
+                      textAlign: TextAlign.center,
                     )
                   ],
                 ),
@@ -241,7 +247,8 @@ class DayFollowUps extends StatelessWidget {
                   child: Center(
                     child: Text(
                       AppLocalizations.of(context).translate('add-follow-ups'),
-                      style: TextStyles.h6.copyWith(color: theme.primary[600]),
+                      style: TextStyles.footnote
+                          .copyWith(color: theme.primary[600]),
                     ),
                   ),
                 ),
