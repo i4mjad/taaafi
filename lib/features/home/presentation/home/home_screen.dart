@@ -49,8 +49,9 @@ class HomeScreen extends ConsumerWidget {
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             Activities(),
+            verticalSpace(Spacing.points4),
             StatisticsWidget(),
-            verticalSpace(Spacing.points16),
+            verticalSpace(Spacing.points8),
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: CalenderWidget(),
@@ -85,68 +86,65 @@ class Activities extends ConsumerWidget {
     final theme = AppTheme.of(context);
     final locale = ref.watch(localeNotifierProvider);
     return Padding(
-      padding: EdgeInsets.only(left: 12, right: 12),
-      child: GestureDetector(
-        onTap: () {
-          HapticFeedback.mediumImpact();
-          context.goNamed(RouteNames.activities.name);
-        },
-        child: WidgetsContainer(
-          padding: EdgeInsets.zero,
-          backgroundColor: theme.primary[600],
-          borderSide: BorderSide(color: theme.backgroundColor),
-          child: Stack(
-            clipBehavior: Clip.hardEdge,
+      padding: EdgeInsets.only(left: 12, right: 12, top: 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            AppLocalizations.of(context).translate("quick-access"),
+            style: TextStyles.h6.copyWith(color: theme.grey[900]),
+          ),
+          verticalSpace(Spacing.points8),
+          Row(
             children: [
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            AppLocalizations.of(context)
-                                .translate("activities-home-headings"),
-                            style: TextStyles.h6
-                                .copyWith(color: theme.grey[50], fontSize: 14),
-                          ),
-                          verticalSpace(Spacing.points8),
-                          Text(
-                            AppLocalizations.of(context).translate(
-                                "exercises-description-home-description"),
-                            style: TextStyles.small
-                                .copyWith(height: 1.25, color: theme.grey[50]),
-                            softWrap: true,
-                            maxLines: 4,
-                          ),
-                        ],
+              Expanded(
+                child: GestureDetector(
+                  onTap: () {
+                    HapticFeedback.lightImpact();
+                    context.goNamed(RouteNames.activities.name);
+                  },
+                  child: WidgetsContainer(
+                    padding: EdgeInsets.all(12),
+                    backgroundColor: theme.backgroundColor,
+                    borderSide:
+                        BorderSide(color: theme.grey[600]!, width: 0.25),
+                    boxShadow: Shadows.mainShadows,
+                    child: Center(
+                      child: Text(
+                        AppLocalizations.of(context).translate("activities"),
+                        style: TextStyles.footnoteSelected
+                            .copyWith(color: theme.primary[600]),
                       ),
                     ),
-                    horizontalSpace(Spacing.points72),
-                    Icon(LucideIcons.arrowLeft, color: theme.grey[50]),
-                  ],
-                ),
-              ),
-              Positioned(
-                left: locale!.languageCode == 'ar' ? 40 : null,
-                right: locale.languageCode == 'ar' ? null : 40,
-                bottom: -20,
-                child: Transform.rotate(
-                  angle: 15 * 3.141592653589793 / 180,
-                  child: Image.asset(
-                    'asset/illustrations/app-icon.png',
-                    height: 75,
-                    width: 75,
                   ),
                 ),
               ),
+              horizontalSpace(Spacing.points8),
+              Expanded(
+                child: GestureDetector(
+                  onTap: () {
+                    HapticFeedback.lightImpact();
+                    context.goNamed(RouteNames.library.name);
+                  },
+                  child: WidgetsContainer(
+                    padding: EdgeInsets.all(12),
+                    backgroundColor: theme.backgroundColor,
+                    borderSide:
+                        BorderSide(color: theme.grey[600]!, width: 0.25),
+                    boxShadow: Shadows.mainShadows,
+                    child: Center(
+                      child: Text(
+                        AppLocalizations.of(context).translate("library"),
+                        style: TextStyles.footnoteSelected
+                            .copyWith(color: theme.primary[600]),
+                      ),
+                    ),
+                  ),
+                ),
+              )
             ],
           ),
-        ),
+        ],
       ),
     );
   }

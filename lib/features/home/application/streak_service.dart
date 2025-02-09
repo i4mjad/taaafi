@@ -17,10 +17,10 @@ class StreakService {
         await _repository.readFollowUpsByType(FollowUpType.relapse);
 
     if (relapseFollowUps.isEmpty) {
-      return DateTime.now().difference(_onlyDate(userFirstDate)).inDays;
+      return DateTime.now().difference(userFirstDate).inDays;
     } else {
       relapseFollowUps.sort((a, b) => b.time.compareTo(a.time));
-      final lastFollowUpDate = _onlyDate(relapseFollowUps.first.time);
+      final lastFollowUpDate = relapseFollowUps.first.time;
       return DateTime.now().difference(lastFollowUpDate).inDays;
     }
   }
@@ -31,10 +31,10 @@ class StreakService {
         await _repository.readFollowUpsByType(FollowUpType.pornOnly);
 
     if (pornOnlyFollowUps.isEmpty) {
-      return DateTime.now().difference(_onlyDate(userFirstDate)).inDays;
+      return DateTime.now().difference(userFirstDate).inDays;
     } else {
       pornOnlyFollowUps.sort((a, b) => b.time.compareTo(a.time));
-      final lastFollowUpDate = _onlyDate(pornOnlyFollowUps.first.time);
+      final lastFollowUpDate = pornOnlyFollowUps.first.time;
       return DateTime.now().difference(lastFollowUpDate).inDays;
     }
   }
@@ -45,10 +45,10 @@ class StreakService {
         await _repository.readFollowUpsByType(FollowUpType.mastOnly);
 
     if (mastOnlyFollowUps.isEmpty) {
-      return DateTime.now().difference(_onlyDate(userFirstDate)).inDays;
+      return DateTime.now().difference(userFirstDate).inDays;
     } else {
       mastOnlyFollowUps.sort((a, b) => b.time.compareTo(a.time));
-      final lastFollowUpDate = _onlyDate(mastOnlyFollowUps.first.time);
+      final lastFollowUpDate = mastOnlyFollowUps.first.time;
       return DateTime.now().difference(lastFollowUpDate).inDays;
     }
   }
@@ -59,10 +59,19 @@ class StreakService {
         await _repository.readFollowUpsByType(FollowUpType.slipUp);
 
     if (slipUpFollowUps.isEmpty) {
-      return DateTime.now().difference(_onlyDate(userFirstDate)).inDays;
+      final relapseFollowUps =
+          await _repository.readFollowUpsByType(FollowUpType.relapse);
+
+      if (relapseFollowUps.isEmpty) {
+        return DateTime.now().difference(userFirstDate).inDays;
+      } else {
+        relapseFollowUps.sort((a, b) => b.time.compareTo(a.time));
+        final lastRelapseDate = relapseFollowUps.first.time;
+        return DateTime.now().difference(lastRelapseDate).inDays;
+      }
     } else {
       slipUpFollowUps.sort((a, b) => b.time.compareTo(a.time));
-      final lastFollowUpDate = _onlyDate(slipUpFollowUps.first.time);
+      final lastFollowUpDate = slipUpFollowUps.first.time;
       return DateTime.now().difference(lastFollowUpDate).inDays;
     }
   }
@@ -96,15 +105,11 @@ class StreakService {
 
   int _calculateStreak(List<FollowUpModel> followUps, DateTime userFirstDate) {
     if (followUps.isEmpty) {
-      return DateTime.now().difference(_onlyDate(userFirstDate)).inDays;
+      return DateTime.now().difference(userFirstDate).inDays;
     } else {
       followUps.sort((a, b) => b.time.compareTo(a.time));
-      final lastFollowUpDate = _onlyDate(followUps.first.time);
+      final lastFollowUpDate = followUps.first.time;
       return DateTime.now().difference(lastFollowUpDate).inDays;
     }
-  }
-
-  DateTime _onlyDate(DateTime dt) {
-    return DateTime(dt.year, dt.month, dt.day);
   }
 }

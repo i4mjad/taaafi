@@ -119,10 +119,10 @@ class _FollowUpSheetState extends ConsumerState<FollowUpSheet> {
       color: theme.backgroundColor,
       padding: EdgeInsets.all(16),
       width: MediaQuery.of(context).size.width,
+      height: MediaQuery.of(context).size.height * 0.7,
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
         children: [
+          // Fixed top row with date picker
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -194,230 +194,228 @@ class _FollowUpSheetState extends ConsumerState<FollowUpSheet> {
             ],
           ),
           verticalSpace(Spacing.points16),
-          Text(
-            AppLocalizations.of(context).translate('what-you-want-to-add'),
-            style: TextStyles.h6,
-          ),
-          verticalSpace(Spacing.points8),
-          Column(
-            children: [
-              for (int i = 0; i < followUpOptions.length; i += 2)
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 8.0),
-                  child: Row(
+          // Scrollable middle content
+          Expanded(
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    AppLocalizations.of(context)
+                        .translate('what-you-want-to-add'),
+                    style: TextStyles.h6,
+                  ),
+                  verticalSpace(Spacing.points8),
+                  Column(
                     children: [
-                      Expanded(
-                        child: FollowUpButton(
-                          followUpOption: followUpOptions[i],
-                          isSelected:
-                              selectedFollowUps.contains(followUpOptions[i]),
-                          onTap: () => toggleFollowUp(followUpOptions[i]),
-                        ),
-                      ),
-                      if (i + 1 < followUpOptions.length) ...[
-                        horizontalSpace(Spacing.points8),
-                        Expanded(
-                          child: FollowUpButton(
-                            followUpOption: followUpOptions[i + 1],
-                            isSelected: selectedFollowUps
-                                .contains(followUpOptions[i + 1]),
-                            onTap: () => toggleFollowUp(followUpOptions[i + 1]),
+                      for (int i = 0; i < followUpOptions.length; i += 2)
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 8.0),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: FollowUpButton(
+                                  followUpOption: followUpOptions[i],
+                                  isSelected: selectedFollowUps
+                                      .contains(followUpOptions[i]),
+                                  onTap: () =>
+                                      toggleFollowUp(followUpOptions[i]),
+                                ),
+                              ),
+                              if (i + 1 < followUpOptions.length) ...[
+                                horizontalSpace(Spacing.points8),
+                                Expanded(
+                                  child: FollowUpButton(
+                                    followUpOption: followUpOptions[i + 1],
+                                    isSelected: selectedFollowUps
+                                        .contains(followUpOptions[i + 1]),
+                                    onTap: () =>
+                                        toggleFollowUp(followUpOptions[i + 1]),
+                                  ),
+                                ),
+                              ],
+                            ],
                           ),
                         ),
-                      ],
                     ],
                   ),
-                ),
-            ],
-          ),
-          if (selectedFollowUps
-              .any((option) => option.translationKey == 'relapse'))
-            Column(
-              children: [
-                verticalSpace(Spacing.points8),
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Checkbox(
-                      value: addAllFollowUps,
-                      onChanged: (value) {
-                        setState(() {
-                          addAllFollowUps = value!;
-                        });
-                      },
-                    ),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            AppLocalizations.of(context)
-                                .translate('add-all-follow-ups'),
-                            style: TextStyles.smallBold,
-                          ),
-                          Text(
-                            AppLocalizations.of(context)
-                                .translate('add-all-follow-ups-desc'),
-                            style: TextStyles.small.copyWith(
-                              color: theme.grey[500],
+                  if (selectedFollowUps
+                      .any((option) => option.translationKey == 'relapse'))
+                    Column(
+                      children: [
+                        verticalSpace(Spacing.points8),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Checkbox(
+                              value: addAllFollowUps,
+                              onChanged: (value) {
+                                setState(() {
+                                  addAllFollowUps = value!;
+                                });
+                              },
                             ),
-                            softWrap: true,
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    AppLocalizations.of(context)
+                                        .translate('add-all-follow-ups'),
+                                    style: TextStyles.smallBold,
+                                  ),
+                                  Text(
+                                    AppLocalizations.of(context)
+                                        .translate('add-all-follow-ups-desc'),
+                                    style: TextStyles.small.copyWith(
+                                      color: theme.grey[500],
+                                    ),
+                                    softWrap: true,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  verticalSpace(Spacing.points16),
+                  Text(
+                    AppLocalizations.of(context).translate('how-do-you-feel'),
+                    style: TextStyles.h6,
+                  ),
+                  verticalSpace(Spacing.points8),
+                  Text(
+                    AppLocalizations.of(context).translate('negative-feelings'),
+                    style: TextStyles.footnoteSelected.copyWith(
+                      color: theme.grey[700],
+                    ),
+                  ),
+                  verticalSpace(Spacing.points4),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: badEmotions.map((emotion) {
+                      return EmotionButton(
+                        emotion: emotion,
+                        isSelected: selectedEmotions.contains(emotion),
+                        onTap: () => toggleEmotion(emotion),
+                      );
+                    }).toList(),
+                  ),
+                  verticalSpace(Spacing.points16),
+                  Text(
+                    AppLocalizations.of(context).translate('positive-feelings'),
+                    style: TextStyles.footnoteSelected.copyWith(
+                      color: theme.grey[700],
+                    ),
+                  ),
+                  verticalSpace(Spacing.points4),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: goodEmotions.map((emotion) {
+                      return EmotionButton(
+                        emotion: emotion,
+                        isSelected: selectedEmotions.contains(emotion),
+                        onTap: () => toggleEmotion(emotion),
+                      );
+                    }).toList(),
+                  ),
+                  verticalSpace(Spacing.points16),
+                ],
+              ),
+            ),
+          ),
+          // Fixed bottom row with save/cancel buttons
+          Column(
+            children: [
+              Container(
+                color: theme.backgroundColor,
+                padding: EdgeInsets.only(top: 8),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: _isProcessing
+                            ? null
+                            : () async {
+                                setState(() => _isProcessing = true);
+
+                                try {
+                                  await _saveFollowUpsAndEmotions();
+                                  if (mounted) {
+                                    Navigator.pop(context);
+                                  }
+                                } catch (e) {
+                                  if (mounted) {
+                                    setState(() => _isProcessing = false);
+                                  }
+                                }
+                              },
+                        child: WidgetsContainer(
+                          borderRadius: BorderRadius.circular(10),
+                          backgroundColor: _isProcessing
+                              ? theme.grey[400]
+                              : theme.primary[600],
+                          child: Center(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                if (_isProcessing) ...[
+                                  SizedBox(
+                                    height: 20,
+                                    width: 20,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      valueColor: AlwaysStoppedAnimation<Color>(
+                                        theme.grey[50]!,
+                                      ),
+                                    ),
+                                  ),
+                                  horizontalSpace(Spacing.points8),
+                                  Text(
+                                    AppLocalizations.of(context)
+                                        .translate('saving'),
+                                    style: TextStyles.caption
+                                        .copyWith(color: theme.grey[50]),
+                                  ),
+                                ] else
+                                  Text(
+                                    AppLocalizations.of(context)
+                                        .translate('save'),
+                                    style: TextStyles.caption
+                                        .copyWith(color: theme.grey[50]),
+                                  ),
+                              ],
+                            ),
                           ),
-                        ],
+                        ),
+                      ),
+                    ),
+                    horizontalSpace(Spacing.points8),
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () {
+                          HapticFeedback.lightImpact();
+                          Navigator.pop(context);
+                        },
+                        child: WidgetsContainer(
+                          borderRadius: BorderRadius.circular(10),
+                          backgroundColor: theme.backgroundColor,
+                          borderSide:
+                              BorderSide(color: theme.grey[600]!, width: 0.25),
+                          child: Center(
+                            child: Text(
+                              AppLocalizations.of(context).translate('cancel'),
+                              style: TextStyles.caption
+                                  .copyWith(color: theme.grey[900]),
+                            ),
+                          ),
+                        ),
                       ),
                     ),
                   ],
-                ),
-              ],
-            ),
-          verticalSpace(Spacing.points16),
-          Text(
-            AppLocalizations.of(context).translate('how-do-you-feel'),
-            style: TextStyles.h6,
-          ),
-          verticalSpace(Spacing.points8),
-          Text(
-            AppLocalizations.of(context).translate('negative-feelings'),
-            style: TextStyles.footnoteSelected.copyWith(
-              color: theme.grey[700],
-            ),
-          ),
-          verticalSpace(Spacing.points4),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: badEmotions.map((emotion) {
-              return EmotionButton(
-                emotion: emotion,
-                isSelected: selectedEmotions.contains(emotion),
-                onTap: () => toggleEmotion(emotion),
-              );
-            }).toList(),
-          ),
-          verticalSpace(Spacing.points16),
-          Text(
-            AppLocalizations.of(context).translate('positive-feelings'),
-            style: TextStyles.footnoteSelected.copyWith(
-              color: theme.grey[700],
-            ),
-          ),
-          verticalSpace(Spacing.points4),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: goodEmotions.map((emotion) {
-              return EmotionButton(
-                emotion: emotion,
-                isSelected: selectedEmotions.contains(emotion),
-                onTap: () => toggleEmotion(emotion),
-              );
-            }).toList(),
-          ),
-          verticalSpace(Spacing.points16),
-          Row(
-            children: [
-              Expanded(
-                child: GestureDetector(
-                  onTap: _isProcessing
-                      ? null
-                      : () async {
-                          setState(() => _isProcessing = true);
-
-                          try {
-                            await _saveFollowUpsAndEmotions();
-                            if (mounted) {
-                              Navigator.pop(context);
-                            }
-                          } catch (e) {
-                            if (mounted) {
-                              setState(() => _isProcessing = false);
-                            }
-                          }
-                        },
-                  child: WidgetsContainer(
-                    borderRadius: BorderRadius.circular(10),
-                    backgroundColor:
-                        _isProcessing ? theme.grey[400] : theme.primary[600],
-                    boxShadow: [
-                      BoxShadow(
-                        color: Color.fromRGBO(50, 50, 93, 0.25),
-                        blurRadius: 5,
-                        spreadRadius: -1,
-                        offset: Offset(0, 2),
-                      ),
-                      BoxShadow(
-                        color: Color.fromRGBO(0, 0, 0, 0.3),
-                        blurRadius: 3,
-                        spreadRadius: -1,
-                        offset: Offset(0, 1),
-                      ),
-                    ],
-                    child: Center(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          if (_isProcessing) ...[
-                            SizedBox(
-                              height: 20,
-                              width: 20,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                valueColor: AlwaysStoppedAnimation<Color>(
-                                  theme.grey[50]!,
-                                ),
-                              ),
-                            ),
-                            horizontalSpace(Spacing.points8),
-                            Text(
-                              AppLocalizations.of(context).translate('saving'),
-                              style: TextStyles.caption
-                                  .copyWith(color: theme.grey[50]),
-                            ),
-                          ] else
-                            Text(
-                              AppLocalizations.of(context).translate('save'),
-                              style: TextStyles.caption
-                                  .copyWith(color: theme.grey[50]),
-                            ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              horizontalSpace(Spacing.points8),
-              Expanded(
-                child: GestureDetector(
-                  onTap: () {
-                    Navigator.pop(context);
-                  },
-                  child: WidgetsContainer(
-                    borderRadius: BorderRadius.circular(10),
-                    backgroundColor: theme.backgroundColor,
-                    borderSide:
-                        BorderSide(color: theme.grey[600]!, width: 0.25),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Color.fromRGBO(50, 50, 93, 0.25),
-                        blurRadius: 5,
-                        spreadRadius: -1,
-                        offset: Offset(0, 2),
-                      ),
-                      BoxShadow(
-                        color: Color.fromRGBO(0, 0, 0, 0.3),
-                        blurRadius: 3,
-                        spreadRadius: -1,
-                        offset: Offset(0, 1),
-                      ),
-                    ],
-                    child: Center(
-                      child: Text(
-                        AppLocalizations.of(context).translate('cancel'),
-                        style:
-                            TextStyles.caption.copyWith(color: theme.grey[900]),
-                      ),
-                    ),
-                  ),
                 ),
               ),
             ],

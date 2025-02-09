@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/helpers/date_display_formater.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
@@ -50,22 +51,10 @@ class _StatisticsWidgetState extends ConsumerState<StatisticsWidget> {
                   localization.translate("statistics"),
                   style: TextStyles.h6.copyWith(color: theme.grey[900]),
                 ),
-                GestureDetector(
-                  onTap: () {
-                    showModalBottomSheet(
-                      context: context,
-                      builder: (context) => InformationSheet(),
-                    );
-                  },
-                  child: Icon(
-                    LucideIcons.info,
-                    size: 24,
-                    color: theme.grey[600],
-                  ),
-                ),
               ],
             ),
           ),
+          verticalSpace(Spacing.points4),
           verticalSpace(Spacing.points4),
           Row(
             children: [
@@ -127,6 +116,34 @@ class _StatisticsWidgetState extends ConsumerState<StatisticsWidget> {
               },
             ),
           ),
+          verticalSpace(Spacing.points16),
+          Padding(
+            padding: const EdgeInsets.only(right: 16.0, left: 16),
+            child: GestureDetector(
+              onTap: () {
+                HapticFeedback.heavyImpact();
+                showModalBottomSheet(
+                  context: context,
+                  builder: (context) => InformationSheet(),
+                );
+              },
+              child: WidgetsContainer(
+                padding: EdgeInsets.all(8),
+                borderRadius: BorderRadius.circular(8),
+                backgroundColor: theme.backgroundColor,
+                borderSide: BorderSide(color: theme.grey[600]!, width: 0.25),
+                child: Center(
+                  child: Text(
+                    localization.translate("what-is-all-of-those"),
+                    style: TextStyles.small.copyWith(color: theme.primary[500]),
+                    textAlign: TextAlign.center,
+                    softWrap: true,
+                    overflow: TextOverflow.visible,
+                  ),
+                ),
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -138,7 +155,7 @@ class _FirstPageWidget extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = AppTheme.of(context);
     final localization = AppLocalizations.of(context);
-    final streakState = ref.watch(streakStreamProvider);
+    final streakState = ref.watch(streakNotifierProvider);
     final visibilitySettings = ref.watch(statisticsVisibilityProvider);
 
     return streakState.when(
