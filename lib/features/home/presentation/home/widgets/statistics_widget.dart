@@ -10,6 +10,7 @@ import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:reboot_app_3/features/home/data/statistics_notifier.dart';
 import 'package:reboot_app_3/features/home/data/streak_notifier.dart';
+import 'package:reboot_app_3/features/home/presentation/home/home_screen.dart';
 import 'package:reboot_app_3/features/home/presentation/home/statistics_visibility_notifier.dart';
 import 'package:reboot_app_3/features/shared/models/follow_up.dart';
 import 'package:reboot_app_3/features/home/data/models/follow_up_colors.dart';
@@ -124,6 +125,10 @@ class _StatisticsWidgetState extends ConsumerState<StatisticsWidget> {
                 HapticFeedback.heavyImpact();
                 showModalBottomSheet(
                   context: context,
+                  isScrollControlled: true,
+                  constraints: BoxConstraints(
+                    maxHeight: MediaQuery.of(context).size.height * 0.65,
+                  ),
                   builder: (context) => InformationSheet(),
                 );
               },
@@ -479,74 +484,131 @@ class InformationSheet extends ConsumerWidget {
     final theme = AppTheme.of(context);
     final localization = AppLocalizations.of(context);
 
+    void showHomeSettings(BuildContext currentContext) {
+      Navigator.pop(currentContext);
+      // Use a post-frame callback to ensure the first sheet is fully dismissed
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        showModalBottomSheet<void>(
+          context: currentContext,
+          isScrollControlled: true,
+          builder: (BuildContext context) {
+            return HomeSettingsSheet();
+          },
+        );
+      });
+    }
+
     return Container(
       color: theme.backgroundColor,
-      padding: EdgeInsets.all(16),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Row(
-            children: [
-              Text(
-                localization.translate("home"),
-                style: TextStyles.h6,
-              ),
-              Spacer(),
-              GestureDetector(
-                onTap: () {
-                  Navigator.pop(context);
-                },
-                child: Icon(
-                  LucideIcons.xCircle,
-                  size: 24,
-                  color: theme.grey[600],
+          // Fixed header
+          Padding(
+            padding: EdgeInsets.all(16),
+            child: Row(
+              children: [
+                Text(
+                  localization.translate("home"),
+                  style: TextStyles.h6,
                 ),
-              )
-            ],
+                Spacer(),
+                GestureDetector(
+                  onTap: () {
+                    Navigator.pop(context);
+                  },
+                  child: Icon(
+                    LucideIcons.xCircle,
+                    size: 24,
+                    color: theme.grey[600],
+                  ),
+                )
+              ],
+            ),
           ),
-          verticalSpace(Spacing.points16),
-          InformationSection(
-            title: "relapse",
-            description: "what-is-relapse",
-            dotColor: followUpColors[FollowUpType.relapse],
-          ),
-          verticalSpace(Spacing.points16),
-          InformationSection(
-            title: "slipUp",
-            description: "what-is-slip-up",
-            dotColor: followUpColors[FollowUpType.slipUp],
-          ),
-          verticalSpace(Spacing.points16),
-          InformationSection(
-            title: "porn-only",
-            description: "what-is-no-porn",
-            dotColor: followUpColors[FollowUpType.pornOnly],
-          ),
-          verticalSpace(Spacing.points16),
-          InformationSection(
-            title: "mast-only",
-            description: "what-is-no-mast",
-            dotColor: followUpColors[FollowUpType.mastOnly],
-          ),
-          Spacer(),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: theme.backgroundColor,
-              minimumSize: const Size.fromHeight(48),
-              shape: RoundedRectangleBorder(
-                side: BorderSide(
-                  color: theme.grey[500]!,
-                  width: 0.75,
+          // Scrollable content
+          Expanded(
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: EdgeInsets.fromLTRB(16, 0, 16, 0),
+                child: Column(
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        HapticFeedback.heavyImpact();
+                        showHomeSettings(context);
+                      },
+                      child: WidgetsContainer(
+                        padding: EdgeInsets.all(16),
+                        backgroundColor: theme.warn[50],
+                        borderRadius: BorderRadius.circular(10.5),
+                        width: MediaQuery.of(context).size.width,
+                        borderSide:
+                            BorderSide(color: theme.warn[300]!, width: 0.5),
+                        child: Center(
+                          child: Text(
+                            localization.translate("you-can-hide-any-of-those"),
+                            style: TextStyles.smallBold.copyWith(
+                              color: theme.warn[900],
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ),
+                    ),
+                    verticalSpace(Spacing.points8),
+                    InformationSection(
+                      title: "relapse",
+                      description: "what-is-relapse",
+                      dotColor: followUpColors[FollowUpType.relapse],
+                    ),
+                    verticalSpace(Spacing.points16),
+                    InformationSection(
+                      title: "slipUp",
+                      description: "what-is-slip-up",
+                      dotColor: followUpColors[FollowUpType.slipUp],
+                    ),
+                    verticalSpace(Spacing.points16),
+                    InformationSection(
+                      title: "porn-only",
+                      description: "what-is-no-porn",
+                      dotColor: followUpColors[FollowUpType.pornOnly],
+                    ),
+                    verticalSpace(Spacing.points16),
+                    InformationSection(
+                      title: "mast-only",
+                      description: "what-is-no-mast",
+                      dotColor: followUpColors[FollowUpType.mastOnly],
+                    ),
+                    verticalSpace(Spacing.points16),
+                  ],
                 ),
-                borderRadius: BorderRadius.circular(10.5),
               ),
             ),
-            child: Text(
-              localization.translate('close'),
-              style: TextStyles.small.copyWith(
-                color: theme.primary[600]!,
+          ),
+          // Fixed bottom button
+          Padding(
+            padding: EdgeInsets.all(16),
+            child: ElevatedButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: theme.backgroundColor,
+                minimumSize: const Size.fromHeight(48),
+                shape: RoundedRectangleBorder(
+                  side: BorderSide(
+                    color: theme.grey[500]!,
+                    width: 0.75,
+                  ),
+                  borderRadius: BorderRadius.circular(10.5),
+                ),
+              ),
+              child: Text(
+                localization.translate('close'),
+                style: TextStyles.small.copyWith(
+                  color: theme.primary[600]!,
+                ),
               ),
             ),
           ),
