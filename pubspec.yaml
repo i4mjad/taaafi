@@ -265,7 +265,6 @@ flutter:
         - asset: asset/fonts/ExpoArabic-SemiBold.ttf
           weight: 700
           style: normal
-
     - family: Kufam
       fonts:
         - asset: asset/fonts/Kufam-bold.ttf
@@ -286,7 +285,6 @@ flutter:
         - asset: asset/fonts/Kufam-bold.ttf
           weight: 800
           style: normal
-
     - family: Alexandria
       fonts:
         - asset: asset/fonts/Alexandria-VariableFont_wght.ttf
@@ -304,5 +302,29 @@ flutter:
         - asset: asset/fonts/Alexandria-VariableFont_wght.ttf
           weight: 700
           style: normal
-  # For details regarding fonts from package dependencies,
-  # see https://flutter.dev/custom-fonts/#from-packages
+    - family: DinNextLTArabic
+      fonts:
+        - asset: asset/fonts/DINNextLTArabic-UltraLight.ttf
+          weight: 200
+          style: normal
+        - asset: asset/fonts/DINNEXTLTARABIC-Light.ttf
+          weight: 300
+          style: normal
+        - asset: asset/fonts/DINNextLTArabic-Regular.ttf
+          weight: 400
+          style: normal
+        - asset: asset/fonts/DINNextLTArabic-Medium.ttf
+          weight: 500
+          style: normal
+        - asset: asset/fonts/DINNextLTArabic-Bold.ttf
+          weight: 700
+          style: normal
+        - asset: asset/fonts/DINNextLTArabic-Heavy.ttf
+          weight: 800
+          style: normal
+        - asset: asset/fonts/DINNextLTArabic-Black.ttf
+          weight: 900
+          style: normal
+
+        
+  
