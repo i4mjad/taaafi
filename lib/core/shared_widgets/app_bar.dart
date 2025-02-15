@@ -51,7 +51,6 @@ AppBar plainAppBar(BuildContext context, WidgetRef ref, String? title,
       title != null ? title : '',
       style: TextStyles.screenHeadding.copyWith(
         color: theme.grey[900],
-        height: 1,
       ),
     ),
     backgroundColor: theme.backgroundColor,
