@@ -201,3 +201,68 @@ const MaterialColor lightErrorSwatch = MaterialColor(
     900: LightThemeColors.error900,
   },
 );
+
+// First primary color set (original)
+class ThemeColors {
+  static const Color primary50 = Color(0xFFFFF3E0);
+  static const Color primary100 = Color(0xFFFFE0B2);
+  static const Color primary200 = Color(0xFFFFCC80);
+  static const Color primary300 = Color(0xFFFFB74D);
+  static const Color primary400 = Color(0xFFFFA726);
+  static const Color primary500 = Color(0xFFE64A19);
+  static const Color primary600 = Color(0xFFD84315);
+  static const Color primary700 = Color(0xFFBF360C);
+  static const Color primary800 = Color(0xFF8D2803);
+  static const Color primary900 = Color(0xFF5C1A02);
+}
+
+// Second primary color set (new)
+class AlternateThemeColors {
+  static const Color primary50 = Color(0xffebf0f1);
+  static const Color primary100 = Color(0xffc1d2d3);
+  static const Color primary200 = Color(0xffa3bcbe);
+  static const Color primary300 = Color(0xff799da0);
+  static const Color primary400 = Color(0xff5f8a8d);
+  static const Color primary500 = Color(0xff376d71);
+  static const Color primary600 = Color(0xff326367);
+  static const Color primary700 = Color(0xff274d50);
+  static const Color primary800 = Color(0xff1e3c3e);
+  static const Color primary900 = Color(0xff172e2f);
+}
+
+// Create MaterialColor swatch for each theme
+MaterialColor getPrimarySwatch(int themeIndex) {
+  if (themeIndex == 0) {
+    return const MaterialColor(
+      0xFFE64A19,
+      <int, Color>{
+        50: ThemeColors.primary50,
+        100: ThemeColors.primary100,
+        200: ThemeColors.primary200,
+        300: ThemeColors.primary300,
+        400: ThemeColors.primary400,
+        500: ThemeColors.primary500,
+        600: ThemeColors.primary600,
+        700: ThemeColors.primary700,
+        800: ThemeColors.primary800,
+        900: ThemeColors.primary900,
+      },
+    );
+  } else {
+    return const MaterialColor(
+      0xFF2196F3,
+      <int, Color>{
+        50: AlternateThemeColors.primary50,
+        100: AlternateThemeColors.primary100,
+        200: AlternateThemeColors.primary200,
+        300: AlternateThemeColors.primary300,
+        400: AlternateThemeColors.primary400,
+        500: AlternateThemeColors.primary500,
+        600: AlternateThemeColors.primary600,
+        700: AlternateThemeColors.primary700,
+        800: AlternateThemeColors.primary800,
+        900: AlternateThemeColors.primary900,
+      },
+    );
+  }
+}

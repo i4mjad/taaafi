@@ -60,23 +60,22 @@ class AppTheme extends InheritedWidget {
   }
 }
 
-ThemeData get lightTheme {
+ThemeData getLightTheme(int colorThemeIndex) {
+  final customTheme = getLightCustomTheme(colorThemeIndex);
   return ThemeData(
     useMaterial3: true,
     brightness: Brightness.light,
-    primarySwatch: lightCustomTheme.primary,
-    secondaryHeaderColor: lightCustomTheme.secondary[500],
-    hintColor: lightCustomTheme.primary[500],
-    // backgroundColor: lightCustomTheme.grey[50],
-    scaffoldBackgroundColor: lightCustomTheme.secondary[50],
-    cardColor: lightCustomTheme.grey[100],
-    canvasColor: lightCustomTheme.primary[50],
-    // bottomAppBarColor: lightCustomTheme.grey[200],
-    focusColor: lightCustomTheme.primary[500],
+    primarySwatch: customTheme.primary,
+    secondaryHeaderColor: customTheme.secondary[500],
+    hintColor: customTheme.primary[500],
+    scaffoldBackgroundColor: customTheme.secondary[50],
+    cardColor: customTheme.grey[100],
+    canvasColor: customTheme.primary[50],
+    focusColor: customTheme.primary[500],
     appBarTheme: AppBarTheme(
-      backgroundColor: lightCustomTheme.secondary[500],
+      backgroundColor: customTheme.secondary[500],
     ),
-    indicatorColor: lightCustomTheme.primary[900],
+    indicatorColor: customTheme.primary[900],
   );
 }
 

@@ -26,17 +26,19 @@ class CustomThemeData {
   });
 }
 
-const CustomThemeData lightCustomTheme = CustomThemeData(
-  primary: lightPrimarySwatch,
-  backgroundColor: lightBackgroundSwatch,
-  secondary: lightSecondarySwatch,
-  tint: lightTintSwatch,
-  success: lightSuccessSwatch,
-  warn: lightWarnSwatch,
-  grey: lightGreySwatch,
-  error: lightErrorSwatch,
-  calenderHeaderBackgound: calenderHeaderBackgoundSwatch,
-);
+CustomThemeData getLightCustomTheme(int colorThemeIndex) {
+  return CustomThemeData(
+    primary: getPrimarySwatch(colorThemeIndex),
+    backgroundColor: lightBackgroundSwatch,
+    secondary: lightSecondarySwatch,
+    tint: lightTintSwatch,
+    success: lightSuccessSwatch,
+    warn: lightWarnSwatch,
+    grey: lightGreySwatch,
+    error: lightErrorSwatch,
+    calenderHeaderBackgound: calenderHeaderBackgoundSwatch,
+  );
+}
 
 const CustomThemeData darkCustomTheme = CustomThemeData(
   primary: darkPrimarySwatch,

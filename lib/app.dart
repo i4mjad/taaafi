@@ -11,15 +11,18 @@ import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/custom_theme_data.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/core/theming/theme_provider.dart';
+import 'package:reboot_app_3/core/theming/color_theme_provider.dart';
 
 class MyApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final goRouter = ref.watch(goRouterProvider);
     final theme = ref.watch(customThemeProvider);
+    final colorTheme = ref.watch(colorThemeProvider);
     final locale = ref.watch(localeNotifierProvider);
     return AppTheme(
-      customThemeData: theme.darkTheme ? darkCustomTheme : lightCustomTheme,
+      customThemeData:
+          theme.darkTheme ? darkCustomTheme : getLightCustomTheme(colorTheme),
       child: MaterialApp.router(
         routerConfig: goRouter,
         supportedLocales: [Locale('ar', ''), Locale('en', '')],
@@ -39,7 +42,7 @@ class MyApp extends ConsumerWidget {
           return supportedLocales.first;
         },
         debugShowCheckedModeBanner: false,
-        theme: theme.darkTheme == true ? darkTheme : lightTheme,
+        theme: theme.darkTheme ? darkTheme : getLightTheme(colorTheme),
         builder: (_, child) {
           return AppStartupWidget(
             onLoaded: (_) => child!,
