@@ -110,25 +110,26 @@ class _DiaryScreenState extends ConsumerState<DiaryScreen> {
 
         return Scaffold(
             backgroundColor: theme.backgroundColor,
-            appBar:
-                plainAppBar(context, ref, diary.title, false, true, actions: [
-              Padding(
-                padding: const EdgeInsets.only(left: 16, right: 16),
-                child: GestureDetector(
-                  onTap: () async {
-                    setState(() => _isSettingsSheetOpen = true);
-                    await showModalBottomSheet<void>(
-                      context: context,
-                      isScrollControlled: true,
-                      builder: (BuildContext context) {
-                        return DiarySettingsSheet(diary);
+            appBar: plainAppBar(context, ref, diary.title, false, true,
+                onBackPressed: () => _saveDiary(diary),
+                actions: [
+                  Padding(
+                    padding: const EdgeInsets.only(left: 16, right: 16),
+                    child: GestureDetector(
+                      onTap: () async {
+                        setState(() => _isSettingsSheetOpen = true);
+                        await showModalBottomSheet<void>(
+                          context: context,
+                          isScrollControlled: true,
+                          builder: (BuildContext context) {
+                            return DiarySettingsSheet(diary);
+                          },
+                        );
                       },
-                    );
-                  },
-                  child: Icon(LucideIcons.settings),
-                ),
-              ),
-            ]),
+                      child: Icon(LucideIcons.settings),
+                    ),
+                  ),
+                ]),
             body: SafeArea(
               child: AbsorbPointer(
                 absorbing: _isSettingsSheetOpen,

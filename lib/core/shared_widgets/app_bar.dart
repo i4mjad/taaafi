@@ -19,7 +19,6 @@ AppBar appBar(BuildContext context, WidgetRef ref, String? titleTranslationKey,
           : '',
       style: TextStyles.screenHeadding.copyWith(
         color: theme.grey[900],
-        height: 1,
       ),
     ),
     backgroundColor: theme.backgroundColor,
@@ -42,7 +41,7 @@ AppBar appBar(BuildContext context, WidgetRef ref, String? titleTranslationKey,
 
 AppBar plainAppBar(BuildContext context, WidgetRef ref, String? title,
     bool showLocaleChangeIcon, bool automaticallyImplyLeading,
-    {List<Widget>? actions}) {
+    {List<Widget>? actions, Future<void> Function()? onBackPressed}) {
   final theme = AppTheme.of(context);
   final canPop = Navigator.of(context).canPop();
   final showBackButton = canPop && automaticallyImplyLeading;
@@ -64,7 +63,14 @@ AppBar plainAppBar(BuildContext context, WidgetRef ref, String? title,
         ? IconButton(
             icon: const Icon(Icons.arrow_back),
             padding: const EdgeInsets.symmetric(horizontal: 8),
-            onPressed: () => Navigator.of(context).pop(),
+            onPressed: () async {
+              if (onBackPressed != null) {
+                await onBackPressed();
+              }
+              if (context.mounted) {
+                Navigator.of(context).pop();
+              }
+            },
           )
         : null,
     titleSpacing: showBackButton ? -12 : 16,
