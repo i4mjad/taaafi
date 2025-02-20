@@ -186,14 +186,28 @@ class DiaryWidget extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
-                      children: [Text(diary.title, style: TextStyles.footnote)],
+                      children: [
+                        Text(diary.title, style: TextStyles.footnote),
+                        horizontalSpace(Spacing.points8),
+                        diary.linkedTasks.isNotEmpty
+                            ? Wrap(
+                                children: diary.linkedTasks
+                                    .map((task) => Text(
+                                          task.task.name,
+                                          style: TextStyles.small,
+                                        ))
+                                    .toList(),
+                              )
+                            : SizedBox(),
+                      ],
                     ),
-                    verticalSpace(Spacing.points4),
+                    verticalSpace(Spacing.points8),
                     Text(
                       getDisplayDateTime(diary.date, locale!.languageCode),
                       style:
                           TextStyles.caption.copyWith(color: theme.grey[700]),
                     ),
+                    verticalSpace(Spacing.points8),
                     Text(
                       diary.plainText,
                       style: TextStyles.small.copyWith(color: theme.grey[700]),

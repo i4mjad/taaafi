@@ -136,12 +136,11 @@ class _StatisticsWidgetState extends ConsumerState<StatisticsWidget> {
               child: WidgetsContainer(
                 padding: EdgeInsets.all(8),
                 borderRadius: BorderRadius.circular(8),
-                backgroundColor: theme.backgroundColor,
-                borderSide: BorderSide(color: theme.grey[600]!, width: 0.25),
+                backgroundColor: theme.primary[600],
                 child: Center(
                   child: Text(
                     localization.translate("what-is-all-of-those"),
-                    style: TextStyles.small.copyWith(color: theme.primary[500]),
+                    style: TextStyles.small.copyWith(color: theme.grey[50]),
                     textAlign: TextAlign.center,
                     softWrap: true,
                     overflow: TextOverflow.visible,
@@ -465,10 +464,10 @@ class InformationSection extends StatelessWidget {
                 AppLocalizations.of(context).translate(title),
                 style: TextStyles.footnoteSelected,
               ),
-              verticalSpace(Spacing.points4),
+              verticalSpace(Spacing.points8),
               Text(
                 AppLocalizations.of(context).translate(description),
-                style: TextStyles.small,
+                style: TextStyles.small.copyWith(height: 1.2),
                 softWrap: true,
               ),
             ],
@@ -517,7 +516,7 @@ class InformationSheet extends ConsumerWidget {
                   Text(
                     localization.translate("what-is-all-of-those"),
                     style: TextStyles.h6.copyWith(
-                      color: theme.primary[600],
+                      color: theme.grey[900],
                     ),
                   ),
                 ],
@@ -548,6 +547,7 @@ class InformationSheet extends ConsumerWidget {
                                   .translate("you-can-hide-any-of-those"),
                               style: TextStyles.smallBold.copyWith(
                                 color: theme.warn[900],
+                                height: 1.2,
                               ),
                               textAlign: TextAlign.center,
                             ),
@@ -605,7 +605,7 @@ class InformationSheet extends ConsumerWidget {
                 child: Text(
                   localization.translate('close'),
                   style: TextStyles.small.copyWith(
-                    color: theme.primary[600]!,
+                    color: theme.grey[900]!,
                   ),
                 ),
               ),

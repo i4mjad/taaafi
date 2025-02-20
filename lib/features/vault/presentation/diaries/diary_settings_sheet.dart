@@ -137,124 +137,154 @@ class _DiarySettingsSheetState extends ConsumerState<DiarySettingsSheet> {
 
     return Container(
       color: theme.backgroundColor,
-      padding: EdgeInsets.all(16),
-      width: MediaQuery.of(context).size.width,
-      child: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      // padding: EdgeInsets.all(16),
+      // width: MediaQuery.of(context).size.width,
+      height: MediaQuery.of(context).size.height * 0.75,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Fixed Header
+          Padding(
+            padding: const EdgeInsets.only(top: 16, left: 16, right: 16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Expanded(
-                  child: Text(
-                    AppLocalizations.of(context).translate('diary-settings'),
-                    style: TextStyles.h6,
-                  ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        AppLocalizations.of(context)
+                            .translate('diary-settings'),
+                        style: TextStyles.h6,
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        HapticFeedback.mediumImpact();
+                        Navigator.pop(context);
+                      },
+                      child: Icon(
+                        LucideIcons.xCircle,
+                      ),
+                    )
+                  ],
                 ),
-                GestureDetector(
-                  onTap: () {
-                    HapticFeedback.mediumImpact();
-                    Navigator.pop(context);
-                  },
-                  child: Icon(
-                    LucideIcons.xCircle,
-                  ),
-                )
-              ],
-            ),
-            verticalSpace(Spacing.points16),
-            CustomTextField(
-              validator: (text) {
-                return null;
-              },
-              controller: _titleController,
-              prefixIcon: LucideIcons.text,
-              inputType: TextInputType.name,
-              hint: AppLocalizations.of(context).translate('title'),
-            ),
-            verticalSpace(Spacing.points12),
-            GestureDetector(
-              onTap: () => _selectDiaryDateTime(context, locale!.languageCode),
-              child: AbsorbPointer(
-                child: CustomTextField(
-                  controller: _diaryDateTimeController,
-                  hint: AppLocalizations.of(context).translate('date'),
-                  prefixIcon: LucideIcons.calendar,
-                  inputType: TextInputType.datetime,
-                  validator: (value) {
+                verticalSpace(Spacing.points16),
+                CustomTextField(
+                  validator: (text) {
                     return null;
                   },
+                  controller: _titleController,
+                  prefixIcon: LucideIcons.text,
+                  inputType: TextInputType.name,
+                  hint: AppLocalizations.of(context).translate('title'),
                 ),
-              ),
-            ),
-            verticalSpace(Spacing.points12),
-            Text(
-              AppLocalizations.of(context).translate('linked-activities'),
-              style: TextStyles.footnote,
-            ),
-            verticalSpace(Spacing.points4),
-            Text(
-              getDisplayDate(diaryDateTime, locale!.languageCode),
-              style: TextStyles.small.copyWith(color: theme.grey[600]),
-            ),
-            verticalSpace(Spacing.points8),
-            Builder(builder: (BuildContext context) {
-              return tasksAsync.when(
-                data: (tasks) {
-                  if (tasks.isEmpty) {
-                    return Column(
-                      children: [
-                        Container(
-                          width: MediaQuery.of(context).size.width - 32,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                AppLocalizations.of(context)
-                                    .translate('no-tasks-for-date'),
-                                style: TextStyles.footnote,
-                              )
-                            ],
-                          ),
-                        ),
-                      ],
-                    );
-                  }
-
-                  return ListView.separated(
-                    shrinkWrap: true,
-                    physics: NeverScrollableScrollPhysics(),
-                    itemBuilder: (BuildContext context, int index) {
-                      final task = tasks[index];
-                      return DayActivityWidget(
-                        task,
-                        index + 1,
-                        isLinked: linkedTaskIds.contains(task.id),
-                        onLinkedChanged: (isLinked) =>
-                            _updateLinkedTask(task.id, isLinked),
-                      );
-                    },
-                    separatorBuilder: (BuildContext context, int index) =>
-                        verticalSpace(Spacing.points8),
-                    itemCount: tasks.length,
-                  );
-                },
-                loading: () => Center(
-                  child: Padding(
-                    padding: const EdgeInsets.all(24.0),
-                    child: CircularProgressIndicator(
-                      color: theme.primary[600],
+                verticalSpace(Spacing.points12),
+                GestureDetector(
+                  onTap: () =>
+                      _selectDiaryDateTime(context, locale!.languageCode),
+                  child: AbsorbPointer(
+                    child: CustomTextField(
+                      controller: _diaryDateTimeController,
+                      hint: AppLocalizations.of(context).translate('date'),
+                      prefixIcon: LucideIcons.calendar,
+                      inputType: TextInputType.datetime,
+                      validator: (value) {
+                        return null;
+                      },
                     ),
                   ),
                 ),
-                error: (error, stack) => Text('Error: $error'),
-              );
-            }),
-            verticalSpace(Spacing.points16),
-            Row(
+              ],
+            ),
+          ),
+
+          // Scrollable Content
+          Flexible(
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.only(left: 16, right: 16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    verticalSpace(Spacing.points12),
+                    Text(
+                      AppLocalizations.of(context)
+                          .translate('linked-activities'),
+                      style: TextStyles.footnote,
+                    ),
+                    verticalSpace(Spacing.points4),
+                    Text(
+                      getDisplayDate(diaryDateTime, locale!.languageCode),
+                      style: TextStyles.small.copyWith(color: theme.grey[600]),
+                    ),
+                    verticalSpace(Spacing.points8),
+                    Builder(builder: (BuildContext context) {
+                      return tasksAsync.when(
+                        data: (tasks) {
+                          if (tasks.isEmpty) {
+                            return Column(
+                              children: [
+                                Container(
+                                  width: MediaQuery.of(context).size.width - 32,
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        AppLocalizations.of(context)
+                                            .translate('no-tasks-for-date'),
+                                        style: TextStyles.footnote,
+                                      )
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            );
+                          }
+
+                          return ListView.separated(
+                            shrinkWrap: true,
+                            physics: NeverScrollableScrollPhysics(),
+                            itemBuilder: (BuildContext context, int index) {
+                              final task = tasks[index];
+                              return DayActivityWidget(
+                                task,
+                                index + 1,
+                                isLinked: linkedTaskIds.contains(task.id),
+                                onLinkedChanged: (isLinked) =>
+                                    _updateLinkedTask(task.id, isLinked),
+                              );
+                            },
+                            separatorBuilder:
+                                (BuildContext context, int index) =>
+                                    verticalSpace(Spacing.points8),
+                            itemCount: tasks.length,
+                          );
+                        },
+                        loading: () => Center(
+                          child: Padding(
+                            padding: const EdgeInsets.all(24.0),
+                            child: CircularProgressIndicator(
+                              color: theme.primary[600],
+                            ),
+                          ),
+                        ),
+                        error: (error, stack) => Text('Error: $error'),
+                      );
+                    }),
+                  ],
+                ),
+              ),
+            ),
+          ),
+
+          // Fixed Footer
+          Padding(
+            padding: EdgeInsets.all(16),
+            child: Row(
               children: [
                 Expanded(
                   child: GestureDetector(
@@ -299,8 +329,8 @@ class _DiarySettingsSheetState extends ConsumerState<DiarySettingsSheet> {
                 ),
               ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -357,7 +387,8 @@ class _DayActivityWidgetState extends ConsumerState<DayActivityWidget> {
                 Text(
                   widget.task.task.description,
                   // softWrap: true,
-                  style: TextStyles.small.copyWith(color: theme.grey[600]),
+                  style: TextStyles.small
+                      .copyWith(color: theme.grey[600], height: 1.5),
                 ),
               ],
             ),

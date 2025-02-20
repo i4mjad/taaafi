@@ -106,15 +106,23 @@ class Activities extends ConsumerWidget {
                   child: WidgetsContainer(
                     padding: EdgeInsets.all(12),
                     backgroundColor: theme.backgroundColor,
-                    borderSide:
-                        BorderSide(color: theme.grey[600]!, width: 0.25),
+                    borderSide: BorderSide(color: theme.grey[100]!, width: 1),
                     boxShadow: Shadows.mainShadows,
-                    child: Center(
-                      child: Text(
-                        AppLocalizations.of(context).translate("activities"),
-                        style: TextStyles.footnoteSelected
-                            .copyWith(color: theme.primary[600]),
-                      ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          LucideIcons.clipboardCheck,
+                          size: 18,
+                          color: theme.grey[900],
+                        ),
+                        horizontalSpace(Spacing.points8),
+                        Text(
+                          AppLocalizations.of(context).translate("activities"),
+                          style: TextStyles.footnote
+                              .copyWith(color: theme.grey[900]),
+                        ),
+                      ],
                     ),
                   ),
                 ),
@@ -129,15 +137,54 @@ class Activities extends ConsumerWidget {
                   child: WidgetsContainer(
                     padding: EdgeInsets.all(12),
                     backgroundColor: theme.backgroundColor,
-                    borderSide:
-                        BorderSide(color: theme.grey[600]!, width: 0.25),
+                    borderSide: BorderSide(color: theme.grey[100]!, width: 1),
                     boxShadow: Shadows.mainShadows,
-                    child: Center(
-                      child: Text(
-                        AppLocalizations.of(context).translate("library"),
-                        style: TextStyles.footnoteSelected
-                            .copyWith(color: theme.primary[600]),
-                      ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          LucideIcons.lamp,
+                          size: 18,
+                          color: theme.grey[900],
+                        ),
+                        horizontalSpace(Spacing.points8),
+                        Text(
+                          AppLocalizations.of(context).translate("library"),
+                          style: TextStyles.footnote
+                              .copyWith(color: theme.grey[900]),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              horizontalSpace(Spacing.points8),
+              Expanded(
+                child: GestureDetector(
+                  onTap: () {
+                    HapticFeedback.lightImpact();
+                    context.goNamed(RouteNames.diaries.name);
+                  },
+                  child: WidgetsContainer(
+                    padding: EdgeInsets.all(12),
+                    backgroundColor: theme.backgroundColor,
+                    borderSide: BorderSide(color: theme.grey[100]!, width: 1),
+                    boxShadow: Shadows.mainShadows,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          LucideIcons.pencil,
+                          size: 18,
+                          color: theme.grey[900],
+                        ),
+                        horizontalSpace(Spacing.points8),
+                        Text(
+                          AppLocalizations.of(context).translate("diaries"),
+                          style: TextStyles.footnote
+                              .copyWith(color: theme.grey[900]),
+                        ),
+                      ],
                     ),
                   ),
                 ),
