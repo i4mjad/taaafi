@@ -57,16 +57,16 @@ class LightThemeColors {
   static const Color warn900 = Color(0xff65542a);
   // Updated Grey color shades for text and borders
 
-  static const Color grey50 = Color(0xFFF7E6D1);
-  static const Color grey100 = Color(0xFFF2E0CB);
-  static const Color grey200 = Color(0xFFE6D4B7);
-  static const Color grey300 = Color(0xFFCCCBA3);
-  static const Color grey400 = Color(0xFFB3A58E);
-  static const Color grey500 = Color(0xFF998D7A);
-  static const Color grey600 = Color(0xFF807666);
-  static const Color grey700 = Color(0xFF665E51);
-  static const Color grey800 = Color(0xFF4D473D);
-  static const Color grey900 = Color(0xFF332F28);
+  static const Color grey50 = Color(0xFFF4F6F7);
+  static const Color grey100 = Color(0xFFDEE2E5);
+  static const Color grey200 = Color(0xFFced4d9);
+  static const Color grey300 = Color(0xFFb8c0c7);
+  static const Color grey400 = Color(0xFFaab4bd);
+  static const Color grey500 = Color(0xFF95a1ac);
+  static const Color grey600 = Color(0xFF88939d);
+  static const Color grey700 = Color(0xFF6a727a);
+  static const Color grey800 = Color(0xFF52595f);
+  static const Color grey900 = Color(0xFF3f4448);
 
   static const Color error50 = Color(0xfffce7e7);
   static const Color error100 = Color(0xfff5b5b5);

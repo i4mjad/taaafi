@@ -80,7 +80,7 @@ class TextStyles {
     fontFamily: 'ExpoArabic',
     fontStyle: FontStyle.normal,
     fontWeight: FontWeightHelper.medium,
-    height: 20 / 14,
+    height: 1,
     letterSpacing: 0,
   );
 
@@ -90,7 +90,7 @@ class TextStyles {
     fontFamily: 'ExpoArabic',
     fontStyle: FontStyle.normal,
     fontWeight: FontWeightHelper.book,
-    height: 27 / 18,
+    height: 1,
     letterSpacing: 0,
   );
 
@@ -100,7 +100,7 @@ class TextStyles {
     fontFamily: 'ExpoArabic',
     fontStyle: FontStyle.normal,
     fontWeight: FontWeightHelper.book,
-    height: 24 / 16,
+    height: 1,
     letterSpacing: 0,
   );
 
@@ -110,7 +110,7 @@ class TextStyles {
     fontFamily: 'ExpoArabic',
     fontStyle: FontStyle.normal,
     fontWeight: FontWeightHelper.book,
-    height: 20 / 14,
+    height: 1,
     letterSpacing: 0,
   );
 
@@ -120,7 +120,7 @@ class TextStyles {
     fontFamily: 'ExpoArabic',
     fontStyle: FontStyle.normal,
     fontWeight: FontWeightHelper.book,
-    height: 20 / 13,
+    height: 1,
     letterSpacing: 0,
   );
 
@@ -130,7 +130,7 @@ class TextStyles {
     fontFamily: 'ExpoArabic',
     fontStyle: FontStyle.normal,
     fontWeight: FontWeightHelper.book,
-    height: 18 / 12,
+    height: 1,
     letterSpacing: 0,
   );
 
@@ -140,7 +140,7 @@ class TextStyles {
     fontFamily: 'ExpoArabic',
     fontStyle: FontStyle.normal,
     fontWeight: FontWeightHelper.medium,
-    height: 20 / 14,
+    height: 1,
     letterSpacing: 0,
   );
 
@@ -150,7 +150,7 @@ class TextStyles {
     fontFamily: 'ExpoArabic',
     fontStyle: FontStyle.normal,
     fontWeight: FontWeightHelper.semiBold,
-    height: 18 / 12,
+    height: 1,
     letterSpacing: 0,
   );
 
@@ -160,7 +160,7 @@ class TextStyles {
     fontFamily: 'ExpoArabic',
     fontStyle: FontStyle.normal,
     fontWeight: FontWeightHelper.semiBold,
-    height: 18 / 8,
+    height: 1,
     letterSpacing: 0,
   );
 
@@ -170,7 +170,7 @@ class TextStyles {
     fontFamily: 'ExpoArabic',
     fontStyle: FontStyle.normal,
     fontWeight: FontWeightHelper.medium,
-    height: 18 / 8,
+    height: 1,
     letterSpacing: 0,
   );
 
@@ -180,7 +180,7 @@ class TextStyles {
     fontFamily: 'ExpoArabic',
     fontStyle: FontStyle.normal,
     fontWeight: FontWeightHelper.medium,
-    height: 15 / 10,
+    height: 1,
     letterSpacing: 0,
   );
 }
