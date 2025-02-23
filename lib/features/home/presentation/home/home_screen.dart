@@ -19,13 +19,17 @@ import 'package:reboot_app_3/features/home/presentation/home/statistics_visibili
 import 'package:reboot_app_3/features/home/presentation/home/widgets/calender_widget.dart';
 import 'package:reboot_app_3/features/home/presentation/home/widgets/follow_up_sheet.dart';
 import 'package:reboot_app_3/features/home/presentation/home/widgets/statistics_widget.dart';
+import 'package:app_settings/app_settings.dart';
+import 'package:reboot_app_3/features/vault/presentation/vault_settings/activities_notifications_settings_screen.dart';
 
 class HomeScreen extends ConsumerWidget {
   HomeScreen({super.key});
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = AppTheme.of(context);
     final streaksState = ref.watch(streakNotifierProvider);
+    final notificationsEnabled = ref.watch(notificationsEnabledProvider);
     final actions = [
       IconButton(
         onPressed: () {
@@ -48,6 +52,7 @@ class HomeScreen extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
+            if (!notificationsEnabled) const NotificationPromoterWidget(),
             Activities(),
             verticalSpace(Spacing.points4),
             StatisticsWidget(),
@@ -75,6 +80,65 @@ class HomeScreen extends ConsumerWidget {
           style: TextStyles.caption.copyWith(color: theme.grey[50]),
         ),
         icon: Icon(LucideIcons.pencil, color: theme.grey[50]),
+      ),
+    );
+  }
+}
+
+class NotificationPromoterWidget extends ConsumerWidget {
+  const NotificationPromoterWidget({super.key});
+
+  Future<void> _handleNotificationSettings() async {
+    await AppSettings.openAppSettings(type: AppSettingsType.notification);
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = AppTheme.of(context);
+
+    return Padding(
+      padding: EdgeInsets.all(16),
+      child: GestureDetector(
+        onTap: _handleNotificationSettings,
+        child: WidgetsContainer(
+          borderRadius: BorderRadius.circular(16),
+          backgroundColor: theme.success[50],
+          borderSide: BorderSide(
+            color: theme.success[200]!,
+            width: 0.5,
+          ),
+          padding: EdgeInsets.all(12),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Icon(
+                LucideIcons.bellRing,
+                color: theme.success[900],
+                // size: 20,
+              ),
+              horizontalSpace(Spacing.points12),
+              Expanded(
+                child: Text(
+                  AppLocalizations.of(context)
+                      .translate('notification-promotion'),
+                  style: TextStyles.footnote
+                      .copyWith(color: theme.grey[600], height: 1.4),
+                ),
+              ),
+              horizontalSpace(Spacing.points4),
+              GestureDetector(
+                onTap: _handleNotificationSettings,
+                child: Text(
+                  AppLocalizations.of(context).translate('enable'),
+                  style: TextStyles.smallBold.copyWith(
+                    color: theme.success[600],
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
