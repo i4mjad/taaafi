@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
@@ -27,7 +28,7 @@ Future<void> runMainApp() async {
 
   // * Preload MixpanelAnalyticsClient, so we can make unawaited analytics calls
   await container.read(mixpanelAnalyticsClientProvider.future);
-  //Initialize Notification settings
+  // * Initialize Notification settings
   await MessagingService.instance.init();
 
   //Setup error handeling pages
@@ -160,6 +161,11 @@ Future<void> initFirebase() async {
     FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(true);
     FirebaseCrashlytics.instance
         .setUserIdentifier(FirebaseAuth.instance.currentUser?.uid ?? 'Unknown');
+    // * Setup error handeling pages
+    FirebaseFirestore.instance.settings = const Settings(
+      persistenceEnabled: true,
+      cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED,
+    );
   } catch (e) {
     print("Failed to initialize Firebase: $e");
   }

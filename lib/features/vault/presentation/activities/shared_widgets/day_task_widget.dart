@@ -53,6 +53,7 @@ class DayTaskWidget extends ConsumerWidget {
                   task.task.description,
                   style: TextStyles.small.copyWith(
                     color: theme.grey[700],
+                    height: 1.25,
                   ),
                 ),
               ],

@@ -50,34 +50,47 @@ class MigerationRepository {
     }
   }
 
+//TODO: review this
   Future<void> bulkFollowUpsInsertion(List<FollowUpModel> followUps) async {
     final collectionRef = _firestore
         .collection('users')
         .doc(_auth.currentUser?.uid)
         .collection('followUps');
 
-    WriteBatch batch = FirebaseFirestore.instance.batch();
-
     try {
-      // Create a map to track existing followups for each date
       Map<String, Set<String>> dateTypeMap = {};
+      List<WriteBatch> batches = [];
+      WriteBatch currentBatch = FirebaseFirestore.instance.batch();
+      int batchCount = 0;
 
       for (var followUp in followUps) {
-        // Create a unique key for the date (assuming followUp has a dateTime field)
         String dateKey = followUp.time.toString().split(' ')[0];
-
-        // Initialize set for this date if it doesn't exist
         dateTypeMap[dateKey] ??= {};
 
-        // Check if this type already exists for this date
-        if (!dateTypeMap[dateKey]!.contains(followUp.type)) {
+        if (!dateTypeMap[dateKey]!.contains(followUp.type.name)) {
           dateTypeMap[dateKey]!.add(followUp.type.name);
           var docRef = collectionRef.doc();
-          batch.set(docRef, followUp.toMap());
+          currentBatch.set(docRef, followUp.toMap());
+          batchCount++;
+
+          // Commit batch if it reaches Firestore's limit (500)
+          if (batchCount >= 500) {
+            batches.add(currentBatch);
+            currentBatch = FirebaseFirestore.instance.batch();
+            batchCount = 0;
+          }
         }
       }
 
-      return await batch.commit();
+      // Add the last batch if it has any pending writes
+      if (batchCount > 0) {
+        batches.add(currentBatch);
+      }
+
+      // Commit each batch sequentially
+      for (var batch in batches) {
+        await batch.commit();
+      }
     } catch (e, stackTrace) {
       ref.read(errorLoggerProvider).logException(e, stackTrace);
       rethrow;
