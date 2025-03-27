@@ -1,27 +1,27 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'user_document_provider.dart';
+part of 'remote_config_github_gist.dart';
 
 // **************************************************************************
 // RiverpodGenerator
 // **************************************************************************
 
-String _$userDocumentsNotifierHash() =>
-    r'0741916ed3742a74053b8e844aec9e28362ba800';
+String _$remoteConfigGistClientHash() =>
+    r'5a1e9f0922fcef4a3cf18b8e4429a3d1d78629f4';
 
-/// See also [UserDocumentsNotifier].
-@ProviderFor(UserDocumentsNotifier)
-final userDocumentsNotifierProvider = AutoDisposeAsyncNotifierProvider<
-    UserDocumentsNotifier, UserDocument?>.internal(
-  UserDocumentsNotifier.new,
-  name: r'userDocumentsNotifierProvider',
+/// See also [remoteConfigGistClient].
+@ProviderFor(remoteConfigGistClient)
+final remoteConfigGistClientProvider =
+    Provider<RemoteConfigGistClient>.internal(
+  remoteConfigGistClient,
+  name: r'remoteConfigGistClientProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
       ? null
-      : _$userDocumentsNotifierHash,
+      : _$remoteConfigGistClientHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
 
-typedef _$UserDocumentsNotifier = AutoDisposeAsyncNotifier<UserDocument?>;
+typedef RemoteConfigGistClientRef = ProviderRef<RemoteConfigGistClient>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

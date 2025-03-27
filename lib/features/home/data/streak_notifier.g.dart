@@ -36,7 +36,7 @@ final streakStreamProvider =
 );
 
 typedef StreakStreamRef = AutoDisposeStreamProviderRef<StreakStatistics>;
-String _$streakNotifierHash() => r'95a64cbd5215d181cb361f6e1daf697d4875deba';
+String _$streakNotifierHash() => r'bc3c730bb3fd5033247c61c83c2beff5be913f04';
 
 /// See also [StreakNotifier].
 @ProviderFor(StreakNotifier)

@@ -13,7 +13,10 @@ import 'package:reboot_app_3/features/vault/data/activities/ongoing_activity.dar
 import 'package:app_settings/app_settings.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 
-final notificationsEnabledProvider = StateProvider<bool>((ref) => false);
+final notificationsEnabledProvider = FutureProvider<bool>((ref) async {
+  final settings = await FirebaseMessaging.instance.getNotificationSettings();
+  return settings.authorizationStatus == AuthorizationStatus.authorized;
+});
 
 class ActivitiesNotificationsSettingsScreen extends ConsumerWidget {
   const ActivitiesNotificationsSettingsScreen({super.key});
@@ -51,7 +54,8 @@ class ActivitiesNotificationsSettingsScreen extends ConsumerWidget {
                   Consumer(
                     builder: (context, ref, child) {
                       final notificationsEnabled =
-                          ref.watch(notificationsEnabledProvider);
+                          ref.watch(notificationsEnabledProvider).value ??
+                              false;
 
                       if (!notificationsEnabled) {
                         return SizedBox.shrink();
@@ -311,16 +315,36 @@ class _ActivateNotificationState extends ConsumerState<ActivateNotification> {
     final settings = await FirebaseMessaging.instance.getNotificationSettings();
     final isEnabled =
         settings.authorizationStatus == AuthorizationStatus.authorized;
+
+    // Update local state
     setState(() {
       _notificationsEnabled = isEnabled;
     });
-    ref.read(notificationsEnabledProvider.notifier).state = isEnabled;
+    // Invalidate the provider to refresh the value
+    ref.invalidate(notificationsEnabledProvider);
     widget.onNotificationStateChanged?.call(isEnabled);
   }
 
   Future<void> _handleSwitchChange(bool value) async {
-    // Open app settings when switch is toggled
-    await AppSettings.openAppSettings(type: AppSettingsType.notification);
+    // Request permission if not already granted
+    if (!_notificationsEnabled) {
+      final settings = await FirebaseMessaging.instance.requestPermission(
+        alert: true,
+        badge: true,
+        sound: true,
+      );
+
+      final isEnabled =
+          settings.authorizationStatus == AuthorizationStatus.authorized;
+
+      if (!isEnabled) {
+        // If still not enabled, open app settings
+        await AppSettings.openAppSettings(type: AppSettingsType.notification);
+      }
+    } else {
+      // If already enabled and trying to disable, open app settings
+      await AppSettings.openAppSettings(type: AppSettingsType.notification);
+    }
 
     // Check permission status after returning from settings
     await _checkNotificationPermission();

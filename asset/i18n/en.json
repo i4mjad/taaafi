@@ -584,5 +584,9 @@
   "slips": "Slip-ups",
   "statistics-visibility-description": "Choose the statistics you want to be visible on the home page",
   "contact-support": "Having trouble? Click here to contact support",
-  "free-day-warning-message": "If you select this option and save, all follow-ups for the selected day will be removed"
+  "free-day-warning-message": "If you select this option and save, all follow-ups for the selected day will be removed",
+  "vault-features": "Vault Features",
+  "activities-description": "Activities are a set of tasks designed to help you in your recovery journey. You can choose the appropriate activity level and track your progress regularly.",
+  "library-description": "The library is a rich source of content useful for your recovery journey. You'll find articles, videos, books, and other resources that help you better understand recovery challenges.",
+  "diaries-description": "Diaries are your private space to document your recovery journey. You can write your thoughts, feelings, and daily experiences in a safe and private place."
 }

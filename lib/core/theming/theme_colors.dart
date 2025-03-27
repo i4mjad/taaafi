@@ -2,18 +2,17 @@ import 'package:flutter/material.dart';
 
 class LightThemeColors {
   static const Color backgroundcolor = Color(0xffE9E9D9);
-  // Adjusted Primary color shades with warmer, orangish tones
 
-  static const Color primary50 = Color(0xFFFFF3E0);
-  static const Color primary100 = Color(0xFFFFE0B2);
-  static const Color primary200 = Color(0xFFFFCC80);
-  static const Color primary300 = Color(0xFFFFB74D);
-  static const Color primary400 = Color(0xFFFFA726);
-  static const Color primary500 = Color(0xFFE64A19); // Adjusted primary color
-  static const Color primary600 = Color(0xFFD84315);
-  static const Color primary700 = Color(0xFFBF360C);
-  static const Color primary800 = Color(0xFF8D2803);
-  static const Color primary900 = Color(0xFF5C1A02);
+  static const Color primary50 = Color(0xFFE4ECFE); //E4ECFE
+  static const Color primary100 = Color(0xFFCCD9FC); //CCD9FC
+  static const Color primary200 = Color(0xFFB3C6F8); //B3C6F8
+  static const Color primary300 = Color(0xFF9BB5F7); //9BB5F7
+  static const Color primary400 = Color(0xFF85A2F2); //85A2F2
+  static const Color primary500 = Color(0xFF7190EF); //7190EF
+  static const Color primary600 = Color(0xFF5E7DEA); //5E7DEA
+  static const Color primary700 = Color(0xFF4C6BE6); //4C6BE6
+  static const Color primary800 = Color(0xFF3D57E0); //3D57E0
+  static const Color primary900 = Color(0xFF3243DA); //3243DA
 
   static const Color secondary50 = Color(0xFFE8F2F5);
   static const Color secondary100 = Color(0xFFC5DEE7);
@@ -79,7 +78,7 @@ class LightThemeColors {
   static const Color error800 = Color(0xff7b0909);
   static const Color error900 = Color(0xff5e0707);
 
-  static const Color calenderHeaderBackgoundColor = Color(0xffDFDFCE);
+  static const Color calenderHeaderBackgoundColor = Color(0xffE4ECFE);
 }
 
 const MaterialColor lightPrimarySwatch = MaterialColor(
@@ -102,7 +101,7 @@ const MaterialColor lightBackgroundSwatch =
     MaterialColor(0xffF5F7F8, <int, Color>{});
 
 const MaterialColor calenderHeaderBackgoundSwatch = MaterialColor(
-  0xffF6F1E9,
+  0xffE4ECFE,
   <int, Color>{},
 );
 
@@ -204,30 +203,30 @@ const MaterialColor lightErrorSwatch = MaterialColor(
 
 // First primary color set (original)
 class ThemeColors {
-  static const Color primary50 = Color(0xFFFFF3E0);
-  static const Color primary100 = Color(0xFFFFE0B2);
-  static const Color primary200 = Color(0xFFFFCC80);
-  static const Color primary300 = Color(0xFFFFB74D);
-  static const Color primary400 = Color(0xFFFFA726);
-  static const Color primary500 = Color(0xFFE64A19);
-  static const Color primary600 = Color(0xFFD84315);
-  static const Color primary700 = Color(0xFFBF360C);
-  static const Color primary800 = Color(0xFF8D2803);
-  static const Color primary900 = Color(0xFF5C1A02);
+  static const Color primary50 = Color(0xFFE4ECFE); //E4ECFE
+  static const Color primary100 = Color(0xFFCCD9FC); //CCD9FC
+  static const Color primary200 = Color(0xFFB3C6F8); //B3C6F8
+  static const Color primary300 = Color(0xFF9BB5F7); //9BB5F7
+  static const Color primary400 = Color(0xFF85A2F2); //85A2F2
+  static const Color primary500 = Color(0xFF7190EF); //7190EF
+  static const Color primary600 = Color(0xFF5E7DEA); //5E7DEA
+  static const Color primary700 = Color(0xFF4C6BE6); //4C6BE6
+  static const Color primary800 = Color(0xFF3D57E0); //3D57E0
+  static const Color primary900 = Color(0xFF3243DA); //3243DA
 }
 
 // Second primary color set (new)
 class AlternateThemeColors {
-  static const Color primary50 = Color(0xffebf0f1);
-  static const Color primary100 = Color(0xffc1d2d3);
-  static const Color primary200 = Color(0xffa3bcbe);
-  static const Color primary300 = Color(0xff799da0);
-  static const Color primary400 = Color(0xff5f8a8d);
-  static const Color primary500 = Color(0xff376d71);
-  static const Color primary600 = Color(0xff326367);
-  static const Color primary700 = Color(0xff274d50);
-  static const Color primary800 = Color(0xff1e3c3e);
-  static const Color primary900 = Color(0xff172e2f);
+  static const Color primary50 = Color(0xFFE4ECFE); //E4ECFE
+  static const Color primary100 = Color(0xFFCCD9FC); //CCD9FC
+  static const Color primary200 = Color(0xFFB3C6F8); //B3C6F8
+  static const Color primary300 = Color(0xFF9BB5F7); //9BB5F7
+  static const Color primary400 = Color(0xFF85A2F2); //85A2F2
+  static const Color primary500 = Color(0xFF7190EF); //7190EF
+  static const Color primary600 = Color(0xFF5E7DEA); //5E7DEA
+  static const Color primary700 = Color(0xFF4C6BE6); //4C6BE6
+  static const Color primary800 = Color(0xFF3D57E0); //3D57E0
+  static const Color primary900 = Color(0xFF3243DA); //3243DA
 }
 
 // Create MaterialColor swatch for each theme

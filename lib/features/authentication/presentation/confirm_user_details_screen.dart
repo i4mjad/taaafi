@@ -271,6 +271,26 @@ class _ConfirmUserDetailsScreenState
                             : () async {
                                 setState(() => _isProcessing = true);
 
+                                // Add this before attempting migration
+                                final validationError =
+                                    validateUserDocument(userDocument);
+                                if (validationError != null) {
+                                  ref.read(errorLoggerProvider).logException(
+                                    Exception(validationError),
+                                    StackTrace.current,
+                                    context: {
+                                      'validation_context': {
+                                        'user_id': userDocument.uid,
+                                        'error': validationError,
+                                      }
+                                    },
+                                  );
+                                  getErrorSnackBar(
+                                      context, "invalid-user-data");
+                                  setState(() => _isProcessing = false);
+                                  return;
+                                }
+
                                 // Validate date of birth
                                 if (selectedBirthDate != null &&
                                     selectedBirthDate!
@@ -306,50 +326,92 @@ class _ConfirmUserDetailsScreenState
                                 }
 
                                 try {
-                                  await migrateService
-                                      .migrateToNewDocuemntStrcture(
-                                    UserDocument(
-                                      uid: userDocument.uid,
-                                      displayName:
-                                          displayNameController.text.trim(),
-                                      dayOfBirth: selectedBirthDate != null
-                                          ? Timestamp.fromDate(
-                                              selectedBirthDate!)
-                                          : null,
-                                      userFirstDate: userDocument.userFirstDate,
-                                      email: emailController.text.trim(),
-                                      role: "user",
-                                      locale: selectedLocale?.value,
-                                      gender: selectedGender?.value,
-                                      userRelapses: userDocument.userRelapses,
-                                      userWatchingWithoutMasturbating:
-                                          userDocument
-                                              .userWatchingWithoutMasturbating,
-                                      userMasturbatingWithoutWatching:
-                                          userDocument
-                                              .userMasturbatingWithoutWatching,
-                                    ),
+                                  // Log migration attempt
+                                  ref.read(errorLoggerProvider).logException(
+                                    Exception('Migration Attempt'),
+                                    StackTrace.current,
+                                    context: {
+                                      'user_id': userDocument.uid,
+                                      'display_name':
+                                          displayNameController.text,
+                                      'email': emailController.text,
+                                      'selected_birth_date':
+                                          selectedBirthDate?.toString(),
+                                      'selected_locale': selectedLocale?.value,
+                                      'selected_gender': selectedGender?.value,
+                                    },
                                   );
+
+                                  // Create new user document
+                                  final newUserDoc = UserDocument(
+                                    uid: userDocument.uid ??
+                                        '', // Handle null UID
+                                    displayName:
+                                        displayNameController.text.trim(),
+                                    dayOfBirth: selectedBirthDate != null
+                                        ? Timestamp.fromDate(selectedBirthDate!)
+                                        : null,
+                                    userFirstDate: userDocument.userFirstDate,
+                                    email: emailController.text.trim(),
+                                    role: "user",
+                                    locale: selectedLocale?.value,
+                                    gender: selectedGender?.value,
+                                    userRelapses: userDocument.userRelapses,
+                                    userWatchingWithoutMasturbating:
+                                        userDocument
+                                            .userWatchingWithoutMasturbating,
+                                    userMasturbatingWithoutWatching:
+                                        userDocument
+                                            .userMasturbatingWithoutWatching,
+                                  );
+
+                                  await migrateService
+                                      .migrateToNewDocuemntStrcture(newUserDoc);
 
                                   unawaited(ref
                                       .read(analyticsFacadeProvider)
                                       .trackOnboardingFinish());
 
-                                  // Force a refresh of the user document provider so that
-                                  // the router's redirect logic sees the updated document.
-                                  // ignore: unused_result
+                                  // Force a refresh of the user document provider
                                   await ref.refresh(
                                       userDocumentsNotifierProvider.future);
 
                                   if (!mounted) return;
                                   context.goNamed(RouteNames.home.name);
                                 } catch (e, stackTrace) {
-                                  ref
-                                      .read(errorLoggerProvider)
-                                      .logException(e, stackTrace);
-                                  getErrorSnackBar(
-                                      context, "something-went-wrong");
+                                  // Log error with context
+                                  ref.read(errorLoggerProvider).logException(
+                                    e,
+                                    stackTrace,
+                                    context: {
+                                      'user_id': userDocument.uid,
+                                      'display_name':
+                                          displayNameController.text,
+                                      'email': emailController.text,
+                                      'selected_birth_date':
+                                          selectedBirthDate?.toString(),
+                                      'selected_locale': selectedLocale?.value,
+                                      'selected_gender': selectedGender?.value,
+                                    },
+                                  );
+
+                                  String errorKey = "something-went-wrong";
+
+                                  if (e is FirebaseException) {
+                                    switch (e.code) {
+                                      case 'permission-denied':
+                                        errorKey = "permission-denied";
+                                        break;
+                                      case 'not-found':
+                                        errorKey = "user-not-found";
+                                        break;
+                                    }
+                                  } else if (e is TimeoutException) {
+                                    errorKey = "connection-timeout";
+                                  }
+
                                   if (mounted) {
+                                    getErrorSnackBar(context, errorKey);
                                     setState(() => _isProcessing = false);
                                   }
                                 }
@@ -484,5 +546,31 @@ class _ConfirmUserDetailsScreenState
         .map((e) =>
             '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}')
         .join('&');
+  }
+
+  String? validateUserDocument(UserDocument doc) {
+    if (doc.uid?.isEmpty ?? true) {
+      return 'Invalid UID';
+    }
+
+    if (displayNameController.text.trim().isEmpty) {
+      return 'Display name is required';
+    }
+
+    if (!AppRegex.isEmailValid(emailController.text.trim())) {
+      return 'Invalid email format';
+    }
+
+    if (selectedGender == null || selectedLocale == null) {
+      return 'Gender and locale are required';
+    }
+
+    if (selectedBirthDate != null) {
+      if (selectedBirthDate!.isAfter(DateTime(2010, 12, 31))) {
+        return 'Invalid birth date';
+      }
+    }
+
+    return null;
   }
 }

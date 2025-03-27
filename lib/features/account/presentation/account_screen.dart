@@ -26,8 +26,6 @@ import 'package:reboot_app_3/features/account/presentation/update_user_profile_m
 import 'package:reboot_app_3/features/authentication/application/auth_service.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:reboot_app_3/core/theming/color_theme_provider.dart';
-import 'package:reboot_app_3/core/theming/theme_colors.dart';
 
 class AccountScreen extends ConsumerWidget {
   const AccountScreen({super.key});
@@ -515,89 +513,6 @@ class UiAndLanguageSettings extends ConsumerWidget {
               ),
               verticalSpace(Spacing.points24),
               Text(
-                AppLocalizations.of(context).translate('primary-color'),
-                style: TextStyles.h6.copyWith(
-                  color: theme.grey[900],
-                ),
-              ),
-              verticalSpace(Spacing.points12),
-              Row(
-                children: [
-                  Expanded(
-                    child: Consumer(
-                      builder: (context, ref, _) {
-                        final selectedTheme = ref.watch(colorThemeProvider);
-                        return GestureDetector(
-                          onTap: () {
-                            HapticFeedback.lightImpact();
-                            ref
-                                .read(colorThemeProvider.notifier)
-                                .setColorTheme(0);
-                            Navigator.of(context).pop();
-                            getSuccessSnackBar(
-                                context, 'changes-has-been-saved');
-                          },
-                          child: WidgetsContainer(
-                            backgroundColor: ThemeColors.primary600,
-                            borderRadius: BorderRadius.circular(10.5),
-                            boxShadow: Shadows.mainShadows,
-                            height: 50,
-                            borderSide: BorderSide(
-                              color: selectedTheme == 0
-                                  ? ThemeColors.primary600
-                                  : theme.grey[600]!,
-                              width: 0.5,
-                            ),
-                            child: Center(
-                              child: selectedTheme == 0
-                                  ? Icon(LucideIcons.check, color: Colors.white)
-                                  : null,
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Consumer(
-                      builder: (context, ref, _) {
-                        final selectedTheme = ref.watch(colorThemeProvider);
-                        return GestureDetector(
-                          onTap: () {
-                            HapticFeedback.lightImpact();
-                            ref
-                                .read(colorThemeProvider.notifier)
-                                .setColorTheme(1);
-                            Navigator.of(context).pop();
-                            getSuccessSnackBar(
-                                context, 'changes-has-been-saved');
-                          },
-                          child: WidgetsContainer(
-                            backgroundColor: AlternateThemeColors.primary600,
-                            borderRadius: BorderRadius.circular(10.5),
-                            boxShadow: Shadows.mainShadows,
-                            height: 50,
-                            borderSide: BorderSide(
-                              color: selectedTheme == 1
-                                  ? AlternateThemeColors.primary600
-                                  : theme.grey[600]!,
-                              width: 0.5,
-                            ),
-                            child: Center(
-                              child: selectedTheme == 1
-                                  ? Icon(LucideIcons.check, color: Colors.white)
-                                  : null,
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                ],
-              ),
-              verticalSpace(Spacing.points12),
-              Text(
                 AppLocalizations.of(context).translate('night-mode'),
                 style: TextStyles.h6.copyWith(
                   color: theme.grey[900],
@@ -779,8 +694,11 @@ class UserDetailsWidget extends StatelessWidget {
             Row(
               children: [
                 CircleAvatar(
-                  backgroundColor: theme.grey[100],
-                  child: Icon(LucideIcons.user),
+                  backgroundColor: theme.primary[50],
+                  child: Icon(
+                    LucideIcons.user,
+                    color: theme.primary[900],
+                  ),
                 ),
                 horizontalSpace(Spacing.points16),
                 Column(

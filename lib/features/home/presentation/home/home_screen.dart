@@ -52,7 +52,8 @@ class HomeScreen extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            if (!notificationsEnabled) const NotificationPromoterWidget(),
+            if (!(notificationsEnabled.value ?? true))
+              const NotificationPromoterWidget(),
             Activities(),
             verticalSpace(Spacing.points4),
             StatisticsWidget(),
@@ -178,7 +179,7 @@ class Activities extends ConsumerWidget {
                         Icon(
                           LucideIcons.clipboardCheck,
                           size: 18,
-                          color: theme.grey[900],
+                          color: theme.primary[900],
                         ),
                         horizontalSpace(Spacing.points8),
                         Text(
@@ -209,7 +210,7 @@ class Activities extends ConsumerWidget {
                         Icon(
                           LucideIcons.lamp,
                           size: 18,
-                          color: theme.grey[900],
+                          color: theme.primary[900],
                         ),
                         horizontalSpace(Spacing.points8),
                         Text(
@@ -240,7 +241,7 @@ class Activities extends ConsumerWidget {
                         Icon(
                           LucideIcons.pencil,
                           size: 18,
-                          color: theme.grey[900],
+                          color: theme.primary[900],
                         ),
                         horizontalSpace(Spacing.points8),
                         Text(

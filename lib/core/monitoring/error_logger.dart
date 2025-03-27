@@ -8,15 +8,33 @@ part 'error_logger.g.dart';
 class ErrorLogger {
   const ErrorLogger();
 
-  FutureOr<void> logException(Object exception, StackTrace? stackTrace) async {
+  FutureOr<void> logException(
+    Object exception,
+    StackTrace? stackTrace, {
+    Map<String, dynamic>? context,
+  }) async {
+    // Set custom keys for Crashlytics if context is provided
+    if (context != null) {
+      for (final entry in context.entries) {
+        await FirebaseCrashlytics.instance
+            .setCustomKey(entry.key, entry.value.toString());
+      }
+    }
+
     await FirebaseCrashlytics.instance.recordFlutterFatalError(
       FlutterErrorDetails(
         exception: exception,
         stack: stackTrace,
+        context: ErrorDescription(context?.toString() ?? ''),
       ),
     );
-    log(exception.toString(),
-        name: 'Exception', error: exception, stackTrace: stackTrace);
+
+    log(
+      exception.toString(),
+      name: 'Exception',
+      error: exception,
+      stackTrace: stackTrace,
+    );
   }
 }
 

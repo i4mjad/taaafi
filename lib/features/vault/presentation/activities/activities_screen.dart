@@ -185,7 +185,7 @@ class _TodayTasksWidgetState extends ConsumerState<TodayTasksWidget> {
                       TextSpan(
                         text: tasks.length.toString(),
                         style: TextStyle(
-                          color: theme.tint[800],
+                          color: theme.grey[800],
                         ),
                       ),
                     ],
