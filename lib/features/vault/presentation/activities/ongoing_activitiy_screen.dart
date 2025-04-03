@@ -338,6 +338,7 @@ class _ScheduledDatesRowState extends State<ScheduledDatesRow> {
                         ),
                       ),
                     ),
+                    verticalSpace(Spacing.points4),
                     Text(
                       getDisplayMonth(
                         scheduledTask.taskDatetime,
@@ -351,6 +352,7 @@ class _ScheduledDatesRowState extends State<ScheduledDatesRow> {
                         ),
                       ),
                     ),
+                    verticalSpace(Spacing.points4),
                     Text(
                       scheduledTask.taskDatetime.year.toString(),
                       style: TextStyles.small.copyWith(
@@ -376,13 +378,15 @@ class _ScheduledDatesRowState extends State<ScheduledDatesRow> {
     CustomThemeData theme,
   ) {
     final now = DateTime.now();
-    final tomorrow = DateTime(now.year, now.month, now.day + 1);
-    if (scheduledTask.taskDatetime.isAfter(tomorrow)) {
+    final endOfToday = DateTime(now.year, now.month, now.day, 23, 59, 59);
+
+    // If task is in the future, show grey
+    if (scheduledTask.taskDatetime.isAfter(endOfToday)) {
       return Colors.grey[400]!;
     }
 
-    final isCompleted = scheduledTask.isCompleted;
-    return isCompleted ? theme.success[300]! : theme.error[300]!;
+    // For past and current tasks, show success if completed, error if not completed
+    return scheduledTask.isCompleted ? theme.success[300]! : theme.error[300]!;
   }
 }
 
@@ -507,6 +511,7 @@ class OngoingActivityDescriptionAndUserStatisticsWidget extends ConsumerWidget {
             details.activity.description,
             style: TextStyles.small.copyWith(
               color: theme.grey[900],
+              height: 1.4,
             ),
           ),
         ),

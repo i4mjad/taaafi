@@ -1,28 +1,42 @@
 import 'package:reboot_app_3/features/vault/data/activities/ongoing_activity_task.dart';
-import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:reboot_app_3/features/vault/application/activities/activity_service.dart';
+
 import 'package:reboot_app_3/features/vault/application/activities/providers.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'today_tasks_notifier.g.dart';
 
 @riverpod
-class TodayTasksNotifier extends _$TodayTasksNotifier {
-  ActivityService get service => ref.read(activityServiceProvider);
-
+class TodayTasks extends _$TodayTasks {
   @override
-  Stream<List<OngoingActivityTask>> build() {
-    return service.getTodayTasksStream();
+  Map<String, OngoingActivityTask> build() {
+    return {};
   }
 
-  Future<void> completeTask(String taskId) async {
-    try {
-      await service.completeTask(taskId);
-    } catch (e) {
-      state = AsyncError(e, StackTrace.current);
+  void updateTaskCompletion(String taskId, bool isCompleted) {
+    if (state.containsKey(taskId)) {
+      state = {
+        ...state,
+        taskId: state[taskId]!.copyWith(isCompleted: isCompleted),
+      };
     }
   }
 
-  Stream<List<OngoingActivityTask>> tasksStream() {
-    return service.getTodayTasksStream();
+  void setTasks(List<OngoingActivityTask> tasks) {
+    state = {
+      for (var task in tasks) task.scheduledTaskId: task,
+    };
   }
+
+  List<OngoingActivityTask> get tasks => state.values.toList();
+}
+
+// Stream provider that updates the state notifier
+@riverpod
+Stream<List<OngoingActivityTask>> todayTasksStream(TodayTasksStreamRef ref) {
+  final notifier = ref.watch(todayTasksProvider.notifier);
+
+  return ref.read(activityServiceProvider).getTodayTasksStream().map((tasks) {
+    notifier.setTasks(tasks);
+    return tasks;
+  });
 }

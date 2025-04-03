@@ -5,11 +5,14 @@ import 'package:reboot_app_3/features/vault/data/activities/activity_repository.
 import 'package:reboot_app_3/features/vault/data/activities/ongoing_activity.dart';
 import 'package:reboot_app_3/features/vault/data/activities/ongoing_activity_task.dart';
 import 'package:reboot_app_3/features/vault/data/activities/ongoing_activity_details.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:reboot_app_3/core/monitoring/error_logger.dart';
 
 class ActivityService {
   final ActivityRepository _repository;
+  final Ref ref;
 
-  ActivityService(this._repository);
+  ActivityService(this._repository, this.ref);
 
   /// Fetches available activities for subscription
   Future<List<Activity>> getAvailableActivities() async {
@@ -207,6 +210,11 @@ class ActivityService {
       final details = await getOngoingActivityDetails(activityId);
       final now = DateTime.now();
 
+      // Validate dates
+      if (now.isBefore(details.startDate)) {
+        throw Exception('Cannot extend activity before start date');
+      }
+
       DateTime newEndDate;
       if (now.isAfter(details.endDate)) {
         // If activity has ended, extend from today
@@ -216,9 +224,46 @@ class ActivityService {
         newEndDate = details.endDate.add(period);
       }
 
+      // Validate total duration
+      final totalDuration = newEndDate.difference(details.startDate).inDays;
+      if (totalDuration > 90) {
+        throw Exception('Total activity duration cannot exceed 90 days');
+      }
+
+      // Log extension attempt
+      ref.read(errorLoggerProvider).logException(
+        'Extending activity',
+        StackTrace.current,
+        context: {
+          'activityId': activityId,
+          'currentEndDate': details.endDate.toIso8601String(),
+          'newEndDate': newEndDate.toIso8601String(),
+          'extensionPeriod': period.inDays,
+        },
+      );
+
       await _repository.extendActivity(activityId, details.startDate,
           newEndDate, details.scheduledTasks, locale);
-    } catch (e) {
+
+      // Log successful extension
+      ref.read(errorLoggerProvider).logException(
+        'Activity extended successfully',
+        StackTrace.current,
+        context: {
+          'activityId': activityId,
+          'newEndDate': newEndDate.toIso8601String(),
+        },
+      );
+    } catch (e, stackTrace) {
+      // Log extension failure
+      ref.read(errorLoggerProvider).logException(
+        e,
+        stackTrace,
+        context: {
+          'activityId': activityId,
+          'period': period.inDays,
+        },
+      );
       rethrow;
     }
   }

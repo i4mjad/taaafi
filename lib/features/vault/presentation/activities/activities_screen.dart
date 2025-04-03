@@ -12,7 +12,6 @@ import 'package:reboot_app_3/core/theming/custom_theme_data.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/features/vault/data/activities/ongoing_activity.dart';
-import 'package:reboot_app_3/features/vault/data/activities/ongoing_activity_task.dart';
 import 'package:reboot_app_3/features/vault/presentation/activities/shared_widgets/day_task_widget.dart';
 import 'package:reboot_app_3/features/vault/application/activities/ongoing_activities_notifier.dart';
 import 'package:reboot_app_3/features/vault/application/activities/today_tasks_notifier.dart';
@@ -131,27 +130,14 @@ class OngoingActivitiesWidget extends ConsumerWidget {
   }
 }
 
-class TodayTasksWidget extends ConsumerStatefulWidget {
+class TodayTasksWidget extends ConsumerWidget {
   @override
-  _TodayTasksWidgetState createState() => _TodayTasksWidgetState();
-}
-
-class _TodayTasksWidgetState extends ConsumerState<TodayTasksWidget> {
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = AppTheme.of(context);
-    return StreamBuilder<List<OngoingActivityTask>>(
-      stream: ref.watch(todayTasksNotifierProvider.notifier).tasksStream(),
-      builder: (context, snapshot) {
-        if (snapshot.hasError) {
-          return Center(child: Text(snapshot.error.toString()));
-        }
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
-        }
+    final tasksAsync = ref.watch(todayTasksStreamProvider);
 
-        final tasks = snapshot.data!;
-
+    return tasksAsync.when(
+      data: (tasks) {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -230,6 +216,13 @@ class _TodayTasksWidgetState extends ConsumerState<TodayTasksWidget> {
           ],
         );
       },
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (error, stack) => Center(
+        child: Text(
+          error.toString(),
+          style: TextStyles.body.copyWith(color: theme.error[600]),
+        ),
+      ),
     );
   }
 }

@@ -4,6 +4,7 @@ import 'package:reboot_app_3/features/vault/application/activities/providers.dar
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:reboot_app_3/features/vault/data/activities/ongoing_activity_details.dart';
 import 'package:reboot_app_3/features/vault/application/activities/activity_service.dart';
+import 'package:reboot_app_3/features/vault/application/activities/today_tasks_notifier.dart';
 
 part 'ongoing_activity_details_provider.g.dart';
 
@@ -36,28 +37,45 @@ class OngoingActivityDetailsNotifier extends _$OngoingActivityDetailsNotifier {
         throw Exception('Activity details not found');
       }
 
+      // Validate extension period
+      if (period.inDays > 90) {
+        throw Exception('Extension period cannot exceed 90 days');
+      }
+
       // Check if we're in the first half of the activity period
       final activityDuration =
           currentDetails.endDate.difference(currentDetails.startDate);
       final halfwayPoint = currentDetails.startDate.add(activityDuration ~/ 2);
 
-      if (DateTime.now().isBefore(halfwayPoint)) {
-        return false; // Return false to indicate extension not allowed
+      // Calculate completion rate
+      final totalTasks = currentDetails.scheduledTasks.length;
+      final completedTasks = currentDetails.scheduledTasks
+          .where((task) => task.isCompleted)
+          .length;
+      final completionRate = totalTasks > 0 ? completedTasks / totalTasks : 0.0;
+
+      // Allow extension if either:
+      // 1. We're past the halfway point
+      // 2. User has completed >70% of tasks
+      if (!DateTime.now().isBefore(halfwayPoint) || completionRate > 0.7) {
+        // Set loading state before extension
+        state = const AsyncValue.loading();
+
+        // Proceed with extension
+        await service.extendActivity(
+          currentDetails.activity.id,
+          period,
+          locale,
+        );
+
+        // Refresh state with updated details
+        state = AsyncValue.data(await _getOngoingActivityDetails(activityId));
+        return true;
       }
 
-      // Set loading state before extension
-      state = const AsyncValue.loading();
-
-      // Proceed with extension
-      await service.extendActivity(
-        currentDetails.activity.id,
-        period,
-        locale,
-      );
-
-      return true; // Return true to indicate successful extension
-    } catch (e) {
-      state = AsyncError(e, StackTrace.current);
+      return false; // Return false to indicate extension not allowed
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
       rethrow;
     }
   }
@@ -77,6 +95,8 @@ class OngoingActivityDetailsNotifier extends _$OngoingActivityDetailsNotifier {
 
       // Notify other providers to refresh their data
       await ref.read(allTasksNotifierProvider.notifier).refreshTasks();
+      ref.refresh(todayTasksProvider);
+      ref.refresh(todayTasksStreamProvider);
     } catch (e, st) {
       state = AsyncValue.error(e, st);
     }

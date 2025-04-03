@@ -138,6 +138,7 @@ class ActivityDescriptionWidget extends StatelessWidget {
             activity.description,
             style: TextStyles.small.copyWith(
               color: theme.grey[900],
+              height: 1.5,
             ),
           ),
         ),
@@ -208,13 +209,19 @@ class TaskDescriptionSheet extends ConsumerWidget {
                 onTap: () {
                   Navigator.pop(context);
                 },
-                child: Icon(LucideIcons.xCircle, color: theme.grey[900]),
+                child: Icon(
+                  LucideIcons.xCircle,
+                  color: theme.grey[900],
+                ),
               )
             ],
           ),
           verticalSpace(Spacing.points16),
           Text(task.description,
-              style: TextStyles.body.copyWith(color: theme.grey[900])),
+              style: TextStyles.body.copyWith(
+                color: theme.grey[900],
+                height: 1.5,
+              )),
           verticalSpace(Spacing.points16),
           GestureDetector(
             onTap: () {

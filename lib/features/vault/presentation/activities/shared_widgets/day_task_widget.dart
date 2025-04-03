@@ -10,7 +10,7 @@ import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/features/vault/application/activities/ongoing_activity_details_provider.dart';
 import 'package:reboot_app_3/features/vault/data/activities/ongoing_activity_task.dart';
 
-class DayTaskWidget extends ConsumerWidget {
+class DayTaskWidget extends ConsumerStatefulWidget {
   const DayTaskWidget(
     this.task, {
     required this.activityId,
@@ -21,7 +21,21 @@ class DayTaskWidget extends ConsumerWidget {
   final String activityId;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<DayTaskWidget> createState() => _DayTaskWidgetState();
+}
+
+class _DayTaskWidgetState extends ConsumerState<DayTaskWidget> {
+  bool _isUpdating = false;
+  bool _localCompletionState = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _localCompletionState = widget.task.isCompleted;
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final theme = AppTheme.of(context);
     final locale = Localizations.localeOf(context);
 
@@ -32,7 +46,7 @@ class DayTaskWidget extends ConsumerWidget {
       child: Row(
         children: [
           Text(
-            getDisplayTime(task.taskDatetime, locale.languageCode),
+            getDisplayTime(widget.task.taskDatetime, locale.languageCode),
             style: TextStyles.small.copyWith(
               color: theme.grey[900],
             ),
@@ -43,55 +57,85 @@ class DayTaskWidget extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  task.task.name,
+                  widget.task.task.name,
                   style: TextStyles.footnoteSelected.copyWith(
                     color: theme.grey[900],
                   ),
                 ),
                 verticalSpace(Spacing.points4),
                 Text(
-                  task.task.description,
+                  widget.task.task.description,
                   style: TextStyles.small.copyWith(
                     color: theme.grey[700],
-                    height: 1.25,
+                    height: 1.4,
                   ),
                 ),
               ],
             ),
           ),
-          Checkbox(
-            value: task.isCompleted,
-            onChanged: (bool? value) async {
-              HapticFeedback.lightImpact();
-              try {
-                // Check if task is scheduled for future
-                final now = DateTime.now();
-                final endOfToday =
-                    DateTime(now.year, now.month, now.day, 23, 59, 59);
+          if (_isUpdating)
+            SizedBox(
+              width: 20,
+              height: 20,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                valueColor: AlwaysStoppedAnimation<Color>(theme.primary[600]!),
+              ),
+            )
+          else
+            Checkbox(
+              value: _localCompletionState,
+              onChanged: (bool? value) async {
+                if (value == null) return;
 
-                if (task.taskDatetime.isAfter(endOfToday)) {
-                  if (context.mounted) {
-                    HapticFeedback.heavyImpact();
-                    getErrorSnackBar(
-                      context,
-                      "cannot-complete-future-tasks",
-                    );
+                HapticFeedback.lightImpact();
+                setState(() {
+                  _isUpdating = true;
+                  _localCompletionState = value;
+                });
+
+                try {
+                  // Check if task is scheduled for future
+                  final now = DateTime.now();
+                  final endOfToday =
+                      DateTime(now.year, now.month, now.day, 23, 59, 59);
+
+                  if (widget.task.taskDatetime.isAfter(endOfToday)) {
+                    if (context.mounted) {
+                      HapticFeedback.heavyImpact();
+                      getErrorSnackBar(
+                        context,
+                        "cannot-complete-future-tasks",
+                      );
+                      setState(() {
+                        _localCompletionState = !value;
+                      });
+                    }
+                    return;
                   }
-                  return;
-                }
 
-                await ref
-                    .read(ongoingActivityDetailsNotifierProvider(activityId)
-                        .notifier)
-                    .updateTaskCompletion(task.scheduledTaskId, value ?? false);
-              } catch (e) {
-                if (context.mounted) {
-                  getErrorSnackBar(context, e.toString());
+                  await ref
+                      .read(ongoingActivityDetailsNotifierProvider(
+                              widget.activityId)
+                          .notifier)
+                      .updateTaskCompletion(widget.task.scheduledTaskId, value);
+                } catch (e) {
+                  if (context.mounted) {
+                    getErrorSnackBar(context, e.toString());
+                    setState(() {
+                      _localCompletionState = !value;
+                    });
+                  }
+                } finally {
+                  if (mounted) {
+                    setState(() {
+                      _isUpdating = false;
+                    });
+                  }
                 }
-              }
-            },
-            activeColor: theme.primary[600],
-          ),
+              },
+              activeColor: theme.primary[600],
+            ),
         ],
       ),
     );

@@ -151,79 +151,245 @@ class _DiariesScreenState extends ConsumerState<DiariesScreen> {
   }
 }
 
-class DiaryWidget extends ConsumerWidget {
+class DiaryWidget extends ConsumerStatefulWidget {
   const DiaryWidget({super.key, required this.diary, required this.index});
   final Diary diary;
   final int index;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<DiaryWidget> createState() => _DiaryWidgetState();
+}
+
+class _DiaryWidgetState extends ConsumerState<DiaryWidget> {
+  bool isSlided = false;
+
+  Future<bool?> _showDeleteConfirmationDialog(BuildContext context) {
+    final theme = AppTheme.of(context);
+    return showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(
+          AppLocalizations.of(context).translate("confirm-note-delete"),
+          style: TextStyles.footnote.copyWith(color: theme.error[700]),
+        ),
+        content: Text(
+          AppLocalizations.of(context).translate("delete-diary-warning"),
+          style: TextStyles.small.copyWith(color: theme.grey[700], height: 2),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text(
+              AppLocalizations.of(context).translate("cancel"),
+              style: TextStyles.small.copyWith(color: theme.grey[700]),
+            ),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: Text(
+              AppLocalizations.of(context).translate("delete"),
+              style: TextStyles.small.copyWith(color: theme.error[700]),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final theme = AppTheme.of(context);
     final locale = ref.watch(localeNotifierProvider);
+    final localizations = AppLocalizations.of(context);
     return Padding(
       padding: const EdgeInsets.all(1.0),
-      child: GestureDetector(
-        onTap: () => context.go("/vault/diaries/diary/${diary.id}"),
-        child: WidgetsContainer(
-          padding: EdgeInsets.all(12),
-          backgroundColor: theme.backgroundColor,
-          borderSide: BorderSide(color: theme.grey[600]!, width: 0.25),
-          borderRadius: BorderRadius.circular(10.5),
-          boxShadow: Shadows.mainShadows,
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                index.toString(),
-                style: TextStyles.footnoteSelected.copyWith(
-                  color: theme.grey[900],
+      child: Stack(
+        children: [
+          // Right side delete button (for Arabic)
+          if (locale?.languageCode == 'ar')
+            Positioned(
+              right: 0,
+              child: GestureDetector(
+                onTap: () async {
+                  final result = await _showDeleteConfirmationDialog(context);
+                  if (result == true) {
+                    try {
+                      await ref
+                          .read(diariesNotifierProvider.notifier)
+                          .deleteDiary(widget.diary.id);
+                    } catch (e) {
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Failed to delete diary: $e')),
+                        );
+                      }
+                    }
+                  }
+                },
+                child: Padding(
+                  padding: const EdgeInsets.only(right: 12, top: 12),
+                  child: WidgetsContainer(
+                    padding: EdgeInsets.all(12),
+                    backgroundColor: theme.error[50],
+                    borderRadius: BorderRadius.circular(10.5),
+                    borderSide:
+                        BorderSide(color: theme.error[100]!, width: 0.25),
+                    child: Icon(
+                      LucideIcons.trash2,
+                      color: theme.error[700],
+                      size: 24,
+                    ),
+                  ),
                 ),
               ),
-              horizontalSpace(Spacing.points8),
-              Expanded(
-                flex: 3,
-                child: Column(
+            ),
+          // Left side delete button (for English)
+          if (locale?.languageCode == 'en')
+            Positioned(
+              left: 0,
+              child: GestureDetector(
+                onTap: () async {
+                  final result = await _showDeleteConfirmationDialog(context);
+                  if (result == true) {
+                    try {
+                      await ref
+                          .read(diariesNotifierProvider.notifier)
+                          .deleteDiary(widget.diary.id);
+                    } catch (e) {
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Failed to delete diary: $e')),
+                        );
+                      }
+                    }
+                  }
+                },
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 12, top: 12),
+                  child: WidgetsContainer(
+                    padding: EdgeInsets.all(12),
+                    backgroundColor: theme.error[50],
+                    borderRadius: BorderRadius.circular(10.5),
+                    borderSide:
+                        BorderSide(color: theme.error[100]!, width: 0.25),
+                    child: Icon(
+                      LucideIcons.trash2,
+                      color: theme.error[700],
+                      size: 24,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          AnimatedContainer(
+            duration: Duration(milliseconds: 200),
+            transform: Matrix4.translationValues(
+                isSlided ? (locale?.languageCode == 'ar' ? -100 : 100) : 0,
+                0,
+                0),
+            child: GestureDetector(
+              onTap: () =>
+                  context.go("/vault/diaries/diary/${widget.diary.id}"),
+              onHorizontalDragUpdate: (details) {
+                if (locale.languageCode == 'ar') {
+                  // For Arabic: slide left (negative delta)
+                  if (details.primaryDelta! < 0) {
+                    setState(() {
+                      isSlided = true;
+                    });
+                  }
+                } else {
+                  // For English: slide right (positive delta)
+                  if (details.primaryDelta! > 0) {
+                    setState(() {
+                      isSlided = true;
+                    });
+                  }
+                }
+              },
+              onHorizontalDragEnd: (details) {
+                if (locale.languageCode == 'ar') {
+                  // For Arabic: reset on right swipe (positive velocity)
+                  if (details.primaryVelocity! > 0) {
+                    setState(() {
+                      isSlided = false;
+                    });
+                  }
+                } else {
+                  // For English: reset on left swipe (negative velocity)
+                  if (details.primaryVelocity! < 0) {
+                    setState(() {
+                      isSlided = false;
+                    });
+                  }
+                }
+              },
+              child: WidgetsContainer(
+                padding: EdgeInsets.all(12),
+                backgroundColor: theme.backgroundColor,
+                borderSide: BorderSide(color: theme.grey[600]!, width: 0.25),
+                borderRadius: BorderRadius.circular(10.5),
+                boxShadow: Shadows.mainShadows,
+                child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
-                      children: [
-                        Text(diary.title, style: TextStyles.footnote),
-                        horizontalSpace(Spacing.points8),
-                        diary.linkedTasks.isNotEmpty
-                            ? Wrap(
-                                children: diary.linkedTasks
-                                    .map((task) => Text(
-                                          task.task.name,
-                                          style: TextStyles.small,
-                                        ))
-                                    .toList(),
-                              )
-                            : SizedBox(),
-                      ],
-                    ),
-                    verticalSpace(Spacing.points8),
                     Text(
-                      getDisplayDateTime(diary.date, locale!.languageCode),
-                      style:
-                          TextStyles.caption.copyWith(color: theme.grey[700]),
+                      widget.index.toString(),
+                      style: TextStyles.footnoteSelected.copyWith(
+                        color: theme.grey[900],
+                      ),
                     ),
-                    verticalSpace(Spacing.points8),
-                    Text(
-                      diary.plainText,
-                      style: TextStyles.small.copyWith(color: theme.grey[700]),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+                    horizontalSpace(Spacing.points8),
+                    Expanded(
+                      flex: 3,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Text(widget.diary.title,
+                                  style: TextStyles.footnote),
+                              horizontalSpace(Spacing.points8),
+                              widget.diary.linkedTasks.isNotEmpty
+                                  ? Wrap(
+                                      children: widget.diary.linkedTasks
+                                          .map((task) => Text(
+                                                task.task.name,
+                                                style: TextStyles.small,
+                                              ))
+                                          .toList(),
+                                    )
+                                  : SizedBox(),
+                            ],
+                          ),
+                          verticalSpace(Spacing.points8),
+                          Text(
+                            getDisplayDateTime(
+                                widget.diary.date, locale!.languageCode),
+                            style: TextStyles.caption
+                                .copyWith(color: theme.grey[700]),
+                          ),
+                          verticalSpace(Spacing.points8),
+                          Text(
+                            widget.diary.plainText,
+                            style: TextStyles.small
+                                .copyWith(color: theme.grey[700]),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ),
                     ),
+                    Icon(
+                      LucideIcons.chevronLeft,
+                      color: theme.grey[300],
+                    )
                   ],
                 ),
               ),
-              Icon(
-                LucideIcons.chevronLeft,
-                color: theme.grey[300],
-              )
-            ],
+            ),
           ),
-        ),
+        ],
       ),
     );
   }

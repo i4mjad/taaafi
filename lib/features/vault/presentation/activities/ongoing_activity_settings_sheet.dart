@@ -5,7 +5,6 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/routing/route_names.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
-import 'package:reboot_app_3/core/shared_widgets/snackbar.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
@@ -284,17 +283,103 @@ class OngoingActivitySettingsSheet extends ConsumerWidget {
 
   Future<void> _handleExtension(BuildContext context, WidgetRef ref,
       Duration period, Locale locale) async {
-    final success = await ref
-        .read(
-            ongoingActivityDetailsNotifierProvider(ongoingActivityId).notifier)
-        .extendActivity(period, locale, context);
+    try {
+      // Show loading dialog
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return Center(
+            child: CircularProgressIndicator(),
+          );
+        },
+      );
 
-    if (success) {
-      Navigator.pop(context); // Close dialog
-      getSuccessSnackBar(context, 'activity-extended');
-    } else {
-      Navigator.pop(context); // Close dialog
-      getErrorSnackBar(context, 'error-extend-activity');
+      final success = await ref
+          .read(ongoingActivityDetailsNotifierProvider(ongoingActivityId)
+              .notifier)
+          .extendActivity(period, locale, context);
+
+      // Hide loading dialog
+      Navigator.pop(context);
+
+      if (success) {
+        // Show success message
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              AppLocalizations.of(context).translate('activity-extended'),
+              style: TextStyles.body.copyWith(color: Colors.white),
+            ),
+            backgroundColor: AppTheme.of(context).success[600],
+            duration: Duration(seconds: 2),
+          ),
+        );
+        Navigator.pop(context); // Close settings sheet
+      } else {
+        // Show error message with explanation
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              AppLocalizations.of(context).translate('error-extend-activity'),
+              style: TextStyles.body.copyWith(color: Colors.white),
+            ),
+            backgroundColor: AppTheme.of(context).error[600],
+            duration: Duration(seconds: 3),
+            action: SnackBarAction(
+              label: AppLocalizations.of(context).translate('learn-more'),
+              textColor: Colors.white,
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      title: Text(
+                        AppLocalizations.of(context)
+                            .translate('extension-requirements'),
+                        style: TextStyles.h6,
+                      ),
+                      content: Text(
+                        AppLocalizations.of(context)
+                            .translate('extension-requirements-details'),
+                        style: TextStyles.body,
+                      ),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: Text(
+                            AppLocalizations.of(context).translate('close'),
+                            style: TextStyles.body.copyWith(
+                              color: AppTheme.of(context).primary[600],
+                            ),
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                );
+              },
+            ),
+          ),
+        );
+      }
+    } catch (e) {
+      // Hide loading dialog if still showing
+      if (Navigator.canPop(context)) {
+        Navigator.pop(context);
+      }
+
+      // Show error message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            AppLocalizations.of(context).translate('error-extend-activity'),
+            style: TextStyles.body.copyWith(color: Colors.white),
+          ),
+          backgroundColor: AppTheme.of(context).error[600],
+          duration: Duration(seconds: 3),
+        ),
+      );
     }
   }
 }

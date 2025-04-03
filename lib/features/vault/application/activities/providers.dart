@@ -29,5 +29,5 @@ FirebaseFirestore firestore(FirestoreRef ref) {
 
 @riverpod
 ActivityService activityService(ActivityServiceRef ref) {
-  return ActivityService(ref.watch(activityRepositoryProvider));
+  return ActivityService(ref.watch(activityRepositoryProvider), ref);
 }

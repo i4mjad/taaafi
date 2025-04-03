@@ -50,7 +50,7 @@ final firestoreProvider = Provider<FirebaseFirestore>.internal(
 );
 
 typedef FirestoreRef = ProviderRef<FirebaseFirestore>;
-String _$activityServiceHash() => r'6358733ef39d0d46e3cde95514ff4f2cc93cfd8c';
+String _$activityServiceHash() => r'a95a99fead96df2dbcb086a6e5cd93191570b277';
 
 /// See also [activityService].
 @ProviderFor(activityService)

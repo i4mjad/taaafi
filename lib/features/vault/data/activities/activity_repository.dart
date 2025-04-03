@@ -307,9 +307,10 @@ class ActivityRepository {
     unawaited(_analytics.trackProgressCalculationStarted());
     try {
       final userId = _getCurrentUserId();
-      final now = DateTime.now().add(const Duration(days: 1));
+      final now = DateTime.now();
+      final endOfToday = DateTime(now.year, now.month, now.day, 23, 59, 59);
 
-      // Get all scheduled tasks up to now that aren't deleted
+      // Get all scheduled tasks up to today that aren't deleted
       final scheduledTasksSnapshot = await _firestore
           .collection('users')
           .doc(userId)
@@ -318,8 +319,7 @@ class ActivityRepository {
           .collection('scheduledTasks')
           .where('isDeleted', isEqualTo: false)
           .where('scheduledDate',
-              isLessThanOrEqualTo:
-                  Timestamp.fromDate(DateTime(now.year, now.month, now.day)))
+              isLessThanOrEqualTo: Timestamp.fromDate(endOfToday))
           .get();
 
       if (scheduledTasksSnapshot.docs.isEmpty) {
@@ -329,17 +329,20 @@ class ActivityRepository {
       // Count completed tasks from past and today only
       final completedTasks = scheduledTasksSnapshot.docs.where((doc) {
         final taskDate = (doc.data()['scheduledDate'] as Timestamp).toDate();
-        return !taskDate.isAfter(now) && doc.data()['isCompleted'] == true;
+        return !taskDate.isAfter(endOfToday) &&
+            doc.data()['isCompleted'] == true;
       }).length;
 
-      // Count total tasks up to now (excluding future tasks)
+      // Count total tasks up to today (excluding future tasks)
       final totalTasksUntilNow = scheduledTasksSnapshot.docs.where((doc) {
         final taskDate = (doc.data()['scheduledDate'] as Timestamp).toDate();
-        return !taskDate.isAfter(now);
+        return !taskDate.isAfter(endOfToday);
       }).length;
 
       // Calculate progress percentage
-      final progress = completedTasks / totalTasksUntilNow * 100;
+      final progress = totalTasksUntilNow > 0
+          ? (completedTasks / totalTasksUntilNow * 100)
+          : 0.0;
 
       unawaited(_analytics.trackProgressCalculationFinished());
       return progress;
@@ -779,6 +782,9 @@ class ActivityRepository {
     DateTime endDate,
   ) async {
     try {
+      // Track activity update start
+      unawaited(_analytics.trackActivityUpdateStarted());
+
       final userId = _getCurrentUserId();
       // Create batch for atomic operations
       final batch = _firestore.batch();
@@ -824,57 +830,51 @@ class ActivityRepository {
         throw Exception('Base activity not found');
       }
 
-      // Fetch all task templates
-      final tasksSnapshot =
-          await baseActivityDoc.reference.collection('activityTasks').get();
+      // Get tasks from the activityTasks subcollection
+      final tasksSnapshot = await baseActivityDoc.reference
+          .collection('activityTasks')
+          .orderBy('taskName')
+          .get();
 
-      final periodInDays = endDate.difference(startDate).inDays;
+      final tasks = tasksSnapshot.docs
+          .map((taskDoc) => ActivityTask.fromFirestore(taskDoc))
+          .toList();
 
-      // Create new batch for creating new tasks
-      final newBatch = _firestore.batch();
+      // Create a new batch for task creation
+      final taskBatch = _firestore.batch();
 
-      // Create new scheduled tasks for each task template
-      for (var task in tasksSnapshot.docs) {
-        final frequencyStr = task.data()['taskFrequency'] as String;
-        final frequency = _parseTaskFrequency(frequencyStr);
-        // Generate new schedule dates
+      // Generate and create new scheduled tasks
+      for (var task in tasks) {
         final scheduledDates = _generateScheduledDates(
           startDate,
-          periodInDays,
-          frequency,
+          endDate.difference(startDate).inDays,
+          task.frequency,
         );
 
-        // Create new task documents for each date
         for (var date in scheduledDates) {
           final taskDocRef = activityRef.collection('scheduledTasks').doc();
-          newBatch.set(taskDocRef, {
-            'taskId': task.id,
-            'scheduledDate': date,
-            'isCompleted': false,
-            'completedAt': null,
-            'isDeleted': false,
-          });
+          taskBatch.set(
+            taskDocRef,
+            {
+              'taskId': task.id,
+              'scheduledDate': date,
+              'isCompleted': false,
+              'completedAt': null,
+              'isDeleted': false,
+            },
+          );
         }
       }
 
-      // Commit the new tasks batch
-      await newBatch.commit();
+      // Commit the task creation batch
+      await taskBatch.commit();
 
-      // Update the subscription session document
-      final sessionRef = _firestore
-          .collection('activities')
-          .doc(baseActivityId)
-          .collection('subscriptionSessions')
-          .doc(userId);
-
-      batch.update(sessionRef, {
-        'startDate': startDate,
-        'endDate': endDate,
-        'updatedAt': FieldValue.serverTimestamp(),
-      });
+      // Update analytics
+      unawaited(_analytics.trackActivityUpdateFinished());
     } catch (e, stackTrace) {
       ref.read(errorLoggerProvider).logException(e, stackTrace);
-      throw Exception('Failed to update activity: $e');
+      unawaited(_analytics.trackActivityUpdateFailed());
+      throw Exception('Failed to update activity dates: $e');
     }
   }
 
