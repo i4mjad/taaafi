@@ -29,34 +29,38 @@ class AddActivityScreen extends ConsumerWidget {
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: activitiesState.when(
-            data: (activities) => ListView.separated(
-              itemCount: activities.length,
-              separatorBuilder: (_, __) => verticalSpace(Spacing.points8),
-              itemBuilder: (context, index) => ActivityListItem(
-                activity: activities[index],
-                onTap: () async {
-                  try {
-                    final isSubscribed = await ref
-                        .read(activityNotifierProvider.notifier)
-                        .checkSubscription(activities[index].id);
+            data: (activities) => SingleChildScrollView(
+              child: ListView.separated(
+                shrinkWrap: true,
+                physics: NeverScrollableScrollPhysics(),
+                itemCount: activities.length,
+                separatorBuilder: (_, __) => verticalSpace(Spacing.points8),
+                itemBuilder: (context, index) => ActivityListItem(
+                  activity: activities[index],
+                  onTap: () async {
+                    try {
+                      final isSubscribed = await ref
+                          .read(activityNotifierProvider.notifier)
+                          .checkSubscription(activities[index].id);
 
-                    if (context.mounted) {
-                      if (isSubscribed) {
-                        getErrorSnackBar(
-                            context, 'already-subscribed-to-activity');
-                      } else {
-                        context.goNamed(
-                          RouteNames.activityOverview.name,
-                          pathParameters: {"id": activities[index].id},
-                        );
+                      if (context.mounted) {
+                        if (isSubscribed) {
+                          getErrorSnackBar(
+                              context, 'already-subscribed-to-activity');
+                        } else {
+                          context.goNamed(
+                            RouteNames.activityOverview.name,
+                            pathParameters: {"id": activities[index].id},
+                          );
+                        }
+                      }
+                    } catch (e) {
+                      if (context.mounted) {
+                        getErrorSnackBar(context, e.toString());
                       }
                     }
-                  } catch (e) {
-                    if (context.mounted) {
-                      getErrorSnackBar(context, e.toString());
-                    }
-                  }
-                },
+                  },
+                ),
               ),
             ),
             loading: () => const Center(child: CircularProgressIndicator()),

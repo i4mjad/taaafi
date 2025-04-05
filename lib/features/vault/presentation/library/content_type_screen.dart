@@ -93,31 +93,33 @@ class _ContentTypeScreenState extends ConsumerState<ContentTypeScreen> {
               ),
               verticalSpace(Spacing.points16),
               Expanded(
-                child: _isLoading
-                    ? Center(
-                        child: CircularProgressIndicator(
-                          color: theme.primary[700],
-                        ),
-                      )
-                    : filteredData.isEmpty
-                        ? Center(
-                            child: Text(
-                              'No content found',
-                              style: TextStyles.body.copyWith(
-                                color: theme.grey[600],
+                child: SingleChildScrollView(
+                  child: _isLoading
+                      ? Center(
+                          child: CircularProgressIndicator(
+                            color: theme.primary[700],
+                          ),
+                        )
+                      : filteredData.isEmpty
+                          ? Center(
+                              child: Text(
+                                'No content found',
+                                style: TextStyles.body.copyWith(
+                                  color: theme.grey[600],
+                                ),
+                              ),
+                            )
+                          : ListView.separated(
+                              shrinkWrap: true,
+                              physics: NeverScrollableScrollPhysics(),
+                              itemCount: filteredData.length,
+                              separatorBuilder: (_, __) =>
+                                  verticalSpace(Spacing.points8),
+                              itemBuilder: (context, index) => ContentItem(
+                                content: filteredData[index],
                               ),
                             ),
-                          )
-                        : ListView.separated(
-                            itemCount: filteredData.length,
-                            separatorBuilder: (context, index) =>
-                                verticalSpace(Spacing.points8),
-                            itemBuilder: (context, index) {
-                              return ContentItem(
-                                content: filteredData[index],
-                              );
-                            },
-                          ),
+                ),
               ),
             ],
           ),

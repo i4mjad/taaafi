@@ -191,23 +191,13 @@ class _DiaryScreenState extends ConsumerState<DiaryScreen> {
                                 scrollController: ScrollController(),
                                 configurations: QuillEditorConfigurations(
                                   autoFocus: false,
+                                  // Modify onTapOutside to avoid collapsing the selection.
                                   onTapOutside: (event, focusNode) {
-                                    //! this is commented to test why it is causing the focus is always gained when tapping outside
-                                    // _controller.updateSelection(
-                                    //   TextSelection.collapsed(
-                                    //       offset:
-                                    //           _controller.selection.baseOffset),
-                                    //   ChangeSource.local,
-                                    // );
-
-                                    // Collapsing the selection:
-                                    _controller.updateSelection(
-                                      const TextSelection.collapsed(
-                                          offset: 0), // or 0
-                                      ChangeSource.local,
-                                    );
-                                    // Or if you want to simply unfocus:
-                                    focusNode.unfocus();
+                                    // For Apple Notes-like behavior, do not collapse the selection.
+                                    // Option 1: Simply do nothing so that tapping on the style toolbar doesn't collapse the selection.
+                                    // Option 2: Unfocus only if the tap is clearly outside both the editor and the toolbar.
+                                    //
+                                    // For now, we choose Option 1:
                                   },
                                   customStyles: DefaultStyles(
                                     paragraph: DefaultTextBlockStyle(
