@@ -595,5 +595,10 @@
   "error-updating-activity": "Error updating activity",
   "update": "Update",
   "update-activity-dates": "Update Activity Dates",
-  "update-activity-warning": "Warning: This will reset all scheduled tasks. Your previous progress will be marked as deleted."
+  "update-activity-warning": "Warning: This will reset all scheduled tasks. Your previous progress will be marked as deleted.",
+
+  "scheduled-for": "Scheduled for",
+  "mark-as-complete": "Mark as Complete",
+  "task-completed": "Task Completed",
+  "mark-as-incomplete": "Mark as Incomplete"
 }

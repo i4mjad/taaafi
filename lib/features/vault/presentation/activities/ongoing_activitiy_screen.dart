@@ -1,4 +1,6 @@
+import 'package:figma_squircle/figma_squircle.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/helpers/date_display_formater.dart';
@@ -313,57 +315,60 @@ class _ScheduledDatesRowState extends State<ScheduledDatesRow> {
       child: Row(
         children: [
           for (var scheduledTask in widget.scheduledInstances)
-            Padding(
-              padding: EdgeInsets.only(top: 1, bottom: 1, right: 4),
-              child: WidgetsContainer(
-                padding: EdgeInsets.all(8),
-                backgroundColor: theme.backgroundColor,
-                borderSide: BorderSide(
-                  color: _getBorderColor(
-                    scheduledTask,
-                    widget.performance[scheduledTask.task.id] ?? [],
-                    theme,
+            GestureDetector(
+              onTap: () => _showTaskDetailsSheet(context, scheduledTask, theme),
+              child: Padding(
+                padding: EdgeInsets.only(top: 1, bottom: 1, right: 4),
+                child: WidgetsContainer(
+                  padding: EdgeInsets.all(8),
+                  backgroundColor: theme.backgroundColor,
+                  borderSide: BorderSide(
+                    color: _getBorderColor(
+                      scheduledTask,
+                      widget.performance[scheduledTask.task.id] ?? [],
+                      theme,
+                    ),
+                    width: 0.5,
                   ),
-                  width: 0.5,
-                ),
-                child: Column(
-                  children: [
-                    Text(
-                      scheduledTask.taskDatetime.day.toString(),
-                      style: TextStyles.small.copyWith(
-                        color: _getBorderColor(
-                          scheduledTask,
-                          widget.performance[scheduledTask.task.id] ?? [],
-                          theme,
+                  child: Column(
+                    children: [
+                      Text(
+                        scheduledTask.taskDatetime.day.toString(),
+                        style: TextStyles.small.copyWith(
+                          color: _getBorderColor(
+                            scheduledTask,
+                            widget.performance[scheduledTask.task.id] ?? [],
+                            theme,
+                          ),
                         ),
                       ),
-                    ),
-                    verticalSpace(Spacing.points4),
-                    Text(
-                      getDisplayMonth(
-                        scheduledTask.taskDatetime,
-                        Localizations.localeOf(context).languageCode,
-                      ),
-                      style: TextStyles.small.copyWith(
-                        color: _getBorderColor(
-                          scheduledTask,
-                          widget.performance[scheduledTask.task.id] ?? [],
-                          theme,
+                      verticalSpace(Spacing.points4),
+                      Text(
+                        getDisplayMonth(
+                          scheduledTask.taskDatetime,
+                          Localizations.localeOf(context).languageCode,
+                        ),
+                        style: TextStyles.small.copyWith(
+                          color: _getBorderColor(
+                            scheduledTask,
+                            widget.performance[scheduledTask.task.id] ?? [],
+                            theme,
+                          ),
                         ),
                       ),
-                    ),
-                    verticalSpace(Spacing.points4),
-                    Text(
-                      scheduledTask.taskDatetime.year.toString(),
-                      style: TextStyles.small.copyWith(
-                        color: _getBorderColor(
-                          scheduledTask,
-                          widget.performance[scheduledTask.task.id] ?? [],
-                          theme,
+                      verticalSpace(Spacing.points4),
+                      Text(
+                        scheduledTask.taskDatetime.year.toString(),
+                        style: TextStyles.small.copyWith(
+                          color: _getBorderColor(
+                            scheduledTask,
+                            widget.performance[scheduledTask.task.id] ?? [],
+                            theme,
+                          ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -387,6 +392,245 @@ class _ScheduledDatesRowState extends State<ScheduledDatesRow> {
 
     // For past and current tasks, show success if completed, error if not completed
     return scheduledTask.isCompleted ? theme.success[300]! : theme.error[300]!;
+  }
+
+  void _showTaskDetailsSheet(BuildContext context,
+      OngoingActivityTask scheduledTask, CustomThemeData theme) {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) => ScheduledTaskDetailsSheet(
+        scheduledTask: scheduledTask,
+        theme: theme,
+      ),
+    );
+  }
+}
+
+class ScheduledTaskDetailsSheet extends ConsumerStatefulWidget {
+  final OngoingActivityTask scheduledTask;
+  final CustomThemeData theme;
+
+  const ScheduledTaskDetailsSheet({
+    required this.scheduledTask,
+    required this.theme,
+    super.key,
+  });
+
+  @override
+  ConsumerState<ScheduledTaskDetailsSheet> createState() =>
+      _ScheduledTaskDetailsSheetState();
+}
+
+class _ScheduledTaskDetailsSheetState
+    extends ConsumerState<ScheduledTaskDetailsSheet> {
+  bool _isLoading = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      color: widget.theme.backgroundColor,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(widget.scheduledTask.task.name, style: TextStyles.h6),
+          verticalSpace(Spacing.points8),
+          Text(
+            widget.scheduledTask.task.description,
+            style: TextStyles.body.copyWith(
+              color: widget.theme.grey[900],
+              height: 1.4,
+            ),
+          ),
+          verticalSpace(Spacing.points16),
+          Text(
+            '${AppLocalizations.of(context).translate("scheduled-for")}: ${getDisplayDate(widget.scheduledTask.taskDatetime, Localizations.localeOf(context).languageCode)}',
+            style: TextStyles.small,
+          ),
+          verticalSpace(Spacing.points24),
+          if (!widget.scheduledTask.isCompleted) ...[
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: _isLoading
+                    ? null
+                    : () async {
+                        setState(() {
+                          _isLoading = true;
+                        });
+                        try {
+                          await ref
+                              .read(ongoingActivityDetailsNotifierProvider(
+                                      widget.scheduledTask.activityId)
+                                  .notifier)
+                              .updateTaskCompletion(
+                                  widget.scheduledTask.scheduledTaskId, true);
+                          Navigator.pop(context);
+                        } finally {
+                          if (mounted) {
+                            setState(() {
+                              _isLoading = false;
+                            });
+                          }
+                        }
+                      },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: widget.theme.primary[600],
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  shape: SmoothRectangleBorder(
+                    borderRadius: SmoothBorderRadius(
+                      cornerRadius: 10.5,
+                      cornerSmoothing: 1,
+                    ),
+                  ),
+                ),
+                child: _isLoading
+                    ? Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          SizedBox(
+                            width: 16,
+                            height: 16,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                  widget.theme.primary[50]!),
+                            ),
+                          ),
+                          horizontalSpace(Spacing.points8),
+                          Text(
+                            AppLocalizations.of(context)
+                                .translate('processing'),
+                            style: TextStyles.body
+                                .copyWith(color: widget.theme.primary[50]),
+                          ),
+                        ],
+                      )
+                    : Text(
+                        AppLocalizations.of(context)
+                            .translate('mark-as-complete'),
+                        style: TextStyles.body.copyWith(color: Colors.white),
+                      ),
+              ),
+            ),
+          ] else ...[
+            Column(
+              children: [
+                Center(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.check_circle,
+                          color: widget.theme.success[600]),
+                      horizontalSpace(Spacing.points8),
+                      Text(
+                        AppLocalizations.of(context)
+                            .translate('task-completed'),
+                        style: TextStyles.body
+                            .copyWith(color: widget.theme.success[600]),
+                      ),
+                    ],
+                  ),
+                ),
+                verticalSpace(Spacing.points16),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: _isLoading
+                        ? null
+                        : () async {
+                            setState(() {
+                              _isLoading = true;
+                            });
+                            try {
+                              await ref
+                                  .read(ongoingActivityDetailsNotifierProvider(
+                                          widget.scheduledTask.activityId)
+                                      .notifier)
+                                  .updateTaskCompletion(
+                                      widget.scheduledTask.scheduledTaskId,
+                                      false);
+                              Navigator.pop(context);
+                            } finally {
+                              if (mounted) {
+                                setState(() {
+                                  _isLoading = false;
+                                });
+                              }
+                            }
+                          },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: widget.theme.warn[700],
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      shape: SmoothRectangleBorder(
+                        borderRadius: SmoothBorderRadius(
+                          cornerRadius: 10.5,
+                          cornerSmoothing: 1,
+                        ),
+                      ),
+                    ),
+                    child: _isLoading
+                        ? Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              SizedBox(
+                                width: 16,
+                                height: 16,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                      widget.theme.error[50]!),
+                                ),
+                              ),
+                              horizontalSpace(Spacing.points8),
+                              Text(
+                                AppLocalizations.of(context)
+                                    .translate('processing'),
+                                style: TextStyles.body
+                                    .copyWith(color: widget.theme.error[50]),
+                              ),
+                            ],
+                          )
+                        : Text(
+                            AppLocalizations.of(context)
+                                .translate('mark-as-incomplete'),
+                            style:
+                                TextStyles.body.copyWith(color: Colors.white),
+                          ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: () {
+                HapticFeedback.lightImpact();
+                Navigator.pop(context);
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: widget.theme.backgroundColor,
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                side: BorderSide(color: widget.theme.grey[600]!, width: 0.5),
+                shape: SmoothRectangleBorder(
+                  borderRadius: SmoothBorderRadius(
+                    cornerRadius: 10.5,
+                    cornerSmoothing: 1,
+                  ),
+                ),
+              ),
+              child: Text(
+                AppLocalizations.of(context).translate('close'),
+                style:
+                    TextStyles.caption.copyWith(color: widget.theme.grey[900]),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
 
