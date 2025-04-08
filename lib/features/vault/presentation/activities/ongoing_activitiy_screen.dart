@@ -518,12 +518,15 @@ class _ScheduledTaskDetailsSheetState
             Column(
               children: [
                 Center(
-                  child: Row(
+                  child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.check_circle,
-                          color: widget.theme.success[600]),
-                      horizontalSpace(Spacing.points8),
+                      Icon(
+                        LucideIcons.badgeCheck,
+                        color: widget.theme.success[600],
+                        size: 64,
+                      ),
+                      verticalSpace(Spacing.points8),
                       Text(
                         AppLocalizations.of(context)
                             .translate('task-completed'),
@@ -561,7 +564,7 @@ class _ScheduledTaskDetailsSheetState
                             }
                           },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: widget.theme.warn[700],
+                      backgroundColor: widget.theme.warn[50],
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       shape: SmoothRectangleBorder(
                         borderRadius: SmoothBorderRadius(
@@ -588,15 +591,16 @@ class _ScheduledTaskDetailsSheetState
                                 AppLocalizations.of(context)
                                     .translate('processing'),
                                 style: TextStyles.body
-                                    .copyWith(color: widget.theme.error[50]),
+                                    .copyWith(color: widget.theme.warn[800]),
                               ),
                             ],
                           )
                         : Text(
                             AppLocalizations.of(context)
                                 .translate('mark-as-incomplete'),
-                            style:
-                                TextStyles.body.copyWith(color: Colors.white),
+                            style: TextStyles.body.copyWith(
+                              color: widget.theme.warn[600],
+                            ),
                           ),
                   ),
                 ),
