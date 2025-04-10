@@ -499,5 +499,16 @@
   "community-feature-2": "Share your progress and achievements",
   "community-feature-3": "Join support groups and discussions",
   "community-feature-4": "Get motivated by others' success stories",
-  "community-feature-5": "Private and anonymous interactions"
+  "community-feature-5": "Private and anonymous interactions",
+  "community_coming_soon_title": "Community Coming Soon!",
+  "community_coming_soon_description": "We're building a supportive community where you can connect with others on their recovery journey. Stay tuned for updates!",
+  "community_feature_1": "Connect with others in recovery",
+  "community_feature_2": "Share your experiences and insights",
+  "community_feature_3": "Get support from peers and professionals",
+  "notify_me": "Notify Me When Available",
+  "im_interested": "I'm Interested",
+  "interest_recorded_success": "Thank you for your interest! We'll keep you updated.",
+  "interest_already_recorded": "You've already shown interest in this feature!",
+  "error_recording_interest": "Sorry, there was an error. Please try again later.",
+  "already_interested": "You've already shown interest in this feature!"
 }

@@ -493,11 +493,22 @@
   "task-completed": "تم إكمال المهمة",
   "mark-as-incomplete": "تحديد كغير مكتمل",
   "community-coming-soon": "مجتمع تعافي قريبًا!",
+  "already_interested": "لقد أبديت اهتمامك بالفعل",
   "community-coming-soon-description": "نحن نعمل بجد لتقديم ميزة مجتمعية رائعة. ترقبوا التحديثات!",
   "community-features": "ما يمكنك توقعه:",
   "community-feature-1": "تواصل مع الآخرين في نفس رحلة التعافي",
   "community-feature-2": "شارك تقدمك وإنجازاتك",
   "community-feature-3": "انضم إلى مجموعات الدعم والنقاشات",
   "community-feature-4": "استمد التحفيز من قصص نجاح الآخرين",
-  "community-feature-5": "تفاعلات خاصة ومجهولة الهوية"
+  "community-feature-5": "تفاعلات خاصة ومجهولة الهوية",
+  "community_coming_soon_title": "المجتمع قادم قريباً!",
+  "community_coming_soon_description": "نحن نبني مجتمعاً داعماً حيث يمكنك التواصل مع الآخرين في رحلة تعافيهم. ترقبوا التحديثات!",
+  "community_feature_1": "تواصل مع الآخرين في رحلة التعافي",
+  "community_feature_2": "شارك تجاربك وأفكارك",
+  "community_feature_3": "احصل على الدعم من الأقران والمتخصصين",
+  "notify_me": "أخبرني عند التوفر",
+  "im_interested": "أنا مهتم",
+  "interest_recorded_success": "شكراً لاهتمامك! سنبقيك على اطلاع.",
+  "interest_already_recorded": "لقد أبديت اهتمامك بهذه الميزة بالفعل!",
+  "error_recording_interest": "عذراً، حدث خطأ. يرجى المحاولة مرة أخرى لاحقاً."
 }
