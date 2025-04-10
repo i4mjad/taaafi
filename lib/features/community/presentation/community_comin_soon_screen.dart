@@ -15,7 +15,7 @@ class CommunityComingSoonScreen extends ConsumerWidget {
     final l10n = AppLocalizations.of(context);
 
     return Scaffold(
-      backgroundColor: theme.backgroundColor[50],
+      backgroundColor: theme.backgroundColor,
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
