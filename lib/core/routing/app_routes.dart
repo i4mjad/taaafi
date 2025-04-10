@@ -17,6 +17,7 @@ import 'package:reboot_app_3/features/authentication/presentation/login_screen.d
 import 'package:reboot_app_3/features/authentication/presentation/signup_screen.dart';
 import 'package:reboot_app_3/features/authentication/providers/user_document_provider.dart';
 import 'package:reboot_app_3/features/authentication/data/repositories/auth_repository.dart';
+import 'package:reboot_app_3/features/community/presentation/community_comin_soon_screen.dart';
 import 'package:reboot_app_3/features/home/presentation/day_overview/day_overview_screen.dart';
 import 'package:reboot_app_3/features/home/presentation/home/home_screen.dart';
 import 'package:reboot_app_3/features/onboarding/presentation/onboarding_screen.dart';
@@ -217,6 +218,23 @@ GoRouter goRouter(GoRouterRef ref) {
             ],
           ),
           StatefulShellBranch(
+            navigatorKey: shellNavigatorFellowshipKey,
+            routes: [
+              GoRoute(
+                name: RouteNames.community.name,
+                path: '/community',
+                pageBuilder: (context, state) => NoTransitionPage<void>(
+                  key: state.pageKey,
+                  name: state.name,
+                  child: CommunityComingSoonScreen(),
+                ),
+                routes: [
+                  //! Add Pages
+                ],
+              ),
+            ],
+          ),
+          StatefulShellBranch(
             navigatorKey: shellNavigatorVaultKey,
             observers: [
               GoRouterObserver(ref.read(analyticsFacadeProvider)),
@@ -364,24 +382,6 @@ GoRouter goRouter(GoRouterRef ref) {
               ),
             ],
           ),
-          // StatefulShellBranch(
-          //   navigatorKey: shellNavigatorFellowshipKey,
-          //   routes: [
-          //     GoRoute(
-          //       name: RouteNames.ta3afiPlus.name,
-          //       path: '/ta3afi-plus',
-          //       pageBuilder: (context, state) => NoTransitionPage<void>(
-          //         key: state.pageKey,
-          //         name: state.name,
-          //         child: TaaafiPlusScreen(),
-          //       ),
-          //       routes: [
-          //         //! Add Pages
-          //       ],
-          //     ),
-          //   ],
-          // ),
-
           StatefulShellBranch(
             navigatorKey: shellNavigatorAccountKey,
             observers: [

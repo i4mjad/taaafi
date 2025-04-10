@@ -1,5 +1,4 @@
 {
-  
   "daily": "Daily",
   "weekly": "Weekly",
   "monthly": "Monthly",
@@ -12,15 +11,11 @@
   "enable": "Enable",
   "primary-color": "Primary Color",
   "delete-diary-warning": "This action cannot be undone. The diary will be permanently deleted.",
-
   "vault-settings": "Vault Settings",
-  
   "warning": "Warning",
   "delete-activity-warning": "This action cannot be undone. All progress for this activity will be permanently deleted.",
-  
   "start-date": "Start Date",
   "end-date": "End Date",
-  
   "dates-must-be-different": "New dates must be different from current dates",
   "cannot-complete-future-tasks": "Cannot complete tasks scheduled for future dates",
   "already-subscribed-to-activity": "You are already subscribed to this activity",
@@ -39,7 +34,7 @@
   "erase-all-activities": "Erase All Activities",
   "erase-all-bookmarks": "Erase All Bookmarks",
   "erase-all-diaries": "Erase All Diaries",
-  "featured-lists":"Featured Lists",
+  "featured-lists": "Featured Lists",
   "new-diary": "New Diary",
   "activities-settings": "Activities Settings",
   "activities-reminders": "Activities Reminders",
@@ -66,58 +61,40 @@
   "connection": "Connection",
   "determination": "Determination",
   "peace": "Peace",
-  "today-tasks":"Today Tasks",
-
-  "ongoing-activities":"Ongoing Activities",
-
-  "all-tasks":"All Tasks",
-
-  "add-activity":"Add Activity",
-
-  "easy":"Easy",
-  "medium":"Medium",
-  "hard":"Hard",
-
-  "activity-tasks":"Activity Tasks",
-  "close":"Close",
-
-  "activity-period":"Activity period",
-
-  "activity-period-is-not-valid":"The period between start and end date cannot exceed 90 days.",
-
-  "add-the-activity":"Add the activity",
-
+  "today-tasks": "Today Tasks",
+  "ongoing-activities": "Ongoing Activities",
+  "all-tasks": "All Tasks",
+  "add-activity": "Add Activity",
+  "easy": "Easy",
+  "medium": "Medium",
+  "hard": "Hard",
+  "activity-tasks": "Activity Tasks",
+  "close": "Close",
+  "activity-period": "Activity period",
+  "activity-period-is-not-valid": "The period between start and end date cannot exceed 90 days.",
+  "add-the-activity": "Add the activity",
   "starter": "Starter",
   "intermediate": "Intermediate",
   "advanced": "Advanced",
   "expert": "Expert",
-
-  "activity-level":"Activity Level: ",
+  "activity-level": "Activity Level: ",
   "ongoing-activity-starting-date": "Starting Date: ",
-  "activity-progress":"Activity Progress: ",
-
-  "date":"Date",
-  "subscriber":"Subscriber",
-
-  "month":"Month/s",
-
-  "all-levels":"All Levels",
-
-  "list-content":"List Content",
-
-  "activities":"Activities",
-  "linked-activities":"Linked Activities",
-
-  "diary-settings":"Diary Settings",
-
-  "heading":"Heading",
-  "bold":"Bold",
-  "italic":"Italic",
-  "quote":"''Quote''",
-  "list":"- List",
-
-  "vault-p":"Your personal space, where you can write your diaries, challenge your self to become better person",
-  "statistics":"Statistics",
+  "activity-progress": "Activity Progress: ",
+  "date": "Date",
+  "subscriber": "Subscriber",
+  "month": "Month/s",
+  "all-levels": "All Levels",
+  "list-content": "List Content",
+  "activities": "Activities",
+  "linked-activities": "Linked Activities",
+  "diary-settings": "Diary Settings",
+  "heading": "Heading",
+  "bold": "Bold",
+  "italic": "Italic",
+  "quote": "''Quote''",
+  "list": "- List",
+  "vault-p": "Your personal space, where you can write your diaries, challenge your self to become better person",
+  "statistics": "Statistics",
   "articles": "Articles",
   "article": "Article",
   "tutorial": "Tutorial",
@@ -134,33 +111,25 @@
   "Blogs": "Blogs",
   "relapses-30-days": "In the last 30 days",
   "rate-app": "Rate the app",
-
   "free-days-from-start": "Total free days!",
   "changed-to-en": "Language has been changed to English",
   "changed-to-ar": "تم تغيير اللغة إلى العربية",
   "night-mode": "Night Mode",
   "on": "On",
   "off": "Off",
-
   "title": "Title",
   "body": "Body",
-
   "delete": "Delete",
   "save": "Save",
-  "changes-has-been-saved":"Changes has been saved",
-  "library-search-placeholder":"Search for a video, book ...etc",
-
+  "changes-has-been-saved": "Changes has been saved",
+  "library-search-placeholder": "Search for a video, book ...etc",
   "latest-additions": "Latest Additions",
-
   "confirm-note-delete": "Confirm Note Deleting",
-
-  "activity-performance":"Performance",
-  "activity-settings":"Activity Settings",
+  "activity-performance": "Performance",
+  "activity-settings": "Activity Settings",
   "remove-activity": "Remove Activity",
-
-  "taaafi-groups":"Ta'aafi Groups",
-
-  "group":"Group",
+  "taaafi-groups": "Ta'aafi Groups",
+  "group": "Group",
   "not-alone": "You Are Not Alone",
   "not-alone-description": "Learn about different experiences and share your own with a group of recovering individuals to exchange knowledge and discover challenges in the recovery journey.",
   "privacy-first": "Privacy First!",
@@ -169,18 +138,14 @@
   "challenge-peers-description": "Challenge your peers in the recovery journey to achieve advanced stages in the process.",
   "follow-up-peers": "Follow Up on Your Peers",
   "follow-up-peers-description": "Keep up with updates from your peers in the fellowship, help them, and benefit from their recovery experiences.",
-
   "starting-date": "Starting date and time",
   "activity-starting-date": "Activity starting date and time",
   "activity-ending-date": "Activity ending date and time",
-  "please-enter-a-starting-date":"Please enter the starting date",
-  "please-enter-an-ending-date":"Please enter the ending date",
-
-  "please-add-all-required-data":"Please fill the required fields",
-
+  "please-enter-a-starting-date": "Please enter the starting date",
+  "please-enter-an-ending-date": "Please enter the ending date",
+  "please-add-all-required-data": "Please fill the required fields",
   "starting-date-p": "This represent the starting date and time of your journy. You can change it later in the Account settings",
   "without-starting-date-p": "This represent the starting date and time of your journy. You have to set it to continue using the app",
-
   "confirm-your-details-p": "Confirm the following information are correct:",
   "user-name": "User Name",
   "user-email": "User Email",
@@ -192,19 +157,14 @@
   "account": "Account",
   "about": "About",
   "log-out": "Log Out",
-
   "complete-account-registeration": "Complete Registeration",
   "terms-should-be-accepted": "Terms should be accepted",
   "sponsored-by": "A Partnership With:",
   "update-profile": "Update Profile",
-
   "profile-updated": "Your profile has been updated!",
-
   "years": "Years",
   "admin": "Admin",
   "user": "User",
-  
-
   "cant-be-empty": "This field can't be empty",
   "enter-a-valid-dob": "Enter a valid Day of Birth",
   "wrong-password": "The password you entered is incorrect for this email, or the account does not have a password set.",
@@ -239,34 +199,24 @@
   "reboot-calender": "Calender",
   "relapses-by-day-of-week": "Relapses By Day-of-Week",
   "streaks": "Streaks",
-
-
-  "day":"Day",
+  "day": "Day",
   "today-is-last-relapse": "This day recorded as a Relapse, you can't followup today",
   "how-is-this-day": "How was this day?",
-
-  "what-you-want-to-add":"What do you want to add?",
-
-  "required-update":"New Version Available!",
-  "update-now":"Update now",
-  "role":"Account Type",
-  "required-update-p":"You can't use this version, update to the latest version.",
-
-  "account-deleted":"Account deleted successfully",
-  "delete-account-activities":"Delete Activities",
-  "delete-account-activities-desc":"All activities will be deleted",
-
-  "cannot-login-with-apple":"You can't login with Apple",
-
+  "what-you-want-to-add": "What do you want to add?",
+  "required-update": "New Version Available!",
+  "update-now": "Update now",
+  "role": "Account Type",
+  "required-update-p": "You can't use this version, update to the latest version.",
+  "account-deleted": "Account deleted successfully",
+  "delete-account-activities": "Delete Activities",
+  "delete-account-activities-desc": "All activities will be deleted",
+  "cannot-login-with-apple": "You can't login with Apple",
   "logged-out-successfully": "Logged out successfully",
   "data-updated-successfully": "Data updated successfully",
-  "followups":"Followups",
+  "followups": "Followups",
   "daily-follow-ups": "Daily follow ups",
-
   "daily-follow-ups-delete-desc": "All previous daily follow-ups will be deleted",
-
   "emotions-delete-desc": "All recorded emotions will be deleted",
-
   "account-settings": "User Information",
   "app-settings": "Settings",
   "user_name": "User Name",
@@ -278,11 +228,11 @@
   "delete-duplicates": "Delete Duplicates",
   "duplicates-deleted": "Duplicates deleted successfully",
   "delete-duplicates-description": "Some users have duplicates in their daily follow-ups, you can delete the duplicates by clicking the button below",
-  "ta3afi-plus":"Ta'aafi +",
+  "ta3afi-plus": "Ta'aafi +",
   "home-settings": "Home Settings",
   "quick-access": "Quick Access",
   "you-can-hide-any-of-those": "Choose what suits you best from relapse, porn, masturbation, and slip-up statistics to focus on the goals you want to track. Click here to show or hide the statistic",
-  "emotions":"Emotions",
+  "emotions": "Emotions",
   "exercises-description-home-description": "Various Activities specially designed to help you in your recovery journey, step by step towards your goal",
   "activities-home-headings": "Activities, step by step towards recovery",
   "no-follow-ups-for-today": "Great job! Another day of success and progress in your recovery journey. Keep going, you're making change!",
@@ -298,51 +248,37 @@
   "support-app-development": "Support App Development",
   "support-app-development-p": "App development takes a lot of time and effort, yet it remains free and ad-free. If you want to support the development, choose from the following options",
   "contact-us": "Contact us through the following platforms:",
-
   "new-note": "New Note",
   "ta3afi": "Ta'aafi App",
   "taaafi-platform": "Ta'aafi Platform",
-
-  "diaries":"Diaries",
-
-  "follow-up":"Add Follow-Up",
-
+  "diaries": "Diaries",
+  "follow-up": "Add Follow-Up",
   "login": "Login",
   "email": "Email",
   "password": "Password",
   "forget-password": "Forget Password",
   "send-reset-password-link": "Send passowrd reset link",
-
   "confirm-your-details": "Confirm your details",
-
   "sign-up": "Sign Up",
   "login-button": "Login",
   "login-button-p": "Chose your sign in method",
   "or-login-with": "Or Login With:",
   "or-relogin-with": "Or Re-login With:",
-
   "reset-your-password": "Reset Your Password",
   "reset-fillters": "Reset Filters",
   "content-language": "Content Language",
-
   "first-name": "First Name",
   "last-name": "Last Name",
   "repeat-password": "Repeat Password",
-
   "search": "Search",
   "loading": "Loading content...",
-
-
-  "sad":"Sad",
-  "regret":"Regret",
-  "anxious":"Anxious",
-  "fear":"Fear",
-
+  "sad": "Sad",
+  "regret": "Regret",
+  "anxious": "Anxious",
+  "fear": "Fear",
   "posted-at": "Posted at: ",
   "share-app": "Your opinion matters!",
-
   "share-app-p": "Share your suggestions, or success story!",
-
   "sat": "Saturday",
   "sun": "Sunday",
   "mon": "Monday",
@@ -350,13 +286,9 @@
   "wed": "Wednesday",
   "thu": "Thursday",
   "fri": "Friday",
-
   "developed-by": "Developed by: Amjad Al-Sulimani",
   "change-lang": "Change Language",
   "ui-settings": "UI and Language Settings",
-
-
-
   "happy": "Happy",
   "gratitude": "Gratitude",
   "serenity": "Serenity",
@@ -370,114 +302,83 @@
   "slipUp": "Slip up",
   "pornOnly": "Porn Only",
   "mastOnly": "Mast Only",
-
   "negative-feelings": "Negative Feelings",
   "positive-feelings": "Positive Feelings",
-
-  "day-overview":"Day Overview",
-
-  "how-do-you-feel":"How do you feel?",
-
-  "angry":"Angry",
-
+  "day-overview": "Day Overview",
+  "how-do-you-feel": "How do you feel?",
+  "angry": "Angry",
   "Article": "Article",
   "Video": "Video",
   "Book": "Book",
   "Blog": "Articals",
-
   "delete-user-dialog-confirm-button": "Confirm",
   "delete-user-dialog-back-button": "Back",
   "delete-user-dialog-title": "Account Data Reset",
   "delete-user-dialog-content": "Your data will NOT be able to restored, are you sure?",
-
   "out-of-range": "Error",
   "out-of-range-p": "You can't edit this date",
-
-  "start-from-today":"Start from today",
-
+  "start-from-today": "Start from today",
   "follow-up-dialog-yes-button": "Yes",
   "follow-up-dialog-no-button": "No",
   "follow-up-dialog-title": "Daily Follow up",
   "follow-up-dialog-content": "Did you watched any porn today?",
-
   "new-user-dialog-start-button": "Start",
   "new-user-dialog-new-start-button": "New Beginning",
   "new-user-dialog-hint-test-field": "Enter Current Streak",
   "new-user-dialog-title": "Ongoing streak?",
   "new-user-dialog-content": "If you've started before please enter your Current streak and click Start, if not, click New Beginning",
-
   "nofap-content": "NoFap Content",
-  "library":"Library",
-  "settings":"Settings",
+  "library": "Library",
+  "settings": "Settings",
   "explore-content": "Explore Content",
   "explore-articles": "ِExplore Articles",
   "explore-tutorials": "ِExplore Tutorials",
   "explore": "Explore",
-
   "explore-p": "Explore Articles & Tutorials",
   "tutorials": "Tutorials",
-
   "my-profile": "My Profile",
   "my-posts": "My Posts",
   "my-likes": "My Likes",
-
   "small-tip": "Small Tip",
   "mid-tip": "Mediumn Tip",
   "high-tip": "Big Tip",
   "massive-tip": "Huge Tip",
   "subscription-tip": "Monthly Tip",
-
   "search-filters": "Search Filters",
   "content-category": "Contant Category",
   "content-type": "Contant Type",
   "apply-filters": "Apply",
-
-  "one-week":"One Week",
-  "one-month":"One Month",
-  "three-months":"Three Months",
-
+  "one-week": "One Week",
+  "one-month": "One Month",
+  "three-months": "Three Months",
   "lock-app": "Lock App",
-
-  "no-data":"No data",
-
+  "no-data": "No data",
   "highest-streak": "Highest Streak",
   "relapses-average": "Relapses in The Last 7/28/90 Days",
   "relapses-count": "No-Relapses\nDays",
-
   "no-relapses": "No Relapses",
-
   "7-days": "/ 7 Days",
   "28-days": "/ 28 Days",
   "90-days": "/ 90 Days",
-
   "delete-my-data-p": "Do you want to start from the beginning? or start from a specific date insted?",
   "delete-my-data-warning": "WARNING: You can't undo this action after it's done.",
-
   "new-begining": "New Beginning",
   "start-from-specific-date": "Specific Date",
-
   "delete-my-account": "Delete My Account",
   "delete-my-account-p": "We're sorry to see you go. For security purposes, we need to re-authenticate you to be able to delete your account. Please select the provider you used to sign up",
-
   "signin-provider": "Signed In with:",
   "last-signin": "Last Sign in",
-
   "confirm-account-delete": "Confirm Account Delete",
   "confirm-account-delete-p": "ٌYou Can't restore anything after you confirm",
-
   "delete-account-button": "Confirm Delete",
   "minutes": "Minutes",
-
   "no-donations-offer": "ُThere's somthing wrong, please try again",
   "relapses-average-p": "ُThese averages depends on the total days since your first date until today",
-
   "only-ar": "Only arabic content is available now",
   "share-suggestion": "Share Your Suggestions",
-
   "hi": "Hi, ",
   "support": "Support",
   "support-p": "Available on Telegram only",
-
   "fyr": "Journey",
   "personal-details": "Personal Details",
   "free-day-recorded": "Success Day, Good Job!",
@@ -493,16 +394,12 @@
   "preferred-language": "Preferred Language",
   "activate": "Activate",
   "data-are-secured": "We keep your information secure and private.",
-
-  "no-follow-ups":"No Follow Up for this day",
-  "add-follow-ups":"Add Follow up",
-
-  "no-notes":"No Diaries for this day",
-  "add-note":"Add Diaries",
-
-  "no-emotions":"No Emotions added for this day",
-  "add-emotions":"Add Emotions",
-
+  "no-follow-ups": "No Follow Up for this day",
+  "add-follow-ups": "Add Follow up",
+  "no-notes": "No Diaries for this day",
+  "add-note": "Add Diaries",
+  "no-emotions": "No Emotions added for this day",
+  "add-emotions": "Add Emotions",
   "delete-account-info": "When you delete your account, the following will happen:",
   "delete-account-data": "Delete Account Data",
   "delete-account-data-desc": "All your account data will be permanently deleted.",
@@ -556,16 +453,12 @@
   "reset-to-today": "Reset start date to today",
   "vault-title": "The Vault, Your Private Space",
   "vault-description": "Recovery journey needs a safe space, that's why we added the vault—your private space to document your progress. Here, you'll find new diaries, exercises, and a rich library of inspiring content. The vault is your first step towards real and sustainable change.",
-
   "exercises-title": "Activities, Step by Step Towards Recovery",
   "exercises-description": "To face challenges, we offer you exercises, a set of tasks designed with multiple levels to suit your needs, whether daily, weekly, or monthly. Each exercise is another step that steadily brings you closer to your goal.",
-
   "lists-title": "Lists, A Recovery Guide in Your Hands",
   "lists-description": "Your journey towards recovery has become clearer with the lists—a carefully curated collection from the Ta'afi team, covering important topics that help increase your awareness and understanding of addiction challenges, giving you deeper insight and better support.",
-
   "reminders-title": "Reminders, Don't Miss Any Step",
   "reminders-description": "Now you can add reminders to easily follow up on exercise tasks. Set your schedules and let the app remind you of your next steps, making your recovery more regular and continuous.",
-
   "name-should-not-be-empty": "Name field cannot be empty",
   "email-should-not-be-empty": "Email field cannot be empty",
   "something-went-wrong": "Something went wrong. Please try again.",
@@ -590,15 +483,21 @@
   "diaries-description": "Diaries are your private space to document your recovery journey. You can write your thoughts, feelings, and daily experiences in a safe and private place.",
   "current-dates": "Current Dates",
   "new-dates": "New Dates",
-  
   "activity-start-date-cannot-be-before-today": "Activity start date cannot be before today",
   "error-updating-activity": "Error updating activity",
   "update": "Update",
   "update-activity-dates": "Update Activity Dates",
   "update-activity-warning": "Warning: This will reset all scheduled tasks. Your previous progress will be marked as deleted.",
-
   "scheduled-for": "Scheduled for",
   "mark-as-complete": "Mark as Complete",
   "task-completed": "Task Completed",
-  "mark-as-incomplete": "Mark as Incomplete"
+  "mark-as-incomplete": "Mark as Incomplete",
+  "community-coming-soon": "Ta'aafi Community Coming Soon!",
+  "community-coming-soon-description": "We're working hard to bring you an amazing community feature. Stay tuned for updates!",
+  "community-features": "What to expect:",
+  "community-feature-1": "Connect with others on the same recovery journey",
+  "community-feature-2": "Share your progress and achievements",
+  "community-feature-3": "Join support groups and discussions",
+  "community-feature-4": "Get motivated by others' success stories",
+  "community-feature-5": "Private and anonymous interactions"
 }

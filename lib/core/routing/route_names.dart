@@ -28,4 +28,5 @@ enum RouteNames {
   contentLists,
   vaultSettings,
   activitiesNotifications,
+  community,
 }

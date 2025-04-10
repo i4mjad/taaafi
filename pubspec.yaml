@@ -33,6 +33,7 @@ dependencies:
   firebase_crashlytics: ^4.1.2
   firebase_messaging: ^15.1.2
   flutter_flavorizr: ^2.2.3
+  lottie: ^3.2.0
   firebase_remote_config: ^5.0.4
   flutter:
     sdk: flutter
@@ -232,6 +233,7 @@ flutter:
     - asset/illustrations/app-logo.png
     - asset/illustrations/vault-hero-image.svg
     - asset/illustrations/vault-hero-image-02.svg
+    - asset/illustrations/community-animation.json
     - asset/illustrations/plus-hero-image.svg
     - asset/icons/apple-icon.svg
     - asset/icons/google-icon.svg
