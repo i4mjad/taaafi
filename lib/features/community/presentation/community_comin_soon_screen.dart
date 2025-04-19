@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lottie/lottie.dart';
+import 'package:reboot_app_3/core/shared_widgets/container.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
@@ -46,37 +47,33 @@ class CommunityComingSoonScreen extends ConsumerWidget {
                   ),
                 ),
                 const SizedBox(height: 16),
-                Padding(
-                  padding: const EdgeInsets.only(right: 32, left: 32),
-                  child: Column(
-                    children: [
-                      _buildFeatureItem(
-                        context,
-                        l10n.translate('community-feature-1'),
-                        LucideIcons.users,
-                      ),
-                      _buildFeatureItem(
-                        context,
-                        l10n.translate('community-feature-2'),
-                        LucideIcons.trophy,
-                      ),
-                      // _buildFeatureItem(
-                      //   context,
-                      //   l10n.translate('community-feature-3'),
-                      //   LucideIcons.messageCircle,
-                      // ),
-                      _buildFeatureItem(
-                        context,
-                        l10n.translate('community-feature-4'),
-                        LucideIcons.heartHandshake,
-                      ),
-                      _buildFeatureItem(
-                        context,
-                        l10n.translate('community-feature-5'),
-                        LucideIcons.shieldCheck,
-                      ),
-                    ],
-                  ),
+                _buildFeatureItem(
+                  context,
+                  l10n.translate('community-feature-1'),
+                  LucideIcons.users,
+                ),
+                const SizedBox(height: 16),
+                _buildFeatureItem(
+                  context,
+                  l10n.translate('community-feature-2'),
+                  LucideIcons.trophy,
+                ),
+                const SizedBox(height: 16),
+                // _buildFeatureItem(
+                //   context,
+                //   l10n.translate('community-feature-3'),
+                //   LucideIcons.messageCircle,
+                // ),
+                _buildFeatureItem(
+                  context,
+                  l10n.translate('community-feature-4'),
+                  LucideIcons.heartHandshake,
+                ),
+                const SizedBox(height: 16),
+                _buildFeatureItem(
+                  context,
+                  l10n.translate('community-feature-5'),
+                  LucideIcons.shieldCheck,
                 ),
               ],
             ),
@@ -88,8 +85,13 @@ class CommunityComingSoonScreen extends ConsumerWidget {
 
   Widget _buildFeatureItem(BuildContext context, String text, IconData icon) {
     final theme = AppTheme.of(context);
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12.0),
+    return WidgetsContainer(
+      backgroundColor: theme.backgroundColor,
+      // boxShadow: Shadows.mainShadows,
+      borderSide: BorderSide(
+        color: theme.grey[200]!,
+        width: 0.75,
+      ),
       child: Row(
         children: [
           Icon(
@@ -102,7 +104,6 @@ class CommunityComingSoonScreen extends ConsumerWidget {
             child: Text(
               text,
               style: TextStyles.footnote.copyWith(
-                fontSize: 20,
                 height: 1.5,
               ),
             ),
