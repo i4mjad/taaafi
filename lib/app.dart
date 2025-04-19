@@ -15,6 +15,8 @@ import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/core/theming/theme_provider.dart';
 import 'package:reboot_app_3/core/theming/color_theme_provider.dart';
 import 'package:reboot_app_3/core/utils/firebase_remote_config_provider.dart';
+import 'package:reboot_app_3/core/utils/url_launcher_provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class MyApp extends ConsumerWidget {
   @override
@@ -47,25 +49,37 @@ class MyApp extends ConsumerWidget {
         debugShowCheckedModeBanner: false,
         theme: theme.darkTheme ? darkTheme : getLightTheme(colorTheme),
         builder: (_, child) {
-          return ForceUpdateWidget(
-            navigatorKey: rootNavigatorKey,
-            allowCancel: false,
-            showForceUpdateAlert: (context, show) async {
-              return show;
-            },
-            showStoreListing: (uri) async {
-              return;
-            },
-            forceUpdateClient: ForceUpdateClient(
-              fetchRequiredVersion: () async {
-                final remoteConfig =
-                    await ref.read(firebaseRemoteConfigProvider.future);
-                return remoteConfig.getString('required_version_test');
+          return AppStartupWidget(
+            onLoaded: (_) => ForceUpdateWidget(
+              navigatorKey: rootNavigatorKey,
+              allowCancel: false,
+              showForceUpdateAlert: (context, allowCancel) => showAlertDialog(
+                context: context,
+                title:
+                    AppLocalizations.of(context).translate("required-update"),
+                content:
+                    AppLocalizations.of(context).translate("required-update-p"),
+                cancelActionText: allowCancel
+                    ? AppLocalizations.of(context).translate("later")
+                    : null,
+                defaultActionText:
+                    AppLocalizations.of(context).translate("update-now"),
+              ),
+              showStoreListing: (uri) async {
+                ref.read(urlLauncherProvider).launch(
+                      uri,
+                      mode: LaunchMode.externalApplication,
+                    );
               },
-              iosAppStoreId: "1531562469",
-            ),
-            child: AppStartupWidget(
-              onLoaded: (_) => child!,
+              forceUpdateClient: ForceUpdateClient(
+                fetchRequiredVersion: () async {
+                  final remoteConfig =
+                      await ref.read(firebaseRemoteConfigProvider.future);
+                  return remoteConfig.getString('required_version');
+                },
+                iosAppStoreId: "1531562469",
+              ),
+              child: child!,
             ),
           );
         },
@@ -93,8 +107,10 @@ Future<bool?> showAlertDialog({
       barrierDismissible: false,
       routeSettings: RouteSettings(name: routeName),
       builder: (context) => AlertDialog(
-        title: Text(title, style: TextStyles.h6),
-        content: Text(content, style: TextStyles.body),
+        title: Text(title,
+            style:
+                TextStyles.h6.copyWith(color: theme?.primary[600], height: 2)),
+        content: Text(content, style: TextStyles.footnote.copyWith(height: 2)),
         actions: [
           if (cancelActionText != null)
             TextButton(
@@ -116,8 +132,9 @@ Future<bool?> showAlertDialog({
     routeSettings: RouteSettings(name: routeName),
     builder: (context) => CupertinoAlertDialog(
       title: Text(title,
-          style: TextStyles.h6.copyWith(color: theme?.primary[600])),
-      content: Text(content, style: TextStyles.body),
+          style:
+              TextStyles.h6.copyWith(color: theme?.primary[600], height: 1.5)),
+      content: Text(content, style: TextStyles.footnote.copyWith(height: 1.4)),
       actions: [
         if (cancelActionText != null)
           CupertinoDialogAction(
