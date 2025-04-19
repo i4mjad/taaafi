@@ -24,7 +24,7 @@ Contributions are always welcome!
 
 Please consider following these steps before runing tha app:
 
-- Install Flutter with the latest stable version. Current version is `3.0.4`
+- Install Flutter with the latest stable version. Current version is `3.22.2`
 - Use `Android Studio` for development. VS Code is also a choice
 - For runing the app, use `Pixel 4` emulator or any emulator device that have Google Play Services
 
@@ -32,18 +32,17 @@ Please consider following these steps before runing tha app:
 
 | Platform | Version | Description |
 | :------- | :------ | :---------- |
-| Android  | 2.1.2   |             |
-| iOS      | 4.1.2   |             |
+| Android  | 4.2.4   |             |
+| iOS      | 4.2.4   |             |
 
 ## Development Versions
 
 | Platform | Version | Description |
 | :------- | :------ | :---------- |
-| Android  | 2.1.3   |             |
-| iOS      | 4.1.3   |             |
+| Android  | 5.0.0   |             |
+| iOS      | 5.0.0   |             |
 
 ## Future Goals
 
-- Enhance the UI/UX
 - Ta3afi Community (Later)
 - Ta3afi+ (Later)

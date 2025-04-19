@@ -1,0 +1,131 @@
+import 'package:flutter/material.dart';
+import 'package:reboot_app_3/features/vault/application/activities/all_tasks_notifier.dart';
+import 'package:reboot_app_3/features/vault/application/activities/providers.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:reboot_app_3/features/vault/data/activities/ongoing_activity_details.dart';
+import 'package:reboot_app_3/features/vault/application/activities/activity_service.dart';
+import 'package:reboot_app_3/features/vault/application/activities/today_tasks_notifier.dart';
+
+part 'ongoing_activity_details_provider.g.dart';
+
+@riverpod
+class OngoingActivityDetailsNotifier extends _$OngoingActivityDetailsNotifier {
+  ActivityService get service => ref.read(activityServiceProvider);
+
+  @override
+  FutureOr<OngoingActivityDetails> build(String activityId) async {
+    return await _getOngoingActivityDetails(activityId);
+  }
+
+  /// Fetches ongoing activity details including performance data
+  Future<OngoingActivityDetails> _getOngoingActivityDetails(
+      String activityId) async {
+    try {
+      return await service.getOngoingActivityDetails(activityId);
+    } catch (e, st) {
+      // Set state to error with proper error handling
+      state = AsyncValue.error(e, st);
+      rethrow;
+    }
+  }
+
+  Future<bool> extendActivity(
+      Duration period, Locale locale, BuildContext context) async {
+    try {
+      final currentDetails = state.value;
+      if (currentDetails == null) {
+        throw Exception('Activity details not found');
+      }
+
+      // Validate extension period
+      if (period.inDays > 90) {
+        throw Exception('Extension period cannot exceed 90 days');
+      }
+
+      // Check if we're in the first half of the activity period
+      final activityDuration =
+          currentDetails.endDate.difference(currentDetails.startDate);
+      final halfwayPoint = currentDetails.startDate.add(activityDuration ~/ 2);
+
+      // Calculate completion rate
+      final totalTasks = currentDetails.scheduledTasks.length;
+      final completedTasks = currentDetails.scheduledTasks
+          .where((task) => task.isCompleted)
+          .length;
+      final completionRate = totalTasks > 0 ? completedTasks / totalTasks : 0.0;
+
+      // Allow extension if either:
+      // 1. We're past the halfway point
+      // 2. User has completed >70% of tasks
+      if (!DateTime.now().isBefore(halfwayPoint) || completionRate > 0.7) {
+        // Set loading state before extension
+        state = const AsyncValue.loading();
+
+        // Proceed with extension
+        await service.extendActivity(
+          currentDetails.activity.id,
+          period,
+          locale,
+        );
+
+        // Refresh state with updated details
+        state = AsyncValue.data(await _getOngoingActivityDetails(activityId));
+        return true;
+      }
+
+      return false; // Return false to indicate extension not allowed
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+      rethrow;
+    }
+  }
+
+  /// Updates task completion status
+  Future<void> updateTaskCompletion(
+      String scheduledTaskId, bool isCompleted) async {
+    state = const AsyncValue.loading();
+    try {
+      await service.updateTaskCompletion(
+          activityId, scheduledTaskId, isCompleted);
+
+      // Update state with fresh data
+      final updatedDetails =
+          await service.getOngoingActivityDetails(activityId);
+      state = AsyncValue.data(updatedDetails);
+
+      // Notify other providers to refresh their data
+      await ref.read(allTasksNotifierProvider.notifier).refreshTasks();
+      ref.refresh(todayTasksProvider);
+      ref.refresh(todayTasksStreamProvider);
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+    }
+  }
+
+  /// Deletes the activity by marking it and its scheduled tasks as deleted
+  Future<void> deleteActivity() async {
+    state = const AsyncValue.loading();
+    try {
+      await service.deleteActivity(activityId);
+
+      state = AsyncValue.data(await build(activityId));
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+    }
+  }
+
+  /// Updates activity dates and reschedules tasks
+  Future<void> updateActivityDates(DateTime startDate, DateTime endDate) async {
+    state = const AsyncValue.loading();
+    try {
+      await service.updateActivityDates(activityId, startDate, endDate);
+      state = AsyncValue.data(await build(activityId));
+
+      // Refresh other providers
+
+      await ref.read(allTasksNotifierProvider.notifier).refreshTasks();
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+    }
+  }
+}

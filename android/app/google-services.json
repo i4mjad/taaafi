@@ -23,6 +23,14 @@
           }
         },
         {
+          "client_id": "364568176835-1t708slqvj0un9rh62ck92mckmgu8m9q.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.amjadkhalfan.reboot_app_3",
+            "certificate_hash": "0e064cf5a0f2d0b118ff84ff02c259203893d75b"
+          }
+        },
+        {
           "client_id": "364568176835-irsejnvii8oird446j74v70ppkhdtnj0.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {

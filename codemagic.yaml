@@ -1,13 +1,156 @@
----
 workflows:
-  android-workflow-id:
-    name:
-      Android Workflow
-      # .......
-      # .......
-      # .......
-  ios-workflow-id:
-    name: iOS Workflow
+  android-release-workflow:
+    max_build_duration: 120
+    name: Android Release Workflow
     environment:
-      flutter: fvm
-      flavor: stable
+      android_signing:
+        - android-signing-key
+      flutter: 3.24.3
+      groups:
+        - google_credentials
+        - SHOREBIRD
+      vars:
+        PACKAGE_NAME: "com.amjadkhalfan.reboot_app_3"
+        GOOGLE_PLAY_TRACK: alpha
+    scripts:
+      - name: Install Shorebird
+        script: |
+          # Install Shorebird
+          curl --proto '=https' --tlsv1.2 https://raw.githubusercontent.com/shorebirdtech/install/main/install.sh -sSf | bash
+
+          # Add Shorebird to PATH
+          echo PATH="$HOME/.shorebird/bin:$PATH" >> $CM_ENV
+      - name: Set up local.properties
+        script: |
+          echo "flutter.sdk=$HOME/programs/flutter" > "$CM_BUILD_DIR/android/local.properties"
+      - name: Get Flutter packages
+        script: |
+          flutter packages pub get
+      - name: Build AAB file (Shorebird)
+        script: |
+          VERSION=$(cat pubspec.yaml | grep 'version:' | head -1 | awk '{print $2}' | cut -d '+' -f 1)
+          LATEST_BUILD_NUMBER=$(google-play get-latest-build-number --package-name "$PACKAGE_NAME" --tracks="$GOOGLE_PLAY_TRACK")
+          BUILD_NUMBER=$((LATEST_BUILD_NUMBER + 1))
+          if [ $BUILD_NUMBER -lt 10 ]; then
+            BUILD_NUMBER="0$BUILD_NUMBER"
+          fi
+          shorebird release android --flavor prod --flutter-version=3.24.3 \
+            --build-name=$VERSION \
+            --build-number=$BUILD_NUMBER \
+            --target lib/main_prod.dart
+      
+    artifacts:
+      - build/**/outputs/**/*.aab
+      - build/**/outputs/**/mapping.txt
+      - flutter_drive.log
+    publishing:
+      email:
+        recipients:
+          - i4mjad@gmail.com
+        notify:
+          success: true
+          failure: true
+      google_play:
+        credentials: $GCLOUD_SERVICE_ACCOUNT_CREDENTIALS
+        track: closed
+        submit_as_draft: true
+        # changes_not_sent_for_review: true
+
+  ios-release-workflow:
+    name: iOS Release Workflow
+    environment:
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.amjadkhalfan.RebootApp
+      flutter: 3.24.3
+      groups:
+        - SHOREBIRD
+      vars:
+        APP_STORE_APPLE_ID: 1531562469
+    scripts:
+      - name: Install Shorebird
+        script: |
+          # Install Shorebird
+          curl --proto '=https' --tlsv1.2 https://raw.githubusercontent.com/shorebirdtech/install/main/install.sh -sSf | bash
+
+          # Add Shorebird to PATH
+          echo PATH="$HOME/.shorebird/bin:$PATH" >> $CM_ENV
+      - name: Set up code signing settings on Xcode project
+        script: xcode-project use-profiles
+      - name: Get Flutter packages
+        script: |
+          flutter packages pub get
+      - name: Install pods
+        script: |
+          find . -name "Podfile" -execdir pod install \;
+      - name: Update Info.plist
+        script: |
+          # Extract version and build number from codemagic.yaml
+          VERSION=$(cat pubspec.yaml | grep 'version:' | head -1 | awk '{print $2}' | cut -d '+' -f 1)
+          BUILD_NUMBER=$(($(app-store-connect get-latest-testflight-build-number "$APP_STORE_APPLE_ID") + 1))
+
+          # Path to Info.plist
+          PLIST_PATH="./ios/Runner/Info.plist"
+
+          # Update CFBundleShortVersionString and CFBundleVersion in Info.plist
+          /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $VERSION" "$PLIST_PATH"
+          /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $BUILD_NUMBER" "$PLIST_PATH"
+
+      - name: Flutter build ipa (Shorebird release)
+        script: |
+          VERSION=$(cat pubspec.yaml | grep 'version:' | head -1 | awk '{print $2}' | cut -d '+' -f 1)
+          BUILD_NUMBER=$(app-store-connect get-latest-testflight-build-number "$APP_STORE_APPLE_ID")
+          shorebird release ios --flavor prod --flutter-version=3.24.3 --export-options-plist=ios/buildInfo.plist
+    artifacts:
+      - build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
+      - flutter_drive.log
+    integrations:
+      app_store_connect: Taa'afi Codemagic
+    publishing:
+      email:
+        recipients:
+          - i4mjad@gmail.com
+        notify:
+          success: true
+          failure: true
+      app_store_connect:
+        auth: integration
+        submit_to_testflight: false
+
+  ios-patch-workflow:
+    name: iOS Patch Workflow
+    environment:
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.amjadkhalfan.RebootApp
+      flutter: 3.24.3
+      groups:
+        - SHOREBIRD
+      vars:
+        APP_STORE_APPLE_ID: 1531562469
+    inputs:
+      release_version:
+        description: The release version to patch
+    scripts:
+      - name: Install Shorebird
+        script: |
+          # Install Shorebird
+          curl --proto '=https' --tlsv1.2 https://raw.githubusercontent.com/shorebirdtech/install/main/install.sh -sSf | bash
+
+          # Add Shorebird to PATH
+          echo PATH="$HOME/.shorebird/bin:$PATH" >> $CM_ENV
+      - name: Set up code signing settings on Xcode project
+        script: xcode-project use-profiles
+      - name: Get Flutter packages
+        script: |
+          flutter packages pub get
+      - name: Install pods
+        script: |
+          find . -name "Podfile" -execdir pod install \;
+      - name: Shorebird Patch
+        # Run `shorebird patch ios` to patch the specified release.
+        script: |
+          shorebird patch ios --flavor prod \
+            --release-version=${{ inputs.release_version }} \
+            --export-options-plist=/Users/builder/export_options.plist
