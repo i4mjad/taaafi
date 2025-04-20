@@ -88,8 +88,8 @@ GoRouter goRouter(GoRouterRef ref) {
 
         // Check for missing required data
         if (!isLegacy && userDocumentNotifier.hasMissingData(userDocument)) {
-          if (state.matchedLocation != '/completeAccountRegisteration') {
-            return '/completeAccountRegisteration';
+          if (state.matchedLocation != '/confirmProfileDetails') {
+            return '/confirmProfileDetails';
           }
           return null;
         }

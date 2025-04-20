@@ -1,4 +1,3 @@
-import 'package:figma_squircle/figma_squircle.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -8,19 +7,61 @@ import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/routing/route_names.dart';
 import 'package:reboot_app_3/core/shared_widgets/app_bar.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
-import 'package:reboot_app_3/core/shared_widgets/snackbar.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/custom_theme_data.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
-import 'package:reboot_app_3/features/home/data/follow_up_notifier.dart';
 import 'package:reboot_app_3/features/home/data/streak_notifier.dart';
-import 'package:reboot_app_3/features/home/presentation/home/statistics_visibility_notifier.dart';
 import 'package:reboot_app_3/features/home/presentation/home/widgets/calender_widget.dart';
 import 'package:reboot_app_3/features/home/presentation/home/widgets/follow_up_sheet.dart';
 import 'package:reboot_app_3/features/home/presentation/home/widgets/statistics_widget.dart';
 import 'package:app_settings/app_settings.dart';
 import 'package:reboot_app_3/features/vault/presentation/vault_settings/activities_notifications_settings_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+// Home visibility provider
+final homeVisibilityProvider =
+    StateNotifierProvider<HomeVisibilityNotifier, Map<String, bool>>((ref) {
+  return HomeVisibilityNotifier();
+});
+
+class HomeVisibilityNotifier extends StateNotifier<Map<String, bool>> {
+  HomeVisibilityNotifier()
+      : super({
+          'quickAccess': true,
+          'statistics': true,
+          'calendar': true,
+          'currentStreaks': true,
+        }) {
+    _loadPreferences();
+  }
+
+  Future<void> _loadPreferences() async {
+    final prefs = await SharedPreferences.getInstance();
+    final quickAccess = prefs.getBool('home_quick_access_visible') ?? true;
+    final statistics = prefs.getBool('home_statistics_visible') ?? true;
+    final calendar = prefs.getBool('home_calendar_visible') ?? true;
+    final currentStreaks =
+        prefs.getBool('home_current_streaks_visible') ?? true;
+
+    state = {
+      'quickAccess': quickAccess,
+      'statistics': statistics,
+      'calendar': calendar,
+      'currentStreaks': currentStreaks,
+    };
+  }
+
+  Future<void> toggleVisibility(String key, bool value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('home_${key}_visible', value);
+
+    state = {
+      ...state,
+      key: value,
+    };
+  }
+}
 
 class HomeScreen extends ConsumerWidget {
   HomeScreen({super.key});
@@ -30,6 +71,8 @@ class HomeScreen extends ConsumerWidget {
     final theme = AppTheme.of(context);
     final streaksState = ref.watch(streakNotifierProvider);
     final notificationsEnabled = ref.watch(notificationsEnabledProvider);
+    final homeVisibilitySettings = ref.watch(homeVisibilityProvider);
+
     final actions = [
       IconButton(
         onPressed: () {
@@ -41,12 +84,19 @@ class HomeScreen extends ConsumerWidget {
             },
           );
         },
-        icon: Icon(LucideIcons.settings, color: theme.primary[600]),
+        icon: Icon(LucideIcons.listChecks, color: theme.primary[600]),
       ),
     ];
     return Scaffold(
       backgroundColor: theme.backgroundColor,
-      appBar: appBar(context, ref, 'home', false, false, actions: actions),
+      appBar: appBar(
+        context,
+        ref,
+        'home',
+        false,
+        false,
+        actions: actions,
+      ),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -54,14 +104,19 @@ class HomeScreen extends ConsumerWidget {
           children: [
             if (!(notificationsEnabled.value ?? true))
               const NotificationPromoterWidget(),
-            Activities(),
-            verticalSpace(Spacing.points4),
-            StatisticsWidget(),
-            verticalSpace(Spacing.points8),
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: CalenderWidget(),
-            )
+            if (homeVisibilitySettings['quickAccess'] ?? true)
+              QuickAccessWidget(),
+            if (homeVisibilitySettings['quickAccess'] ?? true)
+              verticalSpace(Spacing.points4),
+            if (homeVisibilitySettings['statistics'] ?? true)
+              StatisticsWidget(),
+            if (homeVisibilitySettings['statistics'] ?? true)
+              verticalSpace(Spacing.points8),
+            if (homeVisibilitySettings['calendar'] ?? true)
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: CalenderWidget(),
+              )
           ],
         ),
       ),
@@ -145,7 +200,7 @@ class NotificationPromoterWidget extends ConsumerWidget {
   }
 }
 
-class Activities extends ConsumerWidget {
+class QuickAccessWidget extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = AppTheme.of(context);
@@ -269,7 +324,7 @@ class HomeSettingsSheet extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = AppTheme.of(context);
     final locale = Localizations.localeOf(context);
-    final visibilitySettings = ref.watch(statisticsVisibilityProvider);
+    final homeVisibilitySettings = ref.watch(homeVisibilityProvider);
 
     return Container(
       color: theme.backgroundColor,
@@ -298,169 +353,294 @@ class HomeSettingsSheet extends ConsumerWidget {
             ],
           ),
           verticalSpace(Spacing.points16),
+
+          // Home Elements Visibility Section
           Text(
-            AppLocalizations.of(context).translate('statistics-visibility'),
+            AppLocalizations.of(context).translate('home-elements-visibility'),
             style: TextStyles.body.copyWith(color: theme.grey[600]),
           ),
           verticalSpace(Spacing.points4),
           Text(
             AppLocalizations.of(context)
-                .translate('statistics-visibility-description'),
+                .translate('home-elements-visibility-description'),
             style: TextStyles.footnote.copyWith(color: theme.grey[400]),
           ),
           verticalSpace(Spacing.points8),
-          Row(
-            children: [
-              Expanded(
-                child: SettingsOption(
-                  onTap: () {
-                    ref
-                        .read(statisticsVisibilityProvider.notifier)
-                        .toggleVisibility(
-                          'relapse',
-                          !visibilitySettings['relapse']!,
-                        );
-                  },
-                  text: "relapses",
-                  icon: LucideIcons.eye,
-                  type: "normal",
-                  isChecked: visibilitySettings['relapse']!,
+
+          // Quick Access Option
+          IntrinsicHeight(
+            child: GestureDetector(
+              onTap: () {
+                HapticFeedback.lightImpact();
+                ref.read(homeVisibilityProvider.notifier).toggleVisibility(
+                      'quickAccess',
+                      !homeVisibilitySettings['quickAccess']!,
+                    );
+              },
+              child: WidgetsContainer(
+                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                backgroundColor: homeVisibilitySettings['quickAccess']!
+                    ? theme.primary[50]
+                    : theme.backgroundColor,
+                borderSide: BorderSide(
+                  color: homeVisibilitySettings['quickAccess']!
+                      ? theme.primary[600]!
+                      : theme.grey[200]!,
+                  width: 1,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(
+                          LucideIcons.layoutGrid,
+                          size: 16,
+                          color: homeVisibilitySettings['quickAccess']!
+                              ? theme.primary[600]
+                              : theme.grey[600],
+                        ),
+                        horizontalSpace(Spacing.points4),
+                        Expanded(
+                          child: Text(
+                            AppLocalizations.of(context)
+                                .translate('quick-access'),
+                            style: TextStyles.caption.copyWith(
+                              color: homeVisibilitySettings['quickAccess']!
+                                  ? theme.primary[600]
+                                  : theme.grey[600],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    verticalSpace(Spacing.points8),
+                    Text(
+                      AppLocalizations.of(context)
+                          .translate('quick-access-description'),
+                      style: TextStyles.small.copyWith(
+                        color: homeVisibilitySettings['quickAccess']!
+                            ? theme.primary[400]
+                            : theme.grey[400],
+                        height: 1.2,
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              horizontalSpace(Spacing.points8),
-              Expanded(
-                child: SettingsOption(
-                  onTap: () {
-                    ref
-                        .read(statisticsVisibilityProvider.notifier)
-                        .toggleVisibility(
-                          'pornOnly',
-                          !visibilitySettings['pornOnly']!,
-                        );
-                  },
-                  text: "porn",
-                  icon: LucideIcons.eye,
-                  type: "normal",
-                  isChecked: visibilitySettings['pornOnly']!,
-                ),
-              ),
-            ],
+            ),
           ),
           verticalSpace(Spacing.points8),
-          Row(
-            children: [
-              Expanded(
-                child: SettingsOption(
-                  onTap: () {
-                    ref
-                        .read(statisticsVisibilityProvider.notifier)
-                        .toggleVisibility(
-                          'mastOnly',
-                          !visibilitySettings['mastOnly']!,
-                        );
-                  },
-                  text: "mast",
-                  icon: LucideIcons.eye,
-                  type: "normal",
-                  isChecked: visibilitySettings['mastOnly']!,
+
+          // Current Streaks Option
+          IntrinsicHeight(
+            child: GestureDetector(
+              onTap: () {
+                HapticFeedback.lightImpact();
+                ref.read(homeVisibilityProvider.notifier).toggleVisibility(
+                      'currentStreaks',
+                      !homeVisibilitySettings['currentStreaks']!,
+                    );
+              },
+              child: WidgetsContainer(
+                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                backgroundColor: homeVisibilitySettings['currentStreaks']!
+                    ? theme.primary[50]
+                    : theme.backgroundColor,
+                borderSide: BorderSide(
+                  color: homeVisibilitySettings['currentStreaks']!
+                      ? theme.primary[600]!
+                      : theme.grey[200]!,
+                  width: 1,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(
+                          LucideIcons.timer,
+                          size: 16,
+                          color: homeVisibilitySettings['currentStreaks']!
+                              ? theme.primary[600]
+                              : theme.grey[600],
+                        ),
+                        horizontalSpace(Spacing.points4),
+                        Expanded(
+                          child: Text(
+                            AppLocalizations.of(context)
+                                .translate('current-streaks'),
+                            style: TextStyles.caption.copyWith(
+                              color: homeVisibilitySettings['currentStreaks']!
+                                  ? theme.primary[600]
+                                  : theme.grey[600],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    verticalSpace(Spacing.points8),
+                    Text(
+                      AppLocalizations.of(context)
+                          .translate('current-streaks-description'),
+                      style: TextStyles.small.copyWith(
+                        color: homeVisibilitySettings['currentStreaks']!
+                            ? theme.primary[400]
+                            : theme.grey[400],
+                        height: 1.2,
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              horizontalSpace(Spacing.points8),
-              Expanded(
-                child: SettingsOption(
-                  onTap: () {
-                    ref
-                        .read(statisticsVisibilityProvider.notifier)
-                        .toggleVisibility(
-                          'slipUp',
-                          !visibilitySettings['slipUp']!,
-                        );
-                  },
-                  text: "slips",
-                  icon: LucideIcons.eye,
-                  type: "normal",
-                  isChecked: visibilitySettings['slipUp']!,
+            ),
+          ),
+          verticalSpace(Spacing.points8),
+
+          // Statistics Option
+          IntrinsicHeight(
+            child: GestureDetector(
+              onTap: () {
+                HapticFeedback.lightImpact();
+                ref.read(homeVisibilityProvider.notifier).toggleVisibility(
+                      'statistics',
+                      !homeVisibilitySettings['statistics']!,
+                    );
+              },
+              child: WidgetsContainer(
+                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                backgroundColor: homeVisibilitySettings['statistics']!
+                    ? theme.primary[50]
+                    : theme.backgroundColor,
+                borderSide: BorderSide(
+                  color: homeVisibilitySettings['statistics']!
+                      ? theme.primary[600]!
+                      : theme.grey[200]!,
+                  width: 1,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(
+                          LucideIcons.barChart2,
+                          size: 16,
+                          color: homeVisibilitySettings['statistics']!
+                              ? theme.primary[600]
+                              : theme.grey[600],
+                        ),
+                        horizontalSpace(Spacing.points4),
+                        Expanded(
+                          child: Text(
+                            AppLocalizations.of(context)
+                                .translate('statistics'),
+                            style: TextStyles.caption.copyWith(
+                              color: homeVisibilitySettings['statistics']!
+                                  ? theme.primary[600]
+                                  : theme.grey[600],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    verticalSpace(Spacing.points8),
+                    Text(
+                      AppLocalizations.of(context)
+                          .translate('statistics-description'),
+                      style: TextStyles.small.copyWith(
+                        color: homeVisibilitySettings['statistics']!
+                            ? theme.primary[400]
+                            : theme.grey[400],
+                        height: 1.2,
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ],
+            ),
+          ),
+          verticalSpace(Spacing.points8),
+
+          // Calendar Option
+          IntrinsicHeight(
+            child: GestureDetector(
+              onTap: () {
+                HapticFeedback.lightImpact();
+                ref.read(homeVisibilityProvider.notifier).toggleVisibility(
+                      'calendar',
+                      !homeVisibilitySettings['calendar']!,
+                    );
+              },
+              child: WidgetsContainer(
+                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                backgroundColor: homeVisibilitySettings['calendar']!
+                    ? theme.primary[50]
+                    : theme.backgroundColor,
+                borderSide: BorderSide(
+                  color: homeVisibilitySettings['calendar']!
+                      ? theme.primary[600]!
+                      : theme.grey[200]!,
+                  width: 1,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(
+                          LucideIcons.calendar,
+                          size: 16,
+                          color: homeVisibilitySettings['calendar']!
+                              ? theme.primary[600]
+                              : theme.grey[600],
+                        ),
+                        horizontalSpace(Spacing.points4),
+                        Expanded(
+                          child: Text(
+                            AppLocalizations.of(context).translate('calendar'),
+                            style: TextStyles.caption.copyWith(
+                              color: homeVisibilitySettings['calendar']!
+                                  ? theme.primary[600]
+                                  : theme.grey[600],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    verticalSpace(Spacing.points8),
+                    Text(
+                      AppLocalizations.of(context)
+                          .translate('calendar-description'),
+                      style: TextStyles.small.copyWith(
+                        color: homeVisibilitySettings['calendar']!
+                            ? theme.primary[400]
+                            : theme.grey[400],
+                        height: 1.2,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
           ),
           verticalSpace(Spacing.points16),
-          Text(
-            AppLocalizations.of(context).translate('delete-duplicates'),
-            style: TextStyles.body.copyWith(color: theme.grey[600]),
-          ),
-          verticalSpace(Spacing.points4),
-          Text(
-            AppLocalizations.of(context)
-                .translate('delete-duplicates-description'),
-            style: TextStyles.footnote.copyWith(color: theme.grey[400]),
-          ),
-          verticalSpace(Spacing.points8),
-          ElevatedButton(
-            onPressed: () {
+
+          // Save button
+          GestureDetector(
+            onTap: () {
               HapticFeedback.mediumImpact();
-              ref
-                  .read(followUpNotifierProvider.notifier)
-                  .cleanupDuplicateFollowUps();
-              getSuccessSnackBar(context, "duplicates-deleted");
               Navigator.pop(context);
             },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: theme.backgroundColor,
-              minimumSize: const Size.fromHeight(48),
-              shape: SmoothRectangleBorder(
-                side: BorderSide(color: theme.grey[600]!, width: 0.25),
-                borderRadius: SmoothBorderRadius(
-                  cornerRadius: 10.5,
-                  cornerSmoothing: 1,
+            child: WidgetsContainer(
+              backgroundColor: theme.primary[600],
+              child: Center(
+                child: Text(
+                  AppLocalizations.of(context).translate('close'),
+                  style: TextStyles.h6.copyWith(color: theme.grey[50]),
                 ),
               ),
             ),
-            child: Text(
-              AppLocalizations.of(context).translate('delete-duplicates'),
-              style: TextStyles.caption.copyWith(color: theme.primary[600]),
-            ),
-          ),
-          verticalSpace(Spacing.points16),
-          Row(
-            children: [
-              Expanded(
-                child: GestureDetector(
-                  onTap: () async {
-                    await ref
-                        .read(statisticsVisibilityProvider.notifier)
-                        .savePreferences();
-                    Navigator.pop(context);
-                  },
-                  child: WidgetsContainer(
-                    backgroundColor: theme.primary[600],
-                    child: Center(
-                      child: Text(
-                        AppLocalizations.of(context).translate('save'),
-                        style: TextStyles.h6.copyWith(color: theme.grey[50]),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              horizontalSpace(Spacing.points8),
-              Expanded(
-                child: GestureDetector(
-                  onTap: () => Navigator.pop(context),
-                  child: WidgetsContainer(
-                    backgroundColor: theme.backgroundColor,
-                    borderSide: BorderSide(color: theme.grey[900]!, width: 0.5),
-                    child: Center(
-                      child: Text(
-                        AppLocalizations.of(context).translate('close'),
-                        style:
-                            TextStyles.h6.copyWith(color: theme.primary[900]),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ],
           ),
         ],
       ),

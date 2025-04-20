@@ -326,21 +326,9 @@ class _ConfirmUserDetailsScreenState
                                 }
 
                                 try {
-                                  // Log migration attempt
-                                  ref.read(errorLoggerProvider).logException(
-                                    Exception('Migration Attempt'),
-                                    StackTrace.current,
-                                    context: {
-                                      'user_id': userDocument.uid,
-                                      'display_name':
-                                          displayNameController.text,
-                                      'email': emailController.text,
-                                      'selected_birth_date':
-                                          selectedBirthDate?.toString(),
-                                      'selected_locale': selectedLocale?.value,
-                                      'selected_gender': selectedGender?.value,
-                                    },
-                                  );
+                                  // Log migration attempt - using print instead of error logger
+                                  print(
+                                      'DEBUG: Migration attempt for user ${userDocument.uid}');
 
                                   // Create new user document
                                   final newUserDoc = UserDocument(
@@ -522,7 +510,35 @@ class _ConfirmUserDetailsScreenState
                             ),
                           ),
                         ),
-                        verticalSpace(Spacing.points16),
+                        verticalSpace(Spacing.points8),
+                        ElevatedButton(
+                          onPressed: () async {
+                            await ref
+                                .read(urlLauncherProvider)
+                                .launch(Uri.parse("https://wa.me/96877451200"));
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: theme.success[50],
+                            minimumSize: const Size.fromHeight(48),
+                            shape: SmoothRectangleBorder(
+                              borderRadius: SmoothBorderRadius(
+                                cornerRadius: 10.5,
+                                cornerSmoothing: 1,
+                              ),
+                              side: BorderSide(
+                                color: theme.success[500]!,
+                                width: 0.25,
+                              ),
+                            ),
+                          ),
+                          child: Text(
+                            AppLocalizations.of(context)
+                                .translate('contact-through-whatsapp'),
+                            style: TextStyles.small.copyWith(
+                              color: theme.success[500]!,
+                            ),
+                          ),
+                        ),
                       ],
                     ],
                   )
