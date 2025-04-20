@@ -25,6 +25,7 @@ class StatisticsVisibilityNotifier extends StateNotifier<Map<String, bool>> {
 
   Future<void> toggleVisibility(String key, bool value) async {
     state = {...state, key: value};
+    await savePreferences();
   }
 
   Future<void> savePreferences() async {

@@ -16,6 +16,7 @@ import 'package:reboot_app_3/features/home/presentation/home/widgets/calender_wi
 import 'package:reboot_app_3/features/home/presentation/home/widgets/follow_up_sheet.dart';
 import 'package:reboot_app_3/features/home/presentation/home/widgets/statistics_widget.dart';
 import 'package:app_settings/app_settings.dart';
+import 'package:reboot_app_3/features/home/presentation/home/widgets/streak_settings_sheet.dart';
 import 'package:reboot_app_3/features/vault/presentation/vault_settings/activities_notifications_settings_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -108,10 +109,59 @@ class HomeScreen extends ConsumerWidget {
               QuickAccessWidget(),
             if (homeVisibilitySettings['quickAccess'] ?? true)
               verticalSpace(Spacing.points4),
+            if (homeVisibilitySettings['currentStreaks'] ?? true)
+              Padding(
+                padding:
+                    const EdgeInsets.only(left: 16.0, right: 16.0, top: 16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          AppLocalizations.of(context)
+                              .translate("current-streaks"),
+                          style: TextStyles.h6.copyWith(color: theme.grey[900]),
+                        ),
+                        GestureDetector(
+                          onTap: () {
+                            HapticFeedback.lightImpact();
+                            showModalBottomSheet<void>(
+                              context: context,
+                              isScrollControlled: true,
+                              builder: (BuildContext context) {
+                                return StreakSettingsSheet();
+                              },
+                            );
+                          },
+                          child: Text(
+                            AppLocalizations.of(context).translate("customize"),
+                            style: TextStyles.small.copyWith(
+                                color: theme.grey[600],
+                                decoration: TextDecoration.underline),
+                          ),
+                        ),
+                      ],
+                    ),
+                    CurrentStreaksWidget(),
+                  ],
+                ),
+              ),
             if (homeVisibilitySettings['statistics'] ?? true)
-              StatisticsWidget(),
-            if (homeVisibilitySettings['statistics'] ?? true)
-              verticalSpace(Spacing.points8),
+              Padding(
+                padding: const EdgeInsets.only(left: 16.0, right: 16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      AppLocalizations.of(context).translate("statistics"),
+                      style: TextStyles.h6.copyWith(color: theme.grey[900]),
+                    ),
+                    UserStatisticsWidget(),
+                  ],
+                ),
+              ),
             if (homeVisibilitySettings['calendar'] ?? true)
               Padding(
                 padding: const EdgeInsets.all(16.0),

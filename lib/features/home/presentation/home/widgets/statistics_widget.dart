@@ -101,13 +101,13 @@ class _StatisticsContentState extends ConsumerState<_StatisticsContent> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _FirstPageWidget(),
+                CurrentStreaksWidget(),
                 // verticalSpace(Spacing.points16),
                 Text(
                   AppLocalizations.of(context).translate("statistics"),
                   style: TextStyles.h6.copyWith(color: theme.grey[900]),
                 ),
-                _SecondPageWidget(),
+                UserStatisticsWidget(),
               ],
             ),
           ),
@@ -117,7 +117,7 @@ class _StatisticsContentState extends ConsumerState<_StatisticsContent> {
   }
 }
 
-class _FirstPageWidget extends ConsumerWidget {
+class CurrentStreaksWidget extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = AppTheme.of(context);
@@ -442,7 +442,7 @@ class _FirstPageWidget extends ConsumerWidget {
   }
 }
 
-class _SecondPageWidget extends ConsumerWidget {
+class UserStatisticsWidget extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = AppTheme.of(context);
