@@ -379,19 +379,27 @@ class _ConfirmUserDetailsScreenState
                                   if (!mounted) return;
                                   context.goNamed(RouteNames.home.name);
                                 } catch (e, stackTrace) {
-                                  // Log error with context
+                                  // Log error with context and specific error details
                                   ref.read(errorLoggerProvider).logException(
                                     e,
                                     stackTrace,
                                     context: {
-                                      'user_id': userDocument.uid,
-                                      'display_name':
-                                          displayNameController.text,
-                                      'email': emailController.text,
-                                      'selected_birth_date':
-                                          selectedBirthDate?.toString(),
-                                      'selected_locale': selectedLocale?.value,
-                                      'selected_gender': selectedGender?.value,
+                                      'error_type': e.runtimeType
+                                          .toString(), // Log the specific error type
+                                      'error_message': e
+                                          .toString(), // Log the specific error message
+                                      'migration_context': {
+                                        'user_id': userDocument.uid,
+                                        'display_name':
+                                            displayNameController.text,
+                                        'email': emailController.text,
+                                        'selected_birth_date':
+                                            selectedBirthDate?.toString(),
+                                        'selected_locale':
+                                            selectedLocale?.value,
+                                        'selected_gender':
+                                            selectedGender?.value,
+                                      }
                                     },
                                   );
 
