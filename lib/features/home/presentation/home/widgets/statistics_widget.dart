@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:reboot_app_3/core/helpers/date_display_formater.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
@@ -17,6 +18,8 @@ import 'package:reboot_app_3/features/home/presentation/home/widgets/detailed_st
 import 'package:reboot_app_3/features/home/presentation/home/widgets/streak_settings_sheet.dart';
 import 'package:reboot_app_3/features/shared/models/follow_up.dart';
 import 'package:reboot_app_3/features/home/data/models/follow_up_colors.dart';
+import 'dart:async';
+import 'package:reboot_app_3/features/home/application/streak_service.dart';
 
 class StatisticsWidget extends ConsumerWidget {
   const StatisticsWidget({
@@ -112,6 +115,7 @@ class CurrentStreaksWidget extends ConsumerWidget {
     final streakState = ref.watch(streakNotifierProvider);
     final visibilitySettings = ref.watch(statisticsVisibilityProvider);
     final displayMode = ref.watch(streakDisplayProvider);
+    final followUpsState = ref.watch(followUpsProvider);
 
     // Watch the detailed streaks
     final detailedStreaks = ref.watch(detailedStreakProvider);
@@ -306,14 +310,25 @@ class CurrentStreaksWidget extends ConsumerWidget {
                         color: followUpColors[FollowUpType.relapse]!,
                         width: 0.75),
                     child: Column(
-                      // crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        Text(
-                          localization.translate("current-streak"),
-                          style: TextStyles.footnoteSelected.copyWith(
-                            color: followUpColors[FollowUpType.relapse]!,
-                            fontWeight: FontWeight.w500,
-                          ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              localization.translate("current-streak"),
+                              style: TextStyles.footnoteSelected.copyWith(
+                                color: followUpColors[FollowUpType.relapse]!,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            Text(
+                              _getLastFollowUpDateText(FollowUpType.relapse,
+                                  followUpsState, localization),
+                              style: TextStyles.caption.copyWith(
+                                color: theme.grey[500],
+                              ),
+                            ),
+                          ],
                         ),
                         verticalSpace(Spacing.points8),
                         DetailedStreakWidget(
@@ -334,14 +349,25 @@ class CurrentStreaksWidget extends ConsumerWidget {
                         color: followUpColors[FollowUpType.pornOnly]!,
                         width: 0.75),
                     child: Column(
-                      // crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        Text(
-                          localization.translate("free-porn-days"),
-                          style: TextStyles.footnoteSelected.copyWith(
-                            color: followUpColors[FollowUpType.pornOnly]!,
-                            fontWeight: FontWeight.w500,
-                          ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              localization.translate("free-porn-days"),
+                              style: TextStyles.footnoteSelected.copyWith(
+                                color: followUpColors[FollowUpType.pornOnly]!,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            Text(
+                              _getLastFollowUpDateText(FollowUpType.pornOnly,
+                                  followUpsState, localization),
+                              style: TextStyles.caption.copyWith(
+                                color: theme.grey[500],
+                              ),
+                            ),
+                          ],
                         ),
                         verticalSpace(Spacing.points8),
                         DetailedStreakWidget(
@@ -362,14 +388,25 @@ class CurrentStreaksWidget extends ConsumerWidget {
                         color: followUpColors[FollowUpType.mastOnly]!,
                         width: 0.75),
                     child: Column(
-                      // crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        Text(
-                          localization.translate("free-mast-days"),
-                          style: TextStyles.footnoteSelected.copyWith(
-                            color: followUpColors[FollowUpType.mastOnly]!,
-                            fontWeight: FontWeight.w500,
-                          ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              localization.translate("free-mast-days"),
+                              style: TextStyles.footnoteSelected.copyWith(
+                                color: followUpColors[FollowUpType.mastOnly]!,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            Text(
+                              _getLastFollowUpDateText(FollowUpType.mastOnly,
+                                  followUpsState, localization),
+                              style: TextStyles.caption.copyWith(
+                                color: theme.grey[500],
+                              ),
+                            ),
+                          ],
                         ),
                         verticalSpace(Spacing.points8),
                         DetailedStreakWidget(
@@ -390,14 +427,25 @@ class CurrentStreaksWidget extends ConsumerWidget {
                         color: followUpColors[FollowUpType.slipUp]!,
                         width: 0.75),
                     child: Column(
-                      // crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        Text(
-                          localization.translate("free-slips-days"),
-                          style: TextStyles.footnoteSelected.copyWith(
-                            color: followUpColors[FollowUpType.slipUp]!,
-                            fontWeight: FontWeight.w500,
-                          ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              localization.translate("free-slips-days"),
+                              style: TextStyles.footnoteSelected.copyWith(
+                                color: followUpColors[FollowUpType.slipUp]!,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            Text(
+                              _getLastFollowUpDateText(FollowUpType.slipUp,
+                                  followUpsState, localization),
+                              style: TextStyles.caption.copyWith(
+                                color: theme.grey[500],
+                              ),
+                            ),
+                          ],
                         ),
                         verticalSpace(Spacing.points8),
                         DetailedStreakWidget(
@@ -408,7 +456,6 @@ class CurrentStreaksWidget extends ConsumerWidget {
                       ],
                     ),
                   ),
-                // Add bottom padding to ensure proper spacing
                 verticalSpace(Spacing.points16),
               ],
             ),
@@ -426,6 +473,20 @@ class CurrentStreaksWidget extends ConsumerWidget {
         child: Center(child: Text('Error: $error')),
       ),
     );
+  }
+
+  String _getLastFollowUpDateText(
+      FollowUpType type,
+      Map<FollowUpType, List<FollowUpModel>> followUpsState,
+      AppLocalizations localization) {
+    final followUps = followUpsState[type] ?? [];
+    if (followUps.isEmpty) {
+      return localization.translate("no-follow-ups-yet");
+    }
+    final lastFollowUp =
+        followUps.reduce((a, b) => a.time.isAfter(b.time) ? a : b);
+    return localization.translate("last-follow-up") +
+        getDisplayDateTime(lastFollowUp.time, localization.locale.languageCode);
   }
 }
 
@@ -752,5 +813,61 @@ class InformationSheet extends ConsumerWidget {
         ),
       ),
     );
+  }
+}
+
+final followUpsProvider = StateNotifierProvider<FollowUpsNotifier,
+    Map<FollowUpType, List<FollowUpModel>>>((ref) {
+  final service = ref.watch(streakServiceProvider);
+  return FollowUpsNotifier(service);
+});
+
+class FollowUpsNotifier
+    extends StateNotifier<Map<FollowUpType, List<FollowUpModel>>> {
+  final StreakService _service;
+  Timer? _refreshTimer;
+
+  FollowUpsNotifier(this._service) : super({}) {
+    _initializeFollowUps();
+  }
+
+  Future<void> _initializeFollowUps() async {
+    await _refreshFollowUps();
+    // Refresh every 5 minutes
+    _refreshTimer =
+        Timer.periodic(Duration(minutes: 5), (_) => _refreshFollowUps());
+  }
+
+  Future<void> _refreshFollowUps() async {
+    final types = [
+      FollowUpType.relapse,
+      FollowUpType.pornOnly,
+      FollowUpType.mastOnly,
+      FollowUpType.slipUp,
+    ];
+
+    final Map<FollowUpType, List<FollowUpModel>> newState = {};
+
+    for (final type in types) {
+      try {
+        final followUps = await _service.getFollowUpsByType(type);
+        newState[type] = followUps;
+      } catch (e) {
+        // If there's an error, keep the existing data for this type
+        newState[type] = state[type] ?? [];
+      }
+    }
+
+    state = newState;
+  }
+
+  Future<void> refreshFollowUps() async {
+    await _refreshFollowUps();
+  }
+
+  @override
+  void dispose() {
+    _refreshTimer?.cancel();
+    super.dispose();
   }
 }

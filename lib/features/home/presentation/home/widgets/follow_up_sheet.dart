@@ -19,6 +19,7 @@ import 'package:reboot_app_3/features/shared/models/follow_up.dart';
 import 'package:time_picker_spinner_pop_up/time_picker_spinner_pop_up.dart';
 import 'package:reboot_app_3/features/home/data/follow_up_notifier.dart';
 import 'package:reboot_app_3/features/home/data/emotion_notifier.dart';
+import 'package:reboot_app_3/features/home/presentation/home/widgets/statistics_widget.dart';
 
 class FollowUpSheet extends ConsumerStatefulWidget {
   FollowUpSheet(this.date, {super.key});
@@ -468,6 +469,11 @@ class _FollowUpSheetState extends ConsumerState<FollowUpSheet> {
                                         ref.refresh(
                                             calendarNotifierProvider.future),
                                       ]);
+
+                                      // Refresh the followUpsProvider
+                                      await ref
+                                          .read(followUpsProvider.notifier)
+                                          .refreshFollowUps();
 
                                       Navigator.pop(context);
                                     }

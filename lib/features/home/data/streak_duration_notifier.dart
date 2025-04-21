@@ -185,13 +185,7 @@ class DetailedStreakNotifier
     final lastFollowUpDate = followUps.first.time.toUtc();
 
     // Calculate days since last follow-up
-    final daysSinceLastFollowUp = now.difference(lastFollowUpDate).inDays;
-
-    // Add remaining time in current day
-    final midnight = DateTime(now.year, now.month, now.day);
-    final remainingToday = now.difference(midnight);
-
-    return Duration(days: daysSinceLastFollowUp) + remainingToday;
+    return now.difference(lastFollowUpDate);
   }
 
   Future<Duration> _calcDurationFromSlipUp(DateTime userFirstDate) async {
@@ -206,10 +200,7 @@ class DetailedStreakNotifier
     if (slipUpFollowUps.isNotEmpty) {
       slipUpFollowUps.sort((a, b) => b.time.compareTo(a.time));
       final lastSlipUpDate = slipUpFollowUps.first.time.toUtc();
-      final daysSinceLastSlipUp = now.difference(lastSlipUpDate).inDays;
-      final midnight = DateTime(now.year, now.month, now.day);
-      final remainingToday = now.difference(midnight);
-      return Duration(days: daysSinceLastSlipUp) + remainingToday;
+      return now.difference(lastSlipUpDate);
     }
 
     // If no slip-up follow-ups, check for relapse follow-ups
@@ -220,10 +211,7 @@ class DetailedStreakNotifier
     if (relapseFollowUps.isNotEmpty) {
       relapseFollowUps.sort((a, b) => b.time.compareTo(a.time));
       final lastRelapseDate = relapseFollowUps.first.time.toUtc();
-      final daysSinceLastRelapse = now.difference(lastRelapseDate).inDays;
-      final midnight = DateTime(now.year, now.month, now.day);
-      final remainingToday = now.difference(midnight);
-      return Duration(days: daysSinceLastRelapse) + remainingToday;
+      return now.difference(lastRelapseDate);
     }
 
     // If no follow-ups at all, calculate from first date
