@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:lucide_icons/lucide_icons.dart';
-import 'package:reboot_app_3/core/helpers/date_display_formater.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
@@ -84,18 +83,6 @@ class _StatisticsContentState extends ConsumerState<_StatisticsContent> {
             ),
           ),
           verticalSpace(Spacing.points4),
-          Padding(
-            padding: const EdgeInsets.only(right: 16.0, left: 16),
-            child: Text(
-              localization.translate("starting-date") +
-                  ": " +
-                  (streaksState.value?.userFirstDate != null
-                      ? getDisplayDateTime(streaksState.value!.userFirstDate,
-                          locale!.languageCode)
-                      : ""),
-              style: TextStyles.small.copyWith(color: theme.grey[400]),
-            ),
-          ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Column(

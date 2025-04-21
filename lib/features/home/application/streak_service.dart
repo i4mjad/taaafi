@@ -11,6 +11,10 @@ class StreakService {
     return await _repository.getUserFirstDate();
   }
 
+  Future<List<FollowUpModel>> getFollowUpsByType(FollowUpType type) async {
+    return await _repository.readFollowUpsByType(type);
+  }
+
   Future<int> calculateRelapseStreak() async {
     final userFirstDate = await getUserFirstDate();
     final relapseFollowUps =

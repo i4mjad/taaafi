@@ -76,11 +76,11 @@ class StreakSettingsSheet extends ConsumerWidget {
                           EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                       backgroundColor:
                           streakDisplayMode == StreakDisplayMode.days
-                              ? theme.primary[50]
+                              ? theme.success[50]
                               : theme.backgroundColor,
                       borderSide: BorderSide(
                         color: streakDisplayMode == StreakDisplayMode.days
-                            ? theme.primary[600]!
+                            ? theme.success[600]!
                             : theme.grey[200]!,
                         width: 1,
                       ),
@@ -94,7 +94,7 @@ class StreakSettingsSheet extends ConsumerWidget {
                                 size: 16,
                                 color:
                                     streakDisplayMode == StreakDisplayMode.days
-                                        ? theme.primary[600]
+                                        ? theme.success[600]
                                         : theme.grey[600],
                               ),
                               horizontalSpace(Spacing.points4),
@@ -105,7 +105,7 @@ class StreakSettingsSheet extends ConsumerWidget {
                                   style: TextStyles.caption.copyWith(
                                     color: streakDisplayMode ==
                                             StreakDisplayMode.days
-                                        ? theme.primary[600]
+                                        ? theme.success[600]
                                         : theme.grey[600],
                                   ),
                                 ),
@@ -118,7 +118,7 @@ class StreakSettingsSheet extends ConsumerWidget {
                                 .translate('days-only-description'),
                             style: TextStyles.small.copyWith(
                               color: streakDisplayMode == StreakDisplayMode.days
-                                  ? theme.primary[400]
+                                  ? theme.success[400]
                                   : theme.grey[400],
                               height: 1.2,
                             ),
@@ -144,11 +144,11 @@ class StreakSettingsSheet extends ConsumerWidget {
                           EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                       backgroundColor:
                           streakDisplayMode == StreakDisplayMode.detailed
-                              ? theme.primary[50]
+                              ? theme.success[50]
                               : theme.backgroundColor,
                       borderSide: BorderSide(
                         color: streakDisplayMode == StreakDisplayMode.detailed
-                            ? theme.primary[600]!
+                            ? theme.success[600]!
                             : theme.grey[200]!,
                         width: 1,
                       ),
@@ -162,7 +162,7 @@ class StreakSettingsSheet extends ConsumerWidget {
                                 size: 16,
                                 color: streakDisplayMode ==
                                         StreakDisplayMode.detailed
-                                    ? theme.primary[600]
+                                    ? theme.success[600]
                                     : theme.grey[600],
                               ),
                               horizontalSpace(Spacing.points4),
@@ -173,7 +173,7 @@ class StreakSettingsSheet extends ConsumerWidget {
                                   style: TextStyles.caption.copyWith(
                                     color: streakDisplayMode ==
                                             StreakDisplayMode.detailed
-                                        ? theme.primary[600]
+                                        ? theme.success[600]
                                         : theme.grey[600],
                                   ),
                                 ),
@@ -187,7 +187,7 @@ class StreakSettingsSheet extends ConsumerWidget {
                             style: TextStyles.small.copyWith(
                               color: streakDisplayMode ==
                                       StreakDisplayMode.detailed
-                                  ? theme.primary[400]
+                                  ? theme.success[400]
                                   : theme.grey[400],
                               height: 1.2,
                             ),

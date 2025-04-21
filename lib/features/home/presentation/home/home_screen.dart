@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:reboot_app_3/core/helpers/date_display_formater.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/routing/route_names.dart';
 import 'package:reboot_app_3/core/shared_widgets/app_bar.dart';
@@ -73,6 +74,9 @@ class HomeScreen extends ConsumerWidget {
     final streaksState = ref.watch(streakNotifierProvider);
     final notificationsEnabled = ref.watch(notificationsEnabledProvider);
     final homeVisibilitySettings = ref.watch(homeVisibilityProvider);
+    final locale = ref.watch(localeNotifierProvider);
+
+    final localization = AppLocalizations.of(context);
 
     final actions = [
       IconButton(
@@ -140,6 +144,32 @@ class HomeScreen extends ConsumerWidget {
                             style: TextStyles.small.copyWith(
                                 color: theme.grey[600],
                                 decoration: TextDecoration.underline),
+                          ),
+                        ),
+                      ],
+                    ),
+                    verticalSpace(Spacing.points4),
+                    Row(
+                      children: [
+                        Icon(
+                          LucideIcons.calendar,
+                          size: 16,
+                          color: theme.grey[400],
+                        ),
+                        horizontalSpace(Spacing.points8),
+                        Expanded(
+                          child: Text(
+                            localization.translate("starting-date") +
+                                ": " +
+                                (streaksState.value?.userFirstDate != null
+                                    ? getDisplayDateTime(
+                                        streaksState.value!.userFirstDate,
+                                        locale!.languageCode)
+                                    : localization.translate("not-set")),
+                            style: TextStyles.small.copyWith(
+                              color: theme.grey[400],
+                              fontWeight: FontWeight.w500,
+                            ),
                           ),
                         ),
                       ],
@@ -430,11 +460,11 @@ class HomeSettingsSheet extends ConsumerWidget {
               child: WidgetsContainer(
                 padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 backgroundColor: homeVisibilitySettings['quickAccess']!
-                    ? theme.primary[50]
+                    ? theme.success[50]
                     : theme.backgroundColor,
                 borderSide: BorderSide(
                   color: homeVisibilitySettings['quickAccess']!
-                      ? theme.primary[600]!
+                      ? theme.success[600]!
                       : theme.grey[200]!,
                   width: 1,
                 ),
@@ -447,7 +477,7 @@ class HomeSettingsSheet extends ConsumerWidget {
                           LucideIcons.layoutGrid,
                           size: 16,
                           color: homeVisibilitySettings['quickAccess']!
-                              ? theme.primary[600]
+                              ? theme.success[600]
                               : theme.grey[600],
                         ),
                         horizontalSpace(Spacing.points4),
@@ -457,7 +487,7 @@ class HomeSettingsSheet extends ConsumerWidget {
                                 .translate('quick-access'),
                             style: TextStyles.caption.copyWith(
                               color: homeVisibilitySettings['quickAccess']!
-                                  ? theme.primary[600]
+                                  ? theme.success[600]
                                   : theme.grey[600],
                             ),
                           ),
@@ -470,7 +500,7 @@ class HomeSettingsSheet extends ConsumerWidget {
                           .translate('quick-access-description'),
                       style: TextStyles.small.copyWith(
                         color: homeVisibilitySettings['quickAccess']!
-                            ? theme.primary[400]
+                            ? theme.success[400]
                             : theme.grey[400],
                         height: 1.2,
                       ),
@@ -495,11 +525,11 @@ class HomeSettingsSheet extends ConsumerWidget {
               child: WidgetsContainer(
                 padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 backgroundColor: homeVisibilitySettings['currentStreaks']!
-                    ? theme.primary[50]
+                    ? theme.success[50]
                     : theme.backgroundColor,
                 borderSide: BorderSide(
                   color: homeVisibilitySettings['currentStreaks']!
-                      ? theme.primary[600]!
+                      ? theme.success[600]!
                       : theme.grey[200]!,
                   width: 1,
                 ),
@@ -512,7 +542,7 @@ class HomeSettingsSheet extends ConsumerWidget {
                           LucideIcons.timer,
                           size: 16,
                           color: homeVisibilitySettings['currentStreaks']!
-                              ? theme.primary[600]
+                              ? theme.success[600]
                               : theme.grey[600],
                         ),
                         horizontalSpace(Spacing.points4),
@@ -522,7 +552,7 @@ class HomeSettingsSheet extends ConsumerWidget {
                                 .translate('current-streaks'),
                             style: TextStyles.caption.copyWith(
                               color: homeVisibilitySettings['currentStreaks']!
-                                  ? theme.primary[600]
+                                  ? theme.success[600]
                                   : theme.grey[600],
                             ),
                           ),
@@ -535,7 +565,7 @@ class HomeSettingsSheet extends ConsumerWidget {
                           .translate('current-streaks-description'),
                       style: TextStyles.small.copyWith(
                         color: homeVisibilitySettings['currentStreaks']!
-                            ? theme.primary[400]
+                            ? theme.success[400]
                             : theme.grey[400],
                         height: 1.2,
                       ),
@@ -560,11 +590,11 @@ class HomeSettingsSheet extends ConsumerWidget {
               child: WidgetsContainer(
                 padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 backgroundColor: homeVisibilitySettings['statistics']!
-                    ? theme.primary[50]
+                    ? theme.success[50]
                     : theme.backgroundColor,
                 borderSide: BorderSide(
                   color: homeVisibilitySettings['statistics']!
-                      ? theme.primary[600]!
+                      ? theme.success[600]!
                       : theme.grey[200]!,
                   width: 1,
                 ),
@@ -577,7 +607,7 @@ class HomeSettingsSheet extends ConsumerWidget {
                           LucideIcons.barChart2,
                           size: 16,
                           color: homeVisibilitySettings['statistics']!
-                              ? theme.primary[600]
+                              ? theme.success[600]
                               : theme.grey[600],
                         ),
                         horizontalSpace(Spacing.points4),
@@ -587,7 +617,7 @@ class HomeSettingsSheet extends ConsumerWidget {
                                 .translate('statistics'),
                             style: TextStyles.caption.copyWith(
                               color: homeVisibilitySettings['statistics']!
-                                  ? theme.primary[600]
+                                  ? theme.success[600]
                                   : theme.grey[600],
                             ),
                           ),
@@ -600,7 +630,7 @@ class HomeSettingsSheet extends ConsumerWidget {
                           .translate('statistics-description'),
                       style: TextStyles.small.copyWith(
                         color: homeVisibilitySettings['statistics']!
-                            ? theme.primary[400]
+                            ? theme.success[400]
                             : theme.grey[400],
                         height: 1.2,
                       ),
@@ -625,11 +655,11 @@ class HomeSettingsSheet extends ConsumerWidget {
               child: WidgetsContainer(
                 padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 backgroundColor: homeVisibilitySettings['calendar']!
-                    ? theme.primary[50]
+                    ? theme.success[50]
                     : theme.backgroundColor,
                 borderSide: BorderSide(
                   color: homeVisibilitySettings['calendar']!
-                      ? theme.primary[600]!
+                      ? theme.success[600]!
                       : theme.grey[200]!,
                   width: 1,
                 ),
@@ -642,7 +672,7 @@ class HomeSettingsSheet extends ConsumerWidget {
                           LucideIcons.calendar,
                           size: 16,
                           color: homeVisibilitySettings['calendar']!
-                              ? theme.primary[600]
+                              ? theme.success[600]
                               : theme.grey[600],
                         ),
                         horizontalSpace(Spacing.points4),
@@ -651,7 +681,7 @@ class HomeSettingsSheet extends ConsumerWidget {
                             AppLocalizations.of(context).translate('calendar'),
                             style: TextStyles.caption.copyWith(
                               color: homeVisibilitySettings['calendar']!
-                                  ? theme.primary[600]
+                                  ? theme.success[600]
                                   : theme.grey[600],
                             ),
                           ),
@@ -664,7 +694,7 @@ class HomeSettingsSheet extends ConsumerWidget {
                           .translate('calendar-description'),
                       style: TextStyles.small.copyWith(
                         color: homeVisibilitySettings['calendar']!
-                            ? theme.primary[400]
+                            ? theme.success[400]
                             : theme.grey[400],
                         height: 1.2,
                       ),

@@ -161,7 +161,7 @@ class DetailedStreakNotifier
       case FollowUpType.mastOnly:
         return await _calcDurationFromLastFollowUp(type, userFirstDate);
       case FollowUpType.slipUp:
-        return await _calcDurationFromLastFollowUp(type, userFirstDate);
+        return await _calcDurationFromSlipUp(userFirstDate);
       default:
         return await _calcDurationFromLastFollowUp(type, userFirstDate);
     }
@@ -169,16 +169,65 @@ class DetailedStreakNotifier
 
   Future<Duration> _calcDurationFromLastFollowUp(
       FollowUpType type, DateTime userFirstDate) async {
-    final now = DateTime.now();
+    final now = DateTime.now().toUtc();
+    final firstDate = userFirstDate.toUtc();
 
-    // Calculate streak in the same way as the service does
-    final streakInDays = await _service.calculateRelapseStreak();
+    // Get follow-ups for the specific type
+    final followUps = await _service.getFollowUpsByType(type);
 
-    // Convert days to duration and add remaining time in current day
+    // If no follow-ups, calculate from first date
+    if (followUps.isEmpty) {
+      return now.difference(firstDate);
+    }
+
+    // Sort follow-ups by time (most recent first)
+    followUps.sort((a, b) => b.time.compareTo(a.time));
+    final lastFollowUpDate = followUps.first.time.toUtc();
+
+    // Calculate days since last follow-up
+    final daysSinceLastFollowUp = now.difference(lastFollowUpDate).inDays;
+
+    // Add remaining time in current day
     final midnight = DateTime(now.year, now.month, now.day);
     final remainingToday = now.difference(midnight);
 
-    return Duration(days: streakInDays) + remainingToday;
+    return Duration(days: daysSinceLastFollowUp) + remainingToday;
+  }
+
+  Future<Duration> _calcDurationFromSlipUp(DateTime userFirstDate) async {
+    final now = DateTime.now().toUtc();
+    final firstDate = userFirstDate.toUtc();
+
+    // Get slip-up follow-ups
+    final slipUpFollowUps =
+        await _service.getFollowUpsByType(FollowUpType.slipUp);
+
+    // If there are slip-up follow-ups, use the most recent one
+    if (slipUpFollowUps.isNotEmpty) {
+      slipUpFollowUps.sort((a, b) => b.time.compareTo(a.time));
+      final lastSlipUpDate = slipUpFollowUps.first.time.toUtc();
+      final daysSinceLastSlipUp = now.difference(lastSlipUpDate).inDays;
+      final midnight = DateTime(now.year, now.month, now.day);
+      final remainingToday = now.difference(midnight);
+      return Duration(days: daysSinceLastSlipUp) + remainingToday;
+    }
+
+    // If no slip-up follow-ups, check for relapse follow-ups
+    final relapseFollowUps =
+        await _service.getFollowUpsByType(FollowUpType.relapse);
+
+    // If there are relapse follow-ups, use the most recent one
+    if (relapseFollowUps.isNotEmpty) {
+      relapseFollowUps.sort((a, b) => b.time.compareTo(a.time));
+      final lastRelapseDate = relapseFollowUps.first.time.toUtc();
+      final daysSinceLastRelapse = now.difference(lastRelapseDate).inDays;
+      final midnight = DateTime(now.year, now.month, now.day);
+      final remainingToday = now.difference(midnight);
+      return Duration(days: daysSinceLastRelapse) + remainingToday;
+    }
+
+    // If no follow-ups at all, calculate from first date
+    return now.difference(firstDate);
   }
 
   @override
