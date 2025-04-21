@@ -33,6 +33,7 @@ class _FollowUpSheetState extends ConsumerState<FollowUpSheet> {
   Set<Emotion> selectedEmotions = {};
   bool addAllFollowUps = false; // New state for checkbox
   bool _isProcessing = false;
+  bool _showEmotions = false; // New state for showing emotions section
 
   final List<FollowUpOption> followUpOptions = [
     FollowUpOption(icon: LucideIcons.trophy, translationKey: 'free-day'),
@@ -144,373 +145,409 @@ class _FollowUpSheetState extends ConsumerState<FollowUpSheet> {
         .where((option) => option.translationKey != 'free-day')
         .toList();
 
-    return Container(
-      color: theme.backgroundColor,
-      // padding: EdgeInsets.all(16),
-      width: MediaQuery.of(context).size.width,
-      height: MediaQuery.of(context).size.height * 0.7,
-      child: Column(
-        children: [
-          // Fixed top row with date picker
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                TimePickerSpinnerPopUp(
-                  maxTime: DateTime.now(),
-                  mode: CupertinoDatePickerMode.dateAndTime,
-                  barrierColor: theme.primary[50]!,
-                  padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
-                  locale: locale,
-                  cancelTextStyle: TextStyles.caption.copyWith(
-                    color: theme.primary[600],
-                  ),
-                  confirmTextStyle: TextStyles.caption.copyWith(
-                    color: theme.primary[600],
-                  ),
-                  textStyle: TextStyles.caption.copyWith(
-                    color: theme.primary[600],
-                  ),
-                  timeFormat: "d - MMMM - yyyy hh:mm a",
-                  timeWidgetBuilder: (dateTime) {
-                    return WidgetsContainer(
-                      padding: EdgeInsets.all(8),
-                      backgroundColor: theme.backgroundColor,
-                      borderSide:
-                          BorderSide(color: theme.grey[600]!, width: 0.5),
-                      borderRadius: BorderRadius.circular(8),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Color.fromRGBO(60, 64, 67, 0.3),
-                          blurRadius: 2,
-                          spreadRadius: 0,
-                          offset: Offset(
-                            0,
-                            1,
-                          ),
-                        ),
-                        BoxShadow(
-                          color: Color.fromRGBO(60, 64, 67, 0.15),
-                          blurRadius: 6,
-                          spreadRadius: 2,
-                          offset: Offset(
-                            0,
-                            2,
-                          ),
-                        ),
-                      ],
-                      child: Text(
-                        getDisplayDateTime(dateTime, locale!.languageCode),
-                        style: TextStyles.body,
-                      ),
-                    );
-                  },
-                  initTime: widget.date,
-                  cancelText: AppLocalizations.of(context).translate("cancel"),
-                  confirmText:
-                      AppLocalizations.of(context).translate("confirm"),
-                  onChange: (date) {
-                    setState(() {
-                      widget.date = date;
-                    });
-                  },
-                ),
-                GestureDetector(
-                  onTap: () {
-                    Navigator.pop(context);
-                  },
-                  child: Icon(
-                    LucideIcons.xCircle,
-                  ),
-                )
-              ],
-            ),
-          ),
-
-          // Scrollable middle content
-          Expanded(
-            child: SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      AppLocalizations.of(context)
-                          .translate('what-you-want-to-add'),
-                      style: TextStyles.h6,
+    return IntrinsicHeight(
+      child: Container(
+        color: theme.backgroundColor,
+        // padding: EdgeInsets.all(16),
+        width: MediaQuery.of(context).size.width,
+        child: Column(
+          children: [
+            // Fixed top row with date picker
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  TimePickerSpinnerPopUp(
+                    maxTime: DateTime.now(),
+                    mode: CupertinoDatePickerMode.dateAndTime,
+                    barrierColor: theme.primary[50]!,
+                    padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
+                    locale: locale,
+                    cancelTextStyle: TextStyles.caption.copyWith(
+                      color: theme.primary[600],
                     ),
-                    verticalSpace(Spacing.points8),
-                    // Free day option at the top
-                    FollowUpButton(
-                      followUpOption: freeDayOption,
-                      isSelected: selectedFollowUps.contains(freeDayOption),
-                      onTap: () => toggleFollowUp(freeDayOption),
+                    confirmTextStyle: TextStyles.caption.copyWith(
+                      color: theme.primary[600],
                     ),
-                    verticalSpace(Spacing.points8),
-                    // Other options in grid
-                    Column(
-                      children: [
-                        for (int i = 0; i < otherOptions.length; i += 2)
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 8.0),
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  child: FollowUpButton(
-                                    followUpOption: otherOptions[i],
-                                    isSelected: selectedFollowUps
-                                        .contains(otherOptions[i]),
-                                    onTap: () =>
-                                        toggleFollowUp(otherOptions[i]),
-                                  ),
-                                ),
-                                if (i + 1 < otherOptions.length) ...[
-                                  horizontalSpace(Spacing.points8),
-                                  Expanded(
-                                    child: FollowUpButton(
-                                      followUpOption: otherOptions[i + 1],
-                                      isSelected: selectedFollowUps
-                                          .contains(otherOptions[i + 1]),
-                                      onTap: () =>
-                                          toggleFollowUp(otherOptions[i + 1]),
-                                    ),
-                                  ),
-                                ],
-                              ],
-                            ),
-                          ),
-                      ],
+                    textStyle: TextStyles.caption.copyWith(
+                      color: theme.primary[600],
                     ),
-                    verticalSpace(Spacing.points8),
-
-                    // Warning message moved here, after the options
-                    if (selectedFollowUps
-                        .any((option) => option.translationKey == 'free-day'))
-                      WidgetsContainer(
-                        padding: const EdgeInsets.all(12),
-                        backgroundColor: theme.success[50],
+                    timeFormat: "d - MMMM - yyyy hh:mm a",
+                    timeWidgetBuilder: (dateTime) {
+                      return WidgetsContainer(
+                        padding: EdgeInsets.all(8),
+                        backgroundColor: theme.backgroundColor,
+                        borderSide:
+                            BorderSide(color: theme.grey[600]!, width: 0.5),
                         borderRadius: BorderRadius.circular(8),
-                        borderSide: BorderSide(
-                          color: theme.success[300]!,
-                          width: 0.75,
-                        ),
-                        child: Row(
-                          children: [
-                            Icon(
-                              LucideIcons.star,
-                              color: theme.success[700],
+                        boxShadow: [
+                          BoxShadow(
+                            color: Color.fromRGBO(60, 64, 67, 0.3),
+                            blurRadius: 2,
+                            spreadRadius: 0,
+                            offset: Offset(
+                              0,
+                              1,
                             ),
-                            horizontalSpace(Spacing.points8),
-                            Expanded(
-                              child: Text(
-                                AppLocalizations.of(context)
-                                    .translate('free-day-warning-message'),
-                                style: TextStyles.small
-                                    .copyWith(color: theme.success[700]),
-                              ),
+                          ),
+                          BoxShadow(
+                            color: Color.fromRGBO(60, 64, 67, 0.15),
+                            blurRadius: 6,
+                            spreadRadius: 2,
+                            offset: Offset(
+                              0,
+                              2,
                             ),
-                          ],
+                          ),
+                        ],
+                        child: Text(
+                          getDisplayDateTime(dateTime, locale!.languageCode),
+                          style: TextStyles.body,
                         ),
-                      ),
+                      );
+                    },
+                    initTime: widget.date,
+                    cancelText:
+                        AppLocalizations.of(context).translate("cancel"),
+                    confirmText:
+                        AppLocalizations.of(context).translate("confirm"),
+                    onChange: (date) {
+                      setState(() {
+                        widget.date = date;
+                      });
+                    },
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.pop(context);
+                    },
+                    child: Icon(
+                      LucideIcons.xCircle,
+                    ),
+                  )
+                ],
+              ),
+            ),
 
-                    if (selectedFollowUps
-                        .any((option) => option.translationKey == 'relapse'))
+            // Scrollable middle content
+            Expanded(
+              child: SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        AppLocalizations.of(context)
+                            .translate('what-you-want-to-add'),
+                        style: TextStyles.h6,
+                      ),
+                      verticalSpace(Spacing.points8),
+                      // Free day option at the top
+                      FollowUpButton(
+                        followUpOption: freeDayOption,
+                        isSelected: selectedFollowUps.contains(freeDayOption),
+                        onTap: () => toggleFollowUp(freeDayOption),
+                      ),
+                      verticalSpace(Spacing.points8),
+                      // Other options in grid
                       Column(
                         children: [
-                          verticalSpace(Spacing.points8),
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Checkbox(
-                                value: addAllFollowUps,
-                                onChanged: (value) {
-                                  setState(() {
-                                    addAllFollowUps = value!;
-                                  });
-                                },
-                              ),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      AppLocalizations.of(context)
-                                          .translate('add-all-follow-ups'),
-                                      style: TextStyles.smallBold,
+                          for (int i = 0; i < otherOptions.length; i += 2)
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 8.0),
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: FollowUpButton(
+                                      followUpOption: otherOptions[i],
+                                      isSelected: selectedFollowUps
+                                          .contains(otherOptions[i]),
+                                      onTap: () =>
+                                          toggleFollowUp(otherOptions[i]),
                                     ),
-                                    Text(
-                                      AppLocalizations.of(context)
-                                          .translate('add-all-follow-ups-desc'),
-                                      style: TextStyles.small.copyWith(
-                                        color: theme.grey[500],
+                                  ),
+                                  if (i + 1 < otherOptions.length) ...[
+                                    horizontalSpace(Spacing.points8),
+                                    Expanded(
+                                      child: FollowUpButton(
+                                        followUpOption: otherOptions[i + 1],
+                                        isSelected: selectedFollowUps
+                                            .contains(otherOptions[i + 1]),
+                                        onTap: () =>
+                                            toggleFollowUp(otherOptions[i + 1]),
                                       ),
-                                      softWrap: true,
                                     ),
                                   ],
+                                ],
+                              ),
+                            ),
+                        ],
+                      ),
+                      verticalSpace(Spacing.points8),
+
+                      // Warning message moved here, after the options
+                      if (selectedFollowUps
+                          .any((option) => option.translationKey == 'free-day'))
+                        WidgetsContainer(
+                          padding: const EdgeInsets.all(12),
+                          backgroundColor: theme.success[50],
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: BorderSide(
+                            color: theme.success[300]!,
+                            width: 0.75,
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(
+                                LucideIcons.star,
+                                color: theme.success[700],
+                              ),
+                              horizontalSpace(Spacing.points8),
+                              Expanded(
+                                child: Text(
+                                  AppLocalizations.of(context)
+                                      .translate('free-day-warning-message'),
+                                  style: TextStyles.small
+                                      .copyWith(color: theme.success[700]),
                                 ),
                               ),
                             ],
                           ),
-                        ],
+                        ),
+
+                      if (selectedFollowUps
+                          .any((option) => option.translationKey == 'relapse'))
+                        Column(
+                          children: [
+                            verticalSpace(Spacing.points8),
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Checkbox(
+                                  value: addAllFollowUps,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      addAllFollowUps = value!;
+                                    });
+                                  },
+                                ),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        AppLocalizations.of(context)
+                                            .translate('add-all-follow-ups'),
+                                        style: TextStyles.smallBold,
+                                      ),
+                                      Text(
+                                        AppLocalizations.of(context).translate(
+                                            'add-all-follow-ups-desc'),
+                                        style: TextStyles.small.copyWith(
+                                          color: theme.grey[500],
+                                        ),
+                                        softWrap: true,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      verticalSpace(Spacing.points4),
+                      GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            _showEmotions = !_showEmotions;
+                          });
+                          HapticFeedback.selectionClick();
+                        },
+                        child: WidgetsContainer(
+                          padding: EdgeInsets.all(12),
+                          backgroundColor: theme.primary[50],
+                          borderSide: BorderSide(
+                            color: theme.primary[200]!,
+                            width: 0.75,
+                          ),
+                          borderRadius: BorderRadius.circular(12),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                AppLocalizations.of(context)
+                                    .translate('how-do-you-feel'),
+                                style: TextStyles.caption,
+                              ),
+                              Icon(
+                                _showEmotions
+                                    ? LucideIcons.chevronUp
+                                    : LucideIcons.chevronDown,
+                                color: theme.grey[600],
+                              ),
+                            ],
+                          ),
+                        ),
                       ),
-                    verticalSpace(Spacing.points16),
-                    Text(
-                      AppLocalizations.of(context).translate('how-do-you-feel'),
-                      style: TextStyles.h6,
-                    ),
-                    verticalSpace(Spacing.points8),
-                    Text(
-                      AppLocalizations.of(context)
-                          .translate('negative-feelings'),
-                      style: TextStyles.footnoteSelected.copyWith(
-                        color: theme.grey[700],
-                      ),
-                    ),
-                    verticalSpace(Spacing.points4),
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      children: badEmotions.map((emotion) {
-                        return EmotionButton(
-                          emotion: emotion,
-                          isSelected: selectedEmotions.contains(emotion),
-                          onTap: () => toggleEmotion(emotion),
-                        );
-                      }).toList(),
-                    ),
-                    verticalSpace(Spacing.points16),
-                    Text(
-                      AppLocalizations.of(context)
-                          .translate('positive-feelings'),
-                      style: TextStyles.footnoteSelected.copyWith(
-                        color: theme.grey[700],
-                      ),
-                    ),
-                    verticalSpace(Spacing.points4),
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      children: goodEmotions.map((emotion) {
-                        return EmotionButton(
-                          emotion: emotion,
-                          isSelected: selectedEmotions.contains(emotion),
-                          onTap: () => toggleEmotion(emotion),
-                        );
-                      }).toList(),
-                    ),
-                    verticalSpace(Spacing.points16),
-                  ],
+                      if (_showEmotions) ...[
+                        verticalSpace(Spacing.points8),
+                        Text(
+                          AppLocalizations.of(context)
+                              .translate('negative-feelings'),
+                          style: TextStyles.footnoteSelected.copyWith(
+                            color: theme.grey[700],
+                          ),
+                        ),
+                        verticalSpace(Spacing.points4),
+                        Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
+                          children: badEmotions.map((emotion) {
+                            return EmotionButton(
+                              emotion: emotion,
+                              isSelected: selectedEmotions.contains(emotion),
+                              onTap: () => toggleEmotion(emotion),
+                            );
+                          }).toList(),
+                        ),
+                        verticalSpace(Spacing.points16),
+                        Text(
+                          AppLocalizations.of(context)
+                              .translate('positive-feelings'),
+                          style: TextStyles.footnoteSelected.copyWith(
+                            color: theme.grey[700],
+                          ),
+                        ),
+                        verticalSpace(Spacing.points4),
+                        Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
+                          children: goodEmotions.map((emotion) {
+                            return EmotionButton(
+                              emotion: emotion,
+                              isSelected: selectedEmotions.contains(emotion),
+                              onTap: () => toggleEmotion(emotion),
+                            );
+                          }).toList(),
+                        ),
+                        verticalSpace(Spacing.points16),
+                      ],
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-          // Fixed bottom row with save/cancel buttons
-          Column(
-            children: [
-              Container(
-                color: theme.backgroundColor,
-                padding: EdgeInsets.all(16),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: GestureDetector(
-                        onTap: _isProcessing
-                            ? null
-                            : () async {
-                                setState(() => _isProcessing = true);
+            // Fixed bottom row with save/cancel buttons
+            Column(
+              children: [
+                Container(
+                  color: theme.backgroundColor,
+                  padding: EdgeInsets.all(16),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: _isProcessing
+                              ? null
+                              : () async {
+                                  setState(() => _isProcessing = true);
 
-                                try {
-                                  await _saveFollowUpsAndEmotions();
-                                  if (mounted) {
-                                    await Future.wait([
-                                      ref.refresh(
-                                          statisticsNotifierProvider.future),
-                                      ref.refresh(
-                                          streakNotifierProvider.future),
-                                      ref.refresh(
-                                          followUpNotifierProvider.future),
-                                      ref.refresh(
-                                          calendarNotifierProvider.future),
-                                    ]);
+                                  try {
+                                    await _saveFollowUpsAndEmotions();
+                                    if (mounted) {
+                                      await Future.wait([
+                                        ref.refresh(
+                                            statisticsNotifierProvider.future),
+                                        ref.refresh(
+                                            streakNotifierProvider.future),
+                                        ref.refresh(
+                                            followUpNotifierProvider.future),
+                                        ref.refresh(
+                                            calendarNotifierProvider.future),
+                                      ]);
 
-                                    Navigator.pop(context);
+                                      Navigator.pop(context);
+                                    }
+                                  } catch (e) {
+                                    if (mounted) {
+                                      setState(() => _isProcessing = false);
+                                    }
                                   }
-                                } catch (e) {
-                                  if (mounted) {
-                                    setState(() => _isProcessing = false);
-                                  }
-                                }
-                              },
-                        child: WidgetsContainer(
-                          borderRadius: BorderRadius.circular(10),
-                          backgroundColor: _isProcessing
-                              ? theme.grey[400]
-                              : theme.primary[600],
-                          child: Center(
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                if (_isProcessing) ...[
-                                  SizedBox(
-                                    height: 20,
-                                    width: 20,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                      valueColor: AlwaysStoppedAnimation<Color>(
-                                        theme.grey[50]!,
+                                },
+                          child: WidgetsContainer(
+                            borderRadius: BorderRadius.circular(10),
+                            backgroundColor: _isProcessing
+                                ? theme.grey[400]
+                                : theme.primary[600],
+                            child: Center(
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  if (_isProcessing) ...[
+                                    SizedBox(
+                                      height: 20,
+                                      width: 20,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        valueColor:
+                                            AlwaysStoppedAnimation<Color>(
+                                          theme.grey[50]!,
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                  horizontalSpace(Spacing.points8),
-                                  Text(
-                                    AppLocalizations.of(context)
-                                        .translate('saving'),
-                                    style: TextStyles.caption
-                                        .copyWith(color: theme.grey[50]),
-                                  ),
-                                ] else
-                                  Text(
-                                    AppLocalizations.of(context)
-                                        .translate('save'),
-                                    style: TextStyles.caption
-                                        .copyWith(color: theme.grey[50]),
-                                  ),
-                              ],
+                                    horizontalSpace(Spacing.points8),
+                                    Text(
+                                      AppLocalizations.of(context)
+                                          .translate('saving'),
+                                      style: TextStyles.caption
+                                          .copyWith(color: theme.grey[50]),
+                                    ),
+                                  ] else
+                                    Text(
+                                      AppLocalizations.of(context)
+                                          .translate('save'),
+                                      style: TextStyles.caption
+                                          .copyWith(color: theme.grey[50]),
+                                    ),
+                                ],
+                              ),
                             ),
                           ),
                         ),
                       ),
-                    ),
-                    horizontalSpace(Spacing.points8),
-                    Expanded(
-                      child: GestureDetector(
-                        onTap: () {
-                          HapticFeedback.lightImpact();
-                          Navigator.pop(context);
-                        },
-                        child: WidgetsContainer(
-                          borderRadius: BorderRadius.circular(10),
-                          backgroundColor: theme.backgroundColor,
-                          borderSide:
-                              BorderSide(color: theme.grey[600]!, width: 0.25),
-                          child: Center(
-                            child: Text(
-                              AppLocalizations.of(context).translate('cancel'),
-                              style: TextStyles.caption
-                                  .copyWith(color: theme.grey[900]),
+                      horizontalSpace(Spacing.points8),
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: () {
+                            HapticFeedback.lightImpact();
+                            Navigator.pop(context);
+                          },
+                          child: WidgetsContainer(
+                            borderRadius: BorderRadius.circular(10),
+                            backgroundColor: theme.backgroundColor,
+                            borderSide: BorderSide(
+                                color: theme.grey[600]!, width: 0.25),
+                            child: Center(
+                              child: Text(
+                                AppLocalizations.of(context)
+                                    .translate('cancel'),
+                                style: TextStyles.caption
+                                    .copyWith(color: theme.grey[900]),
+                              ),
                             ),
                           ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-            ],
-          ),
-        ],
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

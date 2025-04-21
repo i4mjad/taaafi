@@ -24,6 +24,7 @@
   "activities-notifications-settings": "تذكيرات التمارين",
   "cancel-notifications": "إيقاف التنبيهات",
   "allow-notifications": "السماح بالاشعارات",
+  "cancel": "إغلاق",
   "allow-notifications-desc": "للحصول على تذكيرات للتمارين اليومية، يجب السماح للتطبيق بإرسال الإشعارات",
   "cancel-notifications-confirmation": "هل أنت متأكد أنك تريد إيقاف الإشعارات لهذا التمرين؟",
   "activity-extended": "تم تمديد التمرين بنجاح",
