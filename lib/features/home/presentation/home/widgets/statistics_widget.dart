@@ -303,158 +303,42 @@ class CurrentStreaksWidget extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 if (visibilitySettings['relapse']!) ...[
-                  WidgetsContainer(
-                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                    backgroundColor: theme.backgroundColor,
-                    borderSide: BorderSide(
-                        color: followUpColors[FollowUpType.relapse]!,
-                        width: 0.75),
-                    child: Column(
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              localization.translate("current-streak"),
-                              style: TextStyles.footnoteSelected.copyWith(
-                                color: followUpColors[FollowUpType.relapse]!,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                            Text(
-                              _getLastFollowUpDateText(FollowUpType.relapse,
-                                  followUpsState, localization),
-                              style: TextStyles.caption.copyWith(
-                                color: theme.grey[500],
-                              ),
-                            ),
-                          ],
-                        ),
-                        verticalSpace(Spacing.points8),
-                        DetailedStreakWidget(
-                          initialInfo: detailedStreaks['relapse']!,
-                          color: followUpColors[FollowUpType.relapse]!,
-                          type: FollowUpType.relapse,
-                        ),
-                      ],
-                    ),
+                  DetailedStreakCard(
+                    titleKey: "current-streak",
+                    icon: LucideIcons.heartCrack,
+                    followUpType: FollowUpType.relapse,
+                    followUpsState: followUpsState,
+                    initialInfo: detailedStreaks['relapse']!,
                   ),
                   verticalSpace(Spacing.points12),
                 ],
                 if (visibilitySettings['pornOnly']!) ...[
-                  WidgetsContainer(
-                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                    backgroundColor: theme.backgroundColor,
-                    borderSide: BorderSide(
-                        color: followUpColors[FollowUpType.pornOnly]!,
-                        width: 0.75),
-                    child: Column(
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              localization.translate("free-porn-days"),
-                              style: TextStyles.footnoteSelected.copyWith(
-                                color: followUpColors[FollowUpType.pornOnly]!,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                            Text(
-                              _getLastFollowUpDateText(FollowUpType.pornOnly,
-                                  followUpsState, localization),
-                              style: TextStyles.caption.copyWith(
-                                color: theme.grey[500],
-                              ),
-                            ),
-                          ],
-                        ),
-                        verticalSpace(Spacing.points8),
-                        DetailedStreakWidget(
-                          initialInfo: detailedStreaks['pornOnly']!,
-                          color: followUpColors[FollowUpType.pornOnly]!,
-                          type: FollowUpType.pornOnly,
-                        ),
-                      ],
-                    ),
+                  DetailedStreakCard(
+                    titleKey: "free-porn-days",
+                    icon: LucideIcons.play,
+                    followUpType: FollowUpType.pornOnly,
+                    followUpsState: followUpsState,
+                    initialInfo: detailedStreaks['pornOnly']!,
                   ),
                   verticalSpace(Spacing.points12),
                 ],
                 if (visibilitySettings['mastOnly']!) ...[
-                  WidgetsContainer(
-                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                    backgroundColor: theme.backgroundColor,
-                    borderSide: BorderSide(
-                        color: followUpColors[FollowUpType.mastOnly]!,
-                        width: 0.75),
-                    child: Column(
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              localization.translate("free-mast-days"),
-                              style: TextStyles.footnoteSelected.copyWith(
-                                color: followUpColors[FollowUpType.mastOnly]!,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                            Text(
-                              _getLastFollowUpDateText(FollowUpType.mastOnly,
-                                  followUpsState, localization),
-                              style: TextStyles.caption.copyWith(
-                                color: theme.grey[500],
-                              ),
-                            ),
-                          ],
-                        ),
-                        verticalSpace(Spacing.points8),
-                        DetailedStreakWidget(
-                          initialInfo: detailedStreaks['mastOnly']!,
-                          color: followUpColors[FollowUpType.mastOnly]!,
-                          type: FollowUpType.mastOnly,
-                        ),
-                      ],
-                    ),
+                  DetailedStreakCard(
+                    titleKey: "free-mast-days",
+                    icon: LucideIcons.hand,
+                    followUpType: FollowUpType.mastOnly,
+                    followUpsState: followUpsState,
+                    initialInfo: detailedStreaks['mastOnly']!,
                   ),
                   verticalSpace(Spacing.points12),
                 ],
                 if (visibilitySettings['slipUp']!)
-                  WidgetsContainer(
-                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                    backgroundColor: theme.backgroundColor,
-                    borderSide: BorderSide(
-                        color: followUpColors[FollowUpType.slipUp]!,
-                        width: 0.75),
-                    child: Column(
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              localization.translate("free-slips-days"),
-                              style: TextStyles.footnoteSelected.copyWith(
-                                color: followUpColors[FollowUpType.slipUp]!,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                            Text(
-                              _getLastFollowUpDateText(FollowUpType.slipUp,
-                                  followUpsState, localization),
-                              style: TextStyles.caption.copyWith(
-                                color: theme.grey[500],
-                              ),
-                            ),
-                          ],
-                        ),
-                        verticalSpace(Spacing.points8),
-                        DetailedStreakWidget(
-                          initialInfo: detailedStreaks['slipUp']!,
-                          color: followUpColors[FollowUpType.slipUp]!,
-                          type: FollowUpType.slipUp,
-                        ),
-                      ],
-                    ),
+                  DetailedStreakCard(
+                    titleKey: "free-slips-days",
+                    icon: LucideIcons.planeLanding,
+                    followUpType: FollowUpType.slipUp,
+                    followUpsState: followUpsState,
+                    initialInfo: detailedStreaks['slipUp']!,
                   ),
                 verticalSpace(Spacing.points16),
               ],
@@ -471,6 +355,85 @@ class CurrentStreaksWidget extends ConsumerWidget {
       error: (error, stack) => SizedBox(
         height: 150,
         child: Center(child: Text('Error: $error')),
+      ),
+    );
+  }
+}
+
+class DetailedStreakCard extends StatelessWidget {
+  final String titleKey;
+  final IconData icon;
+  final FollowUpType followUpType;
+  final Map<FollowUpType, List<FollowUpModel>> followUpsState;
+  final DetailedStreakInfo initialInfo;
+
+  const DetailedStreakCard({
+    super.key,
+    required this.titleKey,
+    required this.icon,
+    required this.followUpType,
+    required this.followUpsState,
+    required this.initialInfo,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = AppTheme.of(context);
+    final localization = AppLocalizations.of(context);
+
+    return WidgetsContainer(
+      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      backgroundColor: theme.backgroundColor,
+      borderSide: BorderSide(
+        color: followUpColors[followUpType]!,
+        width: 0.75,
+      ),
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
+                  Icon(
+                    icon,
+                    size: 16,
+                    color: followUpColors[followUpType],
+                  ),
+                  horizontalSpace(Spacing.points4),
+                  Text(
+                    localization.translate(titleKey),
+                    style: TextStyles.footnoteSelected.copyWith(
+                      color: followUpColors[followUpType]!,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          verticalSpace(Spacing.points4),
+          Row(
+            children: [
+              Text(
+                _getLastFollowUpDateText(
+                  followUpType,
+                  followUpsState,
+                  localization,
+                ),
+                style: TextStyles.small.copyWith(
+                  color: theme.grey[500],
+                ),
+              ),
+            ],
+          ),
+          verticalSpace(Spacing.points8),
+          DetailedStreakWidget(
+            initialInfo: initialInfo,
+            color: followUpColors[followUpType]!,
+            type: followUpType,
+          ),
+        ],
       ),
     );
   }
