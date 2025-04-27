@@ -23,6 +23,45 @@ import 'package:reboot_app_3/features/authentication/application/migration_servi
 import 'package:reboot_app_3/features/authentication/data/models/user_document.dart';
 import 'package:reboot_app_3/features/authentication/providers/user_document_provider.dart';
 
+// Helper function to extract line number from stack trace
+Map<String, String> getExceptionLocationInfo(StackTrace stackTrace) {
+  String stackTraceString = stackTrace.toString();
+  List<String> lines = stackTraceString.split('\n');
+  Map<String, String> result = {
+    'raw_trace': lines.isNotEmpty ? lines[0] : 'Unknown location',
+    'file': 'Unknown file',
+    'line': 'Unknown line',
+    'column': 'Unknown column',
+    'method': 'Unknown method'
+  };
+
+  // Parse the first relevant line to extract file, line, and column information
+  if (lines.length > 1) {
+    // Typical format: "#1      _ConfirmUserDetailsScreenState._method (file:///path/to/file.dart:123:45)"
+    String traceLine =
+        lines[1]; // Use the immediate caller where the exception occurred
+
+    // Extract method name - everything before the file path
+    final methodMatch = RegExp(r'#\d+\s+(.+?)\s+\(').firstMatch(traceLine);
+    if (methodMatch != null && methodMatch.groupCount >= 1) {
+      result['method'] = methodMatch.group(1) ?? 'Unknown method';
+    }
+
+    // Extract file path, line, and column
+    final locationMatch =
+        RegExp(r'\((.+?):(\d+):(\d+)\)').firstMatch(traceLine);
+    if (locationMatch != null && locationMatch.groupCount >= 3) {
+      result['file'] = locationMatch.group(1) ?? 'Unknown file';
+      result['line'] = locationMatch.group(2) ?? 'Unknown line';
+      result['column'] = locationMatch.group(3) ?? 'Unknown column';
+    }
+
+    result['raw_trace'] = traceLine;
+  }
+
+  return result;
+}
+
 class ConfirmUserDetailsScreen extends ConsumerStatefulWidget {
   const ConfirmUserDetailsScreen({Key? key}) : super(key: key);
 
@@ -275,14 +314,25 @@ class _ConfirmUserDetailsScreenState
                                 final validationError =
                                     validateUserDocument(userDocument);
                                 if (validationError != null) {
+                                  final StackTrace currentStack =
+                                      StackTrace.current;
+                                  final locationInfo =
+                                      getExceptionLocationInfo(currentStack);
                                   ref.read(errorLoggerProvider).logException(
-                                    Exception(validationError),
-                                    StackTrace.current,
+                                    Exception(
+                                        'Validation error: $validationError'),
+                                    currentStack,
                                     context: {
                                       'validation_context': {
                                         'user_id': userDocument.uid,
                                         'error': validationError,
-                                      }
+                                      },
+                                      'source_file': locationInfo['file'],
+                                      'source_line': locationInfo['line'],
+                                      'source_column': locationInfo['column'],
+                                      'source_method': locationInfo['method'],
+                                      'validation_source':
+                                          'validateUserDocument',
                                     },
                                   );
                                   getErrorSnackBar(
@@ -368,14 +418,18 @@ class _ConfirmUserDetailsScreenState
                                   context.goNamed(RouteNames.home.name);
                                 } catch (e, stackTrace) {
                                   // Log error with context and specific error details
+                                  final locationInfo =
+                                      getExceptionLocationInfo(stackTrace);
                                   ref.read(errorLoggerProvider).logException(
                                     e,
-                                    stackTrace,
+                                    stackTrace, // Use the actual caught stackTrace
                                     context: {
-                                      'error_type': e.runtimeType
-                                          .toString(), // Log the specific error type
-                                      'error_message': e
-                                          .toString(), // Log the specific error message
+                                      'error_type': e.runtimeType.toString(),
+                                      'error_message': e.toString(),
+                                      'source_file': locationInfo['file'],
+                                      'source_line': locationInfo['line'],
+                                      'source_column': locationInfo['column'],
+                                      'source_method': locationInfo['method'],
                                       'migration_context': {
                                         'user_id': userDocument.uid,
                                         'display_name':
