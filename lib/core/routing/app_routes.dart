@@ -60,6 +60,14 @@ GoRouter goRouter(GoRouterRef ref) {
       final isLoggedIn = authState.asData?.value != null;
 
       if (isLoggedIn) {
+        // Check if the auth state is being refreshed
+        if (authState is AsyncLoading) {
+          if (state.matchedLocation != '/loading') {
+            return '/loading';
+          }
+          return null;
+        }
+
         // Fetch the user document state
         final isLoading = userDocumentState is AsyncLoading;
         final hasError = userDocumentState is AsyncError;
@@ -73,8 +81,10 @@ GoRouter goRouter(GoRouterRef ref) {
           return null;
         }
 
-        // If document is null or has errors, redirect to complete account registration
+        // If there was an error fetching the document or the document is null,
+        // this could indicate a recreated account scenario or missing document
         if (userDocument == null || hasError) {
+          // Check if we're already on the account registration page to prevent loops
           if (state.matchedLocation != '/completeAccountRegisteration') {
             return '/completeAccountRegisteration';
           }
@@ -86,19 +96,19 @@ GoRouter goRouter(GoRouterRef ref) {
             userDocumentNotifier.isLegacyUserDocument(userDocument);
         final isNew = userDocumentNotifier.isNewUserDocument(userDocument);
 
-        // Check for missing required data
-        if (!isLegacy && userDocumentNotifier.hasMissingData(userDocument)) {
+        // Only check for old structure if the document exists and is actually a legacy document
+        // This prevents redirecting new signups to confirmProfileDetails
+        if (isLegacy) {
           if (state.matchedLocation != '/confirmProfileDetails') {
             return '/confirmProfileDetails';
           }
           return null;
         }
 
-        // Only check for old structure if the document exists and is actually a legacy document
-        // This prevents redirecting new signups to confirmProfileDetails
-        if (isLegacy && userDocument.role == null) {
-          if (state.matchedLocation != '/confirmProfileDetails') {
-            return '/confirmProfileDetails';
+        // Check for missing required data
+        if (userDocumentNotifier.hasMissingData(userDocument)) {
+          if (state.matchedLocation != '/completeAccountRegisteration') {
+            return '/completeAccountRegisteration';
           }
           return null;
         }

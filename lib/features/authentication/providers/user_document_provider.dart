@@ -28,50 +28,96 @@ class UserDocumentsNotifier extends _$UserDocumentsNotifier {
     try {
       state = const AsyncLoading(); // Indicate loading state
 
-      final uid = _auth.currentUser?.uid;
+      // Force a full refresh of the current user
+      try {
+        await _auth.currentUser?.reload();
+      } catch (reloadError) {
+        // If reload fails, the user might have been deleted
+        ref.read(errorLoggerProvider).logException(
+            reloadError, StackTrace.current,
+            message: "Failed to reload user data");
+        // Force sign out to clear any stale state
+        await _auth.signOut();
+        state = const AsyncValue.data(null);
+        return null;
+      }
+
+      final currentUser = _auth.currentUser;
+      final uid = currentUser?.uid;
+
       if (uid == null) {
-        state = AsyncValue.data(null); // Update state with error
-        throw Exception("User ID is null");
+        state = const AsyncValue.data(null);
+        return null;
+      }
+
+      // Verify user token is still valid
+      try {
+        await currentUser!.getIdToken(true); // Force token refresh
+      } catch (tokenError) {
+        // Invalid token indicates authentication issues
+        ref.read(errorLoggerProvider).logException(
+            tokenError, StackTrace.current,
+            message: "Invalid authentication token");
+
+        // Force sign out to clear any invalid cached state
+        await _auth.signOut();
+        state = const AsyncValue.data(null);
+        return null;
       }
 
       final doc = await _firestore
           .collection('users')
           .doc(uid)
           .get(GetOptions(source: Source.server));
+
       if (!doc.exists) {
-        state = AsyncValue.data(null); // Update state with error
-        return null; // No document found
+        // User document does not exist, but auth user does
+        // This could indicate a deleted account that was recreated
+        ref.read(errorLoggerProvider).logInfo(
+            "User authenticated but document not found. Possible recreated account.");
+        state = const AsyncValue.data(null);
+        return null;
       }
 
       var userDocument = UserDocument.fromFirestore(doc);
 
-      state = AsyncValue.data(userDocument); // Update state with data
+      // Add additional verification - check email matches for extra security
+      if (currentUser.email != null &&
+          userDocument.email != null &&
+          userDocument.email != currentUser.email) {
+        ref.read(errorLoggerProvider).logWarning(
+            "User email mismatch between auth and Firestore. Possible recreated account.",
+            context: {
+              'auth_email': currentUser.email,
+              'firestore_email': userDocument.email,
+              'uid': uid,
+            });
+        state = const AsyncValue.data(null);
+        return null;
+      }
+
+      state = AsyncValue.data(userDocument);
       return userDocument;
     } catch (e, stack) {
-      state = AsyncValue.error(e, stack); // Update state with error
+      ref
+          .read(errorLoggerProvider)
+          .logException(e, stack, message: "Error fetching user document");
+      state = AsyncValue.error(e, stack);
       return null;
     }
   }
 
   Future<UserDocument?> getUserDocument(String uid) async {
     try {
-      if (uid == null) {
-        state = AsyncValue.data(null); // Update state with error
-        throw Exception("User ID is null");
-      }
-
       final doc = await _firestore
           .collection('users')
           .doc(uid)
           .get(GetOptions(source: Source.server));
       if (!doc.exists) {
-        state = AsyncValue.data(null); // Update state with error
         return null; // No document found
       }
 
-      var userDocument = UserDocument.fromFirestore(doc);
-
-      return userDocument;
+      return UserDocument.fromFirestore(doc);
     } catch (e, stackTrace) {
       ref.read(errorLoggerProvider).logException(e, stackTrace);
       return null;

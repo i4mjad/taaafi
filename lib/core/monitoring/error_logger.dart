@@ -12,6 +12,7 @@ class ErrorLogger {
     Object exception,
     StackTrace? stackTrace, {
     Map<String, dynamic>? context,
+    String? message,
   }) async {
     // Set custom keys for Crashlytics if context is provided
     if (context != null) {
@@ -21,20 +22,57 @@ class ErrorLogger {
       }
     }
 
+    // Add message as a custom key if provided
+    if (message != null) {
+      await FirebaseCrashlytics.instance.setCustomKey('message', message);
+    }
+
     await FirebaseCrashlytics.instance.recordFlutterFatalError(
       FlutterErrorDetails(
         exception: exception,
         stack: stackTrace,
-        context: ErrorDescription(context?.toString() ?? ''),
+        context: ErrorDescription(context?.toString() ?? message ?? ''),
       ),
     );
 
     log(
-      exception.toString(),
+      message ?? exception.toString(),
       name: 'Exception',
       error: exception,
       stackTrace: stackTrace,
     );
+  }
+
+  /// Logs informational messages that are not errors
+  void logInfo(String message, {Map<String, dynamic>? context}) {
+    log(
+      message,
+      name: 'Info',
+    );
+
+    // Optionally log to Crashlytics as breadcrumb
+    if (context != null) {
+      FirebaseCrashlytics.instance
+          .log('INFO: $message - ${context.toString()}');
+    } else {
+      FirebaseCrashlytics.instance.log('INFO: $message');
+    }
+  }
+
+  /// Logs warning messages that are not critical errors
+  void logWarning(String message, {Map<String, dynamic>? context}) {
+    log(
+      message,
+      name: 'Warning',
+    );
+
+    // Log to Crashlytics as breadcrumb
+    if (context != null) {
+      FirebaseCrashlytics.instance
+          .log('WARNING: $message - ${context.toString()}');
+    } else {
+      FirebaseCrashlytics.instance.log('WARNING: $message');
+    }
   }
 }
 
