@@ -450,6 +450,8 @@
   "confirm": "Confirm",
   "cancel": "Cancel",
   "not-started": "Not started yet",
+  "not-set": "Not set",
+  "review-your-details": "Review your details",
   "extend-activity": "Extend Activity",
   "activity-notifications": "Activity Notifications",
   "select-extension-period": "Select extension period",

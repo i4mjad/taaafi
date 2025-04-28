@@ -38,6 +38,12 @@ class FirebaseMessagingRepository {
         );
       }
 
+      // Check if user document exists
+      final docRef = await _firestore.collection('users').doc(uid).get();
+      if (!docRef.exists) {
+        return; // Skip updating if document doesn't exist
+      }
+
       await _firestore.collection('users').doc(uid).set({
         'messagingToken': await _messaging.getToken(),
         'lastTokenUpdate': FieldValue.serverTimestamp(),

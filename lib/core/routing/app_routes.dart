@@ -95,20 +95,21 @@ GoRouter goRouter(GoRouterRef ref) {
         final isLegacy =
             userDocumentNotifier.isLegacyUserDocument(userDocument);
         final isNew = userDocumentNotifier.isNewUserDocument(userDocument);
+        final hasMissingData =
+            userDocumentNotifier.hasMissingData(userDocument);
 
-        // Only check for old structure if the document exists and is actually a legacy document
-        // This prevents redirecting new signups to confirmProfileDetails
-        if (isLegacy) {
-          if (state.matchedLocation != '/confirmProfileDetails') {
-            return '/confirmProfileDetails';
-          }
-          return null;
+        // If we're on confirmProfileDetails and the document is no longer legacy,
+        // redirect to home to prevent loops
+        if (state.matchedLocation == '/confirmProfileDetails' &&
+            !isLegacy &&
+            !hasMissingData) {
+          return '/home';
         }
 
-        // Check for missing required data
-        if (userDocumentNotifier.hasMissingData(userDocument)) {
-          if (state.matchedLocation != '/completeAccountRegisteration') {
-            return '/completeAccountRegisteration';
+        // Check for legacy users or missing data
+        if (userDocument != null && (isLegacy || hasMissingData)) {
+          if (state.matchedLocation != '/confirmProfileDetails') {
+            return '/confirmProfileDetails';
           }
           return null;
         }
@@ -116,7 +117,8 @@ GoRouter goRouter(GoRouterRef ref) {
         // Allow navigation to other routes if the user has the new document structure
         if (isNew) {
           if (state.matchedLocation.startsWith('/onboarding') ||
-              state.matchedLocation == '/loading') {
+              state.matchedLocation == '/loading' ||
+              state.matchedLocation == '/confirmProfileDetails') {
             return '/home';
           }
           return null;

@@ -60,7 +60,6 @@ class StreakNotifier extends _$StreakNotifier {
       slipUpStreak: results[4] as int,
     );
 
-    print('Streaks: $streaks');
     state = AsyncValue.data(streaks);
   }
 }

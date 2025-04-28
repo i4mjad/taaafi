@@ -136,7 +136,7 @@ class _ConfirmUserDetailsScreenState
 
     return Scaffold(
       backgroundColor: theme.backgroundColor,
-      appBar: appBar(context, ref, 'confirm-your-details', true, false),
+      appBar: appBar(context, ref, 'review-your-details', true, false),
       body: userDocumentAsyncValue.when(
         data: (userDocument) {
           if (userDocument == null) {
@@ -310,37 +310,6 @@ class _ConfirmUserDetailsScreenState
                             : () async {
                                 setState(() => _isProcessing = true);
 
-                                // Add this before attempting migration
-                                final validationError =
-                                    validateUserDocument(userDocument);
-                                if (validationError != null) {
-                                  final StackTrace currentStack =
-                                      StackTrace.current;
-                                  final locationInfo =
-                                      getExceptionLocationInfo(currentStack);
-                                  ref.read(errorLoggerProvider).logException(
-                                    Exception(
-                                        'Validation error: $validationError'),
-                                    currentStack,
-                                    context: {
-                                      'validation_context': {
-                                        'user_id': userDocument.uid,
-                                        'error': validationError,
-                                      },
-                                      'source_file': locationInfo['file'],
-                                      'source_line': locationInfo['line'],
-                                      'source_column': locationInfo['column'],
-                                      'source_method': locationInfo['method'],
-                                      'validation_source':
-                                          'validateUserDocument',
-                                    },
-                                  );
-                                  getErrorSnackBar(
-                                      context, "invalid-user-data");
-                                  setState(() => _isProcessing = false);
-                                  return;
-                                }
-
                                 // Validate date of birth
                                 if (selectedBirthDate != null &&
                                     selectedBirthDate!
@@ -376,10 +345,6 @@ class _ConfirmUserDetailsScreenState
                                 }
 
                                 try {
-                                  // Log migration attempt - using print instead of error logger
-                                  print(
-                                      'DEBUG: Migration attempt for user ${userDocument.uid}');
-
                                   // Create new user document
                                   final newUserDoc = UserDocument(
                                     uid: userDocument.uid ??
