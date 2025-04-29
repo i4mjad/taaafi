@@ -21,11 +21,26 @@ class UserDocumentsNotifier extends _$UserDocumentsNotifier {
         state = const AsyncValue.data(null);
       }
     });
-    return await getUserDocument(_auth.currentUser?.uid ?? '');
+
+    final currentUser = _auth.currentUser;
+    if (currentUser == null) {
+      return null;
+    }
+
+    return await getUserDocument(currentUser.uid);
   }
 
   Future<UserDocument?> getUserDocument(String uid) async {
     try {
+      // Validate the uid before making the Firestore call
+      if (uid.isEmpty) {
+        ref.read(errorLoggerProvider).logException(
+              'Invalid UID: Empty string provided for document path',
+              StackTrace.current,
+            );
+        return null;
+      }
+
       final doc = await _firestore
           .collection('users')
           .doc(uid)
