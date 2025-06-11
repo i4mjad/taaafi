@@ -1,9 +1,11 @@
 import { type Locale, fallbackLng } from "../i18n/settings";
 import { getDictionary } from "../dictionaries/get-dictonaries";
-import { Button } from "../../../components/ui/button";
-import { AppStoreIcon, GooglePlayIcon } from "../../../components/ui/icons";
-import Link from "next/link";
-import Image from "next/image";
+import { HeroScrollSection } from "@/components/hero-scroll";
+import Header from "@/components/header";
+import AboutSectionCompanyValues from "@/components/about-section";
+import Footer from "@/components/footer";
+import StatisticsSection from "@/components/statistics-section";
+import { Contact } from "lucide-react";
 
 export default async function ComingSoonPage({
   params,
@@ -14,65 +16,20 @@ export default async function ComingSoonPage({
   const dict = await getDictionary(lang || fallbackLng);
 
   return (
-    <div className="min-h-screen flex items-center">
-      <div className="container mx-auto px-4 py-8 text-center">
-        <div className="max-w-2xl mx-auto">
-          <div className="relative w-32 h-32 mx-auto mb-8">
-            <Image
-              src="/app-icon.png"
-              alt="App Icon"
-              fill
-              priority
-              className="object-contain"
-            />
-          </div>
-          <h1 className="text-4xl font-bold mb-8">{dict.comingSoon}</h1>
-          {/* <h2
-            className="text-2xl font-semibold mb-4"
-            style={{ color: "#ff5733" }}
-          >
-            {dict.latestVersionAvailable}
-          </h2> */}
-          <div className="flex flex-col justify-center gap-2 mb-8 mx-auto">
-            <Button asChild className="flex items-center justify-center">
-              <a
-                href="https://play.google.com/store/apps/details?id=com.amjadkhalfan.reboot_app_3&hl=ar"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <GooglePlayIcon className="mr-2" />
-                {dict.downloadGooglePlay}
-              </a>
-            </Button>
-            <Button asChild className="flex items-center justify-center">
-              <a
-                href="https://apps.apple.com/om/app/reboot-app-for-better-life/id1531562469"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <AppStoreIcon className="mr-2" />
-                {dict.downloadAppStore}
-              </a>
-            </Button>
-          </div>
+    <>
+      <HeroScrollSection dict={dict} />
+      
+      <AboutSectionCompanyValues />
 
-          <Link href={`/${lang}/terms`}>
-            <Button variant="outline" className="mb-12">
-              {dict.termsAndConditions}
-            </Button>
-          </Link>
+      {/* Statistics Section */}
+      <StatisticsSection />
 
-          <section className="max-w-2xl mx-auto">
-            <h2 className="text-2xl font-semibold mb-4">{dict.contactUs}</h2>
-            <a href="mailto:admin@ta3afi.app">
-              <u>
-                <p>{dict.contactUsDescription}</p>
-              </u>
-            </a>
-          </section>
-        </div>
-      </div>
-    </div>
+      {/* Contact Section */}
+      <Contact />
+
+      {/* Footer */}
+      <Footer />
+    </>
   );
 }
 

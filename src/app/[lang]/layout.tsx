@@ -1,4 +1,6 @@
+import Header from "@/components/header";
 import { type Locale, languages, fallbackLng } from "../i18n/settings";
+import { getDictionary } from "../dictionaries/get-dictonaries";
 import Link from "next/link";
 
 export async function generateStaticParams() {
@@ -13,23 +15,15 @@ export default async function LocaleLayout({
   params: Promise<{ lang: Locale }>;
 }) {
   const { lang } = await params;
+  const dict = await getDictionary(lang || fallbackLng);
   const dir = lang === "ar" ? "rtl" : "ltr";
 
   return (
     <html lang={lang} dir={dir}>
-      <body className={"flex min-h-screen flex-col font-kufam"}>
+      <body className={"flex min-h-screen flex-col font-ibm"}>
         <nav className="p-4">
-          <div className="flex justify-center">
-            {["en", "ar"].map((l) => (
-              <Link
-                key={l}
-                href={`/${l}`}
-                className={`mx-2 ${l === lang ? "font-bold" : ""}`}
-              >
-                {l.toUpperCase()}
-              </Link>
-            ))}
-          </div>
+        <Header dict={dict} />
+          
         </nav>
         <main className="flex-grow">{children}</main>
       </body>

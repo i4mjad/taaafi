@@ -10,7 +10,7 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        kufam: ["Kufam", "sans-serif"],
+        ibm: ["IBM Plex Sans Arabic", "sans-serif"],
         sans: ["Arial", "sans-serif"],
       },
       colors: {

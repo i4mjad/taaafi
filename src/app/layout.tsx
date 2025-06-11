@@ -1,7 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import "@/app/globals.css";
-import { fallbackLng } from "@/app/i18n/settings";
 
 export const metadata: Metadata = {
   title: "Ta'aafi App",
