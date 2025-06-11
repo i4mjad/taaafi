@@ -1,8 +1,9 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { Smartphone, Menu } from "lucide-react"
+import { Menu } from "lucide-react"
 import Link from "next/link"
+import Image from "next/image"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import { usePathname, useRouter } from "next/navigation"
@@ -38,7 +39,13 @@ export default function Header({ dict }: HeaderProps) {
         <div className="flex h-16 items-center justify-between">
           {/* Logo and App Name */}
           <div className="flex items-center space-x-2">
-            <Smartphone className="h-8 w-8 text-blue-600" />
+            <Image 
+              src="/images/ta3afi-icon.svg" 
+              alt="Ta3afi App Icon" 
+              width={32} 
+              height={32} 
+              className="h-8 w-8"
+            />
             <span className="text-xl font-bold text-gray-900">{dict.appName}</span>
           </div>
 

@@ -21,10 +21,7 @@ export default async function LocaleLayout({
   return (
     <html lang={lang} dir={dir}>
       <body className={"flex min-h-screen flex-col font-ibm"}>
-        <nav className="p-4">
-        <Header dict={dict} />
-          
-        </nav>
+        
         <main className="flex-grow">{children}</main>
       </body>
     </html>

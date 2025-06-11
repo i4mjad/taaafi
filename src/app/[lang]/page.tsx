@@ -5,7 +5,6 @@ import Header from "@/components/header";
 import AboutSectionCompanyValues from "@/components/about-section";
 import Footer from "@/components/footer";
 import StatisticsSection from "@/components/statistics-section";
-import { Contact } from "lucide-react";
 
 export default async function ComingSoonPage({
   params,
@@ -17,15 +16,29 @@ export default async function ComingSoonPage({
 
   return (
     <>
+      <Header dict={dict} />
+      
       <HeroScrollSection dict={dict} />
       
-      <AboutSectionCompanyValues />
+      <section id="features">
+        <AboutSectionCompanyValues />
+      </section>
 
       {/* Statistics Section */}
-      <StatisticsSection />
+      <section id="statistics">
+        <StatisticsSection />
+      </section>
 
       {/* Contact Section */}
-      <Contact />
+      <section id="contact">
+        {/* Contact component would go here */}
+        <div className="py-16">
+          <div className="container mx-auto px-4 text-center">
+            <h2 className="text-3xl font-bold mb-8">Contact Us</h2>
+            <p className="text-gray-600">Get in touch with us for more information.</p>
+          </div>
+        </div>
+      </section>
 
       {/* Footer */}
       <Footer />
