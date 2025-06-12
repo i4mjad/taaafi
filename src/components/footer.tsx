@@ -36,7 +36,7 @@ const defaultDict: Dict = {
   statistics: "Statistics",
   blog: "Blog",
   contact: "Contact",
-  footerTagline: "Simplifying complexity, one interface at a time.",
+  footerTagline: "For a better life.",
   footerProduct: "Product",
   footerPricing: "Pricing",
   footerCompany: "Company",
