@@ -16,7 +16,9 @@ export default async function ComingSoonPage({
 
   return (
     <>
-      <Header dict={dict} />
+
+      
+      <Header dict={dict}/>
       
       <HeroScrollSection dict={dict} />
       

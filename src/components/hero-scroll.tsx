@@ -29,18 +29,18 @@ export function HeroScrollSection({ dict }: HeroScrollSectionProps) {
         useSimpleCard={true}
         titleComponent={
           <div className="space-y-6">
-            <h1 className="text-4xl font-semibold text-black dark:text-white">
+            <h1 className="text-3xl md:text-4xl font-semibold text-black dark:text-white">
               {dict.heroTitle} <br />
-              <span className="text-4xl md:text-[6rem] font-bold mt-1 leading-none text-blue-600">
+              <span className="text-3xl md:text-[6rem] font-bold mt-1 leading-none text-blue-600">
                 {dict.heroSubtitle}
               </span>
             </h1>
-            <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto">
+            <p className="text-base md:text-xl text-gray-600 max-w-3xl mx-auto px-4">
               {dict.heroDescription}
             </p>
 
             {/* App Store Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-center mt-8">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center mt-6 px-4">
               <Button
                 className="bg-black hover:bg-gray-800 text-white px-6 py-3 h-auto rounded-lg flex items-center justify-center space-x-3"
                 asChild
@@ -73,7 +73,7 @@ export function HeroScrollSection({ dict }: HeroScrollSectionProps) {
             </div>
 
             {/* Reviews Section */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-2xl mx-auto mt-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl mx-auto mt-6 px-4">
               {/* Google Reviews */}
               <div className="bg-white/80 backdrop-blur-sm p-4 rounded-lg">
                 <div className="flex items-center space-x-1 mb-2">
@@ -100,13 +100,13 @@ export function HeroScrollSection({ dict }: HeroScrollSectionProps) {
           </div>
         }
       >
-        <div className="relative w-full h-auto flex justify-center">
+        <div className="relative w-full h-auto flex justify-center mt-4">
           <Image
             src="/images/app-screen-center.png"
             alt={dict.appScreenAlt}
             width={180}
-                      height={360}
-            className="w-2/3 md:w-3/4 h-auto object-contain rounded-[2rem]"
+            height={360}
+            className="w-1/2 sm:w-2/3 md:w-3/4 h-auto object-contain rounded-[2rem]"
             priority
             style={{ backgroundColor: "transparent" }}
           />
