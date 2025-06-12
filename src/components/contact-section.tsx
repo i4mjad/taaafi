@@ -30,7 +30,7 @@ const Contact = ({
   phone = "+123 456 7890",
 }: ContactProps) => {
   return (
-    <section className="bg-background py-32" id="contact">
+    <section className="container mx-auto px-4 py-16" id="contact">
       <div className="container">
         <div className="mb-14">
           <h1 className="mt-2 mb-3 text-3xl font-semibold text-balance md:text-4xl">{title}</h1>

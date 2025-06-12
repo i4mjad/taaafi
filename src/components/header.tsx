@@ -8,24 +8,40 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import { usePathname, useRouter } from "next/navigation"
 
-interface HeaderProps {
-  dict: {
-    appName: string;
-    features: string;
-    statistics: string;
-    blog: string;
-    contact: string;
-    download: string;
-    toggleMenu: string;
-    english: string;
-    arabic: string;
-  };
+interface Dict {
+  appName: string
+  features: string
+  statistics: string
+  blog: string
+  contact: string
+  download: string
+  toggleMenu: string
+  english: string
+  arabic: string
 }
 
-export default function Header({ dict }: HeaderProps) {
+const defaultDict: Dict = {
+  appName: "Ta'aafi",
+  features: "Features",
+  statistics: "Statistics",
+  blog: "Blog",
+  contact: "Contact",
+  download: "Download",
+  toggleMenu: "Toggle menu",
+  english: "English",
+  arabic: "Arabic",
+}
+
+interface HeaderProps {
+  dict?: Dict
+}
+
+export default function Header({ dict = defaultDict }: HeaderProps) {
   const pathname = usePathname()
   const router = useRouter()
   const lang = pathname.split('/')[1] || 'en'
+
+  const isHome = pathname === `/${lang}` || pathname === `/${lang}/`
 
   const handleLanguageChange = (value: string) => {
     if (value && value !== lang) {
@@ -38,32 +54,32 @@ export default function Header({ dict }: HeaderProps) {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
           {/* Logo and App Name */}
-          <div className="flex items-center space-x-2">
+          <Link href={`/${lang}`} className="flex items-center space-x-2 group">
             <Image 
               src="/images/ta3afi-icon.svg" 
               alt="Ta3afi App Icon" 
               width={32} 
               height={32} 
-              className="h-8 w-8"
+              className="h-8 w-8 transition-transform group-hover:scale-105"
             />
             <span className="text-xl font-bold text-gray-900">{dict.appName}</span>
-          </div>
+          </Link>
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
-            <Link href="#features" className="text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors">
+            <Link href={isHome ? "#features" : `/${lang}#features`} className="text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors">
               {dict.features}
             </Link>
             <Link
-              href="#statistics"
+              href={isHome ? "#statistics" : `/${lang}#statistics`}
               className="text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors"
             >
               {dict.statistics}
             </Link>
-            <Link href="#blog" className="text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors">
+            <Link href={isHome ? "#blog" : `/${lang}#blog`} className="text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors">
               {dict.blog}
             </Link>
-            <Link href="#contact" className="text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors">
+            <Link href={isHome ? "#contact" : `/${lang}#contact`} className="text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors">
               {dict.contact}
             </Link>
             
@@ -91,22 +107,22 @@ export default function Header({ dict }: HeaderProps) {
             <SheetContent side="right" className="w-[300px] sm:w-[400px]">
               <nav className="flex flex-col space-y-4 mt-8">
                 <Link
-                  href="#features"
+                  href={isHome ? "#features" : `/${lang}#features`}
                   className="text-lg font-medium text-gray-700 hover:text-gray-900 transition-colors"
                 >
                   {dict.features}
                 </Link>
                 <Link
-                  href="#statistics"
+                  href={isHome ? "#statistics" : `/${lang}#statistics`}
                   className="text-lg font-medium text-gray-700 hover:text-gray-900 transition-colors"
                 >
                   {dict.statistics}
                 </Link>
-                <Link href="#blog" className="text-lg font-medium text-gray-700 hover:text-gray-900 transition-colors">
+                <Link href={isHome ? "#blog" : `/${lang}#blog`} className="text-lg font-medium text-gray-700 hover:text-gray-900 transition-colors">
                   {dict.blog}
                 </Link>
                 <Link
-                  href="#contact"
+                  href={isHome ? "#contact" : `/${lang}#contact`}
                   className="text-lg font-medium text-gray-700 hover:text-gray-900 transition-colors"
                 >
                   {dict.contact}

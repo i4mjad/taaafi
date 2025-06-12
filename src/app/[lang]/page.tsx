@@ -5,6 +5,16 @@ import Header from "@/components/header";
 import AboutSectionCompanyValues from "@/components/about-section";
 import Footer from "@/components/footer";
 import StatisticsSection from "@/components/statistics-section";
+import ContactSection from "@/components/contact-section";
+import { RecentPostsSection } from "@/components/blog/recent-posts-section";
+import { blogPosts } from "@/data/blog-data";
+
+// Server-side function to get recent posts
+const getServerRecentPosts = (count: number) => {
+  return blogPosts
+    .sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime())
+    .slice(0, count);
+};
 
 export default async function ComingSoonPage({
   params,
@@ -32,14 +42,13 @@ export default async function ComingSoonPage({
       </section>
 
       {/* Contact Section */}
+      <section id="blog">
+       <RecentPostsSection posts={getServerRecentPosts(3)} />
+      </section>
+      
+      {/* Contact Section */}
       <section id="contact">
-        {/* Contact component would go here */}
-        <div className="py-16">
-          <div className="container mx-auto px-4 text-center">
-            <h2 className="text-3xl font-bold mb-8">Contact Us</h2>
-            <p className="text-gray-600">Get in touch with us for more information.</p>
-          </div>
-        </div>
+       <ContactSection />
       </section>
 
       {/* Footer */}
