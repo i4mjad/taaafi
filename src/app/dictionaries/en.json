@@ -56,7 +56,7 @@
         },
         {
           "title": "6. Privacy",
-          "content": "Your privacy is important to us. Please review the Privacy Policy section below to understand how we collect and use your data."
+          "content": "Your privacy is important to us. Please review our Privacy Policy to understand how we collect and use your data."
         },
         {
           "title": "7. Modifications",
@@ -65,11 +65,12 @@
         {
           "title": "8. Contact Us",
           "content": "For any questions, contact us at admin@ta3afi.app."
-        },
-        {
-          "title": "Privacy Policy",
-          "content": ""
-        },
+        }
+      ],
+      
+      "privacyPolicy": "Privacy Policy",
+      "privacyLastUpdateDate": "Jan 21, 2025",
+      "privacyContent": [
         {
           "title": "1. Introduction",
           "content": "Welcome to Ta'aafi Platform. Your privacy is important to us, and this Privacy Policy explains how we collect, use, and protect your personal information when you use our app."
@@ -110,7 +111,25 @@
           "title": "10. Contact Us",
           "content": "If you have any questions about this Privacy Policy, please contact us at: Email: admin@ta3afi.app"
         }
-      ]
+      ],
+      
+      "footerTagline": "Simplifying complexity, one interface at a time.",
+      "footerProduct": "Product",
+      "footerPricing": "Pricing",
+      "footerCompany": "Company",
+      "footerAbout": "About",
+      "footerBlog": "Blog",
+      "footerCareers": "Careers",
+      "footerResources": "Resources",
+      "footerSupport": "Support",
+      "footerLegal": "Legal",
+      "footerPrivacyPolicy": "Privacy Policy",
+      "footerTermsAndConditions": "Terms and Conditions",
+      "footerCopyright": "© 2025 Ta'aafi Platform. All rights reserved.",
+      "footerBackToTop": "Back to top",
+      "followUsOnTwitter": "Follow us on Twitter",
+      "followUsOnInstagram": "Follow us on Instagram",
+      "followUsOnGithub": "Follow us on GitHub"
     
   }
   

@@ -3,8 +3,67 @@
 import Link from "next/link"
 import { Twitter, Instagram, Github, ArrowUp } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { usePathname } from "next/navigation"
 
-export default function Footer() {
+interface Dict {
+  appName: string
+  features: string
+  statistics: string
+  blog: string
+  contact: string
+  footerTagline: string
+  footerProduct: string
+  footerPricing: string
+  footerCompany: string
+  footerAbout: string
+  footerBlog: string
+  footerCareers: string
+  footerResources: string
+  footerSupport: string
+  footerLegal: string
+  footerPrivacyPolicy: string
+  footerTermsAndConditions: string
+  footerCopyright: string
+  footerBackToTop: string
+  followUsOnTwitter: string
+  followUsOnInstagram: string
+  followUsOnGithub: string
+}
+
+const defaultDict: Dict = {
+  appName: "Ta'aafi Platform",
+  features: "Features",
+  statistics: "Statistics",
+  blog: "Blog",
+  contact: "Contact",
+  footerTagline: "Simplifying complexity, one interface at a time.",
+  footerProduct: "Product",
+  footerPricing: "Pricing",
+  footerCompany: "Company",
+  footerAbout: "About",
+  footerBlog: "Blog",
+  footerCareers: "Careers",
+  footerResources: "Resources",
+  footerSupport: "Support",
+  footerLegal: "Legal",
+  footerPrivacyPolicy: "Privacy Policy",
+  footerTermsAndConditions: "Terms and Conditions",
+  footerCopyright: "© 2025 Ta'aafi Platform. All rights reserved.",
+  footerBackToTop: "Back to top",
+  followUsOnTwitter: "Follow us on Twitter",
+  followUsOnInstagram: "Follow us on Instagram",
+  followUsOnGithub: "Follow us on GitHub",
+}
+
+interface FooterProps {
+  dict?: Dict
+}
+
+export default function Footer({ dict = defaultDict }: FooterProps) {
+  const pathname = usePathname()
+  const lang = pathname.split('/')[1] || 'en'
+  const isHome = pathname === `/${lang}` || pathname === `/${lang}/`
+
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" })
   }
@@ -16,29 +75,29 @@ export default function Footer() {
         <div className="grid grid-cols-1 lg:grid-cols-6 gap-8 lg:gap-12">
           {/* Company Info */}
           <div className="lg:col-span-2">
-            <h3 className="text-xl font-bold text-gray-900 mb-4">CloudMaster</h3>
-            <p className="text-gray-600 mb-6 max-w-sm">Simplifying complexity, one interface at a time.</p>
+            <h3 className="text-xl font-bold text-gray-900 mb-4">{dict.appName}</h3>
+            <p className="text-gray-600 mb-6 max-w-sm">{dict.footerTagline}</p>
 
             {/* Social Media Icons */}
             <div className="flex space-x-4">
               <Link
                 href="#"
                 className="text-gray-400 hover:text-gray-600 transition-colors"
-                aria-label="Follow us on Twitter"
+                aria-label={dict.followUsOnTwitter}
               >
                 <Twitter className="h-5 w-5" />
               </Link>
               <Link
                 href="#"
                 className="text-gray-400 hover:text-gray-600 transition-colors"
-                aria-label="Follow us on Instagram"
+                aria-label={dict.followUsOnInstagram}
               >
                 <Instagram className="h-5 w-5" />
               </Link>
               <Link
                 href="#"
                 className="text-gray-400 hover:text-gray-600 transition-colors"
-                aria-label="Follow us on GitHub"
+                aria-label={dict.followUsOnGithub}
               >
                 <Github className="h-5 w-5" />
               </Link>
@@ -47,16 +106,16 @@ export default function Footer() {
 
           {/* Product Links */}
           <div>
-            <h4 className="text-sm font-semibold text-gray-900 mb-4">Product</h4>
+            <h4 className="text-sm font-semibold text-gray-900 mb-4">{dict.footerProduct}</h4>
             <ul className="space-y-3">
               <li>
-                <Link href="#features" className="text-sm text-gray-600 hover:text-gray-900 transition-colors">
-                  Features
+                <Link href={isHome ? "#features" : `/${lang}#features`} className="text-sm text-gray-600 hover:text-gray-900 transition-colors">
+                  {dict.features}
                 </Link>
               </li>
               <li>
-                <Link href="#pricing" className="text-sm text-gray-600 hover:text-gray-900 transition-colors">
-                  Pricing
+                <Link href={isHome ? "#pricing" : `/${lang}#pricing`} className="text-sm text-gray-600 hover:text-gray-900 transition-colors">
+                  {dict.footerPricing}
                 </Link>
               </li>
             </ul>
@@ -64,21 +123,21 @@ export default function Footer() {
 
           {/* Company Links */}
           <div>
-            <h4 className="text-sm font-semibold text-gray-900 mb-4">Company</h4>
+            <h4 className="text-sm font-semibold text-gray-900 mb-4">{dict.footerCompany}</h4>
             <ul className="space-y-3">
               <li>
-                <Link href="#about" className="text-sm text-gray-600 hover:text-gray-900 transition-colors">
-                  About
+                <Link href={isHome ? "#about" : `/${lang}#about`} className="text-sm text-gray-600 hover:text-gray-900 transition-colors">
+                  {dict.footerAbout}
                 </Link>
               </li>
               <li>
-                <Link href="#blog" className="text-sm text-gray-600 hover:text-gray-900 transition-colors">
-                  Blog
+                <Link href={isHome ? "#blog" : `/${lang}#blog`} className="text-sm text-gray-600 hover:text-gray-900 transition-colors">
+                  {dict.footerBlog}
                 </Link>
               </li>
               <li>
-                <Link href="#careers" className="text-sm text-gray-600 hover:text-gray-900 transition-colors">
-                  Careers
+                <Link href={isHome ? "#careers" : `/${lang}#careers`} className="text-sm text-gray-600 hover:text-gray-900 transition-colors">
+                  {dict.footerCareers}
                 </Link>
               </li>
             </ul>
@@ -86,16 +145,16 @@ export default function Footer() {
 
           {/* Resources Links */}
           <div>
-            <h4 className="text-sm font-semibold text-gray-900 mb-4">Resources</h4>
+            <h4 className="text-sm font-semibold text-gray-900 mb-4">{dict.footerResources}</h4>
             <ul className="space-y-3">
               <li>
-                <Link href="#support" className="text-sm text-gray-600 hover:text-gray-900 transition-colors">
-                  Support
+                <Link href={isHome ? "#support" : `/${lang}#support`} className="text-sm text-gray-600 hover:text-gray-900 transition-colors">
+                  {dict.footerSupport}
                 </Link>
               </li>
               <li>
-                <Link href="#contact" className="text-sm text-gray-600 hover:text-gray-900 transition-colors">
-                  Contact
+                <Link href={isHome ? "#contact" : `/${lang}#contact`} className="text-sm text-gray-600 hover:text-gray-900 transition-colors">
+                  {dict.contact}
                 </Link>
               </li>
             </ul>
@@ -103,16 +162,16 @@ export default function Footer() {
 
           {/* Legal Links */}
           <div>
-            <h4 className="text-sm font-semibold text-gray-900 mb-4">Legal</h4>
+            <h4 className="text-sm font-semibold text-gray-900 mb-4">{dict.footerLegal}</h4>
             <ul className="space-y-3">
               <li>
-                <Link href="#privacy" className="text-sm text-gray-600 hover:text-gray-900 transition-colors">
-                  Privacy Policy
+                <Link href={`/${lang}/privacy`} className="text-sm text-gray-600 hover:text-gray-900 transition-colors">
+                  {dict.footerPrivacyPolicy}
                 </Link>
               </li>
               <li>
-                <Link href="#terms" className="text-sm text-gray-600 hover:text-gray-900 transition-colors">
-                  Terms and Conditions
+                <Link href={`/${lang}/terms`} className="text-sm text-gray-600 hover:text-gray-900 transition-colors">
+                  {dict.footerTermsAndConditions}
                 </Link>
               </li>
             </ul>
@@ -121,7 +180,7 @@ export default function Footer() {
 
         {/* Footer Bottom */}
         <div className="mt-12 pt-8 border-t border-gray-200 flex flex-col sm:flex-row justify-between items-center">
-          <p className="text-sm text-gray-600 mb-4 sm:mb-0">© 2025 CloudMaster. All rights reserved.</p>
+          <p className="text-sm text-gray-600 mb-4 sm:mb-0">{dict.footerCopyright}</p>
 
           <Button
             variant="ghost"
@@ -129,7 +188,7 @@ export default function Footer() {
             onClick={scrollToTop}
             className="text-sm text-gray-600 hover:text-gray-900 transition-colors flex items-center space-x-1"
           >
-            <span>Back to top</span>
+            <span>{dict.footerBackToTop}</span>
             <ArrowUp className="h-4 w-4" />
           </Button>
         </div>

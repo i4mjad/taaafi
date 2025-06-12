@@ -4,7 +4,7 @@ import { fallbackLng } from "../../i18n/settings";
 import Header from "../../../components/header";
 import Footer from "../../../components/footer";
 
-export default async function TermsPage({
+export default async function PrivacyPage({
   params,
 }: {
   params: Promise<{ lang: Locale }>;
@@ -20,19 +20,19 @@ export default async function TermsPage({
           <div className="max-w-4xl mx-auto">
             {/* Header */}
             <h1 className="text-4xl font-bold mb-8 text-center">
-              {dict.termsAndConditions}
+              {dict.privacyPolicy}
             </h1>
 
             {/* Last Updated Date */}
             <p className="text-gray-600 mb-8 text-center">
-              {dict.lastUpdated}: {dict.termsLastUpdateDate}
+              {dict.lastUpdated}: {dict.privacyLastUpdateDate}
             </p>
 
-            {/* Terms Content */}
+            {/* Privacy Policy Content */}
             <div className="prose prose-lg max-w-none">
               <div className="space-y-8">
-                {dict.termsContent.map((section, index) => (
-                  <section key={index} className="terms-section">
+                {dict.privacyContent.map((section, index) => (
+                  <section key={index} className="privacy-section">
                     {section.title && (
                       <h2 className="text-2xl font-semibold mb-4">
                         {section.title}
@@ -58,4 +58,4 @@ export default async function TermsPage({
   );
 }
 
-export const dynamic = "force-dynamic";
+export const dynamic = "force-dynamic"; 
