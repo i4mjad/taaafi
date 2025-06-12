@@ -1,7 +1,4 @@
-import Header from "@/components/header";
-import { type Locale, languages, fallbackLng } from "../i18n/settings";
-import { getDictionary } from "../dictionaries/get-dictonaries";
-import Link from "next/link";
+import { type Locale, languages } from "../i18n/settings";
 
 export async function generateStaticParams() {
   return languages.map((lang) => ({ lang }));
@@ -15,11 +12,11 @@ export default async function LocaleLayout({
   params: Promise<{ lang: Locale }>;
 }) {
   const { lang } = await params;
-  const dict = await getDictionary(lang || fallbackLng);
+  // const dict = await getDictionary(lang || fallbackLng);
   const dir = lang === "ar" ? "rtl" : "ltr";
 
   return (
-    <html lang={lang} dir={dir}>
+    <html lang={lang} dir={dir} suppressHydrationWarning>
       <body className={"flex min-h-screen flex-col font-ibm"}>
         
         <main className="flex-grow">{children}</main>

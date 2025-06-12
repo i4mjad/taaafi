@@ -7,15 +7,13 @@ import { Button } from "@/components/ui/button"
 import { BlogCard } from "@/components/blog/blog-card"
 import Header from "@/components/header"
 
-interface BlogPostPageProps {
-  params: {
-    slug: string
-  }
-}
-
-export default function BlogPostPage({ params }: BlogPostPageProps) {
-  const lang = "en"; // placeholder, will derive from 'params'? maybe not—blogPostPage no longer has lang param; we can derive from pathname client side header uses path.
-  const post = getPostBySlug(params.slug)
+export default async function BlogPostPage({
+  params,
+}: {
+  params: Promise<{ lang: string; slug: string }>
+}) {
+  const { lang, slug } = await params;
+  const post = getPostBySlug(slug)
 
   if (!post) {
     notFound()
