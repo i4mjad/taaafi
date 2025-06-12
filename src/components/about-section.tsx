@@ -171,7 +171,7 @@ export default function AboutSectionCompanyValues() {
   const currentValue = companyValues.find((value) => value.id === activeValue) || companyValues[0]
 
   return (
-    <section className="py-24">
+    <section>
       <div className="container mx-auto px-4 md:px-6 2xl:max-w-[1400px]">
         <div className="mx-auto mb-16 max-w-3xl space-y-4 text-center">
           <div className="bg-primary/10 text-primary inline-block rounded-lg px-3 py-1 text-sm">Core Values</div>
@@ -300,16 +300,6 @@ export default function AboutSectionCompanyValues() {
             </div>
           </div>
         </Tabs>
-
-        {/* Call-to-action */}
-        <div className="mt-16 text-center">
-          <p className="text-muted-foreground mx-auto mb-6 max-w-2xl">
-            These values guide every aspect of our work. Want to be part of a team that lives these values every day?
-          </p>
-          <Button asChild size="lg">
-            <Link href="/careers">Join Our Team</Link>
-          </Button>
-        </div>
       </div>
     </section>
   )

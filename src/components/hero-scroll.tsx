@@ -24,7 +24,7 @@ interface HeroScrollSectionProps {
 
 export function HeroScrollSection({ dict }: HeroScrollSectionProps) {
   return (
-    <div className="flex flex-col overflow-hidden mb-16 md:mb-24">
+    <div className="flex flex-col overflow-hidden mb-[16px]">
       <ContainerScroll
         useSimpleCard={true}
         titleComponent={
@@ -106,7 +106,7 @@ export function HeroScrollSection({ dict }: HeroScrollSectionProps) {
             alt={dict.appScreenAlt}
             width={180}
                       height={360}
-            className="w-1/4 md:w-3/4 h-auto object-contain rounded-[2rem]"
+            className="w-2/3 md:w-3/4 h-auto object-contain rounded-[2rem]"
             priority
             style={{ backgroundColor: "transparent" }}
           />
