@@ -1,12 +1,12 @@
-"use client"
+'use client'
 
-import { Button } from "@/components/ui/button"
-import { Menu } from "lucide-react"
-import Link from "next/link"
-import Image from "next/image"
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
-import { usePathname, useRouter } from "next/navigation"
+import { Button } from '@/components/ui/button'
+import { Menu } from 'lucide-react'
+import Link from 'next/link'
+import Image from 'next/image'
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
+import { usePathname, useRouter } from 'next/navigation'
 
 interface Dict {
   appName: string
@@ -22,14 +22,14 @@ interface Dict {
 
 const defaultDict: Dict = {
   appName: "Ta'aafi",
-  features: "Features",
-  statistics: "Statistics",
-  blog: "Blog",
-  contact: "Contact",
-  download: "Download",
-  toggleMenu: "Toggle menu",
-  english: "English",
-  arabic: "Arabic",
+  features: 'Features',
+  statistics: 'Statistics',
+  blog: 'Blog',
+  contact: 'Contact',
+  download: 'Download',
+  toggleMenu: 'Toggle menu',
+  english: 'English',
+  arabic: 'Arabic',
 }
 
 interface HeaderProps {
@@ -45,7 +45,10 @@ export default function Header({ dict = defaultDict }: HeaderProps) {
 
   const handleLanguageChange = (value: string) => {
     if (value && value !== lang) {
-      router.push(`/${value}`)
+      const segments = pathname.split('/')
+      segments[1] = value // Replace the old language with the new one
+      const newPath = segments.join('/')
+      router.push(newPath)
     }
   }
 
@@ -55,36 +58,51 @@ export default function Header({ dict = defaultDict }: HeaderProps) {
         <div className="flex h-16 items-center justify-between">
           {/* Logo and App Name */}
           <Link href={`/${lang}`} className="flex items-center space-x-2 group">
-            <Image 
-              src="/images/ta3afi-icon.svg" 
-              alt="Ta3afi App Icon" 
-              width={32} 
-              height={32} 
+            <Image
+              src="/images/ta3afi-icon.svg"
+              alt="Ta3afi App Icon"
+              width={32}
+              height={32}
               className="h-8 w-8 transition-transform group-hover:scale-105"
             />
-            <span className="text-xl font-bold text-gray-900">{dict.appName}</span>
+            <span className="text-xl font-bold text-gray-900">
+              {dict.appName}
+            </span>
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-8">
-            <Link href={isHome ? "#features" : `/${lang}#features`} className="text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors">
+          <nav className="hidden  md:flex items-center gap-6">
+            <Link
+              href={isHome ? '#features' : `/${lang}#features`}
+              className="text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors"
+            >
               {dict.features}
             </Link>
             <Link
-              href={isHome ? "#statistics" : `/${lang}#statistics`}
+              href={isHome ? '#statistics' : `/${lang}#statistics`}
               className="text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors"
             >
               {dict.statistics}
             </Link>
-            <Link href={isHome ? "#blog" : `/${lang}#blog`} className="text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors">
+            <Link
+              href={isHome ? '#blog' : `/${lang}#blog`}
+              className="text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors"
+            >
               {dict.blog}
             </Link>
-            <Link href={isHome ? "#contact" : `/${lang}#contact`} className="text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors">
+            <Link
+              href={isHome ? '#contact' : `/${lang}#contact`}
+              className="text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors"
+            >
               {dict.contact}
             </Link>
-            
+
             {/* Language Switcher */}
-            <ToggleGroup type="single" value={lang} onValueChange={handleLanguageChange}>
+            <ToggleGroup
+              type="single"
+              value={lang}
+              onValueChange={handleLanguageChange}
+            >
               <ToggleGroupItem value="en" aria-label={dict.english}>
                 EN
               </ToggleGroupItem>
@@ -92,8 +110,10 @@ export default function Header({ dict = defaultDict }: HeaderProps) {
                 AR
               </ToggleGroupItem>
             </ToggleGroup>
-            
-            <Button className="bg-blue-600 hover:bg-blue-700 text-white">{dict.download}</Button>
+
+            <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+              {dict.download}
+            </Button>
           </nav>
 
           {/* Mobile Menu */}
@@ -107,30 +127,37 @@ export default function Header({ dict = defaultDict }: HeaderProps) {
             <SheetContent side="right" className="w-[300px] sm:w-[400px]">
               <nav className="flex flex-col space-y-4 mt-8">
                 <Link
-                  href={isHome ? "#features" : `/${lang}#features`}
+                  href={isHome ? '#features' : `/${lang}#features`}
                   className="text-lg font-medium text-gray-700 hover:text-gray-900 transition-colors"
                 >
                   {dict.features}
                 </Link>
                 <Link
-                  href={isHome ? "#statistics" : `/${lang}#statistics`}
+                  href={isHome ? '#statistics' : `/${lang}#statistics`}
                   className="text-lg font-medium text-gray-700 hover:text-gray-900 transition-colors"
                 >
                   {dict.statistics}
                 </Link>
-                <Link href={isHome ? "#blog" : `/${lang}#blog`} className="text-lg font-medium text-gray-700 hover:text-gray-900 transition-colors">
+                <Link
+                  href={isHome ? '#blog' : `/${lang}#blog`}
+                  className="text-lg font-medium text-gray-700 hover:text-gray-900 transition-colors"
+                >
                   {dict.blog}
                 </Link>
                 <Link
-                  href={isHome ? "#contact" : `/${lang}#contact`}
+                  href={isHome ? '#contact' : `/${lang}#contact`}
                   className="text-lg font-medium text-gray-700 hover:text-gray-900 transition-colors"
                 >
                   {dict.contact}
                 </Link>
-                
+
                 {/* Language Switcher */}
                 <div className="flex justify-center py-2">
-                  <ToggleGroup type="single" value={lang} onValueChange={handleLanguageChange}>
+                  <ToggleGroup
+                    type="single"
+                    value={lang}
+                    onValueChange={handleLanguageChange}
+                  >
                     <ToggleGroupItem value="en" aria-label={dict.english}>
                       EN
                     </ToggleGroupItem>
@@ -139,8 +166,10 @@ export default function Header({ dict = defaultDict }: HeaderProps) {
                     </ToggleGroupItem>
                   </ToggleGroup>
                 </div>
-                
-                <Button className="bg-blue-600 hover:bg-blue-700 text-white w-full mt-4">{dict.download}</Button>
+
+                <Button className="bg-blue-600 hover:bg-blue-700 text-white w-full mt-4">
+                  {dict.download}
+                </Button>
               </nav>
             </SheetContent>
           </Sheet>
