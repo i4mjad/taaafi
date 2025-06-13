@@ -38,7 +38,7 @@ export default async function ComingSoonPage({
 
       {/* Statistics Section */}
       <section id="statistics">
-        <StatisticsSection />
+        <StatisticsSection dict={dict} />
       </section>
 
       {/* Contact Section */}

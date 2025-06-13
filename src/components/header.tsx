@@ -13,7 +13,7 @@ interface Dict {
   features: string
   statistics: string
   blog: string
-  contact: string
+  contact?: string
   download: string
   toggleMenu: string
   english: string
@@ -25,7 +25,6 @@ const defaultDict: Dict = {
   features: 'Features',
   statistics: 'Statistics',
   blog: 'Blog',
-  contact: 'Contact',
   download: 'Download',
   toggleMenu: 'Toggle menu',
   english: 'English',

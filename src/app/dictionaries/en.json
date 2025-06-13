@@ -145,8 +145,18 @@
       "footerBackToTop": "Back to top",
       "followUsOnTwitter": "Follow us on Twitter",
       "followUsOnInstagram": "Follow us on Instagram",
-      "followUsOnGithub": "Follow us on GitHub"
-    
-  }
+      "followUsOnGithub": "Follow us on GitHub",
+      
+      "statsHeading": "Our achievements speak for themselves",
+      "statsDescription": "Since launching Ta'aafi we've hit milestones we're proud of, and we're still working non-stop to give you the best experience.",
+      "averageRatingLabel": "Average rating",
+      "downloadsLabel": "Downloads",
+      "activeUsersLabel": "Active users",
+      "usersLabel": "Users",
+      "averageRatingValue": "4.91/5",
+      "downloadsValue": "500,000+",
+      "activeUsersValue": "5,000+",
+      "usersValue": "340,000+"
+}
   
   

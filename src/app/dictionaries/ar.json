@@ -144,8 +144,17 @@
       "whatsappLabel": "واتساب",
       "whatsappDescription": "تواصل معنا عبر واتساب.",
       "whatsapp": "+968 7745 1200",
-      "contact": "اتصل بنا"
-    
-  }
+      "contact": "اتصل بنا",
+      "statsHeading": "إنجازاتنا تتحدث عن نفسها",
+      "statsDescription": "منذ إطلاق تطبيق تَعافِ حققنا أرقاماً نفخر بها، وما زلنا نعمل بلا توقف لنمنحكم أفضل تجربة ممكنة.",
+      "averageRatingLabel": "متوسط التقييمات",
+      "downloadsLabel": "تنزيل",
+      "activeUsersLabel": "مستخدم نشط",
+      "usersLabel": "مستخدم",
+      "averageRatingValue": "4.91/5",
+      "downloadsValue": " 500,000+",
+      "activeUsersValue": "+ 5,000",
+      "usersValue": "+340,000"
+}
   
   

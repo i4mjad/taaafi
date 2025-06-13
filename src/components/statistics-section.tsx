@@ -1,7 +1,37 @@
-import Image from "next/image"
-import { TrendingUp } from "lucide-react"
+import { Star, DownloadCloud, UserCheck, User } from "lucide-react"
 
-export default function StatisticsSection() {
+interface Dict {
+  statsHeading: string
+  statsDescription: string
+  averageRatingLabel: string
+  averageRatingValue: string
+  downloadsLabel: string
+  downloadsValue: string
+  activeUsersLabel: string
+  activeUsersValue: string
+  usersLabel: string
+  usersValue: string
+}
+
+const defaultDict: Dict = {
+  statsHeading: "Our achievements speak for themselves",
+  statsDescription:
+    "Since launching Ta'aafi we've hit milestones we're proud of and we're still working non-stop to give you the best experience.",
+  averageRatingLabel: "Average rating",
+  averageRatingValue: "4.91/5",
+  downloadsLabel: "Downloads",
+  downloadsValue: "35k+",
+  activeUsersLabel: "Active users",
+  activeUsersValue: "1.5k",
+  usersLabel: "Users",
+  usersValue: "30k+",
+}
+
+interface StatisticsSectionProps {
+  dict?: Dict
+}
+
+export default function StatisticsSection({ dict = defaultDict }: StatisticsSectionProps) {
   return (
     <section className="py-16 sm:py-20 lg:py-24 bg-gray-50">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -9,75 +39,39 @@ export default function StatisticsSection() {
           {/* Left Content */}
           <div className="space-y-8">
             <div className="space-y-4">
-              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900">It's all about speed</h2>
-              <p className="text-lg text-gray-600 leading-relaxed">
-                We provide you with a test account that can be set up in seconds. Our main focus is getting responses to
-                you as soon as we can.
-              </p>
-            </div>
-
-            {/* Testimonial */}
-            <div className="space-y-6">
-              <blockquote className="text-xl sm:text-2xl font-medium text-gray-900 italic leading-relaxed">
-                "Amazing people to work with. Very fast and professional partner."
-              </blockquote>
-
-              <div className="flex items-center space-x-4">
-                <div className="relative h-12 w-12 overflow-hidden rounded-full">
-                  <Image src="/placeholder.svg?height=48&width=48" alt="Josh Grazioso" fill className="object-cover" />
-                </div>
-                <div>
-                  <p className="font-semibold text-gray-900">Josh Grazioso</p>
-                  <p className="text-sm text-gray-600">Director Payments & Risk | Airbnb</p>
-                </div>
-              </div>
+              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900">{dict.statsHeading}</h2>
+              <p className="text-lg text-gray-600 leading-relaxed">{dict.statsDescription}</p>
             </div>
           </div>
 
           {/* Right Statistics Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 lg:gap-4">
             {/* Statistic 1 */}
-            <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-sm border border-gray-100">
-              <div className="space-y-2">
-                <div className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900">45k+</div>
-                <p className="text-sm sm:text-base text-gray-600 leading-relaxed">
-                  users - from new startups to public companies
-                </p>
-              </div>
+            <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-sm border border-gray-100 text-center space-y-4">
+              <Star className="h-8 w-8 mx-auto text-teal-700" />
+              <div className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900">{dict.averageRatingValue}</div>
+              <p className="text-sm sm:text-base text-gray-600 leading-relaxed">{dict.averageRatingLabel}</p>
             </div>
 
             {/* Statistic 2 */}
-            <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-sm border border-gray-100">
-              <div className="space-y-2">
-                <div className="flex items-center space-x-2">
-                  <TrendingUp className="h-6 w-6 text-blue-500" />
-                  <div className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900">23%</div>
-                </div>
-                <p className="text-sm sm:text-base text-gray-600 leading-relaxed">
-                  increase in traffic on webpages with Looms
-                </p>
-              </div>
+            <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-sm border border-gray-100 text-center space-y-4">
+              <DownloadCloud className="h-8 w-8 mx-auto text-teal-700" />
+              <div className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900">{dict.downloadsValue}</div>
+              <p className="text-sm sm:text-base text-gray-600 leading-relaxed">{dict.downloadsLabel}</p>
             </div>
 
             {/* Statistic 3 */}
-            <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-sm border border-gray-100">
-              <div className="space-y-2">
-                <div className="flex items-center space-x-2">
-                  <TrendingUp className="h-6 w-6 text-green-500" />
-                  <div className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900">9.3%</div>
-                </div>
-                <p className="text-sm sm:text-base text-gray-600 leading-relaxed">
-                  boost in reply rates across sales outreach
-                </p>
-              </div>
+            <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-sm border border-gray-100 text-center space-y-4">
+              <UserCheck className="h-8 w-8 mx-auto text-teal-700" />
+              <div className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900">{dict.activeUsersValue}</div>
+              <p className="text-sm sm:text-base text-gray-600 leading-relaxed">{dict.activeUsersLabel}</p>
             </div>
 
             {/* Statistic 4 */}
-            <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-sm border border-gray-100">
-              <div className="space-y-2">
-                <div className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900">2x</div>
-                <p className="text-sm sm:text-base text-gray-600 leading-relaxed">faster than previous Acme versions</p>
-              </div>
+            <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-sm border border-gray-100 text-center space-y-4">
+              <User className="h-8 w-8 mx-auto text-teal-700" />
+              <div className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900">{dict.usersValue}</div>
+              <p className="text-sm sm:text-base text-gray-600 leading-relaxed">{dict.usersLabel}</p>
             </div>
           </div>
         </div>
