@@ -1,35 +1,50 @@
-"use client"
+'use client'
 
-import Link from "next/link"
-import { ArrowRight } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import type { BlogPost } from "@/types/blog"
-import { formatDate } from "@/lib/utils"
-import { useParams } from "next/navigation"
+import Link from 'next/link'
+import { ArrowLeft, ArrowRight } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
+import type { BlogPost } from '@/types/blog'
+import { formatDate } from '@/lib/utils'
+import { useParams } from 'next/navigation'
 
 interface RecentPostsSectionProps {
   posts: BlogPost[]
 }
 
 export function RecentPostsSection({ posts }: RecentPostsSectionProps) {
-  const params = useParams();
-  const lang = Array.isArray(params?.lang) ? params.lang[0] : (params as any).lang as string;
+  const params = useParams()
+  const lang = Array.isArray(params?.lang)
+    ? params.lang[0]
+    : ((params as any).lang as string)
 
   return (
     <section className="py-16 bg-gray-50">
       <div className="container mx-auto px-4">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-12">
           <div>
-            <h2 className="text-3xl font-bold tracking-tight mb-2">Latest Articles</h2>
+            <h2 className="text-3xl font-bold tracking-tight mb-2">
+              Latest Articles
+            </h2>
             <p className="text-gray-500 max-w-2xl">
-              Stay updated with our latest insights, tutorials, and industry news
+              Stay updated with our latest insights, tutorials, and industry
+              news
             </p>
           </div>
           <Button asChild className="mt-4 md:mt-0" variant="outline">
             <Link href={`/${lang}/blog`} className="flex items-center">
               View all articles
-              <ArrowRight className="ml-2 h-4 w-4" />
+              {lang === 'ar' ? (
+                <ArrowLeft className="mr-2 h-4 w-4" />
+              ) : (
+                <ArrowRight className="ml-2 h-4 w-4" />
+              )}
             </Link>
           </Button>
         </div>
@@ -41,9 +56,14 @@ export function RecentPostsSection({ posts }: RecentPostsSectionProps) {
               className="flex flex-col h-full border-none shadow-sm hover:shadow-md transition-shadow"
             >
               <CardHeader className="pb-0">
-                <div className="text-sm font-medium text-blue-600 mb-2">{post.category.name}</div>
+                <div className="text-sm font-medium text-blue-600 mb-2">
+                  {post.category.name}
+                </div>
                 <CardTitle className="text-xl mb-2">
-                  <Link href={`/${lang}/blog/${post.slug}`} className="hover:text-blue-600 transition-colors">
+                  <Link
+                    href={`/${lang}/blog/${post.slug}`}
+                    className="hover:text-blue-600 transition-colors"
+                  >
                     {post.title}
                   </Link>
                 </CardTitle>
@@ -53,9 +73,13 @@ export function RecentPostsSection({ posts }: RecentPostsSectionProps) {
               </CardContent>
               <CardFooter className="pt-0 flex items-center justify-between">
                 <div className="flex items-center">
-                  <span className="text-sm text-gray-500">{formatDate(post.publishedAt)}</span>
+                  <span className="text-sm text-gray-500">
+                    {formatDate(post.publishedAt)}
+                  </span>
                   <span className="mx-2 text-gray-300">•</span>
-                  <span className="text-sm text-gray-500">{post.readingTime}</span>
+                  <span className="text-sm text-gray-500">
+                    {post.readingTime}
+                  </span>
                 </div>
               </CardFooter>
             </Card>
