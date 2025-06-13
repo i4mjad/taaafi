@@ -6,12 +6,20 @@
     "termsAndConditions": "الشروط والأحكام",
     "contactUs": "اتصل بنا",
     "contactUsDescription": "للدعم، يرجى الاتصال بنا على admin@ta3afi.app",
+    "emailLabel": "البريد الإلكتروني",
+    "emailDescription": "نرد على جميع رسائل البريد الإلكتروني خلال 24 ساعة.",
+    "email": "support@ta3afi.app",
+    "officeLabel": "المكتب",
+    "officeDescription": "زوروا مكتبنا للحصول على المساعدة.",
+    "officeAddress": "دبي، الإمارات العربية المتحدة",
+    "phoneLabel": "الهاتف",
+    "phoneDescription": "متاحون من الاثنين إلى الجمعة، من 9 صباحاً حتى 5 مساءً.",
+    "phone": "+971 4 123 4567",
     
     "appName": "منصة تعافي",
     "features": "الميزات",
     "statistics": "الإحصائيات", 
     "blog": "المدونة",
-    "contact": "اتصل بنا",
     "download": "تحميل",
     "toggleMenu": "تبديل القائمة",
     "english": "الإنجليزية",
@@ -128,7 +136,14 @@
       "footerBackToTop": "العودة إلى الأعلى",
       "followUsOnTwitter": "تابعنا على تويتر",
       "followUsOnInstagram": "تابعنا على إنستجرام",
-      "followUsOnGithub": "تابعنا على جيت هاب"
+      "followUsOnGithub": "تابعنا على جيت هاب",
+      "socialLabel": "وسائل التواصل الاجتماعي",
+      "socialDescription": "تابعونا على وسائل التواصل الاجتماعي للحصول على التحديثات والدعم.",
+      "instagram": "@ta3afi",
+      "twitter": "@ta3afi",
+      "whatsappLabel": "واتساب",
+      "whatsappDescription": "تواصل معنا عبر واتساب.",
+      "whatsapp": "+968 7745 1200"
     
   }
   

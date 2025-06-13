@@ -33,6 +33,7 @@ export default async function LocaleLayout({
 
   return (
     <html lang={lang} dir={dir} suppressHydrationWarning>
+      
       <body className={`${ibm.variable} flex min-h-screen flex-col font-ibm`}>
         
         <main className="flex-grow">{children}</main>

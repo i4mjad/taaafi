@@ -48,7 +48,7 @@ export default async function ComingSoonPage({
       
       {/* Contact Section */}
       <section id="contact">
-       <ContactSection />
+       <ContactSection dict={dict} />
       </section>
 
       {/* Footer */}
