@@ -11,7 +11,7 @@ export default {
   	extend: {
   		fontFamily: {
   			ibm: [
-  				'IBM Plex Sans Arabic',
+  				'var(--font-ibm)',
   				'sans-serif'
   			],
   			sans: [
