@@ -14,6 +14,7 @@ interface RecentPostsSectionProps {
     blogLatestArticles: string
     blogStayUpdated: string
     blogViewAllArticles: string
+    blogContentComingSoon: string
   }
 }
 
@@ -35,6 +36,7 @@ export function RecentPostsSection({ posts, dict }: RecentPostsSectionProps) {
               {dict.blogStayUpdated}
             </p>
           </div>
+          {/*
           <Button asChild className="mt-4 md:mt-0" variant="outline">
             <Link href={`/${lang}/blog`} className="flex items-center">
               {dict.blogViewAllArticles}
@@ -45,13 +47,19 @@ export function RecentPostsSection({ posts, dict }: RecentPostsSectionProps) {
               )}
             </Link>
           </Button>
+          */}
         </div>
 
+        <p className="text-center text-gray-500 w-full mt-8 text-xl font-semibold">
+          {dict.blogContentComingSoon}
+        </p>
+        {/*
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {posts.map((post) => (
             <BlogCard key={post.id} post={post} />
           ))}
         </div>
+        */}
       </div>
     </section>
   )
