@@ -33,7 +33,7 @@ export default async function ComingSoonPage({
       <HeroScrollSection dict={dict} />
       
       <section id="features">
-        <AboutSectionCompanyValues />
+        <AboutSectionCompanyValues dict={dict} />
       </section>
 
       {/* Statistics Section */}

@@ -2,201 +2,190 @@
 
 import type React from "react"
 import { useState } from "react"
-import Image from "next/image"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { AreaChart, ArrowUpRightIcon, Globe, Heart, Lightbulb, ShieldCheck, Users } from "lucide-react"
+import { BarChart2, CalendarDays, CheckSquare, UsersRound, Sparkles } from "lucide-react"
 import { cn } from "@/lib/utils"
-import Link from "next/link"
+import { usePathname } from "next/navigation"
+
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 // Types
-type CompanyValue = {
+type Feature = {
   id: string
   name: string
   description: string
   icon: React.ElementType
   color: string
-  principles: string[]
-  testimonial?: {
-    quote: string
-    author: string
-    role: string
-    image: string
-  }
-  image?: string
+  status: "now" | "soon"
 }
 
-// Company values data
-const companyValues: CompanyValue[] = [
-  {
-    id: "innovation",
-    name: "Innovation",
-    description:
-      "We constantly push boundaries and challenge the status quo, fostering a culture where creative thinking and experimentation are encouraged at all levels of the organization.",
-    icon: Lightbulb,
-    color: "text-amber-500",
-    principles: [
-      "Embrace experimentation and calculated risk-taking",
-      "Challenge assumptions and existing processes",
-      "Dedicate time and resources to exploring new ideas",
-      "Learn from failures and iterate quickly",
-    ],
-    testimonial: {
-      quote:
-        "Working in an environment that truly values innovation isn't just about having the latest technology—it's about feeling empowered to question, experiment, and sometimes fail. This culture has allowed us to develop solutions no one else has thought of yet.",
-      author: "Alex Chen",
-      role: "Lead Product Engineer",
-      image: "https://images.unsplash.com/photo-1568602471122-7832951cc4c5?q=80&w=400",
-    },
-    image: "https://images.unsplash.com/photo-1534120247760-c44c3e4a62f1?q=80&w=800",
-  },
-  {
-    id: "integrity",
-    name: "Integrity",
-    description:
-      "We believe in transparency, honesty, and ethical conduct in everything we do. Trust is the foundation of our relationships with customers, partners, and each other.",
-    icon: ShieldCheck,
-    color: "text-blue-500",
-    principles: [
-      "Be honest and transparent in all communications",
-      "Do what's right, even when it's difficult",
-      "Keep commitments and take accountability for mistakes",
-      "Protect private data and confidential information",
-    ],
-    testimonial: {
-      quote:
-        "In my ten years with the company, I've seen us turn down lucrative opportunities that didn't align with our ethical standards. That consistent commitment to integrity isn't just good ethics—it's built an unparalleled level of trust with our customers.",
-      author: "Sarah Johnson",
-      role: "Senior Account Director",
-      image: "https://images.unsplash.com/photo-1531123897727-8f129e1688ce?q=80&w=400",
-    },
-    image: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=800",
-  },
-  {
-    id: "collaboration",
-    name: "Collaboration",
-    description:
-      "We achieve more together than alone. By combining diverse perspectives and skills, we create solutions that are stronger, more innovative, and more effective than any individual could produce.",
-    icon: Users,
-    color: "text-indigo-500",
-    principles: [
-      "Value and seek diverse perspectives",
-      "Share knowledge openly across teams",
-      "Give credit and celebrate team achievements",
-      "Support colleagues and prioritize team success",
-    ],
-    testimonial: {
-      quote:
-        "The collaborative spirit here isn't just talk—it's built into how we work. Even as we've grown to multiple offices globally, we've maintained a culture where everyone's input is valued and people genuinely enjoy working together to solve challenging problems.",
-      author: "Miguel Hernandez",
-      role: "Global Operations Manager",
-      image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=400",
-    },
-    image: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=800",
-  },
-  {
-    id: "customer-focus",
-    name: "Customer Focus",
-    description:
-      "Our customers are at the center of everything we do. We're committed to understanding their needs, exceeding their expectations, and building lasting relationships based on mutual success.",
-    icon: Heart,
-    color: "text-red-500",
-    principles: [
-      "Deeply understand customer needs and pain points",
-      "Prioritize features that deliver true customer value",
-      "Proactively gather and implement customer feedback",
-      "Measure success through customer outcomes",
-    ],
-    testimonial: {
-      quote:
-        "I've been amazed at how customer feedback directly shapes our product roadmap. When I joined, I expected the usual lip service to customer-centricity, but here, customer success genuinely drives every decision from product features to support policies.",
-      author: "Avery Wilson",
-      role: "Customer Success Lead",
-      image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=400",
-    },
-    image: "https://images.unsplash.com/photo-1519389950473-47ba0277781c?q=80&w=800",
-  },
-  {
-    id: "excellence",
-    name: "Excellence",
-    description:
-      "We strive for excellence in everything we do, from the quality of our products to our customer service. We set high standards and continuously work to exceed them through learning and improvement.",
-    icon: AreaChart,
-    color: "text-emerald-500",
-    principles: [
-      "Set ambitious goals and high standards",
-      "Pursue continuous improvement through feedback",
-      "Pay attention to details without losing sight of the big picture",
-      "Take pride in delivering exceptional quality",
-    ],
-    testimonial: {
-      quote:
-        "The most inspiring thing about working here is how everyone strives for excellence while remaining humble. There's always a sense that we can do better—not from a place of dissatisfaction, but from genuine passion for creating the best possible experience for our users.",
-      author: "Jordan Taylor",
-      role: "Quality Assurance Director",
-      image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=400",
-    },
-    image: "https://images.unsplash.com/photo-1515187029135-18ee286d815b?q=80&w=800",
-  },
-  {
-    id: "sustainability",
-    name: "Sustainability",
-    description:
-      "We are committed to creating a positive environmental and social impact. Our business decisions consider long-term sustainability and our responsibility to future generations.",
-    icon: Globe,
-    color: "text-green-500",
-    principles: [
-      "Minimize environmental impact in operations and products",
-      "Support community initiatives and social causes",
-      "Consider long-term sustainability in all business decisions",
-      "Measure and report on environmental and social performance",
-    ],
-    testimonial: {
-      quote:
-        "When we announced our carbon-neutral initiative, I wasn't sure if it would be more than a marketing exercise. Three years later, we've reduced emissions by 68%, switched to renewable energy, and built sustainability requirements into our entire supply chain. It's real change.",
-      author: "Priya Patel",
-      role: "Sustainability Program Manager",
-      image: "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?q=80&w=400",
-    },
-    image: "https://images.unsplash.com/photo-1536859355448-76f92ebdc33d?q=80&w=800",
-  },
-]
+interface Dict {
+  coreToolsLabel: string
+  introHeading: string
+  introDescription1: string
+  introDescription2: string
 
-export default function AboutSectionCompanyValues() {
-  const [activeValue, setActiveValue] = useState<string>(companyValues[0].id)
+  trackerName: string
+  trackerDescription: string
+  insightsName: string
+  insightsDescription: string
+  calendarName: string
+  calendarDescription: string
+  diariesName: string
+  diariesDescription: string
+  activitiesName: string
+  activitiesDescription: string
+  libraryName: string
+  libraryDescription: string
+  communityName: string
+  communityDescription: string
+  groupsName: string
+  groupsDescription: string
+  newToolsName: string
+  newToolsDescription: string
+  progressName: string
+  progressDescription: string
+  planningName: string
+  planningDescription: string
+  growthName: string
+  growthDescription: string
+  smartName: string
+  smartDescription: string
+}
 
-  // Get active value object
-  const currentValue = companyValues.find((value) => value.id === activeValue) || companyValues[0]
+const defaultDict: Dict = {
+  coreToolsLabel: "Core Tools",
+  introHeading: "Build Your Recovery",
+  introDescription1:
+    "Your recovery deserves more than willpower alone. Ta3afi equips you with science-backed digital tools that turn every urge resisted into a step forward.",
+  introDescription2:
+    "Start building the life you want—one healthy habit, one honest moment, one day at a time.",
+
+  trackerName: "Tracker",
+  trackerDescription:
+    "Log every victory—from a ten-second pause to a hundred-day streak—and watch your progress grow.",
+  insightsName: "Insights",
+  insightsDescription:
+    "Instant analytics reveal triggers, peak urge times, and patterns that keep you stuck—so you can break them.",
+  calendarName: "Calendar",
+  calendarDescription:
+    "Schedule milestones, therapy sessions, and self-care checkpoints; review wins at a glance.",
+  diariesName: "Diaries",
+  diariesDescription:
+    "A judgment-free space to record thoughts, emotions, and breakthroughs—encrypted and private.",
+  activitiesName: "Activities",
+  activitiesDescription:
+    "Curated tasks and habit-building exercises keep your hands busy and your mind focused on growth.",
+  libraryName: "Resource Library",
+  libraryDescription:
+    "Expert-reviewed articles and videos guide you through cravings, relapse prevention, and long-term healing.",
+  communityName: "Community Hub (Coming Soon)",
+  communityDescription:
+    "Join a worldwide network that celebrates victories, answers questions, and reminds you you're not alone.",
+  groupsName: "Support Groups (Coming Soon)",
+  groupsDescription:
+    "Real-time group chat, shared challenges, and peer accountability to keep motivation high.",
+  newToolsName: "New Tools (Coming Soon)",
+  newToolsDescription:
+    "Personalized AI coaching, relapse-prediction alerts, and mood-tracking integrations—stay tuned!",
+  progressName: "Progress & Insights",
+  progressDescription:
+    "See every victory and pattern in one place. Log streaks with the Tracker, then let Insights uncover triggers and peak-urge moments so you can stay one step ahead.",
+  planningName: "Planning & Reflection",
+  planningDescription:
+    "Map your recovery like a pro. Schedule milestones in the Calendar and process emotions privately in Diaries—because progress without reflection is just motion.",
+  growthName: "Guided Growth",
+  growthDescription:
+    "Keep hands busy and mind focused. Daily Activities and a curated Resource Library give you evidence-based help for every stage of recovery.",
+  smartName: "Smart Assistance (Coming Soon)",
+  smartDescription:
+    "Personalized AI coaching, relapse-prediction alerts, and mood-tracking integrations—everything you need to future-proof your progress.",
+}
+
+interface FeaturesSectionProps {
+  dict?: Partial<Dict>
+}
+
+export default function FeaturesSection({ dict }: FeaturesSectionProps) {
+  const mergedDict: Dict = { ...defaultDict, ...(dict || {}) }
+  const pathname = usePathname()
+  const lang = pathname.split('/')[1] || 'en'
+  const isRTL = lang === 'ar'
+
+  const features: Feature[] = [
+    {
+      id: "smart",
+      name: mergedDict.smartName,
+      description: mergedDict.smartDescription,
+      icon: Sparkles,
+      color: "text-yellow-500",
+      status: "soon",
+    },
+    {
+      id: "community-support",
+      name: mergedDict.communityName,
+      description: mergedDict.communityDescription,
+      icon: UsersRound,
+      color: "text-pink-500",
+      status: "soon",
+    },
+    {
+      id: "growth",
+      name: mergedDict.growthName,
+      description: mergedDict.growthDescription,
+      icon: CheckSquare,
+      color: "text-indigo-500",
+      status: "now",
+    },
+    {
+      id: "planning",
+      name: mergedDict.planningName,
+      description: mergedDict.planningDescription,
+      icon: CalendarDays,
+      color: "text-teal-500",
+      status: "now",
+    },
+    {
+      id: "progress",
+      name: mergedDict.progressName,
+      description: mergedDict.progressDescription,
+      icon: BarChart2,
+      color: "text-amber-500",
+      status: "now",
+    },
+  ]
+
+  const [activeFeature, setActiveFeature] = useState<string>("progress")
+
+  const currentFeature = features.find((f) => f.id === activeFeature) || features[0]
 
   return (
-    <section>
+    <section dir={isRTL ? "rtl" : "ltr"} className={cn(isRTL && "text-right")}>
       <div className="container mx-auto px-4 md:px-6 2xl:max-w-[1400px]">
         <div className="mx-auto mb-16 max-w-3xl space-y-4 text-center">
-          <div className="bg-primary/10 text-primary inline-block rounded-lg px-3 py-1 text-sm">Core Values</div>
-          <h2 className="text-3xl font-bold tracking-tight md:text-4xl">What Guides Our Decisions</h2>
-          <p className="text-muted-foreground">
-            Our values aren't just words on a wall—they're the principles that guide our daily actions and long-term
-            vision, shaping our culture and driving our success.
-          </p>
+          <div className="bg-primary/10 text-primary inline-block rounded-lg px-3 py-1 text-sm">
+            {mergedDict.coreToolsLabel}
+          </div>
+          <h2 className="text-3xl font-bold tracking-tight md:text-4xl">{mergedDict.introHeading}</h2>
+          <p className="text-muted-foreground">{mergedDict.introDescription1}</p>
+          <p className="text-muted-foreground">{mergedDict.introDescription2}</p>
         </div>
 
-        <Tabs value={activeValue} onValueChange={setActiveValue} className="space-y-8">
+        <Tabs value={activeFeature} onValueChange={setActiveFeature} className="space-y-8">
           {/* Value selection - Tabs for md+ screens, Dropdown for smaller screens */}
           <div className="mb-8 flex justify-center">
             {/* Dropdown for small screens */}
             <div className="w-full md:hidden">
-              <Select value={activeValue} onValueChange={setActiveValue}>
+              <Select value={activeFeature} onValueChange={setActiveFeature}>
                 <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select a value" />
+                  <SelectValue placeholder="Select a section" />
                 </SelectTrigger>
                 <SelectContent>
-                  {companyValues.map((value) => (
-                    <SelectItem key={value.id} value={value.id}>
-                      <div className="flex items-center gap-2">
-                        <value.icon className={cn("h-4 w-4", value.color)} />
-                        <span>{value.name}</span>
+                  {features.map((feature) => (
+                    <SelectItem key={feature.id} value={feature.id}>
+                      <div className={cn("flex items-center gap-2", isRTL && "flex-row-reverse")}>
+                        <feature.icon className={cn("h-4 w-4", feature.color, isRTL && "order-2 ml-0 mr-2")} />
+                        <span>{feature.name}</span>
                       </div>
                     </SelectItem>
                   ))}
@@ -206,17 +195,17 @@ export default function AboutSectionCompanyValues() {
 
             {/* Tabs for medium screens and above */}
             <TabsList className="hidden h-auto bg-transparent p-1 md:flex">
-              {companyValues.map((value) => (
+              {features.map((feature) => (
                 <TabsTrigger
-                  key={value.id}
-                  value={value.id}
+                  key={feature.id}
+                  value={feature.id}
                   className={cn(
                     "data-[state=active]:bg-muted gap-2",
                     "data-[state=active]:border-border border border-transparent",
                   )}
                 >
-                  <value.icon className={cn("h-4 w-4", value.color)} />
-                  <span>{value.name}</span>
+                  <feature.icon className={cn("h-4 w-4", feature.color, isRTL && "order-2 ml-0 mr-2")} />
+                  <span>{feature.name}</span>
                 </TabsTrigger>
               ))}
             </TabsList>
@@ -224,79 +213,25 @@ export default function AboutSectionCompanyValues() {
 
           {/* Value content */}
           <div className="grid items-center gap-8 md:grid-cols-12">
-            {/* Left column: Value details */}
+            {/* Left column: Feature details */}
             <div className="space-y-6 md:col-span-6">
-              <div className="mb-4 flex items-center gap-4">
-                <div className={cn("rounded-xl p-2.5", "bg-muted")}>
-                  <currentValue.icon className={cn("h-7 w-7", currentValue.color)} />
+              <div className={cn("mb-4 flex items-center gap-4", isRTL && "flex-row-reverse")}> 
+                <div className={cn("rounded-xl p-2.5", "bg-muted")}> 
+                  <currentFeature.icon className={cn("h-7 w-7", currentFeature.color)} />
                 </div>
-                <h3 className="text-2xl font-bold">{currentValue.name}</h3>
+                <h3 className="text-2xl font-bold">{currentFeature.name}</h3>
               </div>
 
-              <p className="text-muted-foreground text-lg">{currentValue.description}</p>
-
-              <div className="space-y-3 pt-2">
-                <h4 className="font-medium">Key Principles:</h4>
-                <ul className="space-y-2">
-                  {currentValue.principles.map((principle, i) => (
-                    <li key={i} className="flex items-start gap-2">
-                      <ArrowUpRightIcon className={cn("mt-0.5 h-5 w-5", currentValue.color)} />
-                      <span>{principle}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              {currentValue.testimonial && (
-                <Card className="bg-muted/30 mt-6 p-0">
-                  <CardContent className="p-6">
-                    <div className="mb-4 flex flex-col items-start gap-4 sm:flex-row sm:items-center">
-                      <div className="relative h-12 w-12 flex-shrink-0 overflow-hidden rounded-full">
-                        <Image
-                          src={currentValue.testimonial.image || "/placeholder.svg"}
-                          alt={currentValue.testimonial.author}
-                          fill
-                          className="object-cover"
-                        />
-                      </div>
-                      <div>
-                        <h4 className="font-semibold">{currentValue.testimonial.author}</h4>
-                        <p className="text-muted-foreground text-sm">{currentValue.testimonial.role}</p>
-                      </div>
-                    </div>
-                    <p className="text-muted-foreground italic">"{currentValue.testimonial.quote}"</p>
-                  </CardContent>
-                </Card>
-              )}
+              <p className="text-muted-foreground text-lg">
+                {currentFeature.description}
+              </p>
             </div>
 
-            {/* Right column: Value image */}
+            {/* Right column: Icon placeholder */}
             <div className="md:col-span-6">
-              {currentValue.image ? (
-                <div className="relative aspect-[4/3] overflow-hidden rounded-xl shadow-lg">
-                  <Image
-                    src={currentValue.image || "/placeholder.svg"}
-                    alt={`Illustration of our ${currentValue.name} value`}
-                    fill
-                    className="object-cover"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
-                  <div className="absolute right-0 bottom-0 left-0 p-6">
-                    <div
-                      className={cn(
-                        "inline-block rounded-lg px-3 py-1 text-sm text-white",
-                        "bg-black/30 backdrop-blur-sm",
-                      )}
-                    >
-                      {currentValue.name}
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                <div className="bg-muted flex aspect-[4/3] items-center justify-center rounded-xl">
-                  <currentValue.icon className={cn("h-24 w-24", currentValue.color, "opacity-25")} />
-                </div>
-              )}
+              <div className="bg-muted flex aspect-[4/3] items-center justify-center rounded-xl">
+                <currentFeature.icon className={cn("h-24 w-24", currentFeature.color, "opacity-25")} />
+              </div>
             </div>
           </div>
         </Tabs>

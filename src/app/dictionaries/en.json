@@ -160,7 +160,40 @@
       
       "blogLatestArticles": "Latest Articles",
       "blogStayUpdated": "Stay updated with our latest insights, tutorials, and updates",
-      "blogViewAllArticles": "View all articles"
+      "blogViewAllArticles": "View all articles",
+
+      "coreToolsLabel": "Core Tools",
+      "introHeading": "Build Your Recovery",
+      "introDescription1": "Your recovery deserves more than willpower alone. Ta3afi equips you with science-backed digital tools that turn every urge resisted into a step forward.",
+      "introDescription2": "Start building the life you want—one healthy habit, one honest moment, one day at a time.",
+
+      "trackerName": "Tracker",
+      "trackerDescription": "Log every victory—from a ten-second pause to a hundred-day streak—and watch your progress grow.",
+      "insightsName": "Insights",
+      "insightsDescription": "Instant analytics reveal triggers, peak urge times, and patterns that keep you stuck—so you can break them.",
+      "calendarName": "Calendar",
+      "calendarDescription": "Schedule milestones, therapy sessions, and self-care checkpoints; review wins at a glance.",
+      "diariesName": "Diaries",
+      "diariesDescription": "A judgment-free space to record thoughts, emotions, and breakthroughs—encrypted and private.",
+      "activitiesName": "Activities",
+      "activitiesDescription": "Curated tasks and habit-building exercises keep your hands busy and your mind focused on growth.",
+      "libraryName": "Resource Library",
+      "libraryDescription": "Expert-reviewed articles and videos guide you through cravings, relapse prevention, and long-term healing.",
+      "communityName": "Community & Support (Coming Soon)",
+      "communityDescription": "No one fights alone. Our global Community & Support network offers live group chats, themed challenges, and peer accountability so you can celebrate wins, share setbacks, and receive compassionate, science-based guidance whenever temptation strikes.",
+      "groupsName": "Support Groups (Coming Soon)",
+      "groupsDescription": "Real-time group chat, shared challenges, and peer accountability to keep motivation high.",
+      "newToolsName": "New Tools (Coming Soon)",
+      "newToolsDescription": "Personalized AI coaching, relapse-prediction alerts, and mood-tracking integrations—stay tuned!",
+
+      "progressName": "Progress & Insights",
+      "progressDescription": "Capture tiny triumphs and monumental milestones alike. The Tracker records every urge resisted while Insights transforms raw data into actionable clarity—revealing emotional triggers, time-of-day patterns, and hidden victories that boost confidence and sustain momentum.",
+      "planningName": "Planning & Reflection",
+      "planningDescription": "Effective recovery is intentional. Use Calendar to schedule therapy sessions, workouts, and self-care rituals, then turn inward with Diaries—your encrypted refuge where thoughts, feelings, and breakthroughs are processed and reframed into lasting growth.",
+      "growthName": "Guided Growth",
+      "growthDescription": "Banish boredom and fuel neuroplastic change. Bite-sized Activities strengthen willpower, while the Resource Library delivers expert-curated articles, videos, and exercises that rewire habits and keep motivation burning bright through every stage.",
+      "smartName": "Personalized Recovery Plan (Coming Soon)",
+      "smartDescription": "Get ready for a step-by-step Recovery Plan designed around YOU. This upcoming feature blends CBT techniques, habit-stacking exercises, and milestone celebrations into an adaptive roadmap that evolves with your triggers, schedule, and motivations—keeping clarity high and relapse risk low."
 }
   
   
