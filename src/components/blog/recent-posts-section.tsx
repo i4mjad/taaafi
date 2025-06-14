@@ -3,16 +3,10 @@
 import Link from 'next/link'
 import { ArrowLeft, ArrowRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
 import type { BlogPost } from '@/types/blog'
-import { formatDate } from '@/lib/utils'
+
 import { useParams } from 'next/navigation'
+import { BlogCard } from './blog-card'
 
 interface RecentPostsSectionProps {
   posts: BlogPost[]
@@ -51,38 +45,8 @@ export function RecentPostsSection({ posts }: RecentPostsSectionProps) {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {posts.map((post) => (
-            <Card
-              key={post.id}
-              className="flex flex-col h-full border-none shadow-sm hover:shadow-md transition-shadow"
-            >
-              <CardHeader className="pb-0">
-                <div className="text-sm font-medium text-blue-600 mb-2">
-                  {post.category.name}
-                </div>
-                <CardTitle className="text-xl mb-2">
-                  <Link
-                    href={`/${lang}/blog/${post.slug}`}
-                    className="hover:text-blue-600 transition-colors"
-                  >
-                    {post.title}
-                  </Link>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="py-4 flex-grow">
-                <p className="text-gray-600 line-clamp-3">{post.excerpt}</p>
-              </CardContent>
-              <CardFooter className="pt-0 flex items-center justify-between">
-                <div className="flex items-center">
-                  <span className="text-sm text-gray-500">
-                    {formatDate(post.publishedAt)}
-                  </span>
-                  <span className="mx-2 text-gray-300">•</span>
-                  <span className="text-sm text-gray-500">
-                    {post.readingTime}
-                  </span>
-                </div>
-              </CardFooter>
-            </Card>
+            <BlogCard key={post.id}   post={post} />
+            
           ))}
         </div>
       </div>
