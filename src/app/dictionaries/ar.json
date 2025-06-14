@@ -151,10 +151,14 @@
       "downloadsLabel": "تنزيل",
       "activeUsersLabel": "مستخدم نشط يوميًا",
       "usersLabel": "مستخدم",
-      "averageRatingValue": "4.91/5",
+      "averageRatingValue": "4.5/5",
       "downloadsValue": " 500,000+",
       "activeUsersValue": "+ 5,000",
-      "usersValue": "+340,000"
+      "usersValue": "+340,000",
+      
+      "blogLatestArticles": "أحدث المقالات",
+      "blogStayUpdated": "ابق على اطلاع بآخر المقالات والشروحات وأخبار تطوير التطبيق",
+      "blogViewAllArticles": "عرض جميع المقالات"
 }
   
   

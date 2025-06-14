@@ -43,7 +43,7 @@ export default async function ComingSoonPage({
 
       {/* Contact Section */}
       <section id="blog">
-       <RecentPostsSection posts={getServerRecentPosts(3)} />
+       <RecentPostsSection posts={getServerRecentPosts(3)} dict={dict} />
       </section>
       
       {/* Contact Section */}

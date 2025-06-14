@@ -18,7 +18,7 @@ const defaultDict: Dict = {
   statsDescription:
     "Since launching Ta'aafi we've hit milestones we're proud of and we're still working non-stop to give you the best experience.",
   averageRatingLabel: "Average rating",
-  averageRatingValue: "4.91/5",
+  averageRatingValue: "4.5/5",
   downloadsLabel: "Downloads",
   downloadsValue: "35k+",
   activeUsersLabel: "Active users",

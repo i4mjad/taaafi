@@ -10,9 +10,14 @@ import { BlogCard } from './blog-card'
 
 interface RecentPostsSectionProps {
   posts: BlogPost[]
+  dict: {
+    blogLatestArticles: string
+    blogStayUpdated: string
+    blogViewAllArticles: string
+  }
 }
 
-export function RecentPostsSection({ posts }: RecentPostsSectionProps) {
+export function RecentPostsSection({ posts, dict }: RecentPostsSectionProps) {
   const params = useParams()
   const lang = Array.isArray(params?.lang)
     ? params.lang[0]
@@ -24,16 +29,15 @@ export function RecentPostsSection({ posts }: RecentPostsSectionProps) {
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-12">
           <div>
             <h2 className="text-3xl font-bold tracking-tight mb-2">
-              Latest Articles
+              {dict.blogLatestArticles}
             </h2>
             <p className="text-gray-500 max-w-2xl">
-              Stay updated with our latest insights, tutorials, and industry
-              news
+              {dict.blogStayUpdated}
             </p>
           </div>
           <Button asChild className="mt-4 md:mt-0" variant="outline">
             <Link href={`/${lang}/blog`} className="flex items-center">
-              View all articles
+              {dict.blogViewAllArticles}
               {lang === 'ar' ? (
                 <ArrowLeft className="mr-2 h-4 w-4" />
               ) : (
@@ -45,8 +49,7 @@ export function RecentPostsSection({ posts }: RecentPostsSectionProps) {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {posts.map((post) => (
-            <BlogCard key={post.id}   post={post} />
-            
+            <BlogCard key={post.id} post={post} />
           ))}
         </div>
       </div>
