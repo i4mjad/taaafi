@@ -24,6 +24,8 @@
     "toggleMenu": "تبديل القائمة",
     "english": "الإنجليزية",
     "arabic": "العربية",
+    "toastDesktopTitle": "غير متوفر على سطح المكتب",
+    "toastDesktopDescription": "تطبيق تعافي متوفر فقط على أجهزة iOS و Android.",
     
     "heroTitle": "تحرر من الإدمان مع",
     "heroSubtitle": "منصة تعافي",
