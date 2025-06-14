@@ -72,7 +72,7 @@ export default function Footer({ dict = defaultDict }: FooterProps) {
     <footer className="bg-white border-t border-gray-200">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
         {/* Main Footer Content */}
-        <div className="grid grid-cols-1 lg:grid-cols-6 gap-8 lg:gap-12">
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 lg:gap-12">
           {/* Company Info */}
           <div className="lg:col-span-2">
             <h3 className="text-xl font-bold text-gray-900 mb-4">
@@ -96,20 +96,13 @@ export default function Footer({ dict = defaultDict }: FooterProps) {
               >
                 <Instagram className="h-5 w-5" />
               </Link>
-              <Link
-                href="https://github.com/i4mjad"
-                className="text-gray-400 hover:text-gray-600 transition-colors"
-                aria-label={dict.followUsOnGithub}
-              >
-                <Github className="h-5 w-5" />
-              </Link>
             </div>
           </div>
 
-          {/* Product Links */}
+          {/* Company Links */}
           <div>
             <h4 className="text-sm font-semibold text-gray-900 mb-4">
-              {dict.footerProduct}
+              {dict.appName}
             </h4>
             <ul className="space-y-3">
               <li>
@@ -122,24 +115,7 @@ export default function Footer({ dict = defaultDict }: FooterProps) {
               </li>
               <li>
                 <Link
-                  href={isHome ? '#pricing' : `/${lang}#pricing`}
-                  className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
-                >
-                  {dict.footerPricing}
-                </Link>
-              </li>
-            </ul>
-          </div>
-
-          {/* Company Links */}
-          <div>
-            <h4 className="text-sm font-semibold text-gray-900 mb-4">
-              {dict.footerCompany}
-            </h4>
-            <ul className="space-y-3">
-              <li>
-                <Link
-                  href={isHome ? '#about' : `/${lang}#about`}
+                  href={isHome ? '#features' : `/${lang}#features`}
                   className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
                 >
                   {dict.footerAbout}
@@ -153,14 +129,6 @@ export default function Footer({ dict = defaultDict }: FooterProps) {
                   {dict.footerBlog}
                 </Link>
               </li>
-              <li>
-                <Link
-                  href={isHome ? '#careers' : `/${lang}#careers`}
-                  className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
-                >
-                  {dict.footerCareers}
-                </Link>
-              </li>
             </ul>
           </div>
 
@@ -170,14 +138,6 @@ export default function Footer({ dict = defaultDict }: FooterProps) {
               {dict.footerResources}
             </h4>
             <ul className="space-y-3">
-              <li>
-                <Link
-                  href={isHome ? '#support' : `/${lang}#support`}
-                  className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
-                >
-                  {dict.footerSupport}
-                </Link>
-              </li>
               <li>
                 <Link
                   href={isHome ? '#contact' : `/${lang}#contact`}
