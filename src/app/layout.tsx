@@ -1,11 +1,21 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import type { Metadata, Viewport } from "next";
 import "@/app/globals.css";
-import { fallbackLng } from "@/app/i18n/settings";
+
+export const viewport: Viewport = {
+  themeColor: '#FFFFFF',
+};
 
 export const metadata: Metadata = {
   title: "Ta'aafi App",
   description: "Ta'aafi App Website",
+  icons: {
+    icon: [
+      { url: '/favicon.ico', sizes: 'any' },
+      { url: '/favicon.svg', type: 'image/svg+xml' }
+    ],
+    apple: '/apple-touch-icon.png',
+  },
+  manifest: '/site.webmanifest',
 };
 
 export default function RootLayout({
