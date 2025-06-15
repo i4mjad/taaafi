@@ -114,27 +114,11 @@ export default function FeaturesSection({ dict }: FeaturesSectionProps) {
 
   const features: Feature[] = [
     {
-      id: "smart",
-      name: mergedDict.smartName,
-      description: mergedDict.smartDescription,
-      icon: Sparkles,
-      color: "text-yellow-500",
-      status: "soon",
-    },
-    {
-      id: "community-support",
-      name: mergedDict.communityName,
-      description: mergedDict.communityDescription,
-      icon: UsersRound,
-      color: "text-pink-500",
-      status: "soon",
-    },
-    {
-      id: "growth",
-      name: mergedDict.growthName,
-      description: mergedDict.growthDescription,
-      icon: CheckSquare,
-      color: "text-indigo-500",
+      id: "progress",
+      name: mergedDict.progressName,
+      description: mergedDict.progressDescription,
+      icon: BarChart2,
+      color: "text-amber-500",
       status: "now",
     },
     {
@@ -146,12 +130,28 @@ export default function FeaturesSection({ dict }: FeaturesSectionProps) {
       status: "now",
     },
     {
-      id: "progress",
-      name: mergedDict.progressName,
-      description: mergedDict.progressDescription,
-      icon: BarChart2,
-      color: "text-amber-500",
+      id: "growth",
+      name: mergedDict.growthName,
+      description: mergedDict.growthDescription,
+      icon: CheckSquare,
+      color: "text-indigo-500",
       status: "now",
+    },
+    {
+      id: "community-support",
+      name: mergedDict.communityName,
+      description: mergedDict.communityDescription,
+      icon: UsersRound,
+      color: "text-pink-500",
+      status: "soon",
+    },
+    {
+      id: "smart",
+      name: mergedDict.smartName,
+      description: mergedDict.smartDescription,
+      icon: Sparkles,
+      color: "text-yellow-500",
+      status: "soon",
     },
   ]
 
