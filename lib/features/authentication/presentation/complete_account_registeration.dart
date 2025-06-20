@@ -451,11 +451,8 @@ class _CompleteAccountRegisterationScreenState
 
                                     if (!mounted) return;
 
-                                    // Navigate after ensuring the state is updated
-                                    WidgetsBinding.instance
-                                        .addPostFrameCallback((_) {
-                                      context.goNamed(RouteNames.home.name);
-                                    });
+                                    // Navigate to home
+                                    context.goNamed(RouteNames.home.name);
                                   } catch (e, stackTrace) {
                                     ref
                                         .read(errorLoggerProvider)

@@ -53,185 +53,197 @@ class VaultScreen extends ConsumerWidget {
       body: userDocAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(child: Text(e.toString())),
-        data: (_) => Column(
-          children: [
-            // Action banners (shown when account is NOT OK)
-            if (accountStatus == AccountStatus.needCompleteRegistration)
-              const CompleteRegistrationBanner(),
-            if (accountStatus == AccountStatus.needConfirmDetails)
-              const ConfirmDetailsBanner(),
-
-            // Main vault content only when account is OK
-            if (showMainContent) ...[
-              Expanded(
-                child: SingleChildScrollView(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
+        data: (_) {
+          switch (accountStatus) {
+            case AccountStatus.needCompleteRegistration:
+              return const Center(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16.0),
+                  child: CompleteRegistrationBanner(isFullScreen: true),
+                ),
+              );
+            case AccountStatus.needConfirmDetails:
+              return const Center(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16.0),
+                  child: ConfirmDetailsBanner(isFullScreen: true),
+                ),
+              );
+            case AccountStatus.ok:
+              return Column(
+                children: [
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            TodayTasksWidget(),
+                            // Add other scrollable content here
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.all(12),
                     child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        TodayTasksWidget(),
-                        // Add other scrollable content here
+                        Text(
+                          AppLocalizations.of(context)
+                              .translate("quick-access"),
+                          style: TextStyles.h6.copyWith(color: theme.grey[900]),
+                        ),
+                        verticalSpace(Spacing.points8),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: GestureDetector(
+                                onTap: () {
+                                  HapticFeedback.lightImpact();
+                                  context.goNamed(RouteNames.activities.name);
+                                },
+                                child: WidgetsContainer(
+                                  padding: EdgeInsets.all(12),
+                                  backgroundColor: theme.backgroundColor,
+                                  borderSide: BorderSide(
+                                      color: theme.grey[100]!, width: 1),
+                                  boxShadow: Shadows.mainShadows,
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        LucideIcons.clipboardCheck,
+                                        size: 18,
+                                        color: theme.primary[900],
+                                      ),
+                                      horizontalSpace(Spacing.points8),
+                                      Text(
+                                        AppLocalizations.of(context)
+                                            .translate("activities"),
+                                        style: TextStyles.footnote
+                                            .copyWith(color: theme.grey[900]),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                            horizontalSpace(Spacing.points8),
+                            Expanded(
+                              child: GestureDetector(
+                                onTap: () {
+                                  HapticFeedback.lightImpact();
+                                  context.goNamed(RouteNames.library.name);
+                                },
+                                child: WidgetsContainer(
+                                  padding: EdgeInsets.all(12),
+                                  backgroundColor: theme.backgroundColor,
+                                  borderSide: BorderSide(
+                                      color: theme.grey[100]!, width: 1),
+                                  boxShadow: Shadows.mainShadows,
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        LucideIcons.lamp,
+                                        size: 18,
+                                        color: theme.primary[900],
+                                      ),
+                                      horizontalSpace(Spacing.points8),
+                                      Text(
+                                        AppLocalizations.of(context)
+                                            .translate("library"),
+                                        style: TextStyles.footnote
+                                            .copyWith(color: theme.grey[900]),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        verticalSpace(Spacing.points8),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: GestureDetector(
+                                onTap: () {
+                                  HapticFeedback.lightImpact();
+                                  context.goNamed(RouteNames.diaries.name);
+                                },
+                                child: WidgetsContainer(
+                                  padding: EdgeInsets.all(12),
+                                  backgroundColor: theme.backgroundColor,
+                                  borderSide: BorderSide(
+                                      color: theme.grey[100]!, width: 1),
+                                  boxShadow: Shadows.mainShadows,
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        LucideIcons.pencil,
+                                        size: 18,
+                                        color: theme.primary[900],
+                                      ),
+                                      horizontalSpace(Spacing.points8),
+                                      Text(
+                                        AppLocalizations.of(context)
+                                            .translate("diaries"),
+                                        style: TextStyles.footnote
+                                            .copyWith(color: theme.grey[900]),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                            horizontalSpace(Spacing.points8),
+                            Expanded(
+                              child: GestureDetector(
+                                onTap: () {
+                                  HapticFeedback.lightImpact();
+                                  context
+                                      .goNamed(RouteNames.vaultSettings.name);
+                                },
+                                child: WidgetsContainer(
+                                  padding: EdgeInsets.all(12),
+                                  backgroundColor: theme.backgroundColor,
+                                  borderSide: BorderSide(
+                                      color: theme.grey[100]!, width: 1),
+                                  boxShadow: Shadows.mainShadows,
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        LucideIcons.settings2,
+                                        size: 18,
+                                        color: theme.primary[900],
+                                      ),
+                                      horizontalSpace(Spacing.points8),
+                                      Text(
+                                        AppLocalizations.of(context)
+                                            .translate("settings"),
+                                        style: TextStyles.footnote
+                                            .copyWith(color: theme.grey[900]),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                       ],
                     ),
                   ),
-                ),
-              ),
-              Padding(
-                padding: EdgeInsets.all(12),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      AppLocalizations.of(context).translate("quick-access"),
-                      style: TextStyles.h6.copyWith(color: theme.grey[900]),
-                    ),
-                    verticalSpace(Spacing.points8),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: GestureDetector(
-                            onTap: () {
-                              HapticFeedback.lightImpact();
-                              context.goNamed(RouteNames.activities.name);
-                            },
-                            child: WidgetsContainer(
-                              padding: EdgeInsets.all(12),
-                              backgroundColor: theme.backgroundColor,
-                              borderSide:
-                                  BorderSide(color: theme.grey[100]!, width: 1),
-                              boxShadow: Shadows.mainShadows,
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    LucideIcons.clipboardCheck,
-                                    size: 18,
-                                    color: theme.primary[900],
-                                  ),
-                                  horizontalSpace(Spacing.points8),
-                                  Text(
-                                    AppLocalizations.of(context)
-                                        .translate("activities"),
-                                    style: TextStyles.footnote
-                                        .copyWith(color: theme.grey[900]),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                        horizontalSpace(Spacing.points8),
-                        Expanded(
-                          child: GestureDetector(
-                            onTap: () {
-                              HapticFeedback.lightImpact();
-                              context.goNamed(RouteNames.library.name);
-                            },
-                            child: WidgetsContainer(
-                              padding: EdgeInsets.all(12),
-                              backgroundColor: theme.backgroundColor,
-                              borderSide:
-                                  BorderSide(color: theme.grey[100]!, width: 1),
-                              boxShadow: Shadows.mainShadows,
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    LucideIcons.lamp,
-                                    size: 18,
-                                    color: theme.primary[900],
-                                  ),
-                                  horizontalSpace(Spacing.points8),
-                                  Text(
-                                    AppLocalizations.of(context)
-                                        .translate("library"),
-                                    style: TextStyles.footnote
-                                        .copyWith(color: theme.grey[900]),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    verticalSpace(Spacing.points8),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: GestureDetector(
-                            onTap: () {
-                              HapticFeedback.lightImpact();
-                              context.goNamed(RouteNames.diaries.name);
-                            },
-                            child: WidgetsContainer(
-                              padding: EdgeInsets.all(12),
-                              backgroundColor: theme.backgroundColor,
-                              borderSide:
-                                  BorderSide(color: theme.grey[100]!, width: 1),
-                              boxShadow: Shadows.mainShadows,
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    LucideIcons.pencil,
-                                    size: 18,
-                                    color: theme.primary[900],
-                                  ),
-                                  horizontalSpace(Spacing.points8),
-                                  Text(
-                                    AppLocalizations.of(context)
-                                        .translate("diaries"),
-                                    style: TextStyles.footnote
-                                        .copyWith(color: theme.grey[900]),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                        horizontalSpace(Spacing.points8),
-                        Expanded(
-                          child: GestureDetector(
-                            onTap: () {
-                              HapticFeedback.lightImpact();
-                              context.goNamed(RouteNames.vaultSettings.name);
-                            },
-                            child: WidgetsContainer(
-                              padding: EdgeInsets.all(12),
-                              backgroundColor: theme.backgroundColor,
-                              borderSide:
-                                  BorderSide(color: theme.grey[100]!, width: 1),
-                              boxShadow: Shadows.mainShadows,
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    LucideIcons.settings2,
-                                    size: 18,
-                                    color: theme.primary[900],
-                                  ),
-                                  horizontalSpace(Spacing.points8),
-                                  Text(
-                                    AppLocalizations.of(context)
-                                        .translate("settings"),
-                                    style: TextStyles.footnote
-                                        .copyWith(color: theme.grey[900]),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ]
-          ],
-        ),
+                ],
+              );
+          }
+        },
       ),
     );
   }

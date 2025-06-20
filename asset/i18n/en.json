@@ -543,8 +543,9 @@
   "seconds": "Seconds",
   "customize": "Customize",
   "complete-registration-banner": "Please complete your account registration to access all features",
-  "confirm-details-banner": "Please confirm your account details to complete registration",
+  "confirm-details-banner": "Please confirm your account details to continue using the app",
   "take-action": "Take Action",
   "complete-registration": "Complete Registration",
-  "confirm-details": "Confirm Details"
+  "confirm-details": "Confirm Details",
+  "confirm-user-details": "Confirm"
 }

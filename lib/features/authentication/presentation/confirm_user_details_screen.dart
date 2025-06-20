@@ -18,7 +18,6 @@ import 'package:reboot_app_3/core/shared_widgets/snackbar.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
-import 'package:reboot_app_3/core/utils/url_launcher_provider.dart';
 import 'package:reboot_app_3/features/authentication/application/migration_service.dart';
 import 'package:reboot_app_3/features/authentication/data/models/user_document.dart';
 import 'package:reboot_app_3/features/authentication/providers/user_document_provider.dart';
@@ -467,98 +466,11 @@ class _ConfirmUserDetailsScreenState
                               )
                             : Text(
                                 AppLocalizations.of(context)
-                                    .translate('start-your-journy'),
+                                    .translate('confirm-user-details'),
                                 style: TextStyles.caption
                                     .copyWith(color: theme.grey[50]),
                               ),
                       ),
-                      if (true) ...[
-                        verticalSpace(Spacing.points8),
-                        ElevatedButton(
-                          onPressed: () {
-                            final body = '''
-                                Debug Information:
-                                UID: ${userDocument.uid}
-                                Original Document State:
-                                - Display Name: ${userDocument.displayName}
-                                - Email: ${userDocument.email}
-                                - DOB: ${userDocument.dayOfBirth?.toDate()}
-                                - Gender: ${userDocument.gender}
-                                - Locale: ${userDocument.locale}
-
-                                New Values Entered:
-                                - Display Name: ${displayNameController.text}
-                                - Email: ${emailController.text}
-                                - DOB: $selectedBirthDate
-                                - Gender: ${selectedGender?.value}
-                                - Locale: ${selectedLocale?.value}
-                                ''';
-
-                            final Uri emailLaunchUri = Uri(
-                              scheme: 'mailto',
-                              path: 'admin@ta3afi.app',
-                              query: encodeQueryParameters({
-                                'subject': 'Migration Error Report',
-                                'body': body,
-                              }),
-                            );
-
-                            ref
-                                .read(urlLauncherProvider)
-                                .launch(emailLaunchUri);
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: theme.backgroundColor,
-                            minimumSize: const Size.fromHeight(48),
-                            shape: SmoothRectangleBorder(
-                              borderRadius: SmoothBorderRadius(
-                                cornerRadius: 10.5,
-                                cornerSmoothing: 1,
-                              ),
-                              side: BorderSide(
-                                color: theme.grey[500]!,
-                                width: 0.25,
-                              ),
-                            ),
-                          ),
-                          child: Text(
-                            AppLocalizations.of(context)
-                                .translate('contact-support'),
-                            style: TextStyles.small.copyWith(
-                              color: theme.grey[500]!,
-                            ),
-                          ),
-                        ),
-                        verticalSpace(Spacing.points8),
-                        ElevatedButton(
-                          onPressed: () async {
-                            await ref
-                                .read(urlLauncherProvider)
-                                .launch(Uri.parse("https://wa.me/96877451200"));
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: theme.success[50],
-                            minimumSize: const Size.fromHeight(48),
-                            shape: SmoothRectangleBorder(
-                              borderRadius: SmoothBorderRadius(
-                                cornerRadius: 10.5,
-                                cornerSmoothing: 1,
-                              ),
-                              side: BorderSide(
-                                color: theme.success[500]!,
-                                width: 0.25,
-                              ),
-                            ),
-                          ),
-                          child: Text(
-                            AppLocalizations.of(context)
-                                .translate('contact-through-whatsapp'),
-                            style: TextStyles.small.copyWith(
-                              color: theme.success[500]!,
-                            ),
-                          ),
-                        ),
-                      ],
                     ],
                   )
                 ],

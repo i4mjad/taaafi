@@ -457,6 +457,7 @@
   "share-suggestion": "شارك اقتراحاتك",
   "complete-registration": "إكمال التسجيل",
   "confirm-details": "تأكيد التفاصيل",
+  "confirm-user-details": "تأكيد",
   "hi": "مرحبًا، ",
   "support": "الدعم",
   "support-p": "متاح على تيليجرام فقط",
@@ -526,5 +527,5 @@
   "no-follow-ups-yet": "لا يوجد متابعة من هذا النوع بعد",
   "last-follow-up": "آخر متابعة: ",
   "complete-registration-banner": "يرجى إكمال تسجيل حسابك للاستفادة من جميع الميزات",
-  "confirm-details-banner": "يرجى تأكيد تفاصيل حسابك لإكمال التسجيل"
+  "confirm-details-banner": "يرجى تأكيد تفاصيل حسابك لإكمال استخدام التطبيق"
 }

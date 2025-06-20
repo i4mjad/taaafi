@@ -234,6 +234,8 @@ flutter:
     - asset/illustrations/vault-hero-image.svg
     - asset/illustrations/vault-hero-image-02.svg
     - asset/illustrations/community-animation.json
+    - asset/illustrations/warning.json
+    - asset/illustrations/error.json
     - asset/illustrations/plus-hero-image.svg
     - asset/icons/apple-icon.svg
     - asset/icons/google-icon.svg

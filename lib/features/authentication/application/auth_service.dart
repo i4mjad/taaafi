@@ -253,8 +253,11 @@ class AuthService {
         });
       }
 
-      // Delete the user's Firestore document
-      await _authRepository.deleteUserDocument();
+      // Delete the user's Firestore document only if it exists
+      final docExists = await _authRepository.isUserDocumentExist();
+      if (docExists) {
+        await _authRepository.deleteUserDocument();
+      }
 
       // Delete the Firebase user account
       await _auth.currentUser?.delete();

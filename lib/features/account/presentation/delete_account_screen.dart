@@ -15,6 +15,7 @@ import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/features/authentication/application/auth_service.dart';
 import 'package:reboot_app_3/features/account/data/user_profile_notifier.dart';
+import 'package:reboot_app_3/features/authentication/providers/account_status_provider.dart';
 
 class DeleteAccountScreen extends ConsumerWidget {
   const DeleteAccountScreen({super.key});
@@ -22,6 +23,11 @@ class DeleteAccountScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = AppTheme.of(context);
+    final accountStatus = ref.watch(accountStatusProvider);
+    final userProfileAsync = ref.watch(userProfileNotifierProvider);
+
+    // Screen accessible regardless of account status; banners shown at top
+
     return Scaffold(
       backgroundColor: theme.backgroundColor,
       appBar: appBar(context, ref, 'delete-account', true, true),
@@ -90,7 +96,9 @@ class DeleteAccountScreen extends ConsumerWidget {
                   verticalSpace(Spacing.points8),
                   Text(
                     AppLocalizations.of(context).translate('relogin-required'),
-                    style: TextStyles.small,
+                    style: TextStyles.small.copyWith(
+                      height: 1.75,
+                    ),
                     textAlign: TextAlign.center,
                   ),
                 ],

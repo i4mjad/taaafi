@@ -26,6 +26,10 @@ import 'package:reboot_app_3/features/account/presentation/update_user_profile_m
 import 'package:reboot_app_3/features/authentication/application/auth_service.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:reboot_app_3/features/authentication/providers/account_status_provider.dart';
+import 'package:reboot_app_3/features/authentication/providers/user_document_provider.dart';
+import 'package:reboot_app_3/core/shared_widgets/complete_registration_banner.dart';
+import 'package:reboot_app_3/core/shared_widgets/confirm_details_banner.dart';
 
 class AccountScreen extends ConsumerWidget {
   const AccountScreen({super.key});
@@ -34,136 +38,150 @@ class AccountScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final AuthService authService = ref.watch(authServiceProvider);
     final userProfileState = ref.watch(userProfileNotifierProvider);
+    final accountStatus = ref.watch(accountStatusProvider);
+    final showMainContent = accountStatus == AccountStatus.ok;
+    final userDocAsync = ref.watch(userDocumentsNotifierProvider);
     final theme = AppTheme.of(context);
     final customTheme = ref.watch(customThemeProvider);
     return Scaffold(
         backgroundColor: theme.backgroundColor,
         appBar: appBar(context, ref, 'account', false, true),
-        body: userProfileState.when(
-          data: (userProfile) {
-            if (userProfile == null) {
-              return Center(
-                child: CircularProgressIndicator(),
-              );
-            }
-            return Container(
-              width: MediaQuery.of(context).size.width,
-              child: Padding(
-                padding: EdgeInsets.all(14),
-                child: SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      UserDetailsWidget(userProfile),
-                      verticalSpace(Spacing.points24),
-                      Text(
-                        AppLocalizations.of(context).translate('app-settings'),
-                        style: TextStyles.h6,
-                      ),
-                      verticalSpace(Spacing.points8),
-                      GestureDetector(
-                        onTap: () {
-                          HapticFeedback.mediumImpact();
-                          changeLanguage(context);
-                        },
-                        child: SettingsButton(
-                          icon: LucideIcons.smartphone,
-                          textKey: 'ui-settings',
-                        ),
-                      ),
-                      verticalSpace(Spacing.points16),
-                      Text(
-                        AppLocalizations.of(context)
-                            .translate('account-settings'),
-                        style: TextStyles.h6,
-                      ),
-                      verticalSpace(Spacing.points8),
-                      GestureDetector(
-                        onTap: () {
-                          unawaited(ref
-                              .read(analyticsFacadeProvider)
-                              .trackUserResetDataStarted());
+        body: userDocAsync.when(
+            loading: () => const Center(child: CircularProgressIndicator()),
+            error: (e, _) => Center(child: Text(e.toString())),
+            data: (_) => userProfileState.when(
+                  data: (userProfile) {
+                    return Container(
+                      width: MediaQuery.of(context).size.width,
+                      child: SingleChildScrollView(
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              if (!showMainContent &&
+                                  accountStatus ==
+                                      AccountStatus.needCompleteRegistration)
+                                const CompleteRegistrationBanner(),
+                              if (!showMainContent &&
+                                  accountStatus ==
+                                      AccountStatus.needConfirmDetails)
+                                const ConfirmDetailsBanner(),
+                              if (showMainContent)
+                                UserDetailsWidget(userProfile!),
+                              verticalSpace(Spacing.points24),
+                              Text(
+                                AppLocalizations.of(context)
+                                    .translate('app-settings'),
+                                style: TextStyles.h6,
+                              ),
+                              verticalSpace(Spacing.points8),
+                              GestureDetector(
+                                onTap: () {
+                                  HapticFeedback.mediumImpact();
+                                  changeLanguage(context);
+                                },
+                                child: SettingsButton(
+                                  icon: LucideIcons.smartphone,
+                                  textKey: 'ui-settings',
+                                ),
+                              ),
+                              verticalSpace(Spacing.points16),
+                              Text(
+                                AppLocalizations.of(context)
+                                    .translate('account-settings'),
+                                style: TextStyles.h6,
+                              ),
+                              verticalSpace(Spacing.points8),
+                              if (showMainContent)
+                                GestureDetector(
+                                  onTap: () {
+                                    unawaited(ref
+                                        .read(analyticsFacadeProvider)
+                                        .trackUserResetDataStarted());
 
-                          _showResetDataDialog(context, ref);
-                        },
-                        child: SettingsButton(
-                          icon: LucideIcons.userCog,
-                          textKey: 'delete-my-data',
-                        ),
-                      ),
-                      verticalSpace(Spacing.points8),
-                      SettingsButton(
-                        icon: LucideIcons.logOut,
-                        textKey: 'log-out',
-                        action: () async {
-                          await Sentry.configureScope(
-                            (scope) => scope.setUser(null),
-                          );
-                          await authService.signOut(context, ref);
-                          getSuccessSnackBar(
-                              context, 'logged-out-successfully');
-                        },
-                      ),
-                      verticalSpace(Spacing.points8),
-                      GestureDetector(
-                        onTap: () async {
-                          unawaited(ref
-                              .read(analyticsFacadeProvider)
-                              .trackUserDeleteAccount());
+                                    _showResetDataDialog(context, ref);
+                                  },
+                                  child: SettingsButton(
+                                    icon: LucideIcons.userCog,
+                                    textKey: 'delete-my-data',
+                                  ),
+                                ),
+                              verticalSpace(Spacing.points8),
+                              SettingsButton(
+                                icon: LucideIcons.logOut,
+                                textKey: 'log-out',
+                                action: () async {
+                                  await Sentry.configureScope(
+                                    (scope) => scope.setUser(null),
+                                  );
+                                  await authService.signOut(context, ref);
+                                  getSuccessSnackBar(
+                                      context, 'logged-out-successfully');
+                                },
+                              ),
+                              verticalSpace(Spacing.points8),
+                              GestureDetector(
+                                onTap: () async {
+                                  unawaited(ref
+                                      .read(analyticsFacadeProvider)
+                                      .trackUserDeleteAccount());
 
-                          context.goNamed(RouteNames.accountDelete.name);
-                        },
-                        child: SettingsButton(
-                          icon: LucideIcons.userX,
-                          textKey: 'delete-my-account',
-                          type: 'error',
+                                  context
+                                      .goNamed(RouteNames.accountDelete.name);
+                                },
+                                child: SettingsButton(
+                                  icon: LucideIcons.userX,
+                                  textKey: 'delete-my-account',
+                                  type: 'error',
+                                ),
+                              ),
+                              verticalSpace(Spacing.points16),
+                              Text(
+                                AppLocalizations.of(context)
+                                    .translate('about-app'),
+                                style: TextStyles.h6,
+                              ),
+                              verticalSpace(Spacing.points8),
+                              SettingsButton(
+                                icon: LucideIcons.heart,
+                                textKey: 'version-number',
+                                type: 'app',
+                                action: () {
+                                  launchUrl(Uri.parse('https://ta3afi.app'));
+                                },
+                              ),
+                              verticalSpace(Spacing.points8),
+                              SettingsButton(
+                                icon: LucideIcons.contact,
+                                textKey: 'contact-us-through-this-channels',
+                                action: () async {
+                                  await ref.read(urlLauncherProvider).launch(
+                                      Uri.parse('https://t.me/Ta3afiApp'));
+                                },
+                              ),
+                              verticalSpace(Spacing.points8),
+                              SettingsButton(
+                                icon: LucideIcons.star,
+                                textKey: 'rate-app',
+                                action: () async {
+                                  await ref
+                                      .read(inAppRatingServiceProvider)
+                                      .requestReview(context);
+                                },
+                              ),
+                              verticalSpace(Spacing.points12),
+                            ],
+                          ),
                         ),
                       ),
-                      verticalSpace(Spacing.points16),
-                      Text(
-                        AppLocalizations.of(context).translate('about-app'),
-                        style: TextStyles.h6,
-                      ),
-                      verticalSpace(Spacing.points8),
-                      SettingsButton(
-                        icon: LucideIcons.heart,
-                        textKey: 'version-number',
-                        type: 'app',
-                        action: () {
-                          launchUrl(Uri.parse('https://ta3afi.app'));
-                        },
-                      ),
-                      verticalSpace(Spacing.points8),
-                      SettingsButton(
-                        icon: LucideIcons.contact,
-                        textKey: 'contact-us-through-this-channels',
-                        action: () async {
-                          await ref
-                              .read(urlLauncherProvider)
-                              .launch(Uri.parse('https://t.me/Ta3afiApp'));
-                        },
-                      ),
-                      verticalSpace(Spacing.points8),
-                      SettingsButton(
-                        icon: LucideIcons.star,
-                        textKey: 'rate-app',
-                        action: () async {
-                          await ref
-                              .read(inAppRatingServiceProvider)
-                              .requestReview(context);
-                        },
-                      ),
-                      verticalSpace(Spacing.points12),
-                    ],
-                  ),
-                ),
-              ),
-            );
-          },
-          error: (error, stackTrace) => Center(child: Text('Error: $error')),
-          loading: () => Center(child: CircularProgressIndicator()),
-        ));
+                    );
+                  },
+                  error: (error, stackTrace) =>
+                      Center(child: Text('Error: $error')),
+                  loading: () => Center(child: CircularProgressIndicator()),
+                )));
   }
 
   void changeLanguage(BuildContext context) async {
