@@ -80,7 +80,10 @@ class CalendarRepository {
     if (uid == null) throw Exception('User not logged in');
     final userDoc = await _firestore.collection('users').doc(uid).get();
 
-    final userFirstDate = userDoc.data()?['userFirstDate'];
-    return (userFirstDate as Timestamp).toDate();
+    final ts = userDoc.data()?['userFirstDate'] as Timestamp?;
+    if (ts != null) {
+      return ts.toDate();
+    }
+    throw Exception('User first date not found');
   }
 }

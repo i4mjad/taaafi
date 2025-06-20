@@ -541,5 +541,10 @@
   "days": "Days",
   "hours": "Hours",
   "seconds": "Seconds",
-  "customize": "Customize"
+  "customize": "Customize",
+  "complete-registration-banner": "Please complete your account registration to access all features",
+  "confirm-details-banner": "Please confirm your account details to complete registration",
+  "take-action": "Take Action",
+  "complete-registration": "Complete Registration",
+  "confirm-details": "Confirm Details"
 }

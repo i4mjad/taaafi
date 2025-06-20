@@ -13,6 +13,7 @@ import 'package:reboot_app_3/core/theming/custom_theme_data.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/features/home/data/streak_notifier.dart';
+import 'package:reboot_app_3/features/home/data/models/streak_statistics.dart';
 import 'package:reboot_app_3/features/home/presentation/home/widgets/calender_widget.dart';
 import 'package:reboot_app_3/features/home/presentation/home/widgets/follow_up_sheet.dart';
 import 'package:reboot_app_3/features/home/presentation/home/widgets/statistics_widget.dart';
@@ -20,6 +21,10 @@ import 'package:app_settings/app_settings.dart';
 import 'package:reboot_app_3/features/home/presentation/home/widgets/streak_settings_sheet.dart';
 import 'package:reboot_app_3/features/vault/presentation/vault_settings/activities_notifications_settings_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:reboot_app_3/features/authentication/providers/account_status_provider.dart';
+import 'package:reboot_app_3/core/shared_widgets/complete_registration_banner.dart';
+import 'package:reboot_app_3/core/shared_widgets/confirm_details_banner.dart';
+import 'package:reboot_app_3/features/authentication/providers/user_document_provider.dart';
 
 // Home visibility provider
 final homeVisibilityProvider =
@@ -71,27 +76,39 @@ class HomeScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = AppTheme.of(context);
-    final streaksState = ref.watch(streakNotifierProvider);
     final notificationsEnabled = ref.watch(notificationsEnabledProvider);
     final homeVisibilitySettings = ref.watch(homeVisibilityProvider);
     final locale = ref.watch(localeNotifierProvider);
+    final accountStatus = ref.watch(accountStatusProvider);
+    final userDocAsync = ref.watch(userDocumentsNotifierProvider);
+    final showMainContent = accountStatus == AccountStatus.ok;
 
     final localization = AppLocalizations.of(context);
 
-    final actions = [
-      IconButton(
-        onPressed: () {
-          showModalBottomSheet<void>(
-            context: context,
-            isScrollControlled: true,
-            builder: (BuildContext context) {
-              return HomeSettingsSheet();
-            },
-          );
-        },
-        icon: Icon(LucideIcons.listChecks, color: theme.primary[600]),
-      ),
-    ];
+    // Watch streak statistics only when we are sure we need to show them to avoid
+    // unnecessary calls (and possible exceptions) while the account is still
+    // in an incomplete state.
+    AsyncValue<StreakStatistics>? streaksState;
+    if (showMainContent && (homeVisibilitySettings['currentStreaks'] ?? true)) {
+      streaksState = ref.watch(streakNotifierProvider);
+    }
+
+    final actions = showMainContent
+        ? [
+            IconButton(
+              onPressed: () {
+                showModalBottomSheet<void>(
+                  context: context,
+                  isScrollControlled: true,
+                  builder: (BuildContext context) {
+                    return HomeSettingsSheet();
+                  },
+                );
+              },
+              icon: Icon(LucideIcons.listChecks, color: theme.primary[600]),
+            ),
+          ]
+        : null;
     return Scaffold(
       backgroundColor: theme.backgroundColor,
       appBar: appBar(
@@ -102,121 +119,141 @@ class HomeScreen extends ConsumerWidget {
         false,
         actions: actions,
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            if (!(notificationsEnabled.value ?? true))
-              const NotificationPromoterWidget(),
-            if (homeVisibilitySettings['quickAccess'] ?? true)
-              QuickAccessWidget(),
-            if (homeVisibilitySettings['quickAccess'] ?? true)
-              verticalSpace(Spacing.points4),
-            if (homeVisibilitySettings['currentStreaks'] ?? true)
-              Padding(
-                padding:
-                    const EdgeInsets.only(left: 16.0, right: 16.0, top: 16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      body: userDocAsync.when(
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (err, _) => Center(child: Text(err.toString())),
+        data: (_) => SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              // Show the correct banner depending on the current account status
+              if (accountStatus == AccountStatus.needCompleteRegistration)
+                const CompleteRegistrationBanner(),
+              if (accountStatus == AccountStatus.needConfirmDetails)
+                const ConfirmDetailsBanner(),
+
+              // Only show main content if account is properly set up
+              if (showMainContent) ...[
+                if (!(notificationsEnabled.value ?? true))
+                  const NotificationPromoterWidget(),
+                if (homeVisibilitySettings['quickAccess'] ?? true)
+                  QuickAccessWidget(),
+                if (homeVisibilitySettings['quickAccess'] ?? true)
+                  verticalSpace(Spacing.points4),
+                if (homeVisibilitySettings['currentStreaks'] ?? true)
+                  Padding(
+                    padding: const EdgeInsets.only(
+                        left: 16.0, right: 16.0, top: 16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              AppLocalizations.of(context)
+                                  .translate("current-streaks"),
+                              style: TextStyles.h6
+                                  .copyWith(color: theme.grey[900]),
+                            ),
+                            GestureDetector(
+                              onTap: () {
+                                HapticFeedback.lightImpact();
+                                showModalBottomSheet<void>(
+                                  context: context,
+                                  isScrollControlled: true,
+                                  builder: (BuildContext context) {
+                                    return StreakSettingsSheet();
+                                  },
+                                );
+                              },
+                              child: Text(
+                                AppLocalizations.of(context)
+                                    .translate("customize"),
+                                style: TextStyles.small.copyWith(
+                                    color: theme.grey[600],
+                                    decoration: TextDecoration.underline),
+                              ),
+                            ),
+                          ],
+                        ),
+                        verticalSpace(Spacing.points4),
+                        Row(
+                          children: [
+                            Icon(
+                              LucideIcons.calendar,
+                              size: 16,
+                              color: theme.grey[400],
+                            ),
+                            horizontalSpace(Spacing.points8),
+                            Expanded(
+                              child: Text(
+                                localization.translate("starting-date") +
+                                    ": " +
+                                    (() {
+                                      final firstDate =
+                                          streaksState?.value?.userFirstDate;
+                                      return firstDate != null
+                                          ? getDisplayDateTime(
+                                              firstDate, locale!.languageCode)
+                                          : localization.translate("not-set");
+                                    })(),
+                                style: TextStyles.small.copyWith(
+                                  color: theme.grey[400],
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        if (streaksState != null) CurrentStreaksWidget(),
+                      ],
+                    ),
+                  ),
+                if (homeVisibilitySettings['statistics'] ?? true)
+                  Padding(
+                    padding: const EdgeInsets.only(left: 16.0, right: 16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          AppLocalizations.of(context)
-                              .translate("current-streaks"),
+                          AppLocalizations.of(context).translate("statistics"),
                           style: TextStyles.h6.copyWith(color: theme.grey[900]),
                         ),
-                        GestureDetector(
-                          onTap: () {
-                            HapticFeedback.lightImpact();
-                            showModalBottomSheet<void>(
-                              context: context,
-                              isScrollControlled: true,
-                              builder: (BuildContext context) {
-                                return StreakSettingsSheet();
-                              },
-                            );
-                          },
-                          child: Text(
-                            AppLocalizations.of(context).translate("customize"),
-                            style: TextStyles.small.copyWith(
-                                color: theme.grey[600],
-                                decoration: TextDecoration.underline),
-                          ),
-                        ),
+                        UserStatisticsWidget(),
                       ],
                     ),
-                    verticalSpace(Spacing.points4),
-                    Row(
-                      children: [
-                        Icon(
-                          LucideIcons.calendar,
-                          size: 16,
-                          color: theme.grey[400],
-                        ),
-                        horizontalSpace(Spacing.points8),
-                        Expanded(
-                          child: Text(
-                            localization.translate("starting-date") +
-                                ": " +
-                                (streaksState.value?.userFirstDate != null
-                                    ? getDisplayDateTime(
-                                        streaksState.value!.userFirstDate,
-                                        locale!.languageCode)
-                                    : localization.translate("not-set")),
-                            style: TextStyles.small.copyWith(
-                              color: theme.grey[400],
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    CurrentStreaksWidget(),
-                  ],
-                ),
-              ),
-            if (homeVisibilitySettings['statistics'] ?? true)
-              Padding(
-                padding: const EdgeInsets.only(left: 16.0, right: 16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      AppLocalizations.of(context).translate("statistics"),
-                      style: TextStyles.h6.copyWith(color: theme.grey[900]),
-                    ),
-                    UserStatisticsWidget(),
-                  ],
-                ),
-              ),
-            if (homeVisibilitySettings['calendar'] ?? true)
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: CalenderWidget(),
-              )
-          ],
+                  ),
+                if (homeVisibilitySettings['calendar'] ?? true)
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: CalenderWidget(),
+                  )
+              ],
+            ],
+          ),
         ),
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        backgroundColor: theme.primary[600],
-        onPressed: () {
-          showModalBottomSheet<void>(
-            context: context,
-            isScrollControlled: true,
-            builder: (BuildContext context) {
-              return FollowUpSheet(DateTime.now());
-            },
-          );
-        },
-        label: Text(
-          AppLocalizations.of(context).translate("daily-follow-up"),
-          style: TextStyles.caption.copyWith(color: theme.grey[50]),
-        ),
-        icon: Icon(LucideIcons.pencil, color: theme.grey[50]),
-      ),
+      floatingActionButton: showMainContent
+          ? FloatingActionButton.extended(
+              backgroundColor: theme.primary[600],
+              onPressed: () {
+                showModalBottomSheet<void>(
+                  context: context,
+                  isScrollControlled: true,
+                  builder: (BuildContext context) {
+                    return FollowUpSheet(DateTime.now());
+                  },
+                );
+              },
+              label: Text(
+                AppLocalizations.of(context).translate("daily-follow-up"),
+                style: TextStyles.caption.copyWith(color: theme.grey[50]),
+              ),
+              icon: Icon(LucideIcons.pencil, color: theme.grey[50]),
+            )
+          : null,
     );
   }
 }

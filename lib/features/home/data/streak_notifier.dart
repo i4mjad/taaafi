@@ -4,6 +4,8 @@ import 'package:reboot_app_3/features/home/application/streak_service.dart';
 import 'package:reboot_app_3/features/home/data/models/streak_statistics.dart';
 import 'package:reboot_app_3/features/home/data/repos/streak_repository.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:reboot_app_3/features/authentication/providers/account_status_provider.dart';
+import 'package:reboot_app_3/features/authentication/providers/user_document_provider.dart';
 
 part 'streak_notifier.g.dart';
 
@@ -13,6 +15,44 @@ class StreakNotifier extends _$StreakNotifier {
 
   @override
   FutureOr<StreakStatistics> build() async {
+    // Wait until the user document is fully loaded and valid
+    final userDocAsync = ref.watch(userDocumentsNotifierProvider);
+    if (userDocAsync.isLoading || userDocAsync.hasError) {
+      return StreakStatistics(
+        userFirstDate: DateTime.now(),
+        relapseStreak: 0,
+        pornOnlyStreak: 0,
+        mastOnlyStreak: 0,
+        slipUpStreak: 0,
+      );
+    }
+
+    // If no document yet (null) we shouldn't proceed
+    if (userDocAsync.value == null) {
+      return StreakStatistics(
+        userFirstDate: DateTime.now(),
+        relapseStreak: 0,
+        pornOnlyStreak: 0,
+        mastOnlyStreak: 0,
+        slipUpStreak: 0,
+      );
+    }
+
+    // Avoid hitting Firestore if the account is not yet fully set-up.
+    final accountStatus = ref.watch(accountStatusProvider);
+    if (accountStatus != AccountStatus.ok) {
+      // Return an empty, default object; UI that depends on real data is hidden
+      // until the account status becomes `ok`, at which point the provider will
+      // rebuild automatically.
+      return StreakStatistics(
+        userFirstDate: DateTime.now(),
+        relapseStreak: 0,
+        pornOnlyStreak: 0,
+        mastOnlyStreak: 0,
+        slipUpStreak: 0,
+      );
+    }
+
     final userFirstDateFuture = service.getUserFirstDate();
     final relapseStreakFuture = service.calculateRelapseStreak();
     final pornOnlyStreakFuture = service.calculatePornOnlyStreak();

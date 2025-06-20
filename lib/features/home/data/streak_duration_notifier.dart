@@ -150,7 +150,13 @@ class DetailedStreakNotifier
   }
 
   Future<Duration> _calculateStreakDuration(FollowUpType type) async {
-    final userFirstDate = await _service.getUserFirstDate();
+    DateTime? userFirstDate;
+    try {
+      userFirstDate = await _service.getUserFirstDate();
+    } catch (_) {
+      // User first date not ready yet; return zero duration
+      return Duration.zero;
+    }
 
     // Use appropriate methods based on follow-up type
     switch (type) {

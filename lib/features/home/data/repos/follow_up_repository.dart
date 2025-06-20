@@ -182,8 +182,11 @@ class FollowUpRepository {
       final doc = await docRef.get();
       if (doc.exists) {
         final data = doc.data();
-        if (data != null && data.containsKey('userFirstDate')) {
-          return (data['userFirstDate'] as Timestamp).toDate();
+        if (data != null) {
+          final ts = data['userFirstDate'] as Timestamp?;
+          if (ts != null) {
+            return ts.toDate();
+          }
         }
       }
       throw Exception('User first date not found');

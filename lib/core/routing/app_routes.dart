@@ -38,6 +38,8 @@ import 'package:reboot_app_3/features/vault/presentation/vault_settings/vault_se
 import 'package:reboot_app_3/features/vault/presentation/vault_screen.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
+import 'package:reboot_app_3/features/authentication/data/models/user_document.dart';
+import 'dart:async';
 
 part 'app_routes.g.dart';
 
@@ -47,6 +49,27 @@ GoRouter goRouter(GoRouterRef ref) {
   final userDocumentState = ref.watch(userDocumentsNotifierProvider);
   final userDocumentNotifier = ref.read(userDocumentsNotifierProvider.notifier);
 
+  // Build a merged stream to trigger router refreshes whenever auth state OR
+  // user-document state changes.
+  final refreshController = StreamController<void>(sync: true);
+
+  // Listen to auth state stream
+  final authSubscription = authStateChanges(ref).listen((_) {
+    if (!refreshController.isClosed) refreshController.add(null);
+  });
+
+  // Listen to user-document provider updates
+  ref.listen<AsyncValue<UserDocument?>>(userDocumentsNotifierProvider,
+      (prev, next) {
+    if (!refreshController.isClosed) refreshController.add(null);
+  });
+
+  // Ensure we clean up subscriptions
+  ref.onDispose(() {
+    authSubscription.cancel();
+    refreshController.close();
+  });
+
   return GoRouter(
     initialLocation: '/home',
     navigatorKey: rootNavigatorKey,
@@ -55,7 +78,7 @@ GoRouter goRouter(GoRouterRef ref) {
       GoRouterObserver(ref.read(analyticsFacadeProvider)),
       SentryNavigatorObserver()
     ],
-    refreshListenable: GoRouterRefreshStream(authStateChanges(ref)),
+    refreshListenable: GoRouterRefreshStream(refreshController.stream),
     redirect: (context, state) async {
       final isLoggedIn = authState.asData?.value != null;
 
@@ -68,61 +91,12 @@ GoRouter goRouter(GoRouterRef ref) {
           return null;
         }
 
-        // Fetch the user document state
-        final isLoading = userDocumentState is AsyncLoading;
-        final hasError = userDocumentState is AsyncError;
-        final userDocument = userDocumentState.valueOrNull;
-
-        // If we're loading, show loading screen
-        if (isLoading) {
-          if (state.matchedLocation != '/loading') {
-            return '/loading';
-          }
-          return null;
-        }
-
-        // If there was an error fetching the document or the document is null,
-        // this could indicate a recreated account scenario or missing document
-        if (userDocument == null || hasError) {
-          // Check if we're already on the account registration page to prevent loops
-          if (state.matchedLocation != '/completeAccountRegisteration') {
-            return '/completeAccountRegisteration';
-          }
-          return null;
-        }
-
-        // Now we can safely check the document properties since we know userDocument is not null
-        final isLegacy =
-            userDocumentNotifier.isLegacyUserDocument(userDocument);
-        final isNew = userDocumentNotifier.isNewUserDocument(userDocument);
-        final hasMissingData =
-            userDocumentNotifier.hasMissingData(userDocument);
-
-        // If we're on confirmProfileDetails and the document is no longer legacy,
-        // redirect to home to prevent loops
-        if (state.matchedLocation == '/confirmProfileDetails' &&
-            !isLegacy &&
-            !hasMissingData) {
+        // If user is logged in and currently on onboarding or loading, redirect to home
+        if (state.matchedLocation.startsWith('/onboarding') ||
+            state.matchedLocation == '/loading') {
           return '/home';
         }
-
-        // Check for legacy users or missing data
-        if (userDocument != null && (isLegacy || hasMissingData)) {
-          if (state.matchedLocation != '/confirmProfileDetails') {
-            return '/confirmProfileDetails';
-          }
-          return null;
-        }
-
-        // Allow navigation to other routes if the user has the new document structure
-        if (isNew) {
-          if (state.matchedLocation.startsWith('/onboarding') ||
-              state.matchedLocation == '/loading' ||
-              state.matchedLocation == '/confirmProfileDetails') {
-            return '/home';
-          }
-          return null;
-        }
+        return null;
       } else {
         // Non-logged-in user trying to access protected routes
         final isAuthRoute = state.matchedLocation.startsWith('/onboarding');
@@ -178,22 +152,6 @@ GoRouter goRouter(GoRouterRef ref) {
           ),
         ],
       ),
-      GoRoute(
-        path: '/completeAccountRegisteration',
-        name: RouteNames.completeAccountRegisteration.name,
-        pageBuilder: (context, state) => NoTransitionPage<void>(
-          name: RouteNames.completeAccountRegisteration.name,
-          child: CompleteAccountRegisterationScreen(),
-        ),
-      ),
-      GoRoute(
-        path: '/confirmProfileDetails',
-        name: RouteNames.confirmUserDetails.name,
-        pageBuilder: (context, state) => NoTransitionPage(
-          name: RouteNames.confirmUserDetails.name,
-          child: ConfirmUserDetailsScreen(),
-        ),
-      ),
       StatefulShellRoute.indexedStack(
         pageBuilder: (context, state, navigationShell) => NoTransitionPage(
           name: 'main',
@@ -224,7 +182,23 @@ GoRouter goRouter(GoRouterRef ref) {
                         date: DateTime.parse(state.pathParameters["date"]!),
                       ),
                     ),
-                  )
+                  ),
+                  GoRoute(
+                    path: 'completeAccountRegisteration',
+                    name: RouteNames.completeAccountRegisteration.name,
+                    pageBuilder: (context, state) => MaterialPage<void>(
+                      name: RouteNames.completeAccountRegisteration.name,
+                      child: CompleteAccountRegisterationScreen(),
+                    ),
+                  ),
+                  GoRoute(
+                    path: 'confirmProfileDetails',
+                    name: RouteNames.confirmUserDetails.name,
+                    pageBuilder: (context, state) => MaterialPage<void>(
+                      name: RouteNames.confirmUserDetails.name,
+                      child: ConfirmUserDetailsScreen(),
+                    ),
+                  ),
                 ],
               ),
             ],

@@ -136,7 +136,7 @@ class _ConfirmUserDetailsScreenState
 
     return Scaffold(
       backgroundColor: theme.backgroundColor,
-      appBar: appBar(context, ref, 'review-your-details', true, false),
+      appBar: appBar(context, ref, 'review-your-details', true, true),
       body: userDocumentAsyncValue.when(
         data: (userDocument) {
           if (userDocument == null) {

@@ -129,7 +129,7 @@ class OnboardingSection extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = AppTheme.of(context);
     return Container(
-      padding: EdgeInsets.only(right: 32, left: 32),
+      padding: EdgeInsets.only(right: 16, left: 16),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -155,6 +155,7 @@ class OnboardingSection extends ConsumerWidget {
                   description,
                   style: TextStyles.small.copyWith(
                     color: theme.grey[700],
+                    height: 1.5,
                   ),
                 ),
               ],

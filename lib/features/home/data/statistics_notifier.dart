@@ -7,6 +7,7 @@ import 'package:reboot_app_3/features/home/data/models/user_statistics.dart';
 import 'package:reboot_app_3/features/shared/models/follow_up.dart';
 import 'package:reboot_app_3/features/home/data/repos/statistics_repository.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:reboot_app_3/features/authentication/providers/account_status_provider.dart';
 
 part 'statistics_notifier.g.dart';
 
@@ -36,6 +37,14 @@ class StatisticsNotifier extends _$StatisticsNotifier {
 
   @override
   FutureOr<UserStatistics> build() async {
+    final accountStatus = ref.watch(accountStatusProvider);
+    if (accountStatus != AccountStatus.ok) {
+      return UserStatistics(
+          daysWithoutRelapse: 0,
+          relapsesInLast30Days: 0,
+          longestRelapseStreak: 0);
+    }
+
     final daysWithoutRelapseFuture = service.calculateDaysWithoutRelapse();
     final relapsesLast30DaysFuture = service.getRelapsesInLast30Days();
     final longestRelapseStreakFuture = service.calculateLongestRelapseStreak();

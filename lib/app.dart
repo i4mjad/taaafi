@@ -21,66 +21,97 @@ import 'package:url_launcher/url_launcher.dart';
 class MyApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final goRouter = ref.watch(goRouterProvider);
-    final theme = ref.watch(customThemeProvider);
+    final startup = ref.watch(appStartupProvider);
+
+    final themeController = ref.watch(customThemeProvider);
     final colorTheme = ref.watch(colorThemeProvider);
-    final locale = ref.watch(localeNotifierProvider);
+
     return AppTheme(
-      customThemeData:
-          theme.darkTheme ? darkCustomTheme : getLightCustomTheme(colorTheme),
-      child: MaterialApp.router(
-        routerConfig: goRouter,
-        supportedLocales: [Locale('ar', ''), Locale('en', '')],
-        locale: locale,
-        localizationsDelegates: [
-          AppLocalizations.delegate,
-          GlobalMaterialLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-        ],
-        localeResolutionCallback: (locale, supportedLocales) {
-          for (var supportedLocale in supportedLocales) {
-            if (supportedLocale.languageCode == locale?.languageCode) {
-              return supportedLocale;
-            }
-          }
-          return supportedLocales.first;
+      customThemeData: themeController.darkTheme
+          ? darkCustomTheme
+          : getLightCustomTheme(colorTheme),
+      child: startup.when(
+        loading: () {
+          return MaterialApp(
+            debugShowCheckedModeBanner: false,
+            theme: themeController.darkTheme
+                ? darkTheme
+                : getLightTheme(colorTheme),
+            home: const AppStartupLoadingWidget(),
+          );
         },
-        debugShowCheckedModeBanner: false,
-        theme: theme.darkTheme ? darkTheme : getLightTheme(colorTheme),
-        builder: (_, child) {
-          return AppStartupWidget(
-            onLoaded: (_) => ForceUpdateWidget(
-              navigatorKey: rootNavigatorKey,
-              allowCancel: false,
-              showForceUpdateAlert: (context, allowCancel) => showAlertDialog(
-                context: context,
-                title:
-                    AppLocalizations.of(context).translate("required-update"),
-                content:
-                    AppLocalizations.of(context).translate("required-update-p"),
-                cancelActionText: allowCancel
-                    ? AppLocalizations.of(context).translate("later")
-                    : null,
-                defaultActionText:
-                    AppLocalizations.of(context).translate("update-now"),
-              ),
-              showStoreListing: (uri) async {
-                ref.read(urlLauncherProvider).launch(
-                      uri,
-                      mode: LaunchMode.externalApplication,
-                    );
-              },
-              forceUpdateClient: ForceUpdateClient(
-                fetchRequiredVersion: () async {
-                  final remoteConfig =
-                      await ref.read(firebaseRemoteConfigProvider.future);
-                  return remoteConfig.getString('required_version');
-                },
-                iosAppStoreId: "1531562469",
-              ),
-              child: child!,
+        error: (e, st) {
+          return MaterialApp(
+            debugShowCheckedModeBanner: false,
+            theme: themeController.darkTheme
+                ? darkTheme
+                : getLightTheme(colorTheme),
+            home: AppStartupErrorWidget(
+              message: e.toString(),
+              onRetry: () => ref.invalidate(appStartupProvider),
             ),
+          );
+        },
+        data: (_) {
+          final goRouter = ref.watch(goRouterProvider);
+          final locale = ref.watch(localeNotifierProvider);
+
+          return MaterialApp.router(
+            routerConfig: goRouter,
+            supportedLocales: const [Locale('ar', ''), Locale('en', '')],
+            locale: locale,
+            localizationsDelegates: const [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+            ],
+            localeResolutionCallback: (locale, supportedLocales) {
+              for (var supportedLocale in supportedLocales) {
+                if (supportedLocale.languageCode == locale?.languageCode) {
+                  return supportedLocale;
+                }
+              }
+              return supportedLocales.first;
+            },
+            debugShowCheckedModeBanner: false,
+            theme: themeController.darkTheme
+                ? darkTheme
+                : getLightTheme(colorTheme),
+            builder: (_, child) {
+              // Startup is already complete, just wrap in ForceUpdateWidget
+              return ForceUpdateWidget(
+                navigatorKey: rootNavigatorKey,
+                allowCancel: false,
+                showForceUpdateAlert: (context, allowCancel) => showAlertDialog(
+                  context: context,
+                  title:
+                      AppLocalizations.of(context).translate("required-update"),
+                  content: AppLocalizations.of(context)
+                      .translate("required-update-p"),
+                  cancelActionText: allowCancel
+                      ? AppLocalizations.of(context).translate("later")
+                      : null,
+                  defaultActionText:
+                      AppLocalizations.of(context).translate("update-now"),
+                ),
+                showStoreListing: (uri) async {
+                  ref.read(urlLauncherProvider).launch(
+                        uri,
+                        mode: LaunchMode.externalApplication,
+                      );
+                },
+                forceUpdateClient: ForceUpdateClient(
+                  fetchRequiredVersion: () async {
+                    final remoteConfig =
+                        await ref.read(firebaseRemoteConfigProvider.future);
+                    return remoteConfig.getString('required_version');
+                  },
+                  iosAppStoreId: "1531562469",
+                ),
+                child: child!,
+              );
+            },
           );
         },
       ),

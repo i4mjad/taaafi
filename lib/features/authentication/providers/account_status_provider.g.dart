@@ -1,27 +1,25 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'user_document_provider.dart';
+part of 'account_status_provider.dart';
 
 // **************************************************************************
 // RiverpodGenerator
 // **************************************************************************
 
-String _$userDocumentsNotifierHash() =>
-    r'e197083d9a39538f5f4dbe4c844b6d0cd1128663';
+String _$accountStatusHash() => r'6f521758a6236578072950618c86c4012ebcdad9';
 
-/// See also [UserDocumentsNotifier].
-@ProviderFor(UserDocumentsNotifier)
-final userDocumentsNotifierProvider = AutoDisposeAsyncNotifierProvider<
-    UserDocumentsNotifier, UserDocument?>.internal(
-  UserDocumentsNotifier.new,
-  name: r'userDocumentsNotifierProvider',
+/// See also [accountStatus].
+@ProviderFor(accountStatus)
+final accountStatusProvider = AutoDisposeProvider<AccountStatus>.internal(
+  accountStatus,
+  name: r'accountStatusProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
       ? null
-      : _$userDocumentsNotifierHash,
+      : _$accountStatusHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
 
-typedef _$UserDocumentsNotifier = AutoDisposeAsyncNotifier<UserDocument?>;
+typedef AccountStatusRef = AutoDisposeProviderRef<AccountStatus>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

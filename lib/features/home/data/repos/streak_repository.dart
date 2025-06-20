@@ -30,10 +30,12 @@ class StreakRepository {
       final doc = await docRef.get();
       if (doc.exists) {
         final data = doc.data();
-        if (data != null && data.containsKey('userFirstDate')) {
+        if (data != null && data['userFirstDate'] != null) {
           return (data['userFirstDate'] as Timestamp).toDate();
         }
       }
+
+      // If missing, throw; upper layers should ensure user completes registration.
       throw Exception('User first date not found');
     } catch (e, stackTrace) {
       ref.read(errorLoggerProvider).logException(e, stackTrace);
