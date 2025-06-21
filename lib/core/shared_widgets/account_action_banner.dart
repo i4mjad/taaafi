@@ -33,6 +33,10 @@ class AccountActionBanner extends ConsumerWidget {
         messageKey = 'confirm-details-banner';
         routeName = '/confirmProfileDetails';
         break;
+      case AccountStatus.needEmailVerification:
+        messageKey = 'confirm-email-banner';
+        routeName = '/confirmUserEmail';
+        break;
       case AccountStatus.ok:
         return const SizedBox.shrink();
     }

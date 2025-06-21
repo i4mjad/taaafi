@@ -12,6 +12,7 @@ enum RouteNames {
   forgotPassword,
   completeAccountRegisteration,
   confirmUserDetails,
+  confirmUserEmail,
   loading,
   dayOverview,
   diaries,

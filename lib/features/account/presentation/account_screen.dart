@@ -30,6 +30,7 @@ import 'package:reboot_app_3/features/authentication/providers/account_status_pr
 import 'package:reboot_app_3/features/authentication/providers/user_document_provider.dart';
 import 'package:reboot_app_3/core/shared_widgets/complete_registration_banner.dart';
 import 'package:reboot_app_3/core/shared_widgets/confirm_details_banner.dart';
+import 'package:reboot_app_3/core/shared_widgets/confirm_email_banner.dart';
 
 class AccountScreen extends ConsumerWidget {
   const AccountScreen({super.key});
@@ -68,6 +69,10 @@ class AccountScreen extends ConsumerWidget {
                                   accountStatus ==
                                       AccountStatus.needConfirmDetails)
                                 const ConfirmDetailsBanner(),
+                              if (!showMainContent &&
+                                  accountStatus ==
+                                      AccountStatus.needEmailVerification)
+                                const ConfirmEmailBanner(),
                               if (showMainContent)
                                 UserDetailsWidget(userProfile!),
                               verticalSpace(Spacing.points24),

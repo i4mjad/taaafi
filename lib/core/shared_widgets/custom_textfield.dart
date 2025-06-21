@@ -1,5 +1,6 @@
 import 'package:figma_squircle/figma_squircle.dart';
 import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
@@ -17,6 +18,7 @@ class CustomTextField extends StatefulWidget {
   final double? width;
   final bool? enabled;
   final String? Function(String?) validator;
+  final bool showObscureToggle;
 
   const CustomTextField({
     Key? key,
@@ -32,6 +34,7 @@ class CustomTextField extends StatefulWidget {
     this.obscureText = false,
     this.textCapitalization = TextCapitalization.none,
     required this.inputType,
+    this.showObscureToggle = false,
   }) : super(key: key);
 
   @override
@@ -41,12 +44,25 @@ class CustomTextField extends StatefulWidget {
 class _CustomTextFieldState extends State<CustomTextField> {
   bool _isValid = true;
   String? _errorText;
+  late bool _isObscured;
+
+  @override
+  void initState() {
+    super.initState();
+    _isObscured = widget.obscureText;
+  }
 
   void _validate() {
     final error = widget.validator(widget.controller.text);
     setState(() {
       _isValid = error == null;
       _errorText = error;
+    });
+  }
+
+  void _toggleObscure() {
+    setState(() {
+      _isObscured = !_isObscured;
     });
   }
 
@@ -109,7 +125,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
             maxLength: 100,
             maxLines: 1,
             focusNode: widget.focusNode,
-            obscureText: widget.obscureText,
+            obscureText: _isObscured,
             keyboardType: widget.inputType,
             textAlign: TextAlign.start,
             validator: (value) {
@@ -129,6 +145,16 @@ class _CustomTextFieldState extends State<CustomTextField> {
                 widget.prefixIcon,
                 color: theme.grey[900],
               ),
+              suffixIcon: widget.showObscureToggle && widget.obscureText
+                  ? GestureDetector(
+                      onTap: _toggleObscure,
+                      child: Icon(
+                        _isObscured ? LucideIcons.eyeOff : LucideIcons.eye,
+                        color: theme.grey[600],
+                        size: 20,
+                      ),
+                    )
+                  : null,
               counterText: "",
               border: InputBorder.none,
               contentPadding: EdgeInsets.only(top: 16, bottom: 16),

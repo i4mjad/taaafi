@@ -12,6 +12,7 @@ import 'package:reboot_app_3/features/account/presentation/account_screen.dart';
 import 'package:reboot_app_3/features/account/presentation/delete_account_screen.dart';
 import 'package:reboot_app_3/features/authentication/presentation/complete_account_registeration.dart';
 import 'package:reboot_app_3/features/authentication/presentation/confirm_user_details_screen.dart';
+import 'package:reboot_app_3/features/authentication/presentation/confirm_user_email_screen.dart';
 import 'package:reboot_app_3/features/authentication/presentation/forgot_password_screen.dart';
 import 'package:reboot_app_3/features/authentication/presentation/login_screen.dart';
 import 'package:reboot_app_3/features/authentication/presentation/signup_screen.dart';
@@ -197,6 +198,14 @@ GoRouter goRouter(GoRouterRef ref) {
                     pageBuilder: (context, state) => MaterialPage<void>(
                       name: RouteNames.confirmUserDetails.name,
                       child: ConfirmUserDetailsScreen(),
+                    ),
+                  ),
+                  GoRoute(
+                    path: 'confirmUserEmail',
+                    name: RouteNames.confirmUserEmail.name,
+                    pageBuilder: (context, state) => MaterialPage<void>(
+                      name: RouteNames.confirmUserEmail.name,
+                      child: ConfirmUserEmailScreen(),
                     ),
                   ),
                 ],
