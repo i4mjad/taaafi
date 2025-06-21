@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:reboot_app_3/core/monitoring/error_logger.dart';
+import 'package:reboot_app_3/core/services/email_sync_service.dart';
 import 'package:reboot_app_3/features/authentication/data/repositories/auth_repository.dart';
 import 'package:reboot_app_3/features/authentication/data/repositories/migeration_repository.dart';
 import 'package:reboot_app_3/features/authentication/providers/account_status_provider.dart';
@@ -97,6 +98,18 @@ class AuthService {
     }
   }
 
+  /// Performs post-login tasks like email sync
+  Future<void> _performPostLoginTasks() async {
+    try {
+      // Sync email if needed (similar to FCM token update)
+      final emailSyncService = ref.read(emailSyncServiceProvider);
+      await emailSyncService.syncUserEmailIfNeeded();
+    } catch (e, stackTrace) {
+      // Don't break login flow for sync errors
+      ref.read(errorLoggerProvider).logException(e, stackTrace);
+    }
+  }
+
   Future<User?> signInWithGoogle(BuildContext context) async {
     try {
       final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
@@ -115,6 +128,11 @@ class AuthService {
           final userCredential = await _auth.signInWithCredential(credential);
           await userCredential.user?.reload();
           final user = _auth.currentUser;
+
+          // Perform post-login tasks if user exists
+          if (user != null) {
+            await _performPostLoginTasks();
+          }
 
           return user;
         } on FirebaseAuthException catch (e) {
@@ -145,6 +163,12 @@ class AuthService {
 
       await appleCredential.user?.reload();
       final user = _auth.currentUser;
+
+      // Perform post-login tasks if user exists
+      if (user != null) {
+        await _performPostLoginTasks();
+      }
+
       return user;
     } catch (e, stackTrace) {
       ref.read(errorLoggerProvider).logException(e, stackTrace);
@@ -176,6 +200,11 @@ class AuthService {
         return null;
       }
 
+      // Perform post-login tasks if user exists and has document
+      if (user != null && docExists) {
+        await _performPostLoginTasks();
+      }
+
       return user;
     } on FirebaseAuthException catch (e) {
       getSnackBar(context, e.code);
@@ -186,21 +215,45 @@ class AuthService {
     }
   }
 
-  Future<void> reSignInWithApple(BuildContext context) async {
+  Future<bool> reSignInWithApple(BuildContext context) async {
     try {
       final appleProvider = AppleAuthProvider();
       await _auth.currentUser?.reauthenticateWithProvider(appleProvider);
+      return true;
     } on FirebaseAuthException catch (e, stackTrace) {
       ref.read(errorLoggerProvider).logException(e, stackTrace);
-      getSystemSnackBar(context, e.toString());
+      switch (e.code) {
+        case 'user-cancelled':
+          getErrorSnackBar(context, 'authentication-cancelled');
+          break;
+        case 'user-disabled':
+          getErrorSnackBar(context, 'user-disabled');
+          break;
+        case 'requires-recent-login':
+          getErrorSnackBar(context, 'requires-recent-login');
+          break;
+        default:
+          getErrorSnackBar(context, 'authentication-failed');
+      }
+      return false;
+    } catch (e, stackTrace) {
+      ref.read(errorLoggerProvider).logException(e, stackTrace);
+      getErrorSnackBar(context, 'something-went-wrong');
+      return false;
     }
   }
 
-  Future<void> reSignInWithGoogle(BuildContext context) async {
+  Future<bool> reSignInWithGoogle(BuildContext context) async {
     try {
       final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+
+      if (googleUser == null) {
+        getErrorSnackBar(context, 'authentication-cancelled');
+        return false;
+      }
+
       final GoogleSignInAuthentication googleAuth =
-          await googleUser!.authentication;
+          await googleUser.authentication;
 
       if (googleAuth.accessToken != null && googleAuth.idToken != null) {
         final credential = GoogleAuthProvider.credential(
@@ -209,10 +262,28 @@ class AuthService {
         );
 
         await _auth.currentUser?.reauthenticateWithCredential(credential);
+        return true;
+      } else {
+        getErrorSnackBar(context, 'authentication-failed');
+        return false;
       }
     } on FirebaseAuthException catch (e, stackTrace) {
       ref.read(errorLoggerProvider).logException(e, stackTrace);
-      getSystemSnackBar(context, e.toString());
+      switch (e.code) {
+        case 'user-disabled':
+          getErrorSnackBar(context, 'user-disabled');
+          break;
+        case 'requires-recent-login':
+          getErrorSnackBar(context, 'requires-recent-login');
+          break;
+        default:
+          getErrorSnackBar(context, 'authentication-failed');
+      }
+      return false;
+    } catch (e, stackTrace) {
+      ref.read(errorLoggerProvider).logException(e, stackTrace);
+      getErrorSnackBar(context, 'something-went-wrong');
+      return false;
     }
   }
 
@@ -220,14 +291,46 @@ class AuthService {
       BuildContext context, String email, String password) async {
     try {
       final user = FirebaseAuth.instance.currentUser;
-      if (user == null) return false;
+      if (user == null) {
+        getErrorSnackBar(context, 'user-not-found');
+        return false;
+      }
 
       final credential =
           EmailAuthProvider.credential(email: email, password: password);
       await user.reauthenticateWithCredential(credential);
       return true;
+    } on FirebaseAuthException catch (e) {
+      // Show specific error messages based on Firebase Auth error codes
+      switch (e.code) {
+        case 'wrong-password':
+          getErrorSnackBar(context, 'wrong-password');
+          break;
+        case 'invalid-email':
+          getErrorSnackBar(context, 'invalid-email');
+          break;
+        case 'user-disabled':
+          getErrorSnackBar(context, 'user-disabled');
+          break;
+        case 'user-not-found':
+          getErrorSnackBar(context, 'user-not-found');
+          break;
+        case 'too-many-requests':
+          getErrorSnackBar(context, 'too-many-requests');
+          break;
+        case 'invalid-credential':
+          getErrorSnackBar(context, 'invalid-credential');
+          break;
+        case 'requires-recent-login':
+          getErrorSnackBar(context, 'requires-recent-login');
+          break;
+        default:
+          getErrorSnackBar(context, 'authentication-failed');
+      }
+      return false;
     } catch (e, stackTrace) {
       ref.read(errorLoggerProvider).logException(e, stackTrace);
+      getErrorSnackBar(context, 'something-went-wrong');
       return false;
     }
   }

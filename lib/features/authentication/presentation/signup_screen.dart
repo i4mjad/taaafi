@@ -66,6 +66,7 @@ class _SignUpFormState extends ConsumerState<SignUpForm> {
       SegmentedButtonOption(value: 'english', translationKey: 'english');
   bool nowIsStartingDate = false;
   bool isTermsAccepted = false;
+  bool _isProcessing = false;
 
   @override
   void dispose() {
@@ -217,6 +218,7 @@ class _SignUpFormState extends ConsumerState<SignUpForm> {
                       CustomTextField(
                         controller: passwordController,
                         obscureText: true,
+                        showObscureToggle: true,
                         hint:
                             AppLocalizations.of(context).translate('password'),
                         prefixIcon: LucideIcons.lock,
@@ -254,6 +256,7 @@ class _SignUpFormState extends ConsumerState<SignUpForm> {
                       CustomTextField(
                         controller: confirmPasswordController,
                         obscureText: true,
+                        showObscureToggle: true,
                         hint: AppLocalizations.of(context)
                             .translate('repeat-password'),
                         prefixIcon: LucideIcons.lock,
@@ -428,39 +431,73 @@ class _SignUpFormState extends ConsumerState<SignUpForm> {
             ),
           ),
           GestureDetector(
-            onTap: () async {
-              if (_formKey.currentState!.validate() && isTermsAccepted) {
-                final name = nameController.value.text;
-                final selectedDob = dob;
-                final gender = "";
-                final locale = selectedLanguage.value;
-                final firstDate = startingDate;
+            onTap: _isProcessing
+                ? null
+                : () async {
+                    if (_formKey.currentState!.validate() && isTermsAccepted) {
+                      setState(() {
+                        _isProcessing = true;
+                      });
 
-                await authService.signUpWithEmail(
-                  context,
-                  emailController.value.text,
-                  passwordController.value.text,
-                  name,
-                  selectedDob,
-                  gender,
-                  locale,
-                  firstDate,
-                );
-                unawaited(ref.read(analyticsFacadeProvider).trackUserSignup());
-              }
-            },
+                      try {
+                        final name = nameController.value.text;
+                        final selectedDob = dob;
+                        final gender = "";
+                        final locale = selectedLanguage.value;
+                        final firstDate = startingDate;
+
+                        await authService.signUpWithEmail(
+                          context,
+                          emailController.value.text,
+                          passwordController.value.text,
+                          name,
+                          selectedDob,
+                          gender,
+                          locale,
+                          firstDate,
+                        );
+
+                        if (mounted) {
+                          unawaited(ref
+                              .read(analyticsFacadeProvider)
+                              .trackUserSignup());
+                        }
+                      } finally {
+                        if (mounted) {
+                          setState(() {
+                            _isProcessing = false;
+                          });
+                        }
+                      }
+                    }
+                  },
             child: Padding(
               padding: const EdgeInsets.only(top: 16.0),
               child: WidgetsContainer(
-                backgroundColor: theme.primary[600],
+                backgroundColor:
+                    _isProcessing ? theme.grey[400] : theme.primary[600],
                 width: MediaQuery.of(context).size.width - (16 + 16),
                 padding: EdgeInsets.only(top: 12, bottom: 12),
                 borderRadius: BorderRadius.circular(10.5),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
+                    if (_isProcessing) ...[
+                      SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          valueColor:
+                              AlwaysStoppedAnimation<Color>(Colors.white),
+                        ),
+                      ),
+                      horizontalSpace(Spacing.points8),
+                    ],
                     Text(
-                      AppLocalizations.of(context).translate('sign-up'),
+                      _isProcessing
+                          ? AppLocalizations.of(context).translate('processing')
+                          : AppLocalizations.of(context).translate('sign-up'),
                       style: TextStyles.footnoteSelected
                           .copyWith(color: theme.grey[50]),
                     ),

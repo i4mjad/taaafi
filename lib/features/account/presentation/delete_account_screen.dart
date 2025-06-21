@@ -175,6 +175,7 @@ class _ReLoginFormState extends ConsumerState<ReLoginForm> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
+  bool _isProcessing = false;
 
   @override
   void dispose() {
@@ -209,6 +210,7 @@ class _ReLoginFormState extends ConsumerState<ReLoginForm> {
           CustomTextField(
             controller: passwordController,
             obscureText: true,
+            showObscureToggle: true,
             hint: AppLocalizations.of(context).translate('password'),
             prefixIcon: LucideIcons.lock,
             inputType: TextInputType.visiblePassword,
@@ -221,29 +223,47 @@ class _ReLoginFormState extends ConsumerState<ReLoginForm> {
           ),
           verticalSpace(Spacing.points16),
           GestureDetector(
-            onTap: () async {
-              final email = emailController.value.text;
-              final password = passwordController.value.text;
+            onTap: _isProcessing
+                ? null
+                : () async {
+                    final email = emailController.value.text;
+                    final password = passwordController.value.text;
 
-              if (email.isNotEmpty && password.isNotEmpty) {
-                if (_formKey.currentState!.validate()) {
-                  final result = await authService.reSignInWithEmail(
-                    context,
-                    email,
-                    password,
-                  );
-                  if (result) {
-                    HapticFeedback.mediumImpact();
+                    if (email.isNotEmpty && password.isNotEmpty) {
+                      if (_formKey.currentState!.validate()) {
+                        setState(() {
+                          _isProcessing = true;
+                        });
 
-                    await authService.deleteAccount(context);
-                    context.goNamed(RouteNames.onboarding.name);
-                    getSuccessSnackBar(context, 'account-deleted');
-                  }
-                }
-              }
-            },
+                        try {
+                          final result = await authService.reSignInWithEmail(
+                            context,
+                            email,
+                            password,
+                          );
+
+                          if (result && mounted) {
+                            HapticFeedback.mediumImpact();
+                            await authService.deleteAccount(context);
+
+                            if (mounted) {
+                              context.goNamed(RouteNames.onboarding.name);
+                              getSuccessSnackBar(context, 'account-deleted');
+                            }
+                          }
+                        } finally {
+                          if (mounted) {
+                            setState(() {
+                              _isProcessing = false;
+                            });
+                          }
+                        }
+                      }
+                    }
+                  },
             child: WidgetsContainer(
-              backgroundColor: theme.error[600],
+              backgroundColor:
+                  _isProcessing ? theme.grey[400] : theme.error[600],
               width: MediaQuery.of(context).size.width - 32,
               padding: EdgeInsets.all(16),
               // boxShadow: Shadows.mainShadows,
@@ -252,8 +272,22 @@ class _ReLoginFormState extends ConsumerState<ReLoginForm> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+                  if (_isProcessing) ...[
+                    SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                      ),
+                    ),
+                    horizontalSpace(Spacing.points8),
+                  ],
                   Text(
-                    AppLocalizations.of(context).translate('delete-account'),
+                    _isProcessing
+                        ? AppLocalizations.of(context).translate('processing')
+                        : AppLocalizations.of(context)
+                            .translate('delete-account'),
                     style: TextStyles.footnoteSelected
                         .copyWith(color: Colors.white),
                   ),
@@ -271,56 +305,124 @@ class _ReLoginFormState extends ConsumerState<ReLoginForm> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               GestureDetector(
-                onTap: () async {
-                  HapticFeedback.mediumImpact();
-                  await authService.reSignInWithApple(context);
-                  await userProfileNotifier.handleUserDeletion();
-                  context.goNamed(RouteNames.onboarding.name);
-                  getSuccessSnackBar(context, 'account-deleted');
-                },
+                onTap: _isProcessing
+                    ? null
+                    : () async {
+                        HapticFeedback.mediumImpact();
+                        setState(() {
+                          _isProcessing = true;
+                        });
+
+                        try {
+                          final result =
+                              await authService.reSignInWithApple(context);
+                          if (result && mounted) {
+                            await authService.deleteAccount(context);
+                            if (mounted) {
+                              context.goNamed(RouteNames.onboarding.name);
+                              getSuccessSnackBar(context, 'account-deleted');
+                            }
+                          }
+                        } finally {
+                          if (mounted) {
+                            setState(() {
+                              _isProcessing = false;
+                            });
+                          }
+                        }
+                        // Error handling is done inside the authService method
+                      },
                 child: Container(
                   height: 60,
                   width: 60,
                   padding: EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                      color: theme.backgroundColor,
+                      color: _isProcessing
+                          ? theme.grey[200]
+                          : theme.backgroundColor,
                       borderRadius: BorderRadius.circular(150),
-                      boxShadow: Shadows.mainShadows,
+                      boxShadow: _isProcessing ? [] : Shadows.mainShadows,
                       border: Border.all(
                         color: theme.grey[600]!,
                         width: 0.25,
                       )),
-                  child: SvgPicture.asset(
-                    'asset/icons/apple-icon.svg',
-                    semanticsLabel: 'Apple Logo',
-                  ),
+                  child: _isProcessing
+                      ? Center(
+                          child: SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                  theme.primary[600]!),
+                            ),
+                          ),
+                        )
+                      : SvgPicture.asset(
+                          'asset/icons/apple-icon.svg',
+                          semanticsLabel: 'Apple Logo',
+                        ),
                 ),
               ),
               horizontalSpace(Spacing.points4),
               GestureDetector(
-                onTap: () async {
-                  HapticFeedback.mediumImpact();
-                  await authService.reSignInWithGoogle(context);
-                  await userProfileNotifier.handleUserDeletion();
-                  context.goNamed(RouteNames.onboarding.name);
-                  getSuccessSnackBar(context, 'account-deleted');
-                },
+                onTap: _isProcessing
+                    ? null
+                    : () async {
+                        HapticFeedback.mediumImpact();
+                        setState(() {
+                          _isProcessing = true;
+                        });
+
+                        try {
+                          final result =
+                              await authService.reSignInWithGoogle(context);
+                          if (result && mounted) {
+                            await authService.deleteAccount(context);
+                            if (mounted) {
+                              context.goNamed(RouteNames.onboarding.name);
+                              getSuccessSnackBar(context, 'account-deleted');
+                            }
+                          }
+                        } finally {
+                          if (mounted) {
+                            setState(() {
+                              _isProcessing = false;
+                            });
+                          }
+                        }
+                        // Error handling is done inside the authService method
+                      },
                 child: Container(
                   height: 60,
                   width: 60,
                   padding: EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                      color: theme.backgroundColor,
+                      color: _isProcessing
+                          ? theme.grey[200]
+                          : theme.backgroundColor,
                       borderRadius: BorderRadius.circular(150),
-                      boxShadow: Shadows.mainShadows,
+                      boxShadow: _isProcessing ? [] : Shadows.mainShadows,
                       border: Border.all(
                         color: theme.grey[600]!,
                         width: 0.25,
                       )),
-                  child: SvgPicture.asset(
-                    'asset/icons/google-icon.svg',
-                    semanticsLabel: 'Google Logo',
-                  ),
+                  child: _isProcessing
+                      ? Center(
+                          child: SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                  theme.primary[600]!),
+                            ),
+                          ),
+                        )
+                      : SvgPicture.asset(
+                          'asset/icons/google-icon.svg',
+                          semanticsLabel: 'Google Logo',
+                        ),
                 ),
               ),
             ],

@@ -576,6 +576,10 @@
   "field-required": "This field is required",
   "current-email": "Current email address",
   "new-email-same-as-current": "New email cannot be the same as current email",
-  
+  "email-updated-logging-out": "New email verified successfully! You will now be logged out for security.",
+  "logging-out-for-security": "Logging out for security...",
+  "email-verification-sent-check-junk": "Verification link sent to your new email address. Please check your inbox and junk folder too.",
+  "authentication-cancelled": "Authentication was cancelled by the user.",
+  "authentication-failed": "Authentication failed. Please try again.",
   "too-many-requests": "Too many requests. Please try again later."
 }

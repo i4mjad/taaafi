@@ -17,6 +17,7 @@ import 'package:reboot_app_3/core/helpers/app_regex.dart';
 import 'package:reboot_app_3/features/authentication/providers/user_provider.dart';
 import 'package:reboot_app_3/features/authentication/providers/account_status_provider.dart';
 import 'package:reboot_app_3/features/authentication/providers/user_document_provider.dart';
+import 'package:reboot_app_3/features/authentication/application/auth_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:async';
 
@@ -36,6 +37,9 @@ class _ConfirmUserEmailScreenState
   int _resendCooldown = 0;
   Timer? _cooldownTimer;
   String? _currentEmail;
+  bool _emailChangeInProgress = false; // Track if email change is in progress
+  bool _showLogoutCountdown = false; // Track if showing logout countdown
+  int _logoutCountdown = 10; // Countdown seconds
 
   @override
   void initState() {
@@ -103,13 +107,43 @@ class _ConfirmUserEmailScreenState
 
       if (user?.emailVerified == true) {
         _verificationTimer?.cancel();
-        // Refresh the account status and navigate to home
-        ref.invalidate(accountStatusProvider);
-        ref.invalidate(userNotifierProvider);
 
-        if (mounted) {
-          getSuccessSnackBar(context, 'email-verified-successfully');
-          context.goNamed(RouteNames.home.name);
+        // Check if this was an email change by looking at our flag
+        final hasEmailChanged = _emailChangeInProgress;
+
+        if (hasEmailChanged && mounted) {
+          // This is an email change verification - show logout countdown
+          setState(() {
+            _showLogoutCountdown = true;
+            _logoutCountdown = 10;
+          });
+
+          // Start countdown timer
+          Timer.periodic(const Duration(seconds: 1), (timer) {
+            if (mounted) {
+              setState(() {
+                _logoutCountdown--;
+              });
+
+              if (_logoutCountdown <= 0) {
+                timer.cancel();
+                // Log out the user for security - let router handle redirect
+                final authService = ref.read(authServiceProvider);
+                authService.signOut(context, ref);
+              }
+            } else {
+              timer.cancel();
+            }
+          });
+        } else {
+          // This is initial email verification - proceed to home
+          ref.invalidate(accountStatusProvider);
+          ref.invalidate(userNotifierProvider);
+
+          if (mounted) {
+            getSuccessSnackBar(context, 'email-verified-successfully');
+            context.goNamed(RouteNames.home.name);
+          }
         }
       }
     } catch (e) {
@@ -162,6 +196,8 @@ class _ConfirmUserEmailScreenState
         onEmailChanged: (newEmail) {
           setState(() {
             _currentEmail = newEmail;
+            _emailChangeInProgress =
+                true; // Mark that email change is in progress
           });
           // Refresh user provider to get updated email
           ref.invalidate(userNotifierProvider);
@@ -178,250 +214,331 @@ class _ConfirmUserEmailScreenState
     return Scaffold(
       backgroundColor: theme.backgroundColor,
       appBar: appBar(context, ref, 'confirm-email', false, true),
-      body: userAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, _) => Center(child: Text('Error: $error')),
-        data: (user) {
-          if (user == null) {
-            return const Center(child: Text('User not found'));
-          }
+      body: Stack(
+        children: [
+          userAsync.when(
+            loading: () => const Center(child: CircularProgressIndicator()),
+            error: (error, _) => Center(child: Text('Error: $error')),
+            data: (user) {
+              if (user == null) {
+                return const Center(child: Text('User not found'));
+              }
 
-          // Update current email from user data
-          if (_currentEmail != user.email) {
-            _currentEmail = user.email;
-          }
+              // Update current email from user data
+              if (_currentEmail != user.email) {
+                _currentEmail = user.email;
+              }
 
-          return SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Center(
-                    child: Lottie.asset(
-                      'asset/illustrations/warning.json',
-                      height: 200,
-                    ),
-                  ),
-                  verticalSpace(Spacing.points24),
-                  Text(
-                    AppLocalizations.of(context).translate('verify-your-email'),
-                    style: TextStyles.h4.copyWith(color: theme.grey[900]),
-                    textAlign: TextAlign.center,
-                  ),
-                  verticalSpace(Spacing.points16),
-                  Text(
-                    AppLocalizations.of(context)
-                            .translate('verification-email-sent-to') +
-                        ' ${_currentEmail}',
-                    style: TextStyles.body.copyWith(
-                      color: theme.grey[600],
-                      height: 1.4,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  verticalSpace(Spacing.points8),
-                  Text(
-                    AppLocalizations.of(context)
-                        .translate('check-inbox-and-click-link'),
-                    style: TextStyles.footnote.copyWith(
-                      color: theme.grey[500],
-                      height: 1.4,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  verticalSpace(Spacing.points32),
-
-                  // Check email verification status button
-                  GestureDetector(
-                    onTap: _checkEmailVerification,
-                    child: WidgetsContainer(
-                      backgroundColor: theme.primary[600],
-                      width: double.infinity,
-                      child: Center(
-                        child: _isChecking
-                            ? Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  SizedBox(
-                                    height: 20,
-                                    width: 20,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                      valueColor: AlwaysStoppedAnimation<Color>(
-                                          theme.grey[50]!),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Text(
-                                    AppLocalizations.of(context)
-                                        .translate('checking'),
-                                    style: TextStyles.footnote
-                                        .copyWith(color: theme.grey[50]),
-                                  ),
-                                ],
-                              )
-                            : Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    LucideIcons.checkCircle,
-                                    color: theme.grey[50],
-                                    size: 18,
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Text(
-                                    AppLocalizations.of(context)
-                                        .translate('check-verification-status'),
-                                    style: TextStyles.footnote
-                                        .copyWith(color: theme.grey[50]),
-                                  ),
-                                ],
-                              ),
+              return SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Center(
+                        child: Lottie.asset(
+                          'asset/illustrations/warning.json',
+                          height: 200,
+                        ),
                       ),
-                    ),
-                  ),
-
-                  verticalSpace(Spacing.points16),
-
-                  // Resend email button
-                  GestureDetector(
-                    onTap: _resendVerificationEmail,
-                    child: WidgetsContainer(
-                      backgroundColor: _resendCooldown > 0 || _isResending
-                          ? theme.grey[300]
-                          : theme.backgroundColor,
-                      borderSide: BorderSide(
-                        color: _resendCooldown > 0 || _isResending
-                            ? theme.grey[400]!
-                            : theme.primary[600]!,
-                        width: 1,
+                      verticalSpace(Spacing.points24),
+                      Text(
+                        AppLocalizations.of(context)
+                            .translate('verify-your-email'),
+                        style: TextStyles.h4.copyWith(color: theme.grey[900]),
+                        textAlign: TextAlign.center,
                       ),
-                      width: double.infinity,
-                      child: Center(
-                        child: _isResending
-                            ? Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  SizedBox(
-                                    height: 20,
-                                    width: 20,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                      valueColor: AlwaysStoppedAnimation<Color>(
-                                          theme.grey[600]!),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Text(
-                                    AppLocalizations.of(context)
-                                        .translate('sending'),
-                                    style: TextStyles.footnote
-                                        .copyWith(color: theme.grey[600]),
-                                  ),
-                                ],
-                              )
-                            : Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    LucideIcons.mail,
-                                    color: _resendCooldown > 0
-                                        ? theme.grey[600]
-                                        : theme.primary[600],
-                                    size: 18,
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Text(
-                                    _resendCooldown > 0
-                                        ? '${AppLocalizations.of(context).translate('resend-in')} $_resendCooldown ${AppLocalizations.of(context).translate('seconds')}'
-                                        : AppLocalizations.of(context)
-                                            .translate(
-                                                'resend-verification-email'),
-                                    style: TextStyles.footnote.copyWith(
-                                      color: _resendCooldown > 0
-                                          ? theme.grey[600]
-                                          : theme.primary[600],
-                                    ),
-                                  ),
-                                ],
-                              ),
+                      verticalSpace(Spacing.points16),
+                      Text(
+                        AppLocalizations.of(context)
+                                .translate('verification-email-sent-to') +
+                            ' ${_currentEmail}',
+                        style: TextStyles.body.copyWith(
+                          color: theme.grey[600],
+                          height: 1.4,
+                        ),
+                        textAlign: TextAlign.center,
                       ),
-                    ),
-                  ),
-
-                  verticalSpace(Spacing.points16),
-
-                  // Change email button
-                  GestureDetector(
-                    onTap: _showChangeEmailBottomSheet,
-                    child: WidgetsContainer(
-                      backgroundColor: theme.backgroundColor,
-                      borderSide: BorderSide(
-                        color: theme.warn[600]!,
-                        width: 1,
+                      verticalSpace(Spacing.points8),
+                      Text(
+                        AppLocalizations.of(context)
+                            .translate('check-inbox-and-click-link'),
+                        style: TextStyles.footnote.copyWith(
+                          color: theme.grey[500],
+                          height: 1.4,
+                        ),
+                        textAlign: TextAlign.center,
                       ),
-                      width: double.infinity,
-                      child: Center(
+                      verticalSpace(Spacing.points32),
+
+                      // Check email verification status button
+                      GestureDetector(
+                        onTap: _checkEmailVerification,
+                        child: WidgetsContainer(
+                          backgroundColor: theme.primary[600],
+                          width: double.infinity,
+                          child: Center(
+                            child: _isChecking
+                                ? Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      SizedBox(
+                                        height: 20,
+                                        width: 20,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                          valueColor:
+                                              AlwaysStoppedAnimation<Color>(
+                                                  theme.grey[50]!),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Text(
+                                        AppLocalizations.of(context)
+                                            .translate('checking'),
+                                        style: TextStyles.footnote
+                                            .copyWith(color: theme.grey[50]),
+                                      ),
+                                    ],
+                                  )
+                                : Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        LucideIcons.checkCircle,
+                                        color: theme.grey[50],
+                                        size: 18,
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Text(
+                                        AppLocalizations.of(context).translate(
+                                            'check-verification-status'),
+                                        style: TextStyles.footnote
+                                            .copyWith(color: theme.grey[50]),
+                                      ),
+                                    ],
+                                  ),
+                          ),
+                        ),
+                      ),
+
+                      verticalSpace(Spacing.points16),
+
+                      // Resend email button
+                      GestureDetector(
+                        onTap: _resendVerificationEmail,
+                        child: WidgetsContainer(
+                          backgroundColor: _resendCooldown > 0 || _isResending
+                              ? theme.grey[300]
+                              : theme.backgroundColor,
+                          borderSide: BorderSide(
+                            color: _resendCooldown > 0 || _isResending
+                                ? theme.grey[400]!
+                                : theme.primary[600]!,
+                            width: 1,
+                          ),
+                          width: double.infinity,
+                          child: Center(
+                            child: _isResending
+                                ? Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      SizedBox(
+                                        height: 20,
+                                        width: 20,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                          valueColor:
+                                              AlwaysStoppedAnimation<Color>(
+                                                  theme.grey[600]!),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Text(
+                                        AppLocalizations.of(context)
+                                            .translate('sending'),
+                                        style: TextStyles.footnote
+                                            .copyWith(color: theme.grey[600]),
+                                      ),
+                                    ],
+                                  )
+                                : Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        LucideIcons.mail,
+                                        color: _resendCooldown > 0
+                                            ? theme.grey[600]
+                                            : theme.primary[600],
+                                        size: 18,
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Text(
+                                        _resendCooldown > 0
+                                            ? '${AppLocalizations.of(context).translate('resend-in')} $_resendCooldown ${AppLocalizations.of(context).translate('seconds')}'
+                                            : AppLocalizations.of(context)
+                                                .translate(
+                                                    'resend-verification-email'),
+                                        style: TextStyles.footnote.copyWith(
+                                          color: _resendCooldown > 0
+                                              ? theme.grey[600]
+                                              : theme.primary[600],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                          ),
+                        ),
+                      ),
+
+                      verticalSpace(Spacing.points16),
+
+                      // Change email button
+                      GestureDetector(
+                        onTap: _showChangeEmailBottomSheet,
+                        child: WidgetsContainer(
+                          backgroundColor: theme.backgroundColor,
+                          borderSide: BorderSide(
+                            color: theme.warn[600]!,
+                            width: 1,
+                          ),
+                          width: double.infinity,
+                          child: Center(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  LucideIcons.edit2,
+                                  color: theme.warn[600],
+                                  size: 18,
+                                ),
+                                const SizedBox(width: 8),
+                                Text(
+                                  AppLocalizations.of(context)
+                                      .translate('change-email'),
+                                  style: TextStyles.footnote.copyWith(
+                                    color: theme.warn[600],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+
+                      verticalSpace(Spacing.points32),
+
+                      // Info text
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: theme.primary[50],
+                          borderRadius: BorderRadius.circular(8),
+                          border:
+                              Border.all(color: theme.primary[200]!, width: 1),
+                        ),
                         child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Icon(
-                              LucideIcons.edit2,
-                              color: theme.warn[600],
-                              size: 18,
+                              LucideIcons.info,
+                              color: theme.primary[600],
+                              size: 16,
                             ),
                             const SizedBox(width: 8),
-                            Text(
-                              AppLocalizations.of(context)
-                                  .translate('change-email'),
-                              style: TextStyles.footnote.copyWith(
-                                color: theme.warn[600],
+                            Expanded(
+                              child: Text(
+                                AppLocalizations.of(context)
+                                    .translate('email-verification-info'),
+                                style: TextStyles.small.copyWith(
+                                  color: theme.primary[800],
+                                  height: 1.4,
+                                ),
                               ),
                             ),
                           ],
                         ),
                       ),
-                    ),
+                    ],
                   ),
+                ),
+              );
+            },
+          ),
 
-                  verticalSpace(Spacing.points32),
-
-                  // Info text
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: theme.primary[50],
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: theme.primary[200]!, width: 1),
-                    ),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Icon(
-                          LucideIcons.info,
-                          color: theme.primary[600],
-                          size: 16,
+          // Logout countdown overlay
+          if (_showLogoutCountdown)
+            Container(
+              color: Colors.black.withOpacity(0.8),
+              child: Center(
+                child: Container(
+                  margin: const EdgeInsets.all(32),
+                  padding: const EdgeInsets.all(24),
+                  decoration: BoxDecoration(
+                    color: theme.backgroundColor,
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.2),
+                        blurRadius: 10,
+                        spreadRadius: 2,
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        LucideIcons.checkCircle,
+                        color: theme.success[600],
+                        size: 64,
+                      ),
+                      verticalSpace(Spacing.points16),
+                      Text(
+                        AppLocalizations.of(context)
+                            .translate('email-updated-successfully'),
+                        style: TextStyles.h5.copyWith(
+                          color: theme.grey[900],
+                          fontWeight: FontWeight.bold,
                         ),
-                        const SizedBox(width: 8),
-                        Expanded(
+                        textAlign: TextAlign.center,
+                      ),
+                      verticalSpace(Spacing.points12),
+                      Text(
+                        AppLocalizations.of(context)
+                            .translate('logging-out-for-security'),
+                        style: TextStyles.body.copyWith(
+                          color: theme.grey[600],
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      verticalSpace(Spacing.points24),
+                      Container(
+                        width: 80,
+                        height: 80,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: theme.primary[300]!,
+                            width: 4,
+                          ),
+                        ),
+                        child: Center(
                           child: Text(
-                            AppLocalizations.of(context)
-                                .translate('email-verification-info'),
-                            style: TextStyles.small.copyWith(
-                              color: theme.primary[800],
-                              height: 1.4,
+                            '$_logoutCountdown',
+                            style: TextStyles.h3.copyWith(
+                              color: theme.primary[600],
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
-                ],
+                ),
               ),
             ),
-          );
-        },
+        ],
       ),
     );
   }
@@ -522,8 +639,12 @@ class _ChangeEmailBottomSheetState
       ref.invalidate(userDocumentsNotifierProvider);
 
       if (mounted) {
-        getSuccessSnackBar(context, 'email-change-verification-sent');
+        // Show verification sent message
+        getSuccessSnackBar(context, 'email-verification-sent-check-junk');
         Navigator.pop(context);
+
+        // Update the callback to notify parent that email verification was sent
+        widget.onEmailChanged(newEmail);
       }
     } catch (e) {
       if (mounted) {
@@ -540,6 +661,9 @@ class _ChangeEmailBottomSheetState
               break;
             case 'too-many-requests':
               getErrorSnackBar(context, 'too-many-requests');
+              break;
+            case 'requires-recent-login':
+              getErrorSnackBar(context, 'requires-recent-login');
               break;
             default:
               getErrorSnackBar(context, 'email-update-failed');
@@ -666,7 +790,11 @@ class _ChangeEmailBottomSheetState
           ),
           verticalSpace(Spacing.points24),
           GestureDetector(
-            onTap: _isUpdating ? null : _updateEmail,
+            onTap: _isUpdating
+                ? null
+                : () async {
+                    await _updateEmail();
+                  },
             child: WidgetsContainer(
               backgroundColor:
                   _isUpdating ? theme.grey[400] : theme.primary[600],
