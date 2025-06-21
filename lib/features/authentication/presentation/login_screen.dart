@@ -203,6 +203,7 @@ class SignInForm extends ConsumerWidget {
           CustomTextField(
             controller: passwordController,
             obscureText: true,
+            showObscureToggle: true,
             hint: AppLocalizations.of(context).translate('password'),
             prefixIcon: LucideIcons.lock,
             inputType: TextInputType.visiblePassword,

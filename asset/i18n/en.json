@@ -576,6 +576,6 @@
   "field-required": "This field is required",
   "current-email": "Current email address",
   "new-email-same-as-current": "New email cannot be the same as current email",
-  "user-not-found": "User not found. Please try logging in again.",
+  
   "too-many-requests": "Too many requests. Please try again later."
 }

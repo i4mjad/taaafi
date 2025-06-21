@@ -56,6 +56,12 @@ class VaultScreen extends ConsumerWidget {
         error: (e, _) => Center(child: Text(e.toString())),
         data: (_) {
           switch (accountStatus) {
+            case AccountStatus.loading:
+              return Center(
+                child: CircularProgressIndicator(
+                  color: theme.primary[600],
+                ),
+              );
             case AccountStatus.needCompleteRegistration:
               return const Center(
                 child: Padding(

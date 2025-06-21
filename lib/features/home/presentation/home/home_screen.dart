@@ -125,6 +125,12 @@ class HomeScreen extends ConsumerWidget {
         error: (err, _) => Center(child: Text(err.toString())),
         data: (_) {
           switch (accountStatus) {
+            case AccountStatus.loading:
+              return Center(
+                child: CircularProgressIndicator(
+                  color: theme.primary[600],
+                ),
+              );
             case AccountStatus.needCompleteRegistration:
               return const Center(
                 child: Padding(

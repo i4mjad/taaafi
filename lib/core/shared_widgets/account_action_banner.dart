@@ -17,7 +17,8 @@ class AccountActionBanner extends ConsumerWidget {
     final accountStatus = ref.watch(accountStatusProvider);
     final theme = AppTheme.of(context);
 
-    if (accountStatus == AccountStatus.ok) {
+    if (accountStatus == AccountStatus.ok ||
+        accountStatus == AccountStatus.loading) {
       return const SizedBox.shrink();
     }
 
@@ -25,6 +26,9 @@ class AccountActionBanner extends ConsumerWidget {
     String routeName;
 
     switch (accountStatus) {
+      case AccountStatus.loading:
+      case AccountStatus.ok:
+        return const SizedBox.shrink();
       case AccountStatus.needCompleteRegistration:
         messageKey = 'complete-registration-banner';
         routeName = '/completeAccountRegisteration';
@@ -37,8 +41,6 @@ class AccountActionBanner extends ConsumerWidget {
         messageKey = 'confirm-email-banner';
         routeName = '/confirmUserEmail';
         break;
-      case AccountStatus.ok:
-        return const SizedBox.shrink();
     }
 
     return Container(

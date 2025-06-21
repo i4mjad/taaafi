@@ -61,6 +61,12 @@ class AccountScreen extends ConsumerWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             mainAxisAlignment: MainAxisAlignment.start,
                             children: [
+                              if (accountStatus == AccountStatus.loading)
+                                Center(
+                                  child: CircularProgressIndicator(
+                                    color: theme.primary[600],
+                                  ),
+                                ),
                               if (!showMainContent &&
                                   accountStatus ==
                                       AccountStatus.needCompleteRegistration)

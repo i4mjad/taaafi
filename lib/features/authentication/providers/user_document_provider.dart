@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:reboot_app_3/core/monitoring/error_logger.dart';
 import 'package:reboot_app_3/features/authentication/data/models/user_document.dart';
@@ -10,16 +11,25 @@ part 'user_document_provider.g.dart';
 class UserDocumentsNotifier extends _$UserDocumentsNotifier {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  StreamSubscription<User?>? _authSubscription;
 
   @override
   FutureOr<UserDocument?> build() async {
     // Listen to auth state changes and refetch user document accordingly
-    _auth.authStateChanges().listen((user) async {
+    _authSubscription = _auth.authStateChanges().listen((user) async {
       if (user != null) {
-        await getUserDocument(user.uid);
+        // User logged in, fetch their document
+        final document = await getUserDocument(user.uid);
+        state = AsyncValue.data(document);
       } else {
+        // User logged out
         state = const AsyncValue.data(null);
       }
+    });
+
+    // Clean up subscription when provider is disposed
+    ref.onDispose(() {
+      _authSubscription?.cancel();
     });
 
     final currentUser = _auth.currentUser;

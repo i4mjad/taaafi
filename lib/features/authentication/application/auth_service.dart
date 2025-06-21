@@ -8,6 +8,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:reboot_app_3/core/monitoring/error_logger.dart';
 import 'package:reboot_app_3/features/authentication/data/repositories/auth_repository.dart';
 import 'package:reboot_app_3/features/authentication/data/repositories/migeration_repository.dart';
+import 'package:reboot_app_3/features/authentication/providers/account_status_provider.dart';
 import 'package:reboot_app_3/features/authentication/providers/user_document_provider.dart';
 import 'package:reboot_app_3/core/shared_widgets/snackbar.dart';
 import 'package:reboot_app_3/features/authentication/providers/user_provider.dart';
@@ -237,6 +238,12 @@ class AuthService {
 
       // ref.invalidate(userNotifierProvider);
       ref.invalidate(userDocumentsNotifierProvider);
+      ref.invalidate(accountStatusProvider);
+      ref.invalidate(userNotifierProvider);
+      ref.invalidate(streakRepositoryProvider);
+      ref.invalidate(streakNotifierProvider);
+      ref.invalidate(userDocumentsNotifierProvider);
+      ref.invalidate(userNotifierProvider);
     } catch (e, stackTrace) {
       ref.read(errorLoggerProvider).logException(e, stackTrace);
     }
@@ -268,6 +275,7 @@ class AuthService {
       // Invalidate your providers to refresh the app state
       ref.invalidate(userDocumentsNotifierProvider);
       ref.invalidate(userNotifierProvider);
+
       ref.invalidate(streakRepositoryProvider);
       ref.invalidate(streakNotifierProvider);
     } on FirebaseAuthException catch (e, stackTrace) {
