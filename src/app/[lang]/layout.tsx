@@ -4,6 +4,7 @@ import "../globals.css"
 import { Toaster } from "../../components/ui/sonner"
 import { i18n, Locale } from "../../../i18n.config"
 import { ThemeProvider } from "next-themes"
+import UpdateHtmlAttributes from "@/components/update-html-attributes"
 
 export async function generateStaticParams() {
   return i18n.locales.map((locale) => ({ lang: locale }))
@@ -39,6 +40,7 @@ export default async function RootLayout({
 
   return (
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+      <UpdateHtmlAttributes lang={lang} />
       <div className="font-sans" dir={lang === "ar" ? "rtl" : "ltr"}>
         {children}
         <Toaster />
