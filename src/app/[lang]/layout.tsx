@@ -1,12 +1,9 @@
 import type React from "react"
 import type { Metadata } from "next"
-import { Inter } from "next/font/google"
 import "../globals.css"
 import { Toaster } from "../../components/ui/sonner"
 import { i18n, Locale } from "../../../i18n.config"
 import { ThemeProvider } from "next-themes"
-
-const inter = Inter({ subsets: ["latin"] })
 
 export async function generateStaticParams() {
   return i18n.locales.map((locale) => ({ lang: locale }))
@@ -28,13 +25,11 @@ export default async function RootLayout({
   const { lang } = await params;
 
   return (
-    <html lang={lang} dir={lang === "ar" ? "rtl" : "ltr"}>
-      <body className={inter.className}>
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
-          {children}
-          <Toaster />
-        </ThemeProvider>
-      </body>
-    </html>
+    <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+      <div className="font-sans" dir={lang === "ar" ? "rtl" : "ltr"}>
+        {children}
+        <Toaster />
+      </div>
+    </ThemeProvider>
   )
 }

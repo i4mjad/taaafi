@@ -102,7 +102,53 @@ ${colorConfig
   )
 }
 
+// ---------------------------------------------------------------------------
+// Re-typing Recharts tooltip/legend content components
+// Recharts exposes generic component types that do not play well with
+// `React.ComponentProps<typeof Component>` without passing the generics
+// explicitly.  To avoid the resulting "property does not exist" and implicit
+// `any` errors when `strict` mode is enabled, we create small wrapper
+// interfaces that declare only the props this file actually needs.  Where the
+// Recharts payload structure is required we intentionally fall back to `any`
+// because the exact shape is dependent on the concrete chart configuration
+// supplied by the consumer of this UI package.  Using `any` is acceptable
+// here because the implementation treats the payload as an opaque bag of
+// values – it just forwards or renders a subset of its fields.
+// ---------------------------------------------------------------------------
+
 const ChartTooltip = RechartsPrimitive.Tooltip
+
+type GenericPayload = any // eslint-disable-line @typescript-eslint/no-explicit-any
+
+interface ChartTooltipContentProps extends React.ComponentProps<"div"> {
+  /* Active flag – forwarded verbatim from Recharts. */
+  active?: boolean
+  /* Array of tooltip entries – exact structure is Recharts-internal. */
+  payload?: GenericPayload[]
+  /* Optional raw label supplied by Recharts. */
+  label?: unknown
+  /* Recharts formatting callbacks. */
+  labelFormatter?: (
+    label: unknown,
+    payload?: GenericPayload[]
+  ) => React.ReactNode
+  formatter?: (
+    value: unknown,
+    name: unknown,
+    item: GenericPayload,
+    index: number,
+    payload: GenericPayload
+  ) => React.ReactNode
+
+  /* Additional component-specific props. */
+  hideLabel?: boolean
+  hideIndicator?: boolean
+  indicator?: "line" | "dot" | "dashed"
+  color?: string
+  nameKey?: string
+  labelKey?: string
+  labelClassName?: string
+}
 
 function ChartTooltipContent({
   active,
@@ -118,14 +164,7 @@ function ChartTooltipContent({
   color,
   nameKey,
   labelKey,
-}: React.ComponentProps<typeof RechartsPrimitive.Tooltip> &
-  React.ComponentProps<"div"> & {
-    hideLabel?: boolean
-    hideIndicator?: boolean
-    indicator?: "line" | "dot" | "dashed"
-    nameKey?: string
-    labelKey?: string
-  }) {
+}: ChartTooltipContentProps) {
   const { config } = useChart()
 
   const tooltipLabel = React.useMemo(() => {
@@ -179,7 +218,7 @@ function ChartTooltipContent({
     >
       {!nestLabel ? tooltipLabel : null}
       <div className="grid gap-1.5">
-        {payload.map((item, index) => {
+        {payload!.map((item, index) => {
           const key = `${nameKey || item.name || item.dataKey || "value"}`
           const itemConfig = getPayloadConfigFromPayload(config, item, key)
           const indicatorColor = color || item.payload.fill || item.color
@@ -250,17 +289,20 @@ function ChartTooltipContent({
 
 const ChartLegend = RechartsPrimitive.Legend
 
+interface ChartLegendContentProps extends React.ComponentProps<"div"> {
+  payload?: GenericPayload[]
+  verticalAlign?: "top" | "middle" | "bottom"
+  hideIcon?: boolean
+  nameKey?: string
+}
+
 function ChartLegendContent({
   className,
   hideIcon = false,
   payload,
   verticalAlign = "bottom",
   nameKey,
-}: React.ComponentProps<"div"> &
-  Pick<RechartsPrimitive.LegendProps, "payload" | "verticalAlign"> & {
-    hideIcon?: boolean
-    nameKey?: string
-  }) {
+}: ChartLegendContentProps) {
   const { config } = useChart()
 
   if (!payload?.length) {
@@ -275,7 +317,7 @@ function ChartLegendContent({
         className
       )}
     >
-      {payload.map((item) => {
+      {payload!.map((item) => {
         const key = `${nameKey || item.dataKey || "value"}`
         const itemConfig = getPayloadConfigFromPayload(config, item, key)
 
