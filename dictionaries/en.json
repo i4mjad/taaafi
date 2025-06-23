@@ -1,0 +1,119 @@
+{
+  "siteHeader": {
+    "documents": "Documents"
+  },
+  "appSidebar": {
+    "acmeInc": "Acme Inc.",
+    "quickCreate": "Quick Create",
+    "inbox": "Inbox",
+    "dashboard": "Dashboard",
+    "lifecycle": "Lifecycle",
+    "analytics": "Analytics",
+    "projects": "Projects",
+    "team": "Team",
+    "documents": "Documents",
+    "dataLibrary": "Data Library",
+    "reports": "Reports",
+    "wordAssistant": "Word Assistant",
+    "more": "More",
+    "settings": "Settings",
+    "getHelp": "Get Help",
+    "search": "Search",
+    "userMenu": {
+      "account": "Account",
+      "billing": "Billing",
+      "notifications": "Notifications",
+      "logOut": "Log out"
+    },
+    "localeSwitcher": {
+      "english": "English",
+      "arabic": "Arabic"
+    }
+  },
+  "sectionCards": {
+    "totalRevenue": "Total Revenue",
+    "newCustomers": "New Customers",
+    "activeAccounts": "Active Accounts",
+    "growthRate": "Growth Rate",
+    "trendingUp": "Trending up",
+    "trendingDown": "Trending down",
+    "thisMonth": "this month",
+    "thisPeriod": "this period",
+    "visitorsLast6Months": "Visitors for the last 6 months",
+    "acquisitionNeedsAttention": "Acquisition needs attention",
+    "strongUserRetention": "Strong user retention",
+    "engagementExceedTargets": "Engagement exceed targets",
+    "steadyPerformance": "Steady performance",
+    "meetsGrowthProjections": "Meets growth projections"
+  },
+  "chartAreaInteractive": {
+    "totalVisitors": "Total Visitors",
+    "last3Months": "Last 3 months",
+    "last30Days": "Last 30 days",
+    "last7Days": "Last 7 days"
+  },
+  "dataTable": {
+    "view": "View",
+    "selectAView": "Select a view",
+    "outline": "Outline",
+    "pastPerformance": "Past Performance",
+    "keyPersonnel": "Key Personnel",
+    "focusDocuments": "Focus Documents",
+    "customizeColumns": "Customize Columns",
+    "columns": "Columns",
+    "addSection": "Add Section",
+    "noResults": "No results.",
+    "rowsPerPage": "Rows per page",
+    "page": "Page",
+    "of": "of",
+    "selectedRows": "{count} of {total} row(s) selected.",
+    "goToFirstPage": "Go to first page",
+    "goToPreviousPage": "Go to previous page",
+    "goToNextPage": "Go to next page",
+    "goToLastPage": "Go to last page",
+    "headers": {
+      "header": "Header",
+      "sectionType": "Section Type",
+      "status": "Status",
+      "target": "Target",
+      "limit": "Limit",
+      "reviewer": "Reviewer"
+    },
+    "actions": {
+      "edit": "Edit",
+      "makeACopy": "Make a copy",
+      "favorite": "Favorite",
+      "delete": "Delete",
+      "openMenu": "Open menu"
+    },
+    "tableCellViewer": {
+      "sheetTitleSuffix": "Details",
+      "sheetDescription": "Showing total visitors for the last 6 months",
+      "trendingUpBy": "Trending up by {percentage}% this month",
+      "formLabels": {
+        "header": "Header",
+        "type": "Type",
+        "selectAType": "Select a type",
+        "status": "Status",
+        "selectAStatus": "Select a status",
+        "target": "Target",
+        "limit": "Limit",
+        "reviewer": "Reviewer",
+        "selectAReviewer": "Select a reviewer"
+      },
+      "submit": "Submit",
+      "done": "Done"
+    },
+    "statusTypes": {
+      "done": "Done",
+      "inProgress": "In Process"
+    },
+    "reviewerActions": {
+      "assignReviewer": "Assign reviewer"
+    }
+  },
+  "navDocuments": {
+    "open": "Open",
+    "share": "Share"
+  }
+}
