@@ -9,9 +9,22 @@ export async function generateStaticParams() {
   return i18n.locales.map((locale) => ({ lang: locale }))
 }
 
-export const metadata: Metadata = {
-  title: "Dashboard App",
-  description: "A modern dashboard application",
+const metadataByLocale: Record<Locale, Metadata> = {
+  en: {
+    title: "Ta'aafi Platform Admin Portal",
+    description: "Ta'aafi Platform Admin Portal",
+  },
+  ar: {
+    title: "منصة تعافي - بوابة الإدارة",
+    description: "بوابة إدارة منصة تعافي",
+  },
+}
+
+export async function generateMetadata(
+  { params }: { params: Promise<{ lang: Locale }> }
+): Promise<Metadata> {
+  const { lang } = await params
+  return metadataByLocale[lang] ?? metadataByLocale.ar
 }
 
 export default async function RootLayout({
