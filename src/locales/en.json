@@ -1,0 +1,77 @@
+{
+  "auth": {
+    "accessDenied": "Access denied: insufficient permissions.",
+    "signIn": "Sign In",
+    "signOut": "Sign Out",
+    "signInWithGoogle": "Sign in with Google",
+    "signInWithApple": "Sign in with Apple",
+    "signInWithEmail": "Sign in with Email",
+    "email": "Email",
+    "password": "Password",
+    "welcomeToTaaafi": "Welcome to Ta'aafi Platform",
+    "adminPortal": "Admin Portal"
+  },
+  "sidebar": {
+    "taafiPlatform": "Ta'aafi Platform",
+    "quickCreate": "Quick Create",
+    "dashboard": "Dashboard",
+    "userManagement": "User Management",
+    "community": "Community",
+    "forum": "Forum",
+    "groups": "Groups",
+    "directMessages": "Direct Messages",
+    "content": "Content",
+    "contentTypes": "Content Types",
+    "contentOwners": "Content Owners",
+    "categories": "Categories",
+    "contentItems": "Content",
+    "contentLists": "Content Lists",
+    "features": "Feature Flags",
+    "settings": "Settings",
+    "localeSwitcher": {
+      "english": "English",
+      "arabic": "Arabic"
+    }
+  },
+  "modules": {
+    "userManagement": {
+      "title": "User Management",
+      "users": "Users",
+      "createUser": "Create User",
+      "editUser": "Edit User",
+      "deleteUser": "Delete User",
+      "userRole": "Role",
+      "userStatus": "Status"
+    },
+    "community": {
+      "title": "Community",
+      "forum": "Forum Management",
+      "groups": "Groups Management",
+      "messages": "Direct Messages"
+    },
+    "content": {
+      "title": "Content Management",
+      "types": "Content Types",
+      "owners": "Content Owners",
+      "categories": "Categories",
+      "items": "Content Items",
+      "lists": "Content Lists"
+    },
+    "features": {
+      "title": "Feature Flags",
+      "createFeature": "Create Feature",
+      "enabled": "Enabled",
+      "disabled": "Disabled"
+    }
+  },
+  "common": {
+    "edit": "Edit",
+    "delete": "Delete",
+    "save": "Save",
+    "cancel": "Cancel",
+    "loading": "Loading...",
+    "noData": "No data available",
+    "search": "Search",
+    "actions": "Actions"
+  }
+} 

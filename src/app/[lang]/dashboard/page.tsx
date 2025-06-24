@@ -27,7 +27,7 @@ export default async function Page({ params }: { params: Promise<{ lang: Locale 
 
   return (
     <SidebarProvider>
-      <AppSidebar variant="inset" lang={lang} dictionary={dictionary.appSidebar} navDocs={dictionary.navDocuments} />
+      <AppSidebar variant="inset" lang={lang} dictionary={dictionary.appSidebar}  />
       <SidebarInset>
         <SiteHeader dictionary={dictionary.siteHeader} />
         <div className="flex flex-1 flex-col">

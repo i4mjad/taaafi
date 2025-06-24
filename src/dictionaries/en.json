@@ -3,6 +3,7 @@
       "documents": "Documents"
     },
     "appSidebar": {
+      "appName": "Ta'aafi Platform Admin Panel",
       "acmeInc": "Acme Inc.",
       "quickCreate": "Quick Create",
       "inbox": "Inbox",

@@ -44,9 +44,9 @@ export function ThemeSwitcher() {
       value={theme}
       onValueChange={(val) => setAndApplyTheme(val as "light" | "dark")}
       orientation="horizontal"
-      className="mx-2 my-1"
+      className="w-full"
     >
-      <TabsList>
+      <TabsList className="grid w-full grid-cols-2">
         <TabsTrigger value="light">
           <SunIcon />
           <span className="sr-only">Light</span>
