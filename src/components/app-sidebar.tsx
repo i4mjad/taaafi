@@ -38,6 +38,7 @@ import {
 
 import type { Dictionary } from "@/app/[lang]/dashboard/page" // Assuming Dictionary type is exported from page
 import { Locale } from "../../i18n.config"
+import { useAuth } from '@/auth/AuthProvider'
 
 interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
   lang: Locale
@@ -45,11 +46,13 @@ interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
 }
 
 export function AppSidebar({ lang, dictionary, ...props }: AppSidebarProps) {
+  const { user } = useAuth();
+
   const data = {
     user: {
-      name: "shadcn", // This could also be from dictionary or user data
-      email: "m@example.com",
-      avatar: "/placeholder.svg?width=100&height=100",
+      name: user?.displayName ?? user?.email ?? '—',
+      email: user?.email ?? '-',
+      avatar: user?.photoURL ?? '/placeholder.svg?width=100&height=100',
     },
     navMain: [
       { 

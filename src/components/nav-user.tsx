@@ -1,12 +1,11 @@
 "use client"
 
-import { BellIcon, CreditCardIcon, LogOutIcon, MoreVerticalIcon, UserCircleIcon } from "lucide-react"
+import { LogOutIcon, MoreVerticalIcon } from "lucide-react"
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
@@ -14,6 +13,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from "@/components/ui/sidebar"
 import type { Dictionary } from "@/app/[lang]/dashboard/page"
+import { useAuth } from '@/auth/AuthProvider'
 
 interface NavUserProps {
   user: {
@@ -26,6 +26,7 @@ interface NavUserProps {
 
 export function NavUser({ user, dictionary }: NavUserProps) {
   const { isMobile } = useSidebar()
+  const { signOut } = useAuth()
 
   return (
     <SidebarMenu>
@@ -66,22 +67,7 @@ export function NavUser({ user, dictionary }: NavUserProps) {
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <UserCircleIcon className="ltr:mr-2 rtl:ml-2" />
-                {dictionary.account}
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <CreditCardIcon className="ltr:mr-2 rtl:ml-2" />
-                {dictionary.billing}
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <BellIcon className="ltr:mr-2 rtl:ml-2" />
-                {dictionary.notifications}
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={async () => await signOut()}>
               <LogOutIcon className="ltr:mr-2 rtl:ml-2" />
               {dictionary.logOut}
             </DropdownMenuItem>
