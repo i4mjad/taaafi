@@ -7,6 +7,8 @@ import { ThemeProvider } from "next-themes"
 import UpdateHtmlAttributes from "@/components/update-html-attributes"
 import { AuthProvider } from '@/auth/AuthProvider';
 import AuthGuard from '@/components/auth-guard';
+import { TranslationProvider } from '@/contexts/TranslationContext';
+import { getDictionary } from '@/lib/dictionary';
 
 export async function generateStaticParams() {
   return i18n.locales.map((locale) => ({ lang: locale }))
@@ -39,17 +41,22 @@ export default async function RootLayout({
 }>) {
   // In Next.js 15, `params` is asynchronous. Await it before using its properties.
   const { lang } = await params;
+  
+  // Load dictionary for translation context
+  const dictionary = await getDictionary(lang);
 
   return (
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
       <AuthProvider>
-        <UpdateHtmlAttributes lang={lang} />
-        <AuthGuard>
-          <div className="font-sans" dir={lang === "ar" ? "rtl" : "ltr"}>
-            {children}
-            <Toaster />
-          </div>
-        </AuthGuard>
+        <TranslationProvider locale={lang} initialDictionary={dictionary}>
+          <UpdateHtmlAttributes lang={lang} />
+          <AuthGuard>
+            <div className="font-sans" dir={lang === "ar" ? "rtl" : "ltr"}>
+              {children}
+              <Toaster />
+            </div>
+          </AuthGuard>
+        </TranslationProvider>
       </AuthProvider>
     </ThemeProvider>
   )

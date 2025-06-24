@@ -36,7 +36,7 @@ import {
   MoreHorizontal,
   Edit,
   Trash2,
-  FileText,
+  Users,
   Eye,
   EyeOff,
 } from 'lucide-react';
@@ -45,101 +45,102 @@ import { AppSidebar } from '@/components/app-sidebar';
 import { SiteHeader } from '@/components/site-header';
 import { useTranslation } from '@/contexts/TranslationContext';
 import { useCollection } from 'react-firebase-hooks/firestore';
-import { collection, query, orderBy, addDoc, updateDoc, deleteDoc, doc, where } from 'firebase/firestore';
+import { collection, query, orderBy, addDoc, updateDoc, deleteDoc, doc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
-import { ContentType, CreateContentTypeRequest, UpdateContentTypeRequest } from '@/types/content';
-import ContentTypeForm from './components/ContentTypeForm';
+import { ContentOwner, CreateContentOwnerRequest, UpdateContentOwnerRequest } from '@/types/content';
+import ContentOwnerForm from './components/ContentOwnerForm';
 import { toast } from 'sonner';
 
-export default function ContentTypesPage() {
+export default function ContentOwnersPage() {
   const { t, locale } = useTranslation();
   const [searchQuery, setSearchQuery] = useState('');
   const [showForm, setShowForm] = useState(false);
-  const [selectedType, setSelectedType] = useState<ContentType | undefined>();
+  const [selectedOwner, setSelectedOwner] = useState<ContentOwner | undefined>();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [typeToDelete, setTypeToDelete] = useState<ContentType | undefined>();
+  const [ownerToDelete, setOwnerToDelete] = useState<ContentOwner | undefined>();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Firestore queries
-  const [contentTypesSnapshot, loading, error] = useCollection(
-    query(collection(db, 'contentTypes'), orderBy('contentTypeName'))
+  const [contentOwnersSnapshot, loading, error] = useCollection(
+    query(collection(db, 'contentOwners'), orderBy('ownerName'))
   );
 
-  const contentTypes = contentTypesSnapshot?.docs.map(doc => ({
+  const contentOwners = contentOwnersSnapshot?.docs.map(doc => ({
     id: doc.id,
     ...doc.data(),
     createdAt: doc.data().createdAt?.toDate(),
     updatedAt: doc.data().updatedAt?.toDate(),
-  })) as ContentType[] || [];
+  })) as ContentOwner[] || [];
 
-  const filteredContentTypes = contentTypes.filter(type =>
-    type.contentTypeName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    (type.contentTypeNameAr && type.contentTypeNameAr.toLowerCase().includes(searchQuery.toLowerCase()))
+  const filteredContentOwners = contentOwners.filter(owner =>
+    owner.ownerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    (owner.ownerNameAr && owner.ownerNameAr.toLowerCase().includes(searchQuery.toLowerCase())) ||
+    owner.ownerSource.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const handleCreateType = async (data: CreateContentTypeRequest) => {
+  const handleCreateOwner = async (data: CreateContentOwnerRequest) => {
     try {
       setIsSubmitting(true);
-      await addDoc(collection(db, 'contentTypes'), {
+      await addDoc(collection(db, 'contentOwners'), {
         ...data,
         createdAt: new Date(),
         updatedAt: new Date(),
       });
-      toast.success(t('content.types.createSuccess') || 'Content type created successfully');
+      toast.success(t('content.owners.createSuccess') || 'Content owner created successfully');
       setShowForm(false);
-      setSelectedType(undefined);
+      setSelectedOwner(undefined);
     } catch (error) {
-      console.error('Error creating content type:', error);
-      toast.error(t('content.types.createError') || 'Failed to create content type');
+      console.error('Error creating content owner:', error);
+      toast.error(t('content.owners.createError') || 'Failed to create content owner');
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const handleUpdateType = async (data: UpdateContentTypeRequest) => {
-    if (!selectedType) return;
+  const handleUpdateOwner = async (data: UpdateContentOwnerRequest) => {
+    if (!selectedOwner) return;
     
     try {
       setIsSubmitting(true);
-      await updateDoc(doc(db, 'contentTypes', selectedType.id), {
+      await updateDoc(doc(db, 'contentOwners', selectedOwner.id), {
         ...data,
         updatedAt: new Date(),
       });
-      toast.success(t('content.types.updateSuccess') || 'Content type updated successfully');
+      toast.success(t('content.owners.updateSuccess') || 'Content owner updated successfully');
       setShowForm(false);
-      setSelectedType(undefined);
+      setSelectedOwner(undefined);
     } catch (error) {
-      console.error('Error updating content type:', error);
-      toast.error(t('content.types.updateError') || 'Failed to update content type');
+      console.error('Error updating content owner:', error);
+      toast.error(t('content.owners.updateError') || 'Failed to update content owner');
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const handleToggleActive = async (type: ContentType) => {
+  const handleToggleActive = async (owner: ContentOwner) => {
     try {
-      await updateDoc(doc(db, 'contentTypes', type.id), {
-        isActive: !type.isActive,
+      await updateDoc(doc(db, 'contentOwners', owner.id), {
+        isActive: !owner.isActive,
         updatedAt: new Date(),
       });
-      toast.success(t('content.types.statusUpdateSuccess') || 'Status updated successfully');
+      toast.success(t('content.owners.statusUpdateSuccess') || 'Status updated successfully');
     } catch (error) {
       console.error('Error updating status:', error);
-      toast.error(t('content.types.statusUpdateError') || 'Failed to update status');
+      toast.error(t('content.owners.statusUpdateError') || 'Failed to update status');
     }
   };
 
-  const handleDeleteType = async () => {
-    if (!typeToDelete) return;
+  const handleDeleteOwner = async () => {
+    if (!ownerToDelete) return;
 
     try {
-      await deleteDoc(doc(db, 'contentTypes', typeToDelete.id));
-      toast.success(t('content.types.deleteSuccess') || 'Content type deleted successfully');
+      await deleteDoc(doc(db, 'contentOwners', ownerToDelete.id));
+      toast.success(t('content.owners.deleteSuccess') || 'Content owner deleted successfully');
       setDeleteDialogOpen(false);
-      setTypeToDelete(undefined);
+      setOwnerToDelete(undefined);
     } catch (error) {
-      console.error('Error deleting content type:', error);
-      toast.error(t('content.types.deleteError') || 'Failed to delete content type');
+      console.error('Error deleting content owner:', error);
+      toast.error(t('content.owners.deleteError') || 'Failed to delete content owner');
     }
   };
 
@@ -162,9 +163,9 @@ export default function ContentTypesPage() {
   };
 
   const stats = {
-    total: contentTypes.length,
-    active: contentTypes.filter(type => type.isActive).length,
-    inactive: contentTypes.filter(type => !type.isActive).length,
+    total: contentOwners.length,
+    active: contentOwners.filter(owner => owner.isActive).length,
+    inactive: contentOwners.filter(owner => !owner.isActive).length,
   };
 
   // Create sidebar dictionary
@@ -224,31 +225,31 @@ export default function ContentTypesPage() {
         <div className="h-full flex flex-col">
           {/* Header */}
           <div className="flex items-center justify-between px-6 py-4 border-b bg-background">
-            <div>
-              <h1 className="text-3xl font-bold tracking-tight">
-                {t('content.types.title') || 'Content Types'}
-              </h1>
-              <p className="text-muted-foreground">
-                {t('content.types.description') || 'Manage different types of content (articles, videos, resources)'}
-              </p>
-            </div>
-            <Button onClick={() => setShowForm(true)}>
-              <Plus className="h-4 w-4 mr-2" />
-              {t('content.types.create') || 'Create Type'}
-            </Button>
-          </div>
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">
+            {t('content.owners.title') || 'Content Owners'}
+          </h1>
+          <p className="text-muted-foreground">
+            {t('content.owners.description') || 'Manage content creators and their permissions'}
+          </p>
+        </div>
+        <Button onClick={() => setShowForm(true)}>
+          <Plus className="h-4 w-4 mr-2" />
+          {t('content.owners.create') || 'Create Owner'}
+        </Button>
+      </div>
 
-          {/* Content area */}
-          <div className="flex-1 overflow-auto">
-            <div className="p-6 space-y-6 max-w-none">
+      {/* Content area */}
+      <div className="flex-1 overflow-auto">
+        <div className="p-6 space-y-6 max-w-none">
           {/* Stats Cards */}
           <div className="grid gap-4 md:grid-cols-3">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">
-                  {t('content.types.totalTypes') || 'Total Types'}
+                  {t('content.owners.totalOwners') || 'Total Owners'}
                 </CardTitle>
-                <FileText className="h-4 w-4 text-muted-foreground" />
+                <Users className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{stats.total}</div>
@@ -258,7 +259,7 @@ export default function ContentTypesPage() {
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">
-                  {t('content.types.activeTypes') || 'Active Types'}
+                  {t('content.owners.activeOwners') || 'Active Owners'}
                 </CardTitle>
                 <Eye className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
@@ -270,7 +271,7 @@ export default function ContentTypesPage() {
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">
-                  {t('content.types.inactiveTypes') || 'Inactive Types'}
+                  {t('content.owners.inactiveOwners') || 'Inactive Owners'}
                 </CardTitle>
                 <EyeOff className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
@@ -289,7 +290,7 @@ export default function ContentTypesPage() {
               <div className="flex gap-4">
                 <div className="flex-1">
                   <Input
-                    placeholder={t('content.types.searchPlaceholder') || 'Search content types...'}
+                    placeholder={t('content.owners.searchPlaceholder') || 'Search content owners...'}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                   />
@@ -302,12 +303,12 @@ export default function ContentTypesPage() {
             </CardContent>
           </Card>
 
-          {/* Content Types Table */}
+          {/* Content Owners Table */}
           <Card>
             <CardHeader>
-              <CardTitle>{t('content.types.list') || 'Content Types'}</CardTitle>
+              <CardTitle>{t('content.owners.list') || 'Content Owners'}</CardTitle>
               <CardDescription>
-                {t('content.types.listDescription') || 'Manage and organize content types'}
+                {t('content.owners.listDescription') || 'Manage content creators and contributors'}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -325,31 +326,27 @@ export default function ContentTypesPage() {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>{t('content.types.icon') || 'Icon'}</TableHead>
-                      <TableHead>{t('content.types.nameEn') || 'Name (EN)'}</TableHead>
-                      <TableHead>{t('content.types.nameAr') || 'Name (AR)'}</TableHead>
+                      <TableHead>{t('content.owners.nameEn') || 'Name (EN)'}</TableHead>
+                      <TableHead>{t('content.owners.nameAr') || 'Name (AR)'}</TableHead>
+                      <TableHead>{t('content.owners.source') || 'Source'}</TableHead>
                       <TableHead>{t('common.status') || 'Status'}</TableHead>
                       <TableHead>{t('common.active') || 'Active'}</TableHead>
                       <TableHead className="text-right">{t('common.actions') || 'Actions'}</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {filteredContentTypes.map((type) => (
-                      <TableRow key={type.id}>
-                        <TableCell>
-                          <div className="w-8 h-8 bg-muted rounded flex items-center justify-center">
-                          {type.contentTypeIconName}
-                          </div>
-                        </TableCell>
-                        <TableCell className="font-medium">{type.contentTypeName}</TableCell>
+                    {filteredContentOwners.map((owner) => (
+                      <TableRow key={owner.id}>
+                        <TableCell className="font-medium">{owner.ownerName}</TableCell>
                         <TableCell className="text-muted-foreground">
-                          {type.contentTypeNameAr || '-'}
+                          {owner.ownerNameAr || '-'}
                         </TableCell>
-                        <TableCell>{getStatusBadge(type.isActive)}</TableCell>
+                        <TableCell>{owner.ownerSource}</TableCell>
+                        <TableCell>{getStatusBadge(owner.isActive)}</TableCell>
                         <TableCell>
                           <Switch
-                            checked={type.isActive}
-                            onCheckedChange={() => handleToggleActive(type)}
+                            checked={owner.isActive}
+                            onCheckedChange={() => handleToggleActive(owner)}
                           />
                         </TableCell>
                         <TableCell className="text-right">
@@ -362,7 +359,7 @@ export default function ContentTypesPage() {
                             <DropdownMenuContent align="end">
                               <DropdownMenuItem
                                 onClick={() => {
-                                  setSelectedType(type);
+                                  setSelectedOwner(owner);
                                   setShowForm(true);
                                 }}
                               >
@@ -372,7 +369,7 @@ export default function ContentTypesPage() {
                               <DropdownMenuSeparator />
                               <DropdownMenuItem
                                 onClick={() => {
-                                  setTypeToDelete(type);
+                                  setOwnerToDelete(owner);
                                   setDeleteDialogOpen(true);
                                 }}
                                 className="text-red-600"
@@ -389,15 +386,15 @@ export default function ContentTypesPage() {
                 </Table>
               )}
 
-              {!loading && filteredContentTypes.length === 0 && (
+              {!loading && filteredContentOwners.length === 0 && (
                 <div className="text-center py-8">
-                  <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                  <Users className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                   <p className="text-lg font-medium">{t('common.noData') || 'No data'}</p>
                   <p className="text-muted-foreground">
-                    {t('content.types.noTypesFound') || 'No content types found'}
+                    {t('content.owners.noOwnersFound') || 'No content owners found'}
                   </p>
                 </div>
-              )}
+                            )}
             </CardContent>
           </Card>
             </div>
@@ -408,37 +405,37 @@ export default function ContentTypesPage() {
       {/* Form Dialog */}
       <Dialog open={showForm} onOpenChange={(open: boolean) => {
         setShowForm(open);
-        if (!open) setSelectedType(undefined);
+        if (!open) setSelectedOwner(undefined);
       }}>
         <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle>
-              {selectedType 
-                ? (t('content.types.edit') || 'Edit Content Type')
-                : (t('content.types.create') || 'Create Content Type')
+              {selectedOwner 
+                ? (t('content.owners.edit') || 'Edit Content Owner')
+                : (t('content.owners.create') || 'Create Content Owner')
               }
             </DialogTitle>
             <DialogDescription>
-              {selectedType
-                ? (t('content.types.editDescription') || 'Update content type information')
-                : (t('content.types.createDescription') || 'Add a new content type')
+              {selectedOwner
+                ? (t('content.owners.editDescription') || 'Update content owner information')
+                : (t('content.owners.createDescription') || 'Add a new content owner')
               }
             </DialogDescription>
           </DialogHeader>
-                     <ContentTypeForm
-             contentType={selectedType}
-             onSubmit={selectedType 
-               ? (data) => handleUpdateType(data as UpdateContentTypeRequest)
-               : (data) => handleCreateType(data as CreateContentTypeRequest)
-             }
-             onCancel={() => {
-               setShowForm(false);
-               setSelectedType(undefined);
-             }}
-             isLoading={isSubmitting}
-             t={t}
-             locale={locale}
-           />
+          <ContentOwnerForm
+            contentOwner={selectedOwner}
+            onSubmit={selectedOwner 
+              ? (data) => handleUpdateOwner(data as UpdateContentOwnerRequest)
+              : (data) => handleCreateOwner(data as CreateContentOwnerRequest)
+            }
+            onCancel={() => {
+              setShowForm(false);
+              setSelectedOwner(undefined);
+            }}
+            isLoading={isSubmitting}
+            t={t}
+            locale={locale}
+          />
         </DialogContent>
       </Dialog>
 
@@ -446,16 +443,16 @@ export default function ContentTypesPage() {
       <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{t('content.types.deleteTitle') || 'Delete Content Type'}</DialogTitle>
+            <DialogTitle>{t('content.owners.deleteTitle') || 'Delete Content Owner'}</DialogTitle>
             <DialogDescription>
-              {t('content.types.deleteDescription') || 'Are you sure you want to delete this content type? This action cannot be undone.'}
+              {t('content.owners.deleteDescription') || 'Are you sure you want to delete this content owner? This action cannot be undone.'}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <Button variant="outline" onClick={() => setDeleteDialogOpen(false)}>
               {t('common.cancel') || 'Cancel'}
             </Button>
-            <Button variant="destructive" onClick={handleDeleteType}>
+            <Button variant="destructive" onClick={handleDeleteOwner}>
               {t('common.delete') || 'Delete'}
             </Button>
           </DialogFooter>

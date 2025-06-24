@@ -1,0 +1,110 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+You are a code-generation agent targeting the **Content** screens of the Admin Control Panel for **Ta’aafi Platform**, built with Next.js App Router, ShadCN UI, Firebase & `react-firebase-hooks`. Your output must:
+
+1. **Folder & File Structure**  
+   - Use the existing project structure under `src/`:  
+     ```
+     src/
+       app/
+         [lang]/                ← dynamic locale segment (“en” or “ar”)
+           dashboard/
+           community/
+           content/
+           features/
+           login/
+           user-management/
+           layout.tsx           ← wrap all pages (sidebar, header, locale switch)
+           page.tsx             ← root redirect to /dashboard
+       auth/                    ← Firebase auth provider & hooks
+       components/              ← shared UI components
+       contexts/                ← React contexts (e.g. AuthContext)
+       dictionaries/            ← i18n JSON files (en.json, ar.json)
+       hooks/                   ← custom hooks
+       layout/                  ← layout primitives (Sidebar, Topbar)
+       lib/                     ← utility functions
+       modules/                 ← domain logic (services + repositories stubs)
+       repositories/            ← repository interfaces & stubs
+       services/                ← business logic services
+       types/                   ← TypeScript interfaces
+       utils/                   ← misc helpers
+     ```
+   - Under `app/[lang]/content/`, create:  
+     - `page.tsx` for List View  
+     - `components/ContentForm.tsx` for Create/Edit form  
+
+2. **Firestore Integration**  
+   - Collections in root of Firestore:  
+     - `contentTypes`  
+     - `contentOwners`  
+     - `contentCategories`  
+     - `content`  
+     - `contentLists`  
+   - Fields ending with `Ar` (e.g. `contentTypeNameAr`) are **not** yet in existing documents—forms must include them, and reads should handle `null` or missing values until the database is updated.  
+   - Use `react-firebase-hooks/firestore` (`useCollection`, `useDocument`) and Firestore SDK (`addDoc`, `updateDoc`, `deleteDoc`, `doc`, `collection`, `query`, `where`, `orderBy`) for real-time CRUD.
+
+3. **CRUD Screens for Content Module**  
+   For each sub-module, generate both a `page.tsx` and a form component under `app/[lang]/content/<sub-module>/`:
+
+   ### 3.1 Content Types  
+   - **List View** (`content-types/page.tsx`):  
+     - Hook: `useCollection(query(collection(firestore, 'contentTypes'), orderBy('contentTypeName')))`.  
+     - ShadCN `<Table>` with Icon, Name EN, Name AR, Active toggle, Actions.  
+   - **Form** (`content-types/components/ContentTypeForm.tsx`):  
+     - Fields: `contentTypeIconName`, `contentTypeName`, `contentTypeNameAr`, `isActive`.  
+     - Create → `addDoc`, Update → `updateDoc`.
+
+   ### 3.2 Content Owners  
+   - **List View** (`content-owners/page.tsx`)  
+   - **Form** (`content-owners/components/ContentOwnerForm.tsx`)  
+     - Fields: `ownerName`, `ownerNameAr`, `ownerSource`, `isActive`.
+
+   ### 3.3 Categories  
+   - **List View** (`categories/page.tsx`)  
+   - **Form** (`categories/components/CategoryForm.tsx`)  
+     - Fields: `contentCategoryIconName`, `categoryName`, `categoryNameAr`, `isActive`.
+
+   ### 3.4 Content Items  
+   - **List View** (`content/page.tsx`)  
+   - **Form** (`content/components/ContentForm.tsx`)  
+     - Fields: `contentName`, `contentNameAr`, `contentLanguage`, `contentLink`, `contentCategoryId`, `contentTypeId`, `contentOwnerId`, `isActive`, `isDeleted`.  
+     - Display lookups for type/owner/category via separate `useCollection` hooks.
+
+   ### 3.5 Content Lists  
+   - **List View** (`content-lists/page.tsx`)  
+   - **Form** (`content-lists/components/ContentListForm.tsx`)  
+     - Fields: `listName`, `listNameAr`, `listDescription`, `listDescriptionAr`, `contentListIconName`, `listContentIds[]`, `isFeatured`, `isActive`.  
+     - **Select Contents** multi-select:  
+       - Section A: existing `listContentIds` first  
+       - Section B: newly checked items next in selection order  
+       - Section C: remaining content alphabetically  
+       - Search box filters all sections by EN/AR name  
+
+4. **Localization & Layout**  
+   - Wrap all UI text in `t('content.<submodule>.<field>')`.  
+   - Use `<html dir={locale==='ar'?'rtl':'ltr'}>` and Tailwind’s `dir-rtl` utilities.  
+   - Sidebar, header, and locale switch live in `app/[lang]/layout.tsx`.
+
+5. **Responsive & UX**  
+   - Mobile-first breakpoints: phone → tablet → desktop.  
+   - Show loading spinners while hooks load.  
+   - Display bilingual error messages on failures.  
+   - Use ShadCN `<Dialog>` for confirm dialogs (delete/toggle).
+
+6. **Data Layer Abstraction**  
+   - `modules/content/` holds service functions calling repository interfaces.  
+   - `repositories/` contains `IContentRepository`, `InMemoryContentRepository`, and `FirebaseContentRepository` stubs.
+
+7. **TypeScript**  
+   - Define all entity and component prop interfaces in `types/content.ts`.
+
+**Generate**:  
+- A markdown tree of the updated `app/[lang]/content/...` structure.  
+- One full `page.tsx` and form component (`ContentForm.tsx`) for each sub-module, wired to Firestore & hooks.  
+- TypeScript interfaces in `types/content.ts`.  
+- Comments indicating where additional customization or third-party integrations belong.
+
+Ensure the output is self-contained, follows this structure, and is ready for Cursor AI v0.  

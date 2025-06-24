@@ -1,0 +1,292 @@
+'use client';
+
+import React, { useState } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
+import { Switch } from '@/components/ui/switch';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar';
+import { AppSidebar } from '@/components/app-sidebar';
+import { SiteHeader } from '@/components/site-header';
+import { useTranslation } from '@/contexts/TranslationContext';
+import { useCollection } from 'react-firebase-hooks/firestore';
+import { collection, query, orderBy, addDoc, updateDoc, deleteDoc, doc } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
+import { ContentList, CreateContentListRequest, UpdateContentListRequest } from '@/types/content';
+import { toast } from 'sonner';
+import { List, Plus, Star, Eye, EyeOff } from 'lucide-react';
+
+export default function ContentListsPage() {
+  const { t, locale } = useTranslation();
+  const [searchQuery, setSearchQuery] = useState('');
+
+  // Firestore queries
+  const [contentListsSnapshot, loading] = useCollection(
+    query(collection(db, 'contentLists'), orderBy('listName'))
+  );
+
+  const contentLists = contentListsSnapshot?.docs.map(doc => ({
+    id: doc.id,
+    ...doc.data(),
+    createdAt: doc.data().createdAt?.toDate(),
+    updatedAt: doc.data().updatedAt?.toDate(),
+  })) as ContentList[] || [];
+
+  const filteredContentLists = contentLists.filter(list =>
+    list.listName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    (list.listNameAr && list.listNameAr.toLowerCase().includes(searchQuery.toLowerCase()))
+  );
+
+  const handleToggleActive = async (list: ContentList) => {
+    try {
+      await updateDoc(doc(db, 'contentLists', list.id), {
+        isActive: !list.isActive,
+        updatedAt: new Date(),
+      });
+      toast.success(t('content.lists.statusUpdateSuccess') || 'Status updated successfully');
+    } catch (error) {
+      console.error('Error updating status:', error);
+      toast.error(t('content.lists.statusUpdateError') || 'Failed to update status');
+    }
+  };
+
+  const handleToggleFeatured = async (list: ContentList) => {
+    try {
+      await updateDoc(doc(db, 'contentLists', list.id), {
+        isFeatured: !list.isFeatured,
+        updatedAt: new Date(),
+      });
+      toast.success(t('content.lists.statusUpdateSuccess') || 'Status updated successfully');
+    } catch (error) {
+      console.error('Error updating featured status:', error);
+      toast.error(t('content.lists.statusUpdateError') || 'Failed to update status');
+    }
+  };
+
+  const getStatusBadge = (isActive: boolean) => {
+    return (
+      <Badge variant={isActive ? 'default' : 'secondary'}>
+        {isActive ? (
+          <>
+            <Eye className="h-3 w-3 mr-1" />
+            {t('common.active') || 'Active'}
+          </>
+        ) : (
+          <>
+            <EyeOff className="h-3 w-3 mr-1" />
+            {t('common.inactive') || 'Inactive'}
+          </>
+        )}
+      </Badge>
+    );
+  };
+
+  const getFeaturedBadge = (isFeatured: boolean) => {
+    return isFeatured ? (
+      <Badge variant="default">
+        <Star className="h-3 w-3 mr-1" />
+        {t('content.lists.featured') || 'Featured'}
+      </Badge>
+    ) : null;
+  };
+
+  const stats = {
+    total: contentLists.length,
+    active: contentLists.filter(list => list.isActive).length,
+    featured: contentLists.filter(list => list.isFeatured).length,
+  };
+
+  // Create sidebar dictionary
+  const sidebarDictionary = {
+    appName: t('appSidebar.appName') || 'Ta\'aafi Platform Admin Panel',
+    taafiPlatform: t('appSidebar.taafiPlatform') || 'Ta\'aafi Platform',
+    quickCreate: t('appSidebar.quickCreate') || 'Quick Create',
+    inbox: t('appSidebar.inbox') || 'Inbox',
+    dashboard: t('appSidebar.dashboard') || 'Dashboard',
+    userManagement: t('appSidebar.userManagement') || 'User Management',
+    users: t('appSidebar.users') || 'Users',
+    roles: t('appSidebar.roles') || 'Roles',
+    permissions: t('appSidebar.permissions') || 'Permissions',
+    community: t('appSidebar.community') || 'Community',
+    forum: t('appSidebar.forum') || 'Forum',
+    groups: t('appSidebar.groups') || 'Groups',
+    directMessages: t('appSidebar.directMessages') || 'Direct Messages',
+    reports: t('appSidebar.reports') || 'Reports',
+    content: t('appSidebar.content') || 'Content',
+    contentTypes: t('appSidebar.contentTypes') || 'Content Types',
+    contentOwners: t('appSidebar.contentOwners') || 'Content Owners',
+    categories: t('appSidebar.categories') || 'Categories',
+    contentLists: t('appSidebar.contentLists') || 'Content Lists',
+    features: t('appSidebar.features') || 'Features',
+    lifecycle: t('appSidebar.lifecycle') || 'Lifecycle',
+    analytics: t('appSidebar.analytics') || 'Analytics',
+    projects: t('appSidebar.projects') || 'Projects',
+    team: t('appSidebar.team') || 'Team',
+    documents: t('appSidebar.documents') || 'Documents',
+    dataLibrary: t('appSidebar.dataLibrary') || 'Data Library',
+    wordAssistant: t('appSidebar.wordAssistant') || 'Word Assistant',
+    more: t('appSidebar.more') || 'More',
+    settings: t('appSidebar.settings') || 'Settings',
+    getHelp: t('appSidebar.getHelp') || 'Get Help',
+    search: t('appSidebar.search') || 'Search',
+    userMenu: {
+      account: t('appSidebar.userMenu.account') || 'Account',
+      billing: t('appSidebar.userMenu.billing') || 'Billing',
+      notifications: t('appSidebar.userMenu.notifications') || 'Notifications',
+      logOut: t('appSidebar.userMenu.logOut') || 'Log out',
+    },
+    localeSwitcher: {
+      english: t('appSidebar.localeSwitcher.english') || 'English',
+      arabic: t('appSidebar.localeSwitcher.arabic') || 'Arabic',
+    },
+  };
+
+  return (
+    <SidebarProvider>
+      <AppSidebar variant="inset" lang={locale} dictionary={sidebarDictionary} />
+      <SidebarInset>
+        <SiteHeader dictionary={{ documents: t('siteHeader.documents') || 'Documents' }} />
+        <div className="h-full flex flex-col">
+          <div className="flex items-center justify-between px-6 py-4 border-b bg-background">
+            <div>
+              <h1 className="text-3xl font-bold tracking-tight">
+                {t('content.lists.title') || 'Content Lists'}
+              </h1>
+              <p className="text-muted-foreground">
+                {t('content.lists.description') || 'Create and manage curated content collections'}
+              </p>
+            </div>
+            <Button>
+              <Plus className="h-4 w-4 mr-2" />
+              {t('content.lists.create') || 'Create List'}
+            </Button>
+          </div>
+
+          <div className="flex-1 overflow-auto">
+            <div className="p-6 space-y-6">
+              {/* Stats Cards */}
+              <div className="grid gap-4 md:grid-cols-3">
+                <Card>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">
+                      {t('content.lists.totalLists') || 'Total Lists'}
+                    </CardTitle>
+                    <List className="h-4 w-4 text-muted-foreground" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold">{stats.total}</div>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">
+                      {t('content.lists.activeLists') || 'Active Lists'}
+                    </CardTitle>
+                    <Eye className="h-4 w-4 text-muted-foreground" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold text-green-600">{stats.active}</div>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">
+                      {t('content.lists.featuredLists') || 'Featured Lists'}
+                    </CardTitle>
+                    <Star className="h-4 w-4 text-muted-foreground" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold text-yellow-600">{stats.featured}</div>
+                  </CardContent>
+                </Card>
+              </div>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>{t('content.lists.list') || 'Content Lists'}</CardTitle>
+                  <CardDescription>
+                    {t('content.lists.listDescription') || 'Create and manage curated content collections'}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="mb-4">
+                    <Input
+                      placeholder={t('content.lists.searchPlaceholder') || 'Search content lists...'}
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                    />
+                  </div>
+                  
+                  {loading ? (
+                    <div className="text-center py-8">
+                      <p>{t('common.loading') || 'Loading...'}</p>
+                    </div>
+                  ) : (
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>{t('content.lists.nameEn') || 'Name (EN)'}</TableHead>
+                          <TableHead>{t('content.lists.nameAr') || 'Name (AR)'}</TableHead>
+                          <TableHead>{t('content.lists.contentCount') || 'Content Count'}</TableHead>
+                          <TableHead>{t('common.status') || 'Status'}</TableHead>
+                          <TableHead>{t('content.lists.featured') || 'Featured'}</TableHead>
+                          <TableHead>{t('common.active') || 'Active'}</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {filteredContentLists.map((list) => (
+                          <TableRow key={list.id}>
+                            <TableCell className="font-medium">{list.listName}</TableCell>
+                            <TableCell>{list.listNameAr || '-'}</TableCell>
+                            <TableCell>{list.listContentIds?.length || 0}</TableCell>
+                            <TableCell>{getStatusBadge(list.isActive)}</TableCell>
+                            <TableCell>{getFeaturedBadge(list.isFeatured)}</TableCell>
+                            <TableCell>
+                              <Switch
+                                checked={list.isActive}
+                                onCheckedChange={() => handleToggleActive(list)}
+                              />
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  )}
+
+                  {!loading && filteredContentLists.length === 0 && (
+                    <div className="text-center py-8">
+                      <List className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                      <p className="text-lg font-medium">{t('common.noData') || 'No data'}</p>
+                      <p className="text-muted-foreground">
+                        {t('content.lists.noListsFound') || 'No content lists found'}
+                      </p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </div>
+      </SidebarInset>
+    </SidebarProvider>
+  );
+}

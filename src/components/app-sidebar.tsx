@@ -91,7 +91,7 @@ export function AppSidebar({ lang, dictionary, ...props }: AppSidebarProps) {
           { titleKey: "contentTypes", url: `/${lang}/content/types`, icon: ListIcon },
           { titleKey: "contentOwners", url: `/${lang}/content/owners`, icon: UserIcon },
           { titleKey: "categories", url: `/${lang}/content/categories`, icon: TagIcon },
-          { titleKey: "content", url: `/${lang}/content/content`, icon: FileTextIcon },
+          { titleKey: "content", url: `/${lang}/content/items`, icon: FileTextIcon },
           { titleKey: "contentLists", url: `/${lang}/content/lists`, icon: FolderIcon },
         ]
       },
