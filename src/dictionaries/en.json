@@ -115,6 +115,22 @@
     "navDocuments": {
       "open": "Open",
       "share": "Share"
+    },
+    "login": {
+      "companyName": "Acme Inc.",
+      "welcome": "Welcome to Acme Inc.",
+      "noAccount": "Don't have an account?",
+      "signUp": "Sign up",
+      "email": "Email",
+      "emailPlaceholder": "m@example.com",
+      "loginButton": "Login",
+      "or": "Or",
+      "continueWithApple": "Continue with Apple",
+      "continueWithGoogle": "Continue with Google",
+      "agreement": "By clicking continue, you agree to our",
+      "termsOfService": "Terms of Service",
+      "and": "and",
+      "privacyPolicy": "Privacy Policy"
     }
   }
   

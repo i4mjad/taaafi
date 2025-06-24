@@ -115,6 +115,22 @@
     "navDocuments": {
       "open": "فتح",
       "share": "مشاركة"
+    },
+    "login": {
+      "companyName": "شركة أكمي",
+      "welcome": "مرحباً بك في شركة أكمي",
+      "noAccount": "لا تملك حساباً؟",
+      "signUp": "إنشاء حساب",
+      "email": "البريد الإلكتروني",
+      "emailPlaceholder": "m@example.com",
+      "loginButton": "تسجيل الدخول",
+      "or": "أو",
+      "continueWithApple": "المتابعة مع آبل",
+      "continueWithGoogle": "المتابعة مع جوجل",
+      "agreement": "بالنقر على المتابعة، فإنك توافق على",
+      "termsOfService": "شروط الخدمة",
+      "and": "و",
+      "privacyPolicy": "سياسة الخصوصية"
     }
   }
   
