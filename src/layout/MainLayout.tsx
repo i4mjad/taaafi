@@ -66,47 +66,48 @@ export function MainLayout({ children }: MainLayoutProps) {
 
   // Create dictionary object for the existing AppSidebar
   const sidebarDictionary = {
-    appName: t('sidebar.appName'),
-    acmeInc: t('sidebar.taafiPlatform'),
-    quickCreate: t('sidebar.quickCreate'),
+    appName: t('sidebar.taafiPlatform') || 'Ta\'aafi Platform Admin Panel',
+    taafiPlatform: t('sidebar.taafiPlatform') || 'Ta\'aafi Platform',
+    quickCreate: t('sidebar.quickCreate') || 'Quick Create',
     inbox: t('common.inbox') || 'Inbox',
-    dashboard: t('sidebar.dashboard'),
-    lifecycle: t('sidebar.userManagement'),
-    analytics: t('modules.features.title'),
-    projects: t('sidebar.community'),
-    team: t('sidebar.content'),
-    documents: t('sidebar.content'),
-    dataLibrary: t('sidebar.contentTypes'),
-    reports: t('sidebar.contentLists'),
-    wordAssistant: t('sidebar.categories'),
-    more: t('sidebar.features'),
-    settings: t('sidebar.settings'),
-    getHelp: t('common.help') || 'Help',
-    search: t('common.search'),
-    // Sub-navigation items
-    forum: t('sidebar.forum'),
-    groups: t('sidebar.groups'),
-    messages: t('sidebar.directMessages'),
-    types: t('sidebar.contentTypes'),
-    owners: t('sidebar.contentOwners'),
-    categories: t('sidebar.categories'),
-    content: t('sidebar.contentItems'),
-    lists: t('sidebar.contentLists'),
+    dashboard: t('sidebar.dashboard') || 'Dashboard',
+    userManagement: t('sidebar.userManagement') || 'User Management',
+    users: t('modules.userManagement.users') || 'Users',
+    roles: t('common.roles') || 'Roles',
+    permissions: t('common.permissions') || 'Permissions',
+    community: t('sidebar.community') || 'Community',
+    forum: t('sidebar.forum') || 'Forum',
+    groups: t('sidebar.groups') || 'Groups',
+    directMessages: t('sidebar.directMessages') || 'Direct Messages',
+    reports: t('common.reports') || 'Reports',
+    content: t('sidebar.content') || 'Content',
+    contentTypes: t('sidebar.contentTypes') || 'Content Types',
+    contentOwners: t('sidebar.contentOwners') || 'Content Owners',
+    categories: t('sidebar.categories') || 'Categories',
+    contentLists: t('sidebar.contentLists') || 'Content Lists',
+    features: t('sidebar.features') || 'Features',
+    settings: t('sidebar.settings') || 'Settings',
+    getHelp: t('common.help') || 'Get Help',
+    search: t('common.search') || 'Search',
+    // Legacy properties for compatibility
+    lifecycle: t('sidebar.userManagement') || 'User Management',
+    analytics: t('sidebar.features') || 'Features',
+    projects: t('sidebar.community') || 'Community',
+    team: t('sidebar.content') || 'Content',
+    documents: t('sidebar.content') || 'Documents',
+    dataLibrary: t('sidebar.contentTypes') || 'Data Library',
+    wordAssistant: t('sidebar.categories') || 'Word Assistant',
+    more: t('sidebar.features') || 'More',
     userMenu: {
       account: t('common.account') || 'Account',
       billing: t('common.billing') || 'Billing',
       notifications: t('common.notifications') || 'Notifications',
-      logOut: t('auth.signOut'),
+      logOut: t('auth.signOut') || 'Log out',
     },
     localeSwitcher: {
-      english: t('sidebar.localeSwitcher.english'),
-      arabic: t('sidebar.localeSwitcher.arabic'),
+      english: t('sidebar.localeSwitcher.english') || 'English',
+      arabic: t('sidebar.localeSwitcher.arabic') || 'Arabic',
     },
-  };
-
-  const navDocuments = {
-    open: t('common.open') || 'Open',
-    share: t('common.share') || 'Share',
   };
 
   // Dynamic sidebar position based on locale
@@ -120,7 +121,6 @@ export function MainLayout({ children }: MainLayoutProps) {
         <AppSidebar 
           lang={locale}
           dictionary={sidebarDictionary}
-          
           side={sidebarSide}
         />
         

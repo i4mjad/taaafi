@@ -29,12 +29,6 @@ export function LoginForm({
               <span className="sr-only">{dict.login.companyName}</span>
             </a>
             <h1 className="text-xl font-bold">{dict.login.welcome}</h1>
-            <div className="text-center text-sm">
-              {dict.login.noAccount}{" "}
-              <a href="#" className="underline underline-offset-4">
-                {dict.login.signUp}
-              </a>
-            </div>
           </div>
           <div className="flex flex-col gap-6">
             <div className="grid gap-3">
@@ -43,6 +37,13 @@ export function LoginForm({
                 id="email"
                 type="email"
                 placeholder={dict.login.emailPlaceholder}
+                required
+              />
+              <Label htmlFor="password">{dict.login.password}</Label>
+              <Input
+                id="password"
+                type="password"
+                placeholder={dict.login.passwordPlaceholder}
                 required
               />
             </div>
