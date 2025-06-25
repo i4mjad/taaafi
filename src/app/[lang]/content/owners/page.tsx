@@ -5,7 +5,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Switch } from '@/components/ui/switch';
 import {
   Table,
   TableBody,
@@ -56,6 +55,8 @@ export default function ContentOwnersPage() {
   const [selectedOwner, setSelectedOwner] = useState<ContentOwner | undefined>();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [ownerToDelete, setOwnerToDelete] = useState<ContentOwner | undefined>();
+  const [toggleDialogOpen, setToggleDialogOpen] = useState(false);
+  const [ownerToToggle, setOwnerToToggle] = useState<ContentOwner | undefined>();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Firestore queries
@@ -115,13 +116,17 @@ export default function ContentOwnersPage() {
     }
   };
 
-  const handleToggleActive = async (owner: ContentOwner) => {
+  const handleToggleActive = async () => {
+    if (!ownerToToggle) return;
+
     try {
-      await updateDoc(doc(db, 'contentOwners', owner.id), {
-        isActive: !owner.isActive,
+      await updateDoc(doc(db, 'contentOwners', ownerToToggle.id), {
+        isActive: !ownerToToggle.isActive,
         updatedAt: new Date(),
       });
       toast.success(t('content.owners.statusUpdateSuccess') || 'Status updated successfully');
+      setToggleDialogOpen(false);
+      setOwnerToToggle(undefined);
     } catch (error) {
       console.error('Error updating status:', error);
       toast.error(t('content.owners.statusUpdateError') || 'Failed to update status');
@@ -283,7 +288,6 @@ export default function ContentOwnersPage() {
                       <TableHead>{t('content.owners.nameAr') || 'Name (AR)'}</TableHead>
                       <TableHead>{t('content.owners.source') || 'Source'}</TableHead>
                       <TableHead>{t('common.status') || 'Status'}</TableHead>
-                      <TableHead>{t('common.active') || 'Active'}</TableHead>
                       <TableHead className="text-right">{t('common.actions') || 'Actions'}</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -296,12 +300,6 @@ export default function ContentOwnersPage() {
                         </TableCell>
                         <TableCell>{owner.ownerSource}</TableCell>
                         <TableCell>{getStatusBadge(owner.isActive)}</TableCell>
-                        <TableCell>
-                          <Switch
-                            checked={owner.isActive}
-                            onCheckedChange={() => handleToggleActive(owner)}
-                          />
-                        </TableCell>
                         <TableCell className="text-right">
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
@@ -318,6 +316,24 @@ export default function ContentOwnersPage() {
                               >
                                 <Edit className="h-4 w-4 mr-2" />
                                 {t('common.edit') || 'Edit'}
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={() => {
+                                  setOwnerToToggle(owner);
+                                  setToggleDialogOpen(true);
+                                }}
+                              >
+                                {owner.isActive ? (
+                                  <>
+                                    <EyeOff className="h-4 w-4 mr-2" />
+                                    {t('common.deactivate') || 'Deactivate'}
+                                  </>
+                                ) : (
+                                  <>
+                                    <Eye className="h-4 w-4 mr-2" />
+                                    {t('common.activate') || 'Activate'}
+                                  </>
+                                )}
                               </DropdownMenuItem>
                               <DropdownMenuSeparator />
                               <DropdownMenuItem
@@ -388,6 +404,37 @@ export default function ContentOwnersPage() {
             t={t}
             locale={locale}
           />
+        </DialogContent>
+      </Dialog>
+
+      {/* Toggle Status Dialog */}
+      <Dialog open={toggleDialogOpen} onOpenChange={setToggleDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              {ownerToToggle?.isActive 
+                ? (t('content.owners.deactivateTitle') || 'Deactivate Content Owner')
+                : (t('content.owners.activateTitle') || 'Activate Content Owner')
+              }
+            </DialogTitle>
+            <DialogDescription>
+              {ownerToToggle?.isActive
+                ? (t('content.owners.deactivateDescription') || 'Are you sure you want to deactivate this content owner? They will no longer be available for selection.')
+                : (t('content.owners.activateDescription') || 'Are you sure you want to activate this content owner? They will be available for selection.')
+              }
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setToggleDialogOpen(false)}>
+              {t('common.cancel') || 'Cancel'}
+            </Button>
+            <Button onClick={handleToggleActive}>
+              {ownerToToggle?.isActive 
+                ? (t('common.deactivate') || 'Deactivate')
+                : (t('common.activate') || 'Activate')
+              }
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
 

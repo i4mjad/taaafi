@@ -5,7 +5,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Switch } from '@/components/ui/switch';
 import {
   Table,
   TableBody,
@@ -22,6 +21,13 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { SiteHeader } from '@/components/site-header';
 import { useTranslation } from '@/contexts/TranslationContext';
 import { useCollection } from 'react-firebase-hooks/firestore';
@@ -29,11 +35,17 @@ import { collection, query, orderBy, addDoc, updateDoc, deleteDoc, doc } from 'f
 import { db } from '@/lib/firebase';
 import { ContentList, CreateContentListRequest, UpdateContentListRequest } from '@/types/content';
 import { toast } from 'sonner';
-import { List, Plus, Star, Eye, EyeOff } from 'lucide-react';
+import { List, Plus, Star, Eye, EyeOff, MoreHorizontal, Edit, Trash2 } from 'lucide-react';
 
 export default function ContentListsPage() {
   const { t, locale } = useTranslation();
   const [searchQuery, setSearchQuery] = useState('');
+  const [toggleActiveDialogOpen, setToggleActiveDialogOpen] = useState(false);
+  const [toggleFeaturedDialogOpen, setToggleFeaturedDialogOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [listToToggleActive, setListToToggleActive] = useState<ContentList | undefined>();
+  const [listToToggleFeatured, setListToToggleFeatured] = useState<ContentList | undefined>();
+  const [listToDelete, setListToDelete] = useState<ContentList | undefined>();
 
   // Firestore queries
   const [contentListsSnapshot, loading] = useCollection(
@@ -52,29 +64,51 @@ export default function ContentListsPage() {
     (list.listNameAr && list.listNameAr.toLowerCase().includes(searchQuery.toLowerCase()))
   );
 
-  const handleToggleActive = async (list: ContentList) => {
+  const handleToggleActive = async () => {
+    if (!listToToggleActive) return;
+
     try {
-      await updateDoc(doc(db, 'contentLists', list.id), {
-        isActive: !list.isActive,
+      await updateDoc(doc(db, 'contentLists', listToToggleActive.id), {
+        isActive: !listToToggleActive.isActive,
         updatedAt: new Date(),
       });
       toast.success(t('content.lists.statusUpdateSuccess') || 'Status updated successfully');
+      setToggleActiveDialogOpen(false);
+      setListToToggleActive(undefined);
     } catch (error) {
       console.error('Error updating status:', error);
       toast.error(t('content.lists.statusUpdateError') || 'Failed to update status');
     }
   };
 
-  const handleToggleFeatured = async (list: ContentList) => {
+  const handleToggleFeatured = async () => {
+    if (!listToToggleFeatured) return;
+
     try {
-      await updateDoc(doc(db, 'contentLists', list.id), {
-        isFeatured: !list.isFeatured,
+      await updateDoc(doc(db, 'contentLists', listToToggleFeatured.id), {
+        isFeatured: !listToToggleFeatured.isFeatured,
         updatedAt: new Date(),
       });
       toast.success(t('content.lists.statusUpdateSuccess') || 'Status updated successfully');
+      setToggleFeaturedDialogOpen(false);
+      setListToToggleFeatured(undefined);
     } catch (error) {
       console.error('Error updating featured status:', error);
       toast.error(t('content.lists.statusUpdateError') || 'Failed to update status');
+    }
+  };
+
+  const handleDeleteList = async () => {
+    if (!listToDelete) return;
+
+    try {
+      await deleteDoc(doc(db, 'contentLists', listToDelete.id));
+      toast.success(t('content.lists.deleteSuccess') || 'Content list deleted successfully');
+      setDeleteDialogOpen(false);
+      setListToDelete(undefined);
+    } catch (error) {
+      console.error('Error deleting content list:', error);
+      toast.error(t('content.lists.deleteError') || 'Failed to delete content list');
     }
   };
 
@@ -202,7 +236,7 @@ export default function ContentListsPage() {
                           <TableHead>{t('content.lists.contentCount') || 'Content Count'}</TableHead>
                           <TableHead>{t('common.status') || 'Status'}</TableHead>
                           <TableHead>{t('content.lists.featured') || 'Featured'}</TableHead>
-                          <TableHead>{t('common.active') || 'Active'}</TableHead>
+                          <TableHead className="text-right">{t('common.actions') || 'Actions'}</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
@@ -213,11 +247,67 @@ export default function ContentListsPage() {
                             <TableCell>{list.listContentIds?.length || 0}</TableCell>
                             <TableCell>{getStatusBadge(list.isActive)}</TableCell>
                             <TableCell>{getFeaturedBadge(list.isFeatured)}</TableCell>
-                            <TableCell>
-                              <Switch
-                                checked={list.isActive}
-                                onCheckedChange={() => handleToggleActive(list)}
-                              />
+                            <TableCell className="text-right">
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <Button variant="ghost" className="h-8 w-8 p-0">
+                                    <MoreHorizontal className="h-4 w-4" />
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                  <DropdownMenuItem>
+                                    <Edit className="h-4 w-4 mr-2" />
+                                    {t('common.edit') || 'Edit'}
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem
+                                    onClick={() => {
+                                      setListToToggleActive(list);
+                                      setToggleActiveDialogOpen(true);
+                                    }}
+                                  >
+                                    {list.isActive ? (
+                                      <>
+                                        <EyeOff className="h-4 w-4 mr-2" />
+                                        {t('common.deactivate') || 'Deactivate'}
+                                      </>
+                                    ) : (
+                                      <>
+                                        <Eye className="h-4 w-4 mr-2" />
+                                        {t('common.activate') || 'Activate'}
+                                      </>
+                                    )}
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem
+                                    onClick={() => {
+                                      setListToToggleFeatured(list);
+                                      setToggleFeaturedDialogOpen(true);
+                                    }}
+                                  >
+                                    {list.isFeatured ? (
+                                      <>
+                                        <Star className="h-4 w-4 mr-2" />
+                                        {t('content.lists.unfeatured') || 'Remove Featured'}
+                                      </>
+                                    ) : (
+                                      <>
+                                        <Star className="h-4 w-4 mr-2" />
+                                        {t('content.lists.makeFeatured') || 'Make Featured'}
+                                      </>
+                                    )}
+                                  </DropdownMenuItem>
+                                  <DropdownMenuSeparator />
+                                  <DropdownMenuItem
+                                    onClick={() => {
+                                      setListToDelete(list);
+                                      setDeleteDialogOpen(true);
+                                    }}
+                                    className="text-red-600"
+                                  >
+                                    <Trash2 className="h-4 w-4 mr-2" />
+                                    {t('common.delete') || 'Delete'}
+                                  </DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
                             </TableCell>
                           </TableRow>
                         ))}
@@ -239,6 +329,88 @@ export default function ContentListsPage() {
             </div>
           </div>
       </div>
+
+      {/* Toggle Active Dialog */}
+      <Dialog open={toggleActiveDialogOpen} onOpenChange={setToggleActiveDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              {listToToggleActive?.isActive 
+                ? (t('content.lists.deactivateTitle') || 'Deactivate Content List')
+                : (t('content.lists.activateTitle') || 'Activate Content List')
+              }
+            </DialogTitle>
+            <DialogDescription>
+              {listToToggleActive?.isActive
+                ? (t('content.lists.deactivateDescription') || 'Are you sure you want to deactivate this content list? It will no longer be visible to users.')
+                : (t('content.lists.activateDescription') || 'Are you sure you want to activate this content list? It will be visible to users.')
+              }
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setToggleActiveDialogOpen(false)}>
+              {t('common.cancel') || 'Cancel'}
+            </Button>
+            <Button onClick={handleToggleActive}>
+              {listToToggleActive?.isActive 
+                ? (t('common.deactivate') || 'Deactivate')
+                : (t('common.activate') || 'Activate')
+              }
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Toggle Featured Dialog */}
+      <Dialog open={toggleFeaturedDialogOpen} onOpenChange={setToggleFeaturedDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              {listToToggleFeatured?.isFeatured 
+                ? (t('content.lists.unfeaturedTitle') || 'Remove Featured Status')
+                : (t('content.lists.makeFeaturedTitle') || 'Make Content List Featured')
+              }
+            </DialogTitle>
+            <DialogDescription>
+              {listToToggleFeatured?.isFeatured
+                ? (t('content.lists.unfeaturedDescription') || 'Are you sure you want to remove the featured status from this content list?')
+                : (t('content.lists.makeFeaturedDescription') || 'Are you sure you want to make this content list featured? It will be highlighted to users.')
+              }
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setToggleFeaturedDialogOpen(false)}>
+              {t('common.cancel') || 'Cancel'}
+            </Button>
+            <Button onClick={handleToggleFeatured}>
+              {listToToggleFeatured?.isFeatured 
+                ? (t('content.lists.unfeatured') || 'Remove Featured')
+                : (t('content.lists.makeFeatured') || 'Make Featured')
+              }
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Dialog */}
+      <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t('content.lists.deleteTitle') || 'Delete Content List'}</DialogTitle>
+            <DialogDescription>
+              {t('content.lists.deleteDescription') || 'Are you sure you want to delete this content list? This action cannot be undone.'}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDeleteDialogOpen(false)}>
+              {t('common.cancel') || 'Cancel'}
+            </Button>
+            <Button variant="destructive" onClick={handleDeleteList}>
+              {t('common.delete') || 'Delete'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }

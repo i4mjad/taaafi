@@ -5,7 +5,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Switch } from '@/components/ui/switch';
 import {
   Table,
   TableBody,
@@ -56,6 +55,8 @@ export default function CategoriesPage() {
   const [selectedCategory, setSelectedCategory] = useState<Category | undefined>();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [categoryToDelete, setCategoryToDelete] = useState<Category | undefined>();
+  const [toggleDialogOpen, setToggleDialogOpen] = useState(false);
+  const [categoryToToggle, setCategoryToToggle] = useState<Category | undefined>();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Firestore queries
@@ -114,13 +115,17 @@ export default function CategoriesPage() {
     }
   };
 
-  const handleToggleActive = async (category: Category) => {
+  const handleToggleActive = async () => {
+    if (!categoryToToggle) return;
+
     try {
-      await updateDoc(doc(db, 'contentCategories', category.id), {
-        isActive: !category.isActive,
+      await updateDoc(doc(db, 'contentCategories', categoryToToggle.id), {
+        isActive: !categoryToToggle.isActive,
         updatedAt: new Date(),
       });
       toast.success(t('content.categories.statusUpdateSuccess') || 'Status updated successfully');
+      setToggleDialogOpen(false);
+      setCategoryToToggle(undefined);
     } catch (error) {
       console.error('Error updating status:', error);
       toast.error(t('content.categories.statusUpdateError') || 'Failed to update status');
@@ -282,7 +287,6 @@ export default function CategoriesPage() {
                           <TableHead>{t('content.categories.nameEn') || 'Name (EN)'}</TableHead>
                           <TableHead>{t('content.categories.nameAr') || 'Name (AR)'}</TableHead>
                           <TableHead>{t('common.status') || 'Status'}</TableHead>
-                          <TableHead>{t('common.active') || 'Active'}</TableHead>
                           <TableHead className="text-right">{t('common.actions') || 'Actions'}</TableHead>
                         </TableRow>
                       </TableHeader>
@@ -299,12 +303,6 @@ export default function CategoriesPage() {
                               {category.categoryNameAr || '-'}
                             </TableCell>
                             <TableCell>{getStatusBadge(category.isActive)}</TableCell>
-                            <TableCell>
-                              <Switch
-                                checked={category.isActive}
-                                onCheckedChange={() => handleToggleActive(category)}
-                              />
-                            </TableCell>
                             <TableCell className="text-right">
                               <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
@@ -321,6 +319,24 @@ export default function CategoriesPage() {
                                   >
                                     <Edit className="h-4 w-4 mr-2" />
                                     {t('common.edit') || 'Edit'}
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem
+                                    onClick={() => {
+                                      setCategoryToToggle(category);
+                                      setToggleDialogOpen(true);
+                                    }}
+                                  >
+                                    {category.isActive ? (
+                                      <>
+                                        <EyeOff className="h-4 w-4 mr-2" />
+                                        {t('common.deactivate') || 'Deactivate'}
+                                      </>
+                                    ) : (
+                                      <>
+                                        <Eye className="h-4 w-4 mr-2" />
+                                        {t('common.activate') || 'Activate'}
+                                      </>
+                                    )}
                                   </DropdownMenuItem>
                                   <DropdownMenuSeparator />
                                   <DropdownMenuItem
@@ -391,6 +407,37 @@ export default function CategoriesPage() {
             t={t}
             locale={locale}
           />
+        </DialogContent>
+      </Dialog>
+
+      {/* Toggle Status Dialog */}
+      <Dialog open={toggleDialogOpen} onOpenChange={setToggleDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              {categoryToToggle?.isActive 
+                ? (t('content.categories.deactivateTitle') || 'Deactivate Category')
+                : (t('content.categories.activateTitle') || 'Activate Category')
+              }
+            </DialogTitle>
+            <DialogDescription>
+              {categoryToToggle?.isActive
+                ? (t('content.categories.deactivateDescription') || 'Are you sure you want to deactivate this category? It will no longer be available for selection.')
+                : (t('content.categories.activateDescription') || 'Are you sure you want to activate this category? It will be available for selection.')
+              }
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setToggleDialogOpen(false)}>
+              {t('common.cancel') || 'Cancel'}
+            </Button>
+            <Button onClick={handleToggleActive}>
+              {categoryToToggle?.isActive 
+                ? (t('common.deactivate') || 'Deactivate')
+                : (t('common.activate') || 'Activate')
+              }
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
 

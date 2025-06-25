@@ -5,7 +5,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Switch } from '@/components/ui/switch';
 import {
   Table,
   TableBody,
@@ -56,6 +55,8 @@ export default function ContentTypesPage() {
   const [selectedType, setSelectedType] = useState<ContentType | undefined>();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [typeToDelete, setTypeToDelete] = useState<ContentType | undefined>();
+  const [toggleDialogOpen, setToggleDialogOpen] = useState(false);
+  const [typeToToggle, setTypeToToggle] = useState<ContentType | undefined>();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Firestore queries
@@ -114,13 +115,17 @@ export default function ContentTypesPage() {
     }
   };
 
-  const handleToggleActive = async (type: ContentType) => {
+  const handleToggleActive = async () => {
+    if (!typeToToggle) return;
+
     try {
-      await updateDoc(doc(db, 'contentTypes', type.id), {
-        isActive: !type.isActive,
+      await updateDoc(doc(db, 'contentTypes', typeToToggle.id), {
+        isActive: !typeToToggle.isActive,
         updatedAt: new Date(),
       });
       toast.success(t('content.types.statusUpdateSuccess') || 'Status updated successfully');
+      setToggleDialogOpen(false);
+      setTypeToToggle(undefined);
     } catch (error) {
       console.error('Error updating status:', error);
       toast.error(t('content.types.statusUpdateError') || 'Failed to update status');
@@ -280,7 +285,6 @@ export default function ContentTypesPage() {
                         <TableHead>{t('content.types.nameEn') || 'Name (EN)'}</TableHead>
                         <TableHead>{t('content.types.nameAr') || 'Name (AR)'}</TableHead>
                         <TableHead>{t('common.status') || 'Status'}</TableHead>
-                        <TableHead>{t('common.active') || 'Active'}</TableHead>
                         <TableHead className="text-right">{t('common.actions') || 'Actions'}</TableHead>
                       </TableRow>
                     </TableHeader>
@@ -288,21 +292,13 @@ export default function ContentTypesPage() {
                       {filteredContentTypes.map((type) => (
                         <TableRow key={type.id}>
                           <TableCell>
-                            <div className="w-8 h-8 bg-muted rounded flex items-center justify-center">
                               {type.contentTypeIconName}
-                            </div>
                           </TableCell>
                           <TableCell className="font-medium">{type.contentTypeName}</TableCell>
                           <TableCell className="text-muted-foreground">
                             {type.contentTypeNameAr || '-'}
                           </TableCell>
                           <TableCell>{getStatusBadge(type.isActive)}</TableCell>
-                          <TableCell>
-                            <Switch
-                              checked={type.isActive}
-                              onCheckedChange={() => handleToggleActive(type)}
-                            />
-                          </TableCell>
                           <TableCell className="text-right">
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>
@@ -319,6 +315,24 @@ export default function ContentTypesPage() {
                                 >
                                   <Edit className="h-4 w-4 mr-2" />
                                   {t('common.edit') || 'Edit'}
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  onClick={() => {
+                                    setTypeToToggle(type);
+                                    setToggleDialogOpen(true);
+                                  }}
+                                >
+                                  {type.isActive ? (
+                                    <>
+                                      <EyeOff className="h-4 w-4 mr-2" />
+                                      {t('common.deactivate') || 'Deactivate'}
+                                    </>
+                                  ) : (
+                                    <>
+                                      <Eye className="h-4 w-4 mr-2" />
+                                      {t('common.activate') || 'Activate'}
+                                    </>
+                                  )}
                                 </DropdownMenuItem>
                                 <DropdownMenuSeparator />
                                 <DropdownMenuItem
@@ -389,6 +403,37 @@ export default function ContentTypesPage() {
             t={t}
             locale={locale}
           />
+        </DialogContent>
+      </Dialog>
+
+      {/* Toggle Status Dialog */}
+      <Dialog open={toggleDialogOpen} onOpenChange={setToggleDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              {typeToToggle?.isActive 
+                ? (t('content.types.deactivateTitle') || 'Deactivate Content Type')
+                : (t('content.types.activateTitle') || 'Activate Content Type')
+              }
+            </DialogTitle>
+            <DialogDescription>
+              {typeToToggle?.isActive
+                ? (t('content.types.deactivateDescription') || 'Are you sure you want to deactivate this content type? It will no longer be available for selection.')
+                : (t('content.types.activateDescription') || 'Are you sure you want to activate this content type? It will be available for selection.')
+              }
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setToggleDialogOpen(false)}>
+              {t('common.cancel') || 'Cancel'}
+            </Button>
+            <Button onClick={handleToggleActive}>
+              {typeToToggle?.isActive 
+                ? (t('common.deactivate') || 'Deactivate')
+                : (t('common.activate') || 'Activate')
+              }
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
 
