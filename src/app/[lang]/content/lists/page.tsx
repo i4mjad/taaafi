@@ -31,15 +31,19 @@ import {
 import { SiteHeader } from '@/components/site-header';
 import { useTranslation } from '@/contexts/TranslationContext';
 import { useCollection } from 'react-firebase-hooks/firestore';
-import { collection, query, orderBy, addDoc, updateDoc, deleteDoc, doc } from 'firebase/firestore';
+import { collection, query, orderBy, addDoc, updateDoc, deleteDoc, doc, where } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
-import { ContentList, CreateContentListRequest, UpdateContentListRequest } from '@/types/content';
+import { ContentList, CreateContentListRequest, UpdateContentListRequest, Content } from '@/types/content';
 import { toast } from 'sonner';
 import { List, Plus, Star, Eye, EyeOff, MoreHorizontal, Edit, Trash2 } from 'lucide-react';
+import ContentListForm from './components/ContentListForm';
 
 export default function ContentListsPage() {
   const { t, locale } = useTranslation();
   const [searchQuery, setSearchQuery] = useState('');
+  const [showForm, setShowForm] = useState(false);
+  const [selectedList, setSelectedList] = useState<ContentList | undefined>();
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [toggleActiveDialogOpen, setToggleActiveDialogOpen] = useState(false);
   const [toggleFeaturedDialogOpen, setToggleFeaturedDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -52,17 +56,87 @@ export default function ContentListsPage() {
     query(collection(db, 'contentLists'), orderBy('listName'))
   );
 
+  const [contentItemsSnapshot] = useCollection(
+    query(collection(db, 'content'), where('isDeleted', '==', false), where('isActive', '==', true))
+  );
+
   const contentLists = contentListsSnapshot?.docs.map(doc => ({
-    id: doc.id,
     ...doc.data(),
+    id: doc.id, // Ensure document ID is set after spreading doc.data()
     createdAt: doc.data().createdAt?.toDate(),
     updatedAt: doc.data().updatedAt?.toDate(),
   })) as ContentList[] || [];
+
+  const contentItems = contentItemsSnapshot?.docs.map(doc => ({
+    ...doc.data(),
+    id: doc.id, // Ensure document ID is set after spreading doc.data()
+    createdAt: doc.data().createdAt?.toDate(),
+    updatedAt: doc.data().updatedAt?.toDate(),
+  })) as Content[] || [];
 
   const filteredContentLists = contentLists.filter(list =>
     list.listName.toLowerCase().includes(searchQuery.toLowerCase()) ||
     (list.listNameAr && list.listNameAr.toLowerCase().includes(searchQuery.toLowerCase()))
   );
+
+  const handleSubmitList = async (data: CreateContentListRequest | UpdateContentListRequest) => {
+    setIsSubmitting(true);
+    
+    // Store the list ID in a local variable to prevent it from being lost
+    const listId = selectedList?.id;
+    const isUpdate = !!selectedList && !!listId;
+    
+    try {
+      // Filter out undefined values to prevent Firebase errors
+      const cleanData = Object.fromEntries(
+        Object.entries(data).filter(([_, value]) => value !== undefined)
+      );
+      
+      if (isUpdate) {
+        // Validate that we have a valid ID
+        if (!listId || typeof listId !== 'string') {
+          throw new Error(`Invalid list ID: ${listId}`);
+        }
+        
+        // Update existing list
+        await updateDoc(doc(db, 'contentLists', listId), {
+          ...cleanData,
+          updatedAt: new Date(),
+        });
+        toast.success(t('content.lists.updateSuccess') || 'Content list updated successfully');
+      } else {
+        // Create new list
+        await addDoc(collection(db, 'contentLists'), {
+          ...cleanData,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        });
+        toast.success(t('content.lists.createSuccess') || 'Content list created successfully');
+      }
+      
+      setShowForm(false);
+      setSelectedList(undefined);
+    } catch (error) {
+      console.error('Error submitting content list:', error);
+      toast.error(
+        isUpdate
+          ? (t('content.lists.updateError') || 'Failed to update content list')
+          : (t('content.lists.createError') || 'Failed to create content list')
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleCancel = () => {
+    setShowForm(false);
+    setSelectedList(undefined);
+  };
+
+  const handleEditList = (list: ContentList) => {
+    setSelectedList(list);
+    setShowForm(true);
+  };
 
   const handleToggleActive = async () => {
     if (!listToToggleActive) return;
@@ -160,7 +234,7 @@ export default function ContentListsPage() {
                 {t('content.lists.description') || 'Create and manage curated content collections'}
               </p>
             </div>
-            <Button>
+            <Button onClick={() => setShowForm(true)}>
               <Plus className="h-4 w-4 mr-2" />
               {t('content.lists.create') || 'Create List'}
             </Button>
@@ -255,7 +329,7 @@ export default function ContentListsPage() {
                                   </Button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end">
-                                  <DropdownMenuItem>
+                                  <DropdownMenuItem onClick={() => handleEditList(list)}>
                                     <Edit className="h-4 w-4 mr-2" />
                                     {t('common.edit') || 'Edit'}
                                   </DropdownMenuItem>
@@ -409,6 +483,35 @@ export default function ContentListsPage() {
               {t('common.delete') || 'Delete'}
             </Button>
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Content List Form Dialog */}
+      <Dialog open={showForm} onOpenChange={setShowForm}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>
+              {selectedList
+                ? (t('content.lists.editList') || 'Edit Content List')
+                : (t('content.lists.createList') || 'Create Content List')
+              }
+            </DialogTitle>
+            <DialogDescription>
+              {selectedList
+                ? (t('content.lists.editDescription') || 'Update the content list details below.')
+                : (t('content.lists.createDescription') || 'Fill out the form below to create a new content list.')
+              }
+            </DialogDescription>
+          </DialogHeader>
+          <ContentListForm
+            contentList={selectedList}
+            onSubmit={handleSubmitList}
+            onCancel={handleCancel}
+            isLoading={isSubmitting}
+            t={t}
+            locale={locale}
+            contentItems={contentItems}
+          />
         </DialogContent>
       </Dialog>
     </>
