@@ -236,7 +236,7 @@ export default function ContentListsPage() {
                           <TableHead>{t('content.lists.contentCount') || 'Content Count'}</TableHead>
                           <TableHead>{t('common.status') || 'Status'}</TableHead>
                           <TableHead>{t('content.lists.featured') || 'Featured'}</TableHead>
-                          <TableHead className="text-right">{t('common.actions') || 'Actions'}</TableHead>
+                          <TableHead className="text-end">{t('common.actions') || 'Actions'}</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
@@ -247,7 +247,7 @@ export default function ContentListsPage() {
                             <TableCell>{list.listContentIds?.length || 0}</TableCell>
                             <TableCell>{getStatusBadge(list.isActive)}</TableCell>
                             <TableCell>{getFeaturedBadge(list.isFeatured)}</TableCell>
-                            <TableCell className="text-right">
+                            <TableCell className="text-end">
                               <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
                                   <Button variant="ghost" className="h-8 w-8 p-0">

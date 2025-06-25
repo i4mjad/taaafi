@@ -287,7 +287,7 @@ export default function CategoriesPage() {
                           <TableHead>{t('content.categories.nameEn') || 'Name (EN)'}</TableHead>
                           <TableHead>{t('content.categories.nameAr') || 'Name (AR)'}</TableHead>
                           <TableHead>{t('common.status') || 'Status'}</TableHead>
-                          <TableHead className="text-right">{t('common.actions') || 'Actions'}</TableHead>
+                          <TableHead className="text-end">{t('common.actions') || 'Actions'}</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
@@ -303,7 +303,7 @@ export default function CategoriesPage() {
                               {category.categoryNameAr || '-'}
                             </TableCell>
                             <TableCell>{getStatusBadge(category.isActive)}</TableCell>
-                            <TableCell className="text-right">
+                            <TableCell className="text-end">
                               <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
                                   <Button variant="ghost" className="h-8 w-8 p-0">

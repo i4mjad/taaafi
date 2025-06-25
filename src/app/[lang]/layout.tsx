@@ -4,6 +4,7 @@ import "../globals.css"
 import { Toaster } from "../../components/ui/sonner"
 import { i18n, Locale } from "../../../i18n.config"
 import { ThemeProvider } from "next-themes"
+import { DirectionWrapper } from "@/components/direction-provider"
 import UpdateHtmlAttributes from "@/components/update-html-attributes"
 import { AuthProvider } from '@/auth/AuthProvider';
 import AuthGuard from '@/components/auth-guard';
@@ -47,18 +48,20 @@ export default async function RootLayout({
   const dictionary = await getDictionary(lang);
 
   return (
-    <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
-      <AuthProvider>
-        <TranslationProvider locale={lang} initialDictionary={dictionary}>
-          <UpdateHtmlAttributes lang={lang} />
-          <AuthGuard>
-            <MainLayout>
-              {children}
-            </MainLayout>
-            <Toaster />
-          </AuthGuard>
-        </TranslationProvider>
-      </AuthProvider>
-    </ThemeProvider>
+    <DirectionWrapper locale={lang}>
+      <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+        <AuthProvider>
+          <TranslationProvider locale={lang} initialDictionary={dictionary}>
+            <UpdateHtmlAttributes lang={lang} />
+            <AuthGuard>
+              <MainLayout>
+                {children}
+              </MainLayout>
+              <Toaster />
+            </AuthGuard>
+          </TranslationProvider>
+        </AuthProvider>
+      </ThemeProvider>
+    </DirectionWrapper>
   )
 }

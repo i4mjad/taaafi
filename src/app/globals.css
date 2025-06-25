@@ -162,3 +162,23 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* RTL-specific styles for better Arabic layout */
+[dir="rtl"] {
+  /* Fix dropdown menu alignment in RTL */
+  .dropdown-menu-content {
+    direction: rtl;
+  }
+  
+  /* Better spacing for badges with icons in RTL */
+  [dir="rtl"] .badge .lucide {
+    margin-left: 0.25rem;
+    margin-right: 0;
+  }
+  
+  /* Fix button icon spacing in RTL */
+  [dir="rtl"] button .lucide:first-child {
+    margin-left: 0.5rem;
+    margin-right: 0;
+  }
+}
