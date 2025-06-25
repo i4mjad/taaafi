@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
-import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/core/utils/icon_mapper.dart';
+import 'package:reboot_app_3/core/utils/localization_helper.dart';
 import 'package:reboot_app_3/core/utils/url_launcher_provider.dart';
 import 'package:reboot_app_3/features/vault/data/library/models/cursor_content.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -44,7 +44,7 @@ class ContentItem extends ConsumerWidget {
             ),
           ),
         ],
-        padding: EdgeInsets.fromLTRB(16, 8, 16, 8),
+        padding: EdgeInsets.fromLTRB(16, 12, 16, 12),
         child: Row(
           children: [
             Icon(
@@ -63,7 +63,7 @@ class ContentItem extends ConsumerWidget {
                 ),
                 verticalSpace(Spacing.points4),
                 Text(
-                  '${AppLocalizations.of(context).translate(content.type.name)} • ${AppLocalizations.of(context).translate(content.category.name)} • ${content.owner.name}',
+                  '${LocalizationHelper.getLocalizedName(context, content.type.name, content.type.nameAr)} • ${LocalizationHelper.getLocalizedName(context, content.category.name, content.category.nameAr)} • ${LocalizationHelper.getLocalizedName(context, content.owner.name, content.owner.nameAr)}',
                   style: TextStyles.small.copyWith(
                     color: theme.grey[700],
                   ),

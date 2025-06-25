@@ -19,6 +19,7 @@ class LibraryRepository {
       return CursorContentType(
         id: doc.id,
         name: data['contentTypeName'] as String,
+        nameAr: data['contentTypeNameAr'] as String?,
         iconName: data['contentTypeIconName'] as String,
         isActive: data['isActive'] as bool,
       );
@@ -34,6 +35,7 @@ class LibraryRepository {
       return CursorContentOwner(
         id: doc.id,
         name: data['ownerName'] as String,
+        nameAr: data['ownerNameAr'] as String?,
         source: data['ownerSource'] as String,
         isActive: data['isActive'] as bool,
       );
@@ -49,6 +51,7 @@ class LibraryRepository {
       return CursorContentCategory(
         id: doc.id,
         name: data['categoryName'] as String,
+        nameAr: data['categoryNameAr'] as String?,
         iconName: data['contentCategoryIconName'] as String,
         isActive: data['isActive'] as bool,
       );
@@ -83,6 +86,7 @@ class LibraryRepository {
         language: data['contentLanguage'] as String,
         link: data['contentLink'] as String,
         name: data['contentName'] as String,
+        nameAr: data['contentNameAr'] as String?,
         owner: _mapDocumentToOwner(ownerDoc),
         type: _mapDocumentToType(typeDoc),
         createdAt: (data['createdAt'] as Timestamp).toDate(),
@@ -117,7 +121,9 @@ class LibraryRepository {
         contents:
             contents.where((content) => content.isDeleted == false).toList(),
         description: data['listDescription'] as String,
+        descriptionAr: data['listDescriptionAr'] as String?,
         name: data['listName'] as String,
+        nameAr: data['listNameAr'] as String?,
       );
     } catch (e, stackTrace) {
       ref.read(errorLoggerProvider).logException(e, stackTrace);
@@ -207,6 +213,22 @@ class LibraryRepository {
     }
   }
 
+  Future<CursorContentType> getContentTypeById(String typeId) async {
+    try {
+      final docSnapshot =
+          await _firestore.collection('contentTypes').doc(typeId).get();
+
+      if (!docSnapshot.exists) {
+        throw Exception('Content type not found');
+      }
+
+      return _mapDocumentToType(docSnapshot);
+    } catch (e, stackTrace) {
+      ref.read(errorLoggerProvider).logException(e, stackTrace);
+      rethrow;
+    }
+  }
+
   Future<List<CursorContent>> getContentByType(String typeId) async {
     try {
       final querySnapshot = await _firestore
@@ -248,14 +270,18 @@ class LibraryRepository {
           await Future.wait(listsSnapshot.docs.map(_mapDocumentToList));
 
       final filteredContents = contents
-          .where(
-              (content) => content.name.toLowerCase().contains(lowercaseText))
+          .where((content) =>
+              content.name.toLowerCase().contains(lowercaseText) ||
+              (content.nameAr?.toLowerCase().contains(lowercaseText) ?? false))
           .toList();
 
       final filteredLists = lists
           .where((list) =>
               list.name.toLowerCase().contains(lowercaseText) ||
-              list.description.toLowerCase().contains(lowercaseText))
+              (list.nameAr?.toLowerCase().contains(lowercaseText) ?? false) ||
+              list.description.toLowerCase().contains(lowercaseText) ||
+              (list.descriptionAr?.toLowerCase().contains(lowercaseText) ??
+                  false))
           .toList();
 
       return (filteredContents, filteredLists);

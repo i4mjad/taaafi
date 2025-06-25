@@ -6,15 +6,16 @@ import 'package:reboot_app_3/core/shared_widgets/custom_textfield.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
+import 'package:reboot_app_3/core/utils/localization_helper.dart';
 import 'package:reboot_app_3/features/vault/application/library/library_notifier.dart';
 import 'package:reboot_app_3/features/vault/data/library/models/cursor_content.dart';
+import 'package:reboot_app_3/features/vault/data/library/models/cursor_content_type.dart';
 import 'package:reboot_app_3/features/vault/presentation/library/content_item_widget.dart';
 
 class ContentTypeScreen extends ConsumerStatefulWidget {
-  const ContentTypeScreen(this.typeId, this.typeName, {super.key});
+  const ContentTypeScreen(this.typeId, {super.key});
 
   final String typeId;
-  final String typeName;
   @override
   ConsumerState<ConsumerStatefulWidget> createState() =>
       _ContentTypeScreenState();
@@ -27,21 +28,32 @@ class _ContentTypeScreenState extends ConsumerState<ContentTypeScreen> {
 
   List<CursorContent> content = [];
   List<CursorContent> filteredData = [];
+  CursorContentType? contentType;
 
   @override
   void initState() {
     super.initState();
-    _loadContent();
+    _loadData();
 
     searchController.addListener(_onSearchChanged);
   }
 
-  Future<void> _loadContent() async {
+  Future<void> _loadData() async {
     try {
-      final contentList = await ref
-          .read(libraryNotifierProvider.notifier)
-          .getContentByType(widget.typeId);
+      final results = await Future.wait([
+        ref
+            .read(libraryNotifierProvider.notifier)
+            .getContentTypeById(widget.typeId),
+        ref
+            .read(libraryNotifierProvider.notifier)
+            .getContentByType(widget.typeId),
+      ]);
+
+      final fetchedContentType = results[0] as CursorContentType;
+      final contentList = results[1] as List<CursorContent>;
+
       setState(() {
+        contentType = fetchedContentType;
         content = contentList;
         filteredData = contentList;
         _isLoading = false;
@@ -58,7 +70,9 @@ class _ContentTypeScreenState extends ConsumerState<ContentTypeScreen> {
     setState(() {
       String searchQuery = searchController.text.toLowerCase();
       filteredData = content
-          .where((item) => item.name.toLowerCase().contains(searchQuery))
+          .where((item) =>
+              item.name.toLowerCase().contains(searchQuery) ||
+              (item.nameAr?.toLowerCase().contains(searchQuery) ?? false))
           .toList();
     });
   }
@@ -77,7 +91,15 @@ class _ContentTypeScreenState extends ConsumerState<ContentTypeScreen> {
 
     return Scaffold(
       backgroundColor: theme.backgroundColor,
-      appBar: appBar(context, ref, widget.typeName, false, true),
+      appBar: appBar(
+          context,
+          ref,
+          contentType != null
+              ? LocalizationHelper.getLocalizedName(
+                  context, contentType!.name, contentType!.nameAr)
+              : '',
+          false,
+          true),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16),

@@ -55,6 +55,15 @@ class LibraryService {
     }
   }
 
+  /// Gets a content type by ID
+  Future<CursorContentType> getContentTypeById(String typeId) async {
+    try {
+      return await _repository.getContentTypeById(typeId);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   /// Gets content for a specific type
   Future<List<CursorContent>> getContentByType(String typeId) async {
     try {

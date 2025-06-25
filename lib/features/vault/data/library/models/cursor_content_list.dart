@@ -7,7 +7,9 @@ class CursorContentList {
   final bool isFeatured;
   final List<CursorContent> contents;
   final String description;
+  final String? descriptionAr;
   final String name;
+  final String? nameAr;
 
   const CursorContentList({
     required this.id,
@@ -16,6 +18,8 @@ class CursorContentList {
     required this.isFeatured,
     required this.contents,
     required this.description,
+    this.descriptionAr,
     required this.name,
+    this.nameAr,
   });
 }

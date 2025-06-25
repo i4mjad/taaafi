@@ -37,7 +37,7 @@ final libraryRepositoryProvider =
 );
 
 typedef LibraryRepositoryRef = AutoDisposeProviderRef<LibraryRepository>;
-String _$libraryNotifierHash() => r'299a67bf0281e5ad67177a82236d8cf1f4f8c9c3';
+String _$libraryNotifierHash() => r'ab85ccefc38ec64850ab32cf86e6929b28b30af4';
 
 /// See also [LibraryNotifier].
 @ProviderFor(LibraryNotifier)

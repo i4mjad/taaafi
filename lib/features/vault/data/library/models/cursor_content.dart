@@ -8,6 +8,7 @@ class CursorContent {
   final String language;
   final String link;
   final String name;
+  final String? nameAr;
   final CursorContentOwner owner;
   final CursorContentType type;
   final DateTime createdAt;
@@ -21,6 +22,7 @@ class CursorContent {
     required this.language,
     required this.link,
     required this.name,
+    this.nameAr,
     required this.owner,
     required this.type,
     required this.createdAt,

@@ -42,6 +42,11 @@ class LibraryNotifier extends _$LibraryNotifier {
     return await _service.getContentByType(typeId);
   }
 
+  /// Fetches a content type by ID
+  Future<CursorContentType> getContentTypeById(String typeId) async {
+    return await _service.getContentTypeById(typeId);
+  }
+
   /// Fetches all content lists
   Future<List<CursorContentList>> getAllLists() async {
     return await _service.getAllLists();

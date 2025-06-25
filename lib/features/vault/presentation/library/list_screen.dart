@@ -6,6 +6,7 @@ import 'package:reboot_app_3/core/shared_widgets/container.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
+import 'package:reboot_app_3/core/utils/localization_helper.dart';
 import 'package:reboot_app_3/features/vault/application/library/library_notifier.dart';
 import 'package:reboot_app_3/features/vault/data/library/models/cursor_content_list.dart';
 import 'package:reboot_app_3/features/vault/presentation/library/content_item_widget.dart';
@@ -52,7 +53,15 @@ class _ListScreenState extends ConsumerState<ListScreen> {
 
     return Scaffold(
       backgroundColor: theme.backgroundColor,
-      appBar: plainAppBar(context, ref, listDetails?.name ?? '', false, true),
+      appBar: plainAppBar(
+          context,
+          ref,
+          listDetails != null
+              ? LocalizationHelper.getLocalizedName(
+                  context, listDetails!.name, listDetails!.nameAr)
+              : '',
+          false,
+          true),
       body: _isLoading
           ? Center(
               child: Column(
@@ -105,8 +114,14 @@ class _ListScreenState extends ConsumerState<ListScreen> {
                         ],
                         width: width,
                         child: Text(
-                          listDetails?.description ?? '',
+                          listDetails != null
+                              ? LocalizationHelper.getLocalizedName(
+                                  context,
+                                  listDetails!.description,
+                                  listDetails!.descriptionAr)
+                              : '',
                           style: TextStyles.small.copyWith(
+                            height: 1.4,
                             color: theme.grey[900],
                           ),
                         ),

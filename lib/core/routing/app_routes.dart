@@ -343,13 +343,12 @@ GoRouter goRouter(GoRouterRef ref) {
                         ),
                       ),
                       GoRoute(
-                        path: "contentType/:typeId/:typeName",
+                        path: "contentType/:typeId",
                         name: RouteNames.contentType.name,
                         pageBuilder: (context, state) => MaterialPage(
                           name: RouteNames.contentType.name,
                           child: ContentTypeScreen(
                             state.pathParameters["typeId"]!,
-                            state.pathParameters["typeName"]!,
                           ),
                         ),
                       )
