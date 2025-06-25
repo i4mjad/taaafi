@@ -91,7 +91,7 @@ export default function ContentItemsPage() {
 
   return (
     <>
-      <SiteHeader dictionary={{ documents: t('siteHeader.documents') || 'Documents' }} />
+      <SiteHeader dictionary={{ documents: t('content.items.title') || 'Content Items' }} />
       <div className="h-full flex flex-col">
           <div className="flex items-center justify-between px-6 py-4 border-b bg-background">
             <div>

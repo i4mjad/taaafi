@@ -8,7 +8,7 @@ export default function ContentRoute() {
   const { t, locale } = useTranslation();
 
   const headerDictionary = {
-    documents: t('siteHeader.documents') || 'Documents',
+    documents: t('appSidebar.content') || 'Content',
   };
   
   return (

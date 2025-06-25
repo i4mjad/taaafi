@@ -169,7 +169,7 @@ export default function ContentOwnersPage() {
 
 
   const headerDictionary = {
-    documents: t('siteHeader.documents') || 'Documents',
+    documents: t('content.owners.title') || 'Content Owners',
   };
 
   return (

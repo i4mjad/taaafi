@@ -168,7 +168,7 @@ export default function CategoriesPage() {
 
 
   const headerDictionary = {
-    documents: t('siteHeader.documents') || 'Documents',
+    documents: t('content.categories.title') || 'Categories',
   };
 
   return (

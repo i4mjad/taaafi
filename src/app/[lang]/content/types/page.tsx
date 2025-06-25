@@ -166,7 +166,7 @@ export default function ContentTypesPage() {
   };
 
   const headerDictionary = {
-    documents: t('siteHeader.documents') || 'Documents',
+    documents: t('content.types.title') || 'Content Types',
   };
 
   return (
