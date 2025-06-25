@@ -1,11 +1,8 @@
-import { AppSidebar } from "@/components/app-sidebar"
 import { ChartAreaInteractive } from "@/components/chart-area-interactive"
 import { DataTable } from "@/components/data-table"
 import { SectionCards } from "@/components/section-cards"
 import { SiteHeader } from "@/components/site-header"
-import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
 import { Locale } from "../../../../i18n.config"
-// import { getDictionary } from "../../dictionaries"
 import rawData from "./data.json" // Keep original data loading
 import { getDictionary } from "./dictionaries"
 
@@ -26,22 +23,19 @@ export default async function Page({ params }: { params: Promise<{ lang: Locale 
   }))
 
   return (
-    <SidebarProvider>
-      <AppSidebar variant="inset" lang={lang} dictionary={dictionary.appSidebar}  />
-      <SidebarInset>
-        <SiteHeader dictionary={dictionary.siteHeader} />
-        <div className="flex flex-1 flex-col">
-          <div className="@container/main flex flex-1 flex-col gap-2">
-            <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
-              <SectionCards dictionary={dictionary.sectionCards} />
-              <div className="px-4 lg:px-6">
-                <ChartAreaInteractive dictionary={dictionary.chartAreaInteractive} />
-              </div>
-              <DataTable data={data} dictionary={dictionary.dataTable} lang={lang} />
+    <>
+      <SiteHeader dictionary={dictionary.siteHeader} />
+      <div className="flex flex-1 flex-col">
+        <div className="@container/main flex flex-1 flex-col gap-2">
+          <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
+            <SectionCards dictionary={dictionary.sectionCards} />
+            <div className="px-4 lg:px-6">
+              <ChartAreaInteractive dictionary={dictionary.chartAreaInteractive} />
             </div>
+            <DataTable data={data} dictionary={dictionary.dataTable} lang={lang} />
           </div>
         </div>
-      </SidebarInset>
-    </SidebarProvider>
+      </div>
+    </>
   )
 }

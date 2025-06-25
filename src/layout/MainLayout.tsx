@@ -20,26 +20,7 @@ export function MainLayout({ children }: MainLayoutProps) {
   // Check if we're on a public route (login page)
   const isLoginPage = pathname.includes('/login');
 
-  if (loading) {
-    return (
-      <div className="flex h-screen">
-        <div className="w-64 border-r">
-          <Skeleton className="h-full w-full" />
-        </div>
-        <div className="flex-1 p-8">
-          <div className="space-y-4">
-            <Skeleton className="h-8 w-1/3" />
-            <Skeleton className="h-4 w-2/3" />
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-              {[...Array(4)].map((_, i) => (
-                <Skeleton key={i} className="h-32" />
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  // Don't show full loading layout, handle loading in content area instead
 
   // If user is not authenticated and NOT on login page, show access denied
   if (!user && !isLoginPage) {
@@ -58,7 +39,7 @@ export function MainLayout({ children }: MainLayoutProps) {
   // If we're on the login page, render without sidebar
   if (isLoginPage) {
     return (
-      <div className={`min-h-screen ${locale === 'ar' ? 'rtl' : 'ltr'}`}>
+      <div className={`font-sans min-h-screen ${locale === 'ar' ? 'rtl' : 'ltr'}`}>
         {children}
       </div>
     );
@@ -66,47 +47,47 @@ export function MainLayout({ children }: MainLayoutProps) {
 
   // Create dictionary object for the existing AppSidebar
   const sidebarDictionary = {
-    appName: t('sidebar.taafiPlatform') || 'Ta\'aafi Platform Admin Panel',
-    taafiPlatform: t('sidebar.taafiPlatform') || 'Ta\'aafi Platform',
-    quickCreate: t('sidebar.quickCreate') || 'Quick Create',
-    inbox: t('common.inbox') || 'Inbox',
-    dashboard: t('sidebar.dashboard') || 'Dashboard',
-    userManagement: t('sidebar.userManagement') || 'User Management',
-    users: t('modules.userManagement.users') || 'Users',
-    roles: t('common.roles') || 'Roles',
-    permissions: t('common.permissions') || 'Permissions',
-    community: t('sidebar.community') || 'Community',
-    forum: t('sidebar.forum') || 'Forum',
-    groups: t('sidebar.groups') || 'Groups',
-    directMessages: t('sidebar.directMessages') || 'Direct Messages',
-    reports: t('common.reports') || 'Reports',
-    content: t('sidebar.content') || 'Content',
-    contentTypes: t('sidebar.contentTypes') || 'Content Types',
-    contentOwners: t('sidebar.contentOwners') || 'Content Owners',
-    categories: t('sidebar.categories') || 'Categories',
-    contentLists: t('sidebar.contentLists') || 'Content Lists',
-    features: t('sidebar.features') || 'Features',
-    settings: t('sidebar.settings') || 'Settings',
-    getHelp: t('common.help') || 'Get Help',
-    search: t('common.search') || 'Search',
+    appName: t('appSidebar.appName') || 'Ta\'aafi Platform Admin Panel',
+    taafiPlatform: t('appSidebar.taafiPlatform') || 'Ta\'aafi Platform',
+    quickCreate: t('appSidebar.quickCreate') || 'Quick Create',
+    inbox: t('appSidebar.inbox') || 'Inbox',
+    dashboard: t('appSidebar.dashboard') || 'Dashboard',
+    userManagement: t('appSidebar.userManagement') || 'User Management',
+    users: t('appSidebar.users') || 'Users',
+    roles: t('appSidebar.roles') || 'Roles',
+    permissions: t('appSidebar.permissions') || 'Permissions',
+    community: t('appSidebar.community') || 'Community',
+    forum: t('appSidebar.forum') || 'Forum',
+    groups: t('appSidebar.groups') || 'Groups',
+    directMessages: t('appSidebar.directMessages') || 'Direct Messages',
+    reports: t('appSidebar.reports') || 'Reports',
+    content: t('appSidebar.content') || 'Content',
+    contentTypes: t('appSidebar.contentTypes') || 'Content Types',
+    contentOwners: t('appSidebar.contentOwners') || 'Content Owners',
+    categories: t('appSidebar.categories') || 'Categories',
+    contentLists: t('appSidebar.contentLists') || 'Content Lists',
+    features: t('appSidebar.features') || 'Features',
+    settings: t('appSidebar.settings') || 'Settings',
+    getHelp: t('appSidebar.getHelp') || 'Get Help',
+    search: t('appSidebar.search') || 'Search',
     // Legacy properties for compatibility
-    lifecycle: t('sidebar.userManagement') || 'User Management',
-    analytics: t('sidebar.features') || 'Features',
-    projects: t('sidebar.community') || 'Community',
-    team: t('sidebar.content') || 'Content',
-    documents: t('sidebar.content') || 'Documents',
-    dataLibrary: t('sidebar.contentTypes') || 'Data Library',
-    wordAssistant: t('sidebar.categories') || 'Word Assistant',
-    more: t('sidebar.features') || 'More',
+    lifecycle: t('appSidebar.userManagement') || 'User Management',
+    analytics: t('appSidebar.features') || 'Features',
+    projects: t('appSidebar.community') || 'Community',
+    team: t('appSidebar.content') || 'Content',
+    documents: t('appSidebar.documents') || 'Documents',
+    dataLibrary: t('appSidebar.dataLibrary') || 'Data Library',
+    wordAssistant: t('appSidebar.wordAssistant') || 'Word Assistant',
+    more: t('appSidebar.more') || 'More',
     userMenu: {
-      account: t('common.account') || 'Account',
-      billing: t('common.billing') || 'Billing',
-      notifications: t('common.notifications') || 'Notifications',
-      logOut: t('auth.signOut') || 'Log out',
+      account: t('appSidebar.userMenu.account') || 'Account',
+      billing: t('appSidebar.userMenu.billing') || 'Billing',
+      notifications: t('appSidebar.userMenu.notifications') || 'Notifications',
+      logOut: t('appSidebar.userMenu.logOut') || 'Log out',
     },
     localeSwitcher: {
-      english: t('sidebar.localeSwitcher.english') || 'English',
-      arabic: t('sidebar.localeSwitcher.arabic') || 'Arabic',
+      english: t('appSidebar.localeSwitcher.english') || 'English',
+      arabic: t('appSidebar.localeSwitcher.arabic') || 'Arabic',
     },
   };
 
@@ -116,7 +97,7 @@ export function MainLayout({ children }: MainLayoutProps) {
   // Normal authenticated layout with single sidebar
   return (
     <SidebarProvider>
-      <div className={`flex h-screen w-full ${locale === 'ar' ? 'rtl' : 'ltr'}`}>
+      <div className={`font-sans flex h-screen w-full ${locale === 'ar' ? 'rtl' : 'ltr'}`}>
         {/* Single sidebar that changes position based on locale */}
         <AppSidebar 
           lang={locale}
@@ -127,7 +108,26 @@ export function MainLayout({ children }: MainLayoutProps) {
         {/* Main content area - takes remaining space */}
         <SidebarInset className="flex-1 min-w-0">
           <main className="h-full w-full overflow-auto">
-            {children}
+            {loading ? (
+              <div className="p-8">
+                <div className="space-y-4">
+                  <Skeleton className="h-8 w-1/3" />
+                  <Skeleton className="h-4 w-2/3" />
+                  <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                    {[...Array(4)].map((_, i) => (
+                      <Skeleton key={i} className="h-32" />
+                    ))}
+                  </div>
+                  <div className="space-y-3 mt-8">
+                    {[...Array(5)].map((_, i) => (
+                      <Skeleton key={i} className="h-16 w-full" />
+                    ))}
+                  </div>
+                </div>
+              </div>
+            ) : (
+              children
+            )}
           </main>
         </SidebarInset>
       </div>

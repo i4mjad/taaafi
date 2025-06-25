@@ -9,6 +9,7 @@ import { AuthProvider } from '@/auth/AuthProvider';
 import AuthGuard from '@/components/auth-guard';
 import { TranslationProvider } from '@/contexts/TranslationContext';
 import { getDictionary } from '@/lib/dictionary';
+import { MainLayout } from '@/layout/MainLayout';
 
 export async function generateStaticParams() {
   return i18n.locales.map((locale) => ({ lang: locale }))
@@ -51,10 +52,10 @@ export default async function RootLayout({
         <TranslationProvider locale={lang} initialDictionary={dictionary}>
           <UpdateHtmlAttributes lang={lang} />
           <AuthGuard>
-            <div className="font-sans" dir={lang === "ar" ? "rtl" : "ltr"}>
+            <MainLayout>
               {children}
-              <Toaster />
-            </div>
+            </MainLayout>
+            <Toaster />
           </AuthGuard>
         </TranslationProvider>
       </AuthProvider>

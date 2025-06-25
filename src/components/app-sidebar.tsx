@@ -36,13 +36,56 @@ import {
   SidebarSeparator,
 } from "@/components/ui/sidebar"
 
-import type { Dictionary } from "@/app/[lang]/dashboard/page" // Assuming Dictionary type is exported from page
 import { Locale } from "../../i18n.config"
 import { useAuth } from '@/auth/AuthProvider'
 
+interface SidebarDictionary {
+  appName: string;
+  taafiPlatform: string;
+  quickCreate: string;
+  inbox: string;
+  dashboard: string;
+  userManagement: string;
+  users: string;
+  roles: string;
+  permissions: string;
+  community: string;
+  forum: string;
+  groups: string;
+  directMessages: string;
+  reports: string;
+  content: string;
+  contentTypes: string;
+  contentOwners: string;
+  categories: string;
+  contentLists: string;
+  features: string;
+  settings: string;
+  getHelp: string;
+  search: string;
+  lifecycle: string;
+  analytics: string;
+  projects: string;
+  team: string;
+  documents: string;
+  dataLibrary: string;
+  wordAssistant: string;
+  more: string;
+  userMenu: {
+    account: string;
+    billing: string;
+    notifications: string;
+    logOut: string;
+  };
+  localeSwitcher: {
+    english: string;
+    arabic: string;
+  };
+}
+
 interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
   lang: Locale
-  dictionary: Dictionary["appSidebar"]
+  dictionary: SidebarDictionary
 }
 
 export function AppSidebar({ lang, dictionary, ...props }: AppSidebarProps) {

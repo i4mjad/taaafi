@@ -40,12 +40,10 @@ import {
   Eye,
   EyeOff,
 } from 'lucide-react';
-import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar';
-import { AppSidebar } from '@/components/app-sidebar';
 import { SiteHeader } from '@/components/site-header';
 import { useTranslation } from '@/contexts/TranslationContext';
 import { useCollection } from 'react-firebase-hooks/firestore';
-import { collection, query, orderBy, addDoc, updateDoc, deleteDoc, doc, where } from 'firebase/firestore';
+import { collection, query, orderBy, addDoc, updateDoc, deleteDoc, doc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { ContentType, CreateContentTypeRequest, UpdateContentTypeRequest } from '@/types/content';
 import ContentTypeForm from './components/ContentTypeForm';
@@ -167,243 +165,195 @@ export default function ContentTypesPage() {
     inactive: contentTypes.filter(type => !type.isActive).length,
   };
 
-  // Create sidebar dictionary
-  const sidebarDictionary = {
-    appName: t('appSidebar.appName') || 'Ta\'aafi Platform Admin Panel',
-    taafiPlatform: t('appSidebar.taafiPlatform') || 'Ta\'aafi Platform',
-    quickCreate: t('appSidebar.quickCreate') || 'Quick Create',
-    inbox: t('appSidebar.inbox') || 'Inbox',
-    dashboard: t('appSidebar.dashboard') || 'Dashboard',
-    userManagement: t('appSidebar.userManagement') || 'User Management',
-    users: t('appSidebar.users') || 'Users',
-    roles: t('appSidebar.roles') || 'Roles',
-    permissions: t('appSidebar.permissions') || 'Permissions',
-    community: t('appSidebar.community') || 'Community',
-    forum: t('appSidebar.forum') || 'Forum',
-    groups: t('appSidebar.groups') || 'Groups',
-    directMessages: t('appSidebar.directMessages') || 'Direct Messages',
-    reports: t('appSidebar.reports') || 'Reports',
-    content: t('appSidebar.content') || 'Content',
-    contentTypes: t('appSidebar.contentTypes') || 'Content Types',
-    contentOwners: t('appSidebar.contentOwners') || 'Content Owners',
-    categories: t('appSidebar.categories') || 'Categories',
-    contentLists: t('appSidebar.contentLists') || 'Content Lists',
-    features: t('appSidebar.features') || 'Features',
-    lifecycle: t('appSidebar.lifecycle') || 'Lifecycle',
-    analytics: t('appSidebar.analytics') || 'Analytics',
-    projects: t('appSidebar.projects') || 'Projects',
-    team: t('appSidebar.team') || 'Team',
-    documents: t('appSidebar.documents') || 'Documents',
-    dataLibrary: t('appSidebar.dataLibrary') || 'Data Library',
-    wordAssistant: t('appSidebar.wordAssistant') || 'Word Assistant',
-    more: t('appSidebar.more') || 'More',
-    settings: t('appSidebar.settings') || 'Settings',
-    getHelp: t('appSidebar.getHelp') || 'Get Help',
-    search: t('appSidebar.search') || 'Search',
-    userMenu: {
-      account: t('appSidebar.userMenu.account') || 'Account',
-      billing: t('appSidebar.userMenu.billing') || 'Billing',
-      notifications: t('appSidebar.userMenu.notifications') || 'Notifications',
-      logOut: t('appSidebar.userMenu.logOut') || 'Log out',
-    },
-    localeSwitcher: {
-      english: t('appSidebar.localeSwitcher.english') || 'English',
-      arabic: t('appSidebar.localeSwitcher.arabic') || 'Arabic',
-    },
-  };
-
   const headerDictionary = {
     documents: t('siteHeader.documents') || 'Documents',
   };
 
   return (
-    <SidebarProvider>
-      <AppSidebar variant="inset" lang={locale} dictionary={sidebarDictionary} />
-      <SidebarInset>
-        <SiteHeader dictionary={headerDictionary} />
-        <div className="h-full flex flex-col">
-          {/* Header */}
-          <div className="flex items-center justify-between px-6 py-4 border-b bg-background">
-            <div>
-              <h1 className="text-3xl font-bold tracking-tight">
-                {t('content.types.title') || 'Content Types'}
-              </h1>
-              <p className="text-muted-foreground">
-                {t('content.types.description') || 'Manage different types of content (articles, videos, resources)'}
-              </p>
+    <>
+      <SiteHeader dictionary={headerDictionary} />
+      <div className="h-full flex flex-col">
+        {/* Header */}
+        <div className="flex items-center justify-between px-6 py-4 border-b bg-background">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">
+              {t('content.types.title') || 'Content Types'}
+            </h1>
+            <p className="text-muted-foreground">
+              {t('content.types.description') || 'Manage different types of content (articles, videos, resources)'}
+            </p>
+          </div>
+          <Button onClick={() => setShowForm(true)}>
+            <Plus className="h-4 w-4 mr-2" />
+            {t('content.types.create') || 'Create Type'}
+          </Button>
+        </div>
+
+        {/* Content area */}
+        <div className="flex-1 overflow-auto">
+          <div className="p-6 space-y-6 max-w-none">
+            {/* Stats Cards */}
+            <div className="grid gap-4 md:grid-cols-3">
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">
+                    {t('content.types.totalTypes') || 'Total Types'}
+                  </CardTitle>
+                  <FileText className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{stats.total}</div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">
+                    {t('content.types.activeTypes') || 'Active Types'}
+                  </CardTitle>
+                  <Eye className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-green-600">{stats.active}</div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">
+                    {t('content.types.inactiveTypes') || 'Inactive Types'}
+                  </CardTitle>
+                  <EyeOff className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-gray-600">{stats.inactive}</div>
+                </CardContent>
+              </Card>
             </div>
-            <Button onClick={() => setShowForm(true)}>
-              <Plus className="h-4 w-4 mr-2" />
-              {t('content.types.create') || 'Create Type'}
-            </Button>
-          </div>
 
-          {/* Content area */}
-          <div className="flex-1 overflow-auto">
-            <div className="p-6 space-y-6 max-w-none">
-          {/* Stats Cards */}
-          <div className="grid gap-4 md:grid-cols-3">
+            {/* Search */}
             <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
-                  {t('content.types.totalTypes') || 'Total Types'}
-                </CardTitle>
-                <FileText className="h-4 w-4 text-muted-foreground" />
+              <CardHeader>
+                <CardTitle>{t('common.search') || 'Search'}</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{stats.total}</div>
+                <div className="flex gap-4">
+                  <div className="flex-1">
+                    <Input
+                      placeholder={t('content.types.searchPlaceholder') || 'Search content types...'}
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                    />
+                  </div>
+                  <Button variant="outline">
+                    <Search className="h-4 w-4 mr-2" />
+                    {t('common.search') || 'Search'}
+                  </Button>
+                </div>
               </CardContent>
             </Card>
 
+            {/* Content Types Table */}
             <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
-                  {t('content.types.activeTypes') || 'Active Types'}
-                </CardTitle>
-                <Eye className="h-4 w-4 text-muted-foreground" />
+              <CardHeader>
+                <CardTitle>{t('content.types.list') || 'Content Types'}</CardTitle>
+                <CardDescription>
+                  {t('content.types.listDescription') || 'Manage and organize content types'}
+                </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-green-600">{stats.active}</div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
-                  {t('content.types.inactiveTypes') || 'Inactive Types'}
-                </CardTitle>
-                <EyeOff className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-gray-600">{stats.inactive}</div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Search */}
-          <Card>
-            <CardHeader>
-              <CardTitle>{t('common.search') || 'Search'}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex gap-4">
-                <div className="flex-1">
-                  <Input
-                    placeholder={t('content.types.searchPlaceholder') || 'Search content types...'}
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                  />
-                </div>
-                <Button variant="outline">
-                  <Search className="h-4 w-4 mr-2" />
-                  {t('common.search') || 'Search'}
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Content Types Table */}
-          <Card>
-            <CardHeader>
-              <CardTitle>{t('content.types.list') || 'Content Types'}</CardTitle>
-              <CardDescription>
-                {t('content.types.listDescription') || 'Manage and organize content types'}
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {loading ? (
-                <div className="space-y-3">
-                  {[...Array(5)].map((_, i) => (
-                    <Skeleton key={i} className="h-16 w-full" />
-                  ))}
-                </div>
-              ) : error ? (
-                <div className="text-center py-8 text-red-600">
-                  <p>{t('common.error') || 'Error loading data'}</p>
-                </div>
-              ) : (
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>{t('content.types.icon') || 'Icon'}</TableHead>
-                      <TableHead>{t('content.types.nameEn') || 'Name (EN)'}</TableHead>
-                      <TableHead>{t('content.types.nameAr') || 'Name (AR)'}</TableHead>
-                      <TableHead>{t('common.status') || 'Status'}</TableHead>
-                      <TableHead>{t('common.active') || 'Active'}</TableHead>
-                      <TableHead className="text-right">{t('common.actions') || 'Actions'}</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {filteredContentTypes.map((type) => (
-                      <TableRow key={type.id}>
-                        <TableCell>
-                          <div className="w-8 h-8 bg-muted rounded flex items-center justify-center">
-                          {type.contentTypeIconName}
-                          </div>
-                        </TableCell>
-                        <TableCell className="font-medium">{type.contentTypeName}</TableCell>
-                        <TableCell className="text-muted-foreground">
-                          {type.contentTypeNameAr || '-'}
-                        </TableCell>
-                        <TableCell>{getStatusBadge(type.isActive)}</TableCell>
-                        <TableCell>
-                          <Switch
-                            checked={type.isActive}
-                            onCheckedChange={() => handleToggleActive(type)}
-                          />
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" className="h-8 w-8 p-0">
-                                <MoreHorizontal className="h-4 w-4" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              <DropdownMenuItem
-                                onClick={() => {
-                                  setSelectedType(type);
-                                  setShowForm(true);
-                                }}
-                              >
-                                <Edit className="h-4 w-4 mr-2" />
-                                {t('common.edit') || 'Edit'}
-                              </DropdownMenuItem>
-                              <DropdownMenuSeparator />
-                              <DropdownMenuItem
-                                onClick={() => {
-                                  setTypeToDelete(type);
-                                  setDeleteDialogOpen(true);
-                                }}
-                                className="text-red-600"
-                              >
-                                <Trash2 className="h-4 w-4 mr-2" />
-                                {t('common.delete') || 'Delete'}
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </TableCell>
-                      </TableRow>
+                {loading ? (
+                  <div className="space-y-3">
+                    {[...Array(5)].map((_, i) => (
+                      <Skeleton key={i} className="h-16 w-full" />
                     ))}
-                  </TableBody>
-                </Table>
-              )}
+                  </div>
+                ) : error ? (
+                  <div className="text-center py-8 text-red-600">
+                    <p>{t('common.error') || 'Error loading data'}</p>
+                  </div>
+                ) : (
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>{t('content.types.icon') || 'Icon'}</TableHead>
+                        <TableHead>{t('content.types.nameEn') || 'Name (EN)'}</TableHead>
+                        <TableHead>{t('content.types.nameAr') || 'Name (AR)'}</TableHead>
+                        <TableHead>{t('common.status') || 'Status'}</TableHead>
+                        <TableHead>{t('common.active') || 'Active'}</TableHead>
+                        <TableHead className="text-right">{t('common.actions') || 'Actions'}</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {filteredContentTypes.map((type) => (
+                        <TableRow key={type.id}>
+                          <TableCell>
+                            <div className="w-8 h-8 bg-muted rounded flex items-center justify-center">
+                              {type.contentTypeIconName}
+                            </div>
+                          </TableCell>
+                          <TableCell className="font-medium">{type.contentTypeName}</TableCell>
+                          <TableCell className="text-muted-foreground">
+                            {type.contentTypeNameAr || '-'}
+                          </TableCell>
+                          <TableCell>{getStatusBadge(type.isActive)}</TableCell>
+                          <TableCell>
+                            <Switch
+                              checked={type.isActive}
+                              onCheckedChange={() => handleToggleActive(type)}
+                            />
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" className="h-8 w-8 p-0">
+                                  <MoreHorizontal className="h-4 w-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuItem
+                                  onClick={() => {
+                                    setSelectedType(type);
+                                    setShowForm(true);
+                                  }}
+                                >
+                                  <Edit className="h-4 w-4 mr-2" />
+                                  {t('common.edit') || 'Edit'}
+                                </DropdownMenuItem>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem
+                                  onClick={() => {
+                                    setTypeToDelete(type);
+                                    setDeleteDialogOpen(true);
+                                  }}
+                                  className="text-red-600"
+                                >
+                                  <Trash2 className="h-4 w-4 mr-2" />
+                                  {t('common.delete') || 'Delete'}
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                )}
 
-              {!loading && filteredContentTypes.length === 0 && (
-                <div className="text-center py-8">
-                  <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                  <p className="text-lg font-medium">{t('common.noData') || 'No data'}</p>
-                  <p className="text-muted-foreground">
-                    {t('content.types.noTypesFound') || 'No content types found'}
-                  </p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-            </div>
+                {!loading && filteredContentTypes.length === 0 && (
+                  <div className="text-center py-8">
+                    <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                    <p className="text-lg font-medium">{t('common.noData') || 'No data'}</p>
+                    <p className="text-muted-foreground">
+                      {t('content.types.noTypesFound') || 'No content types found'}
+                    </p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
           </div>
         </div>
-      </SidebarInset>
+      </div>
 
       {/* Form Dialog */}
       <Dialog open={showForm} onOpenChange={(open: boolean) => {
@@ -425,20 +375,20 @@ export default function ContentTypesPage() {
               }
             </DialogDescription>
           </DialogHeader>
-                     <ContentTypeForm
-             contentType={selectedType}
-             onSubmit={selectedType 
-               ? (data) => handleUpdateType(data as UpdateContentTypeRequest)
-               : (data) => handleCreateType(data as CreateContentTypeRequest)
-             }
-             onCancel={() => {
-               setShowForm(false);
-               setSelectedType(undefined);
-             }}
-             isLoading={isSubmitting}
-             t={t}
-             locale={locale}
-           />
+          <ContentTypeForm
+            contentType={selectedType}
+            onSubmit={selectedType 
+              ? (data) => handleUpdateType(data as UpdateContentTypeRequest)
+              : (data) => handleCreateType(data as CreateContentTypeRequest)
+            }
+            onCancel={() => {
+              setShowForm(false);
+              setSelectedType(undefined);
+            }}
+            isLoading={isSubmitting}
+            t={t}
+            locale={locale}
+          />
         </DialogContent>
       </Dialog>
 
@@ -461,6 +411,6 @@ export default function ContentTypesPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </SidebarProvider>
+    </>
   );
 } 
