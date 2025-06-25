@@ -78,16 +78,16 @@ export default function ContentOwnerForm({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      {/* English Name */}
+      {/* Name */}
       <div className="space-y-2">
         <Label htmlFor="nameEn">
-          {t('content.owners.nameEn') || 'Name (English)'} *
+          {t('content.owners.name') || 'Name'} *
         </Label>
         <Input
           id="nameEn"
           value={formData.ownerName}
           onChange={(e) => handleInputChange('ownerName', e.target.value)}
-          placeholder={t('content.owners.nameEnPlaceholder') || 'Enter owner name in English'}
+          placeholder={t('content.owners.namePlaceholder') || 'Enter owner name'}
           className={errors.ownerName ? 'border-red-500' : ''}
         />
         {errors.ownerName && (

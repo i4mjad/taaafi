@@ -130,16 +130,16 @@ export default function ContentListForm({
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          {/* English Name */}
+          {/* Name */}
           <div className="space-y-2">
             <Label htmlFor="nameEn">
-              {t('content.lists.nameEn') || 'Name (English)'} *
+              {t('content.lists.name') || 'Name'} *
             </Label>
             <Input
               id="nameEn"
               value={formData.listName}
               onChange={(e) => handleInputChange('listName', e.target.value)}
-              placeholder={t('content.lists.nameEnPlaceholder') || 'Enter list name in English'}
+              placeholder={t('content.lists.namePlaceholder') || 'Enter list name'}
               className={errors.listName ? 'border-red-500' : ''}
             />
             {errors.listName && (
@@ -161,16 +161,16 @@ export default function ContentListForm({
             />
           </div>
 
-          {/* English Description */}
+          {/* Description */}
           <div className="space-y-2">
             <Label htmlFor="descriptionEn">
-              {t('content.lists.descriptionEn') || 'Description (English)'} *
+              {t('content.lists.description') || 'Description'} *
             </Label>
             <textarea
               id="descriptionEn"
               value={formData.listDescription}
               onChange={(e) => handleInputChange('listDescription', e.target.value)}
-              placeholder={t('content.lists.descriptionEnPlaceholder') || 'Enter list description in English'}
+              placeholder={t('content.lists.descriptionPlaceholder') || 'Enter list description'}
               className={`flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 ${errors.listDescription ? 'border-red-500' : ''}`}
               rows={3}
             />

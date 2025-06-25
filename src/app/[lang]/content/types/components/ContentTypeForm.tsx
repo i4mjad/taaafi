@@ -98,16 +98,16 @@ export default function ContentTypeForm({
         </p>
       </div>
 
-      {/* English Name */}
+      {/* Name */}
       <div className="space-y-2">
         <Label htmlFor="nameEn">
-          {t('content.types.nameEn') || 'Name (English)'} *
+          {t('content.types.name') || 'Name'} *
         </Label>
         <Input
           id="nameEn"
           value={formData.contentTypeName}
           onChange={(e) => handleInputChange('contentTypeName', e.target.value)}
-          placeholder={t('content.types.nameEnPlaceholder') || 'Enter content type name in English'}
+          placeholder={t('content.types.namePlaceholder') || 'Enter content type name'}
           className={errors.contentTypeName ? 'border-red-500' : ''}
         />
         {errors.contentTypeName && (

@@ -98,16 +98,16 @@ export default function CategoryForm({
         </p>
       </div>
 
-      {/* English Name */}
+      {/* Name */}
       <div className="space-y-2">
         <Label htmlFor="nameEn">
-          {t('content.categories.nameEn') || 'Name (English)'} *
+          {t('content.categories.name') || 'Name'} *
         </Label>
         <Input
           id="nameEn"
           value={formData.categoryName}
           onChange={(e) => handleInputChange('categoryName', e.target.value)}
-          placeholder={t('content.categories.nameEnPlaceholder') || 'Enter category name in English'}
+          placeholder={t('content.categories.namePlaceholder') || 'Enter category name'}
           className={errors.categoryName ? 'border-red-500' : ''}
         />
         {errors.categoryName && (

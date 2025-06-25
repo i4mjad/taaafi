@@ -305,8 +305,8 @@ export default function ContentListsPage() {
                     <Table>
                       <TableHeader>
                         <TableRow>
-                          <TableHead>{t('content.lists.nameEn') || 'Name (EN)'}</TableHead>
-                          <TableHead>{t('content.lists.nameAr') || 'Name (AR)'}</TableHead>
+                          <TableHead>{t('content.lists.name') || 'Name'}</TableHead>
+                          <TableHead>{t('content.lists.nameAr') || 'Name (Arabic)'}</TableHead>
                           <TableHead>{t('content.lists.contentCount') || 'Content Count'}</TableHead>
                           <TableHead>{t('common.status') || 'Status'}</TableHead>
                           <TableHead>{t('content.lists.featured') || 'Featured'}</TableHead>

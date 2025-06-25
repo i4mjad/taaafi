@@ -282,8 +282,8 @@ export default function ContentTypesPage() {
                     <TableHeader>
                       <TableRow>
                         <TableHead>{t('content.types.icon') || 'Icon'}</TableHead>
-                        <TableHead>{t('content.types.nameEn') || 'Name (EN)'}</TableHead>
-                        <TableHead>{t('content.types.nameAr') || 'Name (AR)'}</TableHead>
+                        <TableHead>{t('content.types.name') || 'Name'}</TableHead>
+                        <TableHead>{t('content.types.nameAr') || 'Name (Arabic)'}</TableHead>
                         <TableHead>{t('common.status') || 'Status'}</TableHead>
                         <TableHead className="text-end">{t('common.actions') || 'Actions'}</TableHead>
                       </TableRow>

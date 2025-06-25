@@ -130,16 +130,16 @@ export default function ContentForm({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      {/* English Name */}
+      {/* Name */}
       <div className="space-y-2">
         <Label htmlFor="nameEn">
-          {t('content.items.nameEn') || 'Name (English)'} *
+          {t('content.items.name') || 'Name'} *
         </Label>
         <Input
           id="nameEn"
           value={formData.contentName}
           onChange={(e) => handleInputChange('contentName', e.target.value)}
-          placeholder={t('content.items.nameEnPlaceholder') || 'Enter content name in English'}
+          placeholder={t('content.items.namePlaceholder') || 'Enter content name'}
           className={errors.contentName ? 'border-red-500' : ''}
         />
         {errors.contentName && (

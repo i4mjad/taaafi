@@ -284,8 +284,8 @@ export default function ContentOwnersPage() {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>{t('content.owners.nameEn') || 'Name (EN)'}</TableHead>
-                      <TableHead>{t('content.owners.nameAr') || 'Name (AR)'}</TableHead>
+                      <TableHead>{t('content.owners.name') || 'Name'}</TableHead>
+                      <TableHead>{t('content.owners.nameAr') || 'Name (Arabic)'}</TableHead>
                       <TableHead>{t('content.owners.source') || 'Source'}</TableHead>
                       <TableHead>{t('common.status') || 'Status'}</TableHead>
                                                 <TableHead className="text-end">{t('common.actions') || 'Actions'}</TableHead>

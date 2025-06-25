@@ -284,8 +284,8 @@ export default function CategoriesPage() {
                       <TableHeader>
                         <TableRow>
                           <TableHead>{t('content.categories.icon') || 'Icon'}</TableHead>
-                          <TableHead>{t('content.categories.nameEn') || 'Name (EN)'}</TableHead>
-                          <TableHead>{t('content.categories.nameAr') || 'Name (AR)'}</TableHead>
+                          <TableHead>{t('content.categories.name') || 'Name'}</TableHead>
+                          <TableHead>{t('content.categories.nameAr') || 'Name (Arabic)'}</TableHead>
                           <TableHead>{t('common.status') || 'Status'}</TableHead>
                           <TableHead className="text-end">{t('common.actions') || 'Actions'}</TableHead>
                         </TableRow>

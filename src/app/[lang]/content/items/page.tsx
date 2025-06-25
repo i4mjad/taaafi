@@ -206,8 +206,8 @@ export default function ContentItemsPage() {
                     <Table>
                       <TableHeader>
                         <TableRow>
-                          <TableHead>{t('content.items.nameEn') || 'Name (EN)'}</TableHead>
-                          <TableHead>{t('content.items.nameAr') || 'Name (AR)'}</TableHead>
+                          <TableHead>{t('content.items.name') || 'Name'}</TableHead>
+                          <TableHead>{t('content.items.nameAr') || 'Name (Arabic)'}</TableHead>
                           <TableHead>{t('content.items.type') || 'Type'}</TableHead>
                           <TableHead>{t('content.items.link') || 'Link'}</TableHead>
                           <TableHead className="text-end">{t('common.actions') || 'Actions'}</TableHead>
