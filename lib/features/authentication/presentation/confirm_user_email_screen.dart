@@ -20,6 +20,7 @@ import 'package:reboot_app_3/features/authentication/providers/user_document_pro
 import 'package:reboot_app_3/features/authentication/application/auth_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:async';
+import 'package:flutter/services.dart';
 
 class ConfirmUserEmailScreen extends ConsumerStatefulWidget {
   const ConfirmUserEmailScreen({super.key});
@@ -459,6 +460,11 @@ class _ConfirmUserEmailScreenState
                           ],
                         ),
                       ),
+
+                      verticalSpace(Spacing.points24),
+
+                      // User ID container at the bottom
+                      const UserIdContainer(),
                     ],
                   ),
                 ),
@@ -830,6 +836,124 @@ class _ChangeEmailBottomSheetState
             ),
           ),
           verticalSpace(Spacing.points16),
+        ],
+      ),
+    );
+  }
+}
+
+// Add the new UserIdContainer widget before the main screen class
+class UserIdContainer extends StatelessWidget {
+  const UserIdContainer({super.key});
+
+  // TODO: Replace with proper localization in next release
+  String _getUserIdLabel(String locale) {
+    return locale == 'ar' ? 'معرف المستخدم' : 'User ID';
+  }
+
+  // TODO: Replace with proper localization in next release
+  String _getCopiedMessage(String locale) {
+    return locale == 'ar'
+        ? 'تم نسخ معرف المستخدم'
+        : 'User ID copied to clipboard';
+  }
+
+  Future<void> _copyUserIdToClipboard(BuildContext context) async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      await Clipboard.setData(ClipboardData(text: user.uid));
+      if (context.mounted) {
+        final locale = Localizations.localeOf(context).languageCode;
+        final message = _getCopiedMessage(locale);
+
+        // TODO: Replace with proper snackbar localization in next release
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(message),
+            backgroundColor: AppTheme.of(context).success[600],
+            behavior: SnackBarBehavior.floating,
+            duration: const Duration(seconds: 2),
+          ),
+        );
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = AppTheme.of(context);
+    final user = FirebaseAuth.instance.currentUser;
+    final locale = Localizations.localeOf(context).languageCode;
+
+    if (user == null) return const SizedBox.shrink();
+
+    return WidgetsContainer(
+      backgroundColor: theme.grey[50],
+      borderSide: BorderSide(
+        color: theme.grey[300]!,
+        width: 1,
+      ),
+      width: double.infinity,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                LucideIcons.user,
+                color: theme.grey[600],
+                size: 16,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                _getUserIdLabel(
+                    locale), // TODO: Replace with proper localization in next release
+                style: TextStyles.small.copyWith(
+                  color: theme.grey[600],
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: theme.grey[100],
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: theme.grey[200]!, width: 1),
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    user.uid,
+                    style: TextStyles.small.copyWith(
+                      color: theme.grey[800],
+                      fontFamily: 'monospace',
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                GestureDetector(
+                  onTap: () => _copyUserIdToClipboard(context),
+                  child: Container(
+                    padding: const EdgeInsets.all(6),
+                    decoration: BoxDecoration(
+                      color: theme.primary[100],
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Icon(
+                      LucideIcons.copy,
+                      color: theme.primary[600],
+                      size: 16,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
         ],
       ),
     );
