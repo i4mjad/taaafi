@@ -21,6 +21,7 @@ import 'package:reboot_app_3/features/authentication/application/auth_service.da
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:async';
 import 'package:flutter/services.dart';
+import 'package:reboot_app_3/core/utils/url_launcher_provider.dart';
 
 class ConfirmUserEmailScreen extends ConsumerStatefulWidget {
   const ConfirmUserEmailScreen({super.key});
@@ -394,6 +395,7 @@ class _ConfirmUserEmailScreenState
 
                       verticalSpace(Spacing.points16),
 
+                      // User ID container and WhatsApp contact
                       // Change email button
                       GestureDetector(
                         onTap: _showChangeEmailBottomSheet,
@@ -427,44 +429,11 @@ class _ConfirmUserEmailScreenState
                         ),
                       ),
 
-                      verticalSpace(Spacing.points32),
+                      verticalSpace(Spacing.points16),
 
-                      // Info text
-                      Container(
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: theme.primary[50],
-                          borderRadius: BorderRadius.circular(8),
-                          border:
-                              Border.all(color: theme.primary[200]!, width: 1),
-                        ),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Icon(
-                              LucideIcons.info,
-                              color: theme.primary[600],
-                              size: 16,
-                            ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: Text(
-                                AppLocalizations.of(context)
-                                    .translate('email-verification-info'),
-                                style: TextStyles.small.copyWith(
-                                  color: theme.primary[800],
-                                  height: 1.4,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-
-                      verticalSpace(Spacing.points24),
-
-                      // User ID container at the bottom
                       const UserIdContainer(),
+
+                      verticalSpace(Spacing.points32),
                     ],
                   ),
                 ),
@@ -843,7 +812,7 @@ class _ChangeEmailBottomSheetState
 }
 
 // Add the new UserIdContainer widget before the main screen class
-class UserIdContainer extends StatelessWidget {
+class UserIdContainer extends ConsumerWidget {
   const UserIdContainer({super.key});
 
   // TODO: Replace with proper localization in next release
@@ -856,6 +825,13 @@ class UserIdContainer extends StatelessWidget {
     return locale == 'ar'
         ? 'تم نسخ معرف المستخدم'
         : 'User ID copied to clipboard';
+  }
+
+  // TODO: Replace with proper localization in next release
+  String _getWhatsAppErrorMessage(String locale) {
+    return locale == 'ar'
+        ? 'لا يمكن فتح الواتساب'
+        : 'Could not launch WhatsApp';
   }
 
   Future<void> _copyUserIdToClipboard(BuildContext context) async {
@@ -879,8 +855,33 @@ class UserIdContainer extends StatelessWidget {
     }
   }
 
+  Future<void> _launchWhatsApp(BuildContext context, WidgetRef ref) async {
+    const phoneNumber = '96877451200';
+    final whatsappUrl = Uri.parse('https://wa.me/$phoneNumber');
+    final urlLauncher = ref.read(urlLauncherProvider);
+
+    try {
+      await urlLauncher.launch(whatsappUrl);
+    } on UrlLauncherException catch (e) {
+      if (context.mounted) {
+        final locale = Localizations.localeOf(context).languageCode;
+        final message = _getWhatsAppErrorMessage(locale);
+
+        // TODO: Replace with proper snackbar localization in next release
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(message),
+            backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating,
+            duration: const Duration(seconds: 2),
+          ),
+        );
+      }
+    }
+  }
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = AppTheme.of(context);
     final user = FirebaseAuth.instance.currentUser;
     final locale = Localizations.localeOf(context).languageCode;
@@ -897,6 +898,7 @@ class UserIdContainer extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // User ID Section
           Row(
             children: [
               Icon(
@@ -952,6 +954,69 @@ class UserIdContainer extends StatelessWidget {
                   ),
                 ),
               ],
+            ),
+          ),
+
+          const SizedBox(height: 16),
+
+          // Divider
+          Container(
+            height: 1,
+            color: theme.grey[200],
+            margin: const EdgeInsets.symmetric(vertical: 4),
+          ),
+
+          const SizedBox(height: 12),
+
+          // WhatsApp Contact Section
+          GestureDetector(
+            onTap: () => _launchWhatsApp(context, ref),
+            child: Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: const Color(0xFF25D366).withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(
+                    color: const Color(0xFF25D366).withOpacity(0.3), width: 1),
+              ),
+              child: Row(
+                children: [
+                  Icon(
+                    LucideIcons.messageCircle,
+                    color: const Color(0xFF25D366),
+                    size: 18,
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          AppLocalizations.of(context)
+                              .translate('contact-support'),
+                          style: TextStyles.footnote.copyWith(
+                            color: const Color(0xFF25D366),
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          AppLocalizations.of(context)
+                              .translate('contact-through-whatsapp'),
+                          style: TextStyles.small.copyWith(
+                            color: theme.grey[600],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Icon(
+                    LucideIcons.externalLink,
+                    color: const Color(0xFF25D366),
+                    size: 14,
+                  ),
+                ],
+              ),
             ),
           ),
         ],
