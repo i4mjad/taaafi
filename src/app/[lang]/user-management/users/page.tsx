@@ -4,6 +4,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import {
   type ColumnDef,
   type ColumnFiltersState,
+  type PaginationState,
   type SortingState,
   type VisibilityState,
   flexRender,
@@ -109,18 +110,24 @@ export default function UsersRoute() {
   const [usersToDelete, setUsersToDelete] = useState<string[]>([]);
   const [pagination, setPagination] = useState<PaginationInfo>({
     page: 1,
-    limit: 10,
+    limit: 50,
     total: 0,
     totalPages: 0,
     hasNext: false,
     hasPrev: false,
   });
 
+  console.log('🔧 Component render - current pagination state:', pagination);
+
   // Table state
   const [rowSelection, setRowSelection] = useState({});
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [sorting, setSorting] = useState<SortingState>([]);
+  const [tablePagination, setTablePagination] = useState({
+    pageIndex: 0,
+    pageSize: 50,
+  });
 
   // Filters
   const [roleFilter, setRoleFilter] = useState('all');
@@ -134,10 +141,18 @@ export default function UsersRoute() {
     const loadUsers = useCallback(async () => {
     try {
       setLoading(true);
+      const effectiveLimit = Math.max(pagination.limit, 50); // Ensure minimum 50
+      console.log('📡 loadUsers called');
+      console.log('📡 - pagination state:', pagination);
+      console.log('📡 - pagination.limit:', pagination.limit);
+      console.log('📡 - effectiveLimit:', effectiveLimit);
+      
       const params = new URLSearchParams({
         page: pagination.page.toString(),
-        limit: pagination.limit.toString(),
+        limit: effectiveLimit.toString(),
       });
+      
+      console.log('📡 - URL params:', params.toString());
 
       if (searchQuery.trim()) params.append('search', searchQuery.trim());
       if (roleFilter && roleFilter !== 'all') params.append('role', roleFilter);
@@ -151,6 +166,10 @@ export default function UsersRoute() {
 
       const data = await response.json();
       
+      console.log('📡 API response received:');
+      console.log('📡 - data.users.length:', data.users.length);
+      console.log('📡 - data.pagination:', data.pagination);
+      
       // Convert date strings back to Date objects
       const usersWithDates = data.users.map((user: any) => ({
         ...user,
@@ -159,8 +178,15 @@ export default function UsersRoute() {
         lastLoginAt: user.lastLoginAt ? new Date(user.lastLoginAt) : null,
       }));
       
+      const newPagination = {
+        ...data.pagination,
+        limit: effectiveLimit, // Use the effective limit we actually requested
+      };
+      
+      console.log('📡 Setting new pagination state:', newPagination);
+      
       setUsers(usersWithDates);
-      setPagination(data.pagination);
+      setPagination(newPagination);
           } catch (error) {
         toast.error(t('modules.userManagement.errors.loadingFailed') || 'Failed to load users');
       } finally {
@@ -168,16 +194,47 @@ export default function UsersRoute() {
       }
   }, [pagination.page, pagination.limit, roleFilter, statusFilter, providerFilter, t]);
 
+  // Debug: Log when loadUsers dependencies change
   useEffect(() => {
+    console.log('🔍 loadUsers dependencies changed:');
+    console.log('🔍 - pagination.page:', pagination.page);
+    console.log('🔍 - pagination.limit:', pagination.limit);
+    console.log('🔍 - roleFilter:', roleFilter);
+    console.log('🔍 - statusFilter:', statusFilter);
+    console.log('🔍 - providerFilter:', providerFilter);
+  }, [pagination.page, pagination.limit, roleFilter, statusFilter, providerFilter]);
+
+  // Force pagination limit to 50 on component mount
+  useEffect(() => {
+    console.log('🚀 Mount effect running - forcing limit to 50');
+    setPagination(prev => {
+      console.log('🚀 Mount effect - previous pagination:', prev);
+      const newPagination = { ...prev, limit: 50 };
+      console.log('🚀 Mount effect - new pagination:', newPagination);
+      return newPagination;
+    });
+  }, []); // Empty dependency array means this runs only once on mount
+
+  useEffect(() => {
+    console.log('🔄 useEffect for loadUsers triggered');
     loadUsers();
   }, [loadUsers]);
+
+  // Sync table pagination with backend pagination
+  useEffect(() => {
+    setTablePagination({
+      pageIndex: pagination.page - 1, // React Table uses 0-based indexing
+      pageSize: pagination.limit,
+    });
+  }, [pagination.page, pagination.limit]);
 
   const handleSearch = () => {
     setPagination(prev => ({ ...prev, page: 1 }));
     
+    const effectiveLimit = Math.max(pagination.limit, 50); // Ensure minimum 50
     const searchParams = new URLSearchParams({
       page: '1',
-      limit: pagination.limit.toString(),
+      limit: effectiveLimit.toString(),
     });
 
     if (searchQuery.trim()) searchParams.append('search', searchQuery.trim());
@@ -201,7 +258,10 @@ export default function UsersRoute() {
         }));
         
         setUsers(usersWithDates);
-        setPagination(data.pagination);
+        setPagination({
+          ...data.pagination,
+          limit: effectiveLimit, // Use the effective limit we actually requested
+        });
       })
       .catch((error) => {
         console.error('Error searching users:', error);
@@ -223,6 +283,7 @@ export default function UsersRoute() {
 
   const handlePageChange = (newPage: number) => {
     setPagination(prev => ({ ...prev, page: newPage }));
+    setTablePagination(prev => ({ ...prev, pageIndex: newPage - 1 }));
   };
 
   const handlePageSizeChange = (newPageSize: number) => {
@@ -230,6 +291,11 @@ export default function UsersRoute() {
       ...prev, 
       limit: newPageSize, 
       page: 1 // Reset to first page when changing page size
+    }));
+    setTablePagination(prev => ({
+      ...prev,
+      pageSize: newPageSize,
+      pageIndex: 0 // Reset to first page
     }));
   };
 
@@ -480,12 +546,14 @@ export default function UsersRoute() {
       columnVisibility,
       rowSelection,
       columnFilters,
+      pagination: tablePagination,
     },
     enableRowSelection: true,
     onRowSelectionChange: setRowSelection,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     onColumnVisibilityChange: setColumnVisibility,
+    onPaginationChange: setTablePagination,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getSortedRowModel: getSortedRowModel(),
@@ -752,7 +820,7 @@ export default function UsersRoute() {
                               <SelectValue placeholder={pagination.limit} />
                             </SelectTrigger>
                             <SelectContent side="top">
-                              {[10, 20, 30, 40, 50, 100, 250].map((pageSize) => (
+                              {[50, 100, 200, 250, 500].map((pageSize) => (
                                 <SelectItem key={pageSize} value={`${pageSize}`}>
                                   {pageSize}
                                 </SelectItem>
