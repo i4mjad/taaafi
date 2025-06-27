@@ -57,8 +57,8 @@ android {
         versionCode flutterVersionCode
         versionName flutterVersionName
         //TODO: uncomment this to create a new version
-        versionCode 50200
-        versionName "5.2.0"
+        versionCode 52101
+        versionName "5.2.1"
     }
 
     // compileOptions {
