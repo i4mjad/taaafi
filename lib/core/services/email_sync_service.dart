@@ -59,6 +59,80 @@ class EmailSyncService {
       print('Email sync failed: $e');
     }
   }
+
+  /// Checks if the user is an Apple user without an email address
+  /// This helps identify users affected by the missing email scope issue
+  Future<bool> isAppleUserWithoutEmail() async {
+    try {
+      final currentUser = _auth.currentUser;
+      if (currentUser == null) return false;
+
+      // Check if user has Apple provider
+      final hasAppleProvider = currentUser.providerData
+          .any((provider) => provider.providerId == 'apple.com');
+
+      if (!hasAppleProvider) return false;
+
+      // Check if user has no email or empty email
+      final hasNoEmail =
+          currentUser.email == null || currentUser.email!.isEmpty;
+
+      return hasNoEmail;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  /// Gets the user's authentication providers for debugging/analytics
+  List<String> getUserProviders() {
+    final currentUser = _auth.currentUser;
+    if (currentUser == null) return [];
+
+    return currentUser.providerData
+        .map((provider) => provider.providerId)
+        .toList();
+  }
+
+  /// Checks if user needs email collection (legacy Apple users)
+  Future<bool> shouldPromptForEmailCollection() async {
+    try {
+      final currentUser = _auth.currentUser;
+      if (currentUser == null) return false;
+
+      // Only prompt Apple users without emails
+      if (!await isAppleUserWithoutEmail()) return false;
+
+      // Check if we've already prompted this user (to avoid spam)
+      final docRef = _firestore.collection('users').doc(currentUser.uid);
+      final docSnapshot = await docRef.get();
+
+      if (!docSnapshot.exists) return false;
+
+      final docData = docSnapshot.data();
+      final hasBeenPrompted = docData?['emailCollectionPrompted'] == true;
+
+      // Don't prompt if we've already prompted them
+      return !hasBeenPrompted;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  /// Marks that the user has been prompted for email collection
+  Future<void> markEmailCollectionPrompted() async {
+    try {
+      final currentUser = _auth.currentUser;
+      if (currentUser == null) return;
+
+      final docRef = _firestore.collection('users').doc(currentUser.uid);
+      await docRef.update({
+        'emailCollectionPrompted': true,
+        'emailCollectionPromptedAt': FieldValue.serverTimestamp(),
+      });
+    } catch (e) {
+      // Silently handle errors
+    }
+  }
 }
 
 @Riverpod(keepAlive: true)

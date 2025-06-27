@@ -38,13 +38,18 @@ AccountStatus accountStatus(AccountStatusRef ref) {
 
           // Check email verification first (only for logged in users)
           // Exclude users that only have Apple as their authentication provider
+          // or Apple users without email (due to privacy settings or legacy configuration)
           final hasOnlyAppleProvider = user.providerData.length == 1 &&
               user.providerData.first.providerId == 'apple.com';
+          final isAppleUserWithoutEmail = user.providerData
+                  .any((provider) => provider.providerId == 'apple.com') &&
+              (user.email == null || user.email!.isEmpty);
 
           if (!user.emailVerified &&
               user.providerData
                   .any((provider) => provider.providerId == 'password') &&
-              !hasOnlyAppleProvider) {
+              !hasOnlyAppleProvider &&
+              !isAppleUserWithoutEmail) {
             return AccountStatus.needEmailVerification;
           }
 
