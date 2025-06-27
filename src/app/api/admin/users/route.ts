@@ -43,6 +43,43 @@ export async function GET(request: NextRequest) {
     const auth = getAuth();
     const firestore = getFirestore();
 
+    // Get user stats from Firestore collection counts
+    const getFirestoreUserStats = async () => {
+      try {
+        const usersCollection = firestore.collection('users');
+        
+        // Get total count
+        const totalSnapshot = await usersCollection.count().get();
+        const total = totalSnapshot.data().count;
+        
+        // Get active users count (users with lastTokenUpdate within today)
+        const now = new Date();
+        const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
+        const endOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
+        
+        const activeSnapshot = await usersCollection
+          .where('lastTokenUpdate', '>=', startOfToday)
+          .where('lastTokenUpdate', '<=', endOfToday)
+          .count()
+          .get();
+        const active = activeSnapshot.data().count;
+        
+        // Get admin users count
+        const adminSnapshot = await usersCollection.where('role', '==', 'admin').count().get();
+        const admins = adminSnapshot.data().count;
+        
+        // Get moderator users count
+        const moderatorSnapshot = await usersCollection.where('role', '==', 'moderator').count().get();
+        const moderators = moderatorSnapshot.data().count;
+        
+        return { total, active, admins, moderators };
+      } catch (error) {
+        console.warn('Failed to get Firestore user stats:', error);
+        // Return fallback stats if Firestore query fails
+        return { total: 0, active: 0, admins: 0, moderators: 0 };
+      }
+    };
+
     // Helper function to convert provider ID to user-friendly display name
     const getProviderDisplayName = (providerId: string): string => {
       switch (providerId) {
@@ -94,6 +131,9 @@ export async function GET(request: NextRequest) {
             },
           };
 
+          // Get Firestore-based user stats
+          const firestoreStats = await getFirestoreUserStats();
+
           return NextResponse.json({
             users: [transformedUser],
             pagination: {
@@ -103,9 +143,13 @@ export async function GET(request: NextRequest) {
               totalPages: 1,
               hasNext: false,
               hasPrev: false,
-            }
+            },
+            stats: firestoreStats,
           });
         } else {
+          // Get Firestore-based user stats
+          const firestoreStats = await getFirestoreUserStats();
+
           return NextResponse.json({
             users: [],
             pagination: {
@@ -115,7 +159,8 @@ export async function GET(request: NextRequest) {
               totalPages: 0,
               hasNext: false,
               hasPrev: false,
-            }
+            },
+            stats: firestoreStats,
           });
         }
       } catch (emailSearchError) {
@@ -276,6 +321,9 @@ export async function GET(request: NextRequest) {
       };
     });
 
+    // Get Firestore-based user stats
+    const firestoreStats = await getFirestoreUserStats();
+
     return NextResponse.json({
       users: enhancedUsers,
       pagination: {
@@ -286,6 +334,7 @@ export async function GET(request: NextRequest) {
         hasNext: endIndex < total,
         hasPrev: page > 1,
       },
+      stats: firestoreStats,
     });
   } catch (error) {
     return NextResponse.json(

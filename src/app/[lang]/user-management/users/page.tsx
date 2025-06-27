@@ -99,6 +99,13 @@ interface PaginationInfo {
   hasPrev: boolean;
 }
 
+interface UserStats {
+  total: number;
+  active: number;
+  admins: number;
+  moderators: number;
+}
+
 export default function UsersRoute() {
   const { t, locale } = useTranslation();
   
@@ -108,6 +115,12 @@ export default function UsersRoute() {
   const [bulkActionLoading, setBulkActionLoading] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [usersToDelete, setUsersToDelete] = useState<string[]>([]);
+  const [userStats, setUserStats] = useState<UserStats>({
+    total: 0,
+    active: 0,
+    admins: 0,
+    moderators: 0,
+  });
   const [pagination, setPagination] = useState<PaginationInfo>({
     page: 1,
     limit: 50,
@@ -187,6 +200,11 @@ export default function UsersRoute() {
       
       setUsers(usersWithDates);
       setPagination(newPagination);
+      
+      // Set Firestore-based user stats if available
+      if (data.stats) {
+        setUserStats(data.stats);
+      }
           } catch (error) {
         toast.error(t('modules.userManagement.errors.loadingFailed') || 'Failed to load users');
       } finally {
@@ -262,6 +280,11 @@ export default function UsersRoute() {
           ...data.pagination,
           limit: effectiveLimit, // Use the effective limit we actually requested
         });
+        
+        // Set Firestore-based user stats if available
+        if (data.stats) {
+          setUserStats(data.stats);
+        }
       })
       .catch((error) => {
         console.error('Error searching users:', error);
@@ -564,13 +587,6 @@ export default function UsersRoute() {
   // Get selected user IDs
   const selectedUserIds = table.getFilteredSelectedRowModel().rows.map(row => row.original.uid);
 
-  const stats = {
-    total: pagination.total,
-    active: users.filter(u => u.status === 'active').length,
-    admins: users.filter(u => u.role === 'admin').length,
-    moderators: users.filter(u => u.role === 'moderator').length,
-  };
-
   return (
     <>
       <SiteHeader dictionary={headerDictionary} />
@@ -587,7 +603,7 @@ export default function UsersRoute() {
                   <Users className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{stats.total}</div>
+                  <div className="text-2xl font-bold">{userStats.total.toLocaleString()}</div>
                 </CardContent>
               </Card>
 
@@ -599,7 +615,7 @@ export default function UsersRoute() {
                   <UserCheck className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{stats.active}</div>
+                  <div className="text-2xl font-bold">{userStats.active.toLocaleString()}</div>
                 </CardContent>
               </Card>
 
@@ -611,7 +627,7 @@ export default function UsersRoute() {
                   <Shield className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{stats.admins}</div>
+                  <div className="text-2xl font-bold">{userStats.admins.toLocaleString()}</div>
                 </CardContent>
               </Card>
 
@@ -623,7 +639,7 @@ export default function UsersRoute() {
                   <UserCheck className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{stats.moderators}</div>
+                  <div className="text-2xl font-bold">{userStats.moderators.toLocaleString()}</div>
                 </CardContent>
               </Card>
             </div>
