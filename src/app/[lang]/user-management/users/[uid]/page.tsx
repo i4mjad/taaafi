@@ -20,9 +20,17 @@ import {
   User,
   AlertTriangle,
   CheckCircle,
+  Smartphone,
+  Clock,
+  Languages,
+  Cake,
+  UserCircle,
+  MessageSquare,
+  Send,
 } from 'lucide-react';
 import Link from 'next/link';
 import { useTranslation } from "@/contexts/TranslationContext";
+import { NotificationDialog } from './NotificationDialog';
 
 interface UserProfile {
   uid: string;
@@ -35,6 +43,14 @@ interface UserProfile {
   updatedAt: Date;
   lastLoginAt?: Date | null;
   emailVerified: boolean;
+  dayOfBirth?: Date | null;
+  gender?: string;
+  locale?: string;
+  lastTokenUpdate?: Date | null;
+  messagingToken?: string;
+  platform?: string;
+  userFirstDate?: Date | null;
+  devicesIds?: string[];
   metadata: {
     loginCount: number;
     lastIpAddress?: string;
@@ -50,6 +66,7 @@ export default function UserDetailsPage() {
   const [user, setUser] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [notificationDialogOpen, setNotificationDialogOpen] = useState(false);
 
   const headerDictionary = {
     documents: t('modules.userManagement.userDetails') || 'User Details',
@@ -78,6 +95,9 @@ export default function UserDetailsPage() {
           createdAt: new Date(data.user.createdAt),
           updatedAt: new Date(data.user.updatedAt),
           lastLoginAt: data.user.lastLoginAt ? new Date(data.user.lastLoginAt) : null,
+          dayOfBirth: data.user.dayOfBirth ? new Date(data.user.dayOfBirth) : null,
+          lastTokenUpdate: data.user.lastTokenUpdate ? new Date(data.user.lastTokenUpdate) : null,
+          userFirstDate: data.user.userFirstDate ? new Date(data.user.userFirstDate) : null,
         };
         
         setUser(userWithDates);
@@ -150,6 +170,52 @@ export default function UserDetailsPage() {
       hour: '2-digit',
       minute: '2-digit',
     }).format(dateObj);
+  };
+
+  const formatDateOnly = (date: Date | string | null | undefined) => {
+    if (!date) return t('modules.userManagement.notSpecified') || 'Not specified';
+    
+    const dateObj = date instanceof Date ? date : new Date(date);
+    
+    if (isNaN(dateObj.getTime())) {
+      return t('common.unknown') || 'Unknown';
+    }
+    
+    return new Intl.DateTimeFormat(locale, {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    }).format(dateObj);
+  };
+
+  const formatGender = (gender: string | undefined) => {
+    if (!gender || gender.trim() === '') {
+      return t('modules.userManagement.notSpecified') || 'Not specified';
+    }
+    return gender;
+  };
+
+  const formatLocale = (userLocale: string | undefined) => {
+    if (!userLocale) {
+      return t('modules.userManagement.notSpecified') || 'Not specified';
+    }
+    
+    const localeMap: { [key: string]: string } = {
+      'english': 'English',
+      'arabic': 'العربية',
+      'en': 'English',
+      'ar': 'العربية',
+    };
+    
+    return localeMap[userLocale.toLowerCase()] || userLocale;
+  };
+
+  const formatPlatform = (platform: string | undefined) => {
+    if (!platform) {
+      return t('modules.userManagement.notSpecified') || 'Not specified';
+    }
+    
+    return platform.charAt(0).toUpperCase() + platform.slice(1);
   };
 
   if (loading) {
@@ -232,7 +298,7 @@ export default function UserDetailsPage() {
             </div>
 
             {/* User Profile */}
-            <div className="grid gap-6 md:grid-cols-2">
+            <div className="grid gap-6 lg:grid-cols-2">
               {/* Basic Information */}
               <Card>
                 <CardHeader>
@@ -282,9 +348,62 @@ export default function UserDetailsPage() {
                     <div className="flex items-center gap-3">
                       <Shield className="h-4 w-4 text-muted-foreground" />
                       <div>
-                        <p className="text-sm font-medium">{t('modules.userManagement.userRole') || 'Role'}</p>
+        <p className="text-sm font-medium">{t('modules.userManagement.role') || 'Role'}</p>
                         <p className="text-sm text-muted-foreground capitalize">{user.role}</p>
                       </div>
+                    </div>
+
+                    <div className="flex items-center gap-3">
+                      <UserCircle className="h-4 w-4 text-muted-foreground" />
+                      <div>
+                        <p className="text-sm font-medium">{t('modules.userManagement.displayName') || 'Display Name'}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {user.displayName || t('modules.userManagement.notSpecified') || 'Not specified'}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Personal Information */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <UserCircle className="h-5 w-5" />
+                    {t('modules.userManagement.personalInformation') || 'Personal Information'}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex items-center gap-3">
+                    <Cake className="h-4 w-4 text-muted-foreground" />
+                    <div>
+                      <p className="text-sm font-medium">{t('modules.userManagement.dateOfBirth') || 'Date of Birth'}</p>
+                      <p className="text-sm text-muted-foreground">{formatDateOnly(user.dayOfBirth)}</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    <User className="h-4 w-4 text-muted-foreground" />
+                    <div>
+                      <p className="text-sm font-medium">{t('modules.userManagement.gender') || 'Gender'}</p>
+                      <p className="text-sm text-muted-foreground">{formatGender(user.gender)}</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    <Languages className="h-4 w-4 text-muted-foreground" />
+                    <div>
+                      <p className="text-sm font-medium">{t('modules.userManagement.locale') || 'Preferred Language'}</p>
+                      <p className="text-sm text-muted-foreground">{formatLocale(user.locale)}</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    <Smartphone className="h-4 w-4 text-muted-foreground" />
+                    <div>
+                      <p className="text-sm font-medium">{t('modules.userManagement.platform') || 'Platform'}</p>
+                      <p className="text-sm text-muted-foreground">{formatPlatform(user.platform)}</p>
                     </div>
                   </div>
                 </CardContent>
@@ -303,6 +422,14 @@ export default function UserDetailsPage() {
                     <div className="flex items-center gap-3">
                       <Calendar className="h-4 w-4 text-muted-foreground" />
                       <div>
+                        <p className="text-sm font-medium">{t('modules.userManagement.userFirstDate') || 'First Registration'}</p>
+                        <p className="text-sm text-muted-foreground">{formatDate(user.userFirstDate)}</p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-3">
+                      <Calendar className="h-4 w-4 text-muted-foreground" />
+                      <div>
                         <p className="text-sm font-medium">{t('modules.userManagement.memberSince') || 'Member Since'}</p>
                         <p className="text-sm text-muted-foreground">{formatDate(user.createdAt)}</p>
                       </div>
@@ -314,6 +441,16 @@ export default function UserDetailsPage() {
                         <p className="text-sm font-medium">{t('modules.userManagement.lastLogin') || 'Last Login'}</p>
                         <p className="text-sm text-muted-foreground">
                           {formatDate(user.lastLoginAt)}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-3">
+                      <Clock className="h-4 w-4 text-muted-foreground" />
+                      <div>
+                        <p className="text-sm font-medium">{t('modules.userManagement.lastTokenUpdate') || 'Last Token Update'}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {formatDate(user.lastTokenUpdate)}
                         </p>
                       </div>
                     </div>
@@ -350,12 +487,88 @@ export default function UserDetailsPage() {
                   </div>
                 </CardContent>
               </Card>
+
+              {/* Device Information */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Smartphone className="h-5 w-5" />
+                    {t('modules.userManagement.deviceInformation') || 'Device Information'}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <MessageSquare className="h-4 w-4 text-muted-foreground" />
+                        <p className="text-sm font-medium">{t('modules.userManagement.messagingToken') || 'Messaging Token'}</p>
+                      </div>
+                      {user.messagingToken && (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => setNotificationDialogOpen(true)}
+                          className="h-8"
+                        >
+                          <Send className="h-3 w-3 mr-1" />
+                          {t('modules.userManagement.sendNotification') || 'Send Notification'}
+                        </Button>
+                      )}
+                    </div>
+                    <div className="pl-7">
+                      <p className="text-xs text-muted-foreground font-mono break-all bg-muted p-2 rounded">
+                        {user.messagingToken || t('modules.userManagement.notSpecified') || 'Not specified'}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    <Smartphone className="h-4 w-4 text-muted-foreground" />
+                    <div>
+                      <p className="text-sm font-medium">{t('modules.userManagement.deviceCount') || 'Registered Devices'}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {user.devicesIds?.length || 0} {t('modules.userManagement.connectedDevices') || 'devices'}
+                      </p>
+                    </div>
+                  </div>
+
+                  {user.devicesIds && user.devicesIds.length > 0 && (
+                    <div className="space-y-2">
+                      <p className="text-sm font-medium">{t('modules.userManagement.devicesIds') || 'Device IDs'}</p>
+                      <div className="space-y-1">
+                        {user.devicesIds.map((deviceId, index) => (
+                          <div key={index} className="p-2 bg-muted rounded text-xs font-mono break-all">
+                            {deviceId}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {(!user.devicesIds || user.devicesIds.length === 0) && (
+                    <div className="text-center py-4 text-muted-foreground">
+                      <Smartphone className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                      <p className="text-sm">{t('modules.userManagement.noDevices') || 'No devices registered'}</p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
             </div>
 
             {/* TODO: Add more sections like user permissions, recent activity, etc. */}
           </div>
         </div>
       </div>
+
+      {/* Notification Dialog */}
+      {user?.messagingToken && (
+        <NotificationDialog
+          open={notificationDialogOpen}
+          onOpenChange={setNotificationDialogOpen}
+          messagingToken={user.messagingToken}
+          userDisplayName={user.displayName}
+        />
+      )}
     </>
   );
 } 

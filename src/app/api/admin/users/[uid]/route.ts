@@ -58,6 +58,15 @@ export async function GET(
       updatedAt: new Date(authUser.metadata.lastRefreshTime || authUser.metadata.creationTime),
       lastLoginAt: authUser.metadata.lastSignInTime ? new Date(authUser.metadata.lastSignInTime) : null,
       emailVerified: authUser.emailVerified,
+      // Additional user document fields from Firestore
+      dayOfBirth: firestoreProfile.dayOfBirth ? firestoreProfile.dayOfBirth.toDate() : null,
+      gender: firestoreProfile.gender || null,
+      locale: firestoreProfile.locale || null,
+      lastTokenUpdate: firestoreProfile.lastTokenUpdate ? firestoreProfile.lastTokenUpdate.toDate() : null,
+      messagingToken: firestoreProfile.messagingToken || null,
+      platform: firestoreProfile.platform || null,
+      userFirstDate: firestoreProfile.userFirstDate ? firestoreProfile.userFirstDate.toDate() : null,
+      devicesIds: firestoreProfile.devicesIds || [],
       metadata: {
         loginCount: firestoreProfile.metadata?.loginCount || 0,
         lastIpAddress: firestoreProfile.metadata?.lastIpAddress || null,
