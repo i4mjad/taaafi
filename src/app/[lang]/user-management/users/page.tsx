@@ -665,7 +665,7 @@ export default function UsersRoute() {
                 <div className="flex flex-col gap-4 md:flex-row md:items-end mb-6">
                   <div className="flex-1 relative">
                     <Input
-                      placeholder={t('modules.userManagement.searchPlaceholder') || 'Search by email or name...'}
+                      placeholder={t('modules.userManagement.searchPlaceholder') || 'Search by user ID, email, or name...'}
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
