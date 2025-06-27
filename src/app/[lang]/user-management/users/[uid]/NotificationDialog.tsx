@@ -6,7 +6,14 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { 
+  ResponsiveDialog as Dialog, 
+  ResponsiveDialogContent as DialogContent, 
+  ResponsiveDialogDescription as DialogDescription, 
+  ResponsiveDialogFooter as DialogFooter, 
+  ResponsiveDialogHeader as DialogHeader, 
+  ResponsiveDialogTitle as DialogTitle 
+} from '@/components/ui/responsive-dialog';
 import { Plus, X } from 'lucide-react';
 import { useTranslation } from "@/contexts/TranslationContext";
 import { toast } from "sonner";
