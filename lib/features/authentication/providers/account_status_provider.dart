@@ -37,7 +37,14 @@ AccountStatus accountStatus(AccountStatusRef ref) {
           }
 
           // Check email verification first (only for logged in users)
-          if (!user.emailVerified) {
+          // Exclude users that only have Apple as their authentication provider
+          final hasOnlyAppleProvider = user.providerData.length == 1 &&
+              user.providerData.first.providerId == 'apple.com';
+
+          if (!user.emailVerified &&
+              user.providerData
+                  .any((provider) => provider.providerId == 'password') &&
+              !hasOnlyAppleProvider) {
             return AccountStatus.needEmailVerification;
           }
 
