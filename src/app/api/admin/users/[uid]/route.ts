@@ -22,10 +22,10 @@ if (!getApps().length) {
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { uid: string } }
-) {
+  context: { params: Promise<{ uid: string }> }
+): Promise<NextResponse> {
   try {
-    const { uid } = params;
+    const { uid } = await context.params;
 
     const auth = getAuth();
     const firestore = getFirestore();
@@ -67,7 +67,7 @@ export async function GET(
 
     return NextResponse.json({ user: userProfile });
   } catch (error: any) {
-    console.error(`Error fetching user ${params.uid}:`, error);
+    console.error(`Error fetching user:`, error);
     
     if (error.code === 'auth/user-not-found') {
       return NextResponse.json(

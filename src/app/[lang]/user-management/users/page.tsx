@@ -58,7 +58,6 @@ import {
   Edit,
   Trash2,
   UserCheck,
-  UserX,
   Users,
   UserPlus,
   Shield,
@@ -261,26 +260,7 @@ export default function UsersRoute() {
     }
   };
 
-  const handleBanUser = async (uid: string, banned: boolean) => {
-    try {
-      const response = await fetch(`/api/admin/users/${uid}/ban`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ banned }),
-      });
 
-      if (!response.ok) {
-        throw new Error('Failed to update user status');
-      }
-
-      const result = await response.json();
-      toast.success(result.message || `User ${banned ? 'banned' : 'unbanned'} successfully`);
-      await loadUsers();
-    } catch (error) {
-      console.error('Error updating user status:', error);
-      toast.error(t('modules.userManagement.errors.statusUpdateFailed') || 'Failed to update user status');
-    }
-  };
 
   const getStatusBadge = (status: string) => {
     const variants = {
@@ -474,18 +454,6 @@ export default function UsersRoute() {
                 <Edit className="h-4 w-4 mr-2" />
                 {t('common.edit')}
               </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              {user.status === 'active' ? (
-                <DropdownMenuItem onClick={() => handleBanUser(user.uid, true)}>
-                  <UserX className="h-4 w-4 mr-2" />
-                  {t('modules.userManagement.banUser') || 'Ban User'}
-                </DropdownMenuItem>
-              ) : (
-                <DropdownMenuItem onClick={() => handleBanUser(user.uid, false)}>
-                  <UserCheck className="h-4 w-4 mr-2" />
-                  {t('modules.userManagement.unbanUser') || 'Unban User'}
-                </DropdownMenuItem>
-              )}
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 onClick={() => {

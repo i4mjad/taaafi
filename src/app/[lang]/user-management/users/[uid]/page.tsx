@@ -18,7 +18,7 @@ import {
   Globe,
   Activity,
   User,
-  Ban,
+  AlertTriangle,
   CheckCircle,
 } from 'lucide-react';
 import Link from 'next/link';
@@ -104,7 +104,7 @@ export default function UserDetailsPage() {
     const icons = {
       active: CheckCircle,
       inactive: User,
-      suspended: Ban,
+      suspended: AlertTriangle,
     };
 
     const Icon = icons[status as keyof typeof icons] || User;

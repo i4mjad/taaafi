@@ -6,7 +6,7 @@ export interface UserProfile {
   displayName?: string;
   photoURL?: string;
   role: UserRole;
-  status: 'active' | 'inactive' | 'suspended';
+  status: 'active' | 'inactive' | 'suspended'; // Note: Ban strategy not yet implemented
   createdAt: Date;
   updatedAt: Date;
   lastLoginAt?: Date;

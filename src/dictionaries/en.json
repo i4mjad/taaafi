@@ -436,8 +436,6 @@
         "filterByProvider": "Filter by provider",
         "noUsersFound": "No users found matching your criteria",
         "viewDetails": "View Details",
-        "banUser": "Ban User",
-        "unbanUser": "Unban User",
         "deleteUsers": "Delete Users",
         "deleteSelected": "Delete Selected",
         "selectedUsers": "{count} user(s) selected",

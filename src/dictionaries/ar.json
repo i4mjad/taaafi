@@ -436,8 +436,6 @@
         "filterByProvider": "تصفية حسب مقدم الخدمة",
         "noUsersFound": "لم يتم العثور على مستخدمين يطابقون معاييرك",
         "viewDetails": "عرض التفاصيل",
-        "banUser": "حظر المستخدم",
-        "unbanUser": "إلغاء حظر المستخدم",
         "deleteUsers": "حذف المستخدمين",
         "deleteSelected": "حذف المحدد",
         "selectedUsers": "{count} مستخدم (مستخدمين) محدد",
