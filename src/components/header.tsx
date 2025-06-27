@@ -8,8 +8,14 @@ import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 import { usePathname, useRouter } from 'next/navigation'
 import { Toaster } from '@/components/ui/toaster'
 import { toast } from '@/hooks/use-toast'
-import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '@/components/ui/dropdown-menu'
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from '@/components/ui/dropdown-menu'
 import { Download } from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 interface Dict {
   appName: string
@@ -46,6 +52,7 @@ export default function Header({ dict = defaultDict }: HeaderProps) {
   const pathname = usePathname()
   const router = useRouter()
   const lang = pathname.split('/')[1] || 'en'
+  const isRTL = lang === 'ar'
 
   const isHome = pathname === `/${lang}` || pathname === `/${lang}/`
 
@@ -60,24 +67,31 @@ export default function Header({ dict = defaultDict }: HeaderProps) {
 
   const handleDownloadClick = () => {
     if (typeof window === 'undefined') return
-    const userAgent = navigator.userAgent || navigator.vendor || (window as any).opera
+    const userAgent =
+      navigator.userAgent || navigator.vendor || (window as any).opera
 
     const isAndroid = /android/i.test(userAgent)
-    const isIOS = /iPad|iPhone|iPod/.test(userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
+    const isIOS =
+      /iPad|iPhone|iPod/.test(userAgent) ||
+      (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
 
     if (isAndroid) {
-      window.location.href = 'https://play.google.com/store/apps/details?id=com.amjadkhalfan.reboot_app_3&hl=ar&pli=1'
+      window.location.href =
+        'https://play.google.com/store/apps/details?id=com.amjadkhalfan.reboot_app_3&hl=ar&pli=1'
       return
     }
 
     if (isIOS) {
-      window.location.href = 'https://apps.apple.com/om/app/taaafi-platfrom-better-life/id1531562469'
+      window.location.href =
+        'https://apps.apple.com/om/app/taaafi-platfrom-better-life/id1531562469'
       return
     }
 
     toast({
       title: dict.toastDesktopTitle ?? 'Not available on desktop',
-      description: dict.toastDesktopDescription ?? "Ta'aafi is only available for iOS and Android.",
+      description:
+        dict.toastDesktopDescription ??
+        "Ta'aafi is only available for iOS and Android.",
     })
   }
 
@@ -88,7 +102,10 @@ export default function Header({ dict = defaultDict }: HeaderProps) {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between">
             {/* Logo and App Name */}
-            <Link href={`/${lang}`} className="flex items-center space-x-2 group">
+            <Link
+              href={`/${lang}`}
+              className="flex items-center space-x-2 group"
+            >
               <Image
                 src="/images/ta3afi-icon.svg"
                 alt="Ta3afi App Icon"
@@ -142,7 +159,10 @@ export default function Header({ dict = defaultDict }: HeaderProps) {
                 </ToggleGroupItem>
               </ToggleGroup>
 
-              <Button className="bg-blue-600 hover:bg-blue-700 text-white" onClick={handleDownloadClick}>
+              <Button
+                className="bg-blue-600 hover:bg-blue-700 text-white"
+                onClick={handleDownloadClick}
+              >
                 {dict.download}
               </Button>
             </nav>
@@ -150,7 +170,11 @@ export default function Header({ dict = defaultDict }: HeaderProps) {
             {/* Mobile Icons */}
             <div className="flex items-center gap-1 md:hidden">
               {/* Download Icon */}
-              <Button size="icon" className="bg-blue-100 hover:bg-blue-200 text-blue-600" onClick={handleDownloadClick}>
+              <Button
+                size="icon"
+                className="bg-blue-100 hover:bg-blue-200 text-blue-600"
+                onClick={handleDownloadClick}
+              >
                 <Download className="h-6 w-6" />
                 <span className="sr-only">{dict.download}</span>
               </Button>
@@ -164,22 +188,34 @@ export default function Header({ dict = defaultDict }: HeaderProps) {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-56">
-                  <DropdownMenuItem asChild>
+                  <DropdownMenuItem
+                    asChild
+                    className={isRTL ? 'justify-end' : ''}
+                  >
                     <Link href={isHome ? '#features' : `/${lang}#features`}>
                       {dict.features}
                     </Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
+                  <DropdownMenuItem
+                    asChild
+                    className={isRTL ? 'justify-end' : ''}
+                  >
                     <Link href={isHome ? '#statistics' : `/${lang}#statistics`}>
                       {dict.statistics}
                     </Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
+                  <DropdownMenuItem
+                    asChild
+                    className={isRTL ? 'justify-end' : ''}
+                  >
                     <Link href={isHome ? '#blog' : `/${lang}#blog`}>
                       {dict.blog}
                     </Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
+                  <DropdownMenuItem
+                    asChild
+                    className={isRTL ? 'justify-end' : ''}
+                  >
                     <Link href={isHome ? '#contact' : `/${lang}#contact`}>
                       {dict.contact}
                     </Link>
