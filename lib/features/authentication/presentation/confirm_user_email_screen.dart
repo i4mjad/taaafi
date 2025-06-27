@@ -240,7 +240,7 @@ class _ConfirmUserEmailScreenState
                       Center(
                         child: Lottie.asset(
                           'asset/illustrations/warning.json',
-                          height: 200,
+                          height: 100,
                         ),
                       ),
                       verticalSpace(Spacing.points24),
@@ -815,42 +815,12 @@ class _ChangeEmailBottomSheetState
 class UserIdContainer extends ConsumerWidget {
   const UserIdContainer({super.key});
 
-  // TODO: Replace with proper localization in next release
-  String _getUserIdLabel(String locale) {
-    return locale == 'ar' ? 'معرف المستخدم' : 'User ID';
-  }
-
-  // TODO: Replace with proper localization in next release
-  String _getCopiedMessage(String locale) {
-    return locale == 'ar'
-        ? 'تم نسخ معرف المستخدم'
-        : 'User ID copied to clipboard';
-  }
-
-  // TODO: Replace with proper localization in next release
-  String _getWhatsAppErrorMessage(String locale) {
-    return locale == 'ar'
-        ? 'لا يمكن فتح الواتساب'
-        : 'Could not launch WhatsApp';
-  }
-
   Future<void> _copyUserIdToClipboard(BuildContext context) async {
     final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
       await Clipboard.setData(ClipboardData(text: user.uid));
       if (context.mounted) {
-        final locale = Localizations.localeOf(context).languageCode;
-        final message = _getCopiedMessage(locale);
-
-        // TODO: Replace with proper snackbar localization in next release
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(message),
-            backgroundColor: AppTheme.of(context).success[600],
-            behavior: SnackBarBehavior.floating,
-            duration: const Duration(seconds: 2),
-          ),
-        );
+        getSuccessSnackBar(context, 'user-id-copied');
       }
     }
   }
@@ -862,20 +832,9 @@ class UserIdContainer extends ConsumerWidget {
 
     try {
       await urlLauncher.launch(whatsappUrl);
-    } on UrlLauncherException catch (e) {
+    } on UrlLauncherException {
       if (context.mounted) {
-        final locale = Localizations.localeOf(context).languageCode;
-        final message = _getWhatsAppErrorMessage(locale);
-
-        // TODO: Replace with proper snackbar localization in next release
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(message),
-            backgroundColor: Colors.red,
-            behavior: SnackBarBehavior.floating,
-            duration: const Duration(seconds: 2),
-          ),
-        );
+        getErrorSnackBar(context, 'whatsapp-error');
       }
     }
   }
@@ -884,7 +843,6 @@ class UserIdContainer extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = AppTheme.of(context);
     final user = FirebaseAuth.instance.currentUser;
-    final locale = Localizations.localeOf(context).languageCode;
 
     if (user == null) return const SizedBox.shrink();
 
@@ -908,8 +866,7 @@ class UserIdContainer extends ConsumerWidget {
               ),
               const SizedBox(width: 8),
               Text(
-                _getUserIdLabel(
-                    locale), // TODO: Replace with proper localization in next release
+                AppLocalizations.of(context).translate('user-id'),
                 style: TextStyles.small.copyWith(
                   color: theme.grey[600],
                   fontWeight: FontWeight.w600,

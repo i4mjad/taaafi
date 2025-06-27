@@ -88,10 +88,7 @@ class CommunityComingSoonScreen extends ConsumerWidget {
     return WidgetsContainer(
       backgroundColor: theme.backgroundColor,
       // boxShadow: Shadows.mainShadows,
-      borderSide: BorderSide(
-        color: theme.grey[200]!,
-        width: 0.75,
-      ),
+      borderSide: BorderSide.none,
       child: Row(
         children: [
           Icon(
