@@ -1,10 +1,3 @@
-// TODO: Implement Firebase configuration
-// This file should contain your Firebase app initialization and configuration
-
-// Placeholder exports to prevent import errors
-// Replace with actual Firebase configuration when implementing
-
-
 import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
@@ -26,4 +19,4 @@ const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const db = getFirestore(app);
 export const storage = getStorage(app);
-// */ 
+export const firestore = db; // Alternative export name for consistency 

@@ -92,7 +92,9 @@
         "status": "الحالة",
         "target": "الهدف",
         "limit": "الحد",
-        "reviewer": "المراجع"
+        "reviewer": "المراجع",
+        "userId": "معرف المستخدم",
+        "provider": "مقدم خدمة تسجيل الدخول"
       },
       "actions": {
         "edit": "تعديل",
@@ -114,7 +116,10 @@
           "target": "الهدف",
           "limit": "الحد",
           "reviewer": "المراجع",
-          "selectAReviewer": "اختر مراجعًا"
+          "selectAReviewer": "اختر مراجعًا",
+          "userId": "معرف المستخدم",
+          "provider": "مقدم خدمة تسجيل الدخول",
+          "selectAProvider": "اختر مقدم خدمة"
         },
         "submit": "إرسال",
         "done": "تم"
@@ -406,6 +411,77 @@
         }
       }
     },
+    "modules": {
+      "userManagement": {
+        "title": "إدارة المستخدمين",
+        "description": "إدارة مستخدمي المنصة وصلاحياتهم",
+        "users": "المستخدمون",
+        "usersDescription": "إدارة حسابات المستخدمين وصلاحياتهم",
+        "totalUsers": "إجمالي المستخدمين",
+        "activeUsers": "المستخدمون النشطون",
+        "admins": "المديرون",
+        "moderators": "المشرفون",
+        "user": "المستخدم",
+        "role": "الدور",
+        "status": "الحالة",
+        "lastLogin": "آخر تسجيل دخول",
+        "createdAt": "تاريخ الإنشاء",
+        "userId": "معرف المستخدم",
+        "provider": "مقدم خدمة تسجيل الدخول",
+        "rowsPerPage": "صفوف لكل صفحة",
+        "createUser": "إنشاء مستخدم",
+        "searchPlaceholder": "البحث بالبريد الإلكتروني أو الاسم...",
+        "filterByRole": "تصفية حسب الدور",
+        "filterByStatus": "تصفية حسب الحالة",
+        "filterByProvider": "تصفية حسب مقدم الخدمة",
+        "noUsersFound": "لم يتم العثور على مستخدمين يطابقون معاييرك",
+        "viewDetails": "عرض التفاصيل",
+        "banUser": "حظر المستخدم",
+        "unbanUser": "إلغاء حظر المستخدم",
+        "deleteUsers": "حذف المستخدمين",
+        "deleteSelected": "حذف المحدد",
+        "selectedUsers": "{count} مستخدم (مستخدمين) محدد",
+        "deleteUsersConfirmation": "هل أنت متأكد من حذف {count} مستخدم (مستخدمين)؟ لا يمكن التراجع عن هذا الإجراء وسيتم حذف مستنداتهم المرتبطة أيضاً.",
+        "clearFilters": "مسح المرشحات",
+        "clearSelection": "مسح التحديد",
+        "rowsSelected": "{selected} من {total} صف (صفوف) محدد.",
+        "page": "صفحة",
+        "of": "من",
+        "deleting": "جاري الحذف...",
+        "roles": "الأدوار",
+        "statuses": "الحالة",
+        "providers": "مقدمو الخدمة",
+        "suspendUser": "تعليق",
+        "activateUser": "تفعيل",
+        "userDetails": "تفاصيل المستخدم",
+        "userDetailsDescription": "عرض وإدارة معلومات المستخدم",
+        "userNotFound": "المستخدم غير موجود",
+        "userNotFoundDescription": "لم يتم العثور على المستخدم المطلوب.",
+        "basicInformation": "المعلومات الأساسية",
+        "activityInformation": "معلومات النشاط",
+        "email": "البريد الإلكتروني",
+        "verified": "محقق",
+        "memberSince": "عضو منذ",
+        "lastIpAddress": "آخر عنوان IP",
+        "totalLogins": "إجمالي تسجيلات الدخول",
+        "daysSince": "أيام منذ الانضمام",
+        "userStatus": {
+          "active": "نشط",
+          "inactive": "غير نشط",
+          "suspended": "معلق"
+        },
+        "userRole": {
+          "admin": "مدير",
+          "moderator": "مشرف",
+          "user": "مستخدم"
+        },
+        "errors": {
+          "loadingFailed": "فشل في تحميل المستخدمين",
+          "deleteFailed": "فشل في حذف المستخدمين",
+          "statusUpdateFailed": "فشل في تحديث حالة المستخدم"
+        }
+      }
+    },
     "common": {
       "search": "بحث",
       "edit": "تعديل",
@@ -423,7 +499,9 @@
       "never": "أبداً",
       "all": "الكل",
       "activate": "تفعيل",
-      "deactivate": "إلغاء التفعيل"
+      "deactivate": "إلغاء التفعيل",
+      "back": "رجوع",
+      "unknown": "غير معروف"
     }
   }
   

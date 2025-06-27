@@ -92,7 +92,9 @@
         "status": "Status",
         "target": "Target",
         "limit": "Limit",
-        "reviewer": "Reviewer"
+        "reviewer": "Reviewer",
+        "userId": "User ID",
+        "provider": "Sign-in Provider"
       },
       "actions": {
         "edit": "Edit",
@@ -114,7 +116,10 @@
           "target": "Target",
           "limit": "Limit",
           "reviewer": "Reviewer",
-          "selectAReviewer": "Select a reviewer"
+          "selectAReviewer": "Select a reviewer",
+          "userId": "User ID",
+          "provider": "Sign-in Provider",
+          "selectAProvider": "Select a provider"
         },
         "submit": "Submit",
         "done": "Done"
@@ -406,6 +411,77 @@
         }
       }
     },
+    "modules": {
+      "userManagement": {
+        "title": "User Management",
+        "description": "Manage platform users and their permissions",
+        "users": "Users",
+        "usersDescription": "Manage user accounts and permissions",
+        "totalUsers": "Total Users",
+        "activeUsers": "Active Users",
+        "admins": "Administrators",
+        "moderators": "Moderators",
+        "user": "User",
+        "role": "Role",
+        "status": "Status",
+        "lastLogin": "Last Login",
+        "createdAt": "Created",
+        "userId": "User ID",
+        "provider": "Sign-in Provider",
+        "rowsPerPage": "Rows per page",
+        "createUser": "Create User",
+        "searchPlaceholder": "Search by email or name...",
+        "filterByRole": "Filter by role",
+        "filterByStatus": "Filter by status",
+        "filterByProvider": "Filter by provider",
+        "noUsersFound": "No users found matching your criteria",
+        "viewDetails": "View Details",
+        "banUser": "Ban User",
+        "unbanUser": "Unban User",
+        "deleteUsers": "Delete Users",
+        "deleteSelected": "Delete Selected",
+        "selectedUsers": "{count} user(s) selected",
+        "deleteUsersConfirmation": "Are you sure you want to delete {count} user(s)? This action cannot be undone and will also delete their associated documents.",
+        "clearFilters": "Clear Filters",
+        "clearSelection": "Clear selection",
+        "rowsSelected": "{selected} of {total} row(s) selected.",
+        "page": "Page",
+        "of": "of",
+        "deleting": "Deleting...",
+        "roles": "Roles",
+        "statuses": "Status",
+        "providers": "Providers",
+        "suspendUser": "Suspend",
+        "activateUser": "Activate",
+        "userDetails": "User Details",
+        "userDetailsDescription": "View and manage user information",
+        "userNotFound": "User Not Found",
+        "userNotFoundDescription": "The requested user could not be found.",
+        "basicInformation": "Basic Information",
+        "activityInformation": "Activity Information",
+        "email": "Email",
+        "verified": "Verified",
+        "memberSince": "Member Since",
+        "lastIpAddress": "Last IP Address",
+        "totalLogins": "Total Logins",
+        "daysSince": "Days Since Joining",
+        "userStatus": {
+          "active": "Active",
+          "inactive": "Inactive", 
+          "suspended": "Suspended"
+        },
+        "userRole": {
+          "admin": "Admin",
+          "moderator": "Moderator",
+          "user": "User"
+        },
+        "errors": {
+          "loadingFailed": "Failed to load users",
+          "deleteFailed": "Failed to delete users",
+          "statusUpdateFailed": "Failed to update user status"
+        }
+      }
+    },
     "common": {
       "search": "Search",
       "edit": "Edit",
@@ -423,7 +499,9 @@
       "never": "Never",
       "all": "All",
       "activate": "Activate",
-      "deactivate": "Deactivate"
+      "deactivate": "Deactivate",
+      "back": "Back",
+      "unknown": "Unknown"
     }
   }
   

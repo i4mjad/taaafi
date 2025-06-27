@@ -124,7 +124,7 @@ export default function FeatureFlagsPage({ t, locale }: FeatureFlagsPageProps) {
 
   const handleToggleFeature = (featureId: string) => {
     // TODO: Implement feature toggle logic
-    console.log(`Toggling feature: ${featureId}`);
+    
   };
 
   const getEnvironmentBadge = (environment: string) => {

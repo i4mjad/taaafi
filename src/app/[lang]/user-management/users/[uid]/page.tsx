@@ -1,0 +1,361 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import { useParams } from 'next/navigation';
+import { SiteHeader } from '@/components/site-header';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Separator } from '@/components/ui/separator';
+import {
+  ArrowLeft,
+  Edit,
+  Shield,
+  Mail,
+  Calendar,
+  Globe,
+  Activity,
+  User,
+  Ban,
+  CheckCircle,
+} from 'lucide-react';
+import Link from 'next/link';
+import { useTranslation } from "@/contexts/TranslationContext";
+
+interface UserProfile {
+  uid: string;
+  email: string;
+  displayName?: string;
+  photoURL?: string;
+  role: 'admin' | 'moderator' | 'user';
+  status: 'active' | 'inactive' | 'suspended';
+  createdAt: Date;
+  updatedAt: Date;
+  lastLoginAt?: Date | null;
+  emailVerified: boolean;
+  metadata: {
+    loginCount: number;
+    lastIpAddress?: string;
+    userAgent?: string;
+  };
+}
+
+export default function UserDetailsPage() {
+  const { t, locale } = useTranslation();
+  const params = useParams();
+  const uid = params.uid as string;
+  
+  const [user, setUser] = useState<UserProfile | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const headerDictionary = {
+    documents: t('modules.userManagement.userDetails') || 'User Details',
+  };
+
+  useEffect(() => {
+    const loadUser = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch(`/api/admin/users/${uid}`);
+        
+        if (!response.ok) {
+          if (response.status === 404) {
+            setError('User not found');
+          } else {
+            setError('Failed to load user details');
+          }
+          return;
+        }
+
+        const data = await response.json();
+        
+        // Convert date strings back to Date objects
+        const userWithDates = {
+          ...data.user,
+          createdAt: new Date(data.user.createdAt),
+          updatedAt: new Date(data.user.updatedAt),
+          lastLoginAt: data.user.lastLoginAt ? new Date(data.user.lastLoginAt) : null,
+        };
+        
+        setUser(userWithDates);
+      } catch (err) {
+        console.error('Error loading user:', err);
+        setError('Failed to load user details');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (uid) {
+      loadUser();
+    }
+  }, [uid]);
+
+  const getStatusBadge = (status: string) => {
+    const variants = {
+      active: 'default',
+      inactive: 'secondary',
+      suspended: 'destructive',
+    } as const;
+
+    const icons = {
+      active: CheckCircle,
+      inactive: User,
+      suspended: Ban,
+    };
+
+    const Icon = icons[status as keyof typeof icons] || User;
+
+    return (
+      <Badge variant={variants[status as keyof typeof variants] || 'secondary'}>
+        <Icon className="h-3 w-3 mr-1" />
+        {t(`modules.userManagement.userStatus.${status}`) || status}
+      </Badge>
+    );
+  };
+
+  const getRoleBadge = (role: string) => {
+    const variants = {
+      admin: 'default',
+      moderator: 'secondary',
+      user: 'outline',
+    } as const;
+
+    return (
+      <Badge variant={variants[role as keyof typeof variants] || 'outline'}>
+        <Shield className="h-3 w-3 mr-1" />
+        {t(`modules.userManagement.userRole.${role}`) || role}
+      </Badge>
+    );
+  };
+
+  const formatDate = (date: Date | string | null | undefined) => {
+    if (!date) return t('common.never') || 'Never';
+    
+    // Handle both Date objects and date strings
+    const dateObj = date instanceof Date ? date : new Date(date);
+    
+    // Check if the date is valid
+    if (isNaN(dateObj.getTime())) {
+      return t('common.unknown') || 'Unknown';
+    }
+    
+    return new Intl.DateTimeFormat(locale, {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    }).format(dateObj);
+  };
+
+  if (loading) {
+    return (
+      <>
+        <SiteHeader dictionary={headerDictionary} />
+        <div className="flex flex-1 flex-col">
+          <div className="@container/main flex flex-1 flex-col gap-2">
+            <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6 px-4 lg:px-6">
+              <Skeleton className="h-8 w-64" />
+              <div className="grid gap-6 md:grid-cols-2">
+                <Skeleton className="h-96" />
+                <Skeleton className="h-96" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </>
+    );
+  }
+
+  if (error || !user) {
+    return (
+      <>
+        <SiteHeader dictionary={headerDictionary} />
+        <div className="flex flex-1 flex-col">
+          <div className="@container/main flex flex-1 flex-col gap-2">
+            <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6 px-4 lg:px-6">
+              <div className="flex items-center gap-4">
+                <Button variant="outline" size="sm" asChild>
+                  <Link href={`/${locale}/user-management/users`}>
+                    <ArrowLeft className="h-4 w-4 mr-2" />
+                    {t('common.back') || 'Back'}
+                  </Link>
+                </Button>
+              </div>
+              <div className="text-center py-8">
+                <h1 className="text-2xl font-bold">
+                  {t('modules.userManagement.userNotFound') || 'User Not Found'}
+                </h1>
+                <p className="text-muted-foreground mt-2">
+                  {error || (t('modules.userManagement.userNotFoundDescription') || 'The requested user could not be found.')}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </>
+    );
+  }
+
+  return (
+    <>
+      <SiteHeader dictionary={headerDictionary} />
+      <div className="flex flex-1 flex-col">
+        <div className="@container/main flex flex-1 flex-col gap-2">
+          <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6 px-4 lg:px-6">
+            {/* Header */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <Button variant="outline" size="sm" asChild>
+                  <Link href={`/${locale}/user-management/users`}>
+                    <ArrowLeft className="h-4 w-4 mr-2" />
+                    {t('common.back') || 'Back'}
+                  </Link>
+                </Button>
+                <div>
+                  <h1 className="text-3xl font-bold tracking-tight">
+                    {t('modules.userManagement.userDetails') || 'User Details'}
+                  </h1>
+                  <p className="text-muted-foreground">
+                    {t('modules.userManagement.userDetailsDescription') || 'View and manage user information'}
+                  </p>
+                </div>
+              </div>
+              <Button>
+                <Edit className="h-4 w-4 mr-2" />
+                {t('common.edit')}
+              </Button>
+            </div>
+
+            {/* User Profile */}
+            <div className="grid gap-6 md:grid-cols-2">
+              {/* Basic Information */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <User className="h-5 w-5" />
+                    {t('modules.userManagement.basicInformation') || 'Basic Information'}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  {/* Avatar and Name */}
+                  <div className="flex items-center gap-4">
+                    <Avatar className="h-16 w-16">
+                      <AvatarImage src={user.photoURL || undefined} alt={user.displayName} />
+                      <AvatarFallback className="text-lg">
+                        {user.displayName?.charAt(0) || user.email.charAt(0).toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="space-y-1">
+                      <h3 className="text-xl font-semibold">
+                        {user.displayName || user.email}
+                      </h3>
+                      <div className="flex items-center gap-2">
+                        {getRoleBadge(user.role)}
+                        {getStatusBadge(user.status)}
+                      </div>
+                    </div>
+                  </div>
+
+                  <Separator />
+
+                  {/* Contact Information */}
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-3">
+                      <Mail className="h-4 w-4 text-muted-foreground" />
+                      <div>
+                        <p className="text-sm font-medium">{t('modules.userManagement.email') || 'Email'}</p>
+                        <p className="text-sm text-muted-foreground">{user.email}</p>
+                      </div>
+                      {user.emailVerified && (
+                        <Badge variant="outline" className="ml-auto">
+                          <CheckCircle className="h-3 w-3 mr-1" />
+                          {t('modules.userManagement.verified') || 'Verified'}
+                        </Badge>
+                      )}
+                    </div>
+
+                    <div className="flex items-center gap-3">
+                      <Shield className="h-4 w-4 text-muted-foreground" />
+                      <div>
+                        <p className="text-sm font-medium">{t('modules.userManagement.userRole') || 'Role'}</p>
+                        <p className="text-sm text-muted-foreground capitalize">{user.role}</p>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Activity Information */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Activity className="h-5 w-5" />
+                    {t('modules.userManagement.activityInformation') || 'Activity Information'}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-3">
+                      <Calendar className="h-4 w-4 text-muted-foreground" />
+                      <div>
+                        <p className="text-sm font-medium">{t('modules.userManagement.memberSince') || 'Member Since'}</p>
+                        <p className="text-sm text-muted-foreground">{formatDate(user.createdAt)}</p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-3">
+                      <Activity className="h-4 w-4 text-muted-foreground" />
+                      <div>
+                        <p className="text-sm font-medium">{t('modules.userManagement.lastLogin') || 'Last Login'}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {formatDate(user.lastLoginAt)}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-3">
+                      <Globe className="h-4 w-4 text-muted-foreground" />
+                      <div>
+                        <p className="text-sm font-medium">{t('modules.userManagement.lastIpAddress') || 'Last IP Address'}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {user.metadata.lastIpAddress || t('common.unknown') || 'Unknown'}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <Separator />
+
+                  {/* Statistics */}
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="text-center p-4 bg-muted rounded-lg">
+                      <p className="text-2xl font-bold">{user.metadata.loginCount}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {t('modules.userManagement.totalLogins') || 'Total Logins'}
+                      </p>
+                    </div>
+                    <div className="text-center p-4 bg-muted rounded-lg">
+                      <p className="text-2xl font-bold">
+                        {Math.floor((Date.now() - user.createdAt.getTime()) / (1000 * 60 * 60 * 24))}
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        {t('modules.userManagement.daysSince') || 'Days Since Joining'}
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* TODO: Add more sections like user permissions, recent activity, etc. */}
+          </div>
+        </div>
+      </div>
+    </>
+  );
+} 
