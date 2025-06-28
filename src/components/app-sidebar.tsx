@@ -2,15 +2,12 @@
 
 import type * as React from "react"
 import {
-  BarChartIcon,
   FolderIcon,
   HeartHandshakeIcon,
   LayoutDashboardIcon,
   ListIcon,
   UsersIcon,
   MessageSquareIcon,
-  ShieldIcon,
-  KeyIcon,
   SettingsIcon,
   FileTextIcon,
   UserIcon,
@@ -39,58 +36,18 @@ import {
 
 import { Locale } from "../../i18n.config"
 import { useAuth } from '@/auth/AuthProvider'
+import { useTranslation } from '@/contexts/TranslationContext'
 
-interface SidebarDictionary {
-  appName: string;
-  taafiPlatform: string;
-  quickCreate: string;
-  inbox: string;
-  dashboard: string;
-  userManagement: string;
-  users: string;
-  roles: string;
-  permissions: string;
-  community: string;
-  forum: string;
-  groups: string;
-  directMessages: string;
-  reports: string;
-  content: string;
-  contentTypes: string;
-  contentOwners: string;
-  categories: string;
-  contentLists: string;
-  features: string;
-  settings: string;
-  getHelp: string;
-  search: string;
-  lifecycle: string;
-  analytics: string;
-  projects: string;
-  team: string;
-  documents: string;
-  dataLibrary: string;
-  wordAssistant: string;
-  more: string;
-  userMenu: {
-    account: string;
-    billing: string;
-    notifications: string;
-    logOut: string;
-  };
-  localeSwitcher: {
-    english: string;
-    arabic: string;
-  };
-}
+
 
 interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
   lang: Locale
-  dictionary: SidebarDictionary
+  
 }
 
-export function AppSidebar({ lang, dictionary, ...props }: AppSidebarProps) {
+export function AppSidebar({ lang, ...props }: AppSidebarProps) {
   const { user } = useAuth();
+  const { t } = useTranslation();
 
   const data = {
     user: {
@@ -163,12 +120,12 @@ export function AppSidebar({ lang, dictionary, ...props }: AppSidebarProps) {
               <a href="#">
                 <HeartHandshakeIcon className="h-5 w-5" />
                 
-                <span className="text-base font-semibold">{dictionary.appName}</span>
+                <span className="text-base font-semibold">{t('appSidebar.appName')}</span>
               </a>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
-        <LocaleSwitcher currentLocale={lang} dictionary={dictionary.localeSwitcher} />
+        <LocaleSwitcher currentLocale={lang} />
         <ThemeSwitcher />
       </SidebarHeader>
       <SidebarSeparator />
@@ -176,19 +133,18 @@ export function AppSidebar({ lang, dictionary, ...props }: AppSidebarProps) {
         <NavMain
           items={data.navMain.map((item) => ({
             ...item,
-            title: String(dictionary[item.titleKey as keyof typeof dictionary] ?? item.titleKey),
+            title: t(`appSidebar.${item.titleKey}`),
             items: item.items?.map((subItem) => ({
               ...subItem,
-              title: String(dictionary[subItem.titleKey as keyof typeof dictionary] ?? subItem.titleKey),
+              title: t(`appSidebar.${subItem.titleKey}`),
             })),
           }))}
-          dictionary={dictionary}
         />
     
    
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} dictionary={dictionary.userMenu} />
+        <NavUser user={data.user} />
       </SidebarFooter>
     </Sidebar>
   )

@@ -7,7 +7,6 @@ import { ThemeProvider } from "next-themes"
 import { DirectionWrapper } from "@/components/direction-provider"
 import UpdateHtmlAttributes from "@/components/update-html-attributes"
 import { AuthProvider } from '@/auth/AuthProvider';
-import AuthGuard from '@/components/auth-guard';
 import { TranslationProvider } from '@/contexts/TranslationContext';
 import { getDictionary } from '@/lib/dictionary';
 import { MainLayout } from '@/layout/MainLayout';
@@ -53,12 +52,10 @@ export default async function RootLayout({
         <AuthProvider>
           <TranslationProvider locale={lang} initialDictionary={dictionary}>
             <UpdateHtmlAttributes lang={lang} />
-            <AuthGuard>
-              <MainLayout>
-                {children}
-              </MainLayout>
-              <Toaster />
-            </AuthGuard>
+            <MainLayout>
+              {children}
+            </MainLayout>
+            <Toaster />
           </TranslationProvider>
         </AuthProvider>
       </ThemeProvider>

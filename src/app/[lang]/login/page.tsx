@@ -12,7 +12,6 @@ export default async function LoginPage({ params }: { params: Promise<{ lang: Lo
       <div className="absolute top-4 right-4 w-48">
         <LocaleSwitcher 
           currentLocale={lang} 
-          dictionary={dict.appSidebar.localeSwitcher} 
         />
       </div>
       <div className="w-full max-w-sm">

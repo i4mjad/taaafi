@@ -6,6 +6,7 @@
       "appName": "Ta'aafi Platform Admin Panel",
       "taafiPlatform": "Ta'aafi Platform",
       "quickCreate": "Quick Create",
+      "notifications": "Notifications",
       "inbox": "Inbox",
       "dashboard": "Dashboard",
       "userManagement": "User Management",
@@ -43,7 +44,19 @@
       "localeSwitcher": {
         "english": "English",
         "arabic": "Arabic"
+      },
+      "themeSwitcher": {
+        "light": "Light",
+        "dark": "Dark"
       }
+    },
+    "auth": {
+      "accessDenied": "Access Denied",
+      "accessDeniedMessage": "Please sign in with an administrator or moderator account.",
+      "signInError": "Failed to sign in",
+      "loading": "Loading...",
+      "insufficientPermissions": "Access denied: you do not have sufficient permissions.",
+      "logOut": "Log out"
     },
     "sectionCards": {
       "totalRevenue": "Total Revenue",
@@ -473,11 +486,39 @@
           "unsubscribe": "Unsubscribe",
           "currentSubscriptions": "Current subscriptions",
           "noGroupsAvailable": "No groups available",
+          "fcmActive": "FCM Active",
+          "noFcmToken": "No FCM Token",
+          "noMessagingTokenWarning": "User has no messaging token. Subscriptions will be saved but push notifications won't work.",
+          "errorLoadingGroups": "Error loading groups",
+          "topic": "Topic",
+          "subscribedTo": "subscribed to",
+          "unsubscribedFrom": "unsubscribed from",
+          "subscription": "subscription",
+          "unsubscription": "unsubscription",
+          "user": "User",
+          "group": "group",
+          "successfully": "successfully",
+          "note": "Note",
+          "failedTo": "Failed to",
+          "pushNotificationsActive": "Push notifications are active",
+          "groupSubscriptionUpdated": "Group subscription updated",
+          "butFcmFailed": "but FCM topic",
+          "failed": "failed",
+          "mayNotReceiveNotifications": "User may not receive push notifications",
+          "noMessagingTokenForNotifications": "No messaging token found for push notifications",
           "errors": {
             "nameRequired": "English name is required",
             "nameArRequired": "Arabic name is required",
             "topicIdRequired": "Topic ID is required",
-            "invalidTopicId": "Topic ID can only contain letters, numbers, underscores, and hyphens"
+            "invalidTopicId": "Topic ID can only contain letters, numbers, underscores, and hyphens",
+            "groupNotFound": "Group not found",
+            "cannotSubscribeInactive": "Cannot subscribe to inactive group",
+            "alreadySubscribed": "User is already subscribed to this group",
+            "notSubscribed": "User is not subscribed to this group",
+            "groupDataNotFound": "Group data not found"
+          },
+          "warnings": {
+            "noMessagingToken": "User has no messaging token. Subscription will be saved but notifications may not work."
           }
         },
         "role": "Role",
@@ -687,6 +728,73 @@
             }
           }
         }
+      },
+      "content": {
+        "title": "Content Management",
+        "description": "Manage content, categories, and publishing workflow",
+        "createContent": "Create Content",
+        "totalContent": "Total Content",
+        "draftContent": "Draft Content",
+        "contentTypes": "Content Types",
+        "pendingReview": "Pending Review",
+        "publishedToday": "published today",
+        "readyForReview": "Ready for review",
+        "activeContentTypes": "Active content types",
+        "awaitingApproval": "Awaiting approval",
+        "recentContent": "Recent Content",
+        "recentContentDescription": "Latest content updates and publications",
+        "viewAllContent": "View All Content",
+        "manage": "Manage",
+        "typesDescription": "Manage different types of content (articles, videos, resources)",
+        "ownersDescription": "Manage content creators and their permissions",
+        "categoriesDescription": "Organize content into categories and topics",
+        "itemsDescription": "Manage individual content pieces and their metadata",
+        "listsDescription": "Create and manage curated content collections"
+      },
+      "community": {
+        "title": "Community Management",
+        "description": "Manage community interactions and support groups",
+        "forumDescription": "Manage forum discussions and topics",
+        "forumManagement": "Forum Management",
+        "forumManagementDescription": "Forum management interface will be implemented here.",
+        "groupsDescription": "Manage support groups and communities",
+        "messagesDescription": "Monitor direct messages and communications",
+        "totalPosts": "Total Posts",
+        "today": "today",
+        "activeGroups": "Active Groups",
+        "ofTotalGroups": "of {total} total groups",
+        "directMessages": "Direct Messages",
+        "fromLastWeek": "from last week",
+        "reportsPending": "Reports Pending",
+        "requiresReview": "Requires review",
+        "recentActivity": "Recent Activity",
+        "recentActivityDescription": "Latest community interactions and events",
+        "viewAllActivity": "View All Activity"
+      },
+      "features": {
+        "title": "Feature Management",
+        "description": "Manage feature flags and experimental features",
+        "createFeature": "Create Feature",
+        "totalFeatures": "Total Features",
+        "enabledFeatures": "Enabled Features",
+        "percentOfTotal": "% of total",
+        "production": "Production",
+        "liveFeatures": "Live features",
+        "development": "Development",
+        "inDevelopment": "In development",
+        "featureFlags": "Feature Flags",
+        "featureFlagsDescription": "Manage feature rollouts and experimental functionality",
+        "searchPlaceholder": "Search feature flags...",
+        "feature": "Feature",
+        "environment": "Environment",
+        "rollout": "Rollout",
+        "owner": "Owner",
+        "updated": "Updated",
+        "enabled": "Enabled",
+        "disabled": "Disabled",
+        "viewAnalytics": "View Analytics",
+        "noFeaturesMatch": "No features match your search",
+        "noFeaturesConfigured": "No feature flags configured yet"
       }
     },
     "common": {

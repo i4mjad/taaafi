@@ -19,11 +19,9 @@ import {
   SidebarMenuSubItem,
   useSidebar,
 } from "@/components/ui/sidebar"
-import type { Dictionary } from "@/app/[lang]/dashboard/page"
-
 interface NavMainProps {
   items: {
-    title: string // Already translated by AppSidebar
+    title: string
     url: string
     icon?: LucideIcon
     items?: {
@@ -32,10 +30,9 @@ interface NavMainProps {
       icon?: LucideIcon
     }[]
   }[]
-  dictionary: Dictionary["appSidebar"]
 }
 
-export function NavMain({ items, dictionary }: NavMainProps) {
+export function NavMain({ items }: NavMainProps) {
   const { state: sidebarState } = useSidebar()
   const isCollapsed = sidebarState === "collapsed"
 

@@ -6,6 +6,7 @@
       "appName": "لوحة تحكم منصة تعافي",
       "taafiPlatform": "منصة تعافي",
       "quickCreate": "إنشاء سريع",
+      "notifications": "الإشعارات",
       "inbox": "صندوق الوارد",
       "dashboard": "لوحة التحكم",
       "userManagement": "إدارة المستخدمين",
@@ -43,7 +44,19 @@
       "localeSwitcher": {
         "english": "الإنجليزية",
         "arabic": "العربية"
+      },
+      "themeSwitcher": {
+        "light": "فاتح",
+        "dark": "داكن"
       }
+    },
+    "auth": {
+      "accessDenied": "الوصول مرفوض",
+      "accessDeniedMessage": "يرجى تسجيل الدخول بحساب مدير أو مشرف.",
+      "signInError": "فشل في تسجيل الدخول",
+      "loading": "جاري التحميل...",
+      "insufficientPermissions": "الوصول مرفوض: ليس لديك صلاحيات كافية.",
+      "logOut": "تسجيل الخروج"
     },
     "sectionCards": {
       "totalRevenue": "إجمالي الإيرادات",
@@ -473,11 +486,39 @@
           "unsubscribe": "إلغاء الاشتراك",
           "currentSubscriptions": "الاشتراكات الحالية",
           "noGroupsAvailable": "لا توجد مجموعات متاحة",
+          "fcmActive": "FCM نشط",
+          "noFcmToken": "لا يوجد رمز FCM",
+          "noMessagingTokenWarning": "المستخدم ليس لديه رمز رسائل. سيتم حفظ الاشتراك ولكن الإشعارات قد لا تعمل.",
+          "errorLoadingGroups": "خطأ في تحميل المجموعات",
+          "topic": "الموضوع",
+          "subscribedTo": "مشترك في",
+          "unsubscribedFrom": "إلغاء الاشتراك من",
+          "subscription": "الاشتراك",
+          "unsubscription": "إلغاء الاشتراك",
+          "user": "المستخدم",
+          "group": "مجموعة",
+          "successfully": "بنجاح",
+          "note": "ملاحظة",
+          "failedTo": "فشل في",
+          "pushNotificationsActive": "الإشعارات الفورية نشطة",
+          "groupSubscriptionUpdated": "تم تحديث اشتراك المجموعة",
+          "butFcmFailed": "ولكن موضوع FCM",
+          "failed": "فشل",
+          "mayNotReceiveNotifications": "قد لا يتلقى المستخدم الإشعارات الفورية",
+          "noMessagingTokenForNotifications": "لم يتم العثور على رمز رسائل للإشعارات الفورية",
           "errors": {
             "nameRequired": "الاسم الإنجليزي مطلوب",
             "nameArRequired": "الاسم العربي مطلوب",
             "topicIdRequired": "معرف الموضوع مطلوب",
-            "invalidTopicId": "معرف الموضوع يمكن أن يحتوي على أحرف وأرقام وشرطات سفلية وعادية فقط"
+            "invalidTopicId": "معرف الموضوع يمكن أن يحتوي على أحرف وأرقام وشرطات سفلية وعادية فقط",
+            "groupNotFound": "المجموعة غير موجودة",
+            "cannotSubscribeInactive": "لا يمكن الاشتراك في مجموعة غير نشطة",
+            "alreadySubscribed": "المستخدم مشترك بالفعل في هذه المجموعة",
+            "notSubscribed": "المستخدم غير مشترك في هذه المجموعة",
+            "groupDataNotFound": "بيانات المجموعة غير موجودة"
+          },
+          "warnings": {
+            "noMessagingToken": "المستخدم ليس لديه رمز رسائل. سيتم حفظ الاشتراك ولكن الإشعارات قد لا تعمل."
           }
         },
         
@@ -688,6 +729,73 @@
             }
           }
         }
+      },
+      "content": {
+        "title": "إدارة المحتوى",
+        "description": "إدارة المحتوى والتصنيفات وسير العمل للنشر",
+        "createContent": "إنشاء محتوى",
+        "totalContent": "إجمالي المحتوى",
+        "draftContent": "المحتوى المسودة",
+        "contentTypes": "أنواع المحتوى",
+        "pendingReview": "في انتظار المراجعة",
+        "publishedToday": "نُشر اليوم",
+        "readyForReview": "جاهز للمراجعة",
+        "activeContentTypes": "أنواع المحتوى النشطة",
+        "awaitingApproval": "في انتظار الموافقة",
+        "recentContent": "المحتوى الحديث",
+        "recentContentDescription": "أحدث تحديثات ومنشورات المحتوى",
+        "viewAllContent": "عرض جميع المحتوى",
+        "manage": "إدارة",
+        "typesDescription": "إدارة أنواع المحتوى المختلفة (مقالات، فيديوهات، موارد)",
+        "ownersDescription": "إدارة منشئي المحتوى وصلاحياتهم",
+        "categoriesDescription": "تنظيم المحتوى في تصنيفات ومواضيع",
+        "itemsDescription": "إدارة القطع الفردية للمحتوى وبياناتها الوصفية",
+        "listsDescription": "إنشاء وإدارة مجموعات المحتوى المنسقة"
+      },
+      "community": {
+        "title": "إدارة المجتمع",
+        "description": "إدارة تفاعلات المجتمع ومجموعات الدعم",
+        "forumDescription": "إدارة مناقشات ومواضيع المنتدى",
+        "forumManagement": "إدارة المنتدى",
+        "forumManagementDescription": "سيتم تنفيذ واجهة إدارة المنتدى هنا.",
+        "groupsDescription": "إدارة مجموعات الدعم والمجتمعات",
+        "messagesDescription": "مراقبة الرسائل المباشرة والاتصالات",
+        "totalPosts": "إجمالي المنشورات",
+        "today": "اليوم",
+        "activeGroups": "المجموعات النشطة",
+        "ofTotalGroups": "من {total} مجموعة إجمالية",
+        "directMessages": "الرسائل المباشرة",
+        "fromLastWeek": "من الأسبوع الماضي",
+        "reportsPending": "التقارير المعلقة",
+        "requiresReview": "تتطلب مراجعة",
+        "recentActivity": "النشاط الحديث",
+        "recentActivityDescription": "أحدث تفاعلات وأحداث المجتمع",
+        "viewAllActivity": "عرض جميع الأنشطة"
+      },
+      "features": {
+        "title": "إدارة الميزات",
+        "description": "إدارة أعلام الميزات والميزات التجريبية",
+        "createFeature": "إنشاء ميزة",
+        "totalFeatures": "إجمالي الميزات",
+        "enabledFeatures": "الميزات المُفعلة",
+        "percentOfTotal": "% من الإجمالي",
+        "production": "الإنتاج",
+        "liveFeatures": "الميزات المباشرة",
+        "development": "التطوير",
+        "inDevelopment": "قيد التطوير",
+        "featureFlags": "أعلام الميزات",
+        "featureFlagsDescription": "إدارة طرح الميزات والوظائف التجريبية",
+        "searchPlaceholder": "البحث في أعلام الميزات...",
+        "feature": "الميزة",
+        "environment": "البيئة",
+        "rollout": "الطرح",
+        "owner": "المالك",
+        "updated": "محدث",
+        "enabled": "مُفعل",
+        "disabled": "معطل",
+        "viewAnalytics": "عرض التحليلات",
+        "noFeaturesMatch": "لا توجد ميزات تطابق بحثك",
+        "noFeaturesConfigured": "لم يتم تكوين أعلام الميزات بعد"
       }
     },
     "common": {

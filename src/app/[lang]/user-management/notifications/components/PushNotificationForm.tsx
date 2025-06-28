@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -11,6 +11,10 @@ import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Loader2, Send, AlertCircle, CheckCircle, Users, Smartphone } from 'lucide-react';
 import { useTranslation } from "@/contexts/TranslationContext";
+// Firebase imports
+import { useCollection } from 'react-firebase-hooks/firestore';
+import { collection, query, where, orderBy } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
 
 interface NotificationData {
   title: string;
@@ -35,8 +39,6 @@ interface Group {
 export default function PushNotificationForm() {
   const { t, locale } = useTranslation();
   const [isLoading, setIsLoading] = useState(false);
-  const [groupsLoading, setGroupsLoading] = useState(true);
-  const [groups, setGroups] = useState<Group[]>([]);
   const [alert, setAlert] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const [formData, setFormData] = useState<NotificationData>({
     title: '',
@@ -47,32 +49,29 @@ export default function PushNotificationForm() {
     topic: ''
   });
 
-  // Load groups from database
-  useEffect(() => {
-    loadGroups();
-  }, []);
+  // Use Firebase hooks to fetch active groups
+  const [groupsSnapshot, groupsLoading, groupsError] = useCollection(
+    query(
+      collection(db, 'usersMessagingGroups'), 
+      where('isActive', '==', true),
+      orderBy('name')
+    )
+  );
 
-  const loadGroups = async () => {
-    try {
-      setGroupsLoading(true);
-      const response = await fetch('/api/admin/groups');
-      
-      if (response.ok) {
-        const data = await response.json();
-        const activeGroups = data.groups.filter((group: Group) => group.isActive);
-        setGroups(activeGroups);
-        
-        // Set default topic to first available group if form topic is empty
-        if (activeGroups.length > 0 && !formData.topic) {
-          setFormData(prev => ({ ...prev, topic: activeGroups[0].topicId }));
-        }
-      }
-    } catch (error) {
-      console.error('Error loading groups:', error);
-    } finally {
-      setGroupsLoading(false);
-    }
-  };
+  // Convert Firestore documents to Group objects
+  const groups: Group[] = groupsSnapshot?.docs.map(doc => {
+    const data = doc.data();
+    return {
+      id: doc.id,
+      name: data.name,
+      nameAr: data.nameAr,
+      description: data.description,
+      descriptionAr: data.descriptionAr,
+      topicId: data.topicId,
+      memberCount: data.memberCount || 0,
+      isActive: data.isActive !== false,
+    };
+  }) || [];
 
   // Get available topics from database groups only
   const getAvailableTopics = () => {
@@ -201,6 +200,27 @@ export default function PushNotificationForm() {
 
   const selectedTopicInfo = getSelectedTopicInfo();
   const availableTopics = getAvailableTopics();
+
+  // Show error state if groups failed to load
+  if (groupsError) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Smartphone className="h-5 w-5" />
+            {t('modules.userManagement.notifications.pushNotifications.title') || 'Push Notifications'}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="text-center py-8">
+            <AlertCircle className="h-12 w-12 text-destructive mx-auto mb-4" />
+            <h3 className="text-lg font-medium mb-2">Error loading groups</h3>
+            <p className="text-muted-foreground">{groupsError.message}</p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card>

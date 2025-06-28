@@ -8,6 +8,9 @@ import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Loader2, Plus, Users, AlertCircle, CheckCircle } from 'lucide-react';
 import { useTranslation } from "@/contexts/TranslationContext";
+// Firebase imports
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
 
 interface GroupData {
   name: string;
@@ -83,43 +86,46 @@ export default function CreateGroupDialog({ trigger, onGroupCreated }: CreateGro
     setAlert(null);
 
     try {
-      const response = await fetch('/api/admin/groups', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
+      // Add group to Firestore
+      const groupData = {
+        name: formData.name,
+        nameAr: formData.nameAr,
+        description: formData.description || '',
+        descriptionAr: formData.descriptionAr || '',
+        topicId: formData.topicId,
+        memberCount: 0,
+        isActive: true,
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+      };
+
+      const docRef = await addDoc(collection(db, 'usersMessagingGroups'), groupData);
+
+      setAlert({ type: 'success', message: t('modules.userManagement.groups.createSuccess') || 'Group created successfully' });
+      
+      // Reset form
+      setFormData({
+        name: '',
+        nameAr: '',
+        description: '',
+        descriptionAr: '',
+        topicId: ''
       });
-
-      const result = await response.json();
-
-      if (response.ok) {
-        setAlert({ type: 'success', message: t('modules.userManagement.groups.createSuccess') || 'Group created successfully' });
-        
-        // Reset form
-        setFormData({
-          name: '',
-          nameAr: '',
-          description: '',
-          descriptionAr: '',
-          topicId: ''
-        });
-        
-        // Call callback if provided
-        if (onGroupCreated) {
-          onGroupCreated(result.group);
-        }
-        
-        // Close dialog after a short delay
-        setTimeout(() => {
-          setOpen(false);
-          setAlert(null);
-        }, 1500);
-      } else {
-        setAlert({ type: 'error', message: result.error || t('modules.userManagement.groups.createError') || 'Failed to create group' });
+      
+      // Call callback if provided
+      if (onGroupCreated) {
+        onGroupCreated({ id: docRef.id, ...groupData });
       }
-    } catch (error) {
-      setAlert({ type: 'error', message: t('modules.userManagement.groups.createError') || 'Failed to create group' });
+      
+      // Close dialog after a short delay
+      setTimeout(() => {
+        setOpen(false);
+        setAlert(null);
+      }, 1500);
+
+    } catch (error: any) {
+      console.error('Error creating group:', error);
+      setAlert({ type: 'error', message: error.message || t('modules.userManagement.groups.createError') || 'Failed to create group' });
     } finally {
       setIsLoading(false);
     }

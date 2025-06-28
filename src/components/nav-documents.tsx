@@ -16,7 +16,7 @@ import type { Dictionary } from "@/app/[lang]/dashboard/page"
 
 interface NavDocumentsProps {
   items: {
-    name: string // Already translated by AppSidebar
+    name: string 
     url: string
     icon: LucideIcon
   }[]

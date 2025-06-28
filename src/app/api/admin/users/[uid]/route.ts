@@ -50,7 +50,7 @@ export async function GET(
     const userProfile = {
       uid: authUser.uid,
       email: authUser.email || '',
-      displayName: authUser.displayName || firestoreProfile.displayName || null,
+      displayName: firestoreProfile.displayName || authUser.displayName || null,
       photoURL: authUser.photoURL || firestoreProfile.photoURL || null,
       role: customClaims.role || firestoreProfile.role || 'user',
       status: authUser.disabled ? 'suspended' : (firestoreProfile.status || 'active'),

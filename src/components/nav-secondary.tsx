@@ -14,7 +14,7 @@ import {
 
 interface NavSecondaryProps extends React.ComponentPropsWithoutRef<typeof SidebarGroup> {
   items: {
-    title: string // Already translated by AppSidebar
+    title: string
     url: string
     icon: LucideIcon
   }[]

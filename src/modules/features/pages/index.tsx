@@ -170,7 +170,7 @@ export default function FeatureFlagsPage({ t, locale }: FeatureFlagsPageProps) {
         <div>
           <h1 className="text-3xl font-bold tracking-tight">{t('modules.features.title')}</h1>
           <p className="text-muted-foreground">
-            {t('modules.features.description') || 'Manage feature flags and experimental features'}
+            {t('modules.features.description')}
           </p>
         </div>
         <Button>
@@ -183,7 +183,7 @@ export default function FeatureFlagsPage({ t, locale }: FeatureFlagsPageProps) {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Features</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('modules.features.totalFeatures')}</CardTitle>
             <ToggleLeft className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -193,39 +193,39 @@ export default function FeatureFlagsPage({ t, locale }: FeatureFlagsPageProps) {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Enabled Features</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('modules.features.enabledFeatures')}</CardTitle>
             <ToggleRight className="h-4 w-4 text-green-600" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-green-600">{stats.enabled}</div>
             <p className="text-xs text-muted-foreground">
-              {Math.round((stats.enabled / stats.total) * 100)}% of total
+              {Math.round((stats.enabled / stats.total) * 100)}{t('modules.features.percentOfTotal')}
             </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Production</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('modules.features.production')}</CardTitle>
             <Shield className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.production}</div>
             <p className="text-xs text-muted-foreground">
-              Live features
+              {t('modules.features.liveFeatures')}
             </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Development</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('modules.features.development')}</CardTitle>
             <Zap className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.development}</div>
             <p className="text-xs text-muted-foreground">
-              In development
+              {t('modules.features.inDevelopment')}
             </p>
           </CardContent>
         </Card>
@@ -240,7 +240,7 @@ export default function FeatureFlagsPage({ t, locale }: FeatureFlagsPageProps) {
           <div className="flex items-center space-x-2">
             <Search className="h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder={t('modules.features.searchPlaceholder') || 'Search feature flags...'}
+              placeholder={t('modules.features.searchPlaceholder')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="flex-1"
@@ -252,22 +252,22 @@ export default function FeatureFlagsPage({ t, locale }: FeatureFlagsPageProps) {
       {/* Feature Flags Table */}
       <Card>
         <CardHeader>
-          <CardTitle>Feature Flags</CardTitle>
+          <CardTitle>{t('modules.features.featureFlags')}</CardTitle>
           <CardDescription>
-            Manage feature rollouts and experimental functionality
+            {t('modules.features.featureFlagsDescription')}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Feature</TableHead>
-                <TableHead>Environment</TableHead>
-                <TableHead>Rollout</TableHead>
-                <TableHead>Owner</TableHead>
-                <TableHead>Updated</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
+                <TableHead>{t('modules.features.feature')}</TableHead>
+                <TableHead>{t('modules.features.environment')}</TableHead>
+                <TableHead>{t('modules.features.rollout')}</TableHead>
+                <TableHead>{t('modules.features.owner')}</TableHead>
+                <TableHead>{t('modules.features.updated')}</TableHead>
+                <TableHead>{t('common.status')}</TableHead>
+                <TableHead className="text-right">{t('common.actions')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -329,7 +329,7 @@ export default function FeatureFlagsPage({ t, locale }: FeatureFlagsPageProps) {
                         </DropdownMenuItem>
                         <DropdownMenuItem>
                           <Activity className="h-4 w-4 mr-2" />
-                          View Analytics
+                          {t('modules.features.viewAnalytics')}
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem className="text-red-600">
@@ -349,7 +349,7 @@ export default function FeatureFlagsPage({ t, locale }: FeatureFlagsPageProps) {
               <ToggleLeft className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
               <p className="text-lg font-medium">{t('common.noData')}</p>
               <p className="text-muted-foreground">
-                {searchQuery ? 'No features match your search' : 'No feature flags configured yet'}
+                {searchQuery ? t('modules.features.noFeaturesMatch') : t('modules.features.noFeaturesConfigured')}
               </p>
             </div>
           )}

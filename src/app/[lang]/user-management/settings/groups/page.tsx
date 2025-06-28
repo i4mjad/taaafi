@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useParams } from 'next/navigation';
 import { SiteHeader } from '@/components/site-header';
 import { Button } from '@/components/ui/button';
@@ -43,6 +43,10 @@ import Link from 'next/link';
 import { useTranslation } from "@/contexts/TranslationContext";
 import CreateGroupDialog from '../components/CreateGroupDialog';
 import EditGroupDialog from './components/EditGroupDialog';
+// Firebase imports
+import { useCollection } from 'react-firebase-hooks/firestore';
+import { collection, query, orderBy, doc, deleteDoc, writeBatch } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
 
 interface Group {
   id: string;
@@ -61,8 +65,6 @@ export default function GroupsManagementPage() {
   const { t, locale } = useTranslation();
   const params = useParams();
   
-  const [groups, setGroups] = useState<Group[]>([]);
-  const [loading, setLoading] = useState(true);
   const [deleteLoading, setDeleteLoading] = useState<string | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [groupToDelete, setGroupToDelete] = useState<Group | null>(null);
@@ -73,31 +75,27 @@ export default function GroupsManagementPage() {
     documents: t('modules.userManagement.groups.title') || 'Messaging Groups',
   };
 
-  useEffect(() => {
-    loadGroups();
-  }, []);
+  // Use Firebase hooks to fetch groups
+  const [groupsSnapshot, loading, error] = useCollection(
+    query(collection(db, 'usersMessagingGroups'), orderBy('createdAt', 'desc'))
+  );
 
-  const loadGroups = async () => {
-    try {
-      setLoading(true);
-      const response = await fetch('/api/admin/groups');
-      
-      if (response.ok) {
-        const data = await response.json();
-        // Convert date strings back to Date objects with validation
-        const groupsWithDates = data.groups.map((group: any) => ({
-          ...group,
-          createdAt: group.createdAt ? new Date(group.createdAt) : new Date(),
-          updatedAt: group.updatedAt ? new Date(group.updatedAt) : new Date(),
-        }));
-        setGroups(groupsWithDates);
-      }
-    } catch (error) {
-      console.error('Error loading groups:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  // Convert Firestore documents to Group objects
+  const groups: Group[] = groupsSnapshot?.docs.map(doc => {
+    const data = doc.data();
+    return {
+      id: doc.id,
+      name: data.name,
+      nameAr: data.nameAr,
+      description: data.description,
+      descriptionAr: data.descriptionAr,
+      topicId: data.topicId,
+      memberCount: data.memberCount || 0,
+      isActive: data.isActive !== false, // Default to true if not specified
+      createdAt: data.createdAt?.toDate() || new Date(),
+      updatedAt: data.updatedAt?.toDate() || new Date(),
+    };
+  }) || [];
 
   const handleDeleteGroup = async () => {
     if (!groupToDelete) return;
@@ -105,18 +103,22 @@ export default function GroupsManagementPage() {
     try {
       setDeleteLoading(groupToDelete.id);
       
-      const response = await fetch(`/api/admin/groups/${groupToDelete.id}`, {
-        method: 'DELETE',
-      });
+      // Create a batch operation for deleting group and updating memberships
+      const batch = writeBatch(db);
+      
+      // Delete the group document
+      const groupRef = doc(db, 'usersMessagingGroups', groupToDelete.id);
+      batch.delete(groupRef);
 
-      if (response.ok) {
-        await loadGroups(); // Reload groups after deletion
-        setDeleteDialogOpen(false);
-        setGroupToDelete(null);
-      } else {
-        const data = await response.json();
-        console.error('Failed to delete group:', data.error);
-      }
+      // TODO: Remove group from user memberships (if using userGroupMemberships collection)
+      // This would require querying userGroupMemberships and updating each document
+      // For now, we'll just delete the group document
+
+      // Execute batch operations
+      await batch.commit();
+
+      setDeleteDialogOpen(false);
+      setGroupToDelete(null);
     } catch (error) {
       console.error('Error deleting group:', error);
     } finally {
@@ -169,6 +171,25 @@ export default function GroupsManagementPage() {
     );
   }
 
+  if (error) {
+    return (
+      <>
+        <SiteHeader dictionary={headerDictionary} />
+        <div className="flex flex-1 flex-col">
+          <div className="@container/main flex flex-1 flex-col gap-2">
+            <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6 px-4 lg:px-6">
+              <div className="text-center py-12">
+                <AlertTriangle className="h-12 w-12 mx-auto mb-4 text-destructive" />
+                <h3 className="text-lg font-medium mb-2">Error loading groups</h3>
+                <p className="text-muted-foreground">{error.message}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </>
+    );
+  }
+
   return (
     <>
       <SiteHeader dictionary={headerDictionary} />
@@ -194,7 +215,6 @@ export default function GroupsManagementPage() {
                 </div>
               </div>
               <CreateGroupDialog 
-                onGroupCreated={loadGroups}
                 trigger={
                   <Button>
                     <Plus className="h-4 w-4 mr-2" />
@@ -226,7 +246,6 @@ export default function GroupsManagementPage() {
                       {t('modules.userManagement.groups.noGroupsDescription') || 'Create your first messaging group to get started'}
                     </p>
                     <CreateGroupDialog 
-                      onGroupCreated={loadGroups}
                       trigger={
                         <Button>
                           <Plus className="h-4 w-4 mr-2" />
@@ -374,7 +393,6 @@ export default function GroupsManagementPage() {
           onOpenChange={setEditDialogOpen}
           group={groupToEdit}
           onGroupUpdated={() => {
-            loadGroups();
             setEditDialogOpen(false);
             setGroupToEdit(null);
           }}

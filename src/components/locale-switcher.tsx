@@ -3,14 +3,14 @@
 import { usePathname, useRouter } from "next/navigation"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Locale } from "../../i18n.config"
-import { Dictionary } from "@/app/[lang]/dashboard/page"
+import { useTranslation } from "@/contexts/TranslationContext"
 
 interface LocaleSwitcherProps {
   currentLocale: Locale
-  dictionary: Dictionary["appSidebar"]["localeSwitcher"]
 }
 
-export function LocaleSwitcher({ currentLocale, dictionary }: LocaleSwitcherProps) {
+export function LocaleSwitcher({ currentLocale }: LocaleSwitcherProps) {
+  const { t } = useTranslation()
   const router = useRouter()
   const pathname = usePathname()
 
@@ -29,8 +29,8 @@ export function LocaleSwitcher({ currentLocale, dictionary }: LocaleSwitcherProp
       className="w-full"
     >
       <TabsList className="grid w-full grid-cols-2">
-        <TabsTrigger value="en">{dictionary.english}</TabsTrigger>
-        <TabsTrigger value="ar">{dictionary.arabic}</TabsTrigger>
+        <TabsTrigger value="en">{t('appSidebar.localeSwitcher.english')}</TabsTrigger>
+        <TabsTrigger value="ar">{t('appSidebar.localeSwitcher.arabic')}</TabsTrigger>
       </TabsList>
     </Tabs>
   )

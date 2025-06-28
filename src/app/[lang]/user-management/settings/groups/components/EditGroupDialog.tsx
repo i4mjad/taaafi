@@ -9,6 +9,9 @@ import { Switch } from '@/components/ui/switch';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Loader2, Save, Users, AlertCircle, CheckCircle } from 'lucide-react';
 import { useTranslation } from "@/contexts/TranslationContext";
+// Firebase imports
+import { doc, updateDoc, serverTimestamp } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
 
 interface Group {
   id: string;
@@ -90,34 +93,39 @@ export default function EditGroupDialog({ open, onOpenChange, group, onGroupUpda
     setAlert(null);
 
     try {
-      const response = await fetch(`/api/admin/groups/${group.id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      });
+      // Update group in Firestore
+      const groupRef = doc(db, 'usersMessagingGroups', group.id);
+      const updateData = {
+        name: formData.name,
+        nameAr: formData.nameAr,
+        description: formData.description,
+        descriptionAr: formData.descriptionAr,
+        isActive: formData.isActive,
+        updatedAt: serverTimestamp(),
+      };
 
-      const result = await response.json();
+      await updateDoc(groupRef, updateData);
 
-      if (response.ok) {
-        setAlert({ type: 'success', message: t('modules.userManagement.groups.updateSuccess') || 'Group updated successfully' });
-        
-        // Call callback if provided
-        if (onGroupUpdated) {
-          onGroupUpdated(result.group);
-        }
-        
-        // Close dialog after a short delay
-        setTimeout(() => {
-          onOpenChange(false);
-          setAlert(null);
-        }, 1500);
-      } else {
-        setAlert({ type: 'error', message: result.error || t('modules.userManagement.groups.updateError') || 'Failed to update group' });
+      setAlert({ type: 'success', message: t('modules.userManagement.groups.updateSuccess') || 'Group updated successfully' });
+      
+      // Call callback if provided
+      if (onGroupUpdated) {
+        onGroupUpdated({
+          ...group,
+          ...updateData,
+          updatedAt: new Date(), // Use current date for immediate UI update
+        } as Group);
       }
-    } catch (error) {
-      setAlert({ type: 'error', message: t('modules.userManagement.groups.updateError') || 'Failed to update group' });
+      
+      // Close dialog after a short delay
+      setTimeout(() => {
+        onOpenChange(false);
+        setAlert(null);
+      }, 1500);
+
+    } catch (error: any) {
+      console.error('Error updating group:', error);
+      setAlert({ type: 'error', message: error.message || t('modules.userManagement.groups.updateError') || 'Failed to update group' });
     } finally {
       setIsLoading(false);
     }
