@@ -1,5 +1,5 @@
-export const fallbackLng = "en";
-export const languages = [fallbackLng, "ar"] as const;
+export const fallbackLng = "ar";
+export const languages = [fallbackLng, "en"] as const;
 
 export type Locale = (typeof languages)[number];
 

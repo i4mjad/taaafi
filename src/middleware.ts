@@ -2,8 +2,8 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 // List of supported languages
-const supportedLocales = ["en", "ar"];
-const defaultLocale = "en";
+const supportedLocales = ["ar", "en"];
+const defaultLocale = "ar";
 
 export function middleware(request: NextRequest) {
   // Get pathname
@@ -27,22 +27,12 @@ export function middleware(request: NextRequest) {
     return;
   }
 
-  // Get the preferred language from browser
-  const acceptLanguage = request.headers.get("accept-language");
-  let browserLocale = defaultLocale;
+  // Always use Arabic as the locale (no browser language detection)
+  const locale = "ar";
 
-  if (acceptLanguage) {
-    // Parse the Accept-Language header and get the first supported locale
-    browserLocale =
-      acceptLanguage
-        .split(",")
-        .map((lang) => lang.split(";")[0].substring(0, 2))
-        .find((lang) => supportedLocales.includes(lang)) || defaultLocale;
-  }
-
-  // Redirect to the same pathname with locale prefix
+  // Redirect to the same pathname with Arabic locale prefix
   return NextResponse.redirect(
-    new URL(`/${browserLocale}${pathname === "/" ? "" : pathname}`, request.url)
+    new URL(`/${locale}${pathname === "/" ? "" : pathname}`, request.url)
   );
 }
 

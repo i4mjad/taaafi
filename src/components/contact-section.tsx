@@ -23,7 +23,7 @@ const Contact = ({
     contactUsDescription: "Contact the support team at CloudMaster.",
     emailLabel: "Email",
     emailDescription: "We respond to all emails within 24 hours.",
-    email: "support@cloudmaster.com",
+    email: "admin@cloudmaster.com",
     socialLabel: "Social Media",
     socialDescription: "Follow us on social media for updates and support.",
     whatsappLabel: "WhatsApp",
