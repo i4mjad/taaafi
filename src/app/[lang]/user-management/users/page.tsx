@@ -143,8 +143,6 @@ export default function UsersRoute() {
   });
 
   // Filters
-  const [roleFilter, setRoleFilter] = useState('all');
-  const [statusFilter, setStatusFilter] = useState('all');
   const [providerFilter, setProviderFilter] = useState('all');
 
   const headerDictionary = {
@@ -168,8 +166,6 @@ export default function UsersRoute() {
       console.log('📡 - URL params:', params.toString());
 
       if (searchQuery.trim()) params.append('search', searchQuery.trim());
-      if (roleFilter && roleFilter !== 'all') params.append('role', roleFilter);
-      if (statusFilter && statusFilter !== 'all') params.append('status', statusFilter);
       if (providerFilter && providerFilter !== 'all') params.append('provider', providerFilter);
 
       const response = await fetch(`/api/admin/users?${params}`);
@@ -210,17 +206,15 @@ export default function UsersRoute() {
       } finally {
         setLoading(false);
       }
-  }, [pagination.page, pagination.limit, roleFilter, statusFilter, providerFilter, t]);
+  }, [pagination.page, pagination.limit, providerFilter, t]);
 
   // Debug: Log when loadUsers dependencies change
   useEffect(() => {
     console.log('🔍 loadUsers dependencies changed:');
     console.log('🔍 - pagination.page:', pagination.page);
     console.log('🔍 - pagination.limit:', pagination.limit);
-    console.log('🔍 - roleFilter:', roleFilter);
-    console.log('🔍 - statusFilter:', statusFilter);
     console.log('🔍 - providerFilter:', providerFilter);
-  }, [pagination.page, pagination.limit, roleFilter, statusFilter, providerFilter]);
+  }, [pagination.page, pagination.limit, providerFilter]);
 
   // Force pagination limit to 50 on component mount
   useEffect(() => {
@@ -256,8 +250,6 @@ export default function UsersRoute() {
     });
 
     if (searchQuery.trim()) searchParams.append('search', searchQuery.trim());
-    if (roleFilter && roleFilter !== 'all') searchParams.append('role', roleFilter);
-    if (statusFilter && statusFilter !== 'all') searchParams.append('status', statusFilter);
     if (providerFilter && providerFilter !== 'all') searchParams.append('provider', providerFilter);
 
     setLoading(true);
@@ -297,8 +289,6 @@ export default function UsersRoute() {
 
   const handleClearSearch = () => {
     setSearchQuery('');
-    setRoleFilter('all');
-    setStatusFilter('all');
     setProviderFilter('all');
     setPagination(prev => ({ ...prev, page: 1 }));
     // This will trigger loadUsers due to the filter changes
@@ -348,8 +338,6 @@ export default function UsersRoute() {
       setUsersToDelete([]);
     }
   };
-
-
 
   const getStatusBadge = (status: string) => {
     const variants = {
@@ -698,28 +686,6 @@ export default function UsersRoute() {
                       </Button>
                     )}
                   </div>
-                  <Select value={roleFilter} onValueChange={setRoleFilter}>
-                    <SelectTrigger className="w-[180px]">
-                      <SelectValue placeholder={t('modules.userManagement.filterByRole') || 'Filter by role'} />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">{t('common.all')} {t('modules.userManagement.roles') || 'Roles'}</SelectItem>
-                      <SelectItem value="admin">{t('modules.userManagement.userRole.admin') || 'Admin'}</SelectItem>
-                      <SelectItem value="moderator">{t('modules.userManagement.userRole.moderator') || 'Moderator'}</SelectItem>
-                      <SelectItem value="user">{t('modules.userManagement.userRole.user') || 'User'}</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <Select value={statusFilter} onValueChange={setStatusFilter}>
-                    <SelectTrigger className="w-[180px]">
-                      <SelectValue placeholder={t('modules.userManagement.filterByStatus') || 'Filter by status'} />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">{t('common.all')} {t('modules.userManagement.statuses') || 'Status'}</SelectItem>
-                      <SelectItem value="active">{t('modules.userManagement.userStatus.active') || 'Active'}</SelectItem>
-                      <SelectItem value="inactive">{t('modules.userManagement.userStatus.inactive') || 'Inactive'}</SelectItem>
-                      <SelectItem value="suspended">{t('modules.userManagement.userStatus.suspended') || 'Suspended'}</SelectItem>
-                    </SelectContent>
-                  </Select>
                   <Select value={providerFilter} onValueChange={setProviderFilter}>
                     <SelectTrigger className="w-[180px]">
                       <SelectValue placeholder={t('modules.userManagement.filterByProvider') || 'Filter by provider'} />
@@ -743,7 +709,7 @@ export default function UsersRoute() {
                       <Search className="h-4 w-4 mr-2" />
                       {t('common.search')}
                     </Button>
-                    {(searchQuery || roleFilter !== 'all' || statusFilter !== 'all' || providerFilter !== 'all') && (
+                    {(searchQuery || providerFilter !== 'all') && (
                       <Button variant="outline" onClick={handleClearSearch}>
                         {t('modules.userManagement.clearFilters') || 'Clear Filters'}
                       </Button>

@@ -31,6 +31,7 @@ import {
 import Link from 'next/link';
 import { useTranslation } from "@/contexts/TranslationContext";
 import { NotificationDialog } from './NotificationDialog';
+import UserGroupsCard from './UserGroupsCard';
 
 interface UserProfile {
   uid: string;
@@ -553,6 +554,9 @@ export default function UserDetailsPage() {
                   )}
                 </CardContent>
               </Card>
+
+              {/* User Groups Management */}
+              <UserGroupsCard userId={user.uid} />
             </div>
 
             {/* TODO: Add more sections like user permissions, recent activity, etc. */}

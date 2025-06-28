@@ -19,6 +19,7 @@ import {
   MessageCircleIcon,
   AlertTriangleIcon,
   CrownIcon,
+  BellIcon,
 } from "lucide-react"
 
 import { NavMain } from "@/components/nav-main"
@@ -109,8 +110,7 @@ export function AppSidebar({ lang, dictionary, ...props }: AppSidebarProps) {
         icon: UsersIcon,
         items: [
           { titleKey: "users", url: `/${lang}/user-management/users`, icon: UserIcon },
-          { titleKey: "roles", url: `/${lang}/user-management/roles`, icon: CrownIcon },
-          { titleKey: "permissions", url: `/${lang}/user-management/permissions`, icon: KeyIcon },
+          { titleKey: "notifications", url: `/${lang}/user-management/notifications`, icon: BellIcon },
           { titleKey: "settings", url: `/${lang}/user-management/settings`, icon: SettingsIcon },
         ]
       },
