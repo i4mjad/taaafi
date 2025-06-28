@@ -10,11 +10,12 @@ export default {
   theme: {
   	extend: {
   		fontFamily: {
-  			ibm: [
-  				'var(--font-ibm)',
+  			'expo-arabic': [
+  				'ExpoArabic',
   				'sans-serif'
   			],
   			sans: [
+  				'ExpoArabic',
   				'Arial',
   				'sans-serif'
   			]
