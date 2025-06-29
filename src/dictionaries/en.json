@@ -433,6 +433,10 @@
         "notifications": "Notifications",
         "settings": "Settings",
         "settingsDescription": "Configure user management and notification settings",
+        "subscriptionManagement": "Subscription Management",
+        "subscriptionManagementDescription": "View and manage user group subscriptions",
+        "noSubscriptions": "No group subscriptions found",
+        "totalSubscriptions": "Total subscriptions",
         "actions": {
           "title": "Actions",
           "description": "Administrative actions for user management"
@@ -506,6 +510,11 @@
           "failed": "failed",
           "mayNotReceiveNotifications": "User may not receive push notifications",
           "noMessagingTokenForNotifications": "No messaging token found for push notifications",
+          "groupId": "Group ID",
+          "topicLabel": "Topic",
+          "groupLabel": "Group", 
+          "unknownSubscription": "Unknown Subscription",
+          "notAvailable": "N/A",
           "errors": {
             "nameRequired": "English name is required",
             "nameArRequired": "Arabic name is required",
@@ -649,7 +658,8 @@
         "errors": {
           "loadingFailed": "Failed to load users",
           "deleteFailed": "Failed to delete users",
-          "statusUpdateFailed": "Failed to update user status"
+          "statusUpdateFailed": "Failed to update user status",
+          "loadingSubscriptions": "Error loading subscriptions"
         },
         "notifications": {
           "title": "Notifications",

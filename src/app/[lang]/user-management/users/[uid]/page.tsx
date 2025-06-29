@@ -27,11 +27,16 @@ import {
   UserCircle,
   MessageSquare,
   Send,
+  Users,
 } from 'lucide-react';
 import Link from 'next/link';
 import { useTranslation } from "@/contexts/TranslationContext";
 import { NotificationDialog } from './NotificationDialog';
 import UserGroupsCard from './UserGroupsCard';
+// Firebase imports
+import { useDocument } from 'react-firebase-hooks/firestore';
+import { doc } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
 
 interface UserProfile {
   uid: string;
@@ -68,6 +73,29 @@ export default function UserDetailsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [notificationDialogOpen, setNotificationDialogOpen] = useState(false);
+
+  // Use Firebase hook to fetch user group memberships
+  const [userMembershipsSnapshot, userMembershipsLoading, userMembershipsError] = useDocument(
+    uid ? doc(db, 'userGroupMemberships', uid) : null
+  );
+
+  // Get user subscriptions count for statistics
+  const userSubscriptionsCount = userMembershipsSnapshot?.exists() 
+    ? (userMembershipsSnapshot.data()?.groups || []).length 
+    : 0;
+
+  // Track last update timestamp for debugging
+  const [lastSubscriptionUpdate, setLastSubscriptionUpdate] = useState<Date | null>(null);
+
+  // Debug logging for subscription updates
+  useEffect(() => {
+    if (userMembershipsSnapshot?.exists()) {
+      const groups = userMembershipsSnapshot.data()?.groups || [];
+      const updateTime = new Date();
+      console.log(`🔄 User subscriptions updated for ${uid}:`, groups.length, 'groups', updateTime.toLocaleTimeString());
+      setLastSubscriptionUpdate(updateTime);
+    }
+  }, [userMembershipsSnapshot, uid]);
 
   const headerDictionary = {
     documents: t('modules.userManagement.userDetails') || 'User Details',
@@ -114,6 +142,8 @@ export default function UserDetailsPage() {
       loadUser();
     }
   }, [uid]);
+
+
 
   const getStatusBadge = (status: string) => {
     const variants = {
@@ -470,7 +500,7 @@ export default function UserDetailsPage() {
                   <Separator />
 
                   {/* Statistics */}
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-3 gap-4">
                     <div className="text-center p-4 bg-muted rounded-lg">
                       <p className="text-2xl font-bold">{user.metadata.loginCount}</p>
                       <p className="text-sm text-muted-foreground">
@@ -484,6 +514,33 @@ export default function UserDetailsPage() {
                       <p className="text-sm text-muted-foreground">
                         {t('modules.userManagement.daysSince') || 'Days Since Joining'}
                       </p>
+                    </div>
+                    <div className="text-center p-4 bg-muted rounded-lg">
+                      <div className="flex items-center justify-center gap-1 mb-1">
+                        <Users className="h-4 w-4 text-muted-foreground" />
+                        <p className="text-2xl font-bold">
+                          {userMembershipsLoading ? (
+                            <span className="animate-pulse">...</span>
+                          ) : userMembershipsError ? (
+                            <span className="text-destructive text-sm">Error</span>
+                          ) : (
+                            userSubscriptionsCount
+                          )}
+                        </p>
+                      </div>
+                      <p className="text-sm text-muted-foreground">
+                        {t('modules.userManagement.groupSubscriptions') || 'Group Subscriptions'}
+                      </p>
+                      {lastSubscriptionUpdate && (
+                        <p className="text-xs text-muted-foreground mt-1">
+                          Last updated: {lastSubscriptionUpdate.toLocaleTimeString()}
+                        </p>
+                      )}
+                      {userMembershipsError && (
+                        <p className="text-xs text-destructive mt-1">
+                          {t('modules.userManagement.errors.loadingSubscriptions') || 'Failed to load subscriptions'}
+                        </p>
+                      )}
                     </div>
                   </div>
                 </CardContent>
@@ -555,7 +612,7 @@ export default function UserDetailsPage() {
                 </CardContent>
               </Card>
 
-              {/* User Groups Management */}
+              {/* Group Subscriptions Management */}
               <UserGroupsCard userId={user.uid} />
             </div>
 

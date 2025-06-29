@@ -433,6 +433,10 @@
         "notifications": "الإشعارات",
         "settings": "الإعدادات",
         "settingsDescription": "تكوين إدارة المستخدمين وإعدادات الإشعارات",
+        "subscriptionManagement": "إدارة الاشتراكات",
+        "subscriptionManagementDescription": "عرض وإدارة اشتراكات المجموعات للمستخدمين",
+        "noSubscriptions": "لم يتم العثور على اشتراكات في المجموعات",
+        "totalSubscriptions": "إجمالي الاشتراكات",
         "actions": {
           "title": "الإجراءات",
           "description": "الإجراءات الإدارية لإدارة المستخدمين"
@@ -506,6 +510,11 @@
           "failed": "فشل",
           "mayNotReceiveNotifications": "قد لا يتلقى المستخدم الإشعارات الفورية",
           "noMessagingTokenForNotifications": "لم يتم العثور على رمز رسائل للإشعارات الفورية",
+          "groupId": "معرف المجموعة",
+          "topicLabel": "الموضوع",
+          "groupLabel": "المجموعة",
+          "unknownSubscription": "اشتراك غير معروف",
+          "notAvailable": "غير متوفر",
           "errors": {
             "nameRequired": "الاسم الإنجليزي مطلوب",
             "nameArRequired": "الاسم العربي مطلوب",
@@ -650,7 +659,8 @@
         "errors": {
           "loadingFailed": "فشل في تحميل المستخدمين",
           "deleteFailed": "فشل في حذف المستخدمين",
-          "statusUpdateFailed": "فشل في تحديث حالة المستخدم"
+          "statusUpdateFailed": "فشل في تحديث حالة المستخدم",
+          "loadingSubscriptions": "خطأ في تحميل الاشتراكات"
         },
         "notifications": {
           "title": "الإشعارات",
