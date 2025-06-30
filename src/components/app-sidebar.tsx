@@ -67,6 +67,7 @@ export function AppSidebar({ lang, ...props }: AppSidebarProps) {
         icon: UsersIcon,
         items: [
           { titleKey: "users", url: `/${lang}/user-management/users`, icon: UserIcon },
+          { titleKey: "reports", url: `/${lang}/user-management/reports`, icon: AlertTriangleIcon },
           { titleKey: "notifications", url: `/${lang}/user-management/notifications`, icon: BellIcon },
           { titleKey: "settings", url: `/${lang}/user-management/settings`, icon: SettingsIcon },
         ]
