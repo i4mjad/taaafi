@@ -130,7 +130,7 @@ export default function UsersRoute() {
     hasPrev: false,
   });
 
-  console.log('🔧 Component render - current pagination state:', pagination);
+  
 
   // Table state
   const [rowSelection, setRowSelection] = useState({});
@@ -153,17 +153,17 @@ export default function UsersRoute() {
     try {
       setLoading(true);
       const effectiveLimit = Math.max(pagination.limit, 50); // Ensure minimum 50
-      console.log('📡 loadUsers called');
-      console.log('📡 - pagination state:', pagination);
-      console.log('📡 - pagination.limit:', pagination.limit);
-      console.log('📡 - effectiveLimit:', effectiveLimit);
+      
+      
+      
+      
       
       const params = new URLSearchParams({
         page: pagination.page.toString(),
         limit: effectiveLimit.toString(),
       });
       
-      console.log('📡 - URL params:', params.toString());
+      
 
       if (searchQuery.trim()) params.append('search', searchQuery.trim());
       if (providerFilter && providerFilter !== 'all') params.append('provider', providerFilter);
@@ -175,9 +175,9 @@ export default function UsersRoute() {
 
       const data = await response.json();
       
-      console.log('📡 API response received:');
-      console.log('📡 - data.users.length:', data.users.length);
-      console.log('📡 - data.pagination:', data.pagination);
+      
+      
+      
       
       // Convert date strings back to Date objects
       const usersWithDates = data.users.map((user: any) => ({
@@ -192,7 +192,7 @@ export default function UsersRoute() {
         limit: effectiveLimit, // Use the effective limit we actually requested
       };
       
-      console.log('📡 Setting new pagination state:', newPagination);
+      
       
       setUsers(usersWithDates);
       setPagination(newPagination);
@@ -210,25 +210,25 @@ export default function UsersRoute() {
 
   // Debug: Log when loadUsers dependencies change
   useEffect(() => {
-    console.log('🔍 loadUsers dependencies changed:');
-    console.log('🔍 - pagination.page:', pagination.page);
-    console.log('🔍 - pagination.limit:', pagination.limit);
-    console.log('🔍 - providerFilter:', providerFilter);
+    
+    
+    
+    
   }, [pagination.page, pagination.limit, providerFilter]);
 
   // Force pagination limit to 50 on component mount
   useEffect(() => {
-    console.log('🚀 Mount effect running - forcing limit to 50');
+    
     setPagination(prev => {
-      console.log('🚀 Mount effect - previous pagination:', prev);
+      
       const newPagination = { ...prev, limit: 50 };
-      console.log('🚀 Mount effect - new pagination:', newPagination);
+      
       return newPagination;
     });
   }, []); // Empty dependency array means this runs only once on mount
 
   useEffect(() => {
-    console.log('🔄 useEffect for loadUsers triggered');
+    
     loadUsers();
   }, [loadUsers]);
 

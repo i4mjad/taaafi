@@ -76,7 +76,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     // Send the message
     const response = await messaging.send(message);
 
-    console.log('FCM message sent successfully:', response);
+    
 
     return NextResponse.json({
       success: true,

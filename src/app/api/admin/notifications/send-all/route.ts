@@ -75,11 +75,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     // 🎯 Send to the specified group topic
     const messageId = await messaging.send(message);
 
-    console.log('FCM message sent to group topic successfully:', {
-      messageId,
-      topic,
-      title: notification.title,
-    });
+
 
     // ✅ Returns immediately - FCM handles the fan-out to group members
     return NextResponse.json({

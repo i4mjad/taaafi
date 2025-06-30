@@ -97,12 +97,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       console.warn('Could not fetch group info:', error);
     }
 
-    console.log('In-app notification created successfully:', {
-      notificationId: notificationRef.id,
-      topic,
-      title,
-      type: type || 'info'
-    });
+    
 
     return NextResponse.json({
       success: true,

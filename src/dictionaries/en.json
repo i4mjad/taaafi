@@ -589,6 +589,7 @@
         "devicesIds": "Device IDs",
         "connectedDevices": "Connected Devices",
         "deviceCount": "Registered Devices",
+        "groupSubscriptions": "Group Subscriptions",
         "notSpecified": "Not specified",
         "noDevices": "No devices registered",
         "sendNotification": "Send Notification",
@@ -643,6 +644,64 @@
             "invalidBadge": "Badge count must be a number",
             "invalidTtl": "TTL must be a number",
             "duplicateDataKey": "Data keys must be unique"
+          }
+        },
+        "migrationManagement": {
+          "title": "Migration Management",
+          "description": "Manage followup data migration from arrays to collection",
+          "viewMigrationStatus": "View Migration Status",
+          "hideMigrationStatus": "Hide Migration Status",
+          "loading": "Loading migration data...",
+          "error": "Error loading migration data",
+          "noLegacyData": "No legacy data found",
+          "migrationComplete": "Migration Complete",
+          "migrationIncomplete": "Migration Incomplete",
+          "totalFollowups": "Total Followups",
+          "missingEntries": "Missing Entries",
+          "duplicateEntries": "Duplicate Entries",
+          "relapses": {
+            "title": "Relapses (userRelapses → relapse)",
+            "description": "Migration status for relapse entries",
+            "legacyCount": "Legacy Entries",
+            "newCount": "Migrated Entries",
+            "missingCount": "Missing Entries"
+          },
+          "mastOnly": {
+            "title": "Masturbation Only (userMasturbatingWithoutWatching → mastOnly)",
+            "description": "Migration status for masturbation-only entries",
+            "legacyCount": "Legacy Entries",
+            "newCount": "Migrated Entries",
+            "missingCount": "Missing Entries"
+          },
+          "pornOnly": {
+            "title": "Porn Only (userWatchingWithoutMasturbating → pornOnly)",
+            "description": "Migration status for porn-only entries",
+            "legacyCount": "Legacy Entries",
+            "newCount": "Migrated Entries",
+            "missingCount": "Missing Entries"
+          },
+          "migrateMissing": "Migrate Missing Entries",
+          "migrating": "Migrating...",
+          "migrateSuccess": "Migration completed successfully",
+          "migrateError": "Failed to migrate entries",
+          "allMigrated": "All entries migrated",
+          "removeDuplicates": "Remove Duplicates",
+          "removingDuplicates": "Removing duplicates...",
+          "duplicatesRemoved": "Duplicates removed successfully",
+          "duplicateRemovalError": "Failed to remove duplicates",
+          "noDuplicates": "No duplicates found",
+          "duplicatesList": "Duplicate Dates",
+          "legacyEntries": "Legacy Entries",
+          "migratedEntries": "Migrated Entries",
+          "missingEntriesList": "Missing Entries",
+          "noMissingEntries": "No missing entries",
+          "refreshData": "Refresh Data",
+          "lastUpdated": "Last updated",
+          "dateFormat": "YYYY-MM-DD",
+          "status": {
+            "complete": "Complete",
+            "incomplete": "Incomplete", 
+            "pending": "Pending"
           }
         },
         "userStatus": {

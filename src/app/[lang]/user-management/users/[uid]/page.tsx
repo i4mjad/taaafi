@@ -33,6 +33,7 @@ import Link from 'next/link';
 import { useTranslation } from "@/contexts/TranslationContext";
 import { NotificationDialog } from './NotificationDialog';
 import UserGroupsCard from './UserGroupsCard';
+import MigrationManagementCard from './MigrationManagementCard';
 // Firebase imports
 import { useDocument } from 'react-firebase-hooks/firestore';
 import { doc } from 'firebase/firestore';
@@ -57,6 +58,10 @@ interface UserProfile {
   platform?: string;
   userFirstDate?: Date | null;
   devicesIds?: string[];
+  // Legacy array fields for migration
+  userRelapses?: string[];
+  userMasturbatingWithoutWatching?: string[];
+  userWatchingWithoutMasturbating?: string[];
   metadata: {
     loginCount: number;
     lastIpAddress?: string;
@@ -69,12 +74,13 @@ export default function UserDetailsPage() {
   const params = useParams();
   const uid = params.uid as string;
   
-  const [user, setUser] = useState<UserProfile | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [notificationDialogOpen, setNotificationDialogOpen] = useState(false);
 
-  // Use Firebase hook to fetch user group memberships
+  // Use Firebase hooks to fetch user document and group memberships
+  const [userSnapshot, userLoading, userError] = useDocument(
+    uid ? doc(db, 'users', uid) : null
+  );
+
   const [userMembershipsSnapshot, userMembershipsLoading, userMembershipsError] = useDocument(
     uid ? doc(db, 'userGroupMemberships', uid) : null
   );
@@ -87,12 +93,45 @@ export default function UserDetailsPage() {
   // Track last update timestamp for debugging
   const [lastSubscriptionUpdate, setLastSubscriptionUpdate] = useState<Date | null>(null);
 
+  // Process user data from Firebase snapshot
+  const user: UserProfile | null = userSnapshot?.exists() ? (() => {
+    const userData = userSnapshot.data();
+    return {
+      uid: userSnapshot.id,
+      email: userData.email || '',
+      displayName: userData.displayName,
+      photoURL: userData.photoURL,
+      role: userData.role || 'user',
+      status: userData.status || 'active',
+      createdAt: userData.createdAt?.toDate() || new Date(),
+      updatedAt: userData.updatedAt?.toDate() || new Date(),
+      lastLoginAt: userData.lastLoginAt?.toDate() || null,
+      emailVerified: userData.emailVerified || false,
+      dayOfBirth: userData.dayOfBirth?.toDate() || null,
+      gender: userData.gender,
+      locale: userData.locale,
+      lastTokenUpdate: userData.lastTokenUpdate?.toDate() || null,
+      messagingToken: userData.messagingToken,
+      platform: userData.platform,
+      userFirstDate: userData.userFirstDate?.toDate() || null,
+      devicesIds: userData.devicesIds || [],
+      userRelapses: userData.userRelapses || [],
+      userMasturbatingWithoutWatching: userData.userMasturbatingWithoutWatching || [],
+      userWatchingWithoutMasturbating: userData.userWatchingWithoutMasturbating || [],
+      metadata: {
+        loginCount: userData.metadata?.loginCount || 0,
+        lastIpAddress: userData.metadata?.lastIpAddress,
+        userAgent: userData.metadata?.userAgent,
+      },
+    };
+  })() : null;
+
   // Debug logging for subscription updates
   useEffect(() => {
     if (userMembershipsSnapshot?.exists()) {
       const groups = userMembershipsSnapshot.data()?.groups || [];
       const updateTime = new Date();
-      console.log(`🔄 User subscriptions updated for ${uid}:`, groups.length, 'groups', updateTime.toLocaleTimeString());
+      
       setLastSubscriptionUpdate(updateTime);
     }
   }, [userMembershipsSnapshot, uid]);
@@ -100,48 +139,6 @@ export default function UserDetailsPage() {
   const headerDictionary = {
     documents: t('modules.userManagement.userDetails') || 'User Details',
   };
-
-  useEffect(() => {
-    const loadUser = async () => {
-      try {
-        setLoading(true);
-        const response = await fetch(`/api/admin/users/${uid}`);
-        
-        if (!response.ok) {
-          if (response.status === 404) {
-            setError('User not found');
-          } else {
-            setError('Failed to load user details');
-          }
-          return;
-        }
-
-        const data = await response.json();
-        
-        // Convert date strings back to Date objects
-        const userWithDates = {
-          ...data.user,
-          createdAt: new Date(data.user.createdAt),
-          updatedAt: new Date(data.user.updatedAt),
-          lastLoginAt: data.user.lastLoginAt ? new Date(data.user.lastLoginAt) : null,
-          dayOfBirth: data.user.dayOfBirth ? new Date(data.user.dayOfBirth) : null,
-          lastTokenUpdate: data.user.lastTokenUpdate ? new Date(data.user.lastTokenUpdate) : null,
-          userFirstDate: data.user.userFirstDate ? new Date(data.user.userFirstDate) : null,
-        };
-        
-        setUser(userWithDates);
-      } catch (err) {
-        console.error('Error loading user:', err);
-        setError('Failed to load user details');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (uid) {
-      loadUser();
-    }
-  }, [uid]);
 
 
 
@@ -249,7 +246,7 @@ export default function UserDetailsPage() {
     return platform.charAt(0).toUpperCase() + platform.slice(1);
   };
 
-  if (loading) {
+  if (userLoading) {
     return (
       <>
         <SiteHeader dictionary={headerDictionary} />
@@ -268,7 +265,7 @@ export default function UserDetailsPage() {
     );
   }
 
-  if (error || !user) {
+  if (userError || !user) {
     return (
       <>
         <SiteHeader dictionary={headerDictionary} />
@@ -288,7 +285,7 @@ export default function UserDetailsPage() {
                   {t('modules.userManagement.userNotFound') || 'User Not Found'}
                 </h1>
                 <p className="text-muted-foreground mt-2">
-                  {error || (t('modules.userManagement.userNotFoundDescription') || 'The requested user could not be found.')}
+                  {userError?.message || (t('modules.userManagement.userNotFoundDescription') || 'The requested user could not be found.')}
                 </p>
               </div>
             </div>
@@ -329,7 +326,7 @@ export default function UserDetailsPage() {
             </div>
 
             {/* User Profile */}
-            <div className="grid gap-6 lg:grid-cols-2">
+            <div className="grid gap-6 lg:grid-cols-2 xl:grid-cols-2">
               {/* Basic Information */}
               <Card>
                 <CardHeader>
@@ -612,8 +609,15 @@ export default function UserDetailsPage() {
                 </CardContent>
               </Card>
 
-              {/* Group Subscriptions Management */}
-              <UserGroupsCard userId={user.uid} />
+              {/* Group Subscriptions Management - Full Width */}
+              <div className="col-span-full">
+                <UserGroupsCard userId={user.uid} />
+              </div>
+
+              {/* Migration Management - Full Width */}
+              <div className="col-span-full">
+                <MigrationManagementCard userId={user.uid} user={user} />
+              </div>
             </div>
 
             {/* TODO: Add more sections like user permissions, recent activity, etc. */}

@@ -590,6 +590,7 @@
         "devicesIds": "معرفات الأجهزة",
         "connectedDevices": "الأجهزة المتصلة",
         "deviceCount": "الأجهزة المسجلة",
+        "groupSubscriptions": "اشتراكات المجموعات",
         "notSpecified": "غير محدد",
         "noDevices": "لا توجد أجهزة مسجلة",
         "sendNotification": "إرسال إشعار",
@@ -644,6 +645,64 @@
             "invalidBadge": "عدد الشارة يجب أن يكون رقماً",
             "invalidTtl": "TTL يجب أن يكون رقماً",
             "duplicateDataKey": "مفاتيح البيانات يجب أن تكون فريدة"
+          }
+        },
+        "migrationManagement": {
+          "title": "إدارة الترحيل",
+          "description": "إدارة ترحيل بيانات المتابعة من المصفوفات إلى المجموعة",
+          "viewMigrationStatus": "عرض حالة الترحيل",
+          "hideMigrationStatus": "إخفاء حالة الترحيل",
+          "loading": "جاري تحميل بيانات الترحيل...",
+          "error": "خطأ في تحميل بيانات الترحيل",
+          "noLegacyData": "لم يتم العثور على بيانات قديمة",
+          "migrationComplete": "اكتمل الترحيل",
+          "migrationIncomplete": "الترحيل غير مكتمل",
+          "totalFollowups": "إجمالي المتابعات",
+          "missingEntries": "الإدخالات المفقودة",
+          "duplicateEntries": "الإدخالات المكررة",
+          "relapses": {
+            "title": "الانتكاسات (userRelapses → relapse)",
+            "description": "حالة ترحيل إدخالات الانتكاسات",
+            "legacyCount": "الإدخالات القديمة",
+            "newCount": "الإدخالات المرحلة",
+            "missingCount": "الإدخالات المفقودة"
+          },
+          "mastOnly": {
+            "title": "الاستمناء فقط (userMasturbatingWithoutWatching → mastOnly)",
+            "description": "حالة ترحيل إدخالات الاستمناء فقط",
+            "legacyCount": "الإدخالات القديمة",
+            "newCount": "الإدخالات المرحلة",
+            "missingCount": "الإدخالات المفقودة"
+          },
+          "pornOnly": {
+            "title": "المشاهدة فقط (userWatchingWithoutMasturbating → pornOnly)",
+            "description": "حالة ترحيل إدخالات المشاهدة فقط",
+            "legacyCount": "الإدخالات القديمة",
+            "newCount": "الإدخالات المرحلة",
+            "missingCount": "الإدخالات المفقودة"
+          },
+          "migrateMissing": "ترحيل الإدخالات المفقودة",
+          "migrating": "جاري الترحيل...",
+          "migrateSuccess": "تم إكمال الترحيل بنجاح",
+          "migrateError": "فشل في ترحيل الإدخالات",
+          "allMigrated": "تم ترحيل جميع الإدخالات",
+          "removeDuplicates": "إزالة المكررات",
+          "removingDuplicates": "جاري إزالة المكررات...",
+          "duplicatesRemoved": "تم حذف المكررات بنجاح",
+          "duplicateRemovalError": "فشل في حذف المكررات",
+          "noDuplicates": "لم يتم العثور على مكررات",
+          "duplicatesList": "التواريخ المكررة",
+          "legacyEntries": "الإدخالات القديمة",
+          "migratedEntries": "الإدخالات المرحلة",
+          "missingEntriesList": "الإدخالات المفقودة",
+          "noMissingEntries": "لا توجد إدخالات مفقودة",
+          "refreshData": "تحديث البيانات",
+          "lastUpdated": "آخر تحديث",
+          "dateFormat": "YYYY-MM-DD",
+          "status": {
+            "complete": "مكتمل",
+            "incomplete": "غير مكتمل",
+            "pending": "في الانتظار"
           }
         },
         "userStatus": {

@@ -98,12 +98,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       );
     }
 
-    console.log(`FCM ${action} completed successfully:`, {
-      userId,
-      topicId,
-      action,
-      successCount: result.successCount,
-    });
+
 
     return NextResponse.json({
       success: true,
