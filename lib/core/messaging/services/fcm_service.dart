@@ -22,22 +22,47 @@ class MessagingService {
   );
   final _localNotificationPlugin = FlutterLocalNotificationsPlugin();
   final _messaging = FirebaseMessaging.instance;
+  final _auth = FirebaseAuth.instance;
+  final _firestore = FirebaseFirestore.instance;
   bool _isFlutterNotificationPluginInitalized = false;
 
   Future<void> init() async {
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
-    //1. Request permission
-    await requestPermission();
+    try {
+      //1. Request permission
+      await requestPermission();
+    } catch (e) {
+      print('Error requesting permissions: $e');
+      // Continue with initialization even if permissions fail
+    }
 
-    //2. Setup message handler
-    await _setupMessageHandler();
+    try {
+      //2. Setup message handler
+      await _setupMessageHandler();
+    } catch (e) {
+      print('Error setting up message handler: $e');
+      // Continue with initialization
+    }
 
-    //3. Get FCM token
-    await getFCMToken();
+    try {
+      //3. Get FCM token
+      await getFCMToken();
+    } catch (e) {
+      print('Error getting FCM token: $e');
+      // Continue with initialization
+    }
 
-    //4. Update FCM token
-    await updateFCMToken();
+    try {
+      //4. Update FCM token
+      await updateFCMToken();
+    } catch (e) {
+      print('Error updating FCM token: $e');
+      // Continue with initialization
+    }
+
+    //5. Setup auth state listener for topic subscription
+    _setupAuthStateListener();
   }
 
   Future<void> requestPermission() async {
@@ -166,6 +191,81 @@ class MessagingService {
       //Do something
     }
     await showNotification(message);
+  }
+
+  /// Sets up listener for authentication state changes
+  /// Subscribes logged-in users to all_users topic
+  void _setupAuthStateListener() {
+    _auth.authStateChanges().listen((User? user) async {
+      if (user != null) {
+        // User is signed in - subscribe to all_users topic and update FCM token
+        await _subscribeToAllUsersGroup();
+        await updateFCMToken();
+      }
+    });
+  }
+
+  /// Subscribes the logged-in user to the "all_users" messaging group
+  Future<void> _subscribeToAllUsersGroup() async {
+    final user = _auth.currentUser;
+    if (user == null) return;
+
+    try {
+      // Subscribe to FCM topic first (critical)
+      await _messaging.subscribeToTopic('all_users');
+      print('Successfully subscribed to all_users topic');
+
+      // Track subscription in Firestore (optional, non-blocking)
+      _trackAllUsersSubscription(user.uid).catchError((e) {
+        print('Error tracking subscription in Firestore: $e');
+        // Don't rethrow - this is optional
+      });
+    } catch (e) {
+      print('Error subscribing to all_users topic: $e');
+    }
+  }
+
+  /// Tracks that the user is subscribed to the all_users group
+  Future<void> _trackAllUsersSubscription(String userId) async {
+    try {
+      final userMembershipsRef =
+          _firestore.collection('userGroupMemberships').doc(userId);
+
+      final doc = await userMembershipsRef.get();
+      List<Map<String, dynamic>> currentGroups = [];
+
+      if (doc.exists) {
+        final data = doc.data();
+        if (data != null && data['groups'] != null) {
+          currentGroups = List<Map<String, dynamic>>.from(data['groups']);
+        }
+      }
+
+      // Check if already subscribed to all_users
+      bool alreadySubscribed = currentGroups.any(
+        (group) => group['topicId'] == 'all_users',
+      );
+
+      if (!alreadySubscribed) {
+        final now = Timestamp.now();
+        // Add all_users subscription
+        currentGroups.add({
+          'groupName': 'All Users',
+          'groupNameAr': 'جميع المستخدمين',
+          'topicId': 'all_users',
+          'subscribedAt': now,
+        });
+
+        // Update user's memberships
+        await userMembershipsRef.set({
+          'userId': userId,
+          'groups': currentGroups,
+          'updatedAt': now,
+        }, SetOptions(merge: true));
+      }
+    } catch (e) {
+      print('Error tracking all_users subscription: $e');
+    }
   }
 }
 

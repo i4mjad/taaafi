@@ -10,6 +10,8 @@ import 'package:reboot_app_3/core/routing/route_names.dart';
 import 'package:reboot_app_3/core/routing/scaffold_with_nested_navigation.dart';
 import 'package:reboot_app_3/features/account/presentation/account_screen.dart';
 import 'package:reboot_app_3/features/account/presentation/delete_account_screen.dart';
+import 'package:reboot_app_3/features/home/presentation/reports/user_reports_screen.dart';
+import 'package:reboot_app_3/features/home/presentation/reports/report_conversation_screen.dart';
 import 'package:reboot_app_3/features/authentication/presentation/complete_account_registeration.dart';
 import 'package:reboot_app_3/features/authentication/presentation/confirm_user_details_screen.dart';
 import 'package:reboot_app_3/features/authentication/presentation/confirm_user_email_screen.dart';
@@ -398,6 +400,26 @@ GoRouter goRouter(GoRouterRef ref) {
                       name: RouteNames.accountDelete.name,
                       child: DeleteAccountScreen(),
                     ),
+                  ),
+                  GoRoute(
+                    path: 'reports',
+                    name: RouteNames.userReports.name,
+                    pageBuilder: (context, state) => MaterialPage(
+                      name: RouteNames.userReports.name,
+                      child: UserReportsScreen(),
+                    ),
+                    routes: [
+                      GoRoute(
+                        path: 'conversation/:reportId',
+                        name: RouteNames.reportConversation.name,
+                        pageBuilder: (context, state) => MaterialPage(
+                          name: RouteNames.reportConversation.name,
+                          child: ReportConversationScreen(
+                            reportId: state.pathParameters['reportId']!,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),

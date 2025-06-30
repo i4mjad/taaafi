@@ -1,0 +1,198 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:reboot_app_3/features/home/application/user_reports_service.dart';
+import 'package:reboot_app_3/features/home/data/models/user_report.dart';
+import 'package:reboot_app_3/features/home/data/repos/user_reports_repository.dart';
+
+part 'user_reports_notifier.g.dart';
+
+@riverpod
+class UserReportsNotifier extends _$UserReportsNotifier {
+  UserReportsService get service => ref.read(userReportsServiceProvider);
+
+  @override
+  FutureOr<List<UserReport>> build() async {
+    return await service.getUserReports();
+  }
+
+  /// Submit a new data error report
+  Future<String> submitDataErrorReport({
+    required String userMessage,
+  }) async {
+    state = const AsyncValue.loading();
+    try {
+      final reportId = await service.submitDataErrorReport(
+        userMessage: userMessage,
+      );
+      // Refresh the reports after submission
+      state = AsyncValue.data(await service.getUserReports());
+      return reportId;
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+      rethrow;
+    }
+  }
+
+  /// Submit a new community feedback report
+  Future<String> submitCommunityFeedbackReport({
+    required String userMessage,
+  }) async {
+    state = const AsyncValue.loading();
+    try {
+      final reportId = await service.submitCommunityFeedbackReport(
+        userMessage: userMessage,
+      );
+      // Refresh the reports after submission
+      state = AsyncValue.data(await service.getUserReports());
+      return reportId;
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+      rethrow;
+    }
+  }
+
+  /// Submit a new contact us report
+  Future<String> submitContactUsReport({
+    required String userMessage,
+  }) async {
+    state = const AsyncValue.loading();
+    try {
+      final reportId = await service.submitContactUsReport(
+        userMessage: userMessage,
+      );
+      // Refresh the reports after submission
+      state = AsyncValue.data(await service.getUserReports());
+      return reportId;
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+      rethrow;
+    }
+  }
+
+  /// Add a message to an existing report
+  Future<void> addMessageToReport({
+    required String reportId,
+    required String message,
+  }) async {
+    try {
+      await service.addMessageToReport(
+        reportId: reportId,
+        message: message,
+      );
+      // Refresh the reports after adding message
+      state = AsyncValue.data(await service.getUserReports());
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+      rethrow;
+    }
+  }
+
+  /// Get a specific report by ID
+  Future<UserReport?> getReportById(String reportId) async {
+    try {
+      return await service.getReportById(reportId);
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+      rethrow;
+    }
+  }
+
+  /// Refresh the reports list
+  Future<void> refresh() async {
+    state = const AsyncValue.loading();
+    try {
+      state = AsyncValue.data(await service.getUserReports());
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+    }
+  }
+
+  /// Check if user has any pending reports
+  Future<bool> hasPendingReports() async {
+    try {
+      return await service.hasPendingReports();
+    } catch (e) {
+      return false;
+    }
+  }
+
+  /// Check if user should see the report button
+  Future<bool> shouldShowReportButton() async {
+    try {
+      return await service.shouldShowReportButton();
+    } catch (e) {
+      return true;
+    }
+  }
+
+  /// Get the most recent report if it exists
+  Future<UserReport?> getMostRecentReport() async {
+    try {
+      return await service.getMostRecentReport();
+    } catch (e) {
+      return null;
+    }
+  }
+
+  /// Check if user can submit new messages to a report
+  bool canSubmitMessage(UserReport report) {
+    return service.canSubmitMessage(report);
+  }
+
+  /// Get pending reports
+  Future<List<UserReport>> getPendingReports() async {
+    try {
+      return await service.getPendingReports();
+    } catch (e) {
+      return [];
+    }
+  }
+}
+
+/// Provider for report messages
+@riverpod
+Future<List<ReportMessage>> reportMessages(
+    ReportMessagesRef ref, String reportId) async {
+  final service = ref.watch(userReportsServiceProvider);
+  return await service.getReportMessages(reportId);
+}
+
+/// Provider for UserReportsService
+@riverpod
+UserReportsService userReportsService(UserReportsServiceRef ref) {
+  final repository = ref.watch(userReportsRepositoryProvider);
+  return UserReportsService(repository);
+}
+
+/// Provider for UserReportsRepository
+@riverpod
+UserReportsRepository userReportsRepository(UserReportsRepositoryRef ref) {
+  final firestore = FirebaseFirestore.instance;
+  return UserReportsRepository(firestore, ref);
+}
+
+/// Provider for watching user reports stream
+@riverpod
+Stream<List<UserReport>> userReportsStream(UserReportsStreamRef ref) {
+  final service = ref.watch(userReportsServiceProvider);
+  return service.watchUserReports();
+}
+
+/// Provider for watching report messages stream
+@riverpod
+Stream<List<ReportMessage>> reportMessagesStream(
+    ReportMessagesStreamRef ref, String reportId) {
+  final service = ref.watch(userReportsServiceProvider);
+  return service.watchReportMessages(reportId);
+}
+
+/// Provider for checking if report button should be shown
+@riverpod
+Future<bool> shouldShowReportButton(ShouldShowReportButtonRef ref) async {
+  final service = ref.watch(userReportsServiceProvider);
+  return await service.shouldShowReportButton();
+}
+
+/// Provider for hiding/showing the data error container
+final hideDataErrorContainerProvider = StateProvider<bool>((ref) => false);

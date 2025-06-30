@@ -30,4 +30,6 @@ enum RouteNames {
   vaultSettings,
   activitiesNotifications,
   community,
+  userReports,
+  reportConversation,
 }

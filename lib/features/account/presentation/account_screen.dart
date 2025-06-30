@@ -4,11 +4,11 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:reboot_app_3/core/routing/route_names.dart';
 import 'package:reboot_app_3/core/app_review/app_review.dart';
 import 'package:reboot_app_3/core/helpers/date_display_formater.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/monitoring/analytics_facade.dart';
-import 'package:reboot_app_3/core/routing/route_names.dart';
 import 'package:reboot_app_3/core/shared_widgets/app_bar.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
 import 'package:reboot_app_3/core/shared_widgets/custom_segmented_button.dart';
@@ -31,6 +31,7 @@ import 'package:reboot_app_3/features/authentication/providers/user_document_pro
 import 'package:reboot_app_3/core/shared_widgets/complete_registration_banner.dart';
 import 'package:reboot_app_3/core/shared_widgets/confirm_details_banner.dart';
 import 'package:reboot_app_3/core/shared_widgets/confirm_email_banner.dart';
+import 'package:reboot_app_3/features/account/presentation/contact_us_modal.dart';
 
 class AccountScreen extends ConsumerWidget {
   const AccountScreen({super.key});
@@ -108,6 +109,18 @@ class AccountScreen extends ConsumerWidget {
                               if (showMainContent)
                                 GestureDetector(
                                   onTap: () {
+                                    context
+                                        .pushNamed(RouteNames.userReports.name);
+                                  },
+                                  child: SettingsButton(
+                                    icon: LucideIcons.fileText,
+                                    textKey: 'my-reports',
+                                  ),
+                                ),
+                              verticalSpace(Spacing.points8),
+                              if (showMainContent)
+                                GestureDetector(
+                                  onTap: () {
                                     unawaited(ref
                                         .read(analyticsFacadeProvider)
                                         .trackUserResetDataStarted());
@@ -164,12 +177,20 @@ class AccountScreen extends ConsumerWidget {
                                 },
                               ),
                               verticalSpace(Spacing.points8),
+                              GestureDetector(
+                                onTap: () => _showContactUsModal(context),
+                                child: SettingsButton(
+                                  icon: LucideIcons.helpCircle,
+                                  textKey: 'contact-support-team',
+                                ),
+                              ),
+                              verticalSpace(Spacing.points8),
                               SettingsButton(
-                                icon: LucideIcons.contact,
+                                icon: LucideIcons.messageCircle,
                                 textKey: 'contact-us-through-this-channels',
                                 action: () async {
                                   await ref.read(urlLauncherProvider).launch(
-                                      Uri.parse('https://t.me/Ta3afiApp'));
+                                      Uri.parse('https://wa.me/96877451200'));
                                 },
                               ),
                               verticalSpace(Spacing.points8),
@@ -212,6 +233,15 @@ class AccountScreen extends ConsumerWidget {
       builder: (BuildContext context) {
         return ResetDataModalSheet();
       },
+    );
+  }
+
+  void _showContactUsModal(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => const ContactUsModal(),
     );
   }
 }
