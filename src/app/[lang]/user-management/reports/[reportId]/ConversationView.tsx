@@ -127,7 +127,7 @@ export default function ConversationView({ reportId, reportStatus, onStatusChang
     }
 
     try {
-      const userLocale = user.locale === 'ar' ? 'ar' : 'en';
+      const userLocale = user.locale === 'arabic' ? 'ar' : 'en';
       
       // Get localized notification content for new message
       const title = userLocale === 'ar' 

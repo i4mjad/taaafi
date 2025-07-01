@@ -222,7 +222,7 @@ export default function ReportDetailsPage() {
     }
 
     try {
-      const userLocale = user.locale === 'ar' ? 'ar' : 'en';
+      const userLocale = user.locale === 'arabic' ? 'ar' : 'en';
       const notificationKey = `body${newStatus.charAt(0).toUpperCase() + newStatus.slice(1)}`;
       
       const title = t(`modules.userManagement.reports.notifications.statusUpdate.${userLocale}.title`);
@@ -637,7 +637,7 @@ export default function ReportDetailsPage() {
                                 {t('modules.userManagement.locale') || 'Language'}
                               </span>
                               <span className="text-sm">
-                                {user.locale === 'ar' ? 'العربية' : 'English'}
+                                {user.locale === 'arabic' ? 'العربية' : 'English'}
                               </span>
                             </div>
 
