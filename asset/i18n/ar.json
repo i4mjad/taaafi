@@ -628,5 +628,7 @@
   "contact-request-submitted": "تم إرسال رسالتك! سنرد خلال 24 ساعة.",
   "max-active-reports-reached": "لديك بالفعل 2 تقارير نشطة من هذا النوع. يرجى انتظار حلها قبل إرسال تقرير جديد.",
   "message-cannot-be-empty": "لا يمكن أن تكون الرسالة فارغة",
-  "message-exceeds-character-limit": "الرسالة تتجاوز 220 حرف"
+  "message-exceeds-character-limit": "الرسالة تتجاوز 220 حرف",
+  "recovery-follow-up": "متابعة التعافي",
+  "recovery-follow-up-question": "متى تريد البدء في متابعة تعافيك؟ التاريخ الذي ستقوم باختياره، سنقوم ببدء العد منه"
 }

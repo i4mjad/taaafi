@@ -8,6 +8,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:go_router/go_router.dart';
 import 'package:reboot_app_3/core/messaging/repositories/fcm_repository.dart';
 import 'package:reboot_app_3/core/routing/route_names.dart';
+import 'package:reboot_app_3/core/routing/navigator_keys.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'fcm_service.g.dart';
@@ -29,13 +30,8 @@ class MessagingService with WidgetsBindingObserver {
   final _firestore = FirebaseFirestore.instance;
   bool _isFlutterNotificationPluginInitalized = false;
 
-  // Add GoRouter reference
-  static GoRouter? _router;
-
-  // Initialize with router
-  static void initializeWithRouter(GoRouter router) {
-    _router = router;
-  }
+  // Pending message to handle once context is available
+  RemoteMessage? _queuedMessage;
 
   Future<void> init() async {
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
@@ -78,10 +74,7 @@ class MessagingService with WidgetsBindingObserver {
     //5. Setup auth state listener for topic subscription
     _setupAuthStateListener();
 
-    //6. Clear badge when app starts
-    await clearBadge();
-
-    //7. Check if app was opened from a notification when terminated
+    //6. Check if app was opened from a notification when terminated
     final initialMessage = await _messaging.getInitialMessage();
     if (initialMessage != null) {
       print('App opened from notification: ${initialMessage.messageId}');
@@ -104,11 +97,6 @@ class MessagingService with WidgetsBindingObserver {
 
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
-  }
-
-  /// Public method to manually clear app badge - can be called from anywhere in the app
-  static Future<void> clearAppBadge() async {
-    await instance.clearBadge();
   }
 
   /// Public method to get and print FCM token for testing
@@ -311,11 +299,24 @@ class MessagingService with WidgetsBindingObserver {
 
   /// Handles navigation based on notification data
   Future<void> _handleNotificationNavigation(RemoteMessage message) async {
-    // Check if router is available
-    if (_router == null) {
-      print('Router not initialized, cannot navigate from notification');
+    // Try to obtain a BuildContext from the rootNavigatorKey
+    final ctx = rootNavigatorKey.currentContext;
+
+    if (ctx == null) {
+      // Context isn't ready yet – queue the message for later and retry
+      print('BuildContext not ready yet. Queuing navigation.');
+      _queuedMessage = message;
+      // Retry after next frame (max 5 attempts to avoid infinite loop)
+      Future.delayed(const Duration(milliseconds: 300), () {
+        if (_queuedMessage != null) {
+          _handleNotificationNavigation(_queuedMessage!);
+        }
+      });
       return;
     }
+
+    // We have a context, clear any queued message
+    _queuedMessage = null;
 
     final data = message.data;
     final screen = data['screen'];
@@ -336,7 +337,7 @@ class MessagingService with WidgetsBindingObserver {
         case 'reportDetails':
           final reportId = data['reportId'];
           if (reportId != null) {
-            _router!.goNamed(
+            GoRouter.of(ctx).goNamed(
               RouteNames.reportConversation.name,
               pathParameters: {'reportId': reportId},
             );
@@ -344,36 +345,36 @@ class MessagingService with WidgetsBindingObserver {
           break;
 
         case 'userReports':
-          _router!.goNamed(RouteNames.userReports.name);
+          GoRouter.of(ctx).goNamed(RouteNames.userReports.name);
           break;
 
         case 'activities':
-          _router!.goNamed(RouteNames.activities.name);
+          GoRouter.of(ctx).goNamed(RouteNames.activities.name);
           break;
 
         case 'library':
-          _router!.goNamed(RouteNames.library.name);
+          GoRouter.of(ctx).goNamed(RouteNames.library.name);
           break;
 
         case 'diaries':
-          _router!.goNamed(RouteNames.diaries.name);
+          GoRouter.of(ctx).goNamed(RouteNames.diaries.name);
           break;
 
         case 'community':
-          _router!.goNamed(RouteNames.community.name);
+          GoRouter.of(ctx).goNamed(RouteNames.community.name);
           break;
 
         case 'account':
-          _router!.goNamed(RouteNames.account.name);
+          GoRouter.of(ctx).goNamed(RouteNames.account.name);
           break;
 
         case 'vault':
-          _router!.goNamed(RouteNames.vault.name);
+          GoRouter.of(ctx).goNamed(RouteNames.vault.name);
           break;
 
         case 'home':
         default:
-          _router!.goNamed(RouteNames.home.name);
+          GoRouter.of(ctx).goNamed(RouteNames.home.name);
           break;
       }
     } catch (e) {

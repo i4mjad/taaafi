@@ -650,5 +650,7 @@
   "contact-request-submitted": "Your message has been sent! We'll respond within 24 hours.",
   "max-active-reports-reached": "You already have 2 active reports of this type. Please wait for them to be resolved before submitting a new one.",
   "message-cannot-be-empty": "Message cannot be empty",
-  "message-exceeds-character-limit": "Message exceeds 220 characters"
+  "message-exceeds-character-limit": "Message exceeds 220 characters",
+  "recovery-follow-up": "Recovery Follow-up",
+  "recovery-follow-up-question": "When do you want to start tracking your recovery? We will start counting from the date you choose"
 }

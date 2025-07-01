@@ -266,13 +266,15 @@ class _CompleteAccountRegisterationScreenState
                               ),
                               verticalSpace(Spacing.points16),
                               Text(
-                                'متابعة التعافي',
+                                AppLocalizations.of(context)
+                                    .translate('recovery-follow-up'),
                                 style: TextStyles.h6
                                     .copyWith(color: theme.grey[900]),
                               ),
                               verticalSpace(Spacing.points8),
                               Text(
-                                'متى تريد البدء في متابعة تعافيك؟ التاريخ الذي ستقوم باختياره، سنقوم ببدء العد منه',
+                                AppLocalizations.of(context)
+                                    .translate('recovery-follow-up-question'),
                                 style: TextStyles.footnote
                                     .copyWith(color: theme.grey[600]),
                               ),

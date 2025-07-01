@@ -127,6 +127,7 @@ class _ReportConversationScreenState
           // Report info header
           reportAsyncValue.when(
             data: (reports) {
+              //TODO: pass the report id to he screen instead of filtering it like this
               final report = reports.firstWhere(
                 (r) => r.id == widget.reportId,
                 orElse: () => throw Exception('Report not found'),
@@ -476,7 +477,7 @@ class RoadmapUpdate extends StatelessWidget {
     final updateColor = isUser ? theme.primary[600]! : theme.success[600]!;
     final updateIcon = isUser ? LucideIcons.user : LucideIcons.shield;
     final updateTitle = isUser
-        ? localization.translate('user-update')
+        ? localization.translate('you')
         : localization.translate('admin-response');
 
     return IntrinsicHeight(
@@ -542,13 +543,11 @@ class RoadmapUpdate extends StatelessWidget {
                     // Update header
                     Row(
                       children: [
-                        Container(
+                        WidgetsContainer(
                           padding:
                               EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                          decoration: BoxDecoration(
-                            color: updateColor.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
+                          backgroundColor: updateColor.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(4),
                           child: Text(
                             '${localization.translate("update")} $updateNumber',
                             style: TextStyles.small.copyWith(
@@ -560,9 +559,8 @@ class RoadmapUpdate extends StatelessWidget {
                         horizontalSpace(Spacing.points8),
                         Text(
                           updateTitle,
-                          style: TextStyles.body.copyWith(
+                          style: TextStyles.footnoteSelected.copyWith(
                             color: theme.grey[700],
-                            fontWeight: FontWeight.w500,
                           ),
                         ),
                       ],
@@ -573,7 +571,7 @@ class RoadmapUpdate extends StatelessWidget {
                     // Message content
                     Text(
                       message.message,
-                      style: TextStyles.body.copyWith(
+                      style: TextStyles.bodyLarge.copyWith(
                         color: theme.grey[800],
                         height: 1.5,
                       ),
