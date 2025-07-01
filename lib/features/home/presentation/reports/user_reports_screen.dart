@@ -12,6 +12,7 @@ import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/features/home/data/models/user_report.dart';
 import 'package:reboot_app_3/features/home/data/user_reports_notifier.dart';
+import 'package:reboot_app_3/features/home/application/user_reports_service.dart';
 
 class UserReportsScreen extends ConsumerWidget {
   const UserReportsScreen({super.key});
@@ -96,6 +97,20 @@ class ReportCard extends ConsumerWidget {
 
   const ReportCard({super.key, required this.report});
 
+  /// Get the localization key for the report type title
+  String _getReportTypeTitleKey(String reportTypeId) {
+    switch (reportTypeId) {
+      case ReportTypes.dataError:
+        return 'report-data-error';
+      case ReportTypes.communityFeedback:
+        return 'community-feedback';
+      case ReportTypes.contactUs:
+        return 'contact-us';
+      default:
+        return 'my-reports';
+    }
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = AppTheme.of(context);
@@ -161,7 +176,8 @@ class ReportCard extends ConsumerWidget {
                       horizontalSpace(Spacing.points8),
                       Expanded(
                         child: Text(
-                          localization.translate('report-data-error'),
+                          localization.translate(
+                              _getReportTypeTitleKey(report.reportTypeId)),
                           style: TextStyles.body.copyWith(
                             color: theme.grey[800],
                             fontWeight: FontWeight.w500,

@@ -167,7 +167,7 @@
   "update-profile": "Update Profile",
   "profile-updated": "Your profile has been updated!",
   "years": "Years",
-  "admin": "Admin",
+  
   "user": "User",
   
   "enter-a-valid-dob": "Enter a valid Day of Birth",
@@ -259,7 +259,7 @@
   "contact-us-through-this-channels": "Contact us",
   "support-app-development": "Support App Development",
   "support-app-development-p": "App development takes a lot of time and effort, yet it remains free and ad-free. If you want to support the development, choose from the following options",
-  "contact-us": "Contact us through the following platforms:",
+  "contact-us": "Contact us",
   "new-note": "New Note",
   "ta3afi": "Ta'aafi App",
   "taaafi-platform": "Ta'aafi Platform",
@@ -502,7 +502,7 @@
   "user-id-copied": "User ID copied to clipboard",
   "whatsapp-error": "Could not launch WhatsApp",
   "error-updating-activity": "Error updating activity",
-  "update": "Update",
+  
   "update-activity-dates": "Update Activity Dates",
   "update-activity-warning": "Warning: This will reset all scheduled tasks. Your previous progress will be marked as deleted.",
   "scheduled-for": "Scheduled for",
