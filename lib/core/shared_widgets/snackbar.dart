@@ -57,6 +57,7 @@ SnackBar _errorSnackBar(BuildContext context, String messageId) {
               AppLocalizations.of(context).translate(messageId),
               style: TextStyles.caption.copyWith(
                 color: theme.error[900],
+                height: 1.5,
               ),
             ),
           ),
@@ -99,6 +100,7 @@ SnackBar _successSnackBar(BuildContext context, String messageId) {
               AppLocalizations.of(context).translate(messageId),
               style: TextStyles.caption.copyWith(
                 color: theme.success[600],
+                height: 1.5,
               ),
             ),
           ),

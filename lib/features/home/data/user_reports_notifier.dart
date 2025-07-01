@@ -22,12 +22,18 @@ class UserReportsNotifier extends _$UserReportsNotifier {
   }) async {
     state = const AsyncValue.loading();
     try {
-      final reportId = await service.submitDataErrorReport(
+      final result = await service.submitDataErrorReport(
         userMessage: userMessage,
       );
-      // Refresh the reports after submission
-      state = AsyncValue.data(await service.getUserReports());
-      return reportId;
+
+      if (result.isSuccess) {
+        // Refresh the reports after submission
+        state = AsyncValue.data(await service.getUserReports());
+        return result.data!;
+      } else {
+        state = AsyncValue.error(result.errorKey!, StackTrace.current);
+        throw Exception(result.errorKey!);
+      }
     } catch (e, st) {
       state = AsyncValue.error(e, st);
       rethrow;
@@ -40,12 +46,18 @@ class UserReportsNotifier extends _$UserReportsNotifier {
   }) async {
     state = const AsyncValue.loading();
     try {
-      final reportId = await service.submitCommunityFeedbackReport(
+      final result = await service.submitCommunityFeedbackReport(
         userMessage: userMessage,
       );
-      // Refresh the reports after submission
-      state = AsyncValue.data(await service.getUserReports());
-      return reportId;
+
+      if (result.isSuccess) {
+        // Refresh the reports after submission
+        state = AsyncValue.data(await service.getUserReports());
+        return result.data!;
+      } else {
+        state = AsyncValue.error(result.errorKey!, StackTrace.current);
+        throw Exception(result.errorKey!);
+      }
     } catch (e, st) {
       state = AsyncValue.error(e, st);
       rethrow;
@@ -58,12 +70,18 @@ class UserReportsNotifier extends _$UserReportsNotifier {
   }) async {
     state = const AsyncValue.loading();
     try {
-      final reportId = await service.submitContactUsReport(
+      final result = await service.submitContactUsReport(
         userMessage: userMessage,
       );
-      // Refresh the reports after submission
-      state = AsyncValue.data(await service.getUserReports());
-      return reportId;
+
+      if (result.isSuccess) {
+        // Refresh the reports after submission
+        state = AsyncValue.data(await service.getUserReports());
+        return result.data!;
+      } else {
+        state = AsyncValue.error(result.errorKey!, StackTrace.current);
+        throw Exception(result.errorKey!);
+      }
     } catch (e, st) {
       state = AsyncValue.error(e, st);
       rethrow;
@@ -76,10 +94,15 @@ class UserReportsNotifier extends _$UserReportsNotifier {
     required String message,
   }) async {
     try {
-      await service.addMessageToReport(
+      final result = await service.addMessageToReport(
         reportId: reportId,
         message: message,
       );
+
+      if (!result.isSuccess) {
+        throw Exception(result.errorKey!);
+      }
+
       // Refresh the reports after adding message
       state = AsyncValue.data(await service.getUserReports());
     } catch (e, st) {

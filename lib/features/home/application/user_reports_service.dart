@@ -1,6 +1,20 @@
 import 'package:reboot_app_3/features/home/data/models/user_report.dart';
 import 'package:reboot_app_3/features/home/data/repos/user_reports_repository.dart';
 
+/// Result class for report operations
+class ReportResult<T> {
+  final bool isSuccess;
+  final T? data;
+  final String? errorKey;
+
+  const ReportResult.success(this.data)
+      : isSuccess = true,
+        errorKey = null;
+  const ReportResult.error(this.errorKey)
+      : isSuccess = false,
+        data = null;
+}
+
 /// Report type constants
 class ReportTypes {
   static const String dataError = 'AVgC6BG76LJqDaalZFvV';
@@ -28,7 +42,7 @@ class UserReportsService {
   }
 
   /// Submit a new data error report
-  Future<String> submitDataErrorReport({
+  Future<ReportResult<String>> submitDataErrorReport({
     required String userMessage,
   }) async {
     return await _submitReport(
@@ -38,7 +52,7 @@ class UserReportsService {
   }
 
   /// Submit a new community feedback report
-  Future<String> submitCommunityFeedbackReport({
+  Future<ReportResult<String>> submitCommunityFeedbackReport({
     required String userMessage,
   }) async {
     return await _submitReport(
@@ -48,7 +62,7 @@ class UserReportsService {
   }
 
   /// Submit a new contact us report
-  Future<String> submitContactUsReport({
+  Future<ReportResult<String>> submitContactUsReport({
     required String userMessage,
   }) async {
     return await _submitReport(
@@ -58,48 +72,57 @@ class UserReportsService {
   }
 
   /// Generic method to submit a report with validation
-  Future<String> _submitReport({
+  Future<ReportResult<String>> _submitReport({
     required String reportTypeId,
     required String userMessage,
   }) async {
     if (userMessage.trim().isEmpty) {
-      throw Exception('User message cannot be empty');
+      return const ReportResult.error('message-cannot-be-empty');
     }
 
     if (userMessage.length > 220) {
-      throw Exception('Message exceeds 220 characters');
+      return const ReportResult.error('message-exceeds-character-limit');
     }
 
     // Check if user can create another report of this type
     final canCreate = await canCreateReport(reportTypeId);
     if (!canCreate) {
-      throw Exception(
-          'You already have 2 active reports of this type. Please wait for them to be resolved.');
+      return const ReportResult.error('max-active-reports-reached');
     }
 
-    return await _repository.createReport(
-      reportTypeId: reportTypeId,
-      initialMessage: userMessage,
-    );
+    try {
+      final reportId = await _repository.createReport(
+        reportTypeId: reportTypeId,
+        initialMessage: userMessage,
+      );
+      return ReportResult.success(reportId);
+    } catch (e) {
+      return const ReportResult.error('report-submission-failed');
+    }
   }
 
   /// Add a message to an existing report
-  Future<void> addMessageToReport({
+  Future<ReportResult<void>> addMessageToReport({
     required String reportId,
     required String message,
   }) async {
     if (message.trim().isEmpty) {
-      throw Exception('Message cannot be empty');
+      return const ReportResult.error('message-cannot-be-empty');
     }
 
     if (message.length > 220) {
-      throw Exception('Message exceeds 220 characters');
+      return const ReportResult.error('message-exceeds-character-limit');
     }
 
-    await _repository.addMessage(
-      reportId: reportId,
-      message: message,
-    );
+    try {
+      await _repository.addMessage(
+        reportId: reportId,
+        message: message,
+      );
+      return const ReportResult.success(null);
+    } catch (e) {
+      return const ReportResult.error('report-submission-failed');
+    }
   }
 
   /// Get all user reports

@@ -46,7 +46,6 @@ class _ConfirmUserEmailScreenState
   @override
   void initState() {
     super.initState();
-    _startVerificationCheck();
     _getCurrentEmail();
     _listenToAuthChanges();
   }
@@ -146,6 +145,11 @@ class _ConfirmUserEmailScreenState
             getSuccessSnackBar(context, 'email-verified-successfully');
             context.goNamed(RouteNames.home.name);
           }
+        }
+      } else {
+        // Email is not verified yet - show warning snackbar
+        if (mounted) {
+          getErrorSnackBar(context, 'email-not-verified-yet');
         }
       }
     } catch (e) {
@@ -253,7 +257,7 @@ class _ConfirmUserEmailScreenState
                       verticalSpace(Spacing.points16),
                       Text(
                         AppLocalizations.of(context)
-                                .translate('verification-email-sent-to') +
+                                .translate('send-verification-email-first') +
                             ' ${_currentEmail}',
                         style: TextStyles.body.copyWith(
                           color: theme.grey[600],
@@ -264,7 +268,7 @@ class _ConfirmUserEmailScreenState
                       verticalSpace(Spacing.points8),
                       Text(
                         AppLocalizations.of(context)
-                            .translate('check-inbox-and-click-link'),
+                            .translate('check-main-and-junk-mail-then-refresh'),
                         style: TextStyles.footnote.copyWith(
                           color: theme.grey[500],
                           height: 1.4,
@@ -695,6 +699,36 @@ class _ChangeEmailBottomSheetState
               height: 1.4,
             ),
           ),
+          verticalSpace(Spacing.points12),
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: theme.warn[50],
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: theme.warn[200]!, width: 1),
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Icon(
+                  LucideIcons.alertTriangle,
+                  color: theme.warn[600],
+                  size: 16,
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    AppLocalizations.of(context)
+                        .translate('email-change-signout-warning'),
+                    style: TextStyles.small.copyWith(
+                      color: theme.warn[700],
+                      height: 1.4,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
           verticalSpace(Spacing.points16),
           Form(
             key: _formKey,
@@ -847,9 +881,9 @@ class UserIdContainer extends ConsumerWidget {
     if (user == null) return const SizedBox.shrink();
 
     return WidgetsContainer(
-      backgroundColor: theme.grey[50],
+      backgroundColor: theme.backgroundColor,
       borderSide: BorderSide(
-        color: theme.grey[300]!,
+        color: theme.grey[100]!,
         width: 1,
       ),
       width: double.infinity,
@@ -878,7 +912,7 @@ class UserIdContainer extends ConsumerWidget {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: theme.grey[100],
+              color: theme.backgroundColor,
               borderRadius: BorderRadius.circular(8),
               border: Border.all(color: theme.grey[200]!, width: 1),
             ),

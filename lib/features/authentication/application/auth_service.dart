@@ -53,6 +53,11 @@ class AuthService {
         password: password,
       );
 
+      // Send email verification immediately after account creation
+      if (credential.user != null && !credential.user!.emailVerified) {
+        await credential.user!.sendEmailVerification();
+      }
+
       final fcmToken = await _fcmRepository.getMessagingToken();
       final deviceId = await _getDeviceId();
 

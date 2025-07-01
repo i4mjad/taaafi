@@ -565,6 +565,10 @@
   "email-verified-successfully": "Email verified successfully! Welcome to Ta'afi.",
   "verification-email-sent": "Verification email sent successfully",
   "failed-to-send-verification-email": "Failed to send verification email. Please try again.",
+  "send-verification-email-first": "First, send the verification email to",
+  "check-main-and-junk-mail-then-refresh": "Check your main and junk mail folders, then come back here to refresh",
+  "email-change-signout-warning": "Important: If you successfully update your email and confirm it by clicking the verification link, then come back here to check verification status, you will be signed out immediately as a security measure. This automatic sign-out indicates that your email change was successful. You will need to log in again with your new email address.",
+  "email-not-verified-yet": "Email not verified yet. Try resending the verification email and check your inbox and junk folder.",
   "seconds": "s",
   "change-email": "Change Email",
   "change-email-description": "If you entered an incorrect email address during registration, you can change it here. A new verification email will be sent to the new address.",
@@ -643,5 +647,8 @@
   "contact-us-placeholder": "Describe your question or issue...",
   "contact-us-note": "We're here to help",
   "send-request": "Send Request",
-  "contact-request-submitted": "Your message has been sent! We'll respond within 24 hours."
+  "contact-request-submitted": "Your message has been sent! We'll respond within 24 hours.",
+  "max-active-reports-reached": "You already have 2 active reports of this type. Please wait for them to be resolved before submitting a new one.",
+  "message-cannot-be-empty": "Message cannot be empty",
+  "message-exceeds-character-limit": "Message exceeds 220 characters"
 }

@@ -18,6 +18,7 @@ import 'package:reboot_app_3/core/utils/url_launcher_provider.dart';
 import 'package:reboot_app_3/features/authentication/application/auth_service.dart';
 import 'package:reboot_app_3/features/authentication/data/repositories/auth_repository.dart';
 import 'package:reboot_app_3/features/authentication/providers/user_document_provider.dart';
+import 'package:reboot_app_3/core/shared_widgets/snackbar.dart';
 
 class SignUpScreen extends ConsumerWidget {
   const SignUpScreen({super.key});
@@ -310,6 +311,7 @@ class _SignUpFormState extends ConsumerState<SignUpForm> {
                     },
                   ),
                   verticalSpace(Spacing.points16),
+                  //TODO: localize this
                   Text(
                     'متابعة التعافي',
                     style: TextStyles.h6.copyWith(color: theme.grey[900]),
@@ -458,6 +460,10 @@ class _SignUpFormState extends ConsumerState<SignUpForm> {
                         );
 
                         if (mounted) {
+                          // Show success message about email verification
+                          getSuccessSnackBar(
+                              context, 'email-verification-info');
+
                           unawaited(ref
                               .read(analyticsFacadeProvider)
                               .trackUserSignup());

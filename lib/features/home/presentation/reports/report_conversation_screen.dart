@@ -87,7 +87,20 @@ class _ReportConversationScreenState
       }
     } catch (e) {
       if (mounted) {
-        getSystemSnackBar(context, e.toString());
+        // Extract the localization key from the exception message
+        String errorKey = 'report-submission-failed';
+        if (e.toString().contains('Exception: ')) {
+          final extractedKey = e.toString().replaceFirst('Exception: ', '');
+          // Check if it's one of our known error keys
+          if ([
+            'max-active-reports-reached',
+            'message-cannot-be-empty',
+            'message-exceeds-character-limit'
+          ].contains(extractedKey)) {
+            errorKey = extractedKey;
+          }
+        }
+        getErrorSnackBar(context, errorKey);
       }
     } finally {
       if (mounted) {
