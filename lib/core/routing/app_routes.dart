@@ -43,6 +43,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:reboot_app_3/features/authentication/data/models/user_document.dart';
 import 'dart:async';
+import 'package:firebase_auth/firebase_auth.dart';
 
 part 'app_routes.g.dart';
 
@@ -83,27 +84,27 @@ GoRouter goRouter(GoRouterRef ref) {
     ],
     refreshListenable: GoRouterRefreshStream(refreshController.stream),
     redirect: (context, state) async {
-      final isLoggedIn = authState.asData?.value != null;
+      // Rely on the cached FirebaseAuth user to know the auth status *immediately*
+      // at app startup. This prevents an incorrect redirect to the onboarding
+      // flow before `authStateChangesProvider` emits its first value.
+
+      final firebaseUser = FirebaseAuth.instance.currentUser;
+      final bool isLoggedIn = firebaseUser != null;
 
       if (isLoggedIn) {
-        // Check if the auth state is being refreshed
-        if (authState is AsyncLoading) {
-          if (state.matchedLocation != '/loading') {
-            return '/loading';
-          }
-          return null;
-        }
-
-        // If user is logged in and currently on onboarding or loading, redirect to home
+        // User is authenticated. If they somehow landed on the onboarding or
+        // loading routes, send them to the home screen instead.
         if (state.matchedLocation.startsWith('/onboarding') ||
             state.matchedLocation == '/loading') {
           return '/home';
         }
         return null;
       } else {
-        // Non-logged-in user trying to access protected routes
-        final isAuthRoute = state.matchedLocation.startsWith('/onboarding');
-        if (!isAuthRoute && state.matchedLocation != '/onboarding') {
+        // User is not authenticated. Force them into the onboarding flow if
+        // they try to visit a protected route.
+        final isOnboardingRoute =
+            state.matchedLocation.startsWith('/onboarding');
+        if (!isOnboardingRoute && state.matchedLocation != '/onboarding') {
           return '/onboarding';
         }
       }

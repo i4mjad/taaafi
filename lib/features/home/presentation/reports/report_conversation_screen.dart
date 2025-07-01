@@ -548,6 +548,8 @@ class RoadmapUpdate extends StatelessWidget {
                               EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                           backgroundColor: updateColor.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(4),
+                          borderSide:
+                              BorderSide(color: updateColor.withOpacity(0.5)),
                           child: Text(
                             '${localization.translate("update")} $updateNumber',
                             style: TextStyles.small.copyWith(
@@ -571,7 +573,7 @@ class RoadmapUpdate extends StatelessWidget {
                     // Message content
                     Text(
                       message.message,
-                      style: TextStyles.bodyLarge.copyWith(
+                      style: TextStyles.caption.copyWith(
                         color: theme.grey[800],
                         height: 1.5,
                       ),
