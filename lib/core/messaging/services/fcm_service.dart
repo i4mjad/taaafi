@@ -78,10 +78,9 @@ class MessagingService with WidgetsBindingObserver {
     final initialMessage = await _messaging.getInitialMessage();
     if (initialMessage != null) {
       print('App opened from notification: ${initialMessage.messageId}');
-      // Use post frame callback to ensure navigation is ready
-      WidgetsBinding.instance.addPostFrameCallback((_) async {
-        await _handleNotificationNavigation(initialMessage);
-      });
+      // Defer navigation until after the UI (and GoRouter) have been
+      // completely built. We'll process this message later from MyApp.
+      _queuedMessage = initialMessage;
     }
   }
 
@@ -278,10 +277,11 @@ class MessagingService with WidgetsBindingObserver {
     //Background
     FirebaseMessaging.onMessageOpenedApp.listen(_handleBackgroundMessage);
 
-    //Opened app
+    //Opened app (cold start). We just queue the message and let the app
+    //process it once navigation is fully ready.
     final initialMessage = await _messaging.getInitialMessage();
     if (initialMessage != null) {
-      await _handleBackgroundMessage(initialMessage);
+      _queuedMessage = initialMessage;
     }
   }
 
@@ -454,6 +454,17 @@ class MessagingService with WidgetsBindingObserver {
       }
     } catch (e) {
       print('Error tracking all_users subscription: $e');
+    }
+  }
+
+  /// Call this **after** the UI & GoRouter are ready (e.g. from MyApp) to
+  /// process any message that was received while the app was terminated.
+  void processQueuedMessage() {
+    if (_queuedMessage != null) {
+      final msg = _queuedMessage!;
+      // Do NOT clear _queuedMessage yet. Let _handleNotificationNavigation
+      // clear it when navigation actually succeeds (ctx available).
+      _handleNotificationNavigation(msg);
     }
   }
 }

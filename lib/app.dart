@@ -17,6 +17,7 @@ import 'package:reboot_app_3/core/theming/color_theme_provider.dart';
 import 'package:reboot_app_3/core/utils/firebase_remote_config_provider.dart';
 import 'package:reboot_app_3/core/utils/url_launcher_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:reboot_app_3/core/messaging/services/fcm_service.dart';
 
 class MyApp extends ConsumerWidget {
   @override
@@ -78,8 +79,14 @@ class MyApp extends ConsumerWidget {
             theme: themeController.darkTheme
                 ? darkTheme
                 : getLightTheme(colorTheme),
-            builder: (_, child) {
-              // Startup is already complete, just wrap in ForceUpdateWidget
+            builder: (context, child) {
+              // Ensure any queued notification deep-link is processed once the
+              // router & UI are fully ready.
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                MessagingService.instance.processQueuedMessage();
+              });
+
+              // Wrap the content with ForceUpdateWidget as before.
               return ForceUpdateWidget(
                 navigatorKey: rootNavigatorKey,
                 allowCancel: false,
