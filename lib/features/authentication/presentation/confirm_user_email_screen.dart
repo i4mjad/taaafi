@@ -90,13 +90,6 @@ class _ConfirmUserEmailScreenState
     _currentEmail = FirebaseAuth.instance.currentUser?.email;
   }
 
-  void _startVerificationCheck() {
-    _verificationTimer =
-        Timer.periodic(const Duration(seconds: 3), (timer) async {
-      await _checkEmailVerification();
-    });
-  }
-
   Future<void> _checkEmailVerification() async {
     if (_isChecking) return;
 

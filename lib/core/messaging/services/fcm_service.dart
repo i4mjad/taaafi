@@ -3,13 +3,14 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:reboot_app_3/core/messaging/repositories/fcm_repository.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'fcm_service.g.dart';
 
-class MessagingService {
+class MessagingService with WidgetsBindingObserver {
   MessagingService._();
 
   static final MessagingService instance = MessagingService._();
@@ -28,6 +29,9 @@ class MessagingService {
 
   Future<void> init() async {
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+
+    // Add lifecycle observer to listen for app state changes
+    WidgetsBinding.instance.addObserver(this);
 
     try {
       //1. Request permission
@@ -63,6 +67,70 @@ class MessagingService {
 
     //5. Setup auth state listener for topic subscription
     _setupAuthStateListener();
+
+    //6. Clear badge when app starts
+    await clearBadge();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+
+    // Clear badge when app comes to foreground
+    if (state == AppLifecycleState.resumed) {
+      clearBadge();
+    }
+  }
+
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+  }
+
+  /// Public method to manually clear app badge - can be called from anywhere in the app
+  static Future<void> clearAppBadge() async {
+    await instance.clearBadge();
+  }
+
+  /// Clears the app badge count on iOS
+  Future<void> clearBadge() async {
+    if (Platform.isIOS) {
+      try {
+        // Use Firebase Messaging to set badge count to 0
+        await _messaging.setAutoInitEnabled(true);
+
+        // Use the iOS specific implementation to clear badge
+        final iosPlugin =
+            _localNotificationPlugin.resolvePlatformSpecificImplementation<
+                IOSFlutterLocalNotificationsPlugin>();
+
+        if (iosPlugin != null) {
+          // Clear all pending notifications and reset badge
+          await _localNotificationPlugin.cancelAll();
+
+          // Set badge to 0 using a hidden notification
+          await _localNotificationPlugin.show(
+            99999, // Use a high ID to avoid conflicts
+            '', // empty title
+            '', // empty body
+            NotificationDetails(
+              iOS: DarwinNotificationDetails(
+                presentAlert: false,
+                presentBadge: true,
+                presentSound: false,
+                badgeNumber: 0, // Set badge to 0
+              ),
+            ),
+          );
+
+          // Immediately cancel the hidden notification
+          await _localNotificationPlugin.cancel(99999);
+        }
+
+        print('Badge cleared successfully');
+      } catch (e) {
+        print('Error clearing badge: $e');
+      }
+    }
   }
 
   Future<void> requestPermission() async {
@@ -119,6 +187,8 @@ class MessagingService {
     await _localNotificationPlugin.initialize(initalSettings,
         onDidReceiveNotificationResponse: (response) async {
       print('onDidReceiveNotificationResponse: $response');
+      // Clear badge when user taps on notification
+      await clearBadge();
     });
 
     _isFlutterNotificationPluginInitalized = true;
@@ -187,6 +257,11 @@ class MessagingService {
   }
 
   Future<void> _handleBackgroundMessage(RemoteMessage message) async {
+    print('Handling background message: ${message.messageId}');
+
+    // Clear badge when app is opened from notification
+    await clearBadge();
+
     if (message.data["type"] == "news") {
       //Do something
     }
