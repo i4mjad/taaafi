@@ -95,36 +95,23 @@ class MessagingService with WidgetsBindingObserver {
   Future<void> clearBadge() async {
     if (Platform.isIOS) {
       try {
-        // Use Firebase Messaging to set badge count to 0
-        await _messaging.setAutoInitEnabled(true);
-
-        // Use the iOS specific implementation to clear badge
-        final iosPlugin =
-            _localNotificationPlugin.resolvePlatformSpecificImplementation<
-                IOSFlutterLocalNotificationsPlugin>();
-
-        if (iosPlugin != null) {
-          // Clear all pending notifications and reset badge
-          await _localNotificationPlugin.cancelAll();
-
-          // Set badge to 0 using a hidden notification
-          await _localNotificationPlugin.show(
-            99999, // Use a high ID to avoid conflicts
-            '', // empty title
-            '', // empty body
-            NotificationDetails(
-              iOS: DarwinNotificationDetails(
-                presentAlert: false,
-                presentBadge: true,
-                presentSound: false,
-                badgeNumber: 0, // Set badge to 0
-              ),
+        // Set badge to 0 using a hidden notification
+        await _localNotificationPlugin.show(
+          99999, // Use a high ID to avoid conflicts
+          '', // empty title
+          '', // empty body
+          NotificationDetails(
+            iOS: DarwinNotificationDetails(
+              presentAlert: false,
+              presentBadge: true,
+              presentSound: false,
+              badgeNumber: 0, // Set badge to 0
             ),
-          );
+          ),
+        );
 
-          // Immediately cancel the hidden notification
-          await _localNotificationPlugin.cancel(99999);
-        }
+        // Immediately cancel the hidden notification
+        await _localNotificationPlugin.cancel(99999);
 
         print('Badge cleared successfully');
       } catch (e) {
