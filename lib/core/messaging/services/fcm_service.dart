@@ -5,7 +5,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:go_router/go_router.dart';
 import 'package:reboot_app_3/core/messaging/repositories/fcm_repository.dart';
+import 'package:reboot_app_3/core/routing/route_names.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'fcm_service.g.dart';
@@ -26,6 +28,14 @@ class MessagingService with WidgetsBindingObserver {
   final _auth = FirebaseAuth.instance;
   final _firestore = FirebaseFirestore.instance;
   bool _isFlutterNotificationPluginInitalized = false;
+
+  // Add GoRouter reference
+  static GoRouter? _router;
+
+  // Initialize with router
+  static void initializeWithRouter(GoRouter router) {
+    _router = router;
+  }
 
   Future<void> init() async {
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
@@ -70,6 +80,16 @@ class MessagingService with WidgetsBindingObserver {
 
     //6. Clear badge when app starts
     await clearBadge();
+
+    //7. Check if app was opened from a notification when terminated
+    final initialMessage = await _messaging.getInitialMessage();
+    if (initialMessage != null) {
+      print('App opened from notification: ${initialMessage.messageId}');
+      // Use post frame callback to ensure navigation is ready
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        await _handleNotificationNavigation(initialMessage);
+      });
+    }
   }
 
   @override
@@ -89,6 +109,21 @@ class MessagingService with WidgetsBindingObserver {
   /// Public method to manually clear app badge - can be called from anywhere in the app
   static Future<void> clearAppBadge() async {
     await instance.clearBadge();
+  }
+
+  /// Public method to get and print FCM token for testing
+  static Future<String?> printFCMToken() async {
+    try {
+      final token = await instance._messaging.getToken();
+      print('====================================');
+      print('FCM TOKEN FOR TESTING:');
+      print(token);
+      print('====================================');
+      return token;
+    } catch (e) {
+      print('Error getting FCM token: $e');
+      return null;
+    }
   }
 
   /// Clears the app badge count on iOS
@@ -176,6 +211,17 @@ class MessagingService with WidgetsBindingObserver {
       print('onDidReceiveNotificationResponse: $response');
       // Clear badge when user taps on notification
       await clearBadge();
+
+      // Handle navigation from local notification tap
+      if (response.payload != null && response.payload!.isNotEmpty) {
+        try {
+          // Parse payload back to Map if it contains navigation data
+          // Note: You might need to encode/decode the payload properly
+          print('Notification payload: ${response.payload}');
+        } catch (e) {
+          print('Error handling notification tap: $e');
+        }
+      }
     });
 
     _isFlutterNotificationPluginInitalized = true;
@@ -231,6 +277,14 @@ class MessagingService with WidgetsBindingObserver {
     FirebaseMessaging.onMessage.listen((message) async {
       print('onMessage: $message');
       await showNotification(message);
+
+      // Optionally navigate in foreground based on notification type
+      // You can customize this behavior based on your requirements
+      final shouldNavigateInForeground =
+          message.data['navigateInForeground'] == 'true';
+      if (shouldNavigateInForeground) {
+        await _handleNotificationNavigation(message);
+      }
     });
 
     //Background
@@ -249,10 +303,82 @@ class MessagingService with WidgetsBindingObserver {
     // Clear badge when app is opened from notification
     await clearBadge();
 
-    if (message.data["type"] == "news") {
-      //Do something
-    }
+    // Handle navigation based on notification data
+    await _handleNotificationNavigation(message);
+
     await showNotification(message);
+  }
+
+  /// Handles navigation based on notification data
+  Future<void> _handleNotificationNavigation(RemoteMessage message) async {
+    // Check if router is available
+    if (_router == null) {
+      print('Router not initialized, cannot navigate from notification');
+      return;
+    }
+
+    final data = message.data;
+    final screen = data['screen'];
+
+    if (screen == null) {
+      print('No screen specified in notification data');
+      return;
+    }
+
+    print('Navigating to screen: $screen with data: $data');
+
+    // Add delay to ensure app is ready for navigation
+    await Future.delayed(const Duration(milliseconds: 100));
+
+    try {
+      switch (screen) {
+        case 'reportConversation':
+        case 'reportDetails':
+          final reportId = data['reportId'];
+          if (reportId != null) {
+            _router!.goNamed(
+              RouteNames.reportConversation.name,
+              pathParameters: {'reportId': reportId},
+            );
+          }
+          break;
+
+        case 'userReports':
+          _router!.goNamed(RouteNames.userReports.name);
+          break;
+
+        case 'activities':
+          _router!.goNamed(RouteNames.activities.name);
+          break;
+
+        case 'library':
+          _router!.goNamed(RouteNames.library.name);
+          break;
+
+        case 'diaries':
+          _router!.goNamed(RouteNames.diaries.name);
+          break;
+
+        case 'community':
+          _router!.goNamed(RouteNames.community.name);
+          break;
+
+        case 'account':
+          _router!.goNamed(RouteNames.account.name);
+          break;
+
+        case 'vault':
+          _router!.goNamed(RouteNames.vault.name);
+          break;
+
+        case 'home':
+        default:
+          _router!.goNamed(RouteNames.home.name);
+          break;
+      }
+    } catch (e) {
+      print('Error navigating from notification: $e');
+    }
   }
 
   /// Sets up listener for authentication state changes

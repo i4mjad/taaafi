@@ -17,6 +17,7 @@ import 'package:reboot_app_3/core/theming/color_theme_provider.dart';
 import 'package:reboot_app_3/core/utils/firebase_remote_config_provider.dart';
 import 'package:reboot_app_3/core/utils/url_launcher_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:reboot_app_3/core/messaging/services/fcm_service.dart';
 
 class MyApp extends ConsumerWidget {
   @override
@@ -55,6 +56,9 @@ class MyApp extends ConsumerWidget {
         data: (_) {
           final goRouter = ref.watch(goRouterProvider);
           final locale = ref.watch(localeNotifierProvider);
+
+          // Initialize MessagingService with router
+          MessagingService.initializeWithRouter(goRouter);
 
           return MaterialApp.router(
             routerConfig: goRouter,
