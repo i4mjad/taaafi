@@ -430,7 +430,6 @@
         "description": "إدارة مستخدمي المنصة وصلاحياتهم",
         "users": "المستخدمون",
         "usersDescription": "إدارة حسابات المستخدمين وصلاحياتهم",
-        "notifications": "الإشعارات",
         "settings": "الإعدادات",
         "settingsDescription": "تكوين إدارة المستخدمين وإعدادات الإشعارات",
         "subscriptionManagement": "إدارة الاشتراكات",
@@ -899,6 +898,9 @@
             "lastLogin": "آخر تسجيل دخول",
             "updateStatus": "تحديث الحالة",
             "selectNewStatus": "اختر الحالة الجديدة",
+            "selectNewStatusPlaceholder": "اختر الحالة الجديدة",
+            "selectDifferentStatus": "اختر حالة مختلفة للتحديث",
+            "currentStatus": "الحالة الحالية",
             "sendMessage": "إرسال رسالة",
             "messageLabel": "رسالتك",
             "messagePlaceholder": "اكتب رسالتك للمستخدم...",
@@ -916,6 +918,8 @@
             "updateStatusAndNotify": "تحديث الحالة وإشعار المستخدم",
             "updating": "جاري التحديث...",
             "copyReportId": "نسخ معرف التقرير",
+            "copiedToClipboard": "تم النسخ إلى الحافظة",
+            "copyToClipboardError": "فشل النسخ إلى الحافظة",
             "viewUserProfile": "عرض ملف المستخدم",
             "reportIdCopied": "تم نسخ معرف التقرير",
             "updateSuccess": "تم تحديث التقرير بنجاح",
@@ -925,7 +929,12 @@
             "statusTransitionError": "انتقال حالة غير صالح",
             "messageRequired": "الرسالة مطلوبة",
             "messageSent": "تم إرسال الرسالة بنجاح",
-            "messageError": "فشل في إرسال الرسالة"
+            "messageError": "فشل في إرسال الرسالة",
+            "reportDataNotAvailable": "بيانات التقرير غير متاحة",
+            "pleaseSelectDifferentStatus": "يرجى اختيار حالة مختلفة",
+            "unknownType": "نوع غير معروف",
+            "userDataNotAvailable": "بيانات المستخدم غير متاحة",
+            "requestedReportNotFound": "لم يتم العثور على التقرير المطلوب."
           },
           "messageNotifications": {
             "title": "رسالة جديدة من المدير",
@@ -962,19 +971,50 @@
           },
           "notifications": {
             "statusUpdate": {
-              "en": {
-                "title": "Report Update",
-                "bodyPending": "Your data error report has been received and is being reviewed.",
-                "bodyInProgress": "Your data error report is currently being processed by our team.",
-                "bodyClosed": "Your data error report has been reviewed and closed.",
-                "bodyFinalized": "Your data error report has been reviewed and finalized."
-              },
               "ar": {
                 "title": "تحديث التقرير",
-                "bodyPending": "تم استلام تقرير خطأ البيانات الخاص بك وهو قيد المراجعة.",
-                "bodyInProgress": "تقرير خطأ البيانات الخاص بك قيد المعالجة من قبل فريقنا.",
-                "bodyClosed": "تم مراجعة تقرير خطأ البيانات الخاص بك وإغلاقه.",
-                "bodyFinalized": "تم مراجعة تقرير خطأ البيانات الخاص بك وإنهاؤه."
+                "default": {
+                  "bodyPending": "تم استلام تقريرك وهو قيد المراجعة.",
+                  "bodyInProgress": "تقريرك قيد المعالجة من قبل فريقنا.",
+                  "bodyClosed": "تم مراجعة تقريرك وإغلاقه.",
+                  "bodyFinalized": "تم مراجعة تقريرك وإنهاؤه."
+                },
+                "dataError": {
+                  "bodyPending": "تم استلام تقرير خطأ البيانات الخاص بك وهو قيد المراجعة من قبل فريقنا التقني.",
+                  "bodyInProgress": "فريقنا التقني يقوم حالياً بالتحقق من تقرير خطأ البيانات الخاص بك.",
+                  "bodyClosed": "تم مراجعة تقرير خطأ البيانات الخاص بك وتم حل المشكلة.",
+                  "bodyFinalized": "تم معالجة تقرير خطأ البيانات الخاص بك وإنهاؤه."
+                },
+                "technicalIssue": {
+                  "bodyPending": "تم استلام تقرير المشكلة التقنية الخاص بك وتم إسناده لفريق التطوير.",
+                  "bodyInProgress": "فريق التطوير يعمل حالياً على حل المشكلة التقنية الخاصة بك.",
+                  "bodyClosed": "تم حل المشكلة التقنية الخاصة بك وإغلاق التقرير.",
+                  "bodyFinalized": "تم إكمال تقرير المشكلة التقنية الخاص بك وإنهاؤه."
+                },
+                "contentIssue": {
+                  "bodyPending": "تم استلام تقرير مشكلة المحتوى الخاص بك وهو قيد المراجعة من قبل فريق المحتوى.",
+                  "bodyInProgress": "فريق المحتوى يقوم حالياً بمراجعة تقرير مشكلة المحتوى الخاص بك.",
+                  "bodyClosed": "تم معالجة مشكلة المحتوى الخاصة بك وإغلاق التقرير.",
+                  "bodyFinalized": "تم مراجعة تقرير مشكلة المحتوى الخاص بك وإنهاؤه."
+                },
+                "accountIssue": {
+                  "bodyPending": "تم استلام تقرير مشكلة الحساب الخاص بك وهو قيد المراجعة من قبل فريق الدعم.",
+                  "bodyInProgress": "فريق الدعم يعمل حالياً على حل مشكلة الحساب الخاصة بك.",
+                  "bodyClosed": "تم حل مشكلة الحساب الخاصة بك وإغلاق التقرير.",
+                  "bodyFinalized": "تم معالجة تقرير مشكلة الحساب الخاص بك وإنهاؤه."
+                },
+                "featureRequest": {
+                  "bodyPending": "تم استلام طلب الميزة الخاص بك وهو قيد التقييم من قبل فريق المنتج.",
+                  "bodyInProgress": "فريق المنتج يقوم حالياً بمراجعة طلب الميزة الخاص بك.",
+                  "bodyClosed": "تم مراجعة طلب الميزة الخاص بك وإغلاق التقرير.",
+                  "bodyFinalized": "تم تقييم طلب الميزة الخاص بك وإنهاؤه."
+                },
+                "other": {
+                  "bodyPending": "تم استلام تقريرك وهو قيد المراجعة من قبل فريقنا.",
+                  "bodyInProgress": "فريقنا يقوم حالياً بمراجعة تقريرك.",
+                  "bodyClosed": "تم مراجعة تقريرك وإغلاقه.",
+                  "bodyFinalized": "تم معالجة تقريرك وإنهاؤه."
+                }
               }
             }
           },

@@ -375,7 +375,6 @@
         "nameEnPlaceholder": "Enter list name in English",
         "nameAr": "Name (Arabic)",
         "nameArPlaceholder": "Enter list name in Arabic",
-        "description": "Description",
         "descriptionPlaceholder": "Enter list description",
         "descriptionEn": "Description (English)",
         "descriptionEnPlaceholder": "Enter list description in English",
@@ -430,7 +429,6 @@
         "description": "Manage platform users and their permissions",
         "users": "Users",
         "usersDescription": "Manage user accounts and permissions",
-        "notifications": "Notifications",
         "settings": "Settings",
         "settingsDescription": "Configure user management and notification settings",
         "subscriptionManagement": "Subscription Management",
@@ -886,6 +884,9 @@
             "lastLogin": "Last Login",
             "updateStatus": "Update Status",
             "selectNewStatus": "Select new status",
+            "selectNewStatusPlaceholder": "Select new status",
+            "selectDifferentStatus": "Select a different status to update",
+            "currentStatus": "Current status",
             "sendMessage": "Send Message",
             "messageLabel": "Your Message",
             "messagePlaceholder": "Type your message to the user...",
@@ -903,6 +904,8 @@
             "updateStatusAndNotify": "Update Status & Notify User",
             "updating": "Updating...",
             "copyReportId": "Copy Report ID",
+            "copiedToClipboard": "copied to clipboard",
+            "copyToClipboardError": "Failed to copy to clipboard",
             "viewUserProfile": "View User Profile",
             "reportIdCopied": "Report ID copied to clipboard",
             "updateSuccess": "Report updated successfully",
@@ -912,7 +915,12 @@
             "statusTransitionError": "Invalid status transition",
             "messageRequired": "Message is required",
             "messageSent": "Message sent successfully",
-            "messageError": "Failed to send message"
+            "messageError": "Failed to send message",
+            "reportDataNotAvailable": "Report data not available",
+            "pleaseSelectDifferentStatus": "Please select a different status",
+            "unknownType": "Unknown Type",
+            "userDataNotAvailable": "User data not available",
+            "requestedReportNotFound": "The requested report could not be found."
           },
           "messageNotifications": {
             "title": "New Message from Admin",
@@ -950,17 +958,93 @@
             "statusUpdate": {
               "en": {
                 "title": "Report Update",
-                "bodyPending": "Your data error report has been received and is being reviewed.",
-                "bodyInProgress": "Your data error report is currently being processed by our team.",
-                "bodyClosed": "Your data error report has been reviewed and closed.",
-                "bodyFinalized": "Your data error report has been reviewed and finalized."
+                "default": {
+                  "bodyPending": "Your report has been received and is being reviewed.",
+                  "bodyInProgress": "Your report is currently being processed by our team.",
+                  "bodyClosed": "Your report has been reviewed and closed.",
+                  "bodyFinalized": "Your report has been reviewed and finalized."
+                },
+                "dataError": {
+                  "bodyPending": "Your data error report has been received and is being reviewed by our technical team.",
+                  "bodyInProgress": "Our technical team is currently investigating your data error report.",
+                  "bodyClosed": "Your data error report has been reviewed and the issue has been resolved.",
+                  "bodyFinalized": "Your data error report has been processed and finalized."
+                },
+                "technicalIssue": {
+                  "bodyPending": "Your technical report has been received and assigned to our development team.",
+                  "bodyInProgress": "Our development team is actively working on your technical report.",
+                  "bodyClosed": "Your technical report has been resolved and is now closed.",
+                  "bodyFinalized": "Your technical report has been completed and finalized."
+                },
+                "contentIssue": {
+                  "bodyPending": "Your content report has been received and is under review by our content team.",
+                  "bodyInProgress": "Our content team is currently reviewing your content report.",
+                  "bodyClosed": "Your content report has been addressed and is now closed.",
+                  "bodyFinalized": "Your content report has been reviewed and finalized."
+                },
+                "accountIssue": {
+                  "bodyPending": "Your account report has been received and is being reviewed by our support team.",
+                  "bodyInProgress": "Our support team is currently working on resolving your account report.",
+                  "bodyClosed": "Your account report has been resolved and is now closed.",
+                  "bodyFinalized": "Your account report has been processed and finalized."
+                },
+                "featureRequest": {
+                  "bodyPending": "Your feature request has been received and is being evaluated by our product team.",
+                  "bodyInProgress": "Our product team is currently reviewing your feature request.",
+                  "bodyClosed": "Your feature request has been reviewed and the report is now closed.",
+                  "bodyFinalized": "Your feature request has been evaluated and finalized."
+                },
+                "other": {
+                  "bodyPending": "Your report has been received and is being reviewed by our team.",
+                  "bodyInProgress": "Our team is currently reviewing your report.",
+                  "bodyClosed": "Your report has been reviewed and closed.",
+                  "bodyFinalized": "Your report has been processed and finalized."
+                }
               },
               "ar": {
                 "title": "تحديث التقرير",
-                "bodyPending": "تم استلام تقرير خطأ البيانات الخاص بك وهو قيد المراجعة.",
-                "bodyInProgress": "تقرير خطأ البيانات الخاص بك قيد المعالجة من قبل فريقنا.",
-                "bodyClosed": "تم مراجعة تقرير خطأ البيانات الخاص بك وإغلاقه.",
-                "bodyFinalized": "تم مراجعة تقرير خطأ البيانات الخاص بك وإنهاؤه."
+                "default": {
+                  "bodyPending": "تم استلام تقريرك وهو قيد المراجعة.",
+                  "bodyInProgress": "تقريرك قيد المعالجة من قبل فريقنا.",
+                  "bodyClosed": "تم مراجعة تقريرك وإغلاقه.",
+                  "bodyFinalized": "تم مراجعة تقريرك وإنهاؤه."
+                },
+                "dataError": {
+                  "bodyPending": "تم استلام تقرير خطأ البيانات الخاص بك وهو قيد المراجعة من قبل فريقنا التقني.",
+                  "bodyInProgress": "فريقنا التقني يقوم حالياً بالتحقق من تقرير خطأ البيانات الخاص بك.",
+                  "bodyClosed": "تم مراجعة تقرير خطأ البيانات الخاص بك وتم حل المشكلة.",
+                  "bodyFinalized": "تم معالجة تقرير خطأ البيانات الخاص بك وإنهاؤه."
+                },
+                "technicalIssue": {
+                  "bodyPending": "تم استلام تقرير المشكلة التقنية الخاص بك وتم إسناده لفريق التطوير.",
+                  "bodyInProgress": "فريق التطوير يعمل حالياً على حل المشكلة التقنية الخاصة بك.",
+                  "bodyClosed": "تم حل المشكلة التقنية الخاصة بك وإغلاق التقرير.",
+                  "bodyFinalized": "تم إكمال تقرير المشكلة التقنية الخاص بك وإنهاؤه."
+                },
+                "contentIssue": {
+                  "bodyPending": "تم استلام تقرير مشكلة المحتوى الخاص بك وهو قيد المراجعة من قبل فريق المحتوى.",
+                  "bodyInProgress": "فريق المحتوى يقوم حالياً بمراجعة تقرير مشكلة المحتوى الخاص بك.",
+                  "bodyClosed": "تم معالجة مشكلة المحتوى الخاصة بك وإغلاق التقرير.",
+                  "bodyFinalized": "تم مراجعة تقرير مشكلة المحتوى الخاص بك وإنهاؤه."
+                },
+                "accountIssue": {
+                  "bodyPending": "تم استلام تقرير مشكلة الحساب الخاص بك وهو قيد المراجعة من قبل فريق الدعم.",
+                  "bodyInProgress": "فريق الدعم يعمل حالياً على حل مشكلة الحساب الخاصة بك.",
+                  "bodyClosed": "تم حل مشكلة الحساب الخاصة بك وإغلاق التقرير.",
+                  "bodyFinalized": "تم معالجة تقرير مشكلة الحساب الخاص بك وإنهاؤه."
+                },
+                "featureRequest": {
+                  "bodyPending": "تم استلام طلب الميزة الخاص بك وهو قيد التقييم من قبل فريق المنتج.",
+                  "bodyInProgress": "فريق المنتج يقوم حالياً بمراجعة طلب الميزة الخاص بك.",
+                  "bodyClosed": "تم مراجعة طلب الميزة الخاص بك وإغلاق التقرير.",
+                  "bodyFinalized": "تم تقييم طلب الميزة الخاص بك وإنهاؤه."
+                },
+                "other": {
+                  "bodyPending": "تم استلام تقريرك وهو قيد المراجعة من قبل فريقنا.",
+                  "bodyInProgress": "فريقنا يقوم حالياً بمراجعة تقريرك.",
+                  "bodyClosed": "تم مراجعة تقريرك وإغلاقه.",
+                  "bodyFinalized": "تم معالجة تقريرك وإنهاؤه."
+                }
               }
             }
           },

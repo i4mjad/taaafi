@@ -37,6 +37,9 @@ import { db } from '@/lib/firebase';
 // Import conversation component
 import ConversationView from './ConversationView';
 
+// Import notification payload utilities
+import { createReportUpdatePayload } from '@/utils/notificationPayloads';
+
 interface UserReport {
   id: string;
   uid: string;
@@ -133,7 +136,7 @@ export default function ReportDetailsPage() {
   const getReportTypeName = (reportTypeId: string) => {
     const reportType = reportTypesMap.get(reportTypeId);
     if (!reportType) {
-      return t('modules.userManagement.reports.reportTypeDataError') || 'Unknown Type';
+      return t('modules.userManagement.reports.reportDetails.unknownType') || 'Unknown Type';
     }
     return locale === 'ar' ? reportType.nameAr : reportType.nameEn;
   };
@@ -180,9 +183,9 @@ export default function ReportDetailsPage() {
   const copyToClipboard = async (text: string, label: string) => {
     try {
       await navigator.clipboard.writeText(text);
-      toast.success(`${label} ${t('modules.userManagement.reports.reportDetails.reportIdCopied') || 'copied to clipboard'}`);
+      toast.success(`${label} ${t('modules.userManagement.reports.reportDetails.copiedToClipboard') || 'copied to clipboard'}`);
     } catch (error) {
-      toast.error('Failed to copy to clipboard');
+      toast.error(t('modules.userManagement.reports.reportDetails.copyToClipboardError') || 'Failed to copy to clipboard');
     }
   };
 
@@ -225,8 +228,32 @@ export default function ReportDetailsPage() {
       const userLocale = user.locale === 'arabic' ? 'ar' : 'en';
       const notificationKey = `body${newStatus.charAt(0).toUpperCase() + newStatus.slice(1)}`;
       
+      // Map report type IDs to notification keys
+      const getReportTypeKey = (reportTypeId: string): string => {
+        const reportTypeMap: { [key: string]: string } = {
+          'dataError': 'dataError',
+          'technicalIssue': 'technicalIssue',
+          'contentIssue': 'contentIssue',
+          'accountIssue': 'accountIssue',
+          'featureRequest': 'featureRequest',
+          'other': 'other'
+        };
+        return reportTypeMap[reportTypeId] || 'default';
+      };
+
+      const reportTypeKey = getReportTypeKey(report?.reportTypeId || '');
+      
       const title = t(`modules.userManagement.reports.notifications.statusUpdate.${userLocale}.title`);
-      const body = t(`modules.userManagement.reports.notifications.statusUpdate.${userLocale}.${notificationKey}`);
+      const body = t(`modules.userManagement.reports.notifications.statusUpdate.${userLocale}.${reportTypeKey}.${notificationKey}`);
+
+      // Use the new payload structure with navigation data
+      const payload = createReportUpdatePayload(
+        title,
+        body,
+        reportId,
+        newStatus,
+        userLocale
+      );
 
       const response = await fetch('/api/admin/notifications/send', {
         method: 'POST',
@@ -235,52 +262,7 @@ export default function ReportDetailsPage() {
         },
         body: JSON.stringify({
           token: user.messagingToken,
-          notification: {
-            title,
-            body,
-          },
-          data: {
-            reportId: reportId,
-            status: newStatus,
-            type: 'report_update',
-          },
-          android: {
-            priority: 'high',
-            ttl: 3600000, // 1 hour in milliseconds
-            notification: {
-              priority: 'high',
-              default_sound: true,
-              default_vibrate_timings: true,
-            },
-          },
-          apns: {
-            headers: {
-              'apns-priority': '10', // Highest priority for iOS
-              'apns-push-type': 'alert',
-            },
-            payload: {
-              aps: {
-                alert: {
-                  title,
-                  body,
-                },
-                badge: 1,
-                sound: 'default',
-                'content-available': 1, // Background processing
-                'mutable-content': 1,   // Allow notification modifications
-              },
-            },
-          },
-          webpush: {
-            headers: {
-              Urgency: 'high',
-              TTL: '3600',
-            },
-            notification: {
-              requireInteraction: true,
-              vibrate: [200, 100, 200],
-            },
-          },
+          ...payload
         }),
       });
 
@@ -299,12 +281,12 @@ export default function ReportDetailsPage() {
     console.log('Attempting to update status from', report?.status, 'to', selectedStatus);
     
     if (!report) {
-      toast.error('Report data not available');
+      toast.error(t('modules.userManagement.reports.reportDetails.reportDataNotAvailable') || 'Report data not available');
       return;
     }
 
     if (!selectedStatus || selectedStatus === report.status) {
-      toast.error('Please select a different status');
+      toast.error(t('modules.userManagement.reports.reportDetails.pleaseSelectDifferentStatus') || 'Please select a different status');
       return;
     }
 
@@ -371,7 +353,7 @@ export default function ReportDetailsPage() {
                   {t('modules.userManagement.reports.errors.reportNotFound') || 'Report Not Found'}
                 </h1>
                 <p className="text-muted-foreground mt-2">
-                  {reportError?.message || userError?.message || 'The requested report could not be found.'}
+                  {reportError?.message || userError?.message || t('modules.userManagement.reports.reportDetails.requestedReportNotFound') || 'The requested report could not be found.'}
                 </p>
               </div>
             </div>
@@ -543,7 +525,7 @@ export default function ReportDetailsPage() {
                           </Label>
                           <div className="mt-2 space-y-2">
                             <div className="text-sm text-muted-foreground">
-                              Current status: <span className="font-medium">{report.status}</span>
+                              {t('modules.userManagement.reports.reportDetails.currentStatus') || 'Current status'}: <span className="font-medium">{report.status}</span>
                             </div>
                             <Select 
                               value={selectedStatus} 
@@ -553,7 +535,7 @@ export default function ReportDetailsPage() {
                               }}
                             >
                               <SelectTrigger>
-                                <SelectValue placeholder="Select new status" />
+                                <SelectValue placeholder={t('modules.userManagement.reports.reportDetails.selectNewStatusPlaceholder') || 'Select new status'} />
                               </SelectTrigger>
                               <SelectContent>
                                 {getValidStatusTransitions(report.status).map((status) => (
@@ -575,7 +557,7 @@ export default function ReportDetailsPage() {
                           {isUpdating 
                             ? t('modules.userManagement.reports.reportDetails.updating') || 'Updating...'
                             : selectedStatus === report.status
-                            ? 'Select a different status to update'
+                            ? t('modules.userManagement.reports.reportDetails.selectDifferentStatus') || 'Select a different status to update'
                             : t('modules.userManagement.reports.reportDetails.updateStatusAndNotify') || 'Update Status & Notify User'
                           }
                         </Button>
@@ -662,7 +644,7 @@ export default function ReportDetailsPage() {
                       ) : (
                         <div className="text-center py-4">
                           <p className="text-muted-foreground">
-                            {t('modules.userManagement.userNotFound') || 'User data not available'}
+                            {t('modules.userManagement.reports.reportDetails.userDataNotAvailable') || 'User data not available'}
                           </p>
                         </div>
                       )}
@@ -677,7 +659,7 @@ export default function ReportDetailsPage() {
                   {t('modules.userManagement.reports.errors.reportNotFound') || 'Report Not Found'}
                 </h3>
                 <p className="text-muted-foreground">
-                  The requested report could not be found.
+                  {t('modules.userManagement.reports.reportDetails.requestedReportNotFound') || 'The requested report could not be found.'}
                 </p>
               </div>
             )}

@@ -22,6 +22,9 @@ import { useCollection, useDocument } from 'react-firebase-hooks/firestore';
 import { collection, query, orderBy, addDoc, updateDoc, doc, Timestamp, increment } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 
+// Import notification payload utilities
+import { createNewMessagePayload } from '@/utils/notificationPayloads';
+
 interface ReportMessage {
   id: string;
   reportId: string;
@@ -137,6 +140,15 @@ export default function ConversationView({ reportId, reportStatus, onStatusChang
         ? 'لديك رسالة جديدة بخصوص تقريرك'
         : 'You have a new message regarding your report';
 
+      // Use the new payload structure with navigation data
+      const payload = createNewMessagePayload(
+        title,
+        body,
+        reportId,
+        'admin',
+        userLocale
+      );
+
       const response = await fetch('/api/admin/notifications/send', {
         method: 'POST',
         headers: {
@@ -144,52 +156,7 @@ export default function ConversationView({ reportId, reportStatus, onStatusChang
         },
         body: JSON.stringify({
           token: user.messagingToken,
-          notification: {
-            title,
-            body,
-          },
-          data: {
-            reportId: reportId,
-            type: 'new_message',
-            messageFrom: 'admin',
-          },
-          android: {
-            priority: 'high',
-            ttl: 3600000, // 1 hour in milliseconds
-            notification: {
-              priority: 'high',
-              default_sound: true,
-              default_vibrate_timings: true,
-            },
-          },
-          apns: {
-            headers: {
-              'apns-priority': '10', // Highest priority for iOS
-              'apns-push-type': 'alert',
-            },
-            payload: {
-              aps: {
-                alert: {
-                  title,
-                  body,
-                },
-                badge: 1,
-                sound: 'default',
-                'content-available': 1, // Background processing
-                'mutable-content': 1,   // Allow notification modifications
-              },
-            },
-          },
-          webpush: {
-            headers: {
-              Urgency: 'high',
-              TTL: '3600',
-            },
-            notification: {
-              requireInteraction: true,
-              vibrate: [200, 100, 200],
-            },
-          },
+          ...payload
         }),
       });
 
