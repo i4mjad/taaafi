@@ -24,6 +24,7 @@
       "categories": "التصنيفات",
       "contentLists": "قوائم المحتوى",
       "features": "الميزات",
+      "featureFlags": "أعلام الميزات",
       "lifecycle": "دورة الحياة",
       "analytics": "التحليلات",
       "projects": "المشاريع",
@@ -356,7 +357,7 @@
       },
       "lists": {
         "title": "قوائم المحتوى",
-        
+        "description": "إنشاء وإدارة مجموعات المحتوى المنسقة",
         "create": "إنشاء قائمة",
         "edit": "تعديل القائمة",
         "list": "قوائم المحتوى",
@@ -529,7 +530,6 @@
             "noMessagingToken": "المستخدم ليس لديه رمز رسائل. سيتم حفظ الاشتراك ولكن الإشعارات قد لا تعمل."
           }
         },
-        
         "totalUsers": "إجمالي المستخدمين",
         "activeUsers": "المستخدمون النشطون",
         "admins": "المديرون",
@@ -768,6 +768,8 @@
             "sendingTo": "الإرسال إلى:",
             "sendTo": "إرسال إلى",
             "notificationType": "نوع الإشعار",
+            "messageType": "نوع الرسالة",
+            "selectMessageType": "اختر نوع الرسالة",
             "typeInfo": "معلومات",
             "typeWarning": "تحذير",
             "typeSuccess": "نجح",
@@ -778,8 +780,10 @@
             "messageBodyPlaceholder": "أدخل محتوى رسالتك",
             "actionText": "نص زر الإجراء (اختياري)",
             "actionTextPlaceholder": "اعرف المزيد",
+            "actionTextHelp": "النص الذي سيظهر على زر الإجراء",
             "actionUrl": "رابط زر الإجراء (اختياري)",
             "actionUrlPlaceholder": "https://example.com/page",
+            "actionUrlHelp": "الرابط الذي سيتم الانتقال إليه عند النقر على زر الإجراء",
             "persistent": "إشعار دائم",
             "persistentHelp": "الإشعارات الدائمة تبقى حتى يتم إلغاؤها من قبل المستخدم",
             "sending": "جارٍ الإرسال...",
@@ -798,6 +802,7 @@
           }
         },
         "reports": {
+          "viewFullReport": "عرض التقرير الكامل",
           "title": "تقارير المستخدمين",
           "description": "مراجعة وإدارة تقارير أخطاء البيانات المرسلة من المستخدمين",
           "create": "إنشاء تقرير",
@@ -1015,6 +1020,51 @@
                   "bodyClosed": "تم مراجعة تقريرك وإغلاقه.",
                   "bodyFinalized": "تم معالجة تقريرك وإنهاؤه."
                 }
+              },
+              "en": {
+                "title": "Report Update",
+                "default": {
+                  "bodyPending": "Your report has been received and is under review.",
+                  "bodyInProgress": "Your report is being processed by our team.",
+                  "bodyClosed": "Your report has been reviewed and closed.",
+                  "bodyFinalized": "Your report has been reviewed and finalized."
+                },
+                "dataError": {
+                  "bodyPending": "Your data error report has been received and is under review by our technical team.",
+                  "bodyInProgress": "Our technical team is currently investigating your data error report.",
+                  "bodyClosed": "Your data error report has been reviewed and the issue has been resolved.",
+                  "bodyFinalized": "Your data error report has been processed and finalized."
+                },
+                "technicalIssue": {
+                  "bodyPending": "Your technical issue report has been received and assigned to our development team.",
+                  "bodyInProgress": "Our development team is currently working on resolving your technical issue.",
+                  "bodyClosed": "Your technical issue has been resolved and the report closed.",
+                  "bodyFinalized": "Your technical issue report has been completed and finalized."
+                },
+                "contentIssue": {
+                  "bodyPending": "Your content issue report has been received and is under review by our content team.",
+                  "bodyInProgress": "Our content team is currently reviewing your content issue report.",
+                  "bodyClosed": "Your content issue has been addressed and the report closed.",
+                  "bodyFinalized": "Your content issue report has been reviewed and finalized."
+                },
+                "accountIssue": {
+                  "bodyPending": "Your account issue report has been received and is under review by our support team.",
+                  "bodyInProgress": "Our support team is currently working on resolving your account issue.",
+                  "bodyClosed": "Your account issue has been resolved and the report closed.",
+                  "bodyFinalized": "Your account issue report has been processed and finalized."
+                },
+                "featureRequest": {
+                  "bodyPending": "Your feature request has been received and is under evaluation by our product team.",
+                  "bodyInProgress": "Our product team is currently reviewing your feature request.",
+                  "bodyClosed": "Your feature request has been reviewed and the report closed.",
+                  "bodyFinalized": "Your feature request has been evaluated and finalized."
+                },
+                "other": {
+                  "bodyPending": "Your report has been received and is under review by our team.",
+                  "bodyInProgress": "Our team is currently reviewing your report.",
+                  "bodyClosed": "Your report has been reviewed and closed.",
+                  "bodyFinalized": "Your report has been processed and finalized."
+                }
               }
             }
           },
@@ -1027,6 +1077,208 @@
             "invalidStatusTransition": "انتقال حالة غير صالح",
             "adminResponseRequired": "رد المدير مطلوب",
             "userNotFound": "لم يتم العثور على المستخدم لهذا التقرير"
+          }
+        },
+        "warnings": {
+          "title": "تحذيرات المستخدم",
+          "description": "إدارة وتتبع تحذيرات المستخدمين والانتهاكات",
+          "issueWarning": "إصدار تحذير",
+          "issueWarningDescription": "إصدار تحذير لـ {user} بسبب سلوك غير مناسب",
+          "activeWarnings": "التحذيرات النشطة",
+          "totalWarnings": "إجمالي التحذيرات",
+          "inactiveWarnings": "التحذيرات غير النشطة",
+          "noWarnings": "لا توجد تحذيرات",
+          "noWarningsDescription": "لم يتم إصدار أي تحذيرات لهذا المستخدم",
+          "warningDetails": "تفاصيل التحذير",
+          "warningId": "معرف التحذير",
+          "viewDetails": "عرض التفاصيل",
+          "reason": "السبب",
+          "reasonPlaceholder": "أدخل سبب هذا التحذير",
+          "description": "الوصف",
+          "descriptionPlaceholder": "قدم تفاصيل إضافية حول الانتهاك",
+                      "relatedContent": "المحتوى ذو الصلة",
+            "relatedContentPlaceholder": "مرجع إلى المحتوى أو الرسالة أو معرف المنشور",
+            "relatedContentType": {
+              "label": "نوع المحتوى",
+              "user": "مستخدم",
+              "report": "تقرير", 
+              "post": "منشور",
+              "comment": "تعليق",
+              "message": "رسالة",
+              "group": "مجموعة",
+              "other": "أخرى"
+            },
+            "relatedContentId": "معرف المحتوى",
+            "relatedContentTitle": "الوصف",
+          "reportId": "معرف التقرير",
+          "reportIdPlaceholder": "أدخل معرف التقرير إن وجد",
+          "reportIdHelp": "اختياري: ربط هذا التحذير بتقرير مستخدم محدد",
+          "reportRef": "مرجع التقرير",
+          "issued": "تاريخ الإصدار",
+          "by": "بواسطة",
+          "createSuccess": "تم إنشاء التحذير بنجاح",
+          "createError": "فشل في إنشاء التحذير",
+          "updateSuccess": "تم تحديث التحذير بنجاح",
+          "updateError": "فشل في تحديث التحذير",
+          "type": {
+            "label": "نوع التحذير",
+            "selectType": "اختر نوع التحذير",
+            "contentViolation": "انتهاك المحتوى",
+            "content_violation": "انتهاك المحتوى",
+            "inappropriateBehavior": "سلوك غير مناسب",
+            "inappropriate_behavior": "سلوك غير مناسب",
+            "spam": "رسائل مزعجة",
+            "harassment": "مضايقة",
+            "other": "أخرى"
+          },
+          "severity": {
+            "label": "الشدة",
+            "selectSeverity": "اختر مستوى الشدة",
+            "low": "منخفض",
+            "medium": "متوسط",
+            "high": "عالي",
+            "critical": "حرج"
+          },
+          "errors": {
+            "reasonRequired": "السبب مطلوب",
+            "loadingFailed": "فشل في تحميل التحذيرات"
+          },
+          "reportNotFound": "التقرير غير موجود أو الوصول مرفوض",
+          "reportDeleted": "التقرير لم يعد موجوداً",
+          "reportDeletedDescription": "قد يكون هذا التقرير قد تم حذفه. معرف التقرير:",
+          "hideDetails": "إخفاء التفاصيل",
+          "viewDetails": "عرض التفاصيل",
+          "deviceHistory": {
+            "title": "تنبيه سجل الجهاز",
+            "alertTitle": "تم العثور على انتهاكات سابقة على هذا الجهاز",
+            "description": "الانتهاكات السابقة الموجودة على الأجهزة المرتبطة بهذا المستخدم:",
+            "previousBans": "الحظر السابق:",
+            "previousWarnings": "التحذيرات السابقة:",
+            "noViolations": "لم يتم العثور على انتهاكات سابقة على هذه الأجهزة",
+            "recommendation": "التوصية:",
+            "recommendEscalation": "فكر في تصعيد الإجراء إلى حظر بسبب الانتهاكات المتكررة",
+            "userIdLabel": "معرف المستخدم:",
+            "statusLabel": "الحالة:",
+            "reasonLabel": "السبب:",
+            "dateLabel": "التاريخ:",
+            "showMore": "عرض المزيد",
+            "checkingHistory": "جاري فحص سجل الجهاز...",
+            "moreBans": "المزيد من الحظر",
+            "moreWarnings": "المزيد من التحذيرات",
+            "thisUser": "هذا المستخدم"
+          }
+        },
+        "bans": {
+          "title": "حظر المستخدمين",
+          "description": "إدارة قيود المستخدمين والحظر المؤقت/الدائم",
+          "issueBan": "إصدار حظر",
+          "issueBanDescription": "إصدار حظر لـ {user} مع قيود محددة",
+          "banConfiguration": "إعدادات الحظر",
+          "banDetails": "تفاصيل الحظر",
+          "expirationSettings": "إعدادات انتهاء الصلاحية",
+          "relatedContentOptional": "المحتوى ذو الصلة (اختياري)",
+          "activeBans": "الحظر النشط",
+          "totalBans": "إجمالي الحظر",
+          "expiredBans": "الحظر المنتهي الصلاحية",
+          "noBans": "لا يوجد حظر",
+          "noBansDescription": "لم يتم إصدار أي حظر لهذا المستخدم",
+          "banDetails": "تفاصيل الحظر",
+          "banId": "معرف الحظر",
+          "viewDetails": "عرض التفاصيل",
+          "revokeBan": "إلغاء الحظر",
+          "reason": "السبب",
+          "reasonPlaceholder": "أدخل سبب هذا الحظر",
+          "description": "الوصف",
+          "descriptionPlaceholder": "قدم تفاصيل إضافية حول الحظر",
+                      "relatedContent": "المحتوى ذو الصلة",
+            "relatedContentPlaceholder": "مرجع إلى المحتوى أو التقرير أو معرف الحادثة",
+            "relatedContentType": {
+              "label": "نوع المحتوى",
+              "user": "مستخدم",
+              "report": "تقرير", 
+              "post": "منشور",
+              "comment": "تعليق",
+              "message": "رسالة",
+              "group": "مجموعة",
+              "other": "أخرى"
+            },
+            "relatedContentTypePlaceholder": "اختر نوع المحتوى",
+            "relatedContentId": "معرف المحتوى",
+            "relatedContentIdPlaceholder": "أدخل معرف المحتوى أو المرجع",
+            "relatedContentTitle": "الوصف",
+            "relatedContentTitlePlaceholder": "أدخل الوصف (اختياري)",
+          "restrictedFeatures": "الميزات المقيدة",
+          "restrictedDevices": "الأجهزة المقيدة",
+          "issued": "تاريخ الإصدار",
+          "expires": "تنتهي الصلاحية",
+          "expiresAt": "تنتهي الصلاحية في",
+          "expiresDate": "تاريخ انتهاء الصلاحية",
+          "expiresTime": "وقت انتهاء الصلاحية",
+          "selectDate": "اختر تاريخ انتهاء الصلاحية",
+          "selectTime": "اختر وقت انتهاء الصلاحية",
+          "dateRequired": "التاريخ مطلوب للحظر المؤقت",
+          "timeRequired": "الوقت مطلوب للحظر المؤقت",
+          "by": "بواسطة",
+          "permanent": "دائم",
+          "expired": "منتهي الصلاحية",
+          "permanentWarning": "⚠️ لا يمكن إلغاء الحظر الدائم تلقائياً",
+          "createSuccess": "تم إنشاء الحظر بنجاح",
+          "createError": "فشل في إنشاء الحظر",
+          "updateSuccess": "تم تحديث الحظر بنجاح",
+          "updateError": "فشل في تحديث الحظر",
+          "revokeSuccess": "تم إلغاء الحظر بنجاح",
+          "revokeError": "فشل في إلغاء الحظر",
+          "type": {
+            "label": "نوع الحظر",
+            "selectType": "اختر نوع الحظر",
+            "featureBan": "حظر الميزة",
+            "feature_ban": "حظر الميزة",
+            "userBan": "حظر المستخدم",
+            "user_ban": "حظر المستخدم",
+            "deviceBan": "حظر الجهاز",
+            "device_ban": "حظر الجهاز"
+          },
+          "scope": {
+            "label": "نطاق الحظر",
+            "selectScope": "اختر نطاق الحظر",
+            "featureSpecific": "ميزة محددة",
+            "feature_specific": "ميزة محددة",
+            "appWide": "على مستوى التطبيق",
+            "app_wide": "على مستوى التطبيق"
+          },
+          "severity": {
+            "label": "المدة",
+            "selectSeverity": "اختر المدة",
+            "temporary": "مؤقت",
+            "permanent": "دائم"
+          },
+          "errors": {
+            "reasonRequired": "السبب مطلوب",
+            "featuresRequired": "يجب اختيار ميزة واحدة على الأقل لحظر الميزات",
+            "devicesRequired": "يجب اختيار جهاز واحد على الأقل لحظر الأجهزة",
+            "expirationRequired": "تاريخ انتهاء الصلاحية مطلوب للحظر المؤقت",
+            "loadingFailed": "فشل في تحميل الحظر"
+          },
+          "deviceBanNote": "حظر الأجهزة يكون تلقائياً على مستوى التطبيق",
+          "userBanNote": "حظر المستخدمين يكون تلقائياً على مستوى التطبيق",
+          "deviceHistory": {
+            "title": "تنبيه سجل الجهاز",
+            "alertTitle": "تم العثور على انتهاكات سابقة على هذا الجهاز",
+            "description": "الانتهاكات السابقة الموجودة على الأجهزة المرتبطة بهذا المستخدم:",
+            "previousBans": "الحظر السابق:",
+            "previousWarnings": "التحذيرات السابقة:",
+            "noViolations": "لم يتم العثور على انتهاكات سابقة على هذه الأجهزة",
+            "recommendation": "التوصية:",
+            "recommendPermanentBan": "فكر في حظر الجهاز بشكل دائم بسبب الانتهاكات المتكررة",
+            "userIdLabel": "معرف المستخدم:",
+            "statusLabel": "الحالة:",
+            "reasonLabel": "السبب:",
+            "dateLabel": "التاريخ:",
+            "showMore": "عرض المزيد",
+            "checkingHistory": "جاري فحص سجل الجهاز...",
+            "moreBans": "المزيد من الحظر",
+            "moreWarnings": "المزيد من التحذيرات",
+            "thisUser": "هذا المستخدم"
           }
         }
       },
@@ -1095,7 +1347,63 @@
         "disabled": "معطل",
         "viewAnalytics": "عرض التحليلات",
         "noFeaturesMatch": "لا توجد ميزات تطابق بحثك",
-        "noFeaturesConfigured": "لم يتم تكوين أعلام الميزات بعد"
+        "noFeaturesConfigured": "لم يتم تكوين أعلام الميزات بعد",
+        "appFeatures": {
+          "title": "ميزات التطبيق",
+          "description": "إدارة ميزات التطبيق التي يمكن تقييدها في الحظر",
+          "create": "إنشاء ميزة",
+          "edit": "تعديل الميزة",
+          "createDescription": "إضافة ميزة تطبيق جديدة يمكن إدارتها",
+          "editDescription": "تحديث معلومات ميزة التطبيق",
+          "list": "ميزات التطبيق",
+          "listDescription": "إدارة ميزات التطبيق وإعدادات الحظر الخاصة بها",
+          "totalFeatures": "إجمالي الميزات",
+          "activeFeatures": "الميزات النشطة",
+          "bannableFeatures": "الميزات القابلة للحظر",
+          "categories": "التصنيفات",
+          "ofTotal": "من الإجمالي",
+          "canBeBanned": "يمكن حظرها",
+          "featureCategories": "تصنيفات الميزات",
+          "feature": "الميزة",
+          "bannable": "قابلة للحظر",
+          "updated": "محدث",
+          "searchPlaceholder": "البحث في ميزات التطبيق...",
+          "noFeaturesMatch": "لا توجد ميزات تطابق بحثك",
+          "noFeaturesConfigured": "لم يتم تكوين ميزات التطبيق بعد",
+          "nameEn": "الاسم (إنجليزي)",
+          "nameEnPlaceholder": "أدخل اسم الميزة بالإنجليزية",
+          "nameAr": "الاسم (عربي)",
+          "nameArPlaceholder": "أدخل اسم الميزة بالعربية",
+          "descriptionEn": "الوصف (إنجليزي)",
+          "descriptionEnPlaceholder": "اوصف هذه الميزة بالإنجليزية",
+          "descriptionAr": "الوصف (عربي)",
+          "descriptionArPlaceholder": "اوصف هذه الميزة بالعربية",
+          "iconName": "اسم الأيقونة",
+          "iconNamePlaceholder": "مثال: MessageSquare, Users, Video",
+          "iconNameHelp": "استخدم أسماء أيقونات Lucide React",
+          "isActive": "نشط",
+          "isBannable": "يمكن حظرها",
+          "createSuccess": "تم إنشاء الميزة بنجاح",
+          "createError": "فشل في إنشاء الميزة",
+          "updateSuccess": "تم تحديث الميزة بنجاح",
+          "updateError": "فشل في تحديث الميزة",
+          "deleteSuccess": "تم حذف الميزة بنجاح",
+          "deleteError": "فشل في حذف الميزة",
+          "statusUpdateSuccess": "تم تحديث حالة الميزة بنجاح",
+          "statusUpdateError": "فشل في تحديث حالة الميزة",
+          "errors": {
+            "nameRequired": "اسم الميزة مطلوب",
+            "uniqueNameExists": "توجد ميزة بهذا الاسم بالفعل"
+          },
+          "category": {
+            "label": "التصنيف",
+            "core": "أساسي",
+            "social": "اجتماعي",
+            "content": "المحتوى",
+            "communication": "التواصل",
+            "settings": "الإعدادات"
+          }
+        }
       }
     },
     "common": {
@@ -1104,7 +1412,9 @@
       "delete": "حذف",
       "cancel": "إلغاء",
       "create": "إنشاء",
+      "creating": "جاري الإنشاء...",
       "update": "تحديث",
+      "updating": "جاري التحديث...",
       "active": "نشط",
       "inactive": "غير نشط",
       "status": "الحالة",
@@ -1112,12 +1422,21 @@
       "noData": "لا توجد بيانات",
       "loading": "جاري التحميل...",
       "error": "خطأ في تحميل البيانات",
+      "errors": {
+        "loadingFailed": "فشل في تحميل البيانات"
+      },
+      "retry": "إعادة المحاولة",
+      "technicalDetails": "التفاصيل التقنية",
+      "code": "الرمز",
       "never": "أبداً",
       "all": "الكل",
       "activate": "تفعيل",
       "deactivate": "إلغاء التفعيل",
       "back": "رجوع",
-      "unknown": "غير معروف"
+      "unknown": "غير معروف",
+      "yes": "نعم",
+      "no": "لا",
+      "close": "إغلاق"
     }
   }
   

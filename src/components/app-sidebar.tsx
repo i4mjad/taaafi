@@ -99,7 +99,11 @@ export function AppSidebar({ lang, ...props }: AppSidebarProps) {
       { 
         titleKey: "features", 
         url: `/${lang}/features`, 
-        icon: FlagIcon 
+        icon: FlagIcon,
+        items: [
+          { titleKey: "featureFlags", url: `/${lang}/features`, icon: FlagIcon },
+          { titleKey: "appFeatures", url: `/${lang}/features/app-features`, icon: SettingsIcon },
+        ]
       },
     ],
     documents: [

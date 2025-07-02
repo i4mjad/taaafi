@@ -385,6 +385,7 @@ export default function UsersRoute() {
       day: 'numeric',
       hour: '2-digit',
       minute: '2-digit',
+      calendar: 'gregory',
     }).format(dateObj);
   };
 

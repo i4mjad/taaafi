@@ -34,6 +34,8 @@ import { useTranslation } from "@/contexts/TranslationContext";
 import { NotificationDialog } from './NotificationDialog';
 import UserGroupsCard from './UserGroupsCard';
 import MigrationManagementCard from './MigrationManagementCard';
+import WarningManagementCard from './components/WarningManagementCard';
+import BanManagementCard from './components/BanManagementCard';
 // Firebase imports
 import { useDocument } from 'react-firebase-hooks/firestore';
 import { doc } from 'firebase/firestore';
@@ -197,6 +199,7 @@ export default function UserDetailsPage() {
       day: 'numeric',
       hour: '2-digit',
       minute: '2-digit',
+      calendar: 'gregory',
     }).format(dateObj);
   };
 
@@ -213,6 +216,7 @@ export default function UserDetailsPage() {
       year: 'numeric',
       month: 'long',
       day: 'numeric',
+      calendar: 'gregory',
     }).format(dateObj);
   };
 
@@ -617,6 +621,24 @@ export default function UserDetailsPage() {
               {/* Migration Management - Full Width */}
               <div className="col-span-full">
                 <MigrationManagementCard userId={user.uid} user={user} />
+              </div>
+
+              {/* Warning Management - Full Width */}
+              <div className="col-span-full">
+                <WarningManagementCard 
+                  userId={user.uid} 
+                  userDisplayName={user.displayName}
+                  userDevices={user.devicesIds || []}
+                />
+              </div>
+
+              {/* Ban Management - Full Width */}
+              <div className="col-span-full">
+                <BanManagementCard 
+                  userId={user.uid} 
+                  userDisplayName={user.displayName}
+                  userDevices={user.devicesIds || []}
+                />
               </div>
             </div>
 
