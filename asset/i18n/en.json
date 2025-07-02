@@ -502,7 +502,7 @@
   "user-id-copied": "User ID copied to clipboard",
   "whatsapp-error": "Could not launch WhatsApp",
   "error-updating-activity": "Error updating activity",
-  
+  "home-layout": "Home Layout",
   "update-activity-dates": "Update Activity Dates",
   "update-activity-warning": "Warning: This will reset all scheduled tasks. Your previous progress will be marked as deleted.",
   "scheduled-for": "Scheduled for",
@@ -671,5 +671,13 @@
   "minutes-ago": "m ago",
   "hours-ago": "h ago",
   "yesterday": "Yesterday",
-  "days-ago": "days ago"
+  "days-ago": "days ago",
+  "home-layout-settings": "Home Layout Settings",
+  "home-layout-description": "You can reorder and hide/show home screen elements from account settings",
+  "home-layout-help-title": "Home Layout Settings",
+  "home-layout-help-message": "You can reorder elements by dragging and dropping, and hide/show elements by tapping on them. You can access these settings from the account page.",
+  "drag-to-reorder": "Drag to reorder",
+  "tap-to-toggle-visibility": "Tap to toggle visibility",
+  "reset-to-default-order": "Reset to default order",
+  "reset-order": "Reset Order"
 }

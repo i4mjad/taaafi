@@ -32,6 +32,7 @@ import 'package:reboot_app_3/core/shared_widgets/complete_registration_banner.da
 import 'package:reboot_app_3/core/shared_widgets/confirm_details_banner.dart';
 import 'package:reboot_app_3/core/shared_widgets/confirm_email_banner.dart';
 import 'package:reboot_app_3/features/account/presentation/contact_us_modal.dart';
+import 'package:reboot_app_3/features/home/presentation/home/enhanced_home_settings_sheet.dart';
 
 class AccountScreen extends ConsumerWidget {
   const AccountScreen({super.key});
@@ -97,6 +98,27 @@ class AccountScreen extends ConsumerWidget {
                                 child: SettingsButton(
                                   icon: LucideIcons.smartphone,
                                   textKey: 'ui-settings',
+                                ),
+                              ),
+                              verticalSpace(Spacing.points8),
+                              GestureDetector(
+                                onTap: () {
+                                  HapticFeedback.mediumImpact();
+                                  showModalBottomSheet<void>(
+                                    context: context,
+                                    isScrollControlled: true,
+                                    isDismissible:
+                                        false, // Prevent tap outside to dismiss
+                                    enableDrag:
+                                        false, // Prevent swipe down to dismiss
+                                    builder: (BuildContext context) {
+                                      return EnhancedHomeSettingsSheet();
+                                    },
+                                  );
+                                },
+                                child: SettingsButton(
+                                  icon: LucideIcons.layoutGrid,
+                                  textKey: 'home-layout',
                                 ),
                               ),
                               verticalSpace(Spacing.points16),

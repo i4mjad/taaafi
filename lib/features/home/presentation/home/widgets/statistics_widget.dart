@@ -11,7 +11,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:reboot_app_3/features/home/data/statistics_notifier.dart';
 import 'package:reboot_app_3/features/home/data/streak_duration_notifier.dart';
 import 'package:reboot_app_3/features/home/data/streak_notifier.dart';
-import 'package:reboot_app_3/features/home/presentation/home/home_screen.dart';
 import 'package:reboot_app_3/features/home/presentation/home/statistics_visibility_notifier.dart';
 import 'package:reboot_app_3/features/home/presentation/home/streak_display_notifier.dart';
 import 'package:reboot_app_3/features/home/presentation/home/widgets/detailed_streak_widget.dart';
@@ -22,6 +21,7 @@ import 'dart:async';
 import 'package:reboot_app_3/features/home/application/streak_service.dart';
 import 'package:reboot_app_3/features/home/presentation/home/widgets/data_error_report_dialog.dart';
 import 'package:reboot_app_3/features/home/data/user_reports_notifier.dart';
+import 'package:reboot_app_3/features/home/presentation/home/enhanced_home_settings_sheet.dart';
 
 class StatisticsWidget extends ConsumerWidget {
   const StatisticsWidget({
@@ -810,7 +810,7 @@ class InformationSheet extends ConsumerWidget {
           context: currentContext,
           isScrollControlled: true,
           builder: (BuildContext context) {
-            return HomeSettingsSheet();
+            return EnhancedHomeSettingsSheet();
           },
         );
       });

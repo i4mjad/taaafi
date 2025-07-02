@@ -6,7 +6,6 @@ import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/routing/route_names.dart';
 import 'package:reboot_app_3/core/shared_widgets/snackbar.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
-import 'package:reboot_app_3/core/theming/custom_theme_data.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/features/notifications/data/models/app_notification.dart';
@@ -358,23 +357,6 @@ class _NotificationItem extends StatelessWidget {
         return LucideIcons.checkCircle;
       default:
         return LucideIcons.bell;
-    }
-  }
-
-  Color _getStatusColor(String status, CustomThemeData theme) {
-    switch (status) {
-      case 'pending':
-        return theme.warn[600]!;
-      case 'in-progress':
-        return theme.primary[600]!;
-      case 'waiting-for-admin-response':
-        return theme.primary[400]!;
-      case 'closed':
-        return theme.grey[600]!;
-      case 'finalized':
-        return theme.success[600]!;
-      default:
-        return theme.grey[600]!;
     }
   }
 
