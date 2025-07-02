@@ -32,4 +32,5 @@ enum RouteNames {
   community,
   userReports,
   reportConversation,
+  notifications,
 }

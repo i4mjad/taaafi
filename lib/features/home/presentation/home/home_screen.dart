@@ -26,6 +26,7 @@ import 'package:reboot_app_3/core/shared_widgets/complete_registration_banner.da
 import 'package:reboot_app_3/core/shared_widgets/confirm_details_banner.dart';
 import 'package:reboot_app_3/core/shared_widgets/confirm_email_banner.dart';
 import 'package:reboot_app_3/features/authentication/providers/user_document_provider.dart';
+import 'package:reboot_app_3/features/notifications/data/repositories/notifications_repository.dart';
 
 // Home visibility provider
 final homeVisibilityProvider =
@@ -96,6 +97,55 @@ class HomeScreen extends ConsumerWidget {
 
     final actions = showMainContent
         ? [
+            Stack(
+              children: [
+                IconButton(
+                  onPressed: () {
+                    context.pushNamed(RouteNames.notifications.name);
+                  },
+                  icon: Icon(LucideIcons.bell, color: theme.primary[600]),
+                ),
+                // Badge
+                Consumer(
+                  builder: (context, ref, child) {
+                    final unreadCountAsync =
+                        ref.watch(unreadNotificationCountProvider);
+                    return unreadCountAsync.when(
+                      data: (count) {
+                        if (count == 0) return SizedBox.shrink();
+                        return Positioned(
+                          right: 8,
+                          top: 8,
+                          child: Container(
+                            padding: EdgeInsets.all(4),
+                            decoration: BoxDecoration(
+                              color: theme.error[600],
+                              shape: BoxShape.circle,
+                            ),
+                            constraints: BoxConstraints(
+                              minWidth: 18,
+                              minHeight: 18,
+                            ),
+                            child: Center(
+                              child: Text(
+                                count > 9 ? '9+' : count.toString(),
+                                style: TextStyles.footnote.copyWith(
+                                  color: Colors.white,
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                      loading: () => SizedBox.shrink(),
+                      error: (_, __) => SizedBox.shrink(),
+                    );
+                  },
+                ),
+              ],
+            ),
             IconButton(
               onPressed: () {
                 showModalBottomSheet<void>(

@@ -12,6 +12,7 @@ import 'package:reboot_app_3/features/account/presentation/account_screen.dart';
 import 'package:reboot_app_3/features/account/presentation/delete_account_screen.dart';
 import 'package:reboot_app_3/features/home/presentation/reports/user_reports_screen.dart';
 import 'package:reboot_app_3/features/home/presentation/reports/report_conversation_screen.dart';
+import 'package:reboot_app_3/features/notifications/presentation/notifications_screen.dart';
 import 'package:reboot_app_3/features/authentication/presentation/complete_account_registeration.dart';
 import 'package:reboot_app_3/features/authentication/presentation/confirm_user_details_screen.dart';
 import 'package:reboot_app_3/features/authentication/presentation/confirm_user_email_screen.dart';
@@ -209,6 +210,14 @@ GoRouter goRouter(GoRouterRef ref) {
                     pageBuilder: (context, state) => MaterialPage<void>(
                       name: RouteNames.confirmUserEmail.name,
                       child: ConfirmUserEmailScreen(),
+                    ),
+                  ),
+                  GoRoute(
+                    path: 'notifications',
+                    name: RouteNames.notifications.name,
+                    pageBuilder: (context, state) => MaterialPage<void>(
+                      name: RouteNames.notifications.name,
+                      child: NotificationsScreen(),
                     ),
                   ),
                 ],

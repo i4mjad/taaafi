@@ -22,31 +22,32 @@ Future<void> appStartup(Ref ref) async {
     // ref.invalidate(onboardingRepositoryProvider);
   });
 
-  await Future.delayed(Duration(milliseconds: 500));
+  await Future.delayed(Duration(milliseconds: 1000));
 
   //* await for all initialization code to be complete before returning
   await ref.watch(sharedPreferencesProvider.future);
+  await ref.read(userNotifierProvider.future);
 
   // If user is logged in, ensure user document is loaded before proceeding
-  final currentUser = FirebaseAuth.instance.currentUser;
-  if (currentUser != null) {
-    // Wait for user provider to be ready
-    await ref.read(userNotifierProvider.future);
+  // final currentUser = FirebaseAuth.instance.currentUser;
+  // if (currentUser != null) {
+  //   // Wait for user provider to be ready
+  //   await ref.read(userNotifierProvider.future);
 
-    // Wait for user document to be loaded (with timeout)
-    try {
-      await ref.read(userDocumentsNotifierProvider.future).timeout(
-        Duration(seconds: 10), // 10 second timeout
-        onTimeout: () {
-          // If timeout, return null - this will be handled gracefully
-          return null;
-        },
-      );
-    } catch (e) {
-      // If there's an error loading the document, continue anyway
-      // The account status provider will handle the error state
-    }
-  }
+  //   // Wait for user document to be loaded (with timeout)
+  //   try {
+  //     await ref.read(userDocumentsNotifierProvider.future).timeout(
+  //       Duration(seconds: 10), // 10 second timeout
+  //       onTimeout: () {
+  //         // If timeout, return null - this will be handled gracefully
+  //         return null;
+  //       },
+  //     );
+  //   } catch (e) {
+  //     // If there's an error loading the document, continue anyway
+  //     // The account status provider will handle the error state
+  //   }
+  // }
 
   // await ref.watch(mixpanelAnalyticsClientProvider.future);
   // await ref.watch(onboardingRepositoryProvider.future);

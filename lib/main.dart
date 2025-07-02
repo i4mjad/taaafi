@@ -28,6 +28,10 @@ Future<void> runMainApp() async {
 
   // * Preload MixpanelAnalyticsClient, so we can make unawaited analytics calls
   await container.read(mixpanelAnalyticsClientProvider.future);
+
+  // * Set global container reference for FCM service
+  MessagingService.setGlobalContainer(container);
+
   // * Initialize Notification settings
   await MessagingService.instance.init();
 

@@ -3,13 +3,22 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:go_router/go_router.dart';
 import 'package:reboot_app_3/core/messaging/repositories/fcm_repository.dart';
 import 'package:reboot_app_3/core/routing/route_names.dart';
 import 'package:reboot_app_3/core/routing/navigator_keys.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:reboot_app_3/features/notifications/data/models/app_notification.dart';
+import 'package:reboot_app_3/features/notifications/data/repositories/notifications_repository.dart';
+import 'package:reboot_app_3/features/notifications/data/database/notifications_database.dart';
+import 'package:reboot_app_3/core/theming/app-themes.dart';
+import 'package:reboot_app_3/core/theming/text_styles.dart';
+import 'package:figma_squircle/figma_squircle.dart';
+import 'package:lucide_icons/lucide_icons.dart';
+import 'package:reboot_app_3/core/localization/localization.dart';
 
 part 'fcm_service.g.dart';
 
@@ -30,6 +39,14 @@ class MessagingService with WidgetsBindingObserver {
   final _firestore = FirebaseFirestore.instance;
   bool _isFlutterNotificationPluginInitalized = false;
 
+  // Global provider container for accessing repositories
+  static ProviderContainer? _globalContainer;
+
+  // Method to set the global container reference
+  static void setGlobalContainer(ProviderContainer container) {
+    _globalContainer = container;
+  }
+
   // Pending message to handle once context is available
   RemoteMessage? _queuedMessage;
 
@@ -43,7 +60,6 @@ class MessagingService with WidgetsBindingObserver {
       //1. Request permission
       await requestPermission();
     } catch (e) {
-      print('Error requesting permissions: $e');
       // Continue with initialization even if permissions fail
     }
 
@@ -51,7 +67,6 @@ class MessagingService with WidgetsBindingObserver {
       //2. Setup message handler
       await _setupMessageHandler();
     } catch (e) {
-      print('Error setting up message handler: $e');
       // Continue with initialization
     }
 
@@ -59,7 +74,6 @@ class MessagingService with WidgetsBindingObserver {
       //3. Get FCM token
       await getFCMToken();
     } catch (e) {
-      print('Error getting FCM token: $e');
       // Continue with initialization
     }
 
@@ -67,7 +81,6 @@ class MessagingService with WidgetsBindingObserver {
       //4. Update FCM token
       await updateFCMToken();
     } catch (e) {
-      print('Error updating FCM token: $e');
       // Continue with initialization
     }
 
@@ -77,7 +90,6 @@ class MessagingService with WidgetsBindingObserver {
     //6. Check if app was opened from a notification when terminated
     final initialMessage = await _messaging.getInitialMessage();
     if (initialMessage != null) {
-      print('App opened from notification: ${initialMessage.messageId}');
       // Defer navigation until after the UI (and GoRouter) have been
       // completely built. We'll process this message later from MyApp.
       _queuedMessage = initialMessage;
@@ -134,10 +146,8 @@ class MessagingService with WidgetsBindingObserver {
 
         // Immediately cancel the hidden notification
         await _localNotificationPlugin.cancel(99999);
-
-        print('Badge cleared successfully');
       } catch (e) {
-        print('Error clearing badge: $e');
+        // Silent error - don't clutter logs
       }
     }
   }
@@ -182,11 +192,7 @@ class MessagingService with WidgetsBindingObserver {
 
     //IOS Setup
 
-    final initalIOSSettings = DarwinInitializationSettings(
-      onDidReceiveLocalNotification: (id, title, body, payload) async {
-        print('onDidReceiveLocalNotification: $id, $title, $body, $payload');
-      },
-    );
+    const initalIOSSettings = DarwinInitializationSettings();
 
     final initalSettings = InitializationSettings(
       android: initalAndroidSettings,
@@ -195,7 +201,6 @@ class MessagingService with WidgetsBindingObserver {
 
     await _localNotificationPlugin.initialize(initalSettings,
         onDidReceiveNotificationResponse: (response) async {
-      print('onDidReceiveNotificationResponse: $response');
       // Clear badge when user taps on notification
       await clearBadge();
 
@@ -204,9 +209,8 @@ class MessagingService with WidgetsBindingObserver {
         try {
           // Parse payload back to Map if it contains navigation data
           // Note: You might need to encode/decode the payload properly
-          print('Notification payload: ${response.payload}');
         } catch (e) {
-          print('Error handling notification tap: $e');
+          // Silent error - don't clutter logs
         }
       }
     });
@@ -218,7 +222,6 @@ class MessagingService with WidgetsBindingObserver {
     try {
       return await _fcmRepository.updateUserMessagingToken();
     } catch (e) {
-      print('Error getting FCM token: $e');
       return null;
     }
   }
@@ -227,46 +230,88 @@ class MessagingService with WidgetsBindingObserver {
     try {
       return await _fcmRepository.getMessagingToken();
     } catch (e) {
-      print('Error getting FCM token: $e');
       return null;
+    }
+  }
+
+  Future<void> storeNotification(RemoteMessage message) async {
+    try {
+      final data = message.data;
+      final notification = message.notification;
+
+      // Store all notifications (not just report-related ones)
+      if (notification != null) {
+        final appNotification = AppNotification(
+          id: message.messageId ??
+              DateTime.now().millisecondsSinceEpoch.toString(),
+          title: notification.title ?? 'New Notification',
+          message: notification.body ?? 'You have a new notification',
+          timestamp: message.sentTime ?? DateTime.now(),
+          isRead: false,
+          reportId: data['reportId'] ?? '',
+          reportStatus: data['reportStatus'] ?? 'general',
+          additionalData: data,
+        );
+
+        // Try to use repository first for proper state management
+        if (_globalContainer != null) {
+          try {
+            await _globalContainer!
+                .read(notificationsRepositoryProvider.notifier)
+                .addNotification(appNotification);
+          } catch (e) {
+            await NotificationsDatabase.instance.create(appNotification);
+          }
+        } else {
+          // Fallback to direct database access
+          await NotificationsDatabase.instance.create(appNotification);
+        }
+      }
+    } catch (e) {
+      // Silent error - don't clutter logs
     }
   }
 
   Future<void> showNotification(RemoteMessage message) async {
     RemoteNotification? notification = message.notification;
-    AndroidNotification? android = message.notification?.android;
-    if (notification != null && android != null) {
-      _localNotificationPlugin.show(
-        notification.hashCode,
-        notification.title,
-        notification.body,
-        NotificationDetails(
-          android: AndroidNotificationDetails(
-            'high_importance_channel',
-            'High Importance Notifications',
-            channelDescription:
-                'This channel is used for important notifications',
-            icon: '@mipmap/ic_launcher',
+
+    if (notification != null) {
+      try {
+        await _localNotificationPlugin.show(
+          notification.hashCode,
+          notification.title,
+          notification.body,
+          NotificationDetails(
+            android: AndroidNotificationDetails(
+              'high_importance_channel',
+              'High Importance Notifications',
+              channelDescription:
+                  'This channel is used for important notifications',
+              icon: '@mipmap/ic_launcher',
+            ),
+            iOS: DarwinNotificationDetails(
+              presentAlert: true,
+              presentBadge: true,
+              presentSound: true,
+            ),
           ),
-          iOS: DarwinNotificationDetails(
-            presentAlert: true,
-            presentBadge: true,
-            presentSound: true,
-          ),
-        ),
-        payload: message.data.toString(),
-      );
+          payload: message.data.toString(),
+        );
+      } catch (e) {
+        // Silent error - don't clutter logs
+      }
     }
   }
 
   Future<void> _setupMessageHandler() async {
     //Foreground
     FirebaseMessaging.onMessage.listen((message) async {
-      print('onMessage: $message');
+      await storeNotification(message);
+      await setupFlutterNotification(message);
+      await _showNotificationSnackbar(message);
       await showNotification(message);
 
       // Optionally navigate in foreground based on notification type
-      // You can customize this behavior based on your requirements
       final shouldNavigateInForeground =
           message.data['navigateInForeground'] == 'true';
       if (shouldNavigateInForeground) {
@@ -286,7 +331,8 @@ class MessagingService with WidgetsBindingObserver {
   }
 
   Future<void> _handleBackgroundMessage(RemoteMessage message) async {
-    print('Handling background message: ${message.messageId}');
+    // Store notification in database
+    await storeNotification(message);
 
     // Clear badge when app is opened from notification
     await clearBadge();
@@ -297,6 +343,119 @@ class MessagingService with WidgetsBindingObserver {
     await showNotification(message);
   }
 
+  /// Shows a snackbar with notification content and navigation button
+  Future<void> _showNotificationSnackbar(RemoteMessage message) async {
+    final ctx = rootNavigatorKey.currentContext;
+
+    if (ctx == null) {
+      return;
+    }
+
+    final notification = message.notification;
+    if (notification == null) {
+      return;
+    }
+
+    final localization = AppLocalizations.of(ctx);
+    final title = notification.title ??
+        localization.translate('notification-snackbar-new-title');
+    final body = notification.body ??
+        localization.translate('notification-snackbar-new-body');
+
+    try {
+      // Find the ScaffoldMessenger
+      final scaffoldMessenger = ScaffoldMessenger.of(ctx);
+
+      // Clear any existing snackbars
+      scaffoldMessenger.clearSnackBars();
+
+      // Show the snackbar using app's design system
+      final theme = AppTheme.of(ctx);
+      scaffoldMessenger.showSnackBar(
+        SnackBar(
+          behavior: SnackBarBehavior.floating,
+          margin: const EdgeInsets.all(16),
+          padding: const EdgeInsets.fromLTRB(16, 16, 8, 16),
+          shape: SmoothRectangleBorder(
+            borderRadius: SmoothBorderRadius(
+              cornerRadius: 15,
+              cornerSmoothing: 1,
+            ),
+            side: BorderSide(
+              width: 2,
+              color: theme.primary[300]!,
+            ),
+          ),
+          backgroundColor: theme.primary[50],
+          duration: const Duration(seconds: 5),
+          content: Row(
+            children: [
+              Icon(
+                LucideIcons.bell,
+                color: theme.primary[600]!,
+                size: 24,
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: TextStyles.caption.copyWith(
+                        color: theme.grey[900],
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      body,
+                      style: TextStyles.caption.copyWith(
+                        color: theme.grey[700],
+                        height: 1.3,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 8),
+              TextButton(
+                onPressed: () {
+                  scaffoldMessenger.hideCurrentSnackBar();
+                  // Navigate to notifications screen
+                  try {
+                    GoRouter.of(ctx).goNamed(RouteNames.notifications.name);
+                  } catch (e) {
+                    // Silent error - don't clutter logs
+                  }
+                },
+                style: TextButton.styleFrom(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  backgroundColor: theme.primary[600],
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                child: Text(
+                  localization.translate('notification-snackbar-view'),
+                  style: TextStyles.caption.copyWith(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    } catch (e) {
+      // Silent error - don't clutter logs
+    }
+  }
+
   /// Handles navigation based on notification data
   Future<void> _handleNotificationNavigation(RemoteMessage message) async {
     // Try to obtain a BuildContext from the rootNavigatorKey
@@ -304,7 +463,6 @@ class MessagingService with WidgetsBindingObserver {
 
     if (ctx == null) {
       // Context isn't ready yet – queue the message for later and retry
-      print('BuildContext not ready yet. Queuing navigation.');
       _queuedMessage = message;
       // Retry after next frame (max 5 attempts to avoid infinite loop)
       Future.delayed(const Duration(milliseconds: 300), () {
@@ -322,16 +480,15 @@ class MessagingService with WidgetsBindingObserver {
     final screen = data['screen'];
 
     if (screen == null) {
-      print('No screen specified in notification data');
       return;
     }
-
-    print('Navigating to screen: $screen with data: $data');
 
     // Add delay to ensure app is ready for navigation
     await Future.delayed(const Duration(milliseconds: 100));
 
     try {
+      // Comment out dynamic redirection - always redirect to notifications screen
+      /*
       switch (screen) {
         case 'reportConversation':
         case 'reportDetails':
@@ -377,8 +534,12 @@ class MessagingService with WidgetsBindingObserver {
           GoRouter.of(ctx).goNamed(RouteNames.home.name);
           break;
       }
+      */
+
+      // Always redirect to notifications screen
+      GoRouter.of(ctx).goNamed(RouteNames.notifications.name);
     } catch (e) {
-      print('Error navigating from notification: $e');
+      // Silent error - don't clutter logs
     }
   }
 
@@ -402,15 +563,13 @@ class MessagingService with WidgetsBindingObserver {
     try {
       // Subscribe to FCM topic first (critical)
       await _messaging.subscribeToTopic('all_users');
-      print('Successfully subscribed to all_users topic');
 
       // Track subscription in Firestore (optional, non-blocking)
       _trackAllUsersSubscription(user.uid).catchError((e) {
-        print('Error tracking subscription in Firestore: $e');
         // Don't rethrow - this is optional
       });
     } catch (e) {
-      print('Error subscribing to all_users topic: $e');
+      // Silent error - don't clutter logs
     }
   }
 
@@ -453,7 +612,7 @@ class MessagingService with WidgetsBindingObserver {
         }, SetOptions(merge: true));
       }
     } catch (e) {
-      print('Error tracking all_users subscription: $e');
+      // Silent error - don't clutter logs
     }
   }
 
@@ -483,5 +642,6 @@ FirebaseMessaging messaging(MessagingRef ref) {
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await MessagingService.instance.setupFlutterNotification(message);
+  await MessagingService.instance.storeNotification(message);
   await MessagingService.instance.showNotification(message);
 }
