@@ -77,20 +77,29 @@ class BanService {
   /// Check if device is banned
   Future<bool> isDeviceBanned(String deviceId) async {
     try {
-      final querySnapshot = await _firestore
-          .collection('bans')
-          .where('type', isEqualTo: BanType.device_ban.name)
-          .where('isActive', isEqualTo: true)
-          .where('restrictedDevices', arrayContains: deviceId)
-          .get();
+      print('🔍 [BAN_SERVICE] Checking if device is banned: $deviceId');
 
-      final activeBans = querySnapshot.docs
-          .map((doc) => Ban.fromFirestore(doc))
-          .where((ban) => ban.isCurrentlyActive)
-          .toList();
+      final deviceBans = await getDeviceBans(deviceId);
+      final isBanned = deviceBans.isNotEmpty;
 
-      return activeBans.isNotEmpty;
+      print('🚫 [BAN_SERVICE] Device banned result: $isBanned');
+
+      if (isBanned) {
+        print(
+            '❌ [BAN_SERVICE] DEVICE IS BANNED - This device is restricted from app access');
+        for (int i = 0; i < deviceBans.length; i++) {
+          final ban = deviceBans[i];
+          print(
+              '📋 [BAN_SERVICE] Device Ban $i: ID=${ban.id}, reason=${ban.reason}, issuedAt=${ban.issuedAt}');
+        }
+      }
+
+      return isBanned;
     } catch (e) {
+      print('❌ [BAN_SERVICE] Error checking device ban: $e');
+      // For security: if we can't verify device ban status,
+      // we should fail safely but log the error
+      // The calling code will handle this appropriately
       throw BanServiceException('Error checking device ban: $e');
     }
   }
@@ -214,18 +223,59 @@ class BanService {
   /// Get all active bans for a specific device (global check)
   Future<List<Ban>> getDeviceBans(String deviceId) async {
     try {
-      final querySnapshot = await _firestore
-          .collection('bans')
-          .where('type', isEqualTo: BanType.device_ban.name)
-          .where('isActive', isEqualTo: true)
-          .where('restrictedDevices', arrayContains: deviceId)
-          .get();
+      print('🔍 [BAN_SERVICE] Getting device bans for device: $deviceId');
 
-      return querySnapshot.docs
-          .map((doc) => Ban.fromFirestore(doc))
-          .where((ban) => ban.isCurrentlyActive)
-          .toList();
+      // Primary method: Query device bans directly
+      try {
+        final querySnapshot = await _firestore
+            .collection('bans')
+            .where('type', isEqualTo: BanType.device_ban.name)
+            .where('isActive', isEqualTo: true)
+            .where('restrictedDevices', arrayContains: deviceId)
+            .get();
+
+        final bans = querySnapshot.docs
+            .map((doc) => Ban.fromFirestore(doc))
+            .where((ban) => ban.isCurrentlyActive)
+            .toList();
+
+        print(
+            '📋 [BAN_SERVICE] Found ${bans.length} device bans via primary query');
+        return bans;
+      } catch (e) {
+        print('⚠️ [BAN_SERVICE] Primary device ban query failed: $e');
+
+        // Fallback method: Try simpler query approach
+        try {
+          print('🔄 [BAN_SERVICE] Trying fallback device ban query...');
+
+          // Query all active device bans and filter manually
+          final querySnapshot = await _firestore
+              .collection('bans')
+              .where('type', isEqualTo: BanType.device_ban.name)
+              .where('isActive', isEqualTo: true)
+              .get();
+
+          final bans = querySnapshot.docs
+              .map((doc) => Ban.fromFirestore(doc))
+              .where((ban) =>
+                  ban.isCurrentlyActive &&
+                  ban.restrictedDevices != null &&
+                  ban.restrictedDevices!.contains(deviceId))
+              .toList();
+
+          print(
+              '📋 [BAN_SERVICE] Found ${bans.length} device bans via fallback query');
+          return bans;
+        } catch (fallbackError) {
+          print(
+              '❌ [BAN_SERVICE] Fallback device ban query also failed: $fallbackError');
+          throw BanServiceException(
+              'All device ban queries failed. Primary: $e, Fallback: $fallbackError');
+        }
+      }
     } catch (e) {
+      print('❌ [BAN_SERVICE] Critical error getting device bans: $e');
       throw BanServiceException('Failed to get device bans: $e');
     }
   }

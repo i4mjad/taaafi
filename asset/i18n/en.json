@@ -751,5 +751,18 @@
   "related-content-group": "Group",
   "related-content-other": "Other",
   "reference-id": "Reference ID",
-  "more-warnings": "more warning(s)"
+  "more-warnings": "more warning(s)",
+  "device-ban-appeal-message": "If you believe this device restriction is in error, please contact support with the device ID provided above.",
+  "device-ban-no-logout-message": "Device restrictions cannot be resolved by logging out. Please contact support for assistance.",
+  "device-id": "Device ID",
+  "restriction-type": "Restriction Type",
+  "appeal-message": "If you believe this restriction was applied in error, please contact our support team with the reference ID above for assistance.",
+  "unable-to-load-ban-details": "Unable to load ban details",
+  "account-restricted-message": "Your account has been restricted from accessing the application.",
+  "security-initialization-success": "Security initialization completed successfully",
+  "security-check-failed": "Security check failed, proceeding with limited functionality",
+  "device-permanently-restricted": "This device has been permanently restricted from accessing the application. Contact support if you believe this is an error.",
+  "device-restricted-for-account": "This device has been restricted from accessing the application for your account. Contact support if you believe this is an error.",
+  "device-ban-verification-error": "Critical error during device ban verification",
+  "device-access-revoked": "This device has been restricted from accessing the application. Device access has been revoked due to policy violations. Please contact support for more information."
 }

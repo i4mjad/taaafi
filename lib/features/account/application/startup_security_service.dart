@@ -18,83 +18,48 @@ class StartupSecurityService {
   /// Initialize security and device tracking during app startup
   Future<SecurityStartupResult> initializeAppSecurity() async {
     try {
-      print('🔒 [DEBUG] Starting security initialization...');
-
       // Step 1: Initialize device tracking
-      print('📱 [DEBUG] Step 1: Initializing device tracking...');
       await _facade.initializeDeviceTracking();
-      print('✅ [DEBUG] Device tracking initialized');
 
       // Step 2: Get device ID for ban checking
-      print('🔍 [DEBUG] Step 2: Getting device ID...');
       final deviceId = await _facade.getCurrentDeviceId();
-      print('📱 [DEBUG] Device ID: $deviceId');
 
-      // Step 3: Check for device-wide bans (most restrictive)
-      print('🚫 [DEBUG] Step 3: Checking device bans...');
-      final isDeviceBanned = await _checkDeviceBan(deviceId);
-      print('🚫 [DEBUG] Device banned: $isDeviceBanned');
-      if (isDeviceBanned) {
-        print('❌ [DEBUG] Device is banned, returning device banned result');
+      // Step 3: Check for device-wide bans (HIGHEST PRIORITY - blocks all access)
+      final deviceBanResult = await _checkDeviceBanRobust(deviceId);
+
+      if (deviceBanResult.isBanned) {
         return SecurityStartupResult.deviceBanned(
-          message:
-              'This device has been restricted from accessing the application.',
+          message: deviceBanResult.message,
           deviceId: deviceId,
         );
+      } else if (deviceBanResult.hasError) {
+        // For security, if we can't verify device ban status, we should be cautious
+        // But we'll allow access with a warning rather than blocking completely
       }
 
-      // Step 4: Check user-level bans if user is logged in
+      // Step 4: Check user-level bans if user is logged in (LOWER PRIORITY)
       final user = _auth.currentUser;
-      print('👤 [DEBUG] Step 4: Checking user bans...');
-      print('👤 [DEBUG] Current user: ${user?.uid ?? 'null'}');
       if (user != null) {
-        print('🔍 [DEBUG] User is logged in, checking for user bans...');
         final isUserBanned = await _facade.isCurrentUserBannedFromApp();
-        print('🚫 [DEBUG] User banned: $isUserBanned');
-
-        // Additional debug: Get user bans directly
-        try {
-          final userBans = await _facade.getCurrentUserBans();
-          print('📋 [DEBUG] Found ${userBans.length} total bans for user');
-          for (int i = 0; i < userBans.length; i++) {
-            final ban = userBans[i];
-            print(
-                '📋 [DEBUG] Ban $i: ID=${ban.id}, scope=${ban.scope}, isActive=${ban.isActive}, isExpired=${ban.isExpired}, isCurrentlyActive=${ban.isCurrentlyActive}');
-          }
-          final appWideBans =
-              userBans.where((ban) => ban.scope == BanScope.app_wide).toList();
-          print('🚫 [DEBUG] Found ${appWideBans.length} app-wide bans');
-        } catch (e) {
-          print('❌ [DEBUG] Error getting user bans for debugging: $e');
-        }
 
         if (isUserBanned) {
-          print('❌ [DEBUG] User is banned, returning user banned result');
           return SecurityStartupResult.userBanned(
             message:
                 'Your account has been restricted from accessing the application.',
             userId: user.uid,
           );
         }
-        print('✅ [DEBUG] User is not banned, continuing...');
-      } else {
-        print('👤 [DEBUG] No user logged in, skipping user ban check');
       }
 
       // Step 5: Pre-load feature access map for performance
-      print('🗺️ [DEBUG] Step 5: Pre-loading feature access map...');
       final featureAccessMap = await _facade.generateFeatureAccessMap();
-      print(
-          '✅ [DEBUG] Feature access map loaded with ${featureAccessMap.length} features');
 
-      print('✅ [DEBUG] Security initialization completed successfully');
       return SecurityStartupResult.success(
         message: 'Security initialization completed successfully',
         featureAccessMap: featureAccessMap,
         deviceId: deviceId,
       );
     } catch (e) {
-      print('❌ [DEBUG] Security initialization failed: $e');
       // Fail safely - allow app to continue but log the error
       return SecurityStartupResult.warning(
         message: 'Security check failed, proceeding with limited functionality',
@@ -103,28 +68,89 @@ class StartupSecurityService {
     }
   }
 
-  /// Check if device is banned (internal method)
-  Future<bool> _checkDeviceBan(String deviceId) async {
+  /// Enhanced device ban checking with robust error handling
+  Future<DeviceBanCheckResult> _checkDeviceBanRobust(String deviceId) async {
     try {
-      print('🔍 [DEBUG] Checking device ban for device: $deviceId');
-      // Check for device-wide bans globally (not just current user)
-      final deviceBans = await _facade.getDeviceBans(deviceId);
-      print('📋 [DEBUG] Found ${deviceBans.length} device bans');
-      for (int i = 0; i < deviceBans.length; i++) {
-        final ban = deviceBans[i];
-        print(
-            '📋 [DEBUG] Device Ban $i: ID=${ban.id}, isActive=${ban.isActive}, isExpired=${ban.isExpired}');
+      // Method 1: Check for global device bans (bans that apply to all users on this device)
+      try {
+        final deviceBans = await _facade.getDeviceBans(deviceId);
+
+        if (deviceBans.isNotEmpty) {
+          return DeviceBanCheckResult.banned(
+              'This device has been permanently restricted from accessing the application. Contact support if you believe this is an error.');
+        }
+      } catch (e) {
+        // Continue to next method if this fails
       }
 
-      // Device is banned if there are any active bans for this device
-      final isBanned = deviceBans.isNotEmpty;
-      print('🚫 [DEBUG] Device ban result: $isBanned');
-      return isBanned;
+      // Method 2: Check for user-specific device bans (if user is logged in)
+      final user = _auth.currentUser;
+      if (user != null) {
+        try {
+          final userBans = await _facade.getCurrentUserBans();
+
+          // Look for device bans that apply to this specific device
+          final userDeviceBans = userBans
+              .where((ban) =>
+                  ban.type == BanType.device_ban &&
+                  ban.isCurrentlyActive &&
+                  ban.deviceIds != null &&
+                  ban.deviceIds!.contains(deviceId))
+              .toList();
+
+          if (userDeviceBans.isNotEmpty) {
+            return DeviceBanCheckResult.banned(
+              'This device has been restricted from accessing the application for your account. Contact support if you believe this is an error.',
+            );
+          }
+        } catch (e) {
+          // Continue to next method if this fails
+        }
+      }
+
+      // Method 3: Fallback - check if device is in any user's device ban list
+      // This is a simpler check that might work even if the main queries fail
+      try {
+        final fallbackResult = await _checkDeviceBanFallback(deviceId);
+        if (fallbackResult.isBanned) {
+          return fallbackResult;
+        }
+      } catch (fallbackError) {
+        // Continue if fallback fails
+      }
+
+      return DeviceBanCheckResult.notBanned();
     } catch (e) {
-      print('❌ [DEBUG] Error checking device ban: $e');
-      // Fail safely - if we can't check, allow access
-      return false;
+      return DeviceBanCheckResult.error(
+        'Critical error during device ban verification: $e',
+      );
     }
+  }
+
+  /// Fallback method for checking device bans with simpler logic
+  Future<DeviceBanCheckResult> _checkDeviceBanFallback(String deviceId) async {
+    try {
+      // Try to get device bans directly and check if any exist
+      final deviceBans = await _facade.getDeviceBans(deviceId);
+
+      if (deviceBans.isNotEmpty) {
+        return DeviceBanCheckResult.banned(
+          'This device has been restricted from accessing the application. '
+          'Device access has been revoked due to policy violations. '
+          'Please contact support for more information.',
+        );
+      }
+
+      return DeviceBanCheckResult.notBanned();
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  /// Check if device is banned (internal method - DEPRECATED in favor of robust check)
+  Future<bool> _checkDeviceBan(String deviceId) async {
+    final result = await _checkDeviceBanRobust(deviceId);
+    return result.isBanned;
   }
 
   /// Get current security status (for runtime checks)
@@ -289,4 +315,38 @@ enum SecurityStatusType {
   banned,
   warning,
   error,
+}
+
+/// Result of device ban checking with enhanced error handling
+class DeviceBanCheckResult {
+  final bool isBanned;
+  final bool hasError;
+  final String message;
+  final String? error;
+
+  const DeviceBanCheckResult._({
+    required this.isBanned,
+    required this.hasError,
+    required this.message,
+    this.error,
+  });
+
+  factory DeviceBanCheckResult.banned(String message) => DeviceBanCheckResult._(
+        isBanned: true,
+        hasError: false,
+        message: message,
+      );
+
+  factory DeviceBanCheckResult.notBanned() => DeviceBanCheckResult._(
+        isBanned: false,
+        hasError: false,
+        message: 'Device is not banned',
+      );
+
+  factory DeviceBanCheckResult.error(String error) => DeviceBanCheckResult._(
+        isBanned: false,
+        hasError: true,
+        message: 'Device ban check failed',
+        error: error,
+      );
 }

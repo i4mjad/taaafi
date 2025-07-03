@@ -42,10 +42,12 @@ Future<SecurityStartupResult> appStartup(Ref ref) async {
   ref.read(localeNotifierProvider);
 
   // Initialize security and check for device/user bans
+  // NOTE: Device bans are checked FIRST (highest priority) before user bans
   final securityService = ref.watch(startupSecurityServiceProvider);
   final securityResult = await securityService.initializeAppSecurity();
 
   // Return security result - this will determine if app should load or show ban screen
+  // Device bans take precedence over user bans in the security service
   return securityResult;
 
   // If user is logged in, ensure user document is loaded before proceeding
@@ -84,6 +86,7 @@ class AppStartupWidget extends ConsumerWidget {
     return appStartupState.when(
       data: (securityResult) {
         // Check if device or user is banned
+        // Device bans have highest priority and are checked first in the security service
         if (securityResult.isBlocked) {
           return AppBannedWidget(securityResult: securityResult);
         }
