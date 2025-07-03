@@ -33,4 +33,5 @@ enum RouteNames {
   userReports,
   reportConversation,
   notifications,
+  userProfile,
 }

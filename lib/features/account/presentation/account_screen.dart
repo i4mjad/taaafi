@@ -22,7 +22,6 @@ import 'package:reboot_app_3/core/theming/theme_provider.dart';
 import 'package:reboot_app_3/core/utils/url_launcher_provider.dart';
 import 'package:reboot_app_3/features/account/data/models/user_profile.dart';
 import 'package:reboot_app_3/features/account/data/user_profile_notifier.dart';
-import 'package:reboot_app_3/features/account/presentation/update_user_profile_modal_sheet.dart';
 import 'package:reboot_app_3/features/authentication/application/auth_service.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -33,6 +32,7 @@ import 'package:reboot_app_3/core/shared_widgets/confirm_details_banner.dart';
 import 'package:reboot_app_3/core/shared_widgets/confirm_email_banner.dart';
 import 'package:reboot_app_3/features/account/presentation/contact_us_modal.dart';
 import 'package:reboot_app_3/features/home/presentation/home/enhanced_home_settings_sheet.dart';
+import 'package:reboot_app_3/features/authentication/providers/user_provider.dart';
 
 class AccountScreen extends ConsumerWidget {
   const AccountScreen({super.key});
@@ -82,7 +82,14 @@ class AccountScreen extends ConsumerWidget {
                                       AccountStatus.needEmailVerification)
                                 const ConfirmEmailBanner(),
                               if (showMainContent)
-                                UserDetailsWidget(userProfile!),
+                                GestureDetector(
+                                  onTap: () {
+                                    HapticFeedback.mediumImpact();
+                                    context
+                                        .pushNamed(RouteNames.userProfile.name);
+                                  },
+                                  child: UserDetailsWidget(userProfile!),
+                                ),
                               verticalSpace(Spacing.points24),
                               Text(
                                 AppLocalizations.of(context)
@@ -749,15 +756,17 @@ class SettingsButton extends StatelessWidget {
   }
 }
 
-class UserDetailsWidget extends StatelessWidget {
+class UserDetailsWidget extends ConsumerWidget {
   const UserDetailsWidget(
     this.userProfile, {
     super.key,
   });
   final UserProfile userProfile;
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = AppTheme.of(context);
+    final currentUser = ref.watch(userNotifierProvider);
+
     return Padding(
       padding: const EdgeInsets.all(4.0),
       child: WidgetsContainer(
@@ -767,67 +776,84 @@ class UserDetailsWidget extends StatelessWidget {
         borderRadius: BorderRadius.circular(15),
         borderSide: BorderSide(color: theme.grey[900]!, width: 0.25),
         cornerSmoothing: 1,
-        boxShadow: Shadows.mainShadows,
         child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Row(
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                CircleAvatar(
-                  backgroundColor: theme.primary[50],
-                  child: Icon(
-                    LucideIcons.user,
-                    color: theme.primary[900],
+                currentUser.when(
+                  data: (user) {
+                    final hasProfileImage =
+                        user?.photoURL != null && user!.photoURL!.isNotEmpty;
+
+                    return CircleAvatar(
+                      backgroundColor: theme.primary[50],
+                      backgroundImage:
+                          hasProfileImage ? NetworkImage(user.photoURL!) : null,
+                      child: hasProfileImage
+                          ? null
+                          : Icon(
+                              LucideIcons.user,
+                              color: theme.primary[900],
+                            ),
+                    );
+                  },
+                  loading: () => CircleAvatar(
+                    backgroundColor: theme.primary[50],
+                    child: Icon(
+                      LucideIcons.user,
+                      color: theme.primary[900],
+                    ),
+                  ),
+                  error: (_, __) => CircleAvatar(
+                    backgroundColor: theme.primary[50],
+                    child: Icon(
+                      LucideIcons.user,
+                      color: theme.primary[900],
+                    ),
                   ),
                 ),
-                horizontalSpace(Spacing.points16),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                verticalSpace(Spacing.points12),
+                Row(
                   children: [
-                    Text(
-                      userProfile.displayName,
-                      style: TextStyles.footnoteSelected.copyWith(
-                        color: theme.grey[900],
-                      ),
-                    ),
-                    verticalSpace(Spacing.points4),
-                    Text(
-                      userProfile.email,
-                      style: TextStyles.caption.copyWith(
-                        color: theme.grey[600],
-                      ),
-                    ),
-                    verticalSpace(Spacing.points4),
-                    Text(
-                      userProfile.age.toString() +
-                          " " +
-                          AppLocalizations.of(context).translate('years'),
-                      style: TextStyles.caption.copyWith(
-                        color: theme.grey[600],
-                      ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          userProfile.displayName,
+                          style: TextStyles.footnoteSelected.copyWith(
+                            color: theme.grey[900],
+                          ),
+                        ),
+                        verticalSpace(Spacing.points8),
+                        Text(
+                          userProfile.email,
+                          style: TextStyles.caption.copyWith(
+                            color: theme.grey[600],
+                          ),
+                        ),
+                        verticalSpace(Spacing.points8),
+                        Text(
+                          userProfile.age.toString() +
+                              " " +
+                              AppLocalizations.of(context).translate('years'),
+                          style: TextStyles.caption.copyWith(
+                            color: theme.grey[600],
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
               ],
             ),
-            GestureDetector(
-              onTap: () {
-                HapticFeedback.lightImpact();
-                showModalBottomSheet(
-                  useSafeArea: true,
-                  isScrollControlled: true,
-                  useRootNavigator: true,
-                  context: context,
-                  backgroundColor: Colors.transparent,
-                  builder: (context) => UpdateUserProfileModalSheet(),
-                );
-              },
-              child: Icon(
-                LucideIcons.edit,
-                size: 18,
-              ),
-            ),
+            Spacer(),
+            Icon(
+                Directionality.of(context) == TextDirection.rtl
+                    ? LucideIcons.chevronLeft
+                    : LucideIcons.chevronRight,
+                color: theme.grey[600]),
           ],
         ),
       ),

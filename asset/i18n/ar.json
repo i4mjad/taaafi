@@ -658,5 +658,20 @@
   "drag-to-reorder": "اسحب لإعادة الترتيب",
   "tap-to-toggle-visibility": "انقر لإظهار/إخفاء",
   "reset-to-default-order": "إعادة تعيين الترتيب الافتراضي",
-  "reset-order": "إعادة الترتيب"
+  "reset-order": "إعادة الترتيب",
+  "user-profile": "الملف الشخصي",
+  "error-loading-profile": "خطأ في تحميل الملف الشخصي",
+  "no-profile-data": "لا توجد بيانات للملف الشخصي",
+  "profile-details": "تفاصيل الملف الشخصي",
+  "warnings": "التحذيرات",
+  "bans": "الحظر",
+  "age": "العمر",
+  "member-since": "عضو منذ",
+  "account-status": "حالة الحساب",
+  "active": "نشط",
+  "no-warnings": "لا توجد تحذيرات",
+  "warnings-description": "حسابك لا يحتوي على أي تحذيرات. استمر في اتباع إرشادات المجتمع للحفاظ على سجل نظيف.",
+  "account-in-good-standing": "الحساب في وضع جيد",
+  "bans-description": "حسابك في وضع جيد ولا توجد عليه قيود. استمر في اتباع شروط الخدمة للحفاظ على هذا الوضع.",
+  "edit-profile": "تعديل الملف الشخصي"
 }

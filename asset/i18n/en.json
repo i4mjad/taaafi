@@ -679,5 +679,20 @@
   "drag-to-reorder": "Drag to reorder",
   "tap-to-toggle-visibility": "Tap to toggle visibility",
   "reset-to-default-order": "Reset to default order",
-  "reset-order": "Reset Order"
+  "reset-order": "Reset Order",
+  "user-profile": "User Profile",
+  "error-loading-profile": "Error loading profile",
+  "no-profile-data": "No profile data available",
+  "profile-details": "Profile Details",
+  "warnings": "Warnings",
+  "bans": "Bans",
+  "age": "Age",
+  "member-since": "Member Since",
+  "account-status": "Account Status",
+  "active": "Active",
+  "no-warnings": "No Warnings",
+  "warnings-description": "Your account has no warnings. Keep following our community guidelines to maintain a clean record.",
+  "account-in-good-standing": "Account in Good Standing",
+  "bans-description": "Your account is in good standing with no restrictions. Continue following our terms of service to keep it that way.",
+  "edit-profile": "Edit Profile"
 }

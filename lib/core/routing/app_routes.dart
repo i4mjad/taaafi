@@ -10,6 +10,7 @@ import 'package:reboot_app_3/core/routing/route_names.dart';
 import 'package:reboot_app_3/core/routing/scaffold_with_nested_navigation.dart';
 import 'package:reboot_app_3/features/account/presentation/account_screen.dart';
 import 'package:reboot_app_3/features/account/presentation/delete_account_screen.dart';
+import 'package:reboot_app_3/features/account/presentation/user_profile_screen.dart';
 import 'package:reboot_app_3/features/home/presentation/reports/user_reports_screen.dart';
 import 'package:reboot_app_3/features/home/presentation/reports/report_conversation_screen.dart';
 import 'package:reboot_app_3/features/notifications/presentation/notifications_screen.dart';
@@ -403,6 +404,14 @@ GoRouter goRouter(GoRouterRef ref) {
                   child: AccountScreen(),
                 ),
                 routes: [
+                  GoRoute(
+                    path: 'profile',
+                    name: RouteNames.userProfile.name,
+                    pageBuilder: (context, state) => MaterialPage(
+                      name: RouteNames.userProfile.name,
+                      child: UserProfileScreen(),
+                    ),
+                  ),
                   GoRoute(
                     path: 'account-delete',
                     name: RouteNames.accountDelete.name,
