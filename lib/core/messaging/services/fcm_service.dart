@@ -306,6 +306,9 @@ class MessagingService with WidgetsBindingObserver {
   Future<void> _setupMessageHandler() async {
     //Foreground
     FirebaseMessaging.onMessage.listen((message) async {
+      print(
+          '🔔 [FCM] Received foreground message: ${message.notification?.title}');
+
       await storeNotification(message);
       await setupFlutterNotification(message);
       await _showNotificationSnackbar(message);
