@@ -15,6 +15,7 @@ import 'package:reboot_app_3/core/shared_widgets/snackbar.dart';
 import 'package:reboot_app_3/features/authentication/providers/user_provider.dart';
 import 'package:reboot_app_3/features/home/data/repos/streak_repository.dart';
 import 'package:reboot_app_3/features/home/data/streak_notifier.dart';
+import 'package:reboot_app_3/core/routing/app_startup.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'auth_service.g.dart';
@@ -36,6 +37,17 @@ class AuthService {
   final Ref ref;
 
   AuthService(this._auth, this._authRepository, this._fcmRepository, this.ref);
+
+  /// Invalidate app startup to trigger security re-check after login
+  void _invalidateAppStartup() {
+    try {
+      ref.invalidate(appStartupProvider);
+      print(
+          '🔄 [AUTH_SERVICE] Invalidated appStartupProvider for security re-check');
+    } catch (e) {
+      print('⚠️ [AUTH_SERVICE] Could not invalidate appStartupProvider: $e');
+    }
+  }
 
   Future<void> signUpWithEmail(
     BuildContext context,
@@ -72,6 +84,11 @@ class AuthService {
         fcmToken,
         deviceId,
       );
+
+      // Invalidate startup to re-check security for new user
+      if (credential.user != null) {
+        _invalidateAppStartup();
+      }
     } on FirebaseAuthException catch (e) {
       getSnackBar(context, e.code);
     } catch (e, stackTrace) {
@@ -137,6 +154,8 @@ class AuthService {
           // Perform post-login tasks if user exists
           if (user != null) {
             await _performPostLoginTasks();
+            // Invalidate startup to re-check security for logged in user
+            _invalidateAppStartup();
           }
 
           return user;
@@ -172,6 +191,8 @@ class AuthService {
       // Perform post-login tasks if user exists
       if (user != null) {
         await _performPostLoginTasks();
+        // Invalidate startup to re-check security for logged in user
+        _invalidateAppStartup();
       }
 
       return user;
@@ -208,6 +229,8 @@ class AuthService {
       // Perform post-login tasks if user exists and has document
       if (user != null && docExists) {
         await _performPostLoginTasks();
+        // Invalidate startup to re-check security for logged in user
+        _invalidateAppStartup();
       }
 
       return user;

@@ -16,6 +16,7 @@ import 'package:reboot_app_3/core/theming/theme_provider.dart';
 import 'package:reboot_app_3/core/theming/color_theme_provider.dart';
 import 'package:reboot_app_3/core/utils/firebase_remote_config_provider.dart';
 import 'package:reboot_app_3/core/utils/url_launcher_provider.dart';
+import 'package:reboot_app_3/features/account/presentation/banned_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:reboot_app_3/core/messaging/services/fcm_service.dart';
 
@@ -53,7 +54,36 @@ class MyApp extends ConsumerWidget {
             ),
           );
         },
-        data: (_) {
+        data: (securityResult) {
+          // ✅ Check if user/device is banned BEFORE creating the app
+          if (securityResult.isBlocked) {
+            final locale = ref.watch(localeNotifierProvider);
+            return MaterialApp(
+              debugShowCheckedModeBanner: false,
+              theme: themeController.darkTheme
+                  ? darkTheme
+                  : getLightTheme(colorTheme),
+              supportedLocales: const [Locale('ar', ''), Locale('en', '')],
+              locale: locale,
+              localizationsDelegates: const [
+                AppLocalizations.delegate,
+                GlobalMaterialLocalizations.delegate,
+                GlobalCupertinoLocalizations.delegate,
+                GlobalWidgetsLocalizations.delegate,
+              ],
+              localeResolutionCallback: (locale, supportedLocales) {
+                for (var supportedLocale in supportedLocales) {
+                  if (supportedLocale.languageCode == locale?.languageCode) {
+                    return supportedLocale;
+                  }
+                }
+                return supportedLocales.first;
+              },
+              home: AppBannedWidget(securityResult: securityResult),
+            );
+          }
+
+          // ✅ Only create normal app if user is NOT banned
           final goRouter = ref.watch(goRouterProvider);
           final locale = ref.watch(localeNotifierProvider);
 

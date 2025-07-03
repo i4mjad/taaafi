@@ -33,6 +33,8 @@ import 'package:reboot_app_3/core/shared_widgets/confirm_email_banner.dart';
 import 'package:reboot_app_3/features/account/presentation/contact_us_modal.dart';
 import 'package:reboot_app_3/features/home/presentation/home/enhanced_home_settings_sheet.dart';
 import 'package:reboot_app_3/features/authentication/providers/user_provider.dart';
+import 'package:reboot_app_3/features/account/data/app_features_config.dart';
+import 'package:reboot_app_3/features/account/presentation/widgets/feature_access_guard.dart';
 
 class AccountScreen extends ConsumerWidget {
   const AccountScreen({super.key});
@@ -206,11 +208,16 @@ class AccountScreen extends ConsumerWidget {
                                 },
                               ),
                               verticalSpace(Spacing.points8),
-                              GestureDetector(
-                                onTap: () => _showContactUsModal(context),
-                                child: SettingsButton(
-                                  icon: LucideIcons.helpCircle,
-                                  textKey: 'contact-support-team',
+                              FeatureAccessGuard(
+                                featureUniqueName:
+                                    AppFeaturesConfig.contactAdmin,
+                                child: GestureDetector(
+                                  onTap: () =>
+                                      _showContactUsModal(context, ref),
+                                  child: SettingsButton(
+                                    icon: LucideIcons.helpCircle,
+                                    textKey: 'contact-support-team',
+                                  ),
                                 ),
                               ),
                               verticalSpace(Spacing.points8),
@@ -265,7 +272,21 @@ class AccountScreen extends ConsumerWidget {
     );
   }
 
-  void _showContactUsModal(BuildContext context) {
+  void _showContactUsModal(BuildContext context, WidgetRef ref) async {
+    // Check feature access before showing modal
+    final canAccess =
+        await checkFeatureAccess(ref, AppFeaturesConfig.contactAdmin);
+
+    if (!canAccess) {
+      showFeatureBanDialog(
+        context,
+        AppFeaturesConfig.contactAdmin,
+        customMessage:
+            'You are restricted from contacting support. Please review your account status.',
+      );
+      return;
+    }
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/shared_widgets/app_bar.dart';
@@ -13,6 +14,12 @@ import 'package:reboot_app_3/features/account/data/user_profile_notifier.dart';
 import 'package:reboot_app_3/features/authentication/providers/user_provider.dart';
 import 'package:reboot_app_3/core/helpers/date_display_formater.dart';
 import 'package:reboot_app_3/features/account/presentation/update_user_profile_modal_sheet.dart';
+import 'package:reboot_app_3/features/account/data/models/ban.dart';
+import 'package:reboot_app_3/features/account/data/models/warning.dart';
+import 'package:reboot_app_3/features/account/providers/clean_ban_warning_providers.dart';
+import 'package:reboot_app_3/features/account/utils/ban_display_formatter.dart';
+import 'package:reboot_app_3/features/account/presentation/warning_detail_modal.dart';
+import 'package:reboot_app_3/features/account/presentation/ban_detail_modal.dart';
 
 class UserProfileScreen extends ConsumerWidget {
   const UserProfileScreen({super.key});
@@ -65,7 +72,7 @@ class UserProfileScreen extends ConsumerWidget {
                     LucideIcons.alertTriangle,
                   ),
                   verticalSpace(Spacing.points12),
-                  _buildWarningsCard(context, theme),
+                  _buildWarningsCard(context, theme, ref),
 
                   verticalSpace(Spacing.points24),
 
@@ -286,92 +293,427 @@ class UserProfileScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildWarningsCard(BuildContext context, CustomThemeData theme) {
-    return WidgetsContainer(
-      padding: const EdgeInsets.all(16),
-      backgroundColor: theme.backgroundColor,
-      borderSide: BorderSide(color: theme.warn[300]!, width: 0.5),
-      borderRadius: BorderRadius.circular(12),
-      boxShadow: [
-        BoxShadow(
-          color: const Color.fromRGBO(0, 0, 0, 0.08),
-          blurRadius: 8,
-          spreadRadius: 0,
-          offset: const Offset(0, 2),
-        ),
-      ],
+  Widget _buildWarningsCard(
+      BuildContext context, CustomThemeData theme, WidgetRef ref) {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return const SizedBox.shrink();
+
+    return Consumer(
+      builder: (context, ref, child) {
+        final warningsAsync = ref.watch(currentUserWarningsProvider);
+
+        return warningsAsync.when(
+          loading: () => WidgetsContainer(
+            padding: const EdgeInsets.all(16),
+            backgroundColor: theme.backgroundColor,
+            borderSide: BorderSide(color: theme.warn[300]!, width: 0.5),
+            borderRadius: BorderRadius.circular(12),
+            child: const Center(child: CircularProgressIndicator()),
+          ),
+          error: (error, stack) => WidgetsContainer(
+            padding: const EdgeInsets.all(16),
+            backgroundColor: theme.backgroundColor,
+            borderSide: BorderSide(color: theme.error[300]!, width: 0.5),
+            borderRadius: BorderRadius.circular(12),
+            child: Text('Error loading warnings'),
+          ),
+          data: (warnings) {
+            final hasWarnings = warnings.isNotEmpty;
+
+            return WidgetsContainer(
+              padding: const EdgeInsets.all(16),
+              backgroundColor: theme.backgroundColor,
+              borderSide: BorderSide(
+                  color: hasWarnings ? theme.warn[300]! : theme.grey[300]!,
+                  width: 1),
+              borderRadius: BorderRadius.circular(12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(
+                        hasWarnings
+                            ? LucideIcons.alertTriangle
+                            : LucideIcons.checkCircle,
+                        color:
+                            hasWarnings ? theme.warn[600] : theme.success[600],
+                        size: 20,
+                      ),
+                      horizontalSpace(Spacing.points8),
+                      Text(
+                        hasWarnings
+                            ? AppLocalizations.of(context)
+                                .translate('active-warnings')
+                            : AppLocalizations.of(context)
+                                .translate('no-warnings'),
+                        style: TextStyles.body.copyWith(
+                          color: theme.grey[900],
+                        ),
+                      ),
+                    ],
+                  ),
+                  if (hasWarnings) ...[
+                    verticalSpace(Spacing.points12),
+                    ...warnings.take(3).map((warning) => Padding(
+                          padding: const EdgeInsets.only(bottom: 8),
+                          child: GestureDetector(
+                            onTap: () {
+                              HapticFeedback.lightImpact();
+                              showModalBottomSheet(
+                                context: context,
+                                isScrollControlled: true,
+                                backgroundColor: Colors.transparent,
+                                builder: (context) => DraggableScrollableSheet(
+                                  initialChildSize: 0.7,
+                                  minChildSize: 0.5,
+                                  maxChildSize: 0.95,
+                                  builder: (context, scrollController) =>
+                                      WarningDetailModal(
+                                    warning: warning,
+                                  ),
+                                ),
+                              );
+                            },
+                            child:
+                                _buildWarningItem(context, theme, warning, ref),
+                          ),
+                        )),
+                    if (warnings.length > 3) ...[
+                      Text(
+                        '+ ${warnings.length - 3} ${AppLocalizations.of(context).translate('more-warnings')}',
+                        style: TextStyles.small.copyWith(
+                          color: theme.warn[600],
+                          fontStyle: FontStyle.italic,
+                        ),
+                      ),
+                    ],
+                  ] else ...[
+                    verticalSpace(Spacing.points8),
+                    Text(
+                      AppLocalizations.of(context)
+                          .translate('warnings-description'),
+                      style: TextStyles.footnote.copyWith(
+                        color: theme.grey[600],
+                        height: 1.4,
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Widget _buildWarningItem(BuildContext context, CustomThemeData theme,
+      Warning warning, WidgetRef ref) {
+    final locale = ref.watch(localeNotifierProvider);
+
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: theme.warn[50],
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: theme.warn[200]!, width: 0.5),
+      ),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Icon(
-                LucideIcons.alertTriangle,
-                color: theme.warn[600],
-                size: 20,
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  color: _getSeverityColor(warning.severity, theme),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: Text(
+                  _getSeverityText(warning.severity, context),
+                  style: TextStyles.small.copyWith(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
               ),
-              horizontalSpace(Spacing.points8),
+              const Spacer(),
               Text(
-                AppLocalizations.of(context).translate('no-warnings'),
-                style: TextStyles.body.copyWith(
-                  color: theme.grey[900],
+                getDisplayDate(warning.issuedAt, locale?.languageCode ?? 'en'),
+                style: TextStyles.small.copyWith(
+                  color: theme.grey[600],
                 ),
               ),
             ],
           ),
-          verticalSpace(Spacing.points8),
+          verticalSpace(Spacing.points4),
           Text(
-            AppLocalizations.of(context).translate('warnings-description'),
+            warning.reason,
             style: TextStyles.footnote.copyWith(
-              color: theme.grey[600],
-              height: 1.4,
+              color: theme.grey[900],
+              fontWeight: FontWeight.w500,
             ),
+          ),
+          if (warning.description != null) ...[
+            verticalSpace(Spacing.points4),
+            Text(
+              warning.description!,
+              style: TextStyles.small.copyWith(
+                color: theme.grey[700],
+              ),
+            ),
+          ],
+          // Add subtle tap indicator
+          verticalSpace(Spacing.points8),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Text(
+                AppLocalizations.of(context).translate('tap-for-details'),
+                style: TextStyles.small.copyWith(
+                  color: theme.grey[500],
+                  fontStyle: FontStyle.italic,
+                ),
+              ),
+              horizontalSpace(Spacing.points4),
+              Icon(
+                LucideIcons.chevronRight,
+                size: 14,
+                color: theme.grey[500],
+              ),
+            ],
           ),
         ],
       ),
     );
   }
 
+  Color _getSeverityColor(WarningSeverity severity, CustomThemeData theme) {
+    switch (severity) {
+      case WarningSeverity.low:
+        return theme.primary[500]!;
+      case WarningSeverity.medium:
+        return theme.warn[500]!;
+      case WarningSeverity.high:
+        return theme.error[500]!;
+      case WarningSeverity.critical:
+        return theme.error[700]!;
+    }
+  }
+
+  String _getSeverityText(WarningSeverity severity, BuildContext context) {
+    switch (severity) {
+      case WarningSeverity.low:
+        return AppLocalizations.of(context).translate('low');
+      case WarningSeverity.medium:
+        return AppLocalizations.of(context).translate('medium');
+      case WarningSeverity.high:
+        return AppLocalizations.of(context).translate('high');
+      case WarningSeverity.critical:
+        return AppLocalizations.of(context).translate('critical');
+    }
+  }
+
   Widget _buildBansCard(BuildContext context, CustomThemeData theme) {
-    return WidgetsContainer(
-      padding: const EdgeInsets.all(16),
-      backgroundColor: theme.backgroundColor,
-      borderSide: BorderSide(color: theme.grey[600]!, width: 0.5),
-      borderRadius: BorderRadius.circular(12),
-      boxShadow: [
-        BoxShadow(
-          color: const Color.fromRGBO(0, 0, 0, 0.08),
-          blurRadius: 8,
-          spreadRadius: 0,
-          offset: const Offset(0, 2),
-        ),
-      ],
-      child: Column(
-        children: [
-          Row(
-            children: [
-              Icon(
-                LucideIcons.shield,
-                color: theme.success[600],
-                size: 20,
-              ),
-              horizontalSpace(Spacing.points8),
-              Text(
-                AppLocalizations.of(context)
-                    .translate('account-in-good-standing'),
-                style: TextStyles.body.copyWith(color: theme.grey[900]),
-              ),
-            ],
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return const SizedBox.shrink();
+
+    return Consumer(
+      builder: (context, ref, child) {
+        final bansAsync = ref.watch(currentUserBansProvider);
+
+        return bansAsync.when(
+          loading: () => WidgetsContainer(
+            padding: const EdgeInsets.all(16),
+            backgroundColor: theme.backgroundColor,
+            borderSide: BorderSide(color: theme.grey[600]!, width: 0.5),
+            borderRadius: BorderRadius.circular(12),
+            child: const Center(child: CircularProgressIndicator()),
           ),
-          verticalSpace(Spacing.points8),
-          Text(
-            AppLocalizations.of(context).translate('bans-description'),
-            style: TextStyles.caption.copyWith(
-              color: theme.grey[600],
-              height: 1.4,
-            ),
+          error: (error, stack) => WidgetsContainer(
+            padding: const EdgeInsets.all(16),
+            backgroundColor: theme.backgroundColor,
+            borderSide: BorderSide(color: theme.error[300]!, width: 0.5),
+            borderRadius: BorderRadius.circular(12),
+            child: Text('Error loading bans'),
           ),
-        ],
-      ),
+          data: (bans) {
+            final hasBans = bans.isNotEmpty;
+
+            return WidgetsContainer(
+              padding: const EdgeInsets.all(16),
+              backgroundColor: theme.backgroundColor,
+              borderSide: BorderSide(
+                  color: hasBans ? theme.error[300]! : theme.success[300]!,
+                  width: 0.5),
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: const Color.fromRGBO(0, 0, 0, 0.08),
+                  blurRadius: 8,
+                  spreadRadius: 0,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(
+                        hasBans ? LucideIcons.shieldOff : LucideIcons.shield,
+                        color: hasBans ? theme.error[600] : theme.success[600],
+                        size: 20,
+                      ),
+                      horizontalSpace(Spacing.points8),
+                      Expanded(
+                        child: Text(
+                          hasBans
+                              ? AppLocalizations.of(context)
+                                  .translate('account-restricted')
+                              : AppLocalizations.of(context)
+                                  .translate('account-in-good-standing'),
+                          style:
+                              TextStyles.body.copyWith(color: theme.grey[900]),
+                        ),
+                      ),
+                    ],
+                  ),
+                  if (hasBans) ...[
+                    verticalSpace(Spacing.points12),
+                    ...bans.take(2).map((ban) => GestureDetector(
+                          onTap: () {
+                            HapticFeedback.lightImpact();
+                            showModalBottomSheet(
+                              context: context,
+                              isScrollControlled: true,
+                              backgroundColor: Colors.transparent,
+                              builder: (context) => DraggableScrollableSheet(
+                                initialChildSize: 0.7,
+                                minChildSize: 0.5,
+                                maxChildSize: 0.95,
+                                builder: (context, scrollController) =>
+                                    BanDetailModal(
+                                  ban: ban,
+                                ),
+                              ),
+                            );
+                          },
+                          child: Container(
+                            margin: const EdgeInsets.only(bottom: 8),
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: theme.error[50],
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(
+                                  color: theme.error[200]!, width: 0.5),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 6, vertical: 2),
+                                      decoration: BoxDecoration(
+                                        color: ban.scope == BanScope.app_wide
+                                            ? theme.error[600]
+                                            : theme.warn[600],
+                                        borderRadius: BorderRadius.circular(4),
+                                      ),
+                                      child: Text(
+                                        ban.scope == BanScope.app_wide
+                                            ? AppLocalizations.of(context)
+                                                .translate('app-wide')
+                                            : AppLocalizations.of(context)
+                                                .translate('feature-specific'),
+                                        style: TextStyles.small.copyWith(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ),
+                                    const Spacer(),
+                                    Text(
+                                      BanDisplayFormatter.formatBanDuration(
+                                          ban),
+                                      style: TextStyles.small.copyWith(
+                                        color: theme.grey[600],
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                verticalSpace(Spacing.points4),
+                                Text(
+                                  ban.reason,
+                                  style: TextStyles.footnote.copyWith(
+                                    color: theme.grey[900],
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                if (ban.description != null) ...[
+                                  verticalSpace(Spacing.points4),
+                                  Text(
+                                    ban.description!,
+                                    style: TextStyles.small.copyWith(
+                                      color: theme.grey[700],
+                                    ),
+                                  ),
+                                ],
+                                // Add subtle tap indicator
+                                verticalSpace(Spacing.points8),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    Text(
+                                      AppLocalizations.of(context)
+                                          .translate('tap-for-details'),
+                                      style: TextStyles.small.copyWith(
+                                        color: theme.grey[500],
+                                        fontStyle: FontStyle.italic,
+                                      ),
+                                    ),
+                                    horizontalSpace(Spacing.points4),
+                                    Icon(
+                                      LucideIcons.chevronRight,
+                                      size: 14,
+                                      color: theme.grey[500],
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        )),
+                    if (bans.length > 2) ...[
+                      Text(
+                        '+ ${bans.length - 2} more restriction(s)',
+                        style: TextStyles.small.copyWith(
+                          color: theme.error[600],
+                          fontStyle: FontStyle.italic,
+                        ),
+                      ),
+                    ],
+                  ] else ...[
+                    verticalSpace(Spacing.points8),
+                    Text(
+                      AppLocalizations.of(context)
+                          .translate('bans-description'),
+                      style: TextStyles.footnote.copyWith(
+                        color: theme.grey[600],
+                        height: 1.4,
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            );
+          },
+        );
+      },
     );
   }
 }

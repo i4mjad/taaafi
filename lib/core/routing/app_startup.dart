@@ -1,21 +1,32 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/features/authentication/providers/user_document_provider.dart';
 import 'package:reboot_app_3/features/authentication/providers/user_provider.dart';
 import 'package:reboot_app_3/features/home/presentation/home/statistics_visibility_notifier.dart';
+import 'package:reboot_app_3/features/account/application/startup_security_service.dart';
+import 'package:reboot_app_3/features/account/presentation/banned_screen.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'app_startup.g.dart';
 
+/// Provider for the startup security service
+@Riverpod(keepAlive: true)
+StartupSecurityService startupSecurityService(StartupSecurityServiceRef ref) {
+  return StartupSecurityService();
+}
+
 // https://codewithandrea.com/articles/robust-app-initialization-riverpod/
 @Riverpod(keepAlive: true)
-Future<void> appStartup(Ref ref) async {
+Future<SecurityStartupResult> appStartup(Ref ref) async {
   ref.onDispose(() {
     ref.invalidate(userDocumentsNotifierProvider);
     ref.invalidate(userNotifierProvider);
+    ref.invalidate(startupSecurityServiceProvider);
+    ref.invalidate(localeNotifierProvider);
     // ref.invalidate(firebaseRemoteConfigProvider);
     // ref.invalidate(sharedPreferencesProvider);
     // ref.invalidate(onboardingRepositoryProvider);
@@ -26,6 +37,16 @@ Future<void> appStartup(Ref ref) async {
   //* await for all initialization code to be complete before returning
   await ref.watch(sharedPreferencesProvider.future);
   await ref.read(userNotifierProvider.future);
+
+  // Initialize locale provider - this will load saved locale or default to Arabic
+  ref.read(localeNotifierProvider);
+
+  // Initialize security and check for device/user bans
+  final securityService = ref.watch(startupSecurityServiceProvider);
+  final securityResult = await securityService.initializeAppSecurity();
+
+  // Return security result - this will determine if app should load or show ban screen
+  return securityResult;
 
   // If user is logged in, ensure user document is loaded before proceeding
   // final currentUser = FirebaseAuth.instance.currentUser;
@@ -52,7 +73,7 @@ Future<void> appStartup(Ref ref) async {
   // await ref.watch(onboardingRepositoryProvider.future);
 }
 
-/// Widget class to manage asynchronous app initialization
+/// Widget class to manage asynchronous app initialization with security checks
 class AppStartupWidget extends ConsumerWidget {
   const AppStartupWidget({super.key, required this.onLoaded});
   final WidgetBuilder onLoaded;
@@ -61,7 +82,18 @@ class AppStartupWidget extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final appStartupState = ref.watch(appStartupProvider);
     return appStartupState.when(
-      data: (_) {
+      data: (securityResult) {
+        // Check if device or user is banned
+        if (securityResult.isBlocked) {
+          return AppBannedWidget(securityResult: securityResult);
+        }
+
+        // Show warning if security check failed but allow app to continue
+        if (securityResult.hasWarning) {
+          // Log warning but continue with app loading
+          // You could also show a snackbar or toast here
+        }
+
         return onLoaded(context);
       },
       loading: () => const AppStartupLoadingWidget(),

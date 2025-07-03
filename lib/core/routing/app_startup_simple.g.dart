@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'app_startup.dart';
+part of 'app_startup_simple.dart';
 
 // **************************************************************************
 // RiverpodGenerator
@@ -25,19 +25,22 @@ final startupSecurityServiceProvider =
 );
 
 typedef StartupSecurityServiceRef = ProviderRef<StartupSecurityService>;
-String _$appStartupHash() => r'feff0535334cea26d225d9e54e232d42505bf506';
+String _$appStartupWithSecurityHash() =>
+    r'70bdd37de8ba6b2752e1892cc5763b54642567e2';
 
-/// See also [appStartup].
-@ProviderFor(appStartup)
-final appStartupProvider = FutureProvider<SecurityStartupResult>.internal(
-  appStartup,
-  name: r'appStartupProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product') ? null : _$appStartupHash,
+/// See also [appStartupWithSecurity].
+@ProviderFor(appStartupWithSecurity)
+final appStartupWithSecurityProvider =
+    FutureProvider<SecurityStartupResult>.internal(
+  appStartupWithSecurity,
+  name: r'appStartupWithSecurityProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$appStartupWithSecurityHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
 
-typedef AppStartupRef = FutureProviderRef<SecurityStartupResult>;
+typedef AppStartupWithSecurityRef = FutureProviderRef<SecurityStartupResult>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member
