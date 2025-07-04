@@ -99,57 +99,10 @@ class MessagingService with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
-
-    // Clear badge when app comes to foreground
-    if (state == AppLifecycleState.resumed) {
-      clearBadge();
-    }
   }
 
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
-  }
-
-  /// Public method to get and print FCM token for testing
-  static Future<String?> printFCMToken() async {
-    try {
-      final token = await instance._messaging.getToken();
-      print('====================================');
-      print('FCM TOKEN FOR TESTING:');
-      print(token);
-      print('====================================');
-      return token;
-    } catch (e) {
-      print('Error getting FCM token: $e');
-      return null;
-    }
-  }
-
-  /// Clears the app badge count on iOS
-  Future<void> clearBadge() async {
-    if (Platform.isIOS) {
-      try {
-        // Set badge to 0 using a hidden notification
-        await _localNotificationPlugin.show(
-          99999, // Use a high ID to avoid conflicts
-          '', // empty title
-          '', // empty body
-          NotificationDetails(
-            iOS: DarwinNotificationDetails(
-              presentAlert: false,
-              presentBadge: true,
-              presentSound: false,
-              badgeNumber: 0, // Set badge to 0
-            ),
-          ),
-        );
-
-        // Immediately cancel the hidden notification
-        await _localNotificationPlugin.cancel(99999);
-      } catch (e) {
-        // Silent error - don't clutter logs
-      }
-    }
   }
 
   Future<void> requestPermission() async {
@@ -201,9 +154,6 @@ class MessagingService with WidgetsBindingObserver {
 
     await _localNotificationPlugin.initialize(initalSettings,
         onDidReceiveNotificationResponse: (response) async {
-      // Clear badge when user taps on notification
-      await clearBadge();
-
       // Handle navigation from local notification tap
       if (response.payload != null && response.payload!.isNotEmpty) {
         try {
@@ -336,9 +286,6 @@ class MessagingService with WidgetsBindingObserver {
   Future<void> _handleBackgroundMessage(RemoteMessage message) async {
     // Store notification in database
     await storeNotification(message);
-
-    // Clear badge when app is opened from notification
-    await clearBadge();
 
     // Handle navigation based on notification data
     await _handleNotificationNavigation(message);

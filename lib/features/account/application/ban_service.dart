@@ -14,9 +14,6 @@ class BanService {
   /// Get user's active bans
   Future<List<Ban>> getUserBans(String userId) async {
     try {
-      print('🔍 [BAN_SERVICE] Querying Firestore for user bans...');
-      print('👤 [BAN_SERVICE] User ID: $userId');
-
       final querySnapshot = await _firestore
           .collection('bans')
           .where('userId', isEqualTo: userId)
@@ -24,26 +21,17 @@ class BanService {
           .orderBy('issuedAt', descending: true)
           .get();
 
-      print(
-          '📋 [BAN_SERVICE] Firestore returned ${querySnapshot.docs.length} documents');
-
       final allBans =
           querySnapshot.docs.map((doc) => Ban.fromFirestore(doc)).toList();
-      print('📋 [BAN_SERVICE] Mapped to ${allBans.length} ban objects');
 
       for (int i = 0; i < allBans.length; i++) {
         final ban = allBans[i];
-        print(
-            '📋 [BAN_SERVICE] Raw Ban $i: ID=${ban.id}, scope=${ban.scope}, isActive=${ban.isActive}, expiresAt=${ban.expiresAt}, isExpired=${ban.isExpired}, isCurrentlyActive=${ban.isCurrentlyActive}');
       }
 
       final activeBans = allBans.where((ban) => ban.isCurrentlyActive).toList();
-      print(
-          '✅ [BAN_SERVICE] Filtered to ${activeBans.length} currently active bans');
 
       return activeBans;
     } catch (e) {
-      print('❌ [BAN_SERVICE] Error fetching user bans: $e');
       throw BanServiceException('Error fetching user bans: $e');
     }
   }
@@ -77,26 +65,17 @@ class BanService {
   /// Check if device is banned
   Future<bool> isDeviceBanned(String deviceId) async {
     try {
-      print('🔍 [BAN_SERVICE] Checking if device is banned: $deviceId');
-
       final deviceBans = await getDeviceBans(deviceId);
       final isBanned = deviceBans.isNotEmpty;
 
-      print('🚫 [BAN_SERVICE] Device banned result: $isBanned');
-
       if (isBanned) {
-        print(
-            '❌ [BAN_SERVICE] DEVICE IS BANNED - This device is restricted from app access');
         for (int i = 0; i < deviceBans.length; i++) {
           final ban = deviceBans[i];
-          print(
-              '📋 [BAN_SERVICE] Device Ban $i: ID=${ban.id}, reason=${ban.reason}, issuedAt=${ban.issuedAt}');
         }
       }
 
       return isBanned;
     } catch (e) {
-      print('❌ [BAN_SERVICE] Error checking device ban: $e');
       // For security: if we can't verify device ban status,
       // we should fail safely but log the error
       // The calling code will handle this appropriately
@@ -126,46 +105,36 @@ class BanService {
   /// Check if current user has any app-wide ban
   Future<bool> isCurrentUserBannedFromApp() async {
     try {
-      print('🔍 [BAN_SERVICE] Checking if current user is banned from app...');
       final user = _auth.currentUser;
       if (user == null) {
-        print('👤 [BAN_SERVICE] No current user, returning false');
         return false;
       }
 
-      print('👤 [BAN_SERVICE] Checking for user: ${user.uid}');
-
       // Check device ban
-      print('📱 [BAN_SERVICE] Checking device ban...');
+
       final deviceId = await _deviceService.getDeviceId();
-      print('📱 [BAN_SERVICE] Device ID: $deviceId');
+
       final isDeviceBannedResult = await isDeviceBanned(deviceId);
-      print('🚫 [BAN_SERVICE] Device banned: $isDeviceBannedResult');
+
       if (isDeviceBannedResult) {
-        print('❌ [BAN_SERVICE] Device is banned, returning true');
         return true;
       }
 
       // Check user ban
-      print('👤 [BAN_SERVICE] Checking user bans...');
+
       final bans = await getUserBans(user.uid);
-      print('📋 [BAN_SERVICE] Retrieved ${bans.length} user bans');
 
       for (int i = 0; i < bans.length; i++) {
         final ban = bans[i];
-        print(
-            '📋 [BAN_SERVICE] Ban $i: ID=${ban.id}, scope=${ban.scope}, type=${ban.type}, isActive=${ban.isActive}, isExpired=${ban.isExpired}, isCurrentlyActive=${ban.isCurrentlyActive}');
       }
 
       final appWideBans =
           bans.where((ban) => ban.scope == BanScope.app_wide).toList();
-      print('🚫 [BAN_SERVICE] Found ${appWideBans.length} app-wide bans');
 
       final hasAppWideBan = bans.any((ban) => ban.scope == BanScope.app_wide);
-      print('✅ [BAN_SERVICE] User has app-wide ban: $hasAppWideBan');
+
       return hasAppWideBan;
     } catch (e) {
-      print('❌ [BAN_SERVICE] Error checking app ban: $e');
       throw BanServiceException('Error checking app ban: $e');
     }
   }
@@ -223,8 +192,6 @@ class BanService {
   /// Get all active bans for a specific device (global check)
   Future<List<Ban>> getDeviceBans(String deviceId) async {
     try {
-      print('🔍 [BAN_SERVICE] Getting device bans for device: $deviceId');
-
       // Primary method: Query device bans directly
       try {
         final querySnapshot = await _firestore
@@ -239,16 +206,10 @@ class BanService {
             .where((ban) => ban.isCurrentlyActive)
             .toList();
 
-        print(
-            '📋 [BAN_SERVICE] Found ${bans.length} device bans via primary query');
         return bans;
       } catch (e) {
-        print('⚠️ [BAN_SERVICE] Primary device ban query failed: $e');
-
         // Fallback method: Try simpler query approach
         try {
-          print('🔄 [BAN_SERVICE] Trying fallback device ban query...');
-
           // Query all active device bans and filter manually
           final querySnapshot = await _firestore
               .collection('bans')
@@ -264,18 +225,13 @@ class BanService {
                   ban.restrictedDevices!.contains(deviceId))
               .toList();
 
-          print(
-              '📋 [BAN_SERVICE] Found ${bans.length} device bans via fallback query');
           return bans;
         } catch (fallbackError) {
-          print(
-              '❌ [BAN_SERVICE] Fallback device ban query also failed: $fallbackError');
           throw BanServiceException(
               'All device ban queries failed. Primary: $e, Fallback: $fallbackError');
         }
       }
     } catch (e) {
-      print('❌ [BAN_SERVICE] Critical error getting device bans: $e');
       throw BanServiceException('Failed to get device bans: $e');
     }
   }

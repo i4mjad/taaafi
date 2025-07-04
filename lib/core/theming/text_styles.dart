@@ -90,7 +90,7 @@ class TextStyles {
     fontFamily: 'ExpoArabic',
     fontStyle: FontStyle.normal,
     fontWeight: FontWeightHelper.book,
-    height: 1,
+    height: 1.4,
     letterSpacing: 0,
   );
 
@@ -100,7 +100,7 @@ class TextStyles {
     fontFamily: 'ExpoArabic',
     fontStyle: FontStyle.normal,
     fontWeight: FontWeightHelper.book,
-    height: 1,
+    height: 1.4,
     letterSpacing: 0,
   );
 
@@ -180,7 +180,7 @@ class TextStyles {
     fontFamily: 'ExpoArabic',
     fontStyle: FontStyle.normal,
     fontWeight: FontWeightHelper.medium,
-    height: 1,
+    height: 1.4,
     letterSpacing: 0,
   );
 }

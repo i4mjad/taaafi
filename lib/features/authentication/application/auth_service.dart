@@ -42,11 +42,7 @@ class AuthService {
   void _invalidateAppStartup() {
     try {
       ref.invalidate(appStartupProvider);
-      print(
-          '🔄 [AUTH_SERVICE] Invalidated appStartupProvider for security re-check');
-    } catch (e) {
-      print('⚠️ [AUTH_SERVICE] Could not invalidate appStartupProvider: $e');
-    }
+    } catch (e) {}
   }
 
   Future<void> signUpWithEmail(

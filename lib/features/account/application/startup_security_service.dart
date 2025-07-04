@@ -25,7 +25,7 @@ class StartupSecurityService {
       final deviceId = await _facade.getCurrentDeviceId();
 
       // Step 3: Check for device-wide bans (HIGHEST PRIORITY - blocks all access)
-      final deviceBanResult = await _checkDeviceBanRobust(deviceId);
+      final deviceBanResult = await _checkDeviceBan(deviceId);
 
       if (deviceBanResult.isBanned) {
         return SecurityStartupResult.deviceBanned(
@@ -69,7 +69,7 @@ class StartupSecurityService {
   }
 
   /// Enhanced device ban checking with robust error handling
-  Future<DeviceBanCheckResult> _checkDeviceBanRobust(String deviceId) async {
+  Future<DeviceBanCheckResult> _checkDeviceBan(String deviceId) async {
     try {
       // Method 1: Check for global device bans (bans that apply to all users on this device)
       try {
@@ -145,12 +145,6 @@ class StartupSecurityService {
     } catch (e) {
       throw e;
     }
-  }
-
-  /// Check if device is banned (internal method - DEPRECATED in favor of robust check)
-  Future<bool> _checkDeviceBan(String deviceId) async {
-    final result = await _checkDeviceBanRobust(deviceId);
-    return result.isBanned;
   }
 
   /// Get current security status (for runtime checks)

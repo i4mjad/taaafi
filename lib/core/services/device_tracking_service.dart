@@ -27,9 +27,7 @@ class DeviceTrackingService {
       if (user != null) {
         await updateUserDeviceIds(user.uid);
       }
-    } catch (e) {
-      print('Error initializing device tracking service: $e');
-    }
+    } catch (e) {}
   }
 
   /// Generate and get device ID
@@ -64,7 +62,6 @@ class DeviceTrackingService {
         return 'device_${Platform.operatingSystem}_$timestamp';
       }
     } catch (e) {
-      print('Error getting device info: $e');
       // Fallback to timestamp-based ID
       final timestamp = DateTime.now().millisecondsSinceEpoch;
       return 'device_fallback_$timestamp';
@@ -75,7 +72,6 @@ class DeviceTrackingService {
   Future<void> updateUserDeviceIds(String userId) async {
     try {
       final deviceId = await getDeviceId();
-      print('Updating device ID: $deviceId for user: $userId');
 
       final userRef = _firestore.collection('users').doc(userId);
       final userDoc = await userRef.get();
@@ -86,7 +82,7 @@ class DeviceTrackingService {
           'devicesIds': [deviceId],
           'lastDeviceUpdate': FieldValue.serverTimestamp(),
         }, SetOptions(merge: true));
-        print('Created new user document with device ID');
+
         return;
       }
 
@@ -100,7 +96,6 @@ class DeviceTrackingService {
           'devicesIds': FieldValue.arrayUnion([deviceId]),
           'lastDeviceUpdate': FieldValue.serverTimestamp(),
         });
-        print('Added device ID to existing user document');
 
         // Clean up old device IDs if we have too many
         final updatedDeviceIds = [...currentDeviceIds, deviceId];
@@ -111,13 +106,9 @@ class DeviceTrackingService {
             'devicesIds': deviceIdsToKeep,
             'lastDeviceUpdate': FieldValue.serverTimestamp(),
           });
-          print('Cleaned up old device IDs, keeping last 10');
         }
-      } else {
-        print('Device ID already exists for user');
-      }
+      } else {}
     } catch (e) {
-      print('Error updating user device IDs: $e');
       rethrow;
     }
   }
@@ -130,7 +121,6 @@ class DeviceTrackingService {
 
       return await getUserDeviceIds(user.uid);
     } catch (e) {
-      print('Error getting current user device IDs: $e');
       return [];
     }
   }
@@ -147,7 +137,6 @@ class DeviceTrackingService {
 
       return [];
     } catch (e) {
-      print('Error getting device IDs for user $userId: $e');
       return [];
     }
   }
@@ -160,7 +149,6 @@ class DeviceTrackingService {
         'lastDeviceUpdate': FieldValue.serverTimestamp(),
       });
     } catch (e) {
-      print('Error removing device ID from user: $e');
       rethrow;
     }
   }

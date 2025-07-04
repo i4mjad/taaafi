@@ -14,7 +14,6 @@ import 'package:reboot_app_3/core/helpers/date_display_formater.dart';
 import 'package:reboot_app_3/features/account/application/startup_security_service.dart';
 import 'package:reboot_app_3/features/account/providers/clean_ban_warning_providers.dart';
 import 'package:reboot_app_3/features/account/data/models/ban.dart';
-import 'package:reboot_app_3/features/account/utils/ban_display_formatter.dart';
 import 'package:reboot_app_3/core/routing/app_startup.dart';
 
 /// Widget to show when device or user is banned
@@ -81,6 +80,57 @@ class _BannedScreenContent extends ConsumerWidget {
     }
   }
 
+  /// Get localized text for ban type
+  String _getBanTypeText(BanType banType, BuildContext context) {
+    switch (banType) {
+      case BanType.user_ban:
+        return AppLocalizations.of(context).translate('user-ban');
+      case BanType.device_ban:
+        return AppLocalizations.of(context).translate('device-ban');
+      case BanType.feature_ban:
+        return AppLocalizations.of(context).translate('feature-ban');
+      default:
+        return AppLocalizations.of(context).translate('unknown-ban-type');
+    }
+  }
+
+  /// Format ban duration for display with localization
+  String _formatBanDuration(Ban ban, BuildContext context) {
+    if (ban.severity == BanSeverity.permanent) {
+      return AppLocalizations.of(context).translate('permanent');
+    }
+
+    if (ban.expiresAt == null) {
+      return AppLocalizations.of(context).translate('unknown');
+    }
+
+    final now = DateTime.now();
+    final difference = ban.expiresAt!.difference(now);
+
+    if (difference.isNegative) {
+      return AppLocalizations.of(context).translate('expired');
+    }
+
+    final l10n = AppLocalizations.of(context);
+
+    if (difference.inDays > 0) {
+      final dayLabel = difference.inDays == 1
+          ? l10n.translate('day')
+          : l10n.translate('days');
+      return '${difference.inDays} $dayLabel';
+    } else if (difference.inHours > 0) {
+      final hourLabel = difference.inHours == 1
+          ? l10n.translate('hour')
+          : l10n.translate('hours');
+      return '${difference.inHours} $hourLabel';
+    } else {
+      final minuteLabel = difference.inMinutes == 1
+          ? l10n.translate('minute')
+          : l10n.translate('minutes');
+      return '${difference.inMinutes} $minuteLabel';
+    }
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     // Access theme through the context now that we have AppTheme wrapper
@@ -141,74 +191,26 @@ class _BannedScreenContent extends ConsumerWidget {
                 textAlign: TextAlign.center,
               ),
 
-              const SizedBox(height: 32),
+              verticalSpace(Spacing.points24),
 
-              // For user bans, show actual ban details
-              if (isUserBan) ...[
-                _buildUserBanDetails(
-                    context, ref, theme, locale ?? const Locale('en')),
-              ],
+              // Show ban details for both device and user bans
+              _buildBanDetails(context, ref, theme,
+                  locale ?? const Locale('en'), isDeviceBan),
 
-              const SizedBox(height: 32),
+              const SizedBox(height: 24),
 
-              // Contact support information
-              WidgetsContainer(
-                backgroundColor: theme.backgroundColor,
-                borderSide: BorderSide(color: theme.error[300]!),
-                borderRadius: BorderRadius.circular(12),
-                child: Column(
-                  children: [
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.info,
-                          color: theme.grey[600],
-                          size: 20,
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            isDeviceBan
-                                ? AppLocalizations.of(context)
-                                    .translate('device-ban-appeal-message')
-                                : AppLocalizations.of(context)
-                                    .translate('appeal-message'),
-                            style: TextStyles.body.copyWith(
-                              color: theme.grey[800],
-                              height: 1.5,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-
-                    const SizedBox(height: 12),
-
-                    // Contact details or reference ID
-                    if (securityResult.deviceId != null ||
-                        securityResult.userId != null) ...[
-                      Text(
-                        AppLocalizations.of(context).translate('reference-id') +
-                            ': ${securityResult.deviceId ?? securityResult.userId}',
-                        style: TextStyles.small.copyWith(
-                          color: theme.grey[600],
-                          height: 1.5,
-                        ),
-                      ),
-                    ],
-                  ],
-                ),
-              ),
+              // Refresh button for both user and device bans
+              _buildRefreshButton(context, ref, theme),
 
               // Logout button ONLY for user bans (NOT for device bans)
               if (isUserBan) ...[
-                const SizedBox(height: 24),
+                const SizedBox(height: 16),
                 _buildLogoutButton(context, ref, theme),
               ],
 
               // For device bans, show a message that logout won't help
               if (isDeviceBan) ...[
-                const SizedBox(height: 24),
+                const SizedBox(height: 16),
                 Text(
                   AppLocalizations.of(context)
                       .translate('device-ban-no-logout-message'),
@@ -223,6 +225,132 @@ class _BannedScreenContent extends ConsumerWidget {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildBanDetails(BuildContext context, WidgetRef ref,
+      CustomThemeData theme, Locale locale, bool isDeviceBan) {
+    if (isDeviceBan) {
+      // For device bans, show device ban details
+      return _buildDeviceBanDetails(context, ref, theme, locale);
+    } else {
+      // For user bans, show user ban details
+      return _buildUserBanDetails(context, ref, theme, locale);
+    }
+  }
+
+  Widget _buildDeviceBanDetails(BuildContext context, WidgetRef ref,
+      CustomThemeData theme, Locale locale) {
+    // For device bans, we need to fetch device bans from the ban service
+    // Since we don't have a specific provider for device bans, we'll use the current user bans
+    // and filter for device bans that apply to this device
+    final userBansAsync = ref.watch(currentUserBansProvider);
+
+    return userBansAsync.when(
+      loading: () => WidgetsContainer(
+        padding: const EdgeInsets.all(16),
+        child: const CircularProgressIndicator(),
+      ),
+      error: (error, stack) => WidgetsContainer(
+        padding: const EdgeInsets.all(16),
+        backgroundColor: theme.backgroundColor,
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(color: theme.error[300]!),
+        child: Column(
+          children: [
+            Icon(
+              LucideIcons.alertTriangle,
+              color: theme.error[600],
+              size: 24,
+            ),
+            verticalSpace(Spacing.points8),
+            Text(
+              AppLocalizations.of(context)
+                  .translate('unable-to-load-ban-details'),
+              style: TextStyles.body.copyWith(
+                color: theme.error[700],
+              ),
+            ),
+            verticalSpace(Spacing.points4),
+            Text(
+              _translateSecurityMessage(context, securityResult.message),
+              style: TextStyles.small.copyWith(
+                color: theme.grey[600],
+                height: 1.5,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      ),
+      data: (bans) {
+        // Filter for device bans that apply to this device
+        final currentDeviceId = securityResult.deviceId;
+        final deviceBans = bans
+            .where((ban) =>
+                ban.type == BanType.device_ban &&
+                ban.isActive &&
+                (ban.deviceIds?.contains(currentDeviceId) == true ||
+                    ban.restrictedDevices?.contains(currentDeviceId) == true))
+            .toList();
+
+        if (deviceBans.isEmpty) {
+          // If no specific device ban found, show a generic device restriction message
+          return WidgetsContainer(
+            padding: const EdgeInsets.all(16),
+            backgroundColor: theme.backgroundColor,
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide(color: theme.error[300]!),
+            child: Column(
+              children: [
+                Icon(
+                  LucideIcons.smartphone,
+                  color: theme.error[600],
+                  size: 24,
+                ),
+                verticalSpace(Spacing.points8),
+                Text(
+                  AppLocalizations.of(context).translate('device-restricted'),
+                  style: TextStyles.body.copyWith(
+                    color: theme.error[700],
+                    fontWeight: FontWeight.bold,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                verticalSpace(Spacing.points8),
+                Text(
+                  _translateSecurityMessage(context, securityResult.message),
+                  style: TextStyles.small.copyWith(
+                    color: theme.grey[600],
+                    height: 1.5,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                if (currentDeviceId != null) ...[
+                  verticalSpace(Spacing.points8),
+                  Text(
+                    '${AppLocalizations.of(context).translate('device-id')}: $currentDeviceId',
+                    style: TextStyles.small.copyWith(
+                      color: theme.grey[500],
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ],
+            ),
+          );
+        }
+
+        // Show all device bans that apply to this device
+        return Column(
+          children: deviceBans
+              .map((ban) => Padding(
+                    padding: const EdgeInsets.only(bottom: 16),
+                    child: _buildBanDetailsCard(context, ban, theme, locale),
+                  ))
+              .toList(),
+        );
+      },
     );
   }
 
@@ -268,18 +396,10 @@ class _BannedScreenContent extends ConsumerWidget {
         ),
       ),
       data: (bans) {
-        // Find the app-wide ban (the one blocking the user)
-        Ban? appWideBan;
-        try {
-          appWideBan = bans.firstWhere(
-            (ban) => ban.scope == BanScope.app_wide && ban.isActive,
-          );
-        } catch (e) {
-          // No app-wide ban found, use the first ban if any
-          appWideBan = bans.isNotEmpty ? bans.first : null;
-        }
+        // Show all active bans that are blocking the user
+        final activeBans = bans.where((ban) => ban.isActive).toList();
 
-        if (appWideBan == null) {
+        if (activeBans.isEmpty) {
           return WidgetsContainer(
             padding: const EdgeInsets.all(16),
             backgroundColor: theme.backgroundColor,
@@ -295,7 +415,15 @@ class _BannedScreenContent extends ConsumerWidget {
           );
         }
 
-        return _buildBanDetailsCard(context, appWideBan, theme, locale);
+        // Show all active bans
+        return Column(
+          children: activeBans
+              .map((ban) => Padding(
+                    padding: const EdgeInsets.only(bottom: 16),
+                    child: _buildBanDetailsCard(context, ban, theme, locale),
+                  ))
+              .toList(),
+        );
       },
     );
   }
@@ -338,19 +466,46 @@ class _BannedScreenContent extends ConsumerWidget {
                       ),
                     ),
                     verticalSpace(Spacing.points4),
-                    WidgetsContainer(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 4),
-                      backgroundColor: theme.error[600],
-                      borderRadius: BorderRadius.circular(6),
-                      borderSide: BorderSide.none,
-                      child: Text(
-                        AppLocalizations.of(context).translate('app-wide'),
-                        style: TextStyles.small.copyWith(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w600,
+                    Row(
+                      children: [
+                        // Ban scope badge
+                        WidgetsContainer(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 8, vertical: 4),
+                          backgroundColor: ban.scope == BanScope.app_wide
+                              ? theme.error[600]
+                              : theme.warn[600],
+                          borderRadius: BorderRadius.circular(6),
+                          borderSide: BorderSide.none,
+                          child: Text(
+                            ban.scope == BanScope.app_wide
+                                ? AppLocalizations.of(context)
+                                    .translate('app-wide')
+                                : AppLocalizations.of(context)
+                                    .translate('feature-specific'),
+                            style: TextStyles.small.copyWith(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
                         ),
-                      ),
+                        horizontalSpace(Spacing.points8),
+                        // Ban type badge
+                        WidgetsContainer(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 8, vertical: 4),
+                          backgroundColor: theme.grey[600],
+                          borderRadius: BorderRadius.circular(6),
+                          borderSide: BorderSide.none,
+                          child: Text(
+                            _getBanTypeText(ban.type, context),
+                            style: TextStyles.small.copyWith(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -386,7 +541,7 @@ class _BannedScreenContent extends ConsumerWidget {
           _buildDetailRow(
             context,
             AppLocalizations.of(context).translate('duration'),
-            BanDisplayFormatter.formatBanDuration(ban),
+            _formatBanDuration(ban, context),
             LucideIcons.clock,
             theme,
           ),
@@ -462,6 +617,150 @@ class _BannedScreenContent extends ConsumerWidget {
     );
   }
 
+  bool _isLoggingOut = false;
+  bool _isRefreshing = false;
+
+  Future<void> _logout(
+      BuildContext context, WidgetRef ref, CustomThemeData theme) async {
+    try {
+      _isLoggingOut = true;
+      await FirebaseAuth.instance.signOut();
+      // Force the app to re-evaluate startup state, which will redirect to onboarding
+      // since the user is no longer authenticated
+      ref.invalidate(appStartupProvider);
+    } catch (e) {
+      // Handle logout error
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            AppLocalizations.of(context).translate('logout-error'),
+            style: TextStyles.body.copyWith(color: Colors.white),
+          ),
+          backgroundColor: theme.error[600],
+        ),
+      );
+    } finally {
+      _isLoggingOut = false;
+    }
+  }
+
+  Future<void> _refreshBanStatus(
+      BuildContext context, WidgetRef ref, CustomThemeData theme) async {
+    try {
+      _isRefreshing = true;
+
+      // Invalidate the startup provider to re-check security status
+      ref.invalidate(appStartupProvider);
+
+      // Also invalidate the current user bans to get fresh data
+      ref.invalidate(currentUserBansProvider);
+
+      // Wait a moment for the providers to refresh
+      await Future.delayed(const Duration(milliseconds: 500));
+
+      // Check the new startup state
+      final startupState = ref.read(appStartupProvider);
+
+      startupState.when(
+        data: (startup) {
+          // If startup is successful, it means the user is no longer banned
+          if (startup != null) {
+            // Navigate to home or let the app handle the routing
+            // The app startup will automatically handle the navigation
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  AppLocalizations.of(context).translate('ban-status-updated'),
+                  style: TextStyles.body.copyWith(color: Colors.white),
+                ),
+                backgroundColor: Colors.green[600],
+              ),
+            );
+          }
+        },
+        loading: () {
+          // Still loading, show a message
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                AppLocalizations.of(context).translate('checking-ban-status'),
+                style: TextStyles.body.copyWith(color: Colors.white),
+              ),
+              backgroundColor: theme.primary[600],
+            ),
+          );
+        },
+        error: (error, stack) {
+          // Still banned or error occurred
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                AppLocalizations.of(context).translate('ban-still-active'),
+                style: TextStyles.body.copyWith(color: Colors.white),
+              ),
+              backgroundColor: theme.error[600],
+            ),
+          );
+        },
+      );
+    } catch (e) {
+      // Handle refresh error
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            AppLocalizations.of(context).translate('refresh-error'),
+            style: TextStyles.body.copyWith(color: Colors.white),
+          ),
+          backgroundColor: theme.error[600],
+        ),
+      );
+    } finally {
+      _isRefreshing = false;
+    }
+  }
+
+  Widget _buildRefreshButton(
+      BuildContext context, WidgetRef ref, CustomThemeData theme) {
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton.icon(
+        onPressed:
+            _isRefreshing ? null : () => _refreshBanStatus(context, ref, theme),
+        icon: _isRefreshing
+            ? SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                ),
+              )
+            : Icon(
+                LucideIcons.refreshCw,
+                color: Colors.white,
+              ),
+        label: Text(
+          AppLocalizations.of(context).translate('check-ban-status'),
+          style: TextStyles.body.copyWith(
+            color: Colors.white,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: theme.primary[600],
+          foregroundColor: Colors.white,
+          padding: const EdgeInsets.symmetric(vertical: 12),
+          shape: SmoothRectangleBorder(
+            borderRadius: SmoothBorderRadius(
+              cornerRadius: 8,
+              cornerSmoothing: 1.0,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildLogoutButton(
       BuildContext context, WidgetRef ref, CustomThemeData theme) {
     return SizedBox(
@@ -492,31 +791,5 @@ class _BannedScreenContent extends ConsumerWidget {
         ),
       ),
     );
-  }
-
-  bool _isLoggingOut = false;
-
-  Future<void> _logout(
-      BuildContext context, WidgetRef ref, CustomThemeData theme) async {
-    try {
-      _isLoggingOut = true;
-      await FirebaseAuth.instance.signOut();
-      // Force the app to re-evaluate startup state, which will redirect to onboarding
-      // since the user is no longer authenticated
-      ref.invalidate(appStartupProvider);
-    } catch (e) {
-      // Handle logout error
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            AppLocalizations.of(context).translate('logout-error'),
-            style: TextStyles.body.copyWith(color: Colors.white),
-          ),
-          backgroundColor: theme.error[600],
-        ),
-      );
-    } finally {
-      _isLoggingOut = false;
-    }
   }
 }
