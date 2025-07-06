@@ -211,13 +211,12 @@ class AccountScreen extends ConsumerWidget {
                               FeatureAccessGuard(
                                 featureUniqueName:
                                     AppFeaturesConfig.contactAdmin,
-                                child: GestureDetector(
-                                  onTap: () =>
-                                      _showContactUsModal(context, ref),
-                                  child: SettingsButton(
-                                    icon: LucideIcons.helpCircle,
-                                    textKey: 'contact-support-team',
-                                  ),
+                                onTap: () => _showContactUsModal(context, ref),
+                                customBanMessage: AppLocalizations.of(context)
+                                    .translate('contact-support-restricted'),
+                                child: SettingsButton(
+                                  icon: LucideIcons.helpCircle,
+                                  textKey: 'contact-support-team',
                                 ),
                               ),
                               verticalSpace(Spacing.points8),
@@ -272,21 +271,7 @@ class AccountScreen extends ConsumerWidget {
     );
   }
 
-  void _showContactUsModal(BuildContext context, WidgetRef ref) async {
-    // Check feature access before showing modal
-    final canAccess =
-        await checkFeatureAccess(ref, AppFeaturesConfig.contactAdmin);
-
-    if (!canAccess) {
-      showFeatureBanDialog(
-        context,
-        AppFeaturesConfig.contactAdmin,
-        customMessage:
-            'You are restricted from contacting support. Please review your account status.',
-      );
-      return;
-    }
-
+  void _showContactUsModal(BuildContext context, WidgetRef ref) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,

@@ -2,7 +2,6 @@ import 'ban_warning_facade.dart';
 import '../data/models/ban.dart';
 import '../data/models/warning.dart';
 import '../data/models/app_feature.dart';
-import '../utils/ban_display_formatter.dart';
 
 /// Legacy service for backward compatibility (Facade Pattern)
 /// @deprecated Use BanWarningFacade directly
@@ -117,7 +116,31 @@ class BanWarningService {
   }
 
   /// Format ban duration for display
+  /// Note: This method is deprecated and doesn't support localization
+  /// Use BanDisplayFormatter.formatBanDuration(ban, context) directly instead
   String formatBanDuration(Ban ban) {
-    return BanDisplayFormatter.formatBanDuration(ban);
+    // Fallback for backward compatibility - returns English text
+    if (ban.severity == BanSeverity.permanent) {
+      return 'Permanent';
+    }
+
+    if (ban.expiresAt == null) {
+      return 'Unknown';
+    }
+
+    final now = DateTime.now();
+    final difference = ban.expiresAt!.difference(now);
+
+    if (difference.isNegative) {
+      return 'Expired';
+    }
+
+    if (difference.inDays > 0) {
+      return '${difference.inDays} day(s)';
+    } else if (difference.inHours > 0) {
+      return '${difference.inHours} hour(s)';
+    } else {
+      return '${difference.inMinutes} minute(s)';
+    }
   }
 }

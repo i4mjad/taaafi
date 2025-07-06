@@ -478,7 +478,9 @@ class UserProfileScreen extends ConsumerWidget {
               ),
               horizontalSpace(Spacing.points4),
               Icon(
-                LucideIcons.chevronRight,
+                locale?.languageCode == 'en'
+                    ? LucideIcons.chevronRight
+                    : LucideIcons.chevronLeft,
                 size: 14,
                 color: theme.grey[500],
               ),
@@ -522,6 +524,7 @@ class UserProfileScreen extends ConsumerWidget {
     return Consumer(
       builder: (context, ref, child) {
         final bansAsync = ref.watch(currentUserBansProvider);
+        final locale = ref.watch(localeNotifierProvider);
 
         return bansAsync.when(
           loading: () => WidgetsContainer(
@@ -536,7 +539,10 @@ class UserProfileScreen extends ConsumerWidget {
             backgroundColor: theme.backgroundColor,
             borderSide: BorderSide(color: theme.error[300]!, width: 0.5),
             borderRadius: BorderRadius.circular(12),
-            child: Text('Error loading bans'),
+            child: Text(
+              AppLocalizations.of(context).translate('error-loading-bans'),
+              style: TextStyles.body.copyWith(color: theme.error[600]),
+            ),
           ),
           data: (bans) {
             final hasBans = bans.isNotEmpty;
@@ -638,7 +644,7 @@ class UserProfileScreen extends ConsumerWidget {
                                     const Spacer(),
                                     Text(
                                       BanDisplayFormatter.formatBanDuration(
-                                          ban),
+                                          ban, context),
                                       style: TextStyles.small.copyWith(
                                         color: theme.grey[600],
                                         fontWeight: FontWeight.w500,
@@ -678,7 +684,9 @@ class UserProfileScreen extends ConsumerWidget {
                                     ),
                                     horizontalSpace(Spacing.points4),
                                     Icon(
-                                      LucideIcons.chevronRight,
+                                      locale?.languageCode == 'en'
+                                          ? LucideIcons.chevronRight
+                                          : LucideIcons.chevronLeft,
                                       size: 14,
                                       color: theme.grey[500],
                                     ),
@@ -690,7 +698,7 @@ class UserProfileScreen extends ConsumerWidget {
                         )),
                     if (bans.length > 2) ...[
                       Text(
-                        '+ ${bans.length - 2} more restriction(s)',
+                        '+ ${bans.length - 2} ${AppLocalizations.of(context).translate('more-restrictions')}',
                         style: TextStyles.small.copyWith(
                           color: theme.error[600],
                           fontStyle: FontStyle.italic,

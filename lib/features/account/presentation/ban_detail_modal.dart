@@ -262,7 +262,7 @@ class BanDetailModal extends ConsumerWidget {
             context,
             theme,
             AppLocalizations.of(context).translate('duration'),
-            BanDisplayFormatter.formatBanDuration(ban),
+            BanDisplayFormatter.formatBanDuration(ban, context),
             LucideIcons.clock,
           ),
           if (ban.expiresAt != null) ...[
@@ -383,7 +383,7 @@ class BanDetailModal extends ConsumerWidget {
                         border: Border.all(color: theme.error[300]!, width: 1),
                       ),
                       child: Text(
-                        feature,
+                        AppLocalizations.of(context).translate(feature),
                         style: TextStyles.small.copyWith(
                           color: theme.error[800],
                           fontWeight: FontWeight.w500,

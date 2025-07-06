@@ -27,10 +27,12 @@ class BanRepository {
           .orderBy('issuedAt', descending: true)
           .get();
 
-      return querySnapshot.docs
+      final bans = querySnapshot.docs
           .map((doc) => Ban.fromFirestore(doc))
           .where((ban) => ban.isCurrentlyActive)
           .toList();
+
+      return bans;
     } catch (e, stackTrace) {
       ref.read(errorLoggerProvider).logException(e, stackTrace);
       rethrow;
@@ -58,15 +60,19 @@ class BanRepository {
       // Check for app-wide bans first
       final appWideBan =
           bans.where((ban) => ban.scope == BanScope.app_wide).firstOrNull;
-      if (appWideBan != null) return appWideBan;
+      if (appWideBan != null) {
+        return appWideBan;
+      }
 
       // Then check for feature-specific bans
-      return bans
+      final featureBan = bans
           .where((ban) =>
               ban.scope == BanScope.feature_specific &&
               ban.restrictedFeatures != null &&
               ban.restrictedFeatures!.contains(featureUniqueName))
           .firstOrNull;
+
+      return featureBan;
     } catch (e, stackTrace) {
       ref.read(errorLoggerProvider).logException(e, stackTrace);
       rethrow;

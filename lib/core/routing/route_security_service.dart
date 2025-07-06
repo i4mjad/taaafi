@@ -16,6 +16,21 @@ class RouteSecurityService {
   // Store the latest security result for the banned screen
   SecurityCheckResult? _lastSecurityResult;
 
+  // Cache for device ban status
+  SecurityCheckResult? _cachedDeviceBanResult;
+  DateTime? _deviceBanCacheTime;
+
+  // Cache for user ban status
+  SecurityCheckResult? _cachedUserBanResult;
+  DateTime? _userBanCacheTime;
+  String? _cachedUserId; // Track which user the cache is for
+
+  // Cache durations
+  static const Duration _deviceBanCacheDuration =
+      Duration(minutes: 10); // Device bans are rarely changed
+  static const Duration _userBanCacheDuration =
+      Duration(minutes: 3); // User bans might change more frequently
+
   RouteSecurityService({
     BanWarningFacade? facade,
     FirebaseAuth? auth,
@@ -126,27 +141,45 @@ class RouteSecurityService {
   }
 
   /// Check device bans (affects all users regardless of authentication)
+  /// Uses caching to prevent expensive Firestore queries on every navigation
   Future<SecurityCheckResult> _checkDeviceBans() async {
     try {
-      // Get device ID for ban checking
+      // Check if we have a valid cached result
+      if (_cachedDeviceBanResult != null &&
+          _deviceBanCacheTime != null &&
+          DateTime.now().difference(_deviceBanCacheTime!) <
+              _deviceBanCacheDuration) {
+        return _cachedDeviceBanResult!;
+      }
+
+      // Cache expired or doesn't exist, fetch fresh data
       final deviceId = await _facade.getCurrentDeviceId();
       final deviceBans = await _facade.getDeviceBans(deviceId);
 
+      SecurityCheckResult result;
       if (deviceBans.isNotEmpty) {
-        return SecurityCheckResult.deviceBanned(
+        result = SecurityCheckResult.deviceBanned(
           message: 'Device is banned from accessing the application',
           deviceId: deviceId,
         );
+      } else {
+        result = SecurityCheckResult.allowed();
       }
 
-      return SecurityCheckResult.allowed();
+      // Update cache
+      _cachedDeviceBanResult = result;
+      _deviceBanCacheTime = DateTime.now();
+
+      return result;
     } catch (e) {
       // On error, we'll allow access but log the error
+      // Don't cache errors to allow retry on next navigation
       return SecurityCheckResult.error(error: e.toString());
     }
   }
 
   /// Check user-specific security state (only for authenticated users)
+  /// Uses caching to prevent expensive Firestore queries on every navigation
   Future<SecurityCheckResult> _checkUserSecurityState() async {
     try {
       final user = _auth.currentUser;
@@ -154,18 +187,37 @@ class RouteSecurityService {
         return SecurityCheckResult.unauthenticated();
       }
 
-      // Check user bans
+      // Check if we have a valid cached result for the current user
+      if (_cachedUserBanResult != null &&
+          _userBanCacheTime != null &&
+          _cachedUserId == user.uid &&
+          DateTime.now().difference(_userBanCacheTime!) <
+              _userBanCacheDuration) {
+        return _cachedUserBanResult!;
+      }
+
+      // Cache expired, doesn't exist, or different user - fetch fresh data
       final isUserBanned = await _facade.isCurrentUserBannedFromApp();
+
+      SecurityCheckResult result;
       if (isUserBanned) {
-        return SecurityCheckResult.userBanned(
+        result = SecurityCheckResult.userBanned(
           message: 'User account is banned from the application',
           userId: user.uid,
         );
+      } else {
+        result = SecurityCheckResult.allowed();
       }
 
-      return SecurityCheckResult.allowed();
+      // Update cache
+      _cachedUserBanResult = result;
+      _userBanCacheTime = DateTime.now();
+      _cachedUserId = user.uid;
+
+      return result;
     } catch (e) {
       // On error, we'll allow access but log the error
+      // Don't cache errors to allow retry on next navigation
       return SecurityCheckResult.error(error: e.toString());
     }
   }
@@ -174,6 +226,37 @@ class RouteSecurityService {
   /// This is used to pass the security result to the banned screen
   SecurityCheckResult? getLastSecurityResult() {
     return _lastSecurityResult;
+  }
+
+  /// Clear device ban cache (useful when admin makes changes or for manual refresh)
+  void clearDeviceBanCache() {
+    _cachedDeviceBanResult = null;
+    _deviceBanCacheTime = null;
+  }
+
+  /// Clear user ban cache (useful when user logs out or when ban status changes)
+  void clearUserBanCache() {
+    _cachedUserBanResult = null;
+    _userBanCacheTime = null;
+    _cachedUserId = null;
+  }
+
+  /// Clear all ban caches
+  void clearAllCaches() {
+    clearDeviceBanCache();
+    clearUserBanCache();
+  }
+
+  /// Force refresh of all ban statuses (ignores cache)
+  Future<void> refreshBanStatuses() async {
+    clearAllCaches();
+    // Next call to getRedirectPath will fetch fresh data
+  }
+
+  /// Handle user logout - clears user-specific cache
+  void onUserLogout() {
+    clearUserBanCache();
+    // Keep device ban cache as it's device-specific, not user-specific
   }
 
   /// Convert SecurityCheckResult to SecurityStartupResult for the banned screen

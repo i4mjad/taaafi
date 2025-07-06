@@ -193,3 +193,110 @@ SnackBar systemSnackBar(BuildContext context, String message) {
     ),
   );
 }
+
+/// Show a ban snackbar with action to view details
+void showBanSnackBar(
+  BuildContext context,
+  String message, {
+  required VoidCallback onViewDetails,
+  bool isPermanent = false,
+}) {
+  ScaffoldMessenger.of(context).showSnackBar(_banSnackBar(context, message,
+      onViewDetails: onViewDetails, isPermanent: isPermanent));
+}
+
+SnackBar _banSnackBar(
+  BuildContext context,
+  String message, {
+  required VoidCallback onViewDetails,
+  bool isPermanent = false,
+}) {
+  final theme = AppTheme.of(context);
+  final l10n = AppLocalizations.of(context);
+
+  return SnackBar(
+    behavior: SnackBarBehavior.floating,
+    padding: EdgeInsets.fromLTRB(16, 20, 16, 20),
+    duration: const Duration(seconds: 5),
+    shape: SmoothRectangleBorder(
+      borderRadius: SmoothBorderRadius(
+        cornerRadius: 15,
+        cornerSmoothing: 1,
+      ),
+      side: BorderSide(
+        width: 2,
+        color: theme.error[400]!,
+      ),
+    ),
+    backgroundColor: theme.error[50],
+    content: Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Icon(
+          LucideIcons.shieldOff,
+          color: theme.error[600],
+          size: 24,
+        ),
+        SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                l10n.translate('access-restricted'),
+                style: TextStyles.body.copyWith(
+                  color: theme.error[800],
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              SizedBox(height: 4),
+              Text(
+                message,
+                style: TextStyles.caption.copyWith(
+                  color: theme.error[700],
+                  height: 1.3,
+                ),
+              ),
+            ],
+          ),
+        ),
+        SizedBox(width: 8),
+        Container(
+          decoration: BoxDecoration(
+            color: theme.error[600],
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              borderRadius: BorderRadius.circular(8),
+              onTap: onViewDetails,
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      LucideIcons.eye,
+                      color: Colors.white,
+                      size: 16,
+                    ),
+                    SizedBox(width: 6),
+                    Text(
+                      l10n.translate('view-details'),
+                      style: TextStyles.caption.copyWith(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
+    ),
+  );
+}

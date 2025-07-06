@@ -16,7 +16,6 @@ class DeviceService {
       // Use the new tracking service which prevents duplicates
       await _trackingService.updateUserDeviceIds(userId);
     } catch (e) {
-      print('Error registering device: $e');
       rethrow;
     }
   }

@@ -1,65 +1,81 @@
+import 'package:flutter/material.dart';
 import '../data/models/ban.dart';
 import '../data/models/warning.dart';
+import '../../../core/localization/localization.dart';
 
 /// Utility class for formatting ban and warning display information (DRY)
 class BanDisplayFormatter {
   // ==================== BAN FORMATTING ====================
 
   /// Format ban duration for display
-  static String formatBanDuration(Ban ban) {
+  static String formatBanDuration(Ban ban, BuildContext context) {
+    final localizations = AppLocalizations.of(context);
+
     if (ban.severity == BanSeverity.permanent) {
-      return 'Permanent';
+      return localizations.translate('ban-duration-permanent');
     }
 
     if (ban.expiresAt == null) {
-      return 'Unknown';
+      return localizations.translate('ban-duration-unknown');
     }
 
     final now = DateTime.now();
     final difference = ban.expiresAt!.difference(now);
 
     if (difference.isNegative) {
-      return 'Expired';
+      return localizations.translate('ban-duration-expired');
     }
 
     if (difference.inDays > 0) {
-      return '${difference.inDays} day(s)';
+      return localizations
+          .translate('ban-duration-days')
+          .replaceAll('{count}', '${difference.inDays}');
     } else if (difference.inHours > 0) {
-      return '${difference.inHours} hour(s)';
+      return localizations
+          .translate('ban-duration-hours')
+          .replaceAll('{count}', '${difference.inHours}');
     } else {
-      return '${difference.inMinutes} minute(s)';
+      return localizations
+          .translate('ban-duration-minutes')
+          .replaceAll('{count}', '${difference.inMinutes}');
     }
   }
 
   /// Format ban scope for display
-  static String formatBanScope(Ban ban) {
+  static String formatBanScope(Ban ban, BuildContext context) {
+    final localizations = AppLocalizations.of(context);
+
     switch (ban.scope) {
       case BanScope.app_wide:
-        return 'App-wide';
+        return localizations.translate('ban-scope-app-wide');
       case BanScope.feature_specific:
-        return 'Feature';
+        return localizations.translate('ban-scope-feature');
     }
   }
 
   /// Format ban type for display
-  static String formatBanType(Ban ban) {
+  static String formatBanType(Ban ban, BuildContext context) {
+    final localizations = AppLocalizations.of(context);
+
     switch (ban.type) {
       case BanType.user_ban:
-        return 'User Ban';
+        return localizations.translate('ban-type-user');
       case BanType.device_ban:
-        return 'Device Ban';
+        return localizations.translate('ban-type-device');
       case BanType.feature_ban:
-        return 'Feature Ban';
+        return localizations.translate('ban-type-feature');
     }
   }
 
   /// Format ban severity for display
-  static String formatBanSeverity(Ban ban) {
+  static String formatBanSeverity(Ban ban, BuildContext context) {
+    final localizations = AppLocalizations.of(context);
+
     switch (ban.severity) {
       case BanSeverity.temporary:
-        return 'Temporary';
+        return localizations.translate('ban-severity-temporary');
       case BanSeverity.permanent:
-        return 'Permanent';
+        return localizations.translate('ban-severity-permanent');
     }
   }
 

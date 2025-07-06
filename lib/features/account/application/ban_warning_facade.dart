@@ -33,7 +33,8 @@ class BanWarningFacade {
   /// Check if current user can access a specific feature
   Future<bool> canUserAccessFeature(String featureUniqueName) async {
     try {
-      return await _banService.canUserPerformAction(featureUniqueName);
+      final result = await _banService.canUserPerformAction(featureUniqueName);
+      return result;
     } catch (e) {
       return false; // Fail safe
     }
@@ -43,14 +44,19 @@ class BanWarningFacade {
   Future<Map<String, bool>> generateFeatureAccessMap() async {
     try {
       final features = await _featureService.getAppFeatures();
+
       final user = _auth.currentUser;
-      if (user == null) return {};
+      if (user == null) {
+        return {};
+      }
 
       final accessMap = <String, bool>{};
       for (final feature in features) {
-        accessMap[feature.uniqueName] =
+        final canAccess =
             await _banService.canUserPerformAction(feature.uniqueName);
+        accessMap[feature.uniqueName] = canAccess;
       }
+
       return accessMap;
     } catch (e) {
       return {}; // Fail safe
@@ -80,7 +86,8 @@ class BanWarningFacade {
 
   /// Check if current user is banned from app
   Future<bool> isCurrentUserBannedFromApp() async {
-    return await _banService.isCurrentUserBannedFromApp();
+    final result = await _banService.isCurrentUserBannedFromApp();
+    return result;
   }
 
   // ==================== FEATURE DETAILS ====================

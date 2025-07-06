@@ -24,10 +24,6 @@ class BanService {
       final allBans =
           querySnapshot.docs.map((doc) => Ban.fromFirestore(doc)).toList();
 
-      for (int i = 0; i < allBans.length; i++) {
-        final ban = allBans[i];
-      }
-
       final activeBans = allBans.where((ban) => ban.isCurrentlyActive).toList();
 
       return activeBans;
@@ -66,13 +62,8 @@ class BanService {
   Future<bool> isDeviceBanned(String deviceId) async {
     try {
       final deviceBans = await getDeviceBans(deviceId);
-      final isBanned = deviceBans.isNotEmpty;
 
-      if (isBanned) {
-        for (int i = 0; i < deviceBans.length; i++) {
-          final ban = deviceBans[i];
-        }
-      }
+      final isBanned = deviceBans.isNotEmpty;
 
       return isBanned;
     } catch (e) {
@@ -87,16 +78,24 @@ class BanService {
   Future<bool> canUserPerformAction(String featureUniqueName) async {
     try {
       final user = _auth.currentUser;
-      if (user == null) return false;
+      if (user == null) {
+        return false;
+      }
 
       // Check device ban first
       final deviceId = await _deviceService.getDeviceId();
-      if (await isDeviceBanned(deviceId)) {
+
+      final isDeviceBannedResult = await isDeviceBanned(deviceId);
+      if (isDeviceBannedResult) {
         return false;
       }
 
       // Check user-specific bans
-      return !(await isUserBannedFromFeature(user.uid, featureUniqueName));
+      final isUserBannedResult =
+          await isUserBannedFromFeature(user.uid, featureUniqueName);
+
+      final canPerform = !isUserBannedResult;
+      return canPerform;
     } catch (e) {
       throw BanServiceException('Error checking user action permission: $e');
     }
@@ -111,7 +110,6 @@ class BanService {
       }
 
       // Check device ban
-
       final deviceId = await _deviceService.getDeviceId();
 
       final isDeviceBannedResult = await isDeviceBanned(deviceId);
@@ -121,12 +119,7 @@ class BanService {
       }
 
       // Check user ban
-
       final bans = await getUserBans(user.uid);
-
-      for (int i = 0; i < bans.length; i++) {
-        final ban = bans[i];
-      }
 
       final appWideBans =
           bans.where((ban) => ban.scope == BanScope.app_wide).toList();

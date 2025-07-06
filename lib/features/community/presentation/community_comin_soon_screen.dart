@@ -53,26 +53,31 @@ class CommunityComingSoonScreen extends ConsumerWidget {
                 // Feedback button with feature access guard
                 FeatureAccessGuard(
                   featureUniqueName: AppFeaturesConfig.contactAdmin,
-                  child: SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton.icon(
-                      onPressed: () => _showFeedbackModal(context, ref),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: theme.primary[600],
-                        foregroundColor: theme.grey[50],
-                        padding: EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                      icon: Icon(LucideIcons.messageSquare, size: 20),
-                      label: Text(
-                        l10n.translate('share-your-ideas'),
-                        style: TextStyles.body.copyWith(
+                  onTap: () => _showFeedbackModal(context, ref),
+                  customBanMessage: AppLocalizations.of(context)
+                      .translate('contact-support-restricted'),
+                  child: WidgetsContainer(
+                    padding: EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+                    backgroundColor: theme.primary[600],
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide.none,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          LucideIcons.messageSquare,
+                          size: 20,
                           color: theme.grey[50],
-                          fontWeight: FontWeight.w500,
                         ),
-                      ),
+                        const SizedBox(width: 8),
+                        Text(
+                          l10n.translate('share-your-ideas'),
+                          style: TextStyles.body.copyWith(
+                            color: theme.grey[50],
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
@@ -143,21 +148,7 @@ class CommunityComingSoonScreen extends ConsumerWidget {
     );
   }
 
-  void _showFeedbackModal(BuildContext context, WidgetRef ref) async {
-    // Check feature access before showing modal
-    final canAccess =
-        await checkFeatureAccess(ref, AppFeaturesConfig.contactAdmin);
-
-    if (!canAccess) {
-      showFeatureBanDialog(
-        context,
-        AppFeaturesConfig.contactAdmin,
-        customMessage:
-            'You are restricted from contacting administrators. Please check your account status.',
-      );
-      return;
-    }
-
+  void _showFeedbackModal(BuildContext context, WidgetRef ref) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
