@@ -34,4 +34,5 @@ enum RouteNames {
   reportConversation,
   notifications,
   userProfile,
+  banned,
 }

@@ -9,6 +9,7 @@ import 'package:reboot_app_3/core/routing/not_found_screen.dart';
 import 'package:reboot_app_3/core/routing/route_names.dart';
 import 'package:reboot_app_3/core/routing/scaffold_with_nested_navigation.dart';
 import 'package:reboot_app_3/features/account/presentation/account_screen.dart';
+import 'package:reboot_app_3/features/account/presentation/banned_screen.dart';
 import 'package:reboot_app_3/features/account/presentation/delete_account_screen.dart';
 import 'package:reboot_app_3/features/account/presentation/user_profile_screen.dart';
 import 'package:reboot_app_3/features/home/presentation/reports/user_reports_screen.dart';
@@ -44,6 +45,8 @@ import 'package:reboot_app_3/features/vault/presentation/vault_screen.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:reboot_app_3/features/authentication/data/models/user_document.dart';
+import 'package:reboot_app_3/core/routing/route_security_service.dart';
+import 'package:reboot_app_3/features/account/application/startup_security_service.dart';
 import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -54,6 +57,7 @@ GoRouter goRouter(GoRouterRef ref) {
   final authState = ref.watch(authStateChangesProvider);
   final userDocumentState = ref.watch(userDocumentsNotifierProvider);
   final userDocumentNotifier = ref.read(userDocumentsNotifierProvider.notifier);
+  final routeSecurityService = ref.read(routeSecurityServiceProvider);
 
   // Build a merged stream to trigger router refreshes whenever auth state OR
   // user-document state changes.
@@ -86,32 +90,31 @@ GoRouter goRouter(GoRouterRef ref) {
     ],
     refreshListenable: GoRouterRefreshStream(refreshController.stream),
     redirect: (context, state) async {
-      // Rely on the cached FirebaseAuth user to know the auth status *immediately*
-      // at app startup. This prevents an incorrect redirect to the onboarding
-      // flow before `authStateChangesProvider` emits its first value.
+      // Use the RouteSecurityService to handle both authentication and security checks
+      // This provides comprehensive protection against device bans, user bans, etc.
+      try {
+        final redirectPath = await routeSecurityService.getRedirectPath(state);
+        return redirectPath;
+      } catch (e) {
+        // Fallback to basic authentication logic if security service fails
+        final firebaseUser = FirebaseAuth.instance.currentUser;
+        final bool isLoggedIn = firebaseUser != null;
 
-      final firebaseUser = FirebaseAuth.instance.currentUser;
-      final bool isLoggedIn = firebaseUser != null;
-
-      if (isLoggedIn) {
-        // User is authenticated. If they somehow landed on the onboarding or
-        // loading routes, send them to the home screen instead.
-        if (state.matchedLocation.startsWith('/onboarding') ||
-            state.matchedLocation == '/loading') {
-          return '/home';
+        if (isLoggedIn) {
+          if (state.matchedLocation.startsWith('/onboarding') ||
+              state.matchedLocation == '/loading') {
+            return '/home';
+          }
+          return null;
+        } else {
+          final isOnboardingRoute =
+              state.matchedLocation.startsWith('/onboarding');
+          if (!isOnboardingRoute && state.matchedLocation != '/onboarding') {
+            return '/onboarding';
+          }
         }
         return null;
-      } else {
-        // User is not authenticated. Force them into the onboarding flow if
-        // they try to visit a protected route.
-        final isOnboardingRoute =
-            state.matchedLocation.startsWith('/onboarding');
-        if (!isOnboardingRoute && state.matchedLocation != '/onboarding') {
-          return '/onboarding';
-        }
       }
-
-      return null;
     },
     routes: [
       GoRoute(
@@ -121,6 +124,35 @@ GoRouter goRouter(GoRouterRef ref) {
           name: RouteNames.loading.name,
           child: LoadingScreen(),
         ),
+      ),
+      GoRoute(
+        path: '/banned',
+        name: RouteNames.banned.name,
+        pageBuilder: (context, state) {
+          // Get the security result from the route security service
+          final securityCheckResult =
+              routeSecurityService.getLastSecurityResult();
+
+          SecurityStartupResult result;
+
+          if (securityCheckResult != null) {
+            // Convert the SecurityCheckResult to SecurityStartupResult
+            result = routeSecurityService
+                .convertToStartupResult(securityCheckResult);
+          } else {
+            // Fallback if no security result is available
+            result = SecurityStartupResult.userBanned(
+              message:
+                  'Your account has been restricted from accessing the application.',
+              userId: FirebaseAuth.instance.currentUser?.uid ?? '',
+            );
+          }
+
+          return NoTransitionPage<void>(
+            name: RouteNames.banned.name,
+            child: AppBannedWidget(securityResult: result),
+          );
+        },
       ),
       GoRoute(
         name: RouteNames.onboarding.name,

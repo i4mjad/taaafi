@@ -53,8 +53,28 @@ class AppBannedWidget extends ConsumerWidget {
 
 /// Internal widget for the banned screen content
 class _BannedScreenContent extends ConsumerWidget {
-  _BannedScreenContent({required this.securityResult});
+  const _BannedScreenContent({required this.securityResult});
   final SecurityStartupResult securityResult;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return _BannedScreenStateful(securityResult: securityResult);
+  }
+}
+
+/// Stateful widget to handle async operations safely
+class _BannedScreenStateful extends ConsumerStatefulWidget {
+  const _BannedScreenStateful({required this.securityResult});
+  final SecurityStartupResult securityResult;
+
+  @override
+  ConsumerState<_BannedScreenStateful> createState() =>
+      _BannedScreenStatefulState();
+}
+
+class _BannedScreenStatefulState extends ConsumerState<_BannedScreenStateful> {
+  bool _isLoggingOut = false;
+  bool _isRefreshing = false;
 
   /// Translate security service messages to localized text
   String _translateSecurityMessage(BuildContext context, String message) {
@@ -132,15 +152,16 @@ class _BannedScreenContent extends ConsumerWidget {
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     // Access theme through the context now that we have AppTheme wrapper
     final theme = AppTheme.of(context);
     final locale = ref.watch(localeNotifierProvider);
 
     // DEVICE BANS have HIGHEST PRIORITY - they block ALL access
     final isDeviceBan =
-        securityResult.status == SecurityStartupStatus.deviceBanned;
-    final isUserBan = securityResult.status == SecurityStartupStatus.userBanned;
+        widget.securityResult.status == SecurityStartupStatus.deviceBanned;
+    final isUserBan =
+        widget.securityResult.status == SecurityStartupStatus.userBanned;
 
     return Scaffold(
       backgroundColor: theme.error[50],
@@ -184,7 +205,8 @@ class _BannedScreenContent extends ConsumerWidget {
 
               // Message
               Text(
-                _translateSecurityMessage(context, securityResult.message),
+                _translateSecurityMessage(
+                    context, widget.securityResult.message),
                 style: TextStyles.body.copyWith(
                   color: theme.grey[700],
                 ),
@@ -273,7 +295,7 @@ class _BannedScreenContent extends ConsumerWidget {
             ),
             verticalSpace(Spacing.points4),
             Text(
-              _translateSecurityMessage(context, securityResult.message),
+              _translateSecurityMessage(context, widget.securityResult.message),
               style: TextStyles.small.copyWith(
                 color: theme.grey[600],
                 height: 1.5,
@@ -285,7 +307,7 @@ class _BannedScreenContent extends ConsumerWidget {
       ),
       data: (bans) {
         // Filter for device bans that apply to this device
-        final currentDeviceId = securityResult.deviceId;
+        final currentDeviceId = widget.securityResult.deviceId;
         final deviceBans = bans
             .where((ban) =>
                 ban.type == BanType.device_ban &&
@@ -319,7 +341,8 @@ class _BannedScreenContent extends ConsumerWidget {
                 ),
                 verticalSpace(Spacing.points8),
                 Text(
-                  _translateSecurityMessage(context, securityResult.message),
+                  _translateSecurityMessage(
+                      context, widget.securityResult.message),
                   style: TextStyles.small.copyWith(
                     color: theme.grey[600],
                     height: 1.5,
@@ -385,7 +408,7 @@ class _BannedScreenContent extends ConsumerWidget {
             ),
             verticalSpace(Spacing.points4),
             Text(
-              securityResult.message,
+              widget.securityResult.message,
               style: TextStyles.small.copyWith(
                 color: theme.grey[600],
                 height: 1.5,
@@ -406,7 +429,7 @@ class _BannedScreenContent extends ConsumerWidget {
             borderRadius: BorderRadius.circular(12),
             borderSide: BorderSide(color: theme.error[300]!),
             child: Text(
-              securityResult.message,
+              widget.securityResult.message,
               style: TextStyles.body.copyWith(
                 color: theme.error[700],
               ),
@@ -617,37 +640,49 @@ class _BannedScreenContent extends ConsumerWidget {
     );
   }
 
-  bool _isLoggingOut = false;
-  bool _isRefreshing = false;
-
   Future<void> _logout(
       BuildContext context, WidgetRef ref, CustomThemeData theme) async {
+    if (!mounted) return;
+
     try {
-      _isLoggingOut = true;
+      setState(() {
+        _isLoggingOut = true;
+      });
+
       await FirebaseAuth.instance.signOut();
       // Force the app to re-evaluate startup state, which will redirect to onboarding
       // since the user is no longer authenticated
       ref.invalidate(appStartupProvider);
     } catch (e) {
       // Handle logout error
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            AppLocalizations.of(context).translate('logout-error'),
-            style: TextStyles.body.copyWith(color: Colors.white),
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              AppLocalizations.of(context).translate('logout-error'),
+              style: TextStyles.body.copyWith(color: Colors.white),
+            ),
+            backgroundColor: theme.error[600],
           ),
-          backgroundColor: theme.error[600],
-        ),
-      );
+        );
+      }
     } finally {
-      _isLoggingOut = false;
+      if (mounted) {
+        setState(() {
+          _isLoggingOut = false;
+        });
+      }
     }
   }
 
   Future<void> _refreshBanStatus(
       BuildContext context, WidgetRef ref, CustomThemeData theme) async {
+    if (!mounted) return;
+
     try {
-      _isRefreshing = true;
+      setState(() {
+        _isRefreshing = true;
+      });
 
       // Invalidate the startup provider to re-check security status
       ref.invalidate(appStartupProvider);
@@ -658,13 +693,17 @@ class _BannedScreenContent extends ConsumerWidget {
       // Wait a moment for the providers to refresh
       await Future.delayed(const Duration(milliseconds: 500));
 
+      if (!mounted) return;
+
       // Check the new startup state
       final startupState = ref.read(appStartupProvider);
+
+      if (!mounted) return;
 
       startupState.when(
         data: (startup) {
           // If startup is successful, it means the user is no longer banned
-          if (startup != null) {
+          if (startup != null && mounted) {
             // Navigate to home or let the app handle the routing
             // The app startup will automatically handle the navigation
             ScaffoldMessenger.of(context).showSnackBar(
@@ -680,42 +719,52 @@ class _BannedScreenContent extends ConsumerWidget {
         },
         loading: () {
           // Still loading, show a message
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                AppLocalizations.of(context).translate('checking-ban-status'),
-                style: TextStyles.body.copyWith(color: Colors.white),
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  AppLocalizations.of(context).translate('checking-ban-status'),
+                  style: TextStyles.body.copyWith(color: Colors.white),
+                ),
+                backgroundColor: theme.primary[600],
               ),
-              backgroundColor: theme.primary[600],
-            ),
-          );
+            );
+          }
         },
         error: (error, stack) {
           // Still banned or error occurred
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                AppLocalizations.of(context).translate('ban-still-active'),
-                style: TextStyles.body.copyWith(color: Colors.white),
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  AppLocalizations.of(context).translate('ban-still-active'),
+                  style: TextStyles.body.copyWith(color: Colors.white),
+                ),
+                backgroundColor: theme.error[600],
               ),
-              backgroundColor: theme.error[600],
-            ),
-          );
+            );
+          }
         },
       );
     } catch (e) {
       // Handle refresh error
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            AppLocalizations.of(context).translate('refresh-error'),
-            style: TextStyles.body.copyWith(color: Colors.white),
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              AppLocalizations.of(context).translate('refresh-error'),
+              style: TextStyles.body.copyWith(color: Colors.white),
+            ),
+            backgroundColor: theme.error[600],
           ),
-          backgroundColor: theme.error[600],
-        ),
-      );
+        );
+      }
     } finally {
-      _isRefreshing = false;
+      if (mounted) {
+        setState(() {
+          _isRefreshing = false;
+        });
+      }
     }
   }
 

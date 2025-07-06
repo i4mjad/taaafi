@@ -25,7 +25,7 @@ final startupSecurityServiceProvider =
 );
 
 typedef StartupSecurityServiceRef = ProviderRef<StartupSecurityService>;
-String _$appStartupHash() => r'feff0535334cea26d225d9e54e232d42505bf506';
+String _$appStartupHash() => r'db1e1475943091716de52dfa9f51496b830f3042';
 
 /// See also [appStartup].
 @ProviderFor(appStartup)
