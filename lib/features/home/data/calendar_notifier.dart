@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:reboot_app_3/features/home/application/calendar_service.dart';
 import 'package:reboot_app_3/features/home/data/repos/calendar_repository.dart';
 import 'package:reboot_app_3/features/shared/models/follow_up.dart';
@@ -8,14 +9,14 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'calendar_notifier.g.dart';
 
 @riverpod
-Stream<List<FollowUpModel>> calendarStream(CalendarStreamRef ref) {
+Stream<List<FollowUpModel>> calendarStream(Ref ref) {
   final service = ref.read(calendarServiceProvider);
   return service.followUpsStream();
 }
 
 /// A provider for the [CalendarService].
 @Riverpod(keepAlive: true)
-CalendarService calendarService(CalendarServiceRef ref) {
+CalendarService calendarService(Ref ref) {
   final firestore = FirebaseFirestore.instance;
   final repository = CalendarRepository(firestore);
   return CalendarService(repository);

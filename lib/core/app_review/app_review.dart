@@ -8,7 +8,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'app_review.g.dart';
 
 @riverpod
-InAppReview inAppReview(InAppReviewRef ref) {
+InAppReview inAppReview(Ref ref) {
   return InAppReview.instance;
 }
 
@@ -33,6 +33,6 @@ class InAppRatingService {
 }
 
 @riverpod
-InAppRatingService inAppRatingService(InAppRatingServiceRef ref) {
+InAppRatingService inAppRatingService(Ref ref) {
   return InAppRatingService(ref);
 }

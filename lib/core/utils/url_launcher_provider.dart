@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -34,6 +35,6 @@ class UrlLauncherException implements Exception {
 }
 
 @riverpod
-UrlLauncher urlLauncher(UrlLauncherRef ref) {
+UrlLauncher urlLauncher(Ref ref) {
   return const UrlLauncher();
 }

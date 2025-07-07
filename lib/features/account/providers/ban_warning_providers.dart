@@ -5,38 +5,38 @@ import '../application/device_service.dart';
 import '../data/models/ban.dart';
 import '../data/models/warning.dart';
 import '../data/models/app_feature.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 part 'ban_warning_providers.g.dart';
 
 // ==================== SERVICES ====================
 
 @riverpod
-BanWarningFacade banWarningFacade(BanWarningFacadeRef ref) {
+BanWarningFacade banWarningFacade(Ref ref) {
   return BanWarningFacade();
 }
 
 @riverpod
-DeviceService deviceService(DeviceServiceRef ref) {
+DeviceService deviceService(Ref ref) {
   return DeviceService();
 }
 
 // ==================== USER BANS ====================
 
 @riverpod
-Future<List<Ban>> currentUserBans(CurrentUserBansRef ref) async {
+Future<List<Ban>> currentUserBans(Ref ref) async {
   final facade = ref.watch(banWarningFacadeProvider);
   return await facade.getCurrentUserBans();
 }
 
 @riverpod
-Future<List<Ban>> userBans(UserBansRef ref, String userId) async {
+Future<List<Ban>> userBans(Ref ref, String userId) async {
   final facade = ref.watch(banWarningFacadeProvider);
   return await facade.getUserBans(userId);
 }
 
 @riverpod
-Future<bool> isCurrentUserBannedFromApp(
-    IsCurrentUserBannedFromAppRef ref) async {
+Future<bool> isCurrentUserBannedFromApp(Ref ref) async {
   final facade = ref.watch(banWarningFacadeProvider);
   return await facade.isCurrentUserBannedFromApp();
 }
@@ -44,20 +44,19 @@ Future<bool> isCurrentUserBannedFromApp(
 // ==================== USER WARNINGS ====================
 
 @riverpod
-Future<List<Warning>> currentUserWarnings(CurrentUserWarningsRef ref) async {
+Future<List<Warning>> currentUserWarnings(Ref ref) async {
   final facade = ref.watch(banWarningFacadeProvider);
   return await facade.getCurrentUserWarnings();
 }
 
 @riverpod
-Future<List<Warning>> userWarnings(UserWarningsRef ref, String userId) async {
+Future<List<Warning>> userWarnings(Ref ref, String userId) async {
   final facade = ref.watch(banWarningFacadeProvider);
   return await facade.getUserWarnings(userId);
 }
 
 @riverpod
-Future<List<Warning>> currentUserHighPriorityWarnings(
-    CurrentUserHighPriorityWarningsRef ref) async {
+Future<List<Warning>> currentUserHighPriorityWarnings(Ref ref) async {
   final facade = ref.watch(banWarningFacadeProvider);
   return await facade.getCurrentUserHighPriorityWarnings();
 }
@@ -65,13 +64,13 @@ Future<List<Warning>> currentUserHighPriorityWarnings(
 // ==================== APP FEATURES ====================
 
 @riverpod
-Future<List<AppFeature>> appFeatures(AppFeaturesRef ref) async {
+Future<List<AppFeature>> appFeatures(Ref ref) async {
   final facade = ref.watch(banWarningFacadeProvider);
   return await facade.getAppFeatures();
 }
 
 @riverpod
-Future<Map<String, bool>> featureAccess(FeatureAccessRef ref) async {
+Future<Map<String, bool>> featureAccess(Ref ref) async {
   final facade = ref.watch(banWarningFacadeProvider);
   return await facade.generateFeatureAccessMap();
 }
@@ -79,13 +78,13 @@ Future<Map<String, bool>> featureAccess(FeatureAccessRef ref) async {
 // ==================== DEVICE TRACKING ====================
 
 @riverpod
-Future<String> currentDeviceId(CurrentDeviceIdRef ref) async {
+Future<String> currentDeviceId(Ref ref) async {
   final deviceService = ref.watch(deviceServiceProvider);
   return await deviceService.getDeviceId();
 }
 
 @riverpod
-Future<List<String>> currentUserDeviceIds(CurrentUserDeviceIdsRef ref) async {
+Future<List<String>> currentUserDeviceIds(Ref ref) async {
   final deviceService = ref.watch(deviceServiceProvider);
   return await deviceService.getCurrentUserDeviceIds();
 }
@@ -94,7 +93,7 @@ Future<List<String>> currentUserDeviceIds(CurrentUserDeviceIdsRef ref) async {
 
 @riverpod
 Future<Map<String, List<dynamic>>> deviceViolationHistory(
-    DeviceViolationHistoryRef ref, String userId) async {
+    Ref ref, String userId) async {
   final facade = ref.watch(banWarningFacadeProvider);
   return await facade.getDeviceViolationHistory(userId);
 }
@@ -124,7 +123,7 @@ class UserBanStatusNotifier extends _$UserBanStatusNotifier {
 
 /// Provider that invalidates ban-related cache when user changes
 @riverpod
-Future<void> invalidateBanCache(InvalidateBanCacheRef ref) async {
+Future<void> invalidateBanCache(Ref ref) async {
   // Listen to auth state changes
   FirebaseAuth.instance.authStateChanges().listen((user) {
     if (user == null) {
@@ -140,6 +139,6 @@ Future<void> invalidateBanCache(InvalidateBanCacheRef ref) async {
 
 /// Provider for getting user ID safely
 @riverpod
-String? currentUserId(CurrentUserIdRef ref) {
+String? currentUserId(Ref ref) {
   return FirebaseAuth.instance.currentUser?.uid;
 }

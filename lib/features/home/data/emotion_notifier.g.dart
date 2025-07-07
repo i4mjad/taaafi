@@ -6,7 +6,7 @@ part of 'emotion_notifier.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$emotionServiceHash() => r'16746dd008b4805e91a0be2550fa39f4cf356ab4';
+String _$emotionServiceHash() => r'284de5da99343cdd44267d72042ddec2232a01b1';
 
 /// See also [emotionService].
 @ProviderFor(emotionService)
@@ -20,6 +20,8 @@ final emotionServiceProvider = Provider<EmotionService>.internal(
   allTransitiveDependencies: null,
 );
 
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
 typedef EmotionServiceRef = ProviderRef<EmotionService>;
 String _$emotionNotifierHash() => r'7a6d2f6e6a50fd08c4c9a3136d7b77ec1a180921';
 
@@ -38,4 +40,4 @@ final emotionNotifierProvider = AutoDisposeAsyncNotifierProvider<
 
 typedef _$EmotionNotifier = AutoDisposeAsyncNotifier<List<EmotionModel>>;
 // ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

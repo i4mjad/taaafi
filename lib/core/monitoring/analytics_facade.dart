@@ -1,3 +1,4 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:reboot_app_3/core/monitoring/analytics_client.dart';
 import 'package:reboot_app_3/core/monitoring/google_analytics_client.dart';
 import 'package:reboot_app_3/core/monitoring/logger_analytics_client.dart';
@@ -7,7 +8,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'analytics_facade.g.dart';
 
 @Riverpod(keepAlive: true)
-AnalyticsFacade analyticsFacade(AnalyticsFacadeRef ref) {
+AnalyticsFacade analyticsFacade(Ref ref) {
   final mixpanelAnalyticsClient =
       ref.watch(mixpanelAnalyticsClientProvider).requireValue;
 

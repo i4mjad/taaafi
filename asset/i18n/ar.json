@@ -383,6 +383,13 @@
   
   "cannot-complete-future-tasks": "لا يمكن إكمال المهام المجدولة للتواريخ المستقبلية",
   "already-subscribed-to-activity": "أنت مشترك بالفعل في هذا التمرين",
+  "update-available": "تحديث متاح",
+  "update-available-message": "يتوفر تحديث جديد للتطبيق. قم بتحميله الآن للحصول على أحدث الميزات والتحسينات.",
+  "update-button": "تحديث",
+  "update-download-progress": "جاري تحميل التحديث: {percentage}%",
+  "update-complete": "اكتمل التحديث",
+  "update-complete-message": "تم تحميل التحديث بنجاح. يرجى إعادة تشغيل التطبيق لتطبيق التغييرات.",
+  "restart-app": "إعادة تشغيل التطبيق",
   "personal-data": "المجتمع",
   "relapses-number": "عدد الانتكاسات: ",
   "day": "يوم",

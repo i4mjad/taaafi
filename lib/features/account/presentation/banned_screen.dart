@@ -109,8 +109,6 @@ class _BannedScreenStatefulState extends ConsumerState<_BannedScreenStateful> {
         return AppLocalizations.of(context).translate('device-ban');
       case BanType.feature_ban:
         return AppLocalizations.of(context).translate('feature-ban');
-      default:
-        return AppLocalizations.of(context).translate('unknown-ban-type');
     }
   }
 

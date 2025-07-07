@@ -20,7 +20,6 @@ import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/features/authentication/application/auth_service.dart';
-import 'package:sentry_flutter/sentry_flutter.dart';
 
 class LogInScreen extends ConsumerStatefulWidget {
   const LogInScreen({super.key});
@@ -344,11 +343,6 @@ class _SignInFormState extends ConsumerState<SignInForm> {
                           email,
                           password,
                         );
-                        if (user != null) {
-                          await Sentry.configureScope(
-                            (scope) => scope.setUser(SentryUser(id: user.uid)),
-                          );
-                        }
                       } catch (e) {
                         LogInScreen.scaffoldMessengerKey.currentState
                             ?.showSnackBar(

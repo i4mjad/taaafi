@@ -6,7 +6,7 @@ part of 'calendar_notifier.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$calendarStreamHash() => r'e781431137b27db7f508c98366afdecd392f9e00';
+String _$calendarStreamHash() => r'94208e18706fb076a84b9117c1927dba281e8aae';
 
 /// See also [calendarStream].
 @ProviderFor(calendarStream)
@@ -21,8 +21,10 @@ final calendarStreamProvider =
   allTransitiveDependencies: null,
 );
 
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
 typedef CalendarStreamRef = AutoDisposeStreamProviderRef<List<FollowUpModel>>;
-String _$calendarServiceHash() => r'713b24b15d9cf0a5f04753ee02832021a0ed2ad6';
+String _$calendarServiceHash() => r'32bc84c92297ec661e415a7928d1ae82ab00a59e';
 
 /// A provider for the [CalendarService].
 ///
@@ -38,6 +40,8 @@ final calendarServiceProvider = Provider<CalendarService>.internal(
   allTransitiveDependencies: null,
 );
 
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
 typedef CalendarServiceRef = ProviderRef<CalendarService>;
 String _$calendarNotifierHash() => r'14f8c0550e5676c662d2f6c6fa94ed34b9ecda1d';
 
@@ -56,4 +60,4 @@ final calendarNotifierProvider =
 
 typedef _$CalendarNotifier = AsyncNotifier<List<FollowUpModel>>;
 // ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

@@ -341,9 +341,9 @@ class ReportInfoHeader extends StatelessWidget {
               Container(
                 padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: statusColor.withOpacity(0.1),
+                  color: statusColor.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: statusColor.withOpacity(0.3)),
+                  border: Border.all(color: statusColor.withValues(alpha: 0.3)),
                 ),
                 child: Text(
                   localization.translate(statusKey),
@@ -398,10 +398,10 @@ class ReportInfoHeader extends StatelessWidget {
                   duration: const Duration(milliseconds: 300),
                   padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                   decoration: BoxDecoration(
-                    color: theme.primary[500]!.withOpacity(0.1),
+                    color: theme.primary[500]!.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
-                    border:
-                        Border.all(color: theme.primary[500]!.withOpacity(0.3)),
+                    border: Border.all(
+                        color: theme.primary[500]!.withValues(alpha: 0.3)),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
@@ -536,7 +536,8 @@ class RoadmapUpdate extends StatelessWidget {
               child: WidgetsContainer(
                 padding: EdgeInsets.all(16),
                 backgroundColor: theme.backgroundColor,
-                borderSide: BorderSide(color: updateColor.withOpacity(0.2)),
+                borderSide:
+                    BorderSide(color: updateColor.withValues(alpha: 0.2)),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -546,10 +547,10 @@ class RoadmapUpdate extends StatelessWidget {
                         WidgetsContainer(
                           padding:
                               EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                          backgroundColor: updateColor.withOpacity(0.1),
+                          backgroundColor: updateColor.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(4),
-                          borderSide:
-                              BorderSide(color: updateColor.withOpacity(0.5)),
+                          borderSide: BorderSide(
+                              color: updateColor.withValues(alpha: 0.5)),
                           child: Text(
                             '${localization.translate("update")} $updateNumber',
                             style: TextStyles.small.copyWith(
@@ -738,7 +739,7 @@ class _PulsingDotState extends State<_PulsingDot>
           width: 8,
           height: 8,
           decoration: BoxDecoration(
-            color: widget.color.withOpacity(_animation.value),
+            color: widget.color.withValues(alpha: _animation.value),
             shape: BoxShape.circle,
           ),
         );

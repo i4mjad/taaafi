@@ -1,3 +1,4 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:reboot_app_3/features/vault/data/activities/ongoing_activity_task.dart';
 
 import 'package:reboot_app_3/features/vault/application/activities/providers.dart';
@@ -32,7 +33,7 @@ class TodayTasks extends _$TodayTasks {
 
 // Stream provider that updates the state notifier
 @riverpod
-Stream<List<OngoingActivityTask>> todayTasksStream(TodayTasksStreamRef ref) {
+Stream<List<OngoingActivityTask>> todayTasksStream(Ref ref) {
   final notifier = ref.watch(todayTasksProvider.notifier);
 
   return ref.read(activityServiceProvider).getTodayTasksStream().map((tasks) {

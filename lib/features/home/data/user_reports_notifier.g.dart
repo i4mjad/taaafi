@@ -6,7 +6,7 @@ part of 'user_reports_notifier.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$reportMessagesHash() => r'43edab30fabbcc991bd4cabf00b2fb45be6e7073';
+String _$reportMessagesHash() => r'12c58c7579f74121bda58ef5b04ced8a4f0df171';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -155,6 +155,8 @@ class ReportMessagesProvider
   }
 }
 
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
 mixin ReportMessagesRef on AutoDisposeFutureProviderRef<List<ReportMessage>> {
   /// The parameter `reportId` of this provider.
   String get reportId;
@@ -170,7 +172,7 @@ class _ReportMessagesProviderElement
 }
 
 String _$userReportsServiceHash() =>
-    r'd14f1fe55f092af31a036688ebc3b7dd84ed080c';
+    r'a2081cd82c8ee209f1be774dd6bfe40707c397fc';
 
 /// Provider for UserReportsService
 ///
@@ -187,9 +189,11 @@ final userReportsServiceProvider =
   allTransitiveDependencies: null,
 );
 
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
 typedef UserReportsServiceRef = AutoDisposeProviderRef<UserReportsService>;
 String _$userReportsRepositoryHash() =>
-    r'f6964b5c42ea0026030bb10b43ea7027fabccb74';
+    r'fccc1c24d7964897a3226bf3a7ad9b72bbd27856';
 
 /// Provider for UserReportsRepository
 ///
@@ -206,9 +210,11 @@ final userReportsRepositoryProvider =
   allTransitiveDependencies: null,
 );
 
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
 typedef UserReportsRepositoryRef
     = AutoDisposeProviderRef<UserReportsRepository>;
-String _$userReportsStreamHash() => r'9a219f1f5d2c050fec3efed78f07880ff0e6b4ae';
+String _$userReportsStreamHash() => r'6d772a9b08cb541c28b2754319d05cb3bb79cff5';
 
 /// Provider for watching user reports stream
 ///
@@ -225,9 +231,11 @@ final userReportsStreamProvider =
   allTransitiveDependencies: null,
 );
 
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
 typedef UserReportsStreamRef = AutoDisposeStreamProviderRef<List<UserReport>>;
 String _$reportMessagesStreamHash() =>
-    r'c2cd73390d74513d9b5896fc737b263b55b52752';
+    r'7d5e827b9250c2b807fe426c132c5d14b43b5c12';
 
 /// Provider for watching report messages stream
 ///
@@ -357,6 +365,8 @@ class ReportMessagesStreamProvider
   }
 }
 
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
 mixin ReportMessagesStreamRef
     on AutoDisposeStreamProviderRef<List<ReportMessage>> {
   /// The parameter `reportId` of this provider.
@@ -373,7 +383,7 @@ class _ReportMessagesStreamProviderElement
 }
 
 String _$shouldShowReportButtonHash() =>
-    r'd653f7612bd18e558ea0e774318f942c363bd4dc';
+    r'42e3e371dbe97e01af2cc7da0574ec359c33836a';
 
 /// Provider for checking if report button should be shown
 ///
@@ -389,6 +399,8 @@ final shouldShowReportButtonProvider = AutoDisposeFutureProvider<bool>.internal(
   allTransitiveDependencies: null,
 );
 
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
 typedef ShouldShowReportButtonRef = AutoDisposeFutureProviderRef<bool>;
 String _$userReportsNotifierHash() =>
     r'347e2fd9345c99d8e1ff1305f4da00db9aa58c04';
@@ -408,4 +420,4 @@ final userReportsNotifierProvider = AutoDisposeAsyncNotifierProvider<
 
 typedef _$UserReportsNotifier = AutoDisposeAsyncNotifier<List<UserReport>>;
 // ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

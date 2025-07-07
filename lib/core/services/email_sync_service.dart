@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'email_sync_service.g.dart';
@@ -136,7 +137,7 @@ class EmailSyncService {
 }
 
 @Riverpod(keepAlive: true)
-EmailSyncService emailSyncService(EmailSyncServiceRef ref) {
+EmailSyncService emailSyncService(Ref ref) {
   return EmailSyncService(
     FirebaseAuth.instance,
     FirebaseFirestore.instance,

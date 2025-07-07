@@ -64,7 +64,7 @@ class StreakRepository {
 }
 
 @Riverpod(keepAlive: true)
-StreakRepository streakRepository(StreakRepositoryRef ref) {
+StreakRepository streakRepository(Ref ref) {
   final firestore = FirebaseFirestore.instance;
   return StreakRepository(firestore, ref);
 }

@@ -7,7 +7,7 @@ part of 'app_startup_simple.dart';
 // **************************************************************************
 
 String _$startupSecurityServiceHash() =>
-    r'ba7d7f0e97889c8f7e455d3ea670a76466c72689';
+    r'723914e9e98aca13ebc2fc68845ee353c8db0187';
 
 /// Provider for the startup security service
 ///
@@ -24,9 +24,11 @@ final startupSecurityServiceProvider =
   allTransitiveDependencies: null,
 );
 
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
 typedef StartupSecurityServiceRef = ProviderRef<StartupSecurityService>;
 String _$appStartupWithSecurityHash() =>
-    r'70bdd37de8ba6b2752e1892cc5763b54642567e2';
+    r'0a8f0b02425c5e4e2f51190a52288a9eca55d2d7';
 
 /// See also [appStartupWithSecurity].
 @ProviderFor(appStartupWithSecurity)
@@ -41,6 +43,8 @@ final appStartupWithSecurityProvider =
   allTransitiveDependencies: null,
 );
 
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
 typedef AppStartupWithSecurityRef = FutureProviderRef<SecurityStartupResult>;
 // ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

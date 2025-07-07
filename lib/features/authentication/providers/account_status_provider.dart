@@ -1,3 +1,4 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:reboot_app_3/features/authentication/providers/user_document_provider.dart';
 import 'package:reboot_app_3/features/authentication/providers/user_provider.dart';
@@ -13,7 +14,7 @@ enum AccountStatus {
 }
 
 @riverpod
-AccountStatus accountStatus(AccountStatusRef ref) {
+AccountStatus accountStatus(Ref ref) {
   final userDocAsync = ref.watch(userDocumentsNotifierProvider);
   final userAsync = ref.watch(userNotifierProvider);
 

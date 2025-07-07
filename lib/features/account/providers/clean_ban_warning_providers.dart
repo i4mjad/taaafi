@@ -7,13 +7,14 @@ import '../data/repositories/ban_repository.dart';
 import '../data/repositories/warning_repository.dart';
 import '../application/clean_ban_service.dart';
 import '../application/clean_warning_service.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 part 'clean_ban_warning_providers.g.dart';
 
 // ==================== REPOSITORIES ====================
 
 @riverpod
-BanRepository banRepository(BanRepositoryRef ref) {
+BanRepository banRepository(Ref ref) {
   return BanRepository(
     FirebaseFirestore.instance,
     FirebaseAuth.instance,
@@ -22,7 +23,7 @@ BanRepository banRepository(BanRepositoryRef ref) {
 }
 
 @riverpod
-WarningRepository warningRepository(WarningRepositoryRef ref) {
+WarningRepository warningRepository(Ref ref) {
   return WarningRepository(
     FirebaseFirestore.instance,
     FirebaseAuth.instance,
@@ -33,13 +34,13 @@ WarningRepository warningRepository(WarningRepositoryRef ref) {
 // ==================== SERVICES ====================
 
 @riverpod
-CleanBanService cleanBanService(CleanBanServiceRef ref) {
+CleanBanService cleanBanService(Ref ref) {
   final repository = ref.watch(banRepositoryProvider);
   return CleanBanService(repository);
 }
 
 @riverpod
-CleanWarningService cleanWarningService(CleanWarningServiceRef ref) {
+CleanWarningService cleanWarningService(Ref ref) {
   final repository = ref.watch(warningRepositoryProvider);
   return CleanWarningService(repository);
 }
@@ -47,20 +48,19 @@ CleanWarningService cleanWarningService(CleanWarningServiceRef ref) {
 // ==================== CURRENT USER DATA ====================
 
 @riverpod
-Future<List<Ban>> currentUserBans(CurrentUserBansRef ref) async {
+Future<List<Ban>> currentUserBans(Ref ref) async {
   final service = ref.watch(cleanBanServiceProvider);
   return await service.getCurrentUserBans();
 }
 
 @riverpod
-Future<List<Warning>> currentUserWarnings(CurrentUserWarningsRef ref) async {
+Future<List<Warning>> currentUserWarnings(Ref ref) async {
   final service = ref.watch(cleanWarningServiceProvider);
   return await service.getCurrentUserWarnings();
 }
 
 @riverpod
-Future<List<Warning>> currentUserHighPriorityWarnings(
-    CurrentUserHighPriorityWarningsRef ref) async {
+Future<List<Warning>> currentUserHighPriorityWarnings(Ref ref) async {
   final service = ref.watch(cleanWarningServiceProvider);
   return await service.getCurrentUserHighPriorityWarnings();
 }
@@ -68,13 +68,13 @@ Future<List<Warning>> currentUserHighPriorityWarnings(
 // ==================== USER-SPECIFIC DATA ====================
 
 @riverpod
-Future<List<Ban>> userBans(UserBansRef ref, String userId) async {
+Future<List<Ban>> userBans(Ref ref, String userId) async {
   final service = ref.watch(cleanBanServiceProvider);
   return await service.getUserBans(userId);
 }
 
 @riverpod
-Future<List<Warning>> userWarnings(UserWarningsRef ref, String userId) async {
+Future<List<Warning>> userWarnings(Ref ref, String userId) async {
   final service = ref.watch(cleanWarningServiceProvider);
   return await service.getUserWarnings(userId);
 }
@@ -82,15 +82,13 @@ Future<List<Warning>> userWarnings(UserWarningsRef ref, String userId) async {
 // ==================== STATUS CHECKS ====================
 
 @riverpod
-Future<bool> isCurrentUserBannedFromApp(
-    IsCurrentUserBannedFromAppRef ref) async {
+Future<bool> isCurrentUserBannedFromApp(Ref ref) async {
   final service = ref.watch(cleanBanServiceProvider);
   return await service.currentUserHasAppWideBans();
 }
 
 @riverpod
-Future<bool> currentUserHasCriticalWarnings(
-    CurrentUserHasCriticalWarningsRef ref) async {
+Future<bool> currentUserHasCriticalWarnings(Ref ref) async {
   final service = ref.watch(cleanWarningServiceProvider);
   return await service.currentUserHasCriticalWarnings();
 }
@@ -99,14 +97,13 @@ Future<bool> currentUserHasCriticalWarnings(
 
 @riverpod
 Future<bool> canCurrentUserAccessFeature(
-    CanCurrentUserAccessFeatureRef ref, String featureUniqueName) async {
+    Ref ref, String featureUniqueName) async {
   final service = ref.watch(cleanBanServiceProvider);
   return await service.canCurrentUserAccessFeature(featureUniqueName);
 }
 
 @riverpod
-Future<Ban?> currentUserFeatureBan(
-    CurrentUserFeatureBanRef ref, String featureUniqueName) async {
+Future<Ban?> currentUserFeatureBan(Ref ref, String featureUniqueName) async {
   final service = ref.watch(cleanBanServiceProvider);
   final userId = FirebaseAuth.instance.currentUser?.uid;
   if (userId == null) return null;
@@ -116,8 +113,7 @@ Future<Ban?> currentUserFeatureBan(
 // ==================== SUMMARY DATA ====================
 
 @riverpod
-Future<BanStatusSummary> currentUserBanSummary(
-    CurrentUserBanSummaryRef ref) async {
+Future<BanStatusSummary> currentUserBanSummary(Ref ref) async {
   final service = ref.watch(cleanBanServiceProvider);
   final userId = FirebaseAuth.instance.currentUser?.uid;
   if (userId == null) {
@@ -133,8 +129,7 @@ Future<BanStatusSummary> currentUserBanSummary(
 }
 
 @riverpod
-Future<WarningStatusSummary> currentUserWarningSummary(
-    CurrentUserWarningSummaryRef ref) async {
+Future<WarningStatusSummary> currentUserWarningSummary(Ref ref) async {
   final service = ref.watch(cleanWarningServiceProvider);
   final userId = FirebaseAuth.instance.currentUser?.uid;
   if (userId == null) {
@@ -152,14 +147,13 @@ Future<WarningStatusSummary> currentUserWarningSummary(
 // ==================== REAL-TIME STREAMS ====================
 
 @riverpod
-Stream<List<Ban>> currentUserBansStream(CurrentUserBansStreamRef ref) {
+Stream<List<Ban>> currentUserBansStream(Ref ref) {
   final service = ref.watch(cleanBanServiceProvider);
   return service.watchCurrentUserBans();
 }
 
 @riverpod
-Stream<List<Warning>> currentUserWarningsStream(
-    CurrentUserWarningsStreamRef ref) {
+Stream<List<Warning>> currentUserWarningsStream(Ref ref) {
   final service = ref.watch(cleanWarningServiceProvider);
   return service.watchCurrentUserWarnings();
 }
@@ -167,13 +161,13 @@ Stream<List<Warning>> currentUserWarningsStream(
 // ==================== HELPER PROVIDERS ====================
 
 @riverpod
-String? currentUserId(CurrentUserIdRef ref) {
+String? currentUserId(Ref ref) {
   return FirebaseAuth.instance.currentUser?.uid;
 }
 
 /// Provider that invalidates cache when user changes
 @riverpod
-Future<void> invalidateUserCache(InvalidateUserCacheRef ref) async {
+Future<void> invalidateUserCache(Ref ref) async {
   FirebaseAuth.instance.authStateChanges().listen((user) {
     if (user == null) {
       // User logged out, invalidate all cache

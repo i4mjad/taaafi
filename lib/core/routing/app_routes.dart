@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:reboot_app_3/core/monitoring/analytics_facade.dart';
 import 'package:reboot_app_3/core/monitoring/logger_navigator_observer.dart';
@@ -43,7 +44,6 @@ import 'package:reboot_app_3/features/vault/presentation/vault_settings/activiti
 import 'package:reboot_app_3/features/vault/presentation/vault_settings/vault_settings_screen.dart';
 import 'package:reboot_app_3/features/vault/presentation/vault_screen.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:reboot_app_3/features/authentication/data/models/user_document.dart';
 import 'package:reboot_app_3/core/routing/route_security_service.dart';
 import 'package:reboot_app_3/features/account/application/startup_security_service.dart';
@@ -53,7 +53,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 part 'app_routes.g.dart';
 
 @riverpod
-GoRouter goRouter(GoRouterRef ref) {
+GoRouter goRouter(Ref<GoRouter> ref) {
   final authState = ref.watch(authStateChangesProvider);
   final userDocumentState = ref.watch(userDocumentsNotifierProvider);
   final userDocumentNotifier = ref.read(userDocumentsNotifierProvider.notifier);
@@ -86,7 +86,6 @@ GoRouter goRouter(GoRouterRef ref) {
     debugLogDiagnostics: false,
     observers: [
       GoRouterObserver(ref.read(analyticsFacadeProvider)),
-      SentryNavigatorObserver()
     ],
     refreshListenable: GoRouterRefreshStream(refreshController.stream),
     redirect: (context, state) async {
@@ -199,7 +198,6 @@ GoRouter goRouter(GoRouterRef ref) {
           StatefulShellBranch(
             observers: [
               GoRouterObserver(ref.read(analyticsFacadeProvider)),
-              SentryNavigatorObserver()
             ],
             navigatorKey: shellNavigatorHomeKey,
             routes: [
@@ -278,7 +276,6 @@ GoRouter goRouter(GoRouterRef ref) {
             navigatorKey: shellNavigatorVaultKey,
             observers: [
               GoRouterObserver(ref.read(analyticsFacadeProvider)),
-              SentryNavigatorObserver()
             ],
             routes: [
               GoRoute(
@@ -425,7 +422,6 @@ GoRouter goRouter(GoRouterRef ref) {
             navigatorKey: shellNavigatorAccountKey,
             observers: [
               GoRouterObserver(ref.read(analyticsFacadeProvider)),
-              SentryNavigatorObserver()
             ],
             routes: [
               GoRoute(

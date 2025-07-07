@@ -193,7 +193,7 @@ class BanRepository {
 // ==================== PROVIDERS ====================
 
 @riverpod
-BanRepository banRepository(BanRepositoryRef ref) {
+BanRepository banRepository(Ref ref) {
   return BanRepository(
     FirebaseFirestore.instance,
     FirebaseAuth.instance,

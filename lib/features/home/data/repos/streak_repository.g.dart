@@ -6,7 +6,7 @@ part of 'streak_repository.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$streakRepositoryHash() => r'443b15b16e7d7a0bbc444fb455ed0b8c45f8f905';
+String _$streakRepositoryHash() => r'35423e9020b0d4da9f463d0500366b4d6af2e686';
 
 /// See also [streakRepository].
 @ProviderFor(streakRepository)
@@ -20,6 +20,8 @@ final streakRepositoryProvider = Provider<StreakRepository>.internal(
   allTransitiveDependencies: null,
 );
 
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
 typedef StreakRepositoryRef = ProviderRef<StreakRepository>;
 // ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

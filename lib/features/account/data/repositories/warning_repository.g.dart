@@ -6,7 +6,7 @@ part of 'warning_repository.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$warningRepositoryHash() => r'27f833d839702c5e217d77a7cb848962da2b3fc0';
+String _$warningRepositoryHash() => r'691a2e8a2a6b4ea228c0257c4c1d9ebba94c9d5a';
 
 /// See also [warningRepository].
 @ProviderFor(warningRepository)
@@ -21,6 +21,8 @@ final warningRepositoryProvider =
   allTransitiveDependencies: null,
 );
 
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
 typedef WarningRepositoryRef = AutoDisposeProviderRef<WarningRepository>;
 // ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

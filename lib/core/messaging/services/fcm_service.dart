@@ -579,13 +579,12 @@ class MessagingService with WidgetsBindingObserver {
 }
 
 @Riverpod(keepAlive: true)
-FlutterLocalNotificationsPlugin localNotificationPlugin(
-    LocalNotificationPluginRef ref) {
+FlutterLocalNotificationsPlugin localNotificationPlugin(Ref ref) {
   return FlutterLocalNotificationsPlugin();
 }
 
 @Riverpod(keepAlive: true)
-FirebaseMessaging messaging(MessagingRef ref) {
+FirebaseMessaging messaging(Ref ref) {
   return FirebaseMessaging.instance;
 }
 

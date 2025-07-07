@@ -441,7 +441,7 @@ class _ConfirmUserEmailScreenState
           // Logout countdown overlay
           if (_showLogoutCountdown)
             Container(
-              color: Colors.black.withOpacity(0.8),
+              color: Colors.black.withValues(alpha: 0.8),
               child: Center(
                 child: Container(
                   margin: const EdgeInsets.all(32),
@@ -451,7 +451,7 @@ class _ConfirmUserEmailScreenState
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.2),
+                        color: Colors.black.withValues(alpha: 0.2),
                         blurRadius: 10,
                         spreadRadius: 2,
                       ),
@@ -958,10 +958,11 @@ class UserIdContainer extends ConsumerWidget {
             child: Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: const Color(0xFF25D366).withOpacity(0.1),
+                color: const Color(0xFF25D366).withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(8),
                 border: Border.all(
-                    color: const Color(0xFF25D366).withOpacity(0.3), width: 1),
+                    color: const Color(0xFF25D366).withValues(alpha: 0.3),
+                    width: 1),
               ),
               child: Row(
                 children: [

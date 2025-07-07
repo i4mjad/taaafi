@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:reboot_app_3/features/vault/data/library/library_repository.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../data/library/library_service.dart';
@@ -70,12 +71,12 @@ class LibraryNotifier extends _$LibraryNotifier {
 }
 
 @riverpod
-LibraryService libraryService(LibraryServiceRef ref) {
+LibraryService libraryService(Ref ref) {
   return LibraryService(ref.watch(libraryRepositoryProvider));
 }
 
 @riverpod
-LibraryRepository libraryRepository(LibraryRepositoryRef ref) {
+LibraryRepository libraryRepository(Ref ref) {
   return LibraryRepository(FirebaseFirestore.instance, ref);
 }
 

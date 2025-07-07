@@ -7,7 +7,7 @@ part of 'route_security_service.dart';
 // **************************************************************************
 
 String _$routeSecurityServiceHash() =>
-    r'dce528d43ea5bd3178a2c31b2e4a21a721d09ae6';
+    r'f0a4205b168ead38b6a4ae14e434803357756388';
 
 /// See also [routeSecurityService].
 @ProviderFor(routeSecurityService)
@@ -22,6 +22,8 @@ final routeSecurityServiceProvider =
   allTransitiveDependencies: null,
 );
 
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
 typedef RouteSecurityServiceRef = AutoDisposeProviderRef<RouteSecurityService>;
 // ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

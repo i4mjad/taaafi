@@ -51,7 +51,8 @@ class BanDetailModal extends ConsumerWidget {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: _getBanScopeColor(ban.scope, theme).withOpacity(0.1),
+                    color: _getBanScopeColor(ban.scope, theme)
+                        .withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Icon(

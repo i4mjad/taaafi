@@ -4,7 +4,6 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import 'package:reboot_app_3/core/monitoring/error_logger.dart';
 import 'package:reboot_app_3/core/services/email_sync_service.dart';
 import 'package:reboot_app_3/features/authentication/data/repositories/auth_repository.dart';
@@ -130,38 +129,28 @@ class AuthService {
 
   Future<User?> signInWithGoogle(BuildContext context) async {
     try {
-      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
-      final GoogleSignInAuthentication? googleAuth =
-          await googleUser?.authentication;
+      await _auth.signOut();
 
-      if (googleAuth?.accessToken != null && googleAuth?.idToken != null) {
-        final credential = GoogleAuthProvider.credential(
-          accessToken: googleAuth!.accessToken,
-          idToken: googleAuth.idToken,
-        );
+      final googleProvider = GoogleAuthProvider();
+      // Request email scope by default.
+      googleProvider.addScope('email');
 
-        try {
-          await _auth.signOut();
+      final userCredential = await _auth.signInWithProvider(googleProvider);
+      await userCredential.user?.reload();
+      final user = _auth.currentUser;
 
-          final userCredential = await _auth.signInWithCredential(credential);
-          await userCredential.user?.reload();
-          final user = _auth.currentUser;
+      // Perform post-login tasks if user exists
+      if (user != null) {
+        await _performPostLoginTasks();
+        _invalidateAppStartup();
+      }
 
-          // Perform post-login tasks if user exists
-          if (user != null) {
-            await _performPostLoginTasks();
-            // Invalidate startup to re-check security for logged in user
-            _invalidateAppStartup();
-          }
-
-          return user;
-        } on FirebaseAuthException catch (e) {
-          if (e.code == 'account-exists-with-different-credential') {
-            getErrorSnackBar(
-                context, "email-already-in-use-different-provider");
-          }
-          rethrow;
-        }
+      return user;
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'account-exists-with-different-credential') {
+        getErrorSnackBar(context, 'email-already-in-use-different-provider');
+      } else {
+        getErrorSnackBar(context, e.code);
       }
       return null;
     } catch (e, stackTrace) {
@@ -269,28 +258,11 @@ class AuthService {
 
   Future<bool> reSignInWithGoogle(BuildContext context) async {
     try {
-      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+      final googleProvider = GoogleAuthProvider();
+      googleProvider.addScope('email');
 
-      if (googleUser == null) {
-        getErrorSnackBar(context, 'authentication-cancelled');
-        return false;
-      }
-
-      final GoogleSignInAuthentication googleAuth =
-          await googleUser.authentication;
-
-      if (googleAuth.accessToken != null && googleAuth.idToken != null) {
-        final credential = GoogleAuthProvider.credential(
-          accessToken: googleAuth.accessToken,
-          idToken: googleAuth.idToken,
-        );
-
-        await _auth.currentUser?.reauthenticateWithCredential(credential);
-        return true;
-      } else {
-        getErrorSnackBar(context, 'authentication-failed');
-        return false;
-      }
+      await _auth.currentUser?.reauthenticateWithProvider(googleProvider);
+      return true;
     } on FirebaseAuthException catch (e, stackTrace) {
       ref.read(errorLoggerProvider).logException(e, stackTrace);
       switch (e.code) {

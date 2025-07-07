@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:reboot_app_3/features/community/data/repositories/community_repository.dart';
@@ -33,7 +34,7 @@ final communityServiceProvider = FutureProvider<CommunityService>((ref) async {
 
 /// Provider for the CommunityNotifier
 @riverpod
-CommunityNotifier communityNotifier(CommunityNotifierRef ref) {
+CommunityNotifier communityNotifier(Ref ref) {
   return CommunityNotifier();
 }
 

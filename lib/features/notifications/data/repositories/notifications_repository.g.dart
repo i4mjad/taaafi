@@ -7,7 +7,7 @@ part of 'notifications_repository.dart';
 // **************************************************************************
 
 String _$unreadNotificationCountHash() =>
-    r'51499a82e9efc57060ac66f835e8f40d81346f66';
+    r'edbe95b1d4ecc7a0dd789a9f4aacee0431fb62fe';
 
 /// See also [unreadNotificationCount].
 @ProviderFor(unreadNotificationCount)
@@ -21,9 +21,11 @@ final unreadNotificationCountProvider = AutoDisposeFutureProvider<int>.internal(
   allTransitiveDependencies: null,
 );
 
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
 typedef UnreadNotificationCountRef = AutoDisposeFutureProviderRef<int>;
 String _$groupedNotificationsHash() =>
-    r'0ed9d7259191cfcfa6e7b1a538b7c8cb20cdf78e';
+    r'405702b7943f2fdd909d1afc0711af5b6954f991';
 
 /// See also [groupedNotifications].
 @ProviderFor(groupedNotifications)
@@ -38,6 +40,8 @@ final groupedNotificationsProvider =
   allTransitiveDependencies: null,
 );
 
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
 typedef GroupedNotificationsRef
     = AutoDisposeProviderRef<Map<DateTime, List<AppNotification>>>;
 String _$notificationsRepositoryHash() =>
@@ -59,4 +63,4 @@ final notificationsRepositoryProvider = AutoDisposeAsyncNotifierProvider<
 typedef _$NotificationsRepository
     = AutoDisposeAsyncNotifier<List<AppNotification>>;
 // ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

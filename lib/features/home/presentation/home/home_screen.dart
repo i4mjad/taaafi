@@ -26,6 +26,7 @@ import 'package:reboot_app_3/core/shared_widgets/confirm_email_banner.dart';
 import 'package:reboot_app_3/features/authentication/providers/user_document_provider.dart';
 import 'package:reboot_app_3/features/notifications/data/repositories/notifications_repository.dart';
 import 'package:reboot_app_3/features/home/presentation/home/home_layout_provider.dart';
+import 'package:reboot_app_3/features/home/presentation/home/widgets/shorebird_update_widget.dart';
 
 class HomeScreen extends ConsumerWidget {
   HomeScreen({super.key});
@@ -248,6 +249,9 @@ class HomeScreen extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
+                    // Shorebird update widget
+                    const ShorebirdUpdateWidget(),
+                    verticalSpace(Spacing.points16),
                     if (!(notificationsEnabled.value ?? true))
                       const NotificationPromoterWidget(),
                     // Home layout help message (dismissible)

@@ -191,7 +191,7 @@ class WarningRepository {
 // ==================== PROVIDERS ====================
 
 @riverpod
-WarningRepository warningRepository(WarningRepositoryRef ref) {
+WarningRepository warningRepository(Ref ref) {
   return WarningRepository(
     FirebaseFirestore.instance,
     FirebaseAuth.instance,

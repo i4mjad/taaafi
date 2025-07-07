@@ -1,3 +1,4 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:reboot_app_3/features/vault/application/diaries/diaries_service.dart';
 import 'package:reboot_app_3/features/vault/data/diaries/diaries_notifier.dart';
 import 'package:reboot_app_3/features/vault/data/diaries/diaries_repository.dart';
@@ -47,6 +48,6 @@ class DiaryNotifier extends _$DiaryNotifier {
 
 // Provider for the DiariesService
 @riverpod
-DiariesService diariesService(DiariesServiceRef ref) {
+DiariesService diariesService(Ref ref) {
   return DiariesService(FirebaseDiariesRepository(ref: ref));
 }

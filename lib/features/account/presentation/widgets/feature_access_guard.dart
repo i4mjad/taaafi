@@ -85,7 +85,6 @@ class _FeatureAccessModal extends ConsumerStatefulWidget {
 class _FeatureAccessModalState extends ConsumerState<_FeatureAccessModal> {
   bool _isLoading = true;
   Ban? _ban;
-  bool? _hasAccess;
 
   @override
   void initState() {
@@ -109,7 +108,7 @@ class _FeatureAccessModalState extends ConsumerState<_FeatureAccessModal> {
         if (mounted) {
           setState(() {
             _ban = ban;
-            _hasAccess = false;
+
             _isLoading = false;
           });
         }
@@ -117,7 +116,6 @@ class _FeatureAccessModalState extends ConsumerState<_FeatureAccessModal> {
     } catch (e) {
       if (mounted) {
         setState(() {
-          _hasAccess = false;
           _isLoading = false;
         });
       }

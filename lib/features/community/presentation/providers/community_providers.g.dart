@@ -6,7 +6,7 @@ part of 'community_providers.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$communityNotifierHash() => r'72fff0b6b3120669a2d4e6a3f11c0fe074b02f6f';
+String _$communityNotifierHash() => r'07d6f026185e6ebf43f3c1207cd0c08c31a1e5b8';
 
 /// Provider for the CommunityNotifier
 ///
@@ -23,6 +23,8 @@ final communityNotifierProvider =
   allTransitiveDependencies: null,
 );
 
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
 typedef CommunityNotifierRef = AutoDisposeProviderRef<CommunityNotifier>;
 // ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

@@ -23,7 +23,6 @@ import 'package:reboot_app_3/core/utils/url_launcher_provider.dart';
 import 'package:reboot_app_3/features/account/data/models/user_profile.dart';
 import 'package:reboot_app_3/features/account/data/user_profile_notifier.dart';
 import 'package:reboot_app_3/features/authentication/application/auth_service.dart';
-import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:reboot_app_3/features/authentication/providers/account_status_provider.dart';
 import 'package:reboot_app_3/features/authentication/providers/user_document_provider.dart';
@@ -168,9 +167,6 @@ class AccountScreen extends ConsumerWidget {
                                 icon: LucideIcons.logOut,
                                 textKey: 'log-out',
                                 action: () async {
-                                  await Sentry.configureScope(
-                                    (scope) => scope.setUser(null),
-                                  );
                                   await authService.signOut(context, ref);
                                   getSuccessSnackBar(
                                       context, 'logged-out-successfully');

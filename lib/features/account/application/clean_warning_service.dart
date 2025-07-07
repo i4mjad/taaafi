@@ -1,3 +1,5 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../data/models/warning.dart';
 import '../data/repositories/warning_repository.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -148,7 +150,7 @@ class WarningStatusSummary {
 // ==================== PROVIDERS ====================
 
 @riverpod
-CleanWarningService cleanWarningService(CleanWarningServiceRef ref) {
+CleanWarningService cleanWarningService(Ref ref) {
   final repository = ref.watch(warningRepositoryProvider);
   return CleanWarningService(repository);
 }

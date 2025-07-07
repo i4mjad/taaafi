@@ -31,9 +31,7 @@ class NotificationsScheduler {
   Future<void> init() async {
     final androidSettings =
         const AndroidInitializationSettings('@mipmap/ic_launcher');
-    final iosSettings = DarwinInitializationSettings(
-      onDidReceiveLocalNotification: _onDidReceiveLocalNotification,
-    );
+    final iosSettings = const DarwinInitializationSettings();
 
     final initSettings = InitializationSettings(
       android: androidSettings,
@@ -58,15 +56,6 @@ class NotificationsScheduler {
 
   void _onNotificationTap(NotificationResponse notificationResponse) {
     onClickNotification.add(notificationResponse.payload ?? '');
-  }
-
-  Future<void> _onDidReceiveLocalNotification(
-    int id,
-    String? title,
-    String? body,
-    String? payload,
-  ) async {
-    print('Received iOS notification: $title');
   }
 
   int _generateNotificationId() {
@@ -127,8 +116,6 @@ class NotificationsScheduler {
         ),
       ),
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-      uiLocalNotificationDateInterpretation:
-          UILocalNotificationDateInterpretation.absoluteTime,
       payload: payload,
     );
   }

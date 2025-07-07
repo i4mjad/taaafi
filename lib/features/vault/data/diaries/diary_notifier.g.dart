@@ -6,7 +6,7 @@ part of 'diary_notifier.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$diariesServiceHash() => r'0ba14d35e9220653ddba2058b5ca4b32388b42c5';
+String _$diariesServiceHash() => r'e1c13dbc396a3693be016d777ef9e9d7abb39f62';
 
 /// See also [diariesService].
 @ProviderFor(diariesService)
@@ -20,6 +20,8 @@ final diariesServiceProvider = AutoDisposeProvider<DiariesService>.internal(
   allTransitiveDependencies: null,
 );
 
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
 typedef DiariesServiceRef = AutoDisposeProviderRef<DiariesService>;
 String _$diaryNotifierHash() => r'f6e4104991ee6b0de8dd53badeea36f4a50fe22e';
 
@@ -172,6 +174,8 @@ class DiaryNotifierProvider
   }
 }
 
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
 mixin DiaryNotifierRef on AutoDisposeAsyncNotifierProviderRef<Diary?> {
   /// The parameter `diaryId` of this provider.
   String get diaryId;
@@ -186,4 +190,4 @@ class _DiaryNotifierProviderElement
   String get diaryId => (origin as DiaryNotifierProvider).diaryId;
 }
 // ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

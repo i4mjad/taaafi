@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:reboot_app_3/features/home/application/emotion_service.dart';
 import 'package:reboot_app_3/features/home/data/models/emotion_model.dart';
 import 'package:reboot_app_3/features/home/data/repos/emotion_repository.dart';
@@ -78,7 +79,7 @@ class EmotionNotifier extends _$EmotionNotifier {
 }
 
 @Riverpod(keepAlive: true)
-EmotionService emotionService(EmotionServiceRef ref) {
+EmotionService emotionService(Ref ref) {
   final firestore = FirebaseFirestore.instance;
   final auth = FirebaseAuth.instance;
   final repository = EmotionRepository(firestore, auth);

@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:reboot_app_3/features/home/application/statistics_service.dart';
 import 'package:reboot_app_3/features/home/data/models/user_statistics.dart'
     as models;
@@ -113,14 +114,14 @@ class StatisticsNotifier extends _$StatisticsNotifier {
 }
 
 @Riverpod(keepAlive: true)
-StatisticsService statisticsService(StatisticsServiceRef ref) {
+StatisticsService statisticsService(Ref ref) {
   final firestore = FirebaseFirestore.instance;
   final repository = StatisticsRepository(firestore, ref);
   return StatisticsService(repository);
 }
 
 @riverpod
-Stream<UserStatisticsModel> statisticsStream(StatisticsStreamRef ref) {
+Stream<UserStatisticsModel> statisticsStream(Ref ref) {
   final service = ref.read(statisticsServiceProvider);
   return service.userStatisticsStream();
 }

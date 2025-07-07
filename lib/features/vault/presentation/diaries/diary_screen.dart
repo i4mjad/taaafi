@@ -8,12 +8,13 @@ import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/shared_widgets/app_bar.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
-import 'package:reboot_app_3/core/theming/font_weights.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/features/vault/data/diaries/diary.dart';
 import 'package:reboot_app_3/features/vault/data/diaries/diary_notifier.dart';
 import 'package:reboot_app_3/features/vault/presentation/diaries/diary_settings_sheet.dart';
+
+//TODO: review this logic
 
 class DiaryScreen extends ConsumerStatefulWidget {
   const DiaryScreen({super.key, required this.diaryId});
@@ -189,53 +190,6 @@ class _DiaryScreenState extends ConsumerState<DiaryScreen> {
                                 controller: _controller,
                                 focusNode: _focusNode,
                                 scrollController: ScrollController(),
-                                configurations: QuillEditorConfigurations(
-                                  autoFocus: false,
-                                  // Modify onTapOutside to avoid collapsing the selection.
-                                  onTapOutside: (event, focusNode) {
-                                    // For Apple Notes-like behavior, do not collapse the selection.
-                                    // Option 1: Simply do nothing so that tapping on the style toolbar doesn't collapse the selection.
-                                    // Option 2: Unfocus only if the tap is clearly outside both the editor and the toolbar.
-                                    //
-                                    // For now, we choose Option 1:
-                                  },
-                                  customStyles: DefaultStyles(
-                                    paragraph: DefaultTextBlockStyle(
-                                      TextStyles.body
-                                          .copyWith(color: theme.grey[900]),
-                                      HorizontalSpacing(0, 0),
-                                      VerticalSpacing(0, 0),
-                                      VerticalSpacing(0, 0),
-                                      BoxDecoration(),
-                                    ),
-                                    h4: DefaultTextBlockStyle(
-                                      TextStyles.h4
-                                          .copyWith(color: theme.grey[900]),
-                                      HorizontalSpacing(0, 0),
-                                      VerticalSpacing(0, 0),
-                                      VerticalSpacing(0, 0),
-                                      BoxDecoration(),
-                                    ),
-                                    lists: DefaultListBlockStyle(
-                                      TextStyles.body
-                                          .copyWith(color: theme.grey[900]),
-                                      HorizontalSpacing(0, 0),
-                                      VerticalSpacing(0, 0),
-                                      VerticalSpacing(0, 0),
-                                      BoxDecoration(),
-                                      null,
-                                    ),
-                                    bold: TextStyles.body.copyWith(
-                                      fontWeight: FontWeightHelper.semiBold,
-                                      color: theme.grey[900],
-                                    ),
-                                    italic: TextStyles.body.copyWith(
-                                      fontWeight: FontWeightHelper.semiBold,
-                                      fontStyle: FontStyle.italic,
-                                      color: theme.grey[900],
-                                    ),
-                                  ),
-                                ),
                               ),
                             ),
                             Positioned(

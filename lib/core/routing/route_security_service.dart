@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../features/account/application/ban_warning_facade.dart';
@@ -355,6 +356,6 @@ enum SecurityCheckStatus {
 }
 
 @riverpod
-RouteSecurityService routeSecurityService(RouteSecurityServiceRef ref) {
+RouteSecurityService routeSecurityService(Ref ref) {
   return RouteSecurityService();
 }

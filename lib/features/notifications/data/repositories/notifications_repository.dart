@@ -1,3 +1,4 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:reboot_app_3/features/notifications/data/database/notifications_database.dart';
 import 'package:reboot_app_3/features/notifications/data/models/app_notification.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -42,15 +43,14 @@ class NotificationsRepository extends _$NotificationsRepository {
 }
 
 @riverpod
-Future<int> unreadNotificationCount(UnreadNotificationCountRef ref) async {
+Future<int> unreadNotificationCount(Ref ref) async {
   final repository = await ref.watch(notificationsRepositoryProvider.future);
   return ref.watch(notificationsRepositoryProvider.notifier).getUnreadCount();
 }
 
 // Helper provider for grouped notifications by date
 @riverpod
-Map<DateTime, List<AppNotification>> groupedNotifications(
-    GroupedNotificationsRef ref) {
+Map<DateTime, List<AppNotification>> groupedNotifications(Ref ref) {
   final notifications =
       ref.watch(notificationsRepositoryProvider).valueOrNull ?? [];
 

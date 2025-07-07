@@ -15,7 +15,7 @@ part 'app_startup.g.dart';
 
 /// Provider for the startup security service
 @Riverpod(keepAlive: true)
-StartupSecurityService startupSecurityService(StartupSecurityServiceRef ref) {
+StartupSecurityService startupSecurityService(Ref ref) {
   return StartupSecurityService();
 }
 

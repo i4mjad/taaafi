@@ -15,14 +15,13 @@ part 'app_startup_simple.g.dart';
 
 /// Provider for the startup security service
 @Riverpod(keepAlive: true)
-StartupSecurityService startupSecurityService(StartupSecurityServiceRef ref) {
+StartupSecurityService startupSecurityService(Ref ref) {
   return StartupSecurityService();
 }
 
 // Enhanced app startup with security checks
 @Riverpod(keepAlive: true)
-Future<SecurityStartupResult> appStartupWithSecurity(
-    AppStartupWithSecurityRef ref) async {
+Future<SecurityStartupResult> appStartupWithSecurity(Ref ref) async {
   ref.onDispose(() {
     ref.invalidate(userDocumentsNotifierProvider);
     ref.invalidate(userNotifierProvider);

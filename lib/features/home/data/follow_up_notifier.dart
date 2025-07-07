@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:reboot_app_3/features/home/application/follow_up_service.dart';
 import 'package:reboot_app_3/features/shared/models/follow_up.dart';
 import 'package:reboot_app_3/features/home/data/repos/follow_up_repository.dart';
@@ -99,7 +100,7 @@ class FollowUpNotifier extends _$FollowUpNotifier {
 }
 
 @Riverpod(keepAlive: true)
-FollowUpService followUpService(FollowUpServiceRef ref) {
+FollowUpService followUpService(Ref ref) {
   final firestore = FirebaseFirestore.instance;
   final repository = FollowUpRepository(firestore, ref);
   return FollowUpService(repository);

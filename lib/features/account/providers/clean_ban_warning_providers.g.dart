@@ -6,7 +6,7 @@ part of 'clean_ban_warning_providers.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$banRepositoryHash() => r'764e1e55633465c1bf78a97c89724e2f83786077';
+String _$banRepositoryHash() => r'0e1c36578a4271979b8f475a4ddeda6ae230d166';
 
 /// See also [banRepository].
 @ProviderFor(banRepository)
@@ -20,8 +20,10 @@ final banRepositoryProvider = AutoDisposeProvider<BanRepository>.internal(
   allTransitiveDependencies: null,
 );
 
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
 typedef BanRepositoryRef = AutoDisposeProviderRef<BanRepository>;
-String _$warningRepositoryHash() => r'27f833d839702c5e217d77a7cb848962da2b3fc0';
+String _$warningRepositoryHash() => r'691a2e8a2a6b4ea228c0257c4c1d9ebba94c9d5a';
 
 /// See also [warningRepository].
 @ProviderFor(warningRepository)
@@ -36,8 +38,10 @@ final warningRepositoryProvider =
   allTransitiveDependencies: null,
 );
 
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
 typedef WarningRepositoryRef = AutoDisposeProviderRef<WarningRepository>;
-String _$cleanBanServiceHash() => r'624d080114776f6cf744c26187c3042dc2c296f1';
+String _$cleanBanServiceHash() => r'db489e35faa1f37f3c3e68fcac1d0511b9559b03';
 
 /// See also [cleanBanService].
 @ProviderFor(cleanBanService)
@@ -51,9 +55,11 @@ final cleanBanServiceProvider = AutoDisposeProvider<CleanBanService>.internal(
   allTransitiveDependencies: null,
 );
 
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
 typedef CleanBanServiceRef = AutoDisposeProviderRef<CleanBanService>;
 String _$cleanWarningServiceHash() =>
-    r'063b2206ee35c92fe21c69dd9f8642b82550c17b';
+    r'10304d969cb84a56db760d97bff390fd849c2bc1';
 
 /// See also [cleanWarningService].
 @ProviderFor(cleanWarningService)
@@ -68,8 +74,10 @@ final cleanWarningServiceProvider =
   allTransitiveDependencies: null,
 );
 
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
 typedef CleanWarningServiceRef = AutoDisposeProviderRef<CleanWarningService>;
-String _$currentUserBansHash() => r'6ce15ce0baa4611bd1798944ee5e8e0f2d9a7910';
+String _$currentUserBansHash() => r'd2f7f858e394dc2b9d4001cb2b7f6e2a516d3c25';
 
 /// See also [currentUserBans].
 @ProviderFor(currentUserBans)
@@ -83,9 +91,11 @@ final currentUserBansProvider = AutoDisposeFutureProvider<List<Ban>>.internal(
   allTransitiveDependencies: null,
 );
 
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
 typedef CurrentUserBansRef = AutoDisposeFutureProviderRef<List<Ban>>;
 String _$currentUserWarningsHash() =>
-    r'f3584727d793dd0a1871eec95b2c0eaf079bf645';
+    r'7ff15266692d2aaf20844ff5567c2d93a323ce69';
 
 /// See also [currentUserWarnings].
 @ProviderFor(currentUserWarnings)
@@ -100,9 +110,11 @@ final currentUserWarningsProvider =
   allTransitiveDependencies: null,
 );
 
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
 typedef CurrentUserWarningsRef = AutoDisposeFutureProviderRef<List<Warning>>;
 String _$currentUserHighPriorityWarningsHash() =>
-    r'39ef19aeee749eab7d7bccdf3bddbd4923efd1d5';
+    r'fae4dae388c99fafe882c881ce52bada9ffb11f1';
 
 /// See also [currentUserHighPriorityWarnings].
 @ProviderFor(currentUserHighPriorityWarnings)
@@ -117,9 +129,11 @@ final currentUserHighPriorityWarningsProvider =
   allTransitiveDependencies: null,
 );
 
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
 typedef CurrentUserHighPriorityWarningsRef
     = AutoDisposeFutureProviderRef<List<Warning>>;
-String _$userBansHash() => r'047deb868a76745ec838bd903dd2ee8da0012fce';
+String _$userBansHash() => r'bc4390d159bbe35d4dbcb614c7fd938418a41f79';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -254,6 +268,8 @@ class UserBansProvider extends AutoDisposeFutureProvider<List<Ban>> {
   }
 }
 
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
 mixin UserBansRef on AutoDisposeFutureProviderRef<List<Ban>> {
   /// The parameter `userId` of this provider.
   String get userId;
@@ -267,7 +283,7 @@ class _UserBansProviderElement
   String get userId => (origin as UserBansProvider).userId;
 }
 
-String _$userWarningsHash() => r'4dce705f684429e15142b088ce31bfb551601586';
+String _$userWarningsHash() => r'1b59696c57f6dcdd5ca17a579d7e8f21b66f46dd';
 
 /// See also [userWarnings].
 @ProviderFor(userWarnings)
@@ -382,6 +398,8 @@ class UserWarningsProvider extends AutoDisposeFutureProvider<List<Warning>> {
   }
 }
 
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
 mixin UserWarningsRef on AutoDisposeFutureProviderRef<List<Warning>> {
   /// The parameter `userId` of this provider.
   String get userId;
@@ -397,7 +415,7 @@ class _UserWarningsProviderElement
 }
 
 String _$isCurrentUserBannedFromAppHash() =>
-    r'ba144aa446796a3af273764749be6632b9264b0f';
+    r'9fcb995a3d01ed3705707f2287f02a037e5b22fb';
 
 /// See also [isCurrentUserBannedFromApp].
 @ProviderFor(isCurrentUserBannedFromApp)
@@ -412,9 +430,11 @@ final isCurrentUserBannedFromAppProvider =
   allTransitiveDependencies: null,
 );
 
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
 typedef IsCurrentUserBannedFromAppRef = AutoDisposeFutureProviderRef<bool>;
 String _$currentUserHasCriticalWarningsHash() =>
-    r'3ac77259a8759c02d7e540d4bb7415f0f9fa9c92';
+    r'4955073876bcc13491eb1a600b39be5454a25d36';
 
 /// See also [currentUserHasCriticalWarnings].
 @ProviderFor(currentUserHasCriticalWarnings)
@@ -429,9 +449,11 @@ final currentUserHasCriticalWarningsProvider =
   allTransitiveDependencies: null,
 );
 
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
 typedef CurrentUserHasCriticalWarningsRef = AutoDisposeFutureProviderRef<bool>;
 String _$canCurrentUserAccessFeatureHash() =>
-    r'bdc1ff84590650c9212f6cac60ee6da256a42564';
+    r'2da1fe2e69b91dca9ea716a30ab557a65d7864f6';
 
 /// See also [canCurrentUserAccessFeature].
 @ProviderFor(canCurrentUserAccessFeature)
@@ -548,6 +570,8 @@ class CanCurrentUserAccessFeatureProvider
   }
 }
 
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
 mixin CanCurrentUserAccessFeatureRef on AutoDisposeFutureProviderRef<bool> {
   /// The parameter `featureUniqueName` of this provider.
   String get featureUniqueName;
@@ -564,7 +588,7 @@ class _CanCurrentUserAccessFeatureProviderElement
 }
 
 String _$currentUserFeatureBanHash() =>
-    r'34c9fb642d4142e2eceda002ccd3289d8cf67a67';
+    r'c34f9bf77f704887ffd06064edad673c76952e96';
 
 /// See also [currentUserFeatureBan].
 @ProviderFor(currentUserFeatureBan)
@@ -680,6 +704,8 @@ class CurrentUserFeatureBanProvider extends AutoDisposeFutureProvider<Ban?> {
   }
 }
 
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
 mixin CurrentUserFeatureBanRef on AutoDisposeFutureProviderRef<Ban?> {
   /// The parameter `featureUniqueName` of this provider.
   String get featureUniqueName;
@@ -696,7 +722,7 @@ class _CurrentUserFeatureBanProviderElement
 }
 
 String _$currentUserBanSummaryHash() =>
-    r'4cba9cfece80d3e3912b203971f4cd5306e5e1c7';
+    r'f0f18fdafe168565f489619c52fd3f994bdf30ba';
 
 /// See also [currentUserBanSummary].
 @ProviderFor(currentUserBanSummary)
@@ -711,10 +737,12 @@ final currentUserBanSummaryProvider =
   allTransitiveDependencies: null,
 );
 
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
 typedef CurrentUserBanSummaryRef
     = AutoDisposeFutureProviderRef<BanStatusSummary>;
 String _$currentUserWarningSummaryHash() =>
-    r'09a5dedefefde281bfb9975b427c31e5441767cd';
+    r'd93774e5e006de8d1dd3309e87709f369299e594';
 
 /// See also [currentUserWarningSummary].
 @ProviderFor(currentUserWarningSummary)
@@ -729,10 +757,12 @@ final currentUserWarningSummaryProvider =
   allTransitiveDependencies: null,
 );
 
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
 typedef CurrentUserWarningSummaryRef
     = AutoDisposeFutureProviderRef<WarningStatusSummary>;
 String _$currentUserBansStreamHash() =>
-    r'3f1c2f192f8c36330c8804c1365a377d91792574';
+    r'1bce1e2b69404fc8b46c7c8b6c177b9dd0858d8c';
 
 /// See also [currentUserBansStream].
 @ProviderFor(currentUserBansStream)
@@ -747,9 +777,11 @@ final currentUserBansStreamProvider =
   allTransitiveDependencies: null,
 );
 
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
 typedef CurrentUserBansStreamRef = AutoDisposeStreamProviderRef<List<Ban>>;
 String _$currentUserWarningsStreamHash() =>
-    r'86000f285691177d5d07e8b3195e112b46de92d1';
+    r'24b63b9ffd3cbe166afbe65de9f508031a1b267c';
 
 /// See also [currentUserWarningsStream].
 @ProviderFor(currentUserWarningsStream)
@@ -764,9 +796,11 @@ final currentUserWarningsStreamProvider =
   allTransitiveDependencies: null,
 );
 
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
 typedef CurrentUserWarningsStreamRef
     = AutoDisposeStreamProviderRef<List<Warning>>;
-String _$currentUserIdHash() => r'b575e143ac1ee8cf8f1271405e64bea0eb69034e';
+String _$currentUserIdHash() => r'e72cfb0559323475253e573efd2f5ab2c0dadabb';
 
 /// See also [currentUserId].
 @ProviderFor(currentUserId)
@@ -780,9 +814,11 @@ final currentUserIdProvider = AutoDisposeProvider<String?>.internal(
   allTransitiveDependencies: null,
 );
 
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
 typedef CurrentUserIdRef = AutoDisposeProviderRef<String?>;
 String _$invalidateUserCacheHash() =>
-    r'e00d4a2ff31e2d17e73f297072e49c8c1106def2';
+    r'0eabefd8ec4e202ff0732e2a46cf0bc93ba62d90';
 
 /// Provider that invalidates cache when user changes
 ///
@@ -798,6 +834,8 @@ final invalidateUserCacheProvider = AutoDisposeFutureProvider<void>.internal(
   allTransitiveDependencies: null,
 );
 
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
 typedef InvalidateUserCacheRef = AutoDisposeFutureProviderRef<void>;
 // ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

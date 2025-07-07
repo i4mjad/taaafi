@@ -175,44 +175,42 @@ class UserReportsNotifier extends _$UserReportsNotifier {
 
 /// Provider for report messages
 @riverpod
-Future<List<ReportMessage>> reportMessages(
-    ReportMessagesRef ref, String reportId) async {
+Future<List<ReportMessage>> reportMessages(Ref ref, String reportId) async {
   final service = ref.watch(userReportsServiceProvider);
   return await service.getReportMessages(reportId);
 }
 
 /// Provider for UserReportsService
 @riverpod
-UserReportsService userReportsService(UserReportsServiceRef ref) {
+UserReportsService userReportsService(Ref ref) {
   final repository = ref.watch(userReportsRepositoryProvider);
   return UserReportsService(repository);
 }
 
 /// Provider for UserReportsRepository
 @riverpod
-UserReportsRepository userReportsRepository(UserReportsRepositoryRef ref) {
+UserReportsRepository userReportsRepository(Ref ref) {
   final firestore = FirebaseFirestore.instance;
   return UserReportsRepository(firestore, ref);
 }
 
 /// Provider for watching user reports stream
 @riverpod
-Stream<List<UserReport>> userReportsStream(UserReportsStreamRef ref) {
+Stream<List<UserReport>> userReportsStream(Ref ref) {
   final service = ref.watch(userReportsServiceProvider);
   return service.watchUserReports();
 }
 
 /// Provider for watching report messages stream
 @riverpod
-Stream<List<ReportMessage>> reportMessagesStream(
-    ReportMessagesStreamRef ref, String reportId) {
+Stream<List<ReportMessage>> reportMessagesStream(Ref ref, String reportId) {
   final service = ref.watch(userReportsServiceProvider);
   return service.watchReportMessages(reportId);
 }
 
 /// Provider for checking if report button should be shown
 @riverpod
-Future<bool> shouldShowReportButton(ShouldShowReportButtonRef ref) async {
+Future<bool> shouldShowReportButton(Ref ref) async {
   final service = ref.watch(userReportsServiceProvider);
   return await service.shouldShowReportButton();
 }

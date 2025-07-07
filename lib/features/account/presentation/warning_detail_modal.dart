@@ -51,7 +51,7 @@ class WarningDetailModal extends ConsumerWidget {
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
                     color: _getSeverityColor(warning.severity, theme)
-                        .withOpacity(0.1),
+                        .withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Icon(

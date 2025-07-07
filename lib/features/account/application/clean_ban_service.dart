@@ -1,3 +1,5 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../data/models/ban.dart';
 import '../data/repositories/ban_repository.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -142,7 +144,7 @@ class BanStatusSummary {
 // ==================== PROVIDERS ====================
 
 @riverpod
-CleanBanService cleanBanService(CleanBanServiceRef ref) {
+CleanBanService cleanBanService(Ref ref) {
   final repository = ref.watch(banRepositoryProvider);
   return CleanBanService(repository);
 }
