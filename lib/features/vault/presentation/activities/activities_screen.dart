@@ -268,7 +268,7 @@ class OngoingActivityWidget extends ConsumerWidget {
                     color: theme.grey[900],
                   ),
                 ),
-                verticalSpace(Spacing.points4),
+                verticalSpace(Spacing.points8),
                 Row(
                   children: [
                     Text(
@@ -282,6 +282,7 @@ class OngoingActivityWidget extends ConsumerWidget {
                     ),
                   ],
                 ),
+                verticalSpace(Spacing.points8),
                 Row(
                   children: [
                     Text(

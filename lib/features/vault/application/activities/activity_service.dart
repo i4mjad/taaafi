@@ -204,6 +204,7 @@ class ActivityService {
     }
   }
 
+  //TODO: review why this is not working when the activity has ended. Also, make sure to handle the case when the activity is finished and the user is trying to extend it.
   Future<void> extendActivity(
       String activityId, Duration period, Locale locale) async {
     try {
