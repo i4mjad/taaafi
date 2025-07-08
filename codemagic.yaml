@@ -221,3 +221,76 @@ workflows:
         notify:
           success: true
           failure: true
+
+  combined-patch-workflow:
+    name: Combined iOS and Android Patch Workflow
+    max_build_duration: 120
+    environment:
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.amjadkhalfan.RebootApp
+      android_signing:
+        - android-signing-key
+      flutter: 3.32.5
+      groups:
+        - google_credentials
+        - SHOREBIRD
+      vars:
+        APP_STORE_APPLE_ID: 1531562469
+        PACKAGE_NAME: "com.amjadkhalfan.reboot_app_3"
+        GOOGLE_PLAY_TRACK: alpha
+    scripts:
+      - name: Install Shorebird
+        script: |
+          # Install Shorebird
+          curl --proto '=https' --tlsv1.2 https://raw.githubusercontent.com/shorebirdtech/install/main/install.sh -sSf | bash
+
+          # Add Shorebird to PATH
+          echo PATH="$HOME/.shorebird/bin:$PATH" >> $CM_ENV
+      - name: Set up code signing settings on Xcode project
+        script: xcode-project use-profiles
+      - name: Set up local.properties
+        script: |
+          echo "flutter.sdk=$HOME/programs/flutter" > "$CM_BUILD_DIR/android/local.properties"
+      - name: Get Flutter packages
+        script: |
+          flutter packages pub get
+      - name: Install pods
+        script: |
+          find . -name "Podfile" -execdir pod install \;
+      - name: Determine Android Release Version
+        script: |
+          VERSION=$(cat pubspec.yaml | grep 'version:' | head -1 | awk '{print $2}' | cut -d '+' -f 1)
+          BUILD_NUMBER_ANDROID=$(google-play get-latest-build-number --package-name "$PACKAGE_NAME" --tracks="$GOOGLE_PLAY_TRACK")
+          ANDROID_RELEASE_VERSION="$VERSION+$BUILD_NUMBER_ANDROID"
+          echo "ANDROID_RELEASE_VERSION=$ANDROID_RELEASE_VERSION" >> $CM_ENV
+      - name: Determine iOS Release Version
+        script: |
+          VERSION=$(cat pubspec.yaml | grep 'version:' | head -1 | awk '{print $2}' | cut -d '+' -f 1)
+          BUILD_NUMBER_IOS=$(app-store-connect get-latest-testflight-build-number "$APP_STORE_APPLE_ID")
+          IOS_RELEASE_VERSION="$VERSION+$BUILD_NUMBER_IOS"
+          echo "IOS_RELEASE_VERSION=$IOS_RELEASE_VERSION" >> $CM_ENV
+      - name: Shorebird Patch Android
+        script: |
+          shorebird patch android --flavor prod \
+            --release-version="$ANDROID_RELEASE_VERSION" \
+            --target lib/main_prod.dart
+      - name: Shorebird Patch iOS
+        script: |
+          shorebird patch ios --flavor prod \
+            --release-version="$IOS_RELEASE_VERSION" \
+            --export-options-plist=ios/buildInfo.plist
+    artifacts:
+      - build/**/outputs/**/*.aab
+      - build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
+      - flutter_drive.log
+    integrations:
+      app_store_connect: Taa'afi Codemagic
+    publishing:
+      email:
+        recipients:
+          - i4mjad@gmail.com
+        notify:
+          success: true
+          failure: true
