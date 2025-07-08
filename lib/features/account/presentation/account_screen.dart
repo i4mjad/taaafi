@@ -221,7 +221,7 @@ class AccountScreen extends ConsumerWidget {
                                 textKey: 'contact-us-through-this-channels',
                                 action: () async {
                                   await ref.read(urlLauncherProvider).launch(
-                                      Uri.parse('https://wa.me/96877451200'));
+                                      Uri.parse('https://wa.me/96876691799'));
                                 },
                               ),
                               verticalSpace(Spacing.points8),
