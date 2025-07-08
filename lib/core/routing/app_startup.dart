@@ -32,7 +32,7 @@ Future<SecurityStartupResult> appStartup(Ref ref) async {
     // ref.invalidate(onboardingRepositoryProvider);
   });
 
-  await Future.delayed(Duration(milliseconds: 1000));
+  await Future.delayed(Duration(milliseconds: 500));
 
   //* await for all initialization code to be complete before returning
   await ref.watch(sharedPreferencesProvider.future);

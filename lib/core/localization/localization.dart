@@ -1,8 +1,7 @@
-import 'dart:convert';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/services.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:reboot_app_3/i18n/translations.dart' as tr;
 
 part 'localization.g.dart';
 
@@ -14,29 +13,15 @@ class AppLocalizations {
   static const LocalizationsDelegate<AppLocalizations> delegate =
       _AppLocalizationsDelegate();
 
-  late Map<String, String> _localizedStrings;
-  late Map<String, String> _fallbackLocalizedStrings;
+  /// No asynchronous loading required – translations are compile-time constants.
+  Future<bool> load() async => true;
 
-  Future<bool> load() async {
-    // Load the language JSON file from the "lang" folder
-    String jsonString =
-        await rootBundle.loadString('asset/i18n/${locale.languageCode}.json');
-    Map<String, dynamic> jsonMap = json.decode(jsonString);
-
-    _localizedStrings = jsonMap.map((key, value) {
-      return MapEntry(key, value.toString());
-    });
-
-    // Load the fallback language JSON file (e.g., English)
-    String fallbackJsonString =
-        await rootBundle.loadString('asset/i18n/en.json');
-    Map<String, dynamic> fallbackJsonMap = json.decode(fallbackJsonString);
-
-    _fallbackLocalizedStrings = fallbackJsonMap.map((key, value) {
-      return MapEntry(key, value.toString());
-    });
-
-    return true;
+  /// Retrieve a localized string for [key] based on the current [locale].
+  /// Falls back to English when the key (or language) is missing.
+  String translate(String key) {
+    return tr.translations[locale.languageCode]?[key] ??
+        tr.translations['en']?[key] ??
+        'Unknown key: $key';
   }
 
   // Helper method to keep the code in the widgets concise
@@ -44,13 +29,6 @@ class AppLocalizations {
     return Localizations.of<AppLocalizations>(context, AppLocalizations) ??
         AppLocalizations(
             Locale('en')); // Fallback to a default locale, e.g., English
-  }
-
-  // This method will be called from every widget which needs a localized text
-  String translate(String key) {
-    return _localizedStrings[key] ??
-        _fallbackLocalizedStrings[key] ??
-        "Unknown key: $key";
   }
 }
 
@@ -66,10 +44,8 @@ class _AppLocalizationsDelegate
 
   @override
   Future<AppLocalizations> load(Locale locale) async {
-    // AppLocalizations class is where the JSON loading actually runs
-    AppLocalizations localizations = AppLocalizations(locale);
-    await localizations.load();
-    return localizations;
+    // No I/O is performed – just instantiate the localizations object.
+    return AppLocalizations(locale);
   }
 
   @override

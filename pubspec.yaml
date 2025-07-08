@@ -242,8 +242,6 @@ flutter:
     - asset/illustrations/plus-hero-image.svg
     - asset/icons/apple-icon.svg
     - asset/icons/google-icon.svg
-    - asset/i18n/en.json
-    - asset/i18n/ar.json
     - shorebird.yaml
 
   # An image asset can refer to one or more resolution-specific "variants", see

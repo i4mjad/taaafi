@@ -1,4 +1,7 @@
-{
+// English translations – extracted from legacy translations.dart
+// This file is maintained manually. Keep keys in sync with other language maps.
+
+const Map<String, String> kEn = {
   "daily": "Daily",
   "weekly": "Weekly",
   "monthly": "Monthly",
@@ -7,25 +10,32 @@
   "motivation": "Motivation",
   "dob-too-young": "You can't select a date of birth before 2010",
   "i-accept-terms-of-use": "I accept the terms of use",
-  "notification-promotion": "Get daily activities reminders, motivational quotes to inspire you on your recovery journey",
+  "notification-promotion":
+      "Get daily activities reminders, motivational quotes to inspire you on your recovery journey",
   "enable": "Enable",
   "primary-color": "Primary Color",
-  "delete-diary-warning": "This action cannot be undone. The diary will be permanently deleted.",
+  "delete-diary-warning":
+      "This action cannot be undone. The diary will be permanently deleted.",
   "vault-settings": "Vault Settings",
   "warning": "Warning",
-  "delete-activity-warning": "This action cannot be undone. All progress for this activity will be permanently deleted.",
+  "delete-activity-warning":
+      "This action cannot be undone. All progress for this activity will be permanently deleted.",
   "start-date": "Start Date",
   "end-date": "End Date",
   "dates-must-be-different": "New dates must be different from current dates",
-  "cannot-complete-future-tasks": "Cannot complete tasks scheduled for future dates",
-  "already-subscribed-to-activity": "You are already subscribed to this activity",
+  "cannot-complete-future-tasks":
+      "Cannot complete tasks scheduled for future dates",
+  "already-subscribed-to-activity":
+      "You are already subscribed to this activity",
   "update-available": "Update Available",
-  "update-available-message": "A new update is available for the app. Download it now to get the latest features and improvements.",
+  "update-available-message":
+      "A new update is available for the app. Download it now to get the latest features and improvements.",
   "update-button": "Update",
   "updating": "Updating...",
   "update-download-progress": "Downloading update: {percentage}%",
   "update-complete": "Update Complete",
-  "update-complete-message": "The update has been downloaded successfully. Please restart the app to apply the changes.",
+  "update-complete-message":
+      "The update has been downloaded successfully. Please restart the app to apply the changes.",
   "restart-app": "Restart App",
   "welcome": "Welcome!",
   "home": "Home",
@@ -37,7 +47,8 @@
   "total-days": "Total days from first date: ",
   "relapses-number": "Relapses Count: ",
   "start-your-journy": "Start Your Journy",
-  "start-your-journy-p": "To start, please select the day you want to start from. If you want to start today click on Today button",
+  "start-your-journy-p":
+      "To start, please select the day you want to start from. If you want to start today click on Today button",
   "diaries-settings": "Diaries Settings",
   "erase-all-activities": "Erase All Activities",
   "erase-all-bookmarks": "Erase All Bookmarks",
@@ -77,7 +88,8 @@
   "hard": "Hard",
   "activity-tasks": "Activity Tasks",
   "activity-period": "Activity period",
-  "activity-period-is-not-valid": "The period between start and end date cannot exceed 90 days.",
+  "activity-period-is-not-valid":
+      "The period between start and end date cannot exceed 90 days.",
   "add-the-activity": "Add the activity",
   "starter": "Starter",
   "intermediate": "Intermediate",
@@ -99,7 +111,8 @@
   "italic": "Italic",
   "quote": "''Quote''",
   "list": "- List",
-  "vault-p": "Your personal space, where you can write your diaries, challenge your self to become better person",
+  "vault-p":
+      "Your personal space, where you can write your diaries, challenge your self to become better person",
   "statistics": "Statistics",
   "statistics-description": "Show your recovery statistics and progress",
   "articles": "Articles",
@@ -110,8 +123,10 @@
   "blogs": "Blogs",
   "today": "Today",
   "specific-day": "Choose Starting Day",
-  "no-content": "Why there is no content? The application is under maintenance, home screen will be improved and enhanced in the coming updates",
-  "not-login": "To see a summary for your journy, you should Log in from Journy tab",
+  "no-content":
+      "Why there is no content? The application is under maintenance, home screen will be improved and enhanced in the coming updates",
+  "not-login":
+      "To see a summary for your journy, you should Log in from Journy tab",
   "Articles": "Articles",
   "Videos": "Videos",
   "Books": "Books",
@@ -138,21 +153,27 @@
   "taaafi-groups": "Ta'aafi Groups",
   "group": "Group",
   "not-alone": "You Are Not Alone",
-  "not-alone-description": "Learn about different experiences and share your own with a group of recovering individuals to exchange knowledge and discover challenges in the recovery journey.",
+  "not-alone-description":
+      "Learn about different experiences and share your own with a group of recovering individuals to exchange knowledge and discover challenges in the recovery journey.",
   "privacy-first": "Privacy First!",
-  "privacy-first-description": "You can share your recovery journey and challenges with complete privacy without revealing your identity.",
+  "privacy-first-description":
+      "You can share your recovery journey and challenges with complete privacy without revealing your identity.",
   "challenge-peers": "Challenge Your Peers",
-  "challenge-peers-description": "Challenge your peers in the recovery journey to achieve advanced stages in the process.",
+  "challenge-peers-description":
+      "Challenge your peers in the recovery journey to achieve advanced stages in the process.",
   "follow-up-peers": "Follow Up on Your Peers",
-  "follow-up-peers-description": "Keep up with updates from your peers in the fellowship, help them, and benefit from their recovery experiences.",
+  "follow-up-peers-description":
+      "Keep up with updates from your peers in the fellowship, help them, and benefit from their recovery experiences.",
   "starting-date": "Starting date and time",
   "activity-starting-date": "Activity starting date and time",
   "activity-ending-date": "Activity ending date and time",
   "please-enter-a-starting-date": "Please enter the starting date",
   "please-enter-an-ending-date": "Please enter the ending date",
   "please-add-all-required-data": "Please fill the required fields",
-  "starting-date-p": "This represent the starting date and time of your journy. You can change it later in the Account settings",
-  "without-starting-date-p": "This represent the starting date and time of your journy. You have to set it to continue using the app",
+  "starting-date-p":
+      "This represent the starting date and time of your journy. You can change it later in the Account settings",
+  "without-starting-date-p":
+      "This represent the starting date and time of your journy. You have to set it to continue using the app",
   "confirm-your-details-p": "Confirm the following information are correct:",
   "user-name": "User Name",
   "user-email": "User Email",
@@ -163,7 +184,8 @@
   "follow-your-reboot": "Follow Your Reboot",
   "follow-your-reboot-p": "Track your Nofap Journey",
   "ta3afi-community": "NoFap Community",
-  "ta3afi-community-p": "Share your journey on NoFap, and explore other NoFappers stories",
+  "ta3afi-community-p":
+      "Share your journey on NoFap, and explore other NoFappers stories",
   "soon": "Soon",
   "account": "Account",
   "about": "About",
@@ -174,27 +196,36 @@
   "update-profile": "Update Profile",
   "profile-updated": "Your profile has been updated!",
   "years": "Years",
-  
   "user": "User",
-  
   "enter-a-valid-dob": "Enter a valid Day of Birth",
-  "wrong-password": "The password you entered is incorrect for this email, or the account does not have a password set.",
+  "wrong-password":
+      "The password you entered is incorrect for this email, or the account does not have a password set.",
   "invalid-email": "The email address you entered is not valid.",
-  "user-disabled": "Your account has been disabled. Please contact support for assistance.",
+  "user-disabled":
+      "Your account has been disabled. Please contact support for assistance.",
   "user-not-found": "No account found with this email address.",
   "email-already-in-use": "An account with this email address already exists.",
-  "operation-not-allowed": "Email and password accounts are not enabled. Please contact support for assistance.",
-  "weak-password": "The password you entered is too weak. Please choose a stronger password.",
-  "account-exists-with-different-credential": "An account with this email address already exists but with different credentials. Please sign in using one of the linked providers.",
-  "invalid-credential": "The credentials you provided are not valid or have expired.",
-  "invalid-verification-code": "The verification code you entered is not valid.",
+  "operation-not-allowed":
+      "Email and password accounts are not enabled. Please contact support for assistance.",
+  "weak-password":
+      "The password you entered is too weak. Please choose a stronger password.",
+  "account-exists-with-different-credential":
+      "An account with this email address already exists but with different credentials. Please sign in using one of the linked providers.",
+  "invalid-credential":
+      "The credentials you provided are not valid or have expired.",
+  "invalid-verification-code":
+      "The verification code you entered is not valid.",
   "invalid-verification-id": "The verification ID you entered is not valid.",
   "user-mismatch": "The credentials you provided do not match the user.",
-  "expired-action-code": "The OTP in the email link has expired. Please request a new one.",
+  "expired-action-code":
+      "The OTP in the email link has expired. Please request a new one.",
   "password-must-contain-a-number": "Password must contain a number",
-  "password-must-contain-at-least-8-characters": "Password must contain at least 8 characters",
-  "password-must-contain-at-least-1-special-character": "Password must contain at least 1 special character. For example: @",
-  "password-is-not-valid": "Passowrd is not valid. Passowrd should be in English only",
+  "password-must-contain-at-least-8-characters":
+      "Password must contain at least 8 characters",
+  "password-must-contain-at-least-1-special-character":
+      "Password must contain at least 1 special character. For example: @",
+  "password-is-not-valid":
+      "Passowrd is not valid. Passowrd should be in English only",
   "passwords-doesnt-match": "Passwords do not match",
   "english": "English",
   "arabic": "العربية",
@@ -219,10 +250,9 @@
   "ban-type-feature": "Feature Ban",
   "ban-severity-temporary": "Temporary",
   "ban-severity-permanent": "Permanent",
-  
-  "feature-restricted-message": "This feature is temporarily restricted for your account.",
+  "feature-restricted-message":
+      "This feature is temporarily restricted for your account.",
   "contact-support-restricted": "You are restricted from contacting support.",
-  
   "account-restricted": "Account Restricted",
   "logout": "Logout",
   "logout-error": "Failed to logout. Please try again.",
@@ -246,8 +276,10 @@
   "restricted-features": "Restricted Features",
   "important-notice": "Important Notice",
   "appeal-information": "Appeal Information",
-  "warning-notice-description": "Warnings are issued to help maintain a positive community environment. Multiple warnings may result in temporary restrictions.",
-  "ban-appeal-description": "If you believe this restriction was applied in error, please contact our support team with the reference ID above for assistance.",
+  "warning-notice-description":
+      "Warnings are issued to help maintain a positive community environment. Multiple warnings may result in temporary restrictions.",
+  "ban-appeal-description":
+      "If you believe this restriction was applied in error, please contact our support team with the reference ID above for assistance.",
   "active": "Active",
   "contact_admin": "Contact Admin",
   "tap-for-details": "Tap for details",
@@ -269,13 +301,15 @@
   "reboot-calender": "Calender",
   "relapses-by-day-of-week": "Relapses By Day-of-Week",
   "streaks": "Streaks",
-  "today-is-last-relapse": "This day recorded as a Relapse, you can't followup today",
+  "today-is-last-relapse":
+      "This day recorded as a Relapse, you can't followup today",
   "how-is-this-day": "How was this day?",
   "what-you-want-to-add": "What do you want to add?",
   "required-update": "New Version Available!",
   "update-now": "Update now",
   "role": "Account Type",
-  "required-update-p": "You can't use this version, update to the latest version.",
+  "required-update-p":
+      "You can't use this version, update to the latest version.",
   "account-deleted": "Account deleted successfully",
   "delete-account-activities": "Delete Activities",
   "delete-account-activities-desc": "All activities will be deleted",
@@ -284,7 +318,8 @@
   "data-updated-successfully": "Data updated successfully",
   "followups": "Followups",
   "daily-follow-ups": "Daily follow ups",
-  "daily-follow-ups-delete-desc": "All previous daily follow-ups will be deleted",
+  "daily-follow-ups-delete-desc":
+      "All previous daily follow-ups will be deleted",
   "emotions-delete-desc": "All recorded emotions will be deleted",
   "account-settings": "User Information",
   "app-settings": "Settings",
@@ -298,32 +333,41 @@
   "ta3afi-plus": "Ta'aafi +",
   "home-settings": "Home Settings",
   "home-elements-visibility": "Home Elements Visibility",
-  "home-elements-visibility-description": "Choose which elements to show on your home screen",
+  "home-elements-visibility-description":
+      "Choose which elements to show on your home screen",
   "streak-display-settings": "Streak Display Settings",
-  "streak-display-settings-description": "Customize how your streak information is displayed",
+  "streak-display-settings-description":
+      "Customize how your streak information is displayed",
   "data-management": "Data Management",
-  "data-management-description": "Manage your app data and clean up duplicate entries",
+  "data-management-description":
+      "Manage your app data and clean up duplicate entries",
   "delete-duplicates": "Delete Duplicates",
-  "delete-duplicates-description": "Remove duplicate follow-up entries to keep your data clean",
+  "delete-duplicates-description":
+      "Remove duplicate follow-up entries to keep your data clean",
   "close": "Close",
-  "you-can-hide-any-of-those": "Choose what suits you best from relapse, porn, masturbation, and slip-up statistics to focus on the goals you want to track. Click here to show or hide the statistic",
+  "you-can-hide-any-of-those":
+      "Choose what suits you best from relapse, porn, masturbation, and slip-up statistics to focus on the goals you want to track. Click here to show or hide the statistic",
   "emotions": "Emotions",
-  "exercises-description-home-description": "Various Activities specially designed to help you in your recovery journey, step by step towards your goal",
+  "exercises-description-home-description":
+      "Various Activities specially designed to help you in your recovery journey, step by step towards your goal",
   "activities-home-headings": "Activities, step by step towards recovery",
-  "no-follow-ups-for-today": "Great job! Another day of success and progress in your recovery journey. Keep going, you're making change!",
+  "no-follow-ups-for-today":
+      "Great job! Another day of success and progress in your recovery journey. Keep going, you're making change!",
   "no-follow-ups-yet": "No follow up yet of this type",
   "last-follow-up": "Last follow up: ",
   "vault": "Vault",
   "fellowship": "Group",
   "about-app": "About App",
-  "about-ta3afi": "An app to raise awareness about the dangers of pornography and addiction to it by providing content and tools to help solve the problem.",
+  "about-ta3afi":
+      "An app to raise awareness about the dangers of pornography and addiction to it by providing content and tools to help solve the problem.",
   "version-number": "Version 5.2.2",
   "what-is-all-of-those": "What's the difference between these numbers?",
   "processing": "Processing...",
   "dismiss": "Dismiss",
   "contact-us-through-this-channels": "Contact us",
   "support-app-development": "Support App Development",
-  "support-app-development-p": "App development takes a lot of time and effort, yet it remains free and ad-free. If you want to support the development, choose from the following options",
+  "support-app-development-p":
+      "App development takes a lot of time and effort, yet it remains free and ad-free. If you want to support the development, choose from the following options",
   "contact-us": "Contact us",
   "new-note": "New Note",
   "ta3afi": "Ta'aafi App",
@@ -391,7 +435,8 @@
   "delete-user-dialog-confirm-button": "Confirm",
   "delete-user-dialog-back-button": "Back",
   "delete-user-dialog-title": "Account Data Reset",
-  "delete-user-dialog-content": "Your data will NOT be able to restored, are you sure?",
+  "delete-user-dialog-content":
+      "Your data will NOT be able to restored, are you sure?",
   "out-of-range": "Error",
   "out-of-range-p": "You can't edit this date",
   "start-from-today": "Start from today",
@@ -403,7 +448,8 @@
   "new-user-dialog-new-start-button": "New Beginning",
   "new-user-dialog-hint-test-field": "Enter Current Streak",
   "new-user-dialog-title": "Ongoing streak?",
-  "new-user-dialog-content": "If you've started before please enter your Current streak and click Start, if not, click New Beginning",
+  "new-user-dialog-content":
+      "If you've started before please enter your Current streak and click Start, if not, click New Beginning",
   "nofap-content": "NoFap Content",
   "library": "Library",
   "settings": "Settings",
@@ -437,12 +483,15 @@
   "7-days": "/ 7 Days",
   "28-days": "/ 28 Days",
   "90-days": "/ 90 Days",
-  "delete-my-data-p": "Do you want to start from the beginning? or start from a specific date insted?",
-  "delete-my-data-warning": "WARNING: You can't undo this action after it's done.",
+  "delete-my-data-p":
+      "Do you want to start from the beginning? or start from a specific date insted?",
+  "delete-my-data-warning":
+      "WARNING: You can't undo this action after it's done.",
   "new-begining": "New Beginning",
   "start-from-specific-date": "Specific Date",
   "delete-my-account": "Delete My Account",
-  "delete-my-account-p": "We're sorry to see you go. For security purposes, we need to re-authenticate you to be able to delete your account. Please select the provider you used to sign up",
+  "delete-my-account-p":
+      "We're sorry to see you go. For security purposes, we need to re-authenticate you to be able to delete your account. Please select the provider you used to sign up",
   "signin-provider": "Signed In with:",
   "last-signin": "Last Sign in",
   "confirm-account-delete": "Confirm Account Delete",
@@ -450,7 +499,8 @@
   "delete-account-button": "Confirm Delete",
   "minutes": "Minutes",
   "no-donations-offer": "ُThere's somthing wrong, please try again",
-  "relapses-average-p": "ُThese averages depends on the total days since your first date until today",
+  "relapses-average-p":
+      "ُThese averages depends on the total days since your first date until today",
   "only-ar": "Only arabic content is available now",
   "share-suggestion": "Share Your Suggestions",
   "hi": "Hi, ",
@@ -463,7 +513,8 @@
   "pornonly-recorded": "Porn watching recorded, keep fighting",
   "mastonly-recorded": "Masturbation recorded, keep fighting",
   "followup-notifications": "User Experince Enhancments",
-  "followup-notifications-p": "To make Ta'aafi more user friendly, please provide the following details",
+  "followup-notifications-p":
+      "To make Ta'aafi more user friendly, please provide the following details",
   "male": "Male",
   "female": "Female",
   "date-of-birth": "Date of Birth",
@@ -477,21 +528,29 @@
   "add-note": "Add Diaries",
   "no-emotions": "No Emotions added for this day",
   "add-emotions": "Add Emotions",
-  "delete-account-info": "When you delete your account, the following will happen:",
+  "delete-account-info":
+      "When you delete your account, the following will happen:",
   "delete-account-data": "Delete Account Data",
-  "delete-account-data-desc": "All your account data will be permanently deleted.",
+  "delete-account-data-desc":
+      "All your account data will be permanently deleted.",
   "delete-account-followups": "Delete Follow-ups",
-  "delete-account-followups-desc": "All your follow-ups will be deleted and the counter start date will be updated to the deletion time.",
+  "delete-account-followups-desc":
+      "All your follow-ups will be deleted and the counter start date will be updated to the deletion time.",
   "delete-account-emotions": "Delete Emotions",
   "delete-account-emotions-desc": "All recorded emotions will be deleted.",
   "delete-account-warning": "WARNING: This action cannot be undone.",
-  "relogin-required": "For security purposes, we need to re-authenticate you to delete your account. Please log in again using your email and password or one of the social login options below.",
+  "relogin-required":
+      "For security purposes, we need to re-authenticate you to delete your account. Please log in again using your email and password or one of the social login options below.",
   "delete-account": "Delete Account",
   "processing-new-account": "Creating account...",
-  "what-is-relapse": "Relapse: A deliberate abandonment of the recovery plan and a full return to unwanted behaviors.",
-  "what-is-slip-up": "Slip-up: A temporary lapse that does not mean abandoning the recovery plan entirely.",
-  "what-is-no-porn": "No porn means your streak of days you spent without watching porn.",
-  "what-is-no-mast": "No masturbation means your streak of days you spent without masturbating.",
+  "what-is-relapse":
+      "Relapse: A deliberate abandonment of the recovery plan and a full return to unwanted behaviors.",
+  "what-is-slip-up":
+      "Slip-up: A temporary lapse that does not mean abandoning the recovery plan entirely.",
+  "what-is-no-porn":
+      "No porn means your streak of days you spent without watching porn.",
+  "what-is-no-mast":
+      "No masturbation means your streak of days you spent without masturbating.",
   "future-date-message": "You clicked on a future date!",
   "past-date-message": "You clicked on a date before your start date!",
   "add-all-follow-ups": "Reset all streaks",
@@ -504,14 +563,18 @@
   "no-ongoing-activities": "No ongoing activities",
   "activities-notifications-settings": "Activity Reminders",
   "allow-notifications": "Allow Notifications",
-  "allow-notifications-desc": "To get daily activity reminders, you need to allow the app to send notifications",
+  "allow-notifications-desc":
+      "To get daily activity reminders, you need to allow the app to send notifications",
   "please-select-starting-date-first": "Please select the starting date first",
   "notifications-allowed": "Notifications are allowed",
-  "notifications-disabled": "Notifications disabled. You can enable them in the settings of the device",
+  "notifications-disabled":
+      "Notifications disabled. You can enable them in the settings of the device",
   "cancel-notifications": "Cancel Notifications",
   "activate-notifications": "Activate Notifications",
-  "activate-notifications-confirmation": "Are you sure you want to activate notifications for this activity?",
-  "cancel-notifications-confirmation": "Are you sure you want to cancel notifications for this activity?",
+  "activate-notifications-confirmation":
+      "Are you sure you want to activate notifications for this activity?",
+  "cancel-notifications-confirmation":
+      "Are you sure you want to cancel notifications for this activity?",
   "confirm": "Confirm",
   "cancel": "Cancel",
   "not-started": "Not started yet",
@@ -520,28 +583,37 @@
   "extend-activity": "Extend Activity",
   "activity-notifications": "Activity Notifications",
   "select-extension-period": "Select extension period",
-  "error-extend-activity": "Cannot extend activity during the first half of its duration",
+  "error-extend-activity":
+      "Cannot extend activity during the first half of its duration",
   "activity-extended": "Activity extended successfully",
   "delete-diaries-confirmation-title": "Delete All Diaries",
-  "delete-diaries-confirmation-message": "Are you sure you want to delete all diaries? This action cannot be undone.",
+  "delete-diaries-confirmation-message":
+      "Are you sure you want to delete all diaries? This action cannot be undone.",
   "diaries-deleted": "All diaries deleted successfully",
   "delete-activities-confirmation-title": "Delete All Activities",
-  "delete-activities-confirmation-message": "Are you sure you want to delete all activities? This action cannot be undone.",
+  "delete-activities-confirmation-message":
+      "Are you sure you want to delete all activities? This action cannot be undone.",
   "activities-deleted": "All activities deleted successfully",
-  "reset-data-desc": "You can reset the start date or delete follow-ups separately. This action cannot be undone. You can delete follow-ups and emotions without resetting the date. If you want a fresh start, select all options and enter the new start date.",
+  "reset-data-desc":
+      "You can reset the start date or delete follow-ups separately. This action cannot be undone. You can delete follow-ups and emotions without resetting the date. If you want a fresh start, select all options and enter the new start date.",
   "reset-to-today": "Reset start date to today",
   "vault-title": "The Vault, Your Private Space",
-  "vault-description": "Recovery journey needs a safe space, that's why we added the vault—your private space to document your progress. Here, you'll find new diaries, exercises, and a rich library of inspiring content. The vault is your first step towards real and sustainable change.",
+  "vault-description":
+      "Recovery journey needs a safe space, that's why we added the vault—your private space to document your progress. Here, you'll find new diaries, exercises, and a rich library of inspiring content. The vault is your first step towards real and sustainable change.",
   "exercises-title": "Activities, Step by Step Towards Recovery",
-  "exercises-description": "To face challenges, we offer you exercises, a set of tasks designed with multiple levels to suit your needs, whether daily, weekly, or monthly. Each exercise is another step that steadily brings you closer to your goal.",
+  "exercises-description":
+      "To face challenges, we offer you exercises, a set of tasks designed with multiple levels to suit your needs, whether daily, weekly, or monthly. Each exercise is another step that steadily brings you closer to your goal.",
   "lists-title": "Lists, A Recovery Guide in Your Hands",
-  "lists-description": "Your journey towards recovery has become clearer with the lists—a carefully curated collection from the Ta'afi team, covering important topics that help increase your awareness and understanding of addiction challenges, giving you deeper insight and better support.",
+  "lists-description":
+      "Your journey towards recovery has become clearer with the lists—a carefully curated collection from the Ta'afi team, covering important topics that help increase your awareness and understanding of addiction challenges, giving you deeper insight and better support.",
   "reminders-title": "Reminders, Don't Miss Any Step",
-  "reminders-description": "Now you can add reminders to easily follow up on exercise tasks. Set your schedules and let the app remind you of your next steps, making your recovery more regular and continuous.",
+  "reminders-description":
+      "Now you can add reminders to easily follow up on exercise tasks. Set your schedules and let the app remind you of your next steps, making your recovery more regular and continuous.",
   "name-should-not-be-empty": "Name field cannot be empty",
   "email-should-not-be-empty": "Email field cannot be empty",
   "something-went-wrong": "Something went wrong. Please try again.",
-  "email-already-in-use-different-provider": "This email is already associated with a different sign-in method. Please use the original sign-in method or a different email.",
+  "email-already-in-use-different-provider":
+      "This email is already associated with a different sign-in method. Please use the original sign-in method or a different email.",
   "show-relapse-stats": "Show Relapse Stats",
   "show-porn-stats": "Show Porn Stats",
   "show-mast-stats": "Show Masturbation Stats",
@@ -553,16 +625,22 @@
   "porn": "Porn",
   "mast": "Masturbation",
   "slips": "Slip-ups",
-  "statistics-visibility-description": "Choose the statistics you want to be visible on the home page",
+  "statistics-visibility-description":
+      "Choose the statistics you want to be visible on the home page",
   "contact-support": "Having trouble? Click here to contact support",
-  "free-day-warning-message": "If you select this option and save, all follow-ups for the selected day will be removed",
+  "free-day-warning-message":
+      "If you select this option and save, all follow-ups for the selected day will be removed",
   "vault-features": "Vault Features",
-  "activities-description": "Activities are a set of tasks designed to help you in your recovery journey. You can choose the appropriate activity level and track your progress regularly.",
-  "library-description": "The library is a rich source of content useful for your recovery journey. You'll find articles, videos, books, and other resources that help you better understand recovery challenges.",
-  "diaries-description": "Diaries are your private space to document your recovery journey. You can write your thoughts, feelings, and daily experiences in a safe and private place.",
+  "activities-description":
+      "Activities are a set of tasks designed to help you in your recovery journey. You can choose the appropriate activity level and track your progress regularly.",
+  "library-description":
+      "The library is a rich source of content useful for your recovery journey. You'll find articles, videos, books, and other resources that help you better understand recovery challenges.",
+  "diaries-description":
+      "Diaries are your private space to document your recovery journey. You can write your thoughts, feelings, and daily experiences in a safe and private place.",
   "current-dates": "Current Dates",
   "new-dates": "New Dates",
-  "activity-start-date-cannot-be-before-today": "Activity start date cannot be before today",
+  "activity-start-date-cannot-be-before-today":
+      "Activity start date cannot be before today",
   "user-id": "User ID",
   "user-id-copied": "User ID copied to clipboard",
   "whatsapp-error": "Could not launch WhatsApp",
@@ -571,13 +649,15 @@
   "active-warnings": "Active Warnings",
   "active-bans": "Active Bans",
   "update-activity-dates": "Update Activity Dates",
-  "update-activity-warning": "Warning: This will reset all scheduled tasks. Your previous progress will be marked as deleted.",
+  "update-activity-warning":
+      "Warning: This will reset all scheduled tasks. Your previous progress will be marked as deleted.",
   "scheduled-for": "Scheduled for",
   "mark-as-complete": "Mark as Complete",
   "task-completed": "Task Completed",
   "mark-as-incomplete": "Mark as Incomplete",
   "community-coming-soon": "Ta'aafi Community Coming Soon!",
-  "community-coming-soon-description": "We're working hard to bring you an amazing community feature. Stay tuned for updates!",
+  "community-coming-soon-description":
+      "We're working hard to bring you an amazing community feature. Stay tuned for updates!",
   "community-features": "What to expect:",
   "community-feature-1": "Connect with others on the same recovery journey",
   "community-feature-2": "Share your progress and achievements",
@@ -585,7 +665,8 @@
   "community-feature-4": "Get motivated by others' success stories",
   "community-feature-5": "Private and anonymous interactions",
   "community_coming_soon_title": "Community Coming Soon!",
-  "community_coming_soon_description": "We're building a supportive community where you can connect with others on their recovery journey. Stay tuned for updates!",
+  "community_coming_soon_description":
+      "We're building a supportive community where you can connect with others on their recovery journey. Stay tuned for updates!",
   "community_feature_1": "Connect with others in recovery",
   "community_feature_2": "Share your experiences and insights",
   "community_feature_3": "Get support from peers and professionals",
@@ -595,9 +676,11 @@
   "current-streaks": "Current Streaks",
   "current-streaks-description": "Show your current recovery streaks",
   "contact-through-whatsapp": "Contact us through WhatsApp",
-  "interest_recorded_success": "Thank you for your interest! We'll keep you updated.",
+  "interest_recorded_success":
+      "Thank you for your interest! We'll keep you updated.",
   "interest_already_recorded": "You've already shown interest in this feature!",
-  "error_recording_interest": "Sorry, there was an error. Please try again later.",
+  "error_recording_interest":
+      "Sorry, there was an error. Please try again later.",
   "already_interested": "You've already shown interest in this feature!",
   "streak-settings": "Streak Settings",
   "streak-display-mode": "Streak Display Mode",
@@ -610,58 +693,76 @@
   "months": "Months",
   "days": "Days",
   "hours": "Hours",
-  
   "customize": "Customize",
-  "complete-registration-banner": "Please complete your account registration to access all features",
-  "confirm-details-banner": "Please confirm your account details to continue using the app",
+  "complete-registration-banner":
+      "Please complete your account registration to access all features",
+  "confirm-details-banner":
+      "Please confirm your account details to continue using the app",
   "take-action": "Take Action",
   "complete-registration": "Complete Registration",
   "confirm-details": "Confirm Details",
   "confirm-user-details": "Confirm",
-  "confirm-email-banner": "Please verify your email address to access all features",
+  "confirm-email-banner":
+      "Please verify your email address to access all features",
   "confirm-email": "Verify Email",
   "verify-your-email": "Verify Your Email",
   "verification-email-sent-to": "A verification email has been sent to",
-  "check-inbox-and-click-link": "Please check your inbox and click the verification link to continue",
+  "check-inbox-and-click-link":
+      "Please check your inbox and click the verification link to continue",
   "checking": "Checking...",
   "check-verification-status": "Check Verification Status",
   "sending": "Sending...",
   "resend-in": "Resend in",
   "resend-verification-email": "Resend Verification Email",
-  "email-verification-info": "We've automatically sent a verification email to your address. Once you click the verification link, you'll be able to access all features of the app.",
-  "email-verified-successfully": "Email verified successfully! Welcome to Ta'afi.",
+  "email-verification-info":
+      "We've automatically sent a verification email to your address. Once you click the verification link, you'll be able to access all features of the app.",
+  "email-verified-successfully":
+      "Email verified successfully! Welcome to Ta'afi.",
   "verification-email-sent": "Verification email sent successfully",
-  "failed-to-send-verification-email": "Failed to send verification email. Please try again.",
+  "failed-to-send-verification-email":
+      "Failed to send verification email. Please try again.",
   "send-verification-email-first": "First, send the verification email to",
-  "check-main-and-junk-mail-then-refresh": "Check your main and junk mail folders, then come back here to refresh",
-  "email-change-signout-warning": "Important: If you successfully update your email and confirm it by clicking the verification link, then come back here to check verification status, you will be signed out immediately as a security measure. This automatic sign-out indicates that your email change was successful. You will need to log in again with your new email address.",
-  "email-not-verified-yet": "Email not verified yet. Try resending the verification email and check your inbox and junk folder.",
+  "check-main-and-junk-mail-then-refresh":
+      "Check your main and junk mail folders, then come back here to refresh",
+  "email-change-signout-warning":
+      "Important: If you successfully update your email and confirm it by clicking the verification link, then come back here to check verification status, you will be signed out immediately as a security measure. This automatic sign-out indicates that your email change was successful. You will need to log in again with your new email address.",
+  "email-not-verified-yet":
+      "Email not verified yet. Try resending the verification email and check your inbox and junk folder.",
   "seconds": "s",
   "change-email": "Change Email",
-  "change-email-description": "If you entered an incorrect email address during registration, you can change it here. A new verification email will be sent to the new address.",
+  "change-email-description":
+      "If you entered an incorrect email address during registration, you can change it here. A new verification email will be sent to the new address.",
   "new-email": "New email address",
   "update-email": "Update Email",
-  "email-already-exists": "This email is already registered with another account",
-  "email-updated-successfully": "Email updated successfully! Please check your new email for verification.",
-  "email-change-verification-sent": "Verification email sent to your new address! Please check your email and click the verification link.",
+  "email-already-exists":
+      "This email is already registered with another account",
+  "email-updated-successfully":
+      "Email updated successfully! Please check your new email for verification.",
+  "email-change-verification-sent":
+      "Verification email sent to your new address! Please check your email and click the verification link.",
   "email-update-failed": "Failed to update email. Please try again.",
-  "requires-recent-login": "For security reasons, please log out and log back in before changing your email.",
+  "requires-recent-login":
+      "For security reasons, please log out and log back in before changing your email.",
   "field-required": "This field is required",
   "current-email": "Current email address",
   "new-email-same-as-current": "New email cannot be the same as current email",
-  "email-updated-logging-out": "New email verified successfully! You will now be logged out for security.",
+  "email-updated-logging-out":
+      "New email verified successfully! You will now be logged out for security.",
   "logging-out-for-security": "Logging out for security...",
-  "email-verification-sent-check-junk": "Verification link sent to your new email address. Please check your inbox and junk folder too.",
+  "email-verification-sent-check-junk":
+      "Verification link sent to your new email address. Please check your inbox and junk folder too.",
   "authentication-cancelled": "Authentication was cancelled by the user.",
   "authentication-failed": "Authentication failed. Please try again.",
   "too-many-requests": "Too many requests. Please try again later.",
   "data-incorrect": "Is your data incorrect?",
   "report-data-error": "Report data error",
-  "report-data-error-description": "After the update some of the data might be lost, if you feel that is the case with your numbers, create a report and we will review it.",
+  "report-data-error-description":
+      "After the update some of the data might be lost, if you feel that is the case with your numbers, create a report and we will review it.",
   "submit-report": "Submit Report",
   "check-your-inquiry": "Check Your Inquiry",
   "user-justification": "User Justification",
-  "user-justification-placeholder": "Explain the issue in detail (220 characters max)",
+  "user-justification-placeholder":
+      "Explain the issue in detail (220 characters max)",
   "report-status": "Report Status",
   "pending": "Pending",
   "in-progress": "In Progress",
@@ -677,7 +778,8 @@
   "submitted-at": "Submitted at",
   "report-type-data-error": "Data Error",
   "hide-data-error-option": "Hide Data Error Option",
-  "hide-data-error-confirmation": "Are you sure you want to hide the data error reporting option? You can show it again from app settings.",
+  "hide-data-error-confirmation":
+      "Are you sure you want to hide the data error reporting option? You can show it again from app settings.",
   "data-error-option-hidden": "Data error reporting option has been hidden",
   "hide": "Hide",
   "my-reports": "My Reports",
@@ -699,33 +801,42 @@
   "user-update": "User Update",
   "update": "Update",
   "add-next-update": "Add Next Update",
-  "describe-your-update": "Describe your update or provide additional information...",
+  "describe-your-update":
+      "Describe your update or provide additional information...",
   "add-update": "Add Update",
   "community-feedback": "Community Feedback",
-  "community-feedback-description": "Share your thoughts and ideas about the upcoming community features. Your feedback helps us build a better platform for everyone.",
-  "community-feedback-placeholder": "Tell us what features you'd like to see in the community...",
+  "community-feedback-description":
+      "Share your thoughts and ideas about the upcoming community features. Your feedback helps us build a better platform for everyone.",
+  "community-feedback-placeholder":
+      "Tell us what features you'd like to see in the community...",
   "community-feedback-note": "Help us improve",
   "submit-feedback": "Submit Feedback",
-  "community-feedback-submitted": "Thank you for your feedback! We'll review your suggestions.",
+  "community-feedback-submitted":
+      "Thank you for your feedback! We'll review your suggestions.",
   "share-your-ideas": "Share Your Ideas",
   "contact-support-team": "Contact Support Team",
-  "contact-us-description": "Need help or have questions? Reach out to our support team and we'll get back to you as soon as possible.",
+  "contact-us-description":
+      "Need help or have questions? Reach out to our support team and we'll get back to you as soon as possible.",
   "contact-us-placeholder": "Describe your question or issue...",
   "contact-us-note": "We're here to help",
   "send-request": "Send Request",
-  "contact-request-submitted": "Your message has been sent! We'll respond within 24 hours.",
-  "max-active-reports-reached": "You already have 2 active reports of this type. Please wait for them to be resolved before submitting a new one.",
+  "contact-request-submitted":
+      "Your message has been sent! We'll respond within 24 hours.",
+  "max-active-reports-reached":
+      "You already have 2 active reports of this type. Please wait for them to be resolved before submitting a new one.",
   "message-cannot-be-empty": "Message cannot be empty",
   "message-exceeds-character-limit": "Message exceeds 220 characters",
   "recovery-follow-up": "Recovery Follow-up",
-  "recovery-follow-up-question": "When do you want to start tracking your recovery? We will start counting from the date you choose",
+  "recovery-follow-up-question":
+      "When do you want to start tracking your recovery? We will start counting from the date you choose",
   "notifications": "Notifications",
   "clear-all": "Clear All",
   "no-notifications": "No Notifications",
   "no-notifications-description": "You'll see updates about your reports here",
   "notification-deleted": "Notification deleted",
   "clear-all-notifications": "Clear All Notifications",
-  "clear-all-notifications-description": "Are you sure you want to clear all notifications? This action cannot be undone.",
+  "clear-all-notifications-description":
+      "Are you sure you want to clear all notifications? This action cannot be undone.",
   "clear": "Clear",
   "all-notifications-cleared": "All notifications cleared",
   "next": "Next",
@@ -741,9 +852,11 @@
   "yesterday": "Yesterday",
   "days-ago": "days ago",
   "home-layout-settings": "Home Layout Settings",
-  "home-layout-description": "You can reorder and hide/show home screen elements from account settings",
+  "home-layout-description":
+      "You can reorder and hide/show home screen elements from account settings",
   "home-layout-help-title": "Home Layout Settings",
-  "home-layout-help-message": "You can reorder elements by dragging and dropping, and hide/show elements by tapping on them. You can access these settings from the account page.",
+  "home-layout-help-message":
+      "You can reorder elements by dragging and dropping, and hide/show elements by tapping on them. You can access these settings from the account page.",
   "drag-to-reorder": "Drag to reorder",
   "tap-to-toggle-visibility": "Tap to toggle visibility",
   "reset-to-default-order": "Reset to default order",
@@ -758,13 +871,16 @@
   "member-since": "Member Since",
   "account-status": "Account Status",
   "no-warnings": "No Warnings",
-  "warnings-description": "Your account has no warnings. Keep following our community guidelines to maintain a clean record.",
+  "warnings-description":
+      "Your account has no warnings. Keep following our community guidelines to maintain a clean record.",
   "account-in-good-standing": "Account in Good Standing",
-  "bans-description": "Your account is in good standing with no restrictions. Continue following our terms of service to keep it that way.",
+  "bans-description":
+      "Your account is in good standing with no restrictions. Continue following our terms of service to keep it that way.",
   "edit-profile": "Edit Profile",
   "device-restricted-title": "Device Restricted",
   "account-restricted-title": "Account Restricted",
-  "ban-appeal-info": "If you believe this restriction was applied in error, please contact our support team for assistance.",
+  "ban-appeal-info":
+      "If you believe this restriction was applied in error, please contact our support team for assistance.",
   "related-content-user": "User",
   "related-content-report": "Report",
   "related-content-post": "Post",
@@ -774,19 +890,29 @@
   "related-content-other": "Other",
   "reference-id": "Reference ID",
   "more-warnings": "more warning(s)",
-  "device-ban-appeal-message": "If you believe this device restriction is in error, please contact support with the device ID provided above.",
-  "device-ban-no-logout-message": "Device restrictions cannot be resolved by logging out. Please contact support for assistance.",
+  "device-ban-appeal-message":
+      "If you believe this device restriction is in error, please contact support with the device ID provided above.",
+  "device-ban-no-logout-message":
+      "Device restrictions cannot be resolved by logging out. Please contact support for assistance.",
   "device-id": "Device ID",
   "restriction-type": "Restriction Type",
-  "appeal-message": "If you believe this restriction was applied in error, please contact our support team with the reference ID above for assistance.",
+  "appeal-message":
+      "If you believe this restriction was applied in error, please contact our support team with the reference ID above for assistance.",
   "unable-to-load-ban-details": "Unable to load ban details",
-  "account-restricted-message": "Your account has been restricted from accessing the application.",
-  "security-initialization-success": "Security initialization completed successfully",
-  "security-check-failed": "Security check failed, proceeding with limited functionality",
-  "device-permanently-restricted": "This device has been permanently restricted from accessing the application. Contact support if you believe this is an error.",
-  "device-restricted-for-account": "This device has been restricted from accessing the application for your account. Contact support if you believe this is an error.",
-  "device-ban-verification-error": "Critical error during device ban verification",
-  "device-access-revoked": "This device has been restricted from accessing the application. Device access has been revoked due to policy violations. Please contact support for more information.",
+  "account-restricted-message":
+      "Your account has been restricted from accessing the application.",
+  "security-initialization-success":
+      "Security initialization completed successfully",
+  "security-check-failed":
+      "Security check failed, proceeding with limited functionality",
+  "device-permanently-restricted":
+      "This device has been permanently restricted from accessing the application. Contact support if you believe this is an error.",
+  "device-restricted-for-account":
+      "This device has been restricted from accessing the application for your account. Contact support if you believe this is an error.",
+  "device-ban-verification-error":
+      "Critical error during device ban verification",
+  "device-access-revoked":
+      "This device has been restricted from accessing the application. Device access has been revoked due to policy violations. Please contact support for more information.",
   "user-ban": "User Ban",
   "device-ban": "Device Ban",
   "feature-ban": "Feature Ban",
@@ -809,6 +935,7 @@
   "view-details": "View Details",
   "feature-access-restricted": "Feature Access Restricted",
   "access-restricted": "Access Restricted",
-  "feature-ban-default-message": "You are currently restricted from accessing this feature. Please contact support if you believe this is an error.",
+  "feature-ban-default-message":
+      "You are currently restricted from accessing this feature. Please contact support if you believe this is an error.",
   "understood": "Understood"
-}
+};
