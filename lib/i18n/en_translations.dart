@@ -814,7 +814,7 @@ const Map<String, String> kEn = {
   "community-feedback-submitted":
       "Thank you for your feedback! We'll review your suggestions.",
   "share-your-ideas": "Share Your Ideas",
-  "contact-support-team": "Contact Support Team",
+  "contact-support-team": "Having trouble? Contact Support Team",
   "contact-us-description":
       "Need help or have questions? Reach out to our support team and we'll get back to you as soon as possible.",
   "contact-us-placeholder": "Describe your question or issue...",

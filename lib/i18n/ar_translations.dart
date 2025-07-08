@@ -775,7 +775,7 @@ const Map<String, String> kAr = {
   "submit-feedback": "إرسال التقييم",
   "community-feedback-submitted": "شكراً لك على تقييمك! سنراجع اقتراحاتك.",
   "share-your-ideas": "شارك أفكارك",
-  "contact-support-team": "تواصل مع فريق الدعم",
+  "contact-support-team": "تواجه مشكلة؟ تواصل مع فريق الدعم",
   "contact-us-description":
       "تحتاج مساعدة أو لديك أسئلة؟ تواصل مع فريق الدعم وسنرد عليك في أسرع وقت ممكن.",
   "contact-us-placeholder": "صف سؤالك أو مشكلتك...",
