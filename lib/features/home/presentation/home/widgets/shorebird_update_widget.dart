@@ -10,6 +10,7 @@ import 'package:reboot_app_3/core/theming/custom_theme_data.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:shorebird_code_push/shorebird_code_push.dart';
+import 'package:restart_app/restart_app.dart';
 
 // Provider for managing Shorebird update state
 final shorebirdUpdateProvider =
@@ -122,9 +123,17 @@ class ShorebirdUpdateNotifier extends StateNotifier<ShorebirdUpdateState> {
     });
   }
 
-  void restartApp() {
-    // Close the app to restart (user needs to manually reopen)
-    SystemNavigator.pop();
+  void restartApp(BuildContext context) {
+    Restart.restartApp(
+      /// In Web Platform, Fill webOrigin only when your new origin is different than the app's origin
+      // webOrigin: 'http://example.com',
+
+      // Customizing the restart notification message (only needed on iOS)
+      notificationTitle: AppLocalizations.of(context)
+          .translate('restarting-app-notification-title'),
+      notificationBody: AppLocalizations.of(context)
+          .translate('restarting-app-notification-body'),
+    );
   }
 
   @override
@@ -342,7 +351,7 @@ class ShorebirdUpdateWidget extends ConsumerWidget {
           child: ElevatedButton(
             onPressed: () {
               HapticFeedback.mediumImpact();
-              ref.read(shorebirdUpdateProvider.notifier).restartApp();
+              ref.read(shorebirdUpdateProvider.notifier).restartApp(context);
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: theme.success[600],

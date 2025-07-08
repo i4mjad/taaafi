@@ -937,5 +937,7 @@ const Map<String, String> kEn = {
   "access-restricted": "Access Restricted",
   "feature-ban-default-message":
       "You are currently restricted from accessing this feature. Please contact support if you believe this is an error.",
-  "understood": "Understood"
+  "understood": "Understood",
+  "restarting-app-notification-title": "App has been updated",
+  "restarting-app-notification-body": "Please tap here to open the app again."
 };

@@ -284,11 +284,27 @@ class UserReportsRepository {
     }
   }
 
-  /// Get the most recent report for the current user
-  Future<UserReport?> getMostRecentReport() async {
+  /// Get the most recent data issue report (reportTypeId == 'AVgC6BG76LJqDaalZFvV') for the current user
+  Future<UserReport?> getMostRecentReportOfTypeDataIssue() async {
     try {
-      final reports = await getUserReports();
-      return reports.isNotEmpty ? reports.first : null;
+      final uid = _getUserId();
+      if (uid == null) return null;
+
+      const dataErrorReportTypeId = 'AVgC6BG76LJqDaalZFvV';
+
+      final querySnapshot = await _firestore
+          .collection('usersReports')
+          .where('uid', isEqualTo: uid)
+          .where('reportTypeId', isEqualTo: dataErrorReportTypeId)
+          .orderBy('lastUpdated', descending: true)
+          .limit(1)
+          .get();
+
+      if (querySnapshot.docs.isEmpty) {
+        return null;
+      }
+
+      return UserReport.fromFirestore(querySnapshot.docs.first);
     } catch (e, stackTrace) {
       ref.read(errorLoggerProvider).logException(e, stackTrace);
       return null;

@@ -914,5 +914,7 @@ const Map<String, String> kAr = {
   "out-of-range-p": "لا يمكنك تعديل هذا التاريخ",
   "starter": "مبتدئ",
   "subscriber": "مشترك",
-  "take-action": "اتخذ إجراء"
+  "take-action": "اتخذ إجراء",
+  "restarting-app-notification-title": "تم تحديث التطبيق",
+  "restarting-app-notification-body": "يرجى النقر هنا لفتح التطبيق مرة أخرى"
 };

@@ -150,9 +150,9 @@ class UserReportsNotifier extends _$UserReportsNotifier {
   }
 
   /// Get the most recent report if it exists
-  Future<UserReport?> getMostRecentReport() async {
+  Future<UserReport?> getMostRecentReportOfTypeDataIssue() async {
     try {
-      return await service.getMostRecentReport();
+      return await service.getMostRecentReportOfTypeDataIssue();
     } catch (e) {
       return null;
     }

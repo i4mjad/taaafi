@@ -161,8 +161,8 @@ class UserReportsService {
   }
 
   /// Get the most recent report
-  Future<UserReport?> getMostRecentReport() async {
-    return await _repository.getMostRecentReport();
+  Future<UserReport?> getMostRecentReportOfTypeDataIssue() async {
+    return await _repository.getMostRecentReportOfTypeDataIssue();
   }
 
   /// Check if user can submit new messages to a report

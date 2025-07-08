@@ -38,7 +38,7 @@ class _DataErrorReportModalState extends ConsumerState<DataErrorReportModal> {
   Future<void> _checkExistingReport() async {
     try {
       final reportsNotifier = ref.read(userReportsNotifierProvider.notifier);
-      final report = await reportsNotifier.getMostRecentReport();
+      final report = await reportsNotifier.getMostRecentReportOfTypeDataIssue();
       if (mounted) {
         setState(() {
           _existingReport = report;
