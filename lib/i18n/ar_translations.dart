@@ -916,5 +916,12 @@ const Map<String, String> kAr = {
   "subscriber": "مشترك",
   "take-action": "اتخذ إجراء",
   "restarting-app-notification-title": "تم تحديث التطبيق",
-  "restarting-app-notification-body": "يرجى النقر هنا لفتح التطبيق مرة أخرى"
+  "restarting-app-notification-body": "يرجى النقر هنا لفتح التطبيق مرة أخرى",
+  "user-account-banned-message": "تم حظر حسابك من المنصة.",
+  "device-banned-message": "تم حظر هذا الجهاز من الوصول إلى المنصة.",
+  "feature-access-restricted-message": "تم تقييد الوصول إلى هذه الميزة.",
+  "access-temporarily-suspended-message": "تم تعليق وصولك مؤقتاً.",
+  "access-permanently-restricted-message": "تم تقييد وصولك بشكل دائم.",
+  "generic-restriction-message":
+      "تم تقييد وصولك إلى التطبيق. يرجى الاتصال بالدعم للحصول على المساعدة."
 };

@@ -938,6 +938,18 @@ const Map<String, String> kEn = {
   "feature-ban-default-message":
       "You are currently restricted from accessing this feature. Please contact support if you believe this is an error.",
   "understood": "Understood",
+  "user-account-banned-message":
+      "Your account has been banned from the platform.",
+  "device-banned-message":
+      "This device has been banned from accessing the platform.",
+  "feature-access-restricted-message":
+      "Access to this feature has been restricted.",
+  "access-temporarily-suspended-message":
+      "Your access has been temporarily suspended.",
+  "access-permanently-restricted-message":
+      "Your access has been permanently restricted.",
+  "generic-restriction-message":
+      "Your access to the application has been restricted. Please contact support for assistance.",
   "restarting-app-notification-title": "App has been updated",
   "restarting-app-notification-body": "Please tap here to open the app again."
 };

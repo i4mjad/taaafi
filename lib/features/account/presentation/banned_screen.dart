@@ -94,9 +94,19 @@ class _BannedScreenStatefulState extends ConsumerState<_BannedScreenStateful> {
         return l10n.translate('security-initialization-success');
       case 'Security check failed, proceeding with limited functionality':
         return l10n.translate('security-check-failed');
+      case 'User account has been banned from the platform.':
+        return l10n.translate('user-account-banned-message');
+      case 'Device has been banned from accessing the platform.':
+        return l10n.translate('device-banned-message');
+      case 'Access to this feature has been restricted.':
+        return l10n.translate('feature-access-restricted-message');
+      case 'Your access has been temporarily suspended.':
+        return l10n.translate('access-temporarily-suspended-message');
+      case 'Your access has been permanently restricted.':
+        return l10n.translate('access-permanently-restricted-message');
       default:
-        // For unknown messages, return the original message
-        return message;
+        // For unknown messages, return a generic restriction message
+        return l10n.translate('generic-restriction-message');
     }
   }
 

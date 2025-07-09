@@ -70,7 +70,7 @@ class UserProfileScreen extends ConsumerWidget {
                   verticalSpace(Spacing.points24),
 
                   // Bans Section - now with dynamic header
-                  _buildBansCard(context, theme),
+                  _buildBansCard(context, theme, ref),
 
                   verticalSpace(Spacing.points24),
                 ],
@@ -87,8 +87,10 @@ class UserProfileScreen extends ConsumerWidget {
     CustomThemeData theme,
     String titleKey,
     IconData icon,
-    Color iconColor,
-  ) {
+    Color iconColor, {
+    VoidCallback? onRefresh,
+    bool isRefreshing = false,
+  }) {
     return Row(
       children: [
         Icon(
@@ -101,6 +103,36 @@ class UserProfileScreen extends ConsumerWidget {
           AppLocalizations.of(context).translate(titleKey),
           style: TextStyles.h6.copyWith(color: theme.grey[900]),
         ),
+        const Spacer(),
+        if (onRefresh != null)
+          GestureDetector(
+            onTap: isRefreshing ? null : onRefresh,
+            child: Container(
+              padding: const EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                color: theme.grey[50],
+                borderRadius: BorderRadius.circular(6),
+                border: Border.all(
+                  color: theme.grey[200]!,
+                  width: 0.5,
+                ),
+              ),
+              child: isRefreshing
+                  ? SizedBox(
+                      width: 14,
+                      height: 14,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 1.5,
+                        color: theme.primary[600],
+                      ),
+                    )
+                  : Icon(
+                      LucideIcons.refreshCw,
+                      size: 14,
+                      color: theme.grey[600],
+                    ),
+            ),
+          ),
       ],
     );
   }
@@ -288,6 +320,7 @@ class UserProfileScreen extends ConsumerWidget {
     return Consumer(
       builder: (context, ref, child) {
         final warningsAsync = ref.watch(currentUserWarningsProvider);
+        final isRefreshing = warningsAsync.isRefreshing;
 
         return warningsAsync.when(
           loading: () => Column(
@@ -299,6 +332,11 @@ class UserProfileScreen extends ConsumerWidget {
                 'warnings',
                 LucideIcons.alertTriangle,
                 theme.primary[600]!,
+                onRefresh: () {
+                  HapticFeedback.lightImpact();
+                  ref.invalidate(currentUserWarningsProvider);
+                },
+                isRefreshing: isRefreshing,
               ),
               verticalSpace(Spacing.points12),
               WidgetsContainer(
@@ -319,6 +357,11 @@ class UserProfileScreen extends ConsumerWidget {
                 'warnings',
                 LucideIcons.alertTriangle,
                 theme.primary[600]!,
+                onRefresh: () {
+                  HapticFeedback.lightImpact();
+                  ref.invalidate(currentUserWarningsProvider);
+                },
+                isRefreshing: isRefreshing,
               ),
               verticalSpace(Spacing.points12),
               WidgetsContainer(
@@ -345,6 +388,11 @@ class UserProfileScreen extends ConsumerWidget {
                       ? LucideIcons.alertTriangle
                       : LucideIcons.checkCircle,
                   hasWarnings ? theme.warn[600]! : theme.success[600]!,
+                  onRefresh: () {
+                    HapticFeedback.lightImpact();
+                    ref.invalidate(currentUserWarningsProvider);
+                  },
+                  isRefreshing: isRefreshing,
                 ),
                 verticalSpace(Spacing.points12),
 
@@ -511,7 +559,8 @@ class UserProfileScreen extends ConsumerWidget {
     }
   }
 
-  Widget _buildBansCard(BuildContext context, CustomThemeData theme) {
+  Widget _buildBansCard(
+      BuildContext context, CustomThemeData theme, WidgetRef ref) {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) return const SizedBox.shrink();
 
@@ -519,6 +568,7 @@ class UserProfileScreen extends ConsumerWidget {
       builder: (context, ref, child) {
         final bansAsync = ref.watch(currentUserBansProvider);
         final locale = ref.watch(localeNotifierProvider);
+        final isRefreshing = bansAsync.isRefreshing;
 
         return bansAsync.when(
           loading: () => Column(
@@ -530,6 +580,11 @@ class UserProfileScreen extends ConsumerWidget {
                 'bans',
                 LucideIcons.shield,
                 theme.primary[600]!,
+                onRefresh: () {
+                  HapticFeedback.lightImpact();
+                  ref.invalidate(currentUserBansProvider);
+                },
+                isRefreshing: isRefreshing,
               ),
               verticalSpace(Spacing.points12),
               WidgetsContainer(
@@ -550,6 +605,11 @@ class UserProfileScreen extends ConsumerWidget {
                 'bans',
                 LucideIcons.shield,
                 theme.primary[600]!,
+                onRefresh: () {
+                  HapticFeedback.lightImpact();
+                  ref.invalidate(currentUserBansProvider);
+                },
+                isRefreshing: isRefreshing,
               ),
               verticalSpace(Spacing.points12),
               WidgetsContainer(
@@ -577,6 +637,11 @@ class UserProfileScreen extends ConsumerWidget {
                   hasBans ? 'account-restricted' : 'account-in-good-standing',
                   hasBans ? LucideIcons.shieldOff : LucideIcons.shield,
                   hasBans ? theme.error[600]! : theme.success[600]!,
+                  onRefresh: () {
+                    HapticFeedback.lightImpact();
+                    ref.invalidate(currentUserBansProvider);
+                  },
+                  isRefreshing: isRefreshing,
                 ),
                 verticalSpace(Spacing.points12),
 

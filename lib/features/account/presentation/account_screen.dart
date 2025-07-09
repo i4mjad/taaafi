@@ -34,6 +34,11 @@ import 'package:reboot_app_3/features/home/presentation/home/enhanced_home_setti
 import 'package:reboot_app_3/features/authentication/providers/user_provider.dart';
 import 'package:reboot_app_3/features/account/data/app_features_config.dart';
 import 'package:reboot_app_3/features/account/presentation/widgets/feature_access_guard.dart';
+import 'package:reboot_app_3/features/home/data/streak_notifier.dart';
+import 'package:reboot_app_3/features/home/data/statistics_notifier.dart';
+import 'package:reboot_app_3/features/home/data/calendar_notifier.dart';
+import 'package:reboot_app_3/features/home/data/streak_duration_notifier.dart';
+import 'package:reboot_app_3/features/home/presentation/home/widgets/statistics_widget.dart';
 
 class AccountScreen extends ConsumerWidget {
   const AccountScreen({super.key});
@@ -288,6 +293,7 @@ class _ResetDataModalSheetState extends ConsumerState<ResetDataModalSheet> {
   bool deleteFollowUps = false;
   bool deleteEmotions = false;
   bool userWantNowAsNewFirstDate = false;
+  bool isLoading = false;
   final startingDateController = TextEditingController();
   DateTime? selectedDate;
 
@@ -337,35 +343,41 @@ class _ResetDataModalSheetState extends ConsumerState<ResetDataModalSheet> {
                   style: TextStyles.h6,
                 ),
                 GestureDetector(
-                  onTap: () => Navigator.of(context).pop(),
-                  child: Icon(LucideIcons.xCircle),
+                  onTap: isLoading ? null : () => Navigator.of(context).pop(),
+                  child: Icon(
+                    LucideIcons.xCircle,
+                    color: isLoading ? theme.grey[400] : null,
+                  ),
                 ),
               ],
             ),
             verticalSpace(Spacing.points24),
             Text(
               AppLocalizations.of(context).translate('reset-data-desc'),
-              style: TextStyles.caption.copyWith(color: theme.warn[800]),
+              style: TextStyles.caption
+                  .copyWith(color: theme.warn[800], height: 1.4),
             ),
             verticalSpace(Spacing.points24),
             GestureDetector(
-              onTap: () async {
-                final DateTime? picked = await showDatePicker(
-                  context: context,
-                  initialDate: selectedDate ?? DateTime.now(),
-                  firstDate: DateTime(2000),
-                  lastDate: DateTime.now(),
-                );
-                if (picked != null) {
-                  setState(() {
-                    selectedDate = picked;
-                    startingDateController.text = getDisplayDate(
-                      picked,
-                      locale?.languageCode ?? 'en',
-                    );
-                  });
-                }
-              },
+              onTap: isLoading
+                  ? null
+                  : () async {
+                      final DateTime? picked = await showDatePicker(
+                        context: context,
+                        initialDate: selectedDate ?? DateTime.now(),
+                        firstDate: DateTime(2000),
+                        lastDate: DateTime.now(),
+                      );
+                      if (picked != null) {
+                        setState(() {
+                          selectedDate = picked;
+                          startingDateController.text = getDisplayDate(
+                            picked,
+                            locale?.languageCode ?? 'en',
+                          );
+                        });
+                      }
+                    },
               child: AbsorbPointer(
                 child: CustomTextField(
                   validator: (value) {
@@ -417,18 +429,21 @@ class _ResetDataModalSheetState extends ConsumerState<ResetDataModalSheet> {
                   Switch(
                     value: userWantNowAsNewFirstDate,
                     activeColor: theme.primary[600],
-                    onChanged: (bool value) {
-                      setState(() {
-                        userWantNowAsNewFirstDate = value;
-                        if (userWantNowAsNewFirstDate) {
-                          final selectedStartingDateDisplay = DisplayDateTime(
-                              DateTime.now(), locale!.languageCode);
-                          startingDateController.text =
-                              selectedStartingDateDisplay.displayDateTime;
-                          selectedDate = selectedStartingDateDisplay.date;
-                        }
-                      });
-                    },
+                    onChanged: isLoading
+                        ? null
+                        : (bool value) {
+                            setState(() {
+                              userWantNowAsNewFirstDate = value;
+                              if (userWantNowAsNewFirstDate) {
+                                final selectedStartingDateDisplay =
+                                    DisplayDateTime(
+                                        DateTime.now(), locale!.languageCode);
+                                startingDateController.text =
+                                    selectedStartingDateDisplay.displayDateTime;
+                                selectedDate = selectedStartingDateDisplay.date;
+                              }
+                            });
+                          },
                   ),
                 ],
               ),
@@ -457,11 +472,13 @@ class _ResetDataModalSheetState extends ConsumerState<ResetDataModalSheet> {
                 horizontalSpace(Spacing.points32),
                 Checkbox(
                   value: deleteFollowUps,
-                  onChanged: (bool? value) {
-                    setState(() {
-                      deleteFollowUps = value ?? false;
-                    });
-                  },
+                  onChanged: isLoading
+                      ? null
+                      : (bool? value) {
+                          setState(() {
+                            deleteFollowUps = value ?? false;
+                          });
+                        },
                 ),
               ],
             ),
@@ -488,11 +505,13 @@ class _ResetDataModalSheetState extends ConsumerState<ResetDataModalSheet> {
                 horizontalSpace(Spacing.points32),
                 Checkbox(
                   value: deleteEmotions,
-                  onChanged: (bool? value) {
-                    setState(() {
-                      deleteEmotions = value ?? false;
-                    });
-                  },
+                  onChanged: isLoading
+                      ? null
+                      : (bool? value) {
+                          setState(() {
+                            deleteEmotions = value ?? false;
+                          });
+                        },
                 ),
               ],
             ),
@@ -501,32 +520,68 @@ class _ResetDataModalSheetState extends ConsumerState<ResetDataModalSheet> {
               children: [
                 Expanded(
                   child: GestureDetector(
-                    onTap: () async {
-                      if (selectedDate != null) {
-                        await userProfileNotifier
-                            .updateUserFirstDate(selectedDate!);
-                      }
-                      if (deleteFollowUps) {
-                        await userProfileNotifier.deleteDailyFollowUps();
-                      }
-                      if (deleteEmotions) {
-                        await userProfileNotifier.deleteEmotions();
-                      }
-                      getSuccessSnackBar(context, 'data-updated-successfully');
-                      Navigator.of(context).pop();
-                    },
+                    onTap: isLoading
+                        ? null
+                        : () async {
+                            setState(() {
+                              isLoading = true;
+                            });
+
+                            try {
+                              if (selectedDate != null) {
+                                await userProfileNotifier
+                                    .updateUserFirstDate(selectedDate!);
+                              }
+                              if (deleteFollowUps) {
+                                await userProfileNotifier
+                                    .deleteDailyFollowUps();
+                              }
+                              if (deleteEmotions) {
+                                await userProfileNotifier.deleteEmotions();
+                              }
+
+                              // Refresh home screen providers after data deletion
+                              ref.invalidate(streakNotifierProvider);
+                              ref.invalidate(statisticsNotifierProvider);
+                              ref.invalidate(calendarStreamProvider);
+                              ref.invalidate(calendarNotifierProvider);
+                              ref.invalidate(followUpsProvider);
+                              ref.invalidate(detailedStreakProvider);
+
+                              getSuccessSnackBar(
+                                  context, 'data-updated-successfully');
+                              Navigator.of(context).pop();
+                            } catch (e) {
+                              // Handle error if needed
+                              setState(() {
+                                isLoading = false;
+                              });
+                            }
+                          },
                     child: WidgetsContainer(
-                      backgroundColor: theme.backgroundColor,
-                      boxShadow: Shadows.mainShadows,
+                      backgroundColor:
+                          isLoading ? theme.grey[100] : theme.backgroundColor,
+                      boxShadow: isLoading ? [] : Shadows.mainShadows,
                       borderSide:
                           BorderSide(color: theme.grey[600]!, width: 0.5),
                       borderRadius: BorderRadius.circular(10.5),
                       child: Center(
-                        child: Text(
-                          AppLocalizations.of(context).translate('confirm'),
-                          style:
-                              TextStyles.h6.copyWith(color: theme.primary[700]),
-                        ),
+                        child: isLoading
+                            ? SizedBox(
+                                height: 20,
+                                width: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: theme.primary[700],
+                                ),
+                              )
+                            : Text(
+                                AppLocalizations.of(context)
+                                    .translate('confirm'),
+                                style: TextStyles.h6.copyWith(
+                                  color: theme.primary[700],
+                                ),
+                              ),
                       ),
                     ),
                   ),
@@ -534,17 +589,21 @@ class _ResetDataModalSheetState extends ConsumerState<ResetDataModalSheet> {
                 horizontalSpace(Spacing.points8),
                 Expanded(
                   child: GestureDetector(
-                    onTap: () => Navigator.of(context).pop(),
+                    onTap: isLoading ? null : () => Navigator.of(context).pop(),
                     child: WidgetsContainer(
-                      backgroundColor: theme.backgroundColor,
-                      boxShadow: Shadows.mainShadows,
+                      backgroundColor:
+                          isLoading ? theme.grey[100] : theme.backgroundColor,
+                      boxShadow: isLoading ? [] : Shadows.mainShadows,
                       borderSide:
                           BorderSide(color: theme.grey[600]!, width: 0.5),
                       borderRadius: BorderRadius.circular(10.5),
                       child: Center(
                         child: Text(
                           AppLocalizations.of(context).translate('cancel'),
-                          style: TextStyles.h6.copyWith(color: theme.grey[900]),
+                          style: TextStyles.h6.copyWith(
+                            color:
+                                isLoading ? theme.grey[400] : theme.grey[900],
+                          ),
                         ),
                       ),
                     ),
