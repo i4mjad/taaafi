@@ -64,26 +64,12 @@ class UserProfileScreen extends ConsumerWidget {
 
                   verticalSpace(Spacing.points24),
 
-                  // Warnings Section
-                  _buildSectionHeader(
-                    context,
-                    theme,
-                    'warnings',
-                    LucideIcons.alertTriangle,
-                  ),
-                  verticalSpace(Spacing.points12),
+                  // Warnings Section - now with dynamic header
                   _buildWarningsCard(context, theme, ref),
 
                   verticalSpace(Spacing.points24),
 
-                  // Bans Section
-                  _buildSectionHeader(
-                    context,
-                    theme,
-                    'bans',
-                    LucideIcons.shield,
-                  ),
-                  verticalSpace(Spacing.points12),
+                  // Bans Section - now with dynamic header
                   _buildBansCard(context, theme),
 
                   verticalSpace(Spacing.points24),
@@ -101,12 +87,13 @@ class UserProfileScreen extends ConsumerWidget {
     CustomThemeData theme,
     String titleKey,
     IconData icon,
+    Color iconColor,
   ) {
     return Row(
       children: [
         Icon(
           icon,
-          color: theme.primary[600],
+          color: iconColor,
           size: 20,
         ),
         horizontalSpace(Spacing.points8),
@@ -303,104 +290,111 @@ class UserProfileScreen extends ConsumerWidget {
         final warningsAsync = ref.watch(currentUserWarningsProvider);
 
         return warningsAsync.when(
-          loading: () => WidgetsContainer(
-            padding: const EdgeInsets.all(16),
-            backgroundColor: theme.backgroundColor,
-            borderSide: BorderSide(color: theme.warn[300]!, width: 0.5),
-            borderRadius: BorderRadius.circular(12),
-            child: const Center(child: CircularProgressIndicator()),
+          loading: () => Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildSectionHeader(
+                context,
+                theme,
+                'warnings',
+                LucideIcons.alertTriangle,
+                theme.primary[600]!,
+              ),
+              verticalSpace(Spacing.points12),
+              WidgetsContainer(
+                padding: const EdgeInsets.all(16),
+                backgroundColor: theme.backgroundColor,
+                borderSide: BorderSide(color: theme.warn[300]!, width: 0.5),
+                borderRadius: BorderRadius.circular(12),
+                child: const Center(child: CircularProgressIndicator()),
+              ),
+            ],
           ),
-          error: (error, stack) => WidgetsContainer(
-            padding: const EdgeInsets.all(16),
-            backgroundColor: theme.backgroundColor,
-            borderSide: BorderSide(color: theme.error[300]!, width: 0.5),
-            borderRadius: BorderRadius.circular(12),
-            child: Text('Error loading warnings'),
+          error: (error, stack) => Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildSectionHeader(
+                context,
+                theme,
+                'warnings',
+                LucideIcons.alertTriangle,
+                theme.primary[600]!,
+              ),
+              verticalSpace(Spacing.points12),
+              WidgetsContainer(
+                padding: const EdgeInsets.all(16),
+                backgroundColor: theme.backgroundColor,
+                borderSide: BorderSide(color: theme.error[300]!, width: 0.5),
+                borderRadius: BorderRadius.circular(12),
+                child: Text('Error loading warnings'),
+              ),
+            ],
           ),
           data: (warnings) {
             final hasWarnings = warnings.isNotEmpty;
 
-            return WidgetsContainer(
-              padding: const EdgeInsets.all(16),
-              backgroundColor: theme.backgroundColor,
-              borderSide: BorderSide(
-                  color: hasWarnings ? theme.warn[300]! : theme.grey[300]!,
-                  width: 1),
-              borderRadius: BorderRadius.circular(12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Icon(
-                        hasWarnings
-                            ? LucideIcons.alertTriangle
-                            : LucideIcons.checkCircle,
-                        color:
-                            hasWarnings ? theme.warn[600] : theme.success[600],
-                        size: 20,
-                      ),
-                      horizontalSpace(Spacing.points8),
-                      Text(
-                        hasWarnings
-                            ? AppLocalizations.of(context)
-                                .translate('active-warnings')
-                            : AppLocalizations.of(context)
-                                .translate('no-warnings'),
-                        style: TextStyles.body.copyWith(
-                          color: theme.grey[900],
-                        ),
-                      ),
-                    ],
-                  ),
-                  if (hasWarnings) ...[
-                    verticalSpace(Spacing.points12),
-                    ...warnings.take(3).map((warning) => Padding(
-                          padding: const EdgeInsets.only(bottom: 8),
-                          child: GestureDetector(
-                            onTap: () {
-                              HapticFeedback.lightImpact();
-                              showModalBottomSheet(
-                                context: context,
-                                isScrollControlled: true,
-                                backgroundColor: Colors.transparent,
-                                builder: (context) => DraggableScrollableSheet(
-                                  initialChildSize: 0.7,
-                                  minChildSize: 0.5,
-                                  maxChildSize: 0.95,
-                                  builder: (context, scrollController) =>
-                                      WarningDetailModal(
-                                    warning: warning,
-                                  ),
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Dynamic section header based on warnings state
+                _buildSectionHeader(
+                  context,
+                  theme,
+                  hasWarnings ? 'active-warnings' : 'no-warnings',
+                  hasWarnings
+                      ? LucideIcons.alertTriangle
+                      : LucideIcons.checkCircle,
+                  hasWarnings ? theme.warn[600]! : theme.success[600]!,
+                ),
+                verticalSpace(Spacing.points12),
+
+                if (hasWarnings) ...[
+                  // Display warnings without container wrapper
+                  ...warnings.take(3).map((warning) => Padding(
+                        padding: const EdgeInsets.only(bottom: 8),
+                        child: GestureDetector(
+                          onTap: () {
+                            HapticFeedback.lightImpact();
+                            showModalBottomSheet(
+                              context: context,
+                              isScrollControlled: true,
+                              backgroundColor: Colors.transparent,
+                              builder: (context) => DraggableScrollableSheet(
+                                initialChildSize: 0.7,
+                                minChildSize: 0.5,
+                                maxChildSize: 0.95,
+                                builder: (context, scrollController) =>
+                                    WarningDetailModal(
+                                  warning: warning,
                                 ),
-                              );
-                            },
-                            child:
-                                _buildWarningItem(context, theme, warning, ref),
-                          ),
-                        )),
-                    if (warnings.length > 3) ...[
-                      Text(
-                        '+ ${warnings.length - 3} ${AppLocalizations.of(context).translate('more-warnings')}',
-                        style: TextStyles.small.copyWith(
-                          color: theme.warn[600],
-                          fontStyle: FontStyle.italic,
+                              ),
+                            );
+                          },
+                          child:
+                              _buildWarningItem(context, theme, warning, ref),
                         ),
-                      ),
-                    ],
-                  ] else ...[
-                    verticalSpace(Spacing.points8),
+                      )),
+                  if (warnings.length > 3) ...[
                     Text(
-                      AppLocalizations.of(context)
-                          .translate('warnings-description'),
-                      style: TextStyles.footnote.copyWith(
-                        color: theme.grey[600],
-                        height: 1.4,
+                      '+ ${warnings.length - 3} ${AppLocalizations.of(context).translate('more-warnings')}',
+                      style: TextStyles.small.copyWith(
+                        color: theme.warn[600],
+                        fontStyle: FontStyle.italic,
                       ),
                     ),
                   ],
+                ] else ...[
+                  // No warnings - show description
+                  Text(
+                    AppLocalizations.of(context)
+                        .translate('warnings-description'),
+                    style: TextStyles.footnote.copyWith(
+                      color: theme.grey[600],
+                      height: 1.4,
+                    ),
+                  ),
                 ],
-              ),
+              ],
             );
           },
         );
@@ -527,197 +521,195 @@ class UserProfileScreen extends ConsumerWidget {
         final locale = ref.watch(localeNotifierProvider);
 
         return bansAsync.when(
-          loading: () => WidgetsContainer(
-            padding: const EdgeInsets.all(16),
-            backgroundColor: theme.backgroundColor,
-            borderSide: BorderSide(color: theme.grey[600]!, width: 0.5),
-            borderRadius: BorderRadius.circular(12),
-            child: const Center(child: CircularProgressIndicator()),
+          loading: () => Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildSectionHeader(
+                context,
+                theme,
+                'bans',
+                LucideIcons.shield,
+                theme.primary[600]!,
+              ),
+              verticalSpace(Spacing.points12),
+              WidgetsContainer(
+                padding: const EdgeInsets.all(16),
+                backgroundColor: theme.backgroundColor,
+                borderSide: BorderSide(color: theme.grey[600]!, width: 0.5),
+                borderRadius: BorderRadius.circular(12),
+                child: const Center(child: CircularProgressIndicator()),
+              ),
+            ],
           ),
-          error: (error, stack) => WidgetsContainer(
-            padding: const EdgeInsets.all(16),
-            backgroundColor: theme.backgroundColor,
-            borderSide: BorderSide(color: theme.error[300]!, width: 0.5),
-            borderRadius: BorderRadius.circular(12),
-            child: Text(
-              AppLocalizations.of(context).translate('error-loading-bans'),
-              style: TextStyles.body.copyWith(color: theme.error[600]),
-            ),
+          error: (error, stack) => Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildSectionHeader(
+                context,
+                theme,
+                'bans',
+                LucideIcons.shield,
+                theme.primary[600]!,
+              ),
+              verticalSpace(Spacing.points12),
+              WidgetsContainer(
+                padding: const EdgeInsets.all(16),
+                backgroundColor: theme.backgroundColor,
+                borderSide: BorderSide(color: theme.error[300]!, width: 0.5),
+                borderRadius: BorderRadius.circular(12),
+                child: Text(
+                  AppLocalizations.of(context).translate('error-loading-bans'),
+                  style: TextStyles.body.copyWith(color: theme.error[600]),
+                ),
+              ),
+            ],
           ),
           data: (bans) {
             final hasBans = bans.isNotEmpty;
 
-            return WidgetsContainer(
-              padding: const EdgeInsets.all(16),
-              backgroundColor: theme.backgroundColor,
-              borderSide: BorderSide(
-                  color: hasBans ? theme.error[300]! : theme.success[300]!,
-                  width: 0.5),
-              borderRadius: BorderRadius.circular(12),
-              boxShadow: [
-                BoxShadow(
-                  color: const Color.fromRGBO(0, 0, 0, 0.08),
-                  blurRadius: 8,
-                  spreadRadius: 0,
-                  offset: const Offset(0, 2),
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Dynamic section header based on bans state
+                _buildSectionHeader(
+                  context,
+                  theme,
+                  hasBans ? 'account-restricted' : 'account-in-good-standing',
+                  hasBans ? LucideIcons.shieldOff : LucideIcons.shield,
+                  hasBans ? theme.error[600]! : theme.success[600]!,
                 ),
-              ],
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Icon(
-                        hasBans ? LucideIcons.shieldOff : LucideIcons.shield,
-                        color: hasBans ? theme.error[600] : theme.success[600],
-                        size: 20,
-                      ),
-                      horizontalSpace(Spacing.points8),
-                      Expanded(
-                        child: Text(
-                          hasBans
-                              ? AppLocalizations.of(context)
-                                  .translate('account-restricted')
-                              : AppLocalizations.of(context)
-                                  .translate('account-in-good-standing'),
-                          style:
-                              TextStyles.body.copyWith(color: theme.grey[900]),
-                        ),
-                      ),
-                    ],
-                  ),
-                  if (hasBans) ...[
-                    verticalSpace(Spacing.points12),
-                    ...bans.take(2).map((ban) => GestureDetector(
-                          onTap: () {
-                            HapticFeedback.lightImpact();
-                            showModalBottomSheet(
-                              context: context,
-                              isScrollControlled: true,
-                              backgroundColor: Colors.transparent,
-                              builder: (context) => DraggableScrollableSheet(
-                                initialChildSize: 0.7,
-                                minChildSize: 0.5,
-                                maxChildSize: 0.95,
-                                builder: (context, scrollController) =>
-                                    BanDetailModal(
-                                  ban: ban,
-                                ),
+                verticalSpace(Spacing.points12),
+
+                if (hasBans) ...[
+                  // Display bans without container wrapper
+                  ...bans.take(2).map((ban) => GestureDetector(
+                        onTap: () {
+                          HapticFeedback.lightImpact();
+                          showModalBottomSheet(
+                            context: context,
+                            isScrollControlled: true,
+                            backgroundColor: Colors.transparent,
+                            builder: (context) => DraggableScrollableSheet(
+                              initialChildSize: 0.7,
+                              minChildSize: 0.5,
+                              maxChildSize: 0.95,
+                              builder: (context, scrollController) =>
+                                  BanDetailModal(
+                                ban: ban,
                               ),
-                            );
-                          },
-                          child: Container(
-                            margin: const EdgeInsets.only(bottom: 8),
-                            padding: const EdgeInsets.all(12),
-                            decoration: BoxDecoration(
-                              color: theme.error[50],
-                              borderRadius: BorderRadius.circular(8),
-                              border: Border.all(
-                                  color: theme.error[200]!, width: 0.5),
                             ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  children: [
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 6, vertical: 2),
-                                      decoration: BoxDecoration(
-                                        color: ban.scope == BanScope.app_wide
-                                            ? theme.error[600]
-                                            : theme.warn[600],
-                                        borderRadius: BorderRadius.circular(4),
-                                      ),
-                                      child: Text(
-                                        ban.scope == BanScope.app_wide
-                                            ? AppLocalizations.of(context)
-                                                .translate('app-wide')
-                                            : AppLocalizations.of(context)
-                                                .translate('feature-specific'),
-                                        style: TextStyles.small.copyWith(
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      ),
+                          );
+                        },
+                        child: Container(
+                          margin: const EdgeInsets.only(bottom: 8),
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: theme.error[50],
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(
+                                color: theme.error[200]!, width: 0.5),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 6, vertical: 2),
+                                    decoration: BoxDecoration(
+                                      color: ban.scope == BanScope.app_wide
+                                          ? theme.error[600]
+                                          : theme.warn[600],
+                                      borderRadius: BorderRadius.circular(4),
                                     ),
-                                    const Spacer(),
-                                    Text(
-                                      BanDisplayFormatter.formatBanDuration(
-                                          ban, context),
+                                    child: Text(
+                                      ban.scope == BanScope.app_wide
+                                          ? AppLocalizations.of(context)
+                                              .translate('app-wide')
+                                          : AppLocalizations.of(context)
+                                              .translate('feature-specific'),
                                       style: TextStyles.small.copyWith(
-                                        color: theme.grey[600],
+                                        color: Colors.white,
                                         fontWeight: FontWeight.w500,
                                       ),
                                     ),
-                                  ],
-                                ),
-                                verticalSpace(Spacing.points4),
-                                Text(
-                                  ban.reason,
-                                  style: TextStyles.footnote.copyWith(
-                                    color: theme.grey[900],
-                                    fontWeight: FontWeight.w500,
                                   ),
-                                ),
-                                if (ban.description != null) ...[
-                                  verticalSpace(Spacing.points4),
+                                  const Spacer(),
                                   Text(
-                                    ban.description!,
+                                    BanDisplayFormatter.formatBanDuration(
+                                        ban, context),
                                     style: TextStyles.small.copyWith(
-                                      color: theme.grey[700],
+                                      color: theme.grey[600],
+                                      fontWeight: FontWeight.w500,
                                     ),
                                   ),
                                 ],
-                                // Add subtle tap indicator
-                                verticalSpace(Spacing.points8),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.end,
-                                  children: [
-                                    Text(
-                                      AppLocalizations.of(context)
-                                          .translate('tap-for-details'),
-                                      style: TextStyles.small.copyWith(
-                                        color: theme.grey[500],
-                                        fontStyle: FontStyle.italic,
-                                      ),
-                                    ),
-                                    horizontalSpace(Spacing.points4),
-                                    Icon(
-                                      locale?.languageCode == 'en'
-                                          ? LucideIcons.chevronRight
-                                          : LucideIcons.chevronLeft,
-                                      size: 14,
-                                      color: theme.grey[500],
-                                    ),
-                                  ],
+                              ),
+                              verticalSpace(Spacing.points4),
+                              Text(
+                                ban.reason,
+                                style: TextStyles.footnote.copyWith(
+                                  color: theme.grey[900],
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              if (ban.description != null) ...[
+                                verticalSpace(Spacing.points4),
+                                Text(
+                                  ban.description!,
+                                  style: TextStyles.small.copyWith(
+                                    color: theme.grey[700],
+                                  ),
                                 ),
                               ],
-                            ),
+                              // Add subtle tap indicator
+                              verticalSpace(Spacing.points8),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  Text(
+                                    AppLocalizations.of(context)
+                                        .translate('tap-for-details'),
+                                    style: TextStyles.small.copyWith(
+                                      color: theme.grey[500],
+                                      fontStyle: FontStyle.italic,
+                                    ),
+                                  ),
+                                  horizontalSpace(Spacing.points4),
+                                  Icon(
+                                    locale?.languageCode == 'en'
+                                        ? LucideIcons.chevronRight
+                                        : LucideIcons.chevronLeft,
+                                    size: 14,
+                                    color: theme.grey[500],
+                                  ),
+                                ],
+                              ),
+                            ],
                           ),
-                        )),
-                    if (bans.length > 2) ...[
-                      Text(
-                        '+ ${bans.length - 2} ${AppLocalizations.of(context).translate('more-restrictions')}',
-                        style: TextStyles.small.copyWith(
-                          color: theme.error[600],
-                          fontStyle: FontStyle.italic,
                         ),
-                      ),
-                    ],
-                  ] else ...[
-                    verticalSpace(Spacing.points8),
+                      )),
+                  if (bans.length > 2) ...[
                     Text(
-                      AppLocalizations.of(context)
-                          .translate('bans-description'),
-                      style: TextStyles.footnote.copyWith(
-                        color: theme.grey[600],
-                        height: 1.4,
+                      '+ ${bans.length - 2} ${AppLocalizations.of(context).translate('more-restrictions')}',
+                      style: TextStyles.small.copyWith(
+                        color: theme.error[600],
+                        fontStyle: FontStyle.italic,
                       ),
                     ),
                   ],
+                ] else ...[
+                  // No bans - show description
+                  Text(
+                    AppLocalizations.of(context).translate('bans-description'),
+                    style: TextStyles.footnote.copyWith(
+                      color: theme.grey[600],
+                      height: 1.4,
+                    ),
+                  ),
                 ],
-              ),
+              ],
             );
           },
         );
