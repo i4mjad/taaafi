@@ -136,8 +136,30 @@ class NotificationsScreen extends ConsumerWidget {
         .read(notificationsRepositoryProvider.notifier)
         .markAsRead(notification.id);
 
-    // Navigate to report conversation
-    if (notification.reportId.isNotEmpty) {
+    // Extract screen parameter from notification data
+    final screen = _extractScreenParameter(notification.additionalData);
+
+    // Handle navigation based on screen parameter
+    if (screen != null && screen.isNotEmpty) {
+      try {
+        // Handle special cases with parameters
+        if (screen == 'reportConversation' || screen == 'reportDetails') {
+          final reportId = _extractReportId(notification);
+          if (reportId.isNotEmpty) {
+            context.pushNamed(
+              RouteNames.reportConversation.name,
+              pathParameters: {'reportId': reportId},
+            );
+          }
+        } else {
+          // Direct navigation to the specified screen
+          context.goNamed(screen);
+        }
+      } catch (e) {
+        // Fallback: if navigation fails, stay on notifications screen
+      }
+    } else if (notification.reportId.isNotEmpty) {
+      // Fallback: Navigate to report conversation if no screen but has reportId
       context.pushNamed(
         RouteNames.reportConversation.name,
         pathParameters: {'reportId': notification.reportId},
@@ -199,6 +221,46 @@ class NotificationsScreen extends ConsumerWidget {
         );
       },
     );
+  }
+
+  String? _extractScreenParameter(Map<String, dynamic>? additionalData) {
+    if (additionalData == null) return null;
+
+    try {
+      final rawValue = additionalData['raw'];
+
+      if (rawValue is Map<String, dynamic>) {
+        return rawValue['screen'] as String?;
+      } else if (rawValue is String) {
+        // Parse string format like "{screen: community}"
+        final screenMatch = RegExp(r'screen:\s*(\w+)').firstMatch(rawValue);
+        return screenMatch?.group(1);
+      }
+
+      // Fallback to direct access
+      return additionalData['screen'] as String?;
+    } catch (e) {
+      return additionalData['screen'] as String?;
+    }
+  }
+
+  String _extractReportId(AppNotification notification) {
+    try {
+      final rawValue = notification.additionalData?['raw'];
+      if (rawValue is Map<String, dynamic>) {
+        final reportId = rawValue['reportId'] as String?;
+        if (reportId != null && reportId.isNotEmpty) return reportId;
+      }
+
+      final directReportId =
+          notification.additionalData?['reportId'] as String?;
+      if (directReportId != null && directReportId.isNotEmpty)
+        return directReportId;
+
+      return notification.reportId;
+    } catch (e) {
+      return notification.reportId;
+    }
   }
 
   String _formatDateKey(DateTime date, AppLocalizations localization) {

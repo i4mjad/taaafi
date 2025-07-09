@@ -256,20 +256,10 @@ class MessagingService with WidgetsBindingObserver {
   Future<void> _setupMessageHandler() async {
     //Foreground
     FirebaseMessaging.onMessage.listen((message) async {
-      print(
-          '🔔 [FCM] Received foreground message: ${message.notification?.title}');
-
       await storeNotification(message);
       await setupFlutterNotification(message);
       await _showNotificationSnackbar(message);
       await showNotification(message);
-
-      // Optionally navigate in foreground based on notification type
-      final shouldNavigateInForeground =
-          message.data['navigateInForeground'] == 'true';
-      if (shouldNavigateInForeground) {
-        await _handleNotificationNavigation(message);
-      }
     });
 
     //Background
@@ -414,7 +404,7 @@ class MessagingService with WidgetsBindingObserver {
     if (ctx == null) {
       // Context isn't ready yet – queue the message for later and retry
       _queuedMessage = message;
-      // Retry after next frame (max 5 attempts to avoid infinite loop)
+      // Retry after next frame
       Future.delayed(const Duration(milliseconds: 300), () {
         if (_queuedMessage != null) {
           _handleNotificationNavigation(_queuedMessage!);
@@ -437,59 +427,33 @@ class MessagingService with WidgetsBindingObserver {
     await Future.delayed(const Duration(milliseconds: 100));
 
     try {
-      // Comment out dynamic redirection - always redirect to notifications screen
-      /*
-      switch (screen) {
-        case 'reportConversation':
-        case 'reportDetails':
-          final reportId = data['reportId'];
-          if (reportId != null) {
-            GoRouter.of(ctx).goNamed(
-              RouteNames.reportConversation.name,
-              pathParameters: {'reportId': reportId},
-            );
-          }
-          break;
-
-        case 'userReports':
-          GoRouter.of(ctx).goNamed(RouteNames.userReports.name);
-          break;
-
-        case 'activities':
-          GoRouter.of(ctx).goNamed(RouteNames.activities.name);
-          break;
-
-        case 'library':
-          GoRouter.of(ctx).goNamed(RouteNames.library.name);
-          break;
-
-        case 'diaries':
-          GoRouter.of(ctx).goNamed(RouteNames.diaries.name);
-          break;
-
-        case 'community':
-          GoRouter.of(ctx).goNamed(RouteNames.community.name);
-          break;
-
-        case 'account':
-          GoRouter.of(ctx).goNamed(RouteNames.account.name);
-          break;
-
-        case 'vault':
-          GoRouter.of(ctx).goNamed(RouteNames.vault.name);
-          break;
-
-        case 'home':
-        default:
-          GoRouter.of(ctx).goNamed(RouteNames.home.name);
-          break;
+      // If no screen parameter, redirect to notifications
+      if (screen == null || screen.isEmpty) {
+        GoRouter.of(ctx).goNamed(RouteNames.notifications.name);
+        return;
       }
-      */
 
-      // Always redirect to notifications screen
-      GoRouter.of(ctx).goNamed(RouteNames.notifications.name);
+      // Handle special cases with parameters
+      if (screen == 'reportConversation' || screen == 'reportDetails') {
+        final reportId = data['reportId'];
+        if (reportId != null) {
+          GoRouter.of(ctx).goNamed(
+            RouteNames.reportConversation.name,
+            pathParameters: {'reportId': reportId},
+          );
+          return;
+        }
+      }
+
+      // Direct navigation - screen parameter should match route name
+      try {
+        GoRouter.of(ctx).goNamed(screen);
+      } catch (e) {
+        // Fallback to notifications if route not found
+        GoRouter.of(ctx).goNamed(RouteNames.notifications.name);
+      }
     } catch (e) {
-      // Silent error - don't clutter logs
+      // Silent error handling
     }
   }
 

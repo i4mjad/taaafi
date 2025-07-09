@@ -3,29 +3,29 @@ import 'package:flutter/material.dart';
 class DarkThemeColors {
   static const Color backgroundcolor = Color(0xff121212);
 
-  // Primary - Vibrant blues for dark mode
-  static const Color primary50 = Color(0xFF0D1929);
-  static const Color primary100 = Color(0xFF152A4D);
-  static const Color primary200 = Color(0xFF1E3A5F);
-  static const Color primary300 = Color(0xFF2B4C7E);
-  static const Color primary400 = Color(0xFF3D5A8C);
-  static const Color primary500 = Color(0xFF4C6BE6); // Main primary
-  static const Color primary600 = Color(0xFF5E7DEA);
-  static const Color primary700 = Color(0xFF7190EF);
-  static const Color primary800 = Color(0xFF85A2F2);
-  static const Color primary900 = Color(0xFF9BB5F7);
+  // Swapped: Secondary colors are now primary
+  static const Color primary50 = Color(0xFF0A1F26);
+  static const Color primary100 = Color(0xFF133640);
+  static const Color primary200 = Color(0xFF1C4D5B);
+  static const Color primary300 = Color(0xFF256576);
+  static const Color primary400 = Color(0xFF2E7C91);
+  static const Color primary500 = Color(0xFF3794AC);
+  static const Color primary600 = Color(0xFF4FA9C0);
+  static const Color primary700 = Color(0xFF6BB8CD);
+  static const Color primary800 = Color(0xFF87C7DA);
+  static const Color primary900 = Color(0xFFA3D6E7);
 
-  // Secondary - Rich teal/cyan for dark mode
-  static const Color secondary50 = Color(0xFF0A1F26);
-  static const Color secondary100 = Color(0xFF133640);
-  static const Color secondary200 = Color(0xFF1C4D5B);
-  static const Color secondary300 = Color(0xFF256576);
-  static const Color secondary400 = Color(0xFF2E7C91);
-  static const Color secondary500 = Color(0xFF3794AC);
-  static const Color secondary600 = Color(0xFF4FA9C0);
-  static const Color secondary700 = Color(0xFF6BB8CD);
-  static const Color secondary800 = Color(0xFF87C7DA);
-  static const Color secondary900 = Color(0xFFA3D6E7);
+  // Swapped: Primary colors are now secondary
+  static const Color secondary50 = Color(0xFF0D1929);
+  static const Color secondary100 = Color(0xFF152A4D);
+  static const Color secondary200 = Color(0xFF1E3A5F);
+  static const Color secondary300 = Color(0xFF2B4C7E);
+  static const Color secondary400 = Color(0xFF3D5A8C);
+  static const Color secondary500 = Color(0xFF4C6BE6); // Main primary
+  static const Color secondary600 = Color(0xFF5E7DEA);
+  static const Color secondary700 = Color(0xFF7190EF);
+  static const Color secondary800 = Color(0xFF85A2F2);
+  static const Color secondary900 = Color(0xFF9BB5F7);
 
   // Tint - Warm amber/orange tones for dark mode
   static const Color tint50 = Color(0xFF2A1A0F);
@@ -91,7 +91,7 @@ class DarkThemeColors {
 }
 
 const MaterialColor darkPrimarySwatch = MaterialColor(
-  0xFF4C6BE6,
+  0xFF3794AC,
   <int, Color>{
     50: DarkThemeColors.primary50,
     100: DarkThemeColors.primary100,
@@ -117,7 +117,7 @@ const MaterialColor darkCalenderHeaderBackgoundSwatch = MaterialColor(
 );
 
 const MaterialColor darkSecondarySwatch = MaterialColor(
-  0xFF3794AC,
+  0xFF4C6BE6,
   <int, Color>{
     50: DarkThemeColors.secondary50,
     100: DarkThemeColors.secondary100,
