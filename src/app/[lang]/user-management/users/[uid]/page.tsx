@@ -6,6 +6,7 @@ import { SiteHeader } from '@/components/site-header';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Separator } from '@/components/ui/separator';
@@ -329,319 +330,339 @@ export default function UserDetailsPage() {
               </Button>
             </div>
 
-            {/* User Profile */}
-            <div className="grid gap-6 lg:grid-cols-2 xl:grid-cols-2">
-              {/* Basic Information */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <User className="h-5 w-5" />
-                    {t('modules.userManagement.basicInformation') || 'Basic Information'}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  {/* Avatar and Name */}
-                  <div className="flex items-center gap-4">
-                    <Avatar className="h-16 w-16">
-                      <AvatarImage src={user.photoURL || undefined} alt={user.displayName} />
-                      <AvatarFallback className="text-lg">
-                        {user.displayName?.charAt(0) || user.email.charAt(0).toUpperCase()}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="space-y-1">
-                      <h3 className="text-xl font-semibold">
-                        {user.displayName || user.email}
-                      </h3>
-                      <div className="flex items-center gap-2">
-                        {getRoleBadge(user.role)}
-                        {getStatusBadge(user.status)}
-                      </div>
-                    </div>
-                  </div>
+            {/* User Details Tabs */}
+            <Tabs defaultValue="profile" className="space-y-6">
+              <TabsList>
+                <TabsTrigger value="profile">{t('modules.userManagement.basicInformation') || 'Profile'}</TabsTrigger>
+                <TabsTrigger value="activity">{t('modules.userManagement.activityInformation') || 'Activity'}</TabsTrigger>
+                <TabsTrigger value="devices">{t('modules.userManagement.deviceInformation') || 'Devices'}</TabsTrigger>
+                <TabsTrigger value="groups">{t('modules.userManagement.groups.title') || 'Groups'}</TabsTrigger>
+                <TabsTrigger value="migration">{t('modules.userManagement.migrationManagement.title') || 'Migration'}</TabsTrigger>
+                <TabsTrigger value="warnings">{t('modules.userManagement.warnings.title') || 'Warnings'}</TabsTrigger>
+                <TabsTrigger value="bans">{t('modules.userManagement.bans.title') || 'Bans'}</TabsTrigger>
+              </TabsList>
 
-                  <Separator />
-
-                  {/* Contact Information */}
-                  <div className="space-y-4">
-                    <div className="flex items-center gap-3">
-                      <Mail className="h-4 w-4 text-muted-foreground" />
-                      <div>
-                        <p className="text-sm font-medium">{t('modules.userManagement.email') || 'Email'}</p>
-                        <p className="text-sm text-muted-foreground">{user.email}</p>
-                      </div>
-                      {user.emailVerified && (
-                        <Badge variant="outline" className="ml-auto">
-                          <CheckCircle className="h-3 w-3 mr-1" />
-                          {t('modules.userManagement.verified') || 'Verified'}
-                        </Badge>
-                      )}
-                    </div>
-
-                    <div className="flex items-center gap-3">
-                      <Shield className="h-4 w-4 text-muted-foreground" />
-                      <div>
-        <p className="text-sm font-medium">{t('modules.userManagement.role') || 'Role'}</p>
-                        <p className="text-sm text-muted-foreground capitalize">{user.role}</p>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-3">
-                      <UserCircle className="h-4 w-4 text-muted-foreground" />
-                      <div>
-                        <p className="text-sm font-medium">{t('modules.userManagement.displayName') || 'Display Name'}</p>
-                        <p className="text-sm text-muted-foreground">
-                          {user.displayName || t('modules.userManagement.notSpecified') || 'Not specified'}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Personal Information */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <UserCircle className="h-5 w-5" />
-                    {t('modules.userManagement.personalInformation') || 'Personal Information'}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="flex items-center gap-3">
-                    <Cake className="h-4 w-4 text-muted-foreground" />
-                    <div>
-                      <p className="text-sm font-medium">{t('modules.userManagement.dateOfBirth') || 'Date of Birth'}</p>
-                      <p className="text-sm text-muted-foreground">{formatDateOnly(user.dayOfBirth)}</p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-3">
-                    <User className="h-4 w-4 text-muted-foreground" />
-                    <div>
-                      <p className="text-sm font-medium">{t('modules.userManagement.gender') || 'Gender'}</p>
-                      <p className="text-sm text-muted-foreground">{formatGender(user.gender)}</p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-3">
-                    <Languages className="h-4 w-4 text-muted-foreground" />
-                    <div>
-                      <p className="text-sm font-medium">{t('modules.userManagement.locale') || 'Preferred Language'}</p>
-                      <p className="text-sm text-muted-foreground">{formatLocale(user.locale)}</p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-3">
-                    <Smartphone className="h-4 w-4 text-muted-foreground" />
-                    <div>
-                      <p className="text-sm font-medium">{t('modules.userManagement.platform') || 'Platform'}</p>
-                      <p className="text-sm text-muted-foreground">{formatPlatform(user.platform)}</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Activity Information */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Activity className="h-5 w-5" />
-                    {t('modules.userManagement.activityInformation') || 'Activity Information'}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  <div className="space-y-4">
-                    <div className="flex items-center gap-3">
-                      <Calendar className="h-4 w-4 text-muted-foreground" />
-                      <div>
-                        <p className="text-sm font-medium">{t('modules.userManagement.userFirstDate') || 'First Registration'}</p>
-                        <p className="text-sm text-muted-foreground">{formatDate(user.userFirstDate)}</p>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-3">
-                      <Calendar className="h-4 w-4 text-muted-foreground" />
-                      <div>
-                        <p className="text-sm font-medium">{t('modules.userManagement.memberSince') || 'Member Since'}</p>
-                        <p className="text-sm text-muted-foreground">{formatDate(user.createdAt)}</p>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-3">
-                      <Activity className="h-4 w-4 text-muted-foreground" />
-                      <div>
-                        <p className="text-sm font-medium">{t('modules.userManagement.lastLogin') || 'Last Login'}</p>
-                        <p className="text-sm text-muted-foreground">
-                          {formatDate(user.lastLoginAt)}
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-3">
-                      <Clock className="h-4 w-4 text-muted-foreground" />
-                      <div>
-                        <p className="text-sm font-medium">{t('modules.userManagement.lastTokenUpdate') || 'Last Token Update'}</p>
-                        <p className="text-sm text-muted-foreground">
-                          {formatDate(user.lastTokenUpdate)}
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-3">
-                      <Globe className="h-4 w-4 text-muted-foreground" />
-                      <div>
-                        <p className="text-sm font-medium">{t('modules.userManagement.lastIpAddress') || 'Last IP Address'}</p>
-                        <p className="text-sm text-muted-foreground">
-                          {user.metadata.lastIpAddress || t('common.unknown') || 'Unknown'}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <Separator />
-
-                  {/* Statistics */}
-                  <div className="grid grid-cols-3 gap-4">
-                    <div className="text-center p-4 bg-muted rounded-lg">
-                      <p className="text-2xl font-bold">{user.metadata.loginCount}</p>
-                      <p className="text-sm text-muted-foreground">
-                        {t('modules.userManagement.totalLogins') || 'Total Logins'}
-                      </p>
-                    </div>
-                    <div className="text-center p-4 bg-muted rounded-lg">
-                      <p className="text-2xl font-bold">
-                        {Math.floor((Date.now() - user.createdAt.getTime()) / (1000 * 60 * 60 * 24))}
-                      </p>
-                      <p className="text-sm text-muted-foreground">
-                        {t('modules.userManagement.daysSince') || 'Days Since Joining'}
-                      </p>
-                    </div>
-                    <div className="text-center p-4 bg-muted rounded-lg">
-                      <div className="flex items-center justify-center gap-1 mb-1">
-                        <Users className="h-4 w-4 text-muted-foreground" />
-                        <p className="text-2xl font-bold">
-                          {userMembershipsLoading ? (
-                            <span className="animate-pulse">...</span>
-                          ) : userMembershipsError ? (
-                            <span className="text-destructive text-sm">Error</span>
-                          ) : (
-                            userSubscriptionsCount
-                          )}
-                        </p>
-                      </div>
-                      <p className="text-sm text-muted-foreground">
-                        {t('modules.userManagement.groupSubscriptions') || 'Group Subscriptions'}
-                      </p>
-                      {lastSubscriptionUpdate && (
-                        <p className="text-xs text-muted-foreground mt-1">
-                          Last updated: {lastSubscriptionUpdate.toLocaleTimeString()}
-                        </p>
-                      )}
-                      {userMembershipsError && (
-                        <p className="text-xs text-destructive mt-1">
-                          {t('modules.userManagement.errors.loadingSubscriptions') || 'Failed to load subscriptions'}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Device Information */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Smartphone className="h-5 w-5" />
-                    {t('modules.userManagement.deviceInformation') || 'Device Information'}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <MessageSquare className="h-4 w-4 text-muted-foreground" />
-                        <p className="text-sm font-medium">{t('modules.userManagement.messagingToken') || 'Messaging Token'}</p>
-                      </div>
-                      {user.messagingToken && (
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => setNotificationDialogOpen(true)}
-                          className="h-8"
-                        >
-                          <Send className="h-3 w-3 mr-1" />
-                          {t('modules.userManagement.sendNotification') || 'Send Notification'}
-                        </Button>
-                      )}
-                    </div>
-                    <div className="pl-7">
-                      <p className="text-xs text-muted-foreground font-mono break-all bg-muted p-2 rounded">
-                        {user.messagingToken || t('modules.userManagement.notSpecified') || 'Not specified'}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-3">
-                    <Smartphone className="h-4 w-4 text-muted-foreground" />
-                    <div>
-                      <p className="text-sm font-medium">{t('modules.userManagement.deviceCount') || 'Registered Devices'}</p>
-                      <p className="text-sm text-muted-foreground">
-                        {user.devicesIds?.length || 0} {t('modules.userManagement.connectedDevices') || 'devices'}
-                      </p>
-                    </div>
-                  </div>
-
-                  {user.devicesIds && user.devicesIds.length > 0 && (
-                    <div className="space-y-2">
-                      <p className="text-sm font-medium">{t('modules.userManagement.devicesIds') || 'Device IDs'}</p>
-                      <div className="space-y-1">
-                        {user.devicesIds.map((deviceId, index) => (
-                          <div key={index} className="p-2 bg-muted rounded text-xs font-mono break-all">
-                            {deviceId}
+              {/* Profile Tab */}
+              <TabsContent value="profile">
+                <div className="grid gap-6 lg:grid-cols-2 xl:grid-cols-2">
+                  {/* Basic Information Card */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        <User className="h-5 w-5" />
+                        {t('modules.userManagement.basicInformation') || 'Basic Information'}
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-6">
+                      {/* Avatar and Name */}
+                      <div className="flex items-center gap-4">
+                        <Avatar className="h-16 w-16">
+                          <AvatarImage src={user.photoURL || undefined} alt={user.displayName} />
+                          <AvatarFallback className="text-lg">
+                            {user.displayName?.charAt(0) || user.email.charAt(0).toUpperCase()}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="space-y-1">
+                          <h3 className="text-xl font-semibold">
+                            {user.displayName || user.email}
+                          </h3>
+                          <div className="flex items-center gap-2">
+                            {getRoleBadge(user.role)}
+                            {getStatusBadge(user.status)}
                           </div>
-                        ))}
+                        </div>
+                      </div>
+
+                      <Separator />
+
+                      {/* Contact Information */}
+                      <div className="space-y-4">
+                        <div className="flex items-center gap-3">
+                          <Mail className="h-4 w-4 text-muted-foreground" />
+                          <div>
+                            <p className="text-sm font-medium">{t('modules.userManagement.email') || 'Email'}</p>
+                            <p className="text-sm text-muted-foreground">{user.email}</p>
+                          </div>
+                          {user.emailVerified && (
+                            <Badge variant="outline" className="ml-auto">
+                              <CheckCircle className="h-3 w-3 mr-1" />
+                              {t('modules.userManagement.verified') || 'Verified'}
+                            </Badge>
+                          )}
+                        </div>
+
+                        <div className="flex items-center gap-3">
+                          <Shield className="h-4 w-4 text-muted-foreground" />
+                          <div>
+                            <p className="text-sm font-medium">{t('modules.userManagement.role') || 'Role'}</p>
+                            <p className="text-sm text-muted-foreground capitalize">{user.role}</p>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-3">
+                          <UserCircle className="h-4 w-4 text-muted-foreground" />
+                          <div>
+                            <p className="text-sm font-medium">{t('modules.userManagement.displayName') || 'Display Name'}</p>
+                            <p className="text-sm text-muted-foreground">
+                              {user.displayName || t('modules.userManagement.notSpecified') || 'Not specified'}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Personal Information Card */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        <UserCircle className="h-5 w-5" />
+                        {t('modules.userManagement.personalInformation') || 'Personal Information'}
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="flex items-center gap-3">
+                        <Cake className="h-4 w-4 text-muted-foreground" />
+                        <div>
+                          <p className="text-sm font-medium">{t('modules.userManagement.dateOfBirth') || 'Date of Birth'}</p>
+                          <p className="text-sm text-muted-foreground">{formatDateOnly(user.dayOfBirth)}</p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-3">
+                        <User className="h-4 w-4 text-muted-foreground" />
+                        <div>
+                          <p className="text-sm font-medium">{t('modules.userManagement.gender') || 'Gender'}</p>
+                          <p className="text-sm text-muted-foreground">{formatGender(user.gender)}</p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-3">
+                        <Languages className="h-4 w-4 text-muted-foreground" />
+                        <div>
+                          <p className="text-sm font-medium">{t('modules.userManagement.locale') || 'Preferred Language'}</p>
+                          <p className="text-sm text-muted-foreground">{formatLocale(user.locale)}</p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-3">
+                        <Smartphone className="h-4 w-4 text-muted-foreground" />
+                        <div>
+                          <p className="text-sm font-medium">{t('modules.userManagement.platform') || 'Platform'}</p>
+                          <p className="text-sm text-muted-foreground">{formatPlatform(user.platform)}</p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              </TabsContent>
+
+              {/* Activity Tab */}
+              <TabsContent value="activity">
+                {/* Activity Information Card (with statistics) */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Activity className="h-5 w-5" />
+                      {t('modules.userManagement.activityInformation') || 'Activity Information'}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    <div className="space-y-4">
+                      <div className="flex items-center gap-3">
+                        <Calendar className="h-4 w-4 text-muted-foreground" />
+                        <div>
+                          <p className="text-sm font-medium">{t('modules.userManagement.userFirstDate') || 'First Registration'}</p>
+                          <p className="text-sm text-muted-foreground">{formatDate(user.userFirstDate)}</p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-3">
+                        <Calendar className="h-4 w-4 text-muted-foreground" />
+                        <div>
+                          <p className="text-sm font-medium">{t('modules.userManagement.memberSince') || 'Member Since'}</p>
+                          <p className="text-sm text-muted-foreground">{formatDate(user.createdAt)}</p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-3">
+                        <Activity className="h-4 w-4 text-muted-foreground" />
+                        <div>
+                          <p className="text-sm font-medium">{t('modules.userManagement.lastLogin') || 'Last Login'}</p>
+                          <p className="text-sm text-muted-foreground">
+                            {formatDate(user.lastLoginAt)}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-3">
+                        <Clock className="h-4 w-4 text-muted-foreground" />
+                        <div>
+                          <p className="text-sm font-medium">{t('modules.userManagement.lastTokenUpdate') || 'Last Token Update'}</p>
+                          <p className="text-sm text-muted-foreground">
+                            {formatDate(user.lastTokenUpdate)}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-3">
+                        <Globe className="h-4 w-4 text-muted-foreground" />
+                        <div>
+                          <p className="text-sm font-medium">{t('modules.userManagement.lastIpAddress') || 'Last IP Address'}</p>
+                          <p className="text-sm text-muted-foreground">
+                            {user.metadata.lastIpAddress || t('common.unknown') || 'Unknown'}
+                          </p>
+                        </div>
                       </div>
                     </div>
-                  )}
 
-                  {(!user.devicesIds || user.devicesIds.length === 0) && (
-                    <div className="text-center py-4 text-muted-foreground">
-                      <Smartphone className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                      <p className="text-sm">{t('modules.userManagement.noDevices') || 'No devices registered'}</p>
+                    <Separator />
+
+                    {/* Statistics */}
+                    <div className="grid grid-cols-3 gap-4">
+                      <div className="text-center p-4 bg-muted rounded-lg">
+                        <p className="text-2xl font-bold">{user.metadata.loginCount}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {t('modules.userManagement.totalLogins') || 'Total Logins'}
+                        </p>
+                      </div>
+                      <div className="text-center p-4 bg-muted rounded-lg">
+                        <p className="text-2xl font-bold">
+                          {Math.floor((Date.now() - user.createdAt.getTime()) / (1000 * 60 * 60 * 24))}
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          {t('modules.userManagement.daysSince') || 'Days Since Joining'}
+                        </p>
+                      </div>
+                      <div className="text-center p-4 bg-muted rounded-lg">
+                        <div className="flex items-center justify-center gap-1 mb-1">
+                          <Users className="h-4 w-4 text-muted-foreground" />
+                          <p className="text-2xl font-bold">
+                            {userMembershipsLoading ? (
+                              <span className="animate-pulse">...</span>
+                            ) : userMembershipsError ? (
+                              <span className="text-destructive text-sm">Error</span>
+                            ) : (
+                              userSubscriptionsCount
+                            )}
+                          </p>
+                        </div>
+                        <p className="text-sm text-muted-foreground">
+                          {t('modules.userManagement.groupSubscriptions') || 'Group Subscriptions'}
+                        </p>
+                        {lastSubscriptionUpdate && (
+                          <p className="text-xs text-muted-foreground mt-1">
+                            Last updated: {lastSubscriptionUpdate.toLocaleTimeString()}
+                          </p>
+                        )}
+                        {userMembershipsError && (
+                          <p className="text-xs text-destructive mt-1">
+                            {t('modules.userManagement.errors.loadingSubscriptions') || 'Failed to load subscriptions'}
+                          </p>
+                        )}
+                      </div>
                     </div>
-                  )}
-                </CardContent>
-              </Card>
+                  </CardContent>
+                </Card>
+              </TabsContent>
 
-              {/* Group Subscriptions Management - Full Width */}
-              <div className="col-span-full">
+              {/* Devices Tab */}
+              <TabsContent value="devices">
+                {/* Device Information Card */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Smartphone className="h-5 w-5" />
+                      {t('modules.userManagement.deviceInformation') || 'Device Information'}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <MessageSquare className="h-4 w-4 text-muted-foreground" />
+                          <p className="text-sm font-medium">{t('modules.userManagement.messagingToken') || 'Messaging Token'}</p>
+                        </div>
+                        {user.messagingToken && (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => setNotificationDialogOpen(true)}
+                            className="h-8"
+                          >
+                            <Send className="h-3 w-3 mr-1" />
+                            {t('modules.userManagement.sendNotification') || 'Send Notification'}
+                          </Button>
+                        )}
+                      </div>
+                      <div className="pl-7">
+                        <p className="text-xs text-muted-foreground font-mono break-all bg-muted p-2 rounded">
+                          {user.messagingToken || t('modules.userManagement.notSpecified') || 'Not specified'}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-3">
+                      <Smartphone className="h-4 w-4 text-muted-foreground" />
+                      <div>
+                        <p className="text-sm font-medium">{t('modules.userManagement.deviceCount') || 'Registered Devices'}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {user.devicesIds?.length || 0} {t('modules.userManagement.connectedDevices') || 'devices'}
+                        </p>
+                      </div>
+                    </div>
+
+                    {user.devicesIds && user.devicesIds.length > 0 && (
+                      <div className="space-y-2">
+                        <p className="text-sm font-medium">{t('modules.userManagement.devicesIds') || 'Device IDs'}</p>
+                        <div className="space-y-1">
+                          {user.devicesIds.map((deviceId, index) => (
+                            <div key={index} className="p-2 bg-muted rounded text-xs font-mono break-all">
+                              {deviceId}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {(!user.devicesIds || user.devicesIds.length === 0) && (
+                      <div className="text-center py-4 text-muted-foreground">
+                        <Smartphone className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                        <p className="text-sm">{t('modules.userManagement.noDevices') || 'No devices registered'}</p>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              {/* Groups Tab */}
+              <TabsContent value="groups">
                 <UserGroupsCard userId={user.uid} />
-              </div>
+              </TabsContent>
 
-              {/* Migration Management - Full Width */}
-              <div className="col-span-full">
+              {/* Migration Tab */}
+              <TabsContent value="migration">
                 <MigrationManagementCard userId={user.uid} user={user} />
-              </div>
+              </TabsContent>
 
-              {/* Warning Management - Full Width */}
-              <div className="col-span-full">
+              {/* Warnings Tab */}
+              <TabsContent value="warnings">
                 <WarningManagementCard 
                   userId={user.uid} 
                   userDisplayName={user.displayName}
                   userDevices={user.devicesIds || []}
                 />
-              </div>
+              </TabsContent>
 
-              {/* Ban Management - Full Width */}
-              <div className="col-span-full">
+              {/* Bans Tab */}
+              <TabsContent value="bans">
                 <BanManagementCard 
                   userId={user.uid} 
                   userDisplayName={user.displayName}
                   userDevices={user.devicesIds || []}
                 />
-              </div>
-            </div>
-
+              </TabsContent>
+            </Tabs>
             {/* TODO: Add more sections like user permissions, recent activity, etc. */}
           </div>
         </div>

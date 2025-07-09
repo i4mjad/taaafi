@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { 
   ResponsiveDialog as Dialog, 
   ResponsiveDialogContent as DialogContent, 
@@ -37,6 +38,45 @@ export function NotificationDialog({
   userDisplayName
 }: NotificationDialogProps) {
   const { t } = useTranslation();
+  // Screen options for targeting specific app screens
+  const screenOptions = [
+    'home',
+    'account',
+    'vault',
+    'ta3afiPlus',
+    'contents',
+    'onboarding',
+    'login',
+    'signup',
+    'forgotPassword',
+    'completeAccountRegisteration',
+    'confirmUserDetails',
+    'confirmUserEmail',
+    'loading',
+    'dayOverview',
+    'diaries',
+    'diary',
+    'library',
+    'libraryList',
+    'contentType',
+    'activities',
+    'allTasks',
+    'addActivity',
+    'activityOverview',
+    'ongoingActivity',
+    'accountDelete',
+    'contentLists',
+    'vaultSettings',
+    'activitiesNotifications',
+    'community',
+    'userReports',
+    'reportConversation',
+    'notifications',
+    'userProfile',
+    'banned'
+  ] as const;
+
+  const [screen, setScreen] = useState('');
   
   const [formData, setFormData] = useState({
     title: '',
@@ -128,6 +168,16 @@ export function NotificationDialog({
     setSending(true);
     
     try {
+      const dataPayload = customData.reduce((acc, item) => {
+        if (item.key.trim() && item.value.trim()) {
+          acc[item.key] = item.value;
+        }
+        return acc;
+      }, {} as Record<string, string>);
+      if (screen) {
+        dataPayload.screen = screen;
+      }
+
       const notificationData = {
         token: messagingToken,
         notification: {
@@ -157,12 +207,7 @@ export function NotificationDialog({
             }
           }
         },
-        data: customData.reduce((acc, item) => {
-          if (item.key.trim() && item.value.trim()) {
-            acc[item.key] = item.value;
-          }
-          return acc;
-        }, {} as Record<string, string>)
+        data: dataPayload
       };
 
       const response = await fetch('/api/admin/notifications/send', {
@@ -193,6 +238,7 @@ export function NotificationDialog({
         collapseKey: '',
       });
       setCustomData([]);
+      setScreen('');
       
     } catch (error) {
       console.error('Error sending notification:', error);
@@ -215,213 +261,244 @@ export function NotificationDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-6">
-          {/* Basic Message Fields */}
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="title">
-                {t('modules.userManagement.notificationDialog.messageTitle') || 'Title'} *
-              </Label>
-                             <Input
-                 id="title"
-                 value={formData.title}
-                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('title', e.target.value)}
-                 placeholder={t('modules.userManagement.notificationDialog.messageTitlePlaceholder') || 'Enter notification title'}
-                 className={errors.title ? 'border-red-500' : ''}
-               />
-              {errors.title && <p className="text-sm text-red-500">{errors.title}</p>}
-            </div>
+        <Tabs defaultValue="basic" className="space-y-6">
+          <TabsList>
+            <TabsTrigger value="basic">{t('common.basic') || 'Basic'}</TabsTrigger>
+            <TabsTrigger value="advanced">{t('common.advanced') || 'Advanced'}</TabsTrigger>
+            <TabsTrigger value="data">{t('modules.userManagement.notificationDialog.data') || 'Custom Data'}</TabsTrigger>
+          </TabsList>
 
-            <div className="space-y-2">
-              <Label htmlFor="body">
-                {t('modules.userManagement.notificationDialog.messageBody') || 'Message'} *
-              </Label>
-              <Textarea
-                id="body"
-                value={formData.body}
-                onChange={(e) => handleInputChange('body', e.target.value)}
-                placeholder={t('modules.userManagement.notificationDialog.messageBodyPlaceholder') || 'Enter notification message'}
-                className={errors.body ? 'border-red-500' : ''}
-                rows={3}
-              />
-              {errors.body && <p className="text-sm text-red-500">{errors.body}</p>}
-            </div>
-          </div>
-
-          {/* Advanced Options */}
-          <div className="space-y-4">
-            <h4 className="font-medium">Advanced Options</h4>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <TabsContent value="basic">
+            {/* Basic Message Fields */}
+            <div className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="imageUrl">
-                  {t('modules.userManagement.notificationDialog.imageUrl') || 'Image URL'}
+                <Label htmlFor="title">
+                  {t('modules.userManagement.notificationDialog.messageTitle') || 'Title'} *
                 </Label>
                 <Input
-                  id="imageUrl"
-                  value={formData.imageUrl}
-                  onChange={(e) => handleInputChange('imageUrl', e.target.value)}
-                  placeholder={t('modules.userManagement.notificationDialog.imageUrlPlaceholder') || 'https://example.com/image.jpg'}
-                  className={errors.imageUrl ? 'border-red-500' : ''}
+                  id="title"
+                  value={formData.title}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('title', e.target.value)}
+                  placeholder={t('modules.userManagement.notificationDialog.messageTitlePlaceholder') || 'Enter notification title'}
+                  className={errors.title ? 'border-red-500' : ''}
                 />
-                <p className="text-xs text-muted-foreground">
-                  {t('modules.userManagement.notificationDialog.imageUrlHelp') || 'Optional image to display in the notification'}
-                </p>
-                {errors.imageUrl && <p className="text-sm text-red-500">{errors.imageUrl}</p>}
+                {errors.title && <p className="text-sm text-red-500">{errors.title}</p>}
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="clickAction">
-                  {t('modules.userManagement.notificationDialog.clickAction') || 'Click Action'}
+                <Label htmlFor="body">
+                  {t('modules.userManagement.notificationDialog.messageBody') || 'Message'} *
                 </Label>
-                <Input
-                  id="clickAction"
-                  value={formData.clickAction}
-                  onChange={(e) => handleInputChange('clickAction', e.target.value)}
-                  placeholder={t('modules.userManagement.notificationDialog.clickActionPlaceholder') || 'https://example.com'}
-                  className={errors.clickAction ? 'border-red-500' : ''}
+                <Textarea
+                  id="body"
+                  value={formData.body}
+                  onChange={(e) => handleInputChange('body', e.target.value)}
+                  placeholder={t('modules.userManagement.notificationDialog.messageBodyPlaceholder') || 'Enter notification message'}
+                  className={errors.body ? 'border-red-500' : ''}
+                  rows={3}
                 />
-                <p className="text-xs text-muted-foreground">
-                  {t('modules.userManagement.notificationDialog.clickActionHelp') || 'URL to open when notification is clicked'}
-                </p>
-                {errors.clickAction && <p className="text-sm text-red-500">{errors.clickAction}</p>}
+                {errors.body && <p className="text-sm text-red-500">{errors.body}</p>}
               </div>
 
+              {/* Screen Selection */}
               <div className="space-y-2">
-                <Label htmlFor="priority">
-                  {t('modules.userManagement.notificationDialog.priority') || 'Priority'}
+                <Label htmlFor="screen">
+                  {t('modules.userManagement.notificationDialog.screen') || 'Screen'}
                 </Label>
-                <Select value={formData.priority} onValueChange={(value) => handleInputChange('priority', value)}>
+                <Select value={screen} onValueChange={setScreen}>
                   <SelectTrigger>
-                    <SelectValue />
+                    <SelectValue placeholder={t('modules.userManagement.notificationDialog.selectScreen') || 'Select screen'} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="normal">
-                      {t('modules.userManagement.notificationDialog.priorityNormal') || 'Normal'}
-                    </SelectItem>
-                    <SelectItem value="high">
-                      {t('modules.userManagement.notificationDialog.priorityHigh') || 'High'}
-                    </SelectItem>
+                    {screenOptions.map((opt) => (
+                      <SelectItem key={opt} value={opt}>
+                        {t(`modules.userManagement.notificationDialog.screens.${opt}`) || opt}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
-                <p className="text-xs text-muted-foreground">
-                  {t('modules.userManagement.notificationDialog.priorityHelp') || 'High priority notifications are delivered immediately'}
-                </p>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="badge">
-                  {t('modules.userManagement.notificationDialog.badge') || 'Badge Count'}
-                </Label>
-                <Input
-                  id="badge"
-                  type="number"
-                  value={formData.badge}
-                  onChange={(e) => handleInputChange('badge', e.target.value)}
-                  placeholder={t('modules.userManagement.notificationDialog.badgePlaceholder') || '1'}
-                  className={errors.badge ? 'border-red-500' : ''}
-                />
-                <p className="text-xs text-muted-foreground">
-                  {t('modules.userManagement.notificationDialog.badgeHelp') || 'Number to display on the app icon badge'}
-                </p>
-                {errors.badge && <p className="text-sm text-red-500">{errors.badge}</p>}
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="ttl">
-                  {t('modules.userManagement.notificationDialog.ttl') || 'Time to Live (TTL)'}
-                </Label>
-                <Input
-                  id="ttl"
-                  type="number"
-                  value={formData.ttl}
-                  onChange={(e) => handleInputChange('ttl', e.target.value)}
-                  placeholder={t('modules.userManagement.notificationDialog.ttlPlaceholder') || '3600'}
-                  className={errors.ttl ? 'border-red-500' : ''}
-                />
-                <p className="text-xs text-muted-foreground">
-                  {t('modules.userManagement.notificationDialog.ttlHelp') || 'Time in seconds for how long the message should be kept in FCM storage'}
-                </p>
-                {errors.ttl && <p className="text-sm text-red-500">{errors.ttl}</p>}
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="collapseKey">
-                  {t('modules.userManagement.notificationDialog.collapseKey') || 'Collapse Key'}
-                </Label>
-                <Input
-                  id="collapseKey"
-                  value={formData.collapseKey}
-                  onChange={(e) => handleInputChange('collapseKey', e.target.value)}
-                  placeholder={t('modules.userManagement.notificationDialog.collapseKeyPlaceholder') || 'update_available'}
-                />
-                <p className="text-xs text-muted-foreground">
-                  {t('modules.userManagement.notificationDialog.collapseKeyHelp') || 'Identifier for a group of messages that can be collapsed'}
-                </p>
               </div>
             </div>
-          </div>
+          </TabsContent>
 
-          {/* Custom Data */}
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <h4 className="font-medium">
-                  {t('modules.userManagement.notificationDialog.data') || 'Custom Data'}
-                </h4>
-                <p className="text-sm text-muted-foreground">
-                  {t('modules.userManagement.notificationDialog.dataHelp') || 'Additional key-value pairs to send with the notification'}
-                </p>
-              </div>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={addCustomDataField}
-              >
-                <Plus className="h-4 w-4 mr-1" />
-                {t('modules.userManagement.notificationDialog.addDataField') || 'Add Data Field'}
-              </Button>
-            </div>
-
-            {customData.map((item, index) => (
-              <div key={index} className="flex gap-2 items-end">
-                <div className="flex-1 space-y-2">
-                  <Label>
-                    {t('modules.userManagement.notificationDialog.dataKey') || 'Key'}
+          <TabsContent value="advanced">
+            {/* Advanced Options */}
+            <div className="space-y-4">
+              <h4 className="font-medium">Advanced Options</h4>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="imageUrl">
+                    {t('modules.userManagement.notificationDialog.imageUrl') || 'Image URL'}
                   </Label>
                   <Input
-                    value={item.key}
-                    onChange={(e) => updateCustomDataField(index, 'key', e.target.value)}
-                    placeholder={t('modules.userManagement.notificationDialog.dataKeyPlaceholder') || 'custom_key'}
+                    id="imageUrl"
+                    value={formData.imageUrl}
+                    onChange={(e) => handleInputChange('imageUrl', e.target.value)}
+                    placeholder={t('modules.userManagement.notificationDialog.imageUrlPlaceholder') || 'https://example.com/image.jpg'}
+                    className={errors.imageUrl ? 'border-red-500' : ''}
                   />
+                  <p className="text-xs text-muted-foreground">
+                    {t('modules.userManagement.notificationDialog.imageUrlHelp') || 'Optional image to display in the notification'}
+                  </p>
+                  {errors.imageUrl && <p className="text-sm text-red-500">{errors.imageUrl}</p>}
                 </div>
-                <div className="flex-1 space-y-2">
-                  <Label>
-                    {t('modules.userManagement.notificationDialog.dataValue') || 'Value'}
+
+                <div className="space-y-2">
+                  <Label htmlFor="clickAction">
+                    {t('modules.userManagement.notificationDialog.clickAction') || 'Click Action'}
                   </Label>
                   <Input
-                    value={item.value}
-                    onChange={(e) => updateCustomDataField(index, 'value', e.target.value)}
-                    placeholder={t('modules.userManagement.notificationDialog.dataValuePlaceholder') || 'custom_value'}
+                    id="clickAction"
+                    value={formData.clickAction}
+                    onChange={(e) => handleInputChange('clickAction', e.target.value)}
+                    placeholder={t('modules.userManagement.notificationDialog.clickActionPlaceholder') || 'https://example.com'}
+                    className={errors.clickAction ? 'border-red-500' : ''}
                   />
+                  <p className="text-xs text-muted-foreground">
+                    {t('modules.userManagement.notificationDialog.clickActionHelp') || 'URL to open when notification is clicked'}
+                  </p>
+                  {errors.clickAction && <p className="text-sm text-red-500">{errors.clickAction}</p>}
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="priority">
+                    {t('modules.userManagement.notificationDialog.priority') || 'Priority'}
+                  </Label>
+                  <Select value={formData.priority} onValueChange={(value) => handleInputChange('priority', value)}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="normal">
+                        {t('modules.userManagement.notificationDialog.priorityNormal') || 'Normal'}
+                      </SelectItem>
+                      <SelectItem value="high">
+                        {t('modules.userManagement.notificationDialog.priorityHigh') || 'High'}
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <p className="text-xs text-muted-foreground">
+                    {t('modules.userManagement.notificationDialog.priorityHelp') || 'High priority notifications are delivered immediately'}
+                  </p>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="badge">
+                    {t('modules.userManagement.notificationDialog.badge') || 'Badge Count'}
+                  </Label>
+                  <Input
+                    id="badge"
+                    type="number"
+                    value={formData.badge}
+                    onChange={(e) => handleInputChange('badge', e.target.value)}
+                    placeholder={t('modules.userManagement.notificationDialog.badgePlaceholder') || '1'}
+                    className={errors.badge ? 'border-red-500' : ''}
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    {t('modules.userManagement.notificationDialog.badgeHelp') || 'Number to display on the app icon badge'}
+                  </p>
+                  {errors.badge && <p className="text-sm text-red-500">{errors.badge}</p>}
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="ttl">
+                    {t('modules.userManagement.notificationDialog.ttl') || 'Time to Live (TTL)'}
+                  </Label>
+                  <Input
+                    id="ttl"
+                    type="number"
+                    value={formData.ttl}
+                    onChange={(e) => handleInputChange('ttl', e.target.value)}
+                    placeholder={t('modules.userManagement.notificationDialog.ttlPlaceholder') || '3600'}
+                    className={errors.ttl ? 'border-red-500' : ''}
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    {t('modules.userManagement.notificationDialog.ttlHelp') || 'Time in seconds for how long the message should be kept in FCM storage'}
+                  </p>
+                  {errors.ttl && <p className="text-sm text-red-500">{errors.ttl}</p>}
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="collapseKey">
+                    {t('modules.userManagement.notificationDialog.collapseKey') || 'Collapse Key'}
+                  </Label>
+                  <Input
+                    id="collapseKey"
+                    value={formData.collapseKey}
+                    onChange={(e) => handleInputChange('collapseKey', e.target.value)}
+                    placeholder={t('modules.userManagement.notificationDialog.collapseKeyPlaceholder') || 'update_available'}
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    {t('modules.userManagement.notificationDialog.collapseKeyHelp') || 'Identifier for a group of messages that can be collapsed'}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="data">
+            {/* Custom Data */}
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h4 className="font-medium">
+                    {t('modules.userManagement.notificationDialog.data') || 'Custom Data'}
+                  </h4>
+                  <p className="text-sm text-muted-foreground">
+                    {t('modules.userManagement.notificationDialog.dataHelp') || 'Additional key-value pairs to send with the notification'}
+                  </p>
                 </div>
                 <Button
                   type="button"
                   variant="outline"
                   size="sm"
-                  onClick={() => removeCustomDataField(index)}
-                  className="mb-0"
+                  onClick={addCustomDataField}
                 >
-                  <X className="h-4 w-4" />
-                  {t('modules.userManagement.notificationDialog.removeDataField') || 'Remove'}
+                  <Plus className="h-4 w-4 mr-1" />
+                  {t('modules.userManagement.notificationDialog.addDataField') || 'Add Data Field'}
                 </Button>
               </div>
-            ))}
-            
-            {errors.data && <p className="text-sm text-red-500">{errors.data}</p>}
-          </div>
-        </div>
+
+              {customData.map((item, index) => (
+                <div key={index} className="flex gap-2 items-end">
+                  <div className="flex-1 space-y-2">
+                    <Label>
+                      {t('modules.userManagement.notificationDialog.dataKey') || 'Key'}
+                    </Label>
+                    <Input
+                      value={item.key}
+                      onChange={(e) => updateCustomDataField(index, 'key', e.target.value)}
+                      placeholder={t('modules.userManagement.notificationDialog.dataKeyPlaceholder') || 'custom_key'}
+                    />
+                  </div>
+                  <div className="flex-1 space-y-2">
+                    <Label>
+                      {t('modules.userManagement.notificationDialog.dataValue') || 'Value'}
+                    </Label>
+                    <Input
+                      value={item.value}
+                      onChange={(e) => updateCustomDataField(index, 'value', e.target.value)}
+                      placeholder={t('modules.userManagement.notificationDialog.dataValuePlaceholder') || 'custom_value'}
+                    />
+                  </div>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => removeCustomDataField(index)}
+                    className="mb-0"
+                  >
+                    <X className="h-4 w-4" />
+                    {t('modules.userManagement.notificationDialog.removeDataField') || 'Remove'}
+                  </Button>
+                </div>
+              ))}
+              
+              {errors.data && <p className="text-sm text-red-500">{errors.data}</p>}
+            </div>
+          </TabsContent>
+        </Tabs>
 
         <DialogFooter>
           <Button
