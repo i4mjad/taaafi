@@ -159,6 +159,7 @@ const Map<String, String> kAr = {
   "processing-new-account": "جاري إنشاء الحساب...",
   "daily-notification-time": "التذكير اليومي",
   "delete-my-data": "إعادة تعيين بيانات الحساب",
+  "reset-counters": "تصفير العدادات",
   "start-your-journy": "إبدأ رحلة التعافي",
   "about-ta3afi":
       "تطبيق للتوعية بمخاطر المواد الإباحية وما يؤدي الإدمان عليها عن طريق تقديم محتوى وأدوات تساعد في حل المشكلة.",

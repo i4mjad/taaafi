@@ -301,7 +301,7 @@ class _UpdateUserProfileModalSheetState
       builder: (BuildContext context) {
         final theme = AppTheme.of(context);
         return AlertDialog(
-          actionsAlignment: MainAxisAlignment.start,
+          actionsAlignment: MainAxisAlignment.end,
           backgroundColor: theme.backgroundColor,
           title: Text(
             AppLocalizations.of(context).translate('confirm-your-details-p'),
@@ -316,26 +316,32 @@ class _UpdateUserProfileModalSheetState
                 '${AppLocalizations.of(context).translate('first-name')}: ${nameController.text}',
                 style: TextStyles.small,
               ),
+              verticalSpace(Spacing.points8),
               Text(
                 '${AppLocalizations.of(context).translate('email')}: ${emailController.text}',
                 style: TextStyles.small,
               ),
+              verticalSpace(Spacing.points8),
               Text(
                 '${AppLocalizations.of(context).translate('date-of-birth')}: ${dobController.text}',
                 style: TextStyles.small,
               ),
+              verticalSpace(Spacing.points8),
               Text(
                 '${AppLocalizations.of(context).translate('starting-date')}: ${userFirstDateController.text}',
                 style: TextStyles.small,
               ),
+              verticalSpace(Spacing.points8),
               Text(
                 '${AppLocalizations.of(context).translate('role')}: ${roleController.text}',
                 style: TextStyles.small,
               ),
+              verticalSpace(Spacing.points8),
               Text(
                 '${AppLocalizations.of(context).translate('gender')}: ${AppLocalizations.of(context).translate(selectedGender.translationKey)}',
                 style: TextStyles.small,
               ),
+              verticalSpace(Spacing.points8),
               Text(
                 '${AppLocalizations.of(context).translate('preferred-language')}: ${AppLocalizations.of(context).translate(selectedLocale.translationKey)}',
                 style: TextStyles.small,

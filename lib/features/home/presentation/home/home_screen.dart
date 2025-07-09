@@ -27,6 +27,7 @@ import 'package:reboot_app_3/features/authentication/providers/user_document_pro
 import 'package:reboot_app_3/features/notifications/data/repositories/notifications_repository.dart';
 import 'package:reboot_app_3/features/home/presentation/home/home_layout_provider.dart';
 import 'package:reboot_app_3/features/home/presentation/home/widgets/shorebird_update_widget.dart';
+import 'package:reboot_app_3/features/home/presentation/home/widgets/reset_button.dart';
 
 class HomeScreen extends ConsumerWidget {
   HomeScreen({super.key});
@@ -222,6 +223,7 @@ class HomeScreen extends ConsumerWidget {
                         ],
                       ),
                       if (streaksState != null) CurrentStreaksWidget(),
+                      const ResetButton(),
                     ],
                   ),
                 ),

@@ -328,6 +328,7 @@ const Map<String, String> kEn = {
   "registered-since": "Registered Since:",
   "daily-notification-time": "Daily Reminder",
   "delete-my-data": "Delete My Data",
+  "reset-counters": "Reset Counters",
   "show-all": "View All",
   "duplicates-deleted": "Duplicates deleted successfully",
   "ta3afi-plus": "Ta'aafi +",
