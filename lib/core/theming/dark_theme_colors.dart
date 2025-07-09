@@ -1,90 +1,97 @@
 import 'package:flutter/material.dart';
 
 class DarkThemeColors {
-  static const Color backgroundcolor = Color(0xff212121);
+  static const Color backgroundcolor = Color(0xff121212);
 
-  static const Color primary50 = Color(0xff2c2a29);
-  static const Color primary100 = Color(0xff323433);
-  static const Color primary200 = Color(0xff3e4241);
-  static const Color primary300 = Color(0xff4c5150);
-  static const Color primary400 = Color(0xff5a6161);
-  static const Color primary500 = Color(0xff697271);
-  static const Color primary600 = Color(0xff798484);
-  static const Color primary700 = Color(0xff8a9696);
-  static const Color primary800 = Color(0xff9ca9a9);
-  static const Color primary900 = Color(0xffaebcbc);
+  // Primary - Vibrant blues for dark mode
+  static const Color primary50 = Color(0xFF0D1929);
+  static const Color primary100 = Color(0xFF152A4D);
+  static const Color primary200 = Color(0xFF1E3A5F);
+  static const Color primary300 = Color(0xFF2B4C7E);
+  static const Color primary400 = Color(0xFF3D5A8C);
+  static const Color primary500 = Color(0xFF4C6BE6); // Main primary
+  static const Color primary600 = Color(0xFF5E7DEA);
+  static const Color primary700 = Color(0xFF7190EF);
+  static const Color primary800 = Color(0xFF85A2F2);
+  static const Color primary900 = Color(0xFF9BB5F7);
 
-  static const Color secondary50 = Color(0xff2c2a29);
-  static const Color secondary100 = Color(0xff323433);
-  static const Color secondary200 = Color(0xff3e4241);
-  static const Color secondary300 = Color(0xff4c5150);
-  static const Color secondary400 = Color(0xff5a6161);
-  static const Color secondary500 = Color(0xff697271);
-  static const Color secondary600 = Color(0xff798484);
-  static const Color secondary700 = Color(0xff8a9696);
-  static const Color secondary800 = Color(0xff9ca9a9);
-  static const Color secondary900 = Color(0xffaebcbc);
+  // Secondary - Rich teal/cyan for dark mode
+  static const Color secondary50 = Color(0xFF0A1F26);
+  static const Color secondary100 = Color(0xFF133640);
+  static const Color secondary200 = Color(0xFF1C4D5B);
+  static const Color secondary300 = Color(0xFF256576);
+  static const Color secondary400 = Color(0xFF2E7C91);
+  static const Color secondary500 = Color(0xFF3794AC);
+  static const Color secondary600 = Color(0xFF4FA9C0);
+  static const Color secondary700 = Color(0xFF6BB8CD);
+  static const Color secondary800 = Color(0xFF87C7DA);
+  static const Color secondary900 = Color(0xFFA3D6E7);
 
-  static const Color tint50 = Color(0xff2c2a29);
-  static const Color tint100 = Color(0xff323433);
-  static const Color tint200 = Color(0xff3e4241);
-  static const Color tint300 = Color(0xff4c5150);
-  static const Color tint400 = Color(0xff5a6161);
-  static const Color tint500 = Color(0xff697271);
-  static const Color tint600 = Color(0xff798484);
-  static const Color tint700 = Color(0xff8a9696);
-  static const Color tint800 = Color(0xff9ca9a9);
-  static const Color tint900 = Color(0xffaebcbc);
+  // Tint - Warm amber/orange tones for dark mode
+  static const Color tint50 = Color(0xFF2A1A0F);
+  static const Color tint100 = Color(0xFF3D2817);
+  static const Color tint200 = Color(0xFF50361F);
+  static const Color tint300 = Color(0xFF6B4829);
+  static const Color tint400 = Color(0xFF865A33);
+  static const Color tint500 = Color(0xFFA16C3D);
+  static const Color tint600 = Color(0xFFBB8250);
+  static const Color tint700 = Color(0xFFD49863);
+  static const Color tint800 = Color(0xFFE0A875);
+  static const Color tint900 = Color(0xFFEDB888);
 
-  static const Color sucess50 = Color(0xff185130);
-  static const Color sucess100 = Color(0xff1f6a3f);
-  static const Color sucess200 = Color(0xff288951);
-  static const Color sucess300 = Color(0xff33b068);
-  static const Color sucess400 = Color(0xff38c172);
-  static const Color sucess500 = Color(0xff60cd8e);
-  static const Color sucess600 = Color(0xff7ad5a1);
-  static const Color sucess700 = Color(0xffa3e2be);
-  static const Color sucess800 = Color(0xffc1ecd3);
-  static const Color sucess900 = Color(0xffebf9f1);
+  // Success - Adjusted greens for dark mode
+  static const Color sucess50 = Color(0xFF0D2818);
+  static const Color sucess100 = Color(0xFF164430);
+  static const Color sucess200 = Color(0xFF1F6048);
+  static const Color sucess300 = Color(0xFF287C60);
+  static const Color sucess400 = Color(0xFF319878);
+  static const Color sucess500 = Color(0xFF3AB490);
+  static const Color sucess600 = Color(0xFF52C3A1);
+  static const Color sucess700 = Color(0xFF6BD1B2);
+  static const Color sucess800 = Color(0xFF84DFC3);
+  static const Color sucess900 = Color(0xFF9DEDD4);
 
-  static const Color warn50 = Color(0xfff1c863);
-  static const Color warn100 = Color(0xfff3ce76);
-  static const Color warn200 = Color(0xfff4d387);
-  static const Color warn300 = Color(0xfff5d997);
-  static const Color warn400 = Color(0xfff7dfa7);
-  static const Color warn500 = Color(0xfff8e4b6);
-  static const Color warn600 = Color(0xfffaeac5);
-  static const Color warn700 = Color(0xfffbefd4);
-  static const Color warn800 = Color(0xfffcf4e2);
-  static const Color warn900 = Color(0xfffefaf1);
+  // Warning - Adjusted yellows for dark mode
+  static const Color warn50 = Color(0xFF2A2310);
+  static const Color warn100 = Color(0xFF3F3518);
+  static const Color warn200 = Color(0xFF564720);
+  static const Color warn300 = Color(0xFF6D5928);
+  static const Color warn400 = Color(0xFF846B30);
+  static const Color warn500 = Color(0xFF9B7D38);
+  static const Color warn600 = Color(0xFFB29040);
+  static const Color warn700 = Color(0xFFC9A348);
+  static const Color warn800 = Color(0xFFDFB650);
+  static const Color warn900 = Color(0xFFF6C958);
 
-  static const Color grey50 = Color(0xfffefefe);
-  static const Color grey100 = Color(0xfffdfdfd);
-  static const Color grey200 = Color(0xfffcfcfd);
-  static const Color grey300 = Color(0xfffbfbfc);
-  static const Color grey400 = Color(0xfff9fafb);
-  static const Color grey500 = Color(0xfff8fafa);
-  static const Color grey600 = Color(0xfff7f9f9);
-  static const Color grey700 = Color(0xfff6f8f9);
-  static const Color grey800 = Color(0xfff5f7f8);
-  static const Color grey900 = Color(0xfff4f6f7);
+  // Grey - Proper scale for dark mode (light text on dark bg)
+  static const Color grey50 = Color(0xFF1A1A1A);
+  static const Color grey100 = Color(0xFF2D2D2D);
+  static const Color grey200 = Color(0xFF404040);
+  static const Color grey300 = Color(0xFF525252);
+  static const Color grey400 = Color(0xFF6B6B6B);
+  static const Color grey500 = Color(0xFF858585);
+  static const Color grey600 = Color(0xFF9E9E9E);
+  static const Color grey700 = Color(0xFFB8B8B8);
+  static const Color grey800 = Color(0xFFD1D1D1);
+  static const Color grey900 = Color(0xFFEBEBEB);
 
-  static const Color error50 = Color(0xffe15839);
-  static const Color error100 = Color(0xffe66b4f);
-  static const Color error200 = Color(0xffeb7d63);
-  static const Color error300 = Color(0xfff08e77);
-  static const Color error400 = Color(0xfff49f8a);
-  static const Color error500 = Color(0xfff7af9d);
-  static const Color error600 = Color(0xfffabfb1);
-  static const Color error700 = Color(0xfffccfc4);
-  static const Color error800 = Color(0xfffedfd7);
-  static const Color error900 = Color(0xffffefeb);
+  // Error - Adjusted reds for dark mode
+  static const Color error50 = Color(0xFF2D0F0F);
+  static const Color error100 = Color(0xFF451717);
+  static const Color error200 = Color(0xFF5D1F1F);
+  static const Color error300 = Color(0xFF752727);
+  static const Color error400 = Color(0xFF8D2F2F);
+  static const Color error500 = Color(0xFFA53737);
+  static const Color error600 = Color(0xFFBD3F3F);
+  static const Color error700 = Color(0xFFD54747);
+  static const Color error800 = Color(0xFFE55555);
+  static const Color error900 = Color(0xFFF06666);
 
-  static const Color darkCalenderHeaderBackgoundColor = Color(0xff212121);
+  static const Color darkCalenderHeaderBackgoundColor = Color(0xFF1E1E1E);
 }
 
 const MaterialColor darkPrimarySwatch = MaterialColor(
-  0xff376d71,
+  0xFF4C6BE6,
   <int, Color>{
     50: DarkThemeColors.primary50,
     100: DarkThemeColors.primary100,
@@ -110,7 +117,7 @@ const MaterialColor darkCalenderHeaderBackgoundSwatch = MaterialColor(
 );
 
 const MaterialColor darkSecondarySwatch = MaterialColor(
-  0xff94c5c9,
+  0xFF3794AC,
   <int, Color>{
     50: DarkThemeColors.secondary50,
     100: DarkThemeColors.secondary100,
@@ -126,7 +133,7 @@ const MaterialColor darkSecondarySwatch = MaterialColor(
 );
 
 const MaterialColor darkTintSwatch = MaterialColor(
-  0xffefc0aa,
+  0xFFA16C3D,
   <int, Color>{
     50: DarkThemeColors.tint50,
     100: DarkThemeColors.tint100,
@@ -142,7 +149,7 @@ const MaterialColor darkTintSwatch = MaterialColor(
 );
 
 const MaterialColor darkSuccessSwatch = MaterialColor(
-  0xff38c172,
+  0xFF3AB490,
   <int, Color>{
     50: DarkThemeColors.sucess50,
     100: DarkThemeColors.sucess100,
@@ -158,7 +165,7 @@ const MaterialColor darkSuccessSwatch = MaterialColor(
 );
 
 const MaterialColor darkWarnSwatch = MaterialColor(
-  0xfff1c863,
+  0xFF9B7D38,
   <int, Color>{
     50: DarkThemeColors.warn50,
     100: DarkThemeColors.warn100,
@@ -190,7 +197,7 @@ const MaterialColor darkGreySwatch = MaterialColor(
 );
 
 const MaterialColor darkErrorSwatch = MaterialColor(
-  0xffdf1111,
+  0xFFA53737,
   <int, Color>{
     50: DarkThemeColors.error50,
     100: DarkThemeColors.error100,
