@@ -40,6 +40,11 @@ import {
   ExternalLink,
   BarChart3,
   Settings,
+  Trash2,
+  ChevronLeft,
+  ChevronRight,
+  ChevronsLeft,
+  ChevronsRight,
 } from 'lucide-react';
 
 // Import the report types management component
@@ -49,8 +54,9 @@ import { toast } from 'sonner';
 
 // Firebase imports - using react-firebase-hooks
 import { useCollection } from 'react-firebase-hooks/firestore';
-import { collection, query, orderBy, where, Timestamp } from 'firebase/firestore';
+import { collection, query, orderBy, where, Timestamp, deleteDoc, doc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 interface UserReport {
   id: string;
@@ -78,6 +84,12 @@ export default function UserReportsPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [dateRangeFilter, setDateRangeFilter] = useState<string>('all');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+
+  // Delete dialog state
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [reportToDelete, setReportToDelete] = useState<UserReport | null>(null);
 
   // Fetch reports from Firebase using react-firebase-hooks
   const [reportsSnapshot, reportsLoading, reportsError] = useCollection(
@@ -220,6 +232,14 @@ export default function UserReportsPage() {
     };
   }, [allReports]);
 
+  // Calculate pagination
+  const totalPages = Math.ceil(filteredReports.length / itemsPerPage);
+  const paginatedReports = useMemo(() => {
+    const start = (currentPage - 1) * itemsPerPage;
+    const end = start + itemsPerPage;
+    return filteredReports.slice(start, end);
+  }, [filteredReports, currentPage, itemsPerPage]);
+
   const getStatusBadge = (status: string) => {
     const variants = {
       pending: { variant: 'secondary' as const, icon: Clock, className: 'text-yellow-600' },
@@ -267,6 +287,20 @@ export default function UserReportsPage() {
   const exportReports = (format: 'csv' | 'excel') => {
     // Implementation for export functionality
     toast.info(`${format.toUpperCase()} export feature coming soon`);
+  };
+
+  // Handle report deletion
+  const handleDeleteReport = async () => {
+    if (!reportToDelete) return;
+    try {
+      await deleteDoc(doc(db, 'usersReports', reportToDelete.id));
+      toast.success(t('modules.userManagement.reports.deleteSuccess') || 'Report deleted successfully');
+    } catch (error) {
+      toast.error(t('modules.userManagement.reports.deleteError') || 'Failed to delete report');
+    } finally {
+      setDeleteDialogOpen(false);
+      setReportToDelete(null);
+    }
   };
 
   const headerDictionary = {
@@ -506,7 +540,7 @@ export default function UserReportsPage() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {filteredReports.map((report) => (
+                      {paginatedReports.map((report) => (
                         <TableRow key={report.id}>
                           <TableCell>
                             <div className="flex items-center gap-2">
@@ -570,6 +604,17 @@ export default function UserReportsPage() {
                                     {t('modules.userManagement.reports.reportDetails.viewUserProfile') || 'View User Profile'}
                                   </Link>
                                 </DropdownMenuItem>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem
+                                  onClick={() => {
+                                    setReportToDelete(report);
+                                    setDeleteDialogOpen(true);
+                                  }}
+                                  className="text-red-600"
+                                >
+                                  <Trash2 className="h-4 w-4 mr-2" />
+                                  {t('common.delete') || 'Delete'}
+                                </DropdownMenuItem>
                               </DropdownMenuContent>
                             </DropdownMenu>
                           </TableCell>
@@ -580,9 +625,78 @@ export default function UserReportsPage() {
                 )}
               </CardContent>
             </Card>
+            <div className="flex items-center justify-between px-4 py-4 border-t">
+              <div className="text-sm text-muted-foreground">
+                {t('modules.userManagement.reports.showing')} {((currentPage - 1) * itemsPerPage) + 1} - {Math.min(currentPage * itemsPerPage, filteredReports.length)} {t('modules.userManagement.reports.of')} {filteredReports.length}
+              </div>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage(1)}
+                  disabled={currentPage === 1}
+                >
+                  <ChevronsLeft className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                  disabled={currentPage === 1}
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                  disabled={currentPage === totalPages}
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage(totalPages)}
+                  disabled={currentPage === totalPages}
+                >
+                  <ChevronsRight className="h-4 w-4" />
+                </Button>
+              </div>
+              <Select value={itemsPerPage.toString()} onValueChange={(value) => { setItemsPerPage(Number(value)); setCurrentPage(1); }}>
+                <SelectTrigger className="w-[100px]">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="10">10</SelectItem>
+                  <SelectItem value="20">20</SelectItem>
+                  <SelectItem value="50">50</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
         </div>
       </div>
+
+      {/* Delete Report Dialog */}
+      <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t('modules.userManagement.reports.deleteTitle') || 'Delete Report'}</DialogTitle>
+            <DialogDescription>
+              {t('modules.userManagement.reports.deleteDescription') || 'Are you sure you want to delete this report? This action cannot be undone.'}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDeleteDialogOpen(false)}>
+              {t('common.cancel') || 'Cancel'}
+            </Button>
+            <Button variant="destructive" onClick={handleDeleteReport}>
+              {t('common.delete') || 'Delete'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   );
 } 

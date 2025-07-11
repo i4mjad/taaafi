@@ -78,6 +78,8 @@ export default function UserDetailsPage() {
   const uid = params.uid as string;
   
   const [notificationDialogOpen, setNotificationDialogOpen] = useState(false);
+  const [authUser, setAuthUser] = useState<any>(null);
+  const [authUserLoading, setAuthUserLoading] = useState(true);
 
   // Use Firebase hooks to fetch user document and group memberships
   const [userSnapshot, userLoading, userError] = useDocument(
@@ -93,10 +95,34 @@ export default function UserDetailsPage() {
     ? (userMembershipsSnapshot.data()?.groups || []).length 
     : 0;
 
+  // Fetch Firebase Auth user data
+  useEffect(() => {
+    const fetchAuthUser = async () => {
+      if (!uid) return;
+      
+      try {
+        setAuthUserLoading(true);
+        const response = await fetch(`/api/admin/users/${uid}`);
+        if (response.ok) {
+          const data = await response.json();
+          setAuthUser(data.user);
+        } else {
+          console.error('Failed to fetch auth user data');
+        }
+        setAuthUserLoading(false);
+      } catch (error) {
+        console.error('Error fetching auth user:', error);
+        setAuthUserLoading(false);
+      }
+    };
+
+    fetchAuthUser();
+  }, [uid]);
+
   // Track last update timestamp for debugging
   const [lastSubscriptionUpdate, setLastSubscriptionUpdate] = useState<Date | null>(null);
 
-  // Process user data from Firebase snapshot
+  // Process user data from Firebase snapshot and Auth data
   const user: UserProfile | null = userSnapshot?.exists() ? (() => {
     const userData = userSnapshot.data();
     return {
@@ -106,9 +132,10 @@ export default function UserDetailsPage() {
       photoURL: userData.photoURL,
       role: userData.role || 'user',
       status: userData.status || 'active',
-      createdAt: userData.createdAt?.toDate() || new Date(),
-      updatedAt: userData.updatedAt?.toDate() || new Date(),
-      lastLoginAt: userData.lastLoginAt?.toDate() || null,
+      // Use Firebase Auth creation date if available, otherwise fallback to Firestore
+      createdAt: authUser?.createdAt ? new Date(authUser.createdAt) : (userData.createdAt?.toDate() || new Date()),
+      updatedAt: authUser?.updatedAt ? new Date(authUser.updatedAt) : (userData.updatedAt?.toDate() || new Date()),
+      lastLoginAt: authUser?.lastLoginAt ? new Date(authUser.lastLoginAt) : (userData.lastLoginAt?.toDate() || null),
       emailVerified: userData.emailVerified || false,
       dayOfBirth: userData.dayOfBirth?.toDate() || null,
       gender: userData.gender,
