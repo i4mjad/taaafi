@@ -54,7 +54,7 @@ import { toast } from 'sonner';
 
 // Firebase imports - using react-firebase-hooks
 import { useCollection } from 'react-firebase-hooks/firestore';
-import { collection, query, orderBy, where, Timestamp, deleteDoc, doc } from 'firebase/firestore';
+import { collection, query, orderBy, where, Timestamp, deleteDoc, doc, limit, startAfter, getDocs, QueryDocumentSnapshot, DocumentData } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
@@ -86,18 +86,26 @@ export default function UserReportsPage() {
   const [dateRangeFilter, setDateRangeFilter] = useState<string>('all');
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
+  
+  // Pagination state for Firestore
+  const [lastVisible, setLastVisible] = useState<QueryDocumentSnapshot<DocumentData> | null>(null);
+  const [firstVisible, setFirstVisible] = useState<QueryDocumentSnapshot<DocumentData> | null>(null);
+  const [pageCache, setPageCache] = useState<Map<number, {
+    docs: QueryDocumentSnapshot<DocumentData>[],
+    lastDoc: QueryDocumentSnapshot<DocumentData> | null,
+    firstDoc: QueryDocumentSnapshot<DocumentData> | null
+  }>>(new Map());
+  const [totalCount, setTotalCount] = useState<number>(0);
+  const [isLoadingPage, setIsLoadingPage] = useState(false);
 
   // Delete dialog state
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [reportToDelete, setReportToDelete] = useState<UserReport | null>(null);
 
-  // Fetch reports from Firebase using react-firebase-hooks
-  const [reportsSnapshot, reportsLoading, reportsError] = useCollection(
-    query(
-      collection(db, 'usersReports'),
-      orderBy('time', 'desc')
-    )
-  );
+  // Custom state for paginated data fetching
+  const [allReports, setAllReports] = useState<UserReport[]>([]);
+  const [reportsLoading, setReportsLoading] = useState(true);
+  const [reportsError, setReportsError] = useState<Error | null>(null);
 
   // Fetch report types for dynamic display
   const [reportTypesSnapshot, reportTypesLoading] = useCollection(
@@ -107,21 +115,142 @@ export default function UserReportsPage() {
     )
   );
 
-  // Convert Firebase data to UserReport objects
-  const allReports: UserReport[] = useMemo(() => {
-    if (!reportsSnapshot) return [];
-    
-    return reportsSnapshot.docs.map(doc => ({
-      id: doc.id,
-      uid: doc.data().uid || '',
-      time: doc.data().time || Timestamp.now(),
-      reportTypeId: doc.data().reportTypeId || doc.data().reportType || 'dataError',
-      status: doc.data().status || 'pending',
-      initialMessage: doc.data().initialMessage || doc.data().userJustification || '',
-      lastUpdated: doc.data().lastUpdated || doc.data().time || Timestamp.now(),
-      messagesCount: doc.data().messagesCount || 1,
-    }));
-  }, [reportsSnapshot]);
+  // Build Firestore query based on filters
+  const buildQuery = () => {
+    let q = query(
+      collection(db, 'usersReports'),
+      orderBy('time', 'desc'),
+      limit(itemsPerPage)
+    );
+
+    // Add status filter if not 'all'
+    if (statusFilter !== 'all') {
+      q = query(
+        collection(db, 'usersReports'),
+        where('status', '==', statusFilter),
+        orderBy('time', 'desc'),
+        limit(itemsPerPage)
+      );
+    }
+
+    // For pagination, add startAfter if we have a cursor
+    if (currentPage > 1 && lastVisible) {
+      const cachedPage = pageCache.get(currentPage - 1);
+      if (cachedPage?.lastDoc) {
+        if (statusFilter !== 'all') {
+          q = query(
+            collection(db, 'usersReports'),
+            where('status', '==', statusFilter),
+            orderBy('time', 'desc'),
+            startAfter(cachedPage.lastDoc),
+            limit(itemsPerPage)
+          );
+        } else {
+          q = query(
+            collection(db, 'usersReports'),
+            orderBy('time', 'desc'),
+            startAfter(cachedPage.lastDoc),
+            limit(itemsPerPage)
+          );
+        }
+      }
+    }
+
+    return q;
+  };
+
+  // Fetch reports with pagination
+  const fetchReports = async (page: number, reset: boolean = false) => {
+    if (reset) {
+      setPageCache(new Map());
+      setCurrentPage(1);
+      page = 1;
+    }
+
+    setIsLoadingPage(true);
+    setReportsError(null);
+
+    try {
+      // Check if page is already cached
+      const cachedPage = pageCache.get(page);
+      if (cachedPage && !reset) {
+        const reports = cachedPage.docs.map(doc => ({
+          id: doc.id,
+          uid: doc.data().uid || '',
+          time: doc.data().time || Timestamp.now(),
+          reportTypeId: doc.data().reportTypeId || doc.data().reportType || 'dataError',
+          status: doc.data().status || 'pending',
+          initialMessage: doc.data().initialMessage || doc.data().userJustification || '',
+          lastUpdated: doc.data().lastUpdated || doc.data().time || Timestamp.now(),
+          messagesCount: doc.data().messagesCount || 1,
+        }));
+        setAllReports(reports);
+        setIsLoadingPage(false);
+        return;
+      }
+
+      const q = buildQuery();
+      const snapshot = await getDocs(q);
+      
+      const reports: UserReport[] = snapshot.docs.map(doc => ({
+        id: doc.id,
+        uid: doc.data().uid || '',
+        time: doc.data().time || Timestamp.now(),
+        reportTypeId: doc.data().reportTypeId || doc.data().reportType || 'dataError',
+        status: doc.data().status || 'pending',
+        initialMessage: doc.data().initialMessage || doc.data().userJustification || '',
+        lastUpdated: doc.data().lastUpdated || doc.data().time || Timestamp.now(),
+        messagesCount: doc.data().messagesCount || 1,
+      }));
+
+      // Cache the page
+      const newPageCache = new Map(pageCache);
+      newPageCache.set(page, {
+        docs: snapshot.docs,
+        lastDoc: snapshot.docs[snapshot.docs.length - 1] || null,
+        firstDoc: snapshot.docs[0] || null
+      });
+      setPageCache(newPageCache);
+
+      if (snapshot.docs.length > 0) {
+        setLastVisible(snapshot.docs[snapshot.docs.length - 1]);
+        setFirstVisible(snapshot.docs[0]);
+      }
+
+      setAllReports(reports);
+      
+      // Get total count for the first page or when filters change
+      if (page === 1 || reset) {
+        const countQuery = statusFilter !== 'all' 
+          ? query(collection(db, 'usersReports'), where('status', '==', statusFilter))
+          : query(collection(db, 'usersReports'));
+        const countSnapshot = await getDocs(countQuery);
+        setTotalCount(countSnapshot.size);
+      }
+      
+    } catch (error) {
+      console.error('Error fetching reports:', error);
+      setReportsError(error as Error);
+    } finally {
+      setIsLoadingPage(false);
+      setReportsLoading(false);
+    }
+  };
+
+  // Effect to fetch reports when page, filters, or itemsPerPage changes
+  useEffect(() => {
+    const shouldReset = currentPage === 1;
+    fetchReports(currentPage, shouldReset);
+  }, [currentPage, statusFilter, itemsPerPage]);
+
+  // Reset to first page when filters change
+  useEffect(() => {
+    if (currentPage !== 1) {
+      setCurrentPage(1);
+    } else {
+      fetchReports(1, true);
+    }
+  }, [statusFilter, dateRangeFilter]);
 
   // Convert report types to a lookup map
   const reportTypesMap = useMemo(() => {
@@ -151,11 +280,11 @@ export default function UserReportsPage() {
     return locale === 'ar' ? reportType.nameAr : reportType.nameEn;
   };
 
-  // Filter reports based on search and filters
+  // Filter reports based on search and date range (client-side for current page)
   const filteredReports = useMemo(() => {
     let filtered = allReports;
 
-    // Search filter
+    // Search filter (client-side on current page)
     if (searchQuery.trim()) {
       filtered = filtered.filter(report => 
         report.uid.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -164,12 +293,7 @@ export default function UserReportsPage() {
       );
     }
 
-    // Status filter
-    if (statusFilter !== 'all') {
-      filtered = filtered.filter(report => report.status === statusFilter);
-    }
-
-    // Date range filter
+    // Date range filter (client-side on current page)
     if (dateRangeFilter !== 'all') {
       const now = new Date();
       let startDate: Date;
@@ -194,51 +318,47 @@ export default function UserReportsPage() {
     }
 
     return filtered;
-  }, [allReports, searchQuery, statusFilter, dateRangeFilter]);
+  }, [allReports, searchQuery, dateRangeFilter]);
 
-  // Calculate stats
+  // Calculate stats (needs to be updated for server-side pagination)
   const stats = useMemo(() => {
-    const total = allReports.length;
+    // For now, show stats based on total count and current page
+    // In a real implementation, you might want to fetch these separately
+    const currentPageTotal = allReports.length;
     const pending = allReports.filter(r => r.status === 'pending').length;
     const inProgress = allReports.filter(r => r.status === 'inProgress').length;
     const waitingForAdmin = allReports.filter(r => r.status === 'waitingForAdminResponse').length;
     const closed = allReports.filter(r => r.status === 'closed').length;
     const finalized = allReports.filter(r => r.status === 'finalized').length;
 
-    // Calculate average response time for closed/finalized reports
-    const resolvedReports = allReports.filter(r => 
-      (r.status === 'closed' || r.status === 'finalized')
-    );
-    
-    let averageResponseTime = 0;
-    if (resolvedReports.length > 0) {
-      const totalHours = resolvedReports.reduce((sum, report) => {
-        const submitTime = report.time.toDate();
-        const lastUpdate = report.lastUpdated.toDate();
-        const diffHours = Math.abs(lastUpdate.getTime() - submitTime.getTime()) / (1000 * 60 * 60);
-        return sum + diffHours;
-      }, 0);
-      averageResponseTime = Math.round(totalHours / resolvedReports.length);
-    }
-
     return {
-      total,
+      total: totalCount,
       pending,
       inProgress,
       waitingForAdmin,
       closed,
       finalized,
-      averageResponseTime,
+      averageResponseTime: 0, // Would need separate calculation
     };
-  }, [allReports]);
+  }, [allReports, totalCount]);
 
-  // Calculate pagination
-  const totalPages = Math.ceil(filteredReports.length / itemsPerPage);
-  const paginatedReports = useMemo(() => {
-    const start = (currentPage - 1) * itemsPerPage;
-    const end = start + itemsPerPage;
-    return filteredReports.slice(start, end);
-  }, [filteredReports, currentPage, itemsPerPage]);
+  // Calculate pagination info
+  const totalPages = Math.ceil(totalCount / itemsPerPage);
+  const hasNextPage = currentPage < totalPages;
+  const hasPrevPage = currentPage > 1;
+
+  // Handle page changes
+  const handlePageChange = (newPage: number) => {
+    if (newPage >= 1 && newPage <= totalPages && newPage !== currentPage) {
+      setCurrentPage(newPage);
+    }
+  };
+
+  const handleItemsPerPageChange = (newItemsPerPage: number) => {
+    setItemsPerPage(newItemsPerPage);
+    setCurrentPage(1);
+    setPageCache(new Map()); // Clear cache when page size changes
+  };
 
   const getStatusBadge = (status: string) => {
     const variants = {
@@ -540,8 +660,23 @@ export default function UserReportsPage() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {paginatedReports.map((report) => (
-                        <TableRow key={report.id}>
+                      {isLoadingPage ? (
+                        // Show loading skeletons during page transitions
+                        [...Array(itemsPerPage)].map((_, i) => (
+                          <TableRow key={i}>
+                            <TableCell><Skeleton className="h-4 w-24" /></TableCell>
+                            <TableCell><Skeleton className="h-4 w-20" /></TableCell>
+                            <TableCell><Skeleton className="h-4 w-16" /></TableCell>
+                            <TableCell><Skeleton className="h-4 w-16" /></TableCell>
+                            <TableCell><Skeleton className="h-4 w-32" /></TableCell>
+                            <TableCell><Skeleton className="h-4 w-40" /></TableCell>
+                            <TableCell><Skeleton className="h-4 w-12" /></TableCell>
+                            <TableCell><Skeleton className="h-4 w-16" /></TableCell>
+                          </TableRow>
+                        ))
+                      ) : (
+                        filteredReports.map((report) => (
+                          <TableRow key={report.id}>
                           <TableCell>
                             <div className="flex items-center gap-2">
                               <span className="font-mono text-sm max-w-[120px] truncate">
@@ -619,61 +754,77 @@ export default function UserReportsPage() {
                             </DropdownMenu>
                           </TableCell>
                         </TableRow>
-                      ))}
+                        ))
+                      )}
                     </TableBody>
                   </Table>
                 )}
               </CardContent>
             </Card>
-            <div className="flex items-center justify-between px-4 py-4 border-t">
-              <div className="text-sm text-muted-foreground">
-                {t('modules.userManagement.reports.showing')} {((currentPage - 1) * itemsPerPage) + 1} - {Math.min(currentPage * itemsPerPage, filteredReports.length)} {t('modules.userManagement.reports.of')} {filteredReports.length}
-              </div>
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setCurrentPage(1)}
-                  disabled={currentPage === 1}
-                >
-                  <ChevronsLeft className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                  disabled={currentPage === 1}
-                >
-                  <ChevronLeft className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                  disabled={currentPage === totalPages}
-                >
-                  <ChevronRight className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setCurrentPage(totalPages)}
-                  disabled={currentPage === totalPages}
-                >
-                  <ChevronsRight className="h-4 w-4" />
-                </Button>
-              </div>
-              <Select value={itemsPerPage.toString()} onValueChange={(value) => { setItemsPerPage(Number(value)); setCurrentPage(1); }}>
-                <SelectTrigger className="w-[100px]">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="10">10</SelectItem>
-                  <SelectItem value="20">20</SelectItem>
-                  <SelectItem value="50">50</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+
+            {/* Pagination Controls */}
+            {!reportsLoading && totalCount > 0 && (
+              <Card>
+                <CardContent className="pt-6">
+                  <div className="flex items-center justify-between">
+                    <div className="text-sm text-muted-foreground">
+                      {t('modules.userManagement.reports.showing')} {((currentPage - 1) * itemsPerPage) + 1} - {Math.min(currentPage * itemsPerPage, totalCount)} {t('modules.userManagement.reports.of')} {totalCount}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handlePageChange(1)}
+                        disabled={!hasPrevPage || isLoadingPage}
+                      >
+                        <ChevronsLeft className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handlePageChange(currentPage - 1)}
+                        disabled={!hasPrevPage || isLoadingPage}
+                      >
+                        <ChevronLeft className="h-4 w-4" />
+                      </Button>
+                      <span className="text-sm font-medium px-2">
+                        {t('modules.userManagement.reports.page')} {currentPage} {t('modules.userManagement.reports.of')} {totalPages}
+                      </span>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handlePageChange(currentPage + 1)}
+                        disabled={!hasNextPage || isLoadingPage}
+                      >
+                        <ChevronRight className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handlePageChange(totalPages)}
+                        disabled={!hasNextPage || isLoadingPage}
+                      >
+                        <ChevronsRight className="h-4 w-4" />
+                      </Button>
+                    </div>
+                    <Select 
+                      value={itemsPerPage.toString()} 
+                      onValueChange={(value) => handleItemsPerPageChange(Number(value))}
+                      disabled={isLoadingPage}
+                    >
+                      <SelectTrigger className="w-[100px]">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="10">10</SelectItem>
+                        <SelectItem value="20">20</SelectItem>
+                        <SelectItem value="50">50</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
           </div>
         </div>
       </div>
