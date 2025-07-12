@@ -1063,6 +1063,7 @@ const Map<String, String> kEn = {
   "groups-feature-1": "Join support groups with shared interests",
   "groups-feature-2": "Chat with group members in a safe environment",
   "groups-feature-3": "Participate in group challenges",
+  "community-profile-settings": "Community Profile",
   "groups-feature-4": "Track group achievements and milestones",
   "groups-feature-5": "Private and secure group interactions",
   "default-image": "Default Image",

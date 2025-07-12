@@ -1034,6 +1034,7 @@ const Map<String, String> kAr = {
   "groups-feature-1": "انضم إلى مجموعات الدعم ذات الاهتمامات المشتركة",
   "groups-feature-2": "تحدث مع أعضاء المجموعة في بيئة آمنة",
   "groups-feature-3": "شارك في تحديات المجموعة",
+  "community-profile-settings": "الملف الشخصي",
   "groups-feature-4": "تتبع إنجازات ومعالم المجموعة",
   "groups-feature-5": "تفاعلات خاصة وآمنة للمجموعة",
   "default-image": "الصورة الافتراضية",

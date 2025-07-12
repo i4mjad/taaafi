@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
+import 'package:reboot_app_3/core/shared_widgets/app_bar.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/features/community/presentation/providers/community_providers_new.dart';
@@ -29,23 +29,7 @@ class _CommunityProfileSettingsScreenState
     final profileAsyncValue = ref.watch(currentCommunityProfileProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: theme.backgroundColor,
-        surfaceTintColor: theme.backgroundColor,
-        elevation: 0,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: theme.grey[900]),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-        actions: [
-          IconButton(
-            icon: Icon(LucideIcons.moreHorizontal, color: theme.grey[900]),
-            onPressed: () {
-              // TODO: Implement more options menu
-            },
-          ),
-        ],
-      ),
+      appBar: appBar(context, ref, "community-profile-settings", false, true),
       backgroundColor: theme.backgroundColor,
       body: profileAsyncValue.when(
         data: (profile) {
@@ -102,12 +86,6 @@ class _CommunityProfileSettingsScreenState
                                 ),
                               ),
                               const SizedBox(height: 4),
-                              Text(
-                                _getUserDisplayEmail(),
-                                style: TextStyles.body.copyWith(
-                                  color: theme.grey[600],
-                                ),
-                              ),
                               const SizedBox(height: 8),
                               Text(
                                 '0 ${localizations.translate('community-followers')}',
@@ -137,29 +115,7 @@ class _CommunityProfileSettingsScreenState
                             ),
                             child: Text(
                               localizations.translate('community-edit-profile'),
-                              style: TextStyles.body.copyWith(
-                                color: theme.grey[900],
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: OutlinedButton(
-                            onPressed: () {
-                              // TODO: Implement share profile functionality
-                            },
-                            style: OutlinedButton.styleFrom(
-                              side: BorderSide(color: theme.grey[300]!),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                            ),
-                            child: Text(
-                              localizations
-                                  .translate('community-share-profile'),
-                              style: TextStyles.body.copyWith(
+                              style: TextStyles.caption.copyWith(
                                 color: theme.grey[900],
                                 fontWeight: FontWeight.w600,
                               ),
@@ -207,14 +163,6 @@ class _CommunityProfileSettingsScreenState
         ),
       ),
     );
-  }
-
-  String _getUserDisplayEmail() {
-    final user = FirebaseAuth.instance.currentUser;
-    if (user?.email != null) {
-      return user!.email!;
-    }
-    return 'user@example.com';
   }
 
   Widget _buildTabContent(theme, localizations) {

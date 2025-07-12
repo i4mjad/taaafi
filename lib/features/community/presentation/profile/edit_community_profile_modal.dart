@@ -4,14 +4,17 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
 import 'package:reboot_app_3/core/shared_widgets/custom_textfield.dart';
+import 'package:reboot_app_3/core/shared_widgets/snackbar.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/custom_theme_data.dart';
+import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
-import 'package:reboot_app_3/features/community/data/models/community_profile.dart';
+import 'package:reboot_app_3/features/community/domain/entities/community_profile_entity.dart';
 import 'package:reboot_app_3/features/community/presentation/widgets/avatar_with_anonymity.dart';
+import 'package:reboot_app_3/features/community/presentation/providers/community_providers_new.dart';
 
 class EditCommunityProfileModal extends ConsumerStatefulWidget {
-  final CommunityProfile profile;
+  final CommunityProfileEntity profile;
 
   const EditCommunityProfileModal({
     super.key,
@@ -37,6 +40,13 @@ class _EditCommunityProfileModalState
         TextEditingController(text: widget.profile.displayName);
     _postAnonymouslyByDefault = widget.profile.postAnonymouslyByDefault;
     _selectedGender = widget.profile.gender;
+
+    // Add listener to update button state when text changes
+    _displayNameController.addListener(() {
+      setState(() {
+        // This will trigger a rebuild and update the button state
+      });
+    });
   }
 
   @override
@@ -147,16 +157,58 @@ class _EditCommunityProfileModalState
                                   color: theme.grey[600],
                                 ),
                               ),
-                              if (_postAnonymouslyByDefault) ...[
-                                const SizedBox(height: 4),
-                                Text(
-                                  localizations.translate(
-                                      'community-anonymous-mode-enabled'),
-                                  style: TextStyles.tiny.copyWith(
-                                    color: theme.warn[600],
+                              const SizedBox(height: 8),
+                            ],
+                          ),
+                        ),
+
+                        // Anonymous Mode Toggle
+                        _buildSectionTitle(
+                          localizations.translate('community-anonymous-mode'),
+                          theme,
+                        ),
+                        const SizedBox(height: 8),
+                        WidgetsContainer(
+                          padding: const EdgeInsets.all(16),
+                          backgroundColor: theme.primary[50],
+                          child: Column(
+                            children: [
+                              Row(
+                                children: [
+                                  Icon(
+                                    LucideIcons.shieldCheck,
+                                    size: 26,
+                                    color: theme.primary[600],
                                   ),
+                                  horizontalSpace(Spacing.points8),
+                                  Expanded(
+                                    child: Text(
+                                      localizations.translate(
+                                          'community-post-anonymously-by-default'),
+                                      style: TextStyles.body.copyWith(
+                                        color: theme.primary[900],
+                                      ),
+                                    ),
+                                  ),
+                                  Switch(
+                                    value: _postAnonymouslyByDefault,
+                                    onChanged: (value) {
+                                      setState(() {
+                                        _postAnonymouslyByDefault = value;
+                                      });
+                                    },
+                                    activeColor: theme.primary[500],
+                                  ),
+                                ],
+                              ),
+                              Text(
+                                localizations.translate(
+                                    'community-anonymous-mode-description'),
+                                style: TextStyles.caption.copyWith(
+                                  color: theme.grey[700],
+                                  height: 1.3,
                                 ),
-                              ],
+                              ),
                             ],
                           ),
                         ),
@@ -171,7 +223,6 @@ class _EditCommunityProfileModalState
                         const SizedBox(height: 8),
                         CustomTextField(
                           controller: _displayNameController,
-                          hint: localizations.translate('enter_display_name'),
                           prefixIcon: LucideIcons.user,
                           inputType: TextInputType.text,
                           enabled: !_postAnonymouslyByDefault,
@@ -190,62 +241,6 @@ class _EditCommunityProfileModalState
                             theme,
                           ),
                         ],
-
-                        const SizedBox(height: 24),
-
-                        // Gender Selection
-                        _buildSectionTitle(
-                          localizations.translate('gender'),
-                          theme,
-                        ),
-                        const SizedBox(height: 8),
-                        _buildGenderSelector(theme, localizations),
-
-                        const SizedBox(height: 24),
-
-                        // Anonymous Mode Toggle
-                        _buildSectionTitle(
-                          localizations.translate('community-anonymous-mode'),
-                          theme,
-                        ),
-                        const SizedBox(height: 8),
-                        WidgetsContainer(
-                          padding: const EdgeInsets.all(16),
-                          child: Column(
-                            children: [
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: Text(
-                                      localizations.translate(
-                                          'community-post-anonymously-by-default'),
-                                      style: TextStyles.body.copyWith(
-                                        color: theme.grey[900],
-                                      ),
-                                    ),
-                                  ),
-                                  Switch(
-                                    value: _postAnonymouslyByDefault,
-                                    onChanged: (value) {
-                                      setState(() {
-                                        _postAnonymouslyByDefault = value;
-                                      });
-                                    },
-                                    activeColor: theme.primary[500],
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                localizations.translate(
-                                    'community-anonymous-mode-description'),
-                                style: TextStyles.caption.copyWith(
-                                  color: theme.grey[600],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
                       ],
                     ),
                   ),
@@ -279,8 +274,8 @@ class _EditCommunityProfileModalState
       child: Row(
         children: [
           Icon(
-            LucideIcons.info,
-            size: 16,
+            LucideIcons.shieldAlert,
+            size: 26,
             color: theme.warn[600],
           ),
           const SizedBox(width: 8),
@@ -289,6 +284,7 @@ class _EditCommunityProfileModalState
               text,
               style: TextStyles.caption.copyWith(
                 color: theme.warn[700],
+                height: 1.3,
               ),
             ),
           ),
@@ -297,61 +293,10 @@ class _EditCommunityProfileModalState
     );
   }
 
-  Widget _buildGenderSelector(
-      CustomThemeData theme, AppLocalizations localizations) {
-    return Row(
-      children: [
-        _buildGenderOption('male', localizations.translate('male'), theme),
-        const SizedBox(width: 12),
-        _buildGenderOption('female', localizations.translate('female'), theme),
-      ],
-    );
-  }
-
-  Widget _buildGenderOption(String value, String label, CustomThemeData theme) {
-    final isSelected = _selectedGender == value;
-
-    return Expanded(
-      child: GestureDetector(
-        onTap: () {
-          setState(() {
-            _selectedGender = value;
-          });
-        },
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-          decoration: BoxDecoration(
-            color: isSelected ? theme.primary[50] : theme.grey[50],
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(
-              color: isSelected ? theme.primary[300]! : theme.grey[200]!,
-            ),
-          ),
-          child: Center(
-            child: Text(
-              label,
-              style: TextStyles.body.copyWith(
-                color: isSelected ? theme.primary[700] : theme.grey[700],
-                fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
   Future<void> _saveProfile() async {
     if (_displayNameController.text.trim().isEmpty &&
         !_postAnonymouslyByDefault) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            AppLocalizations.of(context).translate('field-required'),
-          ),
-          backgroundColor: AppTheme.of(context).error[500],
-        ),
-      );
+      getErrorSnackBar(context, "field-required");
       return;
     }
 
@@ -360,32 +305,22 @@ class _EditCommunityProfileModalState
     });
 
     try {
-      // TODO: Implement actual profile update logic
-      await Future.delayed(const Duration(seconds: 1)); // Simulate API call
+      final updateNotifier = ref.read(communityProfileUpdateProvider.notifier);
+
+      await updateNotifier.updateProfile(
+        displayName: _displayNameController.text.trim(),
+        gender: _selectedGender,
+        postAnonymouslyByDefault: _postAnonymouslyByDefault,
+        avatarUrl: widget.profile.avatarUrl, // Keep existing avatar
+      );
 
       if (mounted) {
         Navigator.of(context).pop();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              AppLocalizations.of(context)
-                  .translate('community-profile-updated'),
-            ),
-            backgroundColor: AppTheme.of(context).success[500],
-          ),
-        );
+        getSuccessSnackBar(context, "community-profile-updated");
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              AppLocalizations.of(context)
-                  .translate('community-profile-update-failed'),
-            ),
-            backgroundColor: AppTheme.of(context).error[500],
-          ),
-        );
+        getErrorSnackBar(context, "community-profile-update-failed");
       }
     } finally {
       if (mounted) {
