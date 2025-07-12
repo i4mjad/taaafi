@@ -14,7 +14,7 @@ import 'package:reboot_app_3/features/community/presentation/providers/community
 class AnonymityToggleModal extends ConsumerStatefulWidget {
   final CommunityProfileEntity profile;
   final bool currentAnonymousState;
-  final VoidCallback? onToggleComplete;
+  final Function(bool)? onToggleComplete;
 
   const AnonymityToggleModal({
     super.key,
@@ -279,7 +279,7 @@ class _AnonymityToggleModalState extends ConsumerState<AnonymityToggleModal> {
 
       if (mounted) {
         Navigator.of(context).pop();
-        widget.onToggleComplete?.call();
+        widget.onToggleComplete?.call(_postAnonymouslyByDefault);
         getSuccessSnackBar(
             context,
             _postAnonymouslyByDefault

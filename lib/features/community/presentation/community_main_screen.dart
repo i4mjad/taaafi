@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
+import 'package:reboot_app_3/core/routing/route_names.dart';
 import 'package:reboot_app_3/core/shared_widgets/app_bar.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
@@ -43,7 +44,7 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen> {
       body: _buildForumTab(),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          context.push('/community/forum/new');
+          context.pushNamed(RouteNames.newPost.name);
         },
         backgroundColor: theme.primary[500],
         child: const Icon(LucideIcons.plus, color: Colors.white),

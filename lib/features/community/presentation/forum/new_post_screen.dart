@@ -885,10 +885,11 @@ class _NewPostScreenState extends ConsumerState<NewPostScreen> {
       builder: (context) => AnonymityToggleModal(
         profile: profile,
         currentAnonymousState: currentAnonymousState,
-        onToggleComplete: () {
-          // Update the anonymousPostProvider with the new profile setting
-          ref.read(anonymousPostProvider.notifier).state =
-              profile.postAnonymouslyByDefault;
+        onToggleComplete: (newAnonymityState) {
+          // Update the anonymousPostProvider with the new state
+          ref.read(anonymousPostProvider.notifier).state = newAnonymityState;
+          // Also refresh the community profile to get the updated setting
+          ref.refresh(currentCommunityProfileProvider);
         },
       ),
     );
