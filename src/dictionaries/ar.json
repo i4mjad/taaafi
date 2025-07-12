@@ -1016,6 +1016,9 @@
             "statusDistribution": "توزيع الحالات",
             "today": "اليوم"
           },
+          "showing": "عرض",
+          "page": "صفحة",
+          "of": "من",
           "notifications": {
             "statusUpdate": {
               "ar": {

@@ -997,8 +997,12 @@
             "slowestResponse": "Slowest Response",
             "responseTimeTarget": "Target: 24 hours",
             "trendsChart": "Trends over time",
-            "statusDistribution": "Status distribution"
+            "statusDistribution": "Status distribution",
+            "today": "Today"
           },
+          "showing": "Showing",
+          "page": "Page",
+          "of": "of",
           "notifications": {
             "statusUpdate": {
               "en": {
