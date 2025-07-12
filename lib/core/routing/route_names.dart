@@ -34,6 +34,8 @@ enum RouteNames {
   // Community routes
   communityOnboarding,
   forumHome,
+  // Groups routes
+  groupsOnboarding,
   postDetail,
   newPost,
   replyComposer,

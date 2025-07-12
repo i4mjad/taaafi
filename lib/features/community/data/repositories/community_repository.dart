@@ -29,4 +29,39 @@ class CommunityRepository {
       rethrow;
     }
   }
+
+  /// Creates a new community profile for the user
+  Future<void> createCommunityProfile({
+    required String uid,
+    required String displayName,
+    required String gender,
+    required bool postAnonymouslyByDefault,
+    String? avatarUrl,
+    String? referralCode,
+  }) async {
+    try {
+      final profileRef = _firestore.collection('communityProfiles').doc(uid);
+
+      await profileRef.set({
+        'displayName': displayName,
+        'gender': gender,
+        'avatarUrl': avatarUrl,
+        'postAnonymouslyByDefault': postAnonymouslyByDefault,
+        'referralCode': referralCode,
+        'createdAt': FieldValue.serverTimestamp(),
+        'updatedAt': FieldValue.serverTimestamp(),
+      });
+
+      // Also save referral code to users collection if provided
+      if (referralCode != null && referralCode.isNotEmpty) {
+        final userRef = _firestore.collection('users').doc(uid);
+        await userRef.update({
+          'referralCode': referralCode,
+        });
+      }
+    } catch (e) {
+      // Let the service layer handle the error
+      rethrow;
+    }
+  }
 }

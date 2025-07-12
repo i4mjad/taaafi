@@ -8,8 +8,8 @@ import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/features/community/presentation/community_profile_setup_modal.dart';
 
-class CommunityOnboardingScreen extends ConsumerWidget {
-  const CommunityOnboardingScreen({super.key});
+class GroupsOnboardingScreen extends ConsumerWidget {
+  const GroupsOnboardingScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -34,14 +34,14 @@ class CommunityOnboardingScreen extends ConsumerWidget {
                 ),
                 const SizedBox(height: 32),
                 Text(
-                  l10n.translate('welcome-to-community'),
+                  l10n.translate('welcome-to-groups'),
                   style: TextStyles.h3.copyWith(
                     color: theme.primary[700],
                   ),
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  l10n.translate('complete-profile-setup'),
+                  l10n.translate('groups-setup-description'),
                   textAlign: TextAlign.center,
                   style: TextStyles.bodyLarge.copyWith(
                     height: 1.5,
@@ -67,7 +67,7 @@ class CommunityOnboardingScreen extends ConsumerWidget {
                         ),
                         const SizedBox(width: 8),
                         Text(
-                          l10n.translate('complete-setup'),
+                          l10n.translate('groups-setup-button'),
                           style: TextStyles.body.copyWith(
                             color: theme.grey[50],
                             fontWeight: FontWeight.w500,
@@ -80,7 +80,7 @@ class CommunityOnboardingScreen extends ConsumerWidget {
 
                 const SizedBox(height: 32),
                 Text(
-                  l10n.translate('community-features'),
+                  l10n.translate('groups-features'),
                   style: TextStyles.h5.copyWith(
                     color: theme.grey[800],
                     fontWeight: FontWeight.w600,
@@ -89,32 +89,32 @@ class CommunityOnboardingScreen extends ConsumerWidget {
                 const SizedBox(height: 16),
                 _buildFeatureItem(
                   context,
-                  l10n.translate('community-feature-1'),
+                  l10n.translate('groups-feature-1'),
                   LucideIcons.users,
                 ),
                 const SizedBox(height: 16),
                 _buildFeatureItem(
                   context,
-                  l10n.translate('community-feature-2'),
+                  l10n.translate('groups-feature-2'),
+                  LucideIcons.messageSquare,
+                ),
+                const SizedBox(height: 16),
+                _buildFeatureItem(
+                  context,
+                  l10n.translate('groups-feature-3'),
+                  LucideIcons.target,
+                ),
+                const SizedBox(height: 16),
+                _buildFeatureItem(
+                  context,
+                  l10n.translate('groups-feature-4'),
                   LucideIcons.trophy,
                 ),
                 const SizedBox(height: 16),
                 _buildFeatureItem(
                   context,
-                  l10n.translate('community-feature-3'),
-                  LucideIcons.messageCircle,
-                ),
-                const SizedBox(height: 16),
-                _buildFeatureItem(
-                  context,
-                  l10n.translate('community-feature-4'),
-                  LucideIcons.heartHandshake,
-                ),
-                const SizedBox(height: 16),
-                _buildFeatureItem(
-                  context,
-                  l10n.translate('community-feature-5'),
-                  LucideIcons.shieldCheck,
+                  l10n.translate('groups-feature-5'),
+                  LucideIcons.shield,
                 ),
 
                 const SizedBox(height: 32),

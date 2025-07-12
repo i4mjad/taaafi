@@ -211,9 +211,9 @@ const Map<String, String> kEn = {
   "community-display-name": "Display Name",
   "enter-display-name": "Enter your display name",
   "community-post-anonymously-by-default": "Post anonymously by default",
-  "referral-code-optional": "Referral Code (Optional)",
-  "enter-referral-code": "Enter referral code",
+
   "complete-setup": "Complete Setup",
+  "go-to-community": "Go to Community",
   "post-detail": "Post Detail",
   "new-post": "New Post",
   "community-reply": "Reply",
@@ -247,6 +247,34 @@ const Map<String, String> kEn = {
   "time-week-ago": "1w",
   "time-weeks-ago": "{count}w",
   "community-anonymous": "Anonymous",
+  "community-posts": "Posts",
+  "community-edit-profile": "Edit Profile",
+  "community-share-profile": "Share Profile",
+  "community-followers": "followers",
+  "community-following": "following",
+  "community-profile-picture": "Profile Picture",
+  "no-profile-image-available":
+      "No profile image available. You can upload a new image or choose to be without an image.",
+  "will-use-following-image":
+      "The following image will be used for your community account:",
+  "community-anonymous-mode": "Anonymous Mode",
+  "community-anonymous-mode-description":
+      "When enabled, your display name and profile picture cannot be changed. You will appear as 'Anonymous' in all posts and comments.",
+  "community-anonymous-mode-enabled": "Anonymous mode is enabled",
+  "community-anonymous-mode-disabled": "Anonymous mode is disabled",
+  "community-save-changes": "Save Changes",
+  "community-cancel": "Cancel",
+  "community-profile-updated": "Profile updated successfully",
+  "community-profile-update-failed": "Failed to update profile",
+  "community-profile-not-found": "Community profile not found",
+  "community-profile-error": "Error loading profile",
+  "community-no-posts": "No posts yet",
+  "community-no-comments": "No comments yet",
+  "community-no-likes": "No likes yet",
+  "community-profile-created": "Community profile created successfully",
+  "community-profile-creation-failed": "Failed to create community profile",
+  "gender-selection-warning":
+      "Please select your real gender. Providing false information may result in account restrictions.",
   "new_thread": "New Thread",
   "whats_on_your_mind": "What's on your mind?",
   "photo": "Photo",
@@ -1026,5 +1054,23 @@ const Map<String, String> kEn = {
   "generic-restriction-message":
       "Your access to the application has been restricted. Please contact support for assistance.",
   "restarting-app-notification-title": "App has been updated",
-  "restarting-app-notification-body": "Please tap here to open the app again."
+  "restarting-app-notification-body": "Please tap here to open the app again.",
+  "welcome-to-groups": "Welcome to Groups",
+  "groups-setup-description":
+      "Set up your profile to join groups and connect with others on the recovery journey",
+  "groups-setup-button": "Set Up Profile",
+  "groups-features": "What to expect:",
+  "groups-feature-1": "Join support groups with shared interests",
+  "groups-feature-2": "Chat with group members in a safe environment",
+  "groups-feature-3": "Participate in group challenges",
+  "groups-feature-4": "Track group achievements and milestones",
+  "groups-feature-5": "Private and secure group interactions",
+  "default-image": "Default Image",
+  "upload-custom-image": "Upload Custom Image",
+  "select-image": "Select Image",
+  "name-too-short": "Name must be at least 2 characters long",
+  "anonymous-mode-reassurance":
+      "Your privacy is protected. When anonymous mode is enabled, your personal information will be hidden from other users.",
+  "register-as-anonymous": "Register as Anonymous?",
+  "without-image": "Without Image"
 };

@@ -22,7 +22,21 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen> {
     final theme = AppTheme.of(context);
 
     return Scaffold(
-      appBar: appBar(context, ref, 'community', false, false),
+      appBar: appBar(
+        context,
+        ref,
+        'community',
+        false,
+        false,
+        actions: [
+          IconButton(
+            icon: const Icon(LucideIcons.user),
+            onPressed: () {
+              context.push('/community/profile');
+            },
+          ),
+        ],
+      ),
       backgroundColor: theme.backgroundColor,
       body: _buildForumTab(),
       floatingActionButton: FloatingActionButton(

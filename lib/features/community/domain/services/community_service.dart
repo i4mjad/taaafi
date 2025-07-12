@@ -1,34 +1,52 @@
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:reboot_app_3/features/community/data/repositories/community_repository.dart';
+import '../entities/community_profile_entity.dart';
 
-/// Service for handling community-related business logic
-class CommunityService {
-  final CommunityRepository _repository;
-  final SharedPreferences _prefs;
-
-  CommunityService(this._repository, this._prefs);
-
-  /// Records user interest in the community feature
+/// Abstract service for community-related operations
+///
+/// This service defines the contract for community profile management
+/// and handles referral code processing.
+abstract class CommunityService {
+  /// Creates a new community profile
   ///
-  /// This method checks if the user has already recorded interest,
-  /// and if not, records it in Firestore and updates local preferences.
+  /// Validates the input data and creates a profile for the authenticated user.
+  /// Throws [ValidationException] if the input data is invalid.
+  /// Throws [AuthenticationException] if the user is not authenticated.
+  Future<CommunityProfileEntity> createProfile({
+    required String displayName,
+    required String gender,
+    required bool postAnonymouslyByDefault,
+    String? avatarUrl,
+  });
+
+  /// Gets the current user's community profile
   ///
-  /// Returns true if interest was recorded, false if it was already recorded.
-  Future<bool> recordInterest() async {
-    try {
-      final hasRecordedInterest =
-          _prefs.getBool('community_interest_recorded') ?? false;
+  /// Returns null if the user doesn't have a profile.
+  /// Throws [AuthenticationException] if the user is not authenticated.
+  Future<CommunityProfileEntity?> getCurrentProfile();
 
-      if (!hasRecordedInterest) {
-        await _repository.recordInterest();
-        await _prefs.setBool('community_interest_recorded', true);
-        return true;
-      }
+  /// Updates the current user's community profile
+  ///
+  /// Throws [ValidationException] if the input data is invalid.
+  /// Throws [AuthenticationException] if the user is not authenticated.
+  Future<CommunityProfileEntity> updateProfile({
+    String? displayName,
+    String? gender,
+    bool? postAnonymouslyByDefault,
+    String? avatarUrl,
+  });
 
-      return false;
-    } catch (e) {
-      // Let the notifier handle the error
-      rethrow;
-    }
-  }
+  /// Checks if the current user has a community profile
+  ///
+  /// Throws [AuthenticationException] if the user is not authenticated.
+  Future<bool> hasProfile();
+
+  /// Watches the current user's community profile
+  ///
+  /// Returns a stream that emits the profile whenever it changes.
+  /// Throws [AuthenticationException] if the user is not authenticated.
+  Stream<CommunityProfileEntity?> watchProfile();
+
+  /// Records user interest in community features
+  ///
+  /// This is used for analytics and feature adoption tracking.
+  Future<void> recordInterest();
 }
