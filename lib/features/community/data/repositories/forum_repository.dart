@@ -96,7 +96,7 @@ class ForumRepository {
   Future<String> createPost({
     required String title,
     required String content,
-    required String categoryId,
+    String? categoryId,
     required bool isAnonymous,
     List<String>? attachmentUrls,
   }) async {

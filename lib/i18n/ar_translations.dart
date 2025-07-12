@@ -284,6 +284,9 @@ const Map<String, String> kAr = {
   "question": "سؤال",
   "discussion": "مناقشة",
   "post_anonymously": "انشر كمجهول",
+  "show-identity": "اظهر هويتي",
+  "hide-identity": "اخف هويتي",
+  "community-profile-visible-message": "يمكن للآخرين رؤية اسمك وملفك",
   "anyone_can_reply": "يمكن لأي شخص الرد",
   "post_created": "تم إنشاء المنشور بنجاح!",
   "photo_coming_soon": "إرفاق الصور قريبًا",
@@ -292,6 +295,7 @@ const Map<String, String> kAr = {
   "link_coming_soon": "إرفاق الرابط قريبًا",
   "post_title": "عنوان",
   "select_category": "اختر الفئة",
+  "none": "لا شيء",
   "content": "محتوى",
   "link": "رابط",
   "challenges": "التحديات",
@@ -1041,8 +1045,7 @@ const Map<String, String> kAr = {
   "upload-custom-image": "رفع صورة مخصصة",
   "select-image": "اختر صورة",
   "name-too-short": "يجب أن يكون الاسم على الأقل حرفين",
-  "anonymous-mode-reassurance":
-      "خصوصيتك محمية. عند تفعيل الوضع المجهول، ستتم إخفاء معلوماتك الشخصية عن المستخدمين الآخرين.",
+  "anonymous-mode-reassurance": "هويتك مخفية",
   "register-as-anonymous": "التسجيل كمجهول؟",
   "without-image": "بدون صورة"
 };

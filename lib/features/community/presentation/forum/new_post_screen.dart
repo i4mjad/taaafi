@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
+import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/features/community/data/models/post_category.dart';
 import 'package:reboot_app_3/features/community/presentation/providers/forum_providers.dart';
+import 'package:reboot_app_3/features/community/presentation/providers/community_providers_new.dart';
+import 'package:reboot_app_3/features/community/presentation/forum/anonymity_toggle_modal.dart';
 
 class NewPostScreen extends ConsumerStatefulWidget {
   const NewPostScreen({super.key});
@@ -46,8 +50,7 @@ class _NewPostScreenState extends ConsumerState<NewPostScreen> {
   bool get _canPost {
     final title = _titleController.text.trim();
     final content = _contentController.text.trim();
-    final selectedCategory = ref.read(selectedCategoryProvider);
-    return title.isNotEmpty && content.isNotEmpty && selectedCategory != null;
+    return title.isNotEmpty && content.isNotEmpty;
   }
 
   @override
@@ -57,6 +60,7 @@ class _NewPostScreenState extends ConsumerState<NewPostScreen> {
     final categoriesAsync = ref.watch(postCategoriesProvider);
     final selectedCategory = ref.watch(selectedCategoryProvider);
     final isAnonymous = ref.watch(anonymousPostProvider);
+    final currentProfileAsync = ref.watch(currentCommunityProfileProvider);
 
     return Scaffold(
       backgroundColor: theme.backgroundColor,
@@ -77,7 +81,7 @@ class _NewPostScreenState extends ConsumerState<NewPostScreen> {
         centerTitle: true,
         actions: [
           Container(
-            margin: const EdgeInsets.only(right: 16),
+            margin: const EdgeInsets.only(left: 16, right: 16),
             child: TextButton(
               onPressed: _canPost ? _handlePost : null,
               style: TextButton.styleFrom(
@@ -87,13 +91,12 @@ class _NewPostScreenState extends ConsumerState<NewPostScreen> {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20),
                 ),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                // padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
               ),
               child: Text(
                 localizations.translate('post'),
-                style: TextStyles.body.copyWith(
-                  color: Colors.white,
+                style: TextStyles.footnote.copyWith(
+                  color: theme.grey[50],
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
                 ),
@@ -104,75 +107,17 @@ class _NewPostScreenState extends ConsumerState<NewPostScreen> {
       ),
       body: Column(
         children: [
-          // Community Selection Row (like Reddit)
-          Container(
-            padding: const EdgeInsets.all(16),
-            child: Row(
-              children: [
-                CircleAvatar(
-                  radius: 16,
-                  backgroundColor: theme.primary[100],
-                  child: Text(
-                    'T',
-                    style: TextStyles.caption.copyWith(
-                      color: theme.primary[700],
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  'ta3afi Community',
-                  style: TextStyles.body.copyWith(
-                    color: theme.grey[900],
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                const Spacer(),
-                // Anonymous Toggle
-                GestureDetector(
-                  onTap: () {
-                    ref.read(anonymousPostProvider.notifier).state =
-                        !isAnonymous;
-                  },
-                  child: Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: isAnonymous ? theme.primary[100] : theme.grey[100],
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(
-                        color: isAnonymous
-                            ? theme.primary[300]!
-                            : theme.grey[300]!,
-                      ),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.visibility_off_outlined,
-                          size: 14,
-                          color: isAnonymous
-                              ? theme.primary[600]
-                              : theme.grey[600],
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          localizations.translate('post_anonymously'),
-                          style: TextStyles.caption.copyWith(
-                            color: isAnonymous
-                                ? theme.primary[600]
-                                : theme.grey[600],
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
+          // Dynamic User Profile Header
+          currentProfileAsync.when(
+            data: (profile) => profile != null
+                ? _buildUserProfileHeader(
+                    context, theme, localizations, profile, isAnonymous)
+                : _buildFallbackHeader(
+                    context, theme, localizations, isAnonymous),
+            loading: () => _buildFallbackHeader(
+                context, theme, localizations, isAnonymous),
+            error: (_, __) => _buildFallbackHeader(
+                context, theme, localizations, isAnonymous),
           ),
 
           Divider(color: theme.grey[200], height: 1),
@@ -211,8 +156,6 @@ class _NewPostScreenState extends ConsumerState<NewPostScreen> {
                     ),
                   ),
 
-                  const SizedBox(height: 16),
-
                   // Category Selection (like Reddit's flair)
                   Container(
                     width: double.infinity,
@@ -225,17 +168,27 @@ class _NewPostScreenState extends ConsumerState<NewPostScreen> {
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 12, vertical: 8),
                             decoration: BoxDecoration(
-                              color: theme.grey[100],
+                              color: selectedCategory != null
+                                  ? selectedCategory.color
+                                      .withValues(alpha: 0.1)
+                                  : theme.grey[100],
                               borderRadius: BorderRadius.circular(16),
-                              border: Border.all(color: theme.grey[300]!),
+                              border: Border.all(
+                                color: selectedCategory != null
+                                    ? selectedCategory.color
+                                    : theme.grey[300]!,
+                              ),
                             ),
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 Icon(
-                                  Icons.local_offer_outlined,
+                                  selectedCategory?.icon ??
+                                      Icons.local_offer_outlined,
                                   size: 16,
-                                  color: theme.grey[600],
+                                  color: selectedCategory != null
+                                      ? selectedCategory.color
+                                      : theme.grey[600],
                                 ),
                                 const SizedBox(width: 6),
                                 Text(
@@ -245,7 +198,7 @@ class _NewPostScreenState extends ConsumerState<NewPostScreen> {
                                           .translate('select_category'),
                                   style: TextStyles.caption.copyWith(
                                     color: selectedCategory != null
-                                        ? theme.grey[700]
+                                        ? selectedCategory.color
                                         : theme.grey[500],
                                     fontWeight: FontWeight.w500,
                                   ),
@@ -254,7 +207,9 @@ class _NewPostScreenState extends ConsumerState<NewPostScreen> {
                                 Icon(
                                   Icons.keyboard_arrow_down,
                                   size: 16,
-                                  color: theme.grey[600],
+                                  color: selectedCategory != null
+                                      ? selectedCategory.color
+                                      : theme.grey[600],
                                 ),
                               ],
                             ),
@@ -264,8 +219,7 @@ class _NewPostScreenState extends ConsumerState<NewPostScreen> {
                     ),
                   ),
 
-                  const SizedBox(height: 24),
-
+                  verticalSpace(Spacing.points4),
                   // Content Input
                   TextField(
                     controller: _contentController,
@@ -389,6 +343,7 @@ class _NewPostScreenState extends ConsumerState<NewPostScreen> {
       ),
       builder: (context) {
         return Container(
+          width: double.infinity,
           padding: const EdgeInsets.all(20),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -406,45 +361,93 @@ class _NewPostScreenState extends ConsumerState<NewPostScreen> {
                 data: (categories) => Wrap(
                   spacing: 8,
                   runSpacing: 8,
-                  children: categories.map((category) {
-                    final displayName = category
-                        .getDisplayName(localizations.locale.languageCode);
-
-                    return GestureDetector(
+                  children: [
+                    // Reset to default general category
+                    GestureDetector(
                       onTap: () {
                         ref.read(selectedCategoryProvider.notifier).state =
-                            category;
+                            const PostCategory(
+                          id: 'general',
+                          name: 'General',
+                          nameAr: 'عام',
+                          iconName: 'chat',
+                          colorHex: '#6B7280',
+                          isActive: true,
+                          sortOrder: 7,
+                        );
                         Navigator.pop(context);
                       },
                       child: Container(
                         padding: const EdgeInsets.symmetric(
                             horizontal: 16, vertical: 10),
                         decoration: BoxDecoration(
-                          color: category.color.withValues(alpha: 0.1),
+                          color: const Color(0xFF6B7280).withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(20),
-                          border: Border.all(color: category.color),
+                          border: Border.all(color: const Color(0xFF6B7280)),
                         ),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Icon(
-                              category.icon,
+                            const Icon(
+                              Icons.refresh,
                               size: 16,
-                              color: category.color,
+                              color: Color(0xFF6B7280),
                             ),
                             const SizedBox(width: 6),
                             Text(
-                              displayName,
+                              localizations.locale.languageCode == 'ar'
+                                  ? 'عام (افتراضي)'
+                                  : 'General (Default)',
                               style: TextStyles.caption.copyWith(
-                                color: category.color,
+                                color: const Color(0xFF6B7280),
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
                           ],
                         ),
                       ),
-                    );
-                  }).toList(),
+                    ),
+                    // Regular categories
+                    ...categories.map((category) {
+                      final displayName = category
+                          .getDisplayName(localizations.locale.languageCode);
+
+                      return GestureDetector(
+                        onTap: () {
+                          ref.read(selectedCategoryProvider.notifier).state =
+                              category;
+                          Navigator.pop(context);
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 10),
+                          decoration: BoxDecoration(
+                            color: category.color.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(color: category.color),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                category.icon,
+                                size: 16,
+                                color: category.color,
+                              ),
+                              const SizedBox(width: 6),
+                              Text(
+                                displayName,
+                                style: TextStyles.caption.copyWith(
+                                  color: category.color,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                  ],
                 ),
                 loading: () => const Center(child: CircularProgressIndicator()),
                 error: (error, stackTrace) => Text(
@@ -573,7 +576,7 @@ class _NewPostScreenState extends ConsumerState<NewPostScreen> {
     final selectedCategory = ref.read(selectedCategoryProvider);
     final isAnonymous = ref.read(anonymousPostProvider);
 
-    if (title.isEmpty || content.isEmpty || selectedCategory == null) return;
+    if (title.isEmpty || content.isEmpty) return;
 
     try {
       // Show loading indicator
@@ -588,7 +591,7 @@ class _NewPostScreenState extends ConsumerState<NewPostScreen> {
       final postId = await repository.createPost(
         title: title,
         content: content,
-        categoryId: selectedCategory.id,
+        categoryId: selectedCategory?.id,
         isAnonymous: isAnonymous,
         attachmentUrls: [], // _attachments.map((a) => a.url).toList(), - commented out for now
       );
@@ -624,7 +627,16 @@ class _NewPostScreenState extends ConsumerState<NewPostScreen> {
   void _resetForm() {
     _titleController.clear();
     _contentController.clear();
-    ref.read(selectedCategoryProvider.notifier).state = null;
+    // Reset to default general category
+    ref.read(selectedCategoryProvider.notifier).state = const PostCategory(
+      id: 'general',
+      name: 'General',
+      nameAr: 'عام',
+      iconName: 'chat',
+      colorHex: '#6B7280',
+      isActive: true,
+      sortOrder: 7,
+    );
     ref.read(anonymousPostProvider.notifier).state = false;
     ref.read(postContentProvider.notifier).state = '';
     // _attachments.clear(); - commented out for now
@@ -690,4 +702,195 @@ class _NewPostScreenState extends ConsumerState<NewPostScreen> {
   //     ),
   //   );
   // }
+
+  Widget _buildUserProfileHeader(
+    BuildContext context,
+    dynamic theme,
+    dynamic localizations,
+    dynamic profile,
+    bool isAnonymous,
+  ) {
+    final user = FirebaseAuth.instance.currentUser;
+    final userImageUrl = user?.photoURL;
+    final displayName = profile.displayName;
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      child: Row(
+        children: [
+          // User Avatar
+          CircleAvatar(
+            radius: 16,
+            backgroundColor: theme.primary[100],
+            backgroundImage: isAnonymous || userImageUrl == null
+                ? null
+                : NetworkImage(userImageUrl),
+            child: isAnonymous || userImageUrl == null
+                ? Icon(
+                    isAnonymous ? Icons.person_outline : Icons.person,
+                    size: 20,
+                    color: theme.primary[700],
+                  )
+                : null,
+          ),
+          const SizedBox(width: 12),
+          // User Info
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  isAnonymous
+                      ? localizations.translate('community-anonymous')
+                      : displayName ?? 'Community Member',
+                  style: TextStyles.body.copyWith(
+                    color: theme.grey[900],
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                Text(
+                  isAnonymous
+                      ? localizations.translate('anonymous-mode-reassurance')
+                      : localizations
+                              .translate('community-profile-visible-message') ??
+                          'Other users will be able to see your name and profile',
+                  style: TextStyles.caption.copyWith(
+                    color: theme.grey[600],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 12),
+          // Toggle Button
+          GestureDetector(
+            onTap: () =>
+                _showAnonymityToggleModal(context, profile, isAnonymous),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              decoration: BoxDecoration(
+                color: theme.grey[50],
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: theme.grey[200]!),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    isAnonymous
+                        ? Icons.visibility
+                        : Icons.visibility_off_outlined,
+                    size: 16,
+                    color: theme.primary[600],
+                  ),
+                  const SizedBox(width: 6),
+                  Text(
+                    isAnonymous
+                        ? localizations.translate('show-identity') ??
+                            'Show my identity'
+                        : localizations.translate('hide-identity') ??
+                            'Hide my identity',
+                    style: TextStyles.caption.copyWith(
+                      color: theme.primary[600],
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFallbackHeader(
+    BuildContext context,
+    dynamic theme,
+    dynamic localizations,
+    bool isAnonymous,
+  ) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      child: Row(
+        children: [
+          CircleAvatar(
+            radius: 16,
+            backgroundColor: theme.primary[100],
+            child: Text(
+              'T',
+              style: TextStyles.caption.copyWith(
+                color: theme.primary[700],
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
+          Text(
+            'ta3afi Community',
+            style: TextStyles.body.copyWith(
+              color: theme.grey[900],
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const Spacer(),
+          // Anonymous Toggle
+          GestureDetector(
+            onTap: () {
+              ref.read(anonymousPostProvider.notifier).state = !isAnonymous;
+            },
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                color: isAnonymous ? theme.primary[100] : theme.grey[100],
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: isAnonymous ? theme.primary[300]! : theme.grey[300]!,
+                ),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.visibility_off_outlined,
+                    size: 14,
+                    color: isAnonymous ? theme.primary[600] : theme.grey[600],
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    localizations.translate('post_anonymously'),
+                    style: TextStyles.caption.copyWith(
+                      color: isAnonymous ? theme.primary[600] : theme.grey[600],
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showAnonymityToggleModal(
+    BuildContext context,
+    dynamic profile,
+    bool currentAnonymousState,
+  ) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => AnonymityToggleModal(
+        profile: profile,
+        currentAnonymousState: currentAnonymousState,
+        onToggleComplete: () {
+          // Update the anonymousPostProvider with the new profile setting
+          ref.read(anonymousPostProvider.notifier).state =
+              profile.postAnonymouslyByDefault;
+        },
+      ),
+    );
+  }
 }

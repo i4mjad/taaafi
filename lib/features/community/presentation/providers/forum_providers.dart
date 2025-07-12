@@ -15,7 +15,16 @@ final postCategoriesProvider = StreamProvider<List<PostCategory>>((ref) {
 
 // Selected Category Provider for new post screen
 final selectedCategoryProvider = StateProvider<PostCategory?>((ref) {
-  return null;
+  // Default to "general" category
+  return const PostCategory(
+    id: 'general',
+    name: 'General',
+    nameAr: 'عام',
+    iconName: 'chat',
+    colorHex: '#6B7280',
+    isActive: true,
+    sortOrder: 7,
+  );
 });
 
 // Post Content Provider for new post screen

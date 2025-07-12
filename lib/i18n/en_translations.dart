@@ -285,6 +285,9 @@ const Map<String, String> kEn = {
   "question": "Question",
   "discussion": "Discussion",
   "post_anonymously": "Post Anonymously",
+  "show-identity": "Show my identity",
+  "hide-identity": "Hide my identity",
+  "community-profile-visible-message": "Others can see your name and profile",
   "anyone_can_reply": "Anyone can reply",
   "post_created": "Post created successfully!",
   "photo_coming_soon": "Photo attachment coming soon",
@@ -293,6 +296,7 @@ const Map<String, String> kEn = {
   "link_coming_soon": "Link attachment coming soon",
   "post_title": "Title",
   "select_category": "Select Category",
+  "none": "None",
   "content": "Content",
   "link": "Link",
   "challenges": "Challenges",
@@ -1070,8 +1074,7 @@ const Map<String, String> kEn = {
   "upload-custom-image": "Upload Custom Image",
   "select-image": "Select Image",
   "name-too-short": "Name must be at least 2 characters long",
-  "anonymous-mode-reassurance":
-      "Your privacy is protected. When anonymous mode is enabled, your personal information will be hidden from other users.",
+  "anonymous-mode-reassurance": "Your identity is hidden",
   "register-as-anonymous": "Register as Anonymous?",
   "without-image": "Without Image"
 };
