@@ -166,6 +166,7 @@ GoRouter goRouter(Ref<GoRouter> ref) {
           );
         },
       ),
+      // Onboarding routes: Non authenticated users
       GoRoute(
         name: RouteNames.onboarding.name,
         path: '/onboarding',
@@ -208,6 +209,7 @@ GoRouter goRouter(Ref<GoRouter> ref) {
           child: ScaffoldWithNestedNavigation(navigationShell: navigationShell),
         ),
         branches: [
+          // * Home
           StatefulShellBranch(
             observers: [
               GoRouterObserver(ref.read(analyticsFacadeProvider)),
@@ -268,143 +270,7 @@ GoRouter goRouter(Ref<GoRouter> ref) {
               ),
             ],
           ),
-          StatefulShellBranch(
-            navigatorKey: shellNavigatorFellowshipKey,
-            routes: [
-              GoRoute(
-                name: RouteNames.community.name,
-                path: '/community',
-                // NEW: redirect to onboarding if user lacks a community profile
-                redirect: (context, state) {
-                  // TODO: Implement hasCommunityProfileProvider check
-                  // For now, allow access to community
-                  return null;
-                },
-                pageBuilder: (context, state) => NoTransitionPage<void>(
-                  key: state.pageKey,
-                  name: state.name,
-                  child: CommunityMainScreen(),
-                ),
-                routes: [
-                  // NEW onboarding route
-                  GoRoute(
-                    path: 'onboarding',
-                    name: RouteNames.communityOnboarding.name,
-                    pageBuilder: (context, state) => MaterialPage<void>(
-                      name: RouteNames.communityOnboarding.name,
-                      child: CommunityOnboardingScreen(),
-                    ),
-                  ),
-                  GoRoute(
-                    path: 'forum',
-                    name: RouteNames.forumHome.name,
-                    pageBuilder: (context, state) => MaterialPage<void>(
-                      name: RouteNames.forumHome.name,
-                      child: ForumHomeScreen(),
-                    ),
-                    routes: [
-                      GoRoute(
-                        path: 'post/:postId',
-                        name: RouteNames.postDetail.name,
-                        pageBuilder: (context, state) => MaterialPage<void>(
-                          name: RouteNames.postDetail.name,
-                          child: PostDetailScreen(
-                              postId: state.pathParameters['postId']!),
-                        ),
-                      ),
-                      GoRoute(
-                        path: 'new',
-                        name: RouteNames.newPost.name,
-                        pageBuilder: (context, state) => MaterialPage<void>(
-                          name: RouteNames.newPost.name,
-                          child: NewPostScreen(),
-                        ),
-                      ),
-                      GoRoute(
-                        path: 'post/:postId/comment/:commentId/reply',
-                        name: RouteNames.replyComposer.name,
-                        pageBuilder: (context, state) => MaterialPage<void>(
-                          name: RouteNames.replyComposer.name,
-                          child: ReplyComposerScreen(
-                            postId: state.pathParameters['postId']!,
-                            parentId: state.pathParameters['commentId']!,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-
-                  GoRoute(
-                    path: 'challenges',
-                    name: RouteNames.globalChallengeList.name,
-                    pageBuilder: (context, state) => MaterialPage<void>(
-                      name: RouteNames.globalChallengeList.name,
-                      child: GlobalChallengeListScreen(),
-                    ),
-                  ),
-                  GoRoute(
-                    path: 'profile',
-                    name: RouteNames.communityProfile.name,
-                    pageBuilder: (context, state) => MaterialPage<void>(
-                      name: RouteNames.communityProfile.name,
-                      child: CommunityProfileSettingsScreen(),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-          StatefulShellBranch(
-            navigatorKey: shellNavigatorGroupsKey,
-            routes: [
-              GoRoute(
-                name: RouteNames.groups.name,
-                path: '/groups',
-                pageBuilder: (context, state) => NoTransitionPage<void>(
-                  key: state.pageKey,
-                  name: state.name,
-                  child: GroupsMainScreen(),
-                ),
-                routes: [
-                  GoRoute(
-                    path: 'list',
-                    name: RouteNames.groupList.name,
-                    pageBuilder: (context, state) => MaterialPage<void>(
-                      name: RouteNames.groupList.name,
-                      child: GroupListScreen(),
-                    ),
-                  ),
-                  GoRoute(
-                    path: ':groupId',
-                    name: RouteNames.groupDetail.name,
-                    pageBuilder: (context, state) => MaterialPage<void>(
-                      name: RouteNames.groupDetail.name,
-                      child: GroupDetailScreen(
-                          groupId: state.pathParameters['groupId']!),
-                    ),
-                  ),
-                  GoRoute(
-                    path: ':groupId/chat',
-                    name: RouteNames.groupChat.name,
-                    pageBuilder: (context, state) => MaterialPage<void>(
-                      name: RouteNames.groupChat.name,
-                      child: GroupChatScreen(
-                          groupId: state.pathParameters['groupId']!),
-                    ),
-                  ),
-                  GoRoute(
-                    path: ':groupId/challenge',
-                    name: RouteNames.groupChallenge.name,
-                    pageBuilder: (context, state) => MaterialPage<void>(
-                      name: RouteNames.groupChallenge.name,
-                      child: GroupChallengeScreen(
-                          groupId: state.pathParameters['groupId']!),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
+          // * Vault
           StatefulShellBranch(
             navigatorKey: shellNavigatorVaultKey,
             observers: [
@@ -551,6 +417,147 @@ GoRouter goRouter(Ref<GoRouter> ref) {
               ),
             ],
           ),
+
+          // * Community
+          StatefulShellBranch(
+            navigatorKey: shellNavigatorFellowshipKey,
+            routes: [
+              GoRoute(
+                name: RouteNames.community.name,
+                path: '/community',
+                // NEW: redirect to onboarding if user lacks a community profile
+                redirect: (context, state) {
+                  // TODO: Implement hasCommunityProfileProvider check
+                  // For now, allow access to community
+                  return null;
+                },
+                pageBuilder: (context, state) => NoTransitionPage<void>(
+                  key: state.pageKey,
+                  name: state.name,
+                  child: CommunityMainScreen(),
+                ),
+                routes: [
+                  // NEW onboarding route
+                  GoRoute(
+                    path: 'onboarding',
+                    name: RouteNames.communityOnboarding.name,
+                    pageBuilder: (context, state) => MaterialPage<void>(
+                      name: RouteNames.communityOnboarding.name,
+                      child: CommunityOnboardingScreen(),
+                    ),
+                  ),
+                  GoRoute(
+                    path: 'forum',
+                    name: RouteNames.forumHome.name,
+                    pageBuilder: (context, state) => MaterialPage<void>(
+                      name: RouteNames.forumHome.name,
+                      child: ForumHomeScreen(),
+                    ),
+                    routes: [
+                      GoRoute(
+                        path: 'post/:postId',
+                        name: RouteNames.postDetail.name,
+                        pageBuilder: (context, state) => MaterialPage<void>(
+                          name: RouteNames.postDetail.name,
+                          child: PostDetailScreen(
+                              postId: state.pathParameters['postId']!),
+                        ),
+                      ),
+                      GoRoute(
+                        path: 'new',
+                        name: RouteNames.newPost.name,
+                        pageBuilder: (context, state) => MaterialPage<void>(
+                          name: RouteNames.newPost.name,
+                          child: NewPostScreen(),
+                        ),
+                      ),
+                      GoRoute(
+                        path: 'post/:postId/comment/:commentId/reply',
+                        name: RouteNames.replyComposer.name,
+                        pageBuilder: (context, state) => MaterialPage<void>(
+                          name: RouteNames.replyComposer.name,
+                          child: ReplyComposerScreen(
+                            postId: state.pathParameters['postId']!,
+                            parentId: state.pathParameters['commentId']!,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  GoRoute(
+                    path: 'challenges',
+                    name: RouteNames.globalChallengeList.name,
+                    pageBuilder: (context, state) => MaterialPage<void>(
+                      name: RouteNames.globalChallengeList.name,
+                      child: GlobalChallengeListScreen(),
+                    ),
+                  ),
+                  GoRoute(
+                    path: 'profile',
+                    name: RouteNames.communityProfile.name,
+                    pageBuilder: (context, state) => MaterialPage<void>(
+                      name: RouteNames.communityProfile.name,
+                      child: CommunityProfileSettingsScreen(),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          // * Groups
+          StatefulShellBranch(
+            navigatorKey: shellNavigatorGroupsKey,
+            routes: [
+              GoRoute(
+                name: RouteNames.groups.name,
+                path: '/groups',
+                pageBuilder: (context, state) => NoTransitionPage<void>(
+                  key: state.pageKey,
+                  name: state.name,
+                  child: GroupsMainScreen(),
+                ),
+                routes: [
+                  GoRoute(
+                    path: 'list',
+                    name: RouteNames.groupList.name,
+                    pageBuilder: (context, state) => MaterialPage<void>(
+                      name: RouteNames.groupList.name,
+                      child: GroupListScreen(),
+                    ),
+                  ),
+                  GoRoute(
+                    path: ':groupId',
+                    name: RouteNames.groupDetail.name,
+                    pageBuilder: (context, state) => MaterialPage<void>(
+                      name: RouteNames.groupDetail.name,
+                      child: GroupDetailScreen(
+                          groupId: state.pathParameters['groupId']!),
+                    ),
+                  ),
+                  GoRoute(
+                    path: ':groupId/chat',
+                    name: RouteNames.groupChat.name,
+                    pageBuilder: (context, state) => MaterialPage<void>(
+                      name: RouteNames.groupChat.name,
+                      child: GroupChatScreen(
+                          groupId: state.pathParameters['groupId']!),
+                    ),
+                  ),
+                  GoRoute(
+                    path: ':groupId/challenge',
+                    name: RouteNames.groupChallenge.name,
+                    pageBuilder: (context, state) => MaterialPage<void>(
+                      name: RouteNames.groupChallenge.name,
+                      child: GroupChallengeScreen(
+                          groupId: state.pathParameters['groupId']!),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          // * Account
           StatefulShellBranch(
             navigatorKey: shellNavigatorAccountKey,
             observers: [
