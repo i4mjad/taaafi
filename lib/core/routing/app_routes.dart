@@ -24,7 +24,20 @@ import 'package:reboot_app_3/features/authentication/presentation/login_screen.d
 import 'package:reboot_app_3/features/authentication/presentation/signup_screen.dart';
 import 'package:reboot_app_3/features/authentication/providers/user_document_provider.dart';
 import 'package:reboot_app_3/features/authentication/data/repositories/auth_repository.dart';
-import 'package:reboot_app_3/features/community/presentation/community_comin_soon_screen.dart';
+
+import 'package:reboot_app_3/features/community/presentation/community_onboarding_screen.dart';
+import 'package:reboot_app_3/features/community/presentation/community_main_screen.dart';
+import 'package:reboot_app_3/features/community/presentation/forum/forum_home_screen.dart';
+import 'package:reboot_app_3/features/community/presentation/groups/group_list_screen.dart';
+import 'package:reboot_app_3/features/community/presentation/groups/groups_main_screen.dart';
+import 'package:reboot_app_3/features/community/presentation/forum/post_detail_screen.dart';
+import 'package:reboot_app_3/features/community/presentation/forum/new_post_screen.dart';
+import 'package:reboot_app_3/features/community/presentation/forum/reply_composer_screen.dart';
+import 'package:reboot_app_3/features/community/presentation/groups/group_detail_screen.dart';
+import 'package:reboot_app_3/features/community/presentation/groups/group_chat_screen.dart';
+import 'package:reboot_app_3/features/community/presentation/groups/group_challenge_screen.dart';
+import 'package:reboot_app_3/features/community/presentation/challenges/global_challenge_list_screen.dart';
+import 'package:reboot_app_3/features/community/presentation/profile/community_profile_settings_screen.dart';
 import 'package:reboot_app_3/features/home/presentation/day_overview/day_overview_screen.dart';
 import 'package:reboot_app_3/features/home/presentation/home/home_screen.dart';
 import 'package:reboot_app_3/features/onboarding/presentation/onboarding_screen.dart';
@@ -261,13 +274,133 @@ GoRouter goRouter(Ref<GoRouter> ref) {
               GoRoute(
                 name: RouteNames.community.name,
                 path: '/community',
+                // NEW: redirect to onboarding if user lacks a community profile
+                redirect: (context, state) {
+                  // TODO: Implement hasCommunityProfileProvider check
+                  // For now, allow access to community
+                  return null;
+                },
                 pageBuilder: (context, state) => NoTransitionPage<void>(
                   key: state.pageKey,
                   name: state.name,
-                  child: CommunityComingSoonScreen(),
+                  child: CommunityMainScreen(),
                 ),
                 routes: [
-                  //! Add Pages
+                  // NEW onboarding route
+                  GoRoute(
+                    path: 'onboarding',
+                    name: RouteNames.communityOnboarding.name,
+                    pageBuilder: (context, state) => MaterialPage<void>(
+                      name: RouteNames.communityOnboarding.name,
+                      child: CommunityOnboardingScreen(),
+                    ),
+                  ),
+                  GoRoute(
+                    path: 'forum',
+                    name: RouteNames.forumHome.name,
+                    pageBuilder: (context, state) => MaterialPage<void>(
+                      name: RouteNames.forumHome.name,
+                      child: ForumHomeScreen(),
+                    ),
+                    routes: [
+                      GoRoute(
+                        path: 'post/:postId',
+                        name: RouteNames.postDetail.name,
+                        pageBuilder: (context, state) => MaterialPage<void>(
+                          name: RouteNames.postDetail.name,
+                          child: PostDetailScreen(
+                              postId: state.pathParameters['postId']!),
+                        ),
+                      ),
+                      GoRoute(
+                        path: 'new',
+                        name: RouteNames.newPost.name,
+                        pageBuilder: (context, state) => MaterialPage<void>(
+                          name: RouteNames.newPost.name,
+                          child: NewPostScreen(),
+                        ),
+                      ),
+                      GoRoute(
+                        path: 'post/:postId/comment/:commentId/reply',
+                        name: RouteNames.replyComposer.name,
+                        pageBuilder: (context, state) => MaterialPage<void>(
+                          name: RouteNames.replyComposer.name,
+                          child: ReplyComposerScreen(
+                            postId: state.pathParameters['postId']!,
+                            parentId: state.pathParameters['commentId']!,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  GoRoute(
+                    path: 'challenges',
+                    name: RouteNames.globalChallengeList.name,
+                    pageBuilder: (context, state) => MaterialPage<void>(
+                      name: RouteNames.globalChallengeList.name,
+                      child: GlobalChallengeListScreen(),
+                    ),
+                  ),
+                  GoRoute(
+                    path: 'profile',
+                    name: RouteNames.communityProfile.name,
+                    pageBuilder: (context, state) => MaterialPage<void>(
+                      name: RouteNames.communityProfile.name,
+                      child: CommunityProfileSettingsScreen(),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            navigatorKey: shellNavigatorGroupsKey,
+            routes: [
+              GoRoute(
+                name: RouteNames.groups.name,
+                path: '/groups',
+                pageBuilder: (context, state) => NoTransitionPage<void>(
+                  key: state.pageKey,
+                  name: state.name,
+                  child: GroupsMainScreen(),
+                ),
+                routes: [
+                  GoRoute(
+                    path: 'list',
+                    name: RouteNames.groupList.name,
+                    pageBuilder: (context, state) => MaterialPage<void>(
+                      name: RouteNames.groupList.name,
+                      child: GroupListScreen(),
+                    ),
+                  ),
+                  GoRoute(
+                    path: ':groupId',
+                    name: RouteNames.groupDetail.name,
+                    pageBuilder: (context, state) => MaterialPage<void>(
+                      name: RouteNames.groupDetail.name,
+                      child: GroupDetailScreen(
+                          groupId: state.pathParameters['groupId']!),
+                    ),
+                  ),
+                  GoRoute(
+                    path: ':groupId/chat',
+                    name: RouteNames.groupChat.name,
+                    pageBuilder: (context, state) => MaterialPage<void>(
+                      name: RouteNames.groupChat.name,
+                      child: GroupChatScreen(
+                          groupId: state.pathParameters['groupId']!),
+                    ),
+                  ),
+                  GoRoute(
+                    path: ':groupId/challenge',
+                    name: RouteNames.groupChallenge.name,
+                    pageBuilder: (context, state) => MaterialPage<void>(
+                      name: RouteNames.groupChallenge.name,
+                      child: GroupChallengeScreen(
+                          groupId: state.pathParameters['groupId']!),
+                    ),
+                  ),
                 ],
               ),
             ],

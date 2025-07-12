@@ -59,6 +59,13 @@ class ScaffoldWithNestedNavigation extends StatelessWidget {
                 ),
               ),
               NavigationDestination(
+                label: AppLocalizations.of(context).translate("group"),
+                icon: Icon(
+                  LucideIcons.heartHandshake,
+                  size: 20,
+                ),
+              ),
+              NavigationDestination(
                 label: AppLocalizations.of(context).translate("vault"),
                 icon: Icon(
                   LucideIcons.bookLock,
