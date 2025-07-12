@@ -17,6 +17,8 @@ class CommunityMainScreen extends ConsumerStatefulWidget {
 }
 
 class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen> {
+  bool _isChallengesSectionExpanded = true;
+
   @override
   Widget build(BuildContext context) {
     final theme = AppTheme.of(context);
@@ -103,28 +105,39 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Section Header
-          Row(
-            children: [
-              Icon(
-                LucideIcons.star,
-                color: theme.primary[600],
-                size: 20,
-              ),
-              const SizedBox(width: 8),
-              Text(
-                localizations.translate('challenges'),
-                style: TextStyles.h6.copyWith(
-                  color: theme.grey[900],
-                  fontWeight: FontWeight.bold,
+          GestureDetector(
+            onTap: () {
+              setState(() {
+                _isChallengesSectionExpanded = !_isChallengesSectionExpanded;
+              });
+            },
+            child: Row(
+              children: [
+                Icon(
+                  LucideIcons.star,
+                  color: theme.primary[600],
+                  size: 20,
                 ),
-              ),
-              const Spacer(),
-              Icon(
-                LucideIcons.chevronDown,
-                color: theme.grey[600],
-                size: 20,
-              ),
-            ],
+                const SizedBox(width: 8),
+                Text(
+                  localizations.translate('challenges'),
+                  style: TextStyles.h6.copyWith(
+                    color: theme.grey[900],
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const Spacer(),
+                AnimatedRotation(
+                  turns: _isChallengesSectionExpanded ? 0 : -0.5,
+                  duration: const Duration(milliseconds: 200),
+                  child: Icon(
+                    LucideIcons.chevronDown,
+                    color: theme.grey[600],
+                    size: 20,
+                  ),
+                ),
+              ],
+            ),
           ),
           const SizedBox(height: 4),
           Text(
@@ -133,33 +146,46 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen> {
               color: theme.grey[600],
             ),
           ),
-          const SizedBox(height: 16),
 
-          // Challenge Cards
-          SizedBox(
-            height: 140,
-            child: ListView(
-              scrollDirection: Axis.horizontal,
-              children: [
-                _buildChallengeHighlightCard(
-                  title: '30-Day Recovery Challenge',
-                  participants: 1847,
-                  onTap: () => context.push('/community/challenges'),
-                ),
-                const SizedBox(width: 12),
-                _buildChallengeHighlightCard(
-                  title: '7-Day Mindfulness Journey',
-                  participants: 432,
-                  onTap: () => context.push('/community/challenges'),
-                ),
-                const SizedBox(width: 12),
-                _buildChallengeHighlightCard(
-                  title: 'Weekly Motivation Challenge',
-                  participants: 891,
-                  onTap: () => context.push('/community/challenges'),
-                ),
-              ],
-            ),
+          // Expandable Challenge Cards
+          AnimatedSize(
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeInOut,
+            child: _isChallengesSectionExpanded
+                ? Column(
+                    children: [
+                      const SizedBox(height: 16),
+                      SizedBox(
+                        height: 140,
+                        child: ListView(
+                          scrollDirection: Axis.horizontal,
+                          children: [
+                            _buildChallengeHighlightCard(
+                              title: '30-Day Recovery Challenge',
+                              participants: 1847,
+                              onTap: () =>
+                                  context.push('/community/challenges'),
+                            ),
+                            const SizedBox(width: 12),
+                            _buildChallengeHighlightCard(
+                              title: '7-Day Mindfulness Journey',
+                              participants: 432,
+                              onTap: () =>
+                                  context.push('/community/challenges'),
+                            ),
+                            const SizedBox(width: 12),
+                            _buildChallengeHighlightCard(
+                              title: 'Weekly Motivation Challenge',
+                              participants: 891,
+                              onTap: () =>
+                                  context.push('/community/challenges'),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  )
+                : const SizedBox.shrink(),
           ),
         ],
       ),
