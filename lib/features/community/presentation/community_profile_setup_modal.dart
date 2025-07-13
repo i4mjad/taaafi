@@ -27,7 +27,7 @@ class _CommunityProfileSetupModalState
     extends ConsumerState<CommunityProfileSetupModal> {
   final _displayNameController = TextEditingController();
   String? _selectedGender;
-  bool _postAnonymouslyByDefault = true;
+  bool _isAnonymous = true;
   bool _isLoading = false;
   bool _isSuccess = false;
   bool _showGenderSelection = true;
@@ -251,7 +251,7 @@ class _CommunityProfileSetupModalState
                       ),
                     ),
                     Switch(
-                      value: _postAnonymouslyByDefault,
+                      value: _isAnonymous,
                       activeColor: theme.success[500],
                       inactiveTrackColor: theme.grey[200],
                       inactiveThumbColor: theme.grey[900],
@@ -259,13 +259,13 @@ class _CommunityProfileSetupModalState
                           ? null
                           : (value) {
                               setState(() {
-                                _postAnonymouslyByDefault = value;
+                                _isAnonymous = value;
                               });
                             },
                     ),
                   ],
                 ),
-                if (_postAnonymouslyByDefault) ...[
+                if (_isAnonymous) ...[
                   const SizedBox(height: 8),
                   WidgetsContainer(
                     padding: const EdgeInsets.all(12),
@@ -519,7 +519,7 @@ class _CommunityProfileSetupModalState
       await createProfileNotifier.createProfile(
         displayName: _displayNameController.text.trim(),
         gender: _selectedGender!,
-        postAnonymouslyByDefault: _postAnonymouslyByDefault,
+        isAnonymous: _isAnonymous,
         // Removed referral code functionality
         avatarUrl: null, // No image upload for now
       );

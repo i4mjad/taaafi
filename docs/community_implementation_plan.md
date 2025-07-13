@@ -36,7 +36,7 @@ lib/features/community/
 | **forumPosts/{postId}/comments/{commentId}/votes** | `cpId` | `voterCPId`, `value` (-1／0／1), `createdAt` | — |
 | **groups** | `groupId` | `name`, `description`, `memberCount`, `capacity`, `gender`, `createdAt` | `members`, `chatMessages`, `challenges` |
 | **globalChallenges** | `chalId` | `name`, `start`, `end`, … | `tasks` |
-| **communityProfiles** | `cpId` | `displayName`, `gender`, `avatarUrl`, `postAnonymouslyByDefault`, `referralCode` | — |
+| **communityProfiles** | `cpId` | `displayName`, `gender`, `avatarUrl`, `isAnonymous`, `referralCode` | — |
 | **users** | `uid` | `referralCode` (set once) | — |
 
 Composite indexes required:

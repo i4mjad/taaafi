@@ -13,7 +13,7 @@ abstract class CommunityService {
   Future<CommunityProfileEntity> createProfile({
     required String displayName,
     required String gender,
-    required bool postAnonymouslyByDefault,
+    required bool isAnonymous,
     String? avatarUrl,
   });
 
@@ -30,7 +30,7 @@ abstract class CommunityService {
   Future<CommunityProfileEntity> updateProfile({
     String? displayName,
     String? gender,
-    bool? postAnonymouslyByDefault,
+    bool? isAnonymous,
     String? avatarUrl,
   });
 

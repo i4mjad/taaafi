@@ -4,13 +4,31 @@ import 'package:go_router/go_router.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
+import 'package:reboot_app_3/core/theming/custom_theme_data.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
+import 'package:reboot_app_3/core/shared_widgets/snackbar.dart';
 import 'package:reboot_app_3/features/community/data/models/post_category.dart';
+import 'package:reboot_app_3/features/community/data/models/post_form_data.dart';
+import 'package:reboot_app_3/features/community/data/exceptions/forum_exceptions.dart';
 import 'package:reboot_app_3/features/community/presentation/providers/forum_providers.dart';
 import 'package:reboot_app_3/features/community/presentation/providers/community_providers_new.dart';
 import 'package:reboot_app_3/features/community/presentation/forum/anonymity_toggle_modal.dart';
 
+/// Screen for creating a new forum post
+///
+/// This screen provides a clean, user-friendly interface for creating new forum posts.
+/// It follows SOLID principles with proper separation of concerns and uses the ForumService
+/// for business logic. Error handling is implemented with consistent snackbar messages.
+///
+/// Features:
+/// - Real-time validation feedback
+/// - Category selection
+/// - Anonymity toggle
+/// - Character limits with visual feedback
+/// - Proper error handling with localized messages
+/// - Loading states
+/// - Form reset functionality
 class NewPostScreen extends ConsumerStatefulWidget {
   const NewPostScreen({super.key});
 
@@ -19,15 +37,16 @@ class NewPostScreen extends ConsumerStatefulWidget {
 }
 
 class _NewPostScreenState extends ConsumerState<NewPostScreen> {
+  // Form controllers
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _contentController = TextEditingController();
+
+  // Focus nodes for better UX
   final FocusNode _titleFocusNode = FocusNode();
   final FocusNode _contentFocusNode = FocusNode();
-  final int _maxTitleCharacters = 300;
-  final int _maxContentCharacters = 5000;
 
-  // Future attachment preparation - commented out for now
-  // final List<PostAttachment> _attachments = [];
+  // Form state
+  bool _isSubmitting = false;
 
   @override
   void initState() {
@@ -40,6 +59,7 @@ class _NewPostScreenState extends ConsumerState<NewPostScreen> {
 
   @override
   void dispose() {
+    // Clean up resources
     _titleController.dispose();
     _contentController.dispose();
     _titleFocusNode.dispose();
@@ -47,666 +67,128 @@ class _NewPostScreenState extends ConsumerState<NewPostScreen> {
     super.dispose();
   }
 
-  bool get _canPost {
-    final title = _titleController.text.trim();
-    final content = _contentController.text.trim();
-    return title.isNotEmpty && content.isNotEmpty;
+  /// Checks if the form can be submitted
+  bool get _canSubmit {
+    return _titleController.text.trim().isNotEmpty &&
+        _contentController.text.trim().isNotEmpty &&
+        !_isSubmitting;
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = AppTheme.of(context);
     final localizations = AppLocalizations.of(context);
-    final categoriesAsync = ref.watch(postCategoriesProvider);
+
+    // Watch providers for reactive UI updates
     final selectedCategory = ref.watch(selectedCategoryProvider);
     final isAnonymous = ref.watch(anonymousPostProvider);
     final currentProfileAsync = ref.watch(currentCommunityProfileProvider);
 
+    // Listen to post creation state for handling results
+    ref.listen<AsyncValue<String?>>(postCreationProvider, (previous, next) {
+      _handlePostCreationResult(next, localizations);
+    });
+
     return Scaffold(
       backgroundColor: theme.backgroundColor,
-      appBar: AppBar(
-        backgroundColor: theme.backgroundColor,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.close),
-          onPressed: () => context.pop(),
-        ),
-        title: Text(
-          localizations.translate('new_thread'),
-          style: TextStyles.h6.copyWith(
-            color: theme.grey[900],
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        centerTitle: true,
-        actions: [
-          Container(
-            margin: const EdgeInsets.only(left: 16, right: 16),
-            child: TextButton(
-              onPressed: _canPost ? _handlePost : null,
-              style: TextButton.styleFrom(
-                backgroundColor:
-                    _canPost ? theme.primary[500] : theme.grey[300],
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                // padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
-              ),
-              child: Text(
-                localizations.translate('post'),
-                style: TextStyles.footnote.copyWith(
-                  color: theme.grey[50],
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
+      appBar: _buildAppBar(theme, localizations),
       body: Column(
         children: [
-          // Dynamic User Profile Header
-          currentProfileAsync.when(
-            data: (profile) => profile != null
-                ? _buildUserProfileHeader(
-                    context, theme, localizations, profile, isAnonymous)
-                : _buildFallbackHeader(
-                    context, theme, localizations, isAnonymous),
-            loading: () => _buildFallbackHeader(
-                context, theme, localizations, isAnonymous),
-            error: (_, __) => _buildFallbackHeader(
-                context, theme, localizations, isAnonymous),
-          ),
+          // User profile header
+          _buildUserProfileHeader(theme, localizations,
+              currentProfileAsync.asData?.value, isAnonymous),
 
           Divider(color: theme.grey[200], height: 1),
 
-          // Content Area
+          // Main content area
           Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Title Input
-                  Container(
-                    width: double.infinity,
-                    child: TextField(
-                      controller: _titleController,
-                      focusNode: _titleFocusNode,
-                      maxLines: null,
-                      maxLength: _maxTitleCharacters,
-                      style: TextStyles.h4.copyWith(
-                        color: theme.grey[900],
-                        fontWeight: FontWeight.w600,
-                      ),
-                      decoration: InputDecoration(
-                        hintText: localizations.translate('post_title'),
-                        hintStyle: TextStyles.h4.copyWith(
-                          color: theme.grey[400],
-                          fontWeight: FontWeight.w600,
-                        ),
-                        border: InputBorder.none,
-                        counterText: '',
-                      ),
-                      onChanged: (value) {
-                        setState(() {});
-                      },
-                    ),
-                  ),
-
-                  // Category Selection (like Reddit's flair)
-                  Container(
-                    width: double.infinity,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        GestureDetector(
-                          onTap: () => _showCategorySelector(context),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 12, vertical: 8),
-                            decoration: BoxDecoration(
-                              color: selectedCategory != null
-                                  ? selectedCategory.color
-                                      .withValues(alpha: 0.1)
-                                  : theme.grey[100],
-                              borderRadius: BorderRadius.circular(16),
-                              border: Border.all(
-                                color: selectedCategory != null
-                                    ? selectedCategory.color
-                                    : theme.grey[300]!,
-                              ),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(
-                                  selectedCategory?.icon ??
-                                      Icons.local_offer_outlined,
-                                  size: 16,
-                                  color: selectedCategory != null
-                                      ? selectedCategory.color
-                                      : theme.grey[600],
-                                ),
-                                const SizedBox(width: 6),
-                                Text(
-                                  selectedCategory?.getDisplayName(
-                                          localizations.locale.languageCode) ??
-                                      localizations
-                                          .translate('select_category'),
-                                  style: TextStyles.caption.copyWith(
-                                    color: selectedCategory != null
-                                        ? selectedCategory.color
-                                        : theme.grey[500],
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                                const SizedBox(width: 4),
-                                Icon(
-                                  Icons.keyboard_arrow_down,
-                                  size: 16,
-                                  color: selectedCategory != null
-                                      ? selectedCategory.color
-                                      : theme.grey[600],
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  verticalSpace(Spacing.points4),
-                  // Content Input
-                  TextField(
-                    controller: _contentController,
-                    focusNode: _contentFocusNode,
-                    maxLines: null,
-                    minLines: 8,
-                    maxLength: _maxContentCharacters,
-                    style: TextStyles.body.copyWith(
-                      color: theme.grey[900],
-                      fontSize: 16,
-                      height: 1.5,
-                    ),
-                    decoration: InputDecoration(
-                      hintText: localizations.translate('whats_on_your_mind'),
-                      hintStyle: TextStyles.body.copyWith(
-                        color: theme.grey[500],
-                        fontSize: 16,
-                      ),
-                      border: InputBorder.none,
-                      counterText: '',
-                    ),
-                    onChanged: (value) {
-                      setState(() {});
-                    },
-                  ),
-
-                  const SizedBox(height: 24),
-
-                  // Attachments Preview (for future implementation) - commented out for now
-                  // if (_attachments.isNotEmpty) ...[
-                  //   _buildAttachmentsPreview(),
-                  //   const SizedBox(height: 16),
-                  // ],
-                ],
-              ),
-            ),
+            child: _buildContentArea(theme, localizations, selectedCategory),
           ),
 
-          // Bottom Section with media options and character count
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: theme.backgroundColor,
-              border: Border(
-                top: BorderSide(color: theme.grey[200]!),
-              ),
-            ),
-            child: Column(
-              children: [
-                // Media Options - commented out for now
-                // Row(
-                //   children: [
-                //     _buildMediaOption(
-                //       icon: Icons.image_outlined,
-                //       label: localizations.translate('photo'),
-                //       onTap: () => _handleAddAttachment(AttachmentType.image),
-                //     ),
-                //     const SizedBox(width: 20),
-                //     _buildMediaOption(
-                //       icon: Icons.videocam_outlined,
-                //       label: localizations.translate('video'),
-                //       onTap: () => _handleAddAttachment(AttachmentType.video),
-                //     ),
-                //     const SizedBox(width: 20),
-                //     _buildMediaOption(
-                //       icon: Icons.poll_outlined,
-                //       label: localizations.translate('poll'),
-                //       onTap: () => _handleAddAttachment(AttachmentType.poll),
-                //     ),
-                //     const SizedBox(width: 20),
-                //     _buildMediaOption(
-                //       icon: Icons.link_outlined,
-                //       label: localizations.translate('link'),
-                //       onTap: () => _handleAddAttachment(AttachmentType.link),
-                //     ),
-                //   ],
-                // ),
-                // const SizedBox(height: 12),
-                // Character counts
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      '${localizations.translate('title')}: ${_titleController.text.length}/$_maxTitleCharacters',
-                      style: TextStyles.caption.copyWith(
-                        color: _titleController.text.length >
-                                _maxTitleCharacters * 0.8
-                            ? theme.error[500]
-                            : theme.grey[500],
-                      ),
-                    ),
-                    Text(
-                      '${localizations.translate('content')}: ${_contentController.text.length}/$_maxContentCharacters',
-                      style: TextStyles.caption.copyWith(
-                        color: _contentController.text.length >
-                                _maxContentCharacters * 0.8
-                            ? theme.error[500]
-                            : theme.grey[500],
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
+          // Bottom section with character counts
+          _buildBottomSection(theme, localizations),
         ],
       ),
     );
   }
 
-  void _showCategorySelector(BuildContext context) {
-    final theme = AppTheme.of(context);
-    final localizations = AppLocalizations.of(context);
-    final categoriesAsync = ref.watch(postCategoriesProvider);
-
-    showModalBottomSheet(
-      context: context,
+  /// Builds the app bar with close button and post button
+  PreferredSizeWidget _buildAppBar(
+      CustomThemeData theme, AppLocalizations localizations) {
+    return AppBar(
       backgroundColor: theme.backgroundColor,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      elevation: 0,
+      leading: IconButton(
+        icon: const Icon(Icons.close),
+        onPressed: () => _handleClose(),
       ),
-      builder: (context) {
-        return Container(
-          width: double.infinity,
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                localizations.translate('select_category'),
-                style: TextStyles.h6.copyWith(
-                  color: theme.grey[900],
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              const SizedBox(height: 16),
-              categoriesAsync.when(
-                data: (categories) => Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: [
-                    // Reset to default general category
-                    GestureDetector(
-                      onTap: () {
-                        ref.read(selectedCategoryProvider.notifier).state =
-                            const PostCategory(
-                          id: 'general',
-                          name: 'General',
-                          nameAr: 'عام',
-                          iconName: 'chat',
-                          colorHex: '#6B7280',
-                          isActive: true,
-                          sortOrder: 7,
-                        );
-                        Navigator.pop(context);
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 16, vertical: 10),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF6B7280).withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(color: const Color(0xFF6B7280)),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Icon(
-                              Icons.refresh,
-                              size: 16,
-                              color: Color(0xFF6B7280),
-                            ),
-                            const SizedBox(width: 6),
-                            Text(
-                              localizations.locale.languageCode == 'ar'
-                                  ? 'عام (افتراضي)'
-                                  : 'General (Default)',
-                              style: TextStyles.caption.copyWith(
-                                color: const Color(0xFF6B7280),
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    // Regular categories
-                    ...categories.map((category) {
-                      final displayName = category
-                          .getDisplayName(localizations.locale.languageCode);
-
-                      return GestureDetector(
-                        onTap: () {
-                          ref.read(selectedCategoryProvider.notifier).state =
-                              category;
-                          Navigator.pop(context);
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 10),
-                          decoration: BoxDecoration(
-                            color: category.color.withValues(alpha: 0.1),
-                            borderRadius: BorderRadius.circular(20),
-                            border: Border.all(color: category.color),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                category.icon,
-                                size: 16,
-                                color: category.color,
-                              ),
-                              const SizedBox(width: 6),
-                              Text(
-                                displayName,
-                                style: TextStyles.caption.copyWith(
-                                  color: category.color,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      );
-                    }).toList(),
-                  ],
-                ),
-                loading: () => const Center(child: CircularProgressIndicator()),
-                error: (error, stackTrace) => Text(
-                  'Error loading categories',
-                  style: TextStyles.caption.copyWith(color: theme.error[500]),
-                ),
-              ),
-              const SizedBox(height: 20),
-            ],
-          ),
-        );
-      },
+      title: Text(
+        localizations.translate('new_thread'),
+        style: TextStyles.h6.copyWith(
+          color: theme.grey[900],
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+      centerTitle: true,
+      actions: [
+        Container(
+          margin: const EdgeInsets.only(left: 16, right: 16),
+          child: _buildPostButton(theme, localizations),
+        ),
+      ],
     );
   }
 
-  // Attachment preview methods - commented out for now
-  // Widget _buildAttachmentsPreview() {
-  //   final theme = AppTheme.of(context);
-  //
-  //   return Container(
-  //     padding: const EdgeInsets.all(12),
-  //     decoration: BoxDecoration(
-  //       color: theme.grey[50],
-  //       borderRadius: BorderRadius.circular(8),
-  //       border: Border.all(color: theme.grey[200]!),
-  //     ),
-  //     child: Column(
-  //       crossAxisAlignment: CrossAxisAlignment.start,
-  //       children: [
-  //         Text(
-  //           'Attachments',
-  //           style: TextStyles.caption.copyWith(
-  //             color: theme.grey[700],
-  //             fontWeight: FontWeight.w600,
-  //           ),
-  //         ),
-  //         const SizedBox(height: 8),
-  //         // This will show attachment previews when implemented
-  //         ..._attachments
-  //             .map((attachment) => _buildAttachmentPreview(attachment)),
-  //       ],
-  //     ),
-  //   );
-  // }
-
-  // Widget _buildAttachmentPreview(PostAttachment attachment) {
-  //   final theme = AppTheme.of(context);
-  //
-  //   return Container(
-  //     padding: const EdgeInsets.all(8),
-  //     margin: const EdgeInsets.only(bottom: 8),
-  //     decoration: BoxDecoration(
-  //       color: theme.backgroundColor,
-  //       borderRadius: BorderRadius.circular(6),
-  //       border: Border.all(color: theme.grey[200]!),
-  //     ),
-  //     child: Row(
-  //       children: [
-  //         Icon(
-  //           attachment.icon,
-  //           color: attachment.color,
-  //           size: 20,
-  //         ),
-  //         const SizedBox(width: 8),
-  //         Expanded(
-  //           child: Text(
-  //             attachment.title ?? attachment.displayName,
-  //             style: TextStyles.caption.copyWith(
-  //               color: theme.grey[700],
-  //             ),
-  //           ),
-  //         ),
-  //         IconButton(
-  //           icon: const Icon(Icons.close, size: 16),
-  //           onPressed: () {
-  //             setState(() {
-  //               _attachments.remove(attachment);
-  //             });
-  //           },
-  //         ),
-  //       ],
-  //     ),
-  //   );
-  // }
-
-  // Media option widget - commented out for now
-  // Widget _buildMediaOption({
-  //   required IconData icon,
-  //   required String label,
-  //   required VoidCallback onTap,
-  // }) {
-  //   final theme = AppTheme.of(context);
-  //
-  //   return GestureDetector(
-  //     onTap: onTap,
-  //     child: Container(
-  //       padding: const EdgeInsets.all(8),
-  //       decoration: BoxDecoration(
-  //         color: theme.grey[100],
-  //         borderRadius: BorderRadius.circular(8),
-  //       ),
-  //       child: Row(
-  //         mainAxisSize: MainAxisSize.min,
-  //         children: [
-  //           Icon(
-  //             icon,
-  //             color: theme.grey[600],
-  //             size: 20,
-  //           ),
-  //           const SizedBox(width: 4),
-  //           Text(
-  //             label,
-  //             style: TextStyles.caption.copyWith(
-  //               color: theme.grey[600],
-  //             ),
-  //           ),
-  //         ],
-  //       ),
-  //     ),
-  //   );
-  // }
-
-  void _handlePost() async {
-    final title = _titleController.text.trim();
-    final content = _contentController.text.trim();
-    final selectedCategory = ref.read(selectedCategoryProvider);
-    final isAnonymous = ref.read(anonymousPostProvider);
-
-    if (title.isEmpty || content.isEmpty) return;
-
-    try {
-      // Show loading indicator
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (context) => const Center(child: CircularProgressIndicator()),
-      );
-
-      // Create post using repository
-      final repository = ref.read(forumRepositoryProvider);
-      final postId = await repository.createPost(
-        title: title,
-        content: content,
-        categoryId: selectedCategory?.id,
-        isAnonymous: isAnonymous,
-        attachmentUrls: [], // _attachments.map((a) => a.url).toList(), - commented out for now
-      );
-
-      // Hide loading indicator
-      Navigator.pop(context);
-
-      // Show success message
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(AppLocalizations.of(context).translate('post_created')),
-          backgroundColor: AppTheme.of(context).primary[500],
+  /// Builds the post button with loading state
+  Widget _buildPostButton(
+      CustomThemeData theme, AppLocalizations localizations) {
+    return TextButton(
+      onPressed: _canSubmit ? _handleSubmit : null,
+      style: TextButton.styleFrom(
+        backgroundColor: _canSubmit ? theme.primary[500] : theme.grey[300],
+        foregroundColor: Colors.white,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
         ),
-      );
-
-      // Reset state and navigate back
-      _resetForm();
-      context.pop();
-    } catch (e) {
-      // Hide loading indicator
-      Navigator.pop(context);
-
-      // Show error message
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error creating post: $e'),
-          backgroundColor: AppTheme.of(context).error[500],
-        ),
-      );
-    }
-  }
-
-  void _resetForm() {
-    _titleController.clear();
-    _contentController.clear();
-    // Reset to default general category
-    ref.read(selectedCategoryProvider.notifier).state = const PostCategory(
-      id: 'general',
-      name: 'General',
-      nameAr: 'عام',
-      iconName: 'chat',
-      colorHex: '#6B7280',
-      isActive: true,
-      sortOrder: 7,
+      ),
+      child: _isSubmitting
+          ? SizedBox(
+              width: 16,
+              height: 16,
+              child: CircularProgressIndicator(
+                color: theme.grey[50],
+                strokeWidth: 2,
+              ),
+            )
+          : Text(
+              localizations.translate('post'),
+              style: TextStyles.footnote.copyWith(
+                color: theme.grey[50],
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
     );
-    ref.read(anonymousPostProvider.notifier).state = false;
-    ref.read(postContentProvider.notifier).state = '';
-    // _attachments.clear(); - commented out for now
   }
 
-  // Attachment handling methods - commented out for now
-  // void _handleAddAttachment(AttachmentType type) {
-  //   // TODO: Implement attachment handling based on type
-  //   switch (type) {
-  //     case AttachmentType.image:
-  //       _handleAddPhoto();
-  //       break;
-  //     case AttachmentType.video:
-  //       _handleAddVideo();
-  //       break;
-  //     case AttachmentType.poll:
-  //       _handleAddPoll();
-  //       break;
-  //     case AttachmentType.link:
-  //       _handleAddLink();
-  //       break;
-  //     default:
-  //       break;
-  //   }
-  // }
-
-  // void _handleAddPhoto() {
-  //   // TODO: Implement photo selection
-  //   ScaffoldMessenger.of(context).showSnackBar(
-  //     SnackBar(
-  //       content:
-  //           Text(AppLocalizations.of(context).translate('photo_coming_soon')),
-  //     ),
-  //   );
-  // }
-
-  // void _handleAddVideo() {
-  //   // TODO: Implement video selection
-  //   ScaffoldMessenger.of(context).showSnackBar(
-  //     SnackBar(
-  //       content:
-  //           Text(AppLocalizations.of(context).translate('video_coming_soon')),
-  //     ),
-  //   );
-  // }
-
-  // void _handleAddPoll() {
-  //   // TODO: Implement poll creation
-  //   ScaffoldMessenger.of(context).showSnackBar(
-  //     SnackBar(
-  //       content:
-  //           Text(AppLocalizations.of(context).translate('poll_coming_soon')),
-  //     ),
-  //   );
-  // }
-
-  // void _handleAddLink() {
-  //   // TODO: Implement link attachment
-  //   ScaffoldMessenger.of(context).showSnackBar(
-  //     SnackBar(
-  //       content:
-  //           Text(AppLocalizations.of(context).translate('link_coming_soon')),
-  //     ),
-  //   );
-  // }
-
+  /// Builds the user profile header section
   Widget _buildUserProfileHeader(
-    BuildContext context,
-    dynamic theme,
-    dynamic localizations,
+    CustomThemeData theme,
+    AppLocalizations localizations,
+    dynamic profile,
+    bool isAnonymous,
+  ) {
+    if (profile != null) {
+      return _buildProfileHeaderWithData(
+          theme, localizations, profile, isAnonymous);
+    }
+    return _buildFallbackProfileHeader(theme, localizations, isAnonymous);
+  }
+
+  /// Builds profile header when user profile data is available
+  Widget _buildProfileHeaderWithData(
+    CustomThemeData theme,
+    AppLocalizations localizations,
     dynamic profile,
     bool isAnonymous,
   ) {
@@ -718,7 +200,7 @@ class _NewPostScreenState extends ConsumerState<NewPostScreen> {
       padding: const EdgeInsets.all(16),
       child: Row(
         children: [
-          // User Avatar
+          // User avatar
           CircleAvatar(
             radius: 16,
             backgroundColor: theme.primary[100],
@@ -733,8 +215,10 @@ class _NewPostScreenState extends ConsumerState<NewPostScreen> {
                   )
                 : null,
           ),
+
           const SizedBox(width: 12),
-          // User Info
+
+          // User info
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -752,8 +236,7 @@ class _NewPostScreenState extends ConsumerState<NewPostScreen> {
                   isAnonymous
                       ? localizations.translate('anonymous-mode-reassurance')
                       : localizations
-                              .translate('community-profile-visible-message') ??
-                          'Other users will be able to see your name and profile',
+                          .translate('community-profile-visible-message'),
                   style: TextStyles.caption.copyWith(
                     color: theme.grey[600],
                   ),
@@ -761,53 +244,21 @@ class _NewPostScreenState extends ConsumerState<NewPostScreen> {
               ],
             ),
           ),
+
           const SizedBox(width: 12),
-          // Toggle Button
-          GestureDetector(
-            onTap: () =>
-                _showAnonymityToggleModal(context, profile, isAnonymous),
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              decoration: BoxDecoration(
-                color: theme.grey[50],
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: theme.grey[200]!),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    isAnonymous
-                        ? Icons.visibility
-                        : Icons.visibility_off_outlined,
-                    size: 16,
-                    color: theme.primary[600],
-                  ),
-                  const SizedBox(width: 6),
-                  Text(
-                    isAnonymous
-                        ? localizations.translate('show-identity') ??
-                            'Show my identity'
-                        : localizations.translate('hide-identity') ??
-                            'Hide my identity',
-                    style: TextStyles.caption.copyWith(
-                      color: theme.primary[600],
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
+
+          // Anonymity toggle button
+          _buildAnonymityToggleButton(
+              theme, localizations, profile, isAnonymous),
         ],
       ),
     );
   }
 
-  Widget _buildFallbackHeader(
-    BuildContext context,
-    dynamic theme,
-    dynamic localizations,
+  /// Builds fallback profile header when profile data is not available
+  Widget _buildFallbackProfileHeader(
+    CustomThemeData theme,
+    AppLocalizations localizations,
     bool isAnonymous,
   ) {
     return Container(
@@ -834,50 +285,434 @@ class _NewPostScreenState extends ConsumerState<NewPostScreen> {
             ),
           ),
           const Spacer(),
-          // Anonymous Toggle
-          GestureDetector(
-            onTap: () {
-              ref.read(anonymousPostProvider.notifier).state = !isAnonymous;
-            },
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              decoration: BoxDecoration(
-                color: isAnonymous ? theme.primary[100] : theme.grey[100],
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(
-                  color: isAnonymous ? theme.primary[300]! : theme.grey[300]!,
-                ),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    Icons.visibility_off_outlined,
-                    size: 14,
-                    color: isAnonymous ? theme.primary[600] : theme.grey[600],
-                  ),
-                  const SizedBox(width: 4),
-                  Text(
-                    localizations.translate('post_anonymously'),
-                    style: TextStyles.caption.copyWith(
-                      color: isAnonymous ? theme.primary[600] : theme.grey[600],
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ],
+          _buildSimpleAnonymityToggle(theme, localizations, isAnonymous),
+        ],
+      ),
+    );
+  }
+
+  /// Builds the anonymity toggle button
+  Widget _buildAnonymityToggleButton(
+    CustomThemeData theme,
+    AppLocalizations localizations,
+    dynamic profile,
+    bool isAnonymous,
+  ) {
+    return GestureDetector(
+      onTap: () => _showAnonymityToggleModal(profile, isAnonymous),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        decoration: BoxDecoration(
+          color: theme.grey[50],
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: theme.grey[200]!),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              isAnonymous ? Icons.visibility : Icons.visibility_off_outlined,
+              size: 16,
+              color: theme.primary[600],
+            ),
+            const SizedBox(width: 6),
+            Text(
+              isAnonymous
+                  ? localizations.translate('show-identity')
+                  : localizations.translate('hide-identity'),
+              style: TextStyles.caption.copyWith(
+                color: theme.primary[600],
+                fontWeight: FontWeight.w500,
               ),
             ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Builds simple anonymity toggle for fallback header
+  Widget _buildSimpleAnonymityToggle(
+    CustomThemeData theme,
+    AppLocalizations localizations,
+    bool isAnonymous,
+  ) {
+    return GestureDetector(
+      onTap: () => _toggleAnonymity(),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        decoration: BoxDecoration(
+          color: isAnonymous ? theme.primary[100] : theme.grey[100],
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: isAnonymous ? theme.primary[300]! : theme.grey[300]!,
+          ),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.visibility_off_outlined,
+              size: 14,
+              color: isAnonymous ? theme.primary[600] : theme.grey[600],
+            ),
+            const SizedBox(width: 4),
+            Text(
+              localizations.translate('post_anonymously'),
+              style: TextStyles.caption.copyWith(
+                color: isAnonymous ? theme.primary[600] : theme.grey[600],
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Builds the main content area with form fields
+  Widget _buildContentArea(
+    CustomThemeData theme,
+    AppLocalizations localizations,
+    PostCategory? selectedCategory,
+  ) {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Title input field
+          _buildTitleInput(theme, localizations),
+
+          // Category selector
+          _buildCategorySelector(theme, localizations, selectedCategory),
+
+          verticalSpace(Spacing.points4),
+
+          // Content input field
+          _buildContentInput(theme, localizations),
+        ],
+      ),
+    );
+  }
+
+  /// Builds the title input field
+  Widget _buildTitleInput(
+      CustomThemeData theme, AppLocalizations localizations) {
+    return TextField(
+      controller: _titleController,
+      focusNode: _titleFocusNode,
+      maxLines: null,
+      maxLength: PostFormValidationConstants.maxTitleLength,
+      style: TextStyles.h4.copyWith(
+        color: theme.grey[900],
+        fontWeight: FontWeight.w600,
+      ),
+      decoration: InputDecoration(
+        hintText: localizations.translate('post_title'),
+        hintStyle: TextStyles.h4.copyWith(
+          color: theme.grey[400],
+          fontWeight: FontWeight.w600,
+        ),
+        border: InputBorder.none,
+        counterText: '',
+      ),
+      onChanged: (value) => setState(() {}),
+    );
+  }
+
+  /// Builds the category selector
+  Widget _buildCategorySelector(
+    CustomThemeData theme,
+    AppLocalizations localizations,
+    PostCategory? selectedCategory,
+  ) {
+    return GestureDetector(
+      onTap: () => _showCategorySelector(theme, localizations),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        decoration: BoxDecoration(
+          color: selectedCategory != null
+              ? selectedCategory.color.withValues(alpha: 0.1)
+              : theme.grey[100],
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: selectedCategory != null
+                ? selectedCategory.color
+                : theme.grey[300]!,
+          ),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              selectedCategory?.icon ?? Icons.local_offer_outlined,
+              size: 16,
+              color: selectedCategory != null
+                  ? selectedCategory.color
+                  : theme.grey[600],
+            ),
+            const SizedBox(width: 6),
+            Text(
+              selectedCategory
+                      ?.getDisplayName(localizations.locale.languageCode) ??
+                  localizations.translate('select_category'),
+              style: TextStyles.caption.copyWith(
+                color: selectedCategory != null
+                    ? selectedCategory.color
+                    : theme.grey[500],
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            const SizedBox(width: 4),
+            Icon(
+              Icons.keyboard_arrow_down,
+              size: 16,
+              color: selectedCategory != null
+                  ? selectedCategory.color
+                  : theme.grey[600],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Builds the content input field
+  Widget _buildContentInput(
+      CustomThemeData theme, AppLocalizations localizations) {
+    return TextField(
+      controller: _contentController,
+      focusNode: _contentFocusNode,
+      maxLines: null,
+      minLines: 8,
+      maxLength: PostFormValidationConstants.maxContentLength,
+      style: TextStyles.body.copyWith(
+        color: theme.grey[900],
+        fontSize: 16,
+        height: 1.5,
+      ),
+      decoration: InputDecoration(
+        hintText: localizations.translate('whats_on_your_mind'),
+        hintStyle: TextStyles.body.copyWith(
+          color: theme.grey[500],
+          fontSize: 16,
+        ),
+        border: InputBorder.none,
+        counterText: '',
+      ),
+      onChanged: (value) => setState(() {}),
+    );
+  }
+
+  /// Builds the bottom section with character counts
+  Widget _buildBottomSection(
+      CustomThemeData theme, AppLocalizations localizations) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: theme.backgroundColor,
+        border: Border(
+          top: BorderSide(color: theme.grey[200]!),
+        ),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          _buildCharacterCount(
+            '${localizations.translate('title')}: ${_titleController.text.length}/${PostFormValidationConstants.maxTitleLength}',
+            _titleController.text.length,
+            PostFormValidationConstants.maxTitleLength,
+            theme,
+          ),
+          _buildCharacterCount(
+            '${localizations.translate('content')}: ${_contentController.text.length}/${PostFormValidationConstants.maxContentLength}',
+            _contentController.text.length,
+            PostFormValidationConstants.maxContentLength,
+            theme,
           ),
         ],
       ),
     );
   }
 
-  void _showAnonymityToggleModal(
-    BuildContext context,
-    dynamic profile,
-    bool currentAnonymousState,
+  /// Builds character count display with color coding
+  Widget _buildCharacterCount(
+      String text, int current, int max, CustomThemeData theme) {
+    final isNearLimit = current > max * 0.8;
+    final isOverLimit = current > max;
+
+    return Text(
+      text,
+      style: TextStyles.caption.copyWith(
+        color: isOverLimit
+            ? theme.error[500]
+            : isNearLimit
+                ? theme.warn[500]
+                : theme.grey[500],
+      ),
+    );
+  }
+
+  /// Shows the category selector modal
+  void _showCategorySelector(
+      CustomThemeData theme, AppLocalizations localizations) {
+    // Force refresh the categories provider to ensure fresh data
+    ref.invalidate(postCategoriesProvider);
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: theme.backgroundColor,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) => Consumer(
+        builder: (context, ref, child) {
+          final categoriesAsync = ref.watch(postCategoriesProvider);
+          return _buildCategorySelectorModal(
+              theme, localizations, categoriesAsync);
+        },
+      ),
+    );
+  }
+
+  /// Builds the category selector modal content
+  Widget _buildCategorySelectorModal(
+    CustomThemeData theme,
+    AppLocalizations localizations,
+    AsyncValue<List<PostCategory>> categoriesAsync,
   ) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header
+          Text(
+            localizations.translate('select_category'),
+            style: TextStyles.h6.copyWith(
+              color: theme.grey[900],
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 16),
+
+          // Categories content
+          categoriesAsync.when(
+            data: (categories) =>
+                _buildCategoryList(theme, localizations, categories),
+            loading: () => const Center(
+              child: Padding(
+                padding: EdgeInsets.all(40),
+                child: CircularProgressIndicator(),
+              ),
+            ),
+            error: (error, stackTrace) =>
+                _buildCategoryError(theme, localizations, error),
+          ),
+          const SizedBox(height: 20),
+        ],
+      ),
+    );
+  }
+
+  /// Builds the category list
+  Widget _buildCategoryList(
+    CustomThemeData theme,
+    AppLocalizations localizations,
+    List<PostCategory> categories,
+  ) {
+    // Always include default general category
+    final defaultCategory = const PostCategory(
+      id: 'general',
+      name: 'General',
+      nameAr: 'عام',
+      iconName: 'chat',
+      colorHex: '#6B7280',
+      isActive: true,
+      sortOrder: 7,
+    );
+
+    // Filter out any duplicate general categories from Firestore
+    final filteredCategories =
+        categories.where((cat) => cat.id != 'general').toList();
+
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: [
+        // Default general category option
+        _buildCategoryOption(
+          theme,
+          localizations,
+          defaultCategory,
+          isDefault: true,
+        ),
+
+        // Regular categories from Firestore
+        ...filteredCategories.map(
+            (category) => _buildCategoryOption(theme, localizations, category)),
+      ],
+    );
+  }
+
+  /// Builds a single category option
+  Widget _buildCategoryOption(
+    CustomThemeData theme,
+    AppLocalizations localizations,
+    PostCategory category, {
+    bool isDefault = false,
+  }) {
+    final displayName = isDefault
+        ? (localizations.locale.languageCode == 'ar'
+            ? 'عام (افتراضي)'
+            : 'General (Default)')
+        : category.getDisplayName(localizations.locale.languageCode);
+
+    return GestureDetector(
+      onTap: () => _selectCategory(category),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        decoration: BoxDecoration(
+          color: category.color.withValues(alpha: 0.1),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: category.color),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              isDefault ? Icons.refresh : category.icon,
+              size: 16,
+              color: category.color,
+            ),
+            const SizedBox(width: 6),
+            Text(
+              displayName,
+              style: TextStyles.caption.copyWith(
+                color: category.color,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Builds category error display
+  Widget _buildCategoryError(
+      CustomThemeData theme, AppLocalizations localizations,
+      [Object? error]) {
+    return Text(
+      localizations.translate('error_loading_categories'),
+      style: TextStyles.caption.copyWith(color: theme.error[500]),
+    );
+  }
+
+  /// Shows the anonymity toggle modal
+  void _showAnonymityToggleModal(dynamic profile, bool currentAnonymousState) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -886,12 +721,145 @@ class _NewPostScreenState extends ConsumerState<NewPostScreen> {
         profile: profile,
         currentAnonymousState: currentAnonymousState,
         onToggleComplete: (newAnonymityState) {
-          // Update the anonymousPostProvider with the new state
           ref.read(anonymousPostProvider.notifier).state = newAnonymityState;
-          // Also refresh the community profile to get the updated setting
           ref.refresh(currentCommunityProfileProvider);
         },
       ),
     );
+  }
+
+  /// Handles close button tap
+  void _handleClose() {
+    if (_hasUnsavedChanges()) {
+      _showUnsavedChangesDialog();
+    } else {
+      context.pop();
+    }
+  }
+
+  /// Checks if there are unsaved changes
+  bool _hasUnsavedChanges() {
+    return _titleController.text.trim().isNotEmpty ||
+        _contentController.text.trim().isNotEmpty;
+  }
+
+  /// Shows unsaved changes dialog
+  void _showUnsavedChangesDialog() {
+    final theme = AppTheme.of(context);
+    final localizations = AppLocalizations.of(context);
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(localizations.translate('unsaved_changes')),
+        content: Text(localizations.translate('unsaved_changes_message')),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(localizations.translate('cancel')),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              context.pop();
+            },
+            style: TextButton.styleFrom(foregroundColor: theme.error[500]),
+            child: Text(localizations.translate('discard')),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Handles form submission
+  Future<void> _handleSubmit() async {
+    if (!_canSubmit) return;
+
+    setState(() => _isSubmitting = true);
+
+    try {
+      // Create post data
+      final postData = PostFormData(
+        title: _titleController.text.trim(),
+        content: _contentController.text.trim(),
+        categoryId: ref.read(selectedCategoryProvider)?.id,
+      );
+
+      // Submit through the provider
+      await ref.read(postCreationProvider.notifier).createPost(
+            postData,
+            AppLocalizations.of(context),
+          );
+    } catch (e) {
+      // Error handling is done in the listener
+      setState(() => _isSubmitting = false);
+    }
+  }
+
+  /// Handles post creation results
+  void _handlePostCreationResult(
+      AsyncValue<String?> result, AppLocalizations localizations) {
+    result.when(
+      data: (postId) {
+        if (postId != null) {
+          // Success - show success message and navigate back
+          getSuccessSnackBar(context, 'post_created');
+          _resetForm();
+          context.pop();
+        }
+      },
+      loading: () {
+        // Loading state is handled by the submit button
+      },
+      error: (error, stackTrace) {
+        setState(() => _isSubmitting = false);
+        _handleError(error, localizations);
+      },
+    );
+  }
+
+  /// Handles errors with appropriate snackbar messages
+  void _handleError(Object error, AppLocalizations localizations) {
+    if (error is PostValidationException) {
+      getErrorSnackBar(context, error.message);
+    } else if (error is ForumAuthenticationException) {
+      getErrorSnackBar(context, 'authentication_required');
+    } else if (error is ForumPermissionException) {
+      getErrorSnackBar(context, 'permission_denied');
+    } else if (error is PostCreationException) {
+      getErrorSnackBar(context, 'post_creation_failed');
+    } else {
+      getErrorSnackBar(context, 'generic_error');
+    }
+  }
+
+  /// Resets the form to initial state
+  void _resetForm() {
+    _titleController.clear();
+    _contentController.clear();
+    ref.read(selectedCategoryProvider.notifier).state = const PostCategory(
+      id: 'general',
+      name: 'General',
+      nameAr: 'عام',
+      iconName: 'chat',
+      colorHex: '#6B7280',
+      isActive: true,
+      sortOrder: 7,
+    );
+    ref.read(anonymousPostProvider.notifier).state = false;
+    ref.read(postContentProvider.notifier).state = '';
+    ref.read(postCreationProvider.notifier).reset();
+  }
+
+  /// Selects a category
+  void _selectCategory(PostCategory category) {
+    ref.read(selectedCategoryProvider.notifier).state = category;
+    Navigator.pop(context);
+  }
+
+  /// Toggles anonymity
+  void _toggleAnonymity() {
+    final current = ref.read(anonymousPostProvider);
+    ref.read(anonymousPostProvider.notifier).state = !current;
   }
 }

@@ -32,9 +32,36 @@ class PostCategory {
     );
   }
 
+  /// Factory method for creating PostCategory from Firestore document
+  /// where the document ID is auto-generated and not stored as a field
+  factory PostCategory.fromFirestore(
+      String documentId, Map<String, dynamic> data) {
+    return PostCategory(
+      id: documentId, // Use the document ID as the category ID
+      name: data['name'] as String,
+      nameAr: data['nameAr'] as String,
+      iconName: data['iconName'] as String,
+      colorHex: data['colorHex'] as String,
+      isActive: data['isActive'] as bool? ?? true,
+      sortOrder: data['sortOrder'] as int? ?? 0,
+    );
+  }
+
   Map<String, dynamic> toJson() {
     return {
       'id': id,
+      'name': name,
+      'nameAr': nameAr,
+      'iconName': iconName,
+      'colorHex': colorHex,
+      'isActive': isActive,
+      'sortOrder': sortOrder,
+    };
+  }
+
+  /// Convert to Firestore data (excludes the id field since it's the document ID)
+  Map<String, dynamic> toFirestore() {
+    return {
       'name': name,
       'nameAr': nameAr,
       'iconName': iconName,

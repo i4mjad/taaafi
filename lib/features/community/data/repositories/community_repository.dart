@@ -35,7 +35,7 @@ class CommunityRepository {
     required String uid,
     required String displayName,
     required String gender,
-    required bool postAnonymouslyByDefault,
+    required bool isAnonymous,
     String? avatarUrl,
     String? referralCode,
   }) async {
@@ -46,7 +46,7 @@ class CommunityRepository {
         'displayName': displayName,
         'gender': gender,
         'avatarUrl': avatarUrl,
-        'postAnonymouslyByDefault': postAnonymouslyByDefault,
+        'isAnonymous': isAnonymous,
         'referralCode': referralCode,
         'createdAt': FieldValue.serverTimestamp(),
         'updatedAt': FieldValue.serverTimestamp(),

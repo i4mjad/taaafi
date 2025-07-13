@@ -6,7 +6,6 @@ class Post {
   final String title;
   final String body;
   final String category;
-  final bool isAnonymous;
   final int score;
   final DateTime createdAt;
   final DateTime? updatedAt;
@@ -17,7 +16,6 @@ class Post {
     required this.title,
     required this.body,
     required this.category,
-    required this.isAnonymous,
     required this.score,
     required this.createdAt,
     this.updatedAt,
@@ -30,7 +28,6 @@ class Post {
         title: doc.data()!["title"],
         body: doc.data()!["body"],
         category: doc.data()!["category"],
-        isAnonymous: doc.data()!["isAnonymous"],
         score: doc.data()!["score"] ?? 0,
         createdAt: (doc.data()!["createdAt"] as Timestamp).toDate(),
         updatedAt: (doc.data()!["updatedAt"] as Timestamp?)?.toDate(),
@@ -42,9 +39,20 @@ class Post {
         'title': title,
         'body': body,
         'category': category,
-        'isAnonymous': isAnonymous,
         'score': score,
         'createdAt': createdAt.toIso8601String(),
         'updatedAt': updatedAt?.toIso8601String(),
+      };
+
+  /// Converts Post to Firestore document data
+  /// Excludes the id field as it's stored as the document ID
+  Map<String, dynamic> toFirestore() => {
+        'authorCPId': authorCPId,
+        'title': title,
+        'body': body,
+        'category': category,
+        'score': score,
+        'createdAt': Timestamp.fromDate(createdAt),
+        'updatedAt': updatedAt != null ? Timestamp.fromDate(updatedAt!) : null,
       };
 }

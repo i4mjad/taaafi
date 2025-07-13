@@ -29,7 +29,7 @@ class EditCommunityProfileModal extends ConsumerStatefulWidget {
 class _EditCommunityProfileModalState
     extends ConsumerState<EditCommunityProfileModal> {
   late TextEditingController _displayNameController;
-  late bool _postAnonymouslyByDefault;
+  late bool _isAnonymous;
   late String _selectedGender;
   bool _isLoading = false;
 
@@ -38,7 +38,7 @@ class _EditCommunityProfileModalState
     super.initState();
     _displayNameController =
         TextEditingController(text: widget.profile.displayName);
-    _postAnonymouslyByDefault = widget.profile.postAnonymouslyByDefault;
+    _isAnonymous = widget.profile.isAnonymous;
     _selectedGender = widget.profile.gender;
 
     // Add listener to update button state when text changes
@@ -146,7 +146,7 @@ class _EditCommunityProfileModalState
                             children: [
                               AvatarWithAnonymity(
                                 cpId: widget.profile.id,
-                                isAnonymous: _postAnonymouslyByDefault,
+                                isAnonymous: _isAnonymous,
                                 size: 80,
                               ),
                               const SizedBox(height: 8),
@@ -191,10 +191,10 @@ class _EditCommunityProfileModalState
                                     ),
                                   ),
                                   Switch(
-                                    value: _postAnonymouslyByDefault,
+                                    value: _isAnonymous,
                                     onChanged: (value) {
                                       setState(() {
-                                        _postAnonymouslyByDefault = value;
+                                        _isAnonymous = value;
                                       });
                                     },
                                     activeColor: theme.primary[500],
@@ -225,7 +225,7 @@ class _EditCommunityProfileModalState
                           controller: _displayNameController,
                           prefixIcon: LucideIcons.user,
                           inputType: TextInputType.text,
-                          enabled: !_postAnonymouslyByDefault,
+                          enabled: !_isAnonymous,
                           validator: (value) {
                             if (value == null || value.trim().isEmpty) {
                               return localizations.translate('field-required');
@@ -233,7 +233,7 @@ class _EditCommunityProfileModalState
                             return null;
                           },
                         ),
-                        if (_postAnonymouslyByDefault) ...[
+                        if (_isAnonymous) ...[
                           const SizedBox(height: 8),
                           _buildInfoBox(
                             localizations.translate(
@@ -294,8 +294,7 @@ class _EditCommunityProfileModalState
   }
 
   Future<void> _saveProfile() async {
-    if (_displayNameController.text.trim().isEmpty &&
-        !_postAnonymouslyByDefault) {
+    if (_displayNameController.text.trim().isEmpty && !_isAnonymous) {
       getErrorSnackBar(context, "field-required");
       return;
     }
@@ -310,7 +309,7 @@ class _EditCommunityProfileModalState
       await updateNotifier.updateProfile(
         displayName: _displayNameController.text.trim(),
         gender: _selectedGender,
-        postAnonymouslyByDefault: _postAnonymouslyByDefault,
+        isAnonymous: _isAnonymous,
         avatarUrl: widget.profile.avatarUrl, // Keep existing avatar
       );
 

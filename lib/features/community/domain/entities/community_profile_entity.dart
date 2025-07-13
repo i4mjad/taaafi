@@ -17,7 +17,7 @@ class CommunityProfileEntity {
   final String? avatarUrl;
 
   /// Whether the user posts anonymously by default
-  final bool postAnonymouslyByDefault;
+  final bool isAnonymous;
 
   /// When the profile was created
   final DateTime createdAt;
@@ -30,7 +30,7 @@ class CommunityProfileEntity {
     required this.displayName,
     required this.gender,
     this.avatarUrl,
-    required this.postAnonymouslyByDefault,
+    required this.isAnonymous,
     required this.createdAt,
     this.updatedAt,
   });
@@ -42,7 +42,7 @@ class CommunityProfileEntity {
       displayName: json['displayName'] as String,
       gender: json['gender'] as String,
       avatarUrl: json['avatarUrl'] as String?,
-      postAnonymouslyByDefault: json['postAnonymouslyByDefault'] as bool,
+      isAnonymous: json['isAnonymous'] as bool,
       createdAt: DateTime.parse(json['createdAt'] as String),
       updatedAt: json['updatedAt'] != null
           ? DateTime.parse(json['updatedAt'] as String)
@@ -57,7 +57,7 @@ class CommunityProfileEntity {
       'displayName': displayName,
       'gender': gender,
       'avatarUrl': avatarUrl,
-      'postAnonymouslyByDefault': postAnonymouslyByDefault,
+      'isAnonymous': isAnonymous,
       'createdAt': createdAt.toIso8601String(),
       'updatedAt': updatedAt?.toIso8601String(),
     };
@@ -94,7 +94,7 @@ class CommunityProfileEntity {
     String? displayName,
     String? gender,
     String? avatarUrl,
-    bool? postAnonymouslyByDefault,
+    bool? isAnonymous,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
@@ -103,8 +103,7 @@ class CommunityProfileEntity {
       displayName: displayName ?? this.displayName,
       gender: gender ?? this.gender,
       avatarUrl: avatarUrl ?? this.avatarUrl,
-      postAnonymouslyByDefault:
-          postAnonymouslyByDefault ?? this.postAnonymouslyByDefault,
+      isAnonymous: isAnonymous ?? this.isAnonymous,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );
@@ -118,7 +117,7 @@ class CommunityProfileEntity {
         other.displayName == displayName &&
         other.gender == gender &&
         other.avatarUrl == avatarUrl &&
-        other.postAnonymouslyByDefault == postAnonymouslyByDefault &&
+        other.isAnonymous == isAnonymous &&
         other.createdAt == createdAt &&
         other.updatedAt == updatedAt;
   }
@@ -129,13 +128,13 @@ class CommunityProfileEntity {
         displayName.hashCode ^
         gender.hashCode ^
         avatarUrl.hashCode ^
-        postAnonymouslyByDefault.hashCode ^
+        isAnonymous.hashCode ^
         createdAt.hashCode ^
         updatedAt.hashCode;
   }
 
   @override
   String toString() {
-    return 'CommunityProfileEntity(id: $id, displayName: $displayName, gender: $gender, avatarUrl: $avatarUrl, postAnonymouslyByDefault: $postAnonymouslyByDefault, createdAt: $createdAt, updatedAt: $updatedAt)';
+    return 'CommunityProfileEntity(id: $id, displayName: $displayName, gender: $gender, avatarUrl: $avatarUrl, isAnonymous: $isAnonymous, createdAt: $createdAt, updatedAt: $updatedAt)';
   }
 }

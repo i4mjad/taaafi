@@ -8,6 +8,7 @@ import 'package:reboot_app_3/core/shared_widgets/app_bar.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/features/community/presentation/widgets/threads_post_card.dart';
+import 'package:reboot_app_3/features/community/presentation/providers/forum_providers.dart';
 
 class CommunityMainScreen extends ConsumerStatefulWidget {
   const CommunityMainScreen({super.key});
@@ -19,6 +20,36 @@ class CommunityMainScreen extends ConsumerStatefulWidget {
 
 class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen> {
   bool _isChallengesSectionExpanded = true;
+  String _selectedFilter = 'all';
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_onScroll);
+    // Load posts when screen initializes
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref
+          .read(postsPaginationProvider.notifier)
+          .loadPosts(category: _selectedFilter);
+    });
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - 200) {
+      // Load more posts when near the bottom
+      ref
+          .read(postsPaginationProvider.notifier)
+          .loadMorePosts(category: _selectedFilter);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -65,32 +96,22 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen> {
           child: ListView(
             scrollDirection: Axis.horizontal,
             children: [
-              _buildFilterChip('community-all', true),
+              _buildFilterChip('community-all', 'all'),
               const SizedBox(width: 8),
-              _buildFilterChip('community-general', false),
+              _buildFilterChip('community-general', 'general'),
               const SizedBox(width: 8),
-              _buildFilterChip('community-questions', false),
+              _buildFilterChip('community-questions', 'question'),
               const SizedBox(width: 8),
-              _buildFilterChip('community-tips', false),
+              _buildFilterChip('community-tips', 'tip'),
               const SizedBox(width: 8),
-              _buildFilterChip('community-support', false),
+              _buildFilterChip('community-support', 'support'),
             ],
           ),
         ),
 
         // Posts list
         Expanded(
-          child: ListView.builder(
-            itemCount: 10, // Placeholder
-            itemBuilder: (context, index) {
-              return ThreadsPostCard(
-                postId: 'post_$index',
-                onTap: () {
-                  context.push('/community/forum/post/post_$index');
-                },
-              );
-            },
-          ),
+          child: _buildPostsList(),
         ),
       ],
     );
@@ -273,9 +294,83 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen> {
 
   // Removed _buildChallengesTab method
 
-  Widget _buildFilterChip(String translationKey, bool isSelected) {
+  Widget _buildPostsList() {
+    final postsState = ref.watch(postsPaginationProvider);
+
+    if (postsState.posts.isEmpty && postsState.isLoading) {
+      return const Center(
+        child: CircularProgressIndicator(),
+      );
+    }
+
+    if (postsState.posts.isEmpty && postsState.error != null) {
+      print('❌ Error loading posts: ${postsState.error}');
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'Error loading posts',
+              style: TextStyles.body.copyWith(
+                color: AppTheme.of(context).error[500],
+              ),
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () {
+                ref
+                    .read(postsPaginationProvider.notifier)
+                    .refresh(category: _selectedFilter);
+              },
+              child: const Text('Retry'),
+            ),
+          ],
+        ),
+      );
+    }
+
+    if (postsState.posts.isEmpty) {
+      return const Center(
+        child: Text('No posts found'),
+      );
+    }
+
+    return RefreshIndicator(
+      onRefresh: () async {
+        await ref
+            .read(postsPaginationProvider.notifier)
+            .refresh(category: _selectedFilter);
+      },
+      child: ListView.builder(
+        controller: _scrollController,
+        itemCount: postsState.posts.length + (postsState.isLoading ? 1 : 0),
+        itemBuilder: (context, index) {
+          if (index == postsState.posts.length) {
+            // Loading indicator at the bottom
+            return const Center(
+              child: Padding(
+                padding: EdgeInsets.all(16.0),
+                child: CircularProgressIndicator(),
+              ),
+            );
+          }
+
+          final post = postsState.posts[index];
+          return ThreadsPostCard(
+            post: post,
+            onTap: () {
+              context.push('/community/forum/post/${post.id}');
+            },
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildFilterChip(String translationKey, String filterValue) {
     final theme = AppTheme.of(context);
     final localizations = AppLocalizations.of(context);
+    final isSelected = _selectedFilter == filterValue;
 
     return FilterChip(
       label: Text(
@@ -287,7 +382,15 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen> {
       ),
       selected: isSelected,
       onSelected: (selected) {
-        // Handle filter selection
+        if (selected) {
+          setState(() {
+            _selectedFilter = filterValue;
+          });
+          // Refresh posts with new filter
+          ref
+              .read(postsPaginationProvider.notifier)
+              .refresh(category: filterValue);
+        }
       },
       backgroundColor: theme.grey[50],
       selectedColor: theme.primary[100],

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
@@ -8,7 +9,6 @@ import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/features/community/domain/entities/community_profile_entity.dart';
-import 'package:reboot_app_3/features/community/presentation/widgets/avatar_with_anonymity.dart';
 import 'package:reboot_app_3/features/community/presentation/providers/community_providers_new.dart';
 
 class AnonymityToggleModal extends ConsumerStatefulWidget {
@@ -29,13 +29,13 @@ class AnonymityToggleModal extends ConsumerStatefulWidget {
 }
 
 class _AnonymityToggleModalState extends ConsumerState<AnonymityToggleModal> {
-  late bool _postAnonymouslyByDefault;
+  late bool _isAnonymous;
   bool _isLoading = false;
 
   @override
   void initState() {
     super.initState();
-    _postAnonymouslyByDefault = widget.currentAnonymousState;
+    _isAnonymous = widget.currentAnonymousState;
   }
 
   @override
@@ -127,14 +127,10 @@ class _AnonymityToggleModalState extends ConsumerState<AnonymityToggleModal> {
                         Center(
                           child: Column(
                             children: [
-                              AvatarWithAnonymity(
-                                cpId: widget.profile.id,
-                                isAnonymous: _postAnonymouslyByDefault,
-                                size: 80,
-                              ),
+                              _buildProfileAvatar(theme),
                               const SizedBox(height: 12),
                               Text(
-                                _postAnonymouslyByDefault
+                                _isAnonymous
                                     ? localizations
                                         .translate('community-anonymous')
                                     : widget.profile.displayName,
@@ -145,7 +141,7 @@ class _AnonymityToggleModalState extends ConsumerState<AnonymityToggleModal> {
                               ),
                               const SizedBox(height: 8),
                               Text(
-                                _postAnonymouslyByDefault
+                                _isAnonymous
                                     ? localizations.translate(
                                         'community-anonymous-mode-enabled')
                                     : localizations.translate(
@@ -162,20 +158,19 @@ class _AnonymityToggleModalState extends ConsumerState<AnonymityToggleModal> {
                         // Anonymous Mode Toggle
                         WidgetsContainer(
                           padding: const EdgeInsets.all(16),
-                          backgroundColor: _postAnonymouslyByDefault
-                              ? theme.primary[50]
-                              : theme.grey[50],
+                          backgroundColor:
+                              _isAnonymous ? theme.primary[50] : theme.grey[50],
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Row(
                                 children: [
                                   Icon(
-                                    _postAnonymouslyByDefault
+                                    _isAnonymous
                                         ? LucideIcons.shieldCheck
                                         : LucideIcons.shield,
                                     size: 26,
-                                    color: _postAnonymouslyByDefault
+                                    color: _isAnonymous
                                         ? theme.primary[600]
                                         : theme.grey[600],
                                   ),
@@ -185,7 +180,7 @@ class _AnonymityToggleModalState extends ConsumerState<AnonymityToggleModal> {
                                       localizations.translate(
                                           'community-post-anonymously-by-default'),
                                       style: TextStyles.body.copyWith(
-                                        color: _postAnonymouslyByDefault
+                                        color: _isAnonymous
                                             ? theme.primary[900]
                                             : theme.grey[900],
                                         fontWeight: FontWeight.w600,
@@ -193,10 +188,10 @@ class _AnonymityToggleModalState extends ConsumerState<AnonymityToggleModal> {
                                     ),
                                   ),
                                   Switch(
-                                    value: _postAnonymouslyByDefault,
+                                    value: _isAnonymous,
                                     onChanged: (value) {
                                       setState(() {
-                                        _postAnonymouslyByDefault = value;
+                                        _isAnonymous = value;
                                       });
                                     },
                                     activeColor: theme.primary[500],
@@ -208,7 +203,7 @@ class _AnonymityToggleModalState extends ConsumerState<AnonymityToggleModal> {
                                 localizations.translate(
                                     'community-anonymous-mode-description'),
                                 style: TextStyles.caption.copyWith(
-                                  color: _postAnonymouslyByDefault
+                                  color: _isAnonymous
                                       ? theme.primary[700]
                                       : theme.grey[700],
                                   height: 1.3,
@@ -262,6 +257,47 @@ class _AnonymityToggleModalState extends ConsumerState<AnonymityToggleModal> {
     );
   }
 
+  Widget _buildProfileAvatar(dynamic theme) {
+    final user = FirebaseAuth.instance.currentUser;
+    final userImageUrl = user?.photoURL;
+
+    if (_isAnonymous) {
+      // When anonymous, show generic anonymous avatar (no real image)
+      return CircleAvatar(
+        radius: 40,
+        backgroundColor: theme.primary[100],
+        child: Icon(
+          Icons.person_outline,
+          size: 40,
+          color: theme.primary[700],
+        ),
+      );
+    } else {
+      // When not anonymous, show the actual Firebase user's image or community profile
+      return CircleAvatar(
+        radius: 40,
+        backgroundColor: theme.primary[100],
+        backgroundImage: userImageUrl != null
+            ? NetworkImage(userImageUrl)
+            : (widget.profile.avatarUrl != null
+                ? NetworkImage(widget.profile.avatarUrl!)
+                : null),
+        child: userImageUrl == null && widget.profile.avatarUrl == null
+            ? Text(
+                widget.profile.displayName.isNotEmpty
+                    ? widget.profile.displayName[0].toUpperCase()
+                    : 'U',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.w600,
+                  color: theme.primary[700],
+                ),
+              )
+            : null,
+      );
+    }
+  }
+
   Future<void> _saveChanges() async {
     setState(() {
       _isLoading = true;
@@ -273,16 +309,16 @@ class _AnonymityToggleModalState extends ConsumerState<AnonymityToggleModal> {
       await updateNotifier.updateProfile(
         displayName: widget.profile.displayName,
         gender: widget.profile.gender,
-        postAnonymouslyByDefault: _postAnonymouslyByDefault,
+        isAnonymous: _isAnonymous,
         avatarUrl: widget.profile.avatarUrl,
       );
 
       if (mounted) {
         Navigator.of(context).pop();
-        widget.onToggleComplete?.call(_postAnonymouslyByDefault);
+        widget.onToggleComplete?.call(_isAnonymous);
         getSuccessSnackBar(
             context,
-            _postAnonymouslyByDefault
+            _isAnonymous
                 ? "community-anonymous-mode-enabled"
                 : "community-anonymous-mode-disabled");
       }

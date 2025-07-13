@@ -21,7 +21,7 @@ class CommunityServiceImpl implements CommunityService {
   Future<CommunityProfileEntity> createProfile({
     required String displayName,
     required String gender,
-    required bool postAnonymouslyByDefault,
+    required bool isAnonymous,
     String? avatarUrl,
   }) async {
     // Check authentication
@@ -48,7 +48,7 @@ class CommunityServiceImpl implements CommunityService {
         displayName: displayName.trim(),
         gender: gender.toLowerCase(),
         avatarUrl: avatarUrl?.trim(),
-        postAnonymouslyByDefault: postAnonymouslyByDefault,
+        isAnonymous: isAnonymous,
         createdAt: now,
         updatedAt: now,
       );
@@ -77,7 +77,7 @@ class CommunityServiceImpl implements CommunityService {
   Future<CommunityProfileEntity> updateProfile({
     String? displayName,
     String? gender,
-    bool? postAnonymouslyByDefault,
+    bool? isAnonymous,
     String? avatarUrl,
   }) async {
     final user = _auth.currentUser;
@@ -103,7 +103,7 @@ class CommunityServiceImpl implements CommunityService {
     final updatedProfile = existingProfile.copyWith(
       displayName: displayName?.trim(),
       gender: gender?.toLowerCase(),
-      postAnonymouslyByDefault: postAnonymouslyByDefault,
+      isAnonymous: isAnonymous,
       avatarUrl: avatarUrl?.trim(),
       updatedAt: DateTime.now(),
     );

@@ -50,13 +50,13 @@ class CommunityOnboardingScreen extends ConsumerWidget {
                 const SizedBox(height: 32),
 
                 // Setup Profile button
-                WidgetsContainer(
-                  padding: EdgeInsets.symmetric(vertical: 16, horizontal: 20),
-                  backgroundColor: theme.primary[600],
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide.none,
-                  child: GestureDetector(
-                    onTap: () => _showProfileSetupModal(context, ref),
+                GestureDetector(
+                  onTap: () => _showProfileSetupModal(context, ref),
+                  child: WidgetsContainer(
+                    padding: EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+                    backgroundColor: theme.primary[600],
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide.none,
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [

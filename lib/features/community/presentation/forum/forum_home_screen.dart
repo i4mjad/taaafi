@@ -6,7 +6,6 @@ import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/shared_widgets/app_bar.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/features/community/presentation/widgets/post_card.dart';
-import 'package:reboot_app_3/features/community/presentation/widgets/category_chips.dart';
 import 'package:reboot_app_3/features/community/presentation/widgets/post_filter_segment.dart';
 
 class ForumHomeScreen extends ConsumerStatefulWidget {
@@ -28,7 +27,8 @@ class _ForumHomeScreenState extends ConsumerState<ForumHomeScreen> {
       body: Column(
         children: [
           // Category Filter Chips
-          const CategoryChips(),
+
+          // const CategoryChips(),
 
           // Post Filter Segment
           const PostFilterSegment(),

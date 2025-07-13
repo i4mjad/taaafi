@@ -5,7 +5,7 @@ class CommunityProfile {
   final String displayName;
   final String gender;
   final String? avatarUrl;
-  final bool postAnonymouslyByDefault;
+  final bool isAnonymous;
   final DateTime createdAt;
   final DateTime? updatedAt;
 
@@ -14,7 +14,7 @@ class CommunityProfile {
     required this.displayName,
     required this.gender,
     this.avatarUrl,
-    required this.postAnonymouslyByDefault,
+    required this.isAnonymous,
     required this.createdAt,
     this.updatedAt,
   });
@@ -27,7 +27,7 @@ class CommunityProfile {
       displayName: data['displayName'] ?? '',
       gender: data['gender'] ?? '',
       avatarUrl: data['avatarUrl'],
-      postAnonymouslyByDefault: data['postAnonymouslyByDefault'] ?? false,
+      isAnonymous: data['isAnonymous'] ?? false,
       createdAt: (data['createdAt'] as Timestamp).toDate(),
       updatedAt: data['updatedAt'] != null
           ? (data['updatedAt'] as Timestamp).toDate()
@@ -40,7 +40,7 @@ class CommunityProfile {
       'displayName': displayName,
       'gender': gender,
       'avatarUrl': avatarUrl,
-      'postAnonymouslyByDefault': postAnonymouslyByDefault,
+      'isAnonymous': isAnonymous,
       'createdAt': Timestamp.fromDate(createdAt),
       'updatedAt': updatedAt != null ? Timestamp.fromDate(updatedAt!) : null,
     };

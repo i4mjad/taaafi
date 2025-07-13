@@ -20,7 +20,7 @@ class CommunityProfileModel {
   final String? avatarUrl;
 
   /// Whether the user posts anonymously by default
-  final bool postAnonymouslyByDefault;
+  final bool isAnonymous;
 
   /// When the profile was created
   final DateTime createdAt;
@@ -33,7 +33,7 @@ class CommunityProfileModel {
     required this.displayName,
     required this.gender,
     this.avatarUrl,
-    required this.postAnonymouslyByDefault,
+    required this.isAnonymous,
     required this.createdAt,
     this.updatedAt,
   });
@@ -45,7 +45,7 @@ class CommunityProfileModel {
       displayName: json['displayName'] as String,
       gender: json['gender'] as String,
       avatarUrl: json['avatarUrl'] as String?,
-      postAnonymouslyByDefault: json['postAnonymouslyByDefault'] as bool,
+      isAnonymous: json['isAnonymous'] as bool,
       createdAt: DateTime.parse(json['createdAt'] as String),
       updatedAt: json['updatedAt'] != null
           ? DateTime.parse(json['updatedAt'] as String)
@@ -60,7 +60,7 @@ class CommunityProfileModel {
       'displayName': displayName,
       'gender': gender,
       'avatarUrl': avatarUrl,
-      'postAnonymouslyByDefault': postAnonymouslyByDefault,
+      'isAnonymous': isAnonymous,
       'createdAt': createdAt.toIso8601String(),
       'updatedAt': updatedAt?.toIso8601String(),
     };
@@ -76,7 +76,7 @@ class CommunityProfileModel {
       displayName: data['displayName'] as String,
       gender: data['gender'] as String,
       avatarUrl: data['avatarUrl'] as String?,
-      postAnonymouslyByDefault: data['postAnonymouslyByDefault'] as bool,
+      isAnonymous: data['isAnonymous'] as bool,
       createdAt: (data['createdAt'] as Timestamp).toDate(),
       updatedAt: data['updatedAt'] != null
           ? (data['updatedAt'] as Timestamp).toDate()
@@ -90,7 +90,7 @@ class CommunityProfileModel {
       'displayName': displayName,
       'gender': gender,
       'avatarUrl': avatarUrl,
-      'postAnonymouslyByDefault': postAnonymouslyByDefault,
+      'isAnonymous': isAnonymous,
       'createdAt': Timestamp.fromDate(createdAt),
       'updatedAt': updatedAt != null ? Timestamp.fromDate(updatedAt!) : null,
     };
@@ -103,7 +103,7 @@ class CommunityProfileModel {
       displayName: displayName,
       gender: gender,
       avatarUrl: avatarUrl,
-      postAnonymouslyByDefault: postAnonymouslyByDefault,
+      isAnonymous: isAnonymous,
       createdAt: createdAt,
       updatedAt: updatedAt,
     );
@@ -116,7 +116,7 @@ class CommunityProfileModel {
       displayName: entity.displayName,
       gender: entity.gender,
       avatarUrl: entity.avatarUrl,
-      postAnonymouslyByDefault: entity.postAnonymouslyByDefault,
+      isAnonymous: entity.isAnonymous,
       createdAt: entity.createdAt,
       updatedAt: entity.updatedAt,
     );
@@ -128,7 +128,7 @@ class CommunityProfileModel {
     String? displayName,
     String? gender,
     String? avatarUrl,
-    bool? postAnonymouslyByDefault,
+    bool? isAnonymous,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
@@ -137,8 +137,7 @@ class CommunityProfileModel {
       displayName: displayName ?? this.displayName,
       gender: gender ?? this.gender,
       avatarUrl: avatarUrl ?? this.avatarUrl,
-      postAnonymouslyByDefault:
-          postAnonymouslyByDefault ?? this.postAnonymouslyByDefault,
+      isAnonymous: isAnonymous ?? this.isAnonymous,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );
@@ -152,7 +151,7 @@ class CommunityProfileModel {
         other.displayName == displayName &&
         other.gender == gender &&
         other.avatarUrl == avatarUrl &&
-        other.postAnonymouslyByDefault == postAnonymouslyByDefault &&
+        other.isAnonymous == isAnonymous &&
         other.createdAt == createdAt &&
         other.updatedAt == updatedAt;
   }
@@ -163,13 +162,13 @@ class CommunityProfileModel {
         displayName.hashCode ^
         gender.hashCode ^
         avatarUrl.hashCode ^
-        postAnonymouslyByDefault.hashCode ^
+        isAnonymous.hashCode ^
         createdAt.hashCode ^
         updatedAt.hashCode;
   }
 
   @override
   String toString() {
-    return 'CommunityProfileModel(id: $id, displayName: $displayName, gender: $gender, avatarUrl: $avatarUrl, postAnonymouslyByDefault: $postAnonymouslyByDefault, createdAt: $createdAt, updatedAt: $updatedAt)';
+    return 'CommunityProfileModel(id: $id, displayName: $displayName, gender: $gender, avatarUrl: $avatarUrl, isAnonymous: $isAnonymous, createdAt: $createdAt, updatedAt: $updatedAt)';
   }
 }

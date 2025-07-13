@@ -119,7 +119,7 @@ class CommunityProfileCreationNotifier extends StateNotifier<AsyncValue<void>> {
   Future<void> createProfile({
     required String displayName,
     required String gender,
-    required bool postAnonymouslyByDefault,
+    required bool isAnonymous,
     String? avatarUrl,
   }) async {
     state = const AsyncValue.loading();
@@ -128,7 +128,7 @@ class CommunityProfileCreationNotifier extends StateNotifier<AsyncValue<void>> {
       await _service.createProfile(
         displayName: displayName,
         gender: gender,
-        postAnonymouslyByDefault: postAnonymouslyByDefault,
+        isAnonymous: isAnonymous,
         avatarUrl: avatarUrl,
       );
       state = const AsyncValue.data(null);
@@ -149,7 +149,7 @@ class CommunityProfileUpdateNotifier extends StateNotifier<AsyncValue<void>> {
   Future<void> updateProfile({
     String? displayName,
     String? gender,
-    bool? postAnonymouslyByDefault,
+    bool? isAnonymous,
     String? avatarUrl,
   }) async {
     state = const AsyncValue.loading();
@@ -158,7 +158,7 @@ class CommunityProfileUpdateNotifier extends StateNotifier<AsyncValue<void>> {
       await _service.updateProfile(
         displayName: displayName,
         gender: gender,
-        postAnonymouslyByDefault: postAnonymouslyByDefault,
+        isAnonymous: isAnonymous,
         avatarUrl: avatarUrl,
       );
       state = const AsyncValue.data(null);

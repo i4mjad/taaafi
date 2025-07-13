@@ -66,7 +66,7 @@ class _CommunityProfileSettingsScreenState
                         // Profile Avatar
                         AvatarWithAnonymity(
                           cpId: profile.id,
-                          isAnonymous: profile.postAnonymouslyByDefault,
+                          isAnonymous: profile.isAnonymous,
                           size: 80,
                         ),
                         const SizedBox(width: 16),
@@ -76,7 +76,7 @@ class _CommunityProfileSettingsScreenState
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                profile.postAnonymouslyByDefault
+                                profile.isAnonymous
                                     ? localizations
                                         .translate('community-anonymous')
                                     : profile.displayName,
