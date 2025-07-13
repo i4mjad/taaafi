@@ -1,9 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:reboot_app_3/features/community/data/models/post_category.dart';
 import 'package:reboot_app_3/features/community/data/models/post.dart';
 import 'package:reboot_app_3/features/community/data/models/comment.dart';
+import 'package:reboot_app_3/features/community/data/models/interaction.dart';
 import 'package:reboot_app_3/features/community/data/repositories/forum_repository.dart';
 import 'package:reboot_app_3/features/community/domain/services/forum_service.dart';
 import 'package:reboot_app_3/features/community/domain/services/post_validation_service.dart';
@@ -107,22 +107,6 @@ final postCommentsProvider =
   return repository.watchComments(postId);
 });
 
-/// Provider for post voting state
-final postVoteProvider =
-    StateNotifierProvider.family<PostVoteNotifier, AsyncValue<void>, String>(
-        (ref, postId) {
-  final repository = ref.watch(forumRepositoryProvider);
-  return PostVoteNotifier(repository, postId);
-});
-
-/// Provider for comment voting state
-final commentVoteProvider =
-    StateNotifierProvider.family<CommentVoteNotifier, AsyncValue<void>, String>(
-        (ref, commentId) {
-  final repository = ref.watch(forumRepositoryProvider);
-  return CommentVoteNotifier(repository, commentId);
-});
-
 /// Provider for adding comments
 final addCommentProvider =
     StateNotifierProvider.family<AddCommentNotifier, AsyncValue<void>, String>(
@@ -135,6 +119,78 @@ final addCommentProvider =
 final replyStateProvider =
     StateNotifierProvider<ReplyStateNotifier, ReplyState>((ref) {
   return ReplyStateNotifier();
+});
+
+// =============================================================================
+// INTERACTION PROVIDERS
+// =============================================================================
+
+/// Provider for user's interaction with a specific target
+final userInteractionProvider = FutureProvider.family.autoDispose<Interaction?,
+    ({String targetType, String targetId, String userCPId})>((ref, params) {
+  final repository = ref.watch(forumRepositoryProvider);
+  final auth = ref.watch(firebaseAuthProvider);
+
+  // Use current user's UID if userCPId is empty
+  final userCPId =
+      params.userCPId.isEmpty ? auth.currentUser?.uid : params.userCPId;
+
+  if (userCPId == null) {
+    return Future.value(null);
+  }
+
+  return repository.getUserInteraction(
+    targetType: params.targetType,
+    targetId: params.targetId,
+    userCPId: userCPId,
+  );
+});
+
+/// Provider for streaming user's interaction with a specific target
+final userInteractionStreamProvider = StreamProvider.family.autoDispose<
+    Interaction?,
+    ({String targetType, String targetId, String userCPId})>((ref, params) {
+  final repository = ref.watch(forumRepositoryProvider);
+  final auth = ref.watch(firebaseAuthProvider);
+
+  // Use current user's UID if userCPId is empty
+  final userCPId =
+      params.userCPId.isEmpty ? auth.currentUser?.uid : params.userCPId;
+
+  if (userCPId == null) {
+    return Stream.value(null);
+  }
+
+  return repository.watchUserInteraction(
+    targetType: params.targetType,
+    targetId: params.targetId,
+    userCPId: userCPId,
+  );
+});
+
+/// Provider for post interactions
+final postInteractionProvider = StateNotifierProvider.family<
+    PostInteractionNotifier, AsyncValue<void>, String>((ref, postId) {
+  final repository = ref.watch(forumRepositoryProvider);
+  return PostInteractionNotifier(repository, postId);
+});
+
+/// Provider for comment interactions
+final commentInteractionProvider = StateNotifierProvider.family<
+    CommentInteractionNotifier, AsyncValue<void>, String>((ref, commentId) {
+  final repository = ref.watch(forumRepositoryProvider);
+  return CommentInteractionNotifier(repository, commentId);
+});
+
+/// Provider for all interactions on a target
+final targetInteractionsProvider = StreamProvider.family
+    .autoDispose<List<Interaction>, ({String targetType, String targetId})>(
+        (ref, params) {
+  final repository = ref.watch(forumRepositoryProvider);
+  return repository.watchTargetInteractions(
+    targetType: params.targetType,
+    targetId: params.targetId,
+  );
 });
 
 // =============================================================================
@@ -170,7 +226,10 @@ class ReplyState {
 class ReplyStateNotifier extends StateNotifier<ReplyState> {
   ReplyStateNotifier() : super(const ReplyState());
 
-  void startReply(String commentId, String username) {
+  void startReply({
+    required String commentId,
+    required String username,
+  }) {
     state = state.copyWith(
       replyToCommentId: commentId,
       replyToUsername: username,
@@ -183,7 +242,51 @@ class ReplyStateNotifier extends StateNotifier<ReplyState> {
   }
 }
 
-/// Notifier for post voting
+/// Notifier for post interactions
+class PostInteractionNotifier extends StateNotifier<AsyncValue<void>> {
+  final ForumRepository _repository;
+  final String _postId;
+
+  PostInteractionNotifier(this._repository, this._postId)
+      : super(const AsyncValue.data(null));
+
+  Future<void> interact(int value) async {
+    state = const AsyncValue.loading();
+    try {
+      await _repository.interactWithPost(postId: _postId, value: value);
+      state = const AsyncValue.data(null);
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+    }
+  }
+}
+
+/// Notifier for comment interactions
+class CommentInteractionNotifier extends StateNotifier<AsyncValue<void>> {
+  final ForumRepository _repository;
+  final String _commentId;
+
+  CommentInteractionNotifier(this._repository, this._commentId)
+      : super(const AsyncValue.data(null));
+
+  Future<void> interact(int value) async {
+    state = const AsyncValue.loading();
+    try {
+      await _repository.interactWithComment(
+          commentId: _commentId, value: value);
+      state = const AsyncValue.data(null);
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+    }
+  }
+}
+
+// =============================================================================
+// LEGACY NOTIFIERS (for backward compatibility)
+// =============================================================================
+
+/// Legacy notifier for post voting
+@deprecated
 class PostVoteNotifier extends StateNotifier<AsyncValue<void>> {
   final ForumRepository _repository;
   final String _postId;
@@ -196,13 +299,14 @@ class PostVoteNotifier extends StateNotifier<AsyncValue<void>> {
     try {
       await _repository.voteOnPost(_postId, value);
       state = const AsyncValue.data(null);
-    } catch (error, stackTrace) {
-      state = AsyncValue.error(error, stackTrace);
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
     }
   }
 }
 
-/// Notifier for comment voting
+/// Legacy notifier for comment voting
+@deprecated
 class CommentVoteNotifier extends StateNotifier<AsyncValue<void>> {
   final ForumRepository _repository;
   final String _commentId;
@@ -215,8 +319,8 @@ class CommentVoteNotifier extends StateNotifier<AsyncValue<void>> {
     try {
       await _repository.voteOnComment(commentId: _commentId, value: value);
       state = const AsyncValue.data(null);
-    } catch (error, stackTrace) {
-      state = AsyncValue.error(error, stackTrace);
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
     }
   }
 }
@@ -244,70 +348,31 @@ class AddCommentNotifier extends StateNotifier<AsyncValue<void>> {
         parentId: parentId,
       );
       state = const AsyncValue.data(null);
-    } catch (error, stackTrace) {
-      state = AsyncValue.error(error, stackTrace);
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
     }
   }
 }
 
-/// Notifier for post creation using ForumService
+/// Notifier for post creation
 class PostCreationNotifier extends StateNotifier<AsyncValue<String?>> {
   final ForumService _forumService;
 
   PostCreationNotifier(this._forumService) : super(const AsyncValue.data(null));
 
-  /// Creates a new post using the forum service
   Future<void> createPost(
       PostFormData postData, AppLocalizations localizations) async {
     state = const AsyncValue.loading();
     try {
       final postId = await _forumService.createPost(postData, localizations);
       state = AsyncValue.data(postId);
-    } catch (error, stackTrace) {
-      state = AsyncValue.error(error, stackTrace);
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
     }
   }
 
-  /// Resets the state to initial
   void reset() {
     state = const AsyncValue.data(null);
-  }
-}
-
-// =============================================================================
-// POSTS PAGINATION STATE AND NOTIFIER
-// =============================================================================
-
-/// State for posts pagination
-class PostsPaginationState {
-  final List<Post> posts;
-  final bool isLoading;
-  final bool hasMore;
-  final String? error;
-  final DocumentSnapshot? lastDocument;
-
-  const PostsPaginationState({
-    this.posts = const [],
-    this.isLoading = false,
-    this.hasMore = true,
-    this.error,
-    this.lastDocument,
-  });
-
-  PostsPaginationState copyWith({
-    List<Post>? posts,
-    bool? isLoading,
-    bool? hasMore,
-    String? error,
-    DocumentSnapshot? lastDocument,
-  }) {
-    return PostsPaginationState(
-      posts: posts ?? this.posts,
-      isLoading: isLoading ?? this.isLoading,
-      hasMore: hasMore ?? this.hasMore,
-      error: error ?? this.error,
-      lastDocument: lastDocument ?? this.lastDocument,
-    );
   }
 }
 
@@ -316,7 +381,7 @@ class PostsPaginationNotifier extends StateNotifier<PostsPaginationState> {
   final ForumRepository _repository;
 
   PostsPaginationNotifier(this._repository)
-      : super(const PostsPaginationState());
+      : super(PostsPaginationState.initial());
 
   /// Loads the first page of posts
   Future<void> loadPosts({String? category}) async {
@@ -325,22 +390,19 @@ class PostsPaginationNotifier extends StateNotifier<PostsPaginationState> {
     state = state.copyWith(isLoading: true, error: null);
 
     try {
-      final postsPage = await _repository.getPosts(
+      final page = await _repository.getPosts(
         limit: 10,
         category: category,
       );
 
       state = state.copyWith(
-        posts: postsPage.posts,
+        posts: page.posts,
+        lastDocument: page.lastDocument,
+        hasMore: page.hasMore,
         isLoading: false,
-        hasMore: postsPage.hasMore,
-        lastDocument: postsPage.lastDocument,
       );
-    } catch (error) {
-      state = state.copyWith(
-        isLoading: false,
-        error: error.toString(),
-      );
+    } catch (e) {
+      state = state.copyWith(isLoading: false, error: e.toString());
     }
   }
 
@@ -348,32 +410,79 @@ class PostsPaginationNotifier extends StateNotifier<PostsPaginationState> {
   Future<void> loadMorePosts({String? category}) async {
     if (state.isLoading || !state.hasMore) return;
 
-    state = state.copyWith(isLoading: true, error: null);
+    state = state.copyWith(isLoading: true);
 
     try {
-      final postsPage = await _repository.getPosts(
+      final page = await _repository.getPosts(
         limit: 10,
         lastDocument: state.lastDocument,
         category: category,
       );
 
       state = state.copyWith(
-        posts: [...state.posts, ...postsPage.posts],
+        posts: [...state.posts, ...page.posts],
+        lastDocument: page.lastDocument,
+        hasMore: page.hasMore,
         isLoading: false,
-        hasMore: postsPage.hasMore,
-        lastDocument: postsPage.lastDocument,
       );
-    } catch (error) {
-      state = state.copyWith(
-        isLoading: false,
-        error: error.toString(),
-      );
+    } catch (e) {
+      state = state.copyWith(isLoading: false, error: e.toString());
     }
   }
 
   /// Refreshes the posts list
   Future<void> refresh({String? category}) async {
-    state = const PostsPaginationState();
+    state = PostsPaginationState.initial();
     await loadPosts(category: category);
+  }
+
+  /// Loads the next page of posts (new method name)
+  Future<void> loadNextPage({String? category}) async {
+    return loadMorePosts(category: category);
+  }
+
+  void reset() {
+    state = PostsPaginationState.initial();
+  }
+}
+
+/// State for posts pagination
+class PostsPaginationState {
+  final List<Post> posts;
+  final bool isLoading;
+  final bool hasMore;
+  final String? error;
+  final dynamic lastDocument;
+
+  PostsPaginationState({
+    required this.posts,
+    required this.isLoading,
+    required this.hasMore,
+    this.error,
+    this.lastDocument,
+  });
+
+  factory PostsPaginationState.initial() {
+    return PostsPaginationState(
+      posts: [],
+      isLoading: false,
+      hasMore: true,
+    );
+  }
+
+  PostsPaginationState copyWith({
+    List<Post>? posts,
+    bool? isLoading,
+    bool? hasMore,
+    String? error,
+    dynamic lastDocument,
+  }) {
+    return PostsPaginationState(
+      posts: posts ?? this.posts,
+      isLoading: isLoading ?? this.isLoading,
+      hasMore: hasMore ?? this.hasMore,
+      error: error ?? this.error,
+      lastDocument: lastDocument ?? this.lastDocument,
+    );
   }
 }

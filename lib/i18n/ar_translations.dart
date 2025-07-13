@@ -1115,4 +1115,14 @@ const Map<String, String> kAr = {
   "permission_denied": "تم رفض الإذن",
   "post_creation_failed": "فشل في إنشاء المنشور",
   "generic_error": "حدث خطأ. يرجى المحاولة مرة أخرى",
+
+  // Forum interactions
+  'likes': 'إعجابات',
+  'dislikes': 'عدم إعجاب',
+  'like': 'أعجبني',
+  'dislike': 'لم يعجبني',
+  'thumbs_up': 'إبهام لأعلى',
+  'thumbs_down': 'إبهام لأسفل',
+  'interaction_failed': 'فشل التفاعل',
+  'invalid_interaction_value': 'قيمة تفاعل غير صحيحة',
 };

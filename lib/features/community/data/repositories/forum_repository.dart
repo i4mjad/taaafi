@@ -1,7 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:reboot_app_3/features/community/data/models/post_category.dart';
 import 'package:reboot_app_3/features/community/data/models/post.dart';
 import 'package:reboot_app_3/features/community/data/models/comment.dart';
+import 'package:reboot_app_3/features/community/data/models/interaction.dart';
 
 /// Container for paginated posts data
 class PostsPage {
@@ -22,8 +24,20 @@ class ForumRepository {
       FirebaseFirestore.instance.collection('forumPosts');
   final CollectionReference _comments =
       FirebaseFirestore.instance.collection('comments');
+  final CollectionReference _interactions =
+      FirebaseFirestore.instance.collection('interactions');
   final CollectionReference _postCategories =
       FirebaseFirestore.instance.collection('postCategories');
+
+  /// Get current user's community profile ID
+  String get _currentUserCPId {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      throw Exception('User not authenticated');
+    }
+    // TODO: Replace with actual community profile ID when implemented
+    return user.uid;
+  }
 
   /// Get post categories from Firestore
   Future<List<PostCategory>> getPostCategories() async {
@@ -46,31 +60,19 @@ class ForumRepository {
 
   /// Stream of post categories from Firestore
   Stream<List<PostCategory>> watchPostCategories() {
-    try {
-      return _postCategories
-          .where('isActive', isEqualTo: true)
-          .orderBy('sortOrder')
-          .snapshots()
-          .map((snapshot) {
-        return snapshot.docs.map((doc) {
-          return PostCategory.fromFirestore(
-            doc.id,
-            doc.data() as Map<String, dynamic>,
-          );
-        }).toList();
-      }).handleError((error) {
-        throw Exception('Failed to watch post categories: $error');
-      });
-    } catch (e) {
-      return Stream.error(Exception('Failed to setup categories stream: $e'));
-    }
+    return _postCategories
+        .where('isActive', isEqualTo: true)
+        .orderBy('sortOrder')
+        .snapshots()
+        .map((snapshot) => snapshot.docs.map((doc) {
+              return PostCategory.fromFirestore(
+                doc.id,
+                doc.data() as Map<String, dynamic>,
+              );
+            }).toList());
   }
 
-  // =============================================================================
-  // POST LISTING METHODS
-  // =============================================================================
-
-  /// Fetches posts with pagination
+  /// Get posts with pagination
   Future<PostsPage> getPosts({
     int limit = 10,
     DocumentSnapshot? lastDocument,
@@ -79,18 +81,17 @@ class ForumRepository {
     try {
       Query query = _posts.orderBy('createdAt', descending: true);
 
-      // Filter by category if provided
-      if (category != null && category != 'all') {
+      if (category != null && category.isNotEmpty) {
         query = query.where('category', isEqualTo: category);
       }
 
-      // Apply pagination
-      query = query.limit(limit);
       if (lastDocument != null) {
         query = query.startAfterDocument(lastDocument);
       }
 
-      final snapshot = await query.get();
+      query = query.limit(limit);
+
+      final QuerySnapshot snapshot = await query.get();
 
       final posts = snapshot.docs.map((doc) {
         return Post.fromFirestore(
@@ -100,103 +101,84 @@ class ForumRepository {
       return PostsPage(
         posts: posts,
         lastDocument: snapshot.docs.isNotEmpty ? snapshot.docs.last : null,
-        hasMore: posts.length == limit,
+        hasMore: snapshot.docs.length == limit,
       );
     } catch (e) {
-      // Log the error and rethrow with more context
       throw Exception('Failed to fetch posts: $e');
     }
   }
 
-  /// Streams posts with real-time updates (for first page)
+  /// Stream of posts from Firestore
   Stream<List<Post>> watchPosts({
     int limit = 10,
     String? category,
   }) {
+    Query query = _posts.orderBy('createdAt', descending: true);
+
+    if (category != null && category.isNotEmpty) {
+      query = query.where('category', isEqualTo: category);
+    }
+
+    return query.limit(limit).snapshots().map((snapshot) {
+      return snapshot.docs.map((doc) {
+        return Post.fromFirestore(
+            doc as DocumentSnapshot<Map<String, dynamic>>);
+      }).toList();
+    });
+  }
+
+  /// Get a single post by ID
+  Future<Post?> getPost(String postId) async {
     try {
-      Query query = _posts.orderBy('createdAt', descending: true);
-
-      // Filter by category if provided
-      if (category != null && category != 'all') {
-        query = query.where('category', isEqualTo: category);
+      final doc = await _posts.doc(postId).get();
+      if (doc.exists) {
+        return Post.fromFirestore(
+            doc as DocumentSnapshot<Map<String, dynamic>>);
       }
-
-      query = query.limit(limit);
-
-      return query.snapshots().map((snapshot) {
-        return snapshot.docs.map((doc) {
-          return Post.fromFirestore(
-              doc as DocumentSnapshot<Map<String, dynamic>>);
-        }).toList();
-      }).handleError((error) {
-        // Handle stream errors
-        throw Exception('Failed to watch posts: $error');
-      });
+      return null;
     } catch (e) {
-      // Handle synchronous errors and return error stream
-      return Stream.error(Exception('Failed to setup posts stream: $e'));
+      throw Exception('Failed to fetch post: $e');
     }
   }
 
-  // =============================================================================
-  // POST DETAIL METHODS
-  // =============================================================================
-
-  /// Watch a specific post by ID
+  /// Stream of a single post
   Stream<Post?> watchPost(String postId) {
-    // TODO: Replace with actual Firestore stream when ready
-    // For now, return a mock post
-    return Stream.fromFuture(Future.delayed(const Duration(milliseconds: 300))
-        .then((_) => _getMockPost(postId)));
+    return _posts.doc(postId).snapshots().map((doc) {
+      if (doc.exists) {
+        return Post.fromFirestore(
+            doc as DocumentSnapshot<Map<String, dynamic>>);
+      }
+      return null;
+    });
   }
 
-  /// Watch comments for a specific post (top-level comments only)
+  /// Get comments for a post
+  Future<List<Comment>> getComments(String postId) async {
+    try {
+      final QuerySnapshot snapshot = await _comments
+          .where('postId', isEqualTo: postId)
+          .orderBy('createdAt')
+          .get();
+
+      return snapshot.docs.map((doc) {
+        return Comment.fromFirestore(
+            doc as DocumentSnapshot<Map<String, dynamic>>);
+      }).toList();
+    } catch (e) {
+      throw Exception('Failed to fetch comments: $e');
+    }
+  }
+
+  /// Stream of comments for a post
   Stream<List<Comment>> watchComments(String postId) {
-    // TODO: Replace with actual Firestore stream when ready
-    // Real implementation would be:
-    // return _comments
-    //     .where('postId', isEqualTo: postId)
-    //     .where('parentFor', isEqualTo: 'post')
-    //     .orderBy('createdAt')
-    //     .snapshots()
-    //     .map((snapshot) => snapshot.docs
-    //         .map((doc) => Comment.fromFirestore(doc))
-    //         .toList());
-
-    // For now, return mock comments
-    return Stream.fromFuture(Future.delayed(const Duration(milliseconds: 300))
-        .then((_) => _getMockComments(postId)));
-  }
-
-  /// Vote on a post
-  Future<void> voteOnPost(String postId, int value) async {
-    // TODO: Implement actual voting logic with Firestore
-    // Real implementation would be:
-    // return _posts.doc(postId).collection('votes').doc(_currentCPId).set({
-    //   'voterCPId': _currentCPId,
-    //   'value': value,
-    //   'createdAt': FieldValue.serverTimestamp(),
-    // });
-
-    // For now, simulate network delay
-    await Future.delayed(const Duration(milliseconds: 500));
-  }
-
-  /// Vote on a comment
-  Future<void> voteOnComment({
-    required String commentId,
-    required int value,
-  }) async {
-    // TODO: Implement actual voting logic with Firestore
-    // Real implementation would be:
-    // return _comments.doc(commentId).collection('votes').doc(_currentCPId).set({
-    //   'voterCPId': _currentCPId,
-    //   'value': value,
-    //   'createdAt': FieldValue.serverTimestamp(),
-    // });
-
-    // For now, simulate network delay
-    await Future.delayed(const Duration(milliseconds: 500));
+    return _comments
+        .where('postId', isEqualTo: postId)
+        .orderBy('createdAt')
+        .snapshots()
+        .map((snapshot) => snapshot.docs
+            .map((doc) => Comment.fromFirestore(
+                doc as DocumentSnapshot<Map<String, dynamic>>))
+            .toList());
   }
 
   /// Add a comment to a post or reply to a comment
@@ -206,73 +188,24 @@ class ForumRepository {
     String? parentFor,
     String? parentId,
   }) async {
-    // TODO: Implement actual comment creation with Firestore
-    // Real implementation would be:
-    // final commentData = {
-    //   'postId': postId,
-    //   'authorCPId': _currentUserCPId,
-    //   'body': body,
-    //   'parentFor': parentFor ?? 'post',
-    //   'parentId': parentId ?? postId,
-    //   'score': 0,
-    //   'createdAt': FieldValue.serverTimestamp(),
-    //   'updatedAt': null,
-    // };
-    // await _comments.add(commentData);
+    try {
+      final commentData = {
+        'postId': postId,
+        'authorCPId': _currentUserCPId,
+        'body': body,
+        'parentFor': parentFor ?? 'post',
+        'parentId': parentId ?? postId,
+        'score': 0,
+        'likeCount': 0,
+        'dislikeCount': 0,
+        'createdAt': FieldValue.serverTimestamp(),
+        'updatedAt': null,
+      };
 
-    // For now, simulate network delay
-    await Future.delayed(const Duration(milliseconds: 500));
-  }
-
-  // =============================================================================
-  // MOCK DATA METHODS
-  // =============================================================================
-
-  /// Mock post data for development
-  Post? _getMockPost(String postId) {
-    return Post(
-      id: postId,
-      authorCPId: 'user_123',
-      title: 'The Claude Code leads just left for Cursor.',
-      body:
-          'so don\'t uninstall Cursor just yet...\n\nit\'s going to be on top again:',
-      category: 'discussion',
-      score: 57,
-      createdAt: DateTime.now().subtract(const Duration(days: 1)),
-    );
-  }
-
-  /// Mock comments data for development
-  List<Comment> _getMockComments(String postId) {
-    return [
-      Comment(
-        id: 'comment_1',
-        postId: postId,
-        authorCPId: 'user_123',
-        body:
-            'The reason why Claude Code is so good is cuz of these leads.\n\nWhere they go, innovation follows.\n\nCC will likely slow down now. But as a low level...',
-        score: 12,
-        createdAt: DateTime.now().subtract(const Duration(days: 1)),
-      ),
-      Comment(
-        id: 'comment_2',
-        postId: postId,
-        authorCPId: 'user_456',
-        body:
-            'I agree! This is exactly what I was thinking. The talent that drives innovation is what makes the difference.',
-        score: 8,
-        createdAt: DateTime.now().subtract(const Duration(hours: 12)),
-      ),
-      Comment(
-        id: 'comment_3',
-        postId: postId,
-        authorCPId: 'user_789',
-        body:
-            'Interesting perspective. I wonder how this will affect the competitive landscape.',
-        score: 3,
-        createdAt: DateTime.now().subtract(const Duration(hours: 6)),
-      ),
-    ];
+      await _comments.add(commentData);
+    } catch (e) {
+      throw Exception('Failed to add comment: $e');
+    }
   }
 
   /// Creates a new post in Firestore
@@ -293,6 +226,8 @@ class ForumRepository {
         'body': content,
         'category': categoryId ?? 'general',
         'score': 0,
+        'likeCount': 0,
+        'dislikeCount': 0,
         'createdAt': Timestamp.fromDate(now),
         'updatedAt': null,
         // Note: attachmentUrls not implemented yet
@@ -305,5 +240,253 @@ class ForumRepository {
     } catch (e) {
       throw Exception('Failed to create post: $e');
     }
+  }
+
+  // =============================================================================
+  // INTERACTION METHODS
+  // =============================================================================
+
+  /// Get a user's interaction with a specific target
+  Future<Interaction?> getUserInteraction({
+    required String targetType,
+    required String targetId,
+    String? userCPId,
+  }) async {
+    try {
+      final userId = userCPId ?? _currentUserCPId;
+      final docId = Interaction.generateDocumentId(
+        userCPId: userId,
+        targetType: targetType,
+        targetId: targetId,
+      );
+
+      final doc = await _interactions.doc(docId).get();
+      if (doc.exists) {
+        return Interaction.fromFirestore(
+            doc as DocumentSnapshot<Map<String, dynamic>>);
+      }
+      return null;
+    } catch (e) {
+      throw Exception('Failed to get user interaction: $e');
+    }
+  }
+
+  /// Stream of user's interaction with a specific target
+  Stream<Interaction?> watchUserInteraction({
+    required String targetType,
+    required String targetId,
+    String? userCPId,
+  }) {
+    final userId = userCPId ?? _currentUserCPId;
+    final docId = Interaction.generateDocumentId(
+      userCPId: userId,
+      targetType: targetType,
+      targetId: targetId,
+    );
+
+    return _interactions.doc(docId).snapshots().map((doc) {
+      if (doc.exists) {
+        return Interaction.fromFirestore(
+            doc as DocumentSnapshot<Map<String, dynamic>>);
+      }
+      return null;
+    });
+  }
+
+  /// Stream of all interactions for a target
+  Stream<List<Interaction>> watchTargetInteractions({
+    required String targetType,
+    required String targetId,
+  }) {
+    return _interactions
+        .where('targetType', isEqualTo: targetType)
+        .where('targetId', isEqualTo: targetId)
+        .snapshots()
+        .map((snapshot) => snapshot.docs
+            .map((doc) => Interaction.fromFirestore(
+                doc as DocumentSnapshot<Map<String, dynamic>>))
+            .toList());
+  }
+
+  /// Interact with a post (like/dislike)
+  Future<void> interactWithPost({
+    required String postId,
+    required int value, // 1 for like, -1 for dislike, 0 for neutral
+  }) async {
+    try {
+      final userId = _currentUserCPId;
+      final docId = Interaction.generateDocumentId(
+        userCPId: userId,
+        targetType: 'post',
+        targetId: postId,
+      );
+
+      await _firestore.runTransaction((transaction) async {
+        // Get current interaction if exists
+        final interactionDoc = await transaction.get(_interactions.doc(docId));
+        final postDoc = await transaction.get(_posts.doc(postId));
+
+        if (!postDoc.exists) {
+          throw Exception('Post not found');
+        }
+
+        final currentPost = Post.fromFirestore(
+            postDoc as DocumentSnapshot<Map<String, dynamic>>);
+        int likeCountChange = 0;
+        int dislikeCountChange = 0;
+
+        if (interactionDoc.exists) {
+          // User has an existing interaction
+          final currentInteraction = Interaction.fromFirestore(
+              interactionDoc as DocumentSnapshot<Map<String, dynamic>>);
+          final oldValue = currentInteraction.value;
+
+          // Calculate count changes
+          if (oldValue == 1) likeCountChange = -1;
+          if (oldValue == -1) dislikeCountChange = -1;
+          if (value == 1) likeCountChange += 1;
+          if (value == -1) dislikeCountChange += 1;
+
+          if (value == 0) {
+            // Remove interaction
+            transaction.delete(_interactions.doc(docId));
+          } else {
+            // Update interaction
+            final updatedInteraction = currentInteraction.updateValue(value);
+            transaction.set(
+                _interactions.doc(docId), updatedInteraction.toFirestore());
+          }
+        } else {
+          // New interaction
+          if (value == 1) likeCountChange = 1;
+          if (value == -1) dislikeCountChange = 1;
+
+          if (value != 0) {
+            final newInteraction = Interaction.create(
+              targetType: 'post',
+              targetId: postId,
+              userCPId: userId,
+              type: 'like',
+              value: value,
+            );
+            transaction.set(
+                _interactions.doc(docId), newInteraction.toFirestore());
+          }
+        }
+
+        // Update post counts
+        final newLikeCount = currentPost.likeCount + likeCountChange;
+        final newDislikeCount = currentPost.dislikeCount + dislikeCountChange;
+        final newScore = newLikeCount - newDislikeCount;
+
+        transaction.update(_posts.doc(postId), {
+          'likeCount': newLikeCount,
+          'dislikeCount': newDislikeCount,
+          'score': newScore,
+          'updatedAt': FieldValue.serverTimestamp(),
+        });
+      });
+    } catch (e) {
+      throw Exception('Failed to interact with post: $e');
+    }
+  }
+
+  /// Interact with a comment (like/dislike)
+  Future<void> interactWithComment({
+    required String commentId,
+    required int value, // 1 for like, -1 for dislike, 0 for neutral
+  }) async {
+    try {
+      final userId = _currentUserCPId;
+      final docId = Interaction.generateDocumentId(
+        userCPId: userId,
+        targetType: 'comment',
+        targetId: commentId,
+      );
+
+      await _firestore.runTransaction((transaction) async {
+        // Get current interaction if exists
+        final interactionDoc = await transaction.get(_interactions.doc(docId));
+        final commentDoc = await transaction.get(_comments.doc(commentId));
+
+        if (!commentDoc.exists) {
+          throw Exception('Comment not found');
+        }
+
+        final currentComment = Comment.fromFirestore(
+            commentDoc as DocumentSnapshot<Map<String, dynamic>>);
+        int likeCountChange = 0;
+        int dislikeCountChange = 0;
+
+        if (interactionDoc.exists) {
+          // User has an existing interaction
+          final currentInteraction = Interaction.fromFirestore(
+              interactionDoc as DocumentSnapshot<Map<String, dynamic>>);
+          final oldValue = currentInteraction.value;
+
+          // Calculate count changes
+          if (oldValue == 1) likeCountChange = -1;
+          if (oldValue == -1) dislikeCountChange = -1;
+          if (value == 1) likeCountChange += 1;
+          if (value == -1) dislikeCountChange += 1;
+
+          if (value == 0) {
+            // Remove interaction
+            transaction.delete(_interactions.doc(docId));
+          } else {
+            // Update interaction
+            final updatedInteraction = currentInteraction.updateValue(value);
+            transaction.set(
+                _interactions.doc(docId), updatedInteraction.toFirestore());
+          }
+        } else {
+          // New interaction
+          if (value == 1) likeCountChange = 1;
+          if (value == -1) dislikeCountChange = 1;
+
+          if (value != 0) {
+            final newInteraction = Interaction.create(
+              targetType: 'comment',
+              targetId: commentId,
+              userCPId: userId,
+              type: 'like',
+              value: value,
+            );
+            transaction.set(
+                _interactions.doc(docId), newInteraction.toFirestore());
+          }
+        }
+
+        // Update comment counts
+        final newLikeCount = currentComment.likeCount + likeCountChange;
+        final newDislikeCount =
+            currentComment.dislikeCount + dislikeCountChange;
+        final newScore = newLikeCount - newDislikeCount;
+
+        transaction.update(_comments.doc(commentId), {
+          'likeCount': newLikeCount,
+          'dislikeCount': newDislikeCount,
+          'score': newScore,
+          'updatedAt': FieldValue.serverTimestamp(),
+        });
+      });
+    } catch (e) {
+      throw Exception('Failed to interact with comment: $e');
+    }
+  }
+
+  /// Legacy method for backward compatibility
+  @deprecated
+  Future<void> voteOnPost(String postId, int value) async {
+    return interactWithPost(postId: postId, value: value);
+  }
+
+  /// Legacy method for backward compatibility
+  @deprecated
+  Future<void> voteOnComment({
+    required String commentId,
+    required int value,
+  }) async {
+    return interactWithComment(commentId: commentId, value: value);
   }
 }

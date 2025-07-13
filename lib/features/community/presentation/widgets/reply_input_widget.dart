@@ -255,13 +255,41 @@ class _ReplyInputWidgetState extends ConsumerState<ReplyInputWidget> {
                       orElse: () => false,
                     );
 
-                    return Text(
-                      isAnonymous
-                          ? localizations.translate('anonymous')
-                          : 'User ${comment.authorCPId}', // TODO: Replace with actual username
-                      style: TextStyles.footnoteSelected.copyWith(
-                        color: theme.grey[700],
-                        fontSize: 12,
+                    // Get the comment author's profile to display their name
+                    final authorProfileAsync = ref.watch(
+                        communityProfileByIdProvider(comment.authorCPId));
+
+                    return authorProfileAsync.when(
+                      data: (authorProfile) {
+                        final displayName = isAnonymous
+                            ? localizations.translate('anonymous')
+                            : authorProfile?.displayName ?? 'Unknown User';
+
+                        return Text(
+                          displayName,
+                          style: TextStyles.footnoteSelected.copyWith(
+                            color: theme.grey[700],
+                            fontSize: 12,
+                          ),
+                        );
+                      },
+                      loading: () => Text(
+                        isAnonymous
+                            ? localizations.translate('anonymous')
+                            : 'Loading...',
+                        style: TextStyles.footnoteSelected.copyWith(
+                          color: theme.grey[700],
+                          fontSize: 12,
+                        ),
+                      ),
+                      error: (error, stackTrace) => Text(
+                        isAnonymous
+                            ? localizations.translate('anonymous')
+                            : 'Unknown User',
+                        style: TextStyles.footnoteSelected.copyWith(
+                          color: theme.grey[700],
+                          fontSize: 12,
+                        ),
                       ),
                     );
                   },

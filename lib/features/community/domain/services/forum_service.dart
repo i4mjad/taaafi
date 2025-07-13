@@ -187,19 +187,19 @@ class ForumService {
     }
   }
 
-  /// Votes on a post
+  /// Interacts with a post (like/dislike)
   ///
-  /// This method handles post voting with proper validation and error handling.
+  /// This method handles post interactions with proper validation and error handling.
   ///
-  /// [postId] - The ID of the post to vote on
-  /// [value] - The vote value (1 for upvote, -1 for downvote, 0 for neutral)
+  /// [postId] - The ID of the post to interact with
+  /// [value] - The interaction value (1 for like, -1 for dislike, 0 for neutral)
   /// [localizations] - Localization helper for error messages
   ///
   /// Throws:
   /// - [ForumAuthenticationException] if user is not authenticated
   /// - [ForumPermissionException] if user doesn't have permission
-  /// - [InteractionException] if voting fails
-  Future<void> voteOnPost({
+  /// - [InteractionException] if interaction fails
+  Future<void> interactWithPost({
     required String postId,
     required int value,
     required AppLocalizations localizations,
@@ -208,8 +208,8 @@ class ForumService {
       // 1. Check authentication
       await _ensureAuthenticated();
 
-      // 2. Validate vote value
-      _validateVoteValue(value, localizations);
+      // 2. Validate interaction value
+      _validateInteractionValue(value, localizations);
 
       // 3. Check user permissions
       await _checkVotingPermission(localizations);
@@ -218,41 +218,41 @@ class ForumService {
       await _ensurePostExists(postId, localizations);
 
       // 5. Check for rate limiting
-      await _checkRateLimit('voting', localizations);
+      await _checkRateLimit('interaction', localizations);
 
-      // 6. Cast the vote
-      await _repository.voteOnPost(postId, value);
+      // 6. Perform the interaction
+      await _repository.interactWithPost(postId: postId, value: value);
 
       // 7. Log the action for analytics
-      await _logVoteAction('post', postId, value);
+      await _logInteractionAction('post', postId, value);
     } on ForumException {
       // Re-throw forum-specific exceptions
       rethrow;
     } catch (e) {
       // Convert unexpected errors to ForumException
       throw InteractionException(
-        localizations.translate('voting_failed'),
-        interactionType: 'vote',
+        localizations.translate('interaction_failed'),
+        interactionType: 'like',
         targetType: 'post',
         details: e.toString(),
-        code: 'VOTING_FAILED',
+        code: 'INTERACTION_FAILED',
       );
     }
   }
 
-  /// Votes on a comment
+  /// Interacts with a comment (like/dislike)
   ///
-  /// This method handles comment voting with proper validation and error handling.
+  /// This method handles comment interactions with proper validation and error handling.
   ///
-  /// [commentId] - The ID of the comment to vote on
-  /// [value] - The vote value (1 for upvote, -1 for downvote, 0 for neutral)
+  /// [commentId] - The ID of the comment to interact with
+  /// [value] - The interaction value (1 for like, -1 for dislike, 0 for neutral)
   /// [localizations] - Localization helper for error messages
   ///
   /// Throws:
   /// - [ForumAuthenticationException] if user is not authenticated
   /// - [ForumPermissionException] if user doesn't have permission
-  /// - [InteractionException] if voting fails
-  Future<void> voteOnComment({
+  /// - [InteractionException] if interaction fails
+  Future<void> interactWithComment({
     required String commentId,
     required int value,
     required AppLocalizations localizations,
@@ -261,8 +261,8 @@ class ForumService {
       // 1. Check authentication
       await _ensureAuthenticated();
 
-      // 2. Validate vote value
-      _validateVoteValue(value, localizations);
+      // 2. Validate interaction value
+      _validateInteractionValue(value, localizations);
 
       // 3. Check user permissions
       await _checkVotingPermission(localizations);
@@ -271,26 +271,54 @@ class ForumService {
       await _ensureCommentExists(commentId, localizations);
 
       // 5. Check for rate limiting
-      await _checkRateLimit('voting', localizations);
+      await _checkRateLimit('interaction', localizations);
 
-      // 6. Cast the vote
-      await _repository.voteOnComment(commentId: commentId, value: value);
+      // 6. Perform the interaction
+      await _repository.interactWithComment(commentId: commentId, value: value);
 
       // 7. Log the action for analytics
-      await _logVoteAction('comment', commentId, value);
+      await _logInteractionAction('comment', commentId, value);
     } on ForumException {
       // Re-throw forum-specific exceptions
       rethrow;
     } catch (e) {
       // Convert unexpected errors to ForumException
       throw InteractionException(
-        localizations.translate('voting_failed'),
-        interactionType: 'vote',
+        localizations.translate('interaction_failed'),
+        interactionType: 'like',
         targetType: 'comment',
         details: e.toString(),
-        code: 'VOTING_FAILED',
+        code: 'INTERACTION_FAILED',
       );
     }
+  }
+
+  /// Legacy method for backward compatibility
+  @deprecated
+  Future<void> voteOnPost({
+    required String postId,
+    required int value,
+    required AppLocalizations localizations,
+  }) async {
+    return interactWithPost(
+      postId: postId,
+      value: value,
+      localizations: localizations,
+    );
+  }
+
+  /// Legacy method for backward compatibility
+  @deprecated
+  Future<void> voteOnComment({
+    required String commentId,
+    required int value,
+    required AppLocalizations localizations,
+  }) async {
+    return interactWithComment(
+      commentId: commentId,
+      value: value,
+      localizations: localizations,
+    );
   }
 
   /// Validates comment content
@@ -332,19 +360,19 @@ class ForumService {
     }
   }
 
-  /// Validates vote value
+  /// Validates interaction value
   ///
-  /// [value] - The vote value to validate
+  /// [value] - The interaction value to validate
   /// [localizations] - Localization helper for error messages
   ///
   /// Throws [InteractionException] if validation fails
-  void _validateVoteValue(int value, AppLocalizations localizations) {
+  void _validateInteractionValue(int value, AppLocalizations localizations) {
     if (value < -1 || value > 1) {
       throw InteractionException(
-        localizations.translate('invalid_vote_value'),
-        interactionType: 'vote',
+        localizations.translate('invalid_interaction_value'),
+        interactionType: 'like',
         targetType: 'unknown',
-        code: 'INVALID_VOTE_VALUE',
+        code: 'INVALID_INTERACTION_VALUE',
       );
     }
   }
@@ -478,15 +506,20 @@ class ForumService {
     print('Comment created on post: $postId, length: ${content.length}');
   }
 
-  /// Logs vote action for analytics
+  /// Logs interaction action for analytics
   ///
   /// [targetType] - The type of target (post or comment)
   /// [targetId] - The target ID
-  /// [value] - The vote value
-  Future<void> _logVoteAction(
+  /// [value] - The interaction value
+  Future<void> _logInteractionAction(
       String targetType, String targetId, int value) async {
     // TODO: Implement proper analytics logging
     // For now, just print for debugging
-    print('Vote cast on $targetType: $targetId, value: $value');
+    String action = value == 1
+        ? 'like'
+        : value == -1
+            ? 'dislike'
+            : 'neutral';
+    print('Interaction: $action on $targetType: $targetId');
   }
 }

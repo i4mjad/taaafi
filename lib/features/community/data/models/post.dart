@@ -7,6 +7,8 @@ class Post {
   final String body;
   final String category;
   final int score;
+  final int likeCount;
+  final int dislikeCount;
   final DateTime createdAt;
   final DateTime? updatedAt;
 
@@ -17,6 +19,8 @@ class Post {
     required this.body,
     required this.category,
     required this.score,
+    required this.likeCount,
+    required this.dislikeCount,
     required this.createdAt,
     this.updatedAt,
   });
@@ -29,6 +33,8 @@ class Post {
         body: doc.data()!["body"],
         category: doc.data()!["category"],
         score: doc.data()!["score"] ?? 0,
+        likeCount: doc.data()!["likeCount"] ?? 0,
+        dislikeCount: doc.data()!["dislikeCount"] ?? 0,
         createdAt: (doc.data()!["createdAt"] as Timestamp).toDate(),
         updatedAt: (doc.data()!["updatedAt"] as Timestamp?)?.toDate(),
       );
@@ -40,6 +46,8 @@ class Post {
         'body': body,
         'category': category,
         'score': score,
+        'likeCount': likeCount,
+        'dislikeCount': dislikeCount,
         'createdAt': createdAt.toIso8601String(),
         'updatedAt': updatedAt?.toIso8601String(),
       };
@@ -52,7 +60,73 @@ class Post {
         'body': body,
         'category': category,
         'score': score,
+        'likeCount': likeCount,
+        'dislikeCount': dislikeCount,
         'createdAt': Timestamp.fromDate(createdAt),
         'updatedAt': updatedAt != null ? Timestamp.fromDate(updatedAt!) : null,
       };
+
+  /// Creates a copy of this post with updated values
+  Post copyWith({
+    String? id,
+    String? authorCPId,
+    String? title,
+    String? body,
+    String? category,
+    int? score,
+    int? likeCount,
+    int? dislikeCount,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) {
+    return Post(
+      id: id ?? this.id,
+      authorCPId: authorCPId ?? this.authorCPId,
+      title: title ?? this.title,
+      body: body ?? this.body,
+      category: category ?? this.category,
+      score: score ?? this.score,
+      likeCount: likeCount ?? this.likeCount,
+      dislikeCount: dislikeCount ?? this.dislikeCount,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is Post &&
+        other.id == id &&
+        other.authorCPId == authorCPId &&
+        other.title == title &&
+        other.body == body &&
+        other.category == category &&
+        other.score == score &&
+        other.likeCount == likeCount &&
+        other.dislikeCount == dislikeCount &&
+        other.createdAt == createdAt &&
+        other.updatedAt == updatedAt;
+  }
+
+  @override
+  int get hashCode {
+    return Object.hash(
+      id,
+      authorCPId,
+      title,
+      body,
+      category,
+      score,
+      likeCount,
+      dislikeCount,
+      createdAt,
+      updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return 'Post(id: $id, authorCPId: $authorCPId, title: $title, body: $body, category: $category, score: $score, likeCount: $likeCount, dislikeCount: $dislikeCount, createdAt: $createdAt, updatedAt: $updatedAt)';
+  }
 }

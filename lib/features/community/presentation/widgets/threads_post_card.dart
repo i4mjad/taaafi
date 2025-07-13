@@ -5,11 +5,10 @@ import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
-import 'package:reboot_app_3/features/community/presentation/widgets/avatar_with_anonymity.dart';
 import 'package:reboot_app_3/features/community/data/models/post.dart';
+import 'package:reboot_app_3/features/community/presentation/widgets/avatar_with_anonymity.dart';
 import 'package:reboot_app_3/features/community/presentation/providers/community_providers_new.dart';
 import 'package:reboot_app_3/features/community/presentation/providers/forum_providers.dart';
-import 'package:reboot_app_3/features/community/domain/entities/community_profile_entity.dart';
 
 class ThreadsPostCard extends ConsumerWidget {
   final Post post;
@@ -26,6 +25,15 @@ class ThreadsPostCard extends ConsumerWidget {
     final theme = AppTheme.of(context);
     final localizations = AppLocalizations.of(context);
     final currentProfileAsync = ref.watch(currentCommunityProfileProvider);
+
+    // Watch user's interaction with this post
+    final userInteractionAsync = ref.watch(
+      userInteractionProvider((
+        targetType: 'post',
+        targetId: post.id,
+        userCPId: '', // Will be filled by provider
+      )),
+    );
 
     return currentProfileAsync.when(
       data: (currentProfile) {
@@ -103,45 +111,136 @@ class ThreadsPostCard extends ConsumerWidget {
                           const SizedBox(height: 16),
 
                           // Engagement buttons (like/dislike)
-                          Row(
-                            children: [
-                              // Like button
-                              _buildEngagementButton(
-                                theme,
-                                LucideIcons.heart,
-                                post.score > 0,
-                                () => _handleLike(ref, 1),
-                              ),
-                              horizontalSpace(Spacing.points8),
+                          userInteractionAsync.when(
+                            data: (interaction) => Row(
+                              children: [
+                                // Like button
+                                _buildEngagementButton(
+                                  theme,
+                                  LucideIcons.thumbsUp,
+                                  interaction?.value == 1,
+                                  () => _handleLike(ref, 1),
+                                ),
+                                horizontalSpace(Spacing.points4),
 
-                              // Comment button
-                              _buildEngagementButton(
-                                theme,
-                                LucideIcons.messageCircle,
-                                false,
-                                () {
-                                  // Handle comment
-                                },
-                              ),
-                              horizontalSpace(Spacing.points8),
+                                // Like count
+                                Text(
+                                  '${post.likeCount}',
+                                  style: TextStyles.tiny.copyWith(
+                                    color: theme.grey[600],
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
 
-                              // Dislike button
-                              _buildEngagementButton(
-                                theme,
-                                LucideIcons.heartOff,
-                                post.score < 0,
-                                () => _handleLike(ref, -1),
-                              ),
-                            ],
+                                horizontalSpace(Spacing.points8),
+
+                                // Dislike button
+                                _buildEngagementButton(
+                                  theme,
+                                  LucideIcons.thumbsDown,
+                                  interaction?.value == -1,
+                                  () => _handleLike(ref, -1),
+                                ),
+                                horizontalSpace(Spacing.points4),
+
+                                // Dislike count
+                                Text(
+                                  '${post.dislikeCount}',
+                                  style: TextStyles.tiny.copyWith(
+                                    color: theme.grey[600],
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+
+                                horizontalSpace(Spacing.points8),
+
+                                // Comment button
+                                _buildEngagementButton(
+                                  theme,
+                                  LucideIcons.messageCircle,
+                                  false,
+                                  () {
+                                    // Handle comment
+                                  },
+                                ),
+                              ],
+                            ),
+                            loading: () => Row(
+                              children: [
+                                _buildEngagementButton(
+                                  theme,
+                                  LucideIcons.thumbsUp,
+                                  false,
+                                  null,
+                                ),
+                                horizontalSpace(Spacing.points4),
+                                Text(
+                                  '${post.likeCount}',
+                                  style: TextStyles.tiny.copyWith(
+                                    color: theme.grey[600],
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                horizontalSpace(Spacing.points8),
+                                _buildEngagementButton(
+                                  theme,
+                                  LucideIcons.thumbsDown,
+                                  false,
+                                  null,
+                                ),
+                                horizontalSpace(Spacing.points4),
+                                Text(
+                                  '${post.dislikeCount}',
+                                  style: TextStyles.tiny.copyWith(
+                                    color: theme.grey[600],
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            error: (_, __) => Row(
+                              children: [
+                                _buildEngagementButton(
+                                  theme,
+                                  LucideIcons.thumbsUp,
+                                  false,
+                                  () => _handleLike(ref, 1),
+                                ),
+                                horizontalSpace(Spacing.points4),
+                                Text(
+                                  '${post.likeCount}',
+                                  style: TextStyles.tiny.copyWith(
+                                    color: theme.grey[600],
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                horizontalSpace(Spacing.points8),
+                                _buildEngagementButton(
+                                  theme,
+                                  LucideIcons.thumbsDown,
+                                  false,
+                                  () => _handleLike(ref, -1),
+                                ),
+                                horizontalSpace(Spacing.points4),
+                                Text(
+                                  '${post.dislikeCount}',
+                                  style: TextStyles.tiny.copyWith(
+                                    color: theme.grey[600],
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
 
                           const SizedBox(height: 12),
 
                           // Engagement stats
                           Text(
-                            '${post.score} ${localizations.translate('community-likes')}',
-                            style: TextStyles.caption.copyWith(
-                              color: theme.grey[500],
+                            '${post.likeCount} ${localizations.translate('likes')} · ${post.dislikeCount} ${localizations.translate('dislikes')}',
+                            style: TextStyles.tiny.copyWith(
+                              color: theme.grey[600],
+                              fontWeight: FontWeight.w500,
                             ),
                           ),
                         ],
@@ -248,7 +347,7 @@ class ThreadsPostCard extends ConsumerWidget {
     dynamic theme,
     IconData icon,
     bool isActive,
-    VoidCallback onTap,
+    VoidCallback? onTap,
   ) {
     return GestureDetector(
       onTap: onTap,
@@ -268,7 +367,22 @@ class ThreadsPostCard extends ConsumerWidget {
   }
 
   void _handleLike(WidgetRef ref, int value) {
-    ref.read(postVoteProvider(post.id).notifier).vote(value);
+    // Get current user's interaction
+    final userInteractionAsync = ref.read(
+      userInteractionProvider((
+        targetType: 'post',
+        targetId: post.id,
+        userCPId: '', // Will be filled by provider
+      )),
+    );
+
+    userInteractionAsync.whenData((currentInteraction) {
+      // If user already has this interaction, toggle it off (neutral)
+      final newValue = currentInteraction?.value == value ? 0 : value;
+
+      // Trigger the interaction
+      ref.read(postInteractionProvider(post.id).notifier).interact(newValue);
+    });
   }
 
   String _formatTimeAgo(DateTime createdAt, AppLocalizations localizations) {

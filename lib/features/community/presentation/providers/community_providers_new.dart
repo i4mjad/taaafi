@@ -68,6 +68,33 @@ final currentCommunityProfileProvider =
   return service.watchProfile();
 });
 
+/// Provider to get community profile by CPId
+final communityProfileByIdProvider =
+    StreamProvider.family<CommunityProfileEntity?, String>((ref, cpId) {
+  final firestore = ref.watch(firestoreProvider);
+
+  return firestore
+      .collection('communityProfiles')
+      .doc(cpId)
+      .snapshots()
+      .map((snapshot) {
+    if (!snapshot.exists) {
+      return null;
+    }
+
+    final data = snapshot.data() as Map<String, dynamic>;
+    return CommunityProfileEntity(
+      id: snapshot.id,
+      displayName: data['displayName'] ?? 'Unknown User',
+      gender: data['gender'] ?? 'other',
+      isAnonymous: data['isAnonymous'] ?? false,
+      avatarUrl: data['avatarUrl'],
+      createdAt: (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      updatedAt: (data['updatedAt'] as Timestamp?)?.toDate(),
+    );
+  });
+});
+
 /// Provider to check if current user has a community profile
 final hasCommunityProfileProvider = FutureProvider<bool>((ref) async {
   final service = ref.watch(communityServiceProvider);

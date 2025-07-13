@@ -32,32 +32,22 @@ class PostInteractionsWidget extends ConsumerWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Row(
         children: [
-          // Like button
-          _buildInteractionButton(
-            theme,
-            LucideIcons.heart,
-            post.score > 0,
-            () => _handleLike(ref, 1),
+          // Like button with user state
+          _UserInteractionButton(
+            post: post,
+            interactionValue: 1,
+            icon: LucideIcons.thumbsUp,
+            count: post.likeCount,
           ),
 
-          const SizedBox(width: 16),
+          const SizedBox(width: 24),
 
-          // Score display
-          Text(
-            '${post.score} ${localizations.translate('likes')}',
-            style: TextStyles.caption.copyWith(
-              color: theme.grey[600],
-            ),
-          ),
-
-          const SizedBox(width: 16),
-
-          // Dislike button
-          _buildInteractionButton(
-            theme,
-            LucideIcons.heartOff,
-            post.score < 0,
-            () => _handleLike(ref, -1),
+          // Dislike button with user state
+          _UserInteractionButton(
+            post: post,
+            interactionValue: -1,
+            icon: LucideIcons.thumbsDown,
+            count: post.dislikeCount,
           ),
 
           const SizedBox(width: 24),
@@ -113,21 +103,111 @@ class PostInteractionsWidget extends ConsumerWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.all(4),
+        padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
           color: isActive ? theme.primary[50] : Colors.transparent,
-          borderRadius: BorderRadius.circular(4),
+          borderRadius: BorderRadius.circular(8),
         ),
         child: Icon(
           icon,
           size: 20,
-          color: isActive ? theme.primary[600] : theme.grey[600],
+          color: isActive ? theme.primary[600] : theme.grey[500],
         ),
       ),
     );
   }
+}
 
-  void _handleLike(WidgetRef ref, int value) {
-    ref.read(postVoteProvider(post.id).notifier).vote(value);
+/// Separate widget to handle user interaction state
+class _UserInteractionButton extends ConsumerWidget {
+  final Post post;
+  final int interactionValue;
+  final IconData icon;
+  final int count;
+
+  const _UserInteractionButton({
+    required this.post,
+    required this.interactionValue,
+    required this.icon,
+    required this.count,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = AppTheme.of(context);
+
+    // Watch user's interaction with this post
+    final userInteractionAsync = ref.watch(
+      userInteractionProvider((
+        targetType: 'post',
+        targetId: post.id,
+        userCPId: '',
+      )),
+    );
+
+    final isActive = userInteractionAsync.maybeWhen(
+      data: (interaction) => interaction?.value == interactionValue,
+      orElse: () => false,
+    );
+
+    final isLoading = userInteractionAsync.isLoading;
+
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        GestureDetector(
+          onTap: isLoading ? null : () => _handleInteraction(ref),
+          child: Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: isActive ? theme.primary[50] : Colors.transparent,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(
+              icon,
+              size: 20,
+              color: isLoading
+                  ? theme.grey[400]
+                  : isActive
+                      ? theme.primary[600]
+                      : theme.grey[500],
+            ),
+          ),
+        ),
+        const SizedBox(width: 8),
+        Text(
+          count.toString(),
+          style: TextStyles.caption.copyWith(
+            color: theme.grey[600],
+          ),
+        ),
+      ],
+    );
+  }
+
+  void _handleInteraction(WidgetRef ref) {
+    try {
+      // Get current user's interaction state
+      final userInteractionAsync = ref.read(
+        userInteractionProvider((
+          targetType: 'post',
+          targetId: post.id,
+          userCPId: '',
+        )),
+      );
+
+      userInteractionAsync.whenData((currentInteraction) {
+        // If user already has this interaction, toggle it off (neutral)
+        final newValue = currentInteraction?.value == interactionValue
+            ? 0
+            : interactionValue;
+
+        // Trigger the interaction
+        ref.read(postInteractionProvider(post.id).notifier).interact(newValue);
+      });
+    } catch (e) {
+      // Handle errors silently to prevent UI crashes
+      debugPrint('Error handling interaction: $e');
+    }
   }
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
+import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/features/community/data/models/comment.dart';
 import 'package:reboot_app_3/features/community/presentation/widgets/comment_tile_widget.dart';
 import 'package:reboot_app_3/features/community/presentation/providers/forum_providers.dart';
@@ -30,15 +31,20 @@ class CommentListWidget extends ConsumerWidget {
           return _buildEmptyState(theme, localizations);
         }
 
-        return Column(
-          children: comments.map((comment) {
+        // Use ListView.builder instead of Column to prevent overflow
+        return ListView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: comments.length,
+          itemBuilder: (context, index) {
+            final comment = comments[index];
             return CommentTileWidget(
               comment: comment,
               isAuthor: comment.authorCPId == postAuthorCPId,
               onMoreTap:
                   onCommentMore != null ? () => onCommentMore!(comment) : null,
             );
-          }).toList(),
+          },
         );
       },
       loading: () => _buildLoadingState(theme),
@@ -60,14 +66,14 @@ class CommentListWidget extends ConsumerWidget {
           const SizedBox(height: 16),
           Text(
             localizations.translate('no_comments_yet'),
-            style: theme.textTheme.bodyLarge?.copyWith(
+            style: TextStyles.bodyLarge.copyWith(
               color: theme.grey[500],
             ),
           ),
           const SizedBox(height: 8),
           Text(
             localizations.translate('be_first_to_comment'),
-            style: theme.textTheme.bodyMedium?.copyWith(
+            style: TextStyles.caption.copyWith(
               color: theme.grey[400],
             ),
           ),
@@ -94,6 +100,7 @@ class CommentListWidget extends ConsumerWidget {
     AppLocalizations localizations,
     Object error,
   ) {
+    print('❌ Error loading comments: $error');
     return Container(
       padding: const EdgeInsets.all(32),
       child: Column(
@@ -106,14 +113,14 @@ class CommentListWidget extends ConsumerWidget {
           const SizedBox(height: 16),
           Text(
             localizations.translate('error_loading_comments'),
-            style: theme.textTheme.bodyLarge?.copyWith(
+            style: TextStyles.bodyLarge.copyWith(
               color: theme.error[600],
             ),
           ),
           const SizedBox(height: 8),
           Text(
             error.toString(),
-            style: theme.textTheme.bodyMedium?.copyWith(
+            style: TextStyles.caption.copyWith(
               color: theme.grey[500],
             ),
             textAlign: TextAlign.center,

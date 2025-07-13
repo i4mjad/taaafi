@@ -66,66 +66,62 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
 
           return Stack(
             children: [
-              // Main content
-              Column(
-                children: [
-                  // Post content
-                  Expanded(
-                    child: SingleChildScrollView(
-                      controller: _scrollController,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // Main post section
-                          Container(
-                            padding: const EdgeInsets.all(16),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                // Post header
-                                PostHeaderWidget(
-                                  post: post,
-                                  onMorePressed: () =>
-                                      _showPostOptions(context, post),
-                                ),
-
-                                const SizedBox(height: 16),
-
-                                // Post content
-                                PostContentWidget(post: post),
-                              ],
+              // Main content - constrained properly
+              Positioned.fill(
+                bottom: 100, // Leave space for reply input
+                child: SingleChildScrollView(
+                  controller: _scrollController,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Main post section
+                      Container(
+                        padding: const EdgeInsets.all(16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Post header
+                            PostHeaderWidget(
+                              post: post,
+                              onMorePressed: () =>
+                                  _showPostOptions(context, post),
                             ),
-                          ),
 
-                          // Post interactions
-                          PostInteractionsWidget(
-                            post: post,
-                            commentCount: _getCommentCount(commentsAsync),
-                            onCommentTap: () => _scrollToComments(),
-                            onShareTap: () => _sharePost(post),
-                            onRepostTap: () => _repostPost(post),
-                          ),
+                            const SizedBox(height: 16),
 
-                          // Divider
-                          Divider(
-                            color: theme.grey[200],
-                            height: 1,
-                          ),
-
-                          // Comments section
-                          CommentListWidget(
-                            postId: widget.postId,
-                            postAuthorCPId: post.authorCPId,
-                            onCommentMore: _handleCommentMore,
-                          ),
-
-                          // Add bottom padding to account for floating reply input
-                          const SizedBox(height: 120),
-                        ],
+                            // Post content
+                            PostContentWidget(post: post),
+                          ],
+                        ),
                       ),
-                    ),
+
+                      // Post interactions
+                      PostInteractionsWidget(
+                        post: post,
+                        commentCount: _getCommentCount(commentsAsync),
+                        onCommentTap: () => _scrollToComments(),
+                        onShareTap: () => _sharePost(post),
+                        onRepostTap: () => _repostPost(post),
+                      ),
+
+                      // Divider
+                      Divider(
+                        color: theme.grey[200],
+                        height: 1,
+                      ),
+
+                      // Comments section
+                      CommentListWidget(
+                        postId: widget.postId,
+                        postAuthorCPId: post.authorCPId,
+                        onCommentMore: _handleCommentMore,
+                      ),
+
+                      // Add bottom padding to account for floating reply input
+                      const SizedBox(height: 20),
+                    ],
                   ),
-                ],
+                ),
               ),
 
               // Floating reply section
@@ -173,14 +169,14 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
           const SizedBox(height: 16),
           Text(
             localizations.translate('post_not_found'),
-            style: theme.textTheme.headlineSmall?.copyWith(
+            style: TextStyles.footnote.copyWith(
               color: theme.grey[600],
             ),
           ),
           const SizedBox(height: 8),
           Text(
             localizations.translate('post_not_found_description'),
-            style: theme.textTheme.bodyMedium?.copyWith(
+            style: TextStyles.caption.copyWith(
               color: theme.grey[500],
             ),
             textAlign: TextAlign.center,
@@ -217,14 +213,14 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
           const SizedBox(height: 16),
           Text(
             localizations.translate('error_loading_post'),
-            style: theme.textTheme.headlineSmall?.copyWith(
+            style: TextStyles.footnote.copyWith(
               color: theme.error[600],
             ),
           ),
           const SizedBox(height: 8),
           Text(
             error.toString(),
-            style: theme.textTheme.bodyMedium?.copyWith(
+            style: TextStyles.caption.copyWith(
               color: theme.grey[500],
             ),
             textAlign: TextAlign.center,

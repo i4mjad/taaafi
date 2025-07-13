@@ -6,9 +6,8 @@ import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/features/community/data/models/comment.dart';
 import 'package:reboot_app_3/features/community/presentation/widgets/avatar_with_anonymity.dart';
-import 'package:reboot_app_3/features/community/presentation/providers/forum_providers.dart';
 import 'package:reboot_app_3/features/community/presentation/providers/community_providers_new.dart';
-import 'package:reboot_app_3/features/community/domain/entities/community_profile_entity.dart';
+import 'package:reboot_app_3/features/community/presentation/providers/forum_providers.dart';
 
 class CommentTileWidget extends ConsumerWidget {
   final Comment comment;
@@ -59,7 +58,7 @@ class CommentTileWidget extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // User info and timestamp
-                    _buildUserInfo(theme, localizations, isAnonymous),
+                    _buildUserInfo(ref, theme, localizations, isAnonymous),
 
                     const SizedBox(height: 8),
 
@@ -76,7 +75,8 @@ class CommentTileWidget extends ConsumerWidget {
                     const SizedBox(height: 12),
 
                     // Actions row
-                    _buildActionsRow(theme, localizations, ref),
+                    _buildInteractionButtons(
+                        context, ref, theme, localizations),
                   ],
                 ),
               ),
@@ -158,18 +158,42 @@ class CommentTileWidget extends ConsumerWidget {
     );
   }
 
-  Widget _buildUserInfo(
-      dynamic theme, AppLocalizations localizations, bool isAnonymous) {
+  Widget _buildUserInfo(WidgetRef ref, dynamic theme,
+      AppLocalizations localizations, bool isAnonymous) {
+    // Get the comment author's profile to display their name
+    final authorProfileAsync =
+        ref.watch(communityProfileByIdProvider(comment.authorCPId));
+
     return Row(
       children: [
         // Username or anonymous indicator
-        Text(
-          isAnonymous
-              ? localizations.translate('anonymous')
-              : 'User ${comment.authorCPId}', // TODO: Replace with actual username
-          style: TextStyles.footnoteSelected.copyWith(
-            color: theme.grey[700],
-            fontSize: 14,
+        authorProfileAsync.when(
+          data: (authorProfile) {
+            final displayName = isAnonymous
+                ? localizations.translate('anonymous')
+                : authorProfile?.displayName ?? 'Unknown User';
+
+            return Text(
+              displayName,
+              style: TextStyles.footnoteSelected.copyWith(
+                color: theme.grey[700],
+                fontSize: 14,
+              ),
+            );
+          },
+          loading: () => Text(
+            isAnonymous ? localizations.translate('anonymous') : 'Loading...',
+            style: TextStyles.footnoteSelected.copyWith(
+              color: theme.grey[700],
+              fontSize: 14,
+            ),
+          ),
+          error: (error, stackTrace) => Text(
+            isAnonymous ? localizations.translate('anonymous') : 'Unknown User',
+            style: TextStyles.footnoteSelected.copyWith(
+              color: theme.grey[700],
+              fontSize: 14,
+            ),
           ),
         ),
 
@@ -218,65 +242,34 @@ class CommentTileWidget extends ConsumerWidget {
     );
   }
 
-  Widget _buildActionsRow(
-      dynamic theme, AppLocalizations localizations, WidgetRef ref) {
+  Widget _buildInteractionButtons(
+    BuildContext context,
+    WidgetRef ref,
+    dynamic theme,
+    AppLocalizations localizations,
+  ) {
     return Row(
       children: [
-        // Like button
-        _buildInteractionButton(
-          theme,
-          LucideIcons.heart,
-          comment.score > 0,
-          () => _handleLike(ref, 1),
+        // Like button with user state
+        _CommentInteractionButton(
+          comment: comment,
+          interactionValue: 1,
+          icon: LucideIcons.thumbsUp,
+          count: comment.likeCount,
         ),
 
-        const SizedBox(width: 16),
+        const SizedBox(width: 24),
 
-        // Comment count/score display
-        Text(
-          '${comment.score} ${localizations.translate('likes')}',
-          style: TextStyles.tiny.copyWith(
-            color: theme.grey[600],
-            fontWeight: FontWeight.w500,
-            fontSize: 13,
-          ),
-        ),
-
-        const SizedBox(width: 16),
-
-        // Dislike button
-        _buildInteractionButton(
-          theme,
-          LucideIcons.heartOff,
-          comment.score < 0,
-          () => _handleLike(ref, -1),
+        // Dislike button with user state
+        _CommentInteractionButton(
+          comment: comment,
+          interactionValue: -1,
+          icon: LucideIcons.thumbsDown,
+          count: comment.dislikeCount,
         ),
 
         const Spacer(),
       ],
-    );
-  }
-
-  Widget _buildInteractionButton(
-    dynamic theme,
-    IconData icon,
-    bool isActive,
-    VoidCallback onTap,
-  ) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(4),
-        decoration: BoxDecoration(
-          color: isActive ? theme.primary[50] : Colors.transparent,
-          borderRadius: BorderRadius.circular(4),
-        ),
-        child: Icon(
-          icon,
-          size: 18,
-          color: isActive ? theme.primary[600] : theme.grey[500],
-        ),
-      ),
     );
   }
 
@@ -296,8 +289,102 @@ class CommentTileWidget extends ConsumerWidget {
       return '${timestamp.day}/${timestamp.month}/${timestamp.year}';
     }
   }
+}
 
-  void _handleLike(WidgetRef ref, int value) {
-    ref.read(commentVoteProvider(comment.id).notifier).vote(value);
+/// Separate widget to handle comment interaction state
+class _CommentInteractionButton extends ConsumerWidget {
+  final Comment comment;
+  final int interactionValue;
+  final IconData icon;
+  final int count;
+
+  const _CommentInteractionButton({
+    required this.comment,
+    required this.interactionValue,
+    required this.icon,
+    required this.count,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = AppTheme.of(context);
+
+    // Watch user's interaction with this comment
+    final userInteractionAsync = ref.watch(
+      userInteractionProvider((
+        targetType: 'comment',
+        targetId: comment.id,
+        userCPId: '',
+      )),
+    );
+
+    final isActive = userInteractionAsync.maybeWhen(
+      data: (interaction) => interaction?.value == interactionValue,
+      orElse: () => false,
+    );
+
+    final isLoading = userInteractionAsync.isLoading;
+
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        GestureDetector(
+          onTap: isLoading ? null : () => _handleInteraction(ref),
+          child: Container(
+            padding: const EdgeInsets.all(4),
+            decoration: BoxDecoration(
+              color: isActive ? theme.primary[50] : Colors.transparent,
+              borderRadius: BorderRadius.circular(4),
+            ),
+            child: Icon(
+              icon,
+              size: 18,
+              color: isLoading
+                  ? theme.grey[400]
+                  : isActive
+                      ? theme.primary[600]
+                      : theme.grey[500],
+            ),
+          ),
+        ),
+        const SizedBox(width: 8),
+        Text(
+          count.toString(),
+          style: TextStyles.tiny.copyWith(
+            color: theme.grey[600],
+            fontWeight: FontWeight.w500,
+            fontSize: 13,
+          ),
+        ),
+      ],
+    );
+  }
+
+  void _handleInteraction(WidgetRef ref) {
+    try {
+      // Get current user's interaction state
+      final userInteractionAsync = ref.read(
+        userInteractionProvider((
+          targetType: 'comment',
+          targetId: comment.id,
+          userCPId: '',
+        )),
+      );
+
+      userInteractionAsync.whenData((currentInteraction) {
+        // If user already has this interaction, toggle it off (neutral)
+        final newValue = currentInteraction?.value == interactionValue
+            ? 0
+            : interactionValue;
+
+        // Trigger the interaction
+        ref
+            .read(commentInteractionProvider(comment.id).notifier)
+            .interact(newValue);
+      });
+    } catch (e) {
+      // Handle errors silently to prevent UI crashes
+      debugPrint('Error handling comment interaction: $e');
+    }
   }
 }

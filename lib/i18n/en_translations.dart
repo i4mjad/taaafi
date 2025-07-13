@@ -1147,4 +1147,13 @@ const Map<String, String> kEn = {
   "generic_error": "An error occurred. Please try again",
 
   // Time related
+  // Forum interactions
+  'likes': 'Likes',
+  'dislikes': 'Dislikes',
+  'like': 'Like',
+  'dislike': 'Dislike',
+  'thumbs_up': 'Thumbs Up',
+  'thumbs_down': 'Thumbs Down',
+  'interaction_failed': 'Interaction failed',
+  'invalid_interaction_value': 'Invalid interaction value',
 };
