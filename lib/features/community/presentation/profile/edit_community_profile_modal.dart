@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
 import 'package:reboot_app_3/core/shared_widgets/custom_textfield.dart';
@@ -32,6 +33,9 @@ class _EditCommunityProfileModalState
   late bool _isAnonymous;
   late String _selectedGender;
   bool _isLoading = false;
+  String _imageOption = 'none'; // 'default', 'none'
+  String? _currentUserImageUrl;
+  bool _isLoadingImage = true;
 
   @override
   void initState() {
@@ -40,6 +44,11 @@ class _EditCommunityProfileModalState
         TextEditingController(text: widget.profile.displayName);
     _isAnonymous = widget.profile.isAnonymous;
     _selectedGender = widget.profile.gender;
+
+    // Set initial image option based on current profile
+    _imageOption = widget.profile.avatarUrl != null ? 'default' : 'none';
+
+    _loadCurrentUserImage();
 
     // Add listener to update button state when text changes
     _displayNameController.addListener(() {
@@ -53,6 +62,34 @@ class _EditCommunityProfileModalState
   void dispose() {
     _displayNameController.dispose();
     super.dispose();
+  }
+
+  Future<void> _loadCurrentUserImage() async {
+    try {
+      final currentUser = FirebaseAuth.instance.currentUser;
+      if (currentUser == null) {
+        setState(() {
+          _isLoadingImage = false;
+        });
+        return;
+      }
+
+      final photoURL = currentUser.photoURL;
+      if (photoURL != null && photoURL.isNotEmpty) {
+        setState(() {
+          _currentUserImageUrl = photoURL;
+          _isLoadingImage = false;
+        });
+      } else {
+        setState(() {
+          _isLoadingImage = false;
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _isLoadingImage = false;
+      });
+    }
   }
 
   @override
@@ -144,11 +181,39 @@ class _EditCommunityProfileModalState
                         Center(
                           child: Column(
                             children: [
-                              AvatarWithAnonymity(
-                                cpId: widget.profile.id,
-                                isAnonymous: _isAnonymous,
-                                size: 80,
-                              ),
+                              // Show preview based on selected image option
+                              if (_imageOption == 'default' &&
+                                  _currentUserImageUrl != null &&
+                                  !_isAnonymous)
+                                Container(
+                                  width: 80,
+                                  height: 80,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
+                                        color: theme.primary[300]!, width: 2),
+                                  ),
+                                  child: ClipOval(
+                                    child: Image.network(
+                                      _currentUserImageUrl!,
+                                      fit: BoxFit.cover,
+                                      errorBuilder:
+                                          (context, error, stackTrace) {
+                                        return AvatarWithAnonymity(
+                                          cpId: widget.profile.id,
+                                          isAnonymous: _isAnonymous,
+                                          size: 80,
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                )
+                              else
+                                AvatarWithAnonymity(
+                                  cpId: widget.profile.id,
+                                  isAnonymous: _isAnonymous,
+                                  size: 80,
+                                ),
                               const SizedBox(height: 8),
                               Text(
                                 localizations
@@ -157,10 +222,146 @@ class _EditCommunityProfileModalState
                                   color: theme.grey[600],
                                 ),
                               ),
-                              const SizedBox(height: 8),
                             ],
                           ),
                         ),
+
+                        const SizedBox(height: 24),
+
+                        // Profile Image Selection
+                        _buildSectionTitle(
+                          localizations.translate('community-profile-picture'),
+                          theme,
+                        ),
+                        const SizedBox(height: 8),
+                        if (_isLoadingImage)
+                          const Center(
+                            child: Padding(
+                              padding: EdgeInsets.all(16.0),
+                              child: CircularProgressIndicator(),
+                            ),
+                          )
+                        else
+                          Column(
+                            children: [
+                              RadioListTile<String>(
+                                title: Text(
+                                  localizations.translate('default-image'),
+                                  style:
+                                      TextStyles.footnote.copyWith(height: 1.4),
+                                ),
+                                value: 'default',
+                                groupValue: _imageOption,
+                                onChanged: _isLoading
+                                    ? null
+                                    : (value) {
+                                        setState(() {
+                                          _imageOption = value!;
+                                        });
+                                      },
+                              ),
+                              RadioListTile<String>(
+                                title: Text(
+                                  localizations.translate('without-image'),
+                                  style:
+                                      TextStyles.footnote.copyWith(height: 1.4),
+                                ),
+                                value: 'none',
+                                groupValue: _imageOption,
+                                onChanged: _isLoading
+                                    ? null
+                                    : (value) {
+                                        setState(() {
+                                          _imageOption = value!;
+                                        });
+                                      },
+                              ),
+                            ],
+                          ),
+
+                        if (_imageOption == 'default') ...[
+                          const SizedBox(height: 8),
+                          if (_currentUserImageUrl != null) ...[
+                            WidgetsContainer(
+                              padding: const EdgeInsets.all(16),
+                              backgroundColor: theme.primary[50],
+                              borderRadius: BorderRadius.circular(10.5),
+                              borderSide: BorderSide(
+                                  color: theme.primary[200]!, width: 1),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      localizations.translate(
+                                          'will-use-following-image'),
+                                      style: TextStyles.caption
+                                          .copyWith(height: 1.4),
+                                    ),
+                                  ),
+                                  horizontalSpace(Spacing.points24),
+                                  Container(
+                                    width: 50,
+                                    height: 50,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(50),
+                                      border: Border.all(
+                                          color: theme.primary[300]!),
+                                    ),
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(50),
+                                      child: Image.network(
+                                        _currentUserImageUrl!,
+                                        fit: BoxFit.cover,
+                                        errorBuilder:
+                                            (context, error, stackTrace) {
+                                          return Container(
+                                            color: theme.grey[200],
+                                            child: Icon(
+                                              LucideIcons.user,
+                                              color: theme.grey[600],
+                                              size: 40,
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ] else ...[
+                            Container(
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: theme.warn[50],
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(color: theme.warn[200]!),
+                              ),
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    LucideIcons.info,
+                                    size: 20,
+                                    color: theme.warn[600],
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: Text(
+                                      localizations.translate(
+                                          'no-profile-image-available'),
+                                      style: TextStyles.caption.copyWith(
+                                        color: theme.warn[700],
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ],
+
+                        const SizedBox(height: 24),
 
                         // Anonymous Mode Toggle
                         _buildSectionTitle(
@@ -306,11 +507,19 @@ class _EditCommunityProfileModalState
     try {
       final updateNotifier = ref.read(communityProfileUpdateProvider.notifier);
 
+      // Determine avatar URL based on image option
+      String? avatarUrl;
+      if (_imageOption == 'default' && _currentUserImageUrl != null) {
+        avatarUrl = _currentUserImageUrl;
+      } else {
+        avatarUrl = null; // No image
+      }
+
       await updateNotifier.updateProfile(
         displayName: _displayNameController.text.trim(),
         gender: _selectedGender,
         isAnonymous: _isAnonymous,
-        avatarUrl: widget.profile.avatarUrl, // Keep existing avatar
+        avatarUrl: avatarUrl,
       );
 
       if (mounted) {

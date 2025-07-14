@@ -68,6 +68,7 @@ class _CommunityProfileSettingsScreenState
                           cpId: profile.id,
                           isAnonymous: profile.isAnonymous,
                           size: 80,
+                          avatarUrl: profile.avatarUrl,
                         ),
                         const SizedBox(width: 16),
                         // Profile Stats

@@ -7,12 +7,14 @@ class AvatarWithAnonymity extends ConsumerWidget {
   final String cpId;
   final bool isAnonymous;
   final double size;
+  final String? avatarUrl;
 
   const AvatarWithAnonymity({
     super.key,
     required this.cpId,
     required this.isAnonymous,
     this.size = 40,
+    this.avatarUrl,
   });
 
   @override
@@ -32,16 +34,54 @@ class AvatarWithAnonymity extends ConsumerWidget {
               size: size * 0.6,
               color: theme.grey[600],
             )
-          : ClipOval(
-              child: Container(
-                color: theme.primary[100],
-                child: Icon(
-                  LucideIcons.user,
-                  size: size * 0.6,
-                  color: theme.primary[600],
+          : avatarUrl != null && avatarUrl!.isNotEmpty
+              ? ClipOval(
+                  child: Image.network(
+                    avatarUrl!,
+                    width: size,
+                    height: size,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      // Fallback to default avatar if image fails to load
+                      return Container(
+                        color: theme.primary[100],
+                        child: Icon(
+                          LucideIcons.user,
+                          size: size * 0.6,
+                          color: theme.primary[600],
+                        ),
+                      );
+                    },
+                    loadingBuilder: (context, child, loadingProgress) {
+                      if (loadingProgress == null) return child;
+                      return Container(
+                        color: theme.primary[100],
+                        child: Center(
+                          child: SizedBox(
+                            width: size * 0.4,
+                            height: size * 0.4,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                theme.primary[600]!,
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                )
+              : ClipOval(
+                  child: Container(
+                    color: theme.primary[100],
+                    child: Icon(
+                      LucideIcons.user,
+                      size: size * 0.6,
+                      color: theme.primary[600],
+                    ),
+                  ),
                 ),
-              ),
-            ),
     );
   }
 }
