@@ -1,0 +1,38 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+
+
+## 2. Firestore Collections & Fields
+
+| Collection | Document ID | Important Fields | Sub-collections |
+|------------|-------------|------------------|-----------------|
+| **forumPosts** | `postId` | `authorCPId`, `title`, `body`, `category`, `isAnonymous`, `score`, `createdAt`, `updatedAt` | — |
+| **comments** | `commentId` | `postId`, `authorCPId`, `body`, `isAnonymous`, `score`, `createdAt`, `updatedAt` | — |
+| **interactions** | `interactionId` | `targetType` (post/comment), `targetId`, `userCPId`, `type` (like), `value` (-1／0／1), `createdAt` | — |
+| **groups** | `groupId` | `name`, `description`, `memberCount`, `capacity`, `gender`, `createdAt` | `members`, `chatMessages`, `challenges` |
+| **globalChallenges** | `chalId` | `name`, `start`, `end`, … | `tasks` |
+| **communityProfiles** | `cpId` | `displayName`, `gender`, `avatarUrl`, `postAnonymouslyByDefault`, `referralCode` | — |
+| **users** | `uid` | `referralCode` (set once) | — |
+
+Composite indexes required:
+* `forumPosts` ⇒ orderBy `score` desc, `createdAt` desc
+* `comments` ⇒ orderBy `postId`, `createdAt` (for comments on posts)
+* `comments` ⇒ orderBy `score` desc (for top comments)
+* `interactions` ⇒ orderBy `targetType`, `targetId`, `userCPId` (for user's interaction on specific target)
+* `interactions` ⇒ orderBy `targetType`, `targetId`, `createdAt` (for all interactions on target)
+* `interactions` ⇒ orderBy `userCPId`, `createdAt` (for user's interaction history)
+
+**Comment Structure**: Comments are simple replies to posts only - no nested comments. This simplifies the data model, UI complexity, and reduces potential for spam/abuse.
+
+**Interactions Architecture**: 
+- **Separate Collection**: `interactions` collection instead of nested sub-collections for better scalability
+- **Unified Structure**: Single collection handles both post and comment interactions
+- **Efficient Querying**: Composite indexes support fast lookup patterns
+- **User-Centric**: Easy to query all interactions by a specific user
+- **Extensible**: `type` field allows future interaction types beyond likes (reactions, saves, etc.)
+- **Atomic Operations**: Document ID format ensures safe upserts without race conditions
+
+---
