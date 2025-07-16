@@ -26,10 +26,12 @@ class CommentTileWidget extends ConsumerWidget {
     final theme = AppTheme.of(context);
     final localizations = AppLocalizations.of(context);
     final currentProfileAsync = ref.watch(currentCommunityProfileProvider);
+    final authorProfileAsync =
+        ref.watch(communityProfileByIdProvider(comment.authorCPId));
 
-    return currentProfileAsync.when(
-      data: (currentProfile) {
-        final isAnonymous = currentProfile?.isAnonymous ?? false;
+    return authorProfileAsync.when(
+      data: (authorProfile) {
+        final isAuthorAnonymous = authorProfile?.isAnonymous ?? false;
 
         return Container(
           padding: const EdgeInsets.all(16),
@@ -46,8 +48,9 @@ class CommentTileWidget extends ConsumerWidget {
               // User avatar
               AvatarWithAnonymity(
                 cpId: comment.authorCPId,
-                isAnonymous: isAnonymous,
+                isAnonymous: isAuthorAnonymous,
                 size: 32,
+                avatarUrl: isAuthorAnonymous ? null : authorProfile?.avatarUrl,
               ),
 
               const SizedBox(width: 12),
@@ -58,7 +61,8 @@ class CommentTileWidget extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // User info and timestamp
-                    _buildUserInfo(ref, theme, localizations, isAnonymous),
+                    _buildUserInfo(ref, theme, localizations, isAuthorAnonymous,
+                        authorProfileAsync),
 
                     const SizedBox(height: 8),
 
@@ -158,18 +162,18 @@ class CommentTileWidget extends ConsumerWidget {
     );
   }
 
-  Widget _buildUserInfo(WidgetRef ref, dynamic theme,
-      AppLocalizations localizations, bool isAnonymous) {
-    // Get the comment author's profile to display their name
-    final authorProfileAsync =
-        ref.watch(communityProfileByIdProvider(comment.authorCPId));
-
+  Widget _buildUserInfo(
+      WidgetRef ref,
+      dynamic theme,
+      AppLocalizations localizations,
+      bool isAuthorAnonymous,
+      AsyncValue authorProfileAsync) {
     return Row(
       children: [
         // Username or anonymous indicator
         authorProfileAsync.when(
           data: (authorProfile) {
-            final displayName = isAnonymous
+            final displayName = isAuthorAnonymous
                 ? localizations.translate('anonymous')
                 : authorProfile?.displayName ?? 'Unknown User';
 
@@ -182,14 +186,18 @@ class CommentTileWidget extends ConsumerWidget {
             );
           },
           loading: () => Text(
-            isAnonymous ? localizations.translate('anonymous') : 'Loading...',
+            isAuthorAnonymous
+                ? localizations.translate('anonymous')
+                : 'Loading...',
             style: TextStyles.footnoteSelected.copyWith(
               color: theme.grey[700],
               fontSize: 14,
             ),
           ),
           error: (error, stackTrace) => Text(
-            isAnonymous ? localizations.translate('anonymous') : 'Unknown User',
+            isAuthorAnonymous
+                ? localizations.translate('anonymous')
+                : 'Unknown User',
             style: TextStyles.footnoteSelected.copyWith(
               color: theme.grey[700],
               fontSize: 14,

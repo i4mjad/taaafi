@@ -1156,4 +1156,12 @@ const Map<String, String> kEn = {
   'thumbs_down': 'Thumbs Down',
   'interaction_failed': 'Interaction failed',
   'invalid_interaction_value': 'Invalid interaction value',
+
+  'community_posts': 'Posts',
+  'community_news': 'News',
+  'community_pinned': 'Pinned',
+  'community_categories': 'Categories',
+  'error_loading_posts': 'Error loading posts',
+  'no_posts_found': 'No posts found',
+  'retry': 'Retry',
 };

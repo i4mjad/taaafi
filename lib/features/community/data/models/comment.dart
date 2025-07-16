@@ -32,7 +32,8 @@ class Comment {
         score: doc.data()!["score"] ?? 0,
         likeCount: doc.data()!["likeCount"] ?? 0,
         dislikeCount: doc.data()!["dislikeCount"] ?? 0,
-        createdAt: (doc.data()!["createdAt"] as Timestamp).toDate(),
+        createdAt: (doc.data()!["createdAt"] as Timestamp?)?.toDate() ??
+            DateTime.now(),
         updatedAt: (doc.data()!["updatedAt"] as Timestamp?)?.toDate(),
       );
 

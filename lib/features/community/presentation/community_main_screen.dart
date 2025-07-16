@@ -5,10 +5,14 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/routing/route_names.dart';
 import 'package:reboot_app_3/core/shared_widgets/app_bar.dart';
+import 'package:reboot_app_3/core/shared_widgets/container.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/features/community/presentation/widgets/threads_post_card.dart';
 import 'package:reboot_app_3/features/community/presentation/providers/forum_providers.dart';
+import 'package:reboot_app_3/features/community/presentation/widgets/avatar_with_anonymity.dart';
+import 'package:reboot_app_3/features/community/presentation/providers/community_providers_new.dart';
+import 'package:reboot_app_3/features/community/data/models/post_category.dart';
 
 class CommunityMainScreen extends ConsumerStatefulWidget {
   const CommunityMainScreen({super.key});
@@ -20,7 +24,7 @@ class CommunityMainScreen extends ConsumerStatefulWidget {
 
 class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen> {
   bool _isChallengesSectionExpanded = true;
-  String _selectedFilter = 'all';
+  String _selectedFilter = 'posts';
   final ScrollController _scrollController = ScrollController();
 
   @override
@@ -31,7 +35,7 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref
           .read(postsPaginationProvider.notifier)
-          .loadPosts(category: _selectedFilter);
+          .loadPosts(category: _getFilterCategory());
     });
   }
 
@@ -41,13 +45,36 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen> {
     super.dispose();
   }
 
+  String? _getFilterCategory() {
+    switch (_selectedFilter) {
+      case 'posts':
+        return null; // Show all posts
+      case 'news':
+        return 'news';
+      case 'pinned':
+        return 'pinned';
+      case 'categories':
+        return null; // This will be handled differently
+      default:
+        return null;
+    }
+  }
+
   void _onScroll() {
+    // Collapse challenges when scrolling
+    if (_scrollController.position.pixels > 50 &&
+        _isChallengesSectionExpanded) {
+      setState(() {
+        _isChallengesSectionExpanded = false;
+      });
+    }
+
+    // Load more posts when near the bottom
     if (_scrollController.position.pixels >=
         _scrollController.position.maxScrollExtent - 200) {
-      // Load more posts when near the bottom
       ref
           .read(postsPaginationProvider.notifier)
-          .loadMorePosts(category: _selectedFilter);
+          .loadMorePosts(category: _getFilterCategory());
     }
   }
 
@@ -63,10 +90,59 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen> {
         false,
         false,
         actions: [
-          IconButton(
-            icon: const Icon(LucideIcons.user),
-            onPressed: () {
-              context.push('/community/profile');
+          Consumer(
+            builder: (context, ref, child) {
+              final communityProfileAsync =
+                  ref.watch(currentCommunityProfileProvider);
+
+              return communityProfileAsync.when(
+                data: (profile) {
+                  if (profile != null) {
+                    return GestureDetector(
+                      onTap: () => context.push('/community/profile'),
+                      child: Padding(
+                        padding: const EdgeInsets.only(left: 16, right: 16.0),
+                        child: AvatarWithAnonymity(
+                          cpId: profile.id,
+                          isAnonymous: profile.isAnonymous,
+                          avatarUrl: profile.avatarUrl,
+                          size: 32,
+                        ),
+                      ),
+                    );
+                  } else {
+                    // Fallback to icon when no profile exists
+                    return IconButton(
+                      icon: const Icon(LucideIcons.user),
+                      onPressed: () {
+                        context.push('/community/profile');
+                      },
+                    );
+                  }
+                },
+                loading: () => Padding(
+                  padding: const EdgeInsets.only(right: 16.0),
+                  child: Container(
+                    width: 32,
+                    height: 32,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: theme.grey[300],
+                    ),
+                    child: Icon(
+                      LucideIcons.user,
+                      size: 20,
+                      color: theme.grey[600],
+                    ),
+                  ),
+                ),
+                error: (error, stackTrace) => IconButton(
+                  icon: const Icon(LucideIcons.user),
+                  onPressed: () {
+                    context.push('/community/profile');
+                  },
+                ),
+              );
             },
           ),
         ],
@@ -91,27 +167,47 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen> {
 
         // Filter chips
         Container(
-          height: 50,
+          height: 35,
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: ListView(
             scrollDirection: Axis.horizontal,
             children: [
-              _buildFilterChip('community-all', 'all'),
+              _buildFilterChip(
+                AppLocalizations.of(context).translate('community_posts'),
+                'posts',
+                LucideIcons.messageSquare,
+                const Color(0xFF3B82F6),
+              ),
               const SizedBox(width: 8),
-              _buildFilterChip('community-general', 'general'),
+              _buildFilterChip(
+                AppLocalizations.of(context).translate('community_news'),
+                'news',
+                LucideIcons.newspaper,
+                const Color(0xFF10B981),
+              ),
               const SizedBox(width: 8),
-              _buildFilterChip('community-questions', 'question'),
+              _buildFilterChip(
+                AppLocalizations.of(context).translate('community_pinned'),
+                'pinned',
+                LucideIcons.pin,
+                const Color(0xFFF59E0B),
+              ),
               const SizedBox(width: 8),
-              _buildFilterChip('community-tips', 'tip'),
-              const SizedBox(width: 8),
-              _buildFilterChip('community-support', 'support'),
+              _buildFilterChip(
+                AppLocalizations.of(context).translate('community_categories'),
+                'categories',
+                LucideIcons.layoutGrid,
+                const Color(0xFF8B5CF6),
+              ),
             ],
           ),
         ),
 
-        // Posts list
+        // Content based on selected filter
         Expanded(
-          child: _buildPostsList(),
+          child: _selectedFilter == 'categories'
+              ? _buildCategoriesSection()
+              : _buildPostsList(),
         ),
       ],
     );
@@ -290,9 +386,116 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen> {
     );
   }
 
-  // Groups tab moved to separate navigation tab
+  Widget _buildCategoriesSection() {
+    final theme = AppTheme.of(context);
+    final localizations = AppLocalizations.of(context);
+    final categoriesAsync = ref.watch(postCategoriesProvider);
 
-  // Removed _buildChallengesTab method
+    return categoriesAsync.when(
+      data: (categories) {
+        // Always include default general category
+        final defaultCategory = const PostCategory(
+          id: 'general',
+          name: 'General',
+          nameAr: 'عام',
+          iconName: 'chat',
+          colorHex: '#6B7280',
+          isActive: true,
+          sortOrder: 0,
+        );
+
+        // Filter out any duplicate general categories from Firestore
+        final filteredCategories =
+            categories.where((cat) => cat.id != 'general').toList();
+        final allCategories = [defaultCategory, ...filteredCategories];
+
+        return Padding(
+          padding: const EdgeInsets.all(16),
+          child: GridView.builder(
+            controller: _scrollController,
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              childAspectRatio: 1.5,
+              crossAxisSpacing: 12,
+              mainAxisSpacing: 12,
+            ),
+            itemCount: allCategories.length,
+            itemBuilder: (context, index) {
+              final category = allCategories[index];
+              return _buildCategoryCard(category, localizations);
+            },
+          ),
+        );
+      },
+      loading: () => const Center(
+        child: CircularProgressIndicator(),
+      ),
+      error: (error, stackTrace) => Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              localizations.translate('error_loading_categories'),
+              style: TextStyles.body.copyWith(
+                color: theme.error[500],
+              ),
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () {
+                ref.refresh(postCategoriesProvider);
+              },
+              child: Text(localizations.translate('retry')),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCategoryCard(
+      PostCategory category, AppLocalizations localizations) {
+    return GestureDetector(
+      onTap: () {
+        // Handle category tap - navigate to posts with this category
+        setState(() {
+          _selectedFilter = 'posts';
+        });
+        ref
+            .read(postsPaginationProvider.notifier)
+            .refresh(category: category.id);
+      },
+      child: WidgetsContainer(
+        backgroundColor: category.color.withValues(alpha: 0.1),
+        borderSide: BorderSide(
+          color: category.color.withValues(alpha: 0.3),
+          width: 1.5,
+        ),
+        cornerSmoothing: 0.8,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              category.icon,
+              size: 28,
+              color: category.color,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              category.getDisplayName(localizations.locale.languageCode),
+              style: TextStyles.body.copyWith(
+                color: category.color,
+                fontWeight: FontWeight.w600,
+              ),
+              textAlign: TextAlign.center,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
   Widget _buildPostsList() {
     final postsState = ref.watch(postsPaginationProvider);
@@ -310,7 +513,7 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              'Error loading posts',
+              AppLocalizations.of(context).translate('error_loading_posts'),
               style: TextStyles.body.copyWith(
                 color: AppTheme.of(context).error[500],
               ),
@@ -320,9 +523,9 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen> {
               onPressed: () {
                 ref
                     .read(postsPaginationProvider.notifier)
-                    .refresh(category: _selectedFilter);
+                    .refresh(category: _getFilterCategory());
               },
-              child: const Text('Retry'),
+              child: Text(AppLocalizations.of(context).translate('retry')),
             ),
           ],
         ),
@@ -330,8 +533,8 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen> {
     }
 
     if (postsState.posts.isEmpty) {
-      return const Center(
-        child: Text('No posts found'),
+      return Center(
+        child: Text(AppLocalizations.of(context).translate('no_posts_found')),
       );
     }
 
@@ -339,7 +542,7 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen> {
       onRefresh: () async {
         await ref
             .read(postsPaginationProvider.notifier)
-            .refresh(category: _selectedFilter);
+            .refresh(category: _getFilterCategory());
       },
       child: ListView.builder(
         controller: _scrollController,
@@ -367,37 +570,49 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen> {
     );
   }
 
-  Widget _buildFilterChip(String translationKey, String filterValue) {
+  Widget _buildFilterChip(
+      String label, String filterValue, IconData icon, Color color) {
     final theme = AppTheme.of(context);
-    final localizations = AppLocalizations.of(context);
     final isSelected = _selectedFilter == filterValue;
 
-    return FilterChip(
-      label: Text(
-        localizations.translate(translationKey),
-        style: TextStyles.caption.copyWith(
-          color: isSelected ? theme.primary[700] : theme.grey[900],
-          fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-        ),
-      ),
-      selected: isSelected,
-      onSelected: (selected) {
-        if (selected) {
-          setState(() {
-            _selectedFilter = filterValue;
-          });
-          // Refresh posts with new filter
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _selectedFilter = filterValue;
+        });
+        // Refresh posts with new filter only if not categories
+        if (filterValue != 'categories') {
           ref
               .read(postsPaginationProvider.notifier)
-              .refresh(category: filterValue);
+              .refresh(category: _getFilterCategory());
         }
       },
-      backgroundColor: theme.grey[50],
-      selectedColor: theme.primary[100],
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20),
-        side: BorderSide(
-          color: isSelected ? theme.primary[300]! : theme.grey[200]!,
+      child: WidgetsContainer(
+        padding: const EdgeInsets.only(left: 8, right: 8, top: 2, bottom: 2),
+        backgroundColor: isSelected
+            ? color.withValues(alpha: 0.15)
+            : color.withValues(alpha: 0.1),
+        borderSide: BorderSide(
+          color: isSelected ? color : theme.grey[200]!,
+          width: isSelected ? 2.0 : 1.0, // Thicker border for selected
+        ),
+        child: Row(
+          children: [
+            Icon(
+              icon,
+              size: 14,
+              color: isSelected ? color : theme.grey[600],
+            ),
+            const SizedBox(width: 4),
+            Text(
+              label,
+              style: TextStyles.caption.copyWith(
+                fontSize: 12,
+                color: isSelected ? color : theme.grey[900],
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+              ),
+            ),
+          ],
         ),
       ),
     );

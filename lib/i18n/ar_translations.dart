@@ -1087,6 +1087,14 @@ const Map<String, String> kAr = {
   "discard": "إهمال",
   "error_loading_categories": "خطأ في تحميل الفئات",
 
+  'community_posts': 'المشاركات',
+  'community_news': 'الأخبار',
+  'community_pinned': 'مثبت',
+  'community_categories': 'الفئات',
+  'error_loading_posts': 'خطأ في تحميل المشاركات',
+  'no_posts_found': 'لم يتم العثور على مشاركات',
+  'retry': 'إعادة المحاولة',
+
   // Post validation translations
   "post_title_empty": "لا يمكن أن يكون عنوان المنشور فارغاً",
   "post_title_too_short": "عنوان المنشور قصير جداً",

@@ -25,6 +25,8 @@ class ThreadsPostCard extends ConsumerWidget {
     final theme = AppTheme.of(context);
     final localizations = AppLocalizations.of(context);
     final currentProfileAsync = ref.watch(currentCommunityProfileProvider);
+    final authorProfileAsync =
+        ref.watch(communityProfileByIdProvider(post.authorCPId));
 
     // Watch user's interaction with this post
     final userInteractionAsync = ref.watch(
@@ -35,310 +37,270 @@ class ThreadsPostCard extends ConsumerWidget {
       )),
     );
 
-    return currentProfileAsync.when(
-      data: (currentProfile) {
-        final isAnonymous = currentProfile?.isAnonymous ?? false;
-
-        return GestureDetector(
-          onTap: onTap,
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            decoration: BoxDecoration(
-              border: Border(
-                bottom: BorderSide(
-                  color: theme.grey[100]!,
-                  width: 0.5,
-                ),
-              ),
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        decoration: BoxDecoration(
+          border: Border(
+            bottom: BorderSide(
+              color: theme.grey[100]!,
+              width: 0.5,
             ),
-            child: Column(
+          ),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Header with user info
+            Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Header with user info
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Avatar
-                    AvatarWithAnonymity(
+                // Avatar with proper author anonymity
+                authorProfileAsync.when(
+                  data: (authorProfile) {
+                    final isAuthorAnonymous =
+                        authorProfile?.isAnonymous ?? false;
+                    return AvatarWithAnonymity(
                       cpId: post.authorCPId,
-                      isAnonymous: isAnonymous,
+                      isAnonymous: isAuthorAnonymous,
                       size: 32,
+                      avatarUrl:
+                          isAuthorAnonymous ? null : authorProfile?.avatarUrl,
+                    );
+                  },
+                  loading: () => Container(
+                    width: 32,
+                    height: 32,
+                    decoration: BoxDecoration(
+                      color: theme.grey[200],
+                      shape: BoxShape.circle,
                     ),
-                    const SizedBox(width: 12),
+                  ),
+                  error: (error, stackTrace) => Container(
+                    width: 32,
+                    height: 32,
+                    decoration: BoxDecoration(
+                      color: theme.error[100],
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Icons.error_outline,
+                      size: 16,
+                      color: theme.error[500],
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
 
-                    // User info and content
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                // User info and content
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Username and time
+                      Row(
                         children: [
-                          // Username and time
-                          Row(
-                            children: [
-                              Text(
-                                post.title,
+                          // Author name with proper error handling
+                          Expanded(
+                            child: authorProfileAsync.when(
+                              data: (authorProfile) {
+                                final isAuthorAnonymous =
+                                    authorProfile?.isAnonymous ?? false;
+                                final displayName = isAuthorAnonymous
+                                    ? localizations.translate('anonymous')
+                                    : authorProfile?.displayName ??
+                                        localizations.translate('unknown_user');
+
+                                return Text(
+                                  displayName,
+                                  style: TextStyles.body.copyWith(
+                                    fontWeight: FontWeight.w600,
+                                    color: theme.grey[900],
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                );
+                              },
+                              loading: () => Container(
+                                height: 16,
+                                width: 80,
+                                decoration: BoxDecoration(
+                                  color: theme.grey[200],
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                              ),
+                              error: (error, stackTrace) => Text(
+                                localizations.translate('unknown_user'),
                                 style: TextStyles.body.copyWith(
                                   fontWeight: FontWeight.w600,
-                                  color: theme.grey[900],
+                                  color: theme.error[600],
                                 ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
                               ),
-                              const SizedBox(width: 8),
-                              Text(
-                                _formatTimeAgo(post.createdAt, localizations),
-                                style: TextStyles.caption.copyWith(
-                                  color: theme.grey[500],
-                                ),
-                              ),
-                              const Spacer(),
-                              Icon(
-                                Icons.more_horiz,
-                                color: theme.grey[400],
-                                size: 16,
-                              ),
-                            ],
+                            ),
                           ),
-
-                          const SizedBox(height: 8),
-
-                          // Post content
+                          const SizedBox(width: 8),
                           Text(
-                            post.body,
-                            style: TextStyles.body.copyWith(
-                              color: theme.grey[900],
-                              height: 1.4,
+                            _formatTimeAgo(post.createdAt, localizations),
+                            style: TextStyles.caption.copyWith(
+                              color: theme.grey[500],
                             ),
                           ),
-
-                          const SizedBox(height: 16),
-
-                          // Engagement buttons (like/dislike)
-                          userInteractionAsync.when(
-                            data: (interaction) => Row(
-                              children: [
-                                // Like button
-                                _buildEngagementButton(
-                                  theme,
-                                  LucideIcons.thumbsUp,
-                                  interaction?.value == 1,
-                                  () => _handleLike(ref, 1),
-                                ),
-                                horizontalSpace(Spacing.points4),
-
-                                // Like count
-                                Text(
-                                  '${post.likeCount}',
-                                  style: TextStyles.tiny.copyWith(
-                                    color: theme.grey[600],
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-
-                                horizontalSpace(Spacing.points8),
-
-                                // Dislike button
-                                _buildEngagementButton(
-                                  theme,
-                                  LucideIcons.thumbsDown,
-                                  interaction?.value == -1,
-                                  () => _handleLike(ref, -1),
-                                ),
-                                horizontalSpace(Spacing.points4),
-
-                                // Dislike count
-                                Text(
-                                  '${post.dislikeCount}',
-                                  style: TextStyles.tiny.copyWith(
-                                    color: theme.grey[600],
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-
-                                horizontalSpace(Spacing.points8),
-
-                                // Comment button
-                                _buildEngagementButton(
-                                  theme,
-                                  LucideIcons.messageCircle,
-                                  false,
-                                  () {
-                                    // Handle comment
-                                  },
-                                ),
-                              ],
-                            ),
-                            loading: () => Row(
-                              children: [
-                                _buildEngagementButton(
-                                  theme,
-                                  LucideIcons.thumbsUp,
-                                  false,
-                                  null,
-                                ),
-                                horizontalSpace(Spacing.points4),
-                                Text(
-                                  '${post.likeCount}',
-                                  style: TextStyles.tiny.copyWith(
-                                    color: theme.grey[600],
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                                horizontalSpace(Spacing.points8),
-                                _buildEngagementButton(
-                                  theme,
-                                  LucideIcons.thumbsDown,
-                                  false,
-                                  null,
-                                ),
-                                horizontalSpace(Spacing.points4),
-                                Text(
-                                  '${post.dislikeCount}',
-                                  style: TextStyles.tiny.copyWith(
-                                    color: theme.grey[600],
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            error: (_, __) => Row(
-                              children: [
-                                _buildEngagementButton(
-                                  theme,
-                                  LucideIcons.thumbsUp,
-                                  false,
-                                  () => _handleLike(ref, 1),
-                                ),
-                                horizontalSpace(Spacing.points4),
-                                Text(
-                                  '${post.likeCount}',
-                                  style: TextStyles.tiny.copyWith(
-                                    color: theme.grey[600],
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                                horizontalSpace(Spacing.points8),
-                                _buildEngagementButton(
-                                  theme,
-                                  LucideIcons.thumbsDown,
-                                  false,
-                                  () => _handleLike(ref, -1),
-                                ),
-                                horizontalSpace(Spacing.points4),
-                                Text(
-                                  '${post.dislikeCount}',
-                                  style: TextStyles.tiny.copyWith(
-                                    color: theme.grey[600],
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-
-                          const SizedBox(height: 12),
-
-                          // Engagement stats
-                          Text(
-                            '${post.likeCount} ${localizations.translate('likes')} · ${post.dislikeCount} ${localizations.translate('dislikes')}',
-                            style: TextStyles.tiny.copyWith(
-                              color: theme.grey[600],
-                              fontWeight: FontWeight.w500,
-                            ),
+                          const SizedBox(width: 8),
+                          Icon(
+                            Icons.more_horiz,
+                            color: theme.grey[400],
+                            size: 16,
                           ),
                         ],
                       ),
-                    ),
-                  ],
+
+                      const SizedBox(height: 8),
+
+                      // Post title
+                      Text(
+                        post.title,
+                        style: TextStyles.body.copyWith(
+                          fontWeight: FontWeight.w600,
+                          color: theme.grey[900],
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+
+                      const SizedBox(height: 8),
+
+                      // Post content
+                      Text(
+                        post.body,
+                        style: TextStyles.body.copyWith(
+                          color: theme.grey[700],
+                          height: 1.4,
+                        ),
+                        maxLines: 3,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+
+                      const SizedBox(height: 12),
+
+                      // Interaction buttons
+                      Row(
+                        children: [
+                          // Like button
+                          userInteractionAsync.when(
+                            data: (interaction) {
+                              final isLiked = interaction?.value == 1;
+                              return _buildEngagementButton(
+                                theme,
+                                LucideIcons.thumbsUp,
+                                isLiked,
+                                () => _handleInteraction(
+                                    ref, 1, interaction?.value),
+                                activeColor: const Color(
+                                    0xFF10B981), // Green color for likes
+                              );
+                            },
+                            loading: () => _buildEngagementButton(
+                              theme,
+                              LucideIcons.thumbsUp,
+                              false,
+                              null,
+                            ),
+                            error: (error, stackTrace) =>
+                                _buildEngagementButton(
+                              theme,
+                              LucideIcons.thumbsUp,
+                              false,
+                              null,
+                            ),
+                          ),
+
+                          const SizedBox(width: 4),
+
+                          Text(
+                            post.likeCount.toString(),
+                            style: TextStyles.caption.copyWith(
+                              color: theme.grey[600],
+                            ),
+                          ),
+
+                          const SizedBox(width: 16),
+
+                          // Dislike button
+                          userInteractionAsync.when(
+                            data: (interaction) {
+                              final isDisliked = interaction?.value == -1;
+                              return _buildEngagementButton(
+                                theme,
+                                LucideIcons.thumbsDown,
+                                isDisliked,
+                                () => _handleInteraction(
+                                    ref, -1, interaction?.value),
+                                activeColor: const Color(
+                                    0xFFEF4444), // Red color for dislikes
+                              );
+                            },
+                            loading: () => _buildEngagementButton(
+                              theme,
+                              LucideIcons.thumbsDown,
+                              false,
+                              null,
+                            ),
+                            error: (error, stackTrace) =>
+                                _buildEngagementButton(
+                              theme,
+                              LucideIcons.thumbsDown,
+                              false,
+                              null,
+                            ),
+                          ),
+
+                          const SizedBox(width: 4),
+
+                          Text(
+                            post.dislikeCount.toString(),
+                            style: TextStyles.caption.copyWith(
+                              color: theme.grey[600],
+                            ),
+                          ),
+
+                          const SizedBox(width: 16),
+
+                          // Comment button
+                          _buildEngagementButton(
+                            theme,
+                            LucideIcons.messageCircle,
+                            false,
+                            null,
+                          ),
+
+                          Text(
+                            '0', // TODO: Add comment count
+                            style: TextStyles.caption.copyWith(
+                              color: theme.grey[600],
+                            ),
+                          ),
+
+                          const Spacer(),
+
+                          // Share button
+                          _buildEngagementButton(
+                            theme,
+                            LucideIcons.share,
+                            false,
+                            null,
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
-          ),
-        );
-      },
-      loading: () => _buildLoadingState(theme),
-      error: (error, stackTrace) =>
-          _buildErrorState(theme, localizations, error),
-    );
-  }
-
-  Widget _buildLoadingState(dynamic theme) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: BoxDecoration(
-        border: Border(
-          bottom: BorderSide(
-            color: theme.grey[100]!,
-            width: 0.5,
-          ),
+          ],
         ),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 32,
-            height: 32,
-            decoration: BoxDecoration(
-              color: theme.grey[200],
-              shape: BoxShape.circle,
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  height: 16,
-                  width: 120,
-                  decoration: BoxDecoration(
-                    color: theme.grey[200],
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Container(
-                  height: 40,
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    color: theme.grey[200],
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildErrorState(
-      dynamic theme, AppLocalizations localizations, Object error) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: BoxDecoration(
-        border: Border(
-          bottom: BorderSide(
-            color: theme.grey[100]!,
-            width: 0.5,
-          ),
-        ),
-      ),
-      child: Row(
-        children: [
-          Icon(
-            Icons.error_outline,
-            size: 32,
-            color: theme.error[500],
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Text(
-              localizations.translate('error_loading_post'),
-              style: TextStyles.body.copyWith(
-                color: theme.error[600],
-              ),
-            ),
-          ),
-        ],
       ),
     );
   }
@@ -347,42 +309,45 @@ class ThreadsPostCard extends ConsumerWidget {
     dynamic theme,
     IconData icon,
     bool isActive,
-    VoidCallback? onTap,
-  ) {
+    VoidCallback? onTap, {
+    Color? activeColor,
+  }) {
+    final effectiveActiveColor = activeColor ?? theme.primary[600];
+    final activeBackgroundColor = activeColor != null
+        ? activeColor.withValues(alpha: 0.1)
+        : theme.primary[50];
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.all(4),
         decoration: BoxDecoration(
-          color: isActive ? theme.primary[50] : Colors.transparent,
+          color: isActive ? activeBackgroundColor : Colors.transparent,
           borderRadius: BorderRadius.circular(4),
         ),
         child: Icon(
           icon,
           size: 20,
-          color: isActive ? theme.primary[600] : theme.grey[600],
+          color: isActive ? effectiveActiveColor : theme.grey[600],
         ),
       ),
     );
   }
 
-  void _handleLike(WidgetRef ref, int value) {
-    // Get current user's interaction
-    final userInteractionAsync = ref.read(
-      userInteractionProvider((
-        targetType: 'post',
-        targetId: post.id,
-        userCPId: '', // Will be filled by provider
-      )),
-    );
+  void _handleInteraction(WidgetRef ref, int value, int? currentValue) {
+    // Determine the new interaction value based on current state
+    int newValue;
 
-    userInteractionAsync.whenData((currentInteraction) {
-      // If user already has this interaction, toggle it off (neutral)
-      final newValue = currentInteraction?.value == value ? 0 : value;
+    if (currentValue == value) {
+      // If clicking the same action, toggle it off (neutral)
+      newValue = 0;
+    } else {
+      // If clicking different action or no current action, set to new value
+      newValue = value;
+    }
 
-      // Trigger the interaction
-      ref.read(postInteractionProvider(post.id).notifier).interact(newValue);
-    });
+    // Trigger the interaction
+    ref.read(postInteractionProvider(post.id).notifier).interact(newValue);
   }
 
   String _formatTimeAgo(DateTime createdAt, AppLocalizations localizations) {

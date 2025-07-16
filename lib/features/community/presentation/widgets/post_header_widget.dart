@@ -26,18 +26,21 @@ class PostHeaderWidget extends ConsumerWidget {
     final theme = AppTheme.of(context);
     final localizations = AppLocalizations.of(context);
     final currentProfileAsync = ref.watch(currentCommunityProfileProvider);
+    final authorProfileAsync =
+        ref.watch(communityProfileByIdProvider(post.authorCPId));
 
-    return currentProfileAsync.when(
-      data: (currentProfile) {
-        final isAnonymous = currentProfile?.isAnonymous ?? false;
+    return authorProfileAsync.when(
+      data: (authorProfile) {
+        final isAuthorAnonymous = authorProfile?.isAnonymous ?? false;
 
         return Row(
           children: [
             // User avatar
             AvatarWithAnonymity(
               cpId: post.authorCPId,
-              isAnonymous: isAnonymous,
+              isAnonymous: isAuthorAnonymous,
               size: 40,
+              avatarUrl: isAuthorAnonymous ? null : authorProfile?.avatarUrl,
             ),
 
             const SizedBox(width: 12),
@@ -52,9 +55,9 @@ class PostHeaderWidget extends ConsumerWidget {
                       // Display name or anonymous
                       Expanded(
                         child: Text(
-                          isAnonymous
+                          isAuthorAnonymous
                               ? localizations.translate('anonymous')
-                              : _getDisplayName(post.authorCPId),
+                              : authorProfile?.displayName ?? 'Unknown User',
                           style: TextStyles.body.copyWith(
                             color: theme.grey[900],
                             fontWeight: FontWeight.w600,
@@ -64,7 +67,8 @@ class PostHeaderWidget extends ConsumerWidget {
 
                       // Author badge if this is the post author
                       if (showAuthorBadge &&
-                          _isCurrentUserAuthor(currentProfileAsync)) ...[
+                          _isCurrentUserAuthor(
+                              ref.watch(currentCommunityProfileProvider))) ...[
                         const SizedBox(width: 8),
                         Container(
                           padding: const EdgeInsets.symmetric(
@@ -186,14 +190,6 @@ class PostHeaderWidget extends ConsumerWidget {
         ),
       ],
     );
-  }
-
-  /// Get display name for a user ID
-  /// TODO: Replace with actual user profile lookup
-  String _getDisplayName(String cpId) {
-    // For now, return a mock display name
-    // In the future, this should lookup the actual user profile
-    return 'd4m1n.max'; // Mock display name
   }
 
   /// Check if current user is the author of this post
