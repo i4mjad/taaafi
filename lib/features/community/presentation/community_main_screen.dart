@@ -23,14 +23,12 @@ class CommunityMainScreen extends ConsumerStatefulWidget {
 }
 
 class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen> {
-  bool _isChallengesSectionExpanded = true;
   String _selectedFilter = 'posts';
   final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
     super.initState();
-    _scrollController.addListener(_onScroll);
     // Load posts when screen initializes
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref
@@ -57,24 +55,6 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen> {
         return null; // This will be handled differently
       default:
         return null;
-    }
-  }
-
-  void _onScroll() {
-    // Collapse challenges when scrolling
-    if (_scrollController.position.pixels > 50 &&
-        _isChallengesSectionExpanded) {
-      setState(() {
-        _isChallengesSectionExpanded = false;
-      });
-    }
-
-    // Load more posts when near the bottom
-    if (_scrollController.position.pixels >=
-        _scrollController.position.maxScrollExtent - 200) {
-      ref
-          .read(postsPaginationProvider.notifier)
-          .loadMorePosts(category: _getFilterCategory());
     }
   }
 
@@ -160,60 +140,156 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen> {
   }
 
   Widget _buildForumTab() {
-    return Column(
-      children: [
-        // Challenges Section
-        _buildChallengesSection(),
-
-        // Filter chips
-        Container(
-          height: 35,
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: ListView(
-            scrollDirection: Axis.horizontal,
-            children: [
-              _buildFilterChip(
-                AppLocalizations.of(context).translate('community_posts'),
-                'posts',
-                LucideIcons.messageSquare,
-                const Color(0xFF3B82F6),
+    return CustomScrollView(
+      controller: _scrollController,
+      slivers: [
+        // Filter chips - sticky
+        SliverPersistentHeader(
+          pinned: true,
+          delegate: _FilterChipsDelegate(
+            filterChips: Container(
+              height: 35,
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: ListView(
+                scrollDirection: Axis.horizontal,
+                children: [
+                  _buildFilterChip(
+                    AppLocalizations.of(context).translate('community_pinned'),
+                    'pinned',
+                    LucideIcons.pin,
+                    const Color(0xFFF59E0B),
+                  ),
+                  const SizedBox(width: 8),
+                  _buildFilterChip(
+                    AppLocalizations.of(context).translate('community_posts'),
+                    'posts',
+                    LucideIcons.messageSquare,
+                    const Color(0xFF3B82F6),
+                  ),
+                  const SizedBox(width: 8),
+                  _buildFilterChip(
+                    AppLocalizations.of(context).translate('challenges'),
+                    'challenges',
+                    LucideIcons.star,
+                    const Color(0xFFEF4444),
+                  ),
+                  const SizedBox(width: 8),
+                  _buildFilterChip(
+                    AppLocalizations.of(context).translate('community_news'),
+                    'news',
+                    LucideIcons.newspaper,
+                    const Color(0xFF10B981),
+                  ),
+                  const SizedBox(width: 8),
+                  _buildFilterChip(
+                    AppLocalizations.of(context)
+                        .translate('community_categories'),
+                    'categories',
+                    LucideIcons.layoutGrid,
+                    const Color(0xFF8B5CF6),
+                  ),
+                ],
               ),
-              const SizedBox(width: 8),
-              _buildFilterChip(
-                AppLocalizations.of(context).translate('community_news'),
-                'news',
-                LucideIcons.newspaper,
-                const Color(0xFF10B981),
-              ),
-              const SizedBox(width: 8),
-              _buildFilterChip(
-                AppLocalizations.of(context).translate('community_pinned'),
-                'pinned',
-                LucideIcons.pin,
-                const Color(0xFFF59E0B),
-              ),
-              const SizedBox(width: 8),
-              _buildFilterChip(
-                AppLocalizations.of(context).translate('community_categories'),
-                'categories',
-                LucideIcons.layoutGrid,
-                const Color(0xFF8B5CF6),
-              ),
-            ],
+            ),
           ),
         ),
 
-        // Content based on selected filter
-        Expanded(
-          child: _selectedFilter == 'categories'
-              ? _buildCategoriesSection()
-              : _buildPostsList(),
+        // Scrollable Content
+        SliverToBoxAdapter(
+          child: _buildMainContent(),
         ),
       ],
     );
   }
 
-  Widget _buildChallengesSection() {
+  Widget _buildMainContent() {
+    switch (_selectedFilter) {
+      case 'pinned':
+        return _buildPinnedView();
+      case 'posts':
+        return _buildPostsView();
+      case 'challenges':
+        return _buildChallengesView();
+      case 'news':
+        return _buildNewsView();
+      case 'categories':
+        return _buildCategoriesView();
+      default:
+        return _buildPostsView();
+    }
+  }
+
+  Widget _buildPinnedView() {
+    final theme = AppTheme.of(context);
+    final localizations = AppLocalizations.of(context);
+    final postsState = ref.watch(postsPaginationProvider);
+
+    return Column(
+      children: [
+        // Description for pinned section
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          child: Text(
+            localizations.translate('pinned_section_description'),
+            style: TextStyles.body.copyWith(
+              color: theme.grey[700],
+              height: 1.4,
+            ),
+          ),
+        ),
+        _buildPostsContent(postsState, localizations, theme),
+      ],
+    );
+  }
+
+  Widget _buildPostsView() {
+    final theme = AppTheme.of(context);
+    final localizations = AppLocalizations.of(context);
+    final postsState = ref.watch(postsPaginationProvider);
+
+    return Column(
+      children: [
+        // Header with trend icon, "Latest Posts" text, and "See All" button
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          child: Row(
+            children: [
+              Icon(
+                LucideIcons.trendingUp,
+                color: theme.primary[500],
+                size: 20,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                localizations.translate('latest_posts'),
+                style: TextStyles.caption.copyWith(
+                  color: theme.grey[900],
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const Spacer(),
+              GestureDetector(
+                onTap: () {
+                  // Navigate to the full posts list screen
+                  context.goNamed(RouteNames.allPosts.name);
+                },
+                child: Text(
+                  localizations.translate('see_all'),
+                  style: TextStyles.caption.copyWith(
+                    color: theme.primary[600],
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        _buildPostsContent(postsState, localizations, theme),
+      ],
+    );
+  }
+
+  Widget _buildChallengesView() {
     final theme = AppTheme.of(context);
     final localizations = AppLocalizations.of(context);
 
@@ -222,88 +298,42 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Section Header
-          GestureDetector(
-            onTap: () {
-              setState(() {
-                _isChallengesSectionExpanded = !_isChallengesSectionExpanded;
-              });
-            },
-            child: Row(
-              children: [
-                Icon(
-                  LucideIcons.star,
-                  color: theme.primary[600],
-                  size: 20,
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  localizations.translate('challenges'),
-                  style: TextStyles.h6.copyWith(
-                    color: theme.grey[900],
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const Spacer(),
-                AnimatedRotation(
-                  turns: _isChallengesSectionExpanded ? 0 : -0.5,
-                  duration: const Duration(milliseconds: 200),
-                  child: Icon(
-                    LucideIcons.chevronDown,
-                    color: theme.grey[600],
-                    size: 20,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 4),
+          // Description for challenges section
           Text(
-            localizations.translate('challenges_subtitle'),
-            style: TextStyles.caption.copyWith(
-              color: theme.grey[600],
+            localizations.translate('challenges_section_description'),
+            style: TextStyles.body.copyWith(
+              color: theme.grey[700],
+              height: 1.4,
             ),
           ),
 
-          // Expandable Challenge Cards
-          AnimatedSize(
-            duration: const Duration(milliseconds: 300),
-            curve: Curves.easeInOut,
-            child: _isChallengesSectionExpanded
-                ? Column(
-                    children: [
-                      const SizedBox(height: 16),
-                      SizedBox(
-                        height: 140,
-                        child: ListView(
-                          scrollDirection: Axis.horizontal,
-                          children: [
-                            _buildChallengeHighlightCard(
-                              title: '30-Day Recovery Challenge',
-                              participants: 1847,
-                              onTap: () =>
-                                  context.push('/community/challenges'),
-                            ),
-                            const SizedBox(width: 12),
-                            _buildChallengeHighlightCard(
-                              title: '7-Day Mindfulness Journey',
-                              participants: 432,
-                              onTap: () =>
-                                  context.push('/community/challenges'),
-                            ),
-                            const SizedBox(width: 12),
-                            _buildChallengeHighlightCard(
-                              title: 'Weekly Motivation Challenge',
-                              participants: 891,
-                              onTap: () =>
-                                  context.push('/community/challenges'),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  )
-                : const SizedBox.shrink(),
+          const SizedBox(height: 16),
+
+          // Challenge Cards
+          SizedBox(
+            height: 140,
+            child: ListView(
+              scrollDirection: Axis.horizontal,
+              children: [
+                _buildChallengeHighlightCard(
+                  title: '30-Day Recovery Challenge',
+                  participants: 1847,
+                  onTap: () => context.push('/community/challenges'),
+                ),
+                const SizedBox(width: 12),
+                _buildChallengeHighlightCard(
+                  title: '7-Day Mindfulness Journey',
+                  participants: 432,
+                  onTap: () => context.push('/community/challenges'),
+                ),
+                const SizedBox(width: 12),
+                _buildChallengeHighlightCard(
+                  title: 'Weekly Motivation Challenge',
+                  participants: 891,
+                  onTap: () => context.push('/community/challenges'),
+                ),
+              ],
+            ),
           ),
         ],
       ),
@@ -386,75 +416,124 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen> {
     );
   }
 
-  Widget _buildCategoriesSection() {
+  Widget _buildNewsView() {
+    final theme = AppTheme.of(context);
+    final localizations = AppLocalizations.of(context);
+    final postsState = ref.watch(postsPaginationProvider);
+
+    return Column(
+      children: [
+        // Description for news section
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          child: Text(
+            localizations.translate('news_section_description'),
+            style: TextStyles.body.copyWith(
+              color: theme.grey[700],
+              height: 1.4,
+            ),
+          ),
+        ),
+        _buildPostsContent(postsState, localizations, theme),
+      ],
+    );
+  }
+
+  Widget _buildCategoriesView() {
     final theme = AppTheme.of(context);
     final localizations = AppLocalizations.of(context);
     final categoriesAsync = ref.watch(postCategoriesProvider);
 
-    return categoriesAsync.when(
-      data: (categories) {
-        // Always include default general category
-        final defaultCategory = const PostCategory(
-          id: 'general',
-          name: 'General',
-          nameAr: 'عام',
-          iconName: 'chat',
-          colorHex: '#6B7280',
-          isActive: true,
-          sortOrder: 0,
-        );
-
-        // Filter out any duplicate general categories from Firestore
-        final filteredCategories =
-            categories.where((cat) => cat.id != 'general').toList();
-        final allCategories = [defaultCategory, ...filteredCategories];
-
-        return Padding(
-          padding: const EdgeInsets.all(16),
-          child: GridView.builder(
-            controller: _scrollController,
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              childAspectRatio: 1.5,
-              crossAxisSpacing: 12,
-              mainAxisSpacing: 12,
+    return Column(
+      children: [
+        // Description for categories section
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          child: Text(
+            localizations.translate('categories_section_description'),
+            style: TextStyles.body.copyWith(
+              color: theme.grey[700],
+              height: 1.4,
             ),
-            itemCount: allCategories.length,
-            itemBuilder: (context, index) {
-              final category = allCategories[index];
-              return _buildCategoryCard(category, localizations);
-            },
           ),
-        );
-      },
-      loading: () => const Center(
-        child: CircularProgressIndicator(),
-      ),
-      error: (error, stackTrace) => Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              localizations.translate('error_loading_categories'),
-              style: TextStyles.body.copyWith(
-                color: theme.error[500],
-              ),
-            ),
-            const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: () {
-                ref.refresh(postCategoriesProvider);
-              },
-              child: Text(localizations.translate('retry')),
-            ),
-          ],
         ),
-      ),
+        // Categories content
+        categoriesAsync.when(
+          data: (categories) {
+            // Filter out any categories with missing required data
+            final validCategories = categories.where((category) {
+              return category.id.isNotEmpty &&
+                  category.name.isNotEmpty &&
+                  category.isActive;
+            }).toList();
+
+            if (validCategories.isEmpty) {
+              return Center(
+                child: Text(
+                  localizations.translate('no_categories_found'),
+                  style: TextStyles.body.copyWith(
+                    color: theme.grey[600],
+                  ),
+                ),
+              );
+            }
+
+            return Padding(
+              padding: const EdgeInsets.all(16),
+              child: GridView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  childAspectRatio: 1.5,
+                  crossAxisSpacing: 12,
+                  mainAxisSpacing: 12,
+                ),
+                itemCount: validCategories.length,
+                itemBuilder: (context, index) {
+                  final category = validCategories[index];
+                  return _buildCategoryCard(category, localizations);
+                },
+              ),
+            );
+          },
+          loading: () => const Center(
+            child: CircularProgressIndicator(),
+          ),
+          error: (error, stackTrace) => Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  localizations.translate('error_loading_categories'),
+                  style: TextStyles.body.copyWith(
+                    color: theme.error[500],
+                  ),
+                ),
+                const SizedBox(height: 16),
+                ElevatedButton(
+                  onPressed: () {
+                    ref.refresh(postCategoriesProvider);
+                  },
+                  child: Text(localizations.translate('retry')),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
     );
   }
 
   Widget _buildCategoryCard(
       PostCategory category, AppLocalizations localizations) {
+    final theme = AppTheme.of(context);
+
+    // Safe fallbacks for potentially null values
+    final categoryColor = category.color ?? theme.grey[500]!;
+    final categoryIcon = category.icon ?? LucideIcons.hash;
+    final displayName = _getSafeCategoryName(category, localizations);
+
     return GestureDetector(
       onTap: () {
         // Handle category tap - navigate to posts with this category
@@ -466,9 +545,9 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen> {
             .refresh(category: category.id);
       },
       child: WidgetsContainer(
-        backgroundColor: category.color.withValues(alpha: 0.1),
+        backgroundColor: categoryColor.withValues(alpha: 0.1),
         borderSide: BorderSide(
-          color: category.color.withValues(alpha: 0.3),
+          color: categoryColor.withValues(alpha: 0.3),
           width: 1.5,
         ),
         cornerSmoothing: 0.8,
@@ -476,15 +555,15 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
-              category.icon,
+              categoryIcon,
               size: 28,
-              color: category.color,
+              color: categoryColor,
             ),
             const SizedBox(height: 8),
             Text(
-              category.getDisplayName(localizations.locale.languageCode),
+              displayName,
               style: TextStyles.body.copyWith(
-                color: category.color,
+                color: categoryColor,
                 fontWeight: FontWeight.w600,
               ),
               textAlign: TextAlign.center,
@@ -497,9 +576,28 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen> {
     );
   }
 
-  Widget _buildPostsList() {
-    final postsState = ref.watch(postsPaginationProvider);
+  String _getSafeCategoryName(
+      PostCategory category, AppLocalizations localizations) {
+    try {
+      // Check if locale is Arabic and use nameAr, otherwise use name
+      final isArabic = localizations.locale.languageCode == 'ar';
 
+      if (isArabic && category.nameAr.isNotEmpty) {
+        return category.nameAr;
+      } else if (category.name.isNotEmpty) {
+        return category.name;
+      } else {
+        // Fallback to ID if both names are empty
+        return category.id;
+      }
+    } catch (e) {
+      // Ultimate fallback - return category ID
+      return category.id.isNotEmpty ? category.id : 'Unknown';
+    }
+  }
+
+  Widget _buildPostsContent(
+      dynamic postsState, AppLocalizations localizations, theme) {
     if (postsState.posts.isEmpty && postsState.isLoading) {
       return const Center(
         child: CircularProgressIndicator(),
@@ -513,9 +611,9 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              AppLocalizations.of(context).translate('error_loading_posts'),
+              localizations.translate('error_loading_posts'),
               style: TextStyles.body.copyWith(
-                color: AppTheme.of(context).error[500],
+                color: theme.error[500],
               ),
             ),
             const SizedBox(height: 16),
@@ -525,7 +623,7 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen> {
                     .read(postsPaginationProvider.notifier)
                     .refresh(category: _getFilterCategory());
               },
-              child: Text(AppLocalizations.of(context).translate('retry')),
+              child: Text(localizations.translate('retry')),
             ),
           ],
         ),
@@ -534,39 +632,26 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen> {
 
     if (postsState.posts.isEmpty) {
       return Center(
-        child: Text(AppLocalizations.of(context).translate('no_posts_found')),
+        child: Text(localizations.translate('no_posts_found')),
       );
     }
 
-    return RefreshIndicator(
-      onRefresh: () async {
-        await ref
-            .read(postsPaginationProvider.notifier)
-            .refresh(category: _getFilterCategory());
-      },
-      child: ListView.builder(
-        controller: _scrollController,
-        itemCount: postsState.posts.length + (postsState.isLoading ? 1 : 0),
-        itemBuilder: (context, index) {
-          if (index == postsState.posts.length) {
-            // Loading indicator at the bottom
-            return const Center(
-              child: Padding(
-                padding: EdgeInsets.all(16.0),
-                child: CircularProgressIndicator(),
-              ),
-            );
-          }
+    // Show only first 5 posts as preview
+    final previewPosts = postsState.posts.take(5).toList();
 
-          final post = postsState.posts[index];
-          return ThreadsPostCard(
-            post: post,
-            onTap: () {
-              context.push('/community/forum/post/${post.id}');
-            },
-          );
-        },
-      ),
+    return ListView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: previewPosts.length,
+      itemBuilder: (context, index) {
+        final post = previewPosts[index];
+        return ThreadsPostCard(
+          post: post,
+          onTap: () {
+            context.push('/community/forum/post/${post.id}');
+          },
+        );
+      },
     );
   }
 
@@ -616,5 +701,36 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen> {
         ),
       ),
     );
+  }
+}
+
+// Delegate for sticky filter chips
+class _FilterChipsDelegate extends SliverPersistentHeaderDelegate {
+  final Widget filterChips;
+
+  _FilterChipsDelegate({
+    required this.filterChips,
+  });
+
+  @override
+  Widget build(
+      BuildContext context, double shrinkOffset, bool overlapsContent) {
+    final theme = AppTheme.of(context);
+    return Container(
+      color: theme.backgroundColor,
+      padding: const EdgeInsets.only(top: 8, bottom: 8),
+      child: filterChips,
+    );
+  }
+
+  @override
+  double get maxExtent => 51; // 35 + 8 + 8 padding
+
+  @override
+  double get minExtent => 51;
+
+  @override
+  bool shouldRebuild(covariant SliverPersistentHeaderDelegate oldDelegate) {
+    return true;
   }
 }

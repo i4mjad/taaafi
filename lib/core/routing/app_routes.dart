@@ -13,6 +13,7 @@ import 'package:reboot_app_3/features/account/presentation/account_screen.dart';
 import 'package:reboot_app_3/features/account/presentation/banned_screen.dart';
 import 'package:reboot_app_3/features/account/presentation/delete_account_screen.dart';
 import 'package:reboot_app_3/features/account/presentation/user_profile_screen.dart';
+import 'package:reboot_app_3/features/community/presentation/posts_list_screen.dart';
 import 'package:reboot_app_3/features/home/presentation/reports/user_reports_screen.dart';
 import 'package:reboot_app_3/features/home/presentation/reports/report_conversation_screen.dart';
 import 'package:reboot_app_3/features/notifications/presentation/notifications_screen.dart';
@@ -31,6 +32,8 @@ import 'package:reboot_app_3/features/community/presentation/community_main_scre
 import 'package:reboot_app_3/features/community/presentation/forum/forum_home_screen.dart';
 import 'package:reboot_app_3/features/community/presentation/groups/group_list_screen.dart';
 import 'package:reboot_app_3/features/community/presentation/groups/groups_main_screen.dart';
+import 'package:reboot_app_3/features/community/presentation/groups/groups_coming_soon_screen.dart';
+import 'package:reboot_app_3/features/community/presentation/groups/groups_coming_soon_preferences.dart';
 import 'package:reboot_app_3/features/community/presentation/forum/post_detail_screen.dart';
 import 'package:reboot_app_3/features/community/presentation/forum/new_post_screen.dart';
 import 'package:reboot_app_3/features/community/presentation/forum/reply_composer_screen.dart';
@@ -465,6 +468,14 @@ GoRouter goRouter(Ref<GoRouter> ref) {
                     ),
                   ),
                   GoRoute(
+                    path: 'allPosts',
+                    name: RouteNames.allPosts.name,
+                    pageBuilder: (context, state) => MaterialPage<void>(
+                      name: RouteNames.allPosts.name,
+                      child: PostsListScreen(),
+                    ),
+                  ),
+                  GoRoute(
                     path: 'forum',
                     name: RouteNames.forumHome.name,
                     pageBuilder: (context, state) => MaterialPage<void>(
@@ -545,32 +556,33 @@ GoRouter goRouter(Ref<GoRouter> ref) {
               GoRoute(
                 name: RouteNames.groups.name,
                 path: '/groups',
-                // Redirect to groups onboarding if user lacks a groups profile
-                redirect: (context, state) async {
-                  // Skip redirect if already going to onboarding
-                  if (state.matchedLocation.contains('/onboarding')) {
-                    return null;
-                  }
+                // COMMENTED OUT: Redirect to groups onboarding if user lacks a groups profile
+                // redirect: (context, state) async {
+                //   // Skip redirect if already going to onboarding
+                //   if (state.matchedLocation.contains('/onboarding')) {
+                //     return null;
+                //   }
 
-                  // Check if user has a groups profile
-                  try {
-                    // Wait for the provider to load
-                    final hasProfile =
-                        await ref.read(hasGroupsProfileProvider.future);
+                //   // Check if user has a groups profile
+                //   try {
+                //     // Wait for the provider to load
+                //     final hasProfile =
+                //         await ref.read(hasGroupsProfileProvider.future);
 
-                    if (!hasProfile) {
-                      return '/groups/onboarding';
-                    }
-                    return null;
-                  } catch (e) {
-                    // On error, redirect to onboarding to be safe
-                    return '/groups/onboarding';
-                  }
-                },
+                //     if (!hasProfile) {
+                //       return '/groups/onboarding';
+                //     }
+                //     return null;
+                //   } catch (e) {
+                //     // On error, redirect to onboarding to be safe
+                //     return '/groups/onboarding';
+                //   }
+                // },
                 pageBuilder: (context, state) => NoTransitionPage<void>(
                   key: state.pageKey,
                   name: state.name,
-                  child: GroupsMainScreen(),
+                  child:
+                      GroupsComingSoonScreen(), // Always show coming soon screen
                 ),
                 routes: [
                   // Groups onboarding route

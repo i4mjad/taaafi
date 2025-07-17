@@ -50,4 +50,5 @@ enum RouteNames {
   notifications,
   userProfile,
   banned,
+  allPosts,
 }

@@ -264,6 +264,26 @@ const Map<String, String> kEn = {
   "share_coming_soon": "Share feature coming soon",
   "repost_coming_soon": "Repost feature coming soon",
   "report_post": "Report post",
+  "delete_post": "Delete Post",
+  "report_inappropriate_content": "Report inappropriate or harmful content",
+  "permanently_delete_post": "Permanently delete this post",
+  "confirm_report_post":
+      "Are you sure you want to report this post? Our team will review it.",
+  "confirm_delete_post":
+      "Are you sure you want to delete this post? This action cannot be undone.",
+  "post_reported": "Post reported successfully",
+  "post_deleted": "Post deleted successfully",
+  "no_categories_found": "No categories available",
+  "pinned_section_description":
+      "Important announcements and featured content that stays at the top for easy access.",
+  "posts_section_description":
+      "Latest community discussions, questions, and shared experiences from members.",
+  "challenges_section_description":
+      "Join organized challenges and activities designed to support your recovery journey and build healthy habits together.",
+  "news_section_description":
+      "Stay updated with the latest announcements, updates, and important information from the community.",
+  "categories_section_description":
+      "Browse content by topics and interests to find discussions that matter most to you.",
   "block_user": "Block user",
   "reply_to_comment": "Reply to comment",
   "report_comment": "Report comment",
@@ -1164,4 +1184,50 @@ const Map<String, String> kEn = {
   'error_loading_posts': 'Error loading posts',
   'no_posts_found': 'No posts found',
   'retry': 'Retry',
+
+  // Posts list and search
+  'latest_posts': 'Latest Posts',
+  'see_all': 'See All',
+  'search_posts': 'Search Posts',
+  'advanced_search': 'Advanced Search',
+  'search_placeholder': 'Search in posts...',
+  'filters': 'Filters',
+  'search_results': 'Search Results',
+  'no_results_found': 'No results found',
+  'apply_filters': 'Apply Filters',
+  'clear_filters': 'Clear Filters',
+  'search_in_posts': 'Search in Posts',
+  'filter_by_category': 'Filter by Category',
+  'filter_by_date': 'Filter by Date',
+  'filter_by_author': 'Filter by Author',
+  'sort_by': 'Sort by',
+  'newest_first': 'Newest First',
+  'oldest_first': 'Oldest First',
+  'most_liked': 'Most Liked',
+  'most_commented': 'Most Commented',
+  'date_range': 'Date Range',
+  'select_start_date': 'Select Start Date',
+  'select_end_date': 'Select End Date',
+  'author_name': 'Author Name',
+
+  // Groups coming soon screen
+  'groups_coming_soon_title': 'You\'re on the list!',
+  'groups_coming_soon_description':
+      'Support groups will open in phases. We\'ll let you know as soon as you can join when we launch the following features:',
+  'groups_feature_support_groups': 'Support Groups',
+  'groups_feature_support_groups_desc':
+      'Join small support groups with others on similar recovery journeys',
+  'groups_feature_group_chat': 'Group Chat',
+  'groups_feature_group_chat_desc':
+      'Private messaging within your support group',
+  'groups_feature_group_challenges': 'Group Challenges',
+  'groups_feature_group_challenges_desc':
+      'Participate in group challenges and track progress together',
+  'groups_feature_group_events': 'Group Events',
+  'groups_feature_group_events_desc':
+      'Join virtual meetups and group activities',
+  'groups_got_it': 'Got it',
+  'groups_thanks': 'Thanks!',
+  'groups_working_hard_message':
+      'We\'re working hard to bring you the best support group experience.',
 };

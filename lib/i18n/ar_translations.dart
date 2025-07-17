@@ -263,6 +263,26 @@ const Map<String, String> kAr = {
   "share_coming_soon": "ميزة المشاركة قريباً",
   "repost_coming_soon": "ميزة إعادة النشر قريباً",
   "report_post": "الإبلاغ عن المنشور",
+  "delete_post": "حذف المنشور",
+  "report_inappropriate_content": "الإبلاغ عن محتوى غير مناسب أو ضار",
+  "permanently_delete_post": "حذف هذا المنشور نهائياً",
+  "confirm_report_post":
+      "هل أنت متأكد من الإبلاغ عن هذا المنشور؟ سيقوم فريقنا بمراجعته.",
+  "confirm_delete_post":
+      "هل أنت متأكد من حذف هذا المنشور؟ لا يمكن التراجع عن هذا الإجراء.",
+  "post_reported": "تم الإبلاغ عن المنشور بنجاح",
+  "post_deleted": "تم حذف المنشور بنجاح",
+  "no_categories_found": "لا توجد فئات متاحة",
+  "pinned_section_description":
+      "الإعلانات المهمة والمحتوى المميز الذي يبقى في المقدمة للوصول السهل.",
+  "posts_section_description":
+      "أحدث النقاشات والأسئلة والتجارب المشتركة من أعضاء المجتمع.",
+  "challenges_section_description":
+      "انضم للتحديات والأنشطة المنظمة المصممة لدعم رحلة التعافي وبناء العادات الصحية معاً.",
+  "news_section_description":
+      "ابق على اطلاع بأحدث الإعلانات والتحديثات والمعلومات المهمة من المجتمع.",
+  "categories_section_description":
+      "تصفح المحتوى حسب المواضيع والاهتمامات للعثور على النقاشات التي تهمك أكثر.",
   "block_user": "حظر المستخدم",
   "reply_to_comment": "رد على التعليق",
   "report_comment": "الإبلاغ عن التعليق",
@@ -603,7 +623,7 @@ const Map<String, String> kAr = {
   "warning-notice-description":
       "يتم إصدار التحذيرات للمساعدة في الحفاظ على بيئة مجتمعية إيجابية. قد تؤدي التحذيرات المتعددة إلى قيود مؤقتة.",
   "ban-appeal-description":
-      "إذا كنت تعتقد أن هذا القيد تم تطبيقه بالخطأ، يرجى الاتصال بفريق الدعم لدينا مع الرقم المرجعي أعلاه للحصول على المساعدة.",
+      "إذا كنت تعتقد أن هذا القيد تم تطبيقه بالخطأ، يرجى الاتصال بفريق الدعم للحصول على المساعدة.",
   "tap-for-details": "اضغط للتفاصيل",
   "app-wide": "على مستوى التطبيق",
   "low": "منخفض",
@@ -1133,4 +1153,48 @@ const Map<String, String> kAr = {
   'thumbs_down': 'إبهام لأسفل',
   'interaction_failed': 'فشل التفاعل',
   'invalid_interaction_value': 'قيمة تفاعل غير صحيحة',
+
+  // Posts list and search
+  'latest_posts': 'أحدث المنشورات',
+  'see_all': 'عرض الكل',
+  'search_posts': 'البحث في المنشورات',
+  'advanced_search': 'البحث المتقدم',
+  'search_placeholder': 'ابحث في المنشورات...',
+  'filters': 'الفلاتر',
+  'search_results': 'نتائج البحث',
+  'no_results_found': 'لم يتم العثور على نتائج',
+  'apply_filters': 'تطبيق الفلاتر',
+  'clear_filters': 'مسح الفلاتر',
+  'search_in_posts': 'البحث في المنشورات',
+  'filter_by_category': 'تصفية حسب الفئة',
+  'filter_by_date': 'تصفية حسب التاريخ',
+  'filter_by_author': 'تصفية حسب المؤلف',
+  'sort_by': 'ترتيب حسب',
+  'newest_first': 'الأحدث أولاً',
+  'oldest_first': 'الأقدم أولاً',
+  'most_liked': 'الأكثر إعجاباً',
+  'most_commented': 'الأكثر تعليقاً',
+  'date_range': 'المدى الزمني',
+  'select_start_date': 'اختر تاريخ البداية',
+  'select_end_date': 'اختر تاريخ النهاية',
+  'author_name': 'اسم المؤلف',
+
+  // Groups coming soon screen
+  'groups_coming_soon_title': 'أنت في القائمة!',
+  'groups_coming_soon_description':
+      'مجموعات الدعم ستفتح على مراحل. سنخبرك حالما تتمكن من الانضمام عندما نطلق الميزات التالية:',
+  'groups_feature_support_groups': 'مجموعات الدعم',
+  'groups_feature_support_groups_desc':
+      'انضم إلى مجموعات دعم صغيرة مع آخرين في رحلات تعافي مشابهة',
+  'groups_feature_group_chat': 'محادثة المجموعة',
+  'groups_feature_group_chat_desc': 'رسائل خاصة ضمن مجموعة الدعم الخاصة بك',
+  'groups_feature_group_challenges': 'تحديات المجموعة',
+  'groups_feature_group_challenges_desc':
+      'شارك في تحديات المجموعة وتتبع التقدم معاً',
+  'groups_feature_group_events': 'فعاليات المجموعة',
+  'groups_feature_group_events_desc':
+      'انضم إلى لقاءات افتراضية وأنشطة المجموعة',
+  'groups_got_it': 'فهمت',
+  'groups_thanks': 'شكراً!',
+  'groups_working_hard_message': 'نعمل بجد لنقدم لك أفضل تجربة مجموعة دعم.',
 };

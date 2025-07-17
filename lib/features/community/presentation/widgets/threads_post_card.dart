@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
-import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/features/community/data/models/post.dart';
 import 'package:reboot_app_3/features/community/presentation/widgets/avatar_with_anonymity.dart';
@@ -33,7 +32,10 @@ class ThreadsPostCard extends ConsumerWidget {
       userInteractionProvider((
         targetType: 'post',
         targetId: post.id,
-        userCPId: '', // Will be filled by provider
+        userCPId: currentProfileAsync.maybeWhen(
+          data: (profile) => profile?.id ?? '',
+          orElse: () => '',
+        ),
       )),
     );
 
@@ -149,10 +151,13 @@ class ThreadsPostCard extends ConsumerWidget {
                             ),
                           ),
                           const SizedBox(width: 8),
-                          Icon(
-                            Icons.more_horiz,
-                            color: theme.grey[400],
-                            size: 16,
+                          GestureDetector(
+                            onTap: () => _showPostOptionsModal(context, ref),
+                            child: Icon(
+                              LucideIcons.moreHorizontal,
+                              color: theme.grey[900],
+                              size: 22,
+                            ),
                           ),
                         ],
                       ),
@@ -369,5 +374,219 @@ class ThreadsPostCard extends ConsumerWidget {
     } else {
       return localizations.translate('time-now');
     }
+  }
+
+  void _showPostOptionsModal(BuildContext context, WidgetRef ref) {
+    final theme = AppTheme.of(context);
+    final localizations = AppLocalizations.of(context);
+    final currentProfileAsync = ref.read(currentCommunityProfileProvider);
+
+    // Check if current user owns this post
+    bool isOwnPost = false;
+    currentProfileAsync.whenData((profile) {
+      isOwnPost = profile?.id == post.authorCPId;
+    });
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        margin: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: theme.backgroundColor,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Handle bar
+            Container(
+              margin: const EdgeInsets.only(top: 12),
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: theme.grey[300],
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+
+            const SizedBox(height: 20),
+
+            // Report Post Option
+            _buildModalOption(
+              context,
+              theme,
+              localizations,
+              icon: LucideIcons.flag,
+              title: localizations.translate('report_post'),
+              subtitle: localizations.translate('report_inappropriate_content'),
+              onTap: () {
+                Navigator.of(context).pop();
+                _reportPost(context, ref);
+              },
+            ),
+
+            // Delete Post Option (only if user owns the post)
+            if (isOwnPost) ...[
+              const SizedBox(height: 8),
+              _buildModalOption(
+                context,
+                theme,
+                localizations,
+                icon: LucideIcons.trash2,
+                title: localizations.translate('delete_post'),
+                subtitle: localizations.translate('permanently_delete_post'),
+                isDestructive: true,
+                onTap: () {
+                  Navigator.of(context).pop();
+                  _deletePost(context, ref);
+                },
+              ),
+            ],
+
+            const SizedBox(height: 20),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildModalOption(
+    BuildContext context,
+    dynamic theme,
+    AppLocalizations localizations, {
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required VoidCallback onTap,
+    bool isDestructive = false,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(16),
+        margin: const EdgeInsets.symmetric(horizontal: 16),
+        decoration: BoxDecoration(
+          color: isDestructive ? theme.error[50] : theme.grey[50],
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: isDestructive ? theme.error[100] : theme.grey[100],
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(
+                icon,
+                size: 20,
+                color: isDestructive ? theme.error[600] : theme.grey[700],
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyles.body.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: isDestructive ? theme.error[700] : theme.grey[900],
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    subtitle,
+                    style: TextStyles.caption.copyWith(
+                      color: isDestructive ? theme.error[600] : theme.grey[600],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Icon(
+              LucideIcons.chevronRight,
+              size: 16,
+              color: isDestructive ? theme.error[500] : theme.grey[500],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _reportPost(BuildContext context, WidgetRef ref) {
+    final theme = AppTheme.of(context);
+    final localizations = AppLocalizations.of(context);
+
+    // Show confirmation dialog
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(localizations.translate('report_post')),
+        content: Text(localizations.translate('confirm_report_post')),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text(localizations.translate('cancel')),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              // TODO: Implement actual reporting logic
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(localizations.translate('post_reported')),
+                  backgroundColor: theme.success[500],
+                ),
+              );
+            },
+            child: Text(
+              localizations.translate('report'),
+              style: TextStyle(color: theme.error[600]),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _deletePost(BuildContext context, WidgetRef ref) {
+    final theme = AppTheme.of(context);
+    final localizations = AppLocalizations.of(context);
+
+    // Show confirmation dialog
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(localizations.translate('delete_post')),
+        content: Text(localizations.translate('confirm_delete_post')),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text(localizations.translate('cancel')),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              // TODO: Implement actual deletion logic
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(localizations.translate('post_deleted')),
+                  backgroundColor: theme.success[500],
+                ),
+              );
+            },
+            child: Text(
+              localizations.translate('delete'),
+              style: TextStyle(color: theme.error[600]),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
