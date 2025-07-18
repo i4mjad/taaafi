@@ -30,6 +30,7 @@ export interface ForumPost {
   category: string;        // Category ID reference
   isAnonymous?: boolean;   // Whether this specific post is anonymous
   isHidden?: boolean;      // Whether this post is hidden by admin
+  isPinned?: boolean;      // Whether this post is pinned to the top
   score: number;           // Overall score (likes - dislikes)
   likeCount: number;
   dislikeCount: number;

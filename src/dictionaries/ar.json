@@ -846,6 +846,7 @@
           "create": "إنشاء تقرير",
           "totalReports": "إجمالي التقارير",
           "pendingReports": "التقارير المعلقة",
+          "inProgressReports": "التقارير قيد المعالجة",
           "closedReports": "التقارير المغلقة",
           "finalizedReports": "التقارير المنجزة",
           "averageResponseTime": "متوسط وقت الاستجابة",
@@ -856,7 +857,10 @@
           "submittedDate": "تاريخ الإرسال",
           "initialMessage": "الرسالة الأولى",
           "messagesCount": "الرسائل",
+          "lastMessageFrom": "آخر رسالة من",
           "lastUpdated": "آخر تحديث",
+          "admin": "المدير",
+          "user": "المستخدم",
           "actions": "الإجراءات",
           "noReportsFound": "لم يتم العثور على تقارير",
           "searchPlaceholder": "البحث بمعرف المستخدم...",
@@ -879,6 +883,23 @@
           "deleteDescription": "هل أنت متأكد من حذف هذا التقرير؟ لا يمكن التراجع عن هذا الإجراء.",
           "deleteSuccess": "تم حذف التقرير بنجاح",
           "deleteError": "فشل في حذف التقرير",
+          "bulkActions": {
+            "title": "الإجراءات المجمعة",
+            "updateStatusTo": "تحديث الحالة إلى",
+            "updateSelected": "تحديث المحدد",
+            "updating": "جاري التحديث...",
+            "selectStatusAndReports": "يرجى تحديد التقارير والحالة",
+            "noValidUpdates": "لا يمكن تحديث أي تقارير إلى الحالة المحددة"
+          },
+          "bulkUpdate": {
+            "confirmTitle": "تأكيد التحديث المجمع",
+            "confirmDescription": "هل أنت متأكد من أنك تريد تحديث التقارير المحددة؟ سيؤدي هذا أيضًا إلى إرسال إشعارات لجميع المستخدمين المتأثرين.",
+            "confirmUpdate": "تأكيد التحديث",
+            "updateError": "فشل في تحديث التقارير",
+            "selectStatusAndReports": "يرجى تحديد التقارير والحالة",
+            "noValidUpdates": "لا يمكن تحديث أي تقارير إلى الحالة المحددة"
+          },
+          "selectStatus": "اختر الحالة",
           "manageReportTypes": "إدارة أنواع التقارير",
           "reportTypes": {
             "title": "أنواع التقارير",
@@ -1495,8 +1516,10 @@
           "selectCategory": "اختر التصنيف",
           "author": "الكاتب",
           "authorProfile": "ملف الكاتب الشخصي",
+          "by": "بواسطة",
           "isAnonymous": "منشور مجهول",
           "isAnonymousHelp": "ما إذا كان هذا المنشور مجهولاً",
+          "pinned": "مثبت",
           "score": "النقاط",
           "likes": "الإعجابات",
           "dislikes": "عدم الإعجاب",
@@ -1530,6 +1553,9 @@
           "hideSuccess": "تم إخفاء المنشور بنجاح",
           "unhideSuccess": "تم إظهار المنشور بنجاح",
           "hideError": "فشل في إخفاء المنشور",
+          "pinSuccess": "تم تثبيت المنشور بنجاح",
+          "unpinSuccess": "تم إلغاء تثبيت المنشور بنجاح",
+          "pinError": "فشل في تثبيت المنشور",
           "reports": "التقارير",
           "pendingReports": "التقارير المعلقة",
           "table": {
@@ -1590,6 +1616,14 @@
             "hideConfirm": {
               "title": "إخفاء المنشور",
               "description": "هل أنت متأكد من إخفاء هذا المنشور؟ لن يكون مرئياً للمستخدمين لكن يمكن استعادته لاحقاً."
+            },
+            "pinConfirm": {
+              "title": "تثبيت المنشور",
+              "description": "هل أنت متأكد من تثبيت هذا المنشور؟ سيظهر في أعلى المنتدى لجميع المستخدمين."
+            },
+            "unpinConfirm": {
+              "title": "إلغاء تثبيت المنشور",
+              "description": "هل أنت متأكد من إلغاء تثبيت هذا المنشور؟ لن يظهر في أعلى المنتدى بعد الآن."
             },
             "deleteConfirm": {
               "title": "حذف المنشور",
@@ -1889,6 +1923,7 @@
       "edit": "تعديل",
       "delete": "حذف",
       "cancel": "إلغاء",
+      "clearSelection": "مسح التحديد",
       "create": "إنشاء",
       "creating": "جاري الإنشاء...",
       "update": "تحديث",

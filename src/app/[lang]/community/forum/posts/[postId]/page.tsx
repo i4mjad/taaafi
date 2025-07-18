@@ -47,6 +47,7 @@ export default function PostDetailPage() {
   const [selectedComment, setSelectedComment] = useState<Comment | null>(null);
   const [showDeletePostDialog, setShowDeletePostDialog] = useState(false);
   const [showHidePostDialog, setShowHidePostDialog] = useState(false);
+  const [showPinPostDialog, setShowPinPostDialog] = useState(false);
   const [showDeleteCommentDialog, setShowDeleteCommentDialog] = useState(false);
   const [showHideCommentDialog, setShowHideCommentDialog] = useState(false);
 
@@ -224,6 +225,25 @@ export default function PostDetailPage() {
     }
   };
 
+  const handlePinPost = async () => {
+    if (!post) return;
+
+    try {
+      await updateDoc(doc(db, 'forumPosts', post.id), {
+        isPinned: !post.isPinned,
+        updatedAt: new Date(),
+      });
+      toast.success(post.isPinned ? 
+        t('modules.community.posts.unpinSuccess') : 
+        t('modules.community.posts.pinSuccess')
+      );
+      setShowPinPostDialog(false);
+    } catch (error) {
+      console.error('Error pinning post:', error);
+      toast.error(t('modules.community.posts.pinError'));
+    }
+  };
+
   // Handle comment actions
   const handleDeleteComment = async () => {
     if (!selectedComment) return;
@@ -328,6 +348,12 @@ export default function PostDetailPage() {
                         {t('modules.community.posts.detailPage.hidden')}
                       </Badge>
                     )}
+                    {post.isPinned && (
+                      <Badge variant="default" className="ml-2">
+                        <Pin className="h-3 w-3 mr-1" />
+                        {t('modules.community.posts.pinned')}
+                      </Badge>
+                    )}
                   </CardTitle>
                   <CardDescription className="mt-2">
                     <div className="flex items-center space-x-4 text-sm">
@@ -352,21 +378,21 @@ export default function PostDetailPage() {
               <Separator />
               
               <div className="flex items-center space-x-6 text-sm">
-                <div className="flex items-center space-x-1">
+                <div className="flex items-center space-x-1"> 
                   <ThumbsUp className="h-4 w-4 text-green-600" />
-                  <span>{post.likeCount} {t('modules.community.posts.likes')}</span>
+                  <span>{t('modules.community.posts.likes').replaceAll('{count}', post.likeCount.toString())}</span>
                 </div>
                 <div className="flex items-center space-x-1">
                   <ThumbsDown className="h-4 w-4 text-red-600" />
-                  <span>{post.dislikeCount} {t('modules.community.posts.dislikes')}</span>
+                  <span>{t('modules.community.posts.dislikes').replaceAll('{count}', post.dislikeCount.toString())}</span>
                 </div>
                 <div className="flex items-center space-x-1">
                   <MessageSquare className="h-4 w-4 text-blue-600" />
-                  <span>{comments.length} {t('modules.community.posts.comments')}</span>
+                  <span>{t('modules.community.posts.comments').replaceAll('{count}', comments.length.toString())}</span>
                 </div>
                 <div>
                   <Badge variant={post.score >= 0 ? 'default' : 'destructive'}>
-                    {t('modules.community.posts.score')}: {post.score}
+                    {t('modules.community.posts.score').replaceAll('{score}', post.score.toString())}
                   </Badge>
                 </div>
                 {postReports.length > 0 && (
@@ -390,7 +416,7 @@ export default function PostDetailPage() {
             <CardHeader>
               <CardTitle>{t('modules.community.posts.detailPage.commentsSection')}</CardTitle>
               <CardDescription>
-                {comments.length} {t('modules.community.comments.title')}
+                {t('modules.community.posts.commentCount').replaceAll('{count}', comments.length.toString())}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -426,14 +452,14 @@ export default function PostDetailPage() {
                             <div className="flex items-center space-x-3 text-xs text-muted-foreground">
                               <div className="flex items-center space-x-1">
                                 <ThumbsUp className="h-3 w-3 text-green-600" />
-                                <span>{comment.likeCount}</span>
+                                <span>{t('modules.community.posts.likes').replaceAll('{count}', comment.likeCount.toString())}</span>
                               </div>
                               <div className="flex items-center space-x-1">
                                 <ThumbsDown className="h-3 w-3 text-red-600" />
-                                <span>{comment.dislikeCount}</span>
+                                <span>{t('modules.community.posts.dislikes').replaceAll('{count}', comment.dislikeCount.toString())}</span>
                               </div>
                               <Badge variant={comment.score >= 0 ? 'outline' : 'destructive'} className="text-xs">
-                                {t('modules.community.posts.score')}: {comment.score}
+                                {t('modules.community.posts.score').replaceAll('{score}', comment.score.toString())}
                               </Badge>
                               {getCommentReportCount(comment.id) > 0 && (
                                 <Badge variant="destructive" className="text-xs">
@@ -512,9 +538,16 @@ export default function PostDetailPage() {
                   t('modules.community.posts.detailPage.actions.hidePost')
                 }
               </Button>
-              <Button variant="outline" className="w-full justify-start">
-                <Pin className="mr-2 h-4 w-4" />
-                {t('modules.community.posts.detailPage.actions.pinPost')}
+              <Button 
+                variant="outline" 
+                className="w-full justify-start"
+                onClick={() => setShowPinPostDialog(true)}
+              >
+                {post.isPinned ? <PinOff className="mr-2 h-4 w-4" /> : <Pin className="mr-2 h-4 w-4" />}
+                {post.isPinned ? 
+                  t('modules.community.posts.detailPage.actions.unpinPost') : 
+                  t('modules.community.posts.detailPage.actions.pinPost')
+                }
               </Button>
               <Button variant="outline" className="w-full justify-start">
                 <Lock className="mr-2 h-4 w-4" />
@@ -623,9 +656,7 @@ export default function PostDetailPage() {
                                    </span>
                                 </div>
                                 <p className="text-xs text-muted-foreground mt-1 truncate">
-                                  {t('modules.community.posts.detailPage.commentByAuthor', { 
-                                    author: relatedComment?.authorCPId || 'Unknown' 
-                                  })}
+                                  {t('modules.community.posts.detailPage.commentByAuthor').replaceAll('{author}', relatedComment?.authorCPId || 'Unknown')}
                                 </p>
                               </div>
                               <Button 
@@ -688,7 +719,7 @@ export default function PostDetailPage() {
                   ))}
                   {interactions.length > 10 && (
                     <p className="text-xs text-muted-foreground text-center pt-2">
-                      +{t('modules.community.posts.detailPage.moreInteractions', { count: interactions.length - 10 })}
+                      +{t('modules.community.posts.detailPage.moreInteractions').replaceAll('{count}', (interactions.length - 10).toString())}
                     </p>
                   )}
                 </div>
@@ -735,6 +766,37 @@ export default function PostDetailPage() {
               {post.isHidden ? 
                 t('modules.community.posts.detailPage.actions.unhidePost') : 
                 t('modules.community.posts.detailPage.actions.hidePost')
+              }
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Pin Post Dialog */}
+      <Dialog open={showPinPostDialog} onOpenChange={setShowPinPostDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              {post.isPinned ? 
+                t('modules.community.posts.detailPage.actions.unpinPost') : 
+                t('modules.community.posts.detailPage.actions.pinPost')
+              }
+            </DialogTitle>
+            <DialogDescription>
+              {post.isPinned ? 
+                t('modules.community.posts.detailPage.unpinConfirm.description') : 
+                t('modules.community.posts.detailPage.pinConfirm.description')
+              }
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowPinPostDialog(false)}>
+              {t('common.cancel')}
+            </Button>
+            <Button onClick={handlePinPost}>
+              {post.isPinned ? 
+                t('modules.community.posts.detailPage.actions.unpinPost') : 
+                t('modules.community.posts.detailPage.actions.pinPost')
               }
             </Button>
           </DialogFooter>

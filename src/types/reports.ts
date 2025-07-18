@@ -9,7 +9,12 @@ export interface UserReport {
   initialMessage: string;
   lastUpdated: Timestamp;
   messagesCount: number;
-  // Extended fields for linking reports to specific items
+  // New related content structure
+  relatedContent?: {
+    type: 'post' | 'comment';  // Type of the reported content (extensible for future types)
+    contentId: string;         // ID of the reported post or comment
+  };
+  // Legacy fields for backward compatibility
   targetId?: string;           // ID of the reported item (post, comment, etc.)
   targetType?: 'post' | 'comment' | 'user' | 'other';  // Type of the reported item
 }

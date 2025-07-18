@@ -82,6 +82,12 @@ export default function ReportDetailsPage() {
     initialMessage: reportSnapshot.data().initialMessage || reportSnapshot.data().userJustification || '',
     lastUpdated: reportSnapshot.data().lastUpdated || reportSnapshot.data().time || Timestamp.now(),
     messagesCount: reportSnapshot.data().messagesCount || 1,
+    // Support both new relatedContent structure and legacy targetId/targetType
+    relatedContent: reportSnapshot.data().relatedContent || {
+      type: reportSnapshot.data().targetType,
+      contentId: reportSnapshot.data().targetId
+    },
+    // Keep legacy fields for backward compatibility
     targetId: reportSnapshot.data().targetId,
     targetType: reportSnapshot.data().targetType,
   } : null;
@@ -105,15 +111,17 @@ export default function ReportDetailsPage() {
 
   // Fetch related post if the report is for a post
   const [relatedPostSnapshot] = useDocument(
-    report?.targetType === 'post' && report.targetId 
-      ? doc(db, 'forumPosts', report.targetId)
+    (report?.relatedContent?.type === 'post' && report.relatedContent.contentId) ||
+    (report?.targetType === 'post' && report.targetId)
+      ? doc(db, 'forumPosts', report.relatedContent?.contentId || report.targetId!)
       : null
   );
 
   // Fetch related comment if the report is for a comment
   const [relatedCommentSnapshot] = useDocument(
-    report?.targetType === 'comment' && report.targetId 
-      ? doc(db, 'comments', report.targetId)
+    (report?.relatedContent?.type === 'comment' && report.relatedContent.contentId) ||
+    (report?.targetType === 'comment' && report.targetId)
+      ? doc(db, 'comments', report.relatedContent?.contentId || report.targetId!)
       : null
   );
 
@@ -601,7 +609,7 @@ export default function ReportDetailsPage() {
 
                             <div>
                               <Label className="text-sm font-medium">
-                                {t('modules.community.posts.content') || 'Post Content'}
+                                {t('modules.community.posts.body') || 'Post Content'}
                               </Label>
                               <div className="mt-2 p-3 bg-muted rounded-md">
                                 <p className="text-sm whitespace-pre-wrap">{relatedPost.body}</p>
@@ -659,7 +667,7 @@ export default function ReportDetailsPage() {
 
                             <div>
                               <Label className="text-sm font-medium">
-                                {t('modules.community.comments.content') || 'Comment Content'}
+                                {t('modules.community.comments.body') || 'Comment Content'}
                               </Label>
                               <div className="mt-2 p-3 bg-muted rounded-md">
                                 <p className="text-sm whitespace-pre-wrap">{relatedComment.body}</p>
@@ -711,14 +719,18 @@ export default function ReportDetailsPage() {
                           </div>
                         )}
 
-                        {!relatedPost && !relatedComment && report.targetId && (
+                        {!relatedPost && !relatedComment && (report.relatedContent?.contentId || report.targetId) && (
                           <div className="text-center py-4">
                             <AlertCircle className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
                             <p className="text-sm text-muted-foreground">
                               {t('modules.userManagement.reports.reportDetails.relatedItemNotFound') || 'The reported item could not be found or may have been deleted.'}
                             </p>
                             <p className="text-xs text-muted-foreground mt-1">
-                              Target ID: {report.targetId} ({report.targetType})
+                              {report.relatedContent ? (
+                                <>Content ID: {report.relatedContent.contentId} ({report.relatedContent.type})</>
+                              ) : (
+                                <>Target ID: {report.targetId} ({report.targetType})</>
+                              )}
                             </p>
                           </div>
                         )}
