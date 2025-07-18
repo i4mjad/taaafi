@@ -53,6 +53,20 @@ final postsPaginationProvider =
   return PostsPaginationNotifier(repository);
 });
 
+// Pinned Posts Provider
+final pinnedPostsPaginationProvider =
+    StateNotifierProvider<PostsPaginationNotifier, PostsPaginationState>((ref) {
+  final repository = ref.watch(forumRepositoryProvider);
+  return PostsPaginationNotifier(repository);
+});
+
+// News Posts Provider
+final newsPostsPaginationProvider =
+    StateNotifierProvider<PostsPaginationNotifier, PostsPaginationState>((ref) {
+  final repository = ref.watch(forumRepositoryProvider);
+  return PostsPaginationNotifier(repository);
+});
+
 // Selected Category Provider for new post screen
 final selectedCategoryProvider = StateProvider<PostCategory?>((ref) {
   // Default to "general" category
@@ -384,7 +398,7 @@ class PostsPaginationNotifier extends StateNotifier<PostsPaginationState> {
       : super(PostsPaginationState.initial());
 
   /// Loads the first page of posts
-  Future<void> loadPosts({String? category}) async {
+  Future<void> loadPosts({String? category, bool? isPinned}) async {
     if (state.isLoading) return;
 
     state = state.copyWith(isLoading: true, error: null);
@@ -393,6 +407,7 @@ class PostsPaginationNotifier extends StateNotifier<PostsPaginationState> {
       final page = await _repository.getPosts(
         limit: 10,
         category: category,
+        isPinned: isPinned,
       );
 
       state = state.copyWith(
@@ -407,7 +422,7 @@ class PostsPaginationNotifier extends StateNotifier<PostsPaginationState> {
   }
 
   /// Loads more posts for pagination
-  Future<void> loadMorePosts({String? category}) async {
+  Future<void> loadMorePosts({String? category, bool? isPinned}) async {
     if (state.isLoading || !state.hasMore) return;
 
     state = state.copyWith(isLoading: true);
@@ -417,6 +432,7 @@ class PostsPaginationNotifier extends StateNotifier<PostsPaginationState> {
         limit: 10,
         lastDocument: state.lastDocument,
         category: category,
+        isPinned: isPinned,
       );
 
       state = state.copyWith(
@@ -431,14 +447,14 @@ class PostsPaginationNotifier extends StateNotifier<PostsPaginationState> {
   }
 
   /// Refreshes the posts list
-  Future<void> refresh({String? category}) async {
+  Future<void> refresh({String? category, bool? isPinned}) async {
     state = PostsPaginationState.initial();
-    await loadPosts(category: category);
+    await loadPosts(category: category, isPinned: isPinned);
   }
 
   /// Loads the next page of posts (new method name)
-  Future<void> loadNextPage({String? category}) async {
-    return loadMorePosts(category: category);
+  Future<void> loadNextPage({String? category, bool? isPinned}) async {
+    return loadMorePosts(category: category, isPinned: isPinned);
   }
 
   void reset() {

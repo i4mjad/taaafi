@@ -88,6 +88,58 @@ class UserReportsNotifier extends _$UserReportsNotifier {
     }
   }
 
+  /// Submit a new post report
+  Future<String> submitPostReport({
+    required String postId,
+    required String userMessage,
+  }) async {
+    state = const AsyncValue.loading();
+    try {
+      final result = await service.submitPostReport(
+        postId: postId,
+        userMessage: userMessage,
+      );
+
+      if (result.isSuccess) {
+        // Refresh the reports after submission
+        state = AsyncValue.data(await service.getUserReports());
+        return result.data!;
+      } else {
+        state = AsyncValue.error(result.errorKey!, StackTrace.current);
+        throw Exception(result.errorKey!);
+      }
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+      rethrow;
+    }
+  }
+
+  /// Submit a new comment report
+  Future<String> submitCommentReport({
+    required String commentId,
+    required String userMessage,
+  }) async {
+    state = const AsyncValue.loading();
+    try {
+      final result = await service.submitCommentReport(
+        commentId: commentId,
+        userMessage: userMessage,
+      );
+
+      if (result.isSuccess) {
+        // Refresh the reports after submission
+        state = AsyncValue.data(await service.getUserReports());
+        return result.data!;
+      } else {
+        state = AsyncValue.error(result.errorKey!, StackTrace.current);
+        throw Exception(result.errorKey!);
+      }
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+      rethrow;
+    }
+  }
+
   /// Add a message to an existing report
   Future<void> addMessageToReport({
     required String reportId,

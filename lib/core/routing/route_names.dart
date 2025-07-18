@@ -51,4 +51,5 @@ enum RouteNames {
   userProfile,
   banned,
   allPosts,
+  categoryPosts,
 }

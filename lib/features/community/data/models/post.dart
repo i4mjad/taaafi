@@ -6,6 +6,7 @@ class Post {
   final String title;
   final String body;
   final String category;
+  final bool isPinned;
   final int score;
   final int likeCount;
   final int dislikeCount;
@@ -18,6 +19,7 @@ class Post {
     required this.title,
     required this.body,
     required this.category,
+    this.isPinned = false,
     required this.score,
     required this.likeCount,
     required this.dislikeCount,
@@ -32,6 +34,7 @@ class Post {
         title: doc.data()!["title"],
         body: doc.data()!["body"],
         category: doc.data()!["category"],
+        isPinned: doc.data()!["isPinned"] ?? false,
         score: doc.data()!["score"] ?? 0,
         likeCount: doc.data()!["likeCount"] ?? 0,
         dislikeCount: doc.data()!["dislikeCount"] ?? 0,
@@ -45,6 +48,7 @@ class Post {
         'title': title,
         'body': body,
         'category': category,
+        'isPinned': isPinned,
         'score': score,
         'likeCount': likeCount,
         'dislikeCount': dislikeCount,
@@ -59,6 +63,7 @@ class Post {
         'title': title,
         'body': body,
         'category': category,
+        'isPinned': isPinned,
         'score': score,
         'likeCount': likeCount,
         'dislikeCount': dislikeCount,
@@ -73,6 +78,7 @@ class Post {
     String? title,
     String? body,
     String? category,
+    bool? isPinned,
     int? score,
     int? likeCount,
     int? dislikeCount,
@@ -85,6 +91,7 @@ class Post {
       title: title ?? this.title,
       body: body ?? this.body,
       category: category ?? this.category,
+      isPinned: isPinned ?? this.isPinned,
       score: score ?? this.score,
       likeCount: likeCount ?? this.likeCount,
       dislikeCount: dislikeCount ?? this.dislikeCount,

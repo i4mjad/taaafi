@@ -19,6 +19,7 @@ class UserReportsRepository {
   Future<String> createReport({
     required String reportTypeId,
     required String initialMessage,
+    Map<String, dynamic>? relatedContent,
   }) async {
     try {
       final uid = _getUserId();
@@ -33,6 +34,7 @@ class UserReportsRepository {
         'initialMessage': initialMessage,
         'lastUpdated': Timestamp.fromDate(now),
         'messagesCount': 1,
+        if (relatedContent != null) 'relatedContent': relatedContent,
       };
 
       final docRef =

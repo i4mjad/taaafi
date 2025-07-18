@@ -35,7 +35,6 @@ class ForumRepository {
     if (user == null) {
       throw Exception('User not authenticated');
     }
-    // TODO: Replace with actual community profile ID when implemented
     return user.uid;
   }
 
@@ -77,12 +76,17 @@ class ForumRepository {
     int limit = 10,
     DocumentSnapshot? lastDocument,
     String? category,
+    bool? isPinned,
   }) async {
     try {
       Query query = _posts.orderBy('createdAt', descending: true);
 
       if (category != null && category.isNotEmpty) {
         query = query.where('category', isEqualTo: category);
+      }
+
+      if (isPinned != null) {
+        query = query.where('isPinned', isEqualTo: isPinned);
       }
 
       if (lastDocument != null) {
@@ -112,11 +116,16 @@ class ForumRepository {
   Stream<List<Post>> watchPosts({
     int limit = 10,
     String? category,
+    bool? isPinned,
   }) {
     Query query = _posts.orderBy('createdAt', descending: true);
 
     if (category != null && category.isNotEmpty) {
       query = query.where('category', isEqualTo: category);
+    }
+
+    if (isPinned != null) {
+      query = query.where('isPinned', isEqualTo: isPinned);
     }
 
     return query.limit(limit).snapshots().map((snapshot) {

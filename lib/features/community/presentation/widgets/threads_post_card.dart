@@ -8,6 +8,7 @@ import 'package:reboot_app_3/features/community/data/models/post.dart';
 import 'package:reboot_app_3/features/community/presentation/widgets/avatar_with_anonymity.dart';
 import 'package:reboot_app_3/features/community/presentation/providers/community_providers_new.dart';
 import 'package:reboot_app_3/features/community/presentation/providers/forum_providers.dart';
+import 'package:reboot_app_3/features/community/presentation/widgets/report_content_modal.dart';
 
 class ThreadsPostCard extends ConsumerWidget {
   final Post post;
@@ -391,10 +392,13 @@ class ThreadsPostCard extends ConsumerWidget {
       context: context,
       backgroundColor: Colors.transparent,
       builder: (context) => Container(
-        margin: const EdgeInsets.all(16),
+        // margin: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: theme.backgroundColor,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(16),
+            topRight: Radius.circular(16),
+          ),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -519,37 +523,18 @@ class ThreadsPostCard extends ConsumerWidget {
   }
 
   void _reportPost(BuildContext context, WidgetRef ref) {
-    final theme = AppTheme.of(context);
-    final localizations = AppLocalizations.of(context);
-
-    // Show confirmation dialog
-    showDialog(
+    showModalBottomSheet(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text(localizations.translate('report_post')),
-        content: Text(localizations.translate('confirm_report_post')),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text(localizations.translate('cancel')),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              // TODO: Implement actual reporting logic
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(localizations.translate('post_reported')),
-                  backgroundColor: theme.success[500],
-                ),
-              );
-            },
-            child: Text(
-              localizations.translate('report'),
-              style: TextStyle(color: theme.error[600]),
-            ),
-          ),
-        ],
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Padding(
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom,
+        ),
+        child: ReportContentModal(
+          contentType: ReportContentType.post,
+          post: post,
+        ),
       ),
     );
   }

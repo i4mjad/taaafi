@@ -273,6 +273,11 @@ const Map<String, String> kEn = {
       "Are you sure you want to delete this post? This action cannot be undone.",
   "post_reported": "Post reported successfully",
   "post_deleted": "Post deleted successfully",
+  "delete_comment": "Delete Comment",
+  "permanently_delete_comment": "Permanently delete this comment",
+  "confirm_delete_comment":
+      "Are you sure you want to delete this comment? This action cannot be undone.",
+  "comment_deleted": "Comment deleted successfully",
   "no_categories_found": "No categories available",
   "pinned_section_description":
       "Important announcements and featured content that stays at the top for easy access.",
@@ -280,6 +285,25 @@ const Map<String, String> kEn = {
       "Latest community discussions, questions, and shared experiences from members.",
   "challenges_section_description":
       "Join organized challenges and activities designed to support your recovery journey and build healthy habits together.",
+  "challenges_coming_soon_title": "Challenges Coming Soon!",
+  "challenges_coming_soon_description":
+      "We're working on exciting challenges to help boost your recovery journey with daily goals and community support.",
+  "challenges_feature_daily_goals": "Daily Goals",
+  "challenges_feature_daily_goals_desc":
+      "Set and track daily recovery milestones",
+  "challenges_feature_community": "Community Support",
+  "challenges_feature_community_desc":
+      "Connect with others on similar journeys",
+  "challenges_feature_rewards": "Achievements & Rewards",
+  "challenges_feature_rewards_desc": "Earn badges and celebrate your progress",
+  "challenges_working_hard_message":
+      "We're working hard to bring you this feature soon!",
+  "no_pinned_posts_title": "No Pinned Posts",
+  "no_pinned_posts_message":
+      "Important announcements and featured content will appear here when available.",
+  "no_news_posts_title": "No News Posts",
+  "no_news_posts_message":
+      "Latest updates and community announcements will be posted here when available.",
   "news_section_description":
       "Stay updated with the latest announcements, updates, and important information from the community.",
   "categories_section_description":
@@ -287,6 +311,26 @@ const Map<String, String> kEn = {
   "block_user": "Block user",
   "reply_to_comment": "Reply to comment",
   "report_comment": "Report comment",
+  "report_content": "Report {type}",
+  "report_responsibility_warning":
+      "Please report content responsibly. False reports may result in warnings or account restrictions. Only report content that violates community guidelines.",
+  "report_content_being_reported": "Content being reported:",
+  "report_justification_label": "Why are you reporting this content?",
+  "report_justification_placeholder":
+      "Please explain why you believe this content violates our community guidelines...",
+  "report_justification_required": "Please provide a reason for reporting",
+  "report_justification_too_long":
+      "Report reason is too long (max 500 characters)",
+  "submit_report": "Submit Report",
+  "post": "post",
+  "comment": "comment",
+  "report_content_type": "Content Type",
+  "report_content_id": "Content ID",
+  "report_content_preview": "Content Preview",
+  "report_justification": "Report Justification",
+  "character_count": "{current}/{max} characters",
+  "report_post_submitted": "Post report submitted successfully",
+  "report_comment_submitted": "Comment report submitted successfully",
   "send": "Send",
   "community-anonymous": "Anonymous",
   "community-posts": "Posts",
@@ -973,7 +1017,7 @@ const Map<String, String> kEn = {
   "max-active-reports-reached":
       "You already have 2 active reports of this type. Please wait for them to be resolved before submitting a new one.",
   "message-cannot-be-empty": "Message cannot be empty",
-  "message-exceeds-character-limit": "Message exceeds 220 characters",
+  "message-exceeds-character-limit": "Message exceeds character limit",
   "recovery-follow-up": "Recovery Follow-up",
   "recovery-follow-up-question":
       "When do you want to start tracking your recovery? We will start counting from the date you choose",
@@ -1019,7 +1063,6 @@ const Map<String, String> kEn = {
   "member-since": "Member Since",
   "account-status": "Account Status",
   "no-warnings": "No Warnings",
-  "post": "Post",
   "warnings-description":
       "Your account has no warnings. Keep following our community guidelines to maintain a clean record.",
   "account-in-good-standing": "Account in Good Standing",
@@ -1181,8 +1224,15 @@ const Map<String, String> kEn = {
   'community_news': 'News',
   'community_pinned': 'Pinned',
   'community_categories': 'Categories',
+  'community_all': 'All Categories',
+  'community_general': 'General',
+  'community_questions': 'Questions',
+  'community_tips': 'Tips & Advice',
+  'community_support': 'Support',
   'error_loading_posts': 'Error loading posts',
   'no_posts_found': 'No posts found',
+  'no_posts_in_category': 'No posts found in this category',
+  'category_posts_subtitle': 'Browse posts in this category',
   'retry': 'Retry',
 
   // Posts list and search

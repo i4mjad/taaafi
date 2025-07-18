@@ -94,6 +94,7 @@ class _CustomTextAreaState extends State<CustomTextArea> {
               hintText: widget.hint,
               hintStyle: TextStyles.footnote.copyWith(
                 color: theme.grey[500],
+                height: 1.3,
               ),
               prefixIcon: Padding(
                 padding: EdgeInsets.only(top: 8, left: 16, right: 8),

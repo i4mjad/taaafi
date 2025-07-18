@@ -11,15 +11,22 @@ import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/features/community/presentation/widgets/threads_post_card.dart';
 import 'package:reboot_app_3/features/community/presentation/providers/forum_providers.dart';
 import 'package:reboot_app_3/features/community/presentation/widgets/advanced_search_modal.dart';
+import 'package:reboot_app_3/features/community/data/models/post_category.dart';
 
-class PostsListScreen extends ConsumerStatefulWidget {
-  const PostsListScreen({super.key});
+class CategoryPostsScreen extends ConsumerStatefulWidget {
+  final PostCategory category;
+
+  const CategoryPostsScreen({
+    super.key,
+    required this.category,
+  });
 
   @override
-  ConsumerState<PostsListScreen> createState() => _PostsListScreenState();
+  ConsumerState<CategoryPostsScreen> createState() =>
+      _CategoryPostsScreenState();
 }
 
-class _PostsListScreenState extends ConsumerState<PostsListScreen> {
+class _CategoryPostsScreenState extends ConsumerState<CategoryPostsScreen> {
   final ScrollController _scrollController = ScrollController();
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
@@ -30,9 +37,11 @@ class _PostsListScreenState extends ConsumerState<PostsListScreen> {
     super.initState();
     _scrollController.addListener(_onScroll);
     _searchController.addListener(_onSearchChanged);
-    // Load posts when screen initializes
+    // Load posts for this category when screen initializes
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(postsPaginationProvider.notifier).loadPosts();
+      ref
+          .read(postsPaginationProvider.notifier)
+          .loadPosts(category: widget.category.id);
     });
   }
 
@@ -49,7 +58,9 @@ class _PostsListScreenState extends ConsumerState<PostsListScreen> {
 
     // Load more posts when near the bottom
     if (scrollPosition >= _scrollController.position.maxScrollExtent - 200) {
-      ref.read(postsPaginationProvider.notifier).loadMorePosts();
+      ref
+          .read(postsPaginationProvider.notifier)
+          .loadMorePosts(category: widget.category.id);
     }
   }
 
@@ -62,7 +73,7 @@ class _PostsListScreenState extends ConsumerState<PostsListScreen> {
   }
 
   void _performSearch() {
-    // TODO: Implement search logic
+    // TODO: Implement search logic with category filter
     setState(() {
       _searchQuery = _searchController.text;
     });
@@ -95,8 +106,30 @@ class _PostsListScreenState extends ConsumerState<PostsListScreen> {
       _searchQuery = '';
       _activeFilters = null;
     });
-    // TODO: Refresh posts without filters
-    ref.read(postsPaginationProvider.notifier).refresh();
+    // Refresh posts for this category without filters
+    ref
+        .read(postsPaginationProvider.notifier)
+        .refresh(category: widget.category.id);
+  }
+
+  String _getCategoryDisplayName() {
+    final localizations = AppLocalizations.of(context);
+    try {
+      // Check if locale is Arabic and use nameAr, otherwise use name
+      final isArabic = localizations.locale.languageCode == 'ar';
+
+      if (isArabic && widget.category.nameAr.isNotEmpty) {
+        return widget.category.nameAr;
+      } else if (widget.category.name.isNotEmpty) {
+        return widget.category.name;
+      } else {
+        // Fallback to ID if both names are empty
+        return widget.category.id;
+      }
+    } catch (e) {
+      // Ultimate fallback - return category ID
+      return widget.category.id.isNotEmpty ? widget.category.id : 'Unknown';
+    }
   }
 
   @override
@@ -105,16 +138,61 @@ class _PostsListScreenState extends ConsumerState<PostsListScreen> {
     final localizations = AppLocalizations.of(context);
 
     return Scaffold(
-      appBar: appBar(
+      appBar: plainAppBar(
         context,
         ref,
-        "community_posts",
+        _getCategoryDisplayName(),
         false,
         true,
       ),
       backgroundColor: theme.backgroundColor,
       body: Column(
         children: [
+          // Category Info Header
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: widget.category.color.withValues(alpha: 0.1),
+              border: Border(
+                bottom: BorderSide(
+                  color: theme.grey[200]!,
+                  width: 1,
+                ),
+              ),
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  widget.category.icon,
+                  color: widget.category.color,
+                  size: 24,
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        _getCategoryDisplayName(),
+                        style: TextStyles.h6.copyWith(
+                          color: widget.category.color,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text(
+                        localizations.translate('category_posts_subtitle'),
+                        style: TextStyles.caption.copyWith(
+                          color: theme.grey[600],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+
           // Search and Filter Section
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -135,7 +213,6 @@ class _PostsListScreenState extends ConsumerState<PostsListScreen> {
                     Expanded(
                       child: CustomTextField(
                         controller: _searchController,
-
                         prefixIcon: LucideIcons.search,
                         inputType: TextInputType.text,
                         validator: (value) =>
@@ -183,17 +260,6 @@ class _PostsListScreenState extends ConsumerState<PostsListScreen> {
                                     });
                                   },
                                 ),
-                              if (_activeFilters?['category']?.isNotEmpty ==
-                                  true)
-                                _buildFilterChip(
-                                  label:
-                                      '${localizations.translate('category')}: ${_activeFilters!['category']}',
-                                  onRemove: () {
-                                    setState(() {
-                                      _activeFilters!['category'] = '';
-                                    });
-                                  },
-                                ),
                               if (_activeFilters?['author']?.isNotEmpty == true)
                                 _buildFilterChip(
                                   label:
@@ -210,14 +276,6 @@ class _PostsListScreenState extends ConsumerState<PostsListScreen> {
                       )
                     else
                       const SizedBox.shrink(),
-                    // Expanded(
-                    //   child: Text(
-                    //     localizations.translate('search_in_posts'),
-                    //     style: TextStyles.caption.copyWith(
-                    //       color: theme.grey[600],
-                    //     ),
-                    //   ),
-                    // ),
 
                     // Clear All Filters
                     if (_activeFilters != null || _searchQuery.isNotEmpty)
@@ -313,7 +371,9 @@ class _PostsListScreenState extends ConsumerState<PostsListScreen> {
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: () {
-                ref.read(postsPaginationProvider.notifier).refresh();
+                ref
+                    .read(postsPaginationProvider.notifier)
+                    .refresh(category: widget.category.id);
               },
               child: Text(localizations.translate('retry')),
             ),
@@ -336,7 +396,7 @@ class _PostsListScreenState extends ConsumerState<PostsListScreen> {
             Text(
               _searchQuery.isNotEmpty || _activeFilters != null
                   ? localizations.translate('no_results_found')
-                  : localizations.translate('no_posts_found'),
+                  : localizations.translate('no_posts_in_category'),
               style: TextStyles.body.copyWith(
                 color: theme.grey[600],
               ),
@@ -356,7 +416,9 @@ class _PostsListScreenState extends ConsumerState<PostsListScreen> {
 
     return RefreshIndicator(
       onRefresh: () async {
-        await ref.read(postsPaginationProvider.notifier).refresh();
+        await ref
+            .read(postsPaginationProvider.notifier)
+            .refresh(category: widget.category.id);
       },
       child: ListView.builder(
         controller: _scrollController,

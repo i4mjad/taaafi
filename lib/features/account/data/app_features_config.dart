@@ -9,13 +9,15 @@ class AppFeaturesConfig {
 
   // Feature unique names - these are used to link features to functionality
   static const String contactAdmin = 'contact_admin';
+  static const String postCreation = 'post_creation';
 
   //TODO: introduce this later through admin control §portal
-  // static const String directMessaging = 'direct_messaging';
-  // static const String postCreation = 'post_creation';
   // static const String commentCreation = 'comment_creation';
-  // static const String groupCreation = 'group_creation';
   // static const String reportSubmission = 'report_submission';
+  // static const String communityInteraction = 'community_interaction';
+
+  // static const String directMessaging = 'direct_messaging';
+  // static const String groupCreation = 'group_creation';
   // static const String feedbackSubmission = 'feedback_submission';
   // static const String profileUpdate = 'profile_update';
   // static const String dataExport = 'data_export';

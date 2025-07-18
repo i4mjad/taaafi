@@ -14,6 +14,8 @@ import 'package:reboot_app_3/features/account/presentation/banned_screen.dart';
 import 'package:reboot_app_3/features/account/presentation/delete_account_screen.dart';
 import 'package:reboot_app_3/features/account/presentation/user_profile_screen.dart';
 import 'package:reboot_app_3/features/community/presentation/posts_list_screen.dart';
+import 'package:reboot_app_3/features/community/presentation/category_posts_screen.dart';
+import 'package:reboot_app_3/features/community/data/models/post_category.dart';
 import 'package:reboot_app_3/features/home/presentation/reports/user_reports_screen.dart';
 import 'package:reboot_app_3/features/home/presentation/reports/report_conversation_screen.dart';
 import 'package:reboot_app_3/features/notifications/presentation/notifications_screen.dart';
@@ -31,9 +33,7 @@ import 'package:reboot_app_3/features/community/presentation/groups_onboarding_s
 import 'package:reboot_app_3/features/community/presentation/community_main_screen.dart';
 import 'package:reboot_app_3/features/community/presentation/forum/forum_home_screen.dart';
 import 'package:reboot_app_3/features/community/presentation/groups/group_list_screen.dart';
-import 'package:reboot_app_3/features/community/presentation/groups/groups_main_screen.dart';
 import 'package:reboot_app_3/features/community/presentation/groups/groups_coming_soon_screen.dart';
-import 'package:reboot_app_3/features/community/presentation/groups/groups_coming_soon_preferences.dart';
 import 'package:reboot_app_3/features/community/presentation/forum/post_detail_screen.dart';
 import 'package:reboot_app_3/features/community/presentation/forum/new_post_screen.dart';
 import 'package:reboot_app_3/features/community/presentation/forum/reply_composer_screen.dart';
@@ -474,6 +474,39 @@ GoRouter goRouter(Ref<GoRouter> ref) {
                       name: RouteNames.allPosts.name,
                       child: PostsListScreen(),
                     ),
+                  ),
+                  GoRoute(
+                    path:
+                        'category/:categoryId/:categoryName/:categoryNameAr/:categoryIcon/:categoryColor',
+                    name: RouteNames.categoryPosts.name,
+                    pageBuilder: (context, state) {
+                      // Parse the category from the path parameters
+                      final categoryId = state.pathParameters['categoryId']!;
+                      final categoryName = Uri.decodeComponent(
+                          state.pathParameters['categoryName']!);
+                      final categoryNameAr = Uri.decodeComponent(
+                          state.pathParameters['categoryNameAr']!);
+                      final categoryIcon =
+                          state.pathParameters['categoryIcon']!;
+                      final categoryColor =
+                          state.pathParameters['categoryColor']!;
+
+                      // Create PostCategory object
+                      final category = PostCategory(
+                        id: categoryId,
+                        name: categoryName,
+                        nameAr: categoryNameAr,
+                        iconName: categoryIcon,
+                        colorHex: categoryColor,
+                        isActive: true,
+                        sortOrder: 0, // Default sort order
+                      );
+
+                      return MaterialPage<void>(
+                        name: RouteNames.categoryPosts.name,
+                        child: CategoryPostsScreen(category: category),
+                      );
+                    },
                   ),
                   GoRoute(
                     path: 'forum',

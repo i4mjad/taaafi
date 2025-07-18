@@ -31,9 +31,20 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen> {
     super.initState();
     // Load posts when screen initializes
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref
-          .read(postsPaginationProvider.notifier)
-          .loadPosts(category: _getFilterCategory());
+      // Load different types of posts based on initial filter
+      if (_selectedFilter == 'pinned') {
+        ref
+            .read(pinnedPostsPaginationProvider.notifier)
+            .loadPosts(isPinned: true);
+      } else if (_selectedFilter == 'news') {
+        ref
+            .read(newsPostsPaginationProvider.notifier)
+            .loadPosts(category: 'news');
+      } else {
+        ref
+            .read(postsPaginationProvider.notifier)
+            .loadPosts(category: _getFilterCategory());
+      }
     });
   }
 
@@ -222,7 +233,7 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen> {
   Widget _buildPinnedView() {
     final theme = AppTheme.of(context);
     final localizations = AppLocalizations.of(context);
-    final postsState = ref.watch(postsPaginationProvider);
+    final postsState = ref.watch(pinnedPostsPaginationProvider);
 
     return Column(
       children: [
@@ -237,7 +248,7 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen> {
             ),
           ),
         ),
-        _buildPostsContent(postsState, localizations, theme),
+        _buildPinnedPostsContent(postsState, localizations, theme),
       ],
     );
   }
@@ -307,30 +318,95 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen> {
             ),
           ),
 
-          const SizedBox(height: 16),
+          const SizedBox(height: 32),
 
-          // Challenge Cards
-          SizedBox(
-            height: 140,
-            child: ListView(
-              scrollDirection: Axis.horizontal,
+          // Coming Soon Section
+          Container(
+            width: double.infinity,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                _buildChallengeHighlightCard(
-                  title: '30-Day Recovery Challenge',
-                  participants: 1847,
-                  onTap: () => context.push('/community/challenges'),
+                // Challenge Icon
+                Icon(
+                  LucideIcons.target,
+                  size: 60,
+                  color: theme.grey[600],
                 ),
-                const SizedBox(width: 12),
-                _buildChallengeHighlightCard(
-                  title: '7-Day Mindfulness Journey',
-                  participants: 432,
-                  onTap: () => context.push('/community/challenges'),
+                const SizedBox(height: 24),
+
+                // Title
+                Text(
+                  localizations.translate('challenges_coming_soon_title'),
+                  style: TextStyles.h4.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: theme.grey[900],
+                  ),
+                  textAlign: TextAlign.center,
                 ),
-                const SizedBox(width: 12),
-                _buildChallengeHighlightCard(
-                  title: 'Weekly Motivation Challenge',
-                  participants: 891,
-                  onTap: () => context.push('/community/challenges'),
+                const SizedBox(height: 12),
+
+                // Description
+                Text(
+                  localizations.translate('challenges_coming_soon_description'),
+                  style: TextStyles.body.copyWith(
+                    color: theme.grey[600],
+                    height: 1.5,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 24),
+
+                // Features List
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: theme.grey[50],
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: theme.grey[200]!),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildChallengeFeatureItem(
+                        icon: LucideIcons.calendar,
+                        title: localizations
+                            .translate('challenges_feature_daily_goals'),
+                        description: localizations
+                            .translate('challenges_feature_daily_goals_desc'),
+                        theme: theme,
+                      ),
+                      const SizedBox(height: 12),
+                      _buildChallengeFeatureItem(
+                        icon: LucideIcons.users,
+                        title: localizations
+                            .translate('challenges_feature_community'),
+                        description: localizations
+                            .translate('challenges_feature_community_desc'),
+                        theme: theme,
+                      ),
+                      const SizedBox(height: 12),
+                      _buildChallengeFeatureItem(
+                        icon: LucideIcons.trophy,
+                        title: localizations
+                            .translate('challenges_feature_rewards'),
+                        description: localizations
+                            .translate('challenges_feature_rewards_desc'),
+                        theme: theme,
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 20),
+
+                // Footer note
+                Text(
+                  localizations.translate('challenges_working_hard_message'),
+                  style: TextStyles.caption.copyWith(
+                    color: theme.grey[500],
+                  ),
+                  textAlign: TextAlign.center,
                 ),
               ],
             ),
@@ -340,86 +416,58 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen> {
     );
   }
 
-  Widget _buildChallengeHighlightCard({
+  Widget _buildChallengeFeatureItem({
+    required IconData icon,
     required String title,
-    required int participants,
-    required VoidCallback onTap,
+    required String description,
+    required dynamic theme,
   }) {
-    final theme = AppTheme.of(context);
-    final localizations = AppLocalizations.of(context);
-
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: 200,
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: theme.grey[50],
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: theme.grey[200]!),
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          padding: const EdgeInsets.all(6),
+          decoration: BoxDecoration(
+            color: theme.error[100],
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Icon(
+            icon,
+            size: 18,
+            color: theme.error[600],
+          ),
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              title,
-              style: TextStyles.body.copyWith(
-                color: theme.grey[900],
-                fontWeight: FontWeight.w600,
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: TextStyles.caption.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: theme.grey[900],
+                ),
               ),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-            ),
-            const Spacer(),
-            Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: theme.primary[100],
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Icon(
-                    LucideIcons.users,
-                    color: theme.primary[600],
-                    size: 16,
-                  ),
+              const SizedBox(height: 2),
+              Text(
+                description,
+                style: TextStyles.tiny.copyWith(
+                  color: theme.grey[600],
+                  height: 1.3,
                 ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        participants >= 1000
-                            ? '${(participants / 1000).toStringAsFixed(1)}k'
-                            : participants.toString(),
-                        style: TextStyles.caption.copyWith(
-                          color: theme.grey[900],
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      Text(
-                        localizations.translate('participants'),
-                        style: TextStyles.tiny.copyWith(
-                          color: theme.grey[600],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ],
+              ),
+            ],
+          ),
         ),
-      ),
+      ],
     );
   }
 
   Widget _buildNewsView() {
     final theme = AppTheme.of(context);
     final localizations = AppLocalizations.of(context);
-    final postsState = ref.watch(postsPaginationProvider);
+    final postsState = ref.watch(newsPostsPaginationProvider);
 
     return Column(
       children: [
@@ -434,7 +482,7 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen> {
             ),
           ),
         ),
-        _buildPostsContent(postsState, localizations, theme),
+        _buildNewsPostsContent(postsState, localizations, theme),
       ],
     );
   }
@@ -530,19 +578,29 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen> {
     final theme = AppTheme.of(context);
 
     // Safe fallbacks for potentially null values
-    final categoryColor = category.color ?? theme.grey[500]!;
-    final categoryIcon = category.icon ?? LucideIcons.hash;
+    final categoryColor = category.color;
+    final categoryIcon = category.icon;
     final displayName = _getSafeCategoryName(category, localizations);
 
     return GestureDetector(
       onTap: () {
-        // Handle category tap - navigate to posts with this category
-        setState(() {
-          _selectedFilter = 'posts';
-        });
-        ref
-            .read(postsPaginationProvider.notifier)
-            .refresh(category: category.id);
+        // Navigate to category posts screen
+        final categoryId = Uri.encodeComponent(category.id);
+        final categoryName = Uri.encodeComponent(category.name);
+        final categoryNameAr = Uri.encodeComponent(category.nameAr);
+        final categoryIcon = Uri.encodeComponent(category.iconName);
+        final categoryColor = Uri.encodeComponent(category.colorHex);
+
+        context.pushNamed(
+          RouteNames.categoryPosts.name,
+          pathParameters: {
+            'categoryId': categoryId,
+            'categoryName': categoryName,
+            'categoryNameAr': categoryNameAr,
+            'categoryIcon': categoryIcon,
+            'categoryColor': categoryColor,
+          },
+        );
       },
       child: WidgetsContainer(
         backgroundColor: categoryColor.withValues(alpha: 0.1),
@@ -655,6 +713,184 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen> {
     );
   }
 
+  Widget _buildPinnedPostsContent(
+      dynamic postsState, AppLocalizations localizations, theme) {
+    if (postsState.posts.isEmpty && postsState.isLoading) {
+      return const Center(
+        child: CircularProgressIndicator(),
+      );
+    }
+
+    if (postsState.posts.isEmpty && postsState.error != null) {
+      print('❌ Error loading pinned posts: ${postsState.error}');
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              localizations.translate('error_loading_posts'),
+              style: TextStyles.body.copyWith(
+                color: theme.error[500],
+              ),
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () {
+                ref
+                    .read(pinnedPostsPaginationProvider.notifier)
+                    .refresh(isPinned: true);
+              },
+              child: Text(localizations.translate('retry')),
+            ),
+          ],
+        ),
+      );
+    }
+
+    if (postsState.posts.isEmpty) {
+      return Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(vertical: 80, horizontal: 32),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Icon(
+              LucideIcons.pin,
+              size: 64,
+              color: theme.grey[400],
+            ),
+            const SizedBox(height: 24),
+            Text(
+              localizations.translate('no_pinned_posts_title'),
+              style: TextStyles.h5.copyWith(
+                color: theme.grey[700],
+                fontWeight: FontWeight.w600,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 12),
+            Text(
+              localizations.translate('no_pinned_posts_message'),
+              style: TextStyles.caption.copyWith(
+                color: theme.grey[600],
+                height: 1.4,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      );
+    }
+
+    // Show only first 5 posts as preview
+    final previewPosts = postsState.posts.take(5).toList();
+
+    return ListView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: previewPosts.length,
+      itemBuilder: (context, index) {
+        final post = previewPosts[index];
+        return ThreadsPostCard(
+          post: post,
+          onTap: () {
+            context.push('/community/forum/post/${post.id}');
+          },
+        );
+      },
+    );
+  }
+
+  Widget _buildNewsPostsContent(
+      dynamic postsState, AppLocalizations localizations, theme) {
+    if (postsState.posts.isEmpty && postsState.isLoading) {
+      return const Center(
+        child: CircularProgressIndicator(),
+      );
+    }
+
+    if (postsState.posts.isEmpty && postsState.error != null) {
+      print('❌ Error loading news posts: ${postsState.error}');
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              localizations.translate('error_loading_posts'),
+              style: TextStyles.body.copyWith(
+                color: theme.error[500],
+              ),
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () {
+                ref
+                    .read(newsPostsPaginationProvider.notifier)
+                    .refresh(category: 'news');
+              },
+              child: Text(localizations.translate('retry')),
+            ),
+          ],
+        ),
+      );
+    }
+
+    if (postsState.posts.isEmpty) {
+      return Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(vertical: 80, horizontal: 32),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Icon(
+              LucideIcons.newspaper,
+              size: 64,
+              color: theme.grey[400],
+            ),
+            const SizedBox(height: 24),
+            Text(
+              localizations.translate('no_news_posts_title'),
+              style: TextStyles.h5.copyWith(
+                color: theme.grey[700],
+                fontWeight: FontWeight.w600,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 12),
+            Text(
+              localizations.translate('no_news_posts_message'),
+              style: TextStyles.caption.copyWith(
+                color: theme.grey[600],
+                height: 1.4,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      );
+    }
+
+    // Show only first 5 posts as preview
+    final previewPosts = postsState.posts.take(5).toList();
+
+    return ListView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: previewPosts.length,
+      itemBuilder: (context, index) {
+        final post = previewPosts[index];
+        return ThreadsPostCard(
+          post: post,
+          onTap: () {
+            context.push('/community/forum/post/${post.id}');
+          },
+        );
+      },
+    );
+  }
+
   Widget _buildFilterChip(
       String label, String filterValue, IconData icon, Color color) {
     final theme = AppTheme.of(context);
@@ -665,11 +901,26 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen> {
         setState(() {
           _selectedFilter = filterValue;
         });
-        // Refresh posts with new filter only if not categories
-        if (filterValue != 'categories') {
-          ref
-              .read(postsPaginationProvider.notifier)
-              .refresh(category: _getFilterCategory());
+
+        // Load appropriate data based on filter
+        switch (filterValue) {
+          case 'pinned':
+            ref
+                .read(pinnedPostsPaginationProvider.notifier)
+                .refresh(isPinned: true);
+            break;
+          case 'news':
+            ref
+                .read(newsPostsPaginationProvider.notifier)
+                .refresh(category: 'news');
+            break;
+          case 'posts':
+            ref.read(postsPaginationProvider.notifier).refresh();
+            break;
+          case 'challenges':
+          case 'categories':
+            // No additional loading needed for these tabs
+            break;
         }
       },
       child: WidgetsContainer(

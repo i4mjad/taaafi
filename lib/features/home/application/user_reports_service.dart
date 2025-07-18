@@ -20,6 +20,8 @@ class ReportTypes {
   static const String dataError = 'AVgC6BG76LJqDaalZFvV';
   static const String communityFeedback = 'C5zGTSYYbS4fVOaoDaTJ';
   static const String contactUs = 'RzznaQlqM7sCUTCO4Zmw';
+  static const String postReport = 'WV2Lpe4V9ajwf0NmsAwN';
+  static const String commentReport = 'n8LCt8NsTfCcYh0mN0e6';
 }
 
 /// Service for handling user reports business logic
@@ -71,16 +73,51 @@ class UserReportsService {
     );
   }
 
+  /// Submit a new post report
+  Future<ReportResult<String>> submitPostReport({
+    required String postId,
+    required String userMessage,
+  }) async {
+    final relatedContent = {
+      'type': 'post',
+      'contentId': postId,
+    };
+
+    return await _submitReport(
+      reportTypeId: ReportTypes.postReport,
+      userMessage: userMessage,
+      relatedContent: relatedContent,
+    );
+  }
+
+  /// Submit a new comment report
+  Future<ReportResult<String>> submitCommentReport({
+    required String commentId,
+    required String userMessage,
+  }) async {
+    final relatedContent = {
+      'type': 'comment',
+      'contentId': commentId,
+    };
+
+    return await _submitReport(
+      reportTypeId: ReportTypes.commentReport,
+      userMessage: userMessage,
+      relatedContent: relatedContent,
+    );
+  }
+
   /// Generic method to submit a report with validation
   Future<ReportResult<String>> _submitReport({
     required String reportTypeId,
     required String userMessage,
+    Map<String, dynamic>? relatedContent,
   }) async {
     if (userMessage.trim().isEmpty) {
       return const ReportResult.error('message-cannot-be-empty');
     }
 
-    if (userMessage.length > 220) {
+    if (userMessage.length > 1500) {
       return const ReportResult.error('message-exceeds-character-limit');
     }
 
@@ -94,6 +131,7 @@ class UserReportsService {
       final reportId = await _repository.createReport(
         reportTypeId: reportTypeId,
         initialMessage: userMessage,
+        relatedContent: relatedContent,
       );
       return ReportResult.success(reportId);
     } catch (e) {
