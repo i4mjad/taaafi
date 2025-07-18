@@ -965,7 +965,15 @@
             "pleaseSelectDifferentStatus": "Please select a different status",
             "unknownType": "Unknown Type",
             "userDataNotAvailable": "User data not available",
-            "requestedReportNotFound": "The requested report could not be found."
+            "requestedReportNotFound": "The requested report could not be found.",
+            "reportedPost": "Reported Post",
+            "reportedComment": "Reported Comment",
+            "postReportedDescription": "The forum post that was reported",
+            "commentReportedDescription": "The comment that was reported",
+            "parentPost": "Parent Post",
+            "viewPost": "View Post",
+            "viewParentPost": "View Parent Post",
+            "relatedItemNotFound": "The reported item could not be found or may have been deleted."
           },
           "messageNotifications": {
             "title": "New Message from Admin",
@@ -1499,6 +1507,98 @@
             "bodyRequired": "Content is required",
             "categoryRequired": "Category is required",
             "authorRequired": "Author is required"
+          },
+          "postNotFound": "Post not found",
+          "hideSuccess": "Post hidden successfully",
+          "unhideSuccess": "Post unhidden successfully",
+          "hideError": "Failed to hide post",
+          "reports": "Reports",
+          "pendingReports": "Pending Reports",
+          "table": {
+            "columns": {
+              "title": "Title",
+              "author": "Author",
+              "category": "Category",
+              "likes": "Likes",
+              "dislikes": "Dislikes",
+              "comments": "Comments",
+              "score": "Score",
+              "createdAt": "Created",
+              "actions": "Actions"
+            },
+            "actions": {
+              "viewDetails": "View Details",
+              "editPost": "Edit Post",
+              "hidePost": "Hide Post",
+              "deletePost": "Delete Post",
+              "manageComments": "Manage Comments"
+            },
+            "noData": "No posts found",
+            "loading": "Loading posts...",
+            "rowsPerPage": "Posts per page",
+            "pagination": {
+              "previous": "Previous",
+              "next": "Next",
+              "page": "Page {current} of {total}"
+            },
+            "accessibility": {
+              "openMenu": "Open menu"
+            }
+          },
+          "detailPage": {
+            "title": "Post Details",
+            "backToList": "Back to Posts",
+            "postContent": "Post Content",
+            "postActions": "Post Actions",
+            "commentsSection": "Comments",
+            "interactionsSection": "Interactions",
+            "noComments": "No comments on this post yet",
+            "noInteractions": "No interactions on this post yet",
+            "hidden": "Hidden",
+            "moreInteractions": "{count} more interactions",
+            "accessibility": {
+              "openMenu": "Open menu"
+            },
+            "actions": {
+              "hidePost": "Hide Post",
+              "unhidePost": "Unhide Post",
+              "deletePost": "Delete Post",
+              "editPost": "Edit Post",
+              "pinPost": "Pin Post",
+              "unpinPost": "Unpin Post",
+              "lockComments": "Lock Comments",
+              "unlockComments": "Unlock Comments"
+            },
+            "hideConfirm": {
+              "title": "Hide Post",
+              "description": "Are you sure you want to hide this post? It will not be visible to users but can be restored later."
+            },
+            "deleteConfirm": {
+              "title": "Delete Post",
+              "description": "Are you sure you want to permanently delete this post? This action cannot be undone and will also delete all comments and interactions."
+            },
+            "commentActions": {
+              "hide": "Hide Comment",
+              "unhide": "Unhide Comment",
+              "delete": "Delete Comment",
+              "reply": "Reply"
+            },
+            "hideCommentConfirm": {
+              "title": "Hide Comment",
+              "description": "Are you sure you want to hide this comment? It will not be visible to users but can be restored later."
+            },
+            "deleteCommentConfirm": {
+              "title": "Delete Comment", 
+              "description": "Are you sure you want to permanently delete this comment? This action cannot be undone."
+            },
+            "reportsSection": "Reports",
+            "totalReports": "Total Reports",
+            "noReports": "No reports found for this post",
+            "postReports": "Post Reports",
+            "commentReports": "Comment Reports",
+            "viewAllPostReports": "View All Post Reports",
+            "viewAllCommentReports": "View All Comment Reports",
+            "commentByAuthor": "Comment by {author}"
           }
         },
         "comments": {
@@ -1542,7 +1642,13 @@
             "bodyRequired": "Comment content is required",
             "postRequired": "Post is required",
             "authorRequired": "Author is required"
-          }
+          },
+          "hideSuccess": "Comment hidden successfully",
+          "unhideSuccess": "Comment unhidden successfully", 
+          "hideError": "Failed to hide comment",
+          "reports": "Reports",
+          "pendingReports": "Pending Reports",
+          "hidden": "Hidden"
         },
         "interactions": {
           "title": "Interactions",
@@ -1633,35 +1739,31 @@
         "analytics": {
           "title": "Community Analytics",
           "description": "View community engagement metrics and insights",
-          "overview": "Overview",
-          "engagement": "Engagement Metrics",
-          "trends": "Trends",
-          "topContent": "Top Content",
-          "userActivity": "User Activity",
-          "totalInteractions": "Total Interactions",
-          "averageCommentsPerPost": "Avg Comments/Post",
-          "averageLikesPerPost": "Avg Likes/Post",
-          "mostActiveCategories": "Most Active Categories",
-          "topPosts": "Top Posts",
-          "topComments": "Top Comments",
-          "activeUsers": "Active Users",
-          "newUsers": "New Users",
-          "growthRate": "Growth Rate",
-          "engagementRate": "Engagement Rate",
-          "categoryBreakdown": "Category Breakdown",
-          "dailyActivity": "Daily Activity",
-          "weeklyTrends": "Weekly Trends",
-          "monthlyTrends": "Monthly Trends",
-          "postEngagement": "Post Engagement",
-          "commentEngagement": "Comment Engagement",
-          "userParticipation": "User Participation",
-          "anonymousVsIdentified": "Anonymous vs Identified Posts",
-          "genderDistribution": "Gender Distribution",
-          "groupMembership": "Group Membership Stats",
-          "exportData": "Export Data",
-          "refreshData": "Refresh Data",
-          "lastUpdated": "Last Updated",
-          "noDataAvailable": "No data available for the selected period"
+          "last7Days": "Last 7 days",
+          "last30Days": "Last 30 days",
+          "last90Days": "Last 90 days",
+          "lastYear": "Last year",
+          "likesDislikes": "{likes} likes, {dislikes} dislikes",
+          "totalComments": "{count} total comments",
+          "totalPosts": "{count} total posts",
+          "inSelectedPeriod": "In selected period",
+          "postDistribution": "Post distribution across categories in the selected period",
+          "noPostsFound": "No posts found in the selected period",
+          "postsCount": "{count} posts",
+          "genderBreakdown": "Community profile gender breakdown",
+          "male": "Male",
+          "female": "Female",
+          "other": "Other",
+          "anonymityBreakdown": "Post anonymity breakdown in selected period",
+          "anonymousPosts": "Anonymous Posts",
+          "identifiedPosts": "Identified Posts",
+          "mostEngagingPosts": "Most engaging posts in the selected period",
+          "likes": "{count} likes",
+          "dislikes": "{count} dislikes",
+          "totalEngagement": "{count} total engagement",
+          "dateFormat": "MMM dd, yyyy",
+          "dateTimeFormat": "MMMM dd, yyyy HH:mm",
+          "exportComingSoon": "Export functionality coming soon"
         }
       },
       "features": {
@@ -1777,6 +1879,26 @@
       "yes": "Yes",
       "no": "No",
       "close": "Close"
+    },
+    "posts": {
+      "totalAcrossAllPosts": "Total across all posts",
+      "likesAndDislikes": "Likes and dislikes",
+      "tryAdjustingFilters": "Try adjusting your search or filter criteria",
+      "anonymous": "Anonymous",
+      "byAuthor": "By: {author}",
+      "dateFormat": "MMM dd, yyyy",
+      "noCommentsYet": "No comments yet",
+      "commentDateFormat": "MMM dd, HH:mm",
+      "moreComments": "...and {count} more comments",
+      "detailedView": "Detailed view of the selected forum post",
+      "author": "Author: {author}",
+      "category": "Category: {category}",
+      "created": "Created: {date}",
+      "likes": "{count} likes",
+      "dislikes": "{count} dislikes",
+      "comments": "{count} comments",
+      "score": "Score: {score}",
+      "detailDateTimeFormat": "MMMM dd, yyyy HH:mm"
     }
   }
   

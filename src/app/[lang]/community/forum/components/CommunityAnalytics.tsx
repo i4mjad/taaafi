@@ -188,7 +188,7 @@ export default function CommunityAnalytics() {
   }, [filteredData, categories, profiles]);
 
   const handleExportData = () => {
-    toast.info('Export functionality coming soon');
+    toast.info(t('modules.community.analytics.exportComingSoon'));
   };
 
   const handleRefreshData = () => {
@@ -233,10 +233,10 @@ export default function CommunityAnalytics() {
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="7">Last 7 days</SelectItem>
-              <SelectItem value="30">Last 30 days</SelectItem>
-              <SelectItem value="90">Last 90 days</SelectItem>
-              <SelectItem value="365">Last year</SelectItem>
+              <SelectItem value="7">{t('modules.community.analytics.last7Days')}</SelectItem>
+              <SelectItem value="30">{t('modules.community.analytics.last30Days')}</SelectItem>
+              <SelectItem value="90">{t('modules.community.analytics.last90Days')}</SelectItem>
+              <SelectItem value="365">{t('modules.community.analytics.lastYear')}</SelectItem>
             </SelectContent>
           </Select>
           <Button variant="outline" size="sm" onClick={handleRefreshData}>
@@ -262,7 +262,7 @@ export default function CommunityAnalytics() {
           <CardContent>
             <div className="text-2xl font-bold">{analytics.totalInteractions}</div>
             <p className="text-xs text-muted-foreground">
-              {analytics.likes} likes, {analytics.dislikes} dislikes
+              {t('modules.community.analytics.likesDislikes', { likes: analytics.likes, dislikes: analytics.dislikes })}
             </p>
           </CardContent>
         </Card>
@@ -277,7 +277,7 @@ export default function CommunityAnalytics() {
           <CardContent>
             <div className="text-2xl font-bold">{analytics.averageCommentsPerPost.toFixed(1)}</div>
             <p className="text-xs text-muted-foreground">
-              {analytics.totalComments} total comments
+              {t('modules.community.analytics.totalComments', { count: analytics.totalComments })}
             </p>
           </CardContent>
         </Card>
@@ -292,7 +292,7 @@ export default function CommunityAnalytics() {
           <CardContent>
             <div className="text-2xl font-bold">{analytics.averageLikesPerPost.toFixed(1)}</div>
             <p className="text-xs text-muted-foreground">
-              {analytics.totalPosts} total posts
+              {t('modules.community.analytics.totalPosts', { count: analytics.totalPosts })}
             </p>
           </CardContent>
         </Card>
@@ -307,7 +307,7 @@ export default function CommunityAnalytics() {
           <CardContent>
             <div className="text-2xl font-bold">{analytics.newProfiles}</div>
             <p className="text-xs text-muted-foreground">
-              In selected period
+              {t('modules.community.analytics.inSelectedPeriod')}
             </p>
           </CardContent>
         </Card>
@@ -318,15 +318,15 @@ export default function CommunityAnalytics() {
         <CardHeader>
           <CardTitle>{t('modules.community.analytics.mostActiveCategories')}</CardTitle>
           <CardDescription>
-            Post distribution across categories in the selected period
+            {t('modules.community.analytics.postDistribution')}
           </CardDescription>
         </CardHeader>
         <CardContent>
           {analytics.categoryStats.length === 0 ? (
             <div className="text-center py-8">
               <BarChart className="mx-auto h-12 w-12 text-muted-foreground/50" />
-              <h3 className="mt-4 text-lg font-semibold">No data available</h3>
-              <p className="text-muted-foreground">No posts found in the selected period</p>
+              <h3 className="mt-4 text-lg font-semibold">{t('modules.community.analytics.noDataAvailable')}</h3>
+              <p className="text-muted-foreground">{t('modules.community.analytics.noPostsFound')}</p>
             </div>
           ) : (
             <div className="space-y-4">
@@ -334,7 +334,7 @@ export default function CommunityAnalytics() {
                 <div key={category.id} className="flex items-center justify-between">
                   <div className="flex items-center space-x-3">
                     <div className="font-medium">{category.name}</div>
-                    <Badge variant="outline">{category.postCount} posts</Badge>
+                    <Badge variant="outline">{t('modules.community.analytics.postsCount', { count: category.postCount })}</Badge>
                   </div>
                   <div className="flex items-center space-x-2">
                     <div className="text-sm text-muted-foreground">
@@ -360,14 +360,14 @@ export default function CommunityAnalytics() {
           <CardHeader>
             <CardTitle>{t('modules.community.analytics.genderDistribution')}</CardTitle>
             <CardDescription>
-              Community profile gender breakdown
+              {t('modules.community.analytics.genderBreakdown')}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
-                  <div className="text-sm font-medium">Male</div>
+                  <div className="text-sm font-medium">{t('modules.community.analytics.male')}</div>
                   <Badge variant="outline">{analytics.genderStats.male}</Badge>
                 </div>
                 <div className="text-sm text-muted-foreground">
@@ -379,7 +379,7 @@ export default function CommunityAnalytics() {
               </div>
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
-                  <div className="text-sm font-medium">Female</div>
+                  <div className="text-sm font-medium">{t('modules.community.analytics.female')}</div>
                   <Badge variant="outline">{analytics.genderStats.female}</Badge>
                 </div>
                 <div className="text-sm text-muted-foreground">
@@ -391,7 +391,7 @@ export default function CommunityAnalytics() {
               </div>
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
-                  <div className="text-sm font-medium">Other</div>
+                  <div className="text-sm font-medium">{t('modules.community.analytics.other')}</div>
                   <Badge variant="outline">{analytics.genderStats.other}</Badge>
                 </div>
                 <div className="text-sm text-muted-foreground">
@@ -410,14 +410,14 @@ export default function CommunityAnalytics() {
           <CardHeader>
             <CardTitle>{t('modules.community.analytics.anonymousVsIdentified')}</CardTitle>
             <CardDescription>
-              Post anonymity breakdown in selected period
+              {t('modules.community.analytics.anonymityBreakdown')}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
-                  <div className="text-sm font-medium">Anonymous Posts</div>
+                  <div className="text-sm font-medium">{t('modules.community.analytics.anonymousPosts')}</div>
                   <Badge variant="secondary">{analytics.anonymousPosts}</Badge>
                 </div>
                 <div className="text-sm text-muted-foreground">
@@ -429,7 +429,7 @@ export default function CommunityAnalytics() {
               </div>
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
-                  <div className="text-sm font-medium">Identified Posts</div>
+                  <div className="text-sm font-medium">{t('modules.community.analytics.identifiedPosts')}</div>
                   <Badge variant="default">{analytics.identifiedPosts}</Badge>
                 </div>
                 <div className="text-sm text-muted-foreground">
@@ -449,7 +449,7 @@ export default function CommunityAnalytics() {
         <CardHeader>
           <CardTitle>{t('modules.community.analytics.topPosts')}</CardTitle>
           <CardDescription>
-            Most engaging posts in the selected period
+            {t('modules.community.analytics.mostEngagingPosts')}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -471,10 +471,10 @@ export default function CommunityAnalytics() {
                       {post.body}
                     </p>
                     <div className="flex items-center space-x-4 mt-2 text-xs text-muted-foreground">
-                      <span>{format(post.createdAt, 'MMM dd, yyyy')}</span>
-                      <span>{post.likeCount} likes</span>
-                      <span>{post.dislikeCount} dislikes</span>
-                      <span>{post.totalEngagement} total engagement</span>
+                      <span>{format(post.createdAt, t('modules.community.analytics.dateFormat'))}</span>
+                      <span>{t('modules.community.analytics.likes', { count: post.likeCount })}</span>
+                      <span>{t('modules.community.analytics.dislikes', { count: post.dislikeCount })}</span>
+                      <span>{t('modules.community.analytics.totalEngagement', { count: post.totalEngagement })}</span>
                     </div>
                   </div>
                 </div>
@@ -486,7 +486,7 @@ export default function CommunityAnalytics() {
 
       {/* Last Updated */}
       <div className="text-center text-sm text-muted-foreground">
-        {t('modules.community.analytics.lastUpdated')}: {format(new Date(), 'MMMM dd, yyyy HH:mm')}
+        {t('modules.community.analytics.lastUpdated')}: {format(new Date(), t('modules.community.analytics.dateTimeFormat'))}
       </div>
     </div>
   );

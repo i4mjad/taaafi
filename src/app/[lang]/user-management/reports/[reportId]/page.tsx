@@ -40,16 +40,12 @@ import ConversationView from './ConversationView';
 // Import notification payload utilities
 import { createReportUpdatePayload } from '@/utils/notificationPayloads';
 
-interface UserReport {
-  id: string;
-  uid: string;
-  time: Timestamp;
-  reportTypeId: string;
-  status: 'pending' | 'inProgress' | 'waitingForAdminResponse' | 'closed' | 'finalized';
-  initialMessage: string;
-  lastUpdated: Timestamp;
-  messagesCount: number;
-}
+// Import types
+import { UserReport as ExtendedUserReport, REPORT_TYPE_IDS } from '@/types/reports';
+import { ForumPost, Comment } from '@/types/community';
+
+// Use the extended UserReport from types
+type UserReport = ExtendedUserReport;
 
 interface UserProfile {
   uid: string;
@@ -86,6 +82,8 @@ export default function ReportDetailsPage() {
     initialMessage: reportSnapshot.data().initialMessage || reportSnapshot.data().userJustification || '',
     lastUpdated: reportSnapshot.data().lastUpdated || reportSnapshot.data().time || Timestamp.now(),
     messagesCount: reportSnapshot.data().messagesCount || 1,
+    targetId: reportSnapshot.data().targetId,
+    targetType: reportSnapshot.data().targetType,
   } : null;
 
   // Fetch user data using react-firebase-hooks
@@ -104,6 +102,51 @@ export default function ReportDetailsPage() {
     lastLoginAt: userSnapshot.data().lastLoginAt,
     messagingToken: userSnapshot.data().messagingToken,
   } : null;
+
+  // Fetch related post if the report is for a post
+  const [relatedPostSnapshot] = useDocument(
+    report?.targetType === 'post' && report.targetId 
+      ? doc(db, 'forumPosts', report.targetId)
+      : null
+  );
+
+  // Fetch related comment if the report is for a comment
+  const [relatedCommentSnapshot] = useDocument(
+    report?.targetType === 'comment' && report.targetId 
+      ? doc(db, 'comments', report.targetId)
+      : null
+  );
+
+  // Parse related post data
+  const relatedPost: ForumPost | null = relatedPostSnapshot?.exists() ? {
+    id: relatedPostSnapshot.id,
+    ...relatedPostSnapshot.data(),
+    createdAt: relatedPostSnapshot.data()?.createdAt?.toDate() || new Date(),
+    updatedAt: relatedPostSnapshot.data()?.updatedAt?.toDate(),
+  } as ForumPost : null;
+
+  // Parse related comment data
+  const relatedComment: Comment | null = relatedCommentSnapshot?.exists() ? {
+    id: relatedCommentSnapshot.id,
+    ...relatedCommentSnapshot.data(),
+    createdAt: relatedCommentSnapshot.data()?.createdAt?.toDate() || new Date(),
+    updatedAt: relatedCommentSnapshot.data()?.updatedAt?.toDate(),
+  } as Comment : null;
+
+  // Fetch the parent post for a comment (if the report is for a comment)
+  const [parentPostSnapshot] = useDocument(
+    relatedComment?.postId 
+      ? doc(db, 'forumPosts', relatedComment.postId)
+      : null
+  );
+
+  // Parse parent post data
+  const parentPost: ForumPost | null = parentPostSnapshot?.exists() ? {
+    id: parentPostSnapshot.id,
+    ...parentPostSnapshot.data(),
+    createdAt: parentPostSnapshot.data()?.createdAt?.toDate() || new Date(),
+    updatedAt: parentPostSnapshot.data()?.updatedAt?.toDate(),
+  } as ForumPost : null;
 
   // Fetch report types for dynamic display
   const [reportTypesSnapshot] = useCollection(
@@ -499,6 +542,189 @@ export default function ReportDetailsPage() {
                       </div>
                     </CardContent>
                   </Card>
+
+                  {/* Related Item */}
+                  {(relatedPost || relatedComment) && (
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                          {relatedPost ? <FileText className="h-5 w-5" /> : <MessageSquare className="h-5 w-5" />}
+                          {relatedPost 
+                            ? (t('modules.userManagement.reports.reportDetails.reportedPost') || 'Reported Post')
+                            : (t('modules.userManagement.reports.reportDetails.reportedComment') || 'Reported Comment')
+                          }
+                        </CardTitle>
+                        <CardDescription>
+                          {relatedPost 
+                            ? (t('modules.userManagement.reports.reportDetails.postReportedDescription') || 'The forum post that was reported')
+                            : (t('modules.userManagement.reports.reportDetails.commentReportedDescription') || 'The comment that was reported')
+                          }
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        {relatedPost && (
+                          <div className="space-y-3">
+                            <div>
+                              <Label className="text-sm font-medium">
+                                {t('modules.community.posts.title') || 'Post Title'}
+                              </Label>
+                              <div className="mt-1">
+                                <h3 className="text-lg font-semibold">{relatedPost.title}</h3>
+                              </div>
+                            </div>
+                            
+                            <div className="grid grid-cols-2 gap-4">
+                              <div>
+                                <Label className="text-sm font-medium">
+                                  {t('modules.community.posts.author') || 'Author'}
+                                </Label>
+                                <div className="mt-1">
+                                  <span className="text-sm">{relatedPost.authorCPId}</span>
+                                </div>
+                              </div>
+                              
+                              <div>
+                                <Label className="text-sm font-medium">
+                                  {t('modules.community.posts.createdAt') || 'Created'}
+                                </Label>
+                                <div className="mt-1">
+                                  <span className="text-sm">{new Intl.DateTimeFormat(locale, {
+                                   year: 'numeric',
+                                   month: 'long',
+                                   day: 'numeric',
+                                   hour: '2-digit',
+                                   minute: '2-digit',
+                                 }).format(relatedPost.createdAt)}</span>
+                                </div>
+                              </div>
+                            </div>
+
+                            <div>
+                              <Label className="text-sm font-medium">
+                                {t('modules.community.posts.content') || 'Post Content'}
+                              </Label>
+                              <div className="mt-2 p-3 bg-muted rounded-md">
+                                <p className="text-sm whitespace-pre-wrap">{relatedPost.body}</p>
+                              </div>
+                            </div>
+
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center space-x-2">
+                                {relatedPost.isHidden && (
+                                  <Badge variant="destructive">
+                                    {t('modules.community.posts.hidden') || 'Hidden'}
+                                  </Badge>
+                                )}
+                                <Badge variant={relatedPost.score >= 0 ? 'default' : 'destructive'}>
+                                  {t('modules.community.posts.score')}: {relatedPost.score}
+                                </Badge>
+                              </div>
+                              <Button variant="outline" size="sm" asChild>
+                                <Link href={`/${locale}/community/forum/posts/${relatedPost.id}`}>
+                                  <ExternalLink className="h-3 w-3 mr-2" />
+                                  {t('modules.userManagement.reports.reportDetails.viewPost') || 'View Post'}
+                                </Link>
+                              </Button>
+                            </div>
+                          </div>
+                        )}
+
+                        {relatedComment && (
+                          <div className="space-y-3">
+                            <div className="grid grid-cols-2 gap-4">
+                              <div>
+                                <Label className="text-sm font-medium">
+                                  {t('modules.community.comments.author') || 'Author'}
+                                </Label>
+                                <div className="mt-1">
+                                  <span className="text-sm">{relatedComment.authorCPId}</span>
+                                </div>
+                              </div>
+                              
+                              <div>
+                                <Label className="text-sm font-medium">
+                                  {t('modules.community.comments.createdAt') || 'Created'}
+                                </Label>
+                                <div className="mt-1">
+                                  <span className="text-sm">{new Intl.DateTimeFormat(locale, {
+                                   year: 'numeric',
+                                   month: 'long',
+                                   day: 'numeric',
+                                   hour: '2-digit',
+                                   minute: '2-digit',
+                                 }).format(relatedComment.createdAt)}</span>
+                                </div>
+                              </div>
+                            </div>
+
+                            <div>
+                              <Label className="text-sm font-medium">
+                                {t('modules.community.comments.content') || 'Comment Content'}
+                              </Label>
+                              <div className="mt-2 p-3 bg-muted rounded-md">
+                                <p className="text-sm whitespace-pre-wrap">{relatedComment.body}</p>
+                              </div>
+                            </div>
+
+                            {parentPost && (
+                              <div>
+                                <Label className="text-sm font-medium">
+                                  {t('modules.userManagement.reports.reportDetails.parentPost') || 'Parent Post'}
+                                </Label>
+                                <div className="mt-2 p-3 bg-secondary rounded-md">
+                                  <h4 className="font-medium text-sm mb-2">{parentPost.title}</h4>
+                                                                     <p className="text-xs text-muted-foreground">
+                                     {t('modules.community.posts.by')} {parentPost.authorCPId} • {new Intl.DateTimeFormat(locale, {
+                                       year: 'numeric',
+                                       month: 'long',
+                                       day: 'numeric',
+                                       hour: '2-digit',
+                                       minute: '2-digit',
+                                     }).format(parentPost.createdAt)}
+                                   </p>
+                                </div>
+                              </div>
+                            )}
+
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center space-x-2">
+                                {relatedComment.isHidden && (
+                                  <Badge variant="destructive">
+                                    {t('modules.community.comments.hidden') || 'Hidden'}
+                                  </Badge>
+                                )}
+                                <Badge variant={relatedComment.score >= 0 ? 'default' : 'destructive'}>
+                                  {t('modules.community.comments.score')}: {relatedComment.score}
+                                </Badge>
+                              </div>
+                              <div className="flex space-x-2">
+                                {parentPost && (
+                                  <Button variant="outline" size="sm" asChild>
+                                    <Link href={`/${locale}/community/forum/posts/${parentPost.id}`}>
+                                      <ExternalLink className="h-3 w-3 mr-2" />
+                                      {t('modules.userManagement.reports.reportDetails.viewParentPost') || 'View Parent Post'}
+                                    </Link>
+                                  </Button>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        {!relatedPost && !relatedComment && report.targetId && (
+                          <div className="text-center py-4">
+                            <AlertCircle className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
+                            <p className="text-sm text-muted-foreground">
+                              {t('modules.userManagement.reports.reportDetails.relatedItemNotFound') || 'The reported item could not be found or may have been deleted.'}
+                            </p>
+                            <p className="text-xs text-muted-foreground mt-1">
+                              Target ID: {report.targetId} ({report.targetType})
+                            </p>
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
+                  )}
 
                   {/* Conversation */}
                   <ConversationView 

@@ -981,7 +981,15 @@
             "pleaseSelectDifferentStatus": "يرجى اختيار حالة مختلفة",
             "unknownType": "نوع غير معروف",
             "userDataNotAvailable": "بيانات المستخدم غير متاحة",
-            "requestedReportNotFound": "لم يتم العثور على التقرير المطلوب."
+            "requestedReportNotFound": "لم يتم العثور على التقرير المطلوب.",
+            "reportedPost": "المنشور المُبلغ عنه",
+            "reportedComment": "التعليق المُبلغ عنه",
+            "postReportedDescription": "منشور المنتدى الذي تم الإبلاغ عنه",
+            "commentReportedDescription": "التعليق الذي تم الإبلاغ عنه",
+            "parentPost": "المنشور الرئيسي",
+            "viewPost": "عرض المنشور",
+            "viewParentPost": "عرض المنشور الرئيسي",
+            "relatedItemNotFound": "لم يتم العثور على العنصر المُبلغ عنه أو ربما تم حذفه."
           },
           "messageNotifications": {
             "title": "رسالة جديدة من المدير",
@@ -1517,7 +1525,117 @@
             "bodyRequired": "المحتوى مطلوب",
             "categoryRequired": "التصنيف مطلوب",
             "authorRequired": "الكاتب مطلوب"
-          }
+          },
+          "postNotFound": "المنشور غير موجود",
+          "hideSuccess": "تم إخفاء المنشور بنجاح",
+          "unhideSuccess": "تم إظهار المنشور بنجاح",
+          "hideError": "فشل في إخفاء المنشور",
+          "reports": "التقارير",
+          "pendingReports": "التقارير المعلقة",
+          "table": {
+            "columns": {
+              "title": "العنوان",
+              "author": "الكاتب",
+              "category": "التصنيف",
+              "likes": "الإعجابات",
+              "dislikes": "عدم الإعجاب",
+              "comments": "التعليقات",
+              "score": "النقاط",
+              "createdAt": "تاريخ الإنشاء",
+              "actions": "الإجراءات"
+            },
+            "actions": {
+              "viewDetails": "عرض التفاصيل",
+              "editPost": "تعديل المنشور",
+              "hidePost": "إخفاء المنشور",
+              "deletePost": "حذف المنشور",
+              "manageComments": "إدارة التعليقات"
+            },
+            "noData": "لا توجد منشورات",
+            "loading": "جاري تحميل المنشورات...",
+            "rowsPerPage": "المنشورات في الصفحة",
+            "pagination": {
+              "previous": "السابق",
+              "next": "التالي",
+              "page": "الصفحة {current} من {total}"
+            },
+            "accessibility": {
+              "openMenu": "فتح القائمة"
+            }
+          },
+          "detailPage": {
+            "title": "تفاصيل المنشور",
+            "backToList": "العودة إلى المنشورات",
+            "postContent": "محتوى المنشور",
+            "postActions": "إجراءات المنشور",
+            "commentsSection": "التعليقات",
+            "interactionsSection": "التفاعلات",
+            "noComments": "لا توجد تعليقات على هذا المنشور بعد",
+            "noInteractions": "لا توجد تفاعلات على هذا المنشور بعد",
+            "hidden": "مخفي",
+            "moreInteractions": "{count} تفاعل إضافي",
+            "accessibility": {
+              "openMenu": "فتح القائمة"
+            },
+            "actions": {
+              "hidePost": "إخفاء المنشور",
+              "unhidePost": "إظهار المنشور",
+              "deletePost": "حذف المنشور",
+              "editPost": "تعديل المنشور",
+              "pinPost": "تثبيت المنشور",
+              "unpinPost": "إلغاء تثبيت المنشور",
+              "lockComments": "قفل التعليقات",
+              "unlockComments": "فتح التعليقات"
+            },
+            "hideConfirm": {
+              "title": "إخفاء المنشور",
+              "description": "هل أنت متأكد من إخفاء هذا المنشور؟ لن يكون مرئياً للمستخدمين لكن يمكن استعادته لاحقاً."
+            },
+            "deleteConfirm": {
+              "title": "حذف المنشور",
+              "description": "هل أنت متأكد من حذف هذا المنشور نهائياً؟ لا يمكن التراجع عن هذا الإجراء وسيتم حذف جميع التعليقات والتفاعلات أيضاً."
+            },
+            "commentActions": {
+              "hide": "إخفاء التعليق",
+              "unhide": "إظهار التعليق",
+              "delete": "حذف التعليق",
+              "reply": "رد"
+            },
+            "hideCommentConfirm": {
+              "title": "إخفاء التعليق",
+              "description": "هل أنت متأكد من إخفاء هذا التعليق؟ لن يكون مرئياً للمستخدمين لكن يمكن استعادته لاحقاً."
+            },
+            "deleteCommentConfirm": {
+              "title": "حذف التعليق",
+              "description": "هل أنت متأكد من حذف هذا التعليق نهائياً؟ لا يمكن التراجع عن هذا الإجراء."
+            },
+            "reportsSection": "التقارير",
+            "totalReports": "إجمالي التقارير",
+            "noReports": "لا توجد تقارير لهذا المنشور",
+            "postReports": "تقارير المنشور",
+            "commentReports": "تقارير التعليقات",
+            "viewAllPostReports": "عرض جميع تقارير المنشور",
+            "viewAllCommentReports": "عرض جميع تقارير التعليقات",
+            "commentByAuthor": "تعليق بواسطة {author}"
+          },
+          "totalAcrossAllPosts": "الإجمالي عبر جميع المنشورات",
+          "likesAndDislikes": "إعجابات وعدم إعجابات",
+          "tryAdjustingFilters": "حاول تعديل معايير البحث أو التصفية",
+          "anonymous": "مجهول",
+          "byAuthor": "بواسطة: {author}",
+          "dateFormat": "dd MMM, yyyy",
+          "noCommentsYet": "لا توجد تعليقات بعد",
+          "commentDateFormat": "dd MMM, HH:mm",
+          "moreComments": "...و{count} تعليق آخر",
+          "detailedView": "عرض تفصيلي للمنشور المحدد في المنتدى",
+          "author": "الكاتب: {author}",
+          "category": "التصنيف: {category}",
+          "created": "تاريخ الإنشاء: {date}",
+          "likes": "{count} إعجاب",
+          "dislikes": "{count} عدم إعجاب",
+          "comments": "{count} تعليق",
+          "score": "النقاط: {score}",
+          "detailDateTimeFormat": "dd MMMM, yyyy HH:mm"
         },
         "comments": {
           "title": "التعليقات",
@@ -1560,7 +1678,13 @@
             "bodyRequired": "محتوى التعليق مطلوب",
             "postRequired": "المنشور مطلوب",
             "authorRequired": "الكاتب مطلوب"
-          }
+          },
+          "hideSuccess": "تم إخفاء التعليق بنجاح",
+          "unhideSuccess": "تم إظهار التعليق بنجاح",
+          "hideError": "فشل في إخفاء التعليق",
+          "reports": "التقارير",
+          "pendingReports": "التقارير المعلقة",
+          "hidden": "مخفي"
         },
         "interactions": {
           "title": "التفاعلات",
@@ -1651,35 +1775,31 @@
         "analytics": {
           "title": "تحليلات المجتمع",
           "description": "عرض مقاييس التفاعل المجتمعي والرؤى",
-          "overview": "نظرة عامة",
-          "engagement": "مقاييس التفاعل",
-          "trends": "الاتجاهات",
-          "topContent": "المحتوى الأفضل",
-          "userActivity": "نشاط المستخدمين",
-          "totalInteractions": "إجمالي التفاعلات",
-          "averageCommentsPerPost": "متوسط التعليقات/المنشور",
-          "averageLikesPerPost": "متوسط الإعجابات/المنشور",
-          "mostActiveCategories": "التصنيفات الأكثر نشاطاً",
-          "topPosts": "أفضل المنشورات",
-          "topComments": "أفضل التعليقات",
-          "activeUsers": "المستخدمون النشطون",
-          "newUsers": "المستخدمون الجدد",
-          "growthRate": "معدل النمو",
-          "engagementRate": "معدل التفاعل",
-          "categoryBreakdown": "تفصيل التصنيفات",
-          "dailyActivity": "النشاط اليومي",
-          "weeklyTrends": "الاتجاهات الأسبوعية",
-          "monthlyTrends": "الاتجاهات الشهرية",
-          "postEngagement": "تفاعل المنشورات",
-          "commentEngagement": "تفاعل التعليقات",
-          "userParticipation": "مشاركة المستخدمين",
-          "anonymousVsIdentified": "المنشورات المجهولة مقابل المعروفة",
-          "genderDistribution": "توزيع الجنس",
-          "groupMembership": "إحصائيات عضوية المجموعات",
-          "exportData": "تصدير البيانات",
-          "refreshData": "تحديث البيانات",
-          "lastUpdated": "آخر تحديث",
-          "noDataAvailable": "لا توجد بيانات متاحة للفترة المحددة"
+          "last7Days": "آخر 7 أيام",
+          "last30Days": "آخر 30 يومًا",
+          "last90Days": "آخر 90 يومًا",
+          "lastYear": "آخر سنة",
+          "likesDislikes": "{likes} إعجاب، {dislikes} عدم إعجاب",
+          "totalComments": "{count} تعليق إجمالي",
+          "totalPosts": "{count} منشور إجمالي",
+          "inSelectedPeriod": "في الفترة المحددة",
+          "postDistribution": "توزيع المنشورات عبر التصنيفات في الفترة المحددة",
+          "noPostsFound": "لم يتم العثور على منشورات في الفترة المحددة",
+          "postsCount": "{count} منشور",
+          "genderBreakdown": "تفصيل الجنس لملفات المجتمع",
+          "male": "ذكر",
+          "female": "أنثى",
+          "other": "آخر",
+          "anonymityBreakdown": "تفصيل إخفاء الهوية للمنشورات في الفترة المحددة",
+          "anonymousPosts": "منشورات مجهولة",
+          "identifiedPosts": "منشورات معروفة",
+          "mostEngagingPosts": "أكثر المنشورات تفاعلاً في الفترة المحددة",
+          "likes": "{count} إعجاب",
+          "dislikes": "{count} عدم إعجاب",
+          "totalEngagement": "{count} تفاعل إجمالي",
+          "dateFormat": "dd MMM, yyyy",
+          "dateTimeFormat": "dd MMMM, yyyy HH:mm",
+          "exportComingSoon": "ميزة التصدير قادمة قريباً"
         }
       },
       "features": {

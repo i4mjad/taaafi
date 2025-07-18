@@ -29,6 +29,7 @@ export interface ForumPost {
   body: string;            // Post content
   category: string;        // Category ID reference
   isAnonymous?: boolean;   // Whether this specific post is anonymous
+  isHidden?: boolean;      // Whether this post is hidden by admin
   score: number;           // Overall score (likes - dislikes)
   likeCount: number;
   dislikeCount: number;
@@ -42,6 +43,7 @@ export interface Comment {
   authorCPId: string;      // Foreign key -> communityProfiles.id
   body: string;            // Comment content
   isAnonymous?: boolean;   // Whether this comment is anonymous
+  isHidden?: boolean;      // Whether this comment is hidden by admin
   score: number;           // Overall score (likes - dislikes)
   likeCount: number;
   dislikeCount: number;
