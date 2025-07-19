@@ -7,6 +7,7 @@ import 'package:reboot_app_3/core/shared_widgets/app_bar.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/features/community/presentation/widgets/post_card.dart';
 import 'package:reboot_app_3/features/community/presentation/widgets/post_filter_segment.dart';
+import 'package:reboot_app_3/features/account/presentation/widgets/feature_access_guard.dart';
 
 class ForumHomeScreen extends ConsumerStatefulWidget {
   const ForumHomeScreen({super.key});
@@ -53,12 +54,15 @@ class _ForumHomeScreenState extends ConsumerState<ForumHomeScreen> {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
+      floatingActionButton: CommunityPostGuard(
+        onAccessGranted: () {
           context.push('/community/forum/new');
         },
-        backgroundColor: theme.primary[500],
-        child: const Icon(LucideIcons.plus, color: Colors.white),
+        child: FloatingActionButton(
+          onPressed: null, // Handled by CommunityPostGuard
+          backgroundColor: theme.primary[500],
+          child: const Icon(LucideIcons.plus, color: Colors.white),
+        ),
       ),
     );
   }

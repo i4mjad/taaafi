@@ -10,11 +10,10 @@ class AppFeaturesConfig {
   // Feature unique names - these are used to link features to functionality
   static const String contactAdmin = 'contact_admin';
   static const String postCreation = 'post_creation';
+  static const String commentCreation = 'comment_creation';
+  static const String communityInteraction = 'community_interaction';
 
   //TODO: introduce this later through admin control §portal
-  // static const String commentCreation = 'comment_creation';
-  // static const String reportSubmission = 'report_submission';
-  // static const String communityInteraction = 'community_interaction';
 
   // static const String directMessaging = 'direct_messaging';
   // static const String groupCreation = 'group_creation';

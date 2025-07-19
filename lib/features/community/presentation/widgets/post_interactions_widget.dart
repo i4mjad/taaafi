@@ -5,7 +5,10 @@ import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/features/community/data/models/post.dart';
+import 'package:reboot_app_3/features/community/data/models/interaction.dart';
 import 'package:reboot_app_3/features/community/presentation/providers/forum_providers.dart';
+import 'package:reboot_app_3/features/community/presentation/providers/community_providers_new.dart';
+import 'package:reboot_app_3/features/account/presentation/widgets/feature_access_guard.dart';
 
 class PostInteractionsWidget extends ConsumerWidget {
   final Post post;
@@ -28,6 +31,9 @@ class PostInteractionsWidget extends ConsumerWidget {
     final theme = AppTheme.of(context);
     final localizations = AppLocalizations.of(context);
 
+    // Watch optimistic post counts for immediate updates
+    final optimisticPostState = ref.watch(optimisticPostStateProvider(post.id));
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Row(
@@ -37,7 +43,7 @@ class PostInteractionsWidget extends ConsumerWidget {
             post: post,
             interactionValue: 1,
             icon: LucideIcons.thumbsUp,
-            count: post.likeCount,
+            count: optimisticPostState.likeCount,
           ),
 
           const SizedBox(width: 24),
@@ -47,7 +53,7 @@ class PostInteractionsWidget extends ConsumerWidget {
             post: post,
             interactionValue: -1,
             icon: LucideIcons.thumbsDown,
-            count: post.dislikeCount,
+            count: optimisticPostState.dislikeCount,
           ),
 
           const SizedBox(width: 24),
@@ -135,42 +141,52 @@ class _UserInteractionButton extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = AppTheme.of(context);
+    final currentProfileAsync = ref.watch(currentCommunityProfileProvider);
 
-    // Watch user's interaction with this post
-    final userInteractionAsync = ref.watch(
-      userInteractionProvider((
+    // Get current user's CP ID
+    final currentUserCPId = currentProfileAsync.maybeWhen(
+      data: (profile) => profile?.id ?? '',
+      orElse: () => '',
+    );
+
+    // Watch optimistic user's interaction with this post (immediate feedback)
+    final optimisticInteraction = ref.watch(
+      optimisticUserInteractionProvider((
         targetType: 'post',
         targetId: post.id,
-        userCPId: '',
+        userCPId: currentUserCPId,
       )),
     );
 
-    final isActive = userInteractionAsync.maybeWhen(
-      data: (interaction) => interaction?.value == interactionValue,
-      orElse: () => false,
-    );
-
-    final isLoading = userInteractionAsync.isLoading;
+    final isActive = optimisticInteraction?.value == interactionValue;
+    // No need to watch loading state since we have optimistic updates
 
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        GestureDetector(
-          onTap: isLoading ? null : () => _handleInteraction(ref),
+        CommunityInteractionGuard(
+          onAccessGranted: () =>
+              _handleOptimisticInteraction(ref, currentUserCPId),
+          postId: post.id,
+          userCPId: currentUserCPId,
           child: Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: isActive ? theme.primary[50] : Colors.transparent,
+              color: isActive
+                  ? (interactionValue == 1
+                      ? theme.primary[50]
+                      : theme.error[50])
+                  : Colors.transparent,
               borderRadius: BorderRadius.circular(8),
             ),
             child: Icon(
               icon,
               size: 20,
-              color: isLoading
-                  ? theme.grey[400]
-                  : isActive
+              color: isActive
+                  ? (interactionValue == 1
                       ? theme.primary[600]
-                      : theme.grey[500],
+                      : theme.error[600])
+                  : theme.grey[500],
             ),
           ),
         ),
@@ -185,29 +201,39 @@ class _UserInteractionButton extends ConsumerWidget {
     );
   }
 
-  void _handleInteraction(WidgetRef ref) {
+  void _handleOptimisticInteraction(WidgetRef ref, String currentUserCPId) {
     try {
-      // Get current user's interaction state
-      final userInteractionAsync = ref.read(
-        userInteractionProvider((
+      final optimisticInteraction = ref.read(
+        optimisticUserInteractionProvider((
           targetType: 'post',
           targetId: post.id,
-          userCPId: '',
+          userCPId: currentUserCPId,
         )),
       );
 
-      userInteractionAsync.whenData((currentInteraction) {
-        // If user already has this interaction, toggle it off (neutral)
-        final newValue = currentInteraction?.value == interactionValue
-            ? 0
-            : interactionValue;
+      // Determine new value based on current state
+      final oldValue = optimisticInteraction?.value ?? 0;
+      final newValue = oldValue == interactionValue ? 0 : interactionValue;
 
-        // Trigger the interaction
-        ref.read(postInteractionProvider(post.id).notifier).interact(newValue);
-      });
+      // 1. Immediately update interaction UI (optimistic)
+      ref
+          .read(optimisticUserInteractionProvider((
+            targetType: 'post',
+            targetId: post.id,
+            userCPId: currentUserCPId,
+          )).notifier)
+          .updateOptimistically(newValue);
+
+      // 2. Immediately update counts UI (optimistic)
+      ref
+          .read(optimisticPostStateProvider(post.id).notifier)
+          .updateOptimisticCounts(oldValue, newValue);
+
+      // 3. Process actual interaction (this will check for bans)
+      ref.read(postInteractionProvider(post.id).notifier).interact(newValue);
     } catch (e) {
       // Handle errors silently to prevent UI crashes
-      debugPrint('Error handling interaction: $e');
+      debugPrint('Error handling optimistic interaction: $e');
     }
   }
 }

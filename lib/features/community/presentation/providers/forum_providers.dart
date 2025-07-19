@@ -9,6 +9,7 @@ import 'package:reboot_app_3/features/community/domain/services/forum_service.da
 import 'package:reboot_app_3/features/community/domain/services/post_validation_service.dart';
 import 'package:reboot_app_3/features/community/data/models/post_form_data.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
+import 'dart:math' as math;
 
 // Forum Repository Provider
 final forumRepositoryProvider = Provider<ForumRepository>((ref) {
@@ -135,6 +136,21 @@ final replyStateProvider =
   return ReplyStateNotifier();
 });
 
+/// Provider for optimistic post state (immediate count updates)
+final optimisticPostStateProvider = StateNotifierProvider.family<
+    OptimisticPostStateNotifier, OptimisticPostState, String>((ref, postId) {
+  // Get the initial state from the actual post
+  final initialPost = ref.watch(postDetailProvider(postId)).value;
+
+  return OptimisticPostStateNotifier(
+    OptimisticPostState(
+      postId: postId,
+      likeCount: initialPost?.likeCount ?? 0,
+      dislikeCount: initialPost?.dislikeCount ?? 0,
+    ),
+  );
+});
+
 // =============================================================================
 // INTERACTION PROVIDERS
 // =============================================================================
@@ -158,6 +174,17 @@ final userInteractionProvider = FutureProvider.family.autoDispose<Interaction?,
     targetId: params.targetId,
     userCPId: userCPId,
   );
+});
+
+/// Provider for optimistic user interactions (immediate UI feedback)
+final optimisticUserInteractionProvider = StateNotifierProvider.family<
+    OptimisticUserInteractionNotifier,
+    Interaction?,
+    ({String targetType, String targetId, String userCPId})>((ref, params) {
+  // Get the initial state from the actual provider
+  final initialState = ref.watch(userInteractionProvider(params)).value;
+
+  return OptimisticUserInteractionNotifier(initialState);
 });
 
 /// Provider for streaming user's interaction with a specific target
@@ -186,14 +213,14 @@ final userInteractionStreamProvider = StreamProvider.family.autoDispose<
 final postInteractionProvider = StateNotifierProvider.family<
     PostInteractionNotifier, AsyncValue<void>, String>((ref, postId) {
   final repository = ref.watch(forumRepositoryProvider);
-  return PostInteractionNotifier(repository, postId);
+  return PostInteractionNotifier(repository, postId, ref);
 });
 
 /// Provider for comment interactions
 final commentInteractionProvider = StateNotifierProvider.family<
     CommentInteractionNotifier, AsyncValue<void>, String>((ref, commentId) {
   final repository = ref.watch(forumRepositoryProvider);
-  return CommentInteractionNotifier(repository, commentId);
+  return CommentInteractionNotifier(repository, commentId, ref);
 });
 
 /// Provider for all interactions on a target
@@ -256,12 +283,116 @@ class ReplyStateNotifier extends StateNotifier<ReplyState> {
   }
 }
 
+/// Notifier for optimistic user interactions
+class OptimisticUserInteractionNotifier extends StateNotifier<Interaction?> {
+  OptimisticUserInteractionNotifier(Interaction? initialState)
+      : super(initialState);
+
+  void updateOptimistically(int newValue) {
+    // Immediately update UI state
+    if (newValue == 0) {
+      state = null;
+    } else {
+      state = Interaction(
+        id: state?.id ?? 'temp_${DateTime.now().millisecondsSinceEpoch}',
+        targetType: state?.targetType ?? 'post',
+        targetId: state?.targetId ?? '',
+        userCPId: state?.userCPId ?? '',
+        type: 'like',
+        value: newValue,
+        createdAt: DateTime.now(),
+      );
+    }
+  }
+
+  void revertOptimistic(Interaction? originalState) {
+    // Revert to original state if needed
+    state = originalState;
+  }
+
+  void confirmOptimistic(Interaction? confirmedState) {
+    // Confirm the optimistic state with real data
+    state = confirmedState;
+  }
+}
+
+/// State for optimistic post updates
+class OptimisticPostState {
+  final String postId;
+  final int likeCount;
+  final int dislikeCount;
+
+  const OptimisticPostState({
+    required this.postId,
+    required this.likeCount,
+    required this.dislikeCount,
+  });
+
+  OptimisticPostState copyWith({
+    int? likeCount,
+    int? dislikeCount,
+  }) {
+    return OptimisticPostState(
+      postId: postId,
+      likeCount: likeCount ?? this.likeCount,
+      dislikeCount: dislikeCount ?? this.dislikeCount,
+    );
+  }
+}
+
+/// Notifier for optimistic post state
+class OptimisticPostStateNotifier extends StateNotifier<OptimisticPostState> {
+  OptimisticPostStateNotifier(OptimisticPostState initialState)
+      : super(initialState);
+
+  void updateOptimisticCounts(int oldValue, int newValue) {
+    int newLikeCount = state.likeCount;
+    int newDislikeCount = state.dislikeCount;
+
+    // Remove old interaction impact
+    if (oldValue == 1) {
+      newLikeCount = math.max(0, newLikeCount - 1);
+    } else if (oldValue == -1) {
+      newDislikeCount = math.max(0, newDislikeCount - 1);
+    }
+
+    // Add new interaction impact
+    if (newValue == 1) {
+      newLikeCount = newLikeCount + 1;
+    } else if (newValue == -1) {
+      newDislikeCount = newDislikeCount + 1;
+    }
+
+    state = state.copyWith(
+      likeCount: newLikeCount,
+      dislikeCount: newDislikeCount,
+    );
+  }
+
+  void revertOptimisticCounts(int likeCount, int dislikeCount) {
+    // Revert to original counts
+    state = state.copyWith(
+      likeCount: likeCount,
+      dislikeCount: dislikeCount,
+    );
+  }
+
+  void confirmOptimisticCounts(int likeCount, int dislikeCount) {
+    // Confirm the optimistic counts with real data
+    state = state.copyWith(
+      likeCount: likeCount,
+      dislikeCount: dislikeCount,
+    );
+  }
+}
+
 /// Notifier for post interactions
 class PostInteractionNotifier extends StateNotifier<AsyncValue<void>> {
   final ForumRepository _repository;
   final String _postId;
+  final Ref _ref;
 
-  PostInteractionNotifier(this._repository, this._postId)
+  PostInteractionNotifier(this._repository, this._postId, this._ref)
       : super(const AsyncValue.data(null));
 
   Future<void> interact(int value) async {
@@ -269,8 +400,31 @@ class PostInteractionNotifier extends StateNotifier<AsyncValue<void>> {
     try {
       await _repository.interactWithPost(postId: _postId, value: value);
       state = const AsyncValue.data(null);
+
+      // Only invalidate specific user interaction cache to refresh real state
+      _ref.invalidate(userInteractionProvider);
+
+      // Refresh post detail and confirm optimistic counts with real data
+      _ref.invalidate(postDetailProvider(_postId));
+
+      // Get updated post to confirm optimistic counts
+      final updatedPostAsync = _ref.read(postDetailProvider(_postId));
+      updatedPostAsync.whenData((updatedPost) {
+        if (updatedPost != null) {
+          // Confirm optimistic counts with real counts
+          _ref
+              .read(optimisticPostStateProvider(_postId).notifier)
+              .confirmOptimisticCounts(
+                  updatedPost.likeCount, updatedPost.dislikeCount);
+        }
+      });
+
+      // Don't invalidate post lists to prevent disappearing posts
     } catch (e, st) {
       state = AsyncValue.error(e, st);
+
+      // If interaction failed (likely due to ban), optimistic changes will be reverted
+      // by the CommunityInteractionGuard's _revertOptimisticChanges method
     }
   }
 }
@@ -279,8 +433,9 @@ class PostInteractionNotifier extends StateNotifier<AsyncValue<void>> {
 class CommentInteractionNotifier extends StateNotifier<AsyncValue<void>> {
   final ForumRepository _repository;
   final String _commentId;
+  final Ref _ref;
 
-  CommentInteractionNotifier(this._repository, this._commentId)
+  CommentInteractionNotifier(this._repository, this._commentId, this._ref)
       : super(const AsyncValue.data(null));
 
   Future<void> interact(int value) async {
@@ -289,6 +444,9 @@ class CommentInteractionNotifier extends StateNotifier<AsyncValue<void>> {
       await _repository.interactWithComment(
           commentId: _commentId, value: value);
       state = const AsyncValue.data(null);
+
+      // Invalidate user interaction cache to refresh UI
+      _ref.invalidate(userInteractionProvider);
     } catch (e, st) {
       state = AsyncValue.error(e, st);
     }

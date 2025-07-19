@@ -1161,6 +1161,9 @@ const Map<String, String> kEn = {
   "default-image": "Default Image",
   "upload-custom-image": "Upload Custom Image",
   "select-image": "Select Image",
+  "post_creation": "Post Creation",
+  "comment_creation": "Comment Creation",
+  "community_interaction": "Community Interaction",
   "name-too-short": "Name must be at least 2 characters long",
   "anonymous-mode-reassurance": "Your identity is hidden",
   "register-as-anonymous": "Register as Anonymous?",
@@ -1239,45 +1242,56 @@ const Map<String, String> kEn = {
   'latest_posts': 'Latest Posts',
   'see_all': 'See All',
   'search_posts': 'Search Posts',
-  'advanced_search': 'Advanced Search',
-  'search_placeholder': 'Search in posts...',
-  'filters': 'Filters',
-  'search_results': 'Search Results',
-  'no_results_found': 'No results found',
-  'apply_filters': 'Apply Filters',
-  'clear_filters': 'Clear Filters',
-  'search_in_posts': 'Search in Posts',
-  'filter_by_category': 'Filter by Category',
-  'filter_by_date': 'Filter by Date',
-  'filter_by_author': 'Filter by Author',
-  'sort_by': 'Sort by',
-  'newest_first': 'Newest First',
-  'oldest_first': 'Oldest First',
-  'most_liked': 'Most Liked',
-  'most_commented': 'Most Commented',
-  'date_range': 'Date Range',
-  'select_start_date': 'Select Start Date',
-  'select_end_date': 'Select End Date',
-  'author_name': 'Author Name',
+  "advanced_search": "Advanced Search",
+  "search_placeholder": "Search in posts...",
+  "filters": "Filters",
+  "search_results": "Search Results",
+  "no_results_found": "No results found",
+  "apply_filters": "Apply Filters",
+  "clear_filters": "Clear Filters",
+  "search_in_posts": "Search in Posts",
+  "filter_by_category": "Filter by Category",
+  "filter_by_date": "Filter by Date",
+  "filter_by_author": "Filter by Author",
+  "sort_by": "Sort by",
+  "newest_first": "Newest First",
+  "oldest_first": "Oldest First",
+  "most_liked": "Most Liked",
+  "most_commented": "Most Commented",
+  "date_range": "Date Range",
+  "select_start_date": "Select Start Date",
+  "select_end_date": "Select End Date",
+  "author_name": "Author Name",
 
   // Groups coming soon screen
-  'groups_coming_soon_title': 'You\'re on the list!',
-  'groups_coming_soon_description':
-      'Support groups will open in phases. We\'ll let you know as soon as you can join when we launch the following features:',
-  'groups_feature_support_groups': 'Support Groups',
-  'groups_feature_support_groups_desc':
-      'Join small support groups with others on similar recovery journeys',
-  'groups_feature_group_chat': 'Group Chat',
-  'groups_feature_group_chat_desc':
-      'Private messaging within your support group',
-  'groups_feature_group_challenges': 'Group Challenges',
-  'groups_feature_group_challenges_desc':
-      'Participate in group challenges and track progress together',
-  'groups_feature_group_events': 'Group Events',
-  'groups_feature_group_events_desc':
-      'Join virtual meetups and group activities',
-  'groups_got_it': 'Got it',
-  'groups_thanks': 'Thanks!',
-  'groups_working_hard_message':
-      'We\'re working hard to bring you the best support group experience.',
+  "groups_coming_soon_title": "You're on the list!",
+  "groups_coming_soon_description":
+      "Support groups will open in phases. We'll let you know as soon as you can join when we launch the following features:",
+  "groups_feature_support_groups": "Support Groups",
+  "groups_feature_support_groups_desc":
+      "Join small support groups with others on similar recovery journeys",
+  "groups_feature_group_chat": "Group Chat",
+  "groups_feature_group_chat_desc":
+      "Private messaging within your support group",
+  "groups_feature_group_challenges": "Group Challenges",
+  "groups_feature_group_challenges_desc":
+      "Participate in group challenges and track progress together",
+  "groups_feature_group_events": "Group Events",
+  "groups_feature_group_events_desc":
+      "Join virtual meetups and group activities",
+  "groups_got_it": "Got it",
+  "groups_thanks": "Thanks!",
+  "groups_working_hard_message":
+      "We're working hard to bring you the best support group experience.",
+
+  // Feature access guard translations
+  "post-creation-restricted":
+      "Your ability to create posts has been restricted",
+  "comment-creation-restricted":
+      "Your ability to add comments has been restricted",
+  "community-interaction-restricted":
+      "Your ability to interact with content has been restricted",
+  "post_creation_banned": "You are {type} banned from creating posts",
+  "comment_creation_banned": "You are {type} banned from adding comments",
+  "interaction_banned": "You are {type} banned from interacting with content",
 };

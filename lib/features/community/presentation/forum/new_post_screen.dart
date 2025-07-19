@@ -14,6 +14,8 @@ import 'package:reboot_app_3/features/community/data/exceptions/forum_exceptions
 import 'package:reboot_app_3/features/community/presentation/providers/forum_providers.dart';
 import 'package:reboot_app_3/features/community/presentation/providers/community_providers_new.dart';
 import 'package:reboot_app_3/features/community/presentation/forum/anonymity_toggle_modal.dart';
+import 'package:reboot_app_3/features/account/presentation/widgets/feature_access_guard.dart';
+import 'package:reboot_app_3/features/account/data/app_features_config.dart';
 
 /// Screen for creating a new forum post
 ///
@@ -771,9 +773,20 @@ class _NewPostScreenState extends ConsumerState<NewPostScreen> {
     );
   }
 
-  /// Handles form submission
+  /// Handles form submission with feature access check
   Future<void> _handleSubmit() async {
     if (!_canSubmit) return;
+
+    // Double-check feature access before submitting
+    final canAccess =
+        await checkFeatureAccess(ref, AppFeaturesConfig.postCreation);
+    if (!canAccess) {
+      getErrorSnackBar(
+        context,
+        'post-creation-restricted',
+      );
+      return;
+    }
 
     setState(() => _isSubmitting = true);
 

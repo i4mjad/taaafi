@@ -13,6 +13,9 @@ import '../../../../core/theming/text_styles.dart';
 import '../../../../core/theming/spacing.dart';
 import '../../../../core/routing/route_names.dart';
 import '../../../../core/helpers/date_display_formater.dart';
+import '../../data/app_features_config.dart';
+import '../../../../core/shared_widgets/snackbar.dart';
+import '../../../community/presentation/providers/forum_providers.dart';
 
 /// Widget that guards access to specific features based on user bans
 class FeatureAccessGuard extends ConsumerWidget {
@@ -515,58 +518,8 @@ Future<void> showFeatureBanDialog(
   );
 }
 
-/// Enhanced helper function to show feature ban snackbar with navigation to user profile
-void showFeatureBanSnackbar(
-  BuildContext context,
-  String featureUniqueName, {
-  String? customMessage,
-  bool isPermanent = false,
-}) {
-  final theme = AppTheme.of(context);
-  final l10n = AppLocalizations.of(context);
-
-  // Determine message based on ban type
-  final banTypeText = isPermanent
-      ? l10n.translate('permanently-banned')
-      : l10n.translate('temporarily-banned');
-
-  final message = customMessage ??
-      '${l10n.translate('feature-access-denied')} - $banTypeText';
-
-  ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(
-      content: Row(
-        children: [
-          Icon(
-            LucideIcons.shieldOff,
-            color: Colors.white,
-            size: 20,
-          ),
-          horizontalSpace(Spacing.points8),
-          Expanded(
-            child: Text(
-              message,
-              style: TextStyles.body.copyWith(color: Colors.white),
-            ),
-          ),
-        ],
-      ),
-      backgroundColor: theme.error[600],
-      duration: const Duration(seconds: 4),
-      action: SnackBarAction(
-        label: l10n.translate('view-details'),
-        textColor: Colors.white,
-        onPressed: () {
-          // Navigate to user profile screen to show ban details
-          context.pushNamed(RouteNames.userProfile.name);
-        },
-      ),
-    ),
-  );
-}
-
-/// Helper function to check feature access and show snackbar if banned
-Future<bool> checkFeatureAccessAndShowSnackbar(
+/// Helper function to check feature access and show ban snackbar if restricted
+Future<bool> checkFeatureAccessAndShowBanSnackbar(
   BuildContext context,
   WidgetRef ref,
   String featureUniqueName, {
@@ -582,13 +535,328 @@ Future<bool> checkFeatureAccessAndShowSnackbar(
 
     final isPermanent = ban?.severity == BanSeverity.permanent;
 
-    showFeatureBanSnackbar(
+    // Use the existing showBanSnackBar function
+    showBanSnackBar(
       context,
-      featureUniqueName,
-      customMessage: customMessage,
+      customMessage ??
+          AppLocalizations.of(context).translate('feature-access-restricted'),
+      onViewDetails: () {
+        // Navigate to user profile screen to show ban details
+        context.pushNamed(RouteNames.userProfile.name);
+      },
       isPermanent: isPermanent,
     );
   }
 
   return canAccess;
+}
+
+/// Enhanced Feature Access Guard with instant feedback support
+/// Perfect for community interactions where users expect immediate visual feedback
+class QuickActionGuard extends ConsumerStatefulWidget {
+  final String featureUniqueName;
+  final Widget child;
+  final VoidCallback onAccessGranted;
+  final VoidCallback? onAccessDenied;
+  final String? customBanMessage;
+  final bool showInstantFeedback;
+  final Duration feedbackDuration;
+
+  const QuickActionGuard({
+    Key? key,
+    required this.featureUniqueName,
+    required this.child,
+    required this.onAccessGranted,
+    this.onAccessDenied,
+    this.customBanMessage,
+    this.showInstantFeedback = true,
+    this.feedbackDuration = const Duration(milliseconds: 300),
+  }) : super(key: key);
+
+  @override
+  ConsumerState<QuickActionGuard> createState() => _QuickActionGuardState();
+}
+
+class _QuickActionGuardState extends ConsumerState<QuickActionGuard>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _animationController;
+  late Animation<double> _scaleAnimation;
+  bool _isProcessing = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      duration: widget.feedbackDuration,
+      vsync: this,
+    );
+    _scaleAnimation = Tween<double>(
+      begin: 1.0,
+      end: 0.95,
+    ).animate(CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeInOut,
+    ));
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: _handleTap,
+      child: AnimatedBuilder(
+        animation: _scaleAnimation,
+        builder: (context, child) {
+          return Transform.scale(
+            scale: _scaleAnimation.value,
+            child: widget.child,
+          );
+        },
+      ),
+    );
+  }
+
+  Future<void> _handleTap() async {
+    if (_isProcessing) return;
+
+    setState(() => _isProcessing = true);
+
+    // Show instant visual feedback
+    if (widget.showInstantFeedback) {
+      await _animationController.forward();
+      await _animationController.reverse();
+    }
+
+    // Check feature access
+    try {
+      final canAccess = await checkFeatureAccess(ref, widget.featureUniqueName);
+
+      if (canAccess) {
+        // Execute the action
+        widget.onAccessGranted();
+      } else {
+        // Show quick ban notification
+        await _showQuickBanFeedback();
+        widget.onAccessDenied?.call();
+      }
+    } catch (e) {
+      // On error, allow the action (fail-safe approach)
+      widget.onAccessGranted();
+    } finally {
+      if (mounted) {
+        setState(() => _isProcessing = false);
+      }
+    }
+  }
+
+  Future<void> _showQuickBanFeedback() async {
+    if (!mounted) return;
+
+    final ban = await ref.read(
+      currentUserFeatureBanProvider(widget.featureUniqueName).future,
+    );
+
+    final isPermanent = ban?.severity == BanSeverity.permanent;
+
+    // Use the existing showBanSnackBar function
+    showBanSnackBar(
+      context,
+      widget.customBanMessage ??
+          AppLocalizations.of(context).translate('feature-access-restricted'),
+      onViewDetails: () {
+        // Navigate to user profile screen to show ban details
+        context.pushNamed(RouteNames.userProfile.name);
+      },
+      isPermanent: isPermanent,
+    );
+  }
+}
+
+/// Smart Feature Guard that adapts UX based on action type
+class SmartFeatureGuard extends ConsumerWidget {
+  final String featureUniqueName;
+  final Widget child;
+  final VoidCallback onAccessGranted;
+  final VoidCallback? onAccessDenied;
+  final String? customBanMessage;
+  final FeatureGuardMode mode;
+
+  const SmartFeatureGuard({
+    Key? key,
+    required this.featureUniqueName,
+    required this.child,
+    required this.onAccessGranted,
+    this.onAccessDenied,
+    this.customBanMessage,
+    this.mode = FeatureGuardMode.modal,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    switch (mode) {
+      case FeatureGuardMode.quick:
+        return QuickActionGuard(
+          featureUniqueName: featureUniqueName,
+          onAccessGranted: onAccessGranted,
+          onAccessDenied: onAccessDenied,
+          customBanMessage: customBanMessage,
+          child: child,
+        );
+      case FeatureGuardMode.modal:
+        return FeatureAccessGuard(
+          featureUniqueName: featureUniqueName,
+          onTap: onAccessGranted,
+          customBanMessage: customBanMessage,
+          child: child,
+        );
+      case FeatureGuardMode.silent:
+        return SilentFeatureGuard(
+          featureUniqueName: featureUniqueName,
+          onAccessGranted: onAccessGranted,
+          onAccessDenied: onAccessDenied,
+        );
+    }
+  }
+}
+
+/// Determines how the feature guard should behave
+enum FeatureGuardMode {
+  /// Shows instant feedback, then processes action - for quick interactions
+  quick,
+
+  /// Shows modal with ban details - for major actions like posting
+  modal,
+
+  /// No UI, just programmatic check - for background operations
+  silent,
+}
+
+/// Convenient wrapper for community posting actions
+class CommunityPostGuard extends StatelessWidget {
+  final Widget child;
+  final VoidCallback onAccessGranted;
+  final VoidCallback? onAccessDenied;
+
+  const CommunityPostGuard({
+    Key? key,
+    required this.child,
+    required this.onAccessGranted,
+    this.onAccessDenied,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return SmartFeatureGuard(
+      featureUniqueName: AppFeaturesConfig.postCreation,
+      mode: FeatureGuardMode.modal,
+      onAccessGranted: onAccessGranted,
+      onAccessDenied: onAccessDenied,
+      customBanMessage:
+          AppLocalizations.of(context).translate('post-creation-restricted'),
+      child: child,
+    );
+  }
+}
+
+/// Convenient wrapper for community commenting actions
+class CommunityCommentGuard extends StatelessWidget {
+  final Widget child;
+  final VoidCallback onAccessGranted;
+  final VoidCallback? onAccessDenied;
+
+  const CommunityCommentGuard({
+    Key? key,
+    required this.child,
+    required this.onAccessGranted,
+    this.onAccessDenied,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return SmartFeatureGuard(
+      featureUniqueName: AppFeaturesConfig.commentCreation,
+      mode: FeatureGuardMode.quick,
+      onAccessGranted: onAccessGranted,
+      onAccessDenied: onAccessDenied,
+      customBanMessage:
+          AppLocalizations.of(context).translate('comment-creation-restricted'),
+      child: child,
+    );
+  }
+}
+
+/// Guard for community interactions (likes, dislikes, etc.)
+/// Provides instant feedback using quick action pattern
+class CommunityInteractionGuard extends ConsumerWidget {
+  final VoidCallback onAccessGranted;
+  final Widget child;
+  final String? postId;
+  final String? userCPId;
+
+  const CommunityInteractionGuard({
+    super.key,
+    required this.onAccessGranted,
+    required this.child,
+    this.postId,
+    this.userCPId,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return QuickActionGuard(
+      featureUniqueName: AppFeaturesConfig.communityInteraction,
+      onAccessGranted: onAccessGranted,
+      onAccessDenied: postId != null && userCPId != null
+          ? () => _revertOptimisticChanges(ref)
+          : null,
+      child: child,
+    );
+  }
+
+  void _revertOptimisticChanges(WidgetRef ref) {
+    // Revert optimistic interaction changes if user is banned
+    if (postId != null && userCPId != null) {
+      try {
+        // Get the real interaction state from server
+        final realInteractionAsync = ref.read(
+          userInteractionProvider((
+            targetType: 'post',
+            targetId: postId!,
+            userCPId: userCPId!,
+          )),
+        );
+
+        // Get the real post state from server
+        final realPostAsync = ref.read(postDetailProvider(postId!));
+
+        realInteractionAsync.whenData((realInteraction) {
+          // Revert optimistic interaction state to real state
+          ref
+              .read(optimisticUserInteractionProvider((
+                targetType: 'post',
+                targetId: postId!,
+                userCPId: userCPId!,
+              )).notifier)
+              .revertOptimistic(realInteraction);
+        });
+
+        realPostAsync.whenData((realPost) {
+          if (realPost != null) {
+            // Revert optimistic counts to real counts
+            ref
+                .read(optimisticPostStateProvider(postId!).notifier)
+                .revertOptimisticCounts(
+                    realPost.likeCount, realPost.dislikeCount);
+          }
+        });
+      } catch (e) {
+        debugPrint('Error reverting optimistic changes: $e');
+      }
+    }
+  }
 }

@@ -272,7 +272,7 @@ const Map<String, String> kAr = {
       "هل أنت متأكد من حذف هذا المنشور؟ لا يمكن التراجع عن هذا الإجراء.",
   "post_reported": "تم الإبلاغ عن المنشور بنجاح",
   "post_deleted": "تم حذف المنشور بنجاح",
-  "no_categories_found": "لا توجد فئات متاحة",
+  "no-categories_found": "لا توجد فئات متاحة",
   "pinned_section_description":
       "الإعلانات المهمة والمحتوى المميز الذي يبقى في المقدمة للوصول السهل.",
   "posts_section_description":
@@ -292,8 +292,8 @@ const Map<String, String> kAr = {
   "no_pinned_posts_title": "لا توجد منشورات مثبتة",
   "no_pinned_posts_message":
       "الإعلانات المهمة والمحتوى المميز سيظهر هنا عند توفره.",
-  "no_news_posts_title": "لا توجد أخبار",
-  "no_news_posts_message":
+  "no-news-posts-title": "لا توجد أخبار",
+  "no-news-posts-message":
       "آخر التحديثات وإعلانات المجتمع ستُنشر هنا عند توفرها.",
   "news_section_description":
       "ابق على اطلاع بأحدث الإعلانات والتحديثات والمعلومات المهمة من المجتمع.",
@@ -1140,7 +1140,9 @@ const Map<String, String> kAr = {
       "لديك تغييرات غير محفوظة. هل أنت متأكد من أنك تريد المغادرة؟",
   "discard": "إهمال",
   "error_loading_categories": "خطأ في تحميل الفئات",
-
+  "post_creation": "إنشاء المنشور",
+  "comment_creation": "إنشاء التعليق",
+  "community_interaction": "التفاعل مع المحتوى",
   'community_posts': 'المشاركات',
   'community_news': 'الأخبار',
   'community_pinned': 'مثبت',
@@ -1243,4 +1245,12 @@ const Map<String, String> kAr = {
   "comment_deleted": "تم حذف التعليق بنجاح",
   'no_posts_in_category': 'لا توجد منشورات في هذه الفئة',
   'category_posts_subtitle': 'تصفح المنشورات في هذه الفئة',
+
+  // Feature access guard translations
+  "post-creation-restricted": "تم تقييد قدرتك على إنشاء المنشورات",
+  "comment-creation-restricted": "تم تقييد قدرتك على إضافة التعليقات",
+  "community-interaction-restricted": "تم تقييد قدرتك على التفاعل مع المحتوى",
+  "post_creation_banned": "أنت محظور {type} من إنشاء المنشورات",
+  "comment_creation_banned": "أنت محظور {type} من إضافة التعليقات",
+  "interaction_banned": "أنت محظور {type} من التفاعل مع المحتوى",
 };

@@ -4,6 +4,9 @@ import 'package:reboot_app_3/features/community/data/repositories/forum_reposito
 import 'package:reboot_app_3/features/community/domain/services/post_validation_service.dart';
 import 'package:reboot_app_3/features/community/data/exceptions/forum_exceptions.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
+import '../../../account/data/app_features_config.dart';
+import '../../../account/application/ban_warning_facade.dart';
+import '../../../account/data/models/ban.dart';
 
 /// Service layer for forum operations
 ///
@@ -395,20 +398,35 @@ class ForumService {
   /// Throws [ForumPermissionException] if user doesn't have permission
   Future<void> _checkPostCreationPermission(
       AppLocalizations localizations) async {
-    // TODO: Implement proper permission checking
-    // For now, all authenticated users can create posts
-    // In the future, this should check user roles, bans, etc.
+    try {
+      final facade = BanWarningFacade();
+      final canAccess = await facade.canUserAccessFeature(
+        AppFeaturesConfig.postCreation,
+      );
 
-    // Example implementation:
-    // final user = _auth.currentUser!;
-    // final permissions = await _permissionService.getUserPermissions(user.uid);
-    // if (!permissions.canCreatePosts) {
-    //   throw ForumPermissionException(
-    //     localizations.translate('no_post_creation_permission'),
-    //     action: 'create_post',
-    //     code: 'NO_POST_CREATION_PERMISSION',
-    //   );
-    // }
+      if (!canAccess) {
+        final ban = await facade.getCurrentUserFeatureBan(
+          AppFeaturesConfig.postCreation,
+        );
+
+        final banType = ban?.severity == BanSeverity.permanent
+            ? 'permanently'
+            : 'temporarily';
+
+        throw ForumPermissionException(
+          localizations
+              .translate('post_creation_banned')
+              .replaceAll('{type}', banType),
+          action: 'create_post',
+          code: 'POST_CREATION_BANNED',
+        );
+      }
+    } catch (e) {
+      if (e is ForumPermissionException) {
+        rethrow;
+      }
+      // Fail-safe: allow on error
+    }
   }
 
   /// Checks if the user has permission to create comments
@@ -416,16 +434,70 @@ class ForumService {
   /// Throws [ForumPermissionException] if user doesn't have permission
   Future<void> _checkCommentCreationPermission(
       AppLocalizations localizations) async {
-    // TODO: Implement proper permission checking
-    // For now, all authenticated users can create comments
+    try {
+      final facade = BanWarningFacade();
+      final canAccess = await facade.canUserAccessFeature(
+        AppFeaturesConfig.commentCreation,
+      );
+
+      if (!canAccess) {
+        final ban = await facade.getCurrentUserFeatureBan(
+          AppFeaturesConfig.commentCreation,
+        );
+
+        final banType = ban?.severity == BanSeverity.permanent
+            ? 'permanently'
+            : 'temporarily';
+
+        throw ForumPermissionException(
+          localizations
+              .translate('comment_creation_banned')
+              .replaceAll('{type}', banType),
+          action: 'create_comment',
+          code: 'COMMENT_CREATION_BANNED',
+        );
+      }
+    } catch (e) {
+      if (e is ForumPermissionException) {
+        rethrow;
+      }
+      // Fail-safe: allow on error
+    }
   }
 
   /// Checks if the user has permission to vote
   ///
   /// Throws [ForumPermissionException] if user doesn't have permission
   Future<void> _checkVotingPermission(AppLocalizations localizations) async {
-    // TODO: Implement proper permission checking
-    // For now, all authenticated users can vote
+    try {
+      final facade = BanWarningFacade();
+      final canAccess = await facade.canUserAccessFeature(
+        AppFeaturesConfig.communityInteraction,
+      );
+
+      if (!canAccess) {
+        final ban = await facade.getCurrentUserFeatureBan(
+          AppFeaturesConfig.communityInteraction,
+        );
+
+        final banType = ban?.severity == BanSeverity.permanent
+            ? 'permanently'
+            : 'temporarily';
+
+        throw ForumPermissionException(
+          localizations
+              .translate('interaction_banned')
+              .replaceAll('{type}', banType),
+          action: 'interact',
+          code: 'INTERACTION_BANNED',
+        );
+      }
+    } catch (e) {
+      if (e is ForumPermissionException) {
+        rethrow;
+      }
+      // Fail-safe: allow on error
+    }
   }
 
   /// Checks rate limiting for the specified resource

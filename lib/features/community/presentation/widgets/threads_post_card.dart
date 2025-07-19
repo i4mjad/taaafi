@@ -5,10 +5,12 @@ import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/features/community/data/models/post.dart';
+import 'package:reboot_app_3/features/community/data/models/interaction.dart';
 import 'package:reboot_app_3/features/community/presentation/widgets/avatar_with_anonymity.dart';
 import 'package:reboot_app_3/features/community/presentation/providers/community_providers_new.dart';
 import 'package:reboot_app_3/features/community/presentation/providers/forum_providers.dart';
 import 'package:reboot_app_3/features/community/presentation/widgets/report_content_modal.dart';
+import 'package:reboot_app_3/features/account/presentation/widgets/feature_access_guard.dart';
 
 class ThreadsPostCard extends ConsumerWidget {
   final Post post;
@@ -28,17 +30,25 @@ class ThreadsPostCard extends ConsumerWidget {
     final authorProfileAsync =
         ref.watch(communityProfileByIdProvider(post.authorCPId));
 
-    // Watch user's interaction with this post
-    final userInteractionAsync = ref.watch(
-      userInteractionProvider((
+    // Get current user's CP ID
+    final currentUserCPId = currentProfileAsync.maybeWhen(
+      data: (profile) => profile?.id ?? '',
+      orElse: () => '',
+    );
+
+    // Watch optimistic user's interaction with this post (immediate feedback)
+    final optimisticInteractionAsync = ref.watch(
+      optimisticUserInteractionProvider((
         targetType: 'post',
         targetId: post.id,
-        userCPId: currentProfileAsync.maybeWhen(
-          data: (profile) => profile?.id ?? '',
-          orElse: () => '',
-        ),
+        userCPId: currentUserCPId,
       )),
     );
+
+    // Watch optimistic post counts (immediate count updates)
+    final optimisticPostState = ref.watch(optimisticPostStateProvider(post.id));
+
+    // No need to watch interaction loading state since we have optimistic updates
 
     return GestureDetector(
       onTap: onTap,
@@ -195,38 +205,32 @@ class ThreadsPostCard extends ConsumerWidget {
                       Row(
                         children: [
                           // Like button
-                          userInteractionAsync.when(
-                            data: (interaction) {
+                          Builder(
+                            builder: (context) {
+                              final interaction = optimisticInteractionAsync;
                               final isLiked = interaction?.value == 1;
-                              return _buildEngagementButton(
-                                theme,
-                                LucideIcons.thumbsUp,
-                                isLiked,
-                                () => _handleInteraction(
-                                    ref, 1, interaction?.value),
-                                activeColor: const Color(
-                                    0xFF10B981), // Green color for likes
+                              return CommunityInteractionGuard(
+                                onAccessGranted: () =>
+                                    _handleOptimisticInteraction(
+                                        ref, 1, interaction, currentUserCPId),
+                                postId: post.id,
+                                userCPId: currentUserCPId,
+                                child: _buildEngagementButton(
+                                  theme,
+                                  LucideIcons.thumbsUp,
+                                  isLiked,
+                                  null, // No onTap since it's handled by guard
+                                  activeColor: const Color(
+                                      0xFF10B981), // Green color for likes
+                                ),
                               );
                             },
-                            loading: () => _buildEngagementButton(
-                              theme,
-                              LucideIcons.thumbsUp,
-                              false,
-                              null,
-                            ),
-                            error: (error, stackTrace) =>
-                                _buildEngagementButton(
-                              theme,
-                              LucideIcons.thumbsUp,
-                              false,
-                              null,
-                            ),
                           ),
 
                           const SizedBox(width: 4),
 
                           Text(
-                            post.likeCount.toString(),
+                            optimisticPostState.likeCount.toString(),
                             style: TextStyles.caption.copyWith(
                               color: theme.grey[600],
                             ),
@@ -235,38 +239,32 @@ class ThreadsPostCard extends ConsumerWidget {
                           const SizedBox(width: 16),
 
                           // Dislike button
-                          userInteractionAsync.when(
-                            data: (interaction) {
+                          Builder(
+                            builder: (context) {
+                              final interaction = optimisticInteractionAsync;
                               final isDisliked = interaction?.value == -1;
-                              return _buildEngagementButton(
-                                theme,
-                                LucideIcons.thumbsDown,
-                                isDisliked,
-                                () => _handleInteraction(
-                                    ref, -1, interaction?.value),
-                                activeColor: const Color(
-                                    0xFFEF4444), // Red color for dislikes
+                              return CommunityInteractionGuard(
+                                onAccessGranted: () =>
+                                    _handleOptimisticInteraction(
+                                        ref, -1, interaction, currentUserCPId),
+                                postId: post.id,
+                                userCPId: currentUserCPId,
+                                child: _buildEngagementButton(
+                                  theme,
+                                  LucideIcons.thumbsDown,
+                                  isDisliked,
+                                  null, // No onTap since it's handled by guard
+                                  activeColor: const Color(
+                                      0xFFEF4444), // Red color for dislikes
+                                ),
                               );
                             },
-                            loading: () => _buildEngagementButton(
-                              theme,
-                              LucideIcons.thumbsDown,
-                              false,
-                              null,
-                            ),
-                            error: (error, stackTrace) =>
-                                _buildEngagementButton(
-                              theme,
-                              LucideIcons.thumbsDown,
-                              false,
-                              null,
-                            ),
                           ),
 
                           const SizedBox(width: 4),
 
                           Text(
-                            post.dislikeCount.toString(),
+                            optimisticPostState.dislikeCount.toString(),
                             style: TextStyles.caption.copyWith(
                               color: theme.grey[600],
                             ),
@@ -353,6 +351,29 @@ class ThreadsPostCard extends ConsumerWidget {
     }
 
     // Trigger the interaction
+    ref.read(postInteractionProvider(post.id).notifier).interact(newValue);
+  }
+
+  void _handleOptimisticInteraction(WidgetRef ref, int value,
+      Interaction? interaction, String currentUserCPId) {
+    final oldValue = interaction?.value ?? 0;
+    final newValue = oldValue == value ? 0 : value;
+
+    // 1. Immediately update interaction UI (optimistic)
+    ref
+        .read(optimisticUserInteractionProvider((
+          targetType: 'post',
+          targetId: post.id,
+          userCPId: currentUserCPId,
+        )).notifier)
+        .updateOptimistically(newValue);
+
+    // 2. Immediately update counts UI (optimistic)
+    ref
+        .read(optimisticPostStateProvider(post.id).notifier)
+        .updateOptimisticCounts(oldValue, newValue);
+
+    // 3. Process actual interaction (this will check for bans)
     ref.read(postInteractionProvider(post.id).notifier).interact(newValue);
   }
 

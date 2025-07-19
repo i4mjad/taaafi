@@ -13,6 +13,7 @@ import 'package:reboot_app_3/features/community/presentation/providers/forum_pro
 import 'package:reboot_app_3/features/community/presentation/widgets/avatar_with_anonymity.dart';
 import 'package:reboot_app_3/features/community/presentation/providers/community_providers_new.dart';
 import 'package:reboot_app_3/features/community/data/models/post_category.dart';
+import 'package:reboot_app_3/features/account/presentation/widgets/feature_access_guard.dart';
 
 class CommunityMainScreen extends ConsumerStatefulWidget {
   const CommunityMainScreen({super.key});
@@ -140,12 +141,15 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen> {
       ),
       backgroundColor: theme.backgroundColor,
       body: _buildForumTab(),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
+      floatingActionButton: CommunityPostGuard(
+        onAccessGranted: () {
           context.pushNamed(RouteNames.newPost.name);
         },
-        backgroundColor: theme.primary[500],
-        child: const Icon(LucideIcons.plus, color: Colors.white),
+        child: FloatingActionButton(
+          onPressed: null, // Handled by CommunityPostGuard
+          backgroundColor: theme.primary[500],
+          child: const Icon(LucideIcons.plus, color: Colors.white),
+        ),
       ),
     );
   }
@@ -444,7 +448,7 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen> {
             children: [
               Text(
                 title,
-                style: TextStyles.caption.copyWith(
+                style: TextStyles.body.copyWith(
                   fontWeight: FontWeight.w600,
                   color: theme.grey[900],
                 ),
@@ -452,7 +456,7 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen> {
               const SizedBox(height: 2),
               Text(
                 description,
-                style: TextStyles.tiny.copyWith(
+                style: TextStyles.caption.copyWith(
                   color: theme.grey[600],
                   height: 1.3,
                 ),

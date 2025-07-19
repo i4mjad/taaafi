@@ -8,6 +8,7 @@ import 'package:reboot_app_3/features/community/data/models/comment.dart';
 import 'package:reboot_app_3/features/community/presentation/widgets/avatar_with_anonymity.dart';
 import 'package:reboot_app_3/features/community/presentation/providers/community_providers_new.dart';
 import 'package:reboot_app_3/features/community/presentation/providers/forum_providers.dart';
+import 'package:reboot_app_3/features/account/presentation/widgets/feature_access_guard.dart';
 
 class CommentTileWidget extends ConsumerWidget {
   final Comment comment;
@@ -336,10 +337,10 @@ class _CommentInteractionButton extends ConsumerWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        GestureDetector(
-          onTap: isLoading ? null : () => _handleInteraction(ref),
+        CommunityInteractionGuard(
+          onAccessGranted: isLoading ? () {} : () => _handleInteraction(ref),
           child: Container(
-            padding: const EdgeInsets.all(4),
+            padding: const EdgeInsets.all(0),
             decoration: BoxDecoration(
               color: isActive ? theme.primary[50] : Colors.transparent,
               borderRadius: BorderRadius.circular(4),

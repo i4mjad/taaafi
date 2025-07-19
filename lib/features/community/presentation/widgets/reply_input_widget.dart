@@ -11,6 +11,8 @@ import 'package:reboot_app_3/features/community/presentation/providers/forum_pro
 import 'package:reboot_app_3/features/community/presentation/providers/community_providers_new.dart';
 import 'package:reboot_app_3/features/community/presentation/forum/anonymity_toggle_modal.dart';
 import 'package:reboot_app_3/features/community/data/models/comment.dart';
+import 'package:reboot_app_3/features/account/presentation/widgets/feature_access_guard.dart';
+import 'package:reboot_app_3/features/account/data/app_features_config.dart';
 
 class ReplyInputWidget extends ConsumerStatefulWidget {
   final String postId;
@@ -148,9 +150,9 @@ class _ReplyInputWidgetState extends ConsumerState<ReplyInputWidget> {
                     // Send button
                     if (_replyController.text.isNotEmpty || _isSubmitting) ...[
                       const SizedBox(width: 8),
-                      GestureDetector(
-                        onTap: _isSubmitting
-                            ? null
+                      CommunityCommentGuard(
+                        onAccessGranted: _isSubmitting
+                            ? () {} // No-op when submitting
                             : () => _handleSubmit(_replyController.text),
                         child: Container(
                           padding: const EdgeInsets.symmetric(
@@ -400,6 +402,17 @@ class _ReplyInputWidgetState extends ConsumerState<ReplyInputWidget> {
 
   Future<void> _handleSubmit(String text) async {
     if (text.trim().isEmpty || _isSubmitting) return;
+
+    // Double-check feature access before submitting
+    final canAccess =
+        await checkFeatureAccess(ref, AppFeaturesConfig.commentCreation);
+    if (!canAccess) {
+      getErrorSnackBar(
+        context,
+        'comment-creation-restricted',
+      );
+      return;
+    }
 
     setState(() {
       _isSubmitting = true;
