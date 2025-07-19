@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:fl_chart/fl_chart.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/shared_widgets/spinner.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
@@ -31,6 +32,11 @@ class _StreakPeriodsModalState extends ConsumerState<StreakPeriodsModal> {
   PeriodDisplayMode _displayMode = PeriodDisplayMode.summary;
   List<PeriodInfo> _periods = [];
   bool _isLoading = true;
+
+  // Chart data
+  late List<FlSpot> _chartSpots = [];
+  late double _maxX = 0;
+  late double _maxY = 0;
 
   // Define segmented button options
   late final List<SegmentedButtonOption> _segmentedOptions;
@@ -66,6 +72,7 @@ class _StreakPeriodsModalState extends ConsumerState<StreakPeriodsModal> {
           await streakService.getFollowUpsByType(widget.followUpType);
 
       final periods = _calculatePeriods(userFirstDate, followUps);
+      _calculateChartData(periods);
 
       setState(() {
         _periods = periods;
@@ -135,6 +142,83 @@ class _StreakPeriodsModalState extends ConsumerState<StreakPeriodsModal> {
     }
 
     return periods;
+  }
+
+  /// Calculates chart data points for visualizing streak periods
+  ///
+  /// The algorithm creates a continuous line chart where:
+  /// - Each period is represented as a line segment
+  /// - X-axis shows cumulative total days across all periods
+  /// - Y-axis shows days within each period (0 to period duration)
+  /// - Each new period starts where the previous one ended
+  ///
+  /// Example calculation for 3 periods:
+  /// Period 1: 34 days -> Points: (0,0) to (34,34)
+  /// Period 2: 15 days -> Points: (34,0) to (49,15)
+  /// Period 3: 10 days (ongoing) -> Points: (49,0), (50,1), (51,2)...(59,10)
+  ///
+  /// Visual representation:
+  /// Y (Days in Period)
+  /// ^
+  /// | 34 ●─────● 15 ●
+  /// |   /         / ●
+  /// |  /         /  ● 10
+  /// | /         /   ●
+  /// |/         /    ●  (ongoing)
+  /// 0 ●       ●     ●
+  /// +─────────────────────> X (Cumulative Days)
+  ///   0    34   49   59
+  void _calculateChartData(List<PeriodInfo> periods) {
+    _chartSpots = [];
+    double cumulativeDays = 0;
+
+    for (int i = 0; i < periods.length; i++) {
+      final period = periods[i];
+      final periodDays = period.duration.inDays.toDouble();
+
+      // STEP 1: Add start point of the period
+      // First period starts at origin (0,0)
+      // Subsequent periods start at (cumulative_days_so_far, 0)
+      if (i == 0) {
+        _chartSpots.add(FlSpot(0, 0));
+      } else {
+        _chartSpots.add(FlSpot(cumulativeDays, 0));
+      }
+
+      // STEP 2: Calculate the cumulative days including this period
+      cumulativeDays += periodDays;
+
+      // STEP 3: Add end point(s) for the period
+      if (!period.isCurrentPeriod) {
+        // For completed periods: add single end point
+        // Creates a straight line from start to end
+        _chartSpots.add(FlSpot(cumulativeDays, periodDays));
+      } else {
+        // For current/ongoing period: add multiple points
+        // This shows day-by-day progress and indicates it's still active
+        // Each point represents one day of progress
+        for (int day = 1; day <= periodDays.toInt(); day++) {
+          // X: cumulative days up to this day
+          // Y: day number within current period
+          final x = cumulativeDays - periodDays + day;
+          final y = day.toDouble();
+          _chartSpots.add(FlSpot(x, y));
+        }
+      }
+    }
+
+    // STEP 4: Calculate chart bounds
+    // X-axis max is the total cumulative days
+    _maxX = cumulativeDays;
+
+    // Find the longest period for Y-axis max
+    _maxY = periods
+        .map((p) => p.duration.inDays.toDouble())
+        .reduce((a, b) => a > b ? a : b);
+
+    // STEP 5: Ensure minimum chart size for better visibility
+    _maxX = _maxX < 10 ? 10 : _maxX;
+    _maxY = _maxY < 10 ? 10 : _maxY;
   }
 
   @override
@@ -207,15 +291,6 @@ class _StreakPeriodsModalState extends ConsumerState<StreakPeriodsModal> {
                     ),
                   ],
                 ),
-
-                verticalSpace(Spacing.points16),
-
-                // Custom Segmented Button
-                CustomSegmentedButton(
-                  options: _segmentedOptions,
-                  selectedOption: _selectedOption,
-                  onChanged: _onSegmentedButtonChanged,
-                ),
               ],
             ),
           ),
@@ -230,7 +305,76 @@ class _StreakPeriodsModalState extends ConsumerState<StreakPeriodsModal> {
                   )
                 : _periods.isEmpty
                     ? _buildEmptyState(theme, localization)
-                    : _buildPeriodsList(theme, localization, locale),
+                    : Column(
+                        children: [
+                          // Chart with title
+                          Container(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 8),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                // Chart title
+                                Text(
+                                  localization
+                                      .translate("streak-progress-chart"),
+                                  style: TextStyles.body.copyWith(
+                                    color: theme.grey[800],
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                verticalSpace(Spacing.points8),
+                                // Chart legend
+                                Row(
+                                  children: [
+                                    Container(
+                                      width: 12,
+                                      height: 12,
+                                      decoration: BoxDecoration(
+                                        color:
+                                            followUpColors[widget.followUpType],
+                                        shape: BoxShape.circle,
+                                      ),
+                                    ),
+                                    horizontalSpace(Spacing.points8),
+                                    Text(
+                                      localization.translate("cumulative-days"),
+                                      style: TextStyles.caption.copyWith(
+                                        color: theme.grey[600],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                verticalSpace(Spacing.points12),
+                                // Chart
+                                Container(
+                                  height: 250,
+                                  child:
+                                      _buildChart(theme, localization, context),
+                                ),
+                              ],
+                            ),
+                          ),
+
+                          // Custom Segmented Button
+                          Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 16),
+                            child: CustomSegmentedButton(
+                              options: _segmentedOptions,
+                              selectedOption: _selectedOption,
+                              onChanged: _onSegmentedButtonChanged,
+                            ),
+                          ),
+
+                          verticalSpace(Spacing.points16),
+
+                          // List of periods
+                          Expanded(
+                            child:
+                                _buildPeriodsList(theme, localization, locale),
+                          ),
+                        ],
+                      ),
           ),
         ],
       ),
@@ -274,6 +418,186 @@ class _StreakPeriodsModalState extends ConsumerState<StreakPeriodsModal> {
         return _buildSimplePeriodItem(
             period, theme, localization, locale, index);
       },
+    );
+  }
+
+  Widget _buildChart(CustomThemeData theme, AppLocalizations localization,
+      BuildContext context) {
+    final color = followUpColors[widget.followUpType] ?? theme.primary;
+
+    return InteractiveViewer(
+      boundaryMargin: EdgeInsets.all(20),
+      minScale: 0.8,
+      maxScale: 4.0,
+      constrained: false,
+      child: SizedBox(
+        width: MediaQuery.of(context).size.width,
+        height: 250,
+        child: LineChart(
+          LineChartData(
+            clipData: FlClipData.all(),
+            gridData: FlGridData(
+              show: true,
+              drawVerticalLine: true,
+              horizontalInterval: _maxY > 50 ? 10 : 5,
+              verticalInterval: _maxX > 50 ? 10 : 5,
+              getDrawingHorizontalLine: (value) {
+                return FlLine(
+                  color: theme.grey[200]!,
+                  strokeWidth: 1,
+                );
+              },
+              getDrawingVerticalLine: (value) {
+                return FlLine(
+                  color: theme.grey[200]!,
+                  strokeWidth: 1,
+                );
+              },
+            ),
+            titlesData: FlTitlesData(
+              show: true,
+              rightTitles: AxisTitles(
+                sideTitles: SideTitles(showTitles: false),
+              ),
+              topTitles: AxisTitles(
+                sideTitles: SideTitles(showTitles: false),
+              ),
+              bottomTitles: AxisTitles(
+                sideTitles: SideTitles(
+                  showTitles: true,
+                  reservedSize: 25,
+                  interval: _maxX > 50 ? 10 : 5,
+                  getTitlesWidget: (value, meta) {
+                    return Padding(
+                      padding: EdgeInsets.only(top: 4),
+                      child: Text(
+                        value.toInt().toString(),
+                        style: TextStyles.caption.copyWith(
+                          color: theme.grey[600],
+                          fontSize: 10,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    );
+                  },
+                ),
+              ),
+              leftTitles: AxisTitles(
+                sideTitles: SideTitles(
+                  showTitles: true,
+                  interval: _maxY > 50 ? 10 : 5,
+                  reservedSize: 30,
+                  getTitlesWidget: (value, meta) {
+                    return Padding(
+                      padding: EdgeInsets.only(right: 4),
+                      child: Text(
+                        value.toInt().toString(),
+                        style: TextStyles.caption.copyWith(
+                          color: theme.grey[600],
+                          fontSize: 10,
+                        ),
+                        textAlign: TextAlign.right,
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ),
+            borderData: FlBorderData(
+              show: true,
+              border: Border.all(color: theme.grey[300]!),
+            ),
+            minX: 0,
+            maxX: _maxX * 1.1,
+            minY: 0,
+            maxY: _maxY * 1.1,
+            lineBarsData: [
+              LineChartBarData(
+                spots: _chartSpots,
+                isCurved: false,
+                color: color,
+                barWidth: 3,
+                isStrokeCapRound: true,
+                dotData: FlDotData(
+                  show: true,
+                  getDotPainter: (spot, percent, barData, index) {
+                    // Find if this is a period boundary point
+                    bool isPeriodBoundary = false;
+                    double runningDays = 0;
+
+                    for (int i = 0; i < _periods.length; i++) {
+                      final periodDays = _periods[i].duration.inDays.toDouble();
+
+                      // Check if this is the start of a period (y=0)
+                      if (spot.x == runningDays && spot.y == 0) {
+                        isPeriodBoundary = true;
+                        break;
+                      }
+
+                      runningDays += periodDays;
+
+                      // Check if this is the end of a period
+                      if (spot.x == runningDays && spot.y == periodDays) {
+                        isPeriodBoundary = true;
+                        break;
+                      }
+                    }
+
+                    if (isPeriodBoundary) {
+                      return FlDotCirclePainter(
+                        radius: 4,
+                        color: color,
+                        strokeWidth: 2,
+                        strokeColor: theme.backgroundColor,
+                      );
+                    }
+
+                    // For ongoing streak points, show smaller dots
+                    if (index == _chartSpots.length - 1 &&
+                        _periods.isNotEmpty &&
+                        _periods.last.isCurrentPeriod) {
+                      return FlDotCirclePainter(
+                        radius: 3,
+                        color: color.withOpacity(0.8),
+                        strokeWidth: 1,
+                        strokeColor: theme.backgroundColor,
+                      );
+                    }
+
+                    return FlDotCirclePainter(
+                      radius: 0,
+                      color: Colors.transparent,
+                    );
+                  },
+                ),
+                belowBarData: BarAreaData(
+                  show: true,
+                  color: color.withOpacity(0.1),
+                ),
+              ),
+            ],
+            lineTouchData: LineTouchData(
+              enabled: true,
+              touchTooltipData: LineTouchTooltipData(
+                getTooltipColor: (touchedSpot) => theme.grey[900]!,
+                getTooltipItems: (touchedSpots) {
+                  return touchedSpots.map((spot) {
+                    // Tooltip shows:
+                    // - Total X: Cumulative days across all periods
+                    // - Day Y: Current day within the active period
+                    return LineTooltipItem(
+                      '${localization.translate("total")}: ${spot.x.toInt()} ${localization.translate("days")}\n${localization.translate("day")} ${spot.y.toInt()}',
+                      TextStyles.caption.copyWith(
+                        color: theme.grey[100],
+                      ),
+                    );
+                  }).toList();
+                },
+              ),
+            ),
+          ),
+        ),
+      ),
     );
   }
 

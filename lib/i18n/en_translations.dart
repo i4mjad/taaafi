@@ -913,6 +913,8 @@ const Map<String, String> kEn = {
   "first-period-description": "This is your journey from the very beginning",
   "current-period-description": "Your ongoing streak continues from here",
   "period": "Period",
+  "streak-progress-chart": "Streak Progress Chart",
+  "cumulative-days": "Cumulative Days",
   "complete-registration-banner":
       "Please complete your account registration to access all features",
   "confirm-details-banner":
@@ -1140,6 +1142,7 @@ const Map<String, String> kEn = {
   "expired": "Expired",
   "unknown": "Unknown",
   "day": "day",
+  "total": "Total",
   "hour": "Hour",
   "minute": "Minute",
   "check-ban-status": "Check Ban Status",

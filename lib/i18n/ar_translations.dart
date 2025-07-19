@@ -622,6 +622,8 @@ const Map<String, String> kAr = {
   "first-period-description": "هذه رحلتك من البداية",
   "current-period-description": "متابعتك الحالية تستمر من هنا",
   "period": "فترة",
+  "streak-progress-chart": "مخطط تقدم المتابعة",
+  "cumulative-days": "الأيام التراكمية",
   "cannot-complete-future-tasks":
       "لا يمكن إكمال المهام المجدولة للتواريخ المستقبلية",
   "already-subscribed-to-activity": "أنت مشترك بالفعل في هذا التمرين",
@@ -637,6 +639,7 @@ const Map<String, String> kAr = {
   "personal-data": "المجتمع",
   "relapses-number": "عدد الانتكاسات: ",
   "day": "يوم",
+  "total": "المجموع",
   "minutes": "دقائق",
   "required-update": "إصدار جديد متاح!",
   "update-now": "تحديث الآن",
