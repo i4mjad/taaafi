@@ -80,14 +80,22 @@ class AccountScreen extends ConsumerWidget {
                                       AccountStatus.needEmailVerification)
                                 const ConfirmEmailBanner(),
                               if (showMainContent)
-                                GestureDetector(
-                                  onTap: () {
-                                    HapticFeedback.mediumImpact();
-                                    context
-                                        .pushNamed(RouteNames.userProfile.name);
-                                  },
-                                  child: UserDetailsWidget(userProfile!),
-                                ),
+                                WidgetsContainer(
+                                    child: Row(
+                                  children: [
+                                    Icon(LucideIcons.user),
+                                    horizontalSpace(Spacing.points8),
+                                    Text(userProfile!.displayName),
+                                  ],
+                                )),
+                              GestureDetector(
+                                onTap: () {
+                                  HapticFeedback.mediumImpact();
+                                  context
+                                      .pushNamed(RouteNames.userProfile.name);
+                                },
+                                child: UserDetailsWidget(userProfile!),
+                              ),
                               verticalSpace(Spacing.points24),
                               Text(
                                 AppLocalizations.of(context)

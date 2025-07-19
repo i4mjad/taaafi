@@ -5,7 +5,6 @@ import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/shared_widgets/app_bar.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
-import 'package:reboot_app_3/features/community/presentation/groups/groups_coming_soon_preferences.dart';
 
 class GroupsComingSoonScreen extends ConsumerStatefulWidget {
   const GroupsComingSoonScreen({super.key});
@@ -17,8 +16,6 @@ class GroupsComingSoonScreen extends ConsumerStatefulWidget {
 
 class _GroupsComingSoonScreenState
     extends ConsumerState<GroupsComingSoonScreen> {
-  bool _hasClickedGotIt = false;
-
   @override
   Widget build(BuildContext context) {
     final theme = AppTheme.of(context);
@@ -114,53 +111,6 @@ class _GroupsComingSoonScreenState
                 ),
               ),
               const SizedBox(height: 40),
-
-              // Got it Button
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: _hasClickedGotIt
-                      ? null
-                      : () async {
-                          // Mark as seen and update local state
-                          await ref
-                              .read(groupsComingSoonProvider.notifier)
-                              .markAsSeen();
-                          setState(() {
-                            _hasClickedGotIt = true;
-                          });
-                        },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor:
-                        _hasClickedGotIt ? theme.grey[400] : theme.primary[600],
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    elevation: 0,
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      if (_hasClickedGotIt) ...[
-                        Icon(LucideIcons.check, size: 18, color: Colors.white),
-                        const SizedBox(width: 8),
-                      ],
-                      Text(
-                        _hasClickedGotIt
-                            ? localizations.translate('groups_thanks')
-                            : localizations.translate('groups_got_it'),
-                        style: TextStyles.body.copyWith(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
 
               // Footer note
               Text(
