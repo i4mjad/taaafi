@@ -12,6 +12,7 @@ import 'package:reboot_app_3/core/shared_widgets/app_bar.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
 import 'package:reboot_app_3/core/shared_widgets/custom_segmented_button.dart';
 import 'package:reboot_app_3/core/shared_widgets/snackbar.dart';
+import 'package:reboot_app_3/core/shared_widgets/spinner.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/custom_theme_data.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
@@ -49,7 +50,7 @@ class AccountScreen extends ConsumerWidget {
         backgroundColor: theme.backgroundColor,
         appBar: appBar(context, ref, 'account', false, true),
         body: userDocAsync.when(
-            loading: () => const Center(child: CircularProgressIndicator()),
+            loading: () => const Center(child: Spinner()),
             error: (e, _) => Center(child: Text(e.toString())),
             data: (_) => userProfileState.when(
                   data: (userProfile) {
@@ -64,9 +65,7 @@ class AccountScreen extends ConsumerWidget {
                             children: [
                               if (accountStatus == AccountStatus.loading)
                                 Center(
-                                  child: CircularProgressIndicator(
-                                    color: theme.primary[600],
-                                  ),
+                                  child: Spinner(),
                                 ),
                               if (!showMainContent &&
                                   accountStatus ==
@@ -226,7 +225,7 @@ class AccountScreen extends ConsumerWidget {
                   },
                   error: (error, stackTrace) =>
                       Center(child: Text('Error: $error')),
-                  loading: () => Center(child: CircularProgressIndicator()),
+                  loading: () => Center(child: Spinner()),
                 )));
   }
 

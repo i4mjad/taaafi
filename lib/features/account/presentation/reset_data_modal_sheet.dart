@@ -6,6 +6,7 @@ import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
 import 'package:reboot_app_3/core/shared_widgets/custom_textfield.dart';
 import 'package:reboot_app_3/core/shared_widgets/snackbar.dart';
+import 'package:reboot_app_3/core/shared_widgets/spinner.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
@@ -304,9 +305,9 @@ class _ResetDataModalSheetState extends ConsumerState<ResetDataModalSheet> {
                             ? SizedBox(
                                 height: 20,
                                 width: 20,
-                                child: CircularProgressIndicator(
+                                child: Spinner(
                                   strokeWidth: 2,
-                                  color: theme.primary[700],
+                                  valueColor: theme.primary[700],
                                 ),
                               )
                             : Text(

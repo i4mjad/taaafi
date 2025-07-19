@@ -10,6 +10,7 @@ import 'package:reboot_app_3/core/shared_widgets/app_bar.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
 import 'package:reboot_app_3/core/shared_widgets/custom_textfield.dart';
 import 'package:reboot_app_3/core/shared_widgets/snackbar.dart';
+import 'package:reboot_app_3/core/shared_widgets/spinner.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
@@ -216,7 +217,7 @@ class _ConfirmUserEmailScreenState
       body: Stack(
         children: [
           userAsync.when(
-            loading: () => const Center(child: CircularProgressIndicator()),
+            loading: () => const Center(child: Spinner()),
             error: (error, _) => Center(child: Text('Error: $error')),
             data: (user) {
               if (user == null) {
@@ -284,12 +285,9 @@ class _ConfirmUserEmailScreenState
                                       SizedBox(
                                         height: 20,
                                         width: 20,
-                                        child: CircularProgressIndicator(
-                                          strokeWidth: 2,
-                                          valueColor:
-                                              AlwaysStoppedAnimation<Color>(
-                                                  theme.grey[50]!),
-                                        ),
+                                        child: Spinner(
+                                            strokeWidth: 2,
+                                            valueColor: theme.grey[50]!),
                                       ),
                                       const SizedBox(width: 8),
                                       Text(
@@ -345,11 +343,9 @@ class _ConfirmUserEmailScreenState
                                       SizedBox(
                                         height: 20,
                                         width: 20,
-                                        child: CircularProgressIndicator(
+                                        child: Spinner(
                                           strokeWidth: 2,
-                                          valueColor:
-                                              AlwaysStoppedAnimation<Color>(
-                                                  theme.grey[600]!),
+                                          valueColor: theme.grey[600],
                                         ),
                                       ),
                                       const SizedBox(width: 8),
@@ -809,11 +805,8 @@ class _ChangeEmailBottomSheetState
                           SizedBox(
                             height: 20,
                             width: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              valueColor: AlwaysStoppedAnimation<Color>(
-                                  theme.grey[50]!),
-                            ),
+                            child: Spinner(
+                                strokeWidth: 2, valueColor: theme.grey[50]!),
                           ),
                           const SizedBox(width: 8),
                           Text(

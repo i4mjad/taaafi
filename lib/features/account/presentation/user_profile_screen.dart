@@ -6,6 +6,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/shared_widgets/app_bar.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
+import 'package:reboot_app_3/core/shared_widgets/spinner.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/custom_theme_data.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
@@ -35,7 +36,7 @@ class UserProfileScreen extends ConsumerWidget {
       backgroundColor: theme.backgroundColor,
       appBar: appBar(context, ref, 'user-profile', false, true),
       body: userProfileState.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
+        loading: () => const Center(child: Spinner()),
         error: (error, stackTrace) => Center(
           child: Text(
             AppLocalizations.of(context).translate('error-loading-profile'),
@@ -121,9 +122,9 @@ class UserProfileScreen extends ConsumerWidget {
                   ? SizedBox(
                       width: 14,
                       height: 14,
-                      child: CircularProgressIndicator(
+                      child: Spinner(
                         strokeWidth: 1.5,
-                        color: theme.primary[600],
+                        valueColor: theme.primary[600],
                       ),
                     )
                   : Icon(
@@ -344,7 +345,7 @@ class UserProfileScreen extends ConsumerWidget {
                 backgroundColor: theme.backgroundColor,
                 borderSide: BorderSide(color: theme.warn[300]!, width: 0.5),
                 borderRadius: BorderRadius.circular(12),
-                child: const Center(child: CircularProgressIndicator()),
+                child: const Center(child: Spinner()),
               ),
             ],
           ),
@@ -592,7 +593,7 @@ class UserProfileScreen extends ConsumerWidget {
                 backgroundColor: theme.backgroundColor,
                 borderSide: BorderSide(color: theme.grey[600]!, width: 0.5),
                 borderRadius: BorderRadius.circular(12),
-                child: const Center(child: CircularProgressIndicator()),
+                child: const Center(child: Spinner()),
               ),
             ],
           ),

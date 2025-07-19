@@ -6,6 +6,7 @@ import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/routing/route_names.dart';
 import 'package:reboot_app_3/core/shared_widgets/app_bar.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
+import 'package:reboot_app_3/core/shared_widgets/spinner.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/features/community/presentation/widgets/threads_post_card.dart';
@@ -550,7 +551,7 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen> {
             );
           },
           loading: () => const Center(
-            child: CircularProgressIndicator(),
+            child: Spinner(),
           ),
           error: (error, stackTrace) => Center(
             child: Column(
@@ -662,7 +663,7 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen> {
       dynamic postsState, AppLocalizations localizations, theme) {
     if (postsState.posts.isEmpty && postsState.isLoading) {
       return const Center(
-        child: CircularProgressIndicator(),
+        child: Spinner(),
       );
     }
 
@@ -721,7 +722,7 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen> {
       dynamic postsState, AppLocalizations localizations, theme) {
     if (postsState.posts.isEmpty && postsState.isLoading) {
       return const Center(
-        child: CircularProgressIndicator(),
+        child: Spinner(),
       );
     }
 
@@ -810,7 +811,7 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen> {
       dynamic postsState, AppLocalizations localizations, theme) {
     if (postsState.posts.isEmpty && postsState.isLoading) {
       return const Center(
-        child: CircularProgressIndicator(),
+        child: Spinner(),
       );
     }
 

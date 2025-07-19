@@ -7,6 +7,7 @@ import 'package:reboot_app_3/core/helpers/date_display_formater.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
 import 'package:reboot_app_3/core/shared_widgets/snackbar.dart';
+import 'package:reboot_app_3/core/shared_widgets/spinner.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
@@ -169,9 +170,9 @@ class _DataErrorReportModalState extends ConsumerState<DataErrorReportModal> {
                     ? SizedBox(
                         height: 20,
                         width: 20,
-                        child: CircularProgressIndicator(
+                        child: Spinner(
                           strokeWidth: 2,
-                          valueColor: AlwaysStoppedAnimation(theme.grey[50]),
+                          valueColor: theme.grey[50],
                         ),
                       )
                     : Text(
@@ -457,10 +458,7 @@ class _DataErrorReportModalState extends ConsumerState<DataErrorReportModal> {
                     ? Center(
                         child: Padding(
                           padding: EdgeInsets.all(32),
-                          child: CircularProgressIndicator(
-                            valueColor:
-                                AlwaysStoppedAnimation(theme.primary[600]),
-                          ),
+                          child: Spinner(),
                         ),
                       )
                     : _existingReport != null

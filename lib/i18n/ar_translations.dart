@@ -91,7 +91,8 @@ const Map<String, String> kAr = {
   "about-app": "عن التطبيق",
   "log-out": "تسجيل الخروج",
   "quick-access": "الوصول السريع",
-  "quick-access-description": "عرض أزرار الوصول السريع للإجراءات الشائعة",
+  "quick-access-description":
+      "الوصول السريع للميزات الأكثر استخداماً: التمارين والمكتبة والمذكرات، كل شيء في مكان واحد مناسب",
   "taaafi-platform": "منصة تعافي",
   "no-follow-ups-for-today":
       "أحسنت! يوم آخر من النجاح والتقدم في رحلة التعافي. استمر، أنت تحدث تغييراً!",
@@ -490,11 +491,14 @@ const Map<String, String> kAr = {
   "new-user-dialog-content":
       "أدخل المدة الحالية إذا كنت بدأت مسبقًا، أو اضغط بداية جديدة للبدء إذا كنت ترغب بالبدء الآن",
   "statistics": "الإحصائيات",
-  "statistics-description": "عرض إحصائيات التعافي وتقدمك",
+  "statistics-description":
+      "تحليل شامل لرحلة التعافي، يتضمن رؤى تفصيلية واتجاهات وإنجازات عبر الزمن",
   "calendar": "التقويم",
-  "calendar-description": "عرض تقويم التعافي وتاريخك",
+  "calendar-description":
+      "خط زمني مرئي لتقدمك اليومي وإكمال التمارين ومعالم التعافي. انقر على أي تاريخ لإضافة متابعات، حتى للتواريخ السابقة",
   "current-streaks": "المتابعات الحالية",
-  "current-streaks-description": "عرض متابعات التعافي الحالية",
+  "current-streaks-description":
+      "تتبع تقدمك المستمر واحتفل بكل إنجاز في رحلة التعافي مع مراقبة المتابعات في الوقت الفعلي. اضغط على أي متابعة لعرض الفترات التفصيلية بين المتابعات",
   "name-should-not-be-empty": "لا يمكن ترك حقل الاسم فارغًا",
   "email-should-not-be-empty": "لا يمكن ترك حقل البريد الإلكتروني فارغًا",
   "something-went-wrong": "حدث خطأ ما. الرجاء المحاولة مرة أخرى.",
@@ -596,6 +600,19 @@ const Map<String, String> kAr = {
   "months": "شهور",
   "days": "أيام",
   "hours": "ساعات",
+  "streak-periods": "فترات المتابعة",
+  "streak-periods-description": "اعرض تاريخ الفترات بين متابعاتك",
+  "period-details": "تفاصيل الفترة",
+  "period-summary": "ملخص الفترة",
+  "starting-period": "فترة البداية",
+  "current-period": "الفترة الحالية",
+  "period-from": "من",
+  "period-to": "إلى",
+  "period-length": "المدة",
+  "no-periods-yet": "لم يتم تسجيل متابعات بعد",
+  "first-period-description": "هذه رحلتك من البداية",
+  "current-period-description": "متابعتك الحالية تستمر من هنا",
+  "period": "فترة",
   "cannot-complete-future-tasks":
       "لا يمكن إكمال المهام المجدولة للتواريخ المستقبلية",
   "already-subscribed-to-activity": "أنت مشترك بالفعل في هذا التمرين",

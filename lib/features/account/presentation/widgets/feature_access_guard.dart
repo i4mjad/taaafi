@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:go_router/go_router.dart';
+import 'package:reboot_app_3/core/shared_widgets/spinner.dart';
 import '../../providers/ban_warning_providers.dart';
 import '../../providers/clean_ban_warning_providers.dart';
 import '../../data/models/ban.dart';
@@ -171,9 +172,9 @@ class _FeatureAccessModalState extends ConsumerState<_FeatureAccessModal> {
         const SizedBox(height: 40),
 
         // Simple loading indicator
-        CircularProgressIndicator(
+        Spinner(
           strokeWidth: 3,
-          valueColor: AlwaysStoppedAnimation<Color>(theme.primary[600]!),
+          valueColor: theme.primary[600],
         ),
 
         const SizedBox(height: 40),

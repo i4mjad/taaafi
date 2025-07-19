@@ -15,6 +15,7 @@ import 'package:reboot_app_3/features/authentication/providers/user_provider.dar
 import 'package:reboot_app_3/features/home/data/repos/streak_repository.dart';
 import 'package:reboot_app_3/features/home/data/streak_notifier.dart';
 import 'package:reboot_app_3/core/routing/app_startup.dart';
+import 'package:reboot_app_3/features/home/presentation/home/streak_display_notifier.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'auth_service.g.dart';
@@ -134,6 +135,8 @@ class AuthService {
       final googleProvider = GoogleAuthProvider();
       // Request email scope by default.
       googleProvider.addScope('email');
+      // Force account selection prompt
+      googleProvider.setCustomParameters({"prompt": "select_account"});
 
       final userCredential = await _auth.signInWithProvider(googleProvider);
       await userCredential.user?.reload();
@@ -260,6 +263,8 @@ class AuthService {
     try {
       final googleProvider = GoogleAuthProvider();
       googleProvider.addScope('email');
+      // Force account selection prompt
+      googleProvider.setCustomParameters({"prompt": "select_account"});
 
       await _auth.currentUser?.reauthenticateWithProvider(googleProvider);
       return true;
@@ -341,6 +346,7 @@ class AuthService {
       ref.invalidate(userNotifierProvider);
       ref.invalidate(streakRepositoryProvider);
       ref.invalidate(streakNotifierProvider);
+      ref.invalidate(detailedStreakInfoProvider);
       ref.invalidate(userDocumentsNotifierProvider);
       ref.invalidate(userNotifierProvider);
     } catch (e, stackTrace) {

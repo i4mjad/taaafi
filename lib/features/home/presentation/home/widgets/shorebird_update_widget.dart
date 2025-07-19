@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
+import 'package:reboot_app_3/core/shared_widgets/spinner.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/custom_theme_data.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
@@ -270,9 +271,8 @@ class ShorebirdUpdateWidget extends ConsumerWidget {
             SizedBox(
               width: 24,
               height: 24,
-              child: CircularProgressIndicator(
+              child: Spinner(
                 strokeWidth: 2,
-                valueColor: AlwaysStoppedAnimation<Color>(theme.primary[600]!),
               ),
             ),
             horizontalSpace(Spacing.points12),

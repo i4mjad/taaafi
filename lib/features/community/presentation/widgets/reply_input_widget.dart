@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
 import 'package:reboot_app_3/core/shared_widgets/snackbar.dart';
+import 'package:reboot_app_3/core/shared_widgets/spinner.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
@@ -170,12 +171,9 @@ class _ReplyInputWidgetState extends ConsumerState<ReplyInputWidget> {
                                     SizedBox(
                                       width: 12,
                                       height: 12,
-                                      child: CircularProgressIndicator(
+                                      child: Spinner(
                                         strokeWidth: 2,
-                                        valueColor:
-                                            AlwaysStoppedAnimation<Color>(
-                                          theme.grey[100]!,
-                                        ),
+                                        valueColor: theme.grey[100]!,
                                       ),
                                     ),
                                     const SizedBox(width: 6),

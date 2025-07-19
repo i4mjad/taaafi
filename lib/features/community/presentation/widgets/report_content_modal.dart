@@ -6,6 +6,7 @@ import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/routing/route_names.dart';
 import 'package:reboot_app_3/core/shared_widgets/custom_textarea.dart';
 import 'package:reboot_app_3/core/shared_widgets/snackbar.dart';
+import 'package:reboot_app_3/core/shared_widgets/spinner.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
@@ -320,9 +321,9 @@ class _ReportContentModalState extends ConsumerState<ReportContentModal> {
                     ? SizedBox(
                         width: 20,
                         height: 20,
-                        child: CircularProgressIndicator(
+                        child: Spinner(
                           strokeWidth: 2,
-                          valueColor: AlwaysStoppedAnimation(theme.grey[50]),
+                          valueColor: theme.grey[50],
                         ),
                       )
                     : Icon(LucideIcons.flag, size: 20),

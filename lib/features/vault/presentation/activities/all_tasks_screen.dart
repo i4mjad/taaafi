@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:reboot_app_3/core/helpers/date_display_formater.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/shared_widgets/app_bar.dart';
+import 'package:reboot_app_3/core/shared_widgets/spinner.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:grouped_list/grouped_list.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
@@ -53,7 +54,7 @@ class AllTasksScreen extends ConsumerWidget {
             ),
             order: GroupedListOrder.ASC,
           ),
-          loading: () => const Center(child: CircularProgressIndicator()),
+          loading: () => const Center(child: Spinner()),
           error: (error, _) => Center(child: Text(error.toString())),
         ),
       ),

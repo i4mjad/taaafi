@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lottie/lottie.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
+import 'package:reboot_app_3/core/shared_widgets/spinner.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 
@@ -32,7 +33,7 @@ class CommunityLoadingScreen extends ConsumerWidget {
               ),
             ),
             const SizedBox(height: 16),
-            const CircularProgressIndicator(),
+            const Spinner(),
             const SizedBox(height: 16),
             Text(
               l10n.translate('loading'),

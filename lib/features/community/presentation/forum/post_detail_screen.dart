@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/shared_widgets/app_bar.dart';
+import 'package:reboot_app_3/core/shared_widgets/spinner.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/features/community/presentation/widgets/post_header_widget.dart';
@@ -187,10 +188,8 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
 
   Widget _buildLoadingState(dynamic theme) {
     return Center(
-      child: CircularProgressIndicator(
-        valueColor: AlwaysStoppedAnimation<Color>(
-          theme.primary[600],
-        ),
+      child: Spinner(
+        valueColor: theme.primary[600],
       ),
     );
   }

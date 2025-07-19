@@ -7,6 +7,7 @@ import 'package:reboot_app_3/core/routing/route_names.dart';
 import 'package:reboot_app_3/core/shared_widgets/app_bar.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
 import 'package:reboot_app_3/core/shared_widgets/snackbar.dart';
+import 'package:reboot_app_3/core/shared_widgets/spinner.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/custom_theme_data.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
@@ -63,7 +64,7 @@ class AddActivityScreen extends ConsumerWidget {
                 ),
               ),
             ),
-            loading: () => const Center(child: CircularProgressIndicator()),
+            loading: () => const Center(child: Spinner()),
             error: (error, _) => Center(
               child: Text(error.toString()),
             ),

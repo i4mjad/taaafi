@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
+import 'package:reboot_app_3/core/shared_widgets/spinner.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/custom_theme_data.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
@@ -279,7 +280,7 @@ class _BannedScreenStatefulState extends ConsumerState<_BannedScreenStateful> {
     return userBansAsync.when(
       loading: () => WidgetsContainer(
         padding: const EdgeInsets.all(16),
-        child: const CircularProgressIndicator(),
+        child: const Spinner(),
       ),
       error: (error, stack) => WidgetsContainer(
         padding: const EdgeInsets.all(16),
@@ -392,7 +393,7 @@ class _BannedScreenStatefulState extends ConsumerState<_BannedScreenStateful> {
     return userBansAsync.when(
       loading: () => WidgetsContainer(
         padding: const EdgeInsets.all(16),
-        child: const CircularProgressIndicator(),
+        child: const Spinner(),
       ),
       error: (error, stack) => WidgetsContainer(
         padding: const EdgeInsets.all(16),
@@ -787,10 +788,7 @@ class _BannedScreenStatefulState extends ConsumerState<_BannedScreenStateful> {
             ? SizedBox(
                 width: 20,
                 height: 20,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                ),
+                child: Spinner(),
               )
             : Icon(
                 LucideIcons.refreshCw,

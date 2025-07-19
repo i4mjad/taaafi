@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
+import 'package:reboot_app_3/core/shared_widgets/spinner.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/features/authentication/providers/user_document_provider.dart';
@@ -118,7 +119,7 @@ class AppStartupLoadingWidget extends StatelessWidget {
     return Scaffold(
       backgroundColor: theme.backgroundColor,
       body: Center(
-        child: CircularProgressIndicator(color: theme.primary[600]),
+        child: Spinner(),
       ),
     );
   }

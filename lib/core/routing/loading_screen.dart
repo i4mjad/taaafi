@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:reboot_app_3/core/shared_widgets/spinner.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 
 class LoadingScreen extends ConsumerWidget {
@@ -11,7 +12,7 @@ class LoadingScreen extends ConsumerWidget {
     return Scaffold(
       backgroundColor: theme.backgroundColor,
       body: Center(
-        child: CircularProgressIndicator(color: theme.primary[600]),
+        child: Spinner(),
       ),
     );
   }

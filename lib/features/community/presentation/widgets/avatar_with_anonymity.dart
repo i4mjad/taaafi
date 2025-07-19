@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:reboot_app_3/core/shared_widgets/spinner.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 
 class AvatarWithAnonymity extends ConsumerWidget {
@@ -60,11 +61,9 @@ class AvatarWithAnonymity extends ConsumerWidget {
                           child: SizedBox(
                             width: size * 0.4,
                             height: size * 0.4,
-                            child: CircularProgressIndicator(
+                            child: Spinner(
                               strokeWidth: 2,
-                              valueColor: AlwaysStoppedAnimation<Color>(
-                                theme.primary[600]!,
-                              ),
+                              valueColor: theme.primary[600],
                             ),
                           ),
                         ),

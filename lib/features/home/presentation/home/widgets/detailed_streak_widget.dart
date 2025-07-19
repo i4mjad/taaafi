@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
+import 'package:reboot_app_3/core/shared_widgets/spinner.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
@@ -34,8 +35,8 @@ class DetailedStreakWidget extends ConsumerWidget {
     // Check if the streak info is available
     if (!streakInfo.containsKey(typeKey) || streakInfo[typeKey] == null) {
       return Center(
-        child: CircularProgressIndicator(
-          color: theme.grey[100],
+        child: Spinner(
+          valueColor: theme.grey[100],
         ),
       );
     }

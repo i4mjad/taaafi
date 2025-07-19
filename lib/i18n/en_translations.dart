@@ -114,7 +114,8 @@ const Map<String, String> kEn = {
   "vault-p":
       "Your personal space, where you can write your diaries, challenge your self to become better person",
   "statistics": "Statistics",
-  "statistics-description": "Show your recovery statistics and progress",
+  "statistics-description":
+      "Comprehensive analytics of your recovery journey, including detailed insights, trends, and achievements over time",
   "articles": "Articles",
   "article": "Article",
   "tutorial": "Tutorial",
@@ -178,9 +179,11 @@ const Map<String, String> kEn = {
   "user-name": "User Name",
   "user-email": "User Email",
   "quick-access": "Quick Access",
-  "quick-access-description": "Show quick access buttons for common actions",
+  "quick-access-description":
+      "Access your most-used features instantly: Activities, Library, and Diaries all in one convenient location",
   "calendar": "Calendar",
-  "calendar-description": "Show your recovery calendar and history",
+  "calendar-description":
+      "Visual timeline of your daily progress, activities completion, and recovery milestones. Click on any date to add follow-ups, even for past dates",
   "follow-your-reboot": "Follow Your Reboot",
   "follow-your-reboot-p": "Track your Nofap Journey",
   "ta3afi-community": "NoFap Community",
@@ -866,7 +869,8 @@ const Map<String, String> kEn = {
   "im_interested": "I'm Interested",
   "later": "Later",
   "current-streaks": "Current Streaks",
-  "current-streaks-description": "Show your current recovery streaks",
+  "current-streaks-description":
+      "Track your ongoing progress and celebrate every milestone in your recovery journey with real-time streak monitoring. Tap on any streak to view detailed periods between follow-ups",
   "contact-through-whatsapp": "Contact us through WhatsApp",
   "interest_recorded_success":
       "Thank you for your interest! We'll keep you updated.",
@@ -886,6 +890,20 @@ const Map<String, String> kEn = {
   "days": "Days",
   "hours": "Hours",
   "customize": "Customize",
+  "streak-periods": "Streak Periods",
+  "streak-periods-description":
+      "View the history of periods between your follow-ups",
+  "period-details": "Period Details",
+  "period-summary": "Period Summary",
+  "starting-period": "Starting Period",
+  "current-period": "Current Period",
+  "period-from": "From",
+  "period-to": "To",
+  "period-length": "Duration",
+  "no-periods-yet": "No follow-ups recorded yet",
+  "first-period-description": "This is your journey from the very beginning",
+  "current-period-description": "Your ongoing streak continues from here",
+  "period": "Period",
   "complete-registration-banner":
       "Please complete your account registration to access all features",
   "confirm-details-banner":

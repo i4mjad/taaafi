@@ -4,6 +4,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/helpers/date_display_formater.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
+import 'package:reboot_app_3/core/shared_widgets/spinner.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
@@ -15,6 +16,7 @@ import 'package:reboot_app_3/features/home/presentation/home/statistics_visibili
 import 'package:reboot_app_3/features/home/presentation/home/streak_display_notifier.dart';
 import 'package:reboot_app_3/features/home/presentation/home/widgets/detailed_streak_widget.dart';
 import 'package:reboot_app_3/features/home/presentation/home/widgets/streak_settings_sheet.dart';
+import 'package:reboot_app_3/features/home/presentation/home/widgets/streak_periods_modal.dart';
 import 'package:reboot_app_3/features/shared/models/follow_up.dart';
 import 'package:reboot_app_3/features/home/data/models/follow_up_colors.dart';
 import 'dart:async';
@@ -134,39 +136,52 @@ class CurrentStreaksWidget extends ConsumerWidget {
               children: [
                 if (visibilitySettings['relapse']!)
                   Expanded(
-                    child: WidgetsContainer(
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                      backgroundColor: theme.backgroundColor,
-                      borderSide: BorderSide(
-                          color: followUpColors[FollowUpType.relapse]!,
-                          width: 0.75),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            "${data.relapseStreak}",
-                            style: TextStyles.h6.copyWith(
-                              color: theme.grey[800],
+                    child: GestureDetector(
+                      onTap: () {
+                        HapticFeedback.lightImpact();
+                        showModalBottomSheet<void>(
+                          context: context,
+                          isScrollControlled: true,
+                          builder: (BuildContext context) {
+                            return StreakPeriodsModal(
+                                followUpType: FollowUpType.relapse);
+                          },
+                        );
+                      },
+                      child: WidgetsContainer(
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        backgroundColor: theme.backgroundColor,
+                        borderSide: BorderSide(
+                            color: followUpColors[FollowUpType.relapse]!,
+                            width: 0.75),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              "${data.relapseStreak}",
+                              style: TextStyles.h6.copyWith(
+                                color: theme.grey[800],
+                              ),
+                              textAlign: TextAlign.center,
                             ),
-                            textAlign: TextAlign.center,
-                          ),
-                          Text(
-                            localization.translate("day"),
-                            style: TextStyles.caption.copyWith(
-                              color: theme.grey[600],
+                            Text(
+                              localization.translate("day"),
+                              style: TextStyles.caption.copyWith(
+                                color: theme.grey[600],
+                              ),
+                              textAlign: TextAlign.center,
                             ),
-                            textAlign: TextAlign.center,
-                          ),
-                          verticalSpace(Spacing.points4),
-                          Text(
-                            localization.translate("current-streak"),
-                            textAlign: TextAlign.center,
-                            style: TextStyles.caption.copyWith(
-                              color: theme.grey[500],
+                            verticalSpace(Spacing.points4),
+                            Text(
+                              localization.translate("current-streak"),
+                              textAlign: TextAlign.center,
+                              style: TextStyles.caption.copyWith(
+                                color: theme.grey[500],
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ),
@@ -177,38 +192,51 @@ class CurrentStreaksWidget extends ConsumerWidget {
                   horizontalSpace(Spacing.points8),
                 if (visibilitySettings['pornOnly']!)
                   Expanded(
-                    child: WidgetsContainer(
-                      padding: EdgeInsets.all(12),
-                      backgroundColor: theme.backgroundColor,
-                      borderSide: BorderSide(
-                          color: followUpColors[FollowUpType.pornOnly]!,
-                          width: 0.75),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            "${data.pornOnlyStreak}",
-                            style: TextStyles.h6.copyWith(
-                              color: theme.grey[800],
+                    child: GestureDetector(
+                      onTap: () {
+                        HapticFeedback.lightImpact();
+                        showModalBottomSheet<void>(
+                          context: context,
+                          isScrollControlled: true,
+                          builder: (BuildContext context) {
+                            return StreakPeriodsModal(
+                                followUpType: FollowUpType.pornOnly);
+                          },
+                        );
+                      },
+                      child: WidgetsContainer(
+                        padding: EdgeInsets.all(12),
+                        backgroundColor: theme.backgroundColor,
+                        borderSide: BorderSide(
+                            color: followUpColors[FollowUpType.pornOnly]!,
+                            width: 0.75),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              "${data.pornOnlyStreak}",
+                              style: TextStyles.h6.copyWith(
+                                color: theme.grey[800],
+                              ),
+                              textAlign: TextAlign.center,
                             ),
-                            textAlign: TextAlign.center,
-                          ),
-                          Text(
-                            localization.translate("day"),
-                            style: TextStyles.caption.copyWith(
-                              color: theme.grey[600],
+                            Text(
+                              localization.translate("day"),
+                              style: TextStyles.caption.copyWith(
+                                color: theme.grey[600],
+                              ),
+                              textAlign: TextAlign.center,
                             ),
-                            textAlign: TextAlign.center,
-                          ),
-                          verticalSpace(Spacing.points4),
-                          Text(
-                            localization.translate("free-porn-days"),
-                            textAlign: TextAlign.center,
-                            style: TextStyles.caption.copyWith(
-                              color: theme.grey[500],
+                            verticalSpace(Spacing.points4),
+                            Text(
+                              localization.translate("free-porn-days"),
+                              textAlign: TextAlign.center,
+                              style: TextStyles.caption.copyWith(
+                                color: theme.grey[500],
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ),
@@ -218,38 +246,51 @@ class CurrentStreaksWidget extends ConsumerWidget {
                   horizontalSpace(Spacing.points8),
                 if (visibilitySettings['mastOnly']!)
                   Expanded(
-                    child: WidgetsContainer(
-                      padding: EdgeInsets.all(12),
-                      backgroundColor: theme.backgroundColor,
-                      borderSide: BorderSide(
-                          color: followUpColors[FollowUpType.mastOnly]!,
-                          width: 0.75),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            "${data.mastOnlyStreak}",
-                            style: TextStyles.h6.copyWith(
-                              color: theme.grey[800],
+                    child: GestureDetector(
+                      onTap: () {
+                        HapticFeedback.lightImpact();
+                        showModalBottomSheet<void>(
+                          context: context,
+                          isScrollControlled: true,
+                          builder: (BuildContext context) {
+                            return StreakPeriodsModal(
+                                followUpType: FollowUpType.mastOnly);
+                          },
+                        );
+                      },
+                      child: WidgetsContainer(
+                        padding: EdgeInsets.all(12),
+                        backgroundColor: theme.backgroundColor,
+                        borderSide: BorderSide(
+                            color: followUpColors[FollowUpType.mastOnly]!,
+                            width: 0.75),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              "${data.mastOnlyStreak}",
+                              style: TextStyles.h6.copyWith(
+                                color: theme.grey[800],
+                              ),
+                              textAlign: TextAlign.center,
                             ),
-                            textAlign: TextAlign.center,
-                          ),
-                          Text(
-                            localization.translate("day"),
-                            style: TextStyles.caption.copyWith(
-                              color: theme.grey[600],
+                            Text(
+                              localization.translate("day"),
+                              style: TextStyles.caption.copyWith(
+                                color: theme.grey[600],
+                              ),
+                              textAlign: TextAlign.center,
                             ),
-                            textAlign: TextAlign.center,
-                          ),
-                          verticalSpace(Spacing.points4),
-                          Text(
-                            localization.translate("free-mast-days"),
-                            textAlign: TextAlign.center,
-                            style: TextStyles.caption.copyWith(
-                              color: theme.grey[500],
+                            verticalSpace(Spacing.points4),
+                            Text(
+                              localization.translate("free-mast-days"),
+                              textAlign: TextAlign.center,
+                              style: TextStyles.caption.copyWith(
+                                color: theme.grey[500],
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ),
@@ -258,38 +299,51 @@ class CurrentStreaksWidget extends ConsumerWidget {
                   horizontalSpace(Spacing.points8),
                 if (visibilitySettings['slipUp']!)
                   Expanded(
-                    child: WidgetsContainer(
-                      padding: EdgeInsets.all(12),
-                      backgroundColor: theme.backgroundColor,
-                      borderSide: BorderSide(
-                          color: followUpColors[FollowUpType.slipUp]!,
-                          width: 0.75),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            "${data.slipUpStreak}",
-                            style: TextStyles.h6.copyWith(
-                              color: theme.grey[800],
+                    child: GestureDetector(
+                      onTap: () {
+                        HapticFeedback.lightImpact();
+                        showModalBottomSheet<void>(
+                          context: context,
+                          isScrollControlled: true,
+                          builder: (BuildContext context) {
+                            return StreakPeriodsModal(
+                                followUpType: FollowUpType.slipUp);
+                          },
+                        );
+                      },
+                      child: WidgetsContainer(
+                        padding: EdgeInsets.all(12),
+                        backgroundColor: theme.backgroundColor,
+                        borderSide: BorderSide(
+                            color: followUpColors[FollowUpType.slipUp]!,
+                            width: 0.75),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              "${data.slipUpStreak}",
+                              style: TextStyles.h6.copyWith(
+                                color: theme.grey[800],
+                              ),
+                              textAlign: TextAlign.center,
                             ),
-                            textAlign: TextAlign.center,
-                          ),
-                          Text(
-                            localization.translate("day"),
-                            style: TextStyles.caption.copyWith(
-                              color: theme.grey[600],
+                            Text(
+                              localization.translate("day"),
+                              style: TextStyles.caption.copyWith(
+                                color: theme.grey[600],
+                              ),
+                              textAlign: TextAlign.center,
                             ),
-                            textAlign: TextAlign.center,
-                          ),
-                          verticalSpace(Spacing.points4),
-                          Text(
-                            localization.translate("free-slips-days"),
-                            textAlign: TextAlign.center,
-                            style: TextStyles.caption.copyWith(
-                              color: theme.grey[500],
+                            verticalSpace(Spacing.points4),
+                            Text(
+                              localization.translate("free-slips-days"),
+                              textAlign: TextAlign.center,
+                              style: TextStyles.caption.copyWith(
+                                color: theme.grey[500],
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ),
@@ -352,7 +406,7 @@ class CurrentStreaksWidget extends ConsumerWidget {
       loading: () => const SizedBox(
         height: 150,
         child: Center(
-          child: CircularProgressIndicator(),
+          child: Spinner(),
         ),
       ),
       error: (error, stack) => SizedBox(
@@ -384,59 +438,71 @@ class DetailedStreakCard extends StatelessWidget {
     final theme = AppTheme.of(context);
     final localization = AppLocalizations.of(context);
 
-    return WidgetsContainer(
-      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      backgroundColor: theme.backgroundColor,
-      borderSide: BorderSide(
-        color: followUpColors[followUpType]!,
-        width: 0.75,
-      ),
-      child: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                children: [
-                  Icon(
-                    icon,
-                    size: 16,
-                    color: followUpColors[followUpType],
-                  ),
-                  horizontalSpace(Spacing.points4),
-                  Text(
-                    localization.translate(titleKey),
-                    style: TextStyles.footnoteSelected.copyWith(
-                      color: followUpColors[followUpType]!,
-                      fontWeight: FontWeight.w500,
+    return GestureDetector(
+      onTap: () {
+        HapticFeedback.lightImpact();
+        showModalBottomSheet<void>(
+          context: context,
+          isScrollControlled: true,
+          builder: (BuildContext context) {
+            return StreakPeriodsModal(followUpType: followUpType);
+          },
+        );
+      },
+      child: WidgetsContainer(
+        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        backgroundColor: theme.backgroundColor,
+        borderSide: BorderSide(
+          color: followUpColors[followUpType]!,
+          width: 0.75,
+        ),
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    Icon(
+                      icon,
+                      size: 16,
+                      color: followUpColors[followUpType],
                     ),
+                    horizontalSpace(Spacing.points4),
+                    Text(
+                      localization.translate(titleKey),
+                      style: TextStyles.footnoteSelected.copyWith(
+                        color: followUpColors[followUpType]!,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            verticalSpace(Spacing.points4),
+            Row(
+              children: [
+                Text(
+                  _getLastFollowUpDateText(
+                    followUpType,
+                    followUpsState,
+                    localization,
                   ),
-                ],
-              ),
-            ],
-          ),
-          verticalSpace(Spacing.points4),
-          Row(
-            children: [
-              Text(
-                _getLastFollowUpDateText(
-                  followUpType,
-                  followUpsState,
-                  localization,
+                  style: TextStyles.small.copyWith(
+                    color: theme.grey[500],
+                  ),
                 ),
-                style: TextStyles.small.copyWith(
-                  color: theme.grey[500],
-                ),
-              ),
-            ],
-          ),
-          verticalSpace(Spacing.points8),
-          DetailedStreakWidget(
-            initialInfo: initialInfo,
-            color: followUpColors[followUpType]!,
-            type: followUpType,
-          ),
-        ],
+              ],
+            ),
+            verticalSpace(Spacing.points8),
+            DetailedStreakWidget(
+              initialInfo: initialInfo,
+              color: followUpColors[followUpType]!,
+              type: followUpType,
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -590,7 +656,7 @@ class UserStatisticsWidget extends ConsumerWidget {
       loading: () => const SizedBox(
         height: 150,
         child: Center(
-          child: CircularProgressIndicator(),
+          child: Spinner(),
         ),
       ),
       error: (error, stack) => SizedBox(

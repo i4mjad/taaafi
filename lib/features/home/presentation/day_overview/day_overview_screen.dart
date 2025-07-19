@@ -7,6 +7,7 @@ import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/routing/route_names.dart';
 import 'package:reboot_app_3/core/shared_widgets/app_bar.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
+import 'package:reboot_app_3/core/shared_widgets/spinner.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
@@ -52,7 +53,7 @@ class DayOverviewScreen extends ConsumerWidget {
                 stream: followUpsStream,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator());
+                    return const Center(child: Spinner());
                   } else if (snapshot.hasError) {
                     return Center(child: Text('Error: ${snapshot.error}'));
                   } else {
@@ -68,7 +69,7 @@ class DayOverviewScreen extends ConsumerWidget {
                 stream: emotionsStream,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator());
+                    return const Center(child: Spinner());
                   } else if (snapshot.hasError) {
                     return Center(child: Text('Error: ${snapshot.error}'));
                   } else {
@@ -224,6 +225,7 @@ class DayFollowUps extends StatelessWidget {
                           .translate('no-follow-ups-for-today'),
                       style: TextStyles.footnote.copyWith(
                         color: theme.success[800],
+                        height: 1.5,
                       ),
                       textAlign: TextAlign.center,
                     )
@@ -592,7 +594,7 @@ class DayNotes extends ConsumerWidget {
           future: records.fetchDiariesForDate(date),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator());
+              return const Center(child: Spinner());
             } else if (snapshot.hasError) {
               return Center(child: Text('Error: ${snapshot.error}'));
             } else {

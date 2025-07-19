@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
+import 'package:reboot_app_3/core/shared_widgets/spinner.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/custom_theme_data.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
@@ -157,8 +158,8 @@ class _NewPostScreenState extends ConsumerState<NewPostScreen> {
           ? SizedBox(
               width: 16,
               height: 16,
-              child: CircularProgressIndicator(
-                color: theme.grey[50],
+              child: Spinner(
+                valueColor: theme.grey[50],
                 strokeWidth: 2,
               ),
             )
@@ -607,7 +608,7 @@ class _NewPostScreenState extends ConsumerState<NewPostScreen> {
             loading: () => const Center(
               child: Padding(
                 padding: EdgeInsets.all(40),
-                child: CircularProgressIndicator(),
+                child: Spinner(),
               ),
             ),
             error: (error, stackTrace) =>

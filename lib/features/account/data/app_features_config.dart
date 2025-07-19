@@ -19,7 +19,6 @@ class AppFeaturesConfig {
   // static const String groupCreation = 'group_creation';
   // static const String feedbackSubmission = 'feedback_submission';
   // static const String profileUpdate = 'profile_update';
-  // static const String dataExport = 'data_export';
   // static const String communityAccess = 'community_access';
 
   /// Get all active app features from Firestore

@@ -15,6 +15,7 @@ import 'package:reboot_app_3/core/shared_widgets/app_bar.dart';
 import 'package:reboot_app_3/core/shared_widgets/custom_segmented_button.dart';
 import 'package:reboot_app_3/core/shared_widgets/custom_textfield.dart';
 import 'package:reboot_app_3/core/shared_widgets/snackbar.dart';
+import 'package:reboot_app_3/core/shared_widgets/spinner.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
@@ -449,10 +450,9 @@ class _ConfirmUserDetailsScreenState
                                   SizedBox(
                                     height: 20,
                                     width: 20,
-                                    child: CircularProgressIndicator(
+                                    child: Spinner(
                                       strokeWidth: 2,
-                                      valueColor: AlwaysStoppedAnimation<Color>(
-                                          theme.grey[50]!),
+                                      valueColor: theme.grey[50],
                                     ),
                                   ),
                                   SizedBox(width: 8),
@@ -482,7 +482,7 @@ class _ConfirmUserDetailsScreenState
           child: Text('Error: $error'),
         ),
         loading: () => Center(
-          child: CircularProgressIndicator(),
+          child: Spinner(),
         ),
       ),
     );

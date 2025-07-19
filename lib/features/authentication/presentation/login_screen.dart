@@ -16,6 +16,7 @@ import 'package:reboot_app_3/core/routing/route_names.dart';
 import 'package:reboot_app_3/core/shared_widgets/app_bar.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
 import 'package:reboot_app_3/core/shared_widgets/custom_textfield.dart';
+import 'package:reboot_app_3/core/shared_widgets/spinner.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
@@ -146,10 +147,9 @@ class _LogInScreenState extends ConsumerState<LogInScreen> {
                             ? SizedBox(
                                 width: 24,
                                 height: 24,
-                                child: CircularProgressIndicator(
+                                child: Spinner(
                                   strokeWidth: 2,
-                                  valueColor: AlwaysStoppedAnimation<Color>(
-                                      theme.primary[600]!),
+                                  valueColor: theme.primary[600],
                                 ),
                               )
                             : SvgPicture.asset(
@@ -210,10 +210,9 @@ class _LogInScreenState extends ConsumerState<LogInScreen> {
                             ? SizedBox(
                                 width: 24,
                                 height: 24,
-                                child: CircularProgressIndicator(
+                                child: Spinner(
                                   strokeWidth: 2,
-                                  valueColor: AlwaysStoppedAnimation<Color>(
-                                      theme.primary[600]!),
+                                  valueColor: theme.primary[600],
                                 ),
                               )
                             : SvgPicture.asset(
@@ -373,9 +372,9 @@ class _SignInFormState extends ConsumerState<SignInForm> {
                     SizedBox(
                       width: 16,
                       height: 16,
-                      child: CircularProgressIndicator(
+                      child: Spinner(
                         strokeWidth: 2,
-                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                        valueColor: Colors.white,
                       ),
                     ),
                     horizontalSpace(Spacing.points8),
