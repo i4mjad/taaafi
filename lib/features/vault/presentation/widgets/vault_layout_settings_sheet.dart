@@ -222,6 +222,29 @@ class _VaultLayoutSettingsSheetState
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    // Quick Access Cards Section
+                    Text(
+                      AppLocalizations.of(context).translate('quick-access'),
+                      style: TextStyles.h6.copyWith(color: theme.grey[900]),
+                    ),
+                    verticalSpace(Spacing.points8),
+                    Text(
+                      AppLocalizations.of(context).translate('drag-to-reorder'),
+                      style: TextStyles.body.copyWith(color: theme.grey[600]),
+                    ),
+                    verticalSpace(Spacing.points4),
+                    Text(
+                      AppLocalizations.of(context)
+                          .translate('tap-to-toggle-visibility'),
+                      style:
+                          TextStyles.footnote.copyWith(color: theme.grey[400]),
+                    ),
+                    verticalSpace(Spacing.points16),
+
+                    // Quick Access Cards Horizontal List
+                    _buildHorizontalCardsReorderList(
+                        theme, vaultLayoutSettings),
+
                     // Home Elements Section
                     Text(
                       AppLocalizations.of(context)
@@ -251,31 +274,6 @@ class _VaultLayoutSettingsSheetState
 
                     // Home Elements List
                     ..._buildHomeElementsItems(theme, vaultLayoutSettings),
-
-                    verticalSpace(Spacing.points32),
-
-                    // Quick Access Cards Section
-                    Text(
-                      AppLocalizations.of(context).translate('quick-access'),
-                      style: TextStyles.h6.copyWith(color: theme.grey[900]),
-                    ),
-                    verticalSpace(Spacing.points8),
-                    Text(
-                      AppLocalizations.of(context).translate('drag-to-reorder'),
-                      style: TextStyles.body.copyWith(color: theme.grey[600]),
-                    ),
-                    verticalSpace(Spacing.points4),
-                    Text(
-                      AppLocalizations.of(context)
-                          .translate('tap-to-toggle-visibility'),
-                      style:
-                          TextStyles.footnote.copyWith(color: theme.grey[400]),
-                    ),
-                    verticalSpace(Spacing.points16),
-
-                    // Quick Access Cards Horizontal List
-                    _buildHorizontalCardsReorderList(
-                        theme, vaultLayoutSettings),
 
                     verticalSpace(Spacing.points32),
                   ],
@@ -366,14 +364,6 @@ class _VaultLayoutSettingsSheetState
                         ),
                       ],
                     ),
-                  ),
-
-                  horizontalSpace(Spacing.points8),
-                  // Visibility toggle
-                  Icon(
-                    isVisible ? LucideIcons.eye : LucideIcons.eyeOff,
-                    size: 18,
-                    color: isVisible ? theme.success[600] : theme.grey[400],
                   ),
                 ],
               ),
@@ -479,11 +469,6 @@ class _VaultLayoutSettingsSheetState
                   ),
                 ),
                 verticalSpace(Spacing.points8),
-                Icon(
-                  isVisible ? LucideIcons.eye : LucideIcons.eyeOff,
-                  size: 16,
-                  color: isVisible ? iconColor : theme.grey[400],
-                ),
               ],
             ),
           );
