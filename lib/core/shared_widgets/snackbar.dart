@@ -185,6 +185,7 @@ SnackBar systemSnackBar(BuildContext context, String message) {
               message,
               style: TextStyles.caption.copyWith(
                 color: theme.primary[600]!,
+                height: 1.5,
               ),
             ),
           ),

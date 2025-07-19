@@ -10,6 +10,8 @@ import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/features/home/presentation/home/statistics_visibility_notifier.dart';
 import 'package:reboot_app_3/features/home/presentation/home/streak_display_notifier.dart';
+import 'package:reboot_app_3/features/home/data/streak_notifier.dart';
+import 'package:reboot_app_3/core/helpers/date_display_formater.dart';
 
 class StreakSettingsSheet extends ConsumerWidget {
   const StreakSettingsSheet({super.key});
@@ -45,6 +47,48 @@ class StreakSettingsSheet extends ConsumerWidget {
                 ),
               )
             ],
+          ),
+          verticalSpace(Spacing.points16),
+
+          // Current starting date info
+          WidgetsContainer(
+            backgroundColor: theme.grey[50],
+            borderSide: BorderSide(color: theme.grey[200]!, width: 1),
+            borderRadius: BorderRadius.circular(8),
+            padding: EdgeInsets.all(12),
+            child: Row(
+              children: [
+                Icon(
+                  LucideIcons.calendar,
+                  color: theme.grey[600],
+                  size: 16,
+                ),
+                horizontalSpace(Spacing.points8),
+                Expanded(
+                  child: Consumer(
+                    builder: (context, ref, child) {
+                      final streaksState = ref.watch(streakNotifierProvider);
+                      final locale = ref.watch(localeNotifierProvider);
+                      final firstDate = streaksState.value?.userFirstDate;
+                      return Text(
+                        AppLocalizations.of(context)
+                                .translate("starting-date") +
+                            ": " +
+                            (firstDate != null
+                                ? getDisplayDateTime(
+                                    firstDate, locale?.languageCode ?? 'en')
+                                : AppLocalizations.of(context)
+                                    .translate("not-set")),
+                        style: TextStyles.caption.copyWith(
+                          color: theme.grey[700],
+                          fontWeight: FontWeight.w500,
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
           ),
           verticalSpace(Spacing.points16),
 

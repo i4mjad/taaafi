@@ -12,6 +12,8 @@ import 'package:syncfusion_flutter_calendar/calendar.dart';
 import 'package:reboot_app_3/features/home/data/calendar_notifier.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:reboot_app_3/features/home/data/models/follow_up_colors.dart';
+import 'package:reboot_app_3/core/helpers/date_display_formater.dart';
+import 'package:reboot_app_3/core/localization/localization.dart';
 
 class CalenderWidget extends ConsumerStatefulWidget {
   const CalenderWidget({
@@ -41,10 +43,9 @@ class _CalenderWidgetState extends ConsumerState<CalenderWidget> {
   @override
   Widget build(BuildContext context) {
     final theme = AppTheme.of(context);
-    // final followUpState = ref.watch(calendarNotifierProvider);
-    final stream = ref.watch(calendarStreamProvider);
+    final followUpState = ref.watch(calendarNotifierProvider);
 
-    return stream.when(
+    return followUpState.when(
       data: (followUps) {
         return Container(
           width: MediaQuery.of(context).size.width - 32,
@@ -104,7 +105,15 @@ class _CalenderWidgetState extends ConsumerState<CalenderWidget> {
                         userFirstDate != null &&
                         selectedDate.isBefore(DateTime(userFirstDate.year,
                             userFirstDate.month, userFirstDate.day, 0, 0))) {
-                      getErrorSnackBar(context, "past-date-message");
+                      final currentLanguage =
+                          AppLocalizations.of(context).locale.languageCode;
+                      final formattedFirstDate =
+                          getDisplayDate(userFirstDate, currentLanguage);
+                      final baseMessage = AppLocalizations.of(context)
+                          .translate("past-date-message");
+                      final messageWithDate =
+                          "$baseMessage\n${AppLocalizations.of(context).translate("start-date")}: $formattedFirstDate";
+                      getSystemSnackBar(context, messageWithDate);
                     } else {
                       context.goNamed(RouteNames.dayOverview.name,
                           pathParameters: {'date': selectedDate.toString()});

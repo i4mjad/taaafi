@@ -522,6 +522,16 @@ const Map<String, String> kEn = {
   "daily-notification-time": "Daily Reminder",
   "delete-my-data": "Delete My Data",
   "reset-counters": "Reset Counters",
+  "actions": "Actions",
+  "reset-data": "Reset Data",
+  "reset-confirmation":
+      "This will permanently delete all your data including streaks, emotions, and follow-ups, then set a new starting date. This action cannot be undone.",
+  "new-starting-date": "New Starting Date",
+  "reset-today": "Reset to Today",
+  "confirm-reset": "Confirm Reset",
+  "final-warning":
+      "Are you absolutely sure? This will permanently delete ALL your data and cannot be undone.",
+  "yes-delete-all": "Yes, Delete All Data",
   "show-all": "View All",
   "duplicates-deleted": "Duplicates deleted successfully",
   "ta3afi-plus": "Ta'aafi +",

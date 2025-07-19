@@ -354,7 +354,7 @@ class CurrentStreaksWidget extends ConsumerWidget {
         // For detailed mode, use a vertical layout with full-width rows
         else {
           return Padding(
-            padding: const EdgeInsets.symmetric(vertical: 16.0),
+            padding: const EdgeInsets.only(top: 8.0),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -367,7 +367,7 @@ class CurrentStreaksWidget extends ConsumerWidget {
                     followUpsState: followUpsState,
                     initialInfo: detailedStreaks['relapse']!,
                   ),
-                  verticalSpace(Spacing.points12),
+                  verticalSpace(Spacing.points8),
                 ],
                 if (visibilitySettings['pornOnly']!) ...[
                   DetailedStreakCard(
@@ -377,7 +377,7 @@ class CurrentStreaksWidget extends ConsumerWidget {
                     followUpsState: followUpsState,
                     initialInfo: detailedStreaks['pornOnly']!,
                   ),
-                  verticalSpace(Spacing.points12),
+                  verticalSpace(Spacing.points8),
                 ],
                 if (visibilitySettings['mastOnly']!) ...[
                   DetailedStreakCard(
@@ -387,7 +387,7 @@ class CurrentStreaksWidget extends ConsumerWidget {
                     followUpsState: followUpsState,
                     initialInfo: detailedStreaks['mastOnly']!,
                   ),
-                  verticalSpace(Spacing.points12),
+                  verticalSpace(Spacing.points8),
                 ],
                 if (visibilitySettings['slipUp']!)
                   DetailedStreakCard(
@@ -397,7 +397,7 @@ class CurrentStreaksWidget extends ConsumerWidget {
                     followUpsState: followUpsState,
                     initialInfo: detailedStreaks['slipUp']!,
                   ),
-                verticalSpace(Spacing.points16),
+                verticalSpace(Spacing.points8),
               ],
             ),
           );
