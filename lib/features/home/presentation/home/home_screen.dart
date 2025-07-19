@@ -10,14 +10,7 @@ import 'package:reboot_app_3/core/shared_widgets/spinner.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
-import 'package:reboot_app_3/features/home/data/streak_notifier.dart';
-import 'package:reboot_app_3/features/home/data/models/streak_statistics.dart';
-import 'package:reboot_app_3/features/home/presentation/home/widgets/follow_up_sheet.dart';
 import 'package:reboot_app_3/features/home/presentation/home/widgets/notification_promoter_widget.dart';
-import 'package:reboot_app_3/features/home/presentation/home/widgets/quick_access_section.dart';
-import 'package:reboot_app_3/features/home/presentation/home/widgets/current_streaks_section.dart';
-import 'package:reboot_app_3/features/home/presentation/home/widgets/statistics_section.dart';
-import 'package:reboot_app_3/features/home/presentation/home/widgets/calendar_section.dart';
 import 'package:reboot_app_3/features/vault/presentation/vault_settings/activities_notifications_settings_screen.dart';
 import 'package:reboot_app_3/features/authentication/providers/account_status_provider.dart';
 import 'package:reboot_app_3/core/shared_widgets/complete_registration_banner.dart';
@@ -25,7 +18,6 @@ import 'package:reboot_app_3/core/shared_widgets/confirm_details_banner.dart';
 import 'package:reboot_app_3/core/shared_widgets/confirm_email_banner.dart';
 import 'package:reboot_app_3/features/authentication/providers/user_document_provider.dart';
 import 'package:reboot_app_3/features/notifications/data/repositories/notifications_repository.dart';
-import 'package:reboot_app_3/features/home/presentation/home/home_layout_provider.dart';
 import 'package:reboot_app_3/features/home/presentation/home/widgets/shorebird_update_widget.dart';
 import 'package:reboot_app_3/features/plus/presentation/widgets/subscription_card.dart';
 
@@ -36,22 +28,11 @@ class HomeScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = AppTheme.of(context);
     final notificationsEnabled = ref.watch(notificationsEnabledProvider);
-    final homeLayoutSettings = ref.watch(homeLayoutProvider);
-    final locale = ref.watch(localeNotifierProvider);
     final accountStatus = ref.watch(accountStatusProvider);
     final userDocAsync = ref.watch(userDocumentsNotifierProvider);
     final showMainContent = accountStatus == AccountStatus.ok;
 
     final localization = AppLocalizations.of(context);
-
-    // Watch streak statistics only when we are sure we need to show them to avoid
-    // unnecessary calls (and possible exceptions) while the account is still
-    // in an incomplete state.
-    AsyncValue<StreakStatistics>? streaksState;
-    if (showMainContent &&
-        (homeLayoutSettings.visibility['currentStreaks'] ?? true)) {
-      streaksState = ref.watch(streakNotifierProvider);
-    }
 
     final actions = showMainContent
         ? [
@@ -169,25 +150,6 @@ class HomeScreen extends ConsumerWidget {
           }
         },
       ),
-      floatingActionButton: showMainContent
-          ? FloatingActionButton.extended(
-              backgroundColor: theme.primary[600],
-              onPressed: () {
-                showModalBottomSheet<void>(
-                  context: context,
-                  isScrollControlled: true,
-                  builder: (BuildContext context) {
-                    return FollowUpSheet(DateTime.now());
-                  },
-                );
-              },
-              label: Text(
-                AppLocalizations.of(context).translate("daily-follow-up"),
-                style: TextStyles.caption.copyWith(color: theme.grey[50]),
-              ),
-              icon: Icon(LucideIcons.pencil, color: theme.grey[50]),
-            )
-          : null,
     );
   }
 }
