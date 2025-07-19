@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/routing/route_names.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
 import 'package:reboot_app_3/core/shared_widgets/snackbar.dart';
@@ -53,12 +52,6 @@ class _CalenderWidgetState extends ConsumerState<CalenderWidget> {
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                AppLocalizations.of(context).translate("reboot-calender"),
-                style: TextStyles.h6.copyWith(
-                  color: theme.grey[900],
-                ),
-              ),
               verticalSpace(Spacing.points8),
               WidgetsContainer(
                 backgroundColor: theme.backgroundColor,

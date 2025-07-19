@@ -179,11 +179,10 @@ const Map<String, String> kEn = {
   "user-name": "User Name",
   "user-email": "User Email",
   "quick-access": "Quick Access",
-  "quick-access-description":
-      "Access your most-used features instantly: Activities, Library, and Diaries all in one convenient location",
+  "quick-access-description": "Access your most-used features instantly",
   "calendar": "Calendar",
   "calendar-description":
-      "Visual timeline of your daily progress, activities completion, and recovery milestones. Click on any date to add follow-ups, even for past dates",
+      "Monthly view of your daily progress. Click on any date to add follow-ups, even for past dates",
   "follow-your-reboot": "Follow Your Reboot",
   "follow-your-reboot-p": "Track your Nofap Journey",
   "ta3afi-community": "NoFap Community",
@@ -870,7 +869,7 @@ const Map<String, String> kEn = {
   "later": "Later",
   "current-streaks": "Current Streaks",
   "current-streaks-description":
-      "Track your ongoing progress and celebrate every milestone in your recovery journey with real-time streak monitoring. Tap on any streak to view detailed periods between follow-ups",
+      "Track your ongoing progress. Tap on any streak to view detailed periods between follow-ups",
   "contact-through-whatsapp": "Contact us through WhatsApp",
   "interest_recorded_success":
       "Thank you for your interest! We'll keep you updated.",
