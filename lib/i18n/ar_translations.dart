@@ -62,6 +62,10 @@ const Map<String, String> kAr = {
   "off": "تعطيل",
   "vault-settings": "إعدادات الخزنة",
   "ta3afi-plus": "تعافي +",
+  "start-every-day-with-great-ideas": "ابدأ كل يوم بأفكار رائعة—بدون إعلانات.",
+  "plus-description":
+      "احصل على محتوى حصري وميزات متقدمة وتجربة خالية من الإعلانات لتسريع رحلة تعافيك.",
+  "upgrade-now": "ترقية الآن",
   "group": "الزمالة",
   "not-alone": "لست وحدك",
   "not-alone-description":
@@ -86,6 +90,7 @@ const Map<String, String> kAr = {
   "ta3afi-community-p":
       "شارك قصتك ورحلتك في التعافي واطلع على تجارب المتعافين من إدمان الإباحية",
   "soon": "قريبًا",
+  "tasks": "المهام",
   "account": "الحساب",
   "about": "تعافي",
   "about-app": "عن التطبيق",
@@ -1282,4 +1287,45 @@ const Map<String, String> kAr = {
   "post_creation_banned": "أنت محظور {type} من إنشاء المنشورات",
   "comment_creation_banned": "أنت محظور {type} من إضافة التعليقات",
   "interaction_banned": "أنت محظور {type} من التفاعل مع المحتوى",
+
+  // شاشة اشتراك تعافي بلس
+  "subscription-main-title": "قل مرحباً لأفضل نسخة منك.",
+  "subscription-subtitle":
+      "الأعضاء أكثر عرضة بنسبة 65% لتحقيق أهدافهم مع النسخة المدفوعة.",
+  "barcode-scan-title": "مسح الباركود:",
+  "barcode-scan-description": "تخطى البحث وسجل بشكل أسرع",
+  "custom-macro-tracking-title": "تتبع مخصص للعناصر الغذائية:",
+  "custom-macro-tracking-description":
+      "اعثر على توازن الكربوهيدرات والبروتين والدهون",
+  "zero-ads-title": "بدون إعلانات:",
+  "zero-ads-description": "تتبع وحقق أهدافك دون إلهاء",
+  "select-plan-title": "اختر خطة للتجربة المجانية.",
+  "yearly-plan": "سنوي",
+  "monthly-plan": "شهري",
+  "yearly-price": "68.98\$",
+  "yearly-period": "/سنة",
+  "monthly-price": "14.98\$",
+  "monthly-period": "/شهر",
+  "original-yearly-price": "179.76\$",
+  "savings-percentage": "توفير 62%",
+  "billed-yearly-info": "يتم الدفع سنوياً بعد التجربة المجانية.",
+  "billed-monthly-info": "يتم الدفع شهرياً بعد التجربة المجانية.",
+  "change-plans-anytime": "غير الخطط أو ألغ في أي وقت.",
+  "start-free-trial": "ابدأ التجربة المجانية لشهر واحد",
+  "free-trial-started": "تم بدء التجربة المجانية بنجاح!",
+
+  // جدول مقارنة الميزات
+  "what-you-get": "ما ستحصل عليه:",
+  "free-version": "مجاني",
+  "premium-version": "مدفوع",
+  "unlimited-activities": "تمارين غير محدودة",
+  "ad-free-experience": "تجربة خالية من الإعلانات",
+  "advanced-tracking": "تتبع متقدم للتقدم",
+  "barcode-scanning": "مسح الباركود",
+  "custom-reminders": "تذكيرات مخصصة",
+  "priority-support": "دعم فني مميز",
+  "export-data": "تصدير بياناتك",
+  "offline-access": "وصول بدون إنترنت",
+  "advanced-analytics": "تحليلات متقدمة",
+  "custom-macro-tracking-feature": "تتبع مخصص للعناصر الغذائية",
 };

@@ -192,6 +192,7 @@ const Map<String, String> kEn = {
   "account": "Account",
   "about": "About",
   "log-out": "Log Out",
+  "tasks": "Tasks",
   "complete-account-registeration": "Complete Registeration",
   "terms-should-be-accepted": "Terms should be accepted",
   "sponsored-by": "A Partnership With:",
@@ -535,6 +536,11 @@ const Map<String, String> kEn = {
   "show-all": "View All",
   "duplicates-deleted": "Duplicates deleted successfully",
   "ta3afi-plus": "Ta'aafi +",
+  "start-every-day-with-great-ideas":
+      "Start every day with great ideas—and zero ads.",
+  "plus-description":
+      "Get exclusive content, advanced features, and an ad-free experience to accelerate your recovery journey.",
+  "upgrade-now": "Upgrade Now",
   "home-settings": "Home Settings",
   "home-elements-visibility": "Home Elements Visibility",
   "home-elements-visibility-description":
@@ -1324,4 +1330,45 @@ const Map<String, String> kEn = {
   "post_creation_banned": "You are {type} banned from creating posts",
   "comment_creation_banned": "You are {type} banned from adding comments",
   "interaction_banned": "You are {type} banned from interacting with content",
+
+  // Ta3afi Plus Subscription Screen
+  "subscription-main-title": "Say hello to your best self.",
+  "subscription-subtitle":
+      "Members are up to 65% more likely to reach their goals with Premium.",
+  "barcode-scan-title": "Barcode Scan:",
+  "barcode-scan-description": "Skip the search and log faster",
+  "custom-macro-tracking-title": "Custom Macro Tracking:",
+  "custom-macro-tracking-description":
+      "Find your balance of carbs, protein & fat",
+  "zero-ads-title": "Zero Ads:",
+  "zero-ads-description": "Track and reach your goals, distraction-free",
+  "select-plan-title": "Select a plan for your free trial.",
+  "yearly-plan": "YEARLY",
+  "monthly-plan": "MONTHLY",
+  "yearly-price": "\$68.98",
+  "yearly-period": "/YR",
+  "monthly-price": "\$14.98",
+  "monthly-period": "/MO",
+  "original-yearly-price": "\$179.76",
+  "savings-percentage": "62% SAVINGS",
+  "billed-yearly-info": "Billed yearly after free trial.",
+  "billed-monthly-info": "Billed monthly after free trial.",
+  "change-plans-anytime": "Change plans or cancel anytime.",
+  "start-free-trial": "Start 1-Month Free Trial",
+  "free-trial-started": "Free trial started successfully!",
+
+  // Features Comparison Table
+  "what-you-get": "What you get:",
+  "free-version": "Free",
+  "premium-version": "Premium",
+  "unlimited-activities": "Unlimited activities",
+  "ad-free-experience": "Ad-free experience",
+  "advanced-tracking": "Advanced progress tracking",
+  "barcode-scanning": "Barcode scanning",
+  "custom-reminders": "Custom reminders",
+  "priority-support": "Priority support",
+  "export-data": "Export your data",
+  "offline-access": "Offline access",
+  "advanced-analytics": "Advanced analytics",
+  "custom-macro-tracking-feature": "Custom macro tracking",
 };

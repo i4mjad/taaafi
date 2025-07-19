@@ -226,6 +226,46 @@ class HomeScreen extends ConsumerWidget {
                           ),
                         ),
                       ),
+                    // Combined Test Screen Access Button
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: GestureDetector(
+                        onTap: () {
+                          context.goNamed(RouteNames.combinedTest.name);
+                        },
+                        child: WidgetsContainer(
+                          padding: EdgeInsets.all(12),
+                          backgroundColor: theme.secondary[50],
+                          borderSide: BorderSide(
+                              color: theme.secondary[200]!, width: 1),
+                          borderRadius: BorderRadius.circular(8),
+                          child: Row(
+                            children: [
+                              Icon(
+                                LucideIcons.testTube,
+                                size: 20,
+                                color: theme.secondary[600],
+                              ),
+                              horizontalSpace(Spacing.points8),
+                              Expanded(
+                                child: Text(
+                                  "Test Combined Dashboard",
+                                  style: TextStyles.caption.copyWith(
+                                    color: theme.secondary[800],
+                                    height: 1.3,
+                                  ),
+                                ),
+                              ),
+                              Icon(
+                                LucideIcons.arrowRight,
+                                size: 16,
+                                color: theme.secondary[600],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
                     // Render ordered elements with consistent spacing
                     ...orderedElements
                         .expand((element) => [

@@ -21,8 +21,6 @@ import 'package:reboot_app_3/features/shared/models/follow_up.dart';
 import 'package:reboot_app_3/features/home/data/models/follow_up_colors.dart';
 import 'dart:async';
 import 'package:reboot_app_3/features/home/application/streak_service.dart';
-import 'package:reboot_app_3/features/home/presentation/home/widgets/data_error_report_dialog.dart';
-import 'package:reboot_app_3/features/home/data/user_reports_notifier.dart';
 import 'package:reboot_app_3/features/home/presentation/home/enhanced_home_settings_sheet.dart';
 
 class StatisticsWidget extends ConsumerWidget {
@@ -102,7 +100,6 @@ class _StatisticsContentState extends ConsumerState<_StatisticsContent> {
                   style: TextStyles.h6.copyWith(color: theme.grey[900]),
                 ),
                 UserStatisticsWidget(),
-                DataIncorrectContainer(),
               ],
             ),
           ),
@@ -648,7 +645,6 @@ class UserStatisticsWidget extends ConsumerWidget {
                   ],
                 ),
               ),
-              DataIncorrectContainer(),
             ],
           ),
         );
@@ -662,151 +658,6 @@ class UserStatisticsWidget extends ConsumerWidget {
       error: (error, stack) => SizedBox(
         height: 150,
         child: Center(child: Text('Error: $error')),
-      ),
-    );
-  }
-}
-
-class DataIncorrectContainer extends ConsumerWidget {
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final theme = AppTheme.of(context);
-    final localization = AppLocalizations.of(context);
-
-    return FutureBuilder<bool>(
-      future: _shouldShowContainer(ref),
-      builder: (context, snapshot) {
-        if (!snapshot.hasData || !snapshot.data!) {
-          return const SizedBox.shrink();
-        }
-
-        return Padding(
-          padding: const EdgeInsets.only(top: 16),
-          child: GestureDetector(
-            onTap: () {
-              HapticFeedback.lightImpact();
-              _showDataErrorModal(context);
-            },
-            onLongPress: () {
-              HapticFeedback.heavyImpact();
-              _showHideConfirmationDialog(context, ref);
-            },
-            child: WidgetsContainer(
-              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              backgroundColor: theme.backgroundColor,
-              borderSide: BorderSide(color: theme.warn[300]!, width: 0.75),
-              child: Row(
-                children: [
-                  Icon(
-                    LucideIcons.alertCircle,
-                    size: 16,
-                    color: theme.warn[600],
-                  ),
-                  horizontalSpace(Spacing.points8),
-                  Expanded(
-                    child: Text(
-                      localization.translate("data-incorrect"),
-                      style: TextStyles.small.copyWith(
-                        color: theme.warn[800],
-                      ),
-                    ),
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      HapticFeedback.lightImpact();
-                      _showHideConfirmationDialog(context, ref);
-                    },
-                    child: Icon(
-                      LucideIcons.x,
-                      size: 16,
-                      color: theme.warn[600],
-                    ),
-                  ),
-                  horizontalSpace(Spacing.points4),
-                  Icon(
-                    LucideIcons.chevronRight,
-                    size: 16,
-                    color: theme.warn[600],
-                  ),
-                ],
-              ),
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  Future<bool> _shouldShowContainer(WidgetRef ref) async {
-    try {
-      // Check if container is manually hidden
-      final isHidden = ref.read(hideDataErrorContainerProvider);
-      if (isHidden) return false;
-
-      // Check if the report button should be shown (no closed/finalized reports)
-      final shouldShow = await ref.read(shouldShowReportButtonProvider.future);
-      return shouldShow;
-    } catch (e) {
-      // Show by default if there's an error
-      return true;
-    }
-  }
-
-  void _showDataErrorModal(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      builder: (context) => const DataErrorReportModal(),
-    );
-  }
-
-  void _showHideConfirmationDialog(BuildContext context, WidgetRef ref) {
-    final theme = AppTheme.of(context);
-    final localization = AppLocalizations.of(context);
-
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: theme.backgroundColor,
-        title: Text(
-          localization.translate('hide-data-error-option'),
-          style: TextStyles.h6.copyWith(color: theme.grey[900]),
-        ),
-        content: Text(
-          localization.translate('hide-data-error-confirmation'),
-          style: TextStyles.body.copyWith(color: theme.grey[700]),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text(
-              localization.translate('cancel'),
-              style: TextStyles.body.copyWith(color: theme.grey[600]),
-            ),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              ref.read(hideDataErrorContainerProvider.notifier).state = true;
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(
-                    localization.translate('data-error-option-hidden'),
-                  ),
-                  backgroundColor: theme.success[600],
-                ),
-              );
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: theme.error[600],
-              foregroundColor: theme.grey[50],
-            ),
-            child: Text(
-              localization.translate('hide'),
-              style: TextStyles.body.copyWith(color: theme.grey[50]),
-            ),
-          ),
-        ],
       ),
     );
   }

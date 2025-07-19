@@ -15,6 +15,7 @@ enum RouteNames {
   confirmUserEmail,
   loading,
   dayOverview,
+  combinedTest,
   diaries,
   diary,
   library,

@@ -33,6 +33,7 @@ import 'package:reboot_app_3/features/home/presentation/home/enhanced_home_setti
 import 'package:reboot_app_3/features/authentication/providers/user_provider.dart';
 import 'package:reboot_app_3/features/account/data/app_features_config.dart';
 import 'package:reboot_app_3/features/account/presentation/widgets/feature_access_guard.dart';
+import 'package:reboot_app_3/features/plus/presentation/widgets/subscription_card.dart';
 
 class AccountScreen extends ConsumerWidget {
   const AccountScreen({super.key});
@@ -79,15 +80,8 @@ class AccountScreen extends ConsumerWidget {
                                   accountStatus ==
                                       AccountStatus.needEmailVerification)
                                 const ConfirmEmailBanner(),
-                              if (showMainContent)
-                                WidgetsContainer(
-                                    child: Row(
-                                  children: [
-                                    Icon(LucideIcons.user),
-                                    horizontalSpace(Spacing.points8),
-                                    Text(userProfile!.displayName),
-                                  ],
-                                )),
+                              if (showMainContent) const SubscriptionCard(),
+                              verticalSpace(Spacing.points16),
                               GestureDetector(
                                 onTap: () {
                                   HapticFeedback.mediumImpact();
