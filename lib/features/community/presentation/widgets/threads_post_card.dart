@@ -338,22 +338,6 @@ class ThreadsPostCard extends ConsumerWidget {
     );
   }
 
-  void _handleInteraction(WidgetRef ref, int value, int? currentValue) {
-    // Determine the new interaction value based on current state
-    int newValue;
-
-    if (currentValue == value) {
-      // If clicking the same action, toggle it off (neutral)
-      newValue = 0;
-    } else {
-      // If clicking different action or no current action, set to new value
-      newValue = value;
-    }
-
-    // Trigger the interaction
-    ref.read(postInteractionProvider(post.id).notifier).interact(newValue);
-  }
-
   void _handleOptimisticInteraction(WidgetRef ref, int value,
       Interaction? interaction, String currentUserCPId) {
     final oldValue = interaction?.value ?? 0;
