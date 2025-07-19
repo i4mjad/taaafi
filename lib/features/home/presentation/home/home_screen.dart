@@ -27,6 +27,7 @@ import 'package:reboot_app_3/features/authentication/providers/user_document_pro
 import 'package:reboot_app_3/features/notifications/data/repositories/notifications_repository.dart';
 import 'package:reboot_app_3/features/home/presentation/home/home_layout_provider.dart';
 import 'package:reboot_app_3/features/home/presentation/home/widgets/shorebird_update_widget.dart';
+import 'package:reboot_app_3/features/plus/presentation/widgets/subscription_card.dart';
 
 class HomeScreen extends ConsumerWidget {
   HomeScreen({super.key});
@@ -146,134 +147,22 @@ class HomeScreen extends ConsumerWidget {
                 ),
               );
             case AccountStatus.ok:
-              // Get ordered elements and build widgets dynamically
-              final orderedElements =
-                  homeLayoutSettings.getOrderedVisibleElements();
-
-              final widgetMap = <String, Widget>{
-                'quickAccess': const QuickAccessSection(),
-                'currentStreaks': const CurrentStreaksSection(),
-                'statistics': const StatisticsSection(),
-                'calendar': const CalendarSection(),
-              };
-
               return SingleChildScrollView(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    // Shorebird update widget
+                    // Shorebird update widget - at the top of everything
                     const ShorebirdUpdateWidget(),
                     verticalSpace(Spacing.points16),
                     if (!(notificationsEnabled.value ?? true))
                       const NotificationPromoterWidget(),
-                    // Home layout help message (dismissible)
-                    if (!homeLayoutSettings.helpMessageDismissed)
-                      Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: WidgetsContainer(
-                          padding: EdgeInsets.all(12),
-                          backgroundColor: theme.primary[50],
-                          borderSide:
-                              BorderSide(color: theme.primary[200]!, width: 1),
-                          borderRadius: BorderRadius.circular(8),
-                          child: Row(
-                            children: [
-                              Icon(
-                                LucideIcons.info,
-                                size: 20,
-                                color: theme.primary[600],
-                              ),
-                              horizontalSpace(Spacing.points8),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      AppLocalizations.of(context)
-                                          .translate('home-layout-help-title'),
-                                      style: TextStyles.caption.copyWith(
-                                        color: theme.primary[900],
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    verticalSpace(Spacing.points8),
-                                    Text(
-                                      AppLocalizations.of(context).translate(
-                                          'home-layout-help-message'),
-                                      style: TextStyles.small.copyWith(
-                                        color: theme.primary[800],
-                                        height: 1.4,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              horizontalSpace(Spacing.points8),
-                              GestureDetector(
-                                onTap: () {
-                                  ref
-                                      .read(homeLayoutProvider.notifier)
-                                      .dismissHelpMessage();
-                                },
-                                child: Icon(
-                                  LucideIcons.x,
-                                  size: 18,
-                                  color: theme.primary[600],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    // Combined Test Screen Access Button
+
+                    // Subscription card
                     Padding(
                       padding: const EdgeInsets.all(16.0),
-                      child: GestureDetector(
-                        onTap: () {
-                          context.goNamed(RouteNames.combinedTest.name);
-                        },
-                        child: WidgetsContainer(
-                          padding: EdgeInsets.all(12),
-                          backgroundColor: theme.secondary[50],
-                          borderSide: BorderSide(
-                              color: theme.secondary[200]!, width: 1),
-                          borderRadius: BorderRadius.circular(8),
-                          child: Row(
-                            children: [
-                              Icon(
-                                LucideIcons.testTube,
-                                size: 20,
-                                color: theme.secondary[600],
-                              ),
-                              horizontalSpace(Spacing.points8),
-                              Expanded(
-                                child: Text(
-                                  "Test Combined Dashboard",
-                                  style: TextStyles.caption.copyWith(
-                                    color: theme.secondary[800],
-                                    height: 1.3,
-                                  ),
-                                ),
-                              ),
-                              Icon(
-                                LucideIcons.arrowRight,
-                                size: 16,
-                                color: theme.secondary[600],
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
+                      child: const SubscriptionCard(),
                     ),
-                    // Render ordered elements with consistent spacing
-                    ...orderedElements
-                        .expand((element) => [
-                              widgetMap[element] ?? SizedBox.shrink(),
-                              verticalSpace(Spacing.points16),
-                            ])
-                        .toList()
-                      ..removeLast(), // Remove the last spacing
                   ],
                 ),
               );
