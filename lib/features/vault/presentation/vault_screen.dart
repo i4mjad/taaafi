@@ -244,11 +244,12 @@ class VaultScreen extends ConsumerWidget {
         height: 70,
         padding: EdgeInsets.all(8),
         backgroundColor: backgroundColor,
-        borderSide: BorderSide(color: iconColor.withOpacity(0.3), width: 1),
+        borderSide:
+            BorderSide(color: iconColor.withValues(alpha: 0.3), width: 1),
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: iconColor.withOpacity(0.1),
+            color: iconColor.withValues(alpha: 0.1),
             blurRadius: 8,
             offset: Offset(0, 2),
           ),
@@ -259,7 +260,7 @@ class VaultScreen extends ConsumerWidget {
             Container(
               padding: EdgeInsets.all(6),
               decoration: BoxDecoration(
-                color: iconColor.withOpacity(0.1),
+                color: iconColor.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(6),
               ),
               child: Icon(

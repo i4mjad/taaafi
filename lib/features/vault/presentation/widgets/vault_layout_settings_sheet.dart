@@ -61,16 +61,6 @@ class _VaultLayoutSettingsSheetState
     'settings': 'settings',
   };
 
-  final Map<String, String> _cardDescriptionKeys = {
-    'activities': 'activities-description',
-    'library': 'library-description',
-    'diaries': 'diaries-description',
-    'notifications':
-        'no-notifications-description', // Using existing notification description
-    'settings':
-        'home-layout-description', // Using existing layout settings description
-  };
-
   Map<String, Map<String, Color>> _getCardThemeColors(CustomThemeData theme) {
     return {
       'activities': {
@@ -420,7 +410,7 @@ class _VaultLayoutSettingsSheetState
                         isVisible ? backgroundColor : theme.grey[100],
                     borderSide: BorderSide(
                       color: isVisible
-                          ? iconColor.withOpacity(0.3)
+                          ? iconColor.withValues(alpha: 0.3)
                           : theme.grey[200]!,
                       width: 1,
                     ),
@@ -428,7 +418,7 @@ class _VaultLayoutSettingsSheetState
                     boxShadow: isVisible
                         ? [
                             BoxShadow(
-                              color: iconColor.withOpacity(0.1),
+                              color: iconColor.withValues(alpha: 0.1),
                               blurRadius: 8,
                               offset: Offset(0, 2),
                             ),
@@ -441,7 +431,7 @@ class _VaultLayoutSettingsSheetState
                           padding: EdgeInsets.all(6),
                           decoration: BoxDecoration(
                             color: isVisible
-                                ? iconColor.withOpacity(0.1)
+                                ? iconColor.withValues(alpha: 0.1)
                                 : theme.grey[200],
                             borderRadius: BorderRadius.circular(6),
                           ),
@@ -473,145 +463,6 @@ class _VaultLayoutSettingsSheetState
             ),
           );
         },
-      ),
-    );
-  }
-
-  Widget _buildHomeElementsList(
-      CustomThemeData theme, VaultLayoutSettings settings) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            AppLocalizations.of(context).translate('drag-to-reorder'),
-            style: TextStyles.body.copyWith(color: theme.grey[600]),
-          ),
-          verticalSpace(Spacing.points4),
-          Text(
-            AppLocalizations.of(context).translate('tap-to-toggle-visibility'),
-            style: TextStyles.footnote.copyWith(color: theme.grey[400]),
-          ),
-          verticalSpace(Spacing.points16),
-          Expanded(
-            child: ReorderableListView.builder(
-              itemCount: _orderedHomeElements.length,
-              onReorder: (oldIndex, newIndex) {
-                if (newIndex > oldIndex) {
-                  newIndex -= 1;
-                }
-                setState(() {
-                  final item = _orderedHomeElements.removeAt(oldIndex);
-                  _orderedHomeElements.insert(newIndex, item);
-                });
-                ref
-                    .read(vaultLayoutProvider.notifier)
-                    .reorderHomeElements(_orderedHomeElements);
-              },
-              itemBuilder: (context, index) {
-                final element = _orderedHomeElements[index];
-                final isVisible =
-                    settings.homeElementsVisibility[element] ?? false;
-
-                return Container(
-                  key: ValueKey(element),
-                  margin: EdgeInsets.only(bottom: 8),
-                  child: IntrinsicHeight(
-                    child: GestureDetector(
-                      onTap: () {
-                        HapticFeedback.lightImpact();
-                        ref
-                            .read(vaultLayoutProvider.notifier)
-                            .toggleHomeElementVisibility(element, !isVisible);
-                      },
-                      child: WidgetsContainer(
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                        backgroundColor:
-                            isVisible ? theme.success[50] : theme.grey[50],
-                        borderSide: BorderSide(
-                          color: isVisible
-                              ? theme.success[600]!
-                              : theme.grey[200]!,
-                          width: 1,
-                        ),
-                        child: Row(
-                          children: [
-                            // Drag handle
-                            Container(
-                              padding: EdgeInsets.all(4),
-                              child: Icon(
-                                LucideIcons.gripVertical,
-                                size: 16,
-                                color: theme.grey[400],
-                              ),
-                            ),
-                            horizontalSpace(Spacing.points8),
-
-                            // Element content
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    children: [
-                                      Icon(
-                                        _homeElementIcons[element],
-                                        size: 16,
-                                        color: isVisible
-                                            ? theme.success[600]
-                                            : theme.grey[600],
-                                      ),
-                                      horizontalSpace(Spacing.points8),
-                                      Expanded(
-                                        child: Text(
-                                          AppLocalizations.of(context)
-                                              .translate(_homeElementTitleKeys[
-                                                  element]!),
-                                          style: TextStyles.caption.copyWith(
-                                            color: isVisible
-                                                ? theme.success[600]
-                                                : theme.grey[600],
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  verticalSpace(Spacing.points8),
-                                  Text(
-                                    AppLocalizations.of(context).translate(
-                                        _homeElementDescriptionKeys[element]!),
-                                    style: TextStyles.small.copyWith(
-                                      color: isVisible
-                                          ? theme.success[400]
-                                          : theme.grey[400],
-                                      height: 1.2,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-
-                            horizontalSpace(Spacing.points8),
-                            // Visibility toggle
-                            Icon(
-                              isVisible ? LucideIcons.eye : LucideIcons.eyeOff,
-                              size: 18,
-                              color: isVisible
-                                  ? theme.success[600]
-                                  : theme.grey[400],
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                );
-              },
-            ),
-          ),
-        ],
       ),
     );
   }

@@ -400,13 +400,13 @@ class _StreakPeriodsModalState extends ConsumerState<StreakPeriodsModal> {
                                           child: Container(
                                             decoration: BoxDecoration(
                                               color: theme.backgroundColor
-                                                  .withOpacity(0.95),
+                                                  .withValues(alpha: 0.95),
                                               borderRadius:
                                                   BorderRadius.circular(12),
                                               boxShadow: [
                                                 BoxShadow(
                                                   color: theme.grey[400]!
-                                                      .withOpacity(0.2),
+                                                      .withValues(alpha: 0.2),
                                                   blurRadius: 8,
                                                   offset: Offset(0, 2),
                                                 ),
@@ -421,7 +421,7 @@ class _StreakPeriodsModalState extends ConsumerState<StreakPeriodsModal> {
                                                   height: 36,
                                                   decoration: BoxDecoration(
                                                     color: theme.backgroundColor
-                                                        .withOpacity(0.9),
+                                                        .withValues(alpha: 0.9),
                                                     borderRadius:
                                                         BorderRadius.circular(
                                                             8),
@@ -431,7 +431,8 @@ class _StreakPeriodsModalState extends ConsumerState<StreakPeriodsModal> {
                                                     boxShadow: [
                                                       BoxShadow(
                                                         color: theme.grey[400]!
-                                                            .withOpacity(0.3),
+                                                            .withValues(
+                                                                alpha: 0.3),
                                                         blurRadius: 4,
                                                         offset: Offset(0, 2),
                                                       ),
@@ -458,7 +459,7 @@ class _StreakPeriodsModalState extends ConsumerState<StreakPeriodsModal> {
                                                   height: 36,
                                                   decoration: BoxDecoration(
                                                     color: theme.backgroundColor
-                                                        .withOpacity(0.9),
+                                                        .withValues(alpha: 0.9),
                                                     borderRadius:
                                                         BorderRadius.circular(
                                                             8),
@@ -468,7 +469,8 @@ class _StreakPeriodsModalState extends ConsumerState<StreakPeriodsModal> {
                                                     boxShadow: [
                                                       BoxShadow(
                                                         color: theme.grey[400]!
-                                                            .withOpacity(0.3),
+                                                            .withValues(
+                                                                alpha: 0.3),
                                                         blurRadius: 4,
                                                         offset: Offset(0, 2),
                                                       ),
@@ -495,7 +497,7 @@ class _StreakPeriodsModalState extends ConsumerState<StreakPeriodsModal> {
                                                   height: 36,
                                                   decoration: BoxDecoration(
                                                     color: theme.backgroundColor
-                                                        .withOpacity(0.9),
+                                                        .withValues(alpha: 0.9),
                                                     borderRadius:
                                                         BorderRadius.circular(
                                                             8),
@@ -505,7 +507,8 @@ class _StreakPeriodsModalState extends ConsumerState<StreakPeriodsModal> {
                                                     boxShadow: [
                                                       BoxShadow(
                                                         color: theme.grey[400]!
-                                                            .withOpacity(0.3),
+                                                            .withValues(
+                                                                alpha: 0.3),
                                                         blurRadius: 4,
                                                         offset: Offset(0, 2),
                                                       ),
@@ -543,13 +546,13 @@ class _StreakPeriodsModalState extends ConsumerState<StreakPeriodsModal> {
                                             child: Container(
                                               decoration: BoxDecoration(
                                                 color: theme.backgroundColor
-                                                    .withOpacity(0.95),
+                                                    .withValues(alpha: 0.95),
                                                 borderRadius:
                                                     BorderRadius.circular(12),
                                                 boxShadow: [
                                                   BoxShadow(
                                                     color: theme.grey[400]!
-                                                        .withOpacity(0.2),
+                                                        .withValues(alpha: 0.2),
                                                     blurRadius: 8,
                                                     offset: Offset(0, 2),
                                                   ),
@@ -699,7 +702,7 @@ class _StreakPeriodsModalState extends ConsumerState<StreakPeriodsModal> {
                                                   horizontal: 8, vertical: 4),
                                               decoration: BoxDecoration(
                                                 color: theme.grey[900]!
-                                                    .withOpacity(0.8),
+                                                    .withValues(alpha: 0.8),
                                                 borderRadius:
                                                     BorderRadius.circular(12),
                                               ),
@@ -947,7 +950,7 @@ class _StreakPeriodsModalState extends ConsumerState<StreakPeriodsModal> {
                               _periods.last.isCurrentPeriod) {
                             return FlDotCirclePainter(
                               radius: 3,
-                              color: color.withOpacity(0.8),
+                              color: color.withValues(alpha: 0.8),
                               strokeWidth: 1,
                               strokeColor: theme.backgroundColor,
                             );
@@ -961,7 +964,7 @@ class _StreakPeriodsModalState extends ConsumerState<StreakPeriodsModal> {
                       ),
                       belowBarData: BarAreaData(
                         show: true,
-                        color: color.withOpacity(0.1),
+                        color: color.withValues(alpha: 0.1),
                       ),
                     ),
                   ],

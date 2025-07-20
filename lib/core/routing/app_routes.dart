@@ -46,7 +46,6 @@ import 'package:reboot_app_3/features/community/presentation/profile/community_p
 import 'package:reboot_app_3/features/community/presentation/providers/community_providers_new.dart';
 import 'package:reboot_app_3/features/home/presentation/day_overview/day_overview_screen.dart';
 import 'package:reboot_app_3/features/home/presentation/home/home_screen.dart';
-import 'package:reboot_app_3/features/home/presentation/combined_test/combined_test_screen.dart';
 import 'package:reboot_app_3/features/onboarding/presentation/onboarding_screen.dart';
 import 'package:reboot_app_3/features/vault/presentation/activities/activities_screen.dart';
 import 'package:reboot_app_3/features/vault/presentation/activities/activity_overview_screen.dart';
@@ -231,14 +230,6 @@ GoRouter goRouter(Ref<GoRouter> ref) {
                   child: HomeScreen(),
                 ),
                 routes: [
-                  GoRoute(
-                    path: 'combinedTest',
-                    name: RouteNames.combinedTest.name,
-                    pageBuilder: (context, state) => MaterialPage<void>(
-                      name: RouteNames.combinedTest.name,
-                      child: CombinedTestScreen(),
-                    ),
-                  ),
                   GoRoute(
                     path: "dayOverview/:date",
                     name: RouteNames.dayOverview.name,

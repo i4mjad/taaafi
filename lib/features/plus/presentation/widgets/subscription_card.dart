@@ -55,7 +55,7 @@ class SubscriptionCard extends ConsumerWidget {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: Colors.amberAccent.withOpacity(0.2),
+                    color: Colors.amberAccent.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Icon(
@@ -95,7 +95,7 @@ class SubscriptionCard extends ConsumerWidget {
             Text(
               AppLocalizations.of(context).translate('plus-description'),
               style: TextStyles.footnote.copyWith(
-                color: Colors.white.withOpacity(0.9),
+                color: Colors.white.withValues(alpha: 0.9),
                 height: 1.4,
               ),
             ),

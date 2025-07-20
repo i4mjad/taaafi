@@ -101,7 +101,7 @@ class _TaaafiPlusScreenState extends ConsumerState<TaaafiPlusScreen> {
                 child: Container(
                   padding: EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: theme.grey[500]?.withOpacity(0.1),
+                    color: theme.grey[500]?.withValues(alpha: 0.1),
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
