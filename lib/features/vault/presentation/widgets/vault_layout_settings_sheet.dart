@@ -24,22 +24,18 @@ class _VaultLayoutSettingsSheetState
   late List<String> _orderedCards;
 
   final Map<String, IconData> _homeElementIcons = {
-    'todayTasks': LucideIcons.clipboardCheck,
     'currentStreaks': LucideIcons.timer,
     'statistics': LucideIcons.barChart2,
     'calendar': LucideIcons.calendar,
   };
 
   final Map<String, String> _homeElementTitleKeys = {
-    'todayTasks': 'today-tasks',
     'currentStreaks': 'current-streaks',
     'statistics': 'statistics',
     'calendar': 'calendar',
   };
 
   final Map<String, String> _homeElementDescriptionKeys = {
-    'todayTasks':
-        'activities-description', // Using existing activities description
     'currentStreaks': 'current-streaks-description',
     'statistics': 'statistics-description',
     'calendar': 'calendar-description',
@@ -140,12 +136,8 @@ class _VaultLayoutSettingsSheetState
                       HapticFeedback.mediumImpact();
                       ref.read(vaultLayoutProvider.notifier).resetToDefaults();
                       setState(() {
-                        _orderedHomeElements = List.from([
-                          'todayTasks',
-                          'currentStreaks',
-                          'statistics',
-                          'calendar'
-                        ]);
+                        _orderedHomeElements = List.from(
+                            ['currentStreaks', 'statistics', 'calendar']);
                         _orderedCards = List.from([
                           'activities',
                           'library',
@@ -278,8 +270,16 @@ class _VaultLayoutSettingsSheetState
 
   List<Widget> _buildHomeElementsItems(
       CustomThemeData theme, VaultLayoutSettings settings) {
-    return List.generate(_orderedHomeElements.length, (index) {
-      final element = _orderedHomeElements[index];
+    // Filter out elements that don't exist in our maps
+    final validElements = _orderedHomeElements
+        .where((element) =>
+            _homeElementIcons.containsKey(element) &&
+            _homeElementTitleKeys.containsKey(element) &&
+            _homeElementDescriptionKeys.containsKey(element))
+        .toList();
+
+    return List.generate(validElements.length, (index) {
+      final element = validElements[index];
       final isVisible = settings.homeElementsVisibility[element] ?? false;
 
       return Container(
@@ -321,7 +321,8 @@ class _VaultLayoutSettingsSheetState
                         Row(
                           children: [
                             Icon(
-                              _homeElementIcons[element],
+                              _homeElementIcons[element] ??
+                                  LucideIcons.helpCircle,
                               size: 16,
                               color: isVisible
                                   ? theme.success[600]
@@ -330,8 +331,8 @@ class _VaultLayoutSettingsSheetState
                             horizontalSpace(Spacing.points8),
                             Expanded(
                               child: Text(
-                                AppLocalizations.of(context)
-                                    .translate(_homeElementTitleKeys[element]!),
+                                AppLocalizations.of(context).translate(
+                                    _homeElementTitleKeys[element] ?? element),
                                 style: TextStyles.caption.copyWith(
                                   color: isVisible
                                       ? theme.success[600]
@@ -343,8 +344,8 @@ class _VaultLayoutSettingsSheetState
                         ),
                         verticalSpace(Spacing.points8),
                         Text(
-                          AppLocalizations.of(context)
-                              .translate(_homeElementDescriptionKeys[element]!),
+                          AppLocalizations.of(context).translate(
+                              _homeElementDescriptionKeys[element] ?? element),
                           style: TextStyles.small.copyWith(
                             color: isVisible
                                 ? theme.success[400]

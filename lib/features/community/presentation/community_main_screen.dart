@@ -17,7 +17,10 @@ import 'package:reboot_app_3/features/community/data/models/post_category.dart';
 import 'package:reboot_app_3/features/account/presentation/widgets/feature_access_guard.dart';
 
 class CommunityMainScreen extends ConsumerStatefulWidget {
-  const CommunityMainScreen({super.key});
+  /// Optional initial tab to select when the screen opens
+  final String? initialTab;
+
+  const CommunityMainScreen({super.key, this.initialTab});
 
   @override
   ConsumerState<CommunityMainScreen> createState() =>
@@ -25,12 +28,16 @@ class CommunityMainScreen extends ConsumerStatefulWidget {
 }
 
 class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen> {
-  String _selectedFilter = 'posts';
+  late String _selectedFilter;
   final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
     super.initState();
+
+    // Set initial filter based on widget parameter or default to 'posts'
+    _selectedFilter = widget.initialTab ?? 'posts';
+
     // Load posts when screen initializes
     WidgetsBinding.instance.addPostFrameCallback((_) {
       // Load different types of posts based on initial filter

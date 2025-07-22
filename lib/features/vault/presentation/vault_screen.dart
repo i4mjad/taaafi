@@ -124,7 +124,7 @@ class VaultScreen extends ConsumerWidget {
         final orderedCards = vaultLayoutSettings.getOrderedVisibleCards();
 
         final homeElementsMap = <String, Widget>{
-          'todayTasks': _buildTodayTasksSection(),
+          // 'todayTasks': _buildTodayTasksSection(),
           'currentStreaks': const CurrentStreaksSection(),
           'statistics': const StatisticsSection(),
           'calendar': const CalendarSection(),

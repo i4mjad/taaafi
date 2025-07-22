@@ -33,7 +33,10 @@ import 'package:reboot_app_3/features/account/data/app_features_config.dart';
 /// - Loading states
 /// - Form reset functionality
 class NewPostScreen extends ConsumerStatefulWidget {
-  const NewPostScreen({super.key});
+  /// Optional initial category ID to pre-select when the screen opens
+  final String? initialCategoryId;
+
+  const NewPostScreen({super.key, this.initialCategoryId});
 
   @override
   ConsumerState<NewPostScreen> createState() => _NewPostScreenState();
@@ -57,7 +60,42 @@ class _NewPostScreenState extends ConsumerState<NewPostScreen> {
     // Auto-focus the title field when the screen opens
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _titleFocusNode.requestFocus();
+
+      // Set initial category if provided
+      if (widget.initialCategoryId != null) {
+        _setInitialCategory();
+      }
     });
+  }
+
+  /// Sets the initial category based on the provided category ID
+  Future<void> _setInitialCategory() async {
+    try {
+      // Wait for categories to load
+      final categories = await ref.read(postCategoriesProvider.future);
+
+      // Find the category with the matching ID
+      final matchingCategory = categories.firstWhere(
+        (category) => category.id == widget.initialCategoryId,
+        orElse: () => const PostCategory(
+          id: 'general',
+          name: 'General',
+          nameAr: 'عام',
+          iconName: 'chat',
+          colorHex: '#6B7280',
+          isActive: true,
+          sortOrder: 7,
+        ),
+      );
+
+      // Set the selected category in the provider
+      if (mounted) {
+        ref.read(selectedCategoryProvider.notifier).state = matchingCategory;
+      }
+    } catch (e) {
+      // If there's an error, just continue with the default category
+      print('Error setting initial category: $e');
+    }
   }
 
   @override

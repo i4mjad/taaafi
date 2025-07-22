@@ -53,7 +53,6 @@ final vaultLayoutProvider =
 
 class VaultLayoutNotifier extends StateNotifier<VaultLayoutSettings> {
   static const List<String> _defaultHomeElementsOrder = [
-    'todayTasks',
     'currentStreaks',
     'statistics',
     'calendar',
@@ -70,7 +69,6 @@ class VaultLayoutNotifier extends StateNotifier<VaultLayoutSettings> {
   VaultLayoutNotifier()
       : super(VaultLayoutSettings(
           homeElementsVisibility: {
-            'todayTasks': true,
             'currentStreaks': true,
             'statistics': true,
             'calendar': true,
@@ -93,7 +91,6 @@ class VaultLayoutNotifier extends StateNotifier<VaultLayoutSettings> {
     final prefs = await SharedPreferences.getInstance();
 
     // Load home elements visibility
-    final todayTasks = prefs.getBool('vault_today_tasks_visible') ?? true;
     final currentStreaks =
         prefs.getBool('vault_current_streaks_visible') ?? true;
     final statistics = prefs.getBool('vault_statistics_visible') ?? true;
@@ -120,7 +117,6 @@ class VaultLayoutNotifier extends StateNotifier<VaultLayoutSettings> {
 
     state = VaultLayoutSettings(
       homeElementsVisibility: {
-        'todayTasks': todayTasks,
         'currentStreaks': currentStreaks,
         'statistics': statistics,
         'calendar': calendar,

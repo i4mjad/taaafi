@@ -453,11 +453,15 @@ GoRouter goRouter(Ref<GoRouter> ref) {
                     return '/community/onboarding';
                   }
                 },
-                pageBuilder: (context, state) => NoTransitionPage<void>(
-                  key: state.pageKey,
-                  name: state.name,
-                  child: CommunityMainScreen(),
-                ),
+                pageBuilder: (context, state) {
+                  // Get initial tab from query parameters
+                  final initialTab = state.uri.queryParameters['tab'];
+                  return NoTransitionPage<void>(
+                    key: state.pageKey,
+                    name: state.name,
+                    child: CommunityMainScreen(initialTab: initialTab),
+                  );
+                },
                 routes: [
                   // NEW onboarding route
                   GoRoute(
@@ -529,10 +533,16 @@ GoRouter goRouter(Ref<GoRouter> ref) {
                       GoRoute(
                         path: 'new',
                         name: RouteNames.newPost.name,
-                        pageBuilder: (context, state) => MaterialPage<void>(
-                          name: RouteNames.newPost.name,
-                          child: NewPostScreen(),
-                        ),
+                        pageBuilder: (context, state) {
+                          // Get initial category ID from query parameters
+                          final initialCategoryId =
+                              state.uri.queryParameters['categoryId'];
+                          return MaterialPage<void>(
+                            name: RouteNames.newPost.name,
+                            child: NewPostScreen(
+                                initialCategoryId: initialCategoryId),
+                          );
+                        },
                       ),
                       GoRoute(
                         path: 'post/:postId/comment/:commentId/reply',

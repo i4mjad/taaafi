@@ -9,6 +9,7 @@ import 'package:reboot_app_3/core/shared_widgets/spinner.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
+import 'package:reboot_app_3/features/home/presentation/home/widgets/card_based_hub.dart';
 import 'package:reboot_app_3/features/home/presentation/home/widgets/notification_promoter_widget.dart';
 import 'package:reboot_app_3/features/vault/presentation/vault_settings/activities_notifications_settings_screen.dart';
 import 'package:reboot_app_3/features/authentication/providers/account_status_provider.dart';
@@ -19,6 +20,9 @@ import 'package:reboot_app_3/features/authentication/providers/user_document_pro
 import 'package:reboot_app_3/features/notifications/data/repositories/notifications_repository.dart';
 import 'package:reboot_app_3/features/home/presentation/home/widgets/shorebird_update_widget.dart';
 import 'package:reboot_app_3/features/plus/presentation/widgets/subscription_card.dart';
+import 'package:reboot_app_3/features/home/presentation/home/widgets/compact_quick_actions.dart';
+import 'package:reboot_app_3/features/home/presentation/home/widgets/compact_streaks_view.dart';
+import 'package:reboot_app_3/features/home/presentation/home/widgets/unified_home_screen.dart';
 
 class HomeScreen extends ConsumerWidget {
   HomeScreen({super.key});
@@ -91,7 +95,7 @@ class HomeScreen extends ConsumerWidget {
       appBar: appBar(
         context,
         ref,
-        'home',
+        'welcome-back',
         false,
         false,
         actions: actions,
@@ -127,25 +131,7 @@ class HomeScreen extends ConsumerWidget {
                 ),
               );
             case AccountStatus.ok:
-              return SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    // Shorebird update widget - at the top of everything
-                    const ShorebirdUpdateWidget(),
-                    verticalSpace(Spacing.points16),
-                    if (!(notificationsEnabled.value ?? true))
-                      const NotificationPromoterWidget(),
-
-                    // Subscription card
-                    Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: const SubscriptionCard(),
-                    ),
-                  ],
-                ),
-              );
+              return UnifiedHomeScreen(); // New unified experience!
           }
         },
       ),

@@ -32,7 +32,7 @@ class SubscriptionCard extends ConsumerWidget {
       },
       child: Container(
         width: double.infinity,
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(12),
         decoration: ShapeDecoration(
           gradient: const LinearGradient(
             begin: Alignment(1.00, 0.00),
@@ -41,7 +41,7 @@ class SubscriptionCard extends ConsumerWidget {
           ),
           shape: SmoothRectangleBorder(
             borderRadius: SmoothBorderRadius(
-              cornerRadius: 16,
+              cornerRadius: 12,
               cornerSmoothing: 1,
             ),
           ),
@@ -53,22 +53,22 @@ class SubscriptionCard extends ConsumerWidget {
             Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.all(8),
+                  padding: const EdgeInsets.all(3),
                   decoration: BoxDecoration(
                     color: Colors.amberAccent.withValues(alpha: 0.2),
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(4),
                   ),
                   child: Icon(
                     LucideIcons.crown,
                     color: Colors.amberAccent,
-                    size: 24,
+                    size: 14,
                   ),
                 ),
-                horizontalSpace(Spacing.points12),
+                horizontalSpace(Spacing.points4),
                 Expanded(
                   child: Text(
                     AppLocalizations.of(context).translate('ta3afi-plus'),
-                    style: TextStyles.h4.copyWith(
+                    style: TextStyles.footnote.copyWith(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
                     ),
@@ -77,48 +77,51 @@ class SubscriptionCard extends ConsumerWidget {
               ],
             ),
 
-            verticalSpace(Spacing.points16),
+            verticalSpace(Spacing.points4),
 
             // Catchy headline
             Text(
               AppLocalizations.of(context)
                   .translate('start-every-day-with-great-ideas'),
-              style: TextStyles.h6.copyWith(
+              style: TextStyles.caption.copyWith(
                 color: Colors.white,
-                height: 1.3,
+                height: 1.1,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+
+            verticalSpace(Spacing.points4),
+
+            // Description
+            Text(
+              AppLocalizations.of(context).translate('plus-description'),
+              style: TextStyles.caption.copyWith(
+                color: Colors.white.withValues(alpha: 0.9),
+                height: 1.2,
+                fontSize: 10,
               ),
             ),
 
             verticalSpace(Spacing.points8),
 
-            // Description
-            Text(
-              AppLocalizations.of(context).translate('plus-description'),
-              style: TextStyles.footnote.copyWith(
-                color: Colors.white.withValues(alpha: 0.9),
-                height: 1.4,
-              ),
-            ),
-
-            verticalSpace(Spacing.points20),
-
             // Subscribe button
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.symmetric(vertical: 12),
+              padding: const EdgeInsets.symmetric(vertical: 6),
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(6),
               ),
               child: Text(
                 AppLocalizations.of(context)
                     .translate('upgrade-now')
                     .toUpperCase(),
                 textAlign: TextAlign.center,
-                style: TextStyles.footnoteSelected.copyWith(
+                style: TextStyles.caption.copyWith(
                   color: const Color(0xFF326367),
                   fontWeight: FontWeight.bold,
-                  letterSpacing: 0.5,
+                  letterSpacing: 0.3,
+                  fontSize: 10,
                 ),
               ),
             ),
