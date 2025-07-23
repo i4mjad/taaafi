@@ -44,7 +44,7 @@ import 'package:reboot_app_3/features/community/presentation/groups/group_challe
 import 'package:reboot_app_3/features/community/presentation/challenges/global_challenge_list_screen.dart';
 import 'package:reboot_app_3/features/community/presentation/profile/community_profile_settings_screen.dart';
 import 'package:reboot_app_3/features/community/presentation/providers/community_providers_new.dart';
-import 'package:reboot_app_3/features/home/presentation/day_overview/day_overview_screen.dart';
+import 'package:reboot_app_3/features/vault/presentation/day_overview/day_overview_screen.dart';
 import 'package:reboot_app_3/features/home/presentation/home/home_screen.dart';
 import 'package:reboot_app_3/features/onboarding/presentation/onboarding_screen.dart';
 import 'package:reboot_app_3/features/vault/presentation/activities/activities_screen.dart';

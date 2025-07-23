@@ -13,10 +13,10 @@ import 'package:reboot_app_3/core/theming/custom_theme_data.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/features/vault/presentation/activities/activities_screen.dart';
-import 'package:reboot_app_3/features/home/presentation/home/widgets/current_streaks_section.dart';
-import 'package:reboot_app_3/features/home/presentation/home/widgets/statistics_section.dart';
-import 'package:reboot_app_3/features/home/presentation/home/widgets/calendar_section.dart';
-import 'package:reboot_app_3/features/home/presentation/home/widgets/follow_up_sheet.dart';
+import 'package:reboot_app_3/features/vault/presentation/widgets/streaks/current_streaks_section.dart';
+import 'package:reboot_app_3/features/vault/presentation/widgets/statistics/statistics_section.dart';
+import 'package:reboot_app_3/features/vault/presentation/widgets/calendar/calendar_section.dart';
+import 'package:reboot_app_3/features/vault/presentation/widgets/follow_up/follow_up_sheet.dart';
 import 'package:reboot_app_3/features/home/presentation/home/widgets/shorebird_update_widget.dart';
 import 'package:reboot_app_3/features/vault/presentation/vault_layout_provider.dart';
 import 'package:reboot_app_3/features/vault/presentation/widgets/vault_layout_settings_sheet.dart';
@@ -119,11 +119,11 @@ class VaultScreen extends ConsumerWidget {
       builder: (context, ref, child) {
         final vaultLayoutSettings = ref.watch(vaultLayoutProvider);
 
-        final orderedHomeElements =
-            vaultLayoutSettings.getOrderedVisibleHomeElements();
+        final orderedVaultElements =
+            vaultLayoutSettings.getOrderedVisibleVaultElements();
         final orderedCards = vaultLayoutSettings.getOrderedVisibleCards();
 
-        final homeElementsMap = <String, Widget>{
+        final vaultElementsMap = <String, Widget>{
           // 'todayTasks': _buildTodayTasksSection(),
           'currentStreaks': const CurrentStreaksSection(),
           'statistics': const StatisticsSection(),
@@ -142,10 +142,10 @@ class VaultScreen extends ConsumerWidget {
               _buildHorizontalCards(context, theme, orderedCards),
               verticalSpace(Spacing.points16),
 
-              // Render ordered home elements
-              ...orderedHomeElements
+              // Render ordered vault elements
+              ...orderedVaultElements
                   .expand((element) => [
-                        homeElementsMap[element] ?? SizedBox.shrink(),
+                        vaultElementsMap[element] ?? SizedBox.shrink(),
                         verticalSpace(Spacing.points16),
                       ])
                   .toList()

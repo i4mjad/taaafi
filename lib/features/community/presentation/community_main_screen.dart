@@ -14,6 +14,7 @@ import 'package:reboot_app_3/features/community/presentation/providers/forum_pro
 import 'package:reboot_app_3/features/community/presentation/widgets/avatar_with_anonymity.dart';
 import 'package:reboot_app_3/features/community/presentation/providers/community_providers_new.dart';
 import 'package:reboot_app_3/features/community/data/models/post_category.dart';
+import 'package:reboot_app_3/features/community/data/models/post.dart';
 import 'package:reboot_app_3/features/account/presentation/widgets/feature_access_guard.dart';
 
 class CommunityMainScreen extends ConsumerStatefulWidget {
@@ -268,11 +269,11 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen> {
   Widget _buildPostsView() {
     final theme = AppTheme.of(context);
     final localizations = AppLocalizations.of(context);
-    final postsState = ref.watch(postsPaginationProvider);
+    final postsAsync = ref.watch(mainScreenPostsProvider(null));
 
     return Column(
       children: [
-        // Header with trend icon, "Latest Posts" text, and "See All" button
+        // Header with trend icon, "Latest Posts" text, count, and "See All" button
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           child: Row(
@@ -288,6 +289,14 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen> {
                 style: TextStyles.caption.copyWith(
                   color: theme.grey[900],
                   fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(width: 4),
+              Text(
+                '(${localizations.translate('latest_50')})',
+                style: TextStyles.caption.copyWith(
+                  color: theme.grey[600],
+                  fontWeight: FontWeight.normal,
                 ),
               ),
               const Spacer(),
@@ -307,7 +316,7 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen> {
             ],
           ),
         ),
-        _buildPostsContent(postsState, localizations, theme),
+        _buildStreamingPostsContent(postsAsync, localizations, theme),
       ],
     );
   }
@@ -666,60 +675,100 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen> {
     }
   }
 
-  Widget _buildPostsContent(
-      dynamic postsState, AppLocalizations localizations, theme) {
-    if (postsState.posts.isEmpty && postsState.isLoading) {
-      return const Center(
+  Widget _buildStreamingPostsContent(AsyncValue<List<Post>> postsAsync,
+      AppLocalizations localizations, theme) {
+    return postsAsync.when(
+      loading: () => const Center(
         child: Spinner(),
-      );
-    }
-
-    if (postsState.posts.isEmpty && postsState.error != null) {
-      print('❌ Error loading posts: ${postsState.error}');
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              localizations.translate('error_loading_posts'),
-              style: TextStyles.body.copyWith(
-                color: theme.error[500],
+      ),
+      error: (error, stack) {
+        print('❌ Error loading posts: $error');
+        return Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                localizations.translate('error_loading_posts'),
+                style: TextStyles.body.copyWith(
+                  color: theme.error[500],
+                ),
               ),
-            ),
-            const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: () {
-                ref
-                    .read(postsPaginationProvider.notifier)
-                    .refresh(category: _getFilterCategory());
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: () {
+                  ref.invalidate(mainScreenPostsProvider(null));
+                },
+                child: Text(localizations.translate('retry')),
+              ),
+            ],
+          ),
+        );
+      },
+      data: (posts) {
+        if (posts.isEmpty) {
+          return Center(
+            child: Text(localizations.translate('no_posts_found')),
+          );
+        }
+
+        return Column(
+          children: [
+            // Posts list
+            ListView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: posts.length,
+              itemBuilder: (context, index) {
+                final post = posts[index];
+                return ThreadsPostCard(
+                  post: post,
+                  onTap: () {
+                    context.push('/community/forum/post/${post.id}');
+                  },
+                );
               },
-              child: Text(localizations.translate('retry')),
             ),
+
+            // Show All button at the end
+            if (posts.length >=
+                20) // Show button when there are enough posts to warrant "Show All"
+              Container(
+                width: double.infinity,
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+                child: ElevatedButton(
+                  onPressed: () {
+                    context.goNamed(RouteNames.allPosts.name);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: theme.primary[500],
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        localizations.translate('show_all_posts'),
+                        style: TextStyles.body.copyWith(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      const Icon(
+                        LucideIcons.arrowRight,
+                        size: 18,
+                        color: Colors.white,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
           ],
-        ),
-      );
-    }
-
-    if (postsState.posts.isEmpty) {
-      return Center(
-        child: Text(localizations.translate('no_posts_found')),
-      );
-    }
-
-    // Show only first 5 posts as preview
-    final previewPosts = postsState.posts.take(5).toList();
-
-    return ListView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      itemCount: previewPosts.length,
-      itemBuilder: (context, index) {
-        final post = previewPosts[index];
-        return ThreadsPostCard(
-          post: post,
-          onTap: () {
-            context.push('/community/forum/post/${post.id}');
-          },
         );
       },
     );

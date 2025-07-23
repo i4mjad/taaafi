@@ -130,6 +130,26 @@ class _NewPostScreenState extends ConsumerState<NewPostScreen> {
       _handlePostCreationResult(next, localizations);
     });
 
+    // Listen to categories loading and set default to general category if none selected
+    ref.listen<AsyncValue<List<PostCategory>>>(postCategoriesProvider,
+        (previous, next) {
+      next.whenData((categories) {
+        final currentSelected = ref.read(selectedCategoryProvider);
+        if (currentSelected == null && categories.isNotEmpty) {
+          // Find general category from Firestore and set as default
+          PostCategory? generalCategory;
+          try {
+            generalCategory =
+                categories.firstWhere((category) => category.id == 'general');
+          } catch (e) {
+            // If no general category found, use the first available category
+            generalCategory = categories.first;
+          }
+          ref.read(selectedCategoryProvider.notifier).state = generalCategory;
+        }
+      });
+    });
+
     return Scaffold(
       backgroundColor: theme.backgroundColor,
       appBar: _buildAppBar(theme, localizations),
@@ -664,37 +684,13 @@ class _NewPostScreenState extends ConsumerState<NewPostScreen> {
     AppLocalizations localizations,
     List<PostCategory> categories,
   ) {
-    // Always include default general category
-    final defaultCategory = const PostCategory(
-      id: 'general',
-      name: 'General',
-      nameAr: 'عام',
-      iconName: 'chat',
-      colorHex: '#6B7280',
-      isActive: true,
-      sortOrder: 7,
-    );
-
-    // Filter out any duplicate general categories from Firestore
-    final filteredCategories =
-        categories.where((cat) => cat.id != 'general').toList();
-
     return Wrap(
       spacing: 8,
       runSpacing: 8,
-      children: [
-        // Default general category option
-        _buildCategoryOption(
-          theme,
-          localizations,
-          defaultCategory,
-          isDefault: true,
-        ),
-
-        // Regular categories from Firestore
-        ...filteredCategories.map(
-            (category) => _buildCategoryOption(theme, localizations, category)),
-      ],
+      children: categories
+          .map((category) =>
+              _buildCategoryOption(theme, localizations, category))
+          .toList(),
     );
   }
 
@@ -702,14 +698,10 @@ class _NewPostScreenState extends ConsumerState<NewPostScreen> {
   Widget _buildCategoryOption(
     CustomThemeData theme,
     AppLocalizations localizations,
-    PostCategory category, {
-    bool isDefault = false,
-  }) {
-    final displayName = isDefault
-        ? (localizations.locale.languageCode == 'ar'
-            ? 'عام (افتراضي)'
-            : 'General (Default)')
-        : category.getDisplayName(localizations.locale.languageCode);
+    PostCategory category,
+  ) {
+    final displayName =
+        category.getDisplayName(localizations.locale.languageCode);
 
     return GestureDetector(
       onTap: () => _selectCategory(category),
@@ -724,7 +716,7 @@ class _NewPostScreenState extends ConsumerState<NewPostScreen> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(
-              isDefault ? Icons.refresh : category.icon,
+              category.icon,
               size: 16,
               color: category.color,
             ),
@@ -873,7 +865,9 @@ class _NewPostScreenState extends ConsumerState<NewPostScreen> {
   /// Handles errors with appropriate snackbar messages
   void _handleError(Object error, AppLocalizations localizations) {
     if (error is PostValidationException) {
-      getErrorSnackBar(context, error.message);
+      // Use the error code as translation key instead of the already translated message
+      final translationKey = _getValidationErrorKey(error);
+      getErrorSnackBar(context, translationKey);
     } else if (error is ForumAuthenticationException) {
       getErrorSnackBar(context, 'authentication_required');
     } else if (error is ForumPermissionException) {
@@ -885,19 +879,52 @@ class _NewPostScreenState extends ConsumerState<NewPostScreen> {
     }
   }
 
+  /// Maps PostValidationException codes to translation keys
+  String _getValidationErrorKey(PostValidationException error) {
+    switch (error.code) {
+      case 'TITLE_EMPTY':
+        return 'post_title_empty';
+      case 'TITLE_TOO_SHORT':
+        return 'post_title_too_short';
+      case 'TITLE_TOO_LONG':
+        return 'post_title_too_long';
+      case 'TITLE_INAPPROPRIATE':
+        return 'post_title_inappropriate';
+      case 'TITLE_SPAMMY':
+        return 'post_title_spammy';
+      case 'CONTENT_EMPTY':
+        return 'post_content_empty';
+      case 'CONTENT_TOO_SHORT':
+        return 'post_content_too_short';
+      case 'CONTENT_TOO_LONG':
+        return 'post_content_too_long';
+      case 'CONTENT_TOO_FEW_WORDS':
+        return 'post_content_too_few_words';
+      case 'CONTENT_TOO_MANY_WORDS':
+        return 'post_content_too_many_words';
+      case 'CONTENT_INAPPROPRIATE':
+        return 'post_content_inappropriate';
+      case 'CONTENT_SPAMMY':
+        return 'post_content_spammy';
+      case 'CATEGORY_INVALID':
+        return 'post_category_invalid';
+      case 'CATEGORY_INVALID_FORMAT':
+        return 'post_category_invalid_format';
+      case 'POST_TOO_SHORT_OVERALL':
+        return 'post_too_short_overall';
+      case 'TITLE_CONTENT_TOO_SIMILAR':
+        return 'post_title_content_too_similar';
+      default:
+        return 'validation_error';
+    }
+  }
+
   /// Resets the form to initial state
   void _resetForm() {
     _titleController.clear();
     _contentController.clear();
-    ref.read(selectedCategoryProvider.notifier).state = const PostCategory(
-      id: 'general',
-      name: 'General',
-      nameAr: 'عام',
-      iconName: 'chat',
-      colorHex: '#6B7280',
-      isActive: true,
-      sortOrder: 7,
-    );
+    // Reset to null and let the category loading logic set the default general category
+    ref.read(selectedCategoryProvider.notifier).state = null;
     ref.read(anonymousPostProvider.notifier).state = false;
     ref.read(postContentProvider.notifier).state = '';
     ref.read(postCreationProvider.notifier).reset();

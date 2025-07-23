@@ -11,11 +11,11 @@ import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/features/account/data/user_profile_notifier.dart';
-import 'package:reboot_app_3/features/home/data/streak_notifier.dart';
-import 'package:reboot_app_3/features/home/data/statistics_notifier.dart';
-import 'package:reboot_app_3/features/home/data/calendar_notifier.dart';
-import 'package:reboot_app_3/features/home/data/streak_duration_notifier.dart';
-import 'package:reboot_app_3/features/home/presentation/home/widgets/statistics_widget.dart';
+import 'package:reboot_app_3/features/vault/data/streaks/streak_notifier.dart';
+import 'package:reboot_app_3/features/vault/data/statistics/statistics_notifier.dart';
+import 'package:reboot_app_3/features/vault/data/calendar/calendar_notifier.dart';
+import 'package:reboot_app_3/features/vault/data/streaks/streak_duration_notifier.dart';
+import 'package:reboot_app_3/features/vault/presentation/widgets/statistics/statistics_widget.dart';
 
 class ResetDataModalSheet extends ConsumerStatefulWidget {
   const ResetDataModalSheet({Key? key}) : super(key: key);

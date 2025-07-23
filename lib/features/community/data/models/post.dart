@@ -7,6 +7,8 @@ class Post {
   final String body;
   final String category;
   final bool isPinned;
+  final bool isDeleted;
+  final bool isCommentingAllowed;
   final int score;
   final int likeCount;
   final int dislikeCount;
@@ -20,6 +22,8 @@ class Post {
     required this.body,
     required this.category,
     this.isPinned = false,
+    this.isDeleted = false,
+    this.isCommentingAllowed = true,
     required this.score,
     required this.likeCount,
     required this.dislikeCount,
@@ -35,6 +39,8 @@ class Post {
         body: doc.data()!["body"],
         category: doc.data()!["category"],
         isPinned: doc.data()!["isPinned"] ?? false,
+        isDeleted: doc.data()!["isDeleted"] ?? false,
+        isCommentingAllowed: doc.data()!["isCommentingAllowed"] ?? true,
         score: doc.data()!["score"] ?? 0,
         likeCount: doc.data()!["likeCount"] ?? 0,
         dislikeCount: doc.data()!["dislikeCount"] ?? 0,
@@ -49,6 +55,8 @@ class Post {
         'body': body,
         'category': category,
         'isPinned': isPinned,
+        'isDeleted': isDeleted,
+        'isCommentingAllowed': isCommentingAllowed,
         'score': score,
         'likeCount': likeCount,
         'dislikeCount': dislikeCount,
@@ -64,6 +72,8 @@ class Post {
         'body': body,
         'category': category,
         'isPinned': isPinned,
+        'isDeleted': isDeleted,
+        'isCommentingAllowed': isCommentingAllowed,
         'score': score,
         'likeCount': likeCount,
         'dislikeCount': dislikeCount,
@@ -79,6 +89,8 @@ class Post {
     String? body,
     String? category,
     bool? isPinned,
+    bool? isDeleted,
+    bool? isCommentingAllowed,
     int? score,
     int? likeCount,
     int? dislikeCount,
@@ -92,6 +104,8 @@ class Post {
       body: body ?? this.body,
       category: category ?? this.category,
       isPinned: isPinned ?? this.isPinned,
+      isDeleted: isDeleted ?? this.isDeleted,
+      isCommentingAllowed: isCommentingAllowed ?? this.isCommentingAllowed,
       score: score ?? this.score,
       likeCount: likeCount ?? this.likeCount,
       dislikeCount: dislikeCount ?? this.dislikeCount,
@@ -109,6 +123,9 @@ class Post {
         other.title == title &&
         other.body == body &&
         other.category == category &&
+        other.isPinned == isPinned &&
+        other.isDeleted == isDeleted &&
+        other.isCommentingAllowed == isCommentingAllowed &&
         other.score == score &&
         other.likeCount == likeCount &&
         other.dislikeCount == dislikeCount &&
@@ -124,6 +141,9 @@ class Post {
       title,
       body,
       category,
+      isPinned,
+      isDeleted,
+      isCommentingAllowed,
       score,
       likeCount,
       dislikeCount,
@@ -134,6 +154,6 @@ class Post {
 
   @override
   String toString() {
-    return 'Post(id: $id, authorCPId: $authorCPId, title: $title, body: $body, category: $category, score: $score, likeCount: $likeCount, dislikeCount: $dislikeCount, createdAt: $createdAt, updatedAt: $updatedAt)';
+    return 'Post(id: $id, authorCPId: $authorCPId, title: $title, body: $body, category: $category, isPinned: $isPinned, isDeleted: $isDeleted, isCommentingAllowed: $isCommentingAllowed, score: $score, likeCount: $likeCount, dislikeCount: $dislikeCount, createdAt: $createdAt, updatedAt: $updatedAt)';
   }
 }

@@ -97,10 +97,13 @@ class ForumRepository {
 
       final QuerySnapshot snapshot = await query.get();
 
-      final posts = snapshot.docs.map((doc) {
-        return Post.fromFirestore(
-            doc as DocumentSnapshot<Map<String, dynamic>>);
-      }).toList();
+      // Filter out deleted posts in code since some posts might not have the field
+      final posts = snapshot.docs
+          .map((doc) =>
+              Post.fromFirestore(doc as DocumentSnapshot<Map<String, dynamic>>))
+          .where((post) => !post
+              .isDeleted) // This will handle missing fields thanks to default value
+          .toList();
 
       return PostsPage(
         posts: posts,
@@ -129,10 +132,13 @@ class ForumRepository {
     }
 
     return query.limit(limit).snapshots().map((snapshot) {
-      return snapshot.docs.map((doc) {
-        return Post.fromFirestore(
-            doc as DocumentSnapshot<Map<String, dynamic>>);
-      }).toList();
+      // Filter out deleted posts in code since some posts might not have the field
+      return snapshot.docs
+          .map((doc) =>
+              Post.fromFirestore(doc as DocumentSnapshot<Map<String, dynamic>>))
+          .where((post) => !post
+              .isDeleted) // This will handle missing fields thanks to default value
+          .toList();
     });
   }
 
@@ -234,6 +240,9 @@ class ForumRepository {
         'title': title,
         'body': content,
         'category': categoryId ?? 'general',
+        'isPinned': false,
+        'isDeleted': false,
+        'isCommentingAllowed': true,
         'score': 0,
         'likeCount': 0,
         'dislikeCount': 0,
@@ -497,5 +506,32 @@ class ForumRepository {
     required int value,
   }) async {
     return interactWithComment(commentId: commentId, value: value);
+  }
+
+  /// Soft delete a post by setting isDeleted to true
+  Future<void> deletePost(String postId) async {
+    try {
+      await _posts.doc(postId).update({
+        'isDeleted': true,
+        'updatedAt': FieldValue.serverTimestamp(),
+      });
+    } catch (e) {
+      throw Exception('Failed to delete post: $e');
+    }
+  }
+
+  /// Toggle commenting on a post
+  Future<void> togglePostCommenting({
+    required String postId,
+    required bool isCommentingAllowed,
+  }) async {
+    try {
+      await _posts.doc(postId).update({
+        'isCommentingAllowed': isCommentingAllowed,
+        'updatedAt': FieldValue.serverTimestamp(),
+      });
+    } catch (e) {
+      throw Exception('Failed to toggle post commenting: $e');
+    }
   }
 }

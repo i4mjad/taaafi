@@ -4,6 +4,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/shared_widgets/app_bar.dart';
 import 'package:reboot_app_3/core/shared_widgets/spinner.dart';
+import 'package:reboot_app_3/core/shared_widgets/snackbar.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/features/community/presentation/widgets/post_header_widget.dart';
@@ -56,7 +57,8 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
     final replyState = ref.watch(replyStateProvider);
 
     return Scaffold(
-      appBar: plainAppBar(context, ref, 'Thread', false, true),
+      appBar: plainAppBar(
+          context, ref, localizations.translate('thread'), false, true),
       backgroundColor: theme.backgroundColor,
       body: postAsync.when(
         data: (post) {
@@ -124,29 +126,65 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
                 ),
               ),
 
-              // Floating reply section
-              Positioned(
-                bottom: 16,
-                left: 16,
-                right: 16,
-                child: Container(
-                  decoration: BoxDecoration(
-                    boxShadow: [
-                      BoxShadow(
-                        color: theme.grey[300]!.withValues(alpha: 0.3),
-                        blurRadius: 8,
-                        offset: const Offset(0, -2),
+              // Floating reply section (only show if commenting is allowed)
+              if (post.isCommentingAllowed)
+                Positioned(
+                  bottom: 16,
+                  left: 16,
+                  right: 16,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      boxShadow: [
+                        BoxShadow(
+                          color: theme.grey[300]!.withValues(alpha: 0.3),
+                          blurRadius: 8,
+                          offset: const Offset(0, -2),
+                        ),
+                      ],
+                    ),
+                    child: SafeArea(
+                      child: ReplyInputWidget(
+                        postId: widget.postId,
+                        onReplySubmitted: _handleReplySubmitted,
                       ),
-                    ],
-                  ),
-                  child: SafeArea(
-                    child: ReplyInputWidget(
-                      postId: widget.postId,
-                      onReplySubmitted: _handleReplySubmitted,
                     ),
                   ),
                 ),
-              ),
+
+              // Show message when commenting is disabled
+              if (!post.isCommentingAllowed)
+                Positioned(
+                  bottom: 16,
+                  left: 16,
+                  right: 16,
+                  child: Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: theme.grey[100],
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: theme.grey[300]!),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(
+                          LucideIcons.ban,
+                          size: 20,
+                          color: theme.grey[600],
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            localizations
+                                .translate('commenting_disabled_on_post'),
+                            style: TextStyles.body.copyWith(
+                              color: theme.grey[600],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
             ],
           );
         },
@@ -246,24 +284,16 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
 
   void _sharePost(dynamic post) {
     // TODO: Implement share functionality
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          AppLocalizations.of(context).translate('share_coming_soon'),
-        ),
-      ),
-    );
+    if (mounted && context.mounted) {
+      getSnackBar(context, 'share_coming_soon');
+    }
   }
 
   void _repostPost(dynamic post) {
     // TODO: Implement repost functionality
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          AppLocalizations.of(context).translate('repost_coming_soon'),
-        ),
-      ),
-    );
+    if (mounted && context.mounted) {
+      getSnackBar(context, 'repost_coming_soon');
+    }
   }
 
   void _handleCommentMore(Comment comment) {
@@ -326,6 +356,29 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
                 _showReportPostModal(context, post);
               },
             ),
+
+            // Toggle Commenting Option (only if user owns the post)
+            if (isOwnPost) ...[
+              const SizedBox(height: 8),
+              _buildModalOption(
+                context,
+                theme,
+                localizations,
+                icon: post.isCommentingAllowed
+                    ? LucideIcons.ban
+                    : LucideIcons.messageSquare,
+                title: post.isCommentingAllowed
+                    ? localizations.translate('disable_commenting')
+                    : localizations.translate('enable_commenting'),
+                subtitle: post.isCommentingAllowed
+                    ? localizations.translate('disable_commenting_subtitle')
+                    : localizations.translate('enable_commenting_subtitle'),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  _toggleCommenting(context, post);
+                },
+              ),
+            ],
 
             // Delete Post Option (only if user owns the post)
             if (isOwnPost) ...[
@@ -409,7 +462,9 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
               ),
             ),
             Icon(
-              LucideIcons.chevronRight,
+              localizations.locale.languageCode == 'ar'
+                  ? LucideIcons.chevronLeft
+                  : LucideIcons.chevronRight,
               size: 16,
               color: isDestructive ? theme.error[500] : theme.grey[500],
             ),
@@ -536,25 +591,126 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
 
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text(localizations.translate('delete_post')),
-        content: Text(localizations.translate('confirm_delete_post')),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text(localizations.translate('cancel')),
+      builder: (context) => Dialog(
+        backgroundColor: Colors.transparent,
+        child: Container(
+          margin: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: theme.backgroundColor,
+            borderRadius: BorderRadius.circular(16),
           ),
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              _deletePost(context, post);
-            },
-            child: Text(
-              localizations.translate('delete'),
-              style: TextStyle(color: theme.error[600]),
-            ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Header
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: theme.error[50],
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(16),
+                    topRight: Radius.circular(16),
+                  ),
+                ),
+                child: Column(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: theme.error[100],
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Icon(
+                        LucideIcons.trash2,
+                        size: 24,
+                        color: theme.error[600],
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      localizations.translate('delete_post'),
+                      style: TextStyles.h6.copyWith(
+                        color: theme.error[700],
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              // Content
+              Padding(
+                padding: const EdgeInsets.all(20),
+                child: Text(
+                  localizations.translate('confirm_delete_post'),
+                  style: TextStyles.body.copyWith(
+                    color: theme.grey[700],
+                    height: 1.4,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+
+              // Actions
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+                child: Row(
+                  children: [
+                    // Cancel button
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () => Navigator.of(context).pop(),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          decoration: BoxDecoration(
+                            color: theme.grey[100],
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Text(
+                            localizations.translate('cancel'),
+                            style: TextStyles.body.copyWith(
+                              color: theme.grey[700],
+                              fontWeight: FontWeight.w600,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(width: 12),
+
+                    // Delete button
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () {
+                          Navigator.of(context).pop();
+                          _deletePost(context, post);
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          decoration: BoxDecoration(
+                            color: theme.error[500],
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Text(
+                            localizations.translate('delete'),
+                            style: TextStyles.body.copyWith(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w600,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
@@ -565,56 +721,191 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
 
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text(localizations.translate('delete_comment')),
-        content: Text(localizations.translate('confirm_delete_comment')),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text(localizations.translate('cancel')),
+      builder: (context) => Dialog(
+        backgroundColor: Colors.transparent,
+        child: Container(
+          margin: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: theme.backgroundColor,
+            borderRadius: BorderRadius.circular(16),
           ),
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              _deleteComment(context, comment);
-            },
-            child: Text(
-              localizations.translate('delete'),
-              style: TextStyle(color: theme.error[600]),
-            ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Header
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: theme.error[50],
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(16),
+                    topRight: Radius.circular(16),
+                  ),
+                ),
+                child: Column(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: theme.error[100],
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Icon(
+                        LucideIcons.trash2,
+                        size: 24,
+                        color: theme.error[600],
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      localizations.translate('delete_comment'),
+                      style: TextStyles.h6.copyWith(
+                        color: theme.error[700],
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              // Content
+              Padding(
+                padding: const EdgeInsets.all(20),
+                child: Text(
+                  localizations.translate('confirm_delete_comment'),
+                  style: TextStyles.body.copyWith(
+                    color: theme.grey[700],
+                    height: 1.4,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+
+              // Actions
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+                child: Row(
+                  children: [
+                    // Cancel button
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () => Navigator.of(context).pop(),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          decoration: BoxDecoration(
+                            color: theme.grey[100],
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Text(
+                            localizations.translate('cancel'),
+                            style: TextStyles.body.copyWith(
+                              color: theme.grey[700],
+                              fontWeight: FontWeight.w600,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(width: 12),
+
+                    // Delete button
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () {
+                          Navigator.of(context).pop();
+                          _deleteComment(context, comment);
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          decoration: BoxDecoration(
+                            color: theme.error[500],
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Text(
+                            localizations.translate('delete'),
+                            style: TextStyles.body.copyWith(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w600,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
 
-  void _deletePost(BuildContext context, dynamic post) {
-    final theme = AppTheme.of(context);
-    final localizations = AppLocalizations.of(context);
+  void _toggleCommenting(BuildContext context, dynamic post) async {
+    // Store a reference to the current context and widget state
+    final currentContext = context;
+    final wasCommentingAllowed = post.isCommentingAllowed;
 
-    // TODO: Implement actual post deletion logic
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(localizations.translate('post_deleted')),
-        backgroundColor: theme.success[500],
-      ),
-    );
+    try {
+      // Use the repository to toggle commenting
+      await ref.read(forumRepositoryProvider).togglePostCommenting(
+            postId: post.id,
+            isCommentingAllowed: !post.isCommentingAllowed,
+          );
 
-    // Navigate back since the post is deleted
-    Navigator.of(context).pop();
+      // Show success message only if widget is still mounted and context is still valid
+      if (mounted && currentContext.mounted) {
+        final messageKey =
+            wasCommentingAllowed ? 'commenting_disabled' : 'commenting_enabled';
+        getSuccessSnackBar(currentContext, messageKey);
+      }
+    } catch (e) {
+      // Show error message only if widget is still mounted and context is still valid
+      if (mounted && currentContext.mounted) {
+        getErrorSnackBar(currentContext, 'error_toggle_commenting');
+      }
+    }
+  }
+
+  void _deletePost(BuildContext context, dynamic post) async {
+    // Store context reference
+    final currentContext = context;
+
+    // Mark as deleted optimistically for immediate UI feedback
+    ref.read(optimisticPostStateProvider(post.id).notifier).markAsDeleted();
+
+    // Show brief success message and navigate back immediately
+    if (mounted && currentContext.mounted) {
+      getSuccessSnackBar(currentContext, 'post_deleted');
+      Navigator.of(currentContext).pop();
+    }
+
+    try {
+      // Perform actual deletion in background
+      await ref.read(forumRepositoryProvider).deletePost(post.id);
+    } catch (e) {
+      // Revert optimistic deletion if failed (though user won't see it since they navigated back)
+      ref.read(optimisticPostStateProvider(post.id).notifier).revertDeletion();
+
+      // Show error message if user is still in app and context is valid
+      if (mounted && currentContext.mounted) {
+        getErrorSnackBar(currentContext, 'error_deleting_post');
+      }
+    }
   }
 
   void _deleteComment(BuildContext context, Comment comment) {
-    final theme = AppTheme.of(context);
-    final localizations = AppLocalizations.of(context);
+    // Store context reference
+    final currentContext = context;
 
     // TODO: Implement actual comment deletion logic
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(localizations.translate('comment_deleted')),
-        backgroundColor: theme.success[500],
-      ),
-    );
+    if (mounted && currentContext.mounted) {
+      getSuccessSnackBar(currentContext, 'comment_deleted');
+    }
 
     // Refresh comments to remove the deleted comment
     ref.refresh(postCommentsProvider(widget.postId));

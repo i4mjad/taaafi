@@ -237,6 +237,17 @@ const Map<String, String> kAr = {
   "later": "لاحقاً",
   "contact-through-whatsapp": "تواصل معنا عبر واتساب",
   "changes-has-been-saved": "تم حفظ التغييرات",
+  "disable_commenting": "تعطيل التعليقات",
+  "enable_commenting": "تفعيل التعليقات",
+  "disable_commenting_subtitle": "منع المستخدمين من التعليق على هذا المنشور",
+  "enable_commenting_subtitle": "السماح للمستخدمين بالتعليق على هذا المنشور",
+  "commenting_disabled": "تم تعطيل التعليقات",
+  "commenting_enabled": "تم تفعيل التعليقات",
+  "commenting_disabled_on_post": "التعليقات معطلة على هذا المنشور",
+  "error_toggle_commenting": "فشل في تغيير إعدادات التعليق",
+  "error_deleting_post": "فشل في حذف المنشور",
+  "no_comments_yet": "لا توجد تعليقات بعد",
+  "be_first_to_comment": "كن أول من يعلق!",
   "featured-lists": "القوائم المختارة",
   "latest-additions": "آخر الإضافات",
   "activities-reminders": "تذكيرات التمارين",
@@ -294,6 +305,8 @@ const Map<String, String> kAr = {
   "community-share": "مشاركة",
   "community-repost": "إعادة نشر",
   "community-hub": "مركز المجتمع",
+  "latest_50": "آخر 50",
+  "show_all_posts": "عرض جميع المنشورات",
   "discover-fresh-content": "اكتشف المحتوى الجديد",
   "explore-trending-now": "اكتشف ما هو شائع الآن",
   "share-your-story": "شارك قصتك",
@@ -501,6 +514,9 @@ const Map<String, String> kAr = {
   "home-elements-visibility": "رؤية عناصر الصفحة الرئيسية",
   "home-elements-visibility-description":
       "اختر العناصر التي تريد عرضها في الصفحة الرئيسية",
+  "vault-elements-visibility": "رؤية عناصر الخزنة",
+  "vault-elements-visibility-description":
+      "اختر العناصر التي تريد عرضها في صفحة الخزنة",
   "streak-display-settings": "إعدادات عرض المتابعة",
   "streak-display-settings-description": "تخصيص طريقة عرض معلومات المتابعة",
   "data-management": "إدارة البيانات",
@@ -1077,6 +1093,7 @@ const Map<String, String> kAr = {
   "home-layout-settings": "إعدادات تخطيط الصفحة الرئيسية",
   "home-layout-description":
       "يمكنك إعادة ترتيب وإخفاء/إظهار عناصر الصفحة الرئيسية من إعدادات الحساب",
+  "vault-layout-settings": "تخطيط صفحة الخزنة",
   "home-layout-help-title": "إعدادات تخطيط الصفحة الرئيسية",
   "home-layout-help-message":
       "يمكنك إعادة ترتيب العناصر بالسحب والإفلات، وإخفاء/إظهار العناصر بالنقر عليها. يمكنك الوصول إلى هذه الإعدادات من صفحة الحساب.",
@@ -1210,7 +1227,7 @@ const Map<String, String> kAr = {
   "without-image": "بدون صورة",
 
   // Post detail screen translations
-  "thread": "خيط",
+  "thread": "منشور",
   "follow": "متابعة",
   "view_activity": "عرض النشاط",
   "author": "المؤلف",
@@ -1262,6 +1279,7 @@ const Map<String, String> kAr = {
   "post_tag_invalid_format": "تنسيق العلامة غير صالح",
   "post_too_short_overall": "المنشور قصير جداً بشكل عام",
   "post_title_content_too_similar": "العنوان والمحتوى متشابهان جداً",
+  "validation_error": "خطأ في التحقق. يرجى مراجعة المدخلات",
   "authentication_required": "المصادقة مطلوبة",
   "permission_denied": "تم رفض الإذن",
   "post_creation_failed": "فشل في إنشاء المنشور",

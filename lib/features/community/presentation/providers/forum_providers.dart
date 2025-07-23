@@ -47,6 +47,27 @@ final postsProvider =
   return repository.watchPosts(limit: 10, category: category);
 });
 
+// Main Screen Posts Provider (limited to 50 posts with optimistic deletion filtering)
+final mainScreenPostsProvider =
+    StreamProvider.family<List<Post>, String?>((ref, category) async* {
+  final repository = ref.watch(forumRepositoryProvider);
+
+  await for (final posts
+      in repository.watchPosts(limit: 50, category: category)) {
+    // Filter out optimistically deleted posts
+    final filteredPosts = <Post>[];
+
+    for (final post in posts) {
+      final optimisticState = ref.read(optimisticPostStateProvider(post.id));
+      if (!optimisticState.isDeleted) {
+        filteredPosts.add(post);
+      }
+    }
+
+    yield filteredPosts;
+  }
+});
+
 // Posts Pagination Provider
 final postsPaginationProvider =
     StateNotifierProvider<PostsPaginationNotifier, PostsPaginationState>((ref) {
@@ -70,16 +91,8 @@ final newsPostsPaginationProvider =
 
 // Selected Category Provider for new post screen
 final selectedCategoryProvider = StateProvider<PostCategory?>((ref) {
-  // Default to "general" category
-  return const PostCategory(
-    id: 'general',
-    name: 'General',
-    nameAr: 'عام',
-    iconName: 'chat',
-    colorHex: '#6B7280',
-    isActive: true,
-    sortOrder: 7,
-  );
+  // Default to null - will be set to general category from Firestore when loaded
+  return null;
 });
 
 // Post Content Provider for new post screen
@@ -321,21 +334,25 @@ class OptimisticPostState {
   final String postId;
   final int likeCount;
   final int dislikeCount;
+  final bool isDeleted;
 
   const OptimisticPostState({
     required this.postId,
     required this.likeCount,
     required this.dislikeCount,
+    this.isDeleted = false,
   });
 
   OptimisticPostState copyWith({
     int? likeCount,
     int? dislikeCount,
+    bool? isDeleted,
   }) {
     return OptimisticPostState(
       postId: postId,
       likeCount: likeCount ?? this.likeCount,
       dislikeCount: dislikeCount ?? this.dislikeCount,
+      isDeleted: isDeleted ?? this.isDeleted,
     );
   }
 }
@@ -383,6 +400,16 @@ class OptimisticPostStateNotifier extends StateNotifier<OptimisticPostState> {
       likeCount: likeCount,
       dislikeCount: dislikeCount,
     );
+  }
+
+  void markAsDeleted() {
+    // Mark post as deleted optimistically for immediate UI feedback
+    state = state.copyWith(isDeleted: true);
+  }
+
+  void revertDeletion() {
+    // Revert deletion if operation failed
+    state = state.copyWith(isDeleted: false);
   }
 }
 

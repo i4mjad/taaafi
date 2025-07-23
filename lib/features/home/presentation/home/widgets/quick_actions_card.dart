@@ -174,7 +174,6 @@ class _QuickActionButton extends StatefulWidget {
 
   const _QuickActionButton({
     required this.action,
-    super.key,
   });
 
   @override

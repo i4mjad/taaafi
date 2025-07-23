@@ -7,10 +7,7 @@ import 'package:reboot_app_3/core/routing/route_names.dart';
 import 'package:reboot_app_3/core/shared_widgets/app_bar.dart';
 import 'package:reboot_app_3/core/shared_widgets/spinner.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
-import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
-import 'package:reboot_app_3/features/home/presentation/home/widgets/card_based_hub.dart';
-import 'package:reboot_app_3/features/home/presentation/home/widgets/notification_promoter_widget.dart';
 import 'package:reboot_app_3/features/vault/presentation/vault_settings/activities_notifications_settings_screen.dart';
 import 'package:reboot_app_3/features/authentication/providers/account_status_provider.dart';
 import 'package:reboot_app_3/core/shared_widgets/complete_registration_banner.dart';
@@ -18,11 +15,8 @@ import 'package:reboot_app_3/core/shared_widgets/confirm_details_banner.dart';
 import 'package:reboot_app_3/core/shared_widgets/confirm_email_banner.dart';
 import 'package:reboot_app_3/features/authentication/providers/user_document_provider.dart';
 import 'package:reboot_app_3/features/notifications/data/repositories/notifications_repository.dart';
-import 'package:reboot_app_3/features/home/presentation/home/widgets/shorebird_update_widget.dart';
-import 'package:reboot_app_3/features/plus/presentation/widgets/subscription_card.dart';
-import 'package:reboot_app_3/features/home/presentation/home/widgets/compact_quick_actions.dart';
-import 'package:reboot_app_3/features/home/presentation/home/widgets/compact_streaks_view.dart';
-import 'package:reboot_app_3/features/home/presentation/home/widgets/unified_home_screen.dart';
+
+import 'package:reboot_app_3/features/home/presentation/home/widgets/main_home_view.dart';
 
 class HomeScreen extends ConsumerWidget {
   HomeScreen({super.key});
@@ -131,7 +125,7 @@ class HomeScreen extends ConsumerWidget {
                 ),
               );
             case AccountStatus.ok:
-              return UnifiedHomeScreen(); // New unified experience!
+              return const MainHomeView();
           }
         },
       ),

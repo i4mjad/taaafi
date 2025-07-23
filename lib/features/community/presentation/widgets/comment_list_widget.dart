@@ -57,7 +57,10 @@ class CommentListWidget extends ConsumerWidget {
   Widget _buildEmptyState(dynamic theme, AppLocalizations localizations) {
     return Container(
       padding: const EdgeInsets.all(32),
+      width: double.infinity,
       child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Icon(
             Icons.chat_bubble_outline,
@@ -70,6 +73,7 @@ class CommentListWidget extends ConsumerWidget {
             style: TextStyles.bodyLarge.copyWith(
               color: theme.grey[500],
             ),
+            textAlign: TextAlign.center,
           ),
           const SizedBox(height: 8),
           Text(
@@ -77,6 +81,7 @@ class CommentListWidget extends ConsumerWidget {
             style: TextStyles.caption.copyWith(
               color: theme.grey[400],
             ),
+            textAlign: TextAlign.center,
           ),
         ],
       ),

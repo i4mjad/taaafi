@@ -297,13 +297,14 @@ App Launch → StartupSecurityService → Device Ban Check → User Ban Check �
 ```
 
 ### New Components
-- **AppStartupWithSecurityWidget** - Replaces standard startup widget
-- **AppBannedScreen** - User-friendly ban notification screen
+- **AppStartupWidget** - Enhanced startup widget with security checks
+- **AppBannedWidget** - User-friendly ban notification screen with localization
 - **SecurityStartupResult** - Result wrapper for security validation
 
 ### Implementation Files
-- `lib/core/routing/app_startup_simple.dart` - Clean startup implementation with security
+- `lib/core/routing/app_startup.dart` - Main startup implementation with security
 - `lib/features/account/application/startup_security_service.dart` - Security service
+- `lib/features/account/presentation/banned_screen.dart` - Localized ban screen
 - Updated localization files with ban screen strings
 
 ## Key Features
@@ -382,7 +383,7 @@ All providers use AsyncValue<T> for consistent loading, error, and data states.
 ### App Startup
 Replace standard startup widget:
 ```dart
-AppStartupWithSecurityWidget(
+AppStartupWidget(
   onLoaded: (context) => YourMainApp(),
 )
 ```
@@ -467,7 +468,7 @@ static const Map<String, AppFeature> features = {
 ### Startup Integration
 ```dart
 MaterialApp(
-  home: AppStartupWithSecurityWidget(
+  home: AppStartupWidget(
     onLoaded: (context) => MainAppScreen(),
   ),
 )

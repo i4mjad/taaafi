@@ -12,10 +12,10 @@ import 'package:reboot_app_3/features/authentication/providers/account_status_pr
 import 'package:reboot_app_3/features/authentication/providers/user_document_provider.dart';
 import 'package:reboot_app_3/core/shared_widgets/snackbar.dart';
 import 'package:reboot_app_3/features/authentication/providers/user_provider.dart';
-import 'package:reboot_app_3/features/home/data/repos/streak_repository.dart';
-import 'package:reboot_app_3/features/home/data/streak_notifier.dart';
+import 'package:reboot_app_3/features/vault/data/streaks/streak_repository.dart';
+import 'package:reboot_app_3/features/vault/data/streaks/streak_notifier.dart';
 import 'package:reboot_app_3/core/routing/app_startup.dart';
-import 'package:reboot_app_3/features/home/presentation/home/streak_display_notifier.dart';
+import 'package:reboot_app_3/features/vault/presentation/notifiers/streak_display_notifier.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'auth_service.g.dart';

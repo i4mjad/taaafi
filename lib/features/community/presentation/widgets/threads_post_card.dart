@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
+import 'package:reboot_app_3/core/shared_widgets/snackbar.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/features/community/data/models/post.dart';
+import 'package:reboot_app_3/features/community/data/models/post_category.dart';
 import 'package:reboot_app_3/features/community/data/models/interaction.dart';
 import 'package:reboot_app_3/features/community/presentation/widgets/avatar_with_anonymity.dart';
 import 'package:reboot_app_3/features/community/presentation/providers/community_providers_new.dart';
@@ -29,6 +31,7 @@ class ThreadsPostCard extends ConsumerWidget {
     final currentProfileAsync = ref.watch(currentCommunityProfileProvider);
     final authorProfileAsync =
         ref.watch(communityProfileByIdProvider(post.authorCPId));
+    final categoriesAsync = ref.watch(postCategoriesProvider);
 
     // Get current user's CP ID
     final currentUserCPId = currentProfileAsync.maybeWhen(
@@ -48,7 +51,24 @@ class ThreadsPostCard extends ConsumerWidget {
     // Watch optimistic post counts (immediate count updates)
     final optimisticPostState = ref.watch(optimisticPostStateProvider(post.id));
 
-    // No need to watch interaction loading state since we have optimistic updates
+    // If post is optimistically deleted, don't render it
+    if (optimisticPostState.isDeleted) {
+      return const SizedBox.shrink();
+    }
+
+    // Find the matching category for the post
+    final postCategory = categoriesAsync.maybeWhen(
+      data: (categories) {
+        try {
+          return categories.firstWhere(
+            (category) => category.id == post.category,
+          );
+        } catch (e) {
+          return null;
+        }
+      },
+      orElse: () => null,
+    );
 
     return GestureDetector(
       onTap: onTap,
@@ -106,62 +126,66 @@ class ThreadsPostCard extends ConsumerWidget {
                 ),
                 const SizedBox(width: 12),
 
-                // User info and content
+                // Content
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Username and time
+                      // Category flair and time
                       Row(
                         children: [
-                          // Author name with proper error handling
-                          Expanded(
-                            child: authorProfileAsync.when(
-                              data: (authorProfile) {
-                                final isAuthorAnonymous =
-                                    authorProfile?.isAnonymous ?? false;
-                                final displayName = isAuthorAnonymous
-                                    ? localizations.translate('anonymous')
-                                    : authorProfile?.displayName ??
-                                        localizations.translate('unknown_user');
-
-                                return Text(
-                                  displayName,
-                                  style: TextStyles.body.copyWith(
-                                    fontWeight: FontWeight.w600,
-                                    color: theme.grey[900],
-                                  ),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                );
-                              },
-                              loading: () => Container(
-                                height: 16,
-                                width: 80,
-                                decoration: BoxDecoration(
-                                  color: theme.grey[200],
-                                  borderRadius: BorderRadius.circular(4),
-                                ),
-                              ),
-                              error: (error, stackTrace) => Text(
-                                localizations.translate('unknown_user'),
-                                style: TextStyles.body.copyWith(
-                                  fontWeight: FontWeight.w600,
-                                  color: theme.error[600],
-                                ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
+                          // Category flair - always show, with fallback for missing categories
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: postCategory != null
+                                  ? postCategory.color.withValues(alpha: 0.1)
+                                  : theme.grey[100],
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: postCategory != null
+                                    ? postCategory.color.withValues(alpha: 0.3)
+                                    : theme.grey[300]!,
+                                width: 1,
                               ),
                             ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  postCategory?.icon ?? LucideIcons.tag,
+                                  size: 12,
+                                  color: postCategory?.color ?? theme.grey[600],
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  postCategory?.getDisplayName(
+                                        localizations.locale.languageCode,
+                                      ) ??
+                                      _getLocalizedCategoryName(
+                                          post.category, localizations),
+                                  style: TextStyles.small.copyWith(
+                                    color:
+                                        postCategory?.color ?? theme.grey[600],
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
+
                           const SizedBox(width: 8),
+
                           Text(
                             _formatTimeAgo(post.createdAt, localizations),
-                            style: TextStyles.caption.copyWith(
+                            style: TextStyles.small.copyWith(
                               color: theme.grey[500],
                             ),
                           ),
-                          const SizedBox(width: 8),
+                          const Spacer(),
                           GestureDetector(
                             onTap: () => _showPostOptionsModal(context, ref),
                             child: Icon(
@@ -286,16 +310,6 @@ class ThreadsPostCard extends ConsumerWidget {
                               color: theme.grey[600],
                             ),
                           ),
-
-                          const Spacer(),
-
-                          // Share button
-                          _buildEngagementButton(
-                            theme,
-                            LucideIcons.share,
-                            false,
-                            null,
-                          ),
                         ],
                       ),
                     ],
@@ -368,17 +382,38 @@ class ThreadsPostCard extends ConsumerWidget {
     if (difference.inDays > 0) {
       return localizations
           .translate('time-days-ago')
-          .replaceAll('{count}', difference.inDays.toString());
+          .replaceAll('{days}', difference.inDays.toString());
     } else if (difference.inHours > 0) {
       return localizations
           .translate('time-hours-ago')
-          .replaceAll('{count}', difference.inHours.toString());
+          .replaceAll('{hours}', difference.inHours.toString());
     } else if (difference.inMinutes > 0) {
       return localizations
           .translate('time-minutes-ago')
           .replaceAll('{count}', difference.inMinutes.toString());
     } else {
       return localizations.translate('time-now');
+    }
+  }
+
+  /// Get localized category name for fallback cases
+  String _getLocalizedCategoryName(
+      String categoryId, AppLocalizations localizations) {
+    // Handle common category fallbacks with localization
+    switch (categoryId.toLowerCase()) {
+      case 'general':
+        return localizations.translate('community_general');
+      case 'discussion':
+        return localizations.translate('community_discussion');
+      case 'question':
+        return localizations.translate('community_question');
+      case 'help':
+        return localizations.translate('community_help');
+      case 'news':
+        return localizations.translate('community_news');
+      default:
+        // Fallback to the original category ID if no translation is available
+        return categoryId;
     }
   }
 
@@ -434,6 +469,29 @@ class ThreadsPostCard extends ConsumerWidget {
                 _reportPost(context, ref);
               },
             ),
+
+            // Toggle Commenting Option (only if user owns the post)
+            if (isOwnPost) ...[
+              const SizedBox(height: 8),
+              _buildModalOption(
+                context,
+                theme,
+                localizations,
+                icon: post.isCommentingAllowed
+                    ? LucideIcons.ban
+                    : LucideIcons.messageSquare,
+                title: post.isCommentingAllowed
+                    ? localizations.translate('disable_commenting')
+                    : localizations.translate('enable_commenting'),
+                subtitle: post.isCommentingAllowed
+                    ? localizations.translate('disable_commenting_subtitle')
+                    : localizations.translate('enable_commenting_subtitle'),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  _toggleCommenting(context, ref);
+                },
+              ),
+            ],
 
             // Delete Post Option (only if user owns the post)
             if (isOwnPost) ...[
@@ -517,7 +575,9 @@ class ThreadsPostCard extends ConsumerWidget {
               ),
             ),
             Icon(
-              LucideIcons.chevronRight,
+              localizations.locale.languageCode == 'ar'
+                  ? LucideIcons.chevronLeft
+                  : LucideIcons.chevronRight,
               size: 16,
               color: isDestructive ? theme.error[500] : theme.grey[500],
             ),
@@ -544,6 +604,29 @@ class ThreadsPostCard extends ConsumerWidget {
     );
   }
 
+  void _toggleCommenting(BuildContext context, WidgetRef ref) async {
+    try {
+      // Use the repository to toggle commenting
+      await ref.read(forumRepositoryProvider).togglePostCommenting(
+            postId: post.id,
+            isCommentingAllowed: !post.isCommentingAllowed,
+          );
+
+      // Show success message only if context is still valid
+      if (context.mounted) {
+        final messageKey = post.isCommentingAllowed
+            ? 'commenting_disabled'
+            : 'commenting_enabled';
+        getSuccessSnackBar(context, messageKey);
+      }
+    } catch (e) {
+      // Show error message only if context is still valid
+      if (context.mounted) {
+        getErrorSnackBar(context, 'error_toggle_commenting');
+      }
+    }
+  }
+
   void _deletePost(BuildContext context, WidgetRef ref) {
     final theme = AppTheme.of(context);
     final localizations = AppLocalizations.of(context);
@@ -551,31 +634,154 @@ class ThreadsPostCard extends ConsumerWidget {
     // Show confirmation dialog
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text(localizations.translate('delete_post')),
-        content: Text(localizations.translate('confirm_delete_post')),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text(localizations.translate('cancel')),
+      builder: (context) => Dialog(
+        backgroundColor: Colors.transparent,
+        child: Container(
+          margin: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: theme.backgroundColor,
+            borderRadius: BorderRadius.circular(16),
           ),
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              // TODO: Implement actual deletion logic
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(localizations.translate('post_deleted')),
-                  backgroundColor: theme.success[500],
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Header
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: theme.error[50],
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(16),
+                    topRight: Radius.circular(16),
+                  ),
                 ),
-              );
-            },
-            child: Text(
-              localizations.translate('delete'),
-              style: TextStyle(color: theme.error[600]),
-            ),
+                child: Column(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: theme.error[100],
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Icon(
+                        LucideIcons.trash2,
+                        size: 24,
+                        color: theme.error[600],
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      localizations.translate('delete_post'),
+                      style: TextStyles.h6.copyWith(
+                        color: theme.error[700],
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              // Content
+              Padding(
+                padding: const EdgeInsets.all(20),
+                child: Text(
+                  localizations.translate('confirm_delete_post'),
+                  style: TextStyles.body.copyWith(
+                    color: theme.grey[700],
+                    height: 1.4,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+
+              // Actions
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+                child: Row(
+                  children: [
+                    // Cancel button
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () => Navigator.of(context).pop(),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          decoration: BoxDecoration(
+                            color: theme.grey[100],
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Text(
+                            localizations.translate('cancel'),
+                            style: TextStyles.body.copyWith(
+                              color: theme.grey[700],
+                              fontWeight: FontWeight.w600,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(width: 12),
+
+                    // Delete button
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () async {
+                          Navigator.of(context).pop();
+
+                          // Mark as deleted optimistically for immediate UI feedback
+                          ref
+                              .read(
+                                  optimisticPostStateProvider(post.id).notifier)
+                              .markAsDeleted();
+
+                          // Show brief success message
+                          if (context.mounted) {
+                            getSuccessSnackBar(context, 'post_deleted');
+                          }
+
+                          try {
+                            // Perform actual deletion in background
+                            await ref
+                                .read(forumRepositoryProvider)
+                                .deletePost(post.id);
+                          } catch (e) {
+                            // Revert optimistic deletion if failed
+                            ref
+                                .read(optimisticPostStateProvider(post.id)
+                                    .notifier)
+                                .revertDeletion();
+
+                            // Show error message only if context is still valid
+                            if (context.mounted) {
+                              getErrorSnackBar(context, 'error_deleting_post');
+                            }
+                          }
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          decoration: BoxDecoration(
+                            color: theme.error[500],
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Text(
+                            localizations.translate('delete'),
+                            style: TextStyles.body.copyWith(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w600,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

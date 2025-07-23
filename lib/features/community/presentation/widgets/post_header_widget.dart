@@ -5,8 +5,10 @@ import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/features/community/data/models/post.dart';
+import 'package:reboot_app_3/features/community/data/models/post_category.dart';
 import 'package:reboot_app_3/features/community/presentation/widgets/avatar_with_anonymity.dart';
 import 'package:reboot_app_3/features/community/presentation/providers/community_providers_new.dart';
+import 'package:reboot_app_3/features/community/presentation/providers/forum_providers.dart';
 import 'package:reboot_app_3/features/community/domain/entities/community_profile_entity.dart';
 
 class PostHeaderWidget extends ConsumerWidget {
@@ -28,6 +30,21 @@ class PostHeaderWidget extends ConsumerWidget {
     final currentProfileAsync = ref.watch(currentCommunityProfileProvider);
     final authorProfileAsync =
         ref.watch(communityProfileByIdProvider(post.authorCPId));
+    final categoriesAsync = ref.watch(postCategoriesProvider);
+
+    // Find the matching category for the post
+    final postCategory = categoriesAsync.maybeWhen(
+      data: (categories) {
+        try {
+          return categories.firstWhere(
+            (category) => category.id == post.category,
+          );
+        } catch (e) {
+          return null;
+        }
+      },
+      orElse: () => null,
+    );
 
     return authorProfileAsync.when(
       data: (authorProfile) {
@@ -93,12 +110,60 @@ class PostHeaderWidget extends ConsumerWidget {
 
                   const SizedBox(height: 2),
 
-                  // Timestamp
-                  Text(
-                    _formatTimestamp(post.createdAt, localizations),
-                    style: TextStyles.caption.copyWith(
-                      color: theme.grey[600],
-                    ),
+                  // Category and timestamp row
+                  Row(
+                    children: [
+                      // Category flair - show category or fallback
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: postCategory != null
+                              ? postCategory.color.withValues(alpha: 0.1)
+                              : theme.grey[100],
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: postCategory != null
+                                ? postCategory.color.withValues(alpha: 0.3)
+                                : theme.grey[300]!,
+                            width: 1,
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              postCategory?.icon ?? LucideIcons.tag,
+                              size: 12,
+                              color: postCategory?.color ?? theme.grey[600],
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              postCategory?.getDisplayName(
+                                    localizations.locale.languageCode,
+                                  ) ??
+                                  _getLocalizedCategoryName(
+                                      post.category, localizations),
+                              style: TextStyles.small.copyWith(
+                                color: postCategory?.color ?? theme.grey[600],
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+
+                      // Timestamp
+                      Text(
+                        _formatTimestamp(post.createdAt, localizations),
+                        style: TextStyles.caption.copyWith(
+                          color: theme.grey[600],
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -192,6 +257,27 @@ class PostHeaderWidget extends ConsumerWidget {
     );
   }
 
+  /// Get localized category name for fallback cases
+  String _getLocalizedCategoryName(
+      String categoryId, AppLocalizations localizations) {
+    // Handle common category fallbacks with localization
+    switch (categoryId.toLowerCase()) {
+      case 'general':
+        return localizations.translate('community_general');
+      case 'discussion':
+        return localizations.translate('community_discussion');
+      case 'question':
+        return localizations.translate('community_question');
+      case 'help':
+        return localizations.translate('community_help');
+      case 'news':
+        return localizations.translate('community_news');
+      default:
+        // Fallback to the original category ID if no translation is available
+        return categoryId;
+    }
+  }
+
   /// Check if current user is the author of this post
   bool _isCurrentUserAuthor(
       AsyncValue<CommunityProfileEntity?> currentProfileAsync) {
@@ -209,11 +295,11 @@ class PostHeaderWidget extends ConsumerWidget {
     if (difference.inDays > 0) {
       return localizations
           .translate('time-days-ago')
-          .replaceAll('{count}', difference.inDays.toString());
+          .replaceAll('{days}', difference.inDays.toString());
     } else if (difference.inHours > 0) {
       return localizations
           .translate('time-hours-ago')
-          .replaceAll('{count}', difference.inHours.toString());
+          .replaceAll('{hours}', difference.inHours.toString());
     } else if (difference.inMinutes > 0) {
       return localizations
           .translate('time-minutes-ago')

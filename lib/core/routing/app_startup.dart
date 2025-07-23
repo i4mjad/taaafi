@@ -7,7 +7,7 @@ import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/features/authentication/providers/user_document_provider.dart';
 import 'package:reboot_app_3/features/authentication/providers/user_provider.dart';
-import 'package:reboot_app_3/features/home/presentation/home/statistics_visibility_notifier.dart';
+import 'package:reboot_app_3/features/vault/presentation/notifiers/statistics_visibility_notifier.dart';
 import 'package:reboot_app_3/features/account/application/startup_security_service.dart';
 import 'package:reboot_app_3/features/account/presentation/banned_screen.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -119,7 +119,19 @@ class AppStartupLoadingWidget extends StatelessWidget {
     return Scaffold(
       backgroundColor: theme.backgroundColor,
       body: Center(
-        child: Spinner(),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Spinner(),
+            verticalSpace(Spacing.points16),
+            Text(
+              'Initializing Security...',
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: theme.grey[700],
+                  ),
+            ),
+          ],
+        ),
       ),
     );
   }

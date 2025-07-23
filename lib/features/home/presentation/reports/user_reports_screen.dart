@@ -11,9 +11,9 @@ import 'package:reboot_app_3/core/shared_widgets/spinner.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
-import 'package:reboot_app_3/features/home/data/models/user_report.dart';
-import 'package:reboot_app_3/features/home/data/user_reports_notifier.dart';
-import 'package:reboot_app_3/features/home/application/user_reports_service.dart';
+import 'package:reboot_app_3/features/shared/data/models/user_report.dart';
+import 'package:reboot_app_3/features/shared/data/notifiers/user_reports_notifier.dart';
+import 'package:reboot_app_3/features/shared/application/user_reports_service.dart';
 
 class UserReportsScreen extends ConsumerWidget {
   const UserReportsScreen({super.key});

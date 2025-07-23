@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -20,22 +22,22 @@ class VaultLayoutSettingsSheet extends ConsumerStatefulWidget {
 
 class _VaultLayoutSettingsSheetState
     extends ConsumerState<VaultLayoutSettingsSheet> {
-  late List<String> _orderedHomeElements;
+  late List<String> _orderedVaultElements;
   late List<String> _orderedCards;
 
-  final Map<String, IconData> _homeElementIcons = {
+  final Map<String, IconData> _vaultElementIcons = {
     'currentStreaks': LucideIcons.timer,
     'statistics': LucideIcons.barChart2,
     'calendar': LucideIcons.calendar,
   };
 
-  final Map<String, String> _homeElementTitleKeys = {
+  final Map<String, String> _vaultElementTitleKeys = {
     'currentStreaks': 'current-streaks',
     'statistics': 'statistics',
     'calendar': 'calendar',
   };
 
-  final Map<String, String> _homeElementDescriptionKeys = {
+  final Map<String, String> _vaultElementDescriptionKeys = {
     'currentStreaks': 'current-streaks-description',
     'statistics': 'statistics-description',
     'calendar': 'calendar-description',
@@ -86,7 +88,7 @@ class _VaultLayoutSettingsSheetState
   void initState() {
     super.initState();
     final vaultLayoutSettings = ref.read(vaultLayoutProvider);
-    _orderedHomeElements = List.from(vaultLayoutSettings.homeElementsOrder);
+    _orderedVaultElements = List.from(vaultLayoutSettings.vaultElementsOrder);
     _orderedCards = List.from(vaultLayoutSettings.cardsOrder);
   }
 
@@ -126,7 +128,7 @@ class _VaultLayoutSettingsSheetState
                   Expanded(
                     child: Text(
                       AppLocalizations.of(context)
-                          .translate('home-layout-settings'),
+                          .translate('vault-layout-settings'),
                       style: TextStyles.h5.copyWith(color: theme.grey[900]),
                     ),
                   ),
@@ -136,7 +138,7 @@ class _VaultLayoutSettingsSheetState
                       HapticFeedback.mediumImpact();
                       ref.read(vaultLayoutProvider.notifier).resetToDefaults();
                       setState(() {
-                        _orderedHomeElements = List.from(
+                        _orderedVaultElements = List.from(
                             ['currentStreaks', 'statistics', 'calendar']);
                         _orderedCards = List.from([
                           'activities',
@@ -227,16 +229,16 @@ class _VaultLayoutSettingsSheetState
                     _buildHorizontalCardsReorderList(
                         theme, vaultLayoutSettings),
 
-                    // Home Elements Section
+                    // Vault Elements Section
                     Text(
                       AppLocalizations.of(context)
-                          .translate('home-elements-visibility'),
+                          .translate('vault-elements-visibility'),
                       style: TextStyles.h6.copyWith(color: theme.grey[900]),
                     ),
                     verticalSpace(Spacing.points4),
                     Text(
                       AppLocalizations.of(context)
-                          .translate('home-elements-visibility-description'),
+                          .translate('vault-elements-visibility-description'),
                       style:
                           TextStyles.caption.copyWith(color: theme.grey[600]),
                     ),
@@ -254,8 +256,14 @@ class _VaultLayoutSettingsSheetState
                     ),
                     verticalSpace(Spacing.points16),
 
-                    // Home Elements List
-                    ..._buildHomeElementsItems(theme, vaultLayoutSettings),
+                    // Vault Elements Reorderable List
+                    Container(
+                      constraints: BoxConstraints(
+                        maxHeight: MediaQuery.of(context).size.height * 0.4,
+                      ),
+                      child: _buildVaultElementsReorderList(
+                          theme, vaultLayoutSettings),
+                    ),
 
                     verticalSpace(Spacing.points32),
                   ],
@@ -268,101 +276,142 @@ class _VaultLayoutSettingsSheetState
     );
   }
 
-  List<Widget> _buildHomeElementsItems(
+  Widget _buildVaultElementsReorderList(
       CustomThemeData theme, VaultLayoutSettings settings) {
     // Filter out elements that don't exist in our maps
-    final validElements = _orderedHomeElements
+    final validElements = _orderedVaultElements
         .where((element) =>
-            _homeElementIcons.containsKey(element) &&
-            _homeElementTitleKeys.containsKey(element) &&
-            _homeElementDescriptionKeys.containsKey(element))
+            _vaultElementIcons.containsKey(element) &&
+            _vaultElementTitleKeys.containsKey(element) &&
+            _vaultElementDescriptionKeys.containsKey(element))
         .toList();
 
-    return List.generate(validElements.length, (index) {
-      final element = validElements[index];
-      final isVisible = settings.homeElementsVisibility[element] ?? false;
-
-      return Container(
-        key: ValueKey(element),
-        margin: EdgeInsets.only(bottom: 8),
-        child: IntrinsicHeight(
-          child: GestureDetector(
-            onTap: () {
-              HapticFeedback.lightImpact();
-              ref
-                  .read(vaultLayoutProvider.notifier)
-                  .toggleHomeElementVisibility(element, !isVisible);
-            },
-            child: WidgetsContainer(
-              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              backgroundColor: isVisible ? theme.success[50] : theme.grey[50],
-              borderSide: BorderSide(
-                color: isVisible ? theme.success[600]! : theme.grey[200]!,
-                width: 1,
+    return ReorderableListView.builder(
+      shrinkWrap: true,
+      physics: BouncingScrollPhysics(),
+      itemCount: validElements.length,
+      proxyDecorator: (child, index, animation) {
+        return AnimatedBuilder(
+          animation: animation,
+          builder: (BuildContext context, Widget? child) {
+            final double animValue =
+                Curves.easeInOut.transform(animation.value);
+            final double elevation = lerpDouble(0, 6, animValue)!;
+            final double scale = lerpDouble(1, 1.02, animValue)!;
+            return Transform.scale(
+              scale: scale,
+              child: Material(
+                elevation: elevation,
+                color: Colors.transparent,
+                shadowColor: theme.grey[400]!.withValues(alpha: 0.3),
+                borderRadius: BorderRadius.circular(12),
+                child: child,
               ),
-              child: Row(
-                children: [
-                  // Drag handle
-                  Container(
-                    padding: EdgeInsets.all(4),
-                    child: Icon(
-                      LucideIcons.gripVertical,
-                      size: 16,
-                      color: theme.grey[400],
-                    ),
-                  ),
-                  horizontalSpace(Spacing.points8),
+            );
+          },
+          child: child,
+        );
+      },
+      onReorder: (oldIndex, newIndex) {
+        if (newIndex > oldIndex) {
+          newIndex -= 1;
+        }
+        setState(() {
+          final item = _orderedVaultElements.removeAt(oldIndex);
+          _orderedVaultElements.insert(newIndex, item);
+        });
+        ref
+            .read(vaultLayoutProvider.notifier)
+            .reorderVaultElements(_orderedVaultElements);
+      },
+      itemBuilder: (context, index) {
+        final element = validElements[index];
+        final isVisible = settings.vaultElementsVisibility[element] ?? false;
 
-                  // Element content
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Icon(
-                              _homeElementIcons[element] ??
-                                  LucideIcons.helpCircle,
-                              size: 16,
-                              color: isVisible
-                                  ? theme.success[600]
-                                  : theme.grey[600],
-                            ),
-                            horizontalSpace(Spacing.points8),
-                            Expanded(
-                              child: Text(
-                                AppLocalizations.of(context).translate(
-                                    _homeElementTitleKeys[element] ?? element),
-                                style: TextStyles.caption.copyWith(
-                                  color: isVisible
-                                      ? theme.success[600]
-                                      : theme.grey[600],
+        return Container(
+          key: ValueKey(element),
+          margin: EdgeInsets.only(bottom: 8),
+          child: IntrinsicHeight(
+            child: GestureDetector(
+              onTap: () {
+                HapticFeedback.lightImpact();
+                ref
+                    .read(vaultLayoutProvider.notifier)
+                    .toggleVaultElementVisibility(element, !isVisible);
+              },
+              child: WidgetsContainer(
+                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                backgroundColor: isVisible ? theme.success[50] : theme.grey[50],
+                borderSide: BorderSide(
+                  color: isVisible ? theme.success[600]! : theme.grey[200]!,
+                  width: 1,
+                ),
+                child: Row(
+                  children: [
+                    // Drag handle
+                    Container(
+                      padding: EdgeInsets.all(4),
+                      child: Icon(
+                        LucideIcons.gripVertical,
+                        size: 16,
+                        color: theme.grey[400],
+                      ),
+                    ),
+                    horizontalSpace(Spacing.points8),
+
+                    // Element content
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Icon(
+                                _vaultElementIcons[element] ??
+                                    LucideIcons.helpCircle,
+                                size: 16,
+                                color: isVisible
+                                    ? theme.success[600]
+                                    : theme.grey[600],
+                              ),
+                              horizontalSpace(Spacing.points8),
+                              Expanded(
+                                child: Text(
+                                  AppLocalizations.of(context).translate(
+                                      _vaultElementTitleKeys[element] ??
+                                          element),
+                                  style: TextStyles.caption.copyWith(
+                                    color: isVisible
+                                        ? theme.success[600]
+                                        : theme.grey[600],
+                                  ),
                                 ),
                               ),
-                            ),
-                          ],
-                        ),
-                        verticalSpace(Spacing.points8),
-                        Text(
-                          AppLocalizations.of(context).translate(
-                              _homeElementDescriptionKeys[element] ?? element),
-                          style: TextStyles.small.copyWith(
-                            color: isVisible
-                                ? theme.success[400]
-                                : theme.grey[400],
-                            height: 1.2,
+                            ],
                           ),
-                        ),
-                      ],
+                          verticalSpace(Spacing.points8),
+                          Text(
+                            AppLocalizations.of(context).translate(
+                                _vaultElementDescriptionKeys[element] ??
+                                    element),
+                            style: TextStyles.small.copyWith(
+                              color: isVisible
+                                  ? theme.success[400]
+                                  : theme.grey[400],
+                              height: 1.2,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
-        ),
-      );
-    });
+        );
+      },
+    );
   }
 
   Widget _buildHorizontalCardsReorderList(
@@ -374,6 +423,40 @@ class _VaultLayoutSettingsSheetState
       child: ReorderableListView.builder(
         scrollDirection: Axis.horizontal,
         itemCount: _orderedCards.length,
+        proxyDecorator: (child, index, animation) {
+          return AnimatedBuilder(
+            animation: animation,
+            builder: (BuildContext context, Widget? child) {
+              final double animValue =
+                  Curves.easeInOut.transform(animation.value);
+              final double scale = lerpDouble(1, 1.05, animValue)!;
+              return Transform.scale(
+                scale: scale,
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: theme.grey[400]!
+                            .withValues(alpha: 0.15 * animValue),
+                        blurRadius: 8 * animValue,
+                        offset: Offset(0, 4 * animValue),
+                      ),
+                    ],
+                  ),
+                  child: ClipRect(
+                    child: Align(
+                      alignment: Alignment.topCenter,
+                      heightFactor: 0.85, // Trim the bottom spacing
+                      child: child,
+                    ),
+                  ),
+                ),
+              );
+            },
+            child: child,
+          );
+        },
         onReorder: (oldIndex, newIndex) {
           if (newIndex > oldIndex) {
             newIndex -= 1;

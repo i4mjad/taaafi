@@ -2,40 +2,40 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class VaultLayoutSettings {
-  final Map<String, bool> homeElementsVisibility;
-  final List<String> homeElementsOrder;
+  final Map<String, bool> vaultElementsVisibility;
+  final List<String> vaultElementsOrder;
   final Map<String, bool> cardsVisibility;
   final List<String> cardsOrder;
   final bool helpMessageDismissed;
 
   VaultLayoutSettings({
-    required this.homeElementsVisibility,
-    required this.homeElementsOrder,
+    required this.vaultElementsVisibility,
+    required this.vaultElementsOrder,
     required this.cardsVisibility,
     required this.cardsOrder,
     required this.helpMessageDismissed,
   });
 
   VaultLayoutSettings copyWith({
-    Map<String, bool>? homeElementsVisibility,
-    List<String>? homeElementsOrder,
+    Map<String, bool>? vaultElementsVisibility,
+    List<String>? vaultElementsOrder,
     Map<String, bool>? cardsVisibility,
     List<String>? cardsOrder,
     bool? helpMessageDismissed,
   }) {
     return VaultLayoutSettings(
-      homeElementsVisibility:
-          homeElementsVisibility ?? this.homeElementsVisibility,
-      homeElementsOrder: homeElementsOrder ?? this.homeElementsOrder,
+      vaultElementsVisibility:
+          vaultElementsVisibility ?? this.vaultElementsVisibility,
+      vaultElementsOrder: vaultElementsOrder ?? this.vaultElementsOrder,
       cardsVisibility: cardsVisibility ?? this.cardsVisibility,
       cardsOrder: cardsOrder ?? this.cardsOrder,
       helpMessageDismissed: helpMessageDismissed ?? this.helpMessageDismissed,
     );
   }
 
-  List<String> getOrderedVisibleHomeElements() {
-    return homeElementsOrder
-        .where((element) => homeElementsVisibility[element] == true)
+  List<String> getOrderedVisibleVaultElements() {
+    return vaultElementsOrder
+        .where((element) => vaultElementsVisibility[element] == true)
         .toList();
   }
 
@@ -52,7 +52,7 @@ final vaultLayoutProvider =
 });
 
 class VaultLayoutNotifier extends StateNotifier<VaultLayoutSettings> {
-  static const List<String> _defaultHomeElementsOrder = [
+  static const List<String> _defaultVaultElementsOrder = [
     'currentStreaks',
     'statistics',
     'calendar',
@@ -68,12 +68,12 @@ class VaultLayoutNotifier extends StateNotifier<VaultLayoutSettings> {
 
   VaultLayoutNotifier()
       : super(VaultLayoutSettings(
-          homeElementsVisibility: {
+          vaultElementsVisibility: {
             'currentStreaks': true,
             'statistics': true,
             'calendar': true,
           },
-          homeElementsOrder: _defaultHomeElementsOrder,
+          vaultElementsOrder: _defaultVaultElementsOrder,
           cardsVisibility: {
             'activities': true,
             'library': true,
@@ -90,7 +90,7 @@ class VaultLayoutNotifier extends StateNotifier<VaultLayoutSettings> {
   Future<void> _loadPreferences() async {
     final prefs = await SharedPreferences.getInstance();
 
-    // Load home elements visibility
+    // Load vault elements visibility
     final currentStreaks =
         prefs.getBool('vault_current_streaks_visible') ?? true;
     final statistics = prefs.getBool('vault_statistics_visible') ?? true;
@@ -105,9 +105,9 @@ class VaultLayoutNotifier extends StateNotifier<VaultLayoutSettings> {
     final settings = prefs.getBool('vault_card_settings_visible') ?? true;
 
     // Load orders
-    final homeElementsOrderString =
-        prefs.getStringList('vault_home_elements_order') ??
-            _defaultHomeElementsOrder;
+    final vaultElementsOrderString =
+        prefs.getStringList('vault_vault_elements_order') ??
+            _defaultVaultElementsOrder;
     final cardsOrderString =
         prefs.getStringList('vault_cards_order') ?? _defaultCardsOrder;
 
@@ -116,12 +116,12 @@ class VaultLayoutNotifier extends StateNotifier<VaultLayoutSettings> {
         prefs.getBool('vault_help_message_dismissed') ?? false;
 
     state = VaultLayoutSettings(
-      homeElementsVisibility: {
+      vaultElementsVisibility: {
         'currentStreaks': currentStreaks,
         'statistics': statistics,
         'calendar': calendar,
       },
-      homeElementsOrder: homeElementsOrderString,
+      vaultElementsOrder: vaultElementsOrderString,
       cardsVisibility: {
         'activities': activities,
         'library': library,
@@ -134,13 +134,13 @@ class VaultLayoutNotifier extends StateNotifier<VaultLayoutSettings> {
     );
   }
 
-  Future<void> toggleHomeElementVisibility(String key, bool value) async {
+  Future<void> toggleVaultElementVisibility(String key, bool value) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('vault_${key}_visible', value);
 
     state = state.copyWith(
-      homeElementsVisibility: {
-        ...state.homeElementsVisibility,
+      vaultElementsVisibility: {
+        ...state.vaultElementsVisibility,
         key: value,
       },
     );
@@ -158,11 +158,11 @@ class VaultLayoutNotifier extends StateNotifier<VaultLayoutSettings> {
     );
   }
 
-  Future<void> reorderHomeElements(List<String> newOrder) async {
+  Future<void> reorderVaultElements(List<String> newOrder) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setStringList('vault_home_elements_order', newOrder);
+    await prefs.setStringList('vault_vault_elements_order', newOrder);
 
-    state = state.copyWith(homeElementsOrder: newOrder);
+    state = state.copyWith(vaultElementsOrder: newOrder);
   }
 
   Future<void> reorderCards(List<String> newOrder) async {
@@ -182,11 +182,11 @@ class VaultLayoutNotifier extends StateNotifier<VaultLayoutSettings> {
   Future<void> resetToDefaults() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setStringList(
-        'vault_home_elements_order', _defaultHomeElementsOrder);
+        'vault_vault_elements_order', _defaultVaultElementsOrder);
     await prefs.setStringList('vault_cards_order', _defaultCardsOrder);
 
     state = state.copyWith(
-      homeElementsOrder: _defaultHomeElementsOrder,
+      vaultElementsOrder: _defaultVaultElementsOrder,
       cardsOrder: _defaultCardsOrder,
     );
   }
