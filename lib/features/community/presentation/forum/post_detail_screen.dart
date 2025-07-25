@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/shared_widgets/app_bar.dart';
@@ -881,7 +882,8 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
     // Show brief success message and navigate back immediately
     if (mounted && currentContext.mounted) {
       getSuccessSnackBar(currentContext, 'post_deleted');
-      Navigator.of(currentContext).pop();
+      // Use GoRouter navigation instead of Navigator.pop()
+      currentContext.pop();
     }
 
     try {

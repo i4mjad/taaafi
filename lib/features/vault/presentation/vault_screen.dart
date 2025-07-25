@@ -12,7 +12,6 @@ import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/custom_theme_data.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
-import 'package:reboot_app_3/features/vault/presentation/activities/activities_screen.dart';
 import 'package:reboot_app_3/features/vault/presentation/widgets/streaks/current_streaks_section.dart';
 import 'package:reboot_app_3/features/vault/presentation/widgets/statistics/statistics_section.dart';
 import 'package:reboot_app_3/features/vault/presentation/widgets/calendar/calendar_section.dart';
@@ -156,13 +155,6 @@ class VaultScreen extends ConsumerWidget {
           ),
         );
       },
-    );
-  }
-
-  Widget _buildTodayTasksSection() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-      child: TodayTasksWidget(),
     );
   }
 

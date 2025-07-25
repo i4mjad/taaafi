@@ -7,10 +7,13 @@ import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/features/home/presentation/home/widgets/quick_actions_widget.dart';
+import 'package:reboot_app_3/features/plus/presentation/widgets/subscription_card.dart';
 import 'package:reboot_app_3/features/vault/presentation/widgets/streaks/streaks_view_widget.dart';
 import 'package:reboot_app_3/features/home/presentation/home/widgets/notification_promoter_widget.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
 import 'package:reboot_app_3/features/vault/presentation/vault_settings/activities_notifications_settings_screen.dart';
+import 'package:reboot_app_3/features/home/presentation/home/widgets/challenges_coming_soon_card.dart';
+import 'package:reboot_app_3/features/home/presentation/home/widgets/groups_coming_soon_card.dart';
 
 class MainHomeView extends ConsumerWidget {
   const MainHomeView({super.key});
@@ -25,6 +28,14 @@ class MainHomeView extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Subscription Card
+          //TODO: consider wraping this to a checker for the subscription status, if the user is subscibed show them a page that will guide them to the features and allow them to access those features.
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: const SubscriptionCard(),
+          ),
+
+          verticalSpace(Spacing.points24),
           // Notification Promoter - show if notifications are disabled
           notificationsEnabledAsync.when(
             data: (enabled) => enabled
@@ -46,9 +57,28 @@ class MainHomeView extends ConsumerWidget {
           const _CommunityActivitySection(),
           verticalSpace(Spacing.points24),
 
-          // Active Goals/Challenges Section
-          const _ActiveChallengesSection(),
+          // Coming Soon Cards Row
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Row(
+              children: [
+                // Challenges Coming Soon Card
+                Expanded(
+                  child: ChallengesComingSoonCard(),
+                ),
+                const SizedBox(width: 12),
+                // Groups Coming Soon Card
+                Expanded(
+                  child: GroupsComingSoonCard(),
+                ),
+              ],
+            ),
+          ),
           verticalSpace(Spacing.points24),
+
+          // Active Goals/Challenges Section
+          // const _ActiveChallengesSection(),
+          // verticalSpace(Spacing.points24),
         ],
       ),
     );

@@ -349,9 +349,9 @@ const Map<String, String> kEn = {
       "Latest community discussions, questions, and shared experiences from members.",
   "challenges_section_description":
       "Join organized challenges and activities designed to support your recovery journey and build healthy habits together.",
-  "challenges_coming_soon_title": "Challenges Coming Soon!",
+  "challenges_coming_soon_title": "Challenges",
   "challenges_coming_soon_description":
-      "We're working on exciting challenges to help boost your recovery journey with daily goals and community support.",
+      "Join exciting challenges with daily goals and community support.",
   "challenges_feature_daily_goals": "Daily Goals",
   "challenges_feature_daily_goals_desc":
       "Set and track daily recovery milestones",
@@ -362,6 +362,7 @@ const Map<String, String> kEn = {
   "challenges_feature_rewards_desc": "Earn badges and celebrate your progress",
   "challenges_working_hard_message":
       "We're working hard to bring you this feature soon!",
+  "whats_coming": "What's Coming:",
   "no_pinned_posts_title": "No Pinned Posts",
   "no_pinned_posts_message":
       "Important announcements and featured content will appear here when available.",
@@ -1365,10 +1366,9 @@ const Map<String, String> kEn = {
   "author_name": "Author Name",
 
   // Groups coming soon screen
-  "groups_coming_soon_title": "You're on the list!",
-  "groups_coming_soon_description":
-      "Support groups will open in phases. We'll let you know as soon as you can join when we launch the following features:",
-  "groups_feature_support_groups": "Support Groups",
+  "groups_coming_soon_title": "Fellowship",
+  "groups_coming_soon_description": "Connect with others through fellowship.",
+  "groups_feature_support_groups": "Support Fellowship",
   "groups_feature_support_groups_desc":
       "Join small support groups with others on similar recovery journeys",
   "groups_feature_group_chat": "Group Chat",
@@ -1397,17 +1397,15 @@ const Map<String, String> kEn = {
   "interaction_banned": "You are {type} banned from interacting with content",
 
   // Ta3afi Plus Subscription Screen
-  "subscription-main-title": "Say hello to your best self.",
+  "subscription-main-title": "Subscribe to Ta'aafi Plus.",
   "subscription-subtitle":
-      "Members are up to 65% more likely to reach their goals with Premium.",
+      "Your subscription helps us build a stronger recovery community and deliver meaningful features that truly support your journey. Together, we're creating something powerful.",
   "barcode-scan-title": "Barcode Scan:",
   "barcode-scan-description": "Skip the search and log faster",
   "custom-macro-tracking-title": "Custom Macro Tracking:",
   "custom-macro-tracking-description":
       "Find your balance of carbs, protein & fat",
-  "zero-ads-title": "Zero Ads:",
-  "zero-ads-description": "Track and reach your goals, distraction-free",
-  "select-plan-title": "Select a plan for your free trial.",
+  "select-plan-title": "Support the community with your subscription.",
   "yearly-plan": "YEARLY",
   "monthly-plan": "MONTHLY",
   "yearly-price": "\$68.98",
@@ -1419,21 +1417,42 @@ const Map<String, String> kEn = {
   "billed-yearly-info": "Billed yearly after free trial.",
   "billed-monthly-info": "Billed monthly after free trial.",
   "change-plans-anytime": "Change plans or cancel anytime.",
-  "start-free-trial": "Start 1-Month Free Trial",
+  "start-free-trial": "Start 3-Day Free Trial",
   "free-trial-started": "Free trial started successfully!",
+
+  // Simple Subscription Card
+  "try-ta3afi-plus": "Try Ta'aafi Plus",
+  "free-trial-description": "Start your 3-day free trial, cancel anytime.",
+  "subscription-monthly-price": "\$3.99 / month",
+  "continue": "Continue",
 
   // Features Comparison Table
   "what-you-get": "What you get:",
   "free-version": "Free",
   "premium-version": "Premium",
-  "unlimited-activities": "Unlimited activities",
-  "ad-free-experience": "Ad-free experience",
-  "advanced-tracking": "Advanced progress tracking",
-  "barcode-scanning": "Barcode scanning",
+  "detailed-analytics": "Detailed recovery analytics",
   "custom-reminders": "Custom reminders",
   "priority-support": "Priority support",
-  "export-data": "Export your data",
-  "offline-access": "Offline access",
-  "advanced-analytics": "Advanced analytics",
-  "custom-macro-tracking-feature": "Custom macro tracking",
+  "special-community-badge": "Special badge in the community",
+  "feature-requests": "Request new features",
+
+  // Feature descriptions
+  "detailed-analytics-desc":
+      "Get comprehensive insights into your recovery progress",
+  "custom-reminders-desc":
+      "Set personalized reminders for your activities and goals",
+  "priority-support-desc": "Get priority assistance from our support team",
+  "special-community-badge-desc": "Stand out with an exclusive premium badge",
+  "feature-requests-desc": "Suggest and vote on new features for the app",
+
+  // Analytics insights
+  "streak-insights": "Track your longest streaks",
+  "mood-patterns": "Discover your mood patterns",
+  "trigger-analysis": "Identify trigger patterns",
+  "progress-trends": "Weekly & monthly trends",
+  "habit-correlation": "Habit correlation insights",
+
+  // Features commitment message
+  "working-hard-message":
+      "We're working hard to extend these features and give you the best recovery experience possible.",
 };

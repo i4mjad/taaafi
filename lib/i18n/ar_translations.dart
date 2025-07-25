@@ -355,9 +355,9 @@ const Map<String, String> kAr = {
       "أحدث النقاشات والأسئلة والتجارب المشتركة من أعضاء المجتمع.",
   "challenges_section_description":
       "انضم للتحديات والأنشطة المنظمة المصممة لدعم رحلة التعافي وبناء العادات الصحية معاً.",
-  "challenges_coming_soon_title": "التحديات قادمة قريباً!",
+  "challenges_coming_soon_title": "التحديات",
   "challenges_coming_soon_description":
-      "نحن نعمل على تحديات مثيرة لتعزيز رحلة التعافي مع أهداف يومية ودعم مجتمعي.",
+      "انضم لتحديات مثيرة مع أهداف يومية ودعم مجتمعي.",
   "challenges_feature_daily_goals": "الأهداف اليومية",
   "challenges_feature_daily_goals_desc": "حدد وتتبع معالم التعافي اليومية",
   "challenges_feature_community": "الدعم المجتمعي",
@@ -365,6 +365,7 @@ const Map<String, String> kAr = {
   "challenges_feature_rewards": "الإنجازات والمكافآت",
   "challenges_feature_rewards_desc": "احصل على شارات واحتفل بتقدمك",
   "challenges_working_hard_message": "نحن نعمل بجد لنقدم لك هذه الميزة قريباً!",
+  "whats_coming": "ما القادم:",
   "no_pinned_posts_title": "لا توجد منشورات مثبتة",
   "no_pinned_posts_message":
       "الإعلانات المهمة والمحتوى المميز سيظهر هنا عند توفره.",
@@ -1321,10 +1322,9 @@ const Map<String, String> kAr = {
   'author_name': 'اسم المؤلف',
 
   // Groups coming soon screen
-  'groups_coming_soon_title': 'أنت في القائمة!',
-  'groups_coming_soon_description':
-      'مجموعات الدعم ستفتح على مراحل. سنخبرك حالما تتمكن من الانضمام عندما نطلق الميزات التالية:',
-  'groups_feature_support_groups': 'مجموعات الدعم',
+  'groups_coming_soon_title': 'الزمالة',
+  'groups_coming_soon_description': 'تواصل مع الآخرين من خلال الزمالة.',
+  'groups_feature_support_groups': 'زمالات الدعم',
   'groups_feature_support_groups_desc':
       'انضم إلى مجموعات دعم صغيرة مع آخرين في رحلات تعافي مشابهة',
   'groups_feature_group_chat': 'محادثة المجموعة',
@@ -1355,17 +1355,15 @@ const Map<String, String> kAr = {
   "interaction_banned": "أنت محظور {type} من التفاعل مع المحتوى",
 
   // شاشة اشتراك تعافي بلس
-  "subscription-main-title": "قل مرحباً لأفضل نسخة منك.",
+  "subscription-main-title": "اشترك في تعافي بلس.",
   "subscription-subtitle":
-      "الأعضاء أكثر عرضة بنسبة 65% لتحقيق أهدافهم مع النسخة المدفوعة.",
+      "اشتراكك يساعدنا في بناء مجتمع تعافي أقوى وتقديم ميزات ذات معنى تدعم رحلتك حقاً. معاً، نحن نصنع شيئاً قوياً.",
   "barcode-scan-title": "مسح الباركود:",
   "barcode-scan-description": "تخطى البحث وسجل بشكل أسرع",
   "custom-macro-tracking-title": "تتبع مخصص للعناصر الغذائية:",
   "custom-macro-tracking-description":
       "اعثر على توازن الكربوهيدرات والبروتين والدهون",
-  "zero-ads-title": "بدون إعلانات:",
-  "zero-ads-description": "تتبع وحقق أهدافك دون إلهاء",
-  "select-plan-title": "اختر خطة للتجربة المجانية.",
+  "select-plan-title": "ادعم المجتمع بإشتراكك.",
   "yearly-plan": "سنوي",
   "monthly-plan": "شهري",
   "yearly-price": "68.98\$",
@@ -1377,21 +1375,41 @@ const Map<String, String> kAr = {
   "billed-yearly-info": "يتم الدفع سنوياً بعد التجربة المجانية.",
   "billed-monthly-info": "يتم الدفع شهرياً بعد التجربة المجانية.",
   "change-plans-anytime": "غير الخطط أو ألغ في أي وقت.",
-  "start-free-trial": "ابدأ التجربة المجانية لشهر واحد",
+  "start-free-trial": "ابدأ التجربة المجانية لـ 3 أيام",
   "free-trial-started": "تم بدء التجربة المجانية بنجاح!",
+
+  // بطاقة الاشتراك البسيطة
+  "try-ta3afi-plus": "جرب تعافي بلس",
+  "free-trial-description":
+      "ابدأ تجربتك المجانية لمدة 3 أيام، يمكنك الإلغاء في أي وقت.",
+  "subscription-monthly-price": "3.99\$ / شهر",
+  "continue": "متابعة",
 
   // جدول مقارنة الميزات
   "what-you-get": "ما ستحصل عليه:",
   "free-version": "مجاني",
   "premium-version": "مدفوع",
-  "unlimited-activities": "تمارين غير محدودة",
-  "ad-free-experience": "تجربة خالية من الإعلانات",
-  "advanced-tracking": "تتبع متقدم للتقدم",
-  "barcode-scanning": "مسح الباركود",
+  "detailed-analytics": "تحليلات مفصلة للتعافي",
   "custom-reminders": "تذكيرات مخصصة",
   "priority-support": "دعم فني مميز",
-  "export-data": "تصدير بياناتك",
-  "offline-access": "وصول بدون إنترنت",
-  "advanced-analytics": "تحليلات متقدمة",
-  "custom-macro-tracking-feature": "تتبع مخصص للعناصر الغذائية",
+  "special-community-badge": "شارة خاصة في المجتمع",
+  "feature-requests": "طلب ميزات جديدة",
+
+  // وصف الميزات
+  "detailed-analytics-desc": "احصل على رؤى شاملة حول تقدم تعافيك",
+  "custom-reminders-desc": "اضبط تذكيرات شخصية لأنشطتك وأهدافك",
+  "priority-support-desc": "احصل على مساعدة ذات أولوية من فريق الدعم",
+  "special-community-badge-desc": "تميز بشارة حصرية للأعضاء المميزين",
+  "feature-requests-desc": "اقترح وصوت على ميزات جديدة للتطبيق",
+
+  // رؤى التحليلات
+  "streak-insights": "تتبع أطول فترات استمراريتك",
+  "mood-patterns": "اكتشف أنماط مزاجك",
+  "trigger-analysis": "حدد أنماط المحفزات",
+  "progress-trends": "اتجاهات أسبوعية وشهرية",
+  "habit-correlation": "رؤى ارتباط العادات",
+
+  // رسالة الالتزام بالميزات
+  "working-hard-message":
+      "نحن نعمل بجد لتوسيع هذه الميزات ونمنحك أفضل تجربة تعافي ممكنة.",
 };

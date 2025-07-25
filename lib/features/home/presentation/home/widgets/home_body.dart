@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:reboot_app_3/features/home/presentation/home/widgets/card_based_hub.dart';
+
 import 'package:reboot_app_3/features/home/presentation/home/widgets/home_header.dart';
 
 class HomeBody extends ConsumerWidget {
@@ -15,7 +15,10 @@ class HomeBody extends ConsumerWidget {
 
         // Scrollable card-based content
         Expanded(
-          child: CardBasedHub(),
+          child: Center(
+            child:
+                Text('HomeBody is deprecated - content moved to MainHomeView'),
+          ),
         ),
       ],
     );

@@ -705,7 +705,7 @@ GoRouter goRouter(Ref<GoRouter> ref) {
                     name: RouteNames.ta3afiPlus.name,
                     pageBuilder: (context, state) => MaterialPage(
                       name: RouteNames.ta3afiPlus.name,
-                      child: TaaafiPlusScreen(),
+                      child: TaaafiPlusSubscriptionScreen(),
                     ),
                   ),
                   GoRoute(
