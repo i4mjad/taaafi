@@ -1354,8 +1354,8 @@ const Map<String, String> kAr = {
   "comment_creation_banned": "أنت محظور {type} من إضافة التعليقات",
   "interaction_banned": "أنت محظور {type} من التفاعل مع المحتوى",
 
-  // شاشة اشتراك تعافي بلس
-  "subscription-main-title": "اشترك في تعافي بلس.",
+  // شاشة اشتراك تعافي +
+  "subscription-main-title": "اشترك في تعافي+",
   "subscription-subtitle":
       "اشتراكك يساعدنا في بناء مجتمع تعافي أقوى وتقديم ميزات ذات معنى تدعم رحلتك حقاً. معاً، نحن نصنع شيئاً قوياً.",
   "barcode-scan-title": "مسح الباركود:",
@@ -1379,7 +1379,7 @@ const Map<String, String> kAr = {
   "free-trial-started": "تم بدء التجربة المجانية بنجاح!",
 
   // بطاقة الاشتراك البسيطة
-  "try-ta3afi-plus": "جرب تعافي بلس",
+  "try-ta3afi-plus": "جرب تعافي +",
   "free-trial-description":
       "ابدأ تجربتك المجانية لمدة 3 أيام، يمكنك الإلغاء في أي وقت.",
   "subscription-monthly-price": "3.99\$ / شهر",
