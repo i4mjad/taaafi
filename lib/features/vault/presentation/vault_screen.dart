@@ -24,6 +24,9 @@ import 'package:reboot_app_3/features/authentication/providers/user_document_pro
 import 'package:reboot_app_3/core/shared_widgets/complete_registration_banner.dart';
 import 'package:reboot_app_3/core/shared_widgets/confirm_details_banner.dart';
 import 'package:reboot_app_3/core/shared_widgets/confirm_email_banner.dart';
+import 'package:reboot_app_3/features/plus/data/notifiers/subscription_notifier.dart';
+import 'package:reboot_app_3/features/plus/data/repositories/subscription_repository.dart';
+import 'package:reboot_app_3/features/plus/presentation/taaafi_plus_features_list_screen.dart';
 
 class VaultScreen extends ConsumerWidget {
   const VaultScreen({super.key});
@@ -139,6 +142,10 @@ class VaultScreen extends ConsumerWidget {
 
               // Horizontal Scrollable Cards
               _buildHorizontalCards(context, theme, orderedCards),
+              verticalSpace(Spacing.points16),
+
+              // Premium Analytics CTA
+              _buildPremiumAnalyticsCTA(context, theme),
               verticalSpace(Spacing.points16),
 
               // Render ordered vault elements
@@ -275,6 +282,146 @@ class VaultScreen extends ConsumerWidget {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildPremiumAnalyticsCTA(
+      BuildContext context, CustomThemeData theme) {
+    return Consumer(
+      builder: (context, ref, child) {
+        final subscriptionAsync = ref.watch(subscriptionNotifierProvider);
+
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          child: Stack(
+            children: [
+              GestureDetector(
+                onTap: () async {
+                  HapticFeedback.lightImpact();
+
+                  // Check subscription status
+                  final hasSubscription =
+                      await ref.read(hasActiveSubscriptionProvider.future);
+
+                  if (hasSubscription) {
+                    // Navigate to premium analytics
+                    context.goNamed(RouteNames.premiumAnalytics.name);
+                  } else {
+                    // Show subscription modal
+                    showModalBottomSheet(
+                      context: context,
+                      isScrollControlled: true,
+                      backgroundColor: Colors.transparent,
+                      useSafeArea: true,
+                      builder: (context) =>
+                          const TaaafiPlusSubscriptionScreen(),
+                    );
+                  }
+                },
+                child: WidgetsContainer(
+                  width: double.infinity,
+                  padding: EdgeInsets.all(16),
+                  backgroundColor: theme.primary[50],
+                  borderSide: BorderSide(color: theme.primary[200]!, width: 1),
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: theme.primary[100]!.withValues(alpha: 0.5),
+                      blurRadius: 8,
+                      offset: Offset(0, 2),
+                    ),
+                  ],
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: theme.primary[100],
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Icon(
+                          LucideIcons.barChart3,
+                          color: theme.primary[600],
+                          size: 24,
+                        ),
+                      ),
+                      horizontalSpace(Spacing.points16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              AppLocalizations.of(context)
+                                  .translate('premium-analytics-title'),
+                              style: TextStyles.footnote.copyWith(
+                                color: theme.grey[900],
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            verticalSpace(Spacing.points4),
+                            Text(
+                              AppLocalizations.of(context)
+                                  .translate('premium-analytics-subtitle'),
+                              style: TextStyles.small.copyWith(
+                                color: theme.grey[600],
+                                height: 1.3,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Icon(
+                        LucideIcons.chevronRight,
+                        color: theme.primary[600],
+                        size: 20,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              // TODO: Remove this test button in production
+              if (true) // Change to true to test
+                Positioned(
+                  top: 8,
+                  right: 8,
+                  child: GestureDetector(
+                    onTap: () async {
+                      // Enable Plus subscription for testing
+                      final notifier =
+                          ref.read(subscriptionNotifierProvider.notifier);
+                      await notifier.updateSubscriptionForTesting(
+                        SubscriptionInfo(
+                          status: SubscriptionStatus.plus,
+                          isActive: true,
+                          expirationDate:
+                              DateTime.now().add(Duration(days: 30)),
+                        ),
+                      );
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                            content: Text('Test: Plus subscription activated')),
+                      );
+                    },
+                    child: Container(
+                      padding: EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                        color: theme.error[600],
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: Text(
+                        'TEST',
+                        style: TextStyles.small.copyWith(
+                          color: theme.grey[50],
+                          fontSize: 10,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        );
+      },
     );
   }
 }

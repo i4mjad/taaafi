@@ -256,19 +256,13 @@ class _TaaafiPlusScreenState
           ),
           child: Column(
             children: [
-              _buildAnalyticsFeatureRow(context, theme, false, true),
+              _buildPersonalAnalyticsFeatureRow(context, theme, false, true),
+              _buildCommunityPerksFeatureRow(context, theme, false, true),
+              _buildSmartAlertsFeatureRow(context, theme, false, true),
               _buildFeatureRowWithIcon(context, theme, 'custom-reminders',
                   LucideIcons.bell, Color(0xFF3B82F6), true, true),
               _buildFeatureRowWithIcon(context, theme, 'priority-support',
                   LucideIcons.headphones, Color(0xFF10B981), false, true),
-              _buildFeatureRowWithIcon(
-                  context,
-                  theme,
-                  'special-community-badge',
-                  LucideIcons.award,
-                  Color(0xFFF59E0B),
-                  false,
-                  true),
               _buildFeatureRowWithIcon(context, theme, 'feature-requests',
                   LucideIcons.lightbulb, Color(0xFFEAB308), false, true,
                   isLast: true),
@@ -309,7 +303,7 @@ class _TaaafiPlusScreenState
     );
   }
 
-  Widget _buildAnalyticsFeatureRow(
+  Widget _buildPersonalAnalyticsFeatureRow(
     BuildContext context,
     dynamic theme,
     bool freeVersion,
@@ -319,9 +313,11 @@ class _TaaafiPlusScreenState
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 16, vertical: 20),
       decoration: BoxDecoration(
-        border: Border(
-          bottom: BorderSide(color: theme.grey[200]!, width: 0.5),
-        ),
+        border: isLast
+            ? null
+            : Border(
+                bottom: BorderSide(color: theme.grey[200]!, width: 0.5),
+              ),
       ),
       child: Column(
         children: [
@@ -405,23 +401,263 @@ class _TaaafiPlusScreenState
               ),
             ],
           ),
-          // Analytics insights (only show for premium)
+          // Personal Analytics insights (only show for premium)
           if (premiumVersion) ...[
             verticalSpace(Spacing.points12),
             Padding(
               padding: EdgeInsets.only(left: 26),
               child: Column(
                 children: [
-                  _buildInsightItem(context, theme, LucideIcons.zap,
-                      'streak-insights', Color(0xFFEF4444)),
-                  _buildInsightItem(context, theme, LucideIcons.heart,
-                      'mood-patterns', Color(0xFFEC4899)),
-                  _buildInsightItem(context, theme, LucideIcons.alertTriangle,
-                      'trigger-analysis', Color(0xFFF97316)),
+                  _buildInsightItem(context, theme, LucideIcons.calendar,
+                      'heat-map-calendar', Color(0xFFEF4444)),
+                  _buildInsightItem(context, theme, LucideIcons.radar,
+                      'trigger-radar', Color(0xFFF97316)),
+                  _buildInsightItem(context, theme, LucideIcons.clock,
+                      'risk-clock', Color(0xFF06B6D4)),
+                  _buildInsightItem(context, theme, LucideIcons.heartHandshake,
+                      'mood-relapse-correlation', Color(0xFFEC4899),
+                      isLast: true),
+                ],
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCommunityPerksFeatureRow(
+    BuildContext context,
+    dynamic theme,
+    bool freeVersion,
+    bool premiumVersion, {
+    bool isLast = false,
+  }) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+      decoration: BoxDecoration(
+        border: isLast
+            ? null
+            : Border(
+                bottom: BorderSide(color: theme.grey[200]!, width: 0.5),
+              ),
+      ),
+      child: Column(
+        children: [
+          // Main feature row
+          Row(
+            children: [
+              // Feature name with icon
+              Expanded(
+                flex: 2,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(
+                          LucideIcons.award,
+                          color: Color(0xFFF59E0B),
+                          size: 18,
+                        ),
+                        horizontalSpace(Spacing.points8),
+                        Expanded(
+                          child: Text(
+                            AppLocalizations.of(context)
+                                .translate('community-perks'),
+                            style: TextStyles.footnote.copyWith(
+                              color: theme.grey[800],
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    verticalSpace(Spacing.points4),
+                    Padding(
+                      padding: EdgeInsets.only(left: 26),
+                      child: Text(
+                        AppLocalizations.of(context)
+                            .translate('community-perks-desc'),
+                        style: TextStyles.small.copyWith(
+                          color: theme.grey[600],
+                          height: 1.3,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              // Free version
+              Expanded(
+                flex: 1,
+                child: Center(
+                  child: freeVersion
+                      ? Icon(
+                          LucideIcons.check,
+                          color: theme.success[600],
+                          size: 18,
+                        )
+                      : Icon(
+                          LucideIcons.x,
+                          color: theme.grey[400],
+                          size: 18,
+                        ),
+                ),
+              ),
+              // Premium version
+              Expanded(
+                flex: 1,
+                child: Center(
+                  child: premiumVersion
+                      ? Icon(
+                          LucideIcons.check,
+                          color: theme.success[600],
+                          size: 18,
+                        )
+                      : Icon(
+                          LucideIcons.x,
+                          color: theme.grey[400],
+                          size: 18,
+                        ),
+                ),
+              ),
+            ],
+          ),
+          // Community Perks insights (only show for premium)
+          if (premiumVersion) ...[
+            verticalSpace(Spacing.points12),
+            Padding(
+              padding: EdgeInsets.only(left: 26),
+              child: Column(
+                children: [
+                  _buildInsightItem(context, theme, LucideIcons.crown,
+                      'plus-badge-flair', Color(0xFFF59E0B)),
                   _buildInsightItem(context, theme, LucideIcons.trendingUp,
-                      'progress-trends', Color(0xFF06B6D4)),
-                  _buildInsightItem(context, theme, LucideIcons.gitBranch,
-                      'habit-correlation', Color(0xFF8B5CF6),
+                      'featured-post-boost', Color(0xFF10B981)),
+                  _buildInsightItem(context, theme, LucideIcons.user,
+                      'streak-overlay-avatar', Color(0xFF3B82F6),
+                      isLast: true),
+                ],
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSmartAlertsFeatureRow(
+    BuildContext context,
+    dynamic theme,
+    bool freeVersion,
+    bool premiumVersion, {
+    bool isLast = false,
+  }) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+      decoration: BoxDecoration(
+        border: isLast
+            ? null
+            : Border(
+                bottom: BorderSide(color: theme.grey[200]!, width: 0.5),
+              ),
+      ),
+      child: Column(
+        children: [
+          // Main feature row
+          Row(
+            children: [
+              // Feature name with icon
+              Expanded(
+                flex: 2,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(
+                          LucideIcons.bell,
+                          color: Color(0xFF3B82F6),
+                          size: 18,
+                        ),
+                        horizontalSpace(Spacing.points8),
+                        Expanded(
+                          child: Text(
+                            AppLocalizations.of(context)
+                                .translate('smart-alerts-forecasts'),
+                            style: TextStyles.footnote.copyWith(
+                              color: theme.grey[800],
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    verticalSpace(Spacing.points4),
+                    Padding(
+                      padding: EdgeInsets.only(left: 26),
+                      child: Text(
+                        AppLocalizations.of(context)
+                            .translate('smart-alerts-forecasts-desc'),
+                        style: TextStyles.small.copyWith(
+                          color: theme.grey[600],
+                          height: 1.3,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              // Free version
+              Expanded(
+                flex: 1,
+                child: Center(
+                  child: freeVersion
+                      ? Icon(
+                          LucideIcons.check,
+                          color: theme.success[600],
+                          size: 18,
+                        )
+                      : Icon(
+                          LucideIcons.x,
+                          color: theme.grey[400],
+                          size: 18,
+                        ),
+                ),
+              ),
+              // Premium version
+              Expanded(
+                flex: 1,
+                child: Center(
+                  child: premiumVersion
+                      ? Icon(
+                          LucideIcons.check,
+                          color: theme.success[600],
+                          size: 18,
+                        )
+                      : Icon(
+                          LucideIcons.x,
+                          color: theme.grey[400],
+                          size: 18,
+                        ),
+                ),
+              ),
+            ],
+          ),
+          // Smart Alerts insights (only show for premium)
+          if (premiumVersion) ...[
+            verticalSpace(Spacing.points12),
+            Padding(
+              padding: EdgeInsets.only(left: 26),
+              child: Column(
+                children: [
+                  _buildInsightItem(context, theme, LucideIcons.alertTriangle,
+                      'high-risk-hour-alert', Color(0xFFEF4444)),
+                  _buildInsightItem(context, theme, LucideIcons.shield,
+                      'streak-vulnerability-alert', Color(0xFF8B5CF6)),
+                  _buildInsightItem(context, theme, LucideIcons.messageSquare,
+                      'topic-based-pushes', Color(0xFF06B6D4),
                       isLast: true),
                 ],
               ),

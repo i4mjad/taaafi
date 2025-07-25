@@ -1412,4 +1412,160 @@ const Map<String, String> kAr = {
   // رسالة الالتزام بالميزات
   "working-hard-message":
       "نحن نعمل بجد لتوسيع هذه الميزات ونمنحك أفضل تجربة تعافي ممكنة.",
+
+  // Updated Personal Analytics sub-features
+  "heat-map-calendar": "تقويم الانتكاسات الحراري",
+  "trigger-radar": "رادار المحفزات",
+  "risk-clock": "ساعة المخاطر",
+  "mood-relapse-correlation": "ارتباط المزاج والانتكاس",
+
+  // Community Perks feature and sub-features
+  "community-perks": "امتيازات المجتمع",
+  "community-perks-desc": "فوائد حصرية واعتراف في المجتمع",
+  "plus-badge-flair": "شارة \"بلس\" ذهبية ولقب مميز",
+  "featured-post-boost": "تعزيز المنشور المميز",
+  "streak-overlay-avatar": "طبقة الإنجازات الاختيارية",
+
+  // Smart Alerts feature and sub-features
+  "smart-alerts-forecasts": "التنبيهات",
+  "smart-alerts-forecasts-desc": "تنبؤات ذكية وإشعارات شخصية",
+  "high-risk-hour-alert": "تنبيه ساعة الخطر العالي",
+  "streak-vulnerability-alert": "تنبيه ضعف الإنجاز",
+  "topic-based-pushes": "إشعارات قائمة على المواضيع",
+
+  // Premium Analytics CTA
+  "premium-analytics-title": "التحليلات المتقدمة",
+  "premium-analytics-subtitle": "اكتشف رؤى مفصلة وتتبع شامل",
+
+  // Premium features section
+  "premium-features": "الميزات المميزة",
+
+  // Analytics feature descriptions
+  "heat-map-calendar-desc":
+      "تقويم بصري مع متوسطات الإنجازات لفترات 7/30/90 يوم يظهر أفضل وأسوأ فتراتك",
+  "trigger-radar-desc": "مخطط عنكبوتي لمحفزات الانتكاس لتحديد الأنماط",
+  "risk-clock-desc": "مخطط 24 ساعة يظهر أكثر أوقاتك عرضة للخطر",
+  "mood-relapse-correlation-desc":
+      "مخططات تظهر كيف يؤثر مزاجك على احتمالية الانتكاس",
+
+  // Upgrade CTA
+  "upgrade-to-premium": "ترقية إلى تعافي بلس",
+  "unlock-analytics-features":
+      "اكتشف جميع ميزات التحليلات المتقدمة واحصل على رؤى أعمق لرحلة تعافيك",
+
+  // Analytics feature titles
+  "heat-map-calendar-title": "خريطة الانتكاسات الحرارية",
+  "trigger-radar-title": "تحليل المحفزات",
+  "risk-clock-title": "ساعة المخاطر",
+  "mood-correlation-title": "ارتباط المزاج",
+
+  // Heat map legend
+  "clean-day": "نظيف",
+  "slip-up-day": "زلة",
+  "relapse-day": "انتكاسة",
+  "porn-only-day": "إباحية",
+  "mast-only-day": "عادة سرية",
+  "no-data-day": "لا توجد بيانات",
+
+  // Streak averages
+  "7-day-average": "متوسط 7 أيام",
+  "30-day-average": "متوسط 30 يوم",
+  "90-day-average": "متوسط 90 يوم",
+
+  // Empty states
+  "heat-map-empty": "ابدأ بتسجيل متابعاتك اليومية لرؤية تقدمك هنا",
+  "trigger-empty": "صنف انتكاساتك بالمحفزات لرؤية الأنماط",
+  "not-enough-data": "لا توجد بيانات كافية بعد",
+
+  // Triggers
+  "trigger-stress": "ضغط",
+  "trigger-boredom": "ملل",
+  "trigger-loneliness": "وحدة",
+  "trigger-late-night": "وقت متأخر",
+  "trigger-social-media": "وسائل التواصل",
+  "trigger-tiredness": "تعب",
+  "trigger-anger": "غضب",
+  "trigger-celebration": "احتفال",
+  "trigger-anxiety": "قلق",
+  "trigger-depression": "اكتئاب",
+
+  // Risk clock
+  "highest-risk-hour": "أعلى خطورة: {hour}",
+  "risk-hour-tip": "فكر في جدولة نشاط أو مكالمة خلال هذا الوقت",
+  "enable-risk-alert": "تفعيل تنبيهات ساعات الخطر العالي",
+
+  // Mood correlation
+  "mood-very-low": "منخفض جداً",
+  "mood-low": "منخفض",
+  "mood-neutral": "محايد",
+  "mood-high": "مرتفع",
+  "mood-very-high": "مرتفع جداً",
+  "mood-entries": "إدخالات المزاج",
+  "correlation-insight": "مزاجك يظهر ارتباطاً قوياً مع الانتكاسات",
+  "negative-correlation":
+      "المزاج المنخفض مرتبط بقوة بالزلات. فكر في خطة التأقلم الخاصة بك.",
+
+  // Feature gate messages
+  "premium-only-feature": "هذه الميزة متاحة لأعضاء بلس",
+  "unlock-with-plus": "افتح مع تعافي بلس",
+
+  // General
+  "times": "مرات",
+  "trigger-tip":
+      "ركز على تحديد الأنماط ووضع استراتيجيات للتعامل مع هذه المحفزات بشكل أفضل",
+
+  // Follow-up history modal
+  "follow-up-history": "تاريخ المتابعات",
+  "last-7-days": "آخر 7 أيام",
+  "last-30-days": "آخر 30 يوم",
+  "last-90-days": "آخر 90 يوم",
+  "no-follow-ups-found": "لم يتم العثور على متابعات",
+  "start-logging-to-see-data":
+      "ابدأ بتسجيل متابعاتك اليومية لرؤية البيانات هنا",
+  "error-loading-data": "خطأ في تحميل البيانات",
+
+  // Months
+  "january": "يناير",
+  "february": "فبراير",
+  "march": "مارس",
+  "april": "أبريل",
+  "may": "مايو",
+  "june": "يونيو",
+  "july": "يوليو",
+  "august": "أغسطس",
+  "september": "سبتمبر",
+  "october": "أكتوبر",
+  "november": "نوفمبر",
+  "december": "ديسمبر",
+
+  // Streak averages section
+  "streak-averages": "متوسطات الأيام النظيفة",
+  "streak-averages-title": "متوسطات الأيام النظيفة",
+  "streak-averages-desc":
+      "تتبع تقدمك بنسب الأيام النظيفة عبر فترات زمنية مختلفة",
+  "streak-averages-explanation":
+      "تُظهر هذه النسب كم يوماً بقيت نظيفاً من إجمالي الأيام في كل فترة. اضغط على أي بطاقة لرؤية المتابعات التفصيلية لتلك الفترة.",
+  "streak-averages-empty": "ابدأ بتسجيل المتابعات لرؤية متوسطات أيامك النظيفة",
+  "how-to-read": "كيفية القراءة",
+  "tap-to-view": "اضغط للعرض",
+
+  // Day-of-month patterns
+  "day-of-month-patterns": "أنماط يوم الشهر",
+  "day-of-month-desc":
+      "المتابعات التاريخية مجمعة حسب رقم اليوم (1-31) عبر جميع الأشهر",
+  "day-of-month-history": "يوم",
+  "sorting-feature-coming": "ميزة الترتيب قريباً",
+
+  // Week days short
+  "sun-short": "ح",
+  "mon-short": "ن",
+  "tue-short": "ث",
+  "wed-short": "ر",
+  "thu-short": "خ",
+  "fri-short": "ج",
+  "sat-short": "س",
+
+  // Legend and other missing keys
+  "risk-empty": "سجل المزيد من المتابعات لرؤية ساعات الخطر",
+  "mood-empty": "قيم مزاجك مع المتابعات لرؤية الارتباط",
 };

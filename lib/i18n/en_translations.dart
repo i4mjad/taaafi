@@ -1452,7 +1452,164 @@ const Map<String, String> kEn = {
   "progress-trends": "Weekly & monthly trends",
   "habit-correlation": "Habit correlation insights",
 
+  // Updated Personal Analytics sub-features
+  "heat-map-calendar": "Relapse Heat-Map Calendar",
+  "trigger-radar": "Trigger Radar",
+  "risk-clock": "Risk Clock",
+  "mood-relapse-correlation": "Mood ↔ Relapse Correlation",
+
+  // Community Perks feature and sub-features
+  "community-perks": "Community Perks",
+  "community-perks-desc": "Exclusive benefits and recognition in the community",
+  "plus-badge-flair": "Gold \"Plus\" Badge & Name Flair",
+  "featured-post-boost": "Featured-Post Boost",
+  "streak-overlay-avatar": "Optional Streak Overlay",
+
+  // Smart Alerts feature and sub-features
+  "smart-alerts-forecasts": "Alerts",
+  "smart-alerts-forecasts-desc":
+      "Intelligent predictions and personalized notifications",
+  "high-risk-hour-alert": "High-Risk Hour Alert",
+  "streak-vulnerability-alert": "Streak Vulnerability Alert",
+  "topic-based-pushes": "Topic-Based Pushes",
+
   // Features commitment message
   "working-hard-message":
       "We're working hard to extend these features and give you the best recovery experience possible.",
+
+  // Premium Analytics CTA
+  "premium-analytics-title": "Advanced Analytics",
+  "premium-analytics-subtitle": "Unlock detailed insights and tracking",
+
+  // Premium features section
+  "premium-features": "Premium Features",
+
+  // Analytics feature descriptions
+  "heat-map-calendar-desc":
+      "Visual calendar with 7/30/90-day streak averages showing your best and worst periods",
+  "trigger-radar-desc":
+      "Spider chart visualization of your relapse triggers to identify patterns",
+  "risk-clock-desc": "24-hour chart showing your most vulnerable times of day",
+  "mood-relapse-correlation-desc":
+      "Charts showing how your mood affects relapse probability",
+
+  // Upgrade CTA
+  "upgrade-to-premium": "Upgrade to Ta'aafi Plus",
+  "unlock-analytics-features":
+      "Unlock all advanced analytics features and get deeper insights into your recovery journey",
+
+  // Analytics feature titles
+  "heat-map-calendar-title": "Relapse Heat Map",
+  "trigger-radar-title": "Trigger Analysis",
+  "risk-clock-title": "Risk Clock",
+  "mood-correlation-title": "Mood Correlation",
+
+  // Heat map legend
+  "clean-day": "Clean",
+  "slip-up-day": "Slip-up",
+  "relapse-day": "Relapse",
+  "porn-only-day": "Porn Only",
+  "mast-only-day": "Masturbation",
+  "no-data-day": "No data",
+
+  // Streak averages
+  "7-day-average": "7-day average",
+  "30-day-average": "30-day average",
+  "90-day-average": "90-day average",
+
+  // Empty states
+  "heat-map-empty":
+      "Start logging your daily follow-ups to see your progress here",
+  "trigger-empty": "Tag your relapses with triggers to see patterns",
+  "risk-empty": "Log more follow-ups to see your vulnerable hours",
+  "mood-empty": "Rate your mood with follow-ups to see correlation",
+
+  // Follow-up history modal
+  "follow-up-history": "Follow-up History",
+  "last-7-days": "Last 7 Days",
+  "last-30-days": "Last 30 Days",
+  "last-90-days": "Last 90 Days",
+  "no-follow-ups-found": "No follow-ups found",
+  "start-logging-to-see-data":
+      "Start logging your daily follow-ups to see data here",
+  "error-loading-data": "Error loading data",
+
+  // Months
+  "january": "January",
+  "february": "February",
+  "march": "March",
+  "april": "April",
+  "may": "May",
+  "june": "June",
+  "july": "July",
+  "august": "August",
+  "september": "September",
+  "october": "October",
+  "november": "November",
+  "december": "December",
+
+  // Streak averages section
+  "streak-averages": "Clean Day Averages",
+  "streak-averages-title": "Clean Day Averages",
+  "streak-averages-desc":
+      "Track your progress with clean day percentages over different time periods",
+  "streak-averages-explanation":
+      "These percentages show how many days you stayed clean out of the total days in each period. Click any card to see detailed follow-ups for that timeframe.",
+  "streak-averages-empty":
+      "Start logging follow-ups to see your clean day averages",
+  "how-to-read": "How to Read",
+  "tap-to-view": "Tap to View",
+
+  // Day-of-month patterns
+  "day-of-month-patterns": "Day-of-Month Patterns",
+  "day-of-month-desc":
+      "Historical follow-ups grouped by day number (1-31) across all months",
+  "day-of-month-history": "Day",
+  "sorting-feature-coming": "Sorting feature coming soon",
+
+  // Week days short
+  "sun-short": "Sun",
+  "mon-short": "Mon",
+  "tue-short": "Tue",
+  "wed-short": "Wed",
+  "thu-short": "Thu",
+  "fri-short": "Fri",
+  "sat-short": "Sat",
+
+  // Triggers
+  "trigger-stress": "Stress",
+  "trigger-boredom": "Boredom",
+  "trigger-loneliness": "Loneliness",
+  "trigger-late-night": "Late night",
+  "trigger-social-media": "Social media",
+  "trigger-tiredness": "Tiredness",
+  "trigger-anger": "Anger",
+  "trigger-celebration": "Celebration",
+  "trigger-anxiety": "Anxiety",
+  "trigger-depression": "Depression",
+
+  // Risk clock
+  "highest-risk-hour": "Highest risk: {hour}",
+  "risk-hour-tip": "Consider scheduling an activity or call during this time",
+  "enable-risk-alert": "Enable high-risk hour alerts",
+
+  // Mood correlation
+  "mood-very-low": "Very low",
+  "mood-low": "Low",
+  "mood-neutral": "Neutral",
+  "mood-high": "High",
+  "mood-very-high": "Very high",
+  "mood-entries": "Mood entries",
+  "correlation-insight": "Your mood shows a strong correlation with relapses",
+  "negative-correlation":
+      "Lower moods are strongly linked to slips. Consider your coping plan.",
+
+  // Feature gate messages
+  "premium-only-feature": "This feature is available for Plus members",
+  "unlock-with-plus": "Unlock with Ta'aafi Plus",
+
+  // General
+  "times": "times",
+  "trigger-tip":
+      "Focus on identifying patterns and create strategies to handle these triggers better",
 };

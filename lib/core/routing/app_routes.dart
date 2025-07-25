@@ -62,6 +62,7 @@ import 'package:reboot_app_3/features/vault/presentation/library/list_screen.dar
 import 'package:reboot_app_3/features/vault/presentation/vault_settings/activities_notifications_settings_screen.dart';
 import 'package:reboot_app_3/features/vault/presentation/vault_settings/vault_settings_screen.dart';
 import 'package:reboot_app_3/features/vault/presentation/vault_screen.dart';
+import 'package:reboot_app_3/features/vault/presentation/premium_analytics_screen.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:reboot_app_3/features/authentication/data/models/user_document.dart';
 import 'package:reboot_app_3/core/routing/route_security_service.dart';
@@ -418,6 +419,14 @@ GoRouter goRouter(Ref<GoRouter> ref) {
                         ),
                       ),
                     ],
+                  ),
+                  GoRoute(
+                    path: "premiumAnalytics",
+                    name: RouteNames.premiumAnalytics.name,
+                    pageBuilder: (context, state) => MaterialPage(
+                      name: RouteNames.premiumAnalytics.name,
+                      child: PremiumAnalyticsScreen(),
+                    ),
                   ),
                 ],
               ),

@@ -30,6 +30,7 @@ enum RouteNames {
   contentLists,
   vaultSettings,
   activitiesNotifications,
+  premiumAnalytics,
   community,
   groups, // New groups main route
   // Community routes
