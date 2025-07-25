@@ -20,45 +20,17 @@ class HeatMapCalendar extends ConsumerWidget {
     final theme = AppTheme.of(context);
     final heatMapAsync = ref.watch(heatMapDataProvider);
 
-    return WidgetsContainer(
-      width: double.infinity,
-      padding: EdgeInsets.all(20),
-      backgroundColor: theme.grey[50],
-      borderSide: BorderSide(color: theme.grey[200]!, width: 1),
-      borderRadius: BorderRadius.circular(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Title
-          Row(
-            children: [
-              Icon(
-                LucideIcons.calendar,
-                color: Color(0xFFEF4444),
-                size: 20,
-              ),
-              horizontalSpace(Spacing.points12),
-              Text(
-                AppLocalizations.of(context)
-                    .translate('heat-map-calendar-title'),
-                style: TextStyles.h5.copyWith(
-                  color: theme.grey[900],
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ],
-          ),
-          verticalSpace(Spacing.points20),
-
-          // Heat map section
-          heatMapAsync.when(
-            data: (followUps) =>
-                _buildHeatMapSection(context, theme, followUps, ref),
-            loading: () => Center(child: Spinner()),
-            error: (error, _) => _buildEmptyState(context, theme),
-          ),
-        ],
-      ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Heat map content
+        heatMapAsync.when(
+          data: (followUps) =>
+              _buildHeatMapSection(context, theme, followUps, ref),
+          loading: () => Center(child: Spinner()),
+          error: (error, _) => _buildEmptyState(context, theme),
+        ),
+      ],
     );
   }
 

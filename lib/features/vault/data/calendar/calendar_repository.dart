@@ -13,7 +13,13 @@ class CalendarRepository {
   }
 
   Future<List<FollowUpModel>> getFollowUps() async {
-    final snapshot = await _firestore.collection('followUps').get();
+    final uid = _getUserId();
+    if (uid == null) throw Exception('User not logged in');
+    final snapshot = await _firestore
+        .collection('users')
+        .doc(uid)
+        .collection('followUps')
+        .get();
     return snapshot.docs.map((doc) => FollowUpModel.fromDoc(doc)).toList();
   }
 

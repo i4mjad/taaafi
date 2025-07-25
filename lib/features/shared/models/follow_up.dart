@@ -5,11 +5,13 @@ class FollowUpModel {
   final String id;
   final FollowUpType type;
   final DateTime time;
+  final List<String> triggers; // NEW: List of trigger IDs
 
   const FollowUpModel({
     required this.id,
     required this.type,
     required this.time,
+    this.triggers = const [], // Default to empty list
   });
 
   /// Create a FollowUpModel from a Firestore document snapshot.
@@ -20,6 +22,8 @@ class FollowUpModel {
       id: doc.id,
       type: _fromStringToEnum(data['type'] as String? ?? 'relapse'),
       time: (data['time'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      triggers: List<String>.from(
+          data['triggers'] as List? ?? []), // Handle triggers field
     );
   }
 
@@ -28,6 +32,7 @@ class FollowUpModel {
     return {
       'type': type.name,
       'time': Timestamp.fromDate(time),
+      'triggers': triggers, // Include triggers in the map
     };
   }
 
@@ -35,11 +40,13 @@ class FollowUpModel {
     String? id,
     FollowUpType? type,
     DateTime? time,
+    List<String>? triggers,
   }) {
     return FollowUpModel(
       id: id ?? this.id,
       type: type ?? this.type,
       time: time ?? this.time,
+      triggers: triggers ?? this.triggers,
     );
   }
 
@@ -51,7 +58,7 @@ class FollowUpModel {
     );
   }
 
-  List<Object?> get props => [id, type, time];
+  List<Object?> get props => [id, type, time, triggers];
 }
 
 enum FollowUpType {

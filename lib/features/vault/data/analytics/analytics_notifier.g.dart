@@ -26,7 +26,7 @@ final premiumAnalyticsServiceProvider =
 // ignore: unused_element
 typedef PremiumAnalyticsServiceRef
     = AutoDisposeProviderRef<PremiumAnalyticsService>;
-String _$heatMapDataHash() => r'84bc5b4701a9b0ec77c55dc72f0c4cf19fe53c57';
+String _$heatMapDataHash() => r'f4905e333c7206e4259c9f283ce2d04da3ffee96';
 
 /// See also [heatMapData].
 @ProviderFor(heatMapData)
@@ -43,7 +43,7 @@ final heatMapDataProvider =
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef HeatMapDataRef = AutoDisposeFutureProviderRef<List<AnalyticsFollowUp>>;
-String _$streakAveragesHash() => r'810fc1436c3ae72b5f6db9292ca4fea20cb440d4';
+String _$streakAveragesHash() => r'5842b65eab1475414091b829fc2f37b287a551c3';
 
 /// See also [streakAverages].
 @ProviderFor(streakAverages)
@@ -61,7 +61,7 @@ final streakAveragesProvider =
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef StreakAveragesRef = AutoDisposeFutureProviderRef<Map<String, double>>;
-String _$triggerRadarDataHash() => r'a2a52bcb8bae8f0a08a880322cfeb5ecdc61e99d';
+String _$triggerRadarDataHash() => r'6c68623ab6ef1ca49ad7fa6f86b79984b854f359';
 
 /// See also [triggerRadarData].
 @ProviderFor(triggerRadarData)
@@ -79,7 +79,7 @@ final triggerRadarDataProvider =
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef TriggerRadarDataRef = AutoDisposeFutureProviderRef<Map<String, int>>;
-String _$riskClockDataHash() => r'3789a4c317c634617a8c7ef7d89aab34d9558c54';
+String _$riskClockDataHash() => r'426c75d720f5d110a2513526bfd209ccf68f068d';
 
 /// See also [riskClockData].
 @ProviderFor(riskClockData)
@@ -97,7 +97,7 @@ final riskClockDataProvider = AutoDisposeFutureProvider<List<int>>.internal(
 // ignore: unused_element
 typedef RiskClockDataRef = AutoDisposeFutureProviderRef<List<int>>;
 String _$moodCorrelationDataHash() =>
-    r'900d89d537c2b871fc69c55df256d90bc48bd27f';
+    r'54d0472008435317b4ecb53a950e7e832088b91c';
 
 /// See also [moodCorrelationData].
 @ProviderFor(moodCorrelationData)

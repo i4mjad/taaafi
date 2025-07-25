@@ -72,9 +72,15 @@ class SubscriptionNotifier extends _$SubscriptionNotifier {
 
 // Simple provider to check subscription status
 @riverpod
-Future<bool> hasActiveSubscription(Ref ref) async {
-  final notifier = ref.read(subscriptionNotifierProvider.notifier);
-  return await notifier.hasActiveSubscription();
+bool hasActiveSubscription(Ref ref) {
+  final subscriptionAsync = ref.watch(subscriptionNotifierProvider);
+
+  return subscriptionAsync.when(
+    data: (subscription) =>
+        subscription.status == SubscriptionStatus.plus && subscription.isActive,
+    loading: () => false,
+    error: (_, __) => false,
+  );
 }
 
 // Provider to check if premium analytics is available

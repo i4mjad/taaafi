@@ -26,17 +26,23 @@ class CalenderWidget extends ConsumerStatefulWidget {
 
 class _CalenderWidgetState extends ConsumerState<CalenderWidget> {
   DateTime userFirstDate = DateTime.now();
+  DateTime? _currentMonth; // Track current month to prevent redundant fetches
   @override
   void initState() {
     super.initState();
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      final now = DateTime.now();
-      userFirstDate =
-          await ref.read(calendarNotifierProvider.notifier).getUserFirstDate();
-      await ref
-          .read(calendarNotifierProvider.notifier)
-          .fetchFollowUpsForMonth(now);
+      // Delay provider modifications to avoid build cycle issues
+      Future(() async {
+        final now = DateTime.now();
+        userFirstDate = await ref
+            .read(calendarNotifierProvider.notifier)
+            .getUserFirstDate();
+        _currentMonth = DateTime(now.year, now.month); // Set initial month
+        await ref
+            .read(calendarNotifierProvider.notifier)
+            .fetchFollowUpsForMonth(now);
+      });
     });
   }
 
@@ -91,9 +97,21 @@ class _CalenderWidgetState extends ConsumerState<CalenderWidget> {
                     final visibleDates = viewChangedDetails.visibleDates;
                     if (visibleDates.isNotEmpty) {
                       final firstVisibleDate = visibleDates.first;
-                      ref
-                          .read(calendarNotifierProvider.notifier)
-                          .fetchFollowUpsForMonth(firstVisibleDate);
+                      final newMonth = DateTime(
+                          firstVisibleDate.year, firstVisibleDate.month);
+
+                      // Only fetch if month actually changed
+                      if (_currentMonth == null ||
+                          _currentMonth!.year != newMonth.year ||
+                          _currentMonth!.month != newMonth.month) {
+                        _currentMonth = newMonth;
+                        // Delay provider modification to avoid build cycle issues
+                        Future(() {
+                          ref
+                              .read(calendarNotifierProvider.notifier)
+                              .fetchFollowUpsForMonth(firstVisibleDate);
+                        });
+                      }
                     }
                   },
                   onTap: (date) {
@@ -136,7 +154,7 @@ class _CalenderWidgetState extends ConsumerState<CalenderWidget> {
     final startDate =
         DateTime(userFirstDate.year, userFirstDate.month, userFirstDate.day);
 
-    // Group follow-ups by date (ignoring time)
+    // Group follow-ups by date (ignoring time) to check which dates have follow-ups
     final followUpDates = followUps
         .map((followUp) => DateTime(
             followUp.time.year, followUp.time.month, followUp.time.day))
@@ -144,15 +162,16 @@ class _CalenderWidgetState extends ConsumerState<CalenderWidget> {
 
     List<Appointment> appointments = [];
 
-    // Add "none" appointments for dates without follow-ups
+    // Add green dots for empty days before today (clean days)
     for (var date = startDate;
         date.isBefore(today);
         date = date.add(Duration(days: 1))) {
       if (!followUpDates.contains(date)) {
+        final appointmentDate = DateTime(date.year, date.month, date.day, 12);
         appointments.add(Appointment(
-          startTime: date,
-          endTime: date.add(Duration(minutes: 10)),
-          subject: 'No Follow-up',
+          startTime: appointmentDate,
+          endTime: appointmentDate.add(Duration(hours: 1)),
+          subject: 'Clean Day',
           color: followUpColors[FollowUpType.none]!,
           startTimeZone: '',
           endTimeZone: '',
@@ -162,10 +181,18 @@ class _CalenderWidgetState extends ConsumerState<CalenderWidget> {
 
     // Add actual follow-ups
     appointments.addAll(followUps.map((followUp) {
+      // Normalize the date to avoid timezone issues
+      final appointmentDate = DateTime(
+        followUp.time.year,
+        followUp.time.month,
+        followUp.time.day,
+        12, // Set to noon to avoid timezone edge cases
+      );
+
       return Appointment(
-        startTime: followUp.time,
-        endTime: followUp.time,
-        subject: followUp.type.name,
+        startTime: appointmentDate,
+        endTime: appointmentDate.add(Duration(hours: 1)),
+        subject: _getSubjectForType(followUp.type),
         color: followUpColors[followUp.type]!,
         startTimeZone: '',
         endTimeZone: '',
@@ -173,6 +200,22 @@ class _CalenderWidgetState extends ConsumerState<CalenderWidget> {
     }));
 
     return _AppointmentDataSource(appointments);
+  }
+
+  /// Get a user-friendly subject for the appointment based on follow-up type
+  String _getSubjectForType(FollowUpType type) {
+    switch (type) {
+      case FollowUpType.none:
+        return 'Clean Day';
+      case FollowUpType.slipUp:
+        return 'Slip Up';
+      case FollowUpType.relapse:
+        return 'Relapse';
+      case FollowUpType.pornOnly:
+        return 'Porn Only';
+      case FollowUpType.mastOnly:
+        return 'Masturbation Only';
+    }
   }
 }
 

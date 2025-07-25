@@ -232,16 +232,6 @@ GoRouter goRouter(Ref<GoRouter> ref) {
                 ),
                 routes: [
                   GoRoute(
-                    path: "dayOverview/:date",
-                    name: RouteNames.dayOverview.name,
-                    pageBuilder: (context, state) => MaterialPage(
-                      name: RouteNames.dayOverview.name,
-                      child: DayOverviewScreen(
-                        date: DateTime.parse(state.pathParameters["date"]!),
-                      ),
-                    ),
-                  ),
-                  GoRoute(
                     path: 'completeAccountRegisteration',
                     name: RouteNames.completeAccountRegisteration.name,
                     pageBuilder: (context, state) => MaterialPage<void>(
@@ -292,6 +282,16 @@ GoRouter goRouter(Ref<GoRouter> ref) {
                   child: VaultScreen(),
                 ),
                 routes: [
+                  GoRoute(
+                    path: "dayOverview/:date",
+                    name: RouteNames.dayOverview.name,
+                    pageBuilder: (context, state) => MaterialPage(
+                      name: RouteNames.dayOverview.name,
+                      child: DayOverviewScreen(
+                        date: DateTime.parse(state.pathParameters["date"]!),
+                      ),
+                    ),
+                  ),
                   GoRoute(
                     path: "activities",
                     name: RouteNames.activities.name,

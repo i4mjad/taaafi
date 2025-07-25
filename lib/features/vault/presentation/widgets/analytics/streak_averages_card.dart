@@ -19,51 +19,17 @@ class StreakAveragesCard extends ConsumerWidget {
     final theme = AppTheme.of(context);
     final streakAveragesAsync = ref.watch(streakAveragesProvider);
 
-    return WidgetsContainer(
-      width: double.infinity,
-      padding: EdgeInsets.all(20),
-      backgroundColor: theme.grey[50],
-      borderSide: BorderSide(color: theme.grey[200]!, width: 1),
-      borderRadius: BorderRadius.circular(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Title
-          Row(
-            children: [
-              Icon(
-                LucideIcons.trendingUp,
-                color: Color(0xFF22C55E),
-                size: 20,
-              ),
-              horizontalSpace(Spacing.points12),
-              Text(
-                AppLocalizations.of(context).translate('streak-averages-title'),
-                style: TextStyles.h5.copyWith(
-                  color: theme.grey[900],
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ],
-          ),
-          verticalSpace(Spacing.points8),
-          Text(
-            AppLocalizations.of(context).translate('streak-averages-desc'),
-            style: TextStyles.small.copyWith(
-              color: theme.grey[600],
-            ),
-          ),
-          verticalSpace(Spacing.points20),
-
-          // Streak averages content
-          streakAveragesAsync.when(
-            data: (averages) =>
-                _buildStreakAverages(context, theme, averages, ref),
-            loading: () => Center(child: Spinner()),
-            error: (_, __) => _buildEmptyState(context, theme),
-          ),
-        ],
-      ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Streak averages content
+        streakAveragesAsync.when(
+          data: (averages) =>
+              _buildStreakAverages(context, theme, averages, ref),
+          loading: () => Center(child: Spinner()),
+          error: (_, __) => _buildEmptyState(context, theme),
+        ),
+      ],
     );
   }
 

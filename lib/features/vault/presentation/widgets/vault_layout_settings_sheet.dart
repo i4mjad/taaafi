@@ -11,6 +11,7 @@ import 'package:reboot_app_3/core/theming/custom_theme_data.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/features/vault/presentation/vault_layout_provider.dart';
+import 'package:reboot_app_3/features/plus/data/notifiers/subscription_notifier.dart';
 
 class VaultLayoutSettingsSheet extends ConsumerStatefulWidget {
   const VaultLayoutSettingsSheet({super.key});
@@ -24,6 +25,7 @@ class _VaultLayoutSettingsSheetState
     extends ConsumerState<VaultLayoutSettingsSheet> {
   late List<String> _orderedVaultElements;
   late List<String> _orderedCards;
+  late List<String> _orderedAnalytics;
 
   final Map<String, IconData> _vaultElementIcons = {
     'currentStreaks': LucideIcons.timer,
@@ -59,6 +61,30 @@ class _VaultLayoutSettingsSheetState
     'settings': 'settings',
   };
 
+  final Map<String, IconData> _analyticsIcons = {
+    'streakAverages': LucideIcons.trendingUp,
+    'heatMapCalendar': LucideIcons.calendar,
+    'triggerRadar': LucideIcons.radar,
+    'riskClock': LucideIcons.clock,
+    'moodCorrelation': LucideIcons.heartHandshake,
+  };
+
+  final Map<String, String> _analyticsTitleKeys = {
+    'streakAverages': 'streak-averages-title',
+    'heatMapCalendar': 'heat-map-calendar-title',
+    'triggerRadar': 'trigger-radar-title',
+    'riskClock': 'risk-clock-title',
+    'moodCorrelation': 'mood-correlation-title',
+  };
+
+  final Map<String, String> _analyticsDescriptionKeys = {
+    'streakAverages': 'streak-averages-desc',
+    'heatMapCalendar': 'heat-map-calendar-desc',
+    'triggerRadar': 'trigger-radar-desc',
+    'riskClock': 'risk-clock-desc',
+    'moodCorrelation': 'mood-relapse-correlation-desc',
+  };
+
   Map<String, Map<String, Color>> _getCardThemeColors(CustomThemeData theme) {
     return {
       'activities': {
@@ -90,188 +116,211 @@ class _VaultLayoutSettingsSheetState
     final vaultLayoutSettings = ref.read(vaultLayoutProvider);
     _orderedVaultElements = List.from(vaultLayoutSettings.vaultElementsOrder);
     _orderedCards = List.from(vaultLayoutSettings.cardsOrder);
+    _orderedAnalytics = List.from(vaultLayoutSettings.analyticsOrder);
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = AppTheme.of(context);
     final vaultLayoutSettings = ref.watch(vaultLayoutProvider);
+    final hasSubscription = ref.watch(hasActiveSubscriptionProvider);
 
-    return SafeArea(
-      child: Container(
-        constraints: BoxConstraints(
-          maxHeight: MediaQuery.of(context).size.height * 0.8,
-        ),
-        decoration: BoxDecoration(
-          color: theme.backgroundColor,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Handle
-            Container(
-              margin: const EdgeInsets.symmetric(vertical: 12),
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: theme.grey[300],
-                borderRadius: BorderRadius.circular(2),
-              ),
+    return Container(
+      decoration: BoxDecoration(
+        color: theme.backgroundColor,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Handle
+          Container(
+            margin: const EdgeInsets.symmetric(vertical: 12),
+            width: 40,
+            height: 4,
+            decoration: BoxDecoration(
+              color: theme.grey[300],
+              borderRadius: BorderRadius.circular(2),
             ),
+          ),
 
-            // Header
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      AppLocalizations.of(context)
-                          .translate('vault-layout-settings'),
-                      style: TextStyles.h5.copyWith(color: theme.grey[900]),
-                    ),
+          // Header - Fixed at top
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    AppLocalizations.of(context)
+                        .translate('vault-layout-settings'),
+                    style: TextStyles.h5.copyWith(color: theme.grey[900]),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                  horizontalSpace(Spacing.points8),
-                  GestureDetector(
-                    onTap: () {
-                      HapticFeedback.mediumImpact();
-                      ref.read(vaultLayoutProvider.notifier).resetToDefaults();
-                      setState(() {
-                        _orderedVaultElements = List.from(
-                            ['currentStreaks', 'statistics', 'calendar']);
-                        _orderedCards = List.from([
-                          'activities',
-                          'library',
-                          'diaries',
-                          'notifications',
-                          'settings'
-                        ]);
-                      });
-                    },
-                    child: WidgetsContainer(
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                      backgroundColor: theme.backgroundColor,
-                      borderSide:
-                          BorderSide(color: theme.primary[600]!, width: 1),
-                      borderRadius: BorderRadius.circular(8),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            LucideIcons.rotateCcw,
-                            size: 14,
+                ),
+                horizontalSpace(Spacing.points8),
+                GestureDetector(
+                  onTap: () {
+                    HapticFeedback.mediumImpact();
+                    ref.read(vaultLayoutProvider.notifier).resetToDefaults();
+                    setState(() {
+                      _orderedVaultElements = List.from([
+                        'currentStreaks',
+                        'statistics',
+                        'calendar',
+                        'streakAverages',
+                        'heatMapCalendar',
+                        'triggerRadar',
+                        'riskClock',
+                        'moodCorrelation'
+                      ]);
+                      _orderedCards = List.from([
+                        'activities',
+                        'library',
+                        'diaries',
+                        'notifications',
+                        'settings'
+                      ]);
+                      _orderedAnalytics = List.from([
+                        'streakAverages',
+                        'heatMapCalendar',
+                        'triggerRadar',
+                        'riskClock',
+                        'moodCorrelation'
+                      ]);
+                    });
+                  },
+                  child: WidgetsContainer(
+                    padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    backgroundColor: theme.backgroundColor,
+                    borderSide:
+                        BorderSide(color: theme.primary[600]!, width: 1),
+                    borderRadius: BorderRadius.circular(8),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          LucideIcons.rotateCcw,
+                          size: 14,
+                          color: theme.primary[600],
+                        ),
+                        horizontalSpace(Spacing.points4),
+                        Text(
+                          AppLocalizations.of(context).translate('reset-order'),
+                          style: TextStyles.small.copyWith(
                             color: theme.primary[600],
+                            fontWeight: FontWeight.w500,
                           ),
-                          horizontalSpace(Spacing.points4),
-                          Text(
-                            AppLocalizations.of(context)
-                                .translate('reset-order'),
-                            style: TextStyles.small.copyWith(
-                              color: theme.primary[600],
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ],
-                      ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
                     ),
                   ),
-                  horizontalSpace(Spacing.points8),
-                  GestureDetector(
-                    onTap: () => Navigator.of(context).pop(),
-                    child: Container(
-                      padding: EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: theme.grey[100],
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Icon(
-                        LucideIcons.x,
-                        size: 18,
-                        color: theme.grey[600],
-                      ),
+                ),
+                horizontalSpace(Spacing.points8),
+                GestureDetector(
+                  onTap: () => Navigator.of(context).pop(),
+                  child: Container(
+                    padding: EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: theme.grey[100],
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Icon(
+                      LucideIcons.x,
+                      size: 18,
+                      color: theme.grey[600],
                     ),
                   ),
+                ),
+              ],
+            ),
+          ),
+
+          verticalSpace(Spacing.points16),
+
+          // Scrollable content - takes remaining space
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              physics: const BouncingScrollPhysics(),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Quick Access Cards Section
+                  Text(
+                    AppLocalizations.of(context).translate('quick-access'),
+                    style: TextStyles.h6.copyWith(color: theme.grey[900]),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  verticalSpace(Spacing.points8),
+                  Text(
+                    AppLocalizations.of(context).translate('drag-to-reorder'),
+                    style: TextStyles.body.copyWith(color: theme.grey[600]),
+                    maxLines: 3,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  verticalSpace(Spacing.points4),
+                  Text(
+                    AppLocalizations.of(context)
+                        .translate('tap-to-toggle-visibility'),
+                    style: TextStyles.footnote.copyWith(color: theme.grey[400]),
+                    maxLines: 3,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  verticalSpace(Spacing.points16),
+
+                  // Quick Access Cards Horizontal List
+                  _buildHorizontalCardsReorderList(theme, vaultLayoutSettings),
+
+                  verticalSpace(Spacing.points24),
+
+                  // Unified Vault Elements Section (including analytics)
+                  Text(
+                    AppLocalizations.of(context)
+                        .translate('vault-elements-visibility'),
+                    style: TextStyles.h6.copyWith(color: theme.grey[900]),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  verticalSpace(Spacing.points4),
+                  Text(
+                    AppLocalizations.of(context)
+                        .translate('vault-elements-visibility-description'),
+                    style: TextStyles.caption.copyWith(color: theme.grey[600]),
+                    maxLines: 4,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  verticalSpace(Spacing.points8),
+                  Text(
+                    AppLocalizations.of(context).translate('drag-to-reorder'),
+                    style: TextStyles.body.copyWith(color: theme.grey[600]),
+                    maxLines: 3,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  verticalSpace(Spacing.points4),
+                  Text(
+                    AppLocalizations.of(context)
+                        .translate('tap-to-toggle-visibility'),
+                    style: TextStyles.footnote.copyWith(color: theme.grey[400]),
+                    maxLines: 3,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  verticalSpace(Spacing.points16),
+
+                  // Unified Elements Reorderable List (vault elements + analytics)
+                  _buildUnifiedElementsReorderList(
+                      theme, vaultLayoutSettings, hasSubscription),
+
+                  // Extra bottom padding for better scrolling experience
+                  verticalSpace(Spacing.points32),
                 ],
               ),
             ),
-
-            verticalSpace(Spacing.points16),
-
-            // Combined sections
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Quick Access Cards Section
-                    Text(
-                      AppLocalizations.of(context).translate('quick-access'),
-                      style: TextStyles.h6.copyWith(color: theme.grey[900]),
-                    ),
-                    verticalSpace(Spacing.points8),
-                    Text(
-                      AppLocalizations.of(context).translate('drag-to-reorder'),
-                      style: TextStyles.body.copyWith(color: theme.grey[600]),
-                    ),
-                    verticalSpace(Spacing.points4),
-                    Text(
-                      AppLocalizations.of(context)
-                          .translate('tap-to-toggle-visibility'),
-                      style:
-                          TextStyles.footnote.copyWith(color: theme.grey[400]),
-                    ),
-                    verticalSpace(Spacing.points16),
-
-                    // Quick Access Cards Horizontal List
-                    _buildHorizontalCardsReorderList(
-                        theme, vaultLayoutSettings),
-
-                    // Vault Elements Section
-                    Text(
-                      AppLocalizations.of(context)
-                          .translate('vault-elements-visibility'),
-                      style: TextStyles.h6.copyWith(color: theme.grey[900]),
-                    ),
-                    verticalSpace(Spacing.points4),
-                    Text(
-                      AppLocalizations.of(context)
-                          .translate('vault-elements-visibility-description'),
-                      style:
-                          TextStyles.caption.copyWith(color: theme.grey[600]),
-                    ),
-                    verticalSpace(Spacing.points8),
-                    Text(
-                      AppLocalizations.of(context).translate('drag-to-reorder'),
-                      style: TextStyles.body.copyWith(color: theme.grey[600]),
-                    ),
-                    verticalSpace(Spacing.points4),
-                    Text(
-                      AppLocalizations.of(context)
-                          .translate('tap-to-toggle-visibility'),
-                      style:
-                          TextStyles.footnote.copyWith(color: theme.grey[400]),
-                    ),
-                    verticalSpace(Spacing.points16),
-
-                    // Vault Elements Reorderable List
-                    Container(
-                      constraints: BoxConstraints(
-                        maxHeight: MediaQuery.of(context).size.height * 0.4,
-                      ),
-                      child: _buildVaultElementsReorderList(
-                          theme, vaultLayoutSettings),
-                    ),
-
-                    verticalSpace(Spacing.points32),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -535,7 +584,7 @@ class _VaultLayoutSettingsSheetState
                             fontWeight: FontWeight.w500,
                           ),
                           textAlign: TextAlign.center,
-                          maxLines: 1,
+                          maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                         ),
                       ],
@@ -548,6 +597,289 @@ class _VaultLayoutSettingsSheetState
           );
         },
       ),
+    );
+  }
+
+  Widget _buildUnifiedElementsReorderList(CustomThemeData theme,
+      VaultLayoutSettings settings, bool hasSubscription) {
+    final validElements = _orderedVaultElements
+        .where((element) =>
+            _vaultElementIcons.containsKey(element) &&
+            _vaultElementTitleKeys.containsKey(element) &&
+            _vaultElementDescriptionKeys.containsKey(element))
+        .toList();
+
+    final validAnalytics = _orderedAnalytics
+        .where((analytics) =>
+            _analyticsIcons.containsKey(analytics) &&
+            _analyticsTitleKeys.containsKey(analytics) &&
+            _analyticsDescriptionKeys.containsKey(analytics))
+        .toList();
+
+    return ReorderableListView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: validElements.length + validAnalytics.length,
+      proxyDecorator: (child, index, animation) {
+        return AnimatedBuilder(
+          animation: animation,
+          builder: (BuildContext context, Widget? child) {
+            final double animValue =
+                Curves.easeInOut.transform(animation.value);
+            final double elevation = lerpDouble(0, 6, animValue)!;
+            final double scale = lerpDouble(1, 1.02, animValue)!;
+            return Transform.scale(
+              scale: scale,
+              child: Material(
+                elevation: elevation,
+                color: Colors.transparent,
+                shadowColor: theme.grey[400]!.withValues(alpha: 0.3),
+                borderRadius: BorderRadius.circular(12),
+                child: child,
+              ),
+            );
+          },
+          child: child,
+        );
+      },
+      onReorder: (oldIndex, newIndex) {
+        if (newIndex > oldIndex) {
+          newIndex -= 1;
+        }
+        setState(() {
+          final item = _orderedVaultElements.removeAt(oldIndex);
+          _orderedVaultElements.insert(newIndex, item);
+        });
+        ref
+            .read(vaultLayoutProvider.notifier)
+            .reorderVaultElements(_orderedVaultElements);
+      },
+      itemBuilder: (context, index) {
+        if (index < validElements.length) {
+          final element = validElements[index];
+          final isVisible = settings.vaultElementsVisibility[element] ?? false;
+
+          return Container(
+            key: ValueKey(element),
+            margin: EdgeInsets.only(bottom: 8),
+            child: IntrinsicHeight(
+              child: GestureDetector(
+                onTap: () {
+                  HapticFeedback.lightImpact();
+                  ref
+                      .read(vaultLayoutProvider.notifier)
+                      .toggleVaultElementVisibility(element, !isVisible);
+                },
+                child: WidgetsContainer(
+                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  backgroundColor:
+                      isVisible ? theme.success[50] : theme.grey[50],
+                  borderSide: BorderSide(
+                    color: isVisible ? theme.success[600]! : theme.grey[200]!,
+                    width: 1,
+                  ),
+                  child: Row(
+                    children: [
+                      // Drag handle
+                      Container(
+                        padding: EdgeInsets.all(4),
+                        child: Icon(
+                          LucideIcons.gripVertical,
+                          size: 16,
+                          color: theme.grey[400],
+                        ),
+                      ),
+                      horizontalSpace(Spacing.points8),
+
+                      // Element content
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Icon(
+                                  _vaultElementIcons[element] ??
+                                      LucideIcons.helpCircle,
+                                  size: 16,
+                                  color: isVisible
+                                      ? theme.success[600]
+                                      : theme.grey[600],
+                                ),
+                                horizontalSpace(Spacing.points8),
+                                Expanded(
+                                  child: Text(
+                                    AppLocalizations.of(context).translate(
+                                        _vaultElementTitleKeys[element] ??
+                                            element),
+                                    style: TextStyles.caption.copyWith(
+                                      color: isVisible
+                                          ? theme.success[600]
+                                          : theme.grey[600],
+                                    ),
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            verticalSpace(Spacing.points8),
+                            Text(
+                              AppLocalizations.of(context).translate(
+                                  _vaultElementDescriptionKeys[element] ??
+                                      element),
+                              style: TextStyles.small.copyWith(
+                                color: isVisible
+                                    ? theme.success[400]
+                                    : theme.grey[400],
+                                height: 1.2,
+                              ),
+                              maxLines: 4,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          );
+        } else {
+          final analytics = validAnalytics[index - validElements.length];
+          final isVisible = hasSubscription
+              ? (settings.analyticsVisibility[analytics] ?? false)
+              : false;
+
+          return Container(
+            key: ValueKey(analytics),
+            margin: EdgeInsets.only(bottom: 8),
+            child: IntrinsicHeight(
+              child: GestureDetector(
+                onTap: hasSubscription
+                    ? () {
+                        HapticFeedback.lightImpact();
+                        ref
+                            .read(vaultLayoutProvider.notifier)
+                            .toggleAnalyticsVisibility(analytics, !isVisible);
+                      }
+                    : null, // Disable tap for non-subscribers
+                child: WidgetsContainer(
+                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  backgroundColor: hasSubscription
+                      ? (isVisible ? theme.success[100] : theme.grey[100])
+                      : theme.grey[50],
+                  borderSide: BorderSide(
+                    color: hasSubscription
+                        ? (isVisible ? theme.success[600]! : theme.grey[200]!)
+                        : theme.grey[100]!,
+                    width: 1,
+                  ),
+                  child: Row(
+                    children: [
+                      // Drag handle or lock icon
+                      Container(
+                        padding: EdgeInsets.all(4),
+                        child: Icon(
+                          hasSubscription
+                              ? LucideIcons.gripVertical
+                              : LucideIcons.lock,
+                          size: 16,
+                          color: hasSubscription
+                              ? theme.grey[400]
+                              : theme.primary[600],
+                        ),
+                      ),
+                      horizontalSpace(Spacing.points8),
+
+                      // Analytics content
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Icon(
+                                  _analyticsIcons[analytics] ??
+                                      LucideIcons.helpCircle,
+                                  size: 16,
+                                  color: hasSubscription
+                                      ? (isVisible
+                                          ? theme.success[600]
+                                          : theme.grey[600])
+                                      : theme.grey[400],
+                                ),
+                                horizontalSpace(Spacing.points8),
+                                Expanded(
+                                  child: Text(
+                                    AppLocalizations.of(context).translate(
+                                        _analyticsTitleKeys[analytics] ??
+                                            analytics),
+                                    style: TextStyles.caption.copyWith(
+                                      color: hasSubscription
+                                          ? (isVisible
+                                              ? theme.success[600]
+                                              : theme.grey[600])
+                                          : theme.grey[400],
+                                    ),
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                                if (!hasSubscription) ...[
+                                  horizontalSpace(Spacing.points8),
+                                  Container(
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal: 6, vertical: 2),
+                                    decoration: BoxDecoration(
+                                      color: theme.primary[600],
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: Text(
+                                      'PLUS',
+                                      style: TextStyles.small.copyWith(
+                                        color: theme.grey[50],
+                                        fontSize: 8,
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ],
+                              ],
+                            ),
+                            verticalSpace(Spacing.points8),
+                            Text(
+                              hasSubscription
+                                  ? AppLocalizations.of(context).translate(
+                                      _analyticsDescriptionKeys[analytics] ??
+                                          analytics)
+                                  : AppLocalizations.of(context)
+                                      .translate('analytics-requires-plus'),
+                              style: TextStyles.small.copyWith(
+                                color: hasSubscription
+                                    ? (isVisible
+                                        ? theme.success[400]
+                                        : theme.grey[400])
+                                    : theme.grey[400],
+                                height: 1.2,
+                              ),
+                              maxLines: 4,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          );
+        }
+      },
     );
   }
 }

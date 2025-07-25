@@ -41,10 +41,17 @@ class CalendarNotifier extends _$CalendarNotifier {
     }
   }
 
-  Future<List<FollowUpModel>> fetchFollowUpsForMonth(DateTime month) async {
-    final startOfMonth = DateTime(month.year, month.month, 1);
-    final endOfMonth = DateTime(month.year, month.month + 1, 0);
-    return await service.fetchFollowUpsForDateRange(startOfMonth, endOfMonth);
+  Future<void> fetchFollowUpsForMonth(DateTime month) async {
+    state = const AsyncValue.loading();
+    try {
+      final startOfMonth = DateTime(month.year, month.month, 1);
+      final endOfMonth = DateTime(month.year, month.month + 1, 0);
+      final followUps =
+          await service.fetchFollowUpsForDateRange(startOfMonth, endOfMonth);
+      state = AsyncValue.data(followUps);
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+    }
   }
 
   Future<DateTime> getUserFirstDate() async {

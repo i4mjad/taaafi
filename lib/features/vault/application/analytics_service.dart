@@ -1,11 +1,77 @@
-import 'package:reboot_app_3/features/shared/models/follow_up.dart';
-import 'package:reboot_app_3/features/vault/data/models/analytics_follow_up.dart';
 import 'package:reboot_app_3/features/vault/data/follow_up/follow_up_repository.dart';
+import 'package:reboot_app_3/features/vault/data/models/analytics_follow_up.dart';
+import 'package:reboot_app_3/features/shared/models/follow_up.dart';
+import 'package:reboot_app_3/features/vault/data/emotions/emotion_repository.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'dart:math' as math;
 
 class PremiumAnalyticsService {
   final FollowUpRepository _followUpRepository;
+  late final EmotionRepository _emotionRepository;
 
-  PremiumAnalyticsService(this._followUpRepository);
+  PremiumAnalyticsService(this._followUpRepository) {
+    _emotionRepository =
+        EmotionRepository(FirebaseFirestore.instance, FirebaseAuth.instance);
+  }
+
+  /// Maps emotion names to mood ratings (-5 to +5 scale)
+  static int _emotionToMoodRating(String emotionName) {
+    // Very negative emotions (-5 to -4)
+    const veryNegative = ['despair', 'dread', 'disgust'];
+
+    // Negative emotions (-3 to -2)
+    const negative = [
+      'angry',
+      'sad',
+      'regret',
+      'anxious',
+      'fear',
+      'frustration',
+      'overwhelmed',
+      'resentment',
+      'disappointment',
+      'exhaustion'
+    ];
+
+    // Slightly negative emotions (-1)
+    const slightlyNegative = ['confusion', 'awkwardness'];
+
+    // Slightly positive emotions (+1)
+    const slightlyPositive = ['satisfaction', 'contentment', 'serenity'];
+
+    // Positive emotions (+2 to +3)
+    const positive = [
+      'happy',
+      'gratitude',
+      'confidence',
+      'compassion',
+      'pride',
+      'connection',
+      'determination',
+      'peace'
+    ];
+
+    // Very positive emotions (+4 to +5)
+    const veryPositive = ['excitement', 'love', 'joy', 'inspiration'];
+
+    if (veryNegative.contains(emotionName)) {
+      return -5;
+    } else if (negative.contains(emotionName)) {
+      return negative.indexOf(emotionName) % 2 == 0 ? -3 : -2;
+    } else if (slightlyNegative.contains(emotionName)) {
+      return -1;
+    } else if (slightlyPositive.contains(emotionName)) {
+      return 1;
+    } else if (positive.contains(emotionName)) {
+      return positive.indexOf(emotionName) % 2 == 0 ? 2 : 3;
+    } else if (veryPositive.contains(emotionName)) {
+      return veryPositive.indexOf(emotionName) % 2 == 0 ? 4 : 5;
+    }
+
+    // Default neutral for unknown emotions
+    return 0;
+  }
 
   /// Get follow-ups for heat map calendar (last 12 months)
   Future<List<AnalyticsFollowUp>> getHeatMapData() async {
@@ -27,20 +93,48 @@ class PremiumAnalyticsService {
   /// Calculate streak averages for 7, 30, and 90 days
   Future<Map<String, double>> calculateStreakAverages() async {
     final now = DateTime.now();
-    final followUps = await _followUpRepository.readAllFollowUps();
 
+    // Get all follow-ups once (performance optimization)
+    final allFollowUps = await _followUpRepository.readAllFollowUps();
     final averages = <String, double>{};
 
     // Calculate for each period
     for (final days in [7, 30, 90]) {
       final startDate = now.subtract(Duration(days: days));
-      final periodFollowUps =
-          followUps.where((f) => f.time.isAfter(startDate)).toList();
 
-      // Count clean days (type == none)
-      final cleanDays =
-          periodFollowUps.where((f) => f.type == FollowUpType.none).length;
-      averages['${days}days'] = cleanDays / days * 100;
+      // Filter follow-ups for this specific period
+      final periodFollowUps = allFollowUps
+          .where((f) =>
+              f.time.isAfter(startDate) &&
+              f.time.isBefore(now.add(Duration(days: 1))))
+          .toList();
+
+      // Group follow-ups by date
+      final followUpsByDate = <DateTime, List<FollowUpModel>>{};
+      for (final followUp in periodFollowUps) {
+        final date = DateTime(
+            followUp.time.year, followUp.time.month, followUp.time.day);
+        followUpsByDate[date] = (followUpsByDate[date] ?? [])..add(followUp);
+      }
+
+      // Count clean days - days with no relapses (only free days or no follow-ups)
+      int cleanDays = 0;
+      for (int i = 0; i < days; i++) {
+        final date =
+            DateTime(now.year, now.month, now.day).subtract(Duration(days: i));
+        final dayFollowUps = followUpsByDate[date] ?? [];
+
+        // A day is clean if:
+        // 1. No follow-ups at all, OR
+        // 2. Only free-day follow-ups (type == none)
+        final hasRelapseFollowUps =
+            dayFollowUps.any((f) => f.type != FollowUpType.none);
+        if (!hasRelapseFollowUps) {
+          cleanDays++;
+        }
+      }
+
+      averages['${days}days'] = (cleanDays / days * 100).roundToDouble();
     }
 
     return averages;
@@ -48,38 +142,36 @@ class PremiumAnalyticsService {
 
   /// Get trigger analysis data (last 30 days)
   Future<Map<String, int>> getTriggerRadarData() async {
-    // TODO: Implement real trigger data collection
-    // For now, returning empty data until trigger collection is implemented
-    // See: docs/future_trigger_implementation.md
+    try {
+      final now = DateTime.now();
+      final thirtyDaysAgo = now.subtract(const Duration(days: 30));
 
-    /* COMMENTED OUT - MOCK DATA
-    final now = DateTime.now();
-    final thirtyDaysAgo = now.subtract(const Duration(days: 30));
+      // Get all follow-ups and filter by date
+      final allFollowUps = await _followUpRepository.readAllFollowUps();
+      final recentFollowUps = allFollowUps
+          .where((f) =>
+              f.time.isAfter(thirtyDaysAgo) &&
+              f.time.isBefore(now.add(const Duration(days: 1))))
+          .toList();
 
-    // Get all follow-ups and filter by date
-    final allFollowUps = await _followUpRepository.readAllFollowUps();
-    final followUps = allFollowUps
-        .where((f) =>
-            f.time.isAfter(thirtyDaysAgo) &&
-            f.time.isBefore(now.add(const Duration(days: 1))))
-        .toList();
+      // Filter only relapse-related events (not free-day)
+      final relapseFollowUps =
+          recentFollowUps.where((f) => f.type != FollowUpType.none).toList();
 
-    // Filter only relapse events
-    final relapses =
-        followUps.where((f) => f.type != FollowUpType.none).toList();
+      // Count triggers from all relapse follow-ups
+      final triggerCounts = <String, int>{};
 
-    // Count triggers (using mock data for now)
-    final triggerCounts = <String, int>{};
-    for (final trigger in CommonTriggers.triggers) {
-      // Mock: randomly assign some counts
-      triggerCounts[trigger] =
-          relapses.length > 0 ? (relapses.length * 0.2).round() : 0;
+      for (final followUp in relapseFollowUps) {
+        for (final trigger in followUp.triggers) {
+          triggerCounts[trigger] = (triggerCounts[trigger] ?? 0) + 1;
+        }
+      }
+
+      return triggerCounts;
+    } catch (e) {
+      // Return empty data if there's an error
+      return <String, int>{};
     }
-
-    return triggerCounts;
-    */
-
-    return <String, int>{};
   }
 
   /// Get risk clock data (hourly distribution)
@@ -100,14 +192,10 @@ class PremiumAnalyticsService {
 
   /// Get mood correlation data (last 30 days)
   Future<MoodCorrelationData> getMoodCorrelationData() async {
-    // TODO: Implement real mood rating collection
-    // For now, returning empty data until mood rating collection is implemented
-    // See: docs/future_trigger_implementation.md
-
-    /* COMMENTED OUT - MOCK DATA
     final now = DateTime.now();
     final thirtyDaysAgo = now.subtract(const Duration(days: 30));
 
+    // Get all follow-ups from the last 30 days
     final allFollowUps = await _followUpRepository.readAllFollowUps();
     final followUps = allFollowUps
         .where((f) =>
@@ -115,77 +203,121 @@ class PremiumAnalyticsService {
             f.time.isBefore(now.add(const Duration(days: 1))))
         .toList();
 
-    // Group by mood (using mock mood data for now)
-    final moodGroups = <int, List<FollowUpModel>>{};
-    for (int mood = -5; mood <= 5; mood++) {
-      moodGroups[mood] = [];
+    // Group follow-ups by date to get daily mood averages
+    final dailyMoodData = <DateTime, List<int>>{};
+    final dailyRelapseData = <DateTime, bool>{};
+
+    // Process each day in the last 30 days
+    for (int i = 0; i < 30; i++) {
+      final date = now.subtract(Duration(days: i));
+      final dateKey = DateTime(date.year, date.month, date.day);
+
+      // Get emotions for this day
+      try {
+        final emotions = await _emotionRepository.readEmotionsByDate(dateKey);
+        if (emotions.isNotEmpty) {
+          final moodRatings =
+              emotions.map((e) => _emotionToMoodRating(e.emotionName)).toList();
+          dailyMoodData[dateKey] = moodRatings;
+        }
+      } catch (e) {
+        // Continue if emotion data unavailable for this day
+      }
+
+      // Check if there were any relapses on this day
+      final dayFollowUps = followUps.where((f) {
+        final followUpDate = DateTime(f.time.year, f.time.month, f.time.day);
+        return followUpDate == dateKey;
+      }).toList();
+
+      dailyRelapseData[dateKey] =
+          dayFollowUps.any((f) => f.type != FollowUpType.none);
     }
 
-    // Mock: distribute follow-ups across moods
-    for (final followUp in followUps) {
-      final mockMood = (followUp.time.day % 11) - 5; // Mock mood based on day
-      moodGroups[mockMood]?.add(followUp);
-    }
-
-    // Calculate correlation
+    // Calculate mood counts and relapse counts by mood level
     final moodCounts = <int, int>{};
     final relapseCounts = <int, int>{};
 
+    // Initialize counts for all mood levels
     for (int mood = -5; mood <= 5; mood++) {
-      final followUpsForMood = moodGroups[mood] ?? [];
-      moodCounts[mood] = followUpsForMood.length;
-
-      final relapseCount = followUpsForMood
-          .where((f) => f.type != FollowUpType.none)
-          .length;
-      relapseCounts[mood] = relapseCount;
+      moodCounts[mood] = 0;
+      relapseCounts[mood] = 0;
     }
 
-    // Calculate correlation coefficient (simplified)
-    double correlation = 0.0;
-    if (followUps.isNotEmpty) {
-      // Simple correlation calculation
-      correlation = -0.3; // Mock negative correlation
-    }
+    // Process daily data
+    dailyMoodData.forEach((date, moodRatings) {
+      // Calculate average mood for the day
+      final avgMood =
+          moodRatings.fold(0, (sum, mood) => sum + mood) / moodRatings.length;
+      final roundedMood = avgMood.round().clamp(-5, 5);
 
-          return MoodCorrelationData(
-        moodCounts: moodCounts,
-        relapseCounts: relapseCounts,
-        correlation: correlation,
-      );
-    */
+      // Increment mood count
+      moodCounts[roundedMood] = (moodCounts[roundedMood] ?? 0) + 1;
+
+      // Check if there was a relapse on this day
+      if (dailyRelapseData[date] == true) {
+        relapseCounts[roundedMood] = (relapseCounts[roundedMood] ?? 0) + 1;
+      }
+    });
+
+    // Calculate correlation coefficient
+    final correlation = _calculateCorrelation(moodCounts, relapseCounts);
 
     return MoodCorrelationData(
-      moodCounts: <int, int>{},
-      relapseCounts: <int, int>{},
-      correlation: 0.0,
+      moodCounts: moodCounts,
+      relapseCounts: relapseCounts,
+      correlation: correlation,
     );
   }
 
   double _calculateCorrelation(
       Map<int, int> moodCounts, Map<int, int> relapseCounts) {
-    // Simple correlation calculation
-    // In production, use proper statistical correlation
-    double totalMoodScore = 0;
-    double totalRelapses = 0;
-    int count = 0;
+    // Calculate Pearson correlation coefficient between mood and relapse rate
 
-    moodCounts.forEach((mood, moodCount) {
-      if (moodCount > 0) {
-        totalMoodScore += mood * moodCount;
-        totalRelapses += relapseCounts[mood] ?? 0;
-        count += moodCount;
+    // Prepare data points (mood level, relapse rate for that mood)
+    final List<double> moodValues = [];
+    final List<double> relapseRates = [];
+
+    for (int mood = -5; mood <= 5; mood++) {
+      final totalDaysWithMood = moodCounts[mood] ?? 0;
+      if (totalDaysWithMood > 0) {
+        final relapses = relapseCounts[mood] ?? 0;
+        final relapseRate = relapses / totalDaysWithMood;
+
+        moodValues.add(mood.toDouble());
+        relapseRates.add(relapseRate);
       }
-    });
+    }
 
-    if (count == 0) return 0;
+    if (moodValues.length < 2) return 0.0;
 
-    // Simplified correlation: negative moods correlate with more relapses
-    final avgMood = totalMoodScore / count;
-    final avgRelapse = totalRelapses / count;
+    // Calculate means
+    final meanMood =
+        moodValues.fold(0.0, (sum, val) => sum + val) / moodValues.length;
+    final meanRelapseRate =
+        relapseRates.fold(0.0, (sum, val) => sum + val) / relapseRates.length;
 
-    // Return a value between -1 and 1
-    return avgMood < 0 && avgRelapse > 0.5 ? -0.6 : 0.2;
+    // Calculate correlation coefficient
+    double numerator = 0.0;
+    double denomX = 0.0;
+    double denomY = 0.0;
+
+    for (int i = 0; i < moodValues.length; i++) {
+      final diffMood = moodValues[i] - meanMood;
+      final diffRelapse = relapseRates[i] - meanRelapseRate;
+
+      numerator += diffMood * diffRelapse;
+      denomX += diffMood * diffMood;
+      denomY += diffRelapse * diffRelapse;
+    }
+
+    final denominator = math.sqrt(denomX * denomY);
+    if (denominator == 0) return 0.0;
+
+    final correlation = numerator / denominator;
+
+    // Clamp to valid correlation range
+    return correlation.clamp(-1.0, 1.0);
   }
 }
 

@@ -561,6 +561,48 @@ const Map<String, String> kEn = {
       "This day recorded as a Relapse, you can't followup today",
   "how-is-this-day": "How was this day?",
   "what-you-want-to-add": "What do you want to add?",
+  "what-triggered-you": "What triggered you?",
+  "common-triggers": "Common Triggers",
+  "upgrade-to-unlock": "Upgrade to unlock trigger tracking",
+  "stress": "Stress",
+  "boredom": "Boredom",
+  "loneliness": "Loneliness",
+  "late-night": "Late Night",
+  "social-media": "Social Media",
+  "urges": "Urges",
+  "anxiety": "Anxiety",
+  "anger": "Anger",
+  "sadness": "Sadness",
+  "peer-pressure": "Peer Pressure",
+  "triggers": "Triggers",
+  "no-triggers-recorded": "No triggers recorded for this day",
+  "add-triggers": "Add triggers",
+  "trigger-radar-scale-description":
+      "Numbers show relative frequency compared to your most common trigger",
+  "trigger-scale-low": "Rare",
+  "trigger-scale-medium": "Common",
+  "trigger-scale-high": "Most Frequent",
+  "how-to-read-trigger-radar": "How to read this chart",
+  "trigger-radar-overview-title": "What is the Trigger Radar?",
+  "trigger-radar-overview-text":
+      "This radar chart shows your most common triggers in the last 30 days. Each point represents how often a specific trigger led to a relapse compared to your most frequent trigger.",
+  "visual-example": "Visual Example",
+  "example-chart-explanation":
+      "This example shows a circular radar chart with triggers labeled around the edges and plotted at different distances from center based on frequency",
+  "understanding-scale-title": "Understanding the Scale",
+  "understanding-scale-text":
+      "The numbers (0%, 25%, 50%, 75%, 100%) show relative frequency. 100% represents your most common trigger, while lower percentages show less frequent triggers.",
+  "scale-100-description":
+      "Your most frequent trigger (appears in 100% of comparable situations)",
+  "scale-75-description":
+      "Very common trigger (appears about 3 out of 4 times compared to your top trigger)",
+  "scale-50-description":
+      "Moderately common trigger (appears about half as often as your top trigger)",
+  "scale-25-description":
+      "Less common trigger (appears about 1 out of 4 times compared to your top trigger)",
+  "reading-tips-title": "Reading Tips",
+  "reading-tips-text":
+      "• Focus on triggers appearing in the outer rings (75%-100%) - these are your biggest patterns\n• Compare trigger positions to understand relative importance\n• Track changes over time to see if patterns shift\n• Use insights to develop targeted coping strategies",
   "required-update": "New Version Available!",
   "update-now": "Update now",
   "role": "Account Type",
@@ -1228,6 +1270,7 @@ const Map<String, String> kEn = {
   "view-details": "View Details",
   "feature-access-restricted": "Feature Access Restricted",
   "access-restricted": "Access Restricted",
+  "less": "Less",
   "more": "More",
   "comment-settings": "Comment Settings",
   "delete-comment": "Delete Comment",
@@ -1603,10 +1646,42 @@ const Map<String, String> kEn = {
   "correlation-insight": "Your mood shows a strong correlation with relapses",
   "negative-correlation":
       "Lower moods are strongly linked to slips. Consider your coping plan.",
+  "mood-correlation-minimum":
+      "Log emotions for at least 5 days to see mood-relapse correlation",
+
+  // Mood correlation help
+  "how-to-read-mood-correlation": "How to Read This Chart",
+  "mood-correlation-explanation":
+      "This chart shows the relationship between your daily mood and relapses over the past 30 days.",
+  "mood-correlation-bars-explanation":
+      "• Blue bars show how often you felt each mood level\n• Red bars show how many relapses occurred at each mood level",
+  "correlation-score-explanation":
+      "The correlation score ranges from -1 to +1:",
+  "correlation-negative-explanation":
+      "• Negative (-1 to -0.4): Lower moods linked to more relapses",
+  "correlation-positive-explanation":
+      "• Positive (0.4 to +1): Higher moods linked to more relapses",
+  "correlation-none-explanation":
+      "• Near zero (-0.4 to +0.4): No clear mood-relapse pattern",
+  "mood-correlation-action-tips": "💡 What This Means:",
+  "mood-correlation-negative-action":
+      "If you see more red bars on the left (negative moods), focus on mood management techniques like meditation, exercise, or talking to someone when feeling low.",
+  "mood-correlation-positive-action":
+      "If you see more red bars on the right (positive moods), be aware that overconfidence or celebration might be triggers. Practice mindful awareness during good times too.",
+  "mood-correlation-none-action":
+      "If relapses are spread evenly across moods, your triggers might be situational rather than mood-based. Focus on identifying external triggers and environments.",
+
+  // Analytics layout settings
+  "analytics-elements-description":
+      "Configure the visibility and order of your advanced analytics sections",
+  "analytics-requires-plus":
+      "Advanced analytics features require a Ta'aafi Plus subscription",
 
   // Feature gate messages
   "premium-only-feature": "This feature is available for Plus members",
   "unlock-with-plus": "Unlock with Ta'aafi Plus",
+  "upgrade-to-plus": "Upgrade to Plus",
+  "unlock-premium-analytics": "Tap to unlock premium analytics",
 
   // General
   "times": "times",

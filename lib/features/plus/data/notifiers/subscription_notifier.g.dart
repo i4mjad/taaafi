@@ -7,11 +7,11 @@ part of 'subscription_notifier.dart';
 // **************************************************************************
 
 String _$hasActiveSubscriptionHash() =>
-    r'36ccfc2125a0446509b892f746cf0d77902f001a';
+    r'1508f52259a508c129c04b6038326e2504d04b7e';
 
 /// See also [hasActiveSubscription].
 @ProviderFor(hasActiveSubscription)
-final hasActiveSubscriptionProvider = AutoDisposeFutureProvider<bool>.internal(
+final hasActiveSubscriptionProvider = AutoDisposeProvider<bool>.internal(
   hasActiveSubscription,
   name: r'hasActiveSubscriptionProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
@@ -23,7 +23,7 @@ final hasActiveSubscriptionProvider = AutoDisposeFutureProvider<bool>.internal(
 
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
-typedef HasActiveSubscriptionRef = AutoDisposeFutureProviderRef<bool>;
+typedef HasActiveSubscriptionRef = AutoDisposeProviderRef<bool>;
 String _$isPremiumAnalyticsAvailableHash() =>
     r'725aed4e99833666e6ed9b17720b8f7dc2e5daef';
 

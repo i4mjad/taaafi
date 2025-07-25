@@ -6,6 +6,8 @@ class VaultLayoutSettings {
   final List<String> vaultElementsOrder;
   final Map<String, bool> cardsVisibility;
   final List<String> cardsOrder;
+  final Map<String, bool> analyticsVisibility;
+  final List<String> analyticsOrder;
   final bool helpMessageDismissed;
 
   VaultLayoutSettings({
@@ -13,6 +15,8 @@ class VaultLayoutSettings {
     required this.vaultElementsOrder,
     required this.cardsVisibility,
     required this.cardsOrder,
+    required this.analyticsVisibility,
+    required this.analyticsOrder,
     required this.helpMessageDismissed,
   });
 
@@ -21,6 +25,8 @@ class VaultLayoutSettings {
     List<String>? vaultElementsOrder,
     Map<String, bool>? cardsVisibility,
     List<String>? cardsOrder,
+    Map<String, bool>? analyticsVisibility,
+    List<String>? analyticsOrder,
     bool? helpMessageDismissed,
   }) {
     return VaultLayoutSettings(
@@ -29,6 +35,8 @@ class VaultLayoutSettings {
       vaultElementsOrder: vaultElementsOrder ?? this.vaultElementsOrder,
       cardsVisibility: cardsVisibility ?? this.cardsVisibility,
       cardsOrder: cardsOrder ?? this.cardsOrder,
+      analyticsVisibility: analyticsVisibility ?? this.analyticsVisibility,
+      analyticsOrder: analyticsOrder ?? this.analyticsOrder,
       helpMessageDismissed: helpMessageDismissed ?? this.helpMessageDismissed,
     );
   }
@@ -42,6 +50,12 @@ class VaultLayoutSettings {
   List<String> getOrderedVisibleCards() {
     return cardsOrder
         .where((element) => cardsVisibility[element] == true)
+        .toList();
+  }
+
+  List<String> getOrderedVisibleAnalytics() {
+    return analyticsOrder
+        .where((element) => analyticsVisibility[element] == true)
         .toList();
   }
 }
@@ -66,6 +80,14 @@ class VaultLayoutNotifier extends StateNotifier<VaultLayoutSettings> {
     'settings',
   ];
 
+  static const List<String> _defaultAnalyticsOrder = [
+    'streakAverages',
+    'heatMapCalendar',
+    'triggerRadar',
+    'riskClock',
+    'moodCorrelation',
+  ];
+
   VaultLayoutNotifier()
       : super(VaultLayoutSettings(
           vaultElementsVisibility: {
@@ -82,6 +104,14 @@ class VaultLayoutNotifier extends StateNotifier<VaultLayoutSettings> {
             'settings': true,
           },
           cardsOrder: _defaultCardsOrder,
+          analyticsVisibility: {
+            'streakAverages': true,
+            'heatMapCalendar': true,
+            'triggerRadar': true,
+            'riskClock': true,
+            'moodCorrelation': true,
+          },
+          analyticsOrder: _defaultAnalyticsOrder,
           helpMessageDismissed: false,
         )) {
     _loadPreferences();
@@ -104,12 +134,26 @@ class VaultLayoutNotifier extends StateNotifier<VaultLayoutSettings> {
         prefs.getBool('vault_card_notifications_visible') ?? true;
     final settings = prefs.getBool('vault_card_settings_visible') ?? true;
 
+    // Load analytics visibility
+    final streakAverages =
+        prefs.getBool('vault_analytics_streak_averages_visible') ?? true;
+    final heatMapCalendar =
+        prefs.getBool('vault_analytics_heat_map_calendar_visible') ?? true;
+    final triggerRadar =
+        prefs.getBool('vault_analytics_trigger_radar_visible') ?? true;
+    final riskClock =
+        prefs.getBool('vault_analytics_risk_clock_visible') ?? true;
+    final moodCorrelation =
+        prefs.getBool('vault_analytics_mood_correlation_visible') ?? true;
+
     // Load orders
     final vaultElementsOrderString =
         prefs.getStringList('vault_vault_elements_order') ??
             _defaultVaultElementsOrder;
     final cardsOrderString =
         prefs.getStringList('vault_cards_order') ?? _defaultCardsOrder;
+    final analyticsOrderString =
+        prefs.getStringList('vault_analytics_order') ?? _defaultAnalyticsOrder;
 
     // Load help message dismissed state
     final helpDismissed =
@@ -130,6 +174,14 @@ class VaultLayoutNotifier extends StateNotifier<VaultLayoutSettings> {
         'settings': settings,
       },
       cardsOrder: cardsOrderString,
+      analyticsVisibility: {
+        'streakAverages': streakAverages,
+        'heatMapCalendar': heatMapCalendar,
+        'triggerRadar': triggerRadar,
+        'riskClock': riskClock,
+        'moodCorrelation': moodCorrelation,
+      },
+      analyticsOrder: analyticsOrderString,
       helpMessageDismissed: helpDismissed,
     );
   }
@@ -158,6 +210,18 @@ class VaultLayoutNotifier extends StateNotifier<VaultLayoutSettings> {
     );
   }
 
+  Future<void> toggleAnalyticsVisibility(String key, bool value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('vault_analytics_${key}_visible', value);
+
+    state = state.copyWith(
+      analyticsVisibility: {
+        ...state.analyticsVisibility,
+        key: value,
+      },
+    );
+  }
+
   Future<void> reorderVaultElements(List<String> newOrder) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setStringList('vault_vault_elements_order', newOrder);
@@ -172,6 +236,13 @@ class VaultLayoutNotifier extends StateNotifier<VaultLayoutSettings> {
     state = state.copyWith(cardsOrder: newOrder);
   }
 
+  Future<void> reorderAnalytics(List<String> newOrder) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setStringList('vault_analytics_order', newOrder);
+
+    state = state.copyWith(analyticsOrder: newOrder);
+  }
+
   Future<void> dismissHelpMessage() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('vault_help_message_dismissed', true);
@@ -184,10 +255,12 @@ class VaultLayoutNotifier extends StateNotifier<VaultLayoutSettings> {
     await prefs.setStringList(
         'vault_vault_elements_order', _defaultVaultElementsOrder);
     await prefs.setStringList('vault_cards_order', _defaultCardsOrder);
+    await prefs.setStringList('vault_analytics_order', _defaultAnalyticsOrder);
 
     state = state.copyWith(
       vaultElementsOrder: _defaultVaultElementsOrder,
       cardsOrder: _defaultCardsOrder,
+      analyticsOrder: _defaultAnalyticsOrder,
     );
   }
 }

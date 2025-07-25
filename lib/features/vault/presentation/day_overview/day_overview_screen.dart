@@ -1,7 +1,9 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/helpers/date_display_formater.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/routing/route_names.dart';
@@ -9,9 +11,12 @@ import 'package:reboot_app_3/core/shared_widgets/app_bar.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
 import 'package:reboot_app_3/core/shared_widgets/spinner.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
+import 'package:reboot_app_3/core/theming/custom_theme_data.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/features/vault/data/models/daily_record.dart';
+import 'package:reboot_app_3/features/plus/data/notifiers/subscription_notifier.dart';
+import 'package:reboot_app_3/features/plus/presentation/taaafi_plus_features_list_screen.dart';
 
 import 'package:reboot_app_3/features/vault/data/emotions/emotion_notifier.dart';
 import 'package:reboot_app_3/features/vault/data/follow_up/follow_up_notifier.dart';
@@ -29,6 +34,11 @@ class DayOverviewScreen extends ConsumerWidget {
     Key? key,
     required this.date,
   }) : super(key: key);
+
+  /// Check if there are any relapse-related follow-ups (not free-day)
+  bool _hasRelapseFollowUps(List<FollowUpModel> followUps) {
+    return followUps.any((followUp) => followUp.type != FollowUpType.none);
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -58,7 +68,16 @@ class DayOverviewScreen extends ConsumerWidget {
                     return Center(child: Text('Error: ${snapshot.error}'));
                   } else {
                     final followUps = snapshot.data ?? [];
-                    return DayFollowUps(date: date, followUps: followUps);
+                    return Column(
+                      children: [
+                        DayFollowUps(date: date, followUps: followUps),
+                        // Only show triggers section if there are relapse-related follow-ups
+                        if (_hasRelapseFollowUps(followUps)) ...[
+                          verticalSpace(Spacing.points32),
+                          DayTriggers(date: date, followUps: followUps),
+                        ],
+                      ],
+                    );
                   }
                 },
               ),
@@ -565,6 +584,222 @@ class EmotionDailyRecordWidget extends ConsumerWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class DayTriggers extends ConsumerWidget {
+  const DayTriggers({
+    super.key,
+    required this.date,
+    required this.followUps,
+  });
+
+  final DateTime date;
+  final List<FollowUpModel> followUps;
+
+  /// Get all triggers from relapse-related follow-ups
+  List<String> _getTriggersFromFollowUps() {
+    final triggers = <String>[];
+    for (final followUp in followUps) {
+      if (followUp.type != FollowUpType.none && followUp.triggers.isNotEmpty) {
+        triggers.addAll(followUp.triggers);
+      }
+    }
+    return triggers.toSet().toList(); // Remove duplicates
+  }
+
+  /// Build blurred trigger content for non-premium users
+  Widget _buildBlurredTriggerContent(
+    BuildContext context,
+    CustomThemeData theme,
+    Widget content,
+  ) {
+    return GestureDetector(
+      onTap: () {
+        HapticFeedback.lightImpact();
+        showModalBottomSheet(
+          context: context,
+          isScrollControlled: true,
+          backgroundColor: Colors.transparent,
+          useSafeArea: true,
+          builder: (context) => const TaaafiPlusSubscriptionScreen(),
+        );
+      },
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(
+          minHeight: 80,
+          maxHeight: 150,
+        ),
+        child: Stack(
+          children: [
+            // Original content (visible through blur)
+            SingleChildScrollView(
+              physics: const NeverScrollableScrollPhysics(),
+              child: content,
+            ),
+
+            // Blur overlay matching vault screen strategy
+            Positioned.fill(
+              child: ClipRect(
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 3.5, sigmaY: 3.5),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Colors.white.withValues(alpha: 0.3),
+                          Colors.white.withValues(alpha: 0.6),
+                          Colors.white.withValues(alpha: 0.8),
+                          Colors.white.withValues(alpha: 0.6),
+                        ],
+                        stops: const [0.0, 0.3, 0.7, 1.0],
+                      ),
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+
+            // Lock icon and upgrade text
+            Positioned.fill(
+              child: Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      LucideIcons.lock,
+                      color: theme.primary[600],
+                      size: 24,
+                    ),
+                    verticalSpace(Spacing.points4),
+                    Text(
+                      AppLocalizations.of(context)
+                          .translate('upgrade-to-unlock'),
+                      style: TextStyles.small.copyWith(
+                        color: theme.primary[600],
+                        fontWeight: FontWeight.w600,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = AppTheme.of(context);
+    final hasSubscription = ref.watch(hasActiveSubscriptionProvider);
+    final triggers = _getTriggersFromFollowUps();
+
+    final triggerContent = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (triggers.isEmpty)
+          Column(
+            children: [
+              Container(
+                width: MediaQuery.of(context).size.width - 32,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      AppLocalizations.of(context)
+                          .translate('no-triggers-recorded'),
+                      style: TextStyles.footnote,
+                      textAlign: TextAlign.center,
+                    )
+                  ],
+                ),
+              ),
+              if (hasSubscription) ...[
+                verticalSpace(Spacing.points12),
+                GestureDetector(
+                  onTap: () {
+                    showModalBottomSheet<void>(
+                        context: context,
+                        isScrollControlled: true,
+                        builder: (BuildContext context) {
+                          return FollowUpSheet(date);
+                        });
+                  },
+                  child: WidgetsContainer(
+                    backgroundColor: theme.backgroundColor,
+                    borderSide:
+                        BorderSide(color: theme.grey[900]!, width: 0.25),
+                    boxShadow: Shadows.mainShadows,
+                    child: Center(
+                      child: Text(
+                        AppLocalizations.of(context).translate('add-triggers'),
+                        style: TextStyles.footnote
+                            .copyWith(color: theme.primary[600]),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ],
+          )
+        else
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: triggers.map((trigger) {
+              return WidgetsContainer(
+                padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                backgroundColor: theme.primary[50],
+                borderSide: BorderSide(
+                  color: theme.primary[600]!,
+                  width: 1.5,
+                ),
+                borderRadius: BorderRadius.circular(16),
+                child: Text(
+                  AppLocalizations.of(context).translate(trigger),
+                  style: TextStyles.small.copyWith(
+                    color: theme.primary[700],
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              );
+            }).toList(),
+          ),
+      ],
+    );
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Icon(
+              LucideIcons.zap,
+              color: theme.primary[600],
+              size: 20,
+            ),
+            horizontalSpace(Spacing.points8),
+            Text(
+              AppLocalizations.of(context).translate('triggers'),
+              style: TextStyles.h6,
+            ),
+          ],
+        ),
+        verticalSpace(Spacing.points12),
+        if (hasSubscription)
+          triggerContent
+        else
+          _buildBlurredTriggerContent(context, theme, triggerContent),
+      ],
     );
   }
 }

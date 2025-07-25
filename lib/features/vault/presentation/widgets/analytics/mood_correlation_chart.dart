@@ -12,67 +12,226 @@ import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/features/vault/data/analytics/analytics_notifier.dart';
 import 'package:reboot_app_3/features/vault/application/analytics_service.dart';
 
-class MoodCorrelationChart extends ConsumerWidget {
+class MoodCorrelationChart extends ConsumerStatefulWidget {
   const MoodCorrelationChart({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<MoodCorrelationChart> createState() =>
+      _MoodCorrelationChartState();
+}
+
+class _MoodCorrelationChartState extends ConsumerState<MoodCorrelationChart> {
+  @override
+  Widget build(BuildContext context) {
     final theme = AppTheme.of(context);
     final moodDataAsync = ref.watch(moodCorrelationDataProvider);
 
-    return WidgetsContainer(
-      width: double.infinity,
-      padding: EdgeInsets.all(20),
-      backgroundColor: theme.grey[50],
-      borderSide: BorderSide(color: theme.grey[200]!, width: 1),
-      borderRadius: BorderRadius.circular(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Title
-          Row(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Mood correlation content
+        moodDataAsync.when(
+          data: (data) {
+            final totalMoodEntries =
+                data.moodCounts.values.fold(0, (sum, count) => sum + count);
+            if (totalMoodEntries < 5) {
+              return _buildEmptyState(context, theme);
+            }
+            return _buildChart(context, theme, data);
+          },
+          loading: () => Center(child: Spinner()),
+          error: (_, __) => _buildEmptyState(context, theme),
+        ),
+      ],
+    );
+  }
+
+  void _showHelpModal(BuildContext context, dynamic theme) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      useSafeArea: true,
+      builder: (context) {
+        final mediaQuery = MediaQuery.of(context);
+        final availableHeight = mediaQuery.size.height - mediaQuery.padding.top;
+
+        return Container(
+          height: availableHeight * 0.9,
+          decoration: BoxDecoration(
+            color: theme.backgroundColor,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+          ),
+          child: Column(
             children: [
-              Icon(
-                LucideIcons.heartHandshake,
-                color: Color(0xFFEC4899),
-                size: 20,
+              // Drag handle
+              Container(
+                margin: EdgeInsets.only(top: 12, bottom: 8),
+                height: 4,
+                width: 40,
+                decoration: BoxDecoration(
+                  color: theme.grey[300],
+                  borderRadius: BorderRadius.circular(2),
+                ),
               ),
-              horizontalSpace(Spacing.points12),
-              Text(
-                AppLocalizations.of(context)
-                    .translate('mood-correlation-title'),
-                style: TextStyles.h5.copyWith(
-                  color: theme.grey[900],
-                  fontWeight: FontWeight.w600,
+
+              // Header
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                decoration: BoxDecoration(
+                  color: theme.primary[50],
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      LucideIcons.info,
+                      color: theme.primary[600],
+                      size: 20,
+                    ),
+                    horizontalSpace(Spacing.points12),
+                    Expanded(
+                      child: Text(
+                        AppLocalizations.of(context)
+                            .translate('how-to-read-mood-correlation'),
+                        style: TextStyles.h5.copyWith(
+                          color: theme.primary[800],
+                          fontWeight: FontWeight.w600,
+                          height: 1.4,
+                        ),
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      icon: Icon(
+                        LucideIcons.x,
+                        color: theme.grey[600],
+                        size: 20,
+                      ),
+                      constraints: BoxConstraints(minWidth: 32, minHeight: 32),
+                      padding: EdgeInsets.all(6),
+                    ),
+                  ],
+                ),
+              ),
+
+              // Content
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: EdgeInsets.fromLTRB(
+                      20, 20, 20, 20 + mediaQuery.padding.bottom),
+                  child: _buildHelpContent(context, theme),
                 ),
               ),
             ],
           ),
-          verticalSpace(Spacing.points8),
-          Text(
-            AppLocalizations.of(context)
-                .translate('mood-relapse-correlation-desc'),
-            style: TextStyles.small.copyWith(
-              color: theme.grey[600],
-            ),
-          ),
-          verticalSpace(Spacing.points20),
+        );
+      },
+    );
+  }
 
-          // Chart
-          moodDataAsync.when(
-            data: (data) {
-              final totalMoodEntries =
-                  data.moodCounts.values.fold(0, (sum, count) => sum + count);
-              if (totalMoodEntries < 5) {
-                return _buildEmptyState(context, theme);
-              }
-              return _buildChart(context, theme, data);
-            },
-            loading: () => Center(child: Spinner()),
-            error: (_, __) => _buildEmptyState(context, theme),
+  Widget _buildHelpContent(BuildContext context, dynamic theme) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Chart explanation
+        Text(
+          AppLocalizations.of(context)
+              .translate('mood-correlation-explanation'),
+          style: TextStyles.body.copyWith(
+            color: theme.grey[800],
+            height: 1.4,
           ),
-        ],
-      ),
+        ),
+        verticalSpace(Spacing.points12),
+
+        Text(
+          AppLocalizations.of(context)
+              .translate('mood-correlation-bars-explanation'),
+          style: TextStyles.body.copyWith(
+            color: theme.grey[700],
+            height: 1.4,
+          ),
+        ),
+        verticalSpace(Spacing.points16),
+
+        // Correlation score explanation
+        Text(
+          AppLocalizations.of(context)
+              .translate('correlation-score-explanation'),
+          style: TextStyles.body.copyWith(
+            color: theme.grey[800],
+            fontWeight: FontWeight.w600,
+            height: 1.4,
+          ),
+        ),
+        verticalSpace(Spacing.points8),
+        Text(
+          AppLocalizations.of(context)
+              .translate('correlation-negative-explanation'),
+          style: TextStyles.body.copyWith(
+            color: theme.grey[700],
+            height: 1.4,
+          ),
+        ),
+        verticalSpace(Spacing.points4),
+        Text(
+          AppLocalizations.of(context)
+              .translate('correlation-positive-explanation'),
+          style: TextStyles.body.copyWith(
+            color: theme.grey[700],
+            height: 1.4,
+          ),
+        ),
+        verticalSpace(Spacing.points4),
+        Text(
+          AppLocalizations.of(context)
+              .translate('correlation-none-explanation'),
+          style: TextStyles.body.copyWith(
+            color: theme.grey[700],
+            height: 1.4,
+          ),
+        ),
+        verticalSpace(Spacing.points16),
+
+        // Action tips
+        Text(
+          AppLocalizations.of(context)
+              .translate('mood-correlation-action-tips'),
+          style: TextStyles.body.copyWith(
+            color: theme.grey[800],
+            fontWeight: FontWeight.w600,
+            height: 1.4,
+          ),
+        ),
+        verticalSpace(Spacing.points8),
+        Text(
+          AppLocalizations.of(context)
+              .translate('mood-correlation-negative-action'),
+          style: TextStyles.body.copyWith(
+            color: theme.grey[700],
+            height: 1.4,
+          ),
+        ),
+        verticalSpace(Spacing.points8),
+        Text(
+          AppLocalizations.of(context)
+              .translate('mood-correlation-positive-action'),
+          style: TextStyles.body.copyWith(
+            color: theme.grey[700],
+            height: 1.4,
+          ),
+        ),
+        verticalSpace(Spacing.points8),
+        Text(
+          AppLocalizations.of(context)
+              .translate('mood-correlation-none-action'),
+          style: TextStyles.body.copyWith(
+            color: theme.grey[700],
+            height: 1.4,
+          ),
+        ),
+      ],
     );
   }
 
@@ -105,7 +264,9 @@ class MoodCorrelationChart extends ConsumerWidget {
                     final mood = group.x - 5;
                     final moodLabel = _getMoodLabel(context, mood);
                     final value = rod.toY.toInt();
-                    final label = rodIndex == 0 ? 'Mood entries' : 'Relapses';
+                    final label = rodIndex == 0
+                        ? AppLocalizations.of(context).translate('mood-entries')
+                        : AppLocalizations.of(context).translate('relapses');
                     return BarTooltipItem(
                       '$moodLabel\n$label: $value',
                       TextStyles.small.copyWith(color: theme.grey[50]),
@@ -279,9 +440,11 @@ class MoodCorrelationChart extends ConsumerWidget {
             ),
             verticalSpace(Spacing.points12),
             Text(
-              AppLocalizations.of(context).translate('not-enough-data'),
+              AppLocalizations.of(context)
+                  .translate('mood-correlation-minimum'),
               style: TextStyles.body.copyWith(
                 color: theme.grey[600],
+                height: 1.4,
               ),
               textAlign: TextAlign.center,
             ),

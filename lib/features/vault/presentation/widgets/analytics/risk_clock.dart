@@ -20,57 +20,22 @@ class RiskClock extends ConsumerWidget {
     final theme = AppTheme.of(context);
     final riskDataAsync = ref.watch(riskClockDataProvider);
 
-    return WidgetsContainer(
-      width: double.infinity,
-      padding: EdgeInsets.all(20),
-      backgroundColor: theme.grey[50],
-      borderSide: BorderSide(color: theme.grey[200]!, width: 1),
-      borderRadius: BorderRadius.circular(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Title
-          Row(
-            children: [
-              Icon(
-                LucideIcons.clock,
-                color: Color(0xFF06B6D4),
-                size: 20,
-              ),
-              horizontalSpace(Spacing.points12),
-              Text(
-                AppLocalizations.of(context).translate('risk-clock-title'),
-                style: TextStyles.h5.copyWith(
-                  color: theme.grey[900],
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ],
-          ),
-          verticalSpace(Spacing.points8),
-          Text(
-            AppLocalizations.of(context).translate('risk-clock-desc'),
-            style: TextStyles.small.copyWith(
-              color: theme.grey[600],
-            ),
-          ),
-          verticalSpace(Spacing.points20),
-
-          // Risk clock
-          riskDataAsync.when(
-            data: (hourlyData) {
-              final totalEvents =
-                  hourlyData.fold(0, (sum, count) => sum + count);
-              if (totalEvents < 3) {
-                return _buildEmptyState(context, theme);
-              }
-              return _buildRiskClock(context, theme, hourlyData);
-            },
-            loading: () => Center(child: Spinner()),
-            error: (_, __) => _buildEmptyState(context, theme),
-          ),
-        ],
-      ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Risk clock content
+        riskDataAsync.when(
+          data: (hourlyData) {
+            final totalEvents = hourlyData.fold(0, (sum, count) => sum + count);
+            if (totalEvents < 3) {
+              return _buildEmptyState(context, theme);
+            }
+            return _buildRiskClock(context, theme, hourlyData);
+          },
+          loading: () => Center(child: Spinner()),
+          error: (_, __) => _buildEmptyState(context, theme),
+        ),
+      ],
     );
   }
 
