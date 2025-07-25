@@ -13,7 +13,7 @@ import 'package:reboot_app_3/features/account/presentation/account_screen.dart';
 import 'package:reboot_app_3/features/account/presentation/banned_screen.dart';
 import 'package:reboot_app_3/features/account/presentation/delete_account_screen.dart';
 import 'package:reboot_app_3/features/account/presentation/user_profile_screen.dart';
-import 'package:reboot_app_3/features/plus/presentation/taaafi_plus_screen.dart';
+import 'package:reboot_app_3/features/plus/presentation/taaafi_plus_features_list_screen.dart';
 import 'package:reboot_app_3/features/community/presentation/posts_list_screen.dart';
 import 'package:reboot_app_3/features/community/presentation/category_posts_screen.dart';
 import 'package:reboot_app_3/features/community/data/models/post_category.dart';
