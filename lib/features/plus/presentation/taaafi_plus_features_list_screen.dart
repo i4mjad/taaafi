@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/services.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
+import 'package:reboot_app_3/core/shared_widgets/ta3afi_platform_icons_icons.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
@@ -61,13 +62,27 @@ class _TaaafiPlusScreenState
                   children: [
                     verticalSpace(Spacing.points24),
                     // Main title
-                    Text(
-                      AppLocalizations.of(context)
-                          .translate('subscription-main-title'),
-                      style: TextStyles.h1.copyWith(
-                        color: theme.grey[900],
-                        fontWeight: FontWeight.bold,
-                      ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            AppLocalizations.of(context)
+                                .translate('subscription-main-title'),
+                            style: TextStyles.h1.copyWith(
+                              color: const Color(0xFFFEBA01),
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                        horizontalSpace(Spacing.points16),
+                        Icon(
+                          Ta3afiPlatformIcons.plus_icon,
+                          color: const Color(0xFFFEBA01),
+                          size: 60,
+                        ),
+                      ],
                     ),
                     verticalSpace(Spacing.points16),
                     // Subtitle
