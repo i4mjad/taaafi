@@ -274,6 +274,8 @@ flutter:
         - asset: asset/fonts/ExpoArabic-SemiBold.ttf
           weight: 700
           style: normal
-
+    - family: Ta3afiPlatformIcons
+      fonts:
+        - asset: asset/fonts/Ta3afiPlatformIcons.ttf
 dependency_overrides:
   intl: 0.20.2

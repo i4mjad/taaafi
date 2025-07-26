@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -13,6 +15,9 @@ import 'package:reboot_app_3/core/shared_widgets/custom_segmented_button.dart';
 import 'package:reboot_app_3/features/shared/models/follow_up.dart';
 import 'package:reboot_app_3/features/vault/data/models/follow_up_colors.dart';
 import 'package:reboot_app_3/features/vault/data/streaks/streak_notifier.dart';
+import 'package:reboot_app_3/features/plus/data/notifiers/subscription_notifier.dart';
+import 'package:reboot_app_3/core/theming/theme_provider.dart';
+import 'package:reboot_app_3/core/shared_widgets/premium_blur_overlay.dart';
 
 enum PeriodDisplayMode { detailed, summary }
 
@@ -254,6 +259,8 @@ class _StreakPeriodsModalState extends ConsumerState<StreakPeriodsModal> {
     final theme = AppTheme.of(context);
     final localization = AppLocalizations.of(context);
     final locale = ref.watch(localeNotifierProvider);
+    final hasSubscription = ref.watch(hasActiveSubscriptionProvider);
+    final themeController = ref.watch(customThemeProvider);
 
     return SafeArea(
       child: Container(
@@ -326,298 +333,293 @@ class _StreakPeriodsModalState extends ConsumerState<StreakPeriodsModal> {
 
             // Content
             Expanded(
-              child: _isLoading
-                  ? Center(
-                      child: Spinner(
-                        valueColor: followUpColors[widget.followUpType],
-                      ),
-                    )
-                  : _periods.isEmpty
-                      ? _buildEmptyState(theme, localization)
-                      : Column(
-                          children: [
-                            // Chart with title
-                            Container(
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 16, vertical: 8),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  // Chart title
-                                  Text(
-                                    localization
-                                        .translate("streak-progress-chart"),
-                                    style: TextStyles.body.copyWith(
-                                      color: theme.grey[800],
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                  verticalSpace(Spacing.points8),
-                                  // Chart legend
-                                  Row(
+              child: hasSubscription
+                  ? (_isLoading
+                      ? Center(
+                          child: Spinner(
+                            valueColor: followUpColors[widget.followUpType],
+                          ),
+                        )
+                      : _periods.isEmpty
+                          ? _buildEmptyState(theme, localization)
+                          : Column(
+                              children: [
+                                // Chart with title
+                                Container(
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: 16, vertical: 8),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
-                                      Container(
-                                        width: 12,
-                                        height: 12,
-                                        decoration: BoxDecoration(
-                                          color: followUpColors[
-                                              widget.followUpType],
-                                          shape: BoxShape.circle,
-                                        ),
-                                      ),
-                                      horizontalSpace(Spacing.points8),
+                                      // Chart title
                                       Text(
                                         localization
-                                            .translate("cumulative-days"),
-                                        style: TextStyles.caption.copyWith(
-                                          color: theme.grey[600],
+                                            .translate("streak-progress-chart"),
+                                        style: TextStyles.body.copyWith(
+                                          color: theme.grey[800],
+                                          fontWeight: FontWeight.w600,
                                         ),
                                       ),
-                                    ],
-                                  ),
-                                  verticalSpace(Spacing.points12),
-                                  // Chart with zoom controls
-                                  Container(
-                                    height: 280,
-                                    child: Stack(
-                                      children: [
-                                        // Chart container with proper clipping
-                                        ClipRect(
-                                          child: Container(
-                                            margin: EdgeInsets.only(
-                                                right: 50,
-                                                top: 20,
-                                                bottom:
-                                                    10), // Space for controls and tooltips
-                                            child: _buildChart(
-                                                theme, localization, context),
-                                          ),
-                                        ),
-                                        // Zoom controls
-                                        Positioned(
-                                          top: 8,
-                                          right: 8,
-                                          child: Container(
+                                      verticalSpace(Spacing.points8),
+                                      // Chart legend
+                                      Row(
+                                        children: [
+                                          Container(
+                                            width: 12,
+                                            height: 12,
                                             decoration: BoxDecoration(
-                                              color: theme.backgroundColor
-                                                  .withValues(alpha: 0.95),
-                                              borderRadius:
-                                                  BorderRadius.circular(12),
-                                              boxShadow: [
-                                                BoxShadow(
-                                                  color: theme.grey[400]!
-                                                      .withValues(alpha: 0.2),
-                                                  blurRadius: 8,
-                                                  offset: Offset(0, 2),
-                                                ),
-                                              ],
+                                              color: followUpColors[
+                                                  widget.followUpType],
+                                              shape: BoxShape.circle,
                                             ),
-                                            padding: EdgeInsets.all(4),
-                                            child: Column(
-                                              children: [
-                                                // Zoom In
-                                                Container(
-                                                  width: 36,
-                                                  height: 36,
-                                                  decoration: BoxDecoration(
-                                                    color: theme.backgroundColor
-                                                        .withValues(alpha: 0.9),
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            8),
-                                                    border: Border.all(
-                                                        color:
-                                                            theme.grey[300]!),
-                                                    boxShadow: [
-                                                      BoxShadow(
-                                                        color: theme.grey[400]!
-                                                            .withValues(
-                                                                alpha: 0.3),
-                                                        blurRadius: 4,
-                                                        offset: Offset(0, 2),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                  child: IconButton(
-                                                    onPressed: _zoomLevel < 5.0
-                                                        ? _zoomIn
-                                                        : null,
-                                                    icon: Icon(
-                                                      LucideIcons.plus,
-                                                      size: 16,
-                                                      color: _zoomLevel < 5.0
-                                                          ? theme.grey[700]
-                                                          : theme.grey[400],
+                                          ),
+                                          horizontalSpace(Spacing.points8),
+                                          Text(
+                                            localization
+                                                .translate("cumulative-days"),
+                                            style: TextStyles.caption.copyWith(
+                                              color: theme.grey[600],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      verticalSpace(Spacing.points12),
+                                      // Chart with zoom controls
+                                      Container(
+                                        height: 280,
+                                        child: Stack(
+                                          children: [
+                                            // Chart container with proper clipping
+                                            ClipRect(
+                                              child: Container(
+                                                margin: EdgeInsets.only(
+                                                    right: 50,
+                                                    top: 20,
+                                                    bottom:
+                                                        10), // Space for controls and tooltips
+                                                child: _buildChart(theme,
+                                                    localization, context),
+                                              ),
+                                            ),
+                                            // Zoom controls
+                                            Positioned(
+                                              top: 8,
+                                              right: 8,
+                                              child: Container(
+                                                decoration: BoxDecoration(
+                                                  color: theme.backgroundColor
+                                                      .withValues(alpha: 0.95),
+                                                  borderRadius:
+                                                      BorderRadius.circular(12),
+                                                  boxShadow: [
+                                                    BoxShadow(
+                                                      color: theme.grey[400]!
+                                                          .withValues(
+                                                              alpha: 0.2),
+                                                      blurRadius: 8,
+                                                      offset: Offset(0, 2),
                                                     ),
-                                                    padding: EdgeInsets.zero,
-                                                  ),
+                                                  ],
                                                 ),
-                                                verticalSpace(Spacing.points4),
-                                                // Zoom Out
-                                                Container(
-                                                  width: 36,
-                                                  height: 36,
-                                                  decoration: BoxDecoration(
-                                                    color: theme.backgroundColor
-                                                        .withValues(alpha: 0.9),
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            8),
-                                                    border: Border.all(
-                                                        color:
-                                                            theme.grey[300]!),
-                                                    boxShadow: [
-                                                      BoxShadow(
-                                                        color: theme.grey[400]!
+                                                padding: EdgeInsets.all(4),
+                                                child: Column(
+                                                  children: [
+                                                    // Zoom In
+                                                    Container(
+                                                      width: 36,
+                                                      height: 36,
+                                                      decoration: BoxDecoration(
+                                                        color: theme
+                                                            .backgroundColor
                                                             .withValues(
-                                                                alpha: 0.3),
-                                                        blurRadius: 4,
-                                                        offset: Offset(0, 2),
+                                                                alpha: 0.9),
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(8),
+                                                        border: Border.all(
+                                                            color: theme
+                                                                .grey[300]!),
+                                                        boxShadow: [
+                                                          BoxShadow(
+                                                            color: theme
+                                                                .grey[400]!
+                                                                .withValues(
+                                                                    alpha: 0.3),
+                                                            blurRadius: 4,
+                                                            offset:
+                                                                Offset(0, 2),
+                                                          ),
+                                                        ],
                                                       ),
-                                                    ],
-                                                  ),
-                                                  child: IconButton(
-                                                    onPressed: _zoomLevel > 1.0
-                                                        ? _zoomOut
-                                                        : null,
-                                                    icon: Icon(
-                                                      LucideIcons.minus,
-                                                      size: 16,
-                                                      color: _zoomLevel > 1.0
-                                                          ? theme.grey[700]
-                                                          : theme.grey[400],
+                                                      child: IconButton(
+                                                        onPressed:
+                                                            _zoomLevel < 5.0
+                                                                ? _zoomIn
+                                                                : null,
+                                                        icon: Icon(
+                                                          LucideIcons.plus,
+                                                          size: 16,
+                                                          color: _zoomLevel <
+                                                                  5.0
+                                                              ? theme.grey[700]
+                                                              : theme.grey[400],
+                                                        ),
+                                                        padding:
+                                                            EdgeInsets.zero,
+                                                      ),
                                                     ),
-                                                    padding: EdgeInsets.zero,
-                                                  ),
-                                                ),
-                                                verticalSpace(Spacing.points4),
-                                                // Reset Zoom
-                                                Container(
-                                                  width: 36,
-                                                  height: 36,
-                                                  decoration: BoxDecoration(
-                                                    color: theme.backgroundColor
-                                                        .withValues(alpha: 0.9),
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            8),
-                                                    border: Border.all(
-                                                        color:
-                                                            theme.grey[300]!),
-                                                    boxShadow: [
-                                                      BoxShadow(
-                                                        color: theme.grey[400]!
+                                                    verticalSpace(
+                                                        Spacing.points4),
+                                                    // Zoom Out
+                                                    Container(
+                                                      width: 36,
+                                                      height: 36,
+                                                      decoration: BoxDecoration(
+                                                        color: theme
+                                                            .backgroundColor
                                                             .withValues(
-                                                                alpha: 0.3),
-                                                        blurRadius: 4,
-                                                        offset: Offset(0, 2),
+                                                                alpha: 0.9),
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(8),
+                                                        border: Border.all(
+                                                            color: theme
+                                                                .grey[300]!),
+                                                        boxShadow: [
+                                                          BoxShadow(
+                                                            color: theme
+                                                                .grey[400]!
+                                                                .withValues(
+                                                                    alpha: 0.3),
+                                                            blurRadius: 4,
+                                                            offset:
+                                                                Offset(0, 2),
+                                                          ),
+                                                        ],
                                                       ),
-                                                    ],
-                                                  ),
-                                                  child: IconButton(
-                                                    onPressed:
-                                                        _zoomLevel != 1.0 ||
+                                                      child: IconButton(
+                                                        onPressed:
+                                                            _zoomLevel > 1.0
+                                                                ? _zoomOut
+                                                                : null,
+                                                        icon: Icon(
+                                                          LucideIcons.minus,
+                                                          size: 16,
+                                                          color: _zoomLevel >
+                                                                  1.0
+                                                              ? theme.grey[700]
+                                                              : theme.grey[400],
+                                                        ),
+                                                        padding:
+                                                            EdgeInsets.zero,
+                                                      ),
+                                                    ),
+                                                    verticalSpace(
+                                                        Spacing.points4),
+                                                    // Reset Zoom
+                                                    Container(
+                                                      width: 36,
+                                                      height: 36,
+                                                      decoration: BoxDecoration(
+                                                        color: theme
+                                                            .backgroundColor
+                                                            .withValues(
+                                                                alpha: 0.9),
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(8),
+                                                        border: Border.all(
+                                                            color: theme
+                                                                .grey[300]!),
+                                                        boxShadow: [
+                                                          BoxShadow(
+                                                            color: theme
+                                                                .grey[400]!
+                                                                .withValues(
+                                                                    alpha: 0.3),
+                                                            blurRadius: 4,
+                                                            offset:
+                                                                Offset(0, 2),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                      child: IconButton(
+                                                        onPressed: _zoomLevel !=
+                                                                    1.0 ||
                                                                 _panX != 0 ||
                                                                 _panY != 0
                                                             ? _resetZoom
                                                             : null,
-                                                    icon: Icon(
-                                                      LucideIcons.home,
-                                                      size: 16,
-                                                      color:
-                                                          _zoomLevel != 1.0 ||
+                                                        icon: Icon(
+                                                          LucideIcons.home,
+                                                          size: 16,
+                                                          color: _zoomLevel !=
+                                                                      1.0 ||
                                                                   _panX != 0 ||
                                                                   _panY != 0
                                                               ? theme.grey[700]
                                                               : theme.grey[400],
-                                                    ),
-                                                    padding: EdgeInsets.zero,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                        // Pan controls when zoomed in
-                                        if (_zoomLevel > 1.0)
-                                          Positioned(
-                                            bottom: 8,
-                                            right: 8,
-                                            child: Container(
-                                              decoration: BoxDecoration(
-                                                color: theme.backgroundColor
-                                                    .withValues(alpha: 0.95),
-                                                borderRadius:
-                                                    BorderRadius.circular(12),
-                                                boxShadow: [
-                                                  BoxShadow(
-                                                    color: theme.grey[400]!
-                                                        .withValues(alpha: 0.2),
-                                                    blurRadius: 8,
-                                                    offset: Offset(0, 2),
-                                                  ),
-                                                ],
-                                              ),
-                                              padding: EdgeInsets.all(4),
-                                              child: Column(
-                                                mainAxisSize: MainAxisSize.min,
-                                                children: [
-                                                  // Up arrow
-                                                  Container(
-                                                    width: 28,
-                                                    height: 28,
-                                                    child: IconButton(
-                                                      onPressed: () {
-                                                        setState(() {
-                                                          final maxPanY = (260 *
-                                                                  (_zoomLevel -
-                                                                      1)) /
-                                                              2;
-                                                          _panY = (_panY + 20)
-                                                              .clamp(-maxPanY,
-                                                                  maxPanY);
-                                                        });
-                                                        HapticFeedback
-                                                            .selectionClick();
-                                                      },
-                                                      icon: Icon(
-                                                        LucideIcons.chevronUp,
-                                                        size: 12,
-                                                        color: theme.grey[700],
+                                                        ),
+                                                        padding:
+                                                            EdgeInsets.zero,
                                                       ),
-                                                      padding: EdgeInsets.zero,
                                                     ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                            // Pan controls when zoomed in
+                                            if (_zoomLevel > 1.0)
+                                              Positioned(
+                                                bottom: 8,
+                                                right: 8,
+                                                child: Container(
+                                                  decoration: BoxDecoration(
+                                                    color: theme.backgroundColor
+                                                        .withValues(
+                                                            alpha: 0.95),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            12),
+                                                    boxShadow: [
+                                                      BoxShadow(
+                                                        color: theme.grey[400]!
+                                                            .withValues(
+                                                                alpha: 0.2),
+                                                        blurRadius: 8,
+                                                        offset: Offset(0, 2),
+                                                      ),
+                                                    ],
                                                   ),
-                                                  Row(
+                                                  padding: EdgeInsets.all(4),
+                                                  child: Column(
                                                     mainAxisSize:
                                                         MainAxisSize.min,
                                                     children: [
-                                                      // Left arrow
+                                                      // Up arrow
                                                       Container(
                                                         width: 28,
                                                         height: 28,
                                                         child: IconButton(
                                                           onPressed: () {
                                                             setState(() {
-                                                              final maxPanX = (MediaQuery.of(
-                                                                              context)
-                                                                          .size
-                                                                          .width *
+                                                              final maxPanY = (260 *
                                                                       (_zoomLevel -
                                                                           1)) /
                                                                   2;
-                                                              _panX = (_panX +
+                                                              _panY = (_panY +
                                                                       20)
                                                                   .clamp(
-                                                                      -maxPanX,
-                                                                      maxPanX);
+                                                                      -maxPanY,
+                                                                      maxPanY);
                                                             });
                                                             HapticFeedback
                                                                 .selectionClick();
                                                           },
                                                           icon: Icon(
                                                             LucideIcons
-                                                                .chevronLeft,
+                                                                .chevronUp,
                                                             size: 12,
                                                             color:
                                                                 theme.grey[700],
@@ -626,32 +628,99 @@ class _StreakPeriodsModalState extends ConsumerState<StreakPeriodsModal> {
                                                               EdgeInsets.zero,
                                                         ),
                                                       ),
-                                                      // Right arrow
+                                                      Row(
+                                                        mainAxisSize:
+                                                            MainAxisSize.min,
+                                                        children: [
+                                                          // Left arrow
+                                                          Container(
+                                                            width: 28,
+                                                            height: 28,
+                                                            child: IconButton(
+                                                              onPressed: () {
+                                                                setState(() {
+                                                                  final maxPanX =
+                                                                      (MediaQuery.of(context).size.width *
+                                                                              (_zoomLevel - 1)) /
+                                                                          2;
+                                                                  _panX = (_panX +
+                                                                          20)
+                                                                      .clamp(
+                                                                          -maxPanX,
+                                                                          maxPanX);
+                                                                });
+                                                                HapticFeedback
+                                                                    .selectionClick();
+                                                              },
+                                                              icon: Icon(
+                                                                LucideIcons
+                                                                    .chevronLeft,
+                                                                size: 12,
+                                                                color: theme
+                                                                    .grey[700],
+                                                              ),
+                                                              padding:
+                                                                  EdgeInsets
+                                                                      .zero,
+                                                            ),
+                                                          ),
+                                                          // Right arrow
+                                                          Container(
+                                                            width: 28,
+                                                            height: 28,
+                                                            child: IconButton(
+                                                              onPressed: () {
+                                                                setState(() {
+                                                                  final maxPanX =
+                                                                      (MediaQuery.of(context).size.width *
+                                                                              (_zoomLevel - 1)) /
+                                                                          2;
+                                                                  _panX = (_panX -
+                                                                          20)
+                                                                      .clamp(
+                                                                          -maxPanX,
+                                                                          maxPanX);
+                                                                });
+                                                                HapticFeedback
+                                                                    .selectionClick();
+                                                              },
+                                                              icon: Icon(
+                                                                LucideIcons
+                                                                    .chevronRight,
+                                                                size: 12,
+                                                                color: theme
+                                                                    .grey[700],
+                                                              ),
+                                                              padding:
+                                                                  EdgeInsets
+                                                                      .zero,
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                      // Down arrow
                                                       Container(
                                                         width: 28,
                                                         height: 28,
                                                         child: IconButton(
                                                           onPressed: () {
                                                             setState(() {
-                                                              final maxPanX = (MediaQuery.of(
-                                                                              context)
-                                                                          .size
-                                                                          .width *
+                                                              final maxPanY = (260 *
                                                                       (_zoomLevel -
                                                                           1)) /
                                                                   2;
-                                                              _panX = (_panX -
+                                                              _panY = (_panY -
                                                                       20)
                                                                   .clamp(
-                                                                      -maxPanX,
-                                                                      maxPanX);
+                                                                      -maxPanY,
+                                                                      maxPanY);
                                                             });
                                                             HapticFeedback
                                                                 .selectionClick();
                                                           },
                                                           icon: Icon(
                                                             LucideIcons
-                                                                .chevronRight,
+                                                                .chevronDown,
                                                             size: 12,
                                                             color:
                                                                 theme.grey[700],
@@ -662,86 +731,64 @@ class _StreakPeriodsModalState extends ConsumerState<StreakPeriodsModal> {
                                                       ),
                                                     ],
                                                   ),
-                                                  // Down arrow
-                                                  Container(
-                                                    width: 28,
-                                                    height: 28,
-                                                    child: IconButton(
-                                                      onPressed: () {
-                                                        setState(() {
-                                                          final maxPanY = (260 *
-                                                                  (_zoomLevel -
-                                                                      1)) /
-                                                              2;
-                                                          _panY = (_panY - 20)
-                                                              .clamp(-maxPanY,
-                                                                  maxPanY);
-                                                        });
-                                                        HapticFeedback
-                                                            .selectionClick();
-                                                      },
-                                                      icon: Icon(
-                                                        LucideIcons.chevronDown,
-                                                        size: 12,
-                                                        color: theme.grey[700],
-                                                      ),
-                                                      padding: EdgeInsets.zero,
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                        // Zoom level indicator
-                                        if (_zoomLevel != 1.0)
-                                          Positioned(
-                                            bottom: 8,
-                                            left: 8,
-                                            child: Container(
-                                              padding: EdgeInsets.symmetric(
-                                                  horizontal: 8, vertical: 4),
-                                              decoration: BoxDecoration(
-                                                color: theme.grey[900]!
-                                                    .withValues(alpha: 0.8),
-                                                borderRadius:
-                                                    BorderRadius.circular(12),
-                                              ),
-                                              child: Text(
-                                                '${(_zoomLevel * 100).toInt()}%',
-                                                style:
-                                                    TextStyles.caption.copyWith(
-                                                  color: theme.grey[100],
-                                                  fontSize: 10,
                                                 ),
                                               ),
-                                            ),
-                                          ),
-                                      ],
-                                    ),
+                                            // Zoom level indicator
+                                            if (_zoomLevel != 1.0)
+                                              Positioned(
+                                                bottom: 8,
+                                                left: 8,
+                                                child: Container(
+                                                  padding: EdgeInsets.symmetric(
+                                                      horizontal: 8,
+                                                      vertical: 4),
+                                                  decoration: BoxDecoration(
+                                                    color: theme.grey[900]!
+                                                        .withValues(alpha: 0.8),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            12),
+                                                  ),
+                                                  child: Text(
+                                                    '${(_zoomLevel * 100).toInt()}%',
+                                                    style: TextStyles.caption
+                                                        .copyWith(
+                                                      color: theme.grey[100],
+                                                      fontSize: 10,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                ],
-                              ),
-                            ),
+                                ),
 
-                            // Custom Segmented Button
-                            Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 16),
-                              child: CustomSegmentedButton(
-                                options: _segmentedOptions,
-                                selectedOption: _selectedOption,
-                                onChanged: _onSegmentedButtonChanged,
-                              ),
-                            ),
+                                // Custom Segmented Button
+                                Padding(
+                                  padding: EdgeInsets.symmetric(horizontal: 16),
+                                  child: CustomSegmentedButton(
+                                    options: _segmentedOptions,
+                                    selectedOption: _selectedOption,
+                                    onChanged: _onSegmentedButtonChanged,
+                                  ),
+                                ),
 
-                            verticalSpace(Spacing.points16),
+                                verticalSpace(Spacing.points16),
 
-                            // List of periods
-                            Expanded(
-                              child: _buildPeriodsList(
-                                  theme, localization, locale),
-                            ),
-                          ],
-                        ),
+                                // List of periods
+                                Expanded(
+                                  child: _buildPeriodsList(
+                                      theme, localization, locale),
+                                ),
+                              ],
+                            ))
+                  : PremiumBlurOverlay(
+                      content: _buildSampleStreakContent(theme, localization),
+                      isDarkTheme: themeController.darkTheme,
+                    ),
             ),
           ],
         ),
@@ -1165,6 +1212,114 @@ class _StreakPeriodsModalState extends ConsumerState<StreakPeriodsModal> {
       final minutes = duration.inMinutes;
       return "$minutes ${localization.translate("minutes")}";
     }
+  }
+
+  Widget _buildSampleStreakContent(
+      CustomThemeData theme, AppLocalizations localization) {
+    return Column(
+      children: [
+        // Sample chart area
+        Container(
+          height: 200,
+          padding: EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: theme.grey[50],
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: theme.grey[200]!, width: 1),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                localization.translate("streak-progress-chart"),
+                style: TextStyles.body.copyWith(
+                  color: theme.grey[800],
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              verticalSpace(Spacing.points16),
+              Expanded(
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.bottomLeft,
+                      end: Alignment.topRight,
+                      colors: [
+                        followUpColors[widget.followUpType]!
+                            .withValues(alpha: 0.1),
+                        followUpColors[widget.followUpType]!
+                            .withValues(alpha: 0.3),
+                      ],
+                    ),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Center(
+                    child: Icon(
+                      LucideIcons.barChart2,
+                      size: 48,
+                      color: followUpColors[widget.followUpType]!
+                          .withValues(alpha: 0.6),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        verticalSpace(Spacing.points16),
+        // Sample period items
+        ...List.generate(
+            3,
+            (index) => Container(
+                  margin: EdgeInsets.only(bottom: 8),
+                  padding: EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: theme.grey[50],
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: theme.grey[200]!, width: 1),
+                  ),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        flex: 2,
+                        child: Text(
+                          "${DateTime.now().subtract(Duration(days: index * 30)).day}/${DateTime.now().subtract(Duration(days: index * 30)).month}/${DateTime.now().subtract(Duration(days: index * 30)).year}",
+                          style: TextStyles.small.copyWith(
+                            color: theme.grey[700],
+                            fontWeight: FontWeight.w600,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                      Spacer(),
+                      Expanded(
+                        flex: 3,
+                        child: Text(
+                          "${index + 15} ${localization.translate("days")}",
+                          textAlign: TextAlign.center,
+                          style: TextStyles.small.copyWith(
+                            color: followUpColors[widget.followUpType],
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                      Spacer(),
+                      Expanded(
+                        flex: 2,
+                        child: Text(
+                          localization.translate("now"),
+                          style: TextStyles.small.copyWith(
+                            color: theme.grey[700],
+                            fontWeight: FontWeight.w600,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ],
+                  ),
+                )),
+      ],
+    );
   }
 }
 

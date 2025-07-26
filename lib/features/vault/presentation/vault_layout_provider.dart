@@ -42,8 +42,21 @@ class VaultLayoutSettings {
   }
 
   List<String> getOrderedVisibleVaultElements() {
+    // Define locked elements that should always be shown
+    final lockedElements = {
+      'streakAverages',
+      'heatMapCalendar',
+      'triggerRadar',
+      'riskClock',
+      'moodCorrelation',
+    };
+
     return vaultElementsOrder
-        .where((element) => vaultElementsVisibility[element] == true)
+        .where((element) =>
+            // Always show locked elements (they'll be displayed as locked in UI)
+            lockedElements.contains(element) ||
+            // Show non-locked elements only if visible
+            vaultElementsVisibility[element] == true)
         .toList();
   }
 
@@ -68,8 +81,13 @@ final vaultLayoutProvider =
 class VaultLayoutNotifier extends StateNotifier<VaultLayoutSettings> {
   static const List<String> _defaultVaultElementsOrder = [
     'currentStreaks',
+    'streakAverages',
     'statistics',
+    'riskClock',
     'calendar',
+    'heatMapCalendar',
+    'triggerRadar',
+    'moodCorrelation',
   ];
 
   static const List<String> _defaultCardsOrder = [
@@ -94,6 +112,11 @@ class VaultLayoutNotifier extends StateNotifier<VaultLayoutSettings> {
             'currentStreaks': true,
             'statistics': true,
             'calendar': true,
+            'streakAverages': true,
+            'heatMapCalendar': true,
+            'triggerRadar': true,
+            'riskClock': true,
+            'moodCorrelation': true,
           },
           vaultElementsOrder: _defaultVaultElementsOrder,
           cardsVisibility: {
@@ -134,17 +157,15 @@ class VaultLayoutNotifier extends StateNotifier<VaultLayoutSettings> {
         prefs.getBool('vault_card_notifications_visible') ?? true;
     final settings = prefs.getBool('vault_card_settings_visible') ?? true;
 
-    // Load analytics visibility
+    // Load analytics visibility (now part of vault elements, use same key format)
     final streakAverages =
-        prefs.getBool('vault_analytics_streak_averages_visible') ?? true;
+        prefs.getBool('vault_streakAverages_visible') ?? true;
     final heatMapCalendar =
-        prefs.getBool('vault_analytics_heat_map_calendar_visible') ?? true;
-    final triggerRadar =
-        prefs.getBool('vault_analytics_trigger_radar_visible') ?? true;
-    final riskClock =
-        prefs.getBool('vault_analytics_risk_clock_visible') ?? true;
+        prefs.getBool('vault_heatMapCalendar_visible') ?? true;
+    final triggerRadar = prefs.getBool('vault_triggerRadar_visible') ?? true;
+    final riskClock = prefs.getBool('vault_riskClock_visible') ?? true;
     final moodCorrelation =
-        prefs.getBool('vault_analytics_mood_correlation_visible') ?? true;
+        prefs.getBool('vault_moodCorrelation_visible') ?? true;
 
     // Load orders
     final vaultElementsOrderString =
@@ -159,13 +180,27 @@ class VaultLayoutNotifier extends StateNotifier<VaultLayoutSettings> {
     final helpDismissed =
         prefs.getBool('vault_help_message_dismissed') ?? false;
 
+    // Simple merge: Start with stored order, then add any missing elements from defaults
+    final finalVaultElementsOrder = List<String>.from(vaultElementsOrderString);
+    for (final element in _defaultVaultElementsOrder) {
+      if (!finalVaultElementsOrder.contains(element)) {
+        finalVaultElementsOrder.add(element);
+      }
+    }
+
     state = VaultLayoutSettings(
       vaultElementsVisibility: {
         'currentStreaks': currentStreaks,
         'statistics': statistics,
         'calendar': calendar,
+        // Add analytics elements to vault elements visibility
+        'streakAverages': streakAverages,
+        'heatMapCalendar': heatMapCalendar,
+        'triggerRadar': triggerRadar,
+        'riskClock': riskClock,
+        'moodCorrelation': moodCorrelation,
       },
-      vaultElementsOrder: vaultElementsOrderString,
+      vaultElementsOrder: finalVaultElementsOrder,
       cardsVisibility: {
         'activities': activities,
         'library': library,

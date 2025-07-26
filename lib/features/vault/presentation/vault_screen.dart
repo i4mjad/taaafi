@@ -26,13 +26,13 @@ import 'package:reboot_app_3/core/shared_widgets/confirm_details_banner.dart';
 import 'package:reboot_app_3/core/shared_widgets/confirm_email_banner.dart';
 import 'package:reboot_app_3/features/plus/data/notifiers/subscription_notifier.dart';
 import 'package:reboot_app_3/features/plus/data/repositories/subscription_repository.dart';
-import 'package:reboot_app_3/features/plus/presentation/taaafi_plus_features_list_screen.dart';
+import 'package:reboot_app_3/core/theming/theme_provider.dart';
+import 'package:reboot_app_3/core/shared_widgets/premium_blur_overlay.dart';
 import 'package:reboot_app_3/features/vault/presentation/widgets/analytics/heat_map_calendar.dart';
 import 'package:reboot_app_3/features/vault/presentation/widgets/analytics/streak_averages_card.dart';
 import 'package:reboot_app_3/features/vault/presentation/widgets/analytics/trigger_radar.dart';
 import 'package:reboot_app_3/features/vault/presentation/widgets/analytics/risk_clock.dart';
 import 'package:reboot_app_3/features/vault/presentation/widgets/analytics/mood_correlation_chart.dart';
-import 'dart:ui';
 
 class VaultScreen extends ConsumerWidget {
   const VaultScreen({super.key});
@@ -40,6 +40,7 @@ class VaultScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = AppTheme.of(context);
+    final themeController = ref.watch(customThemeProvider);
     final accountStatus = ref.watch(accountStatusProvider);
     final showMainContent = accountStatus == AccountStatus.ok;
     final userDocAsync = ref.watch(userDocumentsNotifierProvider);
@@ -53,6 +54,7 @@ class VaultScreen extends ConsumerWidget {
         false,
         actions: showMainContent
             ? [
+                _buildPremiumAnalyticsCTA(context, theme),
                 IconButton(
                   onPressed: () {
                     showModalBottomSheet(
@@ -67,7 +69,8 @@ class VaultScreen extends ConsumerWidget {
                     );
                   },
                   icon: Icon(LucideIcons.settings),
-                )
+                ),
+                // horizontalSpace(Spacing.points16),
               ]
             : null,
       ),
@@ -100,7 +103,7 @@ class VaultScreen extends ConsumerWidget {
                 ),
               );
             case AccountStatus.ok:
-              return _buildMainContent(context, theme);
+              return _buildMainContent(context, theme, themeController);
           }
         },
       ),
@@ -126,7 +129,8 @@ class VaultScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildMainContent(BuildContext context, CustomThemeData theme) {
+  Widget _buildMainContent(
+      BuildContext context, CustomThemeData theme, dynamic themeController) {
     return Consumer(
       builder: (context, ref, child) {
         final vaultLayoutSettings = ref.watch(vaultLayoutProvider);
@@ -135,10 +139,94 @@ class VaultScreen extends ConsumerWidget {
             vaultLayoutSettings.getOrderedVisibleVaultElements();
         final orderedCards = vaultLayoutSettings.getOrderedVisibleCards();
 
+        final hasSubscription = ref.watch(hasActiveSubscriptionProvider);
+        final isDarkTheme = themeController.darkTheme;
+
         final vaultElementsMap = <String, Widget>{
-          'currentStreaks': const CurrentStreaksSection(),
-          'statistics': const StatisticsSection(),
-          'calendar': const CalendarSection(),
+          'currentStreaks': _buildVaultElement(
+            context,
+            theme,
+            AppLocalizations.of(context).translate('current-streaks'),
+            AppLocalizations.of(context)
+                .translate('current-streaks-description'),
+            const CurrentStreaksSection(),
+            LucideIcons.zap,
+            const Color(0xFF6366F1), // Indigo
+          ),
+          'streakAverages': _buildAnalyticsFeature(
+            context,
+            theme,
+            hasSubscription,
+            AppLocalizations.of(context).translate('streak-averages-title'),
+            AppLocalizations.of(context).translate('streak-averages-desc'),
+            const StreakAveragesCard(),
+            LucideIcons.trendingUp,
+            const Color(0xFF22C55E),
+            isDarkTheme,
+          ),
+          'statistics': _buildVaultElement(
+            context,
+            theme,
+            AppLocalizations.of(context).translate('statistics'),
+            AppLocalizations.of(context).translate('statistics-description'),
+            const StatisticsSection(),
+            LucideIcons.pieChart,
+            const Color(0xFF8B5CF6), // Purple
+          ),
+          'riskClock': _buildAnalyticsFeature(
+            context,
+            theme,
+            hasSubscription,
+            AppLocalizations.of(context).translate('risk-clock-title'),
+            AppLocalizations.of(context).translate('risk-clock-desc'),
+            const RiskClock(),
+            LucideIcons.clock,
+            const Color(0xFF06B6D4),
+            isDarkTheme,
+          ),
+          'calendar': _buildVaultElement(
+            context,
+            theme,
+            AppLocalizations.of(context).translate('calendar'),
+            AppLocalizations.of(context).translate('calendar-description'),
+            const CalendarSection(),
+            LucideIcons.calendar,
+            const Color(0xFF06B6D4), // Cyan
+          ),
+          'heatMapCalendar': _buildAnalyticsFeature(
+            context,
+            theme,
+            hasSubscription,
+            AppLocalizations.of(context).translate('heat-map-calendar-title'),
+            AppLocalizations.of(context).translate('day-of-month-desc'),
+            const HeatMapCalendar(),
+            LucideIcons.calendar,
+            const Color(0xFFEF4444),
+            isDarkTheme,
+          ),
+          'triggerRadar': _buildAnalyticsFeature(
+            context,
+            theme,
+            hasSubscription,
+            AppLocalizations.of(context).translate('trigger-radar-title'),
+            AppLocalizations.of(context).translate('trigger-radar-desc'),
+            const TriggerRadar(),
+            LucideIcons.radar,
+            const Color(0xFFF97316),
+            isDarkTheme,
+          ),
+          'moodCorrelation': _buildAnalyticsFeature(
+            context,
+            theme,
+            hasSubscription,
+            AppLocalizations.of(context).translate('mood-correlation-title'),
+            AppLocalizations.of(context)
+                .translate('mood-relapse-correlation-desc'),
+            const MoodCorrelationChart(),
+            LucideIcons.heartHandshake,
+            const Color(0xFFEC4899),
+            isDarkTheme,
+          ),
         };
 
         return SingleChildScrollView(
@@ -153,22 +241,10 @@ class VaultScreen extends ConsumerWidget {
               _buildHorizontalCards(context, theme, orderedCards),
               verticalSpace(Spacing.points16),
 
-              // Premium Analytics CTA
-              _buildPremiumAnalyticsCTA(context, theme),
+              // Render ordered vault elements with consistent spacing
+              ..._buildVaultElementsWithSpacing(
+                  orderedVaultElements, vaultElementsMap),
 
-              // Render ordered vault elements
-              ...orderedVaultElements
-                  .expand((element) => [
-                        vaultElementsMap[element] ?? SizedBox.shrink(),
-                        verticalSpace(Spacing.points16),
-                      ])
-                  .toList()
-                ..removeLast(), // Remove the last spacing
-
-              verticalSpace(Spacing.points16),
-
-              // Analytics Section
-              _buildAnalyticsSection(context, theme),
               verticalSpace(Spacing.points16),
             ],
           ),
@@ -305,262 +381,122 @@ class VaultScreen extends ConsumerWidget {
 
         return Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0),
-          child: Stack(
-            children: [
+          child: // TODO: Remove this test button in production
+
               GestureDetector(
-                onTap: () async {
-                  HapticFeedback.lightImpact();
+            onTap: () async {
+              // Toggle subscription status for testing
+              Future(() async {
+                final notifier =
+                    ref.read(subscriptionNotifierProvider.notifier);
+                final currentStatus =
+                    ref.read(subscriptionNotifierProvider).valueOrNull;
 
-                  if (hasSubscription) {
-                    // Navigate to premium analytics
-                    context.goNamed(RouteNames.premiumAnalytics.name);
-                  } else {
-                    // Show subscription modal
-                    showModalBottomSheet(
-                      context: context,
-                      isScrollControlled: true,
-                      backgroundColor: Colors.transparent,
-                      useSafeArea: true,
-                      builder: (context) =>
-                          const TaaafiPlusSubscriptionScreen(),
-                    );
-                  }
-                },
-                child: WidgetsContainer(
-                  width: double.infinity,
-                  padding: EdgeInsets.all(16),
-                  backgroundColor: theme.primary[50],
-                  borderSide: BorderSide(color: theme.primary[200]!, width: 1),
-                  borderRadius: BorderRadius.circular(12),
-                  boxShadow: [
-                    BoxShadow(
-                      color: theme.primary[100]!.withValues(alpha: 0.5),
-                      blurRadius: 8,
-                      offset: Offset(0, 2),
+                if (currentStatus?.status == SubscriptionStatus.plus &&
+                    currentStatus?.isActive == true) {
+                  // Switch to free
+                  await notifier.updateSubscriptionForTesting(
+                    const SubscriptionInfo(
+                      status: SubscriptionStatus.free,
+                      isActive: false,
                     ),
-                  ],
-                  child: Row(
-                    children: [
-                      Container(
-                        padding: EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: theme.primary[100],
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Icon(
-                          LucideIcons.barChart3,
-                          color: theme.primary[600],
-                          size: 24,
-                        ),
-                      ),
-                      horizontalSpace(Spacing.points16),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              AppLocalizations.of(context)
-                                  .translate('premium-analytics-title'),
-                              style: TextStyles.footnote.copyWith(
-                                color: theme.grey[900],
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                            verticalSpace(Spacing.points4),
-                            Text(
-                              AppLocalizations.of(context)
-                                  .translate('premium-analytics-subtitle'),
-                              style: TextStyles.small.copyWith(
-                                color: theme.grey[600],
-                                height: 1.3,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Icon(
-                        LucideIcons.chevronRight,
-                        color: theme.primary[600],
-                        size: 20,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              // TODO: Remove this test button in production
-              if (true) // Change to false to hide test button
-                Positioned(
-                  top: 8,
-                  left: 8,
-                  child: GestureDetector(
-                    onTap: () async {
-                      // Toggle subscription status for testing
-                      Future(() async {
-                        final notifier =
-                            ref.read(subscriptionNotifierProvider.notifier);
-                        final currentStatus =
-                            ref.read(subscriptionNotifierProvider).valueOrNull;
-
-                        if (currentStatus?.status == SubscriptionStatus.plus &&
-                            currentStatus?.isActive == true) {
-                          // Switch to free
-                          await notifier.updateSubscriptionForTesting(
-                            const SubscriptionInfo(
-                              status: SubscriptionStatus.free,
-                              isActive: false,
-                            ),
-                          );
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                                content: Text('Test: Switched to FREE')),
-                          );
-                        } else {
-                          // Switch to plus
-                          await notifier.updateSubscriptionForTesting(
-                            SubscriptionInfo(
-                              status: SubscriptionStatus.plus,
-                              isActive: true,
-                              expirationDate:
-                                  DateTime.now().add(const Duration(days: 30)),
-                            ),
-                          );
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                                content: Text('Test: Switched to PLUS')),
-                          );
-                        }
-                      });
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: theme.warn[600],
-                        borderRadius: BorderRadius.circular(4),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.2),
-                            blurRadius: 4,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: Text(
-                        'TOGGLE SUB',
-                        style: TextStyles.small.copyWith(
-                          color: theme.grey[50],
-                          fontSize: 10,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
+                  );
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Test: Switched to FREE')),
+                  );
+                } else {
+                  // Switch to plus
+                  await notifier.updateSubscriptionForTesting(
+                    SubscriptionInfo(
+                      status: SubscriptionStatus.plus,
+                      isActive: true,
+                      expirationDate:
+                          DateTime.now().add(const Duration(days: 30)),
                     ),
-                  ),
-                ),
-            ],
+                  );
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Test: Switched to PLUS')),
+                  );
+                }
+              });
+            },
+            child: Icon(LucideIcons.crown),
           ),
         );
       },
     );
   }
 
-  Widget _buildAnalyticsSection(BuildContext context, CustomThemeData theme) {
-    return Consumer(
-      builder: (context, ref, child) {
-        final hasSubscription = ref.watch(hasActiveSubscriptionProvider);
-        final vaultLayoutSettings = ref.watch(vaultLayoutProvider);
-        final orderedAnalytics =
-            vaultLayoutSettings.getOrderedVisibleAnalytics();
+  List<Widget> _buildVaultElementsWithSpacing(
+      List<String> orderedElements, Map<String, Widget> elementsMap) {
+    final List<Widget> result = [];
 
-        // Analytics features map
-        final analyticsMap = <String, Widget Function()>{
-          'streakAverages': () => _buildAnalyticsFeature(
-                context,
-                theme,
-                hasSubscription,
-                AppLocalizations.of(context).translate('streak-averages-title'),
-                AppLocalizations.of(context).translate('streak-averages-desc'),
-                const StreakAveragesCard(),
-                LucideIcons.trendingUp,
-                const Color(
-                    0xFF22C55E), // Original green from StreakAveragesCard
-              ),
-          'heatMapCalendar': () => _buildAnalyticsFeature(
-                context,
-                theme,
-                hasSubscription,
-                AppLocalizations.of(context)
-                    .translate('heat-map-calendar-title'),
-                AppLocalizations.of(context)
-                    .translate('heat-map-calendar-desc'),
-                const HeatMapCalendar(),
-                LucideIcons.calendar,
-                const Color(0xFFEF4444), // Original red from HeatMapCalendar
-              ),
-          'triggerRadar': () => _buildAnalyticsFeature(
-                context,
-                theme,
-                hasSubscription,
-                AppLocalizations.of(context).translate('trigger-radar-title'),
-                AppLocalizations.of(context).translate('trigger-radar-desc'),
-                const TriggerRadar(),
-                LucideIcons.radar,
-                const Color(0xFFF97316), // Original orange from TriggerRadar
-              ),
-          'riskClock': () => _buildAnalyticsFeature(
-                context,
-                theme,
-                hasSubscription,
-                AppLocalizations.of(context).translate('risk-clock-title'),
-                AppLocalizations.of(context).translate('risk-clock-desc'),
-                const RiskClock(),
-                LucideIcons.clock,
-                const Color(0xFF06B6D4), // Original cyan from RiskClock
-              ),
-          'moodCorrelation': () => _buildAnalyticsFeature(
-                context,
-                theme,
-                hasSubscription,
-                AppLocalizations.of(context)
-                    .translate('mood-correlation-title'),
-                AppLocalizations.of(context)
-                    .translate('mood-relapse-correlation-desc'),
-                const MoodCorrelationChart(),
-                LucideIcons.heartHandshake,
-                const Color(
-                    0xFFEC4899), // Original pink from MoodCorrelationChart
-              ),
-        };
+    // Filter out null elements and get visible widgets
+    final visibleElements = orderedElements
+        .where((element) => elementsMap[element] != null)
+        .map((element) => elementsMap[element]!)
+        .toList();
 
-        return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+    // Add spacing between visible elements only
+    for (int i = 0; i < visibleElements.length; i++) {
+      result.add(visibleElements[i]);
+
+      // Add spacing after each element except the last one
+      if (i < visibleElements.length - 1) {
+        result.add(verticalSpace(Spacing.points4)); // Consistent 24px spacing
+      }
+    }
+
+    return result;
+  }
+
+  Widget _buildVaultElement(
+    BuildContext context,
+    CustomThemeData theme,
+    String title,
+    String description,
+    Widget content,
+    IconData icon,
+    Color iconColor,
+  ) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Title with Icon (always visible)
+          Row(
             children: [
-              Text(
-                AppLocalizations.of(context)
-                    .translate('premium-analytics-title'),
-                style: TextStyles.h5.copyWith(
-                  color: theme.grey[900],
-                  fontWeight: FontWeight.w600,
+              Icon(
+                icon,
+                color: iconColor,
+                size: 20,
+              ),
+              horizontalSpace(Spacing.points12),
+              Expanded(
+                child: Text(
+                  title,
+                  style: TextStyles.h5.copyWith(
+                    color: theme.grey[900],
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
-              verticalSpace(Spacing.points16),
-
-              // Render ordered analytics features
-              ...orderedAnalytics
-                  .expand((analyticsKey) => [
-                        if (analyticsMap.containsKey(analyticsKey))
-                          analyticsMap[analyticsKey]!(),
-                        if (analyticsKey != orderedAnalytics.last)
-                          verticalSpace(Spacing.points20),
-                      ])
-                  .toList()
-                ..removeWhere(
-                    (widget) => widget == null), // Remove any null widgets
             ],
           ),
-        );
-      },
+          verticalSpace(Spacing.points8),
+          Text(
+            description,
+            style: TextStyles.small.copyWith(
+              color: theme.grey[600],
+            ),
+          ),
+          verticalSpace(Spacing.points20),
+
+          // Content (no blur for free features)
+          content,
+        ],
+      ),
     );
   }
 
@@ -573,169 +509,56 @@ class VaultScreen extends ConsumerWidget {
     Widget content,
     IconData icon,
     Color iconColor,
+    bool isDarkTheme,
   ) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Title with Icon (always visible)
-        Row(
-          children: [
-            Icon(
-              icon,
-              color: iconColor,
-              size: 20,
-            ),
-            horizontalSpace(Spacing.points12),
-            Expanded(
-              child: Text(
-                title,
-                style: TextStyles.h5.copyWith(
-                  color: theme.grey[900],
-                  fontWeight: FontWeight.w600,
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Title with Icon (always visible)
+          Row(
+            children: [
+              Icon(
+                icon,
+                color: iconColor,
+                size: 20,
+              ),
+              horizontalSpace(Spacing.points12),
+              Expanded(
+                child: Text(
+                  title,
+                  style: TextStyles.h5.copyWith(
+                    color: theme.grey[900],
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
-            ),
-          ],
-        ),
-        verticalSpace(Spacing.points8),
-        Text(
-          description,
-          style: TextStyles.small.copyWith(
-            color: theme.grey[600],
+            ],
           ),
-        ),
-        verticalSpace(Spacing.points20),
-
-        // Content with conditional blur (no container wrapping)
-        if (hasSubscription)
-          content
-        else
-          _buildBlurredContent(context, theme, content),
-      ],
-    );
-  }
-
-  Widget _buildBlurredContent(
-    BuildContext context,
-    CustomThemeData theme,
-    Widget content,
-  ) {
-    return GestureDetector(
-      onTap: () {
-        HapticFeedback.lightImpact();
-        showModalBottomSheet(
-          context: context,
-          isScrollControlled: true,
-          backgroundColor: Colors.transparent,
-          useSafeArea: true,
-          builder: (context) => const TaaafiPlusSubscriptionScreen(),
-        );
-      },
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(
-          minHeight: 120,
-          maxHeight: 250, // Limit height to prevent overflow
-        ),
-        child: Stack(
-          children: [
-            // Original content (more visible through lighter blur)
-            SingleChildScrollView(
-              physics: const NeverScrollableScrollPhysics(),
-              child: content,
+          verticalSpace(Spacing.points8),
+          Text(
+            description,
+            style: TextStyles.small.copyWith(
+              color: theme.grey[600],
             ),
+          ),
+          verticalSpace(Spacing.points20),
 
-            // Progressive blur overlay matching Figma design
-            Positioned.fill(
-              child: ClipRect(
-                child: BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: 3.5, sigmaY: 3.5),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      // Progressive gradient overlay instead of solid white
-                      gradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [
-                          Colors.white.withValues(alpha: 0.3),
-                          Colors.white.withValues(alpha: 0.6),
-                          Colors.white.withValues(alpha: 0.8),
-                          Colors.white.withValues(alpha: 0.6),
-                        ],
-                        stops: const [0.0, 0.3, 0.7, 1.0],
-                      ),
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                  ),
-                ),
+          // Content with conditional blur
+          if (hasSubscription)
+            content
+          else
+            PremiumBlurOverlay(
+              content: content,
+              isDarkTheme: isDarkTheme,
+              constraints: const BoxConstraints(
+                minHeight: 120,
+                maxHeight: 280,
               ),
+              margin: EdgeInsets.zero,
             ),
-
-            // Lock icon and text overlay (positioned to not completely block content)
-            Positioned(
-              bottom: 0,
-              left: 0,
-              right: 0,
-              child: Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      Colors.white.withValues(alpha: 0.0),
-                      Colors.white.withValues(alpha: 0.9),
-                    ],
-                  ),
-                  borderRadius: const BorderRadius.only(
-                    bottomLeft: Radius.circular(16),
-                    bottomRight: Radius.circular(16),
-                  ),
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: theme.primary[600],
-                        borderRadius: BorderRadius.circular(50),
-                        boxShadow: [
-                          BoxShadow(
-                            color: theme.primary[600]!.withValues(alpha: 0.3),
-                            blurRadius: 8,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: Icon(
-                        LucideIcons.lock,
-                        color: theme.grey[50],
-                        size: 20,
-                      ),
-                    ),
-                    verticalSpace(Spacing.points12),
-                    Text(
-                      AppLocalizations.of(context).translate('upgrade-to-plus'),
-                      style: TextStyles.footnote.copyWith(
-                        color: theme.grey[900],
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    verticalSpace(Spacing.points4),
-                    Text(
-                      AppLocalizations.of(context)
-                          .translate('unlock-premium-analytics'),
-                      style: TextStyles.small.copyWith(
-                        color: theme.grey[700],
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
+        ],
       ),
     );
   }

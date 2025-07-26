@@ -37,7 +37,31 @@ class _MoodCorrelationChartState extends ConsumerState<MoodCorrelationChart> {
             if (totalMoodEntries < 5) {
               return _buildEmptyState(context, theme);
             }
-            return _buildChart(context, theme, data);
+            return Column(
+              children: [
+                _buildChart(context, theme, data),
+                WidgetsContainer(
+                    padding: EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                    child: Row(
+                      children: [
+                        Text(
+                          AppLocalizations.of(context)
+                              .translate('how-to-read-mood-correlation'),
+                          style: TextStyles.body.copyWith(
+                            color: theme.grey[800],
+                            height: 1.4,
+                          ),
+                        ),
+                        Spacer(),
+                        IconButton(
+                            onPressed: () {
+                              _showHelpModal(context, theme);
+                            },
+                            icon: Icon(LucideIcons.info))
+                      ],
+                    )),
+              ],
+            );
           },
           loading: () => Center(child: Spinner()),
           error: (_, __) => _buildEmptyState(context, theme),

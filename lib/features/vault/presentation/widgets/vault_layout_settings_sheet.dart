@@ -25,24 +25,53 @@ class _VaultLayoutSettingsSheetState
     extends ConsumerState<VaultLayoutSettingsSheet> {
   late List<String> _orderedVaultElements;
   late List<String> _orderedCards;
-  late List<String> _orderedAnalytics;
 
   final Map<String, IconData> _vaultElementIcons = {
+    // Free vault elements
     'currentStreaks': LucideIcons.timer,
     'statistics': LucideIcons.barChart2,
     'calendar': LucideIcons.calendar,
+    // Analytics elements (locked for non-subscribers)
+    'streakAverages': LucideIcons.trendingUp,
+    'heatMapCalendar': LucideIcons.calendar,
+    'triggerRadar': LucideIcons.radar,
+    'riskClock': LucideIcons.clock,
+    'moodCorrelation': LucideIcons.heartHandshake,
   };
 
   final Map<String, String> _vaultElementTitleKeys = {
+    // Free vault elements
     'currentStreaks': 'current-streaks',
     'statistics': 'statistics',
     'calendar': 'calendar',
+    // Analytics elements (locked for non-subscribers)
+    'streakAverages': 'streak-averages-title',
+    'heatMapCalendar': 'heat-map-calendar-title',
+    'triggerRadar': 'trigger-radar-title',
+    'riskClock': 'risk-clock-title',
+    'moodCorrelation': 'mood-correlation-title',
   };
 
   final Map<String, String> _vaultElementDescriptionKeys = {
+    // Free vault elements
     'currentStreaks': 'current-streaks-description',
     'statistics': 'statistics-description',
     'calendar': 'calendar-description',
+    // Analytics elements (locked for non-subscribers)
+    'streakAverages': 'streak-averages-desc',
+    'heatMapCalendar': 'heat-map-calendar-desc',
+    'triggerRadar': 'trigger-radar-desc',
+    'riskClock': 'risk-clock-desc',
+    'moodCorrelation': 'mood-relapse-correlation-desc',
+  };
+
+  // Define which elements are locked (require subscription)
+  final Set<String> _lockedElements = {
+    'streakAverages',
+    'heatMapCalendar',
+    'triggerRadar',
+    'riskClock',
+    'moodCorrelation',
   };
 
   final Map<String, IconData> _cardIcons = {
@@ -59,30 +88,6 @@ class _VaultLayoutSettingsSheetState
     'diaries': 'diaries',
     'notifications': 'notifications',
     'settings': 'settings',
-  };
-
-  final Map<String, IconData> _analyticsIcons = {
-    'streakAverages': LucideIcons.trendingUp,
-    'heatMapCalendar': LucideIcons.calendar,
-    'triggerRadar': LucideIcons.radar,
-    'riskClock': LucideIcons.clock,
-    'moodCorrelation': LucideIcons.heartHandshake,
-  };
-
-  final Map<String, String> _analyticsTitleKeys = {
-    'streakAverages': 'streak-averages-title',
-    'heatMapCalendar': 'heat-map-calendar-title',
-    'triggerRadar': 'trigger-radar-title',
-    'riskClock': 'risk-clock-title',
-    'moodCorrelation': 'mood-correlation-title',
-  };
-
-  final Map<String, String> _analyticsDescriptionKeys = {
-    'streakAverages': 'streak-averages-desc',
-    'heatMapCalendar': 'heat-map-calendar-desc',
-    'triggerRadar': 'trigger-radar-desc',
-    'riskClock': 'risk-clock-desc',
-    'moodCorrelation': 'mood-relapse-correlation-desc',
   };
 
   Map<String, Map<String, Color>> _getCardThemeColors(CustomThemeData theme) {
@@ -116,7 +121,6 @@ class _VaultLayoutSettingsSheetState
     final vaultLayoutSettings = ref.read(vaultLayoutProvider);
     _orderedVaultElements = List.from(vaultLayoutSettings.vaultElementsOrder);
     _orderedCards = List.from(vaultLayoutSettings.cardsOrder);
-    _orderedAnalytics = List.from(vaultLayoutSettings.analyticsOrder);
   }
 
   @override
@@ -166,12 +170,12 @@ class _VaultLayoutSettingsSheetState
                     setState(() {
                       _orderedVaultElements = List.from([
                         'currentStreaks',
-                        'statistics',
-                        'calendar',
                         'streakAverages',
+                        'statistics',
+                        'riskClock',
+                        'calendar',
                         'heatMapCalendar',
                         'triggerRadar',
-                        'riskClock',
                         'moodCorrelation'
                       ]);
                       _orderedCards = List.from([
@@ -180,13 +184,6 @@ class _VaultLayoutSettingsSheetState
                         'diaries',
                         'notifications',
                         'settings'
-                      ]);
-                      _orderedAnalytics = List.from([
-                        'streakAverages',
-                        'heatMapCalendar',
-                        'triggerRadar',
-                        'riskClock',
-                        'moodCorrelation'
                       ]);
                     });
                   },
@@ -322,144 +319,6 @@ class _VaultLayoutSettingsSheetState
           ),
         ],
       ),
-    );
-  }
-
-  Widget _buildVaultElementsReorderList(
-      CustomThemeData theme, VaultLayoutSettings settings) {
-    // Filter out elements that don't exist in our maps
-    final validElements = _orderedVaultElements
-        .where((element) =>
-            _vaultElementIcons.containsKey(element) &&
-            _vaultElementTitleKeys.containsKey(element) &&
-            _vaultElementDescriptionKeys.containsKey(element))
-        .toList();
-
-    return ReorderableListView.builder(
-      shrinkWrap: true,
-      physics: BouncingScrollPhysics(),
-      itemCount: validElements.length,
-      proxyDecorator: (child, index, animation) {
-        return AnimatedBuilder(
-          animation: animation,
-          builder: (BuildContext context, Widget? child) {
-            final double animValue =
-                Curves.easeInOut.transform(animation.value);
-            final double elevation = lerpDouble(0, 6, animValue)!;
-            final double scale = lerpDouble(1, 1.02, animValue)!;
-            return Transform.scale(
-              scale: scale,
-              child: Material(
-                elevation: elevation,
-                color: Colors.transparent,
-                shadowColor: theme.grey[400]!.withValues(alpha: 0.3),
-                borderRadius: BorderRadius.circular(12),
-                child: child,
-              ),
-            );
-          },
-          child: child,
-        );
-      },
-      onReorder: (oldIndex, newIndex) {
-        if (newIndex > oldIndex) {
-          newIndex -= 1;
-        }
-        setState(() {
-          final item = _orderedVaultElements.removeAt(oldIndex);
-          _orderedVaultElements.insert(newIndex, item);
-        });
-        ref
-            .read(vaultLayoutProvider.notifier)
-            .reorderVaultElements(_orderedVaultElements);
-      },
-      itemBuilder: (context, index) {
-        final element = validElements[index];
-        final isVisible = settings.vaultElementsVisibility[element] ?? false;
-
-        return Container(
-          key: ValueKey(element),
-          margin: EdgeInsets.only(bottom: 8),
-          child: IntrinsicHeight(
-            child: GestureDetector(
-              onTap: () {
-                HapticFeedback.lightImpact();
-                ref
-                    .read(vaultLayoutProvider.notifier)
-                    .toggleVaultElementVisibility(element, !isVisible);
-              },
-              child: WidgetsContainer(
-                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                backgroundColor: isVisible ? theme.success[50] : theme.grey[50],
-                borderSide: BorderSide(
-                  color: isVisible ? theme.success[600]! : theme.grey[200]!,
-                  width: 1,
-                ),
-                child: Row(
-                  children: [
-                    // Drag handle
-                    Container(
-                      padding: EdgeInsets.all(4),
-                      child: Icon(
-                        LucideIcons.gripVertical,
-                        size: 16,
-                        color: theme.grey[400],
-                      ),
-                    ),
-                    horizontalSpace(Spacing.points8),
-
-                    // Element content
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Icon(
-                                _vaultElementIcons[element] ??
-                                    LucideIcons.helpCircle,
-                                size: 16,
-                                color: isVisible
-                                    ? theme.success[600]
-                                    : theme.grey[600],
-                              ),
-                              horizontalSpace(Spacing.points8),
-                              Expanded(
-                                child: Text(
-                                  AppLocalizations.of(context).translate(
-                                      _vaultElementTitleKeys[element] ??
-                                          element),
-                                  style: TextStyles.caption.copyWith(
-                                    color: isVisible
-                                        ? theme.success[600]
-                                        : theme.grey[600],
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                          verticalSpace(Spacing.points8),
-                          Text(
-                            AppLocalizations.of(context).translate(
-                                _vaultElementDescriptionKeys[element] ??
-                                    element),
-                            style: TextStyles.small.copyWith(
-                              color: isVisible
-                                  ? theme.success[400]
-                                  : theme.grey[400],
-                              height: 1.2,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        );
-      },
     );
   }
 
@@ -609,17 +468,10 @@ class _VaultLayoutSettingsSheetState
             _vaultElementDescriptionKeys.containsKey(element))
         .toList();
 
-    final validAnalytics = _orderedAnalytics
-        .where((analytics) =>
-            _analyticsIcons.containsKey(analytics) &&
-            _analyticsTitleKeys.containsKey(analytics) &&
-            _analyticsDescriptionKeys.containsKey(analytics))
-        .toList();
-
     return ReorderableListView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      itemCount: validElements.length + validAnalytics.length,
+      itemCount: validElements.length,
       proxyDecorator: (child, index, animation) {
         return AnimatedBuilder(
           animation: animation,
@@ -646,6 +498,15 @@ class _VaultLayoutSettingsSheetState
         if (newIndex > oldIndex) {
           newIndex -= 1;
         }
+
+        final element = validElements[oldIndex];
+        final isLocked = _lockedElements.contains(element);
+
+        // Prevent reordering of locked elements if user doesn't have subscription
+        if (isLocked && !hasSubscription) {
+          return;
+        }
+
         setState(() {
           final item = _orderedVaultElements.removeAt(oldIndex);
           _orderedVaultElements.insert(newIndex, item);
@@ -655,230 +516,139 @@ class _VaultLayoutSettingsSheetState
             .reorderVaultElements(_orderedVaultElements);
       },
       itemBuilder: (context, index) {
-        if (index < validElements.length) {
-          final element = validElements[index];
-          final isVisible = settings.vaultElementsVisibility[element] ?? false;
+        final element = validElements[index];
+        final isLocked = _lockedElements.contains(element);
+        final isVisible = isLocked
+            ? (hasSubscription &&
+                (settings.vaultElementsVisibility[element] ?? false))
+            : (settings.vaultElementsVisibility[element] ?? false);
 
-          return Container(
-            key: ValueKey(element),
-            margin: EdgeInsets.only(bottom: 8),
-            child: IntrinsicHeight(
-              child: GestureDetector(
-                onTap: () {
-                  HapticFeedback.lightImpact();
-                  ref
-                      .read(vaultLayoutProvider.notifier)
-                      .toggleVaultElementVisibility(element, !isVisible);
-                },
-                child: WidgetsContainer(
-                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                  backgroundColor:
-                      isVisible ? theme.success[50] : theme.grey[50],
-                  borderSide: BorderSide(
-                    color: isVisible ? theme.success[600]! : theme.grey[200]!,
-                    width: 1,
-                  ),
-                  child: Row(
-                    children: [
-                      // Drag handle
-                      Container(
-                        padding: EdgeInsets.all(4),
-                        child: Icon(
-                          LucideIcons.gripVertical,
-                          size: 16,
-                          color: theme.grey[400],
-                        ),
+        return Container(
+          key: ValueKey(element),
+          margin: EdgeInsets.only(bottom: 8),
+          child: IntrinsicHeight(
+            child: GestureDetector(
+              onTap: isLocked && !hasSubscription
+                  ? null // Disable tap for locked elements without subscription
+                  : () {
+                      HapticFeedback.lightImpact();
+                      ref
+                          .read(vaultLayoutProvider.notifier)
+                          .toggleVaultElementVisibility(element, !isVisible);
+                    },
+              child: WidgetsContainer(
+                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                backgroundColor: isLocked && !hasSubscription
+                    ? theme.grey[50]
+                    : (isVisible ? theme.success[50] : theme.grey[50]),
+                borderSide: BorderSide(
+                  color: isLocked && !hasSubscription
+                      ? theme.grey[100]!
+                      : (isVisible ? theme.success[600]! : theme.grey[200]!),
+                  width: 1,
+                ),
+                child: Row(
+                  children: [
+                    // Drag handle or lock icon
+                    Container(
+                      padding: EdgeInsets.all(4),
+                      child: Icon(
+                        isLocked && !hasSubscription
+                            ? LucideIcons.lock
+                            : LucideIcons.gripVertical,
+                        size: 16,
+                        color: isLocked && !hasSubscription
+                            ? theme.primary[600]
+                            : theme.grey[400],
                       ),
-                      horizontalSpace(Spacing.points8),
+                    ),
+                    horizontalSpace(Spacing.points8),
 
-                      // Element content
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                Icon(
-                                  _vaultElementIcons[element] ??
-                                      LucideIcons.helpCircle,
-                                  size: 16,
-                                  color: isVisible
-                                      ? theme.success[600]
-                                      : theme.grey[600],
+                    // Element content
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Icon(
+                                _vaultElementIcons[element] ??
+                                    LucideIcons.helpCircle,
+                                size: 16,
+                                color: isLocked && !hasSubscription
+                                    ? theme.grey[400]
+                                    : (isVisible
+                                        ? theme.success[600]
+                                        : theme.grey[600]),
+                              ),
+                              horizontalSpace(Spacing.points8),
+                              Expanded(
+                                child: Text(
+                                  AppLocalizations.of(context).translate(
+                                      _vaultElementTitleKeys[element] ??
+                                          element),
+                                  style: TextStyles.caption.copyWith(
+                                    color: isLocked && !hasSubscription
+                                        ? theme.grey[400]
+                                        : (isVisible
+                                            ? theme.success[600]
+                                            : theme.grey[600]),
+                                  ),
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
                                 ),
+                              ),
+                              if (isLocked && !hasSubscription) ...[
                                 horizontalSpace(Spacing.points8),
-                                Expanded(
+                                Container(
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: 6, vertical: 2),
+                                  decoration: BoxDecoration(
+                                    color: theme.primary[600],
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
                                   child: Text(
-                                    AppLocalizations.of(context).translate(
-                                        _vaultElementTitleKeys[element] ??
-                                            element),
-                                    style: TextStyles.caption.copyWith(
-                                      color: isVisible
-                                          ? theme.success[600]
-                                          : theme.grey[600],
+                                    'PLUS',
+                                    style: TextStyles.small.copyWith(
+                                      color: theme.grey[50],
+                                      fontSize: 8,
+                                      fontWeight: FontWeight.w700,
                                     ),
-                                    maxLines: 2,
+                                    maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                   ),
                                 ),
                               ],
+                            ],
+                          ),
+                          verticalSpace(Spacing.points8),
+                          Text(
+                            isLocked && !hasSubscription
+                                ? AppLocalizations.of(context)
+                                    .translate('analytics-requires-plus')
+                                : AppLocalizations.of(context).translate(
+                                    _vaultElementDescriptionKeys[element] ??
+                                        element),
+                            style: TextStyles.small.copyWith(
+                              color: isLocked && !hasSubscription
+                                  ? theme.grey[400]
+                                  : (isVisible
+                                      ? theme.success[400]
+                                      : theme.grey[400]),
+                              height: 1.2,
                             ),
-                            verticalSpace(Spacing.points8),
-                            Text(
-                              AppLocalizations.of(context).translate(
-                                  _vaultElementDescriptionKeys[element] ??
-                                      element),
-                              style: TextStyles.small.copyWith(
-                                color: isVisible
-                                    ? theme.success[400]
-                                    : theme.grey[400],
-                                height: 1.2,
-                              ),
-                              maxLines: 4,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ],
-                        ),
+                            maxLines: 4,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
             ),
-          );
-        } else {
-          final analytics = validAnalytics[index - validElements.length];
-          final isVisible = hasSubscription
-              ? (settings.analyticsVisibility[analytics] ?? false)
-              : false;
-
-          return Container(
-            key: ValueKey(analytics),
-            margin: EdgeInsets.only(bottom: 8),
-            child: IntrinsicHeight(
-              child: GestureDetector(
-                onTap: hasSubscription
-                    ? () {
-                        HapticFeedback.lightImpact();
-                        ref
-                            .read(vaultLayoutProvider.notifier)
-                            .toggleAnalyticsVisibility(analytics, !isVisible);
-                      }
-                    : null, // Disable tap for non-subscribers
-                child: WidgetsContainer(
-                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                  backgroundColor: hasSubscription
-                      ? (isVisible ? theme.success[100] : theme.grey[100])
-                      : theme.grey[50],
-                  borderSide: BorderSide(
-                    color: hasSubscription
-                        ? (isVisible ? theme.success[600]! : theme.grey[200]!)
-                        : theme.grey[100]!,
-                    width: 1,
-                  ),
-                  child: Row(
-                    children: [
-                      // Drag handle or lock icon
-                      Container(
-                        padding: EdgeInsets.all(4),
-                        child: Icon(
-                          hasSubscription
-                              ? LucideIcons.gripVertical
-                              : LucideIcons.lock,
-                          size: 16,
-                          color: hasSubscription
-                              ? theme.grey[400]
-                              : theme.primary[600],
-                        ),
-                      ),
-                      horizontalSpace(Spacing.points8),
-
-                      // Analytics content
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                Icon(
-                                  _analyticsIcons[analytics] ??
-                                      LucideIcons.helpCircle,
-                                  size: 16,
-                                  color: hasSubscription
-                                      ? (isVisible
-                                          ? theme.success[600]
-                                          : theme.grey[600])
-                                      : theme.grey[400],
-                                ),
-                                horizontalSpace(Spacing.points8),
-                                Expanded(
-                                  child: Text(
-                                    AppLocalizations.of(context).translate(
-                                        _analyticsTitleKeys[analytics] ??
-                                            analytics),
-                                    style: TextStyles.caption.copyWith(
-                                      color: hasSubscription
-                                          ? (isVisible
-                                              ? theme.success[600]
-                                              : theme.grey[600])
-                                          : theme.grey[400],
-                                    ),
-                                    maxLines: 2,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
-                                if (!hasSubscription) ...[
-                                  horizontalSpace(Spacing.points8),
-                                  Container(
-                                    padding: EdgeInsets.symmetric(
-                                        horizontal: 6, vertical: 2),
-                                    decoration: BoxDecoration(
-                                      color: theme.primary[600],
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    child: Text(
-                                      'PLUS',
-                                      style: TextStyles.small.copyWith(
-                                        color: theme.grey[50],
-                                        fontSize: 8,
-                                        fontWeight: FontWeight.w700,
-                                      ),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ),
-                                ],
-                              ],
-                            ),
-                            verticalSpace(Spacing.points8),
-                            Text(
-                              hasSubscription
-                                  ? AppLocalizations.of(context).translate(
-                                      _analyticsDescriptionKeys[analytics] ??
-                                          analytics)
-                                  : AppLocalizations.of(context)
-                                      .translate('analytics-requires-plus'),
-                              style: TextStyles.small.copyWith(
-                                color: hasSubscription
-                                    ? (isVisible
-                                        ? theme.success[400]
-                                        : theme.grey[400])
-                                    : theme.grey[400],
-                                height: 1.2,
-                              ),
-                              maxLines: 4,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          );
-        }
+          ),
+        );
       },
     );
   }

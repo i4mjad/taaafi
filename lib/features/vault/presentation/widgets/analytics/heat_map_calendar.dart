@@ -3,13 +3,11 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
-import 'package:reboot_app_3/core/shared_widgets/container.dart';
 import 'package:reboot_app_3/core/shared_widgets/spinner.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/features/vault/data/analytics/analytics_notifier.dart';
-import 'package:reboot_app_3/features/shared/models/follow_up.dart';
 import 'package:reboot_app_3/features/vault/presentation/widgets/analytics/follow_up_history_modal.dart';
 
 class HeatMapCalendar extends ConsumerWidget {
@@ -43,23 +41,6 @@ class HeatMapCalendar extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Title for day-of-month view
-        Text(
-          AppLocalizations.of(context).translate('day-of-month-patterns'),
-          style: TextStyles.footnote.copyWith(
-            color: theme.grey[700],
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        verticalSpace(Spacing.points4),
-        Text(
-          AppLocalizations.of(context).translate('day-of-month-desc'),
-          style: TextStyles.small.copyWith(
-            color: theme.grey[600],
-          ),
-        ),
-        verticalSpace(Spacing.points12),
-
         // Week days header (Sun to Sat)
         _buildWeekDaysHeader(context, theme),
         verticalSpace(Spacing.points8),
