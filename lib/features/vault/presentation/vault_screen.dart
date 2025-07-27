@@ -34,6 +34,7 @@ import 'package:reboot_app_3/features/vault/presentation/widgets/analytics/trigg
 import 'package:reboot_app_3/features/vault/presentation/widgets/analytics/risk_clock.dart';
 import 'package:reboot_app_3/features/vault/presentation/widgets/analytics/mood_correlation_chart.dart';
 import 'package:reboot_app_3/features/vault/presentation/widgets/help/help_bottom_sheet.dart';
+import 'package:reboot_app_3/core/shared_widgets/ta3afi_platform_icons_icons.dart';
 
 class VaultScreen extends ConsumerWidget {
   const VaultScreen({super.key});
@@ -269,31 +270,29 @@ class VaultScreen extends ConsumerWidget {
         'icon': LucideIcons.clipboardCheck,
         'color': theme.primary[500]!,
         'backgroundColor': theme.primary[50]!,
+        'hasPlusBadge': false,
         'route': () => context.goNamed(RouteNames.activities.name),
       },
       'library': {
         'icon': LucideIcons.lamp,
         'color': theme.secondary[500]!,
         'backgroundColor': theme.secondary[50]!,
+        'hasPlusBadge': false,
         'route': () => context.goNamed(RouteNames.library.name),
       },
       'diaries': {
         'icon': LucideIcons.pencil,
         'color': theme.tint[500]!,
         'backgroundColor': theme.tint[50]!,
+        'hasPlusBadge': false,
         'route': () => context.goNamed(RouteNames.diaries.name),
       },
-      'notifications': {
-        'icon': LucideIcons.bell,
+      'messagingGroups': {
+        'icon': LucideIcons.messageSquare,
         'color': theme.warn[500]!,
         'backgroundColor': theme.warn[50]!,
-        'route': () => context.goNamed(RouteNames.notifications.name),
-      },
-      'settings': {
-        'icon': LucideIcons.settings,
-        'color': theme.grey[500]!,
-        'backgroundColor': theme.grey[50]!,
-        'route': () => context.goNamed(RouteNames.vaultSettings.name),
+        'hasPlusBadge': true,
+        'route': () => context.goNamed(RouteNames.messagingGroups.name),
       },
     };
 
@@ -303,6 +302,8 @@ class VaultScreen extends ConsumerWidget {
         padding: const EdgeInsets.symmetric(horizontal: 16.0),
         scrollDirection: Axis.horizontal,
         children: orderedCards
+            .where((card) =>
+                cardData.containsKey(card)) // Filter out cards that don't exist
             .expand((card) => [
                   _buildHorizontalCard(
                     context,
@@ -312,8 +313,11 @@ class VaultScreen extends ConsumerWidget {
                     cardData[card]!['color'] as Color,
                     cardData[card]!['backgroundColor'] as Color,
                     cardData[card]!['route'] as VoidCallback,
+                    hasPlusBadge:
+                        cardData[card]!['hasPlusBadge'] as bool? ?? false,
                   ),
-                  if (card != orderedCards.last)
+                  if (card !=
+                      orderedCards.where((c) => cardData.containsKey(c)).last)
                     horizontalSpace(Spacing.points8),
                 ])
             .toList(),
@@ -328,56 +332,86 @@ class VaultScreen extends ConsumerWidget {
     String textKey,
     Color iconColor,
     Color backgroundColor,
-    VoidCallback onTap,
-  ) {
+    VoidCallback onTap, {
+    bool hasPlusBadge = false,
+  }) {
     return GestureDetector(
       onTap: () {
         HapticFeedback.lightImpact();
         onTap();
       },
-      child: WidgetsContainer(
-        width: 70,
-        height: 70,
-        padding: EdgeInsets.all(8),
-        backgroundColor: backgroundColor,
-        borderSide:
-            BorderSide(color: iconColor.withValues(alpha: 0.3), width: 1),
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: iconColor.withValues(alpha: 0.1),
-            blurRadius: 8,
-            offset: Offset(0, 2),
-          ),
-        ],
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              padding: EdgeInsets.all(6),
-              decoration: BoxDecoration(
+      child: Stack(
+        children: [
+          WidgetsContainer(
+            width: 70,
+            height: 70,
+            padding: EdgeInsets.all(8),
+            backgroundColor: backgroundColor,
+            borderSide:
+                BorderSide(color: iconColor.withValues(alpha: 0.3), width: 1),
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
                 color: iconColor.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(6),
+                blurRadius: 8,
+                offset: Offset(0, 2),
               ),
-              child: Icon(
-                icon,
-                size: 18,
-                color: iconColor,
+            ],
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  padding: EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    color: iconColor.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: Icon(
+                    icon,
+                    size: 18,
+                    color: iconColor,
+                  ),
+                ),
+                verticalSpace(Spacing.points4),
+                Text(
+                  AppLocalizations.of(context).translate(textKey),
+                  style: TextStyles.small.copyWith(
+                    color: theme.grey[900],
+                    fontWeight: FontWeight.w500,
+                  ),
+                  textAlign: TextAlign.center,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+          ),
+          // Plus badge overlay
+          if (hasPlusBadge)
+            Positioned(
+              top: -2,
+              right: -2,
+              child: Container(
+                padding: EdgeInsets.all(4),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFEBA01),
+                  borderRadius: BorderRadius.circular(8),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.1),
+                      blurRadius: 4,
+                      offset: Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Icon(
+                  Ta3afiPlatformIcons.plus_icon,
+                  color: Colors.black,
+                  size: 10,
+                ),
               ),
             ),
-            verticalSpace(Spacing.points4),
-            Text(
-              AppLocalizations.of(context).translate(textKey),
-              style: TextStyles.small.copyWith(
-                color: theme.grey[900],
-                fontWeight: FontWeight.w500,
-              ),
-              textAlign: TextAlign.center,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ],
-        ),
+        ],
       ),
     );
   }

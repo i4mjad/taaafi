@@ -1577,6 +1577,8 @@ const Map<String, String> kEn = {
       "Start logging your daily follow-ups to see data here",
   "error-loading-data": "Error loading data",
 
+  // Messaging groups
+  "notifications-groups": "Notifications Groups",
   // Months
   "january": "January",
   "february": "February",
@@ -2170,5 +2172,27 @@ const Map<String, String> kEn = {
   "set-realistic-goals-desc":
       "Use your current averages to set achievable improvement targets for the next period.",
   "set-realistic-goals-benefit":
-      "Build confidence through achievable goals while working toward long-term recovery."
+      "Build confidence through achievable goals while working toward long-term recovery.",
+  "messaging-groups": "Messaging Groups",
+  "messagingGroups": "Messaging Groups",
+  "subscription-groups-subtitle":
+      "Choose topics you want to receive notifications about",
+  "loading-groups": "Loading notification groups...",
+  "no-groups-available": "No groups available",
+  "no-groups-description": "Check back later for new notification topics",
+  "error-loading-groups": "Failed to load notification groups",
+  "refresh-groups": "Refresh",
+  "subscription-successful": "Successfully subscribed to group",
+  "subscription-failed": "Failed to subscribe to group",
+  "unsubscription-successful": "Successfully unsubscribed from group",
+  "unsubscription-failed": "Failed to unsubscribe from group",
+  "cannot-unsubscribe-all-users": "Cannot unsubscribe from default user group",
+  "plus-feature-badge": "Plus Feature",
+  "member-count": "member",
+  "members-count": "members",
+  "default-group": "Default Group",
+  "subscribed-to-group": "Subscribed",
+  "upgrade-to-plus-messaging": "Upgrade to Plus",
+  "subscribe-to-group": "Subscribe",
+  "requires-plus-subscription": "Requires Ta3afi Plus"
 };

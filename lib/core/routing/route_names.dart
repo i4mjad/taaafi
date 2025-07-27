@@ -31,6 +31,7 @@ enum RouteNames {
   vaultSettings,
   activitiesNotifications,
   premiumAnalytics,
+  messagingGroups,
   community,
   groups, // New groups main route
   // Community routes

@@ -78,16 +78,19 @@ class _VaultLayoutSettingsSheetState
     'activities': LucideIcons.clipboardCheck,
     'library': LucideIcons.lamp,
     'diaries': LucideIcons.pencil,
-    'notifications': LucideIcons.bell,
-    'settings': LucideIcons.settings,
+    'messagingGroups': LucideIcons.messageSquare,
   };
 
   final Map<String, String> _cardTitleKeys = {
     'activities': 'activities',
     'library': 'library',
     'diaries': 'diaries',
-    'notifications': 'notifications',
-    'settings': 'settings',
+    'messagingGroups': 'messagingGroups',
+  };
+
+  // Define which cards are locked (require subscription)
+  final Set<String> _lockedCards = {
+    'messagingGroups',
   };
 
   Map<String, Map<String, Color>> _getCardThemeColors(CustomThemeData theme) {
@@ -104,13 +107,9 @@ class _VaultLayoutSettingsSheetState
         'icon': theme.tint[500]!,
         'background': theme.tint[50]!,
       },
-      'notifications': {
+      'messagingGroups': {
         'icon': theme.warn[500]!,
         'background': theme.warn[50]!,
-      },
-      'settings': {
-        'icon': theme.grey[500]!,
-        'background': theme.grey[50]!,
       },
     };
   }
@@ -120,7 +119,11 @@ class _VaultLayoutSettingsSheetState
     super.initState();
     final vaultLayoutSettings = ref.read(vaultLayoutProvider);
     _orderedVaultElements = List.from(vaultLayoutSettings.vaultElementsOrder);
-    _orderedCards = List.from(vaultLayoutSettings.cardsOrder);
+    // Filter out invalid cards from the saved order
+    _orderedCards = vaultLayoutSettings.cardsOrder
+        .where((card) =>
+            _cardIcons.containsKey(card) && _cardTitleKeys.containsKey(card))
+        .toList();
   }
 
   @override
@@ -182,8 +185,7 @@ class _VaultLayoutSettingsSheetState
                         'activities',
                         'library',
                         'diaries',
-                        'notifications',
-                        'settings'
+                        'messagingGroups'
                       ]);
                     });
                   },
@@ -270,7 +272,8 @@ class _VaultLayoutSettingsSheetState
                   verticalSpace(Spacing.points16),
 
                   // Quick Access Cards Horizontal List
-                  _buildHorizontalCardsReorderList(theme, vaultLayoutSettings),
+                  _buildHorizontalCardsReorderList(
+                      theme, vaultLayoutSettings, hasSubscription),
 
                   verticalSpace(Spacing.points24),
 
@@ -312,7 +315,7 @@ class _VaultLayoutSettingsSheetState
                       theme, vaultLayoutSettings, hasSubscription),
 
                   // Extra bottom padding for better scrolling experience
-                  verticalSpace(Spacing.points32),
+                  verticalSpace(Spacing.points24),
                 ],
               ),
             ),
@@ -322,8 +325,8 @@ class _VaultLayoutSettingsSheetState
     );
   }
 
-  Widget _buildHorizontalCardsReorderList(
-      CustomThemeData theme, VaultLayoutSettings settings) {
+  Widget _buildHorizontalCardsReorderList(CustomThemeData theme,
+      VaultLayoutSettings settings, bool hasSubscription) {
     final cardThemeColors = _getCardThemeColors(theme);
 
     return SizedBox(
@@ -377,7 +380,11 @@ class _VaultLayoutSettingsSheetState
         },
         itemBuilder: (context, index) {
           final card = _orderedCards[index];
-          final isVisible = settings.cardsVisibility[card] ?? false;
+
+          final isLocked = _lockedCards.contains(card);
+          final isVisible = isLocked
+              ? (hasSubscription && (settings.cardsVisibility[card] ?? false))
+              : (settings.cardsVisibility[card] ?? false);
           final cardColors = cardThemeColors[card]!;
           final iconColor = cardColors['icon']!;
           final backgroundColor = cardColors['background']!;
@@ -388,66 +395,107 @@ class _VaultLayoutSettingsSheetState
             child: Column(
               children: [
                 GestureDetector(
-                  onTap: () {
-                    HapticFeedback.lightImpact();
-                    ref
-                        .read(vaultLayoutProvider.notifier)
-                        .toggleCardVisibility(card, !isVisible);
-                  },
-                  child: WidgetsContainer(
-                    width: 70,
-                    height: 70,
-                    padding: EdgeInsets.all(8),
-                    backgroundColor:
-                        isVisible ? backgroundColor : theme.grey[100],
-                    borderSide: BorderSide(
-                      color: isVisible
-                          ? iconColor.withValues(alpha: 0.3)
-                          : theme.grey[200]!,
-                      width: 1,
-                    ),
-                    borderRadius: BorderRadius.circular(12),
-                    boxShadow: isVisible
-                        ? [
-                            BoxShadow(
-                              color: iconColor.withValues(alpha: 0.1),
-                              blurRadius: 8,
-                              offset: Offset(0, 2),
+                  onTap: isLocked && !hasSubscription
+                      ? null // Disable tap for locked cards without subscription
+                      : () {
+                          HapticFeedback.lightImpact();
+                          ref
+                              .read(vaultLayoutProvider.notifier)
+                              .toggleCardVisibility(card, !isVisible);
+                        },
+                  child: Stack(
+                    children: [
+                      WidgetsContainer(
+                        width: 70,
+                        height: 70,
+                        padding: EdgeInsets.all(8),
+                        backgroundColor: isLocked && !hasSubscription
+                            ? theme.grey[50]
+                            : (isVisible ? backgroundColor : theme.grey[100]),
+                        borderSide: BorderSide(
+                          color: isLocked && !hasSubscription
+                              ? theme.grey[100]!
+                              : (isVisible
+                                  ? iconColor.withValues(alpha: 0.3)
+                                  : theme.grey[200]!),
+                          width: 1,
+                        ),
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: isVisible && (!isLocked || hasSubscription)
+                            ? [
+                                BoxShadow(
+                                  color: iconColor.withValues(alpha: 0.1),
+                                  blurRadius: 8,
+                                  offset: Offset(0, 2),
+                                ),
+                              ]
+                            : null,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(
+                              padding: EdgeInsets.all(6),
+                              decoration: BoxDecoration(
+                                color: isLocked && !hasSubscription
+                                    ? theme.grey[200]
+                                    : (isVisible
+                                        ? iconColor.withValues(alpha: 0.1)
+                                        : theme.grey[200]),
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: Icon(
+                                _cardIcons[card],
+                                size: 18,
+                                color: isLocked && !hasSubscription
+                                    ? theme.grey[400]
+                                    : (isVisible ? iconColor : theme.grey[400]),
+                              ),
                             ),
-                          ]
-                        : null,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Container(
-                          padding: EdgeInsets.all(6),
-                          decoration: BoxDecoration(
-                            color: isVisible
-                                ? iconColor.withValues(alpha: 0.1)
-                                : theme.grey[200],
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          child: Icon(
-                            _cardIcons[card],
-                            size: 18,
-                            color: isVisible ? iconColor : theme.grey[400],
+                            verticalSpace(Spacing.points4),
+                            Text(
+                              AppLocalizations.of(context)
+                                  .translate(_cardTitleKeys[card]!),
+                              style: TextStyles.small.copyWith(
+                                color: isLocked && !hasSubscription
+                                    ? theme.grey[400]
+                                    : (isVisible
+                                        ? theme.grey[900]
+                                        : theme.grey[600]),
+                                fontWeight: FontWeight.w500,
+                              ),
+                              textAlign: TextAlign.center,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
+                        ),
+                      ),
+                      // Plus badge for locked cards
+                      if (isLocked && !hasSubscription)
+                        Positioned(
+                          top: -2,
+                          right: -2,
+                          child: Container(
+                            padding: EdgeInsets.all(4),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFFEBA01),
+                              borderRadius: BorderRadius.circular(8),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withValues(alpha: 0.1),
+                                  blurRadius: 4,
+                                  offset: Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            child: Icon(
+                              LucideIcons.crown,
+                              color: Colors.black,
+                              size: 8,
+                            ),
                           ),
                         ),
-                        verticalSpace(Spacing.points4),
-                        Text(
-                          AppLocalizations.of(context)
-                              .translate(_cardTitleKeys[card]!),
-                          style: TextStyles.small.copyWith(
-                            color:
-                                isVisible ? theme.grey[900] : theme.grey[600],
-                            fontWeight: FontWeight.w500,
-                          ),
-                          textAlign: TextAlign.center,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ],
-                    ),
+                    ],
                   ),
                 ),
                 verticalSpace(Spacing.points8),

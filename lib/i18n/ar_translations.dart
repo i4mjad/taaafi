@@ -2055,6 +2055,9 @@ const Map<String, String> kAr = {
   "mood-management-benefit":
       "بناء المرونة العاطفية وتقليل تأثير المشاعر الصعبة على تعافيك.",
 
+  // Messaging groups
+  "notifications-groups": "مجموعات الإشعارات",
+
   // Streak Averages Help
   "streak-averages-help-title": "كيفية قراءة متوسطات الخطوط",
   "streak-averages-overview": "فهم اتجاهات تقدمك",
@@ -2096,5 +2099,27 @@ const Map<String, String> kAr = {
       "بناء الثقة من خلال أهداف قابلة للتحقيق أثناء العمل نحو التعافي طويل المدى.",
   "last-7-days": "آخر 7 أيام",
   "last-30-days": "آخر 30 يوم",
-  "last-90-days": "آخر 90 يوم"
+  "last-90-days": "آخر 90 يوم",
+  "messaging-groups": "مجموعات المراسلة",
+  "messagingGroups": "مجموعات المراسلة",
+  "subscription-groups-subtitle": "اختر المواضيع التي تريد تلقي إشعارات عنها",
+  "loading-groups": "جاري تحميل مجموعات الإشعارات...",
+  "no-groups-available": "لا توجد مجموعات متاحة",
+  "no-groups-description": "تحقق لاحقاً للحصول على مواضيع إشعارات جديدة",
+  "error-loading-groups": "فشل في تحميل مجموعات الإشعارات",
+  "refresh-groups": "تحديث",
+  "subscription-successful": "تم الاشتراك في المجموعة بنجاح",
+  "subscription-failed": "فشل في الاشتراك في المجموعة",
+  "unsubscription-successful": "تم إلغاء الاشتراك من المجموعة بنجاح",
+  "unsubscription-failed": "فشل في إلغاء الاشتراك من المجموعة",
+  "cannot-unsubscribe-all-users":
+      "لا يمكن إلغاء الاشتراك من مجموعة المستخدمين الافتراضية",
+  "plus-feature-badge": "ميزة بلس",
+  "member-count": "عضو",
+  "members-count": "أعضاء",
+  "default-group": "المجموعة الافتراضية",
+  "subscribed-to-group": "مشترك",
+  "upgrade-to-plus-messaging": "ترقية إلى بلس",
+  "subscribe-to-group": "اشتراك",
+  "requires-plus-subscription": "يتطلب تعافي بلس"
 };

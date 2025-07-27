@@ -94,8 +94,7 @@ class VaultLayoutNotifier extends StateNotifier<VaultLayoutSettings> {
     'activities',
     'library',
     'diaries',
-    'notifications',
-    'settings',
+    'messagingGroups',
   ];
 
   static const List<String> _defaultAnalyticsOrder = [
@@ -123,8 +122,7 @@ class VaultLayoutNotifier extends StateNotifier<VaultLayoutSettings> {
             'activities': true,
             'library': true,
             'diaries': true,
-            'notifications': true,
-            'settings': true,
+            'messagingGroups': true,
           },
           cardsOrder: _defaultCardsOrder,
           analyticsVisibility: {
@@ -153,9 +151,8 @@ class VaultLayoutNotifier extends StateNotifier<VaultLayoutSettings> {
     final activities = prefs.getBool('vault_card_activities_visible') ?? true;
     final library = prefs.getBool('vault_card_library_visible') ?? true;
     final diaries = prefs.getBool('vault_card_diaries_visible') ?? true;
-    final notifications =
-        prefs.getBool('vault_card_notifications_visible') ?? true;
-    final settings = prefs.getBool('vault_card_settings_visible') ?? true;
+    final messagingGroups =
+        prefs.getBool('vault_card_messagingGroups_visible') ?? true;
 
     // Load analytics visibility (now part of vault elements, use same key format)
     final streakAverages =
@@ -171,8 +168,14 @@ class VaultLayoutNotifier extends StateNotifier<VaultLayoutSettings> {
     final vaultElementsOrderString =
         prefs.getStringList('vault_vault_elements_order') ??
             _defaultVaultElementsOrder;
-    final cardsOrderString =
-        prefs.getStringList('vault_cards_order') ?? _defaultCardsOrder;
+
+    // Check if stored cards order needs migration (add messagingGroups if missing)
+    final storedCardsOrder = prefs.getStringList('vault_cards_order');
+    final cardsOrderString = (storedCardsOrder == null ||
+            !storedCardsOrder.contains('messagingGroups'))
+        ? _defaultCardsOrder // Use default if no stored order or missing messagingGroups
+        : storedCardsOrder;
+
     final analyticsOrderString =
         prefs.getStringList('vault_analytics_order') ?? _defaultAnalyticsOrder;
 
@@ -185,6 +188,14 @@ class VaultLayoutNotifier extends StateNotifier<VaultLayoutSettings> {
     for (final element in _defaultVaultElementsOrder) {
       if (!finalVaultElementsOrder.contains(element)) {
         finalVaultElementsOrder.add(element);
+      }
+    }
+
+    // Same merge logic for cards order to ensure new cards are added to existing users
+    final finalCardsOrder = List<String>.from(cardsOrderString);
+    for (final card in _defaultCardsOrder) {
+      if (!finalCardsOrder.contains(card)) {
+        finalCardsOrder.add(card);
       }
     }
 
@@ -205,10 +216,9 @@ class VaultLayoutNotifier extends StateNotifier<VaultLayoutSettings> {
         'activities': activities,
         'library': library,
         'diaries': diaries,
-        'notifications': notifications,
-        'settings': settings,
+        'messagingGroups': messagingGroups,
       },
-      cardsOrder: cardsOrderString,
+      cardsOrder: finalCardsOrder,
       analyticsVisibility: {
         'streakAverages': streakAverages,
         'heatMapCalendar': heatMapCalendar,
