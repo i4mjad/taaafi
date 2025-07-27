@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { Switch } from '@/components/ui/switch';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Loader2, Plus, Users, AlertCircle, CheckCircle } from 'lucide-react';
 import { useTranslation } from "@/contexts/TranslationContext";
@@ -18,6 +19,7 @@ interface GroupData {
   description: string;
   descriptionAr: string;
   topicId: string;
+  isForPlusUsers: boolean;
 }
 
 interface CreateGroupDialogProps {
@@ -35,7 +37,8 @@ export default function CreateGroupDialog({ trigger, onGroupCreated }: CreateGro
     nameAr: '',
     description: '',
     descriptionAr: '',
-    topicId: ''
+    topicId: '',
+    isForPlusUsers: false
   });
 
   const validateForm = () => {
@@ -95,6 +98,7 @@ export default function CreateGroupDialog({ trigger, onGroupCreated }: CreateGro
         topicId: formData.topicId,
         memberCount: 0,
         isActive: true,
+        isForPlusUsers: formData.isForPlusUsers,
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
       };
@@ -109,7 +113,8 @@ export default function CreateGroupDialog({ trigger, onGroupCreated }: CreateGro
         nameAr: '',
         description: '',
         descriptionAr: '',
-        topicId: ''
+        topicId: '',
+        isForPlusUsers: false
       });
       
       // Call callback if provided
@@ -247,6 +252,22 @@ export default function CreateGroupDialog({ trigger, onGroupCreated }: CreateGro
                 rows={3}
                 dir="rtl"
               />
+            </div>
+          </div>
+
+          {/* Plus Users Flag */}
+          <div className="flex items-center space-x-2">
+            <Switch
+              id="isForPlusUsers"
+              checked={formData.isForPlusUsers}
+              onCheckedChange={(checked) => setFormData({ ...formData, isForPlusUsers: checked })}
+              disabled={isLoading}
+            />
+            <div className="space-y-1">
+              <Label htmlFor="isForPlusUsers">{t('modules.userManagement.groups.isPlusUsers') || 'Plus Users Only'}</Label>
+              <p className="text-sm text-muted-foreground">
+                {t('modules.userManagement.groups.isPlusUsersHelp') || 'Restrict this group to premium/plus users only'}
+              </p>
             </div>
           </div>
 

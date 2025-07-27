@@ -57,6 +57,7 @@ interface Group {
   topicId: string;
   memberCount: number;
   isActive: boolean;
+  isForPlusUsers?: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -92,6 +93,7 @@ export default function GroupsManagementPage() {
       topicId: data.topicId,
       memberCount: data.memberCount || 0,
       isActive: data.isActive !== false, // Default to true if not specified
+      isForPlusUsers: data.isForPlusUsers || false, // Default to false if not specified
       createdAt: data.createdAt?.toDate() || new Date(),
       updatedAt: data.updatedAt?.toDate() || new Date(),
     };
@@ -264,6 +266,7 @@ export default function GroupsManagementPage() {
                           <TableHead>{t('modules.userManagement.groups.members') || 'Members'}</TableHead>
                           <TableHead>{t('modules.userManagement.groups.status') || 'Status'}</TableHead>
                           <TableHead>{t('modules.userManagement.groups.created') || 'Created'}</TableHead>
+                          <TableHead>{t('modules.userManagement.groups.isPlusUsers') || 'Is Plus Users'}</TableHead>
                           <TableHead className="w-[50px]">{t('common.actions') || 'Actions'}</TableHead>
                         </TableRow>
                       </TableHeader>
@@ -302,6 +305,11 @@ export default function GroupsManagementPage() {
                               <div className="text-sm text-muted-foreground">
                                 {formatDate(group.createdAt)}
                               </div>
+                            </TableCell>
+                            <TableCell>
+                              <Badge variant={group.isForPlusUsers ? "default" : "secondary"}>
+                                {group.isForPlusUsers ? (t('common.yes') || 'Yes') : (t('common.no') || 'No')}
+                              </Badge>
                             </TableCell>
                             <TableCell>
                               <DropdownMenu>

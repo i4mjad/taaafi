@@ -22,6 +22,7 @@ interface Group {
   topicId: string;
   memberCount: number;
   isActive: boolean;
+  isForPlusUsers?: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -32,6 +33,7 @@ interface GroupFormData {
   description: string;
   descriptionAr: string;
   isActive: boolean;
+  isForPlusUsers: boolean;
 }
 
 interface EditGroupDialogProps {
@@ -50,7 +52,8 @@ export default function EditGroupDialog({ open, onOpenChange, group, onGroupUpda
     nameAr: '',
     description: '',
     descriptionAr: '',
-    isActive: true
+    isActive: true,
+    isForPlusUsers: false
   });
 
   // Initialize form data when group changes
@@ -61,7 +64,8 @@ export default function EditGroupDialog({ open, onOpenChange, group, onGroupUpda
         nameAr: group.nameAr,
         description: group.description || '',
         descriptionAr: group.descriptionAr || '',
-        isActive: group.isActive
+        isActive: group.isActive,
+        isForPlusUsers: group.isForPlusUsers || false
       });
     }
   }, [group]);
@@ -101,6 +105,7 @@ export default function EditGroupDialog({ open, onOpenChange, group, onGroupUpda
         description: formData.description,
         descriptionAr: formData.descriptionAr,
         isActive: formData.isActive,
+        isForPlusUsers: formData.isForPlusUsers,
         updatedAt: serverTimestamp(),
       };
 
@@ -237,6 +242,22 @@ export default function EditGroupDialog({ open, onOpenChange, group, onGroupUpda
               <Label htmlFor="isActive">{t('modules.userManagement.groups.activeGroup') || 'Active Group'}</Label>
               <p className="text-sm text-muted-foreground">
                 {t('modules.userManagement.groups.activeGroupHelp') || 'Inactive groups cannot receive new subscriptions'}
+              </p>
+            </div>
+          </div>
+
+          {/* Plus Users Flag */}
+          <div className="flex items-center space-x-2">
+            <Switch
+              id="isForPlusUsers"
+              checked={formData.isForPlusUsers}
+              onCheckedChange={(checked) => setFormData({ ...formData, isForPlusUsers: checked })}
+              disabled={isLoading}
+            />
+            <div className="space-y-1">
+              <Label htmlFor="isForPlusUsers">{t('modules.userManagement.groups.isPlusUsers') || 'Plus Users Only'}</Label>
+              <p className="text-sm text-muted-foreground">
+                {t('modules.userManagement.groups.isPlusUsersHelp') || 'Restrict this group to premium/plus users only'}
               </p>
             </div>
           </div>

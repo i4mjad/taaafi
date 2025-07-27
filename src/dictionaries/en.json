@@ -515,6 +515,8 @@
           "groupLabel": "Group", 
           "unknownSubscription": "Unknown Subscription",
           "notAvailable": "N/A",
+          "isPlusUsers": "Plus Users Only",
+          "isPlusUsersHelp": "Restrict this group to premium/plus users only",
           "errors": {
             "nameRequired": "English name is required",
             "nameArRequired": "Arabic name is required",

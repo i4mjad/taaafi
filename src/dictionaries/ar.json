@@ -515,6 +515,8 @@
           "groupLabel": "المجموعة",
           "unknownSubscription": "اشتراك غير معروف",
           "notAvailable": "غير متوفر",
+          "isPlusUsers": "مستخدمو بلس فقط",
+          "isPlusUsersHelp": "تقييد هذه المجموعة لمستخدمي البريميوم/بلس فقط",
           "errors": {
             "nameRequired": "الاسم الإنجليزي مطلوب",
             "nameArRequired": "الاسم العربي مطلوب",
