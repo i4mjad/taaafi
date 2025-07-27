@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -9,6 +8,7 @@ import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/routing/route_names.dart';
 import 'package:reboot_app_3/core/shared_widgets/app_bar.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
+import 'package:reboot_app_3/core/shared_widgets/premium_blur_overlay.dart';
 import 'package:reboot_app_3/core/shared_widgets/spinner.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/custom_theme_data.dart';
@@ -609,92 +609,6 @@ class DayTriggers extends ConsumerWidget {
     return triggers.toSet().toList(); // Remove duplicates
   }
 
-  /// Build blurred trigger content for non-premium users
-  Widget _buildBlurredTriggerContent(
-    BuildContext context,
-    CustomThemeData theme,
-    Widget content,
-  ) {
-    return GestureDetector(
-      onTap: () {
-        HapticFeedback.lightImpact();
-        showModalBottomSheet(
-          context: context,
-          isScrollControlled: true,
-          backgroundColor: Colors.transparent,
-          useSafeArea: true,
-          builder: (context) => const TaaafiPlusSubscriptionScreen(),
-        );
-      },
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(
-          minHeight: 80,
-          maxHeight: 150,
-        ),
-        child: Stack(
-          children: [
-            // Original content (visible through blur)
-            SingleChildScrollView(
-              physics: const NeverScrollableScrollPhysics(),
-              child: content,
-            ),
-
-            // Blur overlay matching vault screen strategy
-            Positioned.fill(
-              child: ClipRect(
-                child: BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: 3.5, sigmaY: 3.5),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [
-                          Colors.white.withValues(alpha: 0.3),
-                          Colors.white.withValues(alpha: 0.6),
-                          Colors.white.withValues(alpha: 0.8),
-                          Colors.white.withValues(alpha: 0.6),
-                        ],
-                        stops: const [0.0, 0.3, 0.7, 1.0],
-                      ),
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-
-            // Lock icon and upgrade text
-            Positioned.fill(
-              child: Center(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      LucideIcons.lock,
-                      color: theme.primary[600],
-                      size: 24,
-                    ),
-                    verticalSpace(Spacing.points4),
-                    Text(
-                      AppLocalizations.of(context)
-                          .translate('upgrade-to-unlock'),
-                      style: TextStyles.small.copyWith(
-                        color: theme.primary[600],
-                        fontWeight: FontWeight.w600,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = AppTheme.of(context);
@@ -798,7 +712,15 @@ class DayTriggers extends ConsumerWidget {
         if (hasSubscription)
           triggerContent
         else
-          _buildBlurredTriggerContent(context, theme, triggerContent),
+          PremiumBlurOverlay(
+            content: triggerContent,
+            isDarkTheme: false,
+            constraints: const BoxConstraints(
+              minHeight: 120,
+              maxHeight: 200,
+            ),
+            margin: EdgeInsets.zero,
+          ),
       ],
     );
   }
