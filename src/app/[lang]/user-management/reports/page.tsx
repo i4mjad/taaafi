@@ -95,8 +95,9 @@ export default function UserReportsPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [dateRangeFilter, setDateRangeFilter] = useState<string>('all');
+  const [reportTypeFilter, setReportTypeFilter] = useState<string>('all');
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [itemsPerPage, setItemsPerPage] = useState(50);
   
   // Bulk update state
   const [selectedReports, setSelectedReports] = useState<Set<string>>(new Set());
@@ -437,24 +438,37 @@ export default function UserReportsPage() {
     const reports: UserReport[] = [];
     
     // For specific status filters, use simple query
+    if (statusFilter !== 'all' || reportTypeFilter !== 'all') {
+      let q = query(collection(db, 'usersReports'));
+      
+      // Add status filter if not 'all'
     if (statusFilter !== 'all') {
-      let q = query(
-        collection(db, 'usersReports'),
-        where('status', '==', statusFilter),
-        orderBy('time', 'desc'),
-        limit(itemsPerPage)
-      );
+        q = query(q, where('status', '==', statusFilter));
+      }
+      
+      // Add report type filter if not 'all'
+      if (reportTypeFilter !== 'all') {
+        q = query(q, where('reportTypeId', '==', reportTypeFilter));
+      }
+      
+      q = query(q, orderBy('time', 'desc'), limit(itemsPerPage));
 
       if (currentPage > 1 && lastVisible) {
         const cachedPage = pageCache.get(currentPage - 1);
         if (cachedPage?.lastDoc) {
-          q = query(
-            collection(db, 'usersReports'),
-            where('status', '==', statusFilter),
-            orderBy('time', 'desc'),
-            startAfter(cachedPage.lastDoc),
-            limit(itemsPerPage)
-          );
+          let paginatedQuery = query(collection(db, 'usersReports'));
+          
+          // Add status filter if not 'all'
+          if (statusFilter !== 'all') {
+            paginatedQuery = query(paginatedQuery, where('status', '==', statusFilter));
+          }
+          
+          // Add report type filter if not 'all'
+          if (reportTypeFilter !== 'all') {
+            paginatedQuery = query(paginatedQuery, where('reportTypeId', '==', reportTypeFilter));
+          }
+          
+          q = query(paginatedQuery, orderBy('time', 'desc'), startAfter(cachedPage.lastDoc), limit(itemsPerPage));
         }
       }
 
@@ -471,7 +485,7 @@ export default function UserReportsPage() {
       }));
     }
 
-    // For 'all' status, fetch pending first, then others to fill the page
+    // For 'all' status and 'all' report type, fetch pending first, then others to fill the page
     const statusPriority = ['pending', 'inProgress', 'waitingForAdminResponse', 'closed', 'finalized'];
     let remainingSlots = itemsPerPage;
     let skipCount = (currentPage - 1) * itemsPerPage;
@@ -530,11 +544,25 @@ export default function UserReportsPage() {
       
       // Get total count for the first page or when filters change
       if (page === 1 || reset) {
-        const countQuery = statusFilter !== 'all' 
-          ? query(collection(db, 'usersReports'), where('status', '==', statusFilter))
-          : query(collection(db, 'usersReports'));
+        try {
+          let countQuery = query(collection(db, 'usersReports'));
+          
+          // Add status filter if not 'all'
+          if (statusFilter !== 'all') {
+            countQuery = query(countQuery, where('status', '==', statusFilter));
+          }
+          
+          // Add report type filter if not 'all'
+          if (reportTypeFilter !== 'all') {
+            countQuery = query(countQuery, where('reportTypeId', '==', reportTypeFilter));
+          }
+          
         const countSnapshot = await getDocs(countQuery);
         setTotalCount(countSnapshot.size);
+        } catch (countError) {
+          console.error('Error fetching total count:', countError);
+          setTotalCount(0); // Set to 0 on error
+        }
       }
       
     } catch (error) {
@@ -550,7 +578,7 @@ export default function UserReportsPage() {
   useEffect(() => {
     const shouldReset = currentPage === 1;
     fetchReports(currentPage, shouldReset);
-  }, [currentPage, statusFilter, itemsPerPage]);
+  }, [currentPage, statusFilter, reportTypeFilter, itemsPerPage]);
 
   // Effect to fetch status counts on component mount and when bulk updates happen
   useEffect(() => {
@@ -564,12 +592,12 @@ export default function UserReportsPage() {
     } else {
       fetchReports(1, true);
     }
-  }, [statusFilter, dateRangeFilter]);
+  }, [statusFilter, dateRangeFilter, reportTypeFilter]);
 
   // Clear selections when page changes or filters change
   useEffect(() => {
     setSelectedReports(new Set());
-  }, [currentPage, statusFilter, dateRangeFilter]);
+  }, [currentPage, statusFilter, dateRangeFilter, reportTypeFilter]);
 
   // Convert report types to a lookup map
   const reportTypesMap = useMemo(() => {
@@ -636,8 +664,12 @@ export default function UserReportsPage() {
       );
     }
 
-    // Reports are already sorted by priority at the database level
-    // Only apply additional sorting if needed for search/filter results
+    // Sort by initial message length (shorter messages first)
+    filtered = filtered.sort((a, b) => {
+      const lengthA = a.initialMessage?.length || 0;
+      const lengthB = b.initialMessage?.length || 0;
+      return lengthA - lengthB;
+    });
 
     return filtered;
   }, [allReports, searchQuery, dateRangeFilter]);
@@ -931,6 +963,23 @@ export default function UserReportsPage() {
                         <SelectItem value="waitingForAdminResponse">{t('modules.userManagement.reports.statusWaitingForAdminResponse') || 'Waiting for Admin Response'}</SelectItem>
                         <SelectItem value="closed">{t('modules.userManagement.reports.statusClosed') || 'Closed'}</SelectItem>
                         <SelectItem value="finalized">{t('modules.userManagement.reports.statusFinalized') || 'Finalized'}</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <Select value={reportTypeFilter} onValueChange={setReportTypeFilter}>
+                      <SelectTrigger className="w-full sm:w-[200px] h-10">
+                        <SelectValue placeholder={t('modules.userManagement.reports.filterByReportType') || 'Filter by Report Type'} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">{t('modules.userManagement.reports.statusAll') || 'All Types'}</SelectItem>
+                        {reportTypesSnapshot && reportTypesSnapshot.docs.map((doc) => {
+                          const reportType = doc.data();
+                          const name = locale === 'ar' ? reportType.nameAr : reportType.nameEn;
+                          return (
+                            <SelectItem key={doc.id} value={doc.id}>
+                              {name || doc.id}
+                            </SelectItem>
+                          );
+                        })}
                       </SelectContent>
                     </Select>
                     <Select value={dateRangeFilter} onValueChange={setDateRangeFilter}>
@@ -1279,9 +1328,9 @@ export default function UserReportsPage() {
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="10">10</SelectItem>
-                        <SelectItem value="20">20</SelectItem>
                         <SelectItem value="50">50</SelectItem>
+                        <SelectItem value="100">100</SelectItem>
+                        <SelectItem value="250">250</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
