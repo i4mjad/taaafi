@@ -7,6 +7,7 @@ import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/routing/route_names.dart';
 import 'package:reboot_app_3/core/shared_widgets/app_bar.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
+import 'package:reboot_app_3/core/shared_widgets/premium_cta_button.dart';
 import 'package:reboot_app_3/core/shared_widgets/spinner.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/custom_theme_data.dart';
@@ -25,7 +26,6 @@ import 'package:reboot_app_3/core/shared_widgets/complete_registration_banner.da
 import 'package:reboot_app_3/core/shared_widgets/confirm_details_banner.dart';
 import 'package:reboot_app_3/core/shared_widgets/confirm_email_banner.dart';
 import 'package:reboot_app_3/features/plus/data/notifiers/subscription_notifier.dart';
-import 'package:reboot_app_3/features/plus/data/repositories/subscription_repository.dart';
 import 'package:reboot_app_3/core/theming/theme_provider.dart';
 import 'package:reboot_app_3/core/shared_widgets/premium_blur_overlay.dart';
 import 'package:reboot_app_3/features/vault/presentation/widgets/analytics/heat_map_calendar.dart';
@@ -33,6 +33,7 @@ import 'package:reboot_app_3/features/vault/presentation/widgets/analytics/strea
 import 'package:reboot_app_3/features/vault/presentation/widgets/analytics/trigger_radar.dart';
 import 'package:reboot_app_3/features/vault/presentation/widgets/analytics/risk_clock.dart';
 import 'package:reboot_app_3/features/vault/presentation/widgets/analytics/mood_correlation_chart.dart';
+import 'package:reboot_app_3/features/vault/presentation/widgets/help/help_bottom_sheet.dart';
 
 class VaultScreen extends ConsumerWidget {
   const VaultScreen({super.key});
@@ -54,7 +55,7 @@ class VaultScreen extends ConsumerWidget {
         false,
         actions: showMainContent
             ? [
-                _buildPremiumAnalyticsCTA(context, theme),
+                PremiumCtaAppBarIcon(),
                 IconButton(
                   onPressed: () {
                     showModalBottomSheet(
@@ -152,6 +153,7 @@ class VaultScreen extends ConsumerWidget {
             const CurrentStreaksSection(),
             LucideIcons.zap,
             const Color(0xFF6366F1), // Indigo
+            'currentStreaks',
           ),
           'streakAverages': _buildAnalyticsFeature(
             context,
@@ -163,6 +165,7 @@ class VaultScreen extends ConsumerWidget {
             LucideIcons.trendingUp,
             const Color(0xFF22C55E),
             isDarkTheme,
+            'streakAverages',
           ),
           'statistics': _buildVaultElement(
             context,
@@ -172,6 +175,7 @@ class VaultScreen extends ConsumerWidget {
             const StatisticsSection(),
             LucideIcons.pieChart,
             const Color(0xFF8B5CF6), // Purple
+            'statistics',
           ),
           'riskClock': _buildAnalyticsFeature(
             context,
@@ -183,6 +187,7 @@ class VaultScreen extends ConsumerWidget {
             LucideIcons.clock,
             const Color(0xFF06B6D4),
             isDarkTheme,
+            'riskClock',
           ),
           'calendar': _buildVaultElement(
             context,
@@ -192,6 +197,7 @@ class VaultScreen extends ConsumerWidget {
             const CalendarSection(),
             LucideIcons.calendar,
             const Color(0xFF06B6D4), // Cyan
+            'calendar',
           ),
           'heatMapCalendar': _buildAnalyticsFeature(
             context,
@@ -203,6 +209,7 @@ class VaultScreen extends ConsumerWidget {
             LucideIcons.calendar,
             const Color(0xFFEF4444),
             isDarkTheme,
+            'heatMapCalendar',
           ),
           'triggerRadar': _buildAnalyticsFeature(
             context,
@@ -214,6 +221,7 @@ class VaultScreen extends ConsumerWidget {
             LucideIcons.radar,
             const Color(0xFFF97316),
             isDarkTheme,
+            'triggerRadar',
           ),
           'moodCorrelation': _buildAnalyticsFeature(
             context,
@@ -226,6 +234,7 @@ class VaultScreen extends ConsumerWidget {
             LucideIcons.heartHandshake,
             const Color(0xFFEC4899),
             isDarkTheme,
+            'moodCorrelation',
           ),
         };
 
@@ -373,60 +382,6 @@ class VaultScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildPremiumAnalyticsCTA(
-      BuildContext context, CustomThemeData theme) {
-    return Consumer(
-      builder: (context, ref, child) {
-        final hasSubscription = ref.watch(hasActiveSubscriptionProvider);
-
-        return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0),
-          child: // TODO: Remove this test button in production
-
-              GestureDetector(
-            onTap: () async {
-              // Toggle subscription status for testing
-              Future(() async {
-                final notifier =
-                    ref.read(subscriptionNotifierProvider.notifier);
-                final currentStatus =
-                    ref.read(subscriptionNotifierProvider).valueOrNull;
-
-                if (currentStatus?.status == SubscriptionStatus.plus &&
-                    currentStatus?.isActive == true) {
-                  // Switch to free
-                  await notifier.updateSubscriptionForTesting(
-                    const SubscriptionInfo(
-                      status: SubscriptionStatus.free,
-                      isActive: false,
-                    ),
-                  );
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Test: Switched to FREE')),
-                  );
-                } else {
-                  // Switch to plus
-                  await notifier.updateSubscriptionForTesting(
-                    SubscriptionInfo(
-                      status: SubscriptionStatus.plus,
-                      isActive: true,
-                      expirationDate:
-                          DateTime.now().add(const Duration(days: 30)),
-                    ),
-                  );
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Test: Switched to PLUS')),
-                  );
-                }
-              });
-            },
-            child: Icon(LucideIcons.crown),
-          ),
-        );
-      },
-    );
-  }
-
   List<Widget> _buildVaultElementsWithSpacing(
       List<String> orderedElements, Map<String, Widget> elementsMap) {
     final List<Widget> result = [];
@@ -458,6 +413,7 @@ class VaultScreen extends ConsumerWidget {
     Widget content,
     IconData icon,
     Color iconColor,
+    String sectionKey,
   ) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
@@ -479,6 +435,22 @@ class VaultScreen extends ConsumerWidget {
                   style: TextStyles.h5.copyWith(
                     color: theme.grey[900],
                     fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+              // Help button
+              GestureDetector(
+                onTap: () => _showHelpForSection(context, sectionKey),
+                child: Container(
+                  padding: EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    color: theme.grey[100],
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: Icon(
+                    LucideIcons.helpCircle,
+                    size: 16,
+                    color: theme.grey[600],
                   ),
                 ),
               ),
@@ -510,13 +482,14 @@ class VaultScreen extends ConsumerWidget {
     IconData icon,
     Color iconColor,
     bool isDarkTheme,
+    String sectionKey,
   ) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Title with Icon (always visible)
+          // Title with Icon (always visible) - Consistent help button for all features
           Row(
             children: [
               Icon(
@@ -529,8 +502,24 @@ class VaultScreen extends ConsumerWidget {
                 child: Text(
                   title,
                   style: TextStyles.h5.copyWith(
-                    color: theme.grey[900],
+                    color: const Color(0xFFFEBA01),
                     fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+              // Help button - consistent for all features
+              GestureDetector(
+                onTap: () => _showHelpForSection(context, sectionKey),
+                child: Container(
+                  padding: EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    color: theme.grey[100],
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: Icon(
+                    LucideIcons.helpCircle,
+                    size: 16,
+                    color: theme.grey[600],
                   ),
                 ),
               ),
@@ -561,5 +550,37 @@ class VaultScreen extends ConsumerWidget {
         ],
       ),
     );
+  }
+
+  void _showHelpForSection(BuildContext context, String sectionKey) {
+    switch (sectionKey) {
+      case 'currentStreaks':
+        VaultHelpSheets.showCurrentStreaksHelp(context);
+        break;
+      case 'statistics':
+        VaultHelpSheets.showStatisticsHelp(context);
+        break;
+      case 'calendar':
+        VaultHelpSheets.showCalendarHelp(context);
+        break;
+      case 'heatMapCalendar':
+        VaultHelpSheets.showHeatMapCalendarHelp(context);
+        break;
+      case 'triggerRadar':
+        VaultHelpSheets.showTriggerRadarHelp(context);
+        break;
+      case 'riskClock':
+        VaultHelpSheets.showRiskClockHelp(context);
+        break;
+      case 'moodCorrelation':
+        VaultHelpSheets.showMoodCorrelationHelp(context);
+        break;
+      case 'streakAverages':
+        VaultHelpSheets.showStreakAveragesHelp(context);
+        break;
+      default:
+        VaultHelpSheets.showPremiumFeatureHelp(context, sectionKey);
+        break;
+    }
   }
 }

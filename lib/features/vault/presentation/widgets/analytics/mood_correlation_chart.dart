@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
-import 'package:reboot_app_3/core/shared_widgets/container.dart';
+
 import 'package:reboot_app_3/core/shared_widgets/spinner.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
@@ -24,7 +24,7 @@ class _MoodCorrelationChartState extends ConsumerState<MoodCorrelationChart> {
   @override
   Widget build(BuildContext context) {
     final theme = AppTheme.of(context);
-    final moodDataAsync = ref.watch(moodCorrelationDataProvider);
+    final moodDataAsync = ref.watch(cachedMoodCorrelationDataProvider);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -37,31 +37,7 @@ class _MoodCorrelationChartState extends ConsumerState<MoodCorrelationChart> {
             if (totalMoodEntries < 5) {
               return _buildEmptyState(context, theme);
             }
-            return Column(
-              children: [
-                _buildChart(context, theme, data),
-                WidgetsContainer(
-                    padding: EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                    child: Row(
-                      children: [
-                        Text(
-                          AppLocalizations.of(context)
-                              .translate('how-to-read-mood-correlation'),
-                          style: TextStyles.body.copyWith(
-                            color: theme.grey[800],
-                            height: 1.4,
-                          ),
-                        ),
-                        Spacer(),
-                        IconButton(
-                            onPressed: () {
-                              _showHelpModal(context, theme);
-                            },
-                            icon: Icon(LucideIcons.info))
-                      ],
-                    )),
-              ],
-            );
+            return _buildChart(context, theme, data);
           },
           loading: () => Center(child: Spinner()),
           error: (_, __) => _buildEmptyState(context, theme),
@@ -70,194 +46,7 @@ class _MoodCorrelationChartState extends ConsumerState<MoodCorrelationChart> {
     );
   }
 
-  void _showHelpModal(BuildContext context, dynamic theme) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      useSafeArea: true,
-      builder: (context) {
-        final mediaQuery = MediaQuery.of(context);
-        final availableHeight = mediaQuery.size.height - mediaQuery.padding.top;
-
-        return Container(
-          height: availableHeight * 0.9,
-          decoration: BoxDecoration(
-            color: theme.backgroundColor,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-          ),
-          child: Column(
-            children: [
-              // Drag handle
-              Container(
-                margin: EdgeInsets.only(top: 12, bottom: 8),
-                height: 4,
-                width: 40,
-                decoration: BoxDecoration(
-                  color: theme.grey[300],
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
-
-              // Header
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-                decoration: BoxDecoration(
-                  color: theme.primary[50],
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-                ),
-                child: Row(
-                  children: [
-                    Icon(
-                      LucideIcons.info,
-                      color: theme.primary[600],
-                      size: 20,
-                    ),
-                    horizontalSpace(Spacing.points12),
-                    Expanded(
-                      child: Text(
-                        AppLocalizations.of(context)
-                            .translate('how-to-read-mood-correlation'),
-                        style: TextStyles.h5.copyWith(
-                          color: theme.primary[800],
-                          fontWeight: FontWeight.w600,
-                          height: 1.4,
-                        ),
-                      ),
-                    ),
-                    IconButton(
-                      onPressed: () => Navigator.of(context).pop(),
-                      icon: Icon(
-                        LucideIcons.x,
-                        color: theme.grey[600],
-                        size: 20,
-                      ),
-                      constraints: BoxConstraints(minWidth: 32, minHeight: 32),
-                      padding: EdgeInsets.all(6),
-                    ),
-                  ],
-                ),
-              ),
-
-              // Content
-              Expanded(
-                child: SingleChildScrollView(
-                  padding: EdgeInsets.fromLTRB(
-                      20, 20, 20, 20 + mediaQuery.padding.bottom),
-                  child: _buildHelpContent(context, theme),
-                ),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildHelpContent(BuildContext context, dynamic theme) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Chart explanation
-        Text(
-          AppLocalizations.of(context)
-              .translate('mood-correlation-explanation'),
-          style: TextStyles.body.copyWith(
-            color: theme.grey[800],
-            height: 1.4,
-          ),
-        ),
-        verticalSpace(Spacing.points12),
-
-        Text(
-          AppLocalizations.of(context)
-              .translate('mood-correlation-bars-explanation'),
-          style: TextStyles.body.copyWith(
-            color: theme.grey[700],
-            height: 1.4,
-          ),
-        ),
-        verticalSpace(Spacing.points16),
-
-        // Correlation score explanation
-        Text(
-          AppLocalizations.of(context)
-              .translate('correlation-score-explanation'),
-          style: TextStyles.body.copyWith(
-            color: theme.grey[800],
-            fontWeight: FontWeight.w600,
-            height: 1.4,
-          ),
-        ),
-        verticalSpace(Spacing.points8),
-        Text(
-          AppLocalizations.of(context)
-              .translate('correlation-negative-explanation'),
-          style: TextStyles.body.copyWith(
-            color: theme.grey[700],
-            height: 1.4,
-          ),
-        ),
-        verticalSpace(Spacing.points4),
-        Text(
-          AppLocalizations.of(context)
-              .translate('correlation-positive-explanation'),
-          style: TextStyles.body.copyWith(
-            color: theme.grey[700],
-            height: 1.4,
-          ),
-        ),
-        verticalSpace(Spacing.points4),
-        Text(
-          AppLocalizations.of(context)
-              .translate('correlation-none-explanation'),
-          style: TextStyles.body.copyWith(
-            color: theme.grey[700],
-            height: 1.4,
-          ),
-        ),
-        verticalSpace(Spacing.points16),
-
-        // Action tips
-        Text(
-          AppLocalizations.of(context)
-              .translate('mood-correlation-action-tips'),
-          style: TextStyles.body.copyWith(
-            color: theme.grey[800],
-            fontWeight: FontWeight.w600,
-            height: 1.4,
-          ),
-        ),
-        verticalSpace(Spacing.points8),
-        Text(
-          AppLocalizations.of(context)
-              .translate('mood-correlation-negative-action'),
-          style: TextStyles.body.copyWith(
-            color: theme.grey[700],
-            height: 1.4,
-          ),
-        ),
-        verticalSpace(Spacing.points8),
-        Text(
-          AppLocalizations.of(context)
-              .translate('mood-correlation-positive-action'),
-          style: TextStyles.body.copyWith(
-            color: theme.grey[700],
-            height: 1.4,
-          ),
-        ),
-        verticalSpace(Spacing.points8),
-        Text(
-          AppLocalizations.of(context)
-              .translate('mood-correlation-none-action'),
-          style: TextStyles.body.copyWith(
-            color: theme.grey[700],
-            height: 1.4,
-          ),
-        ),
-      ],
-    );
-  }
+  // Removed built-in help functionality for consistent help system
 
   Widget _buildChart(
       BuildContext context, dynamic theme, MoodCorrelationData data) {

@@ -11,6 +11,7 @@ import 'package:reboot_app_3/core/monitoring/analytics_facade.dart';
 import 'package:reboot_app_3/core/shared_widgets/app_bar.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
 import 'package:reboot_app_3/core/shared_widgets/custom_segmented_button.dart';
+import 'package:reboot_app_3/core/shared_widgets/premium_cta_button.dart';
 import 'package:reboot_app_3/core/shared_widgets/snackbar.dart';
 import 'package:reboot_app_3/core/shared_widgets/spinner.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
@@ -49,7 +50,9 @@ class AccountScreen extends ConsumerWidget {
     final customTheme = ref.watch(customThemeProvider);
     return Scaffold(
         backgroundColor: theme.backgroundColor,
-        appBar: appBar(context, ref, 'account', false, true),
+        appBar: appBar(context, ref, 'account', false, true, actions: [
+          PremiumCtaAppBarIcon(),
+        ]),
         body: userDocAsync.when(
             loading: () => const Center(child: Spinner()),
             error: (e, _) => Center(child: Text(e.toString())),

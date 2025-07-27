@@ -1683,8 +1683,492 @@ const Map<String, String> kEn = {
   "upgrade-to-plus": "Upgrade to Plus",
   "unlock-premium-analytics": "Tap to unlock premium analytics",
 
+  // Help system translations
+  "how-to-use": "How to Use",
+
+  // Current streaks help
+  "current-streaks-help-title": "How to Read Current Streaks",
+  "what-are-streaks": "What Are Streaks?",
+  "streak-definition": "Understanding Streaks",
+  "streak-definition-desc":
+      "A streak represents consecutive days without engaging in specific behaviors. Each streak starts from zero and increases daily as you maintain your commitment.",
+  "streak-definition-benefit":
+      "Tracking streaks builds motivation, creates positive momentum, and helps you see tangible progress in your recovery journey.",
+
+  "streak-types-title": "Types of Streaks",
+  "relapse-free-streak": "Relapse-Free Streak",
+  "relapse-free-streak-desc":
+      "Shows days since your last full relapse (combination of both porn and masturbation). This is your main recovery metric.",
+  "relapse-free-streak-benefit":
+      "This is your primary indicator of recovery progress and represents complete abstinence from problematic behaviors.",
+
+  "porn-free-streak": "Porn-Free Streak",
+  "porn-free-streak-desc":
+      "Counts days since you last viewed pornographic content, even if other behaviors occurred.",
+  "porn-free-streak-benefit":
+      "Breaking the visual component helps rewire your brain's reward system and reduces compulsive urges.",
+
+  "clean-days-streak": "Clean Days Streak",
+  "clean-days-streak-desc":
+      "Days since masturbation occurred, tracking physical self-control and discipline.",
+  "clean-days-streak-benefit":
+      "Develops willpower and helps break the physical habit cycle that often accompanies addiction.",
+
+  "slip-up-free-streak": "Slip-Up Free Streak",
+  "slip-up-free-streak-desc":
+      "Days since minor setbacks or close calls that didn't result in full relapse.",
+  "slip-up-free-streak-benefit":
+      "Helps identify and prevent minor incidents before they escalate into full relapses.",
+
+  "how-to-use-streaks": "How to Use Streaks Effectively",
+  "viewing-streaks": "Viewing Your Progress",
+  "viewing-streaks-desc":
+      "Tap any streak to see detailed breakdown including months, days, hours, and minutes. Switch between simple day count and detailed view in settings.",
+  "viewing-streaks-benefit":
+      "Detailed tracking increases awareness and appreciation for your progress, especially during difficult moments.",
+
+  "streak-motivation": "Staying Motivated",
+  "streak-motivation-desc":
+      "Use streaks as daily motivation reminders. Focus on extending your current streak rather than comparing to past achievements.",
+  "streak-motivation-benefit":
+      "Each day becomes a small victory, building confidence and creating positive addiction to healthy progress.",
+
+  // Streaks usage help
+  "managing-streaks": "Managing Your Streaks",
+  "viewing-detailed-streaks": "View Detailed Breakdown",
+  "viewing-detailed-streaks-desc":
+      "Tap any streak number to see a detailed view with months, days, hours, and minutes. Use the settings to switch between simple days view and detailed breakdown.",
+  "viewing-detailed-streaks-benefit":
+      "Detailed tracking makes every moment count and helps you appreciate your progress during challenging times.",
+
+  "switching-display-modes": "Display Mode Options",
+  "switching-display-modes-desc":
+      "Access streak settings to choose between 'Days Only' for simplicity or 'Detailed' for complete time breakdown including seconds.",
+  "switching-display-modes-benefit":
+      "Customizing your view keeps you engaged and matches your personal motivation style.",
+
+  "streak-actions": "Recording Your Journey",
+  "recording-follow-ups": "Add Daily Follow-ups",
+  "recording-follow-ups-desc":
+      "Use the '+' floating button or daily follow-up feature to record different types of events: relapses, porn-only, masturbation-only, or slip-ups.",
+  "recording-follow-ups-benefit":
+      "Honest tracking enables accurate progress measurement and helps identify what works in your recovery.",
+
+  "editing-follow-ups": "Edit Past Entries",
+  "editing-follow-ups-desc":
+      "Tap on any past entry in your timeline or calendar to edit details, change the type, or add more context about triggers and circumstances.",
+  "editing-follow-ups-benefit":
+      "Accurate historical data improves pattern recognition and recovery strategy effectiveness.",
+
+  "deleting-follow-ups": "Remove Entries",
+  "deleting-follow-ups-desc":
+      "Long-press or swipe entries to delete incorrect records. Use this carefully as it will adjust your streak calculations immediately.",
+  "deleting-follow-ups-benefit":
+      "Clean, accurate data ensures your streaks reflect reality and maintains motivation through honest tracking.",
+
+  "advanced-streak-management": "Advanced Management",
+  "resetting-streaks": "Reset Individual Streaks",
+  "resetting-streaks-desc":
+      "In streak settings, you can reset specific streak types without affecting others. This is useful for focusing on different recovery goals.",
+  "resetting-streaks-benefit":
+      "Targeted resets allow you to work on specific behaviors while maintaining progress in other areas.",
+
+  "changing-start-date": "Adjust Start Date",
+  "changing-start-date-desc":
+      "Go to account settings to modify your recovery start date if you began your journey before using the app or need to correct the initial date.",
+  "changing-start-date-benefit":
+      "Accurate start dates ensure your statistics reflect your true recovery timeline and achievements.",
+
+  "fresh-restart": "Complete Fresh Start",
+  "fresh-restart-desc":
+      "In advanced settings, you can completely reset all data including streaks, follow-ups, and emotions to start completely fresh from today.",
+  "fresh-restart-benefit":
+      "Sometimes a clean slate provides the mental reset needed for renewed commitment and motivation.",
+
+  // Statistics help
+  "statistics-help-title": "How to Read Statistics",
+  "statistics-overview": "Statistics Overview",
+  "statistics-purpose": "Understanding Your Data",
+  "statistics-purpose-desc":
+      "Statistics provide objective insights into your recovery journey, showing both progress and areas needing attention through measurable data.",
+  "statistics-purpose-benefit":
+      "Data-driven insights help you make informed decisions about your recovery strategy and celebrate real progress.",
+
+  "statistics-metrics": "Key Metrics Explained",
+  "total-clean-days": "Total Clean Days",
+  "total-clean-days-desc":
+      "Total number of relapse-free days since you started your recovery journey. This number only increases and never resets.",
+  "total-clean-days-benefit":
+      "Shows your overall commitment and helps you see that progress continues even after setbacks - every clean day counts.",
+
+  "longest-streak-stat": "Personal Best Streak",
+  "longest-streak-stat-desc":
+      "The longest consecutive period you've maintained without relapse. This represents your peak achievement.",
+  "longest-streak-stat-benefit":
+      "Proves your capability and serves as a benchmark to motivate future progress. You've done it before, you can do it again.",
+
+  "recent-relapses": "Recent Activity (30 Days)",
+  "recent-relapses-desc":
+      "Number of relapses in the last 30 days. Lower numbers indicate improving self-control and recovery progress.",
+  "recent-relapses-benefit":
+      "Tracks current momentum and helps identify if your recovery strategies are working effectively.",
+
+  "using-statistics": "Using Statistics for Recovery",
+  "progress-tracking": "Track Your Progress",
+  "progress-tracking-desc":
+      "Review these numbers regularly to identify patterns, celebrate improvements, and adjust your recovery approach when needed.",
+  "progress-tracking-benefit":
+      "Regular review builds self-awareness and helps you make data-driven improvements to your recovery plan.",
+
+  "goal-setting": "Set Meaningful Goals",
+  "goal-setting-desc":
+      "Use your personal best as a target to beat, and set intermediate goals like reducing monthly relapses or increasing total clean days.",
+  "goal-setting-benefit":
+      "Clear, measurable goals provide direction and create motivation to push through difficult periods.",
+
+  // Calendar help
+  "calendar-help-title": "How to Read the Calendar",
+  "calendar-overview": "Calendar Overview",
+  "calendar-purpose": "Visual Progress Tracking",
+  "calendar-purpose-desc":
+      "The calendar provides a visual representation of your recovery journey, showing clean days and setbacks in an easy-to-understand format.",
+  "calendar-purpose-benefit":
+      "Visual tracking helps you see patterns, identify triggers, and appreciate the progress you've made over time.",
+
+  "calendar-color-coding": "Understanding the Colors",
+  "clean-days-calendar": "Green Dots - Clean Days",
+  "clean-days-calendar-desc":
+      "Green dots represent days when you successfully avoided all problematic behaviors. These are your victory days.",
+  "clean-days-calendar-benefit":
+      "Seeing green dots accumulate builds confidence and motivation, creating a visual reward system for your progress.",
+
+  "relapse-days-calendar": "Red Dots - Relapse Days",
+  "relapse-days-calendar-desc":
+      "Red dots indicate days when full relapses occurred (both porn and masturbation behaviors).",
+  "relapse-days-calendar-benefit":
+      "Helps identify patterns in timing and frequency of relapses, enabling better preparation and prevention strategies.",
+
+  "partial-slips-calendar": "Orange/Yellow Dots - Partial Slips",
+  "partial-slips-calendar-desc":
+      "Different colors show partial slips like porn-only or masturbation-only incidents, which are less severe than full relapses.",
+  "partial-slips-calendar-benefit":
+      "Distinguishing between full relapses and partial slips helps you see progress even during challenging periods.",
+
+  "using-calendar": "Using the Calendar Effectively",
+  "pattern-recognition": "Identify Patterns",
+  "pattern-recognition-desc":
+      "Look for recurring patterns in timing, such as specific days of the week, times of month, or seasonal trends in your behavior.",
+  "pattern-recognition-benefit":
+      "Pattern recognition enables proactive planning and helps you prepare better strategies for vulnerable periods.",
+
+  "day-details": "Explore Day Details",
+  "day-details-desc":
+      "Tap any date to view detailed information about that day, including triggers, emotions, and circumstances around events.",
+  "day-details-benefit":
+      "Detailed day analysis helps you understand the context behind successes and setbacks for better future planning.",
+
+  // Calendar usage help
+  "calendar-interactions": "Calendar Interactions",
+  "adding-follow-ups": "Add Follow-ups by Date",
+  "adding-follow-ups-desc":
+      "Tap any date in the calendar to add follow-ups for that specific day. You can record past events or plan future reminders.",
+  "adding-follow-ups-benefit":
+      "Date-specific tracking provides accurate timeline data and helps you see the exact progression of your recovery.",
+
+  "editing-day-entries": "Edit Day Details",
+  "editing-day-entries-desc":
+      "Tap any colored dot on the calendar to view and edit that day's details including follow-ups, emotions, and notes.",
+  "editing-day-entries-benefit":
+      "Keeping accurate daily records helps you learn from both successes and setbacks for better recovery strategies.",
+
+  "navigating-months": "Navigate Through Time",
+  "navigating-months-desc":
+      "Use arrow buttons or swipe gestures to navigate between months. The calendar automatically loads data for each month as you navigate.",
+  "navigating-months-benefit":
+      "Historical review helps you see long-term progress patterns and seasonal trends in your recovery journey.",
+
+  "calendar-analysis": "Understanding Your Data",
+  "identifying-patterns": "Spot Risk Patterns",
+  "identifying-patterns-desc":
+      "Look for recurring patterns like specific days of the week, times of month, or seasonal periods when setbacks occur more frequently.",
+  "identifying-patterns-benefit":
+      "Pattern awareness enables proactive preparation and targeted intervention strategies for vulnerable periods.",
+
+  "viewing-trends": "Track Progress Trends",
+  "viewing-trends-desc":
+      "Compare different months to see improvement trends. Notice how the density of green days increases as your recovery progresses.",
+  "viewing-trends-benefit":
+      "Visual progress tracking maintains motivation and provides concrete evidence of your recovery improvements over time.",
+
+  "monthly-overview": "Monthly Analysis",
+  "monthly-overview-desc":
+      "Each month view shows your overall performance ratio of clean days vs. setbacks, helping you set goals for the next month.",
+  "monthly-overview-benefit":
+      "Monthly reviews provide natural checkpoints for celebrating progress and adjusting recovery strategies as needed.",
+
+  // Premium features help
+  "premium-feature-info": "Premium Feature Information",
+  "streakAverages-help-title": "How to Read Streak Averages",
+  "streakAverages-description": "Advanced Analytics Feature",
+  "streakAverages-help-desc":
+      "This premium feature provides detailed analysis of your streak patterns over different time periods, helping you identify your best performance windows and optimize your recovery strategy.",
+  "heatMapCalendar-help-title": "How to Read Heat Map Calendar",
+  "heatMapCalendar-description": "Visual Pattern Analysis",
+  "heatMapCalendar-help-desc":
+      "This premium calendar shows color-coded patterns of your recovery journey, making it easy to spot trends, seasonal patterns, and high-risk periods at a glance.",
+  "triggerRadar-help-title": "How to Read Trigger Radar",
+  "triggerRadar-description": "Trigger Pattern Analysis",
+  "triggerRadar-help-desc":
+      "This premium feature analyzes your trigger patterns and frequencies, helping you identify which situations, emotions, or circumstances most commonly lead to setbacks.",
+  "riskClock-help-title": "How to Read Risk Clock",
+  "riskClock-description": "Time-Based Risk Analysis",
+  "riskClock-help-desc":
+      "This premium feature shows when you're most vulnerable throughout the day and week, enabling you to prepare better strategies for high-risk times.",
+  "moodCorrelation-help-title": "How to Read Mood Correlation",
+  "moodCorrelation-description": "Mood and Relapse Correlation",
+  "moodCorrelation-help-desc":
+      "This premium feature analyzes the relationship between your emotional states and setbacks, helping you understand which moods require extra attention and support.",
+  "unlock-with-plus-desc":
+      "Unlock this premium analytics feature with Ta'aafi Plus subscription to gain deeper insights into your recovery journey.",
+
   // General
   "times": "times",
   "trigger-tip":
       "Focus on identifying patterns and create strategies to handle these triggers better",
+
+  // Add analytics help translations at the end
+
+  // Heat Map Calendar Help
+  "heat-map-calendar-help-title": "How to Read the Heat Map Calendar",
+  "heat-map-overview": "Advanced Information",
+  "heat-map-purpose": "Visual Pattern Analysis",
+  "heat-map-purpose-desc":
+      "This advanced assessment displays colorful patterns for your recovery journey, making it easy to discover trends and high-risk periods at a glance.",
+  "heat-map-purpose-benefit":
+      "Helps you quickly identify patterns and plan prevention strategies more effectively.",
+
+  "heat-map-color-coding": "Color Legend",
+  "high-relapse-days": "High-Risk Days (Dark Red)",
+  "high-relapse-days-desc":
+      "Days with multiple relapses or severe setbacks are shown in dark red, indicating very high-risk periods.",
+  "high-relapse-days-benefit":
+      "Quickly identify your most vulnerable days to increase vigilance and support.",
+
+  "medium-relapse-days": "Medium-Risk Days (Orange)",
+  "medium-relapse-days-desc":
+      "Days with single relapses or moderate struggles are shown in orange, indicating elevated risk periods.",
+  "medium-relapse-days-benefit":
+      "Recognize warning signs and patterns that lead to moderate risk situations.",
+
+  "low-relapse-days": "Low-Risk Days (Light Yellow)",
+  "low-relapse-days-desc":
+      "Days with minor slip-ups or challenges are shown in light yellow, indicating low but present risk.",
+  "low-relapse-days-benefit":
+      "Identify subtle patterns that could escalate if not addressed early.",
+
+  "clean-days-heat-map": "Clean Days (Green)",
+  "clean-days-heat-map-desc":
+      "Successful clean days are shown in green, representing strong recovery periods.",
+  "clean-days-heat-map-benefit":
+      "Celebrate your success and identify what strategies work best for you.",
+
+  "heat-map-patterns": "Pattern Recognition",
+  "monthly-patterns": "Monthly Trends",
+  "monthly-patterns-desc":
+      "Look for recurring patterns within specific months or times of year.",
+  "monthly-patterns-benefit":
+      "Anticipate seasonal challenges and prepare targeted strategies.",
+
+  "seasonal-patterns": "Seasonal Variations",
+  "seasonal-patterns-desc":
+      "Identify how different seasons or weather patterns affect your recovery.",
+  "seasonal-patterns-benefit":
+      "Develop season-specific recovery plans and coping mechanisms.",
+
+  "heat-map-usage": "How to Use This Information",
+  "identify-risk-periods": "Identify Risk Periods",
+  "identify-risk-periods-desc":
+      "Use the color patterns to identify specific dates, weeks, or months that pose higher risk.",
+  "identify-risk-periods-benefit":
+      "Proactively plan extra support and activities during identified high-risk periods.",
+
+  "plan-prevention": "Plan Prevention Strategies",
+  "plan-prevention-desc":
+      "Develop specific action plans for times and situations that show patterns of increased risk.",
+  "plan-prevention-benefit":
+      "Break negative patterns before they develop into serious setbacks.",
+
+  // Trigger Radar Help
+  "trigger-radar-help-title": "How to Read the Trigger Radar",
+  "trigger-radar-purpose": "Understanding Your Trigger Patterns",
+  "trigger-radar-purpose-benefit":
+      "Identify which triggers pose the greatest risk to your recovery so you can develop targeted strategies.",
+
+  "trigger-radar-scale-title": "Understanding the Scale",
+  "scale-100-percent": "100% - Most Frequent Trigger",
+  "scale-100-percent-desc":
+      "Your most common trigger - this represents your highest-risk pattern that needs immediate attention.",
+  "scale-100-percent-benefit":
+      "Focus your primary prevention efforts on this trigger for maximum impact.",
+
+  "scale-75-percent": "75% - Very Common Trigger",
+  "scale-75-percent-desc":
+      "A very frequent trigger that occurs about 3 out of 4 times compared to your top trigger.",
+  "scale-75-percent-benefit":
+      "Requires strong prevention strategies and careful monitoring.",
+
+  "scale-50-percent": "50% - Moderately Common Trigger",
+  "scale-50-percent-desc":
+      "A moderate trigger that occurs about half as often as your most frequent trigger.",
+  "scale-50-percent-benefit":
+      "Important to address but may require different strategies than your top triggers.",
+
+  "scale-25-percent": "25% - Less Common Trigger",
+  "scale-25-percent-desc":
+      "A less frequent trigger that still contributes to relapses but at a lower rate.",
+  "scale-25-percent-benefit":
+      "Monitor for patterns and prevent escalation to more frequent triggers.",
+
+  "trigger-radar-usage-tips": "Reading the Radar",
+  "focus-outer-rings": "Focus on Outer Rings",
+  "trigger-radar-usage-tips-desc":
+      "• Focus on triggers appearing in the outer rings (75%-100%) - these are your biggest patterns\n• Compare trigger positions to understand relative importance\n• Track changes over time to see if patterns shift\n• Use insights to develop targeted coping strategies",
+  "focus-outer-rings-benefit":
+      "Prioritize your prevention efforts on the triggers that pose the greatest risk.",
+
+  "using-trigger-radar": "Taking Action",
+  "track-trigger-changes": "Track Changes Over Time",
+  "track-trigger-changes-desc":
+      "Monitor how your trigger patterns change as you implement new coping strategies and build resilience.",
+  "track-trigger-changes-benefit":
+      "See concrete evidence of your recovery progress and strategy effectiveness.",
+
+  "develop-strategies": "Develop Targeted Strategies",
+  "develop-strategies-desc":
+      "Create specific action plans for your most frequent triggers, focusing on prevention and healthy alternatives.",
+  "develop-strategies-benefit":
+      "Build a personalized toolkit of proven strategies that work specifically for your trigger patterns.",
+
+  // Risk Clock Help
+  "risk-clock-help-title": "How to Read the Risk Clock",
+  "risk-clock-overview": "Understanding Your Daily Risk Patterns",
+  "risk-clock-purpose": "24-Hour Vulnerability Analysis",
+  "risk-clock-purpose-desc":
+      "This clock shows which hours of the day you're most vulnerable to relapses, helping you plan your schedule strategically.",
+  "risk-clock-purpose-benefit":
+      "Schedule high-risk activities during low-risk hours and plan extra support during vulnerable times.",
+
+  "risk-clock-interpretation": "Reading the Clock",
+  "high-risk-hours": "High-Risk Hours (Red)",
+  "high-risk-hours-desc":
+      "Hours when most of your relapses have occurred - these require maximum vigilance and preparation.",
+  "high-risk-hours-benefit":
+      "Schedule important activities or support calls during these times to stay occupied and accountable.",
+
+  "medium-risk-hours": "Medium-Risk Hours (Orange)",
+  "medium-risk-hours-desc":
+      "Hours with moderate relapse risk that still require attention and planning.",
+  "medium-risk-hours-benefit":
+      "Plan engaging activities or check-ins during these times to maintain positive momentum.",
+
+  "low-risk-hours": "Low-Risk Hours (Green)",
+  "low-risk-hours-desc":
+      "Your safest hours when relapses are least likely to occur.",
+  "low-risk-hours-benefit":
+      "These are good times for challenging activities or important decisions that require clear thinking.",
+
+  "using-risk-clock": "Using This Information",
+  "schedule-activities": "Schedule Strategic Activities",
+  "schedule-activities-desc":
+      "Plan important meetings, social activities, or challenging tasks during your low-risk hours.",
+  "schedule-activities-benefit":
+      "Maximize your success by aligning important activities with your natural rhythm.",
+
+  "set-reminders": "Set High-Risk Reminders",
+  "set-reminders-desc":
+      "Create alerts or reminders to check in with yourself during high-risk hours.",
+  "set-reminders-benefit":
+      "Stay aware and prepared during your most vulnerable times of day.",
+
+  // Mood Correlation Help
+  "mood-correlation-help-title": "How to Read Mood Correlation",
+  "mood-correlation-overview": "Understanding Mood-Relapse Connections",
+  "mood-correlation-purpose": "Mood Pattern Analysis",
+  "mood-correlation-purpose-desc":
+      "This chart shows how your emotional state correlates with relapse risk, helping you understand which moods require extra attention.",
+  "mood-correlation-purpose-benefit":
+      "Develop mood-specific coping strategies and early warning systems for emotional triggers.",
+
+  "mood-correlation-interpretation": "Understanding the Charts",
+  "high-correlation": "High Correlation (Strong Connection)",
+  "high-correlation-desc":
+      "Moods that show strong correlation with relapses need immediate attention and targeted strategies.",
+  "high-correlation-benefit":
+      "Focus on developing specific emotional regulation skills for these mood states.",
+
+  "low-correlation": "Low Correlation (Weak Connection)",
+  "low-correlation-desc":
+      "Moods that rarely lead to relapses represent your emotional strengths and stable states.",
+  "low-correlation-benefit":
+      "Understand what emotional states support your recovery and how to cultivate them.",
+
+  "mood-ranges": "Mood Range Analysis",
+  "mood-ranges-desc":
+      "See how different intensity levels of emotions (mild vs. severe) affect your relapse risk.",
+  "mood-ranges-benefit":
+      "Develop graduated response strategies based on emotional intensity levels.",
+
+  "using-mood-correlation": "Taking Action",
+  "identify-mood-triggers": "Identify Emotional Triggers",
+  "identify-mood-triggers-desc":
+      "Use correlation data to recognize which emotional states require immediate attention and support.",
+  "identify-mood-triggers-benefit":
+      "Build early warning systems and intervention strategies for high-risk emotional states.",
+
+  "mood-management": "Develop Mood Management",
+  "mood-management-desc":
+      "Create specific strategies for managing emotions that correlate strongly with relapse risk.",
+  "mood-management-benefit":
+      "Build emotional resilience and reduce the impact of difficult feelings on your recovery.",
+
+  // Streak Averages Help
+  "streak-averages-help-title": "How to Read Streak Averages",
+  "streak-averages-overview": "Understanding Your Progress Trends",
+  "streak-averages-purpose": "Progress Measurement",
+  "streak-averages-purpose-desc":
+      "This feature shows average streak lengths over different time periods, helping you understand your overall progress trends.",
+  "streak-averages-purpose-benefit":
+      "Track real progress even when individual streaks feel disappointing or inconsistent.",
+
+  "streak-averages-metrics": "Key Measurements",
+  "overall-average": "Overall Average",
+  "overall-average-desc":
+      "Your average streak length since starting recovery - shows long-term progress trends.",
+  "overall-average-benefit":
+      "See the big picture of your recovery journey and celebrate overall improvement.",
+
+  "recent-average": "Recent Average (Last 90 Days)",
+  "recent-average-desc":
+      "Your average streak length in recent months - shows current performance and momentum.",
+  "recent-average-benefit":
+      "Understand whether your recent efforts are improving your consistency.",
+
+  "improvement-trend": "Improvement Trend",
+  "improvement-trend-desc":
+      "Visual indication of whether your average streak lengths are increasing, decreasing, or stable over time.",
+  "improvement-trend-benefit":
+      "See concrete evidence of recovery progress even during difficult periods.",
+
+  "using-streak-averages": "Using This Information",
+  "track-progress": "Track Real Progress",
+  "track-progress-desc":
+      "Focus on improving your average streak length rather than achieving one perfect streak.",
+  "track-progress-benefit":
+      "Maintain motivation and recognize progress even when individual streaks are shorter than hoped.",
+
+  "set-realistic-goals": "Set Realistic Goals",
+  "set-realistic-goals-desc":
+      "Use your current averages to set achievable improvement targets for the next period.",
+  "set-realistic-goals-benefit":
+      "Build confidence through achievable goals while working toward long-term recovery."
 };

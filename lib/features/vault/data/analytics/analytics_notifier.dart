@@ -83,6 +83,19 @@ Future<MoodCorrelationData> moodCorrelationData(Ref ref) async {
   return await service.getMoodCorrelationData();
 }
 
+// Add cached version that refreshes every 5 minutes
+@Riverpod(keepAlive: true)
+Future<MoodCorrelationData> cachedMoodCorrelationData(Ref ref) async {
+  // Auto-refresh every 5 minutes
+  final timer = Timer.periodic(const Duration(minutes: 5), (_) {
+    ref.invalidateSelf();
+  });
+
+  ref.onDispose(() => timer.cancel());
+
+  return ref.watch(moodCorrelationDataProvider.future);
+}
+
 // Fake data generators for preview
 List<AnalyticsFollowUp> _generateFakeHeatMapData() {
   final random = Random();

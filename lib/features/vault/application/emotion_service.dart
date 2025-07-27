@@ -10,6 +10,11 @@ class EmotionService {
     return await _repository.readEmotionsByDate(date);
   }
 
+  Future<List<EmotionModel>> readEmotionsByDateRange(
+      DateTime startDate, DateTime endDate) async {
+    return await _repository.readEmotionsByDateRange(startDate, endDate);
+  }
+
   Future<void> createEmotion({required EmotionModel emotion}) async {
     await _repository.createEmotion(emotion);
   }

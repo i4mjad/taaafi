@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/shared_widgets/app_bar.dart';
+import 'package:reboot_app_3/core/shared_widgets/premium_cta_button.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/features/community/presentation/widgets/community_section_card.dart';
@@ -22,7 +23,9 @@ class _GroupsMainScreenState extends ConsumerState<GroupsMainScreen> {
     final localizations = AppLocalizations.of(context);
 
     return Scaffold(
-      appBar: appBar(context, ref, 'groups', false, false),
+      appBar: appBar(context, ref, 'groups', false, false, actions: [
+        PremiumCtaAppBarIcon(),
+      ]),
       backgroundColor: theme.backgroundColor,
       body: ListView(
         padding: const EdgeInsets.all(16),

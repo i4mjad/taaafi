@@ -2,6 +2,7 @@ import 'package:reboot_app_3/features/vault/data/follow_up/follow_up_repository.
 import 'package:reboot_app_3/features/vault/data/models/analytics_follow_up.dart';
 import 'package:reboot_app_3/features/shared/models/follow_up.dart';
 import 'package:reboot_app_3/features/vault/data/emotions/emotion_repository.dart';
+import 'package:reboot_app_3/features/vault/data/models/emotion_model.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:math' as math;
@@ -195,43 +196,32 @@ class PremiumAnalyticsService {
     final now = DateTime.now();
     final thirtyDaysAgo = now.subtract(const Duration(days: 30));
 
-    // Get all follow-ups from the last 30 days
-    final allFollowUps = await _followUpRepository.readAllFollowUps();
-    final followUps = allFollowUps
-        .where((f) =>
-            f.time.isAfter(thirtyDaysAgo) &&
-            f.time.isBefore(now.add(const Duration(days: 1))))
-        .toList();
+    // Use batch queries instead of individual date queries - MUCH more efficient!
+    final results = await Future.wait([
+      _emotionRepository.readEmotionsByDateRange(thirtyDaysAgo, now),
+      _followUpRepository.readFollowUpsByDateRange(thirtyDaysAgo, now),
+    ]);
 
-    // Group follow-ups by date to get daily mood averages
+    final allEmotions = results[0] as List<EmotionModel>;
+    final allFollowUps = results[1] as List<FollowUpModel>;
+
+    // Group emotions by date for daily averages
     final dailyMoodData = <DateTime, List<int>>{};
+    for (final emotion in allEmotions) {
+      final dateKey =
+          DateTime(emotion.date.year, emotion.date.month, emotion.date.day);
+      final moodRating = _emotionToMoodRating(emotion.emotionName);
+      dailyMoodData.putIfAbsent(dateKey, () => []).add(moodRating);
+    }
+
+    // Group follow-ups by date for relapse tracking
     final dailyRelapseData = <DateTime, bool>{};
-
-    // Process each day in the last 30 days
-    for (int i = 0; i < 30; i++) {
-      final date = now.subtract(Duration(days: i));
-      final dateKey = DateTime(date.year, date.month, date.day);
-
-      // Get emotions for this day
-      try {
-        final emotions = await _emotionRepository.readEmotionsByDate(dateKey);
-        if (emotions.isNotEmpty) {
-          final moodRatings =
-              emotions.map((e) => _emotionToMoodRating(e.emotionName)).toList();
-          dailyMoodData[dateKey] = moodRatings;
-        }
-      } catch (e) {
-        // Continue if emotion data unavailable for this day
+    for (final followUp in allFollowUps) {
+      final dateKey =
+          DateTime(followUp.time.year, followUp.time.month, followUp.time.day);
+      if (followUp.type != FollowUpType.none) {
+        dailyRelapseData[dateKey] = true;
       }
-
-      // Check if there were any relapses on this day
-      final dayFollowUps = followUps.where((f) {
-        final followUpDate = DateTime(f.time.year, f.time.month, f.time.day);
-        return followUpDate == dateKey;
-      }).toList();
-
-      dailyRelapseData[dateKey] =
-          dayFollowUps.any((f) => f.type != FollowUpType.none);
     }
 
     // Calculate mood counts and relapse counts by mood level
@@ -244,7 +234,7 @@ class PremiumAnalyticsService {
       relapseCounts[mood] = 0;
     }
 
-    // Process daily data
+    // Process daily data more efficiently
     dailyMoodData.forEach((date, moodRatings) {
       // Calculate average mood for the day
       final avgMood =

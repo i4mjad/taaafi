@@ -78,49 +78,6 @@ class StreakAveragesCard extends ConsumerWidget {
             ],
           ),
         ),
-        verticalSpace(Spacing.points16),
-
-        // Additional info section
-        Container(
-          width: double.infinity,
-          padding: EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: theme.backgroundColor,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: theme.grey[200]!, width: 1),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Icon(
-                    LucideIcons.info,
-                    color: theme.primary[600],
-                    size: 16,
-                  ),
-                  horizontalSpace(Spacing.points8),
-                  Text(
-                    AppLocalizations.of(context).translate('how-to-read'),
-                    style: TextStyles.footnote.copyWith(
-                      color: theme.grey[900],
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
-              ),
-              verticalSpace(Spacing.points8),
-              Text(
-                AppLocalizations.of(context)
-                    .translate('streak-averages-explanation'),
-                style: TextStyles.small.copyWith(
-                  color: theme.grey[600],
-                  height: 1.4,
-                ),
-              ),
-            ],
-          ),
-        ),
       ],
     );
   }

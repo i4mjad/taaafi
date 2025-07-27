@@ -119,6 +119,35 @@ class FollowUpRepository {
     }
   }
 
+  /// Read follow-ups for a date range - more efficient than readAllFollowUps for analytics
+  Future<List<FollowUpModel>> readFollowUpsByDateRange(
+      DateTime startDate, DateTime endDate) async {
+    try {
+      final uid = _getUserId();
+      if (uid == null) throw Exception('User not logged in');
+
+      final startOfRange =
+          DateTime(startDate.year, startDate.month, startDate.day);
+      final endOfRange =
+          DateTime(endDate.year, endDate.month, endDate.day, 23, 59, 59);
+
+      final querySnapshot = await _firestore
+          .collection('users')
+          .doc(uid)
+          .collection('followUps')
+          .where('time', isGreaterThanOrEqualTo: startOfRange)
+          .where('time', isLessThanOrEqualTo: endOfRange)
+          .get();
+
+      return querySnapshot.docs
+          .map((doc) => FollowUpModel.fromDoc(doc))
+          .toList();
+    } catch (e, stackTrace) {
+      ref.read(errorLoggerProvider).logException(e, stackTrace);
+      rethrow;
+    }
+  }
+
   /// Update an existing follow-up.
   Future<void> updateFollowUp({
     required FollowUpModel followUp,

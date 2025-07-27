@@ -5,6 +5,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/routing/route_names.dart';
 import 'package:reboot_app_3/core/shared_widgets/app_bar.dart';
+import 'package:reboot_app_3/core/shared_widgets/premium_cta_button.dart';
 import 'package:reboot_app_3/core/shared_widgets/spinner.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
@@ -92,7 +93,10 @@ class HomeScreen extends ConsumerWidget {
         'welcome-back',
         false,
         false,
-        actions: actions,
+        actions: [
+          PremiumCtaAppBarIcon(),
+          ...?actions,
+        ],
       ),
       body: userDocAsync.when(
         loading: () => const Center(child: Spinner()),

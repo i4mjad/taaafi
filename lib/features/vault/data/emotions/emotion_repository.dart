@@ -66,6 +66,25 @@ class EmotionRepository {
         .delete();
   }
 
+  // New batch method for date ranges
+  Future<List<EmotionModel>> readEmotionsByDateRange(
+      DateTime startDate, DateTime endDate) async {
+    final startOfRange =
+        DateTime(startDate.year, startDate.month, startDate.day);
+    final endOfRange =
+        DateTime(endDate.year, endDate.month, endDate.day, 23, 59, 59);
+
+    final snapshot = await _firestore
+        .collection('users')
+        .doc(_userId)
+        .collection('emotions')
+        .where('date', isGreaterThanOrEqualTo: startOfRange)
+        .where('date', isLessThanOrEqualTo: endOfRange)
+        .get();
+
+    return snapshot.docs.map((doc) => EmotionModel.fromDoc(doc)).toList();
+  }
+
   Future<void> deleteAllEmotions() async {
     final batch = _firestore.batch();
     final emotions = await _firestore

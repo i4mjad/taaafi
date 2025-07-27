@@ -116,5 +116,24 @@ final moodCorrelationDataProvider =
 // ignore: unused_element
 typedef MoodCorrelationDataRef
     = AutoDisposeFutureProviderRef<MoodCorrelationData>;
+String _$cachedMoodCorrelationDataHash() =>
+    r'e89172378f9abd74833dd572dbcbb25843aa80c0';
+
+/// See also [cachedMoodCorrelationData].
+@ProviderFor(cachedMoodCorrelationData)
+final cachedMoodCorrelationDataProvider =
+    FutureProvider<MoodCorrelationData>.internal(
+  cachedMoodCorrelationData,
+  name: r'cachedMoodCorrelationDataProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$cachedMoodCorrelationDataHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef CachedMoodCorrelationDataRef = FutureProviderRef<MoodCorrelationData>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
