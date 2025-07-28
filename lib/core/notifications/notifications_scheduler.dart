@@ -31,7 +31,11 @@ class NotificationsScheduler {
   Future<void> init() async {
     final androidSettings =
         const AndroidInitializationSettings('@mipmap/ic_launcher');
-    final iosSettings = const DarwinInitializationSettings();
+    final iosSettings = const DarwinInitializationSettings(
+      requestAlertPermission: true,
+      requestBadgePermission: true,
+      requestSoundPermission: true,
+    );
 
     final initSettings = InitializationSettings(
       android: androidSettings,
@@ -41,12 +45,24 @@ class NotificationsScheduler {
     await _flutterLocalNotificationsPlugin.initialize(
       initSettings,
       onDidReceiveNotificationResponse: _onNotificationTap,
+      onDidReceiveBackgroundNotificationResponse: _onNotificationTap,
     );
 
+    // Enable foreground notifications for Android
     await _flutterLocalNotificationsPlugin
         .resolvePlatformSpecificImplementation<
             AndroidFlutterLocalNotificationsPlugin>()
         ?.createNotificationChannel(_androidChannel);
+
+    // Request permissions for iOS (required for foreground notifications)
+    await _flutterLocalNotificationsPlugin
+        .resolvePlatformSpecificImplementation<
+            IOSFlutterLocalNotificationsPlugin>()
+        ?.requestPermissions(
+          alert: true,
+          badge: true,
+          sound: true,
+        );
 
     tz.initializeTimeZones();
 

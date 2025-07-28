@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -68,22 +69,50 @@ class _SmartAlertsSettingsScreenState
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Header
-              Text(
-                AppLocalizations.of(context).translate('smart-alerts-title'),
-                style: TextStyles.h4.copyWith(
-                  color: theme.grey[900],
-                  fontWeight: FontWeight.bold,
-                  height: 1.4,
-                ),
-              ),
-              verticalSpace(Spacing.points8),
               Text(
                 AppLocalizations.of(context)
                     .translate('smart-alerts-description'),
                 style: TextStyles.body.copyWith(
                   color: theme.grey[700],
                   height: 1.5,
+                ),
+              ),
+              verticalSpace(Spacing.points16),
+
+              // Beta Notice
+              WidgetsContainer(
+                padding: EdgeInsets.all(12),
+                backgroundColor: theme.warn[50],
+                borderSide: BorderSide(color: theme.warn[200]!),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: theme.warn[500],
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: Text(
+                        AppLocalizations.of(context).translate('beta'),
+                        style: TextStyles.caption.copyWith(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 10,
+                        ),
+                      ),
+                    ),
+                    horizontalSpace(Spacing.points8),
+                    Expanded(
+                      child: Text(
+                        AppLocalizations.of(context)
+                            .translate('smart-alerts-beta-notice'),
+                        style: TextStyles.small.copyWith(
+                          color: theme.warn[700],
+                          height: 1.3,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
               verticalSpace(Spacing.points20),
@@ -510,7 +539,8 @@ class _SmartAlertsSettingsScreenState
                 child: OutlinedButton.icon(
                   onPressed: _isLoading || !notificationsEnabled
                       ? null
-                      : () => _testNotification(SmartAlertType.highRiskHour),
+                      : () =>
+                          _testCloudNotification(SmartAlertType.highRiskHour),
                   icon: Icon(LucideIcons.clock, size: 16),
                   label: Text(
                     AppLocalizations.of(context).translate('test-risk-alert'),
@@ -532,8 +562,8 @@ class _SmartAlertsSettingsScreenState
                 child: OutlinedButton.icon(
                   onPressed: _isLoading || !notificationsEnabled
                       ? null
-                      : () =>
-                          _testNotification(SmartAlertType.streakVulnerability),
+                      : () => _testCloudNotification(
+                          SmartAlertType.streakVulnerability),
                   icon: Icon(LucideIcons.calendar, size: 16),
                   label: Text(
                     AppLocalizations.of(context)
@@ -681,9 +711,22 @@ class _SmartAlertsSettingsScreenState
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(AppLocalizations.of(context)
-                .translate('test-notification-sent')),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('✅ Test notification sent successfully!'),
+                SizedBox(height: 4),
+                Text(
+                  Platform.isIOS
+                      ? '🍎 Swipe DOWN from top to see it in Notification Center'
+                      : '📱 Pull down from top to see it in notification panel',
+                  style: TextStyle(fontSize: 12),
+                ),
+              ],
+            ),
             backgroundColor: AppTheme.of(context).success[500],
+            duration: Duration(seconds: 4),
           ),
         );
       }
@@ -694,6 +737,64 @@ class _SmartAlertsSettingsScreenState
             content: Text(AppLocalizations.of(context)
                 .translate('error-sending-notification')),
             backgroundColor: AppTheme.of(context).error[500],
+          ),
+        );
+      }
+    }
+  }
+
+  /// Test notification via Cloud Functions (NEW FCM APPROACH)
+  Future<void> _testCloudNotification(SmartAlertType type) async {
+    if (_isLoading) return;
+
+    HapticFeedback.lightImpact();
+
+    try {
+      await ref
+          .read(smartAlertsNotifierProvider.notifier)
+          .sendTestNotificationViaCloud(type);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('✅ Cloud Functions test notification sent!'),
+                SizedBox(height: 4),
+                Text(
+                  '☁️ Notification sent via Firebase Cloud Functions + FCM',
+                  style: TextStyle(fontSize: 12),
+                ),
+                Text(
+                  '📱 Check your notification panel',
+                  style: TextStyle(fontSize: 12),
+                ),
+              ],
+            ),
+            backgroundColor: AppTheme.of(context).success[500],
+            duration: Duration(seconds: 5),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('❌ Cloud Functions test failed'),
+                SizedBox(height: 4),
+                Text(
+                  'Error: ${e.toString()}',
+                  style: TextStyle(fontSize: 11),
+                ),
+              ],
+            ),
+            backgroundColor: AppTheme.of(context).error[500],
+            duration: Duration(seconds: 6),
           ),
         );
       }

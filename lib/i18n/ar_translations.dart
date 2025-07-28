@@ -1485,6 +1485,10 @@ const Map<String, String> kAr = {
   "smart-alerts-plus-required-title": "تعافي بلس مطلوب",
   "smart-alerts-plus-required-description":
       "التنبيهات الذكية متاحة حصرياً لمشتركي بلس. قم بالترقية للحصول على إشعارات ذكية لمنع الانتكاس",
+  "beta": "تجريبي",
+  "beta-feature": "ميزة تجريبية",
+  "smart-alerts-beta-notice":
+      "التنبيهات الذكية في مرحلة تجريبية حالياً. نحن نحسن هذه الميزة باستمرار بناء على ملاحظات المستخدمين.",
   "notifications-disabled-banner": "فعّل الإشعارات لتلقي نصائح منع الانتكاس",
   "enable-notifications": "تفعيل الإشعارات",
   "high-risk-hour-description":

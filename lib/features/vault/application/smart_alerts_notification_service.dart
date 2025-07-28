@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tz_data;
@@ -50,6 +51,16 @@ class SmartAlertsNotificationService {
           .resolvePlatformSpecificImplementation<
               AndroidFlutterLocalNotificationsPlugin>()
           ?.createNotificationChannel(_smartAlertsChannel);
+
+      // Request permissions for foreground notifications
+      await _localNotifications
+          .resolvePlatformSpecificImplementation<
+              IOSFlutterLocalNotificationsPlugin>()
+          ?.requestPermissions(
+            alert: true,
+            badge: true,
+            sound: true,
+          );
     } catch (e) {
       // Channel creation failed, continue with default channel
     }
@@ -323,8 +334,15 @@ class SmartAlertsNotificationService {
 
   /// Show immediate notification (for testing)
   Future<void> showTestNotification(SmartAlertType type) async {
+    print('🧪 Testing notification for type: ${type.name}');
+
     final hasPermission = await checkAndRequestPermissions();
-    if (!hasPermission) return;
+    print('📱 Permission granted: $hasPermission');
+
+    if (!hasPermission) {
+      print('❌ No notification permission granted');
+      return;
+    }
 
     String title;
     String message;
@@ -342,28 +360,181 @@ class SmartAlertsNotificationService {
         break;
     }
 
-    // Show immediate test notification
-    await _localNotifications.show(
-      999, // Test notification ID
-      title,
-      message,
-      NotificationDetails(
-        android: AndroidNotificationDetails(
-          _smartAlertsChannel.id,
-          _smartAlertsChannel.name,
-          channelDescription: _smartAlertsChannel.description,
-          importance: Importance.high,
-          priority: Priority.high,
-          icon: '@mipmap/ic_launcher',
+    print('📬 Showing test notification: $title');
+
+    try {
+      // CRITICAL: Initialize plugin first (like FCM service does)
+      print('🔧 Initializing notification plugin...');
+
+      // Create Android channel first (like FCM service)
+      const channel = AndroidNotificationChannel(
+        'high_importance_channel',
+        'High Importance Notifications',
+        importance: Importance.high,
+      );
+
+      await _localNotifications
+          .resolvePlatformSpecificImplementation<
+              AndroidFlutterLocalNotificationsPlugin>()
+          ?.createNotificationChannel(channel);
+
+      // Initialize with EXACT same settings as working FCM service
+      const androidSettings =
+          AndroidInitializationSettings('@mipmap/ic_launcher');
+      const iosSettings = DarwinInitializationSettings();
+      const initSettings = InitializationSettings(
+        android: androidSettings,
+        iOS: iosSettings,
+      );
+
+      await _localNotifications.initialize(initSettings);
+      print('✅ Plugin initialized successfully');
+
+      // Send notification with EXACT same settings as working FCM service
+      await _localNotifications.show(
+        999,
+        title,
+        message,
+        NotificationDetails(
+          android: AndroidNotificationDetails(
+            'high_importance_channel',
+            'High Importance Notifications',
+            channelDescription:
+                'This channel is used for important notifications',
+            icon: '@mipmap/ic_launcher',
+          ),
+          iOS: DarwinNotificationDetails(
+            presentAlert: true,
+            presentBadge: true,
+            presentSound: true,
+            // NOTE: Using EXACT same settings as working FCM service
+            // NO sound: 'default' or interruptionLevel - FCM doesn't use them
+          ),
         ),
-        iOS: const DarwinNotificationDetails(
-          presentAlert: true,
-          presentBadge: true,
-          presentSound: true,
+        payload: 'smart_alert_test_${type.name}',
+      );
+
+      if (Platform.isIOS) {
+        print('✅ iOS notification sent (using FCM-proven config)');
+        print('🎯 CHECK: Swipe DOWN from top of iOS simulator');
+        print('   🔔 Look for "$title" in Notification Center');
+      } else {
+        print('✅ Android notification sent (using FCM-proven config)');
+        print('🎯 CHECK: Pull down notification panel');
+      }
+
+      print('📱 THIS SHOULD WORK - using exact FCM configuration!');
+    } catch (e) {
+      print('❌ FCM-style notification failed: $e');
+      rethrow;
+    }
+
+    // Wait a moment and check notification status
+    await Future.delayed(const Duration(seconds: 1));
+    await _checkNotificationStatus();
+  }
+
+  /// Show a simple test notification (for debugging in emulator)
+  Future<void> showSimpleTestNotification() async {
+    print('🚀 Showing simple test notification');
+
+    try {
+      // First, create a special test channel
+      await _localNotifications
+          .resolvePlatformSpecificImplementation<
+              AndroidFlutterLocalNotificationsPlugin>()
+          ?.createNotificationChannel(
+            const AndroidNotificationChannel(
+              'test_channel_immediate',
+              'Test Channel Immediate',
+              description: 'Channel for immediate test notifications',
+              importance: Importance.max,
+              playSound: true,
+              enableVibration: true,
+              showBadge: true,
+            ),
+          );
+
+      await _localNotifications.show(
+        888, // Simple test ID
+        'Test Notification 🔔',
+        'This is a simple test to verify notifications work in emulator 📱',
+        NotificationDetails(
+          android: AndroidNotificationDetails(
+            'test_channel_immediate',
+            'Test Channel Immediate',
+            channelDescription: 'Channel for immediate test notifications',
+            importance: Importance.max,
+            priority: Priority.max,
+            playSound: true,
+            enableVibration: true,
+            showWhen: true,
+            fullScreenIntent: true,
+            ongoing: false,
+            autoCancel: true,
+            ticker: 'Test notification ticker',
+            largeIcon:
+                const DrawableResourceAndroidBitmap('@mipmap/ic_launcher'),
+            styleInformation: const BigTextStyleInformation(
+              'This is a test notification to verify that notifications work properly in the emulator while the app is in foreground.',
+              contentTitle: 'Test Notification 🔔',
+              summaryText: 'Test Summary',
+            ),
+          ),
+          iOS: const DarwinNotificationDetails(
+            presentAlert: true,
+            presentBadge: true,
+            presentSound: true,
+            interruptionLevel: InterruptionLevel.critical,
+            subtitle: 'Test Subtitle',
+          ),
         ),
-      ),
-      payload: 'smart_alert_test_${type.name}',
-    );
+      );
+      print('✅ Simple test notification sent');
+
+      // Wait a moment and check if notification was delivered
+      await Future.delayed(const Duration(seconds: 1));
+      await _checkNotificationStatus();
+    } catch (e) {
+      print('❌ Simple test failed: $e');
+    }
+  }
+
+  /// Check notification status and settings
+  Future<void> _checkNotificationStatus() async {
+    print('🔍 Checking notification status...');
+
+    try {
+      // Check Android notification settings
+      final androidPlugin =
+          _localNotifications.resolvePlatformSpecificImplementation<
+              AndroidFlutterLocalNotificationsPlugin>();
+
+      if (androidPlugin != null) {
+        final bool? areEnabled = await androidPlugin.areNotificationsEnabled();
+        print('📱 Android notifications enabled: $areEnabled');
+
+        // Get active notifications (Android 23+)
+        try {
+          final activeNotifications =
+              await androidPlugin.getActiveNotifications();
+          print('📊 Active notifications count: ${activeNotifications.length}');
+          for (final notification in activeNotifications) {
+            print('   - ID: ${notification.id}, Title: ${notification.title}');
+          }
+        } catch (e) {
+          print('   Could not get active notifications: $e');
+        }
+      }
+
+      print('💡 If you don\'t see notifications, try:');
+      print('   1. Pull down notification panel from top');
+      print('   2. Check emulator sound is ON');
+      print('   3. Try putting app in background then test');
+      print('   4. Check Android Settings > Apps > Ta\'aafi > Notifications');
+    } catch (e) {
+      print('❌ Error checking notification status: $e');
+    }
   }
 
   /// Get next scheduled alert times for display

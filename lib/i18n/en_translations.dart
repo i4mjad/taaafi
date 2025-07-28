@@ -1525,6 +1525,10 @@ const Map<String, String> kEn = {
   "smart-alerts-plus-required-description":
       "Smart Alerts are available exclusively for Plus subscribers. Upgrade to unlock intelligent relapse prevention notifications.",
   "upgrade-to-plus": "Upgrade to Plus",
+  "beta": "Beta",
+  "beta-feature": "Beta Feature",
+  "smart-alerts-beta-notice":
+      "Smart Alerts is currently in beta. We're actively improving this feature based on user feedback.",
   "notifications-disabled-banner":
       "Enable notifications to receive relapse-prevention tips",
   "enable-notifications": "Enable Notifications",

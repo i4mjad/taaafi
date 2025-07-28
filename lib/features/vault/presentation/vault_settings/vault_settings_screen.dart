@@ -14,6 +14,7 @@ import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/features/vault/application/activities/ongoing_activities_notifier.dart';
 import 'package:reboot_app_3/features/vault/data/diaries/diaries_notifier.dart';
 import 'package:reboot_app_3/features/plus/data/notifiers/subscription_notifier.dart';
+import 'package:reboot_app_3/features/plus/presentation/taaafi_plus_features_list_screen.dart';
 
 class VaultSettingsScreen extends ConsumerWidget {
   const VaultSettingsScreen({super.key});
@@ -27,7 +28,7 @@ class VaultSettingsScreen extends ConsumerWidget {
       appBar: appBar(
         context,
         ref,
-        "activities-notifications-settings",
+        "vault-settings",
         false,
         true,
       ),
@@ -114,12 +115,11 @@ class VaultSettingsScreen extends ConsumerWidget {
                     ),
                   ),
 
-                  // Smart Alerts Section (Plus only)
+                  // Smart Alerts Section
                   Consumer(
                     builder: (context, ref, child) {
                       final hasSubscription =
                           ref.watch(hasActiveSubscriptionProvider);
-                      if (!hasSubscription) return Container();
 
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -132,11 +132,27 @@ class VaultSettingsScreen extends ConsumerWidget {
                           ),
                           verticalSpace(Spacing.points8),
                           GestureDetector(
-                            onTap: () => context
-                                .goNamed(RouteNames.smartAlertsSettings.name),
+                            onTap: hasSubscription
+                                ? () => context.goNamed(
+                                    RouteNames.smartAlertsSettings.name)
+                                : () {
+                                    showModalBottomSheet(
+                                      context: context,
+                                      isScrollControlled: true,
+                                      useSafeArea: true,
+                                      backgroundColor: Colors.transparent,
+                                      builder: (context) =>
+                                          const TaaafiPlusSubscriptionScreen(),
+                                    );
+                                  },
                             child: VaultSettingsButton(
                               icon: LucideIcons.shield,
                               textKey: 'smart-alerts-configuration',
+                              type: hasSubscription ? null : 'plus-required',
+                              subtitleKey: hasSubscription
+                                  ? null
+                                  : 'requires-plus-subscription',
+                              showBetaBadge: true,
                             ),
                           ),
                         ],
@@ -221,12 +237,16 @@ class VaultSettingsButton extends StatelessWidget {
   final String textKey;
   final String? type;
   final VoidCallback? action;
+  final String? subtitleKey;
+  final bool showBetaBadge;
   const VaultSettingsButton(
       {super.key,
       required this.icon,
       required this.textKey,
       this.type,
-      this.action});
+      this.action,
+      this.subtitleKey,
+      this.showBetaBadge = false});
 
   @override
   Widget build(BuildContext context) {
@@ -239,7 +259,11 @@ class VaultSettingsButton extends StatelessWidget {
           padding: EdgeInsets.all(16),
           backgroundColor: theme.backgroundColor,
           borderSide: BorderSide(
-              color: type == 'warn' ? theme.error[500]! : theme.grey[600]!,
+              color: type == 'warn'
+                  ? theme.error[500]!
+                  : type == 'plus-required'
+                      ? const Color(0xFFFEBA01)
+                      : theme.grey[600]!,
               width: 0.5),
           borderRadius: BorderRadius.circular(10.5),
           boxShadow: Shadows.mainShadows,
@@ -247,14 +271,55 @@ class VaultSettingsButton extends StatelessWidget {
             children: [
               Icon(
                 icon,
-                color: type == 'warn' ? theme.error[500] : theme.grey[900],
+                color: type == 'warn'
+                    ? theme.error[500]
+                    : type == 'plus-required'
+                        ? const Color(0xFFFEBA01)
+                        : theme.grey[900],
               ),
               horizontalSpace(Spacing.points8),
-              Text(
-                AppLocalizations.of(context).translate(textKey),
-                style: TextStyles.footnote
-                    .copyWith(color: _getTextColor(type, theme)),
-              )
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Text(
+                          AppLocalizations.of(context).translate(textKey),
+                          style: TextStyles.footnote
+                              .copyWith(color: _getTextColor(type, theme)),
+                        ),
+                        if (showBetaBadge) ...[
+                          horizontalSpace(Spacing.points8),
+                          Container(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 6, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: theme.warn[500],
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: Text(
+                              AppLocalizations.of(context).translate('beta'),
+                              style: TextStyles.caption.copyWith(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w600,
+                                fontSize: 10,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                    if (subtitleKey != null)
+                      Text(
+                        AppLocalizations.of(context).translate(subtitleKey!),
+                        style: TextStyles.caption.copyWith(
+                          color: theme.grey[600],
+                        ),
+                      ),
+                  ],
+                ),
+              ),
             ],
           ),
         ),
@@ -268,6 +333,8 @@ class VaultSettingsButton extends StatelessWidget {
         return theme.error[500] as Color;
       case 'app':
         return theme.primary[600] as Color;
+      case 'plus-required':
+        return const Color(0xFFFEBA01);
       default:
         return theme.grey[900] as Color;
     }
