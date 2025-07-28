@@ -7,7 +7,7 @@ part of 'messaging_groups_providers.dart';
 // **************************************************************************
 
 String _$messagingGroupsRepositoryHash() =>
-    r'bf73cfea2cbf17c2bce351c174b3c30d945a4f56';
+    r'f6a39c21d734838eeb487d5d38aae28134f26567';
 
 /// See also [messagingGroupsRepository].
 @ProviderFor(messagingGroupsRepository)
@@ -427,7 +427,7 @@ class _CanSubscribeToGroupProviderElement
 }
 
 String _$messagingGroupsNotifierHash() =>
-    r'a192e8db8d6455c920b89f08b1ab5efd4dd2922f';
+    r'c3744e2ea44608ceb922148f28ecae41a34d0dc2';
 
 /// See also [MessagingGroupsNotifier].
 @ProviderFor(MessagingGroupsNotifier)

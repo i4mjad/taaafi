@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:reboot_app_3/core/messaging/fcm_topic_service.dart';
 import 'package:reboot_app_3/features/messaging/application/messaging_groups_service.dart';
 import 'package:reboot_app_3/features/messaging/data/models/messaging_group.dart';
 import 'package:reboot_app_3/features/messaging/data/models/user_group_membership.dart';
@@ -20,6 +21,7 @@ MessagingGroupsRepository messagingGroupsRepository(Ref ref) {
   return MessagingGroupsRepository(
     FirebaseFirestore.instance,
     FirebaseAuth.instance,
+    ref.watch(fcmTopicServiceProvider),
     ref,
   );
 }

@@ -376,23 +376,6 @@ class _GroupCard extends StatelessWidget {
           ),
           verticalSpace(Spacing.points12),
 
-          // Member count
-          Row(
-            children: [
-              Icon(
-                LucideIcons.users,
-                size: 16,
-                color: theme.grey[500],
-              ),
-              horizontalSpace(Spacing.points4),
-              Text(
-                '${group.memberCount} ${group.memberCount == 1 ? localization.translate('member-count') : localization.translate('members-count')}',
-                style: TextStyles.small.copyWith(color: theme.grey[500]),
-              ),
-            ],
-          ),
-          verticalSpace(Spacing.points16),
-
           // Action button
           SizedBox(
             width: double.infinity,

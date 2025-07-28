@@ -103,6 +103,11 @@ class MessagingGroupsService {
     return await _repository.getSubscribedTopicIds();
   }
 
+  /// Sync FCM subscriptions with current user memberships
+  Future<bool> syncFcmSubscriptions() async {
+    return await _repository.syncFcmSubscriptions();
+  }
+
   /// Get groups with subscription status and plus requirements
   Future<List<GroupWithStatus>> getGroupsWithStatus(
       {bool? hasActiveSubscription}) async {

@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:reboot_app_3/core/messaging/fcm_topic_service.dart';
 import 'package:reboot_app_3/core/monitoring/error_logger.dart';
 import 'package:reboot_app_3/features/messaging/data/models/messaging_group.dart';
 import 'package:reboot_app_3/features/messaging/data/models/user_group_membership.dart';
@@ -8,9 +9,15 @@ import 'package:reboot_app_3/features/messaging/data/models/user_group_membershi
 class MessagingGroupsRepository {
   final FirebaseFirestore _firestore;
   final FirebaseAuth _auth;
+  final FcmTopicService _fcmTopicService;
   final Ref ref;
 
-  MessagingGroupsRepository(this._firestore, this._auth, this.ref);
+  MessagingGroupsRepository(
+    this._firestore,
+    this._auth,
+    this._fcmTopicService,
+    this.ref,
+  );
 
   String? get _currentUserId => _auth.currentUser?.uid;
 
@@ -215,6 +222,14 @@ class MessagingGroupsRepository {
         throw Exception('Already subscribed to this group');
       }
 
+      // Subscribe to FCM topic FIRST - this must succeed for consistency
+      final fcmSubscriptionSuccess =
+          await _fcmTopicService.subscribeToTopic(group.topicId);
+      if (!fcmSubscriptionSuccess) {
+        throw Exception(
+            'Failed to subscribe to FCM topic: ${group.topicId}. User will not receive notifications.');
+      }
+
       // Add new membership
       final updatedGroups = [...currentGroups, membership];
       final updatedMemberships = UserGroupMemberships(
@@ -228,6 +243,9 @@ class MessagingGroupsRepository {
         await _firestore.collection('userGroupMemberships').doc(userId).set(
             firestoreData); // Use set instead of update to ensure all fields are saved
       } catch (firestoreError, firestoreStackTrace) {
+        // If Firestore update fails, we need to rollback the FCM subscription
+        await _fcmTopicService.unsubscribeFromTopic(group.topicId);
+
         ref
             .read(errorLoggerProvider)
             .logException(firestoreError, firestoreStackTrace);
@@ -236,6 +254,14 @@ class MessagingGroupsRepository {
         if (firestoreError.toString().contains('network') ||
             firestoreError.toString().contains('timeout') ||
             firestoreError.toString().contains('unavailable')) {
+          // Re-subscribe to FCM before retry
+          final retryFcmSuccess =
+              await _fcmTopicService.subscribeToTopic(group.topicId);
+          if (!retryFcmSuccess) {
+            throw Exception(
+                'Failed to re-subscribe to FCM topic during retry: ${group.topicId}');
+          }
+
           await Future.delayed(const Duration(seconds: 1));
           await _firestore
               .collection('userGroupMemberships')
@@ -245,9 +271,6 @@ class MessagingGroupsRepository {
           rethrow;
         }
       }
-
-      // TODO: Subscribe to FCM topic
-      // await FirebaseMessaging.instance.subscribeToTopic(group.topicId);
     } catch (e, stackTrace) {
       ref.read(errorLoggerProvider).logException(e, stackTrace);
       rethrow;
@@ -274,7 +297,7 @@ class MessagingGroupsRepository {
         groups: updatedGroups,
       );
 
-      // Update in Firestore with retry logic
+      // Update in Firestore with retry logic FIRST
       try {
         await _firestore
             .collection('userGroupMemberships')
@@ -295,12 +318,22 @@ class MessagingGroupsRepository {
               .doc(userId)
               .set(updatedMemberships.toFirestore());
         } else {
+          // If Firestore update fails, don't unsubscribe from FCM
           rethrow;
         }
       }
 
-      // TODO: Unsubscribe from FCM topic
-      // await FirebaseMessaging.instance.unsubscribeFromTopic(topicId);
+      // Only unsubscribe from FCM topic after Firestore update succeeds
+      final fcmUnsubscriptionSuccess =
+          await _fcmTopicService.unsubscribeFromTopic(topicId);
+      if (!fcmUnsubscriptionSuccess) {
+        // Log FCM unsubscription failure but don't fail the operation
+        // Better to have extra notifications than miss important ones
+        ref.read(errorLoggerProvider).logException(
+              Exception('FCM unsubscription failed for topic: $topicId'),
+              StackTrace.current,
+            );
+      }
     } catch (e, stackTrace) {
       ref.read(errorLoggerProvider).logException(e, stackTrace);
       rethrow;
@@ -330,6 +363,32 @@ class MessagingGroupsRepository {
     } catch (e, stackTrace) {
       ref.read(errorLoggerProvider).logException(e, stackTrace);
       return [];
+    }
+  }
+
+  /// Sync FCM subscriptions with current user memberships
+  /// Useful for data consistency and migration scenarios
+  Future<bool> syncFcmSubscriptions() async {
+    try {
+      final subscribedTopicIds = await getSubscribedTopicIds();
+      if (subscribedTopicIds.isEmpty) {
+        return true; // Nothing to sync
+      }
+
+      final fcmSyncSuccess =
+          await _fcmTopicService.subscribeToMultipleTopics(subscribedTopicIds);
+      if (!fcmSyncSuccess) {
+        ref.read(errorLoggerProvider).logException(
+              Exception(
+                  'Failed to sync FCM subscriptions for topics: $subscribedTopicIds'),
+              StackTrace.current,
+            );
+      }
+
+      return fcmSyncSuccess;
+    } catch (e, stackTrace) {
+      ref.read(errorLoggerProvider).logException(e, stackTrace);
+      return false;
     }
   }
 }
