@@ -2173,8 +2173,9 @@ const Map<String, String> kEn = {
       "Use your current averages to set achievable improvement targets for the next period.",
   "set-realistic-goals-benefit":
       "Build confidence through achievable goals while working toward long-term recovery.",
-  "messaging-groups": "Messaging Groups",
-  "messagingGroups": "Messaging Groups",
+  "messaging-groups": "Notifications Groups",
+  "messagingGroups": "Notifications Groups",
+
   "subscription-groups-subtitle":
       "Choose topics you want to receive notifications about",
   "loading-groups": "Loading notification groups...",

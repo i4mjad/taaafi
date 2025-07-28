@@ -2100,8 +2100,9 @@ const Map<String, String> kAr = {
   "last-7-days": "آخر 7 أيام",
   "last-30-days": "آخر 30 يوم",
   "last-90-days": "آخر 90 يوم",
-  "messaging-groups": "مجموعات المراسلة",
-  "messagingGroups": "مجموعات المراسلة",
+  "messaging-groups": "مجموعات الإشعارات",
+  "messagingGroups": "مجموعات الإشعارات",
+
   "subscription-groups-subtitle": "اختر المواضيع التي تريد تلقي إشعارات عنها",
   "loading-groups": "جاري تحميل مجموعات الإشعارات...",
   "no-groups-available": "لا توجد مجموعات متاحة",
