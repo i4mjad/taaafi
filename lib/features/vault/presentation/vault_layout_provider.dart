@@ -95,6 +95,7 @@ class VaultLayoutNotifier extends StateNotifier<VaultLayoutSettings> {
     'library',
     'diaries',
     'messagingGroups',
+    'settings',
   ];
 
   static const List<String> _defaultAnalyticsOrder = [
@@ -123,6 +124,7 @@ class VaultLayoutNotifier extends StateNotifier<VaultLayoutSettings> {
             'library': true,
             'diaries': true,
             'messagingGroups': true,
+            'settings': true,
           },
           cardsOrder: _defaultCardsOrder,
           analyticsVisibility: {
@@ -153,6 +155,7 @@ class VaultLayoutNotifier extends StateNotifier<VaultLayoutSettings> {
     final diaries = prefs.getBool('vault_card_diaries_visible') ?? true;
     final messagingGroups =
         prefs.getBool('vault_card_messagingGroups_visible') ?? true;
+    final settings = prefs.getBool('vault_card_settings_visible') ?? true;
 
     // Load analytics visibility (now part of vault elements, use same key format)
     final streakAverages =
@@ -169,11 +172,12 @@ class VaultLayoutNotifier extends StateNotifier<VaultLayoutSettings> {
         prefs.getStringList('vault_vault_elements_order') ??
             _defaultVaultElementsOrder;
 
-    // Check if stored cards order needs migration (add messagingGroups if missing)
+    // Check if stored cards order needs migration (add messagingGroups or settings if missing)
     final storedCardsOrder = prefs.getStringList('vault_cards_order');
     final cardsOrderString = (storedCardsOrder == null ||
-            !storedCardsOrder.contains('messagingGroups'))
-        ? _defaultCardsOrder // Use default if no stored order or missing messagingGroups
+            !storedCardsOrder.contains('messagingGroups') ||
+            !storedCardsOrder.contains('settings'))
+        ? _defaultCardsOrder // Use default if no stored order or missing cards
         : storedCardsOrder;
 
     final analyticsOrderString =
@@ -217,6 +221,7 @@ class VaultLayoutNotifier extends StateNotifier<VaultLayoutSettings> {
         'library': library,
         'diaries': diaries,
         'messagingGroups': messagingGroups,
+        'settings': settings,
       },
       cardsOrder: finalCardsOrder,
       analyticsVisibility: {

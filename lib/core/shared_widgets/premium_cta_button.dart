@@ -15,19 +15,15 @@ class PremiumCtaAppBarIcon extends ConsumerWidget {
 
         return GestureDetector(
           onTap: () async {
-            // TODO: Change the functionality of this button to prompt the user to upgrade to premium,
-            // if they are a premium user, show a modal with the features they get with premium
-            // with the ability to access those features from that screen.
-
-            // For now, toggle subscription status for testing
-            Future(() async {
+            // For testing: Toggle subscription status and save to SharedPreferences
+            try {
               final notifier = ref.read(subscriptionNotifierProvider.notifier);
               final currentStatus =
                   ref.read(subscriptionNotifierProvider).valueOrNull;
 
               if (currentStatus?.status == SubscriptionStatus.plus &&
                   currentStatus?.isActive == true) {
-                // Switch to free
+                // Switch to FREE
                 await notifier.updateSubscriptionForTesting(
                   const SubscriptionInfo(
                     status: SubscriptionStatus.free,
@@ -36,33 +32,58 @@ class PremiumCtaAppBarIcon extends ConsumerWidget {
                 );
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Test: Switched to FREE')),
+                    SnackBar(
+                      content: Text(
+                          '🔓 Test: Switched to FREE (Saved to SharedPreferences)'),
+                      backgroundColor: Colors.orange,
+                      duration: Duration(seconds: 2),
+                    ),
                   );
                 }
               } else {
-                // Switch to plus
+                // Switch to PLUS
                 await notifier.updateSubscriptionForTesting(
                   SubscriptionInfo(
                     status: SubscriptionStatus.plus,
                     isActive: true,
                     expirationDate:
                         DateTime.now().add(const Duration(days: 30)),
+                    productId: 'test_plus_subscription',
                   ),
                 );
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Test: Switched to PLUS')),
+                    SnackBar(
+                      content: Text(
+                          '👑 Test: Switched to PLUS (Saved to SharedPreferences)'),
+                      backgroundColor: Colors.green,
+                      duration: Duration(seconds: 2),
+                    ),
                   );
                 }
               }
-            });
+            } catch (e) {
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('❌ Error toggling subscription: $e'),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+              }
+            }
           },
           child: Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Icon(
-              Ta3afiPlatformIcons.plus_icon,
-              color: const Color(0xFFFEBA01),
-              size: 20,
+            child: Stack(
+              children: [
+                Icon(
+                  Ta3afiPlatformIcons.plus_icon,
+                  color:
+                      hasSubscription ? Colors.green : const Color(0xFFFEBA01),
+                  size: 20,
+                ),
+              ],
             ),
           ),
         );

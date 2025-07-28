@@ -126,6 +126,7 @@ const Map<String, String> kEn = {
   "books": "Books",
   "blogs": "Blogs",
   "today": "Today",
+  "tomorrow": "Tomorrow",
   "specific-day": "Choose Starting Day",
   "no-content":
       "Why there is no content? The application is under maintenance, home screen will be improved and enhanced in the coming updates",
@@ -1516,6 +1517,58 @@ const Map<String, String> kEn = {
   "streak-vulnerability-alert": "Streak Vulnerability Alert",
   "topic-based-pushes": "Topic-Based Pushes",
 
+  // Smart Alerts UI translations
+  "smart-alerts-title": "Smart Alert Suite",
+  "smart-alerts-description":
+      "Get personalized notifications to help prevent relapses based on your patterns.",
+  "smart-alerts-plus-required-title": "Ta'aafi Plus Required",
+  "smart-alerts-plus-required-description":
+      "Smart Alerts are available exclusively for Plus subscribers. Upgrade to unlock intelligent relapse prevention notifications.",
+  "upgrade-to-plus": "Upgrade to Plus",
+  "notifications-disabled-banner":
+      "Enable notifications to receive relapse-prevention tips",
+  "enable-notifications": "Enable Notifications",
+  "high-risk-hour-description":
+      "Get notified 30 minutes before your statistically highest risk hour for relapse",
+  "vulnerability-alert-description":
+      "Weekly reminder on your most challenging day to help maintain your streak",
+  "alert-time": "Alert Time",
+  "set-reminder-time": "Set reminder time",
+  "alert-time-updated": "Alert time updated successfully",
+  "error-updating-alert-time": "Error updating alert time",
+  "not-enough-data": "Not enough data available",
+  "next-alert": "Next alert",
+  "calculate-patterns": "Calculate Risk Patterns",
+  "test-risk-alert": "Test Risk Alert",
+  "test-vulnerability-alert": "Test Vulnerability Alert",
+  "error-loading-settings": "Error loading settings",
+  "error-updating-settings": "Error updating settings",
+  "patterns-calculated": "Risk patterns calculated successfully",
+  "error-calculating-patterns": "Error calculating patterns",
+  "test-notification-sent": "Test notification sent",
+  "error-sending-notification": "Error sending notification",
+  "smart-alerts-settings": "Smart Alerts",
+  "smart-alerts-configuration": "Smart Alerts Configuration",
+  "error-opening-settings": "Error opening settings",
+  "need-followups-for-risk-hour":
+      "Need at least 30 follow-up events in the last 30 days (currently have {count})",
+  "need-weeks-for-vulnerability":
+      "Need at least 6 weeks of follow-up history (currently have {weeks} weeks)",
+
+  // Weekday abbreviations
+  "weekday-mon": "Mon",
+  "weekday-tue": "Tue",
+  "weekday-wed": "Wed",
+  "weekday-thu": "Thu",
+  "weekday-fri": "Fri",
+  "weekday-sat": "Sat",
+  "weekday-sun": "Sun",
+
+  // Time format
+  "am": "AM",
+  "pm": "PM",
+  "select-time": "Select time",
+
   // Features commitment message
   "working-hard-message":
       "We're working hard to extend these features and give you the best recovery experience possible.",
@@ -1637,6 +1690,13 @@ const Map<String, String> kEn = {
   "highest-risk-hour": "Highest risk: {hour}",
   "risk-hour-tip": "Consider scheduling an activity or call during this time",
   "enable-risk-alert": "Enable high-risk hour alerts",
+  "risk-clock-filter": "Show data for",
+  "followup-type-relapse": "Relapses",
+  "followup-type-pornOnly": "Porn Only",
+  "followup-type-mastOnly": "Masturbation Only",
+  "followup-type-slipUp": "Slip-ups",
+  "followup-type-all": "All Types",
+  "done": "Done",
 
   // Mood correlation
   "mood-very-low": "Very low",
@@ -1682,7 +1742,6 @@ const Map<String, String> kEn = {
   // Feature gate messages
   "premium-only-feature": "This feature is available for Plus members",
   "unlock-with-plus": "Unlock with Ta'aafi Plus",
-  "upgrade-to-plus": "Upgrade to Plus",
   "unlock-premium-analytics": "Tap to unlock premium analytics",
 
   // Help system translations

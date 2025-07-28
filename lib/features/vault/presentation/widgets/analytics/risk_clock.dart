@@ -4,24 +4,38 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
+import 'package:reboot_app_3/core/shared_widgets/container.dart';
+import 'package:reboot_app_3/core/shared_widgets/platform_dropdown.dart';
 import 'package:reboot_app_3/core/shared_widgets/spinner.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/features/vault/data/analytics/analytics_notifier.dart';
+import 'package:reboot_app_3/features/vault/presentation/widgets/smart_alerts/smart_alerts_settings_modal.dart';
+import 'package:reboot_app_3/features/shared/models/follow_up.dart';
 import 'dart:math' as math;
 
-class RiskClock extends ConsumerWidget {
+class RiskClock extends ConsumerStatefulWidget {
   const RiskClock({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<RiskClock> createState() => _RiskClockState();
+}
+
+class _RiskClockState extends ConsumerState<RiskClock> {
+  FollowUpType? selectedType = FollowUpType.relapse; // Default to relapse
+
+  @override
+  Widget build(BuildContext context) {
     final theme = AppTheme.of(context);
-    final riskDataAsync = ref.watch(riskClockDataProvider);
+    final riskDataAsync = ref.watch(riskClockDataProvider(selectedType));
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // Type selector
+        _buildTypeSelector(context, theme),
+        verticalSpace(Spacing.points16),
         // Risk clock content
         riskDataAsync.when(
           data: (hourlyData) {
@@ -35,6 +49,43 @@ class RiskClock extends ConsumerWidget {
           error: (_, __) => _buildEmptyState(context, theme),
         ),
       ],
+    );
+  }
+
+  Widget _buildTypeSelector(BuildContext context, dynamic theme) {
+    return PlatformDropdown<FollowUpType?>(
+      value: selectedType,
+      label: AppLocalizations.of(context).translate('risk-clock-filter'),
+      items: [
+        PlatformDropdownItem<FollowUpType?>(
+          value: FollowUpType.relapse,
+          label:
+              AppLocalizations.of(context).translate('followup-type-relapse'),
+        ),
+        PlatformDropdownItem<FollowUpType?>(
+          value: FollowUpType.pornOnly,
+          label:
+              AppLocalizations.of(context).translate('followup-type-pornOnly'),
+        ),
+        PlatformDropdownItem<FollowUpType?>(
+          value: FollowUpType.mastOnly,
+          label:
+              AppLocalizations.of(context).translate('followup-type-mastOnly'),
+        ),
+        PlatformDropdownItem<FollowUpType?>(
+          value: FollowUpType.slipUp,
+          label: AppLocalizations.of(context).translate('followup-type-slipUp'),
+        ),
+        PlatformDropdownItem<FollowUpType?>(
+          value: null,
+          label: AppLocalizations.of(context).translate('followup-type-all'),
+        ),
+      ],
+      onChanged: (FollowUpType? newType) {
+        setState(() {
+          selectedType = newType;
+        });
+      },
     );
   }
 
@@ -137,7 +188,7 @@ class RiskClock extends ConsumerWidget {
         GestureDetector(
           onTap: () {
             HapticFeedback.lightImpact();
-            // TODO: Navigate to alerts settings
+            showSmartAlertsSettingsModal(context);
           },
           child: Container(
             padding: EdgeInsets.all(16),
@@ -232,6 +283,7 @@ class RiskClock extends ConsumerWidget {
       context: context,
       backgroundColor: Colors.transparent,
       builder: (context) => Container(
+        width: double.infinity,
         padding: EdgeInsets.all(24),
         decoration: BoxDecoration(
           color: theme.backgroundColor,
@@ -255,7 +307,7 @@ class RiskClock extends ConsumerWidget {
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text(
-                '$count ${AppLocalizations.of(context).translate('relapses')}',
+                '$count ${_getSelectedTypeDisplayName(context)}',
                 style: TextStyles.body.copyWith(
                   color: theme.error[600],
                   fontWeight: FontWeight.w600,
@@ -263,17 +315,61 @@ class RiskClock extends ConsumerWidget {
               ),
             ),
             verticalSpace(Spacing.points20),
-            Text(
-              AppLocalizations.of(context).translate('risk-hour-tip'),
-              style: TextStyles.body.copyWith(
-                color: theme.grey[700],
+            WidgetsContainer(
+              padding: EdgeInsets.all(16),
+              backgroundColor: theme.success[50],
+              borderSide: BorderSide(color: theme.success[500]!),
+              width: double.infinity,
+              child: Row(
+                children: [
+                  Icon(LucideIcons.badgeInfo,
+                      color: theme.success[500], size: 20),
+                  horizontalSpace(Spacing.points12),
+                  Flexible(
+                    child: Text(
+                      AppLocalizations.of(context).translate('risk-hour-tip'),
+                      style: TextStyles.caption.copyWith(
+                        color: theme.success[700],
+                      ),
+                      textAlign: TextAlign.start,
+                    ),
+                  ),
+                ],
               ),
-              textAlign: TextAlign.center,
             ),
           ],
         ),
       ),
     );
+  }
+
+  String _getSelectedTypeDisplayName(BuildContext context) {
+    if (selectedType == null) {
+      return AppLocalizations.of(context)
+          .translate('followup-type-all')
+          .toLowerCase();
+    }
+
+    switch (selectedType!) {
+      case FollowUpType.relapse:
+        return AppLocalizations.of(context)
+            .translate('followup-type-relapse')
+            .toLowerCase();
+      case FollowUpType.pornOnly:
+        return AppLocalizations.of(context)
+            .translate('followup-type-pornOnly')
+            .toLowerCase();
+      case FollowUpType.mastOnly:
+        return AppLocalizations.of(context)
+            .translate('followup-type-mastOnly')
+            .toLowerCase();
+      case FollowUpType.slipUp:
+        return AppLocalizations.of(context)
+            .translate('followup-type-slipUp')
+            .toLowerCase();
+      case FollowUpType.none:
+        return ''; // This shouldn't happen
+    }
   }
 
   String _formatHour(int hour) {

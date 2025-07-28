@@ -294,6 +294,13 @@ class VaultScreen extends ConsumerWidget {
         'hasPlusBadge': true,
         'route': () => context.goNamed(RouteNames.messagingGroups.name),
       },
+      'settings': {
+        'icon': LucideIcons.settings,
+        'color': theme.grey[700]!,
+        'backgroundColor': theme.grey[50]!,
+        'hasPlusBadge': false,
+        'route': () => context.goNamed(RouteNames.vaultSettings.name),
+      },
     };
 
     return SizedBox(

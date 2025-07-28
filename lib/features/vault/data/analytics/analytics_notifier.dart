@@ -58,7 +58,7 @@ Future<Map<String, int>> triggerRadarData(Ref ref) async {
 }
 
 @riverpod
-Future<List<int>> riskClockData(Ref ref) async {
+Future<List<int>> riskClockData(Ref ref, [FollowUpType? filterType]) async {
   final hasSubscription = ref.watch(hasActiveSubscriptionProvider);
 
   if (!hasSubscription) {
@@ -67,7 +67,7 @@ Future<List<int>> riskClockData(Ref ref) async {
   }
 
   final service = ref.read(premiumAnalyticsServiceProvider);
-  return await service.getRiskClockData();
+  return await service.getRiskClockData(filterType);
 }
 
 @riverpod

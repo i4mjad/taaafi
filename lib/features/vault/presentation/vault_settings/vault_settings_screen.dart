@@ -13,6 +13,7 @@ import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/features/vault/application/activities/ongoing_activities_notifier.dart';
 import 'package:reboot_app_3/features/vault/data/diaries/diaries_notifier.dart';
+import 'package:reboot_app_3/features/plus/data/notifiers/subscription_notifier.dart';
 
 class VaultSettingsScreen extends ConsumerWidget {
   const VaultSettingsScreen({super.key});
@@ -113,17 +114,36 @@ class VaultSettingsScreen extends ConsumerWidget {
                     ),
                   ),
 
-                  // Text(
-                  //   AppLocalizations.of(context)
-                  //       .translate('bookmarks-settings'),
-                  //   style: TextStyles.h6,
-                  // ),
-                  // verticalSpace(Spacing.points8),
-                  // VaultSettingsButton(
-                  //   icon: LucideIcons.trash2,
-                  //   textKey: 'erase-all-bookmarks',
-                  //   type: 'warn',
-                  // ),
+                  // Smart Alerts Section (Plus only)
+                  Consumer(
+                    builder: (context, ref, child) {
+                      final hasSubscription =
+                          ref.watch(hasActiveSubscriptionProvider);
+                      if (!hasSubscription) return Container();
+
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          verticalSpace(Spacing.points16),
+                          Text(
+                            AppLocalizations.of(context)
+                                .translate('smart-alerts-settings'),
+                            style: TextStyles.h6,
+                          ),
+                          verticalSpace(Spacing.points8),
+                          GestureDetector(
+                            onTap: () => context
+                                .goNamed(RouteNames.smartAlertsSettings.name),
+                            child: VaultSettingsButton(
+                              icon: LucideIcons.shield,
+                              textKey: 'smart-alerts-configuration',
+                            ),
+                          ),
+                        ],
+                      );
+                    },
+                  ),
+
                   verticalSpace(Spacing.points16),
                   Text(
                     AppLocalizations.of(context).translate('diaries-settings'),

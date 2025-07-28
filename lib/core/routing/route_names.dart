@@ -30,6 +30,7 @@ enum RouteNames {
   contentLists,
   vaultSettings,
   activitiesNotifications,
+  smartAlertsSettings,
   premiumAnalytics,
   messagingGroups,
   community,

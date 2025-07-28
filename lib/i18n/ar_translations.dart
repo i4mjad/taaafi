@@ -501,6 +501,7 @@ const Map<String, String> kAr = {
   "ui-settings": "إعدادات الواجهة واللغة",
   "content-language": "لغة المحتوى",
   "today": "اليوم",
+  "tomorrow": "غداً",
   "specific-day": "اختر يوم البداية",
   "changed-to-ar": "تم تغيير اللغة إلى العربية",
   "changed-to-en": "Language has been changed to English",
@@ -1477,6 +1478,55 @@ const Map<String, String> kAr = {
   "streak-vulnerability-alert": "تنبيه ضعف الإنجاز",
   "topic-based-pushes": "إشعارات قائمة على المواضيع",
 
+  // Smart Alerts UI translations
+  "smart-alerts-title": "مجموعة التنبيهات الذكية",
+  "smart-alerts-description":
+      "احصل على إشعارات مخصصة لمساعدتك في منع الانتكاسات بناءً على أنماطك",
+  "smart-alerts-plus-required-title": "تعافي بلس مطلوب",
+  "smart-alerts-plus-required-description":
+      "التنبيهات الذكية متاحة حصرياً لمشتركي بلس. قم بالترقية للحصول على إشعارات ذكية لمنع الانتكاس",
+  "notifications-disabled-banner": "فعّل الإشعارات لتلقي نصائح منع الانتكاس",
+  "enable-notifications": "تفعيل الإشعارات",
+  "high-risk-hour-description":
+      "احصل على إشعار قبل 30 دقيقة من ساعة الخطر الأعلى إحصائياً للانتكاس",
+  "vulnerability-alert-description":
+      "تذكير أسبوعي في يومك الأكثر تحدياً للمساعدة في الحفاظ على إنجازك",
+  "alert-time": "وقت التنبيه",
+  "set-reminder-time": "تحديد وقت التذكير",
+  "alert-time-updated": "تم تحديث وقت التنبيه بنجاح",
+  "error-updating-alert-time": "خطأ في تحديث وقت التنبيه",
+  "next-alert": "التنبيه التالي",
+  "calculate-patterns": "حساب أنماط الخطر",
+  "test-risk-alert": "اختبار تنبيه الخطر",
+  "test-vulnerability-alert": "اختبار تنبيه الضعف",
+  "error-loading-settings": "خطأ في تحميل الإعدادات",
+  "error-updating-settings": "خطأ في تحديث الإعدادات",
+  "patterns-calculated": "تم حساب أنماط الخطر بنجاح",
+  "error-calculating-patterns": "خطأ في حساب الأنماط",
+  "test-notification-sent": "تم إرسال إشعار الاختبار",
+  "error-sending-notification": "خطأ في إرسال الإشعار",
+  "smart-alerts-settings": "التنبيهات الذكية",
+  "smart-alerts-configuration": "إعدادات التنبيهات الذكية",
+  "error-opening-settings": "خطأ في فتح الإعدادات",
+  "need-followups-for-risk-hour":
+      "تحتاج إلى 30 متابعة على الأقل في آخر 30 يومًا (لديك حاليًا {count})",
+  "need-weeks-for-vulnerability":
+      "تحتاج إلى 6 أسابيع على الأقل من تاريخ المتابعة (لديك حاليًا {weeks} أسابيع)",
+
+  // Weekday abbreviations
+  "weekday-mon": "الإثنين",
+  "weekday-tue": "الثلاثاء",
+  "weekday-wed": "الأربعاء",
+  "weekday-thu": "الخميس",
+  "weekday-fri": "الجمعة",
+  "weekday-sat": "السبت",
+  "weekday-sun": "الأحد",
+
+  // Time format
+  "am": "ص",
+  "pm": "م",
+  "select-time": "اختر الوقت",
+
   // Premium Analytics CTA
   "premium-analytics-title": "التحليلات المتقدمة",
   "premium-analytics-subtitle": "اكتشف رؤى مفصلة وتتبع شامل",
@@ -1537,6 +1587,13 @@ const Map<String, String> kAr = {
   "highest-risk-hour": "أعلى خطورة: {hour}",
   "risk-hour-tip": "فكر في جدولة نشاط أو مكالمة خلال هذا الوقت",
   "enable-risk-alert": "تفعيل تنبيهات ساعات الخطر العالي",
+  "risk-clock-filter": "إظهار البيانات لـ",
+  "followup-type-relapse": "الانتكاسات",
+  "followup-type-pornOnly": "المشاهدة فقط",
+  "followup-type-mastOnly": "العادة السرية فقط",
+  "followup-type-slipUp": "الزلات",
+  "followup-type-all": "جميع الأنواع",
+  "done": "تم",
 
   // Mood correlation
   "mood-very-low": "منخفض جداً",

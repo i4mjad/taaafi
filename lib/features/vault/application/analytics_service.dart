@@ -176,14 +176,24 @@ class PremiumAnalyticsService {
   }
 
   /// Get risk clock data (hourly distribution)
-  Future<List<int>> getRiskClockData() async {
+  Future<List<int>> getRiskClockData([FollowUpType? filterType]) async {
     final followUps = await _followUpRepository.readAllFollowUps();
 
-    // Count relapses by hour
+    // Count events by hour
     final hourlyCounts = List<int>.filled(24, 0);
 
     for (final followUp in followUps) {
-      if (followUp.type != FollowUpType.none) {
+      bool shouldInclude = false;
+
+      if (filterType == null) {
+        // Show all types except none (current behavior)
+        shouldInclude = followUp.type != FollowUpType.none;
+      } else {
+        // Show only the specific type
+        shouldInclude = followUp.type == filterType;
+      }
+
+      if (shouldInclude) {
         hourlyCounts[followUp.time.hour]++;
       }
     }

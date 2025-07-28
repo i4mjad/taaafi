@@ -61,6 +61,7 @@ import 'package:reboot_app_3/features/vault/presentation/library/content_type_sc
 import 'package:reboot_app_3/features/vault/presentation/library/library_screen.dart';
 import 'package:reboot_app_3/features/vault/presentation/library/list_screen.dart';
 import 'package:reboot_app_3/features/vault/presentation/vault_settings/activities_notifications_settings_screen.dart';
+import 'package:reboot_app_3/features/vault/presentation/vault_settings/smart_alerts_settings_screen.dart';
 import 'package:reboot_app_3/features/vault/presentation/vault_settings/vault_settings_screen.dart';
 import 'package:reboot_app_3/features/vault/presentation/vault_screen.dart';
 import 'package:reboot_app_3/features/vault/presentation/premium_analytics_screen.dart';
@@ -417,6 +418,14 @@ GoRouter goRouter(Ref<GoRouter> ref) {
                         pageBuilder: (context, state) => MaterialPage(
                           name: RouteNames.activitiesNotifications.name,
                           child: ActivitiesNotificationsSettingsScreen(),
+                        ),
+                      ),
+                      GoRoute(
+                        path: "smartAlertsSettings",
+                        name: RouteNames.smartAlertsSettings.name,
+                        pageBuilder: (context, state) => MaterialPage(
+                          name: RouteNames.smartAlertsSettings.name,
+                          child: SmartAlertsSettingsScreen(),
                         ),
                       ),
                     ],

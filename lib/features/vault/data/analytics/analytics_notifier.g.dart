@@ -79,23 +79,157 @@ final triggerRadarDataProvider =
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef TriggerRadarDataRef = AutoDisposeFutureProviderRef<Map<String, int>>;
-String _$riskClockDataHash() => r'426c75d720f5d110a2513526bfd209ccf68f068d';
+String _$riskClockDataHash() => r'c24ea7e437ee9e01b67f64af1be1872a869a685e';
+
+/// Copied from Dart SDK
+class _SystemHash {
+  _SystemHash._();
+
+  static int combine(int hash, int value) {
+    // ignore: parameter_assignments
+    hash = 0x1fffffff & (hash + value);
+    // ignore: parameter_assignments
+    hash = 0x1fffffff & (hash + ((0x0007ffff & hash) << 10));
+    return hash ^ (hash >> 6);
+  }
+
+  static int finish(int hash) {
+    // ignore: parameter_assignments
+    hash = 0x1fffffff & (hash + ((0x03ffffff & hash) << 3));
+    // ignore: parameter_assignments
+    hash = hash ^ (hash >> 11);
+    return 0x1fffffff & (hash + ((0x00003fff & hash) << 15));
+  }
+}
 
 /// See also [riskClockData].
 @ProviderFor(riskClockData)
-final riskClockDataProvider = AutoDisposeFutureProvider<List<int>>.internal(
-  riskClockData,
-  name: r'riskClockDataProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$riskClockDataHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+const riskClockDataProvider = RiskClockDataFamily();
+
+/// See also [riskClockData].
+class RiskClockDataFamily extends Family<AsyncValue<List<int>>> {
+  /// See also [riskClockData].
+  const RiskClockDataFamily();
+
+  /// See also [riskClockData].
+  RiskClockDataProvider call([
+    FollowUpType? filterType,
+  ]) {
+    return RiskClockDataProvider(
+      filterType,
+    );
+  }
+
+  @override
+  RiskClockDataProvider getProviderOverride(
+    covariant RiskClockDataProvider provider,
+  ) {
+    return call(
+      provider.filterType,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'riskClockDataProvider';
+}
+
+/// See also [riskClockData].
+class RiskClockDataProvider extends AutoDisposeFutureProvider<List<int>> {
+  /// See also [riskClockData].
+  RiskClockDataProvider([
+    FollowUpType? filterType,
+  ]) : this._internal(
+          (ref) => riskClockData(
+            ref as RiskClockDataRef,
+            filterType,
+          ),
+          from: riskClockDataProvider,
+          name: r'riskClockDataProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$riskClockDataHash,
+          dependencies: RiskClockDataFamily._dependencies,
+          allTransitiveDependencies:
+              RiskClockDataFamily._allTransitiveDependencies,
+          filterType: filterType,
+        );
+
+  RiskClockDataProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.filterType,
+  }) : super.internal();
+
+  final FollowUpType? filterType;
+
+  @override
+  Override overrideWith(
+    FutureOr<List<int>> Function(RiskClockDataRef provider) create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: RiskClockDataProvider._internal(
+        (ref) => create(ref as RiskClockDataRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        filterType: filterType,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeFutureProviderElement<List<int>> createElement() {
+    return _RiskClockDataProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is RiskClockDataProvider && other.filterType == filterType;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, filterType.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
 
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
-typedef RiskClockDataRef = AutoDisposeFutureProviderRef<List<int>>;
+mixin RiskClockDataRef on AutoDisposeFutureProviderRef<List<int>> {
+  /// The parameter `filterType` of this provider.
+  FollowUpType? get filterType;
+}
+
+class _RiskClockDataProviderElement
+    extends AutoDisposeFutureProviderElement<List<int>> with RiskClockDataRef {
+  _RiskClockDataProviderElement(super.provider);
+
+  @override
+  FollowUpType? get filterType => (origin as RiskClockDataProvider).filterType;
+}
+
 String _$moodCorrelationDataHash() =>
     r'54d0472008435317b4ecb53a950e7e832088b91c';
 

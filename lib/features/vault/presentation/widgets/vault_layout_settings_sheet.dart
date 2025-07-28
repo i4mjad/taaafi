@@ -79,6 +79,7 @@ class _VaultLayoutSettingsSheetState
     'library': LucideIcons.lamp,
     'diaries': LucideIcons.pencil,
     'messagingGroups': LucideIcons.messageSquare,
+    'settings': LucideIcons.settings,
   };
 
   final Map<String, String> _cardTitleKeys = {
@@ -86,6 +87,7 @@ class _VaultLayoutSettingsSheetState
     'library': 'library',
     'diaries': 'diaries',
     'messagingGroups': 'messagingGroups',
+    'settings': 'vault-settings',
   };
 
   // Define which cards are locked (require subscription)
@@ -110,6 +112,10 @@ class _VaultLayoutSettingsSheetState
       'messagingGroups': {
         'icon': theme.warn[500]!,
         'background': theme.warn[50]!,
+      },
+      'settings': {
+        'icon': theme.grey[700]!,
+        'background': theme.grey[50]!,
       },
     };
   }
