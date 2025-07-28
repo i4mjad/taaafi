@@ -297,7 +297,7 @@ class VaultScreen extends ConsumerWidget {
     };
 
     return SizedBox(
-      height: 80,
+      height: 105, // Height to accommodate uniform cards with badge margin
       child: ListView(
         padding: const EdgeInsets.symmetric(horizontal: 16.0),
         scrollDirection: Axis.horizontal,
@@ -318,7 +318,8 @@ class VaultScreen extends ConsumerWidget {
                   ),
                   if (card !=
                       orderedCards.where((c) => cardData.containsKey(c)).last)
-                    horizontalSpace(Spacing.points8),
+                    horizontalSpace(
+                        Spacing.points4), // Reduced spacing between cards
                 ])
             .toList(),
       ),
@@ -340,78 +341,97 @@ class VaultScreen extends ConsumerWidget {
         HapticFeedback.lightImpact();
         onTap();
       },
-      child: Stack(
-        children: [
-          WidgetsContainer(
-            width: 70,
-            height: 70,
-            padding: EdgeInsets.all(8),
-            backgroundColor: backgroundColor,
-            borderSide:
-                BorderSide(color: iconColor.withValues(alpha: 0.3), width: 1),
-            borderRadius: BorderRadius.circular(12),
-            boxShadow: [
-              BoxShadow(
-                color: iconColor.withValues(alpha: 0.1),
-                blurRadius: 8,
-                offset: Offset(0, 2),
-              ),
-            ],
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  padding: EdgeInsets.all(6),
-                  decoration: BoxDecoration(
-                    color: iconColor.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  child: Icon(
-                    icon,
-                    size: 18,
-                    color: iconColor,
-                  ),
-                ),
-                verticalSpace(Spacing.points4),
-                Text(
-                  AppLocalizations.of(context).translate(textKey),
-                  style: TextStyles.small.copyWith(
-                    color: theme.grey[900],
-                    fontWeight: FontWeight.w500,
-                  ),
-                  textAlign: TextAlign.center,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+      child: Container(
+        margin: EdgeInsets.all(4), // Add margin to accommodate badge
+        child: Stack(
+          clipBehavior: Clip.none, // Allow badge to overflow slightly
+          children: [
+            WidgetsContainer(
+              width: 90, // Fixed width for all cards based on longest content
+              height: 85, // Fixed height for consistency
+              padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+              backgroundColor: backgroundColor,
+              borderSide:
+                  BorderSide(color: iconColor.withValues(alpha: 0.3), width: 1),
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: iconColor.withValues(alpha: 0.1),
+                  blurRadius: 8,
+                  offset: Offset(0, 2),
                 ),
               ],
-            ),
-          ),
-          // Plus badge overlay
-          if (hasPlusBadge)
-            Positioned(
-              top: -2,
-              right: -2,
-              child: Container(
-                padding: EdgeInsets.all(4),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFFEBA01),
-                  borderRadius: BorderRadius.circular(8),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.1),
-                      blurRadius: 4,
-                      offset: Offset(0, 2),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Icon container with fixed size
+                  Container(
+                    width: 30,
+                    height: 30,
+                    decoration: BoxDecoration(
+                      color: iconColor.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(6),
                     ),
-                  ],
-                ),
-                child: Icon(
-                  Ta3afiPlatformIcons.plus_icon,
-                  color: Colors.black,
-                  size: 10,
-                ),
+                    child: Icon(
+                      icon,
+                      size: 18,
+                      color: iconColor,
+                    ),
+                  ),
+                  // Fixed spacing
+                  SizedBox(height: 6),
+                  // Text with consistent width
+                  Expanded(
+                    child: Container(
+                      width: double.infinity,
+                      alignment: Alignment.center,
+                      child: Text(
+                        AppLocalizations.of(context).translate(textKey),
+                        style: TextStyles.small.copyWith(
+                          color: theme.grey[900],
+                          fontWeight: FontWeight.w500,
+                          fontSize: 11,
+                          height: 1.2,
+                        ),
+                        textAlign: TextAlign.center,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
-        ],
+            // Plus badge overlay - positioned within visible area
+            if (hasPlusBadge)
+              Positioned(
+                top: 2,
+                right: 2,
+                child: Container(
+                  padding:
+                      EdgeInsets.all(5), // Increased padding for larger badge
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFEBA01),
+                    borderRadius:
+                        BorderRadius.circular(8), // Larger border radius
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.15),
+                        blurRadius: 4,
+                        offset: Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Icon(
+                    Ta3afiPlatformIcons.plus_icon,
+                    color: Colors.black,
+                    size: 12, // Larger icon size
+                  ),
+                ),
+              ),
+          ],
+        ),
       ),
     );
   }

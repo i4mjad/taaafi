@@ -330,7 +330,7 @@ class _VaultLayoutSettingsSheetState
     final cardThemeColors = _getCardThemeColors(theme);
 
     return SizedBox(
-      height: 100,
+      height: 120, // Height to accommodate uniform cards with badge margin
       child: ReorderableListView.builder(
         scrollDirection: Axis.horizontal,
         itemCount: _orderedCards.length,
@@ -391,7 +391,7 @@ class _VaultLayoutSettingsSheetState
 
           return Container(
             key: ValueKey(card),
-            margin: EdgeInsets.only(right: 8),
+            margin: EdgeInsets.only(right: 4), // Reduced spacing between cards
             child: Column(
               children: [
                 GestureDetector(
@@ -403,99 +403,124 @@ class _VaultLayoutSettingsSheetState
                               .read(vaultLayoutProvider.notifier)
                               .toggleCardVisibility(card, !isVisible);
                         },
-                  child: Stack(
-                    children: [
-                      WidgetsContainer(
-                        width: 70,
-                        height: 70,
-                        padding: EdgeInsets.all(8),
-                        backgroundColor: isLocked && !hasSubscription
-                            ? theme.grey[50]
-                            : (isVisible ? backgroundColor : theme.grey[100]),
-                        borderSide: BorderSide(
-                          color: isLocked && !hasSubscription
-                              ? theme.grey[100]!
-                              : (isVisible
-                                  ? iconColor.withValues(alpha: 0.3)
-                                  : theme.grey[200]!),
-                          width: 1,
-                        ),
-                        borderRadius: BorderRadius.circular(12),
-                        boxShadow: isVisible && (!isLocked || hasSubscription)
-                            ? [
-                                BoxShadow(
-                                  color: iconColor.withValues(alpha: 0.1),
-                                  blurRadius: 8,
-                                  offset: Offset(0, 2),
+                  child: Container(
+                    margin:
+                        EdgeInsets.all(4), // Add margin to accommodate badge
+                    child: Stack(
+                      clipBehavior:
+                          Clip.none, // Allow badge to overflow slightly
+                      children: [
+                        WidgetsContainer(
+                          width:
+                              90, // Fixed width for all cards based on longest content
+                          height: 85, // Fixed height for consistency
+                          padding:
+                              EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                          backgroundColor: isLocked && !hasSubscription
+                              ? theme.grey[50]
+                              : (isVisible ? backgroundColor : theme.grey[100]),
+                          borderSide: BorderSide(
+                            color: isLocked && !hasSubscription
+                                ? theme.grey[100]!
+                                : (isVisible
+                                    ? iconColor.withValues(alpha: 0.3)
+                                    : theme.grey[200]!),
+                            width: 1,
+                          ),
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: isVisible && (!isLocked || hasSubscription)
+                              ? [
+                                  BoxShadow(
+                                    color: iconColor.withValues(alpha: 0.1),
+                                    blurRadius: 8,
+                                    offset: Offset(0, 2),
+                                  ),
+                                ]
+                              : null,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              // Icon container with fixed size
+                              Container(
+                                width: 30,
+                                height: 30,
+                                decoration: BoxDecoration(
+                                  color: isLocked && !hasSubscription
+                                      ? theme.grey[200]
+                                      : (isVisible
+                                          ? iconColor.withValues(alpha: 0.1)
+                                          : theme.grey[200]),
+                                  borderRadius: BorderRadius.circular(6),
                                 ),
-                              ]
-                            : null,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Container(
-                              padding: EdgeInsets.all(6),
-                              decoration: BoxDecoration(
-                                color: isLocked && !hasSubscription
-                                    ? theme.grey[200]
-                                    : (isVisible
-                                        ? iconColor.withValues(alpha: 0.1)
-                                        : theme.grey[200]),
-                                borderRadius: BorderRadius.circular(6),
-                              ),
-                              child: Icon(
-                                _cardIcons[card],
-                                size: 18,
-                                color: isLocked && !hasSubscription
-                                    ? theme.grey[400]
-                                    : (isVisible ? iconColor : theme.grey[400]),
-                              ),
-                            ),
-                            verticalSpace(Spacing.points4),
-                            Text(
-                              AppLocalizations.of(context)
-                                  .translate(_cardTitleKeys[card]!),
-                              style: TextStyles.small.copyWith(
-                                color: isLocked && !hasSubscription
-                                    ? theme.grey[400]
-                                    : (isVisible
-                                        ? theme.grey[900]
-                                        : theme.grey[600]),
-                                fontWeight: FontWeight.w500,
-                              ),
-                              textAlign: TextAlign.center,
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ],
-                        ),
-                      ),
-                      // Plus badge for locked cards
-                      if (isLocked && !hasSubscription)
-                        Positioned(
-                          top: -2,
-                          right: -2,
-                          child: Container(
-                            padding: EdgeInsets.all(4),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFFEBA01),
-                              borderRadius: BorderRadius.circular(8),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withValues(alpha: 0.1),
-                                  blurRadius: 4,
-                                  offset: Offset(0, 2),
+                                child: Icon(
+                                  _cardIcons[card],
+                                  size: 18,
+                                  color: isLocked && !hasSubscription
+                                      ? theme.grey[400]
+                                      : (isVisible
+                                          ? iconColor
+                                          : theme.grey[400]),
                                 ),
-                              ],
-                            ),
-                            child: Icon(
-                              LucideIcons.crown,
-                              color: Colors.black,
-                              size: 8,
-                            ),
+                              ),
+                              // Fixed spacing
+                              SizedBox(height: 6),
+                              // Text with consistent width
+                              Expanded(
+                                child: Container(
+                                  width: double.infinity,
+                                  alignment: Alignment.center,
+                                  child: Text(
+                                    AppLocalizations.of(context)
+                                        .translate(_cardTitleKeys[card]!),
+                                    style: TextStyles.small.copyWith(
+                                      color: isLocked && !hasSubscription
+                                          ? theme.grey[400]
+                                          : (isVisible
+                                              ? theme.grey[900]
+                                              : theme.grey[600]),
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 11,
+                                      height: 1.2,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                    ],
+                        // Plus badge for locked cards - positioned within visible area
+                        if (isLocked && !hasSubscription)
+                          Positioned(
+                            top: 2,
+                            right: 2,
+                            child: Container(
+                              padding: EdgeInsets.all(
+                                  5), // Increased padding for larger badge
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFFEBA01),
+                                borderRadius: BorderRadius.circular(
+                                    8), // Larger border radius
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withValues(alpha: 0.15),
+                                    blurRadius: 4,
+                                    offset: Offset(0, 2),
+                                  ),
+                                ],
+                              ),
+                              child: Icon(
+                                LucideIcons.crown,
+                                color: Colors.black,
+                                size: 12, // Larger icon size
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
                   ),
                 ),
                 verticalSpace(Spacing.points8),

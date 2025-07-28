@@ -184,7 +184,6 @@ class _QuickActionButtonState extends State<_QuickActionButton>
     with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _scaleAnimation;
-  bool _isPressed = false;
 
   @override
   void initState() {
@@ -209,17 +208,17 @@ class _QuickActionButtonState extends State<_QuickActionButton>
   }
 
   void _handleTapDown(TapDownDetails details) {
-    setState(() => _isPressed = true);
+    // setState(() => _isPressed = true);
     _animationController.forward();
   }
 
   void _handleTapUp(TapUpDetails details) {
-    setState(() => _isPressed = false);
+    // setState(() => _isPressed = false);
     _animationController.reverse();
   }
 
   void _handleTapCancel() {
-    setState(() => _isPressed = false);
+    // setState(() => _isPressed = false);
     _animationController.reverse();
   }
 

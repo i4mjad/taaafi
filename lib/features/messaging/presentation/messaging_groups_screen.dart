@@ -15,13 +15,69 @@ import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/features/messaging/application/messaging_groups_service.dart';
 import 'package:reboot_app_3/features/messaging/data/models/messaging_group.dart';
 import 'package:reboot_app_3/features/messaging/providers/messaging_groups_providers.dart';
+import 'package:reboot_app_3/features/plus/data/notifiers/subscription_notifier.dart';
 import 'package:reboot_app_3/features/plus/presentation/taaafi_plus_features_list_screen.dart';
 
-class MessagingGroupsScreen extends ConsumerWidget {
+class MessagingGroupsScreen extends ConsumerStatefulWidget {
   const MessagingGroupsScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<MessagingGroupsScreen> createState() =>
+      _MessagingGroupsScreenState();
+}
+
+class _MessagingGroupsScreenState extends ConsumerState<MessagingGroupsScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // Check subscription status and unsubscribe from plus groups if needed
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkSubscriptionAndCleanupPlusGroups();
+    });
+  }
+
+  /// Check subscription status and unsubscribe from plus-related groups if user is not subscribed
+  Future<void> _checkSubscriptionAndCleanupPlusGroups() async {
+    try {
+      // Check if user has active subscription
+      final hasActiveSubscription = ref.read(hasActiveSubscriptionProvider);
+
+      if (!hasActiveSubscription) {
+        // Get all groups with status
+        final groupsWithStatus = await ref
+            .read(messagingGroupsServiceProvider)
+            .getGroupsWithStatus();
+
+        // Find plus groups that user is subscribed to
+        final subscribedPlusGroups = groupsWithStatus
+            .where((groupStatus) =>
+                groupStatus.group.isForPlusUsers && groupStatus.isSubscribed)
+            .toList();
+
+        // Unsubscribe from each plus group
+        for (final groupStatus in subscribedPlusGroups) {
+          try {
+            await ref
+                .read(messagingGroupsNotifierProvider.notifier)
+                .unsubscribeFromGroup(groupStatus.group.topicId);
+          } catch (e) {
+            // Continue with other groups even if one fails
+            continue;
+          }
+        }
+
+        // Refresh the groups list to reflect changes
+        if (subscribedPlusGroups.isNotEmpty) {
+          ref.read(messagingGroupsNotifierProvider.notifier).refresh();
+        }
+      }
+    } catch (e) {
+      // Silently handle errors - this is a background cleanup operation
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final theme = AppTheme.of(context);
     final localization = AppLocalizations.of(context);
     final groupsAsync = ref.watch(messagingGroupsNotifierProvider);
