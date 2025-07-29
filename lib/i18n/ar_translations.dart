@@ -478,6 +478,58 @@ const Map<String, String> kAr = {
   "first-name": "الاسم الأول",
   "last-name": "اسم العائلة",
   "repeat-password": "إعادة إدخال كلمة السر",
+
+  // Registration Stepper Keys
+  "setup-account": "إعداد الحساب",
+  "personal-information": "المعلومات الشخصية",
+  "personal-info-explanation":
+      "أخبرنا قليلاً عن نفسك. هذه المعلومات تساعدنا في تخصيص رحلة التعافي الخاصة بك.",
+  "preferences": "التفضيلات",
+  "preferences-explanation": "اختر جنسك واللغة المفضلة للحصول على أفضل تجربة.",
+  "recovery-setup": "إعداد التعافي",
+  "recovery-setup-explanation":
+      "متى بدأت رحلة التعافي؟ هذا يساعدنا في تتبع تقدمك بدقة.",
+  "email-verification": "التحقق من البريد الإلكتروني",
+  "email-verification-explanation":
+      "نحتاج للتحقق من عنوان بريدك الإلكتروني لحماية حسابك وإرسال التحديثات المهمة.",
+  "all-set": "كل شيء جاهز!",
+  "registration-complete": "اكتمل التسجيل!",
+  "welcome-message": "مرحباً بك في رحلة التعافي. نحن هنا لدعمك في كل خطوة.",
+  "start-from-now": "البدء من الآن",
+  "start-from-now-subtitle": "ابدأ تتبع تعافيك من هذه اللحظة",
+  "select-starting-date": "اختر تاريخ ووقت البداية",
+  "terms-acceptance": "أوافق على شروط الاستخدام وسياسة الخصوصية",
+  "verification-sent-to": "تم إرسال بريد التحقق إلى:",
+  "check-verification": "فحص التحقق من البريد الإلكتروني",
+  "resend-verification": "إعادة إرسال بريد التحقق",
+  "field-required": "هذا الحقل مطلوب",
+  "name-required": "يرجى إدخال اسمك",
+  "valid-email-required": "يرجى إدخال بريد إلكتروني صحيح",
+  "valid-birth-date-required": "يرجى إدخال تاريخ ميلاد صحيح (قبل ٢٠١١)",
+  "starting-date-required": "يرجى اختيار متى بدأت رحلة التعافي",
+  "terms-acceptance-required": "يرجى قبول شروط الاستخدام للمتابعة",
+  "registration-failed": "فشل التسجيل. يرجى المحاولة مرة أخرى.",
+  "verification-email-failed": "فشل في إرسال بريد التحقق",
+  "verification-check-failed": "فشل في فحص حالة التحقق",
+
+  // OAuth email verification messages
+  "email-already-verified-explanation":
+      "ممتاز! تم تأكيد بريدك الإلكتروني مسبقاً من خلال مزود الحساب.",
+  "verified-email": "البريد الإلكتروني المؤكد:",
+  "email-verified-oauth-message":
+      "تم تأكيد بريدك الإلكتروني عند تسجيل الدخول. يمكنك المتابعة!",
+
+  // Simplified banner messages
+  "account-setup-needed": "أكمل إعداد حسابك للبدء",
+  "account-setup-needed-subtitle": "نحتاج بعض التفاصيل الإضافية لتخصيص تجربتك",
+  "profile-incomplete": "يحتاج ملفك الشخصي لبعض التحديثات",
+  "profile-incomplete-subtitle": "يرجى مراجعة وتأكيد تفاصيل حسابك",
+  "email-verification-needed": "يرجى التحقق من عنوان بريدك الإلكتروني",
+  "email-verification-needed-subtitle":
+      "تحقق من صندوق الوارد واضغط على رابط التحقق",
+  "complete-profile": "أكمل الملف الشخصي",
+  "verify-email": "تحقق من البريد الإلكتروني",
+
   "terms-should-be-accepted": "يجب الموافقة على شروط الاستخدام",
   "search": "ابحث",
   "loading": "يتم الآن جلب المحتوى...",
@@ -1038,34 +1090,35 @@ const Map<String, String> kAr = {
   "confirm-email-banner":
       "يرجى تأكيد عنوان بريدك الإلكتروني للوصول إلى جميع الميزات",
   "confirm-email": "تأكيد البريد الإلكتروني",
-  "verify-your-email": "تأكيد بريدك الإلكتروني",
+  "verify-your-email": "تحقق من بريدك الإلكتروني",
   "verification-email-sent-to": "تم إرسال رسالة تأكيد إلى",
   "check-inbox-and-click-link":
       "يرجى مراجعة صندوق الوارد والنقر على رابط التأكيد للمتابعة",
   "checking": "جاري التحقق...",
-  "check-verification-status": "التحقق من حالة التأكيد",
+  "check-verification-status": "ضغطت على الرابط",
   "sending": "جاري الإرسال...",
   "resend-in": "إعادة الإرسال خلال",
   "resend-verification-email": "إعادة إرسال رسالة التأكيد",
   "email-verification-info":
       "لقد قمنا بإرسال رسالة تأكيد تلقائياً إلى عنوان بريدك الإلكتروني. بمجرد النقر على رابط التأكيد، ستتمكن من الوصول إلى جميع ميزات التطبيق.",
   "email-verified-successfully":
-      "تم تأكيد البريد الإلكتروني بنجاح! أهلاً بك في تعافي.",
+      "ممتاز! تم تأكيد بريدك الإلكتروني. أهلاً بك في تعافي!",
   "seconds": "ث",
-  "verification-email-sent": "تم إرسال رسالة التأكيد بنجاح",
+  "verification-email-sent": "تم الإرسال! تحقق من بريدك",
   "failed-to-send-verification-email":
-      "فشل في إرسال رسالة التأكيد. يرجى المحاولة مرة أخرى.",
-  "send-verification-email-first": "أولاً، أرسل رسالة التأكيد إلى",
+      "لم نتمكن من الإرسال. يرجى المحاولة مرة أخرى.",
+  "send-verification-email-first": "أرسلنا رسالة التأكيد إلى",
   "check-main-and-junk-mail-then-refresh":
-      "تحقق من صندوق الوارد والرسائل المزعجة، ثم عد هنا للتحديث",
+      "تحقق من صندوق الوارد والرسائل المزعجة",
   "email-change-signout-warning":
-      "مهم: إذا قمت بتحديث بريدك الإلكتروني بنجاح وتأكيده عبر النقر على رابط التأكيد، ثم عدت هنا للتحقق من حالة التأكيد، سيتم تسجيل خروجك فوراً كإجراء أمني. تسجيل الخروج التلقائي هذا يدل على نجاح تغيير بريدك الإلكتروني. ستحتاج لتسجيل الدخول مرة أخرى بعنوان البريد الجديد.",
+      "بعد تغيير بريدك الإلكتروني، ستحتاج لتسجيل الدخول مرة أخرى بالبريد الجديد لضمان الأمان.",
   "email-not-verified-yet":
-      "لم يتم تأكيد البريد الإلكتروني بعد. جرب إعادة إرسال رسالة التأكيد وتحقق من صندوق الوارد والرسائل المزعجة.",
+      "لم يتم التأكيد بعد. تحقق من بريدك أو اطلب رسالة جديدة.",
   "change-email": "تغيير البريد الإلكتروني",
   "change-email-description":
       "إذا قمت بإدخال عنوان بريد إلكتروني خاطئ أثناء التسجيل، يمكنك تغييره هنا. سيتم إرسال رسالة تأكيد جديدة إلى العنوان الجديد.",
   "new-email": "عنوان البريد الإلكتروني الجديد",
+  "back": "العودة",
   "update-email": "تحديث البريد الإلكتروني",
   "updating": "جاري التحديث...",
   "email-already-exists": "هذا البريد الإلكتروني مسجل بالفعل مع حساب آخر",
@@ -1077,7 +1130,6 @@ const Map<String, String> kAr = {
       "فشل في تحديث البريد الإلكتروني. يرجى المحاولة مرة أخرى.",
   "requires-recent-login":
       "لأسباب أمنية، يرجى تسجيل الخروج والدخول مرة أخرى قبل تغيير بريدك الإلكتروني.",
-  "field-required": "هذا الحقل مطلوب",
   "current-email": "عنوان البريد الإلكتروني الحالي",
   "new-email-same-as-current":
       "لا يمكن أن يكون البريد الإلكتروني الجديد نفس البريد الحالي",

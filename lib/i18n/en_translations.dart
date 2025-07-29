@@ -709,6 +709,62 @@ const Map<String, String> kEn = {
   "first-name": "First Name",
   "last-name": "Last Name",
   "repeat-password": "Repeat Password",
+
+  // Registration Stepper Keys
+  "setup-account": "Setup Account",
+  "personal-information": "Personal Information",
+  "personal-info-explanation":
+      "Tell us a bit about yourself. This information helps us personalize your recovery journey.",
+  "preferences": "Preferences",
+  "preferences-explanation":
+      "Choose your gender and preferred language for the best experience.",
+  "recovery-setup": "Recovery Setup",
+  "recovery-setup-explanation":
+      "When did you start your recovery journey? This helps us track your progress accurately.",
+  "email-verification": "Email Verification",
+  "email-verification-explanation":
+      "We need to verify your email address to secure your account and send you important updates.",
+  "all-set": "All Set!",
+  "registration-complete": "Registration Complete!",
+  "welcome-message":
+      "Welcome to your recovery journey. We're here to support you every step of the way.",
+  "start-from-now": "Start from now",
+  "start-from-now-subtitle": "Begin tracking your recovery from this moment",
+  "select-starting-date": "Select starting date and time",
+  "terms-acceptance": "I accept the terms of use and privacy policy",
+  "verification-sent-to": "Verification email sent to:",
+  "check-verification": "Check Email Verification",
+  "resend-verification": "Resend Verification Email",
+  "field-required": "This field is required",
+  "name-required": "Please enter your name",
+  "valid-email-required": "Please enter a valid email address",
+  "valid-birth-date-required": "Please enter a valid birth date (before 2011)",
+  "starting-date-required": "Please select when you started your recovery",
+  "terms-acceptance-required": "Please accept the terms of use to continue",
+  "registration-failed": "Registration failed. Please try again.",
+  "verification-email-failed": "Failed to send verification email",
+  "verification-check-failed": "Failed to check verification status",
+  "finish": "Get Started",
+
+  // OAuth email verification messages
+  "email-already-verified-explanation":
+      "Great! Your email is already verified through your account provider.",
+  "verified-email": "Verified email:",
+  "email-verified-oauth-message":
+      "Your email was verified when you signed in. You're all set to continue!",
+
+  // Simplified banner messages
+  "account-setup-needed": "Complete your account setup to get started",
+  "account-setup-needed-subtitle":
+      "We need a few more details to personalize your experience",
+  "profile-incomplete": "Your profile needs some updates",
+  "profile-incomplete-subtitle":
+      "Please review and confirm your account details",
+  "email-verification-needed": "Please verify your email address",
+  "email-verification-needed-subtitle":
+      "Check your inbox and click the verification link",
+  "complete-profile": "Complete Profile",
+  "verify-email": "Verify Email",
   "search": "Search",
   "loading": "Loading content...",
   "sad": "Sad",
@@ -1088,35 +1144,35 @@ const Map<String, String> kEn = {
   "confirm-email-banner":
       "Please verify your email address to access all features",
   "confirm-email": "Verify Email",
-  "verify-your-email": "Verify Your Email",
+  "verify-your-email": "Check Your Email",
   "verification-email-sent-to": "A verification email has been sent to",
   "check-inbox-and-click-link":
       "Please check your inbox and click the verification link to continue",
   "checking": "Checking...",
-  "check-verification-status": "Check Verification Status",
+  "check-verification-status": "I Clicked the Link",
   "sending": "Sending...",
   "resend-in": "Resend in",
   "resend-verification-email": "Resend Verification Email",
   "email-verification-info":
       "We've automatically sent a verification email to your address. Once you click the verification link, you'll be able to access all features of the app.",
   "email-verified-successfully":
-      "Email verified successfully! Welcome to Ta'afi.",
-  "verification-email-sent": "Verification email sent successfully",
-  "failed-to-send-verification-email":
-      "Failed to send verification email. Please try again.",
-  "send-verification-email-first": "First, send the verification email to",
+      "Perfect! Your email is verified. Welcome to Ta'afi!",
+  "verification-email-sent": "Email sent! Check your inbox",
+  "failed-to-send-verification-email": "Couldn't send email. Please try again.",
+  "send-verification-email-first": "We sent a verification email to",
   "check-main-and-junk-mail-then-refresh":
-      "Check your main and junk mail folders, then come back here to refresh",
+      "Check your inbox and spam folder for our email",
   "email-change-signout-warning":
-      "Important: If you successfully update your email and confirm it by clicking the verification link, then come back here to check verification status, you will be signed out immediately as a security measure. This automatic sign-out indicates that your email change was successful. You will need to log in again with your new email address.",
+      "After changing your email, you'll need to log in again with your new email for security.",
   "email-not-verified-yet":
-      "Email not verified yet. Try resending the verification email and check your inbox and junk folder.",
+      "Not verified yet. Check your inbox or request a new email.",
   "seconds": "s",
   "change-email": "Change Email",
   "change-email-description":
       "If you entered an incorrect email address during registration, you can change it here. A new verification email will be sent to the new address.",
   "new-email": "New email address",
   "update-email": "Update Email",
+  "back": "Back",
   "email-already-exists":
       "This email is already registered with another account",
   "email-updated-successfully":
@@ -1126,7 +1182,6 @@ const Map<String, String> kEn = {
   "email-update-failed": "Failed to update email. Please try again.",
   "requires-recent-login":
       "For security reasons, please log out and log back in before changing your email.",
-  "field-required": "This field is required",
   "current-email": "Current email address",
   "new-email-same-as-current": "New email cannot be the same as current email",
   "email-updated-logging-out":
