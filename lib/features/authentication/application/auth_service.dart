@@ -356,36 +356,58 @@ class AuthService {
 
   Future<void> deleteAccount(BuildContext context) async {
     try {
-      final uid = _auth.currentUser?.uid;
-      if (uid != null) {
-        final firestore = FirebaseFirestore.instance;
-        // Log that this user has been deleted
-        await firestore.collection('deletedUsers').doc(uid).set({
-          'deletedAt': FieldValue.serverTimestamp(),
-        });
+      final currentUser = _auth.currentUser;
+      final uid = currentUser?.uid;
+
+      // Check if user is authenticated
+      if (currentUser == null || uid == null) {
+        getErrorSnackBar(context, 'user-not-found');
+        return;
       }
+
+      print('DEBUG: Starting account deletion for user: $uid');
+
+      // Log that this user has been deleted
+      final firestore = FirebaseFirestore.instance;
+      await firestore.collection('deletedUsers').doc(uid).set({
+        'deletedAt': FieldValue.serverTimestamp(),
+      });
+      print('DEBUG: Added to deletedUsers collection');
 
       // Delete the user's Firestore document only if it exists
       final docExists = await _authRepository.isUserDocumentExist();
       if (docExists) {
         await _authRepository.deleteUserDocument();
+        print('DEBUG: Deleted user Firestore document');
       }
 
-      // Delete the Firebase user account
-      await _auth.currentUser?.delete();
+      // Delete the Firebase user account - this is the critical step
+      print('DEBUG: Attempting to delete Firebase Auth user');
+      await currentUser.delete();
+      print('DEBUG: Firebase Auth user deleted successfully');
 
       // IMPORTANT: Clear the cached auth state by signing out
       await _auth.signOut();
+      print('DEBUG: Signed out successfully');
 
       // Invalidate your providers to refresh the app state
       ref.invalidate(userDocumentsNotifierProvider);
       ref.invalidate(userNotifierProvider);
-
       ref.invalidate(streakRepositoryProvider);
       ref.invalidate(streakNotifierProvider);
+
+      print('DEBUG: Account deletion completed successfully');
     } on FirebaseAuthException catch (e, stackTrace) {
+      print(
+          'DEBUG: FirebaseAuthException during account deletion: ${e.code} - ${e.message}');
       ref.read(errorLoggerProvider).logException(e, stackTrace);
       getErrorSnackBar(context, e.code);
+      rethrow; // Let the calling code know the deletion failed
+    } catch (e, stackTrace) {
+      print('DEBUG: General exception during account deletion: $e');
+      ref.read(errorLoggerProvider).logException(e, stackTrace);
+      getErrorSnackBar(context, 'account-deletion-failed');
+      rethrow; // Let the calling code know the deletion failed
     }
   }
 

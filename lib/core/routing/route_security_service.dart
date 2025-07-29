@@ -83,9 +83,11 @@ class RouteSecurityService {
   String? _handleUnauthenticatedRedirect(GoRouterState state) {
     final isOnboardingRoute = state.matchedLocation.startsWith('/onboarding');
     final isLoadingRoute = state.matchedLocation == '/loading';
+    final isAccountDeletionLoadingRoute =
+        state.matchedLocation == '/account-deletion-loading';
 
-    // Allow onboarding and loading routes for unauthenticated users
-    if (isOnboardingRoute || isLoadingRoute) {
+    // Allow onboarding, loading, and account deletion loading routes for unauthenticated users
+    if (isOnboardingRoute || isLoadingRoute || isAccountDeletionLoadingRoute) {
       return null;
     }
 
@@ -133,7 +135,11 @@ class RouteSecurityService {
       return null;
     } else {
       final isOnboardingRoute = state.matchedLocation.startsWith('/onboarding');
-      if (!isOnboardingRoute && state.matchedLocation != '/onboarding') {
+      final isAccountDeletionLoadingRoute =
+          state.matchedLocation == '/account-deletion-loading';
+      if (!isOnboardingRoute &&
+          state.matchedLocation != '/onboarding' &&
+          !isAccountDeletionLoadingRoute) {
         return '/onboarding';
       }
     }

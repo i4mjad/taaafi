@@ -5,6 +5,7 @@ class Comment {
   final String postId;
   final String authorCPId;
   final String body;
+  final bool isDeleted;
   final int score;
   final int likeCount;
   final int dislikeCount;
@@ -16,6 +17,7 @@ class Comment {
     required this.postId,
     required this.authorCPId,
     required this.body,
+    this.isDeleted = false,
     required this.score,
     required this.likeCount,
     required this.dislikeCount,
@@ -29,6 +31,7 @@ class Comment {
         postId: doc.data()!["postId"],
         authorCPId: doc.data()!["authorCPId"],
         body: doc.data()!["body"],
+        isDeleted: doc.data()!["isDeleted"] ?? false,
         score: doc.data()!["score"] ?? 0,
         likeCount: doc.data()!["likeCount"] ?? 0,
         dislikeCount: doc.data()!["dislikeCount"] ?? 0,
@@ -42,6 +45,7 @@ class Comment {
         'postId': postId,
         'authorCPId': authorCPId,
         'body': body,
+        'isDeleted': isDeleted,
         'score': score,
         'likeCount': likeCount,
         'dislikeCount': dislikeCount,
@@ -55,6 +59,7 @@ class Comment {
         'postId': postId,
         'authorCPId': authorCPId,
         'body': body,
+        'isDeleted': isDeleted,
         'score': score,
         'likeCount': likeCount,
         'dislikeCount': dislikeCount,
@@ -68,6 +73,7 @@ class Comment {
     String? postId,
     String? authorCPId,
     String? body,
+    bool? isDeleted,
     int? score,
     int? likeCount,
     int? dislikeCount,
@@ -79,6 +85,7 @@ class Comment {
       postId: postId ?? this.postId,
       authorCPId: authorCPId ?? this.authorCPId,
       body: body ?? this.body,
+      isDeleted: isDeleted ?? this.isDeleted,
       score: score ?? this.score,
       likeCount: likeCount ?? this.likeCount,
       dislikeCount: dislikeCount ?? this.dislikeCount,
@@ -95,6 +102,7 @@ class Comment {
         other.postId == postId &&
         other.authorCPId == authorCPId &&
         other.body == body &&
+        other.isDeleted == isDeleted &&
         other.score == score &&
         other.likeCount == likeCount &&
         other.dislikeCount == dislikeCount &&
@@ -109,6 +117,7 @@ class Comment {
       postId,
       authorCPId,
       body,
+      isDeleted,
       score,
       likeCount,
       dislikeCount,
@@ -119,6 +128,6 @@ class Comment {
 
   @override
   String toString() {
-    return 'Comment(id: $id, postId: $postId, authorCPId: $authorCPId, body: $body, score: $score, likeCount: $likeCount, dislikeCount: $dislikeCount, createdAt: $createdAt, updatedAt: $updatedAt)';
+    return 'Comment(id: $id, postId: $postId, authorCPId: $authorCPId, body: $body, isDeleted: $isDeleted, score: $score, likeCount: $likeCount, dislikeCount: $dislikeCount, createdAt: $createdAt, updatedAt: $updatedAt)';
   }
 }

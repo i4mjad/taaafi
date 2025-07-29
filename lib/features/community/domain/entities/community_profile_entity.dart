@@ -19,6 +19,9 @@ class CommunityProfileEntity {
   /// Whether the user posts anonymously by default
   final bool isAnonymous;
 
+  /// Whether the profile has been soft deleted
+  final bool isDeleted;
+
   /// When the profile was created
   final DateTime createdAt;
 
@@ -31,6 +34,7 @@ class CommunityProfileEntity {
     required this.gender,
     this.avatarUrl,
     required this.isAnonymous,
+    this.isDeleted = false,
     required this.createdAt,
     this.updatedAt,
   });
@@ -43,6 +47,7 @@ class CommunityProfileEntity {
       gender: json['gender'] as String,
       avatarUrl: json['avatarUrl'] as String?,
       isAnonymous: json['isAnonymous'] as bool,
+      isDeleted: json['isDeleted'] ?? false,
       createdAt: DateTime.parse(json['createdAt'] as String),
       updatedAt: json['updatedAt'] != null
           ? DateTime.parse(json['updatedAt'] as String)
@@ -58,6 +63,7 @@ class CommunityProfileEntity {
       'gender': gender,
       'avatarUrl': avatarUrl,
       'isAnonymous': isAnonymous,
+      'isDeleted': isDeleted,
       'createdAt': createdAt.toIso8601String(),
       'updatedAt': updatedAt?.toIso8601String(),
     };

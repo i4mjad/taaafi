@@ -123,7 +123,7 @@ final notificationsEnabledProvider = AutoDisposeFutureProvider<bool>.internal(
 // ignore: unused_element
 typedef NotificationsEnabledRef = AutoDisposeFutureProviderRef<bool>;
 String _$smartAlertsNotifierHash() =>
-    r'b6f05572132ef33f3d2673284c5a606d76890735';
+    r'372bc22a40a330058c6dd9ead4cb556d55c16515';
 
 /// Notifier for managing smart alert settings
 ///

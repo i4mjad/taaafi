@@ -29,6 +29,7 @@ class UserProfileNotifier extends _$UserProfileNotifier {
       if (uid == null) return null;
 
       final doc = await _firestore.collection('users').doc(uid).get();
+      if (!doc.exists) return null;
       return UserProfile.fromFirestore(doc);
     } catch (e) {
       return null;

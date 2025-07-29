@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'dart:async';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/routing/route_names.dart';
+import 'package:reboot_app_3/core/routing/navigator_keys.dart';
 import 'package:reboot_app_3/core/shared_widgets/app_bar.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
 import 'package:reboot_app_3/core/shared_widgets/custom_textfield.dart';
@@ -17,6 +20,7 @@ import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/features/authentication/application/auth_service.dart';
 import 'package:reboot_app_3/features/account/data/user_profile_notifier.dart';
 import 'package:reboot_app_3/features/authentication/providers/account_status_provider.dart';
+import 'package:reboot_app_3/features/account/presentation/account_deletion_loading_screen.dart';
 
 class DeleteAccountScreen extends ConsumerWidget {
   const DeleteAccountScreen({super.key});
@@ -96,20 +100,193 @@ class DeleteAccountScreen extends ConsumerWidget {
                   ),
                   verticalSpace(Spacing.points8),
                   Text(
-                    AppLocalizations.of(context).translate('relogin-required'),
+                    AppLocalizations.of(context)
+                        .translate('delete-account-final-warning'),
                     style: TextStyles.small.copyWith(
                       height: 1.75,
+                      color: theme.error[600],
                     ),
                     textAlign: TextAlign.center,
                   ),
                 ],
               ),
-              verticalSpace(Spacing.points16),
-              ReLoginForm(),
+              verticalSpace(Spacing.points24),
+
+              // Simple delete button - no re-auth form
+              Consumer(
+                builder: (context, ref, child) {
+                  return GestureDetector(
+                    onTap: () {
+                      _showDeleteConfirmationDialog(context);
+                    },
+                    child: WidgetsContainer(
+                      backgroundColor: theme.error[600],
+                      width: MediaQuery.of(context).size.width - 32,
+                      padding: EdgeInsets.all(16),
+                      borderSide:
+                          BorderSide(width: 0, color: theme.error[900]!),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            LucideIcons.userX,
+                            color: Colors.white,
+                            size: 20,
+                          ),
+                          horizontalSpace(Spacing.points8),
+                          Text(
+                            AppLocalizations.of(context)
+                                .translate('delete-account'),
+                            style: TextStyles.footnoteSelected
+                                .copyWith(color: Colors.white),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
             ],
           ),
         ),
       ),
+    );
+  }
+
+  void _showDeleteConfirmationDialog(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (BuildContext context) {
+        final theme = AppTheme.of(context);
+        return Container(
+          decoration: BoxDecoration(
+            color: theme.backgroundColor,
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(20),
+              topRight: Radius.circular(20),
+            ),
+          ),
+          padding: EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Handle bar
+              Center(
+                child: Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: theme.grey[300],
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
+              verticalSpace(Spacing.points24),
+
+              // Icon and title
+              Row(
+                children: [
+                  Icon(
+                    LucideIcons.alertTriangle,
+                    color: theme.error[600],
+                    size: 24,
+                  ),
+                  horizontalSpace(Spacing.points12),
+                  Expanded(
+                    child: Text(
+                      AppLocalizations.of(context)
+                          .translate('delete-account-confirmation-title'),
+                      style: TextStyles.h5.copyWith(
+                        color: theme.primary[900],
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              verticalSpace(Spacing.points16),
+
+              // Message
+              Text(
+                AppLocalizations.of(context)
+                    .translate('delete-account-confirmation-message'),
+                style: TextStyles.body.copyWith(
+                  color: theme.grey[700],
+                  height: 1.5,
+                ),
+              ),
+              verticalSpace(Spacing.points32),
+
+              // Buttons
+              Row(
+                children: [
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.of(context).pop();
+                      },
+                      child: WidgetsContainer(
+                        backgroundColor: theme.backgroundColor,
+                        borderSide:
+                            BorderSide(color: theme.grey[400]!, width: 1),
+                        padding: EdgeInsets.symmetric(vertical: 16),
+                        child: Center(
+                          child: Text(
+                            AppLocalizations.of(context).translate('cancel'),
+                            style: TextStyles.footnoteSelected.copyWith(
+                              color: theme.grey[700],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  horizontalSpace(Spacing.points12),
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.of(context).pop();
+                        // Navigate directly to loading screen
+                        final rootContext = rootNavigatorKey.currentContext;
+                        if (rootContext != null && rootContext.mounted) {
+                          Navigator.of(rootContext).push(
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  const AccountDeletionLoadingScreen(),
+                              settings: const RouteSettings(
+                                  name: 'account-deletion-loading'),
+                            ),
+                          );
+                        }
+                      },
+                      child: WidgetsContainer(
+                        backgroundColor: theme.error[600],
+                        padding: EdgeInsets.symmetric(vertical: 16),
+                        child: Center(
+                          child: Text(
+                            AppLocalizations.of(context)
+                                .translate('delete-account'),
+                            style: TextStyles.footnoteSelected.copyWith(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+
+              // Bottom padding for safe area
+              SizedBox(height: MediaQuery.of(context).padding.bottom),
+            ],
+          ),
+        );
+      },
     );
   }
 }
@@ -159,270 +336,6 @@ class OnboardingSection extends ConsumerWidget {
               ],
             ),
           )
-        ],
-      ),
-    );
-  }
-}
-
-class ReLoginForm extends ConsumerStatefulWidget {
-  const ReLoginForm({super.key});
-
-  @override
-  _ReLoginFormState createState() => _ReLoginFormState();
-}
-
-class _ReLoginFormState extends ConsumerState<ReLoginForm> {
-  final emailController = TextEditingController();
-  final passwordController = TextEditingController();
-  final _formKey = GlobalKey<FormState>();
-  bool _isProcessing = false;
-
-  @override
-  void dispose() {
-    emailController.dispose();
-    passwordController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = AppTheme.of(context);
-    final authService = ref.watch(authServiceProvider);
-    final userProfileNotifier = ref.read(userProfileNotifierProvider.notifier);
-
-    return Form(
-      key: _formKey,
-      child: Column(
-        children: [
-          CustomTextField(
-            controller: emailController,
-            hint: AppLocalizations.of(context).translate('email'),
-            prefixIcon: LucideIcons.mail,
-            inputType: TextInputType.emailAddress,
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return AppLocalizations.of(context).translate('cant-be-empty');
-              }
-              return null;
-            },
-          ),
-          verticalSpace(Spacing.points8),
-          CustomTextField(
-            controller: passwordController,
-            obscureText: true,
-            showObscureToggle: true,
-            hint: AppLocalizations.of(context).translate('password'),
-            prefixIcon: LucideIcons.lock,
-            inputType: TextInputType.visiblePassword,
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return AppLocalizations.of(context).translate('cant-be-empty');
-              }
-              return null;
-            },
-          ),
-          verticalSpace(Spacing.points16),
-          GestureDetector(
-            onTap: _isProcessing
-                ? null
-                : () async {
-                    final email = emailController.value.text;
-                    final password = passwordController.value.text;
-
-                    if (email.isNotEmpty && password.isNotEmpty) {
-                      if (_formKey.currentState!.validate()) {
-                        setState(() {
-                          _isProcessing = true;
-                        });
-
-                        try {
-                          final result = await authService.reSignInWithEmail(
-                            context,
-                            email,
-                            password,
-                          );
-
-                          if (result && mounted) {
-                            HapticFeedback.mediumImpact();
-                            await authService.deleteAccount(context);
-
-                            if (mounted) {
-                              context.goNamed(RouteNames.onboarding.name);
-                              getSuccessSnackBar(context, 'account-deleted');
-                            }
-                          }
-                        } finally {
-                          if (mounted) {
-                            setState(() {
-                              _isProcessing = false;
-                            });
-                          }
-                        }
-                      }
-                    }
-                  },
-            child: WidgetsContainer(
-              backgroundColor:
-                  _isProcessing ? theme.grey[400] : theme.error[600],
-              width: MediaQuery.of(context).size.width - 32,
-              padding: EdgeInsets.all(16),
-              // boxShadow: Shadows.mainShadows,
-              // borderRadius: BorderRadius.circular(10.5),
-              borderSide: BorderSide(width: 0, color: theme.error[900]!),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  if (_isProcessing) ...[
-                    SizedBox(
-                      width: 16,
-                      height: 16,
-                      child: Spinner(),
-                    ),
-                    horizontalSpace(Spacing.points8),
-                  ],
-                  Text(
-                    _isProcessing
-                        ? AppLocalizations.of(context).translate('processing')
-                        : AppLocalizations.of(context)
-                            .translate('delete-account'),
-                    style: TextStyles.footnoteSelected
-                        .copyWith(color: Colors.white),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          verticalSpace(Spacing.points16),
-          Text(
-            AppLocalizations.of(context).translate('or-relogin-with'),
-            style: TextStyles.caption.copyWith(color: theme.primary[600]),
-          ),
-          verticalSpace(Spacing.points12),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              GestureDetector(
-                onTap: _isProcessing
-                    ? null
-                    : () async {
-                        HapticFeedback.mediumImpact();
-                        setState(() {
-                          _isProcessing = true;
-                        });
-
-                        try {
-                          final result =
-                              await authService.reSignInWithApple(context);
-                          if (result && mounted) {
-                            await authService.deleteAccount(context);
-                            if (mounted) {
-                              context.goNamed(RouteNames.onboarding.name);
-                              getSuccessSnackBar(context, 'account-deleted');
-                            }
-                          }
-                        } finally {
-                          if (mounted) {
-                            setState(() {
-                              _isProcessing = false;
-                            });
-                          }
-                        }
-                        // Error handling is done inside the authService method
-                      },
-                child: Container(
-                  height: 60,
-                  width: 60,
-                  padding: EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                      color: _isProcessing
-                          ? theme.grey[200]
-                          : theme.backgroundColor,
-                      borderRadius: BorderRadius.circular(150),
-                      boxShadow: _isProcessing ? [] : Shadows.mainShadows,
-                      border: Border.all(
-                        color: theme.grey[600]!,
-                        width: 0.25,
-                      )),
-                  child: _isProcessing
-                      ? Center(
-                          child: SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: Spinner(
-                              strokeWidth: 2,
-                              valueColor: theme.primary[600],
-                            ),
-                          ),
-                        )
-                      : SvgPicture.asset(
-                          'asset/icons/apple-icon.svg',
-                          semanticsLabel: 'Apple Logo',
-                        ),
-                ),
-              ),
-              horizontalSpace(Spacing.points4),
-              GestureDetector(
-                onTap: _isProcessing
-                    ? null
-                    : () async {
-                        HapticFeedback.mediumImpact();
-                        setState(() {
-                          _isProcessing = true;
-                        });
-
-                        try {
-                          final result =
-                              await authService.reSignInWithGoogle(context);
-                          if (result && mounted) {
-                            await authService.deleteAccount(context);
-                            if (mounted) {
-                              context.goNamed(RouteNames.onboarding.name);
-                              getSuccessSnackBar(context, 'account-deleted');
-                            }
-                          }
-                        } finally {
-                          if (mounted) {
-                            setState(() {
-                              _isProcessing = false;
-                            });
-                          }
-                        }
-                        // Error handling is done inside the authService method
-                      },
-                child: Container(
-                  height: 60,
-                  width: 60,
-                  padding: EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                      color: _isProcessing
-                          ? theme.grey[200]
-                          : theme.backgroundColor,
-                      borderRadius: BorderRadius.circular(150),
-                      boxShadow: _isProcessing ? [] : Shadows.mainShadows,
-                      border: Border.all(
-                        color: theme.grey[600]!,
-                        width: 0.25,
-                      )),
-                  child: _isProcessing
-                      ? Center(
-                          child: SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: Spinner(
-                              strokeWidth: 2,
-                              valueColor: theme.primary[600],
-                            ),
-                          ),
-                        )
-                      : SvgPicture.asset(
-                          'asset/icons/google-icon.svg',
-                          semanticsLabel: 'Google Logo',
-                        ),
-                ),
-              ),
-            ],
-          ),
         ],
       ),
     );

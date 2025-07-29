@@ -12,6 +12,7 @@ class Interaction {
   final String userCPId; // The user who made the interaction
   final String type; // 'like' (extensible for future types)
   final int value; // 1 for like, -1 for dislike, 0 for neutral
+  final bool isDeleted;
   final DateTime createdAt;
   final DateTime? updatedAt;
 
@@ -22,6 +23,7 @@ class Interaction {
     required this.userCPId,
     required this.type,
     required this.value,
+    this.isDeleted = false,
     required this.createdAt,
     this.updatedAt,
   });
@@ -36,6 +38,7 @@ class Interaction {
       userCPId: data['userCPId'] as String,
       type: data['type'] as String,
       value: data['value'] as int,
+      isDeleted: data['isDeleted'] ?? false,
       createdAt: (data['createdAt'] as Timestamp).toDate(),
       updatedAt: data['updatedAt'] != null
           ? (data['updatedAt'] as Timestamp).toDate()
@@ -50,6 +53,7 @@ class Interaction {
         'userCPId': userCPId,
         'type': type,
         'value': value,
+        'isDeleted': isDeleted,
         'createdAt': createdAt.toIso8601String(),
         'updatedAt': updatedAt?.toIso8601String(),
       };
@@ -62,6 +66,7 @@ class Interaction {
         'userCPId': userCPId,
         'type': type,
         'value': value,
+        'isDeleted': isDeleted,
         'createdAt': Timestamp.fromDate(createdAt),
         'updatedAt': updatedAt != null ? Timestamp.fromDate(updatedAt!) : null,
       };
@@ -97,6 +102,7 @@ class Interaction {
       userCPId: userCPId,
       type: type,
       value: value,
+      isDeleted: false,
       createdAt: DateTime.now(),
     );
   }
@@ -109,6 +115,7 @@ class Interaction {
     String? userCPId,
     String? type,
     int? value,
+    bool? isDeleted,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
@@ -119,6 +126,7 @@ class Interaction {
       userCPId: userCPId ?? this.userCPId,
       type: type ?? this.type,
       value: value ?? this.value,
+      isDeleted: isDeleted ?? this.isDeleted,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );
@@ -142,6 +150,7 @@ class Interaction {
         other.userCPId == userCPId &&
         other.type == type &&
         other.value == value &&
+        other.isDeleted == isDeleted &&
         other.createdAt == createdAt &&
         other.updatedAt == updatedAt;
   }
@@ -155,6 +164,7 @@ class Interaction {
       userCPId,
       type,
       value,
+      isDeleted,
       createdAt,
       updatedAt,
     );
@@ -162,6 +172,6 @@ class Interaction {
 
   @override
   String toString() {
-    return 'Interaction(id: $id, targetType: $targetType, targetId: $targetId, userCPId: $userCPId, type: $type, value: $value, createdAt: $createdAt, updatedAt: $updatedAt)';
+    return 'Interaction(id: $id, targetType: $targetType, targetId: $targetId, userCPId: $userCPId, type: $type, value: $value, isDeleted: $isDeleted, createdAt: $createdAt, updatedAt: $updatedAt)';
   }
 }

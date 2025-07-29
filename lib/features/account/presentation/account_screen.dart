@@ -58,6 +58,11 @@ class AccountScreen extends ConsumerWidget {
             error: (e, _) => Center(child: Text(e.toString())),
             data: (_) => userProfileState.when(
                   data: (userProfile) {
+                    // Handle case where userProfile is null (e.g., during account deletion)
+                    if (userProfile == null) {
+                      return const CompleteRegistrationBanner();
+                    }
+
                     return Container(
                       width: MediaQuery.of(context).size.width,
                       child: SingleChildScrollView(
@@ -91,7 +96,7 @@ class AccountScreen extends ConsumerWidget {
                                   context
                                       .pushNamed(RouteNames.userProfile.name);
                                 },
-                                child: UserDetailsWidget(userProfile!),
+                                child: UserDetailsWidget(userProfile),
                               ),
                               verticalSpace(Spacing.points24),
                               Text(

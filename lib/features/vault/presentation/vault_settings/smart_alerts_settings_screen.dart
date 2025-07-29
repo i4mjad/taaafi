@@ -699,50 +699,6 @@ class _SmartAlertsSettingsScreenState
     }
   }
 
-  Future<void> _testNotification(SmartAlertType type) async {
-    if (_isLoading) return;
-
-    HapticFeedback.lightImpact();
-
-    try {
-      await ref
-          .read(smartAlertsNotifierProvider.notifier)
-          .sendTestNotification(type);
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('✅ Test notification sent successfully!'),
-                SizedBox(height: 4),
-                Text(
-                  Platform.isIOS
-                      ? '🍎 Swipe DOWN from top to see it in Notification Center'
-                      : '📱 Pull down from top to see it in notification panel',
-                  style: TextStyle(fontSize: 12),
-                ),
-              ],
-            ),
-            backgroundColor: AppTheme.of(context).success[500],
-            duration: Duration(seconds: 4),
-          ),
-        );
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(AppLocalizations.of(context)
-                .translate('error-sending-notification')),
-            backgroundColor: AppTheme.of(context).error[500],
-          ),
-        );
-      }
-    }
-  }
-
   /// Test notification via Cloud Functions (NEW FCM APPROACH)
   Future<void> _testCloudNotification(SmartAlertType type) async {
     if (_isLoading) return;

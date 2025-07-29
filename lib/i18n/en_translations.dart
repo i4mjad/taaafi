@@ -860,7 +860,38 @@ const Map<String, String> kEn = {
   "relogin-required":
       "For security purposes, we need to re-authenticate you to delete your account. Please log in again using your email and password or one of the social login options below.",
   "delete-account": "Delete Account",
+  "delete-account-final-warning":
+      "This action cannot be undone. Your account and all data will be permanently deleted.",
+  "authentication-required": "Authentication Required",
+  "recent-login-required-for-deletion":
+      "For security reasons, we need you to re-authenticate before deleting your account.",
+  "please-sign-in-again-with-google":
+      "Please sign in again with Google to verify your identity.",
+  "please-sign-in-again-with-apple":
+      "Please sign in again with Apple to verify your identity.",
+  "sign-in-with-google": "Sign in with Google",
+  "sign-in-with-apple": "Sign in with Apple",
+  "email-reauth-not-supported":
+      "For email accounts, please sign out and contact support if you need to delete your account.",
+  "sign-out": "Sign Out",
+  "sign-out-failed": "Failed to sign out. Please try again.",
+  "delete-account-confirmation-title": "Confirm Account Deletion",
+  "delete-account-confirmation-message":
+      "Are you absolutely sure you want to delete your account? This action cannot be undone and all your data will be permanently lost.",
   "processing-new-account": "Creating account...",
+  "verifying-authentication": "Verifying authentication",
+  "re-authenticating-user": "Re-authenticating user",
+  "backing-up-data": "Backing up your data",
+  "deleting-user-data": "Deleting user data",
+  "deleting-community-data": "Deleting community data",
+  "deleting-account": "Deleting account",
+  "finalizing": "Finalizing",
+  "deletion-failed": "Account deletion failed",
+  "account-deleted-successfully": "Account deleted successfully",
+  "please-wait-deletion-progress":
+      "Please wait while we delete your account. This may take a few moments.",
+  "unknown-error": "An unknown error occurred",
+  "go-back": "Go Back",
   "what-is-relapse":
       "Relapse: A deliberate abandonment of the recovery plan and a full return to unwanted behaviors.",
   "what-is-slip-up":

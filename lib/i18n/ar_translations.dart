@@ -935,6 +935,37 @@ const Map<String, String> kAr = {
   "relogin-required":
       "لأسباب أمنية، نحتاج إلى إعادة مصادقتك لحذف حسابك. يرجى تسجيل الدخول مرة أخرى باستخدام بريدك الإلكتروني وكلمة المرور أو أحد خيارات تسجيل الدخول الاجتماعي أدناه.",
   "delete-account": "حذف الحساب",
+  "delete-account-final-warning":
+      "لا يمكن التراجع عن هذا الإجراء. سيتم حذف حسابك وجميع البيانات نهائياً.",
+  "authentication-required": "المصادقة مطلوبة",
+  "recent-login-required-for-deletion":
+      "لأسباب أمنية، نحتاج إلى إعادة المصادقة قبل حذف حسابك.",
+  "please-sign-in-again-with-google":
+      "يرجى تسجيل الدخول مرة أخرى باستخدام Google للتحقق من هويتك.",
+  "please-sign-in-again-with-apple":
+      "يرجى تسجيل الدخول مرة أخرى باستخدام Apple للتحقق من هويتك.",
+  "sign-in-with-google": "تسجيل الدخول باستخدام Google",
+  "sign-in-with-apple": "تسجيل الدخول باستخدام Apple",
+  "email-reauth-not-supported":
+      "بالنسبة لحسابات البريد الإلكتروني، يرجى تسجيل الخروج والاتصال بالدعم إذا كنت بحاجة لحذف حسابك.",
+  "sign-out": "تسجيل الخروج",
+  "sign-out-failed": "فشل في تسجيل الخروج. يرجى المحاولة مرة أخرى.",
+  "delete-account-confirmation-title": "تأكيد حذف الحساب",
+  "delete-account-confirmation-message":
+      "هل أنت متأكد تماماً من رغبتك في حذف حسابك؟ لا يمكن التراجع عن هذا الإجراء وستفقد جميع بياناتك نهائياً.",
+  "verifying-authentication": "التحقق من المصادقة",
+  "re-authenticating-user": "إعادة مصادقة المستخدم",
+  "backing-up-data": "نسخ احتياطي لبياناتك",
+  "deleting-user-data": "حذف بيانات المستخدم",
+  "deleting-community-data": "حذف بيانات المجتمع",
+  "deleting-account": "حذف الحساب",
+  "finalizing": "الانتهاء",
+  "deletion-failed": "فشل حذف الحساب",
+  "account-deleted-successfully": "تم حذف الحساب بنجاح",
+  "please-wait-deletion-progress":
+      "يرجى الانتظار بينما نحذف حسابك. قد يستغرق هذا بضع لحظات.",
+  "unknown-error": "حدث خطأ غير معروف",
+  "go-back": "العودة",
   "what-is-relapse":
       "الانتكاسة: تخلي متعمد عن خطة التعافي وعودة كاملة إلى السلوكيات غير المرغوب فيها.",
   "what-is-slip-up": "الزلة: خطأ مؤقت لا يعني التخلي عن خطة التعافي بالكامل.",

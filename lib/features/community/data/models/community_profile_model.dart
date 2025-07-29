@@ -22,6 +22,9 @@ class CommunityProfileModel {
   /// Whether the user posts anonymously by default
   final bool isAnonymous;
 
+  /// Whether the profile has been soft deleted
+  final bool isDeleted;
+
   /// When the profile was created
   final DateTime createdAt;
 
@@ -34,6 +37,7 @@ class CommunityProfileModel {
     required this.gender,
     this.avatarUrl,
     required this.isAnonymous,
+    this.isDeleted = false,
     required this.createdAt,
     this.updatedAt,
   });
@@ -46,6 +50,7 @@ class CommunityProfileModel {
       gender: json['gender'] as String,
       avatarUrl: json['avatarUrl'] as String?,
       isAnonymous: json['isAnonymous'] as bool,
+      isDeleted: json['isDeleted'] ?? false,
       createdAt: DateTime.parse(json['createdAt'] as String),
       updatedAt: json['updatedAt'] != null
           ? DateTime.parse(json['updatedAt'] as String)
@@ -61,6 +66,7 @@ class CommunityProfileModel {
       'gender': gender,
       'avatarUrl': avatarUrl,
       'isAnonymous': isAnonymous,
+      'isDeleted': isDeleted,
       'createdAt': createdAt.toIso8601String(),
       'updatedAt': updatedAt?.toIso8601String(),
     };
@@ -77,6 +83,7 @@ class CommunityProfileModel {
       gender: data['gender'] as String,
       avatarUrl: data['avatarUrl'] as String?,
       isAnonymous: data['isAnonymous'] as bool,
+      isDeleted: data['isDeleted'] ?? false,
       createdAt: (data['createdAt'] as Timestamp).toDate(),
       updatedAt: data['updatedAt'] != null
           ? (data['updatedAt'] as Timestamp).toDate()
@@ -91,6 +98,7 @@ class CommunityProfileModel {
       'gender': gender,
       'avatarUrl': avatarUrl,
       'isAnonymous': isAnonymous,
+      'isDeleted': isDeleted,
       'createdAt': Timestamp.fromDate(createdAt),
       'updatedAt': updatedAt != null ? Timestamp.fromDate(updatedAt!) : null,
     };
@@ -104,6 +112,7 @@ class CommunityProfileModel {
       gender: gender,
       avatarUrl: avatarUrl,
       isAnonymous: isAnonymous,
+      isDeleted: isDeleted,
       createdAt: createdAt,
       updatedAt: updatedAt,
     );
@@ -117,6 +126,7 @@ class CommunityProfileModel {
       gender: entity.gender,
       avatarUrl: entity.avatarUrl,
       isAnonymous: entity.isAnonymous,
+      isDeleted: entity.isDeleted,
       createdAt: entity.createdAt,
       updatedAt: entity.updatedAt,
     );
@@ -129,6 +139,7 @@ class CommunityProfileModel {
     String? gender,
     String? avatarUrl,
     bool? isAnonymous,
+    bool? isDeleted,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
@@ -138,6 +149,7 @@ class CommunityProfileModel {
       gender: gender ?? this.gender,
       avatarUrl: avatarUrl ?? this.avatarUrl,
       isAnonymous: isAnonymous ?? this.isAnonymous,
+      isDeleted: isDeleted ?? this.isDeleted,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );
@@ -152,6 +164,7 @@ class CommunityProfileModel {
         other.gender == gender &&
         other.avatarUrl == avatarUrl &&
         other.isAnonymous == isAnonymous &&
+        other.isDeleted == isDeleted &&
         other.createdAt == createdAt &&
         other.updatedAt == updatedAt;
   }
@@ -163,12 +176,13 @@ class CommunityProfileModel {
         gender.hashCode ^
         avatarUrl.hashCode ^
         isAnonymous.hashCode ^
+        isDeleted.hashCode ^
         createdAt.hashCode ^
         updatedAt.hashCode;
   }
 
   @override
   String toString() {
-    return 'CommunityProfileModel(id: $id, displayName: $displayName, gender: $gender, avatarUrl: $avatarUrl, isAnonymous: $isAnonymous, createdAt: $createdAt, updatedAt: $updatedAt)';
+    return 'CommunityProfileModel(id: $id, displayName: $displayName, gender: $gender, avatarUrl: $avatarUrl, isAnonymous: $isAnonymous, isDeleted: $isDeleted, createdAt: $createdAt, updatedAt: $updatedAt)';
   }
 }

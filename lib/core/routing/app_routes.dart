@@ -12,6 +12,7 @@ import 'package:reboot_app_3/core/routing/scaffold_with_nested_navigation.dart';
 import 'package:reboot_app_3/features/account/presentation/account_screen.dart';
 import 'package:reboot_app_3/features/account/presentation/banned_screen.dart';
 import 'package:reboot_app_3/features/account/presentation/delete_account_screen.dart';
+import 'package:reboot_app_3/features/account/presentation/account_deletion_loading_screen.dart';
 import 'package:reboot_app_3/features/account/presentation/user_profile_screen.dart';
 import 'package:reboot_app_3/features/plus/presentation/taaafi_plus_features_list_screen.dart';
 import 'package:reboot_app_3/features/community/presentation/posts_list_screen.dart';
@@ -130,7 +131,11 @@ GoRouter goRouter(Ref<GoRouter> ref) {
         } else {
           final isOnboardingRoute =
               state.matchedLocation.startsWith('/onboarding');
-          if (!isOnboardingRoute && state.matchedLocation != '/onboarding') {
+          final isAccountDeletionLoadingRoute =
+              state.matchedLocation == '/account-deletion-loading';
+          if (!isOnboardingRoute &&
+              state.matchedLocation != '/onboarding' &&
+              !isAccountDeletionLoadingRoute) {
             return '/onboarding';
           }
         }
@@ -174,6 +179,15 @@ GoRouter goRouter(Ref<GoRouter> ref) {
             child: AppBannedWidget(securityResult: result),
           );
         },
+      ),
+      // Account deletion loading screen - accessible to unauthenticated users
+      GoRoute(
+        path: '/account-deletion-loading',
+        name: RouteNames.accountDeletionLoading.name,
+        pageBuilder: (context, state) => MaterialPage(
+          name: RouteNames.accountDeletionLoading.name,
+          child: AccountDeletionLoadingScreen(),
+        ),
       ),
       // Onboarding routes: Non authenticated users
       GoRoute(
