@@ -247,20 +247,11 @@ class DeleteAccountScreen extends ConsumerWidget {
                   horizontalSpace(Spacing.points12),
                   Expanded(
                     child: GestureDetector(
-                      onTap: () {
+                      onTap: () async {
                         Navigator.of(context).pop();
-                        // Navigate directly to loading screen
-                        final rootContext = rootNavigatorKey.currentContext;
-                        if (rootContext != null && rootContext.mounted) {
-                          Navigator.of(rootContext).push(
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  const AccountDeletionLoadingScreen(),
-                              settings: const RouteSettings(
-                                  name: 'account-deletion-loading'),
-                            ),
-                          );
-                        }
+
+                        // Navigate directly to loading screen to attempt deletion
+                        context.goNamed(RouteNames.accountDeletionLoading.name);
                       },
                       child: WidgetsContainer(
                         backgroundColor: theme.error[600],

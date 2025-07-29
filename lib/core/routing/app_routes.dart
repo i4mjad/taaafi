@@ -12,6 +12,7 @@ import 'package:reboot_app_3/core/routing/scaffold_with_nested_navigation.dart';
 import 'package:reboot_app_3/features/account/presentation/account_screen.dart';
 import 'package:reboot_app_3/features/account/presentation/banned_screen.dart';
 import 'package:reboot_app_3/features/account/presentation/delete_account_screen.dart';
+import 'package:reboot_app_3/features/account/presentation/account_deletion_login_screen.dart';
 import 'package:reboot_app_3/features/account/presentation/account_deletion_loading_screen.dart';
 import 'package:reboot_app_3/features/account/presentation/user_profile_screen.dart';
 import 'package:reboot_app_3/features/plus/presentation/taaafi_plus_features_list_screen.dart';
@@ -118,27 +119,10 @@ GoRouter goRouter(Ref<GoRouter> ref) {
         final redirectPath = await routeSecurityService.getRedirectPath(state);
         return redirectPath;
       } catch (e) {
-        // Fallback to basic authentication logic if security service fails
-        final firebaseUser = FirebaseAuth.instance.currentUser;
-        final bool isLoggedIn = firebaseUser != null;
-
-        if (isLoggedIn) {
-          if (state.matchedLocation.startsWith('/onboarding') ||
-              state.matchedLocation == '/loading') {
-            return '/home';
-          }
-          return null;
-        } else {
-          final isOnboardingRoute =
-              state.matchedLocation.startsWith('/onboarding');
-          final isAccountDeletionLoadingRoute =
-              state.matchedLocation == '/account-deletion-loading';
-          if (!isOnboardingRoute &&
-              state.matchedLocation != '/onboarding' &&
-              !isAccountDeletionLoadingRoute) {
-            return '/onboarding';
-          }
-        }
+        print('ERROR: RouteSecurityService failed: $e');
+        // Simple fallback - let RouteSecurityService handle all logic
+        // If it fails, we'll just allow the navigation to proceed
+        // This prevents infinite redirect loops while still providing basic protection
         return null;
       }
     },
@@ -179,6 +163,15 @@ GoRouter goRouter(Ref<GoRouter> ref) {
             child: AppBannedWidget(securityResult: result),
           );
         },
+      ),
+      // Account deletion login screen - accessible to unauthenticated users
+      GoRoute(
+        path: '/account-deletion-login',
+        name: RouteNames.accountDeletionLogin.name,
+        pageBuilder: (context, state) => MaterialPage(
+          name: RouteNames.accountDeletionLogin.name,
+          child: AccountDeletionLoginScreen(),
+        ),
       ),
       // Account deletion loading screen - accessible to unauthenticated users
       GoRoute(

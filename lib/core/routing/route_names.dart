@@ -27,6 +27,7 @@ enum RouteNames {
   activityOverview,
   ongoingActivity,
   accountDelete,
+  accountDeletionLogin,
   accountDeletionLoading,
   contentLists,
   vaultSettings,

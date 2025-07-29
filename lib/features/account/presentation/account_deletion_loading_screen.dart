@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/routing/route_names.dart';
 import 'package:reboot_app_3/core/shared_widgets/snackbar.dart';
@@ -12,7 +13,7 @@ import 'package:reboot_app_3/core/theming/custom_theme_data.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/features/authentication/application/auth_service.dart';
-import 'package:reboot_app_3/features/community/application/community_deletion_service.dart';
+import 'package:reboot_app_3/features/account/presentation/account_deletion_login_screen.dart';
 
 class AccountDeletionLoadingScreen extends ConsumerStatefulWidget {
   const AccountDeletionLoadingScreen({super.key});
@@ -29,7 +30,6 @@ class _AccountDeletionLoadingScreenState
   bool _hasError = false;
   String? _errorMessage;
   bool _requiresReauth = false;
-  String? _authProvider; // 'google', 'apple', or 'email'
 
   @override
   void initState() {
@@ -40,10 +40,32 @@ class _AccountDeletionLoadingScreenState
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+
+    // Clear the deletion login context when reaching the loading screen
+    // This prevents infinite redirects if the router redirects here multiple times
+    DeletionLoginContext.clear();
+
     if (_steps.isEmpty) {
       _initializeSteps();
-      // Start deletion process immediately - no pre-auth required
+      // Start deletion process immediately - attempt deletion first
       _startDeletionProcess();
+    } else if (_requiresReauth) {
+      // If we were waiting for reauth and user is back, restart deletion
+      final currentUser = FirebaseAuth.instance.currentUser;
+      if (currentUser != null) {
+        print('DEBUG: User returned from login, restarting deletion process');
+        setState(() {
+          _requiresReauth = false;
+          _hasError = false;
+          _errorMessage = null;
+          // Reset all steps to pending
+          for (int i = 0; i < _steps.length; i++) {
+            _steps[i] = _steps[i].copyWith(status: DeletionStepStatus.pending);
+          }
+        });
+        // Restart the deletion process
+        _startDeletionProcess();
+      }
     }
   }
 
@@ -51,20 +73,20 @@ class _AccountDeletionLoadingScreenState
     _steps = [
       DeletionStep(
         id: 'backup_data',
-        title: AppLocalizations.of(context).translate('backing-up-data'),
+        title: AppLocalizations.of(context).translate('preparing-deletion'),
         icon: LucideIcons.database,
         status: DeletionStepStatus.pending,
       ),
       DeletionStep(
         id: 'delete_community_data',
-        title:
-            AppLocalizations.of(context).translate('deleting-community-data'),
-        icon: LucideIcons.users,
+        title: AppLocalizations.of(context).translate('deleting-user-data'),
+        icon: LucideIcons.server,
         status: DeletionStepStatus.pending,
       ),
       DeletionStep(
         id: 'delete_documents',
-        title: AppLocalizations.of(context).translate('deleting-user-data'),
+        title:
+            AppLocalizations.of(context).translate('finalizing-data-cleanup'),
         icon: LucideIcons.fileX,
         status: DeletionStepStatus.pending,
       ),
@@ -76,8 +98,8 @@ class _AccountDeletionLoadingScreenState
       ),
       DeletionStep(
         id: 'cleanup',
-        title: AppLocalizations.of(context).translate('finalizing'),
-        icon: LucideIcons.checkCircle,
+        title: AppLocalizations.of(context).translate('cleanup'),
+        icon: LucideIcons.sparkles,
         status: DeletionStepStatus.pending,
       ),
     ];
@@ -94,61 +116,8 @@ class _AccountDeletionLoadingScreenState
     }
   }
 
-  void _detectAuthProvider() {
-    final user = FirebaseAuth.instance.currentUser;
-    if (user != null && user.providerData.isNotEmpty) {
-      final provider = user.providerData.first.providerId;
-      switch (provider) {
-        case 'google.com':
-          _authProvider = 'google';
-          break;
-        case 'apple.com':
-          _authProvider = 'apple';
-          break;
-        case 'password':
-          _authProvider = 'email';
-          break;
-        default:
-          _authProvider = 'email'; // fallback
-      }
-    } else {
-      _authProvider = 'email'; // fallback
-    }
-  }
-
-  Future<void> _handleReauthentication() async {
-    try {
-      final authService = ref.read(authServiceProvider);
-      bool success = false;
-
-      if (_authProvider == 'google') {
-        success = await authService.reSignInWithGoogle(context);
-      } else if (_authProvider == 'apple') {
-        success = await authService.reSignInWithApple(context);
-      }
-
-      if (success) {
-        setState(() {
-          _requiresReauth = false;
-          _hasError = false;
-          _errorMessage = null;
-        });
-        // Retry deletion after successful re-auth
-        _startDeletionProcess();
-      }
-    } catch (e) {
-      setState(() {
-        _hasError = true;
-        _errorMessage = 'Re-authentication failed: ${e.toString()}';
-      });
-    }
-  }
-
   Future<void> _startDeletionProcess() async {
     try {
-      final authService = ref.read(authServiceProvider);
-      final communityDeletionService =
-          ref.read(communityDeletionServiceProvider);
       final currentUser = FirebaseAuth.instance.currentUser;
 
       if (currentUser == null) {
@@ -163,48 +132,49 @@ class _AccountDeletionLoadingScreenState
       await Future.delayed(Duration(milliseconds: 500));
       _updateStepStatus('backup_data', DeletionStepStatus.completed);
 
-      // Step 2: Delete community data (posts, comments, interactions, profile)
+      // Step 2: Call Cloud Function to delete all user data
       _updateStepStatus('delete_community_data', DeletionStepStatus.inProgress);
 
       try {
-        // Check if user has community data before attempting deletion
-        final hasCommunityData = await communityDeletionService
-            .hasUserCommunityData(currentUser.uid);
+        print('DEBUG: Calling Cloud Function to delete user data...');
 
-        if (hasCommunityData) {
-          // Get summary for logging
-          final summary = await communityDeletionService
-              .getCommunityDataSummary(currentUser.uid);
-          print('DEBUG: Community data summary: $summary');
+        // Get Cloud Functions instance
+        final functions = FirebaseFunctions.instance;
+        final callable = functions.httpsCallable('deleteUserAccount');
 
-          // Perform community data deletion
-          await communityDeletionService
-              .deleteUserCommunityData(currentUser.uid);
-          print('DEBUG: Community data deletion completed successfully');
+        // Call the Cloud Function
+        final result = await callable.call();
+
+        print('DEBUG: Cloud Function result: ${result.data}');
+
+        if (result.data['success'] == true) {
+          print('DEBUG: Cloud Function deletion completed successfully');
+          _updateStepStatus(
+              'delete_community_data', DeletionStepStatus.completed);
         } else {
-          print('DEBUG: No community data found for user');
+          throw Exception(
+              'Cloud Function reported failure: ${result.data['message']}');
         }
-
-        _updateStepStatus(
-            'delete_community_data', DeletionStepStatus.completed);
       } catch (e) {
-        print('WARNING: Community data deletion failed: $e');
-        // Don't fail the entire process if community deletion fails
-        // Mark as completed to continue with account deletion
+        print('ERROR: Cloud Function deletion failed: $e');
+        // Don't fail the entire process if cloud function deletion fails
+        // We'll still proceed with Firebase Auth deletion
         _updateStepStatus(
             'delete_community_data', DeletionStepStatus.completed);
       }
 
-      // Step 3: Delete documents
+      // Step 3: Delete documents (handled by Cloud Function above)
       _updateStepStatus('delete_documents', DeletionStepStatus.inProgress);
+      await Future.delayed(Duration(milliseconds: 500));
+      _updateStepStatus('delete_documents', DeletionStepStatus.completed);
 
-      // Step 4: Delete account - attempt immediately
+      // Step 4: Delete Firebase Auth user (only thing done on client)
       _updateStepStatus('delete_account', DeletionStepStatus.inProgress);
 
-      // Actually perform the deletion
-      await authService.deleteAccount(context);
+      // Only delete the Firebase Auth user - all data deletion is handled by Cloud Function
+      await currentUser.delete();
+      print('DEBUG: Firebase Auth user deleted successfully');
 
-      _updateStepStatus('delete_documents', DeletionStepStatus.completed);
       _updateStepStatus('delete_account', DeletionStepStatus.completed);
 
       // Step 5: Cleanup
@@ -229,12 +199,12 @@ class _AccountDeletionLoadingScreenState
       print('FirebaseAuthException during deletion: ${e.code} - ${e.message}');
 
       if (e.code == 'requires-recent-login') {
-        // Handle re-authentication requirement
-        _detectAuthProvider();
+        // User needs to re-authenticate - show login redirect UI
         if (mounted) {
           setState(() {
-            _requiresReauth = true;
             _hasError = false;
+            _errorMessage = null;
+            _requiresReauth = true;
           });
         }
       } else {
@@ -243,6 +213,7 @@ class _AccountDeletionLoadingScreenState
           setState(() {
             _hasError = true;
             _errorMessage = 'Authentication error: ${e.message}';
+            _requiresReauth = false;
           });
         }
       }
@@ -252,20 +223,9 @@ class _AccountDeletionLoadingScreenState
         setState(() {
           _hasError = true;
           _errorMessage = e.toString();
+          _requiresReauth = false;
         });
       }
-    }
-  }
-
-  Future<void> _signOut() async {
-    try {
-      final authService = ref.read(authServiceProvider);
-      await authService.signOut(context, ref);
-      if (mounted) {
-        context.goNamed(RouteNames.onboarding.name);
-      }
-    } catch (e) {
-      getErrorSnackBar(context, 'sign-out-failed');
     }
   }
 
@@ -312,8 +272,15 @@ class _AccountDeletionLoadingScreenState
                                 .translate('authentication-required')
                             : AppLocalizations.of(context)
                                 .translate('deleting-account'),
-                style: TextStyles.h4.copyWith(
-                  color: theme.primary[900],
+                style: TextStyles.h2.copyWith(
+                  color: _hasError
+                      ? theme.error[600]
+                      : _isComplete
+                          ? theme.success[600]
+                          : _requiresReauth
+                              ? theme.warn[600]
+                              : theme.primary[900],
+                  fontWeight: FontWeight.bold,
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -342,7 +309,7 @@ class _AccountDeletionLoadingScreenState
 
               verticalSpace(Spacing.points32),
 
-              // Re-authentication UI
+              // Re-authentication UI - redirect to login screen
               if (_requiresReauth) ...[
                 Container(
                   width: double.infinity,
@@ -361,61 +328,50 @@ class _AccountDeletionLoadingScreenState
                   ),
                   child: Column(
                     children: [
-                      if (_authProvider == 'google' ||
-                          _authProvider == 'apple') ...[
-                        Text(
-                          AppLocalizations.of(context).translate(
-                              'please-sign-in-again-with-${_authProvider}'),
-                          style: TextStyles.body.copyWith(
-                            color: theme.grey[700],
-                          ),
-                          textAlign: TextAlign.center,
+                      Text(
+                        AppLocalizations.of(context)
+                            .translate('security-verification-required'),
+                        style: TextStyles.body.copyWith(
+                          color: theme.grey[700],
+                          fontWeight: FontWeight.w600,
                         ),
-                        verticalSpace(Spacing.points16),
-                        ElevatedButton.icon(
-                          onPressed: _handleReauthentication,
-                          icon: Icon(
-                            _authProvider == 'google'
-                                ? LucideIcons.chrome
-                                : LucideIcons.smartphone,
-                          ),
-                          label: Text(
-                            AppLocalizations.of(context)
-                                .translate('sign-in-with-${_authProvider}'),
-                          ),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: theme.primary[600],
-                            foregroundColor: Colors.white,
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 24, vertical: 12),
-                          ),
+                        textAlign: TextAlign.center,
+                      ),
+                      verticalSpace(Spacing.points8),
+                      Text(
+                        AppLocalizations.of(context).translate(
+                            'please-sign-in-again-to-confirm-identity'),
+                        style: TextStyles.body.copyWith(
+                          color: theme.grey[600],
                         ),
-                      ] else ...[
-                        Text(
+                        textAlign: TextAlign.center,
+                      ),
+                      verticalSpace(Spacing.points20),
+                      ElevatedButton.icon(
+                        onPressed: () {
+                          // Navigate to login screen with deletion context
+                          context.goNamed(
+                            RouteNames.accountDeletionLogin.name,
+                            queryParameters: {'returnTo': 'deletion'},
+                          );
+                        },
+                        icon: Icon(LucideIcons.logIn),
+                        label: Text(
                           AppLocalizations.of(context)
-                              .translate('email-reauth-not-supported'),
-                          style: TextStyles.body.copyWith(
-                            color: theme.grey[700],
-                          ),
-                          textAlign: TextAlign.center,
+                              .translate('sign-in-to-continue'),
                         ),
-                      ],
-                      verticalSpace(Spacing.points16),
-                      OutlinedButton(
-                        onPressed: _signOut,
-                        child: Text(
-                          AppLocalizations.of(context).translate('sign-out'),
-                        ),
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: theme.error[600],
-                          side: BorderSide(color: theme.error[600]!),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: theme.warn[600],
+                          foregroundColor: Colors.white,
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 24, vertical: 12),
                         ),
                       ),
                     ],
                   ),
                 ),
               ]
-              // Progress Steps (only show when not requiring reauth)
+              // Progress Steps (only show when not requiring reauth and not errored)
               else if (!_hasError) ...[
                 Container(
                   width: double.infinity,

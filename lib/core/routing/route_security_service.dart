@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../features/account/application/ban_warning_facade.dart';
 import '../../features/account/application/startup_security_service.dart';
+import '../../features/account/presentation/account_deletion_login_screen.dart';
 
 part 'route_security_service.g.dart';
 
@@ -83,11 +84,12 @@ class RouteSecurityService {
   String? _handleUnauthenticatedRedirect(GoRouterState state) {
     final isOnboardingRoute = state.matchedLocation.startsWith('/onboarding');
     final isLoadingRoute = state.matchedLocation == '/loading';
-    final isAccountDeletionLoadingRoute =
-        state.matchedLocation == '/account-deletion-loading';
+    final isAccountDeletionRoute =
+        state.matchedLocation == '/account-deletion-login' ||
+            state.matchedLocation == '/account-deletion-loading';
 
-    // Allow onboarding, loading, and account deletion loading routes for unauthenticated users
-    if (isOnboardingRoute || isLoadingRoute || isAccountDeletionLoadingRoute) {
+    // Allow onboarding, loading, and account deletion routes for unauthenticated users
+    if (isOnboardingRoute || isLoadingRoute || isAccountDeletionRoute) {
       return null;
     }
 
@@ -99,6 +101,26 @@ class RouteSecurityService {
   String? _handleAuthenticatedRedirect(GoRouterState state) {
     final isOnboardingRoute = state.matchedLocation.startsWith('/onboarding');
     final isLoadingRoute = state.matchedLocation == '/loading';
+    final isAccountDeletionRoute =
+        state.matchedLocation == '/account-deletion-login' ||
+            state.matchedLocation == '/account-deletion-loading';
+
+    // Special handling for account deletion flow
+    if (!isAccountDeletionRoute) {
+      try {
+        // Check if this login is from the deletion flow
+        if (DeletionLoginContext.isDeletionLogin()) {
+          print(
+              'DEBUG: RouteSecurityService detected deletion login, redirecting to deletion loading screen');
+          // Don't clear the flag here - let the loading screen handle it
+          // The flag will auto-expire after 2 minutes if not manually cleared
+          return '/account-deletion-loading';
+        }
+      } catch (e) {
+        print(
+            'DEBUG: RouteSecurityService error checking deletion login flag: $e');
+      }
+    }
 
     // If authenticated user is on onboarding or loading, redirect to home
     if (isOnboardingRoute || isLoadingRoute) {
@@ -135,11 +157,12 @@ class RouteSecurityService {
       return null;
     } else {
       final isOnboardingRoute = state.matchedLocation.startsWith('/onboarding');
-      final isAccountDeletionLoadingRoute =
-          state.matchedLocation == '/account-deletion-loading';
+      final isAccountDeletionRoute =
+          state.matchedLocation == '/account-deletion-login' ||
+              state.matchedLocation == '/account-deletion-loading';
       if (!isOnboardingRoute &&
           state.matchedLocation != '/onboarding' &&
-          !isAccountDeletionLoadingRoute) {
+          !isAccountDeletionRoute) {
         return '/onboarding';
       }
     }
