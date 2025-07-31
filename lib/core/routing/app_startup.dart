@@ -10,6 +10,8 @@ import 'package:reboot_app_3/features/authentication/providers/user_provider.dar
 import 'package:reboot_app_3/features/vault/presentation/notifiers/statistics_visibility_notifier.dart';
 import 'package:reboot_app_3/features/account/application/startup_security_service.dart';
 import 'package:reboot_app_3/features/account/presentation/banned_screen.dart';
+import 'package:reboot_app_3/features/plus/data/repositories/subscription_repository.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'app_startup.g.dart';
@@ -41,6 +43,16 @@ Future<SecurityStartupResult> appStartup(Ref ref) async {
 
   // Initialize locale provider - this will load saved locale or default to Arabic
   ref.read(localeNotifierProvider);
+
+  // Initialize RevenueCat with current user ID
+  try {
+    final subscriptionRepository = ref.read(subscriptionRepositoryProvider);
+    final currentUser = FirebaseAuth.instance.currentUser;
+    await subscriptionRepository.initialize(currentUser?.uid);
+  } catch (e) {
+    // RevenueCat initialization failure should not block app startup
+    debugPrint('RevenueCat initialization failed: $e');
+  }
 
   // Initialize security and check for device/user bans
   // NOTE: Device bans are checked FIRST (highest priority) before user bans

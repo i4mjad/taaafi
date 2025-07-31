@@ -6,7 +6,6 @@ import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/shared_widgets/ta3afi_platform_icons_icons.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
-import 'package:reboot_app_3/core/theming/custom_theme_data.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/features/plus/data/notifiers/subscription_notifier.dart';
@@ -804,7 +803,7 @@ class _TaaafiPlusScreenState
 
   /// Build package options with real pricing from RevenueCat
   Widget _buildPackageOptions(
-      BuildContext context, CustomThemeData theme, List<Package> packages) {
+      BuildContext context, dynamic theme, List<Package> packages) {
     if (packages.isEmpty) {
       return _buildFallbackPurchaseButton(context, theme);
     }
@@ -855,8 +854,7 @@ class _TaaafiPlusScreenState
   }
 
   /// Build loading state for purchase button
-  Widget _buildLoadingPurchaseButton(
-      BuildContext context, CustomThemeData theme) {
+  Widget _buildLoadingPurchaseButton(BuildContext context, dynamic theme) {
     return Container(
       width: double.infinity,
       padding: EdgeInsets.all(12),
@@ -883,7 +881,7 @@ class _TaaafiPlusScreenState
   }
 
   /// Build fallback purchase button when packages fail to load
-  Widget _buildFallbackPurchaseButton(BuildContext context, AppTheme theme) {
+  Widget _buildFallbackPurchaseButton(BuildContext context, dynamic theme) {
     return GestureDetector(
       onTap: () {
         HapticFeedback.mediumImpact();
