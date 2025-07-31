@@ -20,6 +20,32 @@ class PostsPage {
   });
 }
 
+/// Container for paginated comments data
+class CommentsPage {
+  final List<Comment> comments;
+  final DocumentSnapshot? lastDocument;
+  final bool hasMore;
+
+  const CommentsPage({
+    required this.comments,
+    this.lastDocument,
+    required this.hasMore,
+  });
+}
+
+/// Container for paginated liked items data (posts or comments)
+class LikedItemsPage {
+  final List<dynamic> items; // Can be List<Post> or List<Comment>
+  final DocumentSnapshot? lastDocument;
+  final bool hasMore;
+
+  const LikedItemsPage({
+    required this.items,
+    this.lastDocument,
+    required this.hasMore,
+  });
+}
+
 class ForumRepository {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final CollectionReference _posts =
@@ -926,6 +952,184 @@ class ForumRepository {
       });
     } catch (e) {
       throw Exception('Failed to toggle post commenting: $e');
+    }
+  }
+
+  /// Get posts created by a specific user with pagination
+  Future<PostsPage> getUserPosts({
+    required String userCPId,
+    int limit = 10,
+    DocumentSnapshot? lastDocument,
+  }) async {
+    try {
+      Query query = _posts
+          .where('authorCPId', isEqualTo: userCPId)
+          .where('isDeleted', isEqualTo: false)
+          .orderBy('createdAt', descending: true);
+
+      if (lastDocument != null) {
+        query = query.startAfterDocument(lastDocument);
+      }
+
+      query = query.limit(limit);
+
+      final QuerySnapshot snapshot = await query.get();
+      final List<Post> posts = snapshot.docs.map((doc) {
+        return Post.fromFirestore(
+            doc as DocumentSnapshot<Map<String, dynamic>>);
+      }).toList();
+
+      return PostsPage(
+        posts: posts,
+        lastDocument: posts.isNotEmpty ? snapshot.docs.last : null,
+        hasMore: posts.length == limit,
+      );
+    } catch (e) {
+      throw Exception('Failed to fetch user posts: $e');
+    }
+  }
+
+  /// Get comments created by a specific user with pagination
+  Future<CommentsPage> getUserComments({
+    required String userCPId,
+    int limit = 10,
+    DocumentSnapshot? lastDocument,
+  }) async {
+    try {
+      Query query = _comments
+          .where('authorCPId', isEqualTo: userCPId)
+          .where('isDeleted', isEqualTo: false)
+          .orderBy('createdAt', descending: true);
+
+      if (lastDocument != null) {
+        query = query.startAfterDocument(lastDocument);
+      }
+
+      query = query.limit(limit);
+
+      final QuerySnapshot snapshot = await query.get();
+      final List<Comment> comments = snapshot.docs.map((doc) {
+        return Comment.fromFirestore(
+            doc as DocumentSnapshot<Map<String, dynamic>>);
+      }).toList();
+
+      return CommentsPage(
+        comments: comments,
+        lastDocument: comments.isNotEmpty ? snapshot.docs.last : null,
+        hasMore: comments.length == limit,
+      );
+    } catch (e) {
+      throw Exception('Failed to fetch user comments: $e');
+    }
+  }
+
+  /// Get posts liked by a specific user with pagination
+  Future<LikedItemsPage> getUserLikedPosts({
+    required String userCPId,
+    int limit = 10,
+    DocumentSnapshot? lastDocument,
+  }) async {
+    try {
+      Query query = _interactions
+          .where('userCPId', isEqualTo: userCPId)
+          .where('targetType', isEqualTo: 'post')
+          .where('type', isEqualTo: 'like')
+          .where('value', isEqualTo: 1)
+          .where('isDeleted', isEqualTo: false)
+          .orderBy('createdAt', descending: true);
+
+      if (lastDocument != null) {
+        query = query.startAfterDocument(lastDocument);
+      }
+
+      query = query.limit(limit);
+
+      final QuerySnapshot snapshot = await query.get();
+      final List<Interaction> interactions = snapshot.docs.map((doc) {
+        return Interaction.fromFirestore(
+            doc as DocumentSnapshot<Map<String, dynamic>>);
+      }).toList();
+
+      // Get the actual posts for these interactions
+      final List<Post> posts = [];
+      for (final interaction in interactions) {
+        try {
+          final postDoc = await _posts.doc(interaction.targetId).get();
+          if (postDoc.exists) {
+            final post = Post.fromFirestore(
+                postDoc as DocumentSnapshot<Map<String, dynamic>>);
+            if (!post.isDeleted) {
+              posts.add(post);
+            }
+          }
+        } catch (e) {
+          // Skip posts that can't be loaded
+          continue;
+        }
+      }
+
+      return LikedItemsPage(
+        items: posts,
+        lastDocument: interactions.isNotEmpty ? snapshot.docs.last : null,
+        hasMore: interactions.length == limit,
+      );
+    } catch (e) {
+      throw Exception('Failed to fetch user liked posts: $e');
+    }
+  }
+
+  /// Get comments liked by a specific user with pagination
+  Future<LikedItemsPage> getUserLikedComments({
+    required String userCPId,
+    int limit = 10,
+    DocumentSnapshot? lastDocument,
+  }) async {
+    try {
+      Query query = _interactions
+          .where('userCPId', isEqualTo: userCPId)
+          .where('targetType', isEqualTo: 'comment')
+          .where('type', isEqualTo: 'like')
+          .where('value', isEqualTo: 1)
+          .where('isDeleted', isEqualTo: false)
+          .orderBy('createdAt', descending: true);
+
+      if (lastDocument != null) {
+        query = query.startAfterDocument(lastDocument);
+      }
+
+      query = query.limit(limit);
+
+      final QuerySnapshot snapshot = await query.get();
+      final List<Interaction> interactions = snapshot.docs.map((doc) {
+        return Interaction.fromFirestore(
+            doc as DocumentSnapshot<Map<String, dynamic>>);
+      }).toList();
+
+      // Get the actual comments for these interactions
+      final List<Comment> comments = [];
+      for (final interaction in interactions) {
+        try {
+          final commentDoc = await _comments.doc(interaction.targetId).get();
+          if (commentDoc.exists) {
+            final comment = Comment.fromFirestore(
+                commentDoc as DocumentSnapshot<Map<String, dynamic>>);
+            if (!comment.isDeleted) {
+              comments.add(comment);
+            }
+          }
+        } catch (e) {
+          // Skip comments that can't be loaded
+          continue;
+        }
+      }
+
+      return LikedItemsPage(
+        items: comments,
+        lastDocument: interactions.isNotEmpty ? snapshot.docs.last : null,
+        hasMore: interactions.length == limit,
+      );
+    } catch (e) {
+      throw Exception('Failed to fetch user liked comments: $e');
     }
   }
 }
