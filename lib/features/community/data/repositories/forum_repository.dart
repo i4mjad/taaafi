@@ -964,7 +964,6 @@ class ForumRepository {
     try {
       Query query = _posts
           .where('authorCPId', isEqualTo: userCPId)
-          .where('isDeleted', isEqualTo: false)
           .orderBy('createdAt', descending: true);
 
       if (lastDocument != null) {
@@ -974,10 +973,13 @@ class ForumRepository {
       query = query.limit(limit);
 
       final QuerySnapshot snapshot = await query.get();
-      final List<Post> posts = snapshot.docs.map((doc) {
-        return Post.fromFirestore(
-            doc as DocumentSnapshot<Map<String, dynamic>>);
-      }).toList();
+      final List<Post> posts = snapshot.docs
+          .map((doc) {
+            return Post.fromFirestore(
+                doc as DocumentSnapshot<Map<String, dynamic>>);
+          })
+          .where((post) => !post.isDeleted)
+          .toList(); // Filter out deleted posts
 
       return PostsPage(
         posts: posts,
@@ -1001,7 +1003,6 @@ class ForumRepository {
 
       Query query = _comments
           .where('authorCPId', isEqualTo: userCPId)
-          .where('isDeleted', isEqualTo: false)
           .orderBy('createdAt', descending: true);
 
       if (lastDocument != null) {
@@ -1015,13 +1016,16 @@ class ForumRepository {
       print(
           '🔍 [DEBUG] getUserComments - Query executed, found ${snapshot.docs.length} documents');
 
-      final List<Comment> comments = snapshot.docs.map((doc) {
-        final comment = Comment.fromFirestore(
-            doc as DocumentSnapshot<Map<String, dynamic>>);
-        print(
-            '🔍 [DEBUG] getUserComments - Comment: ${comment.id}, body: ${comment.body.length > 50 ? comment.body.substring(0, 50) + "..." : comment.body}');
-        return comment;
-      }).toList();
+      final List<Comment> comments = snapshot.docs
+          .map((doc) {
+            final comment = Comment.fromFirestore(
+                doc as DocumentSnapshot<Map<String, dynamic>>);
+            print(
+                '🔍 [DEBUG] getUserComments - Comment: ${comment.id}, body: ${comment.body.length > 50 ? comment.body.substring(0, 50) + "..." : comment.body}');
+            return comment;
+          })
+          .where((comment) => !comment.isDeleted)
+          .toList(); // Filter out deleted comments
 
       print(
           '🔍 [DEBUG] getUserComments - Processed ${comments.length} comments, hasMore: ${comments.length == limit}');
@@ -1051,7 +1055,6 @@ class ForumRepository {
           .where('targetType', isEqualTo: 'post')
           .where('type', isEqualTo: 'like')
           .where('value', isEqualTo: 1)
-          .where('isDeleted', isEqualTo: false)
           .orderBy('createdAt', descending: true);
 
       if (lastDocument != null) {
@@ -1066,13 +1069,16 @@ class ForumRepository {
       print(
           '❤️ [DEBUG] getUserLikedPosts - Query executed, found ${snapshot.docs.length} interactions');
 
-      final List<Interaction> interactions = snapshot.docs.map((doc) {
-        final interaction = Interaction.fromFirestore(
-            doc as DocumentSnapshot<Map<String, dynamic>>);
-        print(
-            '❤️ [DEBUG] getUserLikedPosts - Interaction: ${interaction.id}, targetId: ${interaction.targetId}, value: ${interaction.value}');
-        return interaction;
-      }).toList();
+      final List<Interaction> interactions = snapshot.docs
+          .map((doc) {
+            final interaction = Interaction.fromFirestore(
+                doc as DocumentSnapshot<Map<String, dynamic>>);
+            print(
+                '❤️ [DEBUG] getUserLikedPosts - Interaction: ${interaction.id}, targetId: ${interaction.targetId}, value: ${interaction.value}');
+            return interaction;
+          })
+          .where((interaction) => !interaction.isDeleted)
+          .toList(); // Filter out deleted interactions
 
       // Get the actual posts for these interactions
       final List<Post> posts = [];
@@ -1133,7 +1139,6 @@ class ForumRepository {
           .where('targetType', isEqualTo: 'comment')
           .where('type', isEqualTo: 'like')
           .where('value', isEqualTo: 1)
-          .where('isDeleted', isEqualTo: false)
           .orderBy('createdAt', descending: true);
 
       if (lastDocument != null) {
@@ -1148,13 +1153,16 @@ class ForumRepository {
       print(
           '💬❤️ [DEBUG] getUserLikedComments - Query executed, found ${snapshot.docs.length} interactions');
 
-      final List<Interaction> interactions = snapshot.docs.map((doc) {
-        final interaction = Interaction.fromFirestore(
-            doc as DocumentSnapshot<Map<String, dynamic>>);
-        print(
-            '💬❤️ [DEBUG] getUserLikedComments - Interaction: ${interaction.id}, targetId: ${interaction.targetId}, value: ${interaction.value}');
-        return interaction;
-      }).toList();
+      final List<Interaction> interactions = snapshot.docs
+          .map((doc) {
+            final interaction = Interaction.fromFirestore(
+                doc as DocumentSnapshot<Map<String, dynamic>>);
+            print(
+                '💬❤️ [DEBUG] getUserLikedComments - Interaction: ${interaction.id}, targetId: ${interaction.targetId}, value: ${interaction.value}');
+            return interaction;
+          })
+          .where((interaction) => !interaction.isDeleted)
+          .toList(); // Filter out deleted interactions
 
       // Get the actual comments for these interactions
       final List<Comment> comments = [];

@@ -11,7 +11,8 @@ import 'package:reboot_app_3/features/community/presentation/providers/forum_pro
 import 'package:reboot_app_3/features/community/presentation/widgets/community_profile_tabs.dart';
 import 'package:reboot_app_3/features/community/presentation/widgets/avatar_with_anonymity.dart';
 import 'package:reboot_app_3/features/community/presentation/widgets/threads_post_card.dart';
-import 'package:reboot_app_3/features/community/presentation/widgets/comment_tile_widget.dart';
+import 'package:reboot_app_3/features/community/presentation/widgets/compact_comment_tile.dart';
+import 'package:reboot_app_3/features/community/presentation/widgets/compact_interaction_tile.dart';
 import 'package:reboot_app_3/features/community/presentation/profile/edit_community_profile_modal.dart';
 import 'package:reboot_app_3/features/community/data/models/post.dart';
 import 'package:reboot_app_3/features/community/data/models/comment.dart';
@@ -546,7 +547,7 @@ class _CommunityProfileSettingsScreenState
               }
 
               final comment = commentsState.comments[index];
-              return CommentTileWidget(
+              return CompactCommentTile(
                 comment: comment,
               );
             },
@@ -650,15 +651,14 @@ class _CommunityProfileSettingsScreenState
 
               final item = allLikedItems[index];
               if (item is Post) {
-                return ThreadsPostCard(
-                  post: item,
-                  onTap: () {
-                    // Navigate to post details if needed
-                  },
+                return CompactInteractionTile(
+                  item: item,
+                  isLikedPost: true,
                 );
               } else if (item is Comment) {
-                return CommentTileWidget(
-                  comment: item,
+                return CompactInteractionTile(
+                  item: item,
+                  isLikedPost: false,
                 );
               }
 
