@@ -79,6 +79,7 @@ class CommunityServiceImpl implements CommunityService {
     String? gender,
     bool? isAnonymous,
     String? avatarUrl,
+    bool? isPlusUser,
   }) async {
     final user = _auth.currentUser;
     if (user == null) {
@@ -105,6 +106,7 @@ class CommunityServiceImpl implements CommunityService {
       gender: gender?.toLowerCase(),
       isAnonymous: isAnonymous,
       avatarUrl: avatarUrl?.trim(),
+      isPlusUser: isPlusUser,
       updatedAt: DateTime.now(),
     );
 

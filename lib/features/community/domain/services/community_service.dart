@@ -32,6 +32,7 @@ abstract class CommunityService {
     String? gender,
     bool? isAnonymous,
     String? avatarUrl,
+    bool? isPlusUser,
   });
 
   /// Checks if the current user has a community profile

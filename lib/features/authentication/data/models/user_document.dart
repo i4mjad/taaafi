@@ -19,6 +19,10 @@ class UserDocument {
   final List<String>? userMasturbatingWithoutWatching;
   final List<String>? userWatchingWithoutMasturbating;
 
+  // Plus subscription tracking fields
+  final bool? isPlusUser;
+  final Timestamp? lastPlusCheck;
+
   UserDocument({
     this.uid,
     this.devicesIds,
@@ -33,10 +37,12 @@ class UserDocument {
     this.userRelapses,
     this.userMasturbatingWithoutWatching,
     this.userWatchingWithoutMasturbating,
+    this.isPlusUser,
+    this.lastPlusCheck,
   });
 
   factory UserDocument.fromFirestore(DocumentSnapshot doc) {
-    final data = doc.data() as Map<String, dynamic>;
+    final data = doc.data() as Map<String, dynamic>? ?? {};
     return UserDocument(
       uid: data['uid'],
       devicesIds: data['devicesIds'] != null
@@ -61,6 +67,8 @@ class UserDocument {
           data['userWatchingWithoutMasturbating'] != null
               ? List<String>.from(data['userWatchingWithoutMasturbating'])
               : null,
+      isPlusUser: data['isPlusUser'],
+      lastPlusCheck: data['lastPlusCheck'],
     );
   }
 
@@ -79,6 +87,8 @@ class UserDocument {
       'userRelapses': userRelapses ?? [],
       'userMasturbatingWithoutWatching': userMasturbatingWithoutWatching ?? [],
       'userWatchingWithoutMasturbating': userWatchingWithoutMasturbating ?? [],
+      'isPlusUser': isPlusUser,
+      'lastPlusCheck': lastPlusCheck,
     };
   }
 
@@ -89,7 +99,45 @@ class UserDocument {
 
   @override
   String toString() {
-    return 'UserDocument( uid: $uid, devicesIds: $devicesIds, displayName: $displayName, email: $email, gender: $gender, locale: $locale, dayOfBirth: $dayOfBirth, userFirstDate: $userFirstDate, role: $role, messagingToken: $messagingToken, userRelapses: $userRelapses, userMasturbatingWithoutWatching: $userMasturbatingWithoutWatching, userWatchingWithoutMasturbating: $userWatchingWithoutMasturbating)';
+    return 'UserDocument( uid: $uid, devicesIds: $devicesIds, displayName: $displayName, email: $email, gender: $gender, locale: $locale, dayOfBirth: $dayOfBirth, userFirstDate: $userFirstDate, role: $role, messagingToken: $messagingToken, userRelapses: $userRelapses, userMasturbatingWithoutWatching: $userMasturbatingWithoutWatching, userWatchingWithoutMasturbating: $userWatchingWithoutMasturbating, isPlusUser: $isPlusUser, lastPlusCheck: $lastPlusCheck)';
+  }
+
+  UserDocument copyWith({
+    String? uid,
+    List<String>? devicesIds,
+    String? displayName,
+    String? email,
+    String? gender,
+    String? locale,
+    Timestamp? dayOfBirth,
+    Timestamp? userFirstDate,
+    String? role,
+    String? messagingToken,
+    List<String>? userRelapses,
+    List<String>? userMasturbatingWithoutWatching,
+    List<String>? userWatchingWithoutMasturbating,
+    bool? isPlusUser,
+    Timestamp? lastPlusCheck,
+  }) {
+    return UserDocument(
+      uid: uid ?? this.uid,
+      devicesIds: devicesIds ?? this.devicesIds,
+      displayName: displayName ?? this.displayName,
+      email: email ?? this.email,
+      gender: gender ?? this.gender,
+      locale: locale ?? this.locale,
+      dayOfBirth: dayOfBirth ?? this.dayOfBirth,
+      userFirstDate: userFirstDate ?? this.userFirstDate,
+      role: role ?? this.role,
+      messagingToken: messagingToken ?? this.messagingToken,
+      userRelapses: userRelapses ?? this.userRelapses,
+      userMasturbatingWithoutWatching: userMasturbatingWithoutWatching ??
+          this.userMasturbatingWithoutWatching,
+      userWatchingWithoutMasturbating: userWatchingWithoutMasturbating ??
+          this.userWatchingWithoutMasturbating,
+      isPlusUser: isPlusUser ?? this.isPlusUser,
+      lastPlusCheck: lastPlusCheck ?? this.lastPlusCheck,
+    );
   }
 
   @override
@@ -111,7 +159,9 @@ class UserDocument {
         listEquals(other.userMasturbatingWithoutWatching,
             userMasturbatingWithoutWatching) &&
         listEquals(other.userWatchingWithoutMasturbating,
-            userWatchingWithoutMasturbating);
+            userWatchingWithoutMasturbating) &&
+        other.isPlusUser == isPlusUser &&
+        other.lastPlusCheck == lastPlusCheck;
   }
 
   @override
@@ -128,6 +178,8 @@ class UserDocument {
         messagingToken.hashCode ^
         userRelapses.hashCode ^
         userMasturbatingWithoutWatching.hashCode ^
-        userWatchingWithoutMasturbating.hashCode;
+        userWatchingWithoutMasturbating.hashCode ^
+        isPlusUser.hashCode ^
+        lastPlusCheck.hashCode;
   }
 }

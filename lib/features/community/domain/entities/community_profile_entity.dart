@@ -22,6 +22,9 @@ class CommunityProfileEntity {
   /// Whether the profile has been soft deleted
   final bool isDeleted;
 
+  /// Whether the user has an active Plus subscription
+  final bool? isPlusUser;
+
   /// When the profile was created
   final DateTime createdAt;
 
@@ -35,6 +38,7 @@ class CommunityProfileEntity {
     this.avatarUrl,
     required this.isAnonymous,
     this.isDeleted = false,
+    this.isPlusUser,
     required this.createdAt,
     this.updatedAt,
   });
@@ -48,6 +52,7 @@ class CommunityProfileEntity {
       avatarUrl: json['avatarUrl'] as String?,
       isAnonymous: json['isAnonymous'] as bool,
       isDeleted: json['isDeleted'] ?? false,
+      isPlusUser: json['isPlusUser'] as bool?,
       createdAt: DateTime.parse(json['createdAt'] as String),
       updatedAt: json['updatedAt'] != null
           ? DateTime.parse(json['updatedAt'] as String)
@@ -64,6 +69,7 @@ class CommunityProfileEntity {
       'avatarUrl': avatarUrl,
       'isAnonymous': isAnonymous,
       'isDeleted': isDeleted,
+      'isPlusUser': isPlusUser,
       'createdAt': createdAt.toIso8601String(),
       'updatedAt': updatedAt?.toIso8601String(),
     };
@@ -79,6 +85,11 @@ class CommunityProfileEntity {
     final now = DateTime.now();
     final difference = now.difference(createdAt);
     return difference.inDays < 7; // Consider new if created within 7 days
+  }
+
+  /// Business logic: Check if user has Plus subscription
+  bool hasPlusSubscription() {
+    return isPlusUser ?? false;
   }
 
   /// Business logic: Get display name with fallback
@@ -101,6 +112,8 @@ class CommunityProfileEntity {
     String? gender,
     String? avatarUrl,
     bool? isAnonymous,
+    bool? isDeleted,
+    bool? isPlusUser,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
@@ -110,6 +123,8 @@ class CommunityProfileEntity {
       gender: gender ?? this.gender,
       avatarUrl: avatarUrl ?? this.avatarUrl,
       isAnonymous: isAnonymous ?? this.isAnonymous,
+      isDeleted: isDeleted ?? this.isDeleted,
+      isPlusUser: isPlusUser ?? this.isPlusUser,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );
@@ -124,6 +139,8 @@ class CommunityProfileEntity {
         other.gender == gender &&
         other.avatarUrl == avatarUrl &&
         other.isAnonymous == isAnonymous &&
+        other.isDeleted == isDeleted &&
+        other.isPlusUser == isPlusUser &&
         other.createdAt == createdAt &&
         other.updatedAt == updatedAt;
   }
@@ -135,12 +152,14 @@ class CommunityProfileEntity {
         gender.hashCode ^
         avatarUrl.hashCode ^
         isAnonymous.hashCode ^
+        isDeleted.hashCode ^
+        isPlusUser.hashCode ^
         createdAt.hashCode ^
         updatedAt.hashCode;
   }
 
   @override
   String toString() {
-    return 'CommunityProfileEntity(id: $id, displayName: $displayName, gender: $gender, avatarUrl: $avatarUrl, isAnonymous: $isAnonymous, createdAt: $createdAt, updatedAt: $updatedAt)';
+    return 'CommunityProfileEntity(id: $id, displayName: $displayName, gender: $gender, avatarUrl: $avatarUrl, isAnonymous: $isAnonymous, isDeleted: $isDeleted, isPlusUser: $isPlusUser, createdAt: $createdAt, updatedAt: $updatedAt)';
   }
 }
