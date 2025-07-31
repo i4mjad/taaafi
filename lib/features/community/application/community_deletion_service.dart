@@ -37,14 +37,17 @@ class CommunityDeletionService {
     _communityInterest = _firestore.collection('communityInterest');
   }
 
-  /// Performs comprehensive soft deletion of all community-related data for a user
+  /// Deletes all community-related data for a specific user
   ///
-  /// This method uses Firestore batch operations to ensure atomicity across
-  /// multiple collections. It implements soft deletion to maintain:
-  /// - Thread continuity in discussions
-  /// - Reply chains and comment hierarchies
-  /// - Historical vote counts and scores
-  /// - Referential integrity across collections
+  /// This method handles bulk deletion of user's community data across all collections:
+  /// - Community profile (soft delete)
+  /// - Forum posts (soft delete)
+  /// - Comments (soft delete)
+  /// - Interactions/votes (soft delete)
+  /// - Community interest tracking (hard delete)
+  ///
+  /// Uses batch operations for atomicity and performance optimization.
+  /// All operations are logged for debugging and auditing purposes.
   ///
   /// [userUID] The Firebase Auth UID of the user being deleted
   ///
@@ -58,29 +61,44 @@ class CommunityDeletionService {
     print('DEBUG: Starting community data deletion for user: $userUID');
 
     try {
+      // First, get the community profile ID from user mapping
+      final communityProfileId = await _getCommunityProfileId(userUID);
+      if (communityProfileId == null) {
+        print('DEBUG: No community profile found for user $userUID');
+        return;
+      }
+
+      print(
+          'DEBUG: Found community profile ID: $communityProfileId for user: $userUID');
+
       // Use batch operations for atomicity across collections
       final batch = _firestore.batch();
       int operationCount = 0;
 
       // Step 1: Soft delete community profile
-      await _softDeleteCommunityProfile(batch, userUID);
+      await _softDeleteCommunityProfile(batch, communityProfileId);
       operationCount++;
 
       // Step 2: Soft delete all user posts
-      final postsCount = await _softDeleteUserPosts(batch, userUID);
+      final postsCount = await _softDeleteUserPosts(batch, communityProfileId);
       operationCount += postsCount;
 
       // Step 3: Soft delete all user comments
-      final commentsCount = await _softDeleteUserComments(batch, userUID);
+      final commentsCount =
+          await _softDeleteUserComments(batch, communityProfileId);
       operationCount += commentsCount;
 
       // Step 4: Soft delete all user interactions
       final interactionsCount =
-          await _softDeleteUserInteractions(batch, userUID);
+          await _softDeleteUserInteractions(batch, communityProfileId);
       operationCount += interactionsCount;
 
       // Step 5: Delete community interest tracking (if exists)
-      await _deleteCommunityInterest(batch, userUID);
+      await _deleteCommunityInterest(batch, userUID); // Still uses userUID
+      operationCount++;
+
+      // Step 6: Update user mapping to mark as deleted
+      await _updateUserMapping(batch, userUID);
       operationCount++;
 
       print(
@@ -101,8 +119,8 @@ class CommunityDeletionService {
 
   /// Soft deletes the user's community profile
   Future<void> _softDeleteCommunityProfile(
-      WriteBatch batch, String userUID) async {
-    final profileDoc = _communityProfiles.doc(userUID);
+      WriteBatch batch, String communityProfileId) async {
+    final profileDoc = _communityProfiles.doc(communityProfileId);
     final profileSnapshot = await profileDoc.get();
 
     if (profileSnapshot.exists) {
@@ -115,14 +133,15 @@ class CommunityDeletionService {
       });
       print('DEBUG: Prepared community profile soft deletion');
     } else {
-      print('DEBUG: No community profile found for user $userUID');
+      print('DEBUG: No community profile found with ID $communityProfileId');
     }
   }
 
   /// Soft deletes all posts authored by the user
-  Future<int> _softDeleteUserPosts(WriteBatch batch, String userUID) async {
+  Future<int> _softDeleteUserPosts(
+      WriteBatch batch, String communityProfileId) async {
     final postsQuery = await _forumPosts
-        .where('authorCPId', isEqualTo: userUID)
+        .where('authorCPId', isEqualTo: communityProfileId)
         .where('isDeleted', isEqualTo: false)
         .get();
 
@@ -144,9 +163,11 @@ class CommunityDeletionService {
   }
 
   /// Soft deletes all comments authored by the user
-  Future<int> _softDeleteUserComments(WriteBatch batch, String userUID) async {
-    final commentsQuery =
-        await _comments.where('authorCPId', isEqualTo: userUID).get();
+  Future<int> _softDeleteUserComments(
+      WriteBatch batch, String communityProfileId) async {
+    final commentsQuery = await _comments
+        .where('authorCPId', isEqualTo: communityProfileId)
+        .get();
 
     int count = 0;
     for (final doc in commentsQuery.docs) {
@@ -170,9 +191,10 @@ class CommunityDeletionService {
 
   /// Soft deletes all interactions (likes/dislikes) by the user
   Future<int> _softDeleteUserInteractions(
-      WriteBatch batch, String userUID) async {
-    final interactionsQuery =
-        await _interactions.where('userCPId', isEqualTo: userUID).get();
+      WriteBatch batch, String communityProfileId) async {
+    final interactionsQuery = await _interactions
+        .where('userCPId', isEqualTo: communityProfileId)
+        .get();
 
     int count = 0;
     for (final doc in interactionsQuery.docs) {
@@ -204,14 +226,64 @@ class CommunityDeletionService {
     }
   }
 
+  /// Helper method to get community profile ID from user mapping
+  Future<String?> _getCommunityProfileId(String userUID) async {
+    try {
+      final doc =
+          await _firestore.collection('userProfileMappings').doc(userUID).get();
+
+      if (!doc.exists || doc.data() == null) {
+        return null;
+      }
+
+      final data = doc.data()!;
+      final isDeleted = data['isDeleted'] as bool? ?? false;
+
+      if (isDeleted) {
+        print(
+            'DEBUG: Community profile already marked as deleted for user $userUID');
+        return null;
+      }
+
+      return data['communityProfileId'] as String?;
+    } catch (e) {
+      print('ERROR: Failed to get community profile ID for user $userUID: $e');
+      return null;
+    }
+  }
+
+  /// Updates user mapping to mark community profile as deleted
+  Future<void> _updateUserMapping(WriteBatch batch, String userUID) async {
+    final mappingDoc =
+        _firestore.collection('userProfileMappings').doc(userUID);
+    final mappingSnapshot = await mappingDoc.get();
+
+    if (mappingSnapshot.exists) {
+      batch.update(mappingDoc, {
+        'isDeleted': true,
+        'deletedAt': FieldValue.serverTimestamp(),
+      });
+      print('DEBUG: Prepared user mapping update for deletion');
+    } else {
+      print('DEBUG: No user mapping found for user $userUID');
+    }
+  }
+
   /// Checks if user has any community data that needs deletion
   ///
   /// This can be used to determine if community deletion is necessary
   /// before executing the full deletion process
   Future<bool> hasUserCommunityData(String userUID) async {
     try {
+      // First get the community profile ID
+      final communityProfileId = await _getCommunityProfileId(userUID);
+      if (communityProfileId == null) {
+        return false; // No community profile found
+      }
+
       // Check community profile
-      final profileSnapshot = await _communityProfiles.doc(userUID).get();
+      final profileSnapshot =
+          await _communityProfiles.doc(communityProfileId).get();
       if (profileSnapshot.exists) {
         final data = profileSnapshot.data() as Map<String, dynamic>?;
         if (data != null && !(data['isDeleted'] ?? false)) {
@@ -221,21 +293,21 @@ class CommunityDeletionService {
 
       // Check posts
       final postsQuery = await _forumPosts
-          .where('authorCPId', isEqualTo: userUID)
+          .where('authorCPId', isEqualTo: communityProfileId)
           .limit(1)
           .get();
       if (postsQuery.docs.isNotEmpty) return true;
 
       // Check comments
       final commentsQuery = await _comments
-          .where('authorCPId', isEqualTo: userUID)
+          .where('authorCPId', isEqualTo: communityProfileId)
           .limit(1)
           .get();
       if (commentsQuery.docs.isNotEmpty) return true;
 
       // Check interactions
       final interactionsQuery = await _interactions
-          .where('userCPId', isEqualTo: userUID)
+          .where('userCPId', isEqualTo: communityProfileId)
           .limit(1)
           .get();
       if (interactionsQuery.docs.isNotEmpty) return true;
@@ -249,26 +321,41 @@ class CommunityDeletionService {
 
   /// Gets a summary of community data for the user (for logging/analytics)
   Future<Map<String, int>> getCommunityDataSummary(String userUID) async {
-    final summary = <String, int>{};
+    final summary = <String, int>{
+      'profiles': 0,
+      'posts': 0,
+      'comments': 0,
+      'interactions': 0,
+    };
 
     try {
+      // First get the community profile ID
+      final communityProfileId = await _getCommunityProfileId(userUID);
+      if (communityProfileId == null) {
+        return summary; // No community profile found
+      }
+
       // Count profile
-      final profileSnapshot = await _communityProfiles.doc(userUID).get();
+      final profileSnapshot =
+          await _communityProfiles.doc(communityProfileId).get();
       summary['profiles'] = profileSnapshot.exists ? 1 : 0;
 
       // Count posts
-      final postsQuery =
-          await _forumPosts.where('authorCPId', isEqualTo: userUID).get();
+      final postsQuery = await _forumPosts
+          .where('authorCPId', isEqualTo: communityProfileId)
+          .get();
       summary['posts'] = postsQuery.docs.length;
 
       // Count comments
-      final commentsQuery =
-          await _comments.where('authorCPId', isEqualTo: userUID).get();
+      final commentsQuery = await _comments
+          .where('authorCPId', isEqualTo: communityProfileId)
+          .get();
       summary['comments'] = commentsQuery.docs.length;
 
       // Count interactions
-      final interactionsQuery =
-          await _interactions.where('userCPId', isEqualTo: userUID).get();
+      final interactionsQuery = await _interactions
+          .where('userCPId', isEqualTo: communityProfileId)
+          .get();
       summary['interactions'] = interactionsQuery.docs.length;
     } catch (e) {
       print('ERROR: Failed to get community data summary: $e');
