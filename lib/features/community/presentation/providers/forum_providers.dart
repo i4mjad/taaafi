@@ -11,6 +11,7 @@ import 'package:reboot_app_3/features/community/data/models/post_form_data.dart'
 import 'package:reboot_app_3/features/community/application/gender_filtering_service.dart';
 import 'package:reboot_app_3/features/community/application/gender_interaction_validator.dart';
 import 'package:reboot_app_3/features/community/presentation/providers/community_providers_new.dart';
+import 'package:reboot_app_3/features/community/domain/entities/community_profile_entity.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
 import 'dart:math' as math;
 
@@ -25,8 +26,12 @@ void _debugGenderFiltering(
   print('🔍 Gender Filtering Debug - $providerName:');
   print('   Category: $category');
   print('   Is Pinned: $isPinned');
-  print('   User Gender: $userGender');
+  print('   User Gender: ${userGender ?? "NULL (profile not loaded/missing)"}');
   print('   Should Apply Filter: $shouldApplyFilter');
+  if (userGender == null && shouldApplyFilter) {
+    print(
+        '   ⚠️  WARNING: Filtering enabled but user gender is null - will show all posts');
+  }
   print(
       '   Rule: ${shouldApplyFilter ? "FILTERING ENABLED (same-gender + admins)" : "FILTERING DISABLED (all users)"}');
 }
@@ -710,6 +715,30 @@ class PostsPaginationNotifier extends StateNotifier<PostsPaginationState> {
   PostsPaginationNotifier(this._repository, this._ref)
       : super(PostsPaginationState.initial());
 
+  /// Helper method to get current user's community profile with proper error handling
+  Future<CommunityProfileEntity?> _getCurrentUserProfile() async {
+    try {
+      final profileAsync = _ref.read(currentCommunityProfileProvider);
+
+      return await profileAsync.when(
+        data: (profile) async => profile,
+        loading: () async {
+          // Wait a bit for the profile to load
+          await Future.delayed(Duration(milliseconds: 100));
+          final retryAsync = _ref.read(currentCommunityProfileProvider);
+          return retryAsync.maybeWhen(
+            data: (profile) => profile,
+            orElse: () => null,
+          );
+        },
+        error: (_, __) async => null,
+      );
+    } catch (e) {
+      print('Error getting current user profile: $e');
+      return null;
+    }
+  }
+
   /// Loads the first page of posts with mandatory gender filtering
   Future<void> loadPosts({String? category, bool? isPinned}) async {
     if (state.isLoading) return;
@@ -718,7 +747,7 @@ class PostsPaginationNotifier extends StateNotifier<PostsPaginationState> {
 
     try {
       // Get current user's gender for mandatory filtering
-      final currentProfile = _ref.read(currentCommunityProfileProvider).value;
+      final currentProfile = await _getCurrentUserProfile();
 
       // Determine if gender filtering should be applied based on content type
       final filterParams =
@@ -761,7 +790,7 @@ class PostsPaginationNotifier extends StateNotifier<PostsPaginationState> {
 
     try {
       // Get current user's gender for mandatory filtering
-      final currentProfile = _ref.read(currentCommunityProfileProvider).value;
+      final currentProfile = await _getCurrentUserProfile();
 
       // Determine if gender filtering should be applied based on content type
       final filterParams =
