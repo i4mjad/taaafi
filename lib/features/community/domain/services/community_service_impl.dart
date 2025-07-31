@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../entities/community_profile_entity.dart';
 import '../repositories/community_repository.dart';
 import '../../data/exceptions/community_exceptions.dart';
@@ -11,11 +12,12 @@ import 'community_service.dart';
 class CommunityServiceImpl implements CommunityService {
   final CommunityRepository _repository;
   final FirebaseAuth _auth;
+  final FirebaseFirestore _firestore;
 
   /// Cache for interest recording to avoid duplicate calls
   bool _hasRecordedInterest = false;
 
-  CommunityServiceImpl(this._repository, this._auth);
+  CommunityServiceImpl(this._repository, this._auth, this._firestore);
 
   @override
   Future<CommunityProfileEntity> createProfile({
@@ -33,18 +35,21 @@ class CommunityServiceImpl implements CommunityService {
     // Validate input data
     _validateProfileData(displayName, gender);
 
-    // Check if profile already exists
-    final existingProfile = await _repository.getProfile(user.uid);
-    if (existingProfile != null) {
+    // Check if profile already exists by checking user mapping
+    final existingProfileId = await _getUserProfileId(user.uid);
+    if (existingProfileId != null) {
       throw const ProfileCreationException(
           'Profile already exists for this user');
     }
 
     try {
+      // Generate a unique community profile ID
+      final profileId = _firestore.collection('communityProfiles').doc().id;
+
       // Create the profile
       final now = DateTime.now();
       final profile = CommunityProfileEntity(
-        id: user.uid,
+        id: profileId,
         displayName: displayName.trim(),
         gender: gender.toLowerCase(),
         avatarUrl: avatarUrl?.trim(),
@@ -53,7 +58,22 @@ class CommunityServiceImpl implements CommunityService {
         updatedAt: now,
       );
 
-      await _repository.createProfile(profile);
+      // Create profile and store user mapping atomically
+      await _firestore.runTransaction((transaction) async {
+        // Create the community profile
+        await _repository.createProfile(profile);
+
+        // Store user-to-profile mapping
+        transaction.set(
+          _firestore.collection('userProfileMappings').doc(user.uid),
+          {
+            'communityProfileId': profileId,
+            'createdAt': FieldValue.serverTimestamp(),
+            'isDeleted': false,
+          },
+        );
+      });
+
       return profile;
     } catch (e) {
       if (e is CommunityException) {
@@ -70,7 +90,13 @@ class CommunityServiceImpl implements CommunityService {
       throw const AuthenticationException('User not authenticated');
     }
 
-    return await _repository.getProfile(user.uid);
+    // Get profile ID from mapping
+    final profileId = await _getUserProfileId(user.uid);
+    if (profileId == null) {
+      return null;
+    }
+
+    return await _repository.getProfile(profileId);
   }
 
   @override
@@ -87,8 +113,14 @@ class CommunityServiceImpl implements CommunityService {
       throw const AuthenticationException('User not authenticated');
     }
 
+    // Get profile ID from mapping
+    final profileId = await _getUserProfileId(user.uid);
+    if (profileId == null) {
+      throw const ProfileNotFoundException('Profile not found for user');
+    }
+
     // Get existing profile
-    final existingProfile = await _repository.getProfile(user.uid);
+    final existingProfile = await _repository.getProfile(profileId);
     if (existingProfile == null) {
       throw const ProfileNotFoundException('Profile not found for user');
     }
@@ -130,7 +162,8 @@ class CommunityServiceImpl implements CommunityService {
       throw const AuthenticationException('User not authenticated');
     }
 
-    return await _repository.profileExists(user.uid);
+    final profileId = await _getUserProfileId(user.uid);
+    return profileId != null;
   }
 
   @override
@@ -140,7 +173,13 @@ class CommunityServiceImpl implements CommunityService {
       throw const AuthenticationException('User not authenticated');
     }
 
-    return _repository.watchProfile(user.uid);
+    return Stream.fromFuture(_getUserProfileId(user.uid))
+        .asyncExpand((profileId) {
+      if (profileId == null) {
+        return Stream.value(null);
+      }
+      return _repository.watchProfile(profileId);
+    });
   }
 
   @override
@@ -208,5 +247,28 @@ class CommunityServiceImpl implements CommunityService {
     final lowerText = text.toLowerCase();
 
     return inappropriateWords.any((word) => lowerText.contains(word));
+  }
+
+  /// Gets the community profile ID for a user
+  Future<String?> _getUserProfileId(String userId) async {
+    try {
+      final doc =
+          await _firestore.collection('userProfileMappings').doc(userId).get();
+
+      if (!doc.exists || doc.data() == null) {
+        return null;
+      }
+
+      final data = doc.data()!;
+      final isDeleted = data['isDeleted'] as bool? ?? false;
+
+      if (isDeleted) {
+        return null;
+      }
+
+      return data['communityProfileId'] as String?;
+    } catch (e) {
+      return null;
+    }
   }
 }

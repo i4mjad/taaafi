@@ -55,7 +55,8 @@ final communityRepositoryProvider = Provider<CommunityRepository>((ref) {
 final communityServiceProvider = Provider<CommunityService>((ref) {
   final repository = ref.watch(communityRepositoryProvider);
   final auth = ref.watch(firebaseAuthProvider);
-  return CommunityServiceImpl(repository, auth);
+  final firestore = ref.watch(firestoreProvider);
+  return CommunityServiceImpl(repository, auth, firestore);
 });
 
 // =============================================================================
