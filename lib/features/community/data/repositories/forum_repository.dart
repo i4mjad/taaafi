@@ -60,12 +60,35 @@ class ForumRepository {
       GenderFilteringService();
 
   /// Get current user's community profile ID
-  String get _currentUserCPId {
+  Future<String> get _currentUserCPId async {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) {
       throw Exception('User not authenticated');
     }
-    return user.uid;
+
+    // Get community profile ID from user mapping
+    final doc = await FirebaseFirestore.instance
+        .collection('userProfileMappings')
+        .doc(user.uid)
+        .get();
+
+    if (!doc.exists || doc.data() == null) {
+      throw Exception('No community profile found for user');
+    }
+
+    final data = doc.data()!;
+    final isDeleted = data['isDeleted'] as bool? ?? false;
+
+    if (isDeleted) {
+      throw Exception('Community profile has been deleted');
+    }
+
+    final profileId = data['communityProfileId'] as String?;
+    if (profileId == null) {
+      throw Exception('Invalid community profile mapping');
+    }
+
+    return profileId;
   }
 
   /// Get post categories from Firestore
@@ -626,7 +649,7 @@ class ForumRepository {
     try {
       final commentData = {
         'postId': postId,
-        'authorCPId': _currentUserCPId,
+        'authorCPId': await _currentUserCPId,
         'body': body,
         'parentFor': parentFor ?? 'post',
         'parentId': parentId ?? postId,
@@ -691,7 +714,7 @@ class ForumRepository {
     String? userCPId,
   }) async {
     try {
-      final userId = userCPId ?? _currentUserCPId;
+      final userId = userCPId ?? await _currentUserCPId;
       final docId = Interaction.generateDocumentId(
         userCPId: userId,
         targetType: targetType,
@@ -715,7 +738,20 @@ class ForumRepository {
     required String targetId,
     String? userCPId,
   }) {
-    final userId = userCPId ?? _currentUserCPId;
+    return Stream.fromFuture(_getWatchUserInteractionStream(
+      targetType: targetType,
+      targetId: targetId,
+      userCPId: userCPId,
+    )).asyncExpand((stream) => stream);
+  }
+
+  /// Helper method to get the stream after resolving user ID
+  Future<Stream<Interaction?>> _getWatchUserInteractionStream({
+    required String targetType,
+    required String targetId,
+    String? userCPId,
+  }) async {
+    final userId = userCPId ?? await _currentUserCPId;
     final docId = Interaction.generateDocumentId(
       userCPId: userId,
       targetType: targetType,
@@ -752,7 +788,7 @@ class ForumRepository {
     required int value, // 1 for like, -1 for dislike, 0 for neutral
   }) async {
     try {
-      final userId = _currentUserCPId;
+      final userId = await _currentUserCPId;
       final docId = Interaction.generateDocumentId(
         userCPId: userId,
         targetType: 'post',
@@ -835,7 +871,7 @@ class ForumRepository {
     required int value, // 1 for like, -1 for dislike, 0 for neutral
   }) async {
     try {
-      final userId = _currentUserCPId;
+      final userId = await _currentUserCPId;
       final docId = Interaction.generateDocumentId(
         userCPId: userId,
         targetType: 'comment',
