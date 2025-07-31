@@ -82,7 +82,8 @@ final forumServiceProvider = Provider<ForumService>((ref) {
   final repository = ref.watch(forumRepositoryProvider);
   final validationService = ref.watch(postValidationServiceProvider);
   final auth = ref.watch(firebaseAuthProvider);
-  return ForumService(repository, validationService, auth);
+  final genderValidator = ref.watch(genderInteractionValidatorProvider);
+  return ForumService(repository, validationService, auth, genderValidator);
 });
 
 // Gender Filtering Service Provider

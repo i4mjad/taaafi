@@ -1,8 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:reboot_app_3/features/community/data/models/post_form_data.dart';
 import 'package:reboot_app_3/features/community/data/repositories/forum_repository.dart';
 import 'package:reboot_app_3/features/community/domain/services/post_validation_service.dart';
 import 'package:reboot_app_3/features/community/data/exceptions/forum_exceptions.dart';
+import 'package:reboot_app_3/features/community/application/gender_interaction_validator.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
 import '../../../account/data/app_features_config.dart';
 import '../../../account/application/ban_warning_facade.dart';
@@ -38,16 +40,19 @@ class ForumService {
   final ForumRepository _repository;
   final PostValidationService _validationService;
   final FirebaseAuth _auth;
+  final GenderInteractionValidator _genderValidator;
 
   /// Creates a new ForumService instance
   ///
   /// [repository] - The forum repository for data access
   /// [validationService] - The validation service for input validation
   /// [auth] - Firebase authentication instance
+  /// [genderValidator] - The gender interaction validator for community rules
   ForumService(
     this._repository,
     this._validationService,
     this._auth,
+    this._genderValidator,
   );
 
   /// Creates a new forum post
@@ -160,10 +165,32 @@ class ForumService {
       // 3. Check user permissions
       await _checkCommentCreationPermission(localizations);
 
-      // 4. Check if post exists
+      // 4. Validate gender-based interaction rules
+      final currentUserGender = await _getCurrentUserGender();
+      if (currentUserGender != null) {
+        if (parentCommentId != null) {
+          // Replying to a comment
+          await _genderValidator.validateCanReplyToComment(
+            currentUserGender: currentUserGender,
+            parentCommentId: parentCommentId,
+            localizations: localizations,
+            applyGenderFilter: true, // Always apply for comments
+          );
+        } else {
+          // Commenting on a post - check the post's category to determine filtering
+          await _genderValidator.validateCanCommentOnPost(
+            currentUserGender: currentUserGender,
+            postId: postId,
+            localizations: localizations,
+            applyGenderFilter: await _shouldApplyGenderFilterForPost(postId),
+          );
+        }
+      }
+
+      // 5. Check if post exists
       await _ensurePostExists(postId, localizations);
 
-      // 5. Check for rate limiting
+      // 6. Check for rate limiting
       await _checkRateLimit('comment_creation', localizations);
 
       // 6. Create the comment
@@ -217,10 +244,21 @@ class ForumService {
       // 3. Check user permissions
       await _checkVotingPermission(localizations);
 
-      // 4. Check if post exists
+      // 4. Validate gender-based interaction rules
+      final currentUserGender = await _getCurrentUserGender();
+      if (currentUserGender != null) {
+        await _genderValidator.validateCanInteractWithPost(
+          currentUserGender: currentUserGender,
+          postId: postId,
+          localizations: localizations,
+          applyGenderFilter: await _shouldApplyGenderFilterForPost(postId),
+        );
+      }
+
+      // 5. Check if post exists
       await _ensurePostExists(postId, localizations);
 
-      // 5. Check for rate limiting
+      // 6. Check for rate limiting
       await _checkRateLimit('interaction', localizations);
 
       // 6. Perform the interaction
@@ -270,10 +308,21 @@ class ForumService {
       // 3. Check user permissions
       await _checkVotingPermission(localizations);
 
-      // 4. Check if comment exists
+      // 4. Validate gender-based interaction rules
+      final currentUserGender = await _getCurrentUserGender();
+      if (currentUserGender != null) {
+        await _genderValidator.validateCanInteractWithComment(
+          currentUserGender: currentUserGender,
+          commentId: commentId,
+          localizations: localizations,
+          applyGenderFilter: true, // Always apply for comments
+        );
+      }
+
+      // 5. Check if comment exists
       await _ensureCommentExists(commentId, localizations);
 
-      // 5. Check for rate limiting
+      // 6. Check for rate limiting
       await _checkRateLimit('interaction', localizations);
 
       // 6. Perform the interaction
@@ -390,6 +439,58 @@ class ForumService {
         'User must be authenticated to perform this action',
         code: 'NOT_AUTHENTICATED',
       );
+    }
+  }
+
+  /// Gets the current user's gender from their community profile
+  ///
+  /// Returns null if user doesn't have a community profile or gender is not set
+  Future<String?> _getCurrentUserGender() async {
+    try {
+      final user = _auth.currentUser;
+      if (user == null) return null;
+
+      // Get the community profile document
+      final doc = await FirebaseFirestore.instance
+          .collection('communityProfiles')
+          .doc(user.uid)
+          .get();
+
+      if (doc.exists) {
+        final data = doc.data();
+        return data?['gender'] as String?;
+      }
+      return null;
+    } catch (e) {
+      // Return null on error to avoid blocking users
+      return null;
+    }
+  }
+
+  /// Determines if gender filtering should be applied to a specific post
+  ///
+  /// [postId] The ID of the post to check
+  /// Returns true if gender filtering should be applied, false otherwise
+  Future<bool> _shouldApplyGenderFilterForPost(String postId) async {
+    try {
+      final doc = await FirebaseFirestore.instance
+          .collection('forumPosts')
+          .doc(postId)
+          .get();
+
+      if (!doc.exists) return true; // Default to applying filter
+
+      final data = doc.data();
+      final category = data?['category'] as String?;
+      final isPinned = data?['isPinned'] as bool? ?? false;
+
+      return GenderInteractionValidator.shouldApplyGenderFilter(
+        category: category,
+        isPinned: isPinned,
+      );
+    } catch (e) {
+      // Default to applying filter on error
+      return true;
     }
   }
 
