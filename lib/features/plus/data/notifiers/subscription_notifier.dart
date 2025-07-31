@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:reboot_app_3/features/plus/application/subscription_service.dart';
 import 'package:reboot_app_3/features/plus/data/repositories/subscription_repository.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -29,6 +30,24 @@ class SubscriptionNotifier extends _$SubscriptionNotifier {
       }
     } catch (e, st) {
       state = AsyncValue.error(e, st);
+    }
+  }
+
+  /// Purchase with Package object (for RevenueCat integration)
+  Future<bool> purchasePackage(Package package) async {
+    state = const AsyncValue.loading();
+    try {
+      final repository = ref.read(subscriptionRepositoryProvider);
+      final success = await repository.purchasePackage(package);
+      if (success) {
+        // Refresh subscription info
+        state = AsyncValue.data(await service.getSubscriptionInfo());
+        return true;
+      }
+      return false;
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+      return false;
     }
   }
 
@@ -88,4 +107,11 @@ bool hasActiveSubscription(Ref ref) {
 Future<bool> isPremiumAnalyticsAvailable(Ref ref) async {
   final notifier = ref.read(subscriptionNotifierProvider.notifier);
   return await notifier.isFeatureAvailable('premium_analytics');
+}
+
+// Provider for available packages from RevenueCat
+@riverpod
+Future<List<Package>> availablePackages(Ref ref) async {
+  final subscription = await ref.watch(subscriptionNotifierProvider.future);
+  return subscription.availablePackages ?? [];
 }
