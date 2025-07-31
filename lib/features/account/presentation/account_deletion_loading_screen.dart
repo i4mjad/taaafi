@@ -468,7 +468,7 @@ class _AccountDeletionLoadingScreenState
             width: 32,
             height: 32,
             decoration: BoxDecoration(
-              color: getStatusColor().withOpacity(0.1),
+              color: getStatusColor().withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(16),
               border: Border.all(color: getStatusColor(), width: 1),
             ),

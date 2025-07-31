@@ -10,6 +10,7 @@ import 'package:reboot_app_3/features/community/data/models/post_category.dart';
 import 'package:reboot_app_3/features/community/data/models/interaction.dart';
 import 'package:reboot_app_3/features/community/presentation/widgets/avatar_with_anonymity.dart';
 import 'package:reboot_app_3/features/community/presentation/widgets/plus_badge_widget.dart';
+import 'package:reboot_app_3/features/community/presentation/widgets/streak_display_widget.dart';
 import 'package:reboot_app_3/features/community/presentation/providers/community_providers_new.dart';
 import 'package:reboot_app_3/features/community/presentation/providers/forum_providers.dart';
 import 'package:reboot_app_3/features/community/presentation/widgets/report_content_modal.dart';
@@ -191,6 +192,27 @@ class ThreadsPostCard extends ConsumerWidget {
                                   children: [
                                     const SizedBox(width: 6),
                                     const PlusBadgeWidget(),
+                                  ],
+                                );
+                              }
+                              return const SizedBox.shrink();
+                            },
+                            loading: () => const SizedBox.shrink(),
+                            error: (error, stackTrace) =>
+                                const SizedBox.shrink(),
+                          ),
+
+                          // Streak display if user shares streak info
+                          authorProfileAsync.when(
+                            data: (authorProfile) {
+                              if (authorProfile?.hasValidStreakData() == true) {
+                                return Row(
+                                  children: [
+                                    const SizedBox(width: 6),
+                                    StreakDisplayWidget(
+                                      streakDays:
+                                          authorProfile!.currentStreakDays!,
+                                    ),
                                   ],
                                 );
                               }

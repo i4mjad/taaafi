@@ -80,6 +80,7 @@ class CommunityServiceImpl implements CommunityService {
     bool? isAnonymous,
     String? avatarUrl,
     bool? isPlusUser,
+    bool? shareRelapseStreaks,
   }) async {
     final user = _auth.currentUser;
     if (user == null) {
@@ -107,6 +108,7 @@ class CommunityServiceImpl implements CommunityService {
       isAnonymous: isAnonymous,
       avatarUrl: avatarUrl?.trim(),
       isPlusUser: isPlusUser,
+      shareRelapseStreaks: shareRelapseStreaks,
       updatedAt: DateTime.now(),
     );
 

@@ -1409,6 +1409,9 @@ const Map<String, String> kEn = {
   "groups-feature-4": "Track group achievements and milestones",
   "groups-feature-5": "Private and secure group interactions",
   "default-image": "Default Image",
+  "use-account-profile-image": "Use your account profile image",
+  "use-anonymous-avatar": "Use anonymous avatar instead",
+  "community-profile-preview": "Profile Preview",
   "upload-custom-image": "Upload Custom Image",
   "select-image": "Select Image",
   "post_creation": "Post Creation",
@@ -1688,6 +1691,18 @@ const Map<String, String> kEn = {
   "support-contact-dialog":
       "As a Plus member, you get priority support. Contact us through the app settings or reach out directly for faster response times.",
   "got-it": "Got it",
+
+  // Plus Streak Sharing Feature
+  "days-streak": "{days} days",
+  "no-streak-data": "No streak data available",
+  "daily-login-requirement":
+      "⚠️ Important: You must log in daily to keep your streak updated in posts and comments. Your displayed streak will only update when you open the app.",
+  "plus-streak-feature-info":
+      "👑 Plus Feature: Share your recovery progress with the community to inspire and motivate others on their journey.",
+  "allow-sharing-progress": "Allow sharing my progress",
+  "share-streak-description":
+      "When enabled, your recovery progress will be visible to other community members",
+  "plus": "Plus",
 
   // Purchase Success Messages
   "purchase-thank-you-title": "Thank You! 🎉",

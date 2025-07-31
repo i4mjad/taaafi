@@ -33,6 +33,7 @@ abstract class CommunityService {
     bool? isAnonymous,
     String? avatarUrl,
     bool? isPlusUser,
+    bool? shareRelapseStreaks,
   });
 
   /// Checks if the current user has a community profile

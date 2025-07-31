@@ -28,6 +28,15 @@ class CommunityProfileModel {
   /// Whether the user has an active Plus subscription
   final bool? isPlusUser;
 
+  /// Whether the user allows sharing their relapse streak information (Plus feature)
+  final bool? shareRelapseStreaks;
+
+  /// Current streak in days (only stored if user shares streaks)
+  final int? currentStreakDays;
+
+  /// Last time streak data was updated
+  final DateTime? streakLastUpdated;
+
   /// When the profile was created
   final DateTime createdAt;
 
@@ -42,6 +51,9 @@ class CommunityProfileModel {
     required this.isAnonymous,
     this.isDeleted = false,
     this.isPlusUser,
+    this.shareRelapseStreaks = false,
+    this.currentStreakDays,
+    this.streakLastUpdated,
     required this.createdAt,
     this.updatedAt,
   });
@@ -56,6 +68,11 @@ class CommunityProfileModel {
       isAnonymous: json['isAnonymous'] as bool,
       isDeleted: json['isDeleted'] ?? false,
       isPlusUser: json['isPlusUser'] as bool?,
+      shareRelapseStreaks: json['shareRelapseStreaks'] as bool? ?? false,
+      currentStreakDays: json['currentStreakDays'] as int?,
+      streakLastUpdated: json['streakLastUpdated'] != null
+          ? DateTime.parse(json['streakLastUpdated'] as String)
+          : null,
       createdAt: DateTime.parse(json['createdAt'] as String),
       updatedAt: json['updatedAt'] != null
           ? DateTime.parse(json['updatedAt'] as String)
@@ -73,6 +90,9 @@ class CommunityProfileModel {
       'isAnonymous': isAnonymous,
       'isDeleted': isDeleted,
       'isPlusUser': isPlusUser,
+      'shareRelapseStreaks': shareRelapseStreaks,
+      'currentStreakDays': currentStreakDays,
+      'streakLastUpdated': streakLastUpdated?.toIso8601String(),
       'createdAt': createdAt.toIso8601String(),
       'updatedAt': updatedAt?.toIso8601String(),
     };
@@ -91,6 +111,11 @@ class CommunityProfileModel {
       isAnonymous: data['isAnonymous'] as bool,
       isDeleted: data['isDeleted'] ?? false,
       isPlusUser: data['isPlusUser'] as bool?,
+      shareRelapseStreaks: data['shareRelapseStreaks'] as bool? ?? false,
+      currentStreakDays: data['currentStreakDays'] as int?,
+      streakLastUpdated: data['streakLastUpdated'] != null
+          ? (data['streakLastUpdated'] as Timestamp).toDate()
+          : null,
       createdAt: (data['createdAt'] as Timestamp).toDate(),
       updatedAt: data['updatedAt'] != null
           ? (data['updatedAt'] as Timestamp).toDate()
@@ -107,6 +132,11 @@ class CommunityProfileModel {
       'isAnonymous': isAnonymous,
       'isDeleted': isDeleted,
       'isPlusUser': isPlusUser,
+      'shareRelapseStreaks': shareRelapseStreaks,
+      'currentStreakDays': currentStreakDays,
+      'streakLastUpdated': streakLastUpdated != null
+          ? Timestamp.fromDate(streakLastUpdated!)
+          : null,
       'createdAt': Timestamp.fromDate(createdAt),
       'updatedAt': updatedAt != null ? Timestamp.fromDate(updatedAt!) : null,
     };
@@ -122,6 +152,9 @@ class CommunityProfileModel {
       isAnonymous: isAnonymous,
       isDeleted: isDeleted,
       isPlusUser: isPlusUser,
+      shareRelapseStreaks: shareRelapseStreaks,
+      currentStreakDays: currentStreakDays,
+      streakLastUpdated: streakLastUpdated,
       createdAt: createdAt,
       updatedAt: updatedAt,
     );
@@ -137,6 +170,9 @@ class CommunityProfileModel {
       isAnonymous: entity.isAnonymous,
       isDeleted: entity.isDeleted,
       isPlusUser: entity.isPlusUser,
+      shareRelapseStreaks: entity.shareRelapseStreaks,
+      currentStreakDays: entity.currentStreakDays,
+      streakLastUpdated: entity.streakLastUpdated,
       createdAt: entity.createdAt,
       updatedAt: entity.updatedAt,
     );
@@ -151,6 +187,9 @@ class CommunityProfileModel {
     bool? isAnonymous,
     bool? isDeleted,
     bool? isPlusUser,
+    bool? shareRelapseStreaks,
+    int? currentStreakDays,
+    DateTime? streakLastUpdated,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
@@ -162,6 +201,9 @@ class CommunityProfileModel {
       isAnonymous: isAnonymous ?? this.isAnonymous,
       isDeleted: isDeleted ?? this.isDeleted,
       isPlusUser: isPlusUser ?? this.isPlusUser,
+      shareRelapseStreaks: shareRelapseStreaks ?? this.shareRelapseStreaks,
+      currentStreakDays: currentStreakDays ?? this.currentStreakDays,
+      streakLastUpdated: streakLastUpdated ?? this.streakLastUpdated,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );
@@ -178,6 +220,9 @@ class CommunityProfileModel {
         other.isAnonymous == isAnonymous &&
         other.isDeleted == isDeleted &&
         other.isPlusUser == isPlusUser &&
+        other.shareRelapseStreaks == shareRelapseStreaks &&
+        other.currentStreakDays == currentStreakDays &&
+        other.streakLastUpdated == streakLastUpdated &&
         other.createdAt == createdAt &&
         other.updatedAt == updatedAt;
   }
@@ -191,12 +236,15 @@ class CommunityProfileModel {
         isAnonymous.hashCode ^
         isDeleted.hashCode ^
         isPlusUser.hashCode ^
+        shareRelapseStreaks.hashCode ^
+        currentStreakDays.hashCode ^
+        streakLastUpdated.hashCode ^
         createdAt.hashCode ^
         updatedAt.hashCode;
   }
 
   @override
   String toString() {
-    return 'CommunityProfileModel(id: $id, displayName: $displayName, gender: $gender, avatarUrl: $avatarUrl, isAnonymous: $isAnonymous, isDeleted: $isDeleted, isPlusUser: $isPlusUser, createdAt: $createdAt, updatedAt: $updatedAt)';
+    return 'CommunityProfileModel(id: $id, displayName: $displayName, gender: $gender, avatarUrl: $avatarUrl, isAnonymous: $isAnonymous, isDeleted: $isDeleted, isPlusUser: $isPlusUser, shareRelapseStreaks: $shareRelapseStreaks, currentStreakDays: $currentStreakDays, streakLastUpdated: $streakLastUpdated, createdAt: $createdAt, updatedAt: $updatedAt)';
   }
 }

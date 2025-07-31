@@ -178,6 +178,7 @@ class CommunityProfileUpdateNotifier extends StateNotifier<AsyncValue<void>> {
     String? gender,
     bool? isAnonymous,
     String? avatarUrl,
+    bool? shareRelapseStreaks,
   }) async {
     state = const AsyncValue.loading();
 
@@ -187,6 +188,7 @@ class CommunityProfileUpdateNotifier extends StateNotifier<AsyncValue<void>> {
         gender: gender,
         isAnonymous: isAnonymous,
         avatarUrl: avatarUrl,
+        shareRelapseStreaks: shareRelapseStreaks,
       );
       state = const AsyncValue.data(null);
     } catch (error, stackTrace) {

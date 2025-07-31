@@ -7,6 +7,7 @@ import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/features/community/data/models/comment.dart';
 import 'package:reboot_app_3/features/community/presentation/widgets/avatar_with_anonymity.dart';
 import 'package:reboot_app_3/features/community/presentation/widgets/plus_badge_widget.dart';
+import 'package:reboot_app_3/features/community/presentation/widgets/streak_display_widget.dart';
 import 'package:reboot_app_3/features/community/presentation/providers/community_providers_new.dart';
 import 'package:reboot_app_3/features/community/presentation/providers/forum_providers.dart';
 import 'package:reboot_app_3/features/account/presentation/widgets/feature_access_guard.dart';
@@ -219,6 +220,29 @@ class CommentTileWidget extends ConsumerWidget {
             padding: EdgeInsets.symmetric(horizontal: 4, vertical: 1),
           ),
         ],
+
+        // Streak display if user shares streak info
+        authorProfileAsync.when(
+          data: (authorProfile) {
+            if (authorProfile?.hasValidStreakData() == true) {
+              return Row(
+                children: [
+                  const SizedBox(width: 6),
+                  StreakDisplayWidget(
+                    streakDays: authorProfile!.currentStreakDays!,
+                    fontSize: 9,
+                    iconSize: 8,
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                  ),
+                ],
+              );
+            }
+            return const SizedBox.shrink();
+          },
+          loading: () => const SizedBox.shrink(),
+          error: (error, stackTrace) => const SizedBox.shrink(),
+        ),
 
         // Author badge
         if (isAuthor) ...[

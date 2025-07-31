@@ -71,6 +71,7 @@ class PlatformSwitch extends StatelessWidget {
                   Text(
                     subtitle!,
                     style: TextStyles.small.copyWith(
+                      height: 1.5,
                       color: theme.grey[600],
                     ),
                   ),
