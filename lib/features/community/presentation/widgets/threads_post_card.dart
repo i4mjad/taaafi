@@ -222,7 +222,8 @@ class ThreadsPostCard extends ConsumerWidget {
                                 data: (authorProfile) {
                                   // Check if user is plus AND allows sharing
                                   final isPlusUser =
-                                      authorProfile?.isPlusUser ?? false;
+                                      authorProfile?.hasPlusSubscription() ??
+                                          false;
                                   final allowsSharing =
                                       authorProfile?.shareRelapseStreaks ??
                                           false;
@@ -269,13 +270,14 @@ class ThreadsPostCard extends ConsumerWidget {
                                                         vertical: 3),
                                                 decoration: BoxDecoration(
                                                   color: const Color(0xFF22C55E)
-                                                      .withOpacity(0.1),
+                                                      .withValues(alpha: 0.1),
                                                   borderRadius:
                                                       BorderRadius.circular(6),
                                                   border: Border.all(
                                                     color:
                                                         const Color(0xFF22C55E)
-                                                            .withOpacity(0.3),
+                                                            .withValues(
+                                                                alpha: 0.3),
                                                     width: 1,
                                                   ),
                                                 ),

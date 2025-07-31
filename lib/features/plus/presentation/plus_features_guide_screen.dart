@@ -12,6 +12,13 @@ import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/core/routing/route_names.dart';
 import 'package:figma_squircle/figma_squircle.dart';
 import 'package:reboot_app_3/features/plus/presentation/feature_suggestion_modal.dart';
+import 'package:reboot_app_3/features/account/presentation/contact_us_modal.dart';
+import 'package:reboot_app_3/features/plus/data/notifiers/subscription_notifier.dart';
+import 'package:reboot_app_3/features/plus/data/repositories/subscription_repository.dart';
+import 'package:reboot_app_3/core/shared_widgets/custom_textarea.dart';
+import 'package:reboot_app_3/core/shared_widgets/snackbar.dart';
+import 'package:reboot_app_3/core/shared_widgets/spinner.dart';
+import 'package:reboot_app_3/features/shared/data/notifiers/user_reports_notifier.dart';
 
 class PlusFeaturesGuideScreen extends ConsumerWidget {
   final bool fromPurchase;
@@ -474,19 +481,11 @@ class PlusFeaturesGuideScreen extends ConsumerWidget {
   }
 
   void _contactSupport(BuildContext context) {
-    showDialog(
+    showModalBottomSheet(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text(AppLocalizations.of(context).translate('priority-support')),
-        content: Text(
-            AppLocalizations.of(context).translate('support-contact-dialog')),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text(AppLocalizations.of(context).translate('got-it')),
-          ),
-        ],
-      ),
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => const PlusContactUsModal(),
     );
   }
 
@@ -496,6 +495,276 @@ class PlusFeaturesGuideScreen extends ConsumerWidget {
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) => const FeatureSuggestionModal(),
+    );
+  }
+}
+
+class PlusContactUsModal extends ConsumerStatefulWidget {
+  const PlusContactUsModal({super.key});
+
+  @override
+  ConsumerState<PlusContactUsModal> createState() => _PlusContactUsModalState();
+}
+
+class _PlusContactUsModalState extends ConsumerState<PlusContactUsModal> {
+  final TextEditingController _messageController = TextEditingController();
+  bool _isSubmitting = false;
+
+  @override
+  void dispose() {
+    _messageController.dispose();
+    super.dispose();
+  }
+
+  String? _validateMessage(String? value) {
+    final localization = AppLocalizations.of(context);
+    if (value == null || value.trim().isEmpty) {
+      return localization.translate('field-required');
+    }
+    if (value.length > 220) {
+      return localization.translate('character-limit-exceeded');
+    }
+    return null;
+  }
+
+  Future<void> _submitContactRequest() async {
+    if (_validateMessage(_messageController.text) != null) {
+      return;
+    }
+
+    setState(() {
+      _isSubmitting = true;
+    });
+
+    try {
+      final reportsNotifier = ref.read(userReportsNotifierProvider.notifier);
+      final reportId = await reportsNotifier.submitContactUsReport(
+        userMessage: _messageController.text.trim(),
+      );
+
+      if (mounted) {
+        Navigator.of(context).pop();
+        context.pushNamed(
+          RouteNames.reportConversation.name,
+          pathParameters: {'reportId': reportId},
+        );
+
+        getSuccessSnackBar(context, 'contact-request-submitted');
+      }
+    } catch (e) {
+      if (mounted) {
+        String errorKey = 'report-submission-failed';
+        if (e.toString().contains('Exception: ')) {
+          final extractedKey = e.toString().replaceFirst('Exception: ', '');
+          if ([
+            'max-active-reports-reached',
+            'message-cannot-be-empty',
+            'message-exceeds-character-limit'
+          ].contains(extractedKey)) {
+            errorKey = extractedKey;
+          }
+        }
+        getErrorSnackBar(context, errorKey);
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isSubmitting = false;
+        });
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = AppTheme.of(context);
+    final localization = AppLocalizations.of(context);
+    final subscriptionAsync = ref.watch(subscriptionNotifierProvider);
+
+    return Container(
+      decoration: BoxDecoration(
+        color: theme.backgroundColor,
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(20),
+          topRight: Radius.circular(20),
+        ),
+      ),
+      child: Padding(
+        padding: EdgeInsets.only(
+          left: 24,
+          right: 24,
+          top: 24,
+          bottom: MediaQuery.of(context).viewInsets.bottom + 24,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Header
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Text(
+                    localization.translate('contact-us'),
+                    style: TextStyles.h5.copyWith(color: theme.grey[900]),
+                  ),
+                ),
+                GestureDetector(
+                  onTap: () => Navigator.of(context).pop(),
+                  child: Icon(
+                    LucideIcons.x,
+                    size: 24,
+                    color: theme.grey[600],
+                  ),
+                ),
+              ],
+            ),
+
+            verticalSpace(Spacing.points16),
+
+            // Plus user premium banner
+            subscriptionAsync.when(
+              data: (subscription) {
+                final isPlus = subscription.status == SubscriptionStatus.plus &&
+                    subscription.isActive;
+                if (isPlus) {
+                  return Column(
+                    children: [
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [
+                              const Color(0xFFFEBA01).withValues(alpha: 0.1),
+                              const Color(0xFFFEBA01).withValues(alpha: 0.05),
+                            ],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color:
+                                const Color(0xFFFEBA01).withValues(alpha: 0.3),
+                            width: 1,
+                          ),
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(
+                              Ta3afiPlatformIcons.plus_icon,
+                              color: const Color(0xFFFEBA01),
+                              size: 24,
+                            ),
+                            horizontalSpace(Spacing.points12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    localization.translate('priority-support'),
+                                    style: TextStyles.footnoteSelected.copyWith(
+                                      color: theme.grey[900],
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  verticalSpace(Spacing.points4),
+                                  Text(
+                                    localization.translate(
+                                        'plus-priority-support-message'),
+                                    style: TextStyles.caption.copyWith(
+                                      color: theme.grey[700],
+                                      height: 1.4,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      verticalSpace(Spacing.points16),
+                    ],
+                  );
+                }
+                return const SizedBox.shrink();
+              },
+              loading: () => const SizedBox.shrink(),
+              error: (_, __) => const SizedBox.shrink(),
+            ),
+
+            // Description
+            Text(
+              localization.translate('contact-us-description'),
+              style: TextStyles.body.copyWith(
+                color: theme.grey[700],
+                height: 1.5,
+              ),
+            ),
+
+            verticalSpace(Spacing.points24),
+
+            // Message input
+            CustomTextArea(
+              controller: _messageController,
+              hint: localization.translate('contact-us-placeholder'),
+              prefixIcon: LucideIcons.messageCircle,
+              validator: _validateMessage,
+              enabled: !_isSubmitting,
+              height: 120,
+            ),
+
+            verticalSpace(Spacing.points8),
+
+            // Helper note
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Text(
+                  localization.translate('contact-us-note'),
+                  style: TextStyles.small.copyWith(
+                    color: theme.grey[500],
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
+              ],
+            ),
+
+            verticalSpace(Spacing.points24),
+
+            // Submit button
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: _isSubmitting ? null : _submitContactRequest,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: theme.primary[600],
+                  foregroundColor: theme.grey[50],
+                  padding: EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                icon: _isSubmitting
+                    ? SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: Spinner(),
+                      )
+                    : Icon(LucideIcons.send, size: 20),
+                label: Text(
+                  localization.translate('send-request'),
+                  style: TextStyles.body.copyWith(
+                    color: theme.grey[50],
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

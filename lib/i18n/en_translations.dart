@@ -1703,6 +1703,8 @@ const Map<String, String> kEn = {
       "Set personalized reminders for activities, goals, and motivation.",
   "plus-priority-support-guide-desc":
       "Get priority assistance from our dedicated support team.",
+  "plus-priority-support-message":
+      "Your request will be handled faster with dedicated priority assistance.",
   "plus-support-message":
       "Thank you for supporting Ta'aafi! Your subscription helps us continue improving the app for everyone.",
   "contact-support-button": "Contact Support",

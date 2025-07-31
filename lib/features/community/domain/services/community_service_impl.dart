@@ -26,6 +26,7 @@ class CommunityServiceImpl implements CommunityService {
     required String gender,
     required bool isAnonymous,
     String? avatarUrl,
+    bool? isPlusUser,
   }) async {
     // Check authentication
     final user = _auth.currentUser;
@@ -36,11 +37,11 @@ class CommunityServiceImpl implements CommunityService {
     // Validate input data
     _validateProfileData(displayName, gender);
 
-    // Check if profile already exists by checking user mapping
-    final existingProfileId = await _getUserProfileId(user.uid);
-    if (existingProfileId != null) {
+    // Check if user already has an active profile
+    final existingProfile = await _getCurrentProfileByUserUID(user.uid);
+    if (existingProfile != null) {
       throw const ProfileCreationException(
-          'Profile already exists for this user');
+          'User already has an active community profile');
     }
 
     try {
@@ -51,30 +52,19 @@ class CommunityServiceImpl implements CommunityService {
       final now = DateTime.now();
       final profile = CommunityProfileEntity(
         id: profileId,
-        userUID: user.uid, // Store user UID for reference
+        userUID: user.uid, // Store user UID for reference and queries
         displayName: displayName.trim(),
         gender: gender.toLowerCase(),
         avatarUrl: avatarUrl?.trim(),
         isAnonymous: isAnonymous,
+        isPlusUser:
+            isPlusUser ?? false, // Use provided value or default to false
         createdAt: now,
         updatedAt: now,
       );
 
-      // Create profile and store user mapping atomically
-      await _firestore.runTransaction((transaction) async {
-        // Create the community profile
-        await _repository.createProfile(profile);
-
-        // Store user-to-profile mapping
-        transaction.set(
-          _firestore.collection('userProfileMappings').doc(user.uid),
-          {
-            'communityProfileId': profileId,
-            'createdAt': FieldValue.serverTimestamp(),
-            'isDeleted': false,
-          },
-        );
-      });
+      // Create the community profile
+      await _repository.createProfile(profile);
 
       return profile;
     } catch (e) {
@@ -92,21 +82,15 @@ class CommunityServiceImpl implements CommunityService {
       throw const AuthenticationException('User not authenticated');
     }
 
-    // Get profile ID from mapping
-    final profileId = await _getUserProfileId(user.uid);
-    if (profileId == null) {
-      return null;
-    }
-
-    return await _repository.getProfile(profileId);
+    return _getCurrentProfileByUserUID(user.uid);
   }
 
   @override
   Future<CommunityProfileEntity> updateProfile({
     String? displayName,
     String? gender,
-    bool? isAnonymous,
     String? avatarUrl,
+    bool? isAnonymous,
     bool? isPlusUser,
     bool? shareRelapseStreaks,
   }) async {
@@ -115,38 +99,23 @@ class CommunityServiceImpl implements CommunityService {
       throw const AuthenticationException('User not authenticated');
     }
 
-    // Get profile ID from mapping
-    final profileId = await _getUserProfileId(user.uid);
-    if (profileId == null) {
-      throw const ProfileNotFoundException('Profile not found for user');
+    final currentProfile = await _getCurrentProfileByUserUID(user.uid);
+    if (currentProfile == null) {
+      throw const ProfileNotFoundException('User has no community profile');
     }
-
-    // Get existing profile
-    final existingProfile = await _repository.getProfile(profileId);
-    if (existingProfile == null) {
-      throw const ProfileNotFoundException('Profile not found for user');
-    }
-
-    // Validate new data if provided
-    if (displayName != null) {
-      _validateDisplayName(displayName);
-    }
-    if (gender != null) {
-      _validateGender(gender);
-    }
-
-    // Create updated profile
-    final updatedProfile = existingProfile.copyWith(
-      displayName: displayName?.trim(),
-      gender: gender?.toLowerCase(),
-      isAnonymous: isAnonymous,
-      avatarUrl: avatarUrl?.trim(),
-      isPlusUser: isPlusUser,
-      shareRelapseStreaks: shareRelapseStreaks,
-      updatedAt: DateTime.now(),
-    );
 
     try {
+      final updatedProfile = currentProfile.copyWith(
+        displayName: displayName ?? currentProfile.displayName,
+        gender: gender ?? currentProfile.gender,
+        avatarUrl: avatarUrl ?? currentProfile.avatarUrl,
+        isAnonymous: isAnonymous ?? currentProfile.isAnonymous,
+        isPlusUser: isPlusUser ?? currentProfile.isPlusUser,
+        shareRelapseStreaks:
+            shareRelapseStreaks ?? currentProfile.shareRelapseStreaks,
+        updatedAt: DateTime.now(),
+      );
+
       await _repository.updateProfile(updatedProfile);
       return updatedProfile;
     } catch (e) {
@@ -164,8 +133,8 @@ class CommunityServiceImpl implements CommunityService {
       throw const AuthenticationException('User not authenticated');
     }
 
-    final profileId = await _getUserProfileId(user.uid);
-    return profileId != null;
+    final profile = await _getCurrentProfileByUserUID(user.uid);
+    return profile != null;
   }
 
   @override
@@ -175,12 +144,23 @@ class CommunityServiceImpl implements CommunityService {
       throw const AuthenticationException('User not authenticated');
     }
 
-    return Stream.fromFuture(_getUserProfileId(user.uid))
-        .asyncExpand((profileId) {
-      if (profileId == null) {
-        return Stream.value(null);
+    return _firestore
+        .collection('communityProfiles')
+        .where('userUID', isEqualTo: user.uid)
+        .where('isDeleted', isEqualTo: false)
+        .limit(1)
+        .snapshots()
+        .map((snapshot) {
+      if (snapshot.docs.isEmpty) {
+        return null;
       }
-      return _repository.watchProfile(profileId);
+
+      final doc = snapshot.docs.first;
+      final data = doc.data();
+      return CommunityProfileEntity.fromJson({
+        'id': doc.id,
+        ...data,
+      });
     });
   }
 
@@ -251,25 +231,29 @@ class CommunityServiceImpl implements CommunityService {
     return inappropriateWords.any((word) => lowerText.contains(word));
   }
 
-  /// Gets the community profile ID for a user
-  Future<String?> _getUserProfileId(String userId) async {
+  /// Helper method to get current user's profile by userUID
+  Future<CommunityProfileEntity?> _getCurrentProfileByUserUID(
+      String userUID) async {
     try {
-      final doc =
-          await _firestore.collection('userProfileMappings').doc(userId).get();
+      final snapshot = await _firestore
+          .collection('communityProfiles')
+          .where('userUID', isEqualTo: userUID)
+          .where('isDeleted', isEqualTo: false)
+          .limit(1)
+          .get();
 
-      if (!doc.exists || doc.data() == null) {
+      if (snapshot.docs.isEmpty) {
         return null;
       }
 
-      final data = doc.data()!;
-      final isDeleted = data['isDeleted'] as bool? ?? false;
-
-      if (isDeleted) {
-        return null;
-      }
-
-      return data['communityProfileId'] as String?;
+      final doc = snapshot.docs.first;
+      final data = doc.data();
+      return CommunityProfileEntity.fromJson({
+        'id': doc.id,
+        ...data,
+      });
     } catch (e) {
+      print('Error getting profile for user $userUID: $e');
       return null;
     }
   }
@@ -373,11 +357,13 @@ class CommunityServiceImpl implements CommunityService {
   /// Performs the actual deletion process with progress tracking
   Stream<DeletionProgress> _performDeletion(String userId) async* {
     try {
-      // Get profile ID
-      final profileId = await _getUserProfileId(userId);
-      if (profileId == null) {
+      // Get user's profile
+      final profile = await _getCurrentProfileByUserUID(userId);
+      if (profile == null) {
         throw const ProfileNotFoundException('Profile not found for deletion');
       }
+
+      final profileId = profile.id;
 
       // Step 1: Delete posts
       yield DeletionProgress(

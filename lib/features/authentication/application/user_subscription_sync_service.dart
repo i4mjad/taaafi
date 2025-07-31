@@ -134,7 +134,7 @@ class UserSubscriptionSyncService {
       if (profile == null) return false;
 
       // Return true if cached status differs from live status
-      return profile.isPlusUser != isSubscriptionActive;
+      return profile.hasPlusSubscription() != isSubscriptionActive;
     } catch (e) {
       print('UserSubscriptionSync: Error checking sync status - $e');
       return false;

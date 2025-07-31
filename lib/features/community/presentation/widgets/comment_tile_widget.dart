@@ -7,7 +7,6 @@ import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/features/community/data/models/comment.dart';
 import 'package:reboot_app_3/features/community/presentation/widgets/avatar_with_anonymity.dart';
 import 'package:reboot_app_3/features/community/presentation/widgets/plus_badge_widget.dart';
-import 'package:reboot_app_3/features/community/presentation/widgets/streak_display_widget.dart';
 import 'package:reboot_app_3/features/community/presentation/providers/community_providers_new.dart';
 import 'package:reboot_app_3/features/community/presentation/providers/forum_providers.dart';
 import 'package:reboot_app_3/features/account/presentation/widgets/feature_access_guard.dart';
@@ -251,10 +250,12 @@ class CommentTileWidget extends ConsumerWidget {
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 4, vertical: 2),
                             decoration: BoxDecoration(
-                              color: const Color(0xFF22C55E).withOpacity(0.1),
+                              color: const Color(0xFF22C55E)
+                                  .withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(4),
                               border: Border.all(
-                                color: const Color(0xFF22C55E).withOpacity(0.3),
+                                color: const Color(0xFF22C55E)
+                                    .withValues(alpha: 0.3),
                                 width: 1,
                               ),
                             ),

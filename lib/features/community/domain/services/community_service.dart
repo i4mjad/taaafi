@@ -41,6 +41,7 @@ abstract class CommunityService {
     required String gender,
     required bool isAnonymous,
     String? avatarUrl,
+    bool? isPlusUser,
   });
 
   /// Gets the current user's community profile

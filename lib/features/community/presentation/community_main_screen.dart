@@ -18,6 +18,8 @@ import 'package:reboot_app_3/features/community/data/models/post_category.dart';
 import 'package:reboot_app_3/features/community/data/models/post.dart';
 import 'package:reboot_app_3/features/account/presentation/widgets/feature_access_guard.dart';
 import 'package:reboot_app_3/features/authentication/application/user_subscription_sync_service.dart';
+import 'package:reboot_app_3/features/community/presentation/community_onboarding_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class CommunityMainScreen extends ConsumerStatefulWidget {
   /// Optional initial tab to select when the screen opens
@@ -43,19 +45,29 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen> {
 
     // Load posts when screen initializes
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      print('🎯 InitState: Starting community main screen initialization');
+      print('🎯 InitState: Selected filter: $_selectedFilter');
+
       // Sync community profile with latest subscription status
       _syncCommunityProfile();
 
+      // Check current user and profile status
+      _checkUserStatus();
+
       // Load different types of posts based on initial filter
       if (_selectedFilter == 'pinned') {
+        print('🎯 InitState: Loading pinned posts');
         ref
             .read(pinnedPostsPaginationProvider.notifier)
             .loadPosts(isPinned: true);
       } else if (_selectedFilter == 'news') {
+        print('🎯 InitState: Loading news posts');
         ref
             .read(newsPostsPaginationProvider.notifier)
             .loadPosts(category: 'news');
       } else {
+        print(
+            '🎯 InitState: Loading general posts with category: ${_getFilterCategory()}');
         ref
             .read(postsPaginationProvider.notifier)
             .loadPosts(category: _getFilterCategory());
@@ -83,6 +95,33 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen> {
     }
   }
 
+  /// Check user authentication and profile status for debugging
+  Future<void> _checkUserStatus() async {
+    try {
+      final auth = FirebaseAuth.instance;
+      final user = auth.currentUser;
+      print('🎯 UserStatus: Current user: ${user?.uid ?? 'Not authenticated'}');
+
+      if (user != null) {
+        final profileAsync = ref.read(currentCommunityProfileProvider);
+        profileAsync.when(
+          data: (profile) {
+            print(
+                '🎯 UserStatus: Community profile: ${profile?.id ?? 'No profile'}, gender: ${profile?.gender}');
+          },
+          loading: () {
+            print('🎯 UserStatus: Community profile is loading...');
+          },
+          error: (error, stack) {
+            print('🎯 UserStatus: Community profile error: $error');
+          },
+        );
+      }
+    } catch (e) {
+      print('🎯 UserStatus: Error checking user status: $e');
+    }
+  }
+
   String? _getFilterCategory() {
     switch (_selectedFilter) {
       case 'posts':
@@ -100,6 +139,32 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = AppTheme.of(context);
+    final screenState = ref.watch(communityScreenStateProvider);
+
+    return Scaffold(
+      backgroundColor: theme.backgroundColor,
+      body: _buildBody(screenState),
+    );
+  }
+
+  Widget _buildBody(CommunityScreenState screenState) {
+    switch (screenState) {
+      case CommunityScreenState.loading:
+        return const Center(child: Spinner());
+
+      case CommunityScreenState.needsOnboarding:
+        return CommunityOnboardingScreen();
+
+      case CommunityScreenState.showMainContent:
+        return _buildMainCommunityContent();
+
+      case CommunityScreenState.error:
+        return _buildErrorState();
+    }
+  }
+
+  Widget _buildMainCommunityContent() {
     final theme = AppTheme.of(context);
 
     return Scaffold(
@@ -179,6 +244,51 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen> {
           backgroundColor: theme.primary[500],
           child: const Icon(LucideIcons.plus, color: Colors.white),
         ),
+      ),
+    );
+  }
+
+  Widget _buildErrorState() {
+    final theme = AppTheme.of(context);
+    final localizations = AppLocalizations.of(context);
+
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            LucideIcons.alertCircle,
+            size: 64,
+            color: theme.error[500],
+          ),
+          const SizedBox(height: 16),
+          Text(
+            localizations.translate('something_went_wrong'),
+            style: TextStyles.h5.copyWith(
+              color: theme.grey[900],
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            localizations.translate('please_try_again'),
+            style: TextStyles.body.copyWith(
+              color: theme.grey[600],
+            ),
+          ),
+          const SizedBox(height: 24),
+          ElevatedButton(
+            onPressed: () {
+              ref.read(communityScreenStateProvider.notifier).refresh();
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: theme.primary[500],
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+            ),
+            child: Text(localizations.translate('try_again')),
+          ),
+        ],
       ),
     );
   }
@@ -290,6 +400,9 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen> {
     final theme = AppTheme.of(context);
     final localizations = AppLocalizations.of(context);
     final postsAsync = ref.watch(mainScreenPostsProvider(null));
+
+    print(
+        '🎯 UI: Building posts view, postsAsync state: ${postsAsync.runtimeType}');
 
     return Column(
       children: [
@@ -698,11 +811,15 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen> {
   Widget _buildStreamingPostsContent(AsyncValue<List<Post>> postsAsync,
       AppLocalizations localizations, theme) {
     return postsAsync.when(
-      loading: () => const Center(
-        child: Spinner(),
-      ),
+      loading: () {
+        print('🎯 UI: Posts loading...');
+        return const Center(
+          child: Spinner(),
+        );
+      },
       error: (error, stack) {
         print('❌ Error loading posts: $error');
+        print('❌ Stack trace: $stack');
         return Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -725,7 +842,9 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen> {
         );
       },
       data: (posts) {
+        print('🎯 UI: Received ${posts.length} posts to display');
         if (posts.isEmpty) {
+          print('🎯 UI: No posts to display - showing empty state');
           return Container(
             width: double.infinity,
             child: Column(
@@ -743,6 +862,7 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen> {
           );
         }
 
+        print('🎯 UI: Building list with ${posts.length} posts');
         return Column(
           children: [
             // Posts list

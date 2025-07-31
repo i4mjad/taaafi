@@ -1583,6 +1583,7 @@ const Map<String, String> kAr = {
 
   // جدول مقارنة الميزات
   "what-you-get": "ما ستحصل عليه:",
+  "contact-support-button": "تواصل مع الدعم",
   "free-version": "مجاني",
   "premium-version": "مدفوع",
   "detailed-analytics": "تحليلات مفصلة للتعافي",
@@ -1816,6 +1817,8 @@ const Map<String, String> kAr = {
       "إعداد تذكيرات مخصصة ومرونة في جدولة الأنشطة",
   "plus-priority-support-guide-desc":
       "دعم فني أولوي وردود أسرع من فريق التطوير",
+  "plus-priority-support-message":
+      "سيتم التعامل مع طلبك بشكل أسرع مع دعم فني مخصص وأولوي",
   "plus-support-message":
       "شكراً لك لدعم تعافي! اشتراكك يساعدنا على الاستمرار في تحسين التطبيق للجميع.",
 

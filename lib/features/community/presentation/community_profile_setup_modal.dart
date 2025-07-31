@@ -15,6 +15,7 @@ import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/core/shared_widgets/custom_textfield.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/features/community/presentation/providers/community_providers_new.dart';
+import 'package:reboot_app_3/features/plus/data/notifiers/subscription_notifier.dart';
 
 class CommunityProfileSetupModal extends ConsumerStatefulWidget {
   const CommunityProfileSetupModal({super.key});
@@ -516,17 +517,24 @@ class _CommunityProfileSetupModalState
       final createProfileNotifier =
           ref.read(communityProfileCreationProvider.notifier);
 
+      // Check current subscription status
+      final hasActiveSubscriptionStatus =
+          ref.read(hasActiveSubscriptionProvider);
+
       await createProfileNotifier.createProfile(
         displayName: _displayNameController.text.trim(),
         gender: _selectedGender!,
         isAnonymous: _isAnonymous,
-        // Removed referral code functionality
         avatarUrl: null, // No image upload for now
+        isPlusUser: hasActiveSubscriptionStatus,
       );
 
       if (mounted) {
         // Invalidate the hasCommunityProfile provider to refresh the cache
         ref.refresh(hasCommunityProfileProvider);
+
+        // Notify the community screen state that onboarding is completed
+        ref.read(communityScreenStateProvider.notifier).onboardingCompleted();
 
         // Set success state
         setState(() {

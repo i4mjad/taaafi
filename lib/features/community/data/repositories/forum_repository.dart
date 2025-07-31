@@ -6,6 +6,7 @@ import 'package:reboot_app_3/features/community/data/models/post.dart';
 import 'package:reboot_app_3/features/community/data/models/comment.dart';
 import 'package:reboot_app_3/features/community/data/models/interaction.dart';
 import 'package:reboot_app_3/features/community/application/gender_filtering_service.dart';
+import 'dart:math';
 
 /// Container for paginated posts data
 class PostsPage {
@@ -346,13 +347,47 @@ class ForumRepository {
 
     return query.limit(limit).snapshots().map((snapshot) {
       // Filter out deleted posts in code since some posts might not have the field
-      return snapshot.docs
+      final posts = snapshot.docs
           .map((doc) =>
               Post.fromFirestore(doc as DocumentSnapshot<Map<String, dynamic>>))
           .where((post) => !post
               .isDeleted) // This will handle missing fields thanks to default value
           .toList();
+
+      print(
+          '🔍 ForumRepository: _watchUnfilteredPosts returning ${posts.length} posts');
+      for (final post in posts) {
+        print(
+            '🔍 ForumRepository: Post ID: ${post.id}, authorCPId: ${post.authorCPId}, content: ${post.body.substring(0, min(50, post.body.length))}...');
+
+        // Check the author's profile gender
+        _checkAuthorGender(post.authorCPId);
+      }
+
+      return posts;
     });
+  }
+
+  /// Debug method to check an author's gender
+  Future<void> _checkAuthorGender(String authorCPId) async {
+    try {
+      final doc = await _firestore
+          .collection('communityProfiles')
+          .doc(authorCPId)
+          .get();
+
+      if (doc.exists) {
+        final data = doc.data() as Map<String, dynamic>;
+        final gender = data['gender'] ?? 'unknown';
+        final isDeleted = data['isDeleted'] ?? false;
+        print(
+            '🔍 ForumRepository: Author $authorCPId - gender: $gender, isDeleted: $isDeleted');
+      } else {
+        print('🔍 ForumRepository: Author $authorCPId - profile not found!');
+      }
+    } catch (e) {
+      print('🔍 ForumRepository: Error checking author $authorCPId: $e');
+    }
   }
 
   /// Stream gender-filtered posts
@@ -362,20 +397,53 @@ class ForumRepository {
     bool? isPinned,
     required String userGender,
   }) async* {
+    print(
+        '🔍 ForumRepository: Starting _watchGenderFilteredPosts for gender: $userGender');
+
     // Get visible profile IDs and watch for changes
     await for (final visibleProfileIds in _genderFilteringService
         .watchVisibleCommunityProfileIds(userGender)) {
-      if (visibleProfileIds.isEmpty) {
-        yield [];
-        continue;
+      print(
+          '🔍 ForumRepository: Received ${visibleProfileIds.length} visible profile IDs: $visibleProfileIds');
+
+      List<Post> genderFilteredPosts = [];
+
+      if (visibleProfileIds.isNotEmpty) {
+        // Try to get posts from valid profiles first
+        genderFilteredPosts = await _getPostsFromProfiles(
+            visibleProfileIds, limit, category, isPinned);
+        print(
+            '🔍 ForumRepository: Found ${genderFilteredPosts.length} posts from valid profiles');
       }
 
-      // Batch queries for large profile ID lists
-      const int batchSize = 10;
-      final List<Stream<List<Post>>> streamBatches = [];
+      // If no posts found from valid profiles, try orphaned posts as fallback
+      if (genderFilteredPosts.isEmpty) {
+        print(
+            '🔍 ForumRepository: No posts from valid profiles, checking for orphaned posts as fallback');
 
-      for (int i = 0; i < visibleProfileIds.length; i += batchSize) {
-        final batch = visibleProfileIds.skip(i).take(batchSize).toList();
+        final orphanedPosts =
+            await _getOrphanedPosts(limit, category, isPinned);
+        print(
+            '🔍 ForumRepository: Found ${orphanedPosts.length} orphaned posts as fallback');
+
+        // For now, just return orphaned posts as fallback
+        yield orphanedPosts;
+      } else {
+        yield genderFilteredPosts;
+      }
+    }
+  }
+
+  /// Get posts from specific profile IDs
+  Future<List<Post>> _getPostsFromProfiles(List<String> profileIds, int limit,
+      String? category, bool? isPinned) async {
+    try {
+      final List<Post> allPosts = [];
+      const int batchSize = 10;
+
+      for (int i = 0; i < profileIds.length; i += batchSize) {
+        final batch = profileIds.skip(i).take(batchSize).toList();
+        print('🔍 ForumRepository: Querying posts for profile batch: $batch');
 
         Query query = _posts
             .where('authorCPId', whereIn: batch)
@@ -389,26 +457,24 @@ class ForumRepository {
           query = query.where('isPinned', isEqualTo: isPinned);
         }
 
-        query = query.limit(limit);
+        final snapshot = await query.limit(limit).get();
 
-        final batchStream = query.snapshots().map((snapshot) {
-          return snapshot.docs
-              .map((doc) => Post.fromFirestore(
-                  doc as DocumentSnapshot<Map<String, dynamic>>))
-              .where((post) => !post.isDeleted)
-              .toList();
-        });
+        final batchPosts = snapshot.docs
+            .map((doc) => Post.fromFirestore(
+                doc as DocumentSnapshot<Map<String, dynamic>>))
+            .where((post) => !post.isDeleted)
+            .toList();
 
-        streamBatches.add(batchStream);
+        print('🔍 ForumRepository: Batch returned ${batchPosts.length} posts');
+        allPosts.addAll(batchPosts);
       }
 
-      // For single batch, yield directly
-      if (streamBatches.length == 1) {
-        yield* streamBatches.first;
-      } else {
-        // For multiple batches, combine them
-        yield* _combinePostStreams(streamBatches, limit);
-      }
+      // Sort by creation date and limit
+      allPosts.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+      return allPosts.take(limit).toList();
+    } catch (e) {
+      print('🔍 ForumRepository: Error getting posts from profiles: $e');
+      return [];
     }
   }
 
@@ -1241,6 +1307,59 @@ class ForumRepository {
       );
     } catch (e) {
       throw Exception('Failed to fetch user liked comments: $e');
+    }
+  }
+
+  /// Get orphaned posts (posts with authorCPId that doesn't exist in communityProfiles)
+  /// This is a fallback method to handle data integrity issues gracefully
+  Future<List<Post>> _getOrphanedPosts(
+      int limit, String? category, bool? isPinned) async {
+    try {
+      print('🔍 ForumRepository: Checking for orphaned posts...');
+
+      // Get all posts first
+      Query query = _posts.orderBy('createdAt', descending: true);
+
+      if (category != null && category.isNotEmpty) {
+        query = query.where('category', isEqualTo: category);
+      }
+
+      if (isPinned != null) {
+        query = query.where('isPinned', isEqualTo: isPinned);
+      }
+
+      final postsSnapshot =
+          await query.limit(50).get(); // Get more posts to check
+
+      final allPosts = postsSnapshot.docs
+          .map((doc) =>
+              Post.fromFirestore(doc as DocumentSnapshot<Map<String, dynamic>>))
+          .where((post) => !post.isDeleted)
+          .toList();
+
+      // Check which posts have non-existent authorCPId
+      final orphanedPosts = <Post>[];
+
+      for (final post in allPosts) {
+        final profileExists = await _firestore
+            .collection('communityProfiles')
+            .doc(post.authorCPId)
+            .get()
+            .then((doc) => doc.exists);
+
+        if (!profileExists) {
+          orphanedPosts.add(post);
+          print(
+              '🔍 ForumRepository: Found orphaned post: ${post.id} by ${post.authorCPId}');
+        }
+
+        if (orphanedPosts.length >= limit) break;
+      }
+
+      return orphanedPosts;
+    } catch (e) {
+      print('🔍 ForumRepository: Error getting orphaned posts: $e');
+      return [];
     }
   }
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:go_router/go_router.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
 import 'package:reboot_app_3/core/shared_widgets/custom_textfield.dart';
@@ -769,7 +770,7 @@ class _EditCommunityProfileModalState
                   TextButton(
                     onPressed: () {
                       Navigator.of(dialogContext).pop();
-                      Navigator.of(context).pop(); // Close modal
+                      context.go('/community/onboarding');
                     },
                     child: Text(localizations.translate('community-cancel')),
                   ),
@@ -787,7 +788,6 @@ class _EditCommunityProfileModalState
                 // Auto-close after completion
                 WidgetsBinding.instance.addPostFrameCallback((_) {
                   Navigator.of(dialogContext).pop();
-                  Navigator.of(context).pop(); // Close modal
 
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
@@ -800,6 +800,9 @@ class _EditCommunityProfileModalState
                   // Refresh profile cache
                   ref.refresh(currentCommunityProfileProvider);
                   ref.refresh(hasCommunityProfileProvider);
+
+                  // Navigate to community onboarding since user no longer has a profile
+                  context.go('/community/onboarding');
                 });
               }
 

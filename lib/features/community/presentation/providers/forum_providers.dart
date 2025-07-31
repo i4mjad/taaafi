@@ -21,21 +21,18 @@ import 'dart:math' as math;
 Future<String?> _getCommunityProfileIdFromUserUID(
     FirebaseFirestore firestore, String userUID) async {
   try {
-    final doc =
-        await firestore.collection('userProfileMappings').doc(userUID).get();
+    final snapshot = await firestore
+        .collection('communityProfiles')
+        .where('userUID', isEqualTo: userUID)
+        .where('isDeleted', isEqualTo: false)
+        .limit(1)
+        .get();
 
-    if (!doc.exists || doc.data() == null) {
+    if (snapshot.docs.isEmpty) {
       return null;
     }
 
-    final data = doc.data()!;
-    final isDeleted = data['isDeleted'] as bool? ?? false;
-
-    if (isDeleted) {
-      return null;
-    }
-
-    return data['communityProfileId'] as String?;
+    return snapshot.docs.first.id;
   } catch (e) {
     print('ERROR: Failed to get community profile ID for user $userUID: $e');
     return null;
@@ -164,19 +161,30 @@ final postsProvider =
   final filterParams = PostFilterParams(category: category);
   final shouldFilter = filterParams.shouldApplyGenderFilter;
 
+  // Handle different AsyncValue states more safely
+  String? userGender;
+
+  if (currentProfile.hasValue) {
+    userGender = currentProfile.value?.gender;
+  } else if (currentProfile.isLoading) {
+    userGender = null;
+  } else if (currentProfile.hasError) {
+    userGender = null;
+  }
+
   // Debug logging to verify gender filtering
   _debugGenderFiltering(
     'postsProvider',
     category: category,
     isPinned: null,
-    userGender: currentProfile.value?.gender,
+    userGender: userGender,
     shouldApplyFilter: shouldFilter,
   );
 
   await for (final posts in repository.watchPosts(
     limit: 10,
     category: category,
-    userGender: currentProfile.value?.gender,
+    userGender: userGender,
     applyGenderFilter: shouldFilter,
   )) {
     yield posts;
@@ -189,11 +197,18 @@ final genderFilteredPostsProvider =
   final repository = ref.watch(forumRepositoryProvider);
   final currentProfile = ref.watch(currentCommunityProfileProvider);
 
+  String? userGender;
+  if (currentProfile.hasValue) {
+    userGender = currentProfile.value?.gender;
+  } else {
+    userGender = null;
+  }
+
   await for (final posts in repository.watchPosts(
     limit: params.limit,
     category: params.category,
     isPinned: params.isPinned,
-    userGender: currentProfile.value?.gender,
+    userGender: userGender,
     applyGenderFilter: params.shouldApplyGenderFilter,
   )) {
     yield posts;
@@ -210,12 +225,36 @@ final mainScreenPostsProvider =
   final filterParams = PostFilterParams(category: category);
   final shouldFilter = filterParams.shouldApplyGenderFilter;
 
+  // Handle different AsyncValue states more safely
+  String? userGender;
+
+  if (currentProfile.hasValue) {
+    // Profile has loaded successfully
+    userGender = currentProfile.value?.gender;
+    print('🎯 MainScreenPostsProvider: Profile loaded, gender: $userGender');
+  } else if (currentProfile.isLoading) {
+    // Profile is still loading, use null gender
+    userGender = null;
+    print(
+        '🎯 MainScreenPostsProvider: Profile still loading, will use null gender');
+  } else if (currentProfile.hasError) {
+    // Profile has error, use null gender
+    userGender = null;
+    print('🎯 MainScreenPostsProvider: Profile error: ${currentProfile.error}');
+  }
+
+  print(
+      '🎯 MainScreenPostsProvider: Starting watchPosts with category: $category, userGender: $userGender, shouldFilter: $shouldFilter');
+
   await for (final posts in repository.watchPosts(
     limit: 50,
     category: category,
-    userGender: currentProfile.value?.gender,
+    userGender: userGender,
     applyGenderFilter: shouldFilter,
   )) {
+    print(
+        '🎯 MainScreenPostsProvider: Received ${posts.length} posts from repository');
+
     // Filter out optimistically deleted posts
     final filteredPosts = <Post>[];
 
@@ -225,6 +264,9 @@ final mainScreenPostsProvider =
         filteredPosts.add(post);
       }
     }
+
+    print(
+        '🎯 MainScreenPostsProvider: After filtering deleted posts: ${filteredPosts.length} posts');
 
     yield filteredPosts;
   }

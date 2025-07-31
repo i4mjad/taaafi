@@ -24,6 +24,8 @@ class AvatarWithAnonymity extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = AppTheme.of(context);
+    print(
+        'DEBUG: AvatarWithAnonymity - cpId: $cpId, isAnonymous: $isAnonymous, avatarUrl: $avatarUrl, isPlusUser: $isPlusUser');
 
     return Container(
       width: size,

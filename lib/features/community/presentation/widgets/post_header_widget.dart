@@ -11,7 +11,6 @@ import 'package:reboot_app_3/features/community/presentation/widgets/plus_badge_
 import 'package:reboot_app_3/features/community/presentation/widgets/streak_display_widget.dart';
 import 'package:reboot_app_3/features/community/presentation/providers/community_providers_new.dart';
 import 'package:reboot_app_3/features/community/presentation/providers/forum_providers.dart';
-import 'package:reboot_app_3/features/community/domain/entities/community_profile_entity.dart';
 
 class PostHeaderWidget extends ConsumerWidget {
   final Post post;
@@ -31,7 +30,7 @@ class PostHeaderWidget extends ConsumerWidget {
     final localizations = AppLocalizations.of(context);
     final currentProfileAsync = ref.watch(currentCommunityProfileProvider);
     final authorProfileAsync =
-        ref.watch(communityProfileByIdProvider(post.authorCPId));
+        ref.watch(communityProfileWithFallbackProvider(post.authorCPId));
     final categoriesAsync = ref.watch(postCategoriesProvider);
 
     // Find the matching category for the post
@@ -52,6 +51,7 @@ class PostHeaderWidget extends ConsumerWidget {
       data: (authorProfile) {
         final isAuthorAnonymous = authorProfile?.isAnonymous ?? false;
         final isAuthorPlusUser = authorProfile?.hasPlusSubscription() ?? false;
+        final isOrphanedPost = authorProfile?.userUID == 'orphaned-post';
 
         return Row(
           children: [
@@ -86,10 +86,13 @@ class PostHeaderWidget extends ConsumerWidget {
                                     isAuthorAnonymous
                                         ? localizations.translate('anonymous')
                                         : authorProfile?.displayName ??
-                                            'Unknown User',
+                                            'Former User',
                                     style: TextStyles.body.copyWith(
                                       fontWeight: FontWeight.w600,
-                                      color: theme.grey[900],
+                                      color: isOrphanedPost
+                                          ? theme.grey[
+                                              600] // Dimmed for orphaned posts
+                                          : theme.grey[900],
                                     ),
                                     overflow: TextOverflow.ellipsis,
                                   ),
@@ -97,8 +100,8 @@ class PostHeaderWidget extends ConsumerWidget {
 
                                 const SizedBox(width: 6),
 
-                                // Plus badge if user is a Plus user
-                                if (isAuthorPlusUser) ...[
+                                // Plus badge if user is a Plus user (not for orphaned posts)
+                                if (isAuthorPlusUser && !isOrphanedPost) ...[
                                   const SizedBox(width: 6),
                                   const PlusBadgeWidget(),
                                 ],
@@ -112,12 +115,12 @@ class PostHeaderWidget extends ConsumerWidget {
                                   horizontal: 8, vertical: 2),
                               decoration: BoxDecoration(
                                 color: postCategory?.color
-                                        ?.withValues(alpha: 0.1) ??
+                                        .withValues(alpha: 0.1) ??
                                     theme.grey[100],
                                 borderRadius: BorderRadius.circular(12),
                                 border: Border.all(
                                   color: postCategory?.color
-                                          ?.withValues(alpha: 0.3) ??
+                                          .withValues(alpha: 0.3) ??
                                       theme.grey[300]!,
                                   width: 1,
                                 ),
@@ -153,7 +156,8 @@ class PostHeaderWidget extends ConsumerWidget {
                               data: (authorProfile) {
                                 // Check if user is plus AND allows sharing
                                 final isPlusUser =
-                                    authorProfile?.isPlusUser ?? false;
+                                    authorProfile?.hasPlusSubscription() ??
+                                        false;
                                 final allowsSharing =
                                     authorProfile?.shareRelapseStreaks ?? false;
 
@@ -335,15 +339,6 @@ class PostHeaderWidget extends ConsumerWidget {
         // Fallback to the original category ID if no translation is available
         return categoryId;
     }
-  }
-
-  /// Check if current user is the author of this post
-  bool _isCurrentUserAuthor(
-      AsyncValue<CommunityProfileEntity?> currentProfileAsync) {
-    return currentProfileAsync.maybeWhen(
-      data: (profile) => profile?.id == post.authorCPId,
-      orElse: () => false,
-    );
   }
 
   /// Format timestamp for display

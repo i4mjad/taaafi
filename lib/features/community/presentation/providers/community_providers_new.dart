@@ -70,7 +70,7 @@ final currentCommunityProfileProvider =
   return service.watchProfile();
 });
 
-/// Provider to get community profile by CPId
+/// Provider to get community profile by CPId with fallback for orphaned posts
 final communityProfileByIdProvider =
     StreamProvider.family<CommunityProfileEntity?, String>((ref, cpId) {
   final firestore = ref.watch(firestoreProvider);
@@ -81,6 +81,59 @@ final communityProfileByIdProvider =
       .map((snapshot) {
     if (!snapshot.exists) {
       return null;
+    }
+
+    final data = snapshot.data() as Map<String, dynamic>;
+    final profile = CommunityProfileEntity(
+      id: snapshot.id,
+      userUID: data['userUID'] ?? '', // Include user UID from Firestore
+      displayName: data['displayName'] ?? 'Unknown User',
+      gender: data['gender'] ?? 'other',
+      isAnonymous: data['isAnonymous'] ?? false,
+      avatarUrl: data['avatarUrl'],
+      isPlusUser: data['isPlusUser'] as bool?,
+      shareRelapseStreaks: data['shareRelapseStreaks'] as bool? ?? false,
+      // Streak data is read directly from user documents, not stored here
+      currentStreakDays: null,
+      streakLastUpdated: null,
+      createdAt: (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      updatedAt: (data['updatedAt'] as Timestamp?)?.toDate(),
+    );
+
+    return profile;
+  });
+});
+
+/// Provider to get community profile by CPId with fallback for orphaned posts
+/// This provider returns a placeholder profile when the real profile doesn't exist
+final communityProfileWithFallbackProvider =
+    StreamProvider.family<CommunityProfileEntity?, String>((ref, cpId) {
+  final firestore = ref.watch(firestoreProvider);
+  return firestore
+      .collection('communityProfiles')
+      .doc(cpId)
+      .snapshots()
+      .map((snapshot) {
+    if (!snapshot.exists) {
+      print(
+          '🔍 CommunityProfile: Profile $cpId not found, creating fallback profile');
+
+      // Return a fallback profile for orphaned posts
+      return CommunityProfileEntity(
+        id: cpId,
+        userUID: 'orphaned-post', // Special marker for orphaned posts
+        displayName: 'Former User', // Better than "Unknown User"
+        gender: 'other',
+        isAnonymous: true, // Make orphaned posts anonymous for privacy
+        avatarUrl: null,
+        isPlusUser: false,
+        shareRelapseStreaks: false,
+        currentStreakDays: null,
+        streakLastUpdated: null,
+        createdAt:
+            DateTime.now().subtract(const Duration(days: 30)), // Old date
+        updatedAt: null,
+      );
     }
 
     final data = snapshot.data() as Map<String, dynamic>;
@@ -247,6 +300,98 @@ final userStreakCalculatorProvider =
     print('🏆 ============================================');
     return null;
   }
+});
+
+/// Community screen state enum
+enum CommunityScreenState {
+  loading,
+  needsOnboarding,
+  showMainContent,
+  error,
+}
+
+/// State notifier for managing community screen state
+class CommunityScreenStateNotifier extends StateNotifier<CommunityScreenState> {
+  final CommunityService _communityService;
+  final Ref _ref;
+
+  CommunityScreenStateNotifier(this._communityService, this._ref)
+      : super(CommunityScreenState.loading) {
+    _checkCommunityState();
+
+    // Listen to changes in community profile
+    _ref.listen<AsyncValue<CommunityProfileEntity?>>(
+      currentCommunityProfileProvider,
+      (previous, next) {
+        next.when(
+          data: (profile) {
+            if (profile != null) {
+              // User has a profile, show main content
+              if (state != CommunityScreenState.showMainContent) {
+                state = CommunityScreenState.showMainContent;
+              }
+            } else {
+              // User doesn't have a profile, show onboarding
+              if (state != CommunityScreenState.needsOnboarding) {
+                state = CommunityScreenState.needsOnboarding;
+              }
+            }
+          },
+          loading: () {
+            // Keep current state during loading unless we're in error state
+            if (state == CommunityScreenState.error) {
+              state = CommunityScreenState.loading;
+            }
+          },
+          error: (error, stackTrace) {
+            print('❌ Error in community profile stream: $error');
+            // On error, default to onboarding to be safe
+            if (state != CommunityScreenState.needsOnboarding) {
+              state = CommunityScreenState.needsOnboarding;
+            }
+          },
+        );
+      },
+    );
+  }
+
+  /// Check if user has community profile and set appropriate state
+  Future<void> _checkCommunityState() async {
+    try {
+      state = CommunityScreenState.loading;
+
+      // Check if user has a community profile
+      final hasProfile = await _communityService.hasProfile();
+
+      if (hasProfile) {
+        state = CommunityScreenState.showMainContent;
+      } else {
+        state = CommunityScreenState.needsOnboarding;
+      }
+    } catch (e) {
+      print('❌ Error checking community state: $e');
+      // On error, default to onboarding to be safe
+      state = CommunityScreenState.needsOnboarding;
+    }
+  }
+
+  /// Force refresh the community state
+  void refresh() {
+    _checkCommunityState();
+  }
+
+  /// Called when user completes onboarding to switch to main content
+  void onboardingCompleted() {
+    state = CommunityScreenState.showMainContent;
+  }
+}
+
+/// Provider for community screen state notifier
+final communityScreenStateProvider =
+    StateNotifierProvider<CommunityScreenStateNotifier, CommunityScreenState>(
+        (ref) {
+  final service = ref.watch(communityServiceProvider);
+  return CommunityScreenStateNotifier(service, ref);
 });
 
 // =============================================================================

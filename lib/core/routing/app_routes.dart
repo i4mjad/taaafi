@@ -47,7 +47,6 @@ import 'package:reboot_app_3/features/community/presentation/groups/group_chat_s
 import 'package:reboot_app_3/features/community/presentation/groups/group_challenge_screen.dart';
 import 'package:reboot_app_3/features/community/presentation/challenges/global_challenge_list_screen.dart';
 import 'package:reboot_app_3/features/community/presentation/profile/community_profile_settings_screen.dart';
-import 'package:reboot_app_3/features/community/presentation/providers/community_providers_new.dart';
 import 'package:reboot_app_3/features/vault/presentation/day_overview/day_overview_screen.dart';
 import 'package:reboot_app_3/features/home/presentation/home/home_screen.dart';
 import 'package:reboot_app_3/features/onboarding/presentation/onboarding_screen.dart';
@@ -466,28 +465,6 @@ GoRouter goRouter(Ref<GoRouter> ref) {
               GoRoute(
                 name: RouteNames.community.name,
                 path: '/community',
-                // NEW: redirect to onboarding if user lacks a community profile
-                redirect: (context, state) async {
-                  // Skip redirect if already going to onboarding
-                  if (state.matchedLocation.contains('/onboarding')) {
-                    return null;
-                  }
-
-                  // Check if user has a community profile
-                  try {
-                    // Wait for the provider to load
-                    final hasProfile =
-                        await ref.read(hasCommunityProfileProvider.future);
-
-                    if (!hasProfile) {
-                      return '/community/onboarding';
-                    }
-                    return null;
-                  } catch (e) {
-                    // On error, redirect to onboarding to be safe
-                    return '/community/onboarding';
-                  }
-                },
                 pageBuilder: (context, state) {
                   // Get initial tab from query parameters
                   final initialTab = state.uri.queryParameters['tab'];
@@ -604,21 +581,6 @@ GoRouter goRouter(Ref<GoRouter> ref) {
                   GoRoute(
                     path: 'profile',
                     name: RouteNames.communityProfile.name,
-                    redirect: (context, state) async {
-                      // Check if user has a community profile
-                      try {
-                        final hasProfile =
-                            await ref.read(hasCommunityProfileProvider.future);
-
-                        if (!hasProfile) {
-                          return '/community/onboarding';
-                        }
-                        return null;
-                      } catch (e) {
-                        // On error, redirect to onboarding to be safe
-                        return '/community/onboarding';
-                      }
-                    },
                     pageBuilder: (context, state) => MaterialPage<void>(
                       name: RouteNames.communityProfile.name,
                       child: CommunityProfileSettingsScreen(),
