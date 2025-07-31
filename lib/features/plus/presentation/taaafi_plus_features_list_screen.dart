@@ -2,11 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/services.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/shared_widgets/ta3afi_platform_icons_icons.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
+import 'package:reboot_app_3/core/theming/custom_theme_data.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
+import 'package:reboot_app_3/features/plus/data/notifiers/subscription_notifier.dart';
 import 'package:figma_squircle/figma_squircle.dart';
 
 class TaaafiPlusSubscriptionScreen extends ConsumerStatefulWidget {
@@ -145,46 +148,21 @@ class _TaaafiPlusScreenState
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    // Combined pricing and CTA button
-                    GestureDetector(
-                      onTap: () {
-                        HapticFeedback.mediumImpact();
-                        _startFreeTrial();
+                    // Dynamic pricing from RevenueCat
+                    Consumer(
+                      builder: (context, ref, _) {
+                        final packagesAsync =
+                            ref.watch(availablePackagesProvider);
+
+                        return packagesAsync.when(
+                          data: (packages) =>
+                              _buildPackageOptions(context, theme, packages),
+                          loading: () =>
+                              _buildLoadingPurchaseButton(context, theme),
+                          error: (error, _) =>
+                              _buildFallbackPurchaseButton(context, theme),
+                        );
                       },
-                      child: Container(
-                        width: double.infinity,
-                        padding: EdgeInsets.all(12),
-                        decoration: ShapeDecoration(
-                          color: theme.primary[600],
-                          shape: SmoothRectangleBorder(
-                            borderRadius: SmoothBorderRadius(
-                              cornerRadius: 8,
-                              cornerSmoothing: 1,
-                            ),
-                          ),
-                        ),
-                        child: Column(
-                          children: [
-                            Text(
-                              AppLocalizations.of(context)
-                                  .translate('subscription-monthly-price'),
-                              style: TextStyles.footnote.copyWith(
-                                color: theme.grey[50],
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            verticalSpace(Spacing.points4),
-                            Text(
-                              AppLocalizations.of(context)
-                                  .translate('start-free-trial'),
-                              style: TextStyles.caption.copyWith(
-                                color: theme.grey[50],
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
                     ),
                     verticalSpace(Spacing.points8),
                     // Cancel anytime text
@@ -822,5 +800,170 @@ class _TaaafiPlusScreenState
         backgroundColor: AppTheme.of(context).primary[600],
       ),
     );
+  }
+
+  /// Build package options with real pricing from RevenueCat
+  Widget _buildPackageOptions(
+      BuildContext context, CustomThemeData theme, List<Package> packages) {
+    if (packages.isEmpty) {
+      return _buildFallbackPurchaseButton(context, theme);
+    }
+
+    // For now, show the first package (you can enhance this to show multiple)
+    final package = packages.first;
+
+    return GestureDetector(
+      onTap: () {
+        HapticFeedback.mediumImpact();
+        _purchasePackage(package);
+      },
+      child: Container(
+        width: double.infinity,
+        padding: EdgeInsets.all(12),
+        decoration: ShapeDecoration(
+          color: theme.primary[600],
+          shape: SmoothRectangleBorder(
+            borderRadius: SmoothBorderRadius(
+              cornerRadius: 8,
+              cornerSmoothing: 1,
+            ),
+          ),
+        ),
+        child: Column(
+          children: [
+            Text(
+              '${package.storeProduct.priceString}/${_getPackagePeriod(package)}',
+              style: TextStyles.footnote.copyWith(
+                color: theme.grey[50],
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            verticalSpace(Spacing.points4),
+            Text(
+              package.storeProduct.introductoryPrice?.price != null
+                  ? AppLocalizations.of(context).translate('start-free-trial')
+                  : AppLocalizations.of(context).translate('subscribe-now'),
+              style: TextStyles.caption.copyWith(
+                color: theme.grey[50],
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Build loading state for purchase button
+  Widget _buildLoadingPurchaseButton(
+      BuildContext context, CustomThemeData theme) {
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.all(12),
+      decoration: ShapeDecoration(
+        color: theme.grey[400],
+        shape: SmoothRectangleBorder(
+          borderRadius: SmoothBorderRadius(
+            cornerRadius: 8,
+            cornerSmoothing: 1,
+          ),
+        ),
+      ),
+      child: Center(
+        child: SizedBox(
+          height: 20,
+          width: 20,
+          child: CircularProgressIndicator(
+            color: theme.grey[50],
+            strokeWidth: 2,
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// Build fallback purchase button when packages fail to load
+  Widget _buildFallbackPurchaseButton(BuildContext context, AppTheme theme) {
+    return GestureDetector(
+      onTap: () {
+        HapticFeedback.mediumImpact();
+        _startFreeTrial();
+      },
+      child: Container(
+        width: double.infinity,
+        padding: EdgeInsets.all(12),
+        decoration: ShapeDecoration(
+          color: theme.primary[600],
+          shape: SmoothRectangleBorder(
+            borderRadius: SmoothBorderRadius(
+              cornerRadius: 8,
+              cornerSmoothing: 1,
+            ),
+          ),
+        ),
+        child: Column(
+          children: [
+            Text(
+              AppLocalizations.of(context)
+                  .translate('subscription-monthly-price'),
+              style: TextStyles.footnote.copyWith(
+                color: theme.grey[50],
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            verticalSpace(Spacing.points4),
+            Text(
+              AppLocalizations.of(context).translate('start-free-trial'),
+              style: TextStyles.caption.copyWith(
+                color: theme.grey[50],
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Purchase a specific package
+  void _purchasePackage(Package package) async {
+    try {
+      final notifier = ref.read(subscriptionNotifierProvider.notifier);
+      final success = await notifier.purchasePackage(package);
+
+      if (success) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+                AppLocalizations.of(context).translate('purchase-successful')),
+            backgroundColor: AppTheme.of(context).primary[600],
+          ),
+        );
+        Navigator.of(context).pop(); // Close the paywall
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content:
+              Text(AppLocalizations.of(context).translate('purchase-failed')),
+          backgroundColor: AppTheme.of(context).error[600],
+        ),
+      );
+    }
+  }
+
+  /// Get package period for display
+  String _getPackagePeriod(Package package) {
+    final packageType = package.packageType;
+    switch (packageType) {
+      case PackageType.monthly:
+        return AppLocalizations.of(context).translate('month');
+      case PackageType.annual:
+        return AppLocalizations.of(context).translate('year');
+      case PackageType.weekly:
+        return AppLocalizations.of(context).translate('week');
+      default:
+        return AppLocalizations.of(context).translate('month');
+    }
   }
 }

@@ -43,8 +43,26 @@ final isPremiumAnalyticsAvailableProvider =
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef IsPremiumAnalyticsAvailableRef = AutoDisposeFutureProviderRef<bool>;
+String _$availablePackagesHash() => r'728ef18ed82f021d4386eec4e2681074344574f2';
+
+/// See also [availablePackages].
+@ProviderFor(availablePackages)
+final availablePackagesProvider =
+    AutoDisposeFutureProvider<List<Package>>.internal(
+  availablePackages,
+  name: r'availablePackagesProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$availablePackagesHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef AvailablePackagesRef = AutoDisposeFutureProviderRef<List<Package>>;
 String _$subscriptionNotifierHash() =>
-    r'0e107f21609aaac69a9df19e9fbb55bbee01067c';
+    r'95d15559007bae4ad5f40637d03484f8fdb283f4';
 
 /// See also [SubscriptionNotifier].
 @ProviderFor(SubscriptionNotifier)
