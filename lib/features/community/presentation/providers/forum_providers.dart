@@ -28,7 +28,7 @@ void _debugGenderFiltering(
   print('   User Gender: $userGender');
   print('   Should Apply Filter: $shouldApplyFilter');
   print(
-      '   Rule: ${shouldApplyFilter ? "FILTERING ENABLED" : "FILTERING DISABLED"}');
+      '   Rule: ${shouldApplyFilter ? "FILTERING ENABLED (same-gender + admins)" : "FILTERING DISABLED (all users)"}');
 }
 
 /// Helper class for managing post filter parameters
@@ -46,23 +46,21 @@ class PostFilterParams {
   /// Determines if gender filtering should be applied based on content type
   bool get shouldApplyGenderFilter {
     // Don't apply gender filtering to:
-    // - Pinned posts
-    // - News posts
-    // - Challenge posts
-    if (isPinned == true) return false;
+    // - News posts (global announcements)
+    // - Challenge posts (community-wide events)
+    // Note: Pinned posts ARE gender-filtered, but admin pinned posts are visible to all
 
     if (category != null) {
       switch (category!.toLowerCase()) {
         case 'news':
         case 'challenges':
-        case 'pinned':
           return false;
         default:
           return true;
       }
     }
 
-    // Default to applying gender filter for regular posts
+    // Default to applying gender filter for all posts including pinned
     return true;
   }
 

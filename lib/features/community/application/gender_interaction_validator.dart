@@ -300,25 +300,21 @@ class GenderInteractionValidator {
     bool? isPinned,
   }) {
     // Don't apply gender filtering to:
-    // - Pinned posts
-    // - News posts
-    // - Challenge posts (if category is 'challenges')
-    if (isPinned == true) {
-      return false;
-    }
+    // - News posts (global announcements)
+    // - Challenge posts (community-wide events)
+    // Note: Pinned posts ARE gender-filtered, but admin pinned posts are visible to all
 
     if (category != null) {
       switch (category.toLowerCase()) {
         case 'news':
         case 'challenges':
-        case 'pinned':
           return false;
         default:
           return true;
       }
     }
 
-    // Default to applying gender filter for regular posts
+    // Default to applying gender filter for all posts including pinned
     return true;
   }
 
