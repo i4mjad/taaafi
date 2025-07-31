@@ -221,6 +221,39 @@ final newsPostsPaginationProvider =
   return PostsPaginationNotifier(repository, ref);
 });
 
+// Profile Tab Pagination Providers
+final userPostsPaginationProvider = StateNotifierProvider.family<
+    UserPostsPaginationNotifier,
+    UserPostsPaginationState,
+    String>((ref, userCPId) {
+  final repository = ref.watch(forumRepositoryProvider);
+  return UserPostsPaginationNotifier(repository, userCPId, ref);
+});
+
+final userCommentsPaginationProvider = StateNotifierProvider.family<
+    UserCommentsPaginationNotifier,
+    UserCommentsPaginationState,
+    String>((ref, userCPId) {
+  final repository = ref.watch(forumRepositoryProvider);
+  return UserCommentsPaginationNotifier(repository, userCPId, ref);
+});
+
+final userLikedPostsPaginationProvider = StateNotifierProvider.family<
+    UserLikedItemsPaginationNotifier,
+    UserLikedItemsPaginationState,
+    String>((ref, userCPId) {
+  final repository = ref.watch(forumRepositoryProvider);
+  return UserLikedItemsPaginationNotifier(repository, userCPId, ref, 'post');
+});
+
+final userLikedCommentsPaginationProvider = StateNotifierProvider.family<
+    UserLikedItemsPaginationNotifier,
+    UserLikedItemsPaginationState,
+    String>((ref, userCPId) {
+  final repository = ref.watch(forumRepositoryProvider);
+  return UserLikedItemsPaginationNotifier(repository, userCPId, ref, 'comment');
+});
+
 // Selected Category Provider for new post screen
 final selectedCategoryProvider = StateProvider<PostCategory?>((ref) {
   // Default to null - will be set to general category from Firestore when loaded
@@ -875,6 +908,334 @@ class PostsPaginationState {
   }) {
     return PostsPaginationState(
       posts: posts ?? this.posts,
+      isLoading: isLoading ?? this.isLoading,
+      hasMore: hasMore ?? this.hasMore,
+      error: error ?? this.error,
+      lastDocument: lastDocument ?? this.lastDocument,
+    );
+  }
+}
+
+/// Notifier for user posts pagination
+class UserPostsPaginationNotifier
+    extends StateNotifier<UserPostsPaginationState> {
+  final ForumRepository _repository;
+  final String _userCPId;
+
+  UserPostsPaginationNotifier(this._repository, this._userCPId, Ref ref)
+      : super(UserPostsPaginationState.initial());
+
+  Future<void> loadPosts() async {
+    if (state.isLoading) return;
+
+    state = state.copyWith(isLoading: true, error: null);
+
+    try {
+      final page = await _repository.getUserPosts(
+        userCPId: _userCPId,
+        limit: 10,
+      );
+
+      state = state.copyWith(
+        posts: page.posts,
+        lastDocument: page.lastDocument,
+        hasMore: page.hasMore,
+        isLoading: false,
+      );
+    } catch (e) {
+      state = state.copyWith(isLoading: false, error: e.toString());
+    }
+  }
+
+  Future<void> loadMorePosts() async {
+    if (state.isLoading || !state.hasMore) return;
+
+    state = state.copyWith(isLoading: true);
+
+    try {
+      final page = await _repository.getUserPosts(
+        userCPId: _userCPId,
+        limit: 10,
+        lastDocument: state.lastDocument,
+      );
+
+      state = state.copyWith(
+        posts: [...state.posts, ...page.posts],
+        lastDocument: page.lastDocument,
+        hasMore: page.hasMore,
+        isLoading: false,
+      );
+    } catch (e) {
+      state = state.copyWith(isLoading: false, error: e.toString());
+    }
+  }
+
+  Future<void> refresh() async {
+    state = UserPostsPaginationState.initial();
+    await loadPosts();
+  }
+
+  void reset() {
+    state = UserPostsPaginationState.initial();
+  }
+}
+
+/// Notifier for user comments pagination
+class UserCommentsPaginationNotifier
+    extends StateNotifier<UserCommentsPaginationState> {
+  final ForumRepository _repository;
+  final String _userCPId;
+
+  UserCommentsPaginationNotifier(this._repository, this._userCPId, Ref ref)
+      : super(UserCommentsPaginationState.initial());
+
+  Future<void> loadComments() async {
+    if (state.isLoading) return;
+
+    state = state.copyWith(isLoading: true, error: null);
+
+    try {
+      final page = await _repository.getUserComments(
+        userCPId: _userCPId,
+        limit: 10,
+      );
+
+      state = state.copyWith(
+        comments: page.comments,
+        lastDocument: page.lastDocument,
+        hasMore: page.hasMore,
+        isLoading: false,
+      );
+    } catch (e) {
+      state = state.copyWith(isLoading: false, error: e.toString());
+    }
+  }
+
+  Future<void> loadMoreComments() async {
+    if (state.isLoading || !state.hasMore) return;
+
+    state = state.copyWith(isLoading: true);
+
+    try {
+      final page = await _repository.getUserComments(
+        userCPId: _userCPId,
+        limit: 10,
+        lastDocument: state.lastDocument,
+      );
+
+      state = state.copyWith(
+        comments: [...state.comments, ...page.comments],
+        lastDocument: page.lastDocument,
+        hasMore: page.hasMore,
+        isLoading: false,
+      );
+    } catch (e) {
+      state = state.copyWith(isLoading: false, error: e.toString());
+    }
+  }
+
+  Future<void> refresh() async {
+    state = UserCommentsPaginationState.initial();
+    await loadComments();
+  }
+
+  void reset() {
+    state = UserCommentsPaginationState.initial();
+  }
+}
+
+/// Notifier for user liked items pagination
+class UserLikedItemsPaginationNotifier
+    extends StateNotifier<UserLikedItemsPaginationState> {
+  final ForumRepository _repository;
+  final String _userCPId;
+  final String _itemType; // 'post' or 'comment'
+
+  UserLikedItemsPaginationNotifier(
+      this._repository, this._userCPId, Ref ref, this._itemType)
+      : super(UserLikedItemsPaginationState.initial());
+
+  Future<void> loadLikedItems() async {
+    if (state.isLoading) return;
+
+    state = state.copyWith(isLoading: true, error: null);
+
+    try {
+      final page = _itemType == 'post'
+          ? await _repository.getUserLikedPosts(
+              userCPId: _userCPId,
+              limit: 10,
+            )
+          : await _repository.getUserLikedComments(
+              userCPId: _userCPId,
+              limit: 10,
+            );
+
+      state = state.copyWith(
+        items: page.items,
+        lastDocument: page.lastDocument,
+        hasMore: page.hasMore,
+        isLoading: false,
+      );
+    } catch (e) {
+      state = state.copyWith(isLoading: false, error: e.toString());
+    }
+  }
+
+  Future<void> loadMoreLikedItems() async {
+    if (state.isLoading || !state.hasMore) return;
+
+    state = state.copyWith(isLoading: true);
+
+    try {
+      final page = _itemType == 'post'
+          ? await _repository.getUserLikedPosts(
+              userCPId: _userCPId,
+              limit: 10,
+              lastDocument: state.lastDocument,
+            )
+          : await _repository.getUserLikedComments(
+              userCPId: _userCPId,
+              limit: 10,
+              lastDocument: state.lastDocument,
+            );
+
+      state = state.copyWith(
+        items: [...state.items, ...page.items],
+        lastDocument: page.lastDocument,
+        hasMore: page.hasMore,
+        isLoading: false,
+      );
+    } catch (e) {
+      state = state.copyWith(isLoading: false, error: e.toString());
+    }
+  }
+
+  Future<void> refresh() async {
+    state = UserLikedItemsPaginationState.initial();
+    await loadLikedItems();
+  }
+
+  void reset() {
+    state = UserLikedItemsPaginationState.initial();
+  }
+}
+
+/// State for user posts pagination
+class UserPostsPaginationState {
+  final List<Post> posts;
+  final bool isLoading;
+  final bool hasMore;
+  final String? error;
+  final dynamic lastDocument;
+
+  UserPostsPaginationState({
+    required this.posts,
+    required this.isLoading,
+    required this.hasMore,
+    this.error,
+    this.lastDocument,
+  });
+
+  factory UserPostsPaginationState.initial() {
+    return UserPostsPaginationState(
+      posts: [],
+      isLoading: false,
+      hasMore: true,
+    );
+  }
+
+  UserPostsPaginationState copyWith({
+    List<Post>? posts,
+    bool? isLoading,
+    bool? hasMore,
+    String? error,
+    dynamic lastDocument,
+  }) {
+    return UserPostsPaginationState(
+      posts: posts ?? this.posts,
+      isLoading: isLoading ?? this.isLoading,
+      hasMore: hasMore ?? this.hasMore,
+      error: error ?? this.error,
+      lastDocument: lastDocument ?? this.lastDocument,
+    );
+  }
+}
+
+/// State for user comments pagination
+class UserCommentsPaginationState {
+  final List<Comment> comments;
+  final bool isLoading;
+  final bool hasMore;
+  final String? error;
+  final dynamic lastDocument;
+
+  UserCommentsPaginationState({
+    required this.comments,
+    required this.isLoading,
+    required this.hasMore,
+    this.error,
+    this.lastDocument,
+  });
+
+  factory UserCommentsPaginationState.initial() {
+    return UserCommentsPaginationState(
+      comments: [],
+      isLoading: false,
+      hasMore: true,
+    );
+  }
+
+  UserCommentsPaginationState copyWith({
+    List<Comment>? comments,
+    bool? isLoading,
+    bool? hasMore,
+    String? error,
+    dynamic lastDocument,
+  }) {
+    return UserCommentsPaginationState(
+      comments: comments ?? this.comments,
+      isLoading: isLoading ?? this.isLoading,
+      hasMore: hasMore ?? this.hasMore,
+      error: error ?? this.error,
+      lastDocument: lastDocument ?? this.lastDocument,
+    );
+  }
+}
+
+/// State for user liked items pagination
+class UserLikedItemsPaginationState {
+  final List<dynamic> items; // Can be List<Post> or List<Comment>
+  final bool isLoading;
+  final bool hasMore;
+  final String? error;
+  final dynamic lastDocument;
+
+  UserLikedItemsPaginationState({
+    required this.items,
+    required this.isLoading,
+    required this.hasMore,
+    this.error,
+    this.lastDocument,
+  });
+
+  factory UserLikedItemsPaginationState.initial() {
+    return UserLikedItemsPaginationState(
+      items: [],
+      isLoading: false,
+      hasMore: true,
+    );
+  }
+
+  UserLikedItemsPaginationState copyWith({
+    List<dynamic>? items,
+    bool? isLoading,
+    bool? hasMore,
+    String? error,
+    dynamic lastDocument,
+  }) {
+    return UserLikedItemsPaginationState(
+      items: items ?? this.items,
       isLoading: isLoading ?? this.isLoading,
       hasMore: hasMore ?? this.hasMore,
       error: error ?? this.error,
