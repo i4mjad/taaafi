@@ -6,6 +6,7 @@ import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/features/community/data/models/comment.dart';
 import 'package:reboot_app_3/features/community/presentation/widgets/avatar_with_anonymity.dart';
+import 'package:reboot_app_3/features/community/presentation/widgets/plus_badge_widget.dart';
 import 'package:reboot_app_3/features/community/presentation/providers/community_providers_new.dart';
 import 'package:reboot_app_3/features/community/presentation/providers/forum_providers.dart';
 import 'package:reboot_app_3/features/account/presentation/widgets/feature_access_guard.dart';
@@ -33,6 +34,7 @@ class CommentTileWidget extends ConsumerWidget {
     return authorProfileAsync.when(
       data: (authorProfile) {
         final isAuthorAnonymous = authorProfile?.isAnonymous ?? false;
+        final isAuthorPlusUser = authorProfile?.hasPlusSubscription() ?? false;
 
         return Container(
           padding: const EdgeInsets.all(16),
@@ -52,6 +54,7 @@ class CommentTileWidget extends ConsumerWidget {
                 isAnonymous: isAuthorAnonymous,
                 size: 32,
                 avatarUrl: isAuthorAnonymous ? null : authorProfile?.avatarUrl,
+                isPlusUser: isAuthorPlusUser,
               ),
 
               const SizedBox(width: 12),
@@ -63,7 +66,7 @@ class CommentTileWidget extends ConsumerWidget {
                   children: [
                     // User info and timestamp
                     _buildUserInfo(ref, theme, localizations, isAuthorAnonymous,
-                        authorProfileAsync),
+                        authorProfileAsync, isAuthorPlusUser),
 
                     const SizedBox(height: 8),
 
@@ -168,7 +171,8 @@ class CommentTileWidget extends ConsumerWidget {
       dynamic theme,
       AppLocalizations localizations,
       bool isAuthorAnonymous,
-      AsyncValue authorProfileAsync) {
+      AsyncValue authorProfileAsync,
+      bool isAuthorPlusUser) {
     return Row(
       children: [
         // Username or anonymous indicator
@@ -205,6 +209,16 @@ class CommentTileWidget extends ConsumerWidget {
             ),
           ),
         ),
+
+        // Plus badge for Plus users
+        if (isAuthorPlusUser) ...[
+          const SizedBox(width: 6),
+          const PlusBadgeWidget(
+            fontSize: 9,
+            iconSize: 8,
+            padding: EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+          ),
+        ],
 
         // Author badge
         if (isAuthor) ...[

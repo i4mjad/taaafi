@@ -9,6 +9,7 @@ import 'package:reboot_app_3/features/community/data/models/post.dart';
 import 'package:reboot_app_3/features/community/data/models/post_category.dart';
 import 'package:reboot_app_3/features/community/data/models/interaction.dart';
 import 'package:reboot_app_3/features/community/presentation/widgets/avatar_with_anonymity.dart';
+import 'package:reboot_app_3/features/community/presentation/widgets/plus_badge_widget.dart';
 import 'package:reboot_app_3/features/community/presentation/providers/community_providers_new.dart';
 import 'package:reboot_app_3/features/community/presentation/providers/forum_providers.dart';
 import 'package:reboot_app_3/features/community/presentation/widgets/report_content_modal.dart';
@@ -94,12 +95,15 @@ class ThreadsPostCard extends ConsumerWidget {
                   data: (authorProfile) {
                     final isAuthorAnonymous =
                         authorProfile?.isAnonymous ?? false;
+                    final isAuthorPlusUser =
+                        authorProfile?.hasPlusSubscription() ?? false;
                     return AvatarWithAnonymity(
                       cpId: post.authorCPId,
                       isAnonymous: isAuthorAnonymous,
                       size: 32,
                       avatarUrl:
                           isAuthorAnonymous ? null : authorProfile?.avatarUrl,
+                      isPlusUser: isAuthorPlusUser,
                     );
                   },
                   loading: () => Container(
@@ -175,6 +179,26 @@ class ThreadsPostCard extends ConsumerWidget {
                                 ),
                               ],
                             ),
+                          ),
+
+                          // Plus badge if user is a Plus user
+                          authorProfileAsync.when(
+                            data: (authorProfile) {
+                              final isAuthorPlusUser =
+                                  authorProfile?.hasPlusSubscription() ?? false;
+                              if (isAuthorPlusUser) {
+                                return Row(
+                                  children: [
+                                    const SizedBox(width: 6),
+                                    const PlusBadgeWidget(),
+                                  ],
+                                );
+                              }
+                              return const SizedBox.shrink();
+                            },
+                            loading: () => const SizedBox.shrink(),
+                            error: (error, stackTrace) =>
+                                const SizedBox.shrink(),
                           ),
 
                           const SizedBox(width: 8),

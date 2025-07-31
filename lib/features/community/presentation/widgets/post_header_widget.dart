@@ -7,6 +7,7 @@ import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/features/community/data/models/post.dart';
 import 'package:reboot_app_3/features/community/data/models/post_category.dart';
 import 'package:reboot_app_3/features/community/presentation/widgets/avatar_with_anonymity.dart';
+import 'package:reboot_app_3/features/community/presentation/widgets/plus_badge_widget.dart';
 import 'package:reboot_app_3/features/community/presentation/providers/community_providers_new.dart';
 import 'package:reboot_app_3/features/community/presentation/providers/forum_providers.dart';
 import 'package:reboot_app_3/features/community/domain/entities/community_profile_entity.dart';
@@ -49,6 +50,7 @@ class PostHeaderWidget extends ConsumerWidget {
     return authorProfileAsync.when(
       data: (authorProfile) {
         final isAuthorAnonymous = authorProfile?.isAnonymous ?? false;
+        final isAuthorPlusUser = authorProfile?.hasPlusSubscription() ?? false;
 
         return Row(
           children: [
@@ -58,6 +60,7 @@ class PostHeaderWidget extends ConsumerWidget {
               isAnonymous: isAuthorAnonymous,
               size: 40,
               avatarUrl: isAuthorAnonymous ? null : authorProfile?.avatarUrl,
+              isPlusUser: isAuthorPlusUser,
             ),
 
             const SizedBox(width: 12),
@@ -154,6 +157,13 @@ class PostHeaderWidget extends ConsumerWidget {
                           ],
                         ),
                       ),
+
+                      // Plus badge if user is a Plus user
+                      if (isAuthorPlusUser) ...[
+                        const SizedBox(width: 6),
+                        const PlusBadgeWidget(),
+                      ],
+
                       const SizedBox(width: 8),
 
                       // Timestamp
