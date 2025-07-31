@@ -14,6 +14,23 @@ import 'package:reboot_app_3/features/community/presentation/providers/community
 import 'package:reboot_app_3/core/localization/localization.dart';
 import 'dart:math' as math;
 
+/// Debug helper to log gender filtering status
+void _debugGenderFiltering(
+  String providerName, {
+  required String? category,
+  required bool? isPinned,
+  required String? userGender,
+  required bool shouldApplyFilter,
+}) {
+  print('🔍 Gender Filtering Debug - $providerName:');
+  print('   Category: $category');
+  print('   Is Pinned: $isPinned');
+  print('   User Gender: $userGender');
+  print('   Should Apply Filter: $shouldApplyFilter');
+  print(
+      '   Rule: ${shouldApplyFilter ? "FILTERING ENABLED" : "FILTERING DISABLED"}');
+}
+
 /// Helper class for managing post filter parameters
 class PostFilterParams {
   final int limit;
@@ -104,11 +121,33 @@ final postCategoriesProvider = StreamProvider<List<PostCategory>>((ref) {
   return repository.watchPostCategories();
 });
 
-// Posts Provider (with lazy loading support)
+// Posts Provider (with lazy loading support and mandatory gender filtering)
 final postsProvider =
-    StreamProvider.family<List<Post>, String?>((ref, category) {
+    StreamProvider.family<List<Post>, String?>((ref, category) async* {
   final repository = ref.watch(forumRepositoryProvider);
-  return repository.watchPosts(limit: 10, category: category);
+  final currentProfile = ref.watch(currentCommunityProfileProvider);
+
+  // Create filter params to determine if gender filtering should be applied
+  final filterParams = PostFilterParams(category: category);
+  final shouldFilter = filterParams.shouldApplyGenderFilter;
+
+  // Debug logging to verify gender filtering
+  _debugGenderFiltering(
+    'postsProvider',
+    category: category,
+    isPinned: null,
+    userGender: currentProfile.value?.gender,
+    shouldApplyFilter: shouldFilter,
+  );
+
+  await for (final posts in repository.watchPosts(
+    limit: 10,
+    category: category,
+    userGender: currentProfile.value?.gender,
+    applyGenderFilter: shouldFilter,
+  )) {
+    yield posts;
+  }
 });
 
 // Gender-aware posts provider
@@ -688,6 +727,15 @@ class PostsPaginationNotifier extends StateNotifier<PostsPaginationState> {
           PostFilterParams(category: category, isPinned: isPinned);
       final shouldApplyGenderFilter = filterParams.shouldApplyGenderFilter;
 
+      // Debug logging to verify gender filtering
+      _debugGenderFiltering(
+        'PostsPaginationNotifier.loadPosts',
+        category: category,
+        isPinned: isPinned,
+        userGender: currentProfile?.gender,
+        shouldApplyFilter: shouldApplyGenderFilter,
+      );
+
       final page = await _repository.getPosts(
         limit: 10,
         category: category,
@@ -721,6 +769,15 @@ class PostsPaginationNotifier extends StateNotifier<PostsPaginationState> {
       final filterParams =
           PostFilterParams(category: category, isPinned: isPinned);
       final shouldApplyGenderFilter = filterParams.shouldApplyGenderFilter;
+
+      // Debug logging to verify gender filtering
+      _debugGenderFiltering(
+        'PostsPaginationNotifier.loadMorePosts',
+        category: category,
+        isPinned: isPinned,
+        userGender: currentProfile?.gender,
+        shouldApplyFilter: shouldApplyGenderFilter,
+      );
 
       final page = await _repository.getPosts(
         limit: 10,
