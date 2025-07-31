@@ -13,6 +13,9 @@ import 'package:reboot_app_3/core/shared_widgets/complete_registration_banner.da
 import 'package:reboot_app_3/core/shared_widgets/confirm_details_banner.dart';
 import 'package:reboot_app_3/core/shared_widgets/confirm_email_banner.dart';
 import 'package:reboot_app_3/core/shared_widgets/spinner.dart';
+import 'package:reboot_app_3/features/community/presentation/providers/community_providers_new.dart';
+import 'package:reboot_app_3/core/routing/route_names.dart';
+import 'package:go_router/go_router.dart';
 
 class CommunityOnboardingScreen extends ConsumerWidget {
   const CommunityOnboardingScreen({super.key});
@@ -197,12 +200,224 @@ class CommunityOnboardingScreen extends ConsumerWidget {
     );
   }
 
-  void _showProfileSetupModal(BuildContext context, WidgetRef ref) {
+  void _showProfileSetupModal(BuildContext context, WidgetRef ref) async {
+    final l10n = AppLocalizations.of(context);
+
+    // Check if user has a deleted profile that can be restored
+    try {
+      final service = ref.read(communityServiceProvider);
+      final deletedProfileId = await service.getDeletedProfileId();
+
+      if (deletedProfileId != null && context.mounted) {
+        // Show choice dialog for restoration vs fresh start
+        _showRejoinChoiceDialog(context, ref, deletedProfileId);
+      } else if (context.mounted) {
+        // Show normal profile setup
+        _showNormalProfileSetup(context);
+      }
+    } catch (e) {
+      // If error checking deleted profile, show normal setup
+      if (context.mounted) {
+        _showNormalProfileSetup(context);
+      }
+    }
+  }
+
+  void _showNormalProfileSetup(BuildContext context) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) => const CommunityProfileSetupModal(),
     );
+  }
+
+  void _showRejoinChoiceDialog(
+      BuildContext context, WidgetRef ref, String deletedProfileId) {
+    final theme = AppTheme.of(context);
+    final l10n = AppLocalizations.of(context);
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: theme.backgroundColor,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          title: Text(
+            l10n.translate('community-rejoin-welcome'),
+            style: TextStyles.h4.copyWith(
+              color: theme.primary[700],
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                l10n.translate('community-rejoin-choice'),
+                style: TextStyles.body.copyWith(
+                  color: theme.grey[700],
+                  height: 1.5,
+                ),
+              ),
+              const SizedBox(height: 24),
+
+              // Restore option
+              _buildChoiceButton(
+                context: context,
+                theme: theme,
+                title: l10n.translate('community-rejoin-restore'),
+                description:
+                    l10n.translate('community-rejoin-restore-description'),
+                icon: LucideIcons.refreshCw,
+                onTap: () {
+                  Navigator.of(context).pop();
+                  _restoreProfile(context, ref, deletedProfileId);
+                },
+              ),
+
+              const SizedBox(height: 16),
+
+              // Fresh start option
+              _buildChoiceButton(
+                context: context,
+                theme: theme,
+                title: l10n.translate('community-rejoin-fresh'),
+                description:
+                    l10n.translate('community-rejoin-fresh-description'),
+                icon: LucideIcons.userPlus,
+                onTap: () {
+                  Navigator.of(context).pop();
+                  _showNormalProfileSetup(context);
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildChoiceButton({
+    required BuildContext context,
+    required dynamic theme,
+    required String title,
+    required String description,
+    required IconData icon,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: WidgetsContainer(
+        padding: const EdgeInsets.all(16),
+        backgroundColor: theme.grey[50],
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(
+          color: theme.grey[200]!,
+          width: 1,
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: theme.primary[100],
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(
+                icon,
+                size: 24,
+                color: theme.primary[600],
+              ),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyles.body.copyWith(
+                      color: theme.grey[900],
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    description,
+                    style: TextStyles.caption.copyWith(
+                      color: theme.grey[600],
+                      height: 1.4,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Icon(
+              LucideIcons.chevronRight,
+              size: 20,
+              color: theme.grey[400],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _restoreProfile(
+      BuildContext context, WidgetRef ref, String deletedProfileId) async {
+    final l10n = AppLocalizations.of(context);
+
+    // Show loading dialog
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        content: Row(
+          children: [
+            const CircularProgressIndicator(),
+            const SizedBox(width: 16),
+            Text(l10n.translate('community-restore-progress')),
+          ],
+        ),
+      ),
+    );
+
+    try {
+      final service = ref.read(communityServiceProvider);
+      await service.restoreProfile(deletedProfileId);
+
+      if (context.mounted) {
+        Navigator.of(context).pop(); // Close loading dialog
+
+        // Show success and navigate to community
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(l10n.translate('community-restore-completed')),
+            backgroundColor: Colors.green,
+          ),
+        );
+
+        // Refresh profile cache and navigate
+        ref.refresh(hasCommunityProfileProvider);
+        context.goNamed(RouteNames.community.name);
+      }
+    } catch (e) {
+      if (context.mounted) {
+        Navigator.of(context).pop(); // Close loading dialog
+
+        // Show error
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(l10n.translate('community-restore-failed')),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
   }
 }
