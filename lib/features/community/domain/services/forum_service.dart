@@ -40,7 +40,9 @@ class ForumService {
   final ForumRepository _repository;
   final PostValidationService _validationService;
   final FirebaseAuth _auth;
+  final FirebaseFirestore _firestore;
   final GenderInteractionValidator _genderValidator;
+  final BanWarningFacade _banWarningFacade;
 
   /// Creates a new ForumService instance
   ///
@@ -52,8 +54,43 @@ class ForumService {
     this._repository,
     this._validationService,
     this._auth,
+    this._firestore,
     this._genderValidator,
+    this._banWarningFacade,
   );
+
+  /// Helper method to get community profile ID from user mapping
+  Future<String> _getCommunityProfileId(String userUID) async {
+    final doc =
+        await _firestore.collection('userProfileMappings').doc(userUID).get();
+
+    if (!doc.exists || doc.data() == null) {
+      throw ForumAuthenticationException(
+        'No community profile found for user',
+        code: 'NO_COMMUNITY_PROFILE',
+      );
+    }
+
+    final data = doc.data()!;
+    final isDeleted = data['isDeleted'] as bool? ?? false;
+
+    if (isDeleted) {
+      throw ForumAuthenticationException(
+        'Community profile has been deleted',
+        code: 'PROFILE_DELETED',
+      );
+    }
+
+    final profileId = data['communityProfileId'] as String?;
+    if (profileId == null) {
+      throw ForumAuthenticationException(
+        'Invalid community profile mapping',
+        code: 'INVALID_PROFILE_MAPPING',
+      );
+    }
+
+    return profileId;
+  }
 
   /// Creates a new forum post
   ///
@@ -106,7 +143,7 @@ class ForumService {
 
       // Use the user's UID as the authorCPId for now
       // TODO: Replace with actual community profile ID when implemented
-      final authorCPId = currentUser.uid;
+      final authorCPId = await _getCommunityProfileId(currentUser.uid);
 
       // 7. Create the post
       final postId = await _repository.createPost(
@@ -450,11 +487,18 @@ class ForumService {
       final user = _auth.currentUser;
       if (user == null) return null;
 
+      // Get community profile ID from mapping
+      String profileId;
+      try {
+        profileId = await _getCommunityProfileId(user.uid);
+      } catch (e) {
+        // If no community profile found, return null
+        return null;
+      }
+
       // Get the community profile document
-      final doc = await FirebaseFirestore.instance
-          .collection('communityProfiles')
-          .doc(user.uid)
-          .get();
+      final doc =
+          await _firestore.collection('communityProfiles').doc(profileId).get();
 
       if (doc.exists) {
         final data = doc.data();

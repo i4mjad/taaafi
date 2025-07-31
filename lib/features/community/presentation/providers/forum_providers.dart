@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:reboot_app_3/features/community/data/models/post_category.dart';
 import 'package:reboot_app_3/features/community/data/models/post.dart';
 import 'package:reboot_app_3/features/community/data/models/comment.dart';
@@ -12,6 +13,7 @@ import 'package:reboot_app_3/features/community/application/gender_filtering_ser
 import 'package:reboot_app_3/features/community/application/gender_interaction_validator.dart';
 import 'package:reboot_app_3/features/community/presentation/providers/community_providers_new.dart';
 import 'package:reboot_app_3/features/community/domain/entities/community_profile_entity.dart';
+import 'package:reboot_app_3/features/account/providers/ban_warning_providers.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
 import 'dart:math' as math;
 
@@ -102,8 +104,11 @@ final forumServiceProvider = Provider<ForumService>((ref) {
   final repository = ref.watch(forumRepositoryProvider);
   final validationService = ref.watch(postValidationServiceProvider);
   final auth = ref.watch(firebaseAuthProvider);
+  final firestore = ref.watch(firestoreProvider);
   final genderValidator = ref.watch(genderInteractionValidatorProvider);
-  return ForumService(repository, validationService, auth, genderValidator);
+  final banWarningFacade = ref.watch(banWarningFacadeProvider);
+  return ForumService(repository, validationService, auth, firestore,
+      genderValidator, banWarningFacade);
 });
 
 // Gender Filtering Service Provider
