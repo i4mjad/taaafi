@@ -16,6 +16,7 @@ import 'package:reboot_app_3/features/account/presentation/account_deletion_logi
 import 'package:reboot_app_3/features/account/presentation/account_deletion_loading_screen.dart';
 import 'package:reboot_app_3/features/account/presentation/user_profile_screen.dart';
 import 'package:reboot_app_3/features/plus/presentation/taaafi_plus_features_list_screen.dart';
+import 'package:reboot_app_3/features/plus/presentation/plus_features_guide_screen.dart';
 import 'package:reboot_app_3/features/community/presentation/posts_list_screen.dart';
 import 'package:reboot_app_3/features/community/presentation/category_posts_screen.dart';
 import 'package:reboot_app_3/features/community/data/models/post_category.dart';
@@ -741,6 +742,20 @@ GoRouter goRouter(Ref<GoRouter> ref) {
                       name: RouteNames.ta3afiPlus.name,
                       child: TaaafiPlusSubscriptionScreen(),
                     ),
+                  ),
+                  GoRoute(
+                    path: 'plus-features-guide',
+                    name: RouteNames.plusFeaturesGuide.name,
+                    pageBuilder: (context, state) {
+                      final extra = state.extra as Map<String, dynamic>?;
+                      final fromPurchase = extra?['fromPurchase'] ?? false;
+
+                      return MaterialPage(
+                        name: RouteNames.plusFeaturesGuide.name,
+                        child:
+                            PlusFeaturesGuideScreen(fromPurchase: fromPurchase),
+                      );
+                    },
                   ),
                   GoRoute(
                     path: 'account-delete',

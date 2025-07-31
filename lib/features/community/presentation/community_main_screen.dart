@@ -708,8 +708,20 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen> {
       },
       data: (posts) {
         if (posts.isEmpty) {
-          return Center(
-            child: Text(localizations.translate('no_posts_found')),
+          return Container(
+            width: double.infinity,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text(
+                  localizations.translate('no_posts_found'),
+                  style: TextStyles.body.copyWith(
+                    color: theme.grey[600],
+                  ),
+                ),
+              ],
+            ),
           );
         }
 

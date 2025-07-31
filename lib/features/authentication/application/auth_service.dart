@@ -340,7 +340,7 @@ class AuthService {
     try {
       await _auth.signOut();
 
-      // ref.invalidate(userNotifierProvider);
+      // Invalidate providers to reset state
       ref.invalidate(userDocumentsNotifierProvider);
       ref.invalidate(accountStatusProvider);
       ref.invalidate(userNotifierProvider);
@@ -349,6 +349,9 @@ class AuthService {
       ref.invalidate(detailedStreakInfoProvider);
       ref.invalidate(userDocumentsNotifierProvider);
       ref.invalidate(userNotifierProvider);
+
+      // Invalidate app startup to re-initialize RevenueCat for logout
+      _invalidateAppStartup();
     } catch (e, stackTrace) {
       ref.read(errorLoggerProvider).logException(e, stackTrace);
     }

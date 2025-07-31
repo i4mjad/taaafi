@@ -5,6 +5,7 @@ enum RouteNames {
   account,
   vault,
   ta3afiPlus,
+  plusFeaturesGuide,
   contents,
   onboarding,
   login,

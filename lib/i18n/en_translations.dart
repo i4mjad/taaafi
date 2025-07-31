@@ -105,6 +105,7 @@ const Map<String, String> kEn = {
   "subscriber": "Subscriber",
   "month": "Month/s",
   "all-levels": "All Levels",
+  "there-is-something-worng-contact-us": "There is something wrong, contact us",
   "list-content": "List Content",
   "activities": "Activities",
   "linked-activities": "Linked Activities",
@@ -1168,6 +1169,7 @@ const Map<String, String> kEn = {
       "Not verified yet. Check your inbox or request a new email.",
   "seconds": "s",
   "change-email": "Change Email",
+  "subscribe-now": "Subscribe Now",
   "change-email-description":
       "If you entered an incorrect email address during registration, you can change it here. A new verification email will be sent to the new address.",
   "new-email": "New email address",
@@ -1570,7 +1572,7 @@ const Map<String, String> kEn = {
   // Simple Subscription Card
   "try-ta3afi-plus": "Try Ta'aafi Plus",
   "free-trial-description": "Start your 3-day free trial, cancel anytime.",
-  "subscription-monthly-price": "\$3.99 / month",
+  "subscription-monthly-price": "\$4.99",
   "continue": "Continue",
 
   // Features Comparison Table
@@ -1661,6 +1663,38 @@ const Map<String, String> kEn = {
       "Need at least 30 follow-up events in the last 30 days (currently have {count})",
   "need-weeks-for-vulnerability":
       "Need at least 6 weeks of follow-up history (currently have {weeks} weeks)",
+
+  // Plus Features Guide Screen
+  "plus-features-guide-title": "Your Plus Features",
+  "plus-features-welcome": "Welcome to Plus!",
+  "plus-features-welcome-desc":
+      "You now have access to all premium features. Tap any feature below to explore and start using it.",
+  "your-plus-features": "Your Plus Features",
+  "plus-analytics-guide-desc":
+      "Deep insights into your recovery patterns with heat maps, trigger analysis, and risk predictions.",
+  "plus-smart-alerts-guide-desc":
+      "Intelligent notifications that help prevent relapses based on your personal patterns.",
+  "plus-community-perks-guide-desc":
+      "Exclusive badges, post boosts, and special recognition in the community.",
+  "plus-custom-reminders-guide-desc":
+      "Set personalized reminders for activities, goals, and motivation.",
+  "plus-priority-support-guide-desc":
+      "Get priority assistance from our dedicated support team.",
+  "plus-support-message":
+      "Thank you for supporting Ta'aafi! Your subscription helps us continue improving the app for everyone.",
+  "contact-support-button": "Contact Support",
+  "reminders-info-dialog":
+      "Custom reminders are integrated throughout the app. You can set them in Activities, Goals, and other sections with enhanced customization options.",
+  "support-contact-dialog":
+      "As a Plus member, you get priority support. Contact us through the app settings or reach out directly for faster response times.",
+  "got-it": "Got it",
+
+  // Purchase Success Messages
+  "purchase-thank-you-title": "Thank You! 🎉",
+  "purchase-thank-you-message":
+      "Welcome to Ta'aafi Plus! You now have access to all premium features. Tap the features below to start exploring your new capabilities.",
+  "explore-features-button": "Explore Features",
+  "explore-features-hint": "Scroll down to see all your new Plus features!",
 
   // Weekday abbreviations
   "weekday-mon": "Mon",

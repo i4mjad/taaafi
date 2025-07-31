@@ -8,6 +8,9 @@ import 'package:reboot_app_3/core/shared_widgets/ta3afi_platform_icons_icons.dar
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
+import 'package:go_router/go_router.dart';
+import 'package:reboot_app_3/core/routing/route_names.dart';
+import 'package:reboot_app_3/core/utils/url_launcher_provider.dart';
 import 'package:reboot_app_3/features/plus/data/notifiers/subscription_notifier.dart';
 import 'package:figma_squircle/figma_squircle.dart';
 
@@ -154,13 +157,14 @@ class _TaaafiPlusScreenState
                             ref.watch(availablePackagesProvider);
 
                         return packagesAsync.when(
-                          data: (packages) =>
-                              _buildPackageOptions(context, theme, packages),
-                          loading: () =>
-                              _buildLoadingPurchaseButton(context, theme),
-                          error: (error, _) =>
-                              _buildFallbackPurchaseButton(context, theme),
-                        );
+                            data: (packages) => _buildPackageOptions(
+                                context, theme, packages, ref),
+                            loading: () =>
+                                _buildLoadingPurchaseButton(context, theme),
+                            error: (error, _) {
+                              return _buildFallbackPurchaseButton(
+                                  context, theme, ref);
+                            });
                       },
                     ),
                     verticalSpace(Spacing.points8),
@@ -802,10 +806,10 @@ class _TaaafiPlusScreenState
   }
 
   /// Build package options with real pricing from RevenueCat
-  Widget _buildPackageOptions(
-      BuildContext context, dynamic theme, List<Package> packages) {
+  Widget _buildPackageOptions(BuildContext context, dynamic theme,
+      List<Package> packages, WidgetRef ref) {
     if (packages.isEmpty) {
-      return _buildFallbackPurchaseButton(context, theme);
+      return _buildFallbackPurchaseButton(context, theme, ref);
     }
 
     // For now, show the first package (you can enhance this to show multiple)
@@ -881,17 +885,20 @@ class _TaaafiPlusScreenState
   }
 
   /// Build fallback purchase button when packages fail to load
-  Widget _buildFallbackPurchaseButton(BuildContext context, dynamic theme) {
+  Widget _buildFallbackPurchaseButton(
+      BuildContext context, dynamic theme, WidgetRef ref) {
     return GestureDetector(
-      onTap: () {
+      onTap: () async {
         HapticFeedback.mediumImpact();
-        _startFreeTrial();
+        await ref
+            .read(urlLauncherProvider)
+            .launch(Uri.parse('https://wa.me/96876691799'));
       },
       child: Container(
         width: double.infinity,
         padding: EdgeInsets.all(12),
         decoration: ShapeDecoration(
-          color: theme.primary[600],
+          color: theme.error[50],
           shape: SmoothRectangleBorder(
             borderRadius: SmoothBorderRadius(
               cornerRadius: 8,
@@ -899,22 +906,14 @@ class _TaaafiPlusScreenState
             ),
           ),
         ),
-        child: Column(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
               AppLocalizations.of(context)
-                  .translate('subscription-monthly-price'),
+                  .translate('there-is-something-worng-contact-us'),
               style: TextStyles.footnote.copyWith(
-                color: theme.grey[50],
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            verticalSpace(Spacing.points4),
-            Text(
-              AppLocalizations.of(context).translate('start-free-trial'),
-              style: TextStyles.caption.copyWith(
-                color: theme.grey[50],
-                fontWeight: FontWeight.w600,
+                color: theme.error[600],
               ),
             ),
           ],
@@ -930,14 +929,12 @@ class _TaaafiPlusScreenState
       final success = await notifier.purchasePackage(package);
 
       if (success) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-                AppLocalizations.of(context).translate('purchase-successful')),
-            backgroundColor: AppTheme.of(context).primary[600],
-          ),
-        );
-        Navigator.of(context).pop(); // Close the paywall
+        // Close the paywall first
+        Navigator.of(context).pop();
+
+        // Navigate to Plus Features Guide with success flag
+        context.pushNamed(RouteNames.plusFeaturesGuide.name,
+            extra: {'fromPurchase': true});
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(

@@ -1,34 +1,69 @@
 import 'dart:io';
+import 'package:flutter/services.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'revenue_cat_service.g.dart';
 
+/// Exception thrown when RevenueCat is not available
+class RevenueCatNotAvailableException implements Exception {
+  final String message;
+  RevenueCatNotAvailableException(this.message);
+
+  @override
+  String toString() => 'RevenueCatNotAvailableException: $message';
+}
+
 class RevenueCatService {
-  static const String _apiKeyIOS =
-      'appl_YOUR_IOS_KEY_HERE'; // Replace with your iOS key
-  static const String _apiKeyAndroid =
-      'goog_YOUR_ANDROID_KEY_HERE'; // Replace with your Android key
+  //TODO: consider adding those to a .env file
+  static const String _apiKeyIOS = 'appl_VJlBGrlcGTKcySomcGMsBdazXTo';
+  static const String _apiKeyAndroid = 'goog_CuAPzQlQmGCxsqzDgdkgmAmcWVB';
 
   /// Initialize RevenueCat
   Future<void> initialize({String? userId}) async {
-    await Purchases.setLogLevel(LogLevel.debug);
+    try {
+      await Purchases.setLogLevel(LogLevel.debug);
 
-    PurchasesConfiguration configuration;
-    if (Platform.isAndroid) {
-      configuration = PurchasesConfiguration(_apiKeyAndroid);
-    } else if (Platform.isIOS) {
-      configuration = PurchasesConfiguration(_apiKeyIOS);
-    } else {
-      throw UnsupportedError('Platform not supported');
+      PurchasesConfiguration configuration;
+      if (Platform.isAndroid) {
+        configuration = PurchasesConfiguration(_apiKeyAndroid);
+      } else if (Platform.isIOS) {
+        configuration = PurchasesConfiguration(_apiKeyIOS);
+      } else {
+        throw UnsupportedError('Platform not supported');
+      }
+
+      await Purchases.configure(configuration);
+
+      // If userId is provided, log in the user after configuration
+      if (userId != null) {
+        await Purchases.logIn(userId);
+      }
+
+      print(
+          'RevenueCat: Successfully initialized${userId != null ? " for user $userId" : " in anonymous mode"}');
+    } on MissingPluginException catch (e) {
+      print('RevenueCat: Plugin not properly installed - ${e.message}');
+      print(
+          'RevenueCat: This usually means the app needs to be rebuilt after adding the plugin');
+      throw RevenueCatNotAvailableException(
+          'RevenueCat plugin not available: ${e.message}');
+    } catch (e) {
+      print('RevenueCat: Initialization failed - $e');
+      rethrow;
     }
+  }
 
-    await Purchases.configure(configuration);
-
-    // If userId is provided, log in the user after configuration
-    if (userId != null) {
-      await Purchases.logIn(userId);
+  /// Check if RevenueCat is available (for graceful degradation)
+  Future<bool> isAvailable() async {
+    try {
+      await Purchases.getCustomerInfo();
+      return true;
+    } on MissingPluginException {
+      return false;
+    } catch (e) {
+      return true; // Other errors don't mean the plugin is unavailable
     }
   }
 

@@ -34,8 +34,8 @@ class PlatformSwitch extends StatelessWidget {
       switchWidget = CupertinoSwitch(
         value: value,
         onChanged: onChanged,
-        activeColor: activeColor ?? theme.primary[600],
-        trackColor: inactiveColor ?? theme.grey[300],
+        activeTrackColor: activeColor ?? theme.primary[600],
+        inactiveTrackColor: inactiveColor ?? theme.grey[300],
       );
     } else {
       switchWidget = Switch(

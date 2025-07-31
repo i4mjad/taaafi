@@ -84,8 +84,20 @@ class SubscriptionRepository {
   SubscriptionRepository(this._revenueCatService);
 
   /// Initialize RevenueCat with user ID
+  /// Note: This is now primarily handled by RevenueCatAuthSyncService
+  /// for automatic Firebase auth synchronization
   Future<void> initialize(String? userId) async {
     await _revenueCatService.initialize(userId: userId);
+  }
+
+  /// Manual user sync for testing or special cases
+  /// The auth sync service handles this automatically for Firebase auth
+  Future<void> syncUserWithRevenueCat(String? userId) async {
+    if (userId != null) {
+      await _revenueCatService.login(userId);
+    } else {
+      await _revenueCatService.logout();
+    }
   }
 
   /// Get current subscription status from RevenueCat (with caching fallback)
