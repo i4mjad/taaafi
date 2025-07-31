@@ -4,8 +4,12 @@
 /// and rules for community profiles. It's independent of external frameworks
 /// and can be used across different layers of the application.
 class CommunityProfileEntity {
-  /// Unique identifier for the community profile
+  /// Unique identifier for the community profile (generated ID)
   final String id;
+
+  /// Firebase Auth User UID for reference (not used for lookups)
+  /// This enables future features like multiple community profiles per user
+  final String userUID;
 
   /// Display name shown to other community members
   final String displayName;
@@ -42,6 +46,7 @@ class CommunityProfileEntity {
 
   const CommunityProfileEntity({
     required this.id,
+    required this.userUID,
     required this.displayName,
     required this.gender,
     this.avatarUrl,
@@ -59,6 +64,7 @@ class CommunityProfileEntity {
   factory CommunityProfileEntity.fromJson(Map<String, dynamic> json) {
     return CommunityProfileEntity(
       id: json['id'] as String,
+      userUID: json['userUID'] as String,
       displayName: json['displayName'] as String,
       gender: json['gender'] as String,
       avatarUrl: json['avatarUrl'] as String?,
@@ -81,6 +87,7 @@ class CommunityProfileEntity {
   Map<String, dynamic> toJson() {
     return {
       'id': id,
+      'userUID': userUID,
       'displayName': displayName,
       'gender': gender,
       'avatarUrl': avatarUrl,
@@ -152,6 +159,7 @@ class CommunityProfileEntity {
   /// Creates a copy of this entity with updated fields
   CommunityProfileEntity copyWith({
     String? id,
+    String? userUID,
     String? displayName,
     String? gender,
     String? avatarUrl,
@@ -166,6 +174,7 @@ class CommunityProfileEntity {
   }) {
     return CommunityProfileEntity(
       id: id ?? this.id,
+      userUID: userUID ?? this.userUID,
       displayName: displayName ?? this.displayName,
       gender: gender ?? this.gender,
       avatarUrl: avatarUrl ?? this.avatarUrl,
@@ -185,6 +194,7 @@ class CommunityProfileEntity {
     if (identical(this, other)) return true;
     return other is CommunityProfileEntity &&
         other.id == id &&
+        other.userUID == userUID &&
         other.displayName == displayName &&
         other.gender == gender &&
         other.avatarUrl == avatarUrl &&
@@ -201,6 +211,7 @@ class CommunityProfileEntity {
   @override
   int get hashCode {
     return id.hashCode ^
+        userUID.hashCode ^
         displayName.hashCode ^
         gender.hashCode ^
         avatarUrl.hashCode ^
@@ -216,6 +227,6 @@ class CommunityProfileEntity {
 
   @override
   String toString() {
-    return 'CommunityProfileEntity(id: $id, displayName: $displayName, gender: $gender, avatarUrl: $avatarUrl, isAnonymous: $isAnonymous, isDeleted: $isDeleted, isPlusUser: $isPlusUser, shareRelapseStreaks: $shareRelapseStreaks, currentStreakDays: $currentStreakDays, streakLastUpdated: $streakLastUpdated, createdAt: $createdAt, updatedAt: $updatedAt)';
+    return 'CommunityProfileEntity(id: $id, userUID: $userUID, displayName: $displayName, gender: $gender, avatarUrl: $avatarUrl, isAnonymous: $isAnonymous, isDeleted: $isDeleted, isPlusUser: $isPlusUser, shareRelapseStreaks: $shareRelapseStreaks, currentStreakDays: $currentStreakDays, streakLastUpdated: $streakLastUpdated, createdAt: $createdAt, updatedAt: $updatedAt)';
   }
 }

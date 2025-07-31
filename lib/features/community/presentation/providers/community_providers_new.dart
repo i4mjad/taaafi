@@ -86,6 +86,7 @@ final communityProfileByIdProvider =
     final data = snapshot.data() as Map<String, dynamic>;
     final profile = CommunityProfileEntity(
       id: snapshot.id,
+      userUID: data['userUID'] ?? '', // Include user UID from Firestore
       displayName: data['displayName'] ?? 'Unknown User',
       gender: data['gender'] ?? 'other',
       isAnonymous: data['isAnonymous'] ?? false,

@@ -7,8 +7,11 @@ import '../../domain/entities/community_profile_entity.dart';
 /// to/from external data sources like Firestore. It acts as a bridge between
 /// the domain layer and the data persistence layer.
 class CommunityProfileModel {
-  /// Unique identifier for the community profile
+  /// Unique identifier for the community profile (generated ID)
   final String id;
+
+  /// Firebase Auth User UID for reference (not used for lookups)
+  final String userUID;
 
   /// Display name shown to other community members
   final String displayName;
@@ -45,6 +48,7 @@ class CommunityProfileModel {
 
   const CommunityProfileModel({
     required this.id,
+    required this.userUID,
     required this.displayName,
     required this.gender,
     this.avatarUrl,
@@ -62,6 +66,7 @@ class CommunityProfileModel {
   factory CommunityProfileModel.fromJson(Map<String, dynamic> json) {
     return CommunityProfileModel(
       id: json['id'] as String,
+      userUID: json['userUID'] as String,
       displayName: json['displayName'] as String,
       gender: json['gender'] as String,
       avatarUrl: json['avatarUrl'] as String?,
@@ -80,31 +85,13 @@ class CommunityProfileModel {
     );
   }
 
-  /// Converts the model to JSON
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'displayName': displayName,
-      'gender': gender,
-      'avatarUrl': avatarUrl,
-      'isAnonymous': isAnonymous,
-      'isDeleted': isDeleted,
-      'isPlusUser': isPlusUser,
-      'shareRelapseStreaks': shareRelapseStreaks,
-      'currentStreakDays': currentStreakDays,
-      'streakLastUpdated': streakLastUpdated?.toIso8601String(),
-      'createdAt': createdAt.toIso8601String(),
-      'updatedAt': updatedAt?.toIso8601String(),
-    };
-  }
-
   /// Creates a CommunityProfileModel from Firestore document
   factory CommunityProfileModel.fromFirestore(
-    DocumentSnapshot<Map<String, dynamic>> doc,
-  ) {
+      DocumentSnapshot<Map<String, dynamic>> doc) {
     final data = doc.data()!;
     return CommunityProfileModel(
       id: doc.id,
+      userUID: data['userUID'] as String,
       displayName: data['displayName'] as String,
       gender: data['gender'] as String,
       avatarUrl: data['avatarUrl'] as String?,
@@ -123,9 +110,48 @@ class CommunityProfileModel {
     );
   }
 
-  /// Converts the model to Firestore document data
+  /// Creates a CommunityProfileModel from domain entity
+  factory CommunityProfileModel.fromEntity(CommunityProfileEntity entity) {
+    return CommunityProfileModel(
+      id: entity.id,
+      userUID: entity.userUID,
+      displayName: entity.displayName,
+      gender: entity.gender,
+      avatarUrl: entity.avatarUrl,
+      isAnonymous: entity.isAnonymous,
+      isDeleted: entity.isDeleted,
+      isPlusUser: entity.isPlusUser,
+      shareRelapseStreaks: entity.shareRelapseStreaks,
+      currentStreakDays: entity.currentStreakDays,
+      streakLastUpdated: entity.streakLastUpdated,
+      createdAt: entity.createdAt,
+      updatedAt: entity.updatedAt,
+    );
+  }
+
+  /// Converts to JSON
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'userUID': userUID,
+      'displayName': displayName,
+      'gender': gender,
+      'avatarUrl': avatarUrl,
+      'isAnonymous': isAnonymous,
+      'isDeleted': isDeleted,
+      'isPlusUser': isPlusUser,
+      'shareRelapseStreaks': shareRelapseStreaks,
+      'currentStreakDays': currentStreakDays,
+      'streakLastUpdated': streakLastUpdated?.toIso8601String(),
+      'createdAt': createdAt.toIso8601String(),
+      'updatedAt': updatedAt?.toIso8601String(),
+    };
+  }
+
+  /// Converts to Firestore document data
   Map<String, dynamic> toFirestore() {
     return {
+      'userUID': userUID,
       'displayName': displayName,
       'gender': gender,
       'avatarUrl': avatarUrl,
@@ -142,10 +168,11 @@ class CommunityProfileModel {
     };
   }
 
-  /// Converts the model to domain entity
+  /// Converts to domain entity
   CommunityProfileEntity toEntity() {
     return CommunityProfileEntity(
       id: id,
+      userUID: userUID,
       displayName: displayName,
       gender: gender,
       avatarUrl: avatarUrl,
@@ -160,27 +187,10 @@ class CommunityProfileModel {
     );
   }
 
-  /// Creates a model from domain entity
-  factory CommunityProfileModel.fromEntity(CommunityProfileEntity entity) {
-    return CommunityProfileModel(
-      id: entity.id,
-      displayName: entity.displayName,
-      gender: entity.gender,
-      avatarUrl: entity.avatarUrl,
-      isAnonymous: entity.isAnonymous,
-      isDeleted: entity.isDeleted,
-      isPlusUser: entity.isPlusUser,
-      shareRelapseStreaks: entity.shareRelapseStreaks,
-      currentStreakDays: entity.currentStreakDays,
-      streakLastUpdated: entity.streakLastUpdated,
-      createdAt: entity.createdAt,
-      updatedAt: entity.updatedAt,
-    );
-  }
-
-  /// Creates a copy of this model with updated fields
+  /// Creates a copy with updated fields
   CommunityProfileModel copyWith({
     String? id,
+    String? userUID,
     String? displayName,
     String? gender,
     String? avatarUrl,
@@ -195,6 +205,7 @@ class CommunityProfileModel {
   }) {
     return CommunityProfileModel(
       id: id ?? this.id,
+      userUID: userUID ?? this.userUID,
       displayName: displayName ?? this.displayName,
       gender: gender ?? this.gender,
       avatarUrl: avatarUrl ?? this.avatarUrl,
@@ -214,6 +225,7 @@ class CommunityProfileModel {
     if (identical(this, other)) return true;
     return other is CommunityProfileModel &&
         other.id == id &&
+        other.userUID == userUID &&
         other.displayName == displayName &&
         other.gender == gender &&
         other.avatarUrl == avatarUrl &&
@@ -230,6 +242,7 @@ class CommunityProfileModel {
   @override
   int get hashCode {
     return id.hashCode ^
+        userUID.hashCode ^
         displayName.hashCode ^
         gender.hashCode ^
         avatarUrl.hashCode ^
@@ -245,6 +258,6 @@ class CommunityProfileModel {
 
   @override
   String toString() {
-    return 'CommunityProfileModel(id: $id, displayName: $displayName, gender: $gender, avatarUrl: $avatarUrl, isAnonymous: $isAnonymous, isDeleted: $isDeleted, isPlusUser: $isPlusUser, shareRelapseStreaks: $shareRelapseStreaks, currentStreakDays: $currentStreakDays, streakLastUpdated: $streakLastUpdated, createdAt: $createdAt, updatedAt: $updatedAt)';
+    return 'CommunityProfileModel(id: $id, userUID: $userUID, displayName: $displayName, gender: $gender, avatarUrl: $avatarUrl, isAnonymous: $isAnonymous, isDeleted: $isDeleted, isPlusUser: $isPlusUser, shareRelapseStreaks: $shareRelapseStreaks, currentStreakDays: $currentStreakDays, streakLastUpdated: $streakLastUpdated, createdAt: $createdAt, updatedAt: $updatedAt)';
   }
 }

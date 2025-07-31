@@ -51,6 +51,7 @@ class CommunityServiceImpl implements CommunityService {
       final now = DateTime.now();
       final profile = CommunityProfileEntity(
         id: profileId,
+        userUID: user.uid, // Store user UID for reference
         displayName: displayName.trim(),
         gender: gender.toLowerCase(),
         avatarUrl: avatarUrl?.trim(),
