@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
+import '../services/revenue_cat_service.dart';
 
 part 'subscription_repository.g.dart';
 
@@ -72,19 +73,65 @@ class SubscriptionInfo {
 }
 
 class SubscriptionRepository {
-  // SharedPreferences keys
+  final RevenueCatService _revenueCatService;
+
+  // SharedPreferences keys (for caching)
   static const String _subscriptionStatusKey = 'subscription_status';
   static const String _subscriptionActiveKey = 'subscription_active';
   static const String _subscriptionExpirationKey = 'subscription_expiration';
   static const String _subscriptionProductIdKey = 'subscription_product_id';
 
-  SubscriptionRepository();
+  SubscriptionRepository(this._revenueCatService);
 
-  /// Get current subscription status
+  /// Initialize RevenueCat with user ID
+  Future<void> initialize(String? userId) async {
+    await _revenueCatService.initialize(userId: userId);
+  }
+
+  /// Get current subscription status from RevenueCat (with caching fallback)
   Future<SubscriptionInfo> getSubscriptionStatus() async {
-    // Simulate network delay
-    await Future.delayed(const Duration(milliseconds: 500));
+    try {
+      // Try to get fresh data from RevenueCat
+      final customerInfo = await _revenueCatService.getCustomerInfo();
+      final offerings = await _revenueCatService.getOfferings();
+      final packages = offerings.current?.availablePackages;
 
+      final subscription =
+          SubscriptionInfo.fromRevenueCat(customerInfo, packages);
+
+      // Cache the fresh data locally for offline access
+      await _cacheSubscriptionStatus(subscription);
+
+      return subscription;
+    } catch (e) {
+      // Fallback to cached data if RevenueCat fails
+      return await _getCachedSubscriptionStatus();
+    }
+  }
+
+  /// Cache subscription status locally
+  Future<void> _cacheSubscriptionStatus(SubscriptionInfo info) async {
+    final prefs = await SharedPreferences.getInstance();
+
+    await prefs.setString(_subscriptionStatusKey, info.status.name);
+    await prefs.setBool(_subscriptionActiveKey, info.isActive);
+
+    if (info.expirationDate != null) {
+      await prefs.setInt(_subscriptionExpirationKey,
+          info.expirationDate!.millisecondsSinceEpoch);
+    } else {
+      await prefs.remove(_subscriptionExpirationKey);
+    }
+
+    if (info.productId != null) {
+      await prefs.setString(_subscriptionProductIdKey, info.productId!);
+    } else {
+      await prefs.remove(_subscriptionProductIdKey);
+    }
+  }
+
+  /// Get cached subscription status from SharedPreferences
+  Future<SubscriptionInfo> _getCachedSubscriptionStatus() async {
     final prefs = await SharedPreferences.getInstance();
 
     // Load from SharedPreferences
@@ -135,38 +182,57 @@ class SubscriptionRepository {
     }
   }
 
-  /// Check if user has active Plus subscription
+  /// Check if user has active Plus subscription (using RevenueCat entitlements)
   Future<bool> hasActiveSubscription() async {
     final info = await getSubscriptionStatus();
-    return info.status == SubscriptionStatus.plus && info.isActive;
+    // Use RevenueCat entitlement check if available, otherwise fallback to legacy check
+    return info.hasEntitlement('plus') ||
+        (info.status == SubscriptionStatus.plus && info.isActive);
   }
 
-  /// Mock purchase subscription (for testing)
+  /// Purchase subscription with RevenueCat
   Future<bool> purchaseSubscription(String productId) async {
-    // Simulate purchase process
-    await Future.delayed(const Duration(seconds: 2));
+    try {
+      final offerings = await _revenueCatService.getOfferings();
+      final package = offerings.current?.availablePackages
+          .firstWhere((pkg) => pkg.storeProduct.identifier == productId);
 
-    // For now, always succeed
-    final newSubscription = SubscriptionInfo(
-      status: SubscriptionStatus.plus,
-      expirationDate: DateTime.now().add(const Duration(days: 30)),
-      productId: productId,
-      isActive: true,
-    );
-
-    await updateSubscriptionStatus(newSubscription);
-    return true;
+      if (package != null) {
+        await _revenueCatService.purchasePackage(package);
+        return true;
+      }
+      return false;
+    } catch (e) {
+      throw Exception('Purchase failed: $e');
+    }
   }
 
-  /// Restore purchases
+  /// Purchase with Package object (NEW)
+  Future<bool> purchasePackage(Package package) async {
+    try {
+      await _revenueCatService.purchasePackage(package);
+      return true;
+    } catch (e) {
+      throw Exception('Purchase failed: $e');
+    }
+  }
+
+  /// Restore purchases with RevenueCat
   Future<SubscriptionInfo> restorePurchases() async {
-    // Simulate restore process
-    await Future.delayed(const Duration(seconds: 1));
-    return await getSubscriptionStatus();
+    try {
+      final customerInfo = await _revenueCatService.restorePurchases();
+      final offerings = await _revenueCatService.getOfferings();
+      final packages = offerings.current?.availablePackages;
+
+      return SubscriptionInfo.fromRevenueCat(customerInfo, packages);
+    } catch (e) {
+      throw Exception('Restore failed: $e');
+    }
   }
 }
 
 @riverpod
 SubscriptionRepository subscriptionRepository(Ref ref) {
-  return SubscriptionRepository();
+  final revenueCatService = ref.read(revenueCatServiceProvider);
+  return SubscriptionRepository(revenueCatService);
 }
