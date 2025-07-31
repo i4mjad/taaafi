@@ -8,8 +8,59 @@ import 'package:reboot_app_3/features/community/data/repositories/forum_reposito
 import 'package:reboot_app_3/features/community/domain/services/forum_service.dart';
 import 'package:reboot_app_3/features/community/domain/services/post_validation_service.dart';
 import 'package:reboot_app_3/features/community/data/models/post_form_data.dart';
+import 'package:reboot_app_3/features/community/application/gender_filtering_service.dart';
+import 'package:reboot_app_3/features/community/application/gender_interaction_validator.dart';
+import 'package:reboot_app_3/features/community/presentation/providers/community_providers_new.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
 import 'dart:math' as math;
+
+/// Helper class for managing post filter parameters
+class PostFilterParams {
+  final int limit;
+  final String? category;
+  final bool? isPinned;
+
+  const PostFilterParams({
+    this.limit = 10,
+    this.category,
+    this.isPinned,
+  });
+
+  /// Determines if gender filtering should be applied based on content type
+  bool get shouldApplyGenderFilter {
+    // Don't apply gender filtering to:
+    // - Pinned posts
+    // - News posts
+    // - Challenge posts
+    if (isPinned == true) return false;
+
+    if (category != null) {
+      switch (category!.toLowerCase()) {
+        case 'news':
+        case 'challenges':
+        case 'pinned':
+          return false;
+        default:
+          return true;
+      }
+    }
+
+    // Default to applying gender filter for regular posts
+    return true;
+  }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is PostFilterParams &&
+          runtimeType == other.runtimeType &&
+          limit == other.limit &&
+          category == other.category &&
+          isPinned == other.isPinned;
+
+  @override
+  int get hashCode => limit.hashCode ^ category.hashCode ^ isPinned.hashCode;
+}
 
 // Forum Repository Provider
 final forumRepositoryProvider = Provider<ForumRepository>((ref) {
@@ -34,6 +85,18 @@ final forumServiceProvider = Provider<ForumService>((ref) {
   return ForumService(repository, validationService, auth);
 });
 
+// Gender Filtering Service Provider
+final genderFilteringServiceProvider = Provider<GenderFilteringService>((ref) {
+  return GenderFilteringService();
+});
+
+// Gender Interaction Validator Provider
+final genderInteractionValidatorProvider =
+    Provider<GenderInteractionValidator>((ref) {
+  final genderFilteringService = ref.watch(genderFilteringServiceProvider);
+  return GenderInteractionValidator(genderFilteringService);
+});
+
 // Post Categories Provider
 final postCategoriesProvider = StreamProvider<List<PostCategory>>((ref) {
   final repository = ref.watch(forumRepositoryProvider);
@@ -47,13 +110,39 @@ final postsProvider =
   return repository.watchPosts(limit: 10, category: category);
 });
 
+// Gender-aware posts provider
+final genderFilteredPostsProvider =
+    StreamProvider.family<List<Post>, PostFilterParams>((ref, params) async* {
+  final repository = ref.watch(forumRepositoryProvider);
+  final currentProfile = ref.watch(currentCommunityProfileProvider);
+
+  await for (final posts in repository.watchPosts(
+    limit: params.limit,
+    category: params.category,
+    isPinned: params.isPinned,
+    userGender: currentProfile.value?.gender,
+    applyGenderFilter: params.shouldApplyGenderFilter,
+  )) {
+    yield posts;
+  }
+});
+
 // Main Screen Posts Provider (limited to 50 posts with optimistic deletion filtering)
 final mainScreenPostsProvider =
     StreamProvider.family<List<Post>, String?>((ref, category) async* {
   final repository = ref.watch(forumRepositoryProvider);
+  final currentProfile = ref.watch(currentCommunityProfileProvider);
 
-  await for (final posts
-      in repository.watchPosts(limit: 50, category: category)) {
+  // Create filter params to determine if gender filtering should be applied
+  final filterParams = PostFilterParams(category: category);
+  final shouldFilter = filterParams.shouldApplyGenderFilter;
+
+  await for (final posts in repository.watchPosts(
+    limit: 50,
+    category: category,
+    userGender: currentProfile.value?.gender,
+    applyGenderFilter: shouldFilter,
+  )) {
     // Filter out optimistically deleted posts
     final filteredPosts = <Post>[];
 
@@ -72,21 +161,21 @@ final mainScreenPostsProvider =
 final postsPaginationProvider =
     StateNotifierProvider<PostsPaginationNotifier, PostsPaginationState>((ref) {
   final repository = ref.watch(forumRepositoryProvider);
-  return PostsPaginationNotifier(repository);
+  return PostsPaginationNotifier(repository, ref);
 });
 
 // Pinned Posts Provider
 final pinnedPostsPaginationProvider =
     StateNotifierProvider<PostsPaginationNotifier, PostsPaginationState>((ref) {
   final repository = ref.watch(forumRepositoryProvider);
-  return PostsPaginationNotifier(repository);
+  return PostsPaginationNotifier(repository, ref);
 });
 
 // News Posts Provider
 final newsPostsPaginationProvider =
     StateNotifierProvider<PostsPaginationNotifier, PostsPaginationState>((ref) {
   final repository = ref.watch(forumRepositoryProvider);
-  return PostsPaginationNotifier(repository);
+  return PostsPaginationNotifier(repository, ref);
 });
 
 // Selected Category Provider for new post screen
@@ -578,21 +667,32 @@ class PostCreationNotifier extends StateNotifier<AsyncValue<String?>> {
 /// Notifier for posts pagination
 class PostsPaginationNotifier extends StateNotifier<PostsPaginationState> {
   final ForumRepository _repository;
+  final Ref _ref;
 
-  PostsPaginationNotifier(this._repository)
+  PostsPaginationNotifier(this._repository, this._ref)
       : super(PostsPaginationState.initial());
 
-  /// Loads the first page of posts
+  /// Loads the first page of posts with mandatory gender filtering
   Future<void> loadPosts({String? category, bool? isPinned}) async {
     if (state.isLoading) return;
 
     state = state.copyWith(isLoading: true, error: null);
 
     try {
+      // Get current user's gender for mandatory filtering
+      final currentProfile = _ref.read(currentCommunityProfileProvider).value;
+
+      // Determine if gender filtering should be applied based on content type
+      final filterParams =
+          PostFilterParams(category: category, isPinned: isPinned);
+      final shouldApplyGenderFilter = filterParams.shouldApplyGenderFilter;
+
       final page = await _repository.getPosts(
         limit: 10,
         category: category,
         isPinned: isPinned,
+        userGender: currentProfile?.gender,
+        applyGenderFilter: shouldApplyGenderFilter,
       );
 
       state = state.copyWith(
@@ -606,18 +706,28 @@ class PostsPaginationNotifier extends StateNotifier<PostsPaginationState> {
     }
   }
 
-  /// Loads more posts for pagination
+  /// Loads more posts for pagination with mandatory gender filtering
   Future<void> loadMorePosts({String? category, bool? isPinned}) async {
     if (state.isLoading || !state.hasMore) return;
 
     state = state.copyWith(isLoading: true);
 
     try {
+      // Get current user's gender for mandatory filtering
+      final currentProfile = _ref.read(currentCommunityProfileProvider).value;
+
+      // Determine if gender filtering should be applied based on content type
+      final filterParams =
+          PostFilterParams(category: category, isPinned: isPinned);
+      final shouldApplyGenderFilter = filterParams.shouldApplyGenderFilter;
+
       final page = await _repository.getPosts(
         limit: 10,
         lastDocument: state.lastDocument,
         category: category,
         isPinned: isPinned,
+        userGender: currentProfile?.gender,
+        applyGenderFilter: shouldApplyGenderFilter,
       );
 
       state = state.copyWith(
