@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:reboot_app_3/features/account/data/models/user_profile.dart';
+import 'package:reboot_app_3/features/community/presentation/providers/community_providers_new.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'user_profile_notifier.g.dart';
@@ -60,10 +61,31 @@ class UserProfileNotifier extends _$UserProfileNotifier {
         role: role,
       );
 
+      // Update user document
       await _firestore
           .collection('users')
           .doc(uid)
           .set(userProfile.toMap(), SetOptions(merge: true));
+
+      // Also update community profile gender if it exists
+      try {
+        final communityService = ref.read(communityServiceProvider);
+        final communityProfile = await communityService.getCurrentProfile();
+
+        if (communityProfile != null) {
+          // Only update if the gender is actually different to avoid unnecessary writes
+          if (communityProfile.gender != gender.toLowerCase()) {
+            await communityService.updateProfile(
+              gender: gender.toLowerCase(),
+            );
+            print('UserProfile: Updated community profile gender to $gender');
+          }
+        }
+      } catch (e) {
+        // Don't fail the entire operation if community profile update fails
+        print('UserProfile: Failed to update community profile gender - $e');
+      }
+
       state = AsyncValue.data(userProfile); // Update state
     } catch (e) {
       state = AsyncValue.error(e, StackTrace.current); // Handle error
