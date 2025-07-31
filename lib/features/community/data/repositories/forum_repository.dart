@@ -1,9 +1,11 @@
+import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:reboot_app_3/features/community/data/models/post_category.dart';
 import 'package:reboot_app_3/features/community/data/models/post.dart';
 import 'package:reboot_app_3/features/community/data/models/comment.dart';
 import 'package:reboot_app_3/features/community/data/models/interaction.dart';
+import 'package:reboot_app_3/features/community/application/gender_filtering_service.dart';
 
 /// Container for paginated posts data
 class PostsPage {
@@ -28,6 +30,8 @@ class ForumRepository {
       FirebaseFirestore.instance.collection('interactions');
   final CollectionReference _postCategories =
       FirebaseFirestore.instance.collection('postCategories');
+  final GenderFilteringService _genderFilteringService =
+      GenderFilteringService();
 
   /// Get current user's community profile ID
   String get _currentUserCPId {
@@ -71,9 +75,36 @@ class ForumRepository {
             }).toList());
   }
 
-  /// Get posts with pagination
+  /// Get posts with pagination and optional gender filtering
   Future<PostsPage> getPosts({
     int limit = 10,
+    DocumentSnapshot? lastDocument,
+    String? category,
+    bool? isPinned,
+    String? userGender,
+    bool applyGenderFilter = false,
+  }) async {
+    if (applyGenderFilter && userGender != null) {
+      return await _getGenderFilteredPosts(
+        limit: limit,
+        lastDocument: lastDocument,
+        category: category,
+        isPinned: isPinned,
+        userGender: userGender,
+      );
+    } else {
+      return await _getUnfilteredPosts(
+        limit: limit,
+        lastDocument: lastDocument,
+        category: category,
+        isPinned: isPinned,
+      );
+    }
+  }
+
+  /// Get posts without gender filtering (for pinned, news, challenges)
+  Future<PostsPage> _getUnfilteredPosts({
+    required int limit,
     DocumentSnapshot? lastDocument,
     String? category,
     bool? isPinned,
@@ -115,9 +146,142 @@ class ForumRepository {
     }
   }
 
-  /// Stream of posts from Firestore
+  /// Get posts with gender filtering applied at source
+  Future<PostsPage> _getGenderFilteredPosts({
+    required int limit,
+    DocumentSnapshot? lastDocument,
+    String? category,
+    bool? isPinned,
+    required String userGender,
+  }) async {
+    try {
+      // Get allowed community profile IDs (same gender + admins)
+      final visibleProfileIds = await _genderFilteringService
+          .getVisibleCommunityProfileIds(userGender);
+
+      if (visibleProfileIds.isEmpty) {
+        return const PostsPage(posts: [], hasMore: false);
+      }
+
+      // Firestore whereIn has a limit of 10, so we need to batch queries if more than 10 IDs
+      const int batchSize = 10;
+      final List<Post> allPosts = [];
+      DocumentSnapshot? globalLastDoc = lastDocument;
+      int remainingLimit = limit;
+
+      for (int i = 0;
+          i < visibleProfileIds.length && remainingLimit > 0;
+          i += batchSize) {
+        final batch = visibleProfileIds.skip(i).take(batchSize).toList();
+
+        final batchResult = await _executeGenderFilteredQuery(
+          authorCPIds: batch,
+          limit: remainingLimit,
+          lastDocument: globalLastDoc,
+          category: category,
+          isPinned: isPinned,
+        );
+
+        allPosts.addAll(batchResult.posts);
+        remainingLimit -= batchResult.posts.length;
+
+        // Update last document for pagination
+        if (batchResult.lastDocument != null) {
+          globalLastDoc = batchResult.lastDocument;
+        }
+
+        // If this batch returned fewer posts than requested, we've reached the end
+        if (batchResult.posts.length <
+            (remainingLimit + batchResult.posts.length) /
+                (i ~/ batchSize + 1)) {
+          break;
+        }
+      }
+
+      // Sort all posts by creation date (since they came from different batches)
+      allPosts.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+
+      // Take only the requested limit
+      final limitedPosts = allPosts.take(limit).toList();
+
+      return PostsPage(
+        posts: limitedPosts,
+        lastDocument: globalLastDoc,
+        hasMore:
+            allPosts.length >= limit && visibleProfileIds.length > batchSize,
+      );
+    } catch (e) {
+      throw Exception('Failed to fetch gender-filtered posts: $e');
+    }
+  }
+
+  /// Execute a single batched gender-filtered query
+  Future<PostsPage> _executeGenderFilteredQuery({
+    required List<String> authorCPIds,
+    required int limit,
+    DocumentSnapshot? lastDocument,
+    String? category,
+    bool? isPinned,
+  }) async {
+    Query query = _posts
+        .where('authorCPId', whereIn: authorCPIds)
+        .orderBy('createdAt', descending: true);
+
+    if (category != null && category.isNotEmpty) {
+      query = query.where('category', isEqualTo: category);
+    }
+
+    if (isPinned != null) {
+      query = query.where('isPinned', isEqualTo: isPinned);
+    }
+
+    if (lastDocument != null) {
+      query = query.startAfterDocument(lastDocument);
+    }
+
+    query = query.limit(limit);
+    final QuerySnapshot snapshot = await query.get();
+
+    final posts = snapshot.docs
+        .map((doc) =>
+            Post.fromFirestore(doc as DocumentSnapshot<Map<String, dynamic>>))
+        .where((post) => !post.isDeleted)
+        .toList();
+
+    return PostsPage(
+      posts: posts,
+      lastDocument: snapshot.docs.isNotEmpty ? snapshot.docs.last : null,
+      hasMore: snapshot.docs.length == limit,
+    );
+  }
+
+  /// Stream of posts from Firestore with optional gender filtering
   Stream<List<Post>> watchPosts({
     int limit = 10,
+    String? category,
+    bool? isPinned,
+    String? userGender,
+    bool applyGenderFilter = false,
+  }) async* {
+    if (applyGenderFilter && userGender != null) {
+      yield* _watchGenderFilteredPosts(
+        limit: limit,
+        category: category,
+        isPinned: isPinned,
+        userGender: userGender,
+      );
+    } else {
+      yield* _watchUnfilteredPosts(
+        limit: limit,
+        category: category,
+        isPinned: isPinned,
+      );
+    }
+  }
+
+  /// Stream unfiltered posts
+  Stream<List<Post>> _watchUnfilteredPosts({
+    required int limit,
     String? category,
     bool? isPinned,
   }) {
@@ -140,6 +304,100 @@ class ForumRepository {
               .isDeleted) // This will handle missing fields thanks to default value
           .toList();
     });
+  }
+
+  /// Stream gender-filtered posts
+  Stream<List<Post>> _watchGenderFilteredPosts({
+    required int limit,
+    String? category,
+    bool? isPinned,
+    required String userGender,
+  }) async* {
+    // Get visible profile IDs and watch for changes
+    await for (final visibleProfileIds in _genderFilteringService
+        .watchVisibleCommunityProfileIds(userGender)) {
+      if (visibleProfileIds.isEmpty) {
+        yield [];
+        continue;
+      }
+
+      // Batch queries for large profile ID lists
+      const int batchSize = 10;
+      final List<Stream<List<Post>>> streamBatches = [];
+
+      for (int i = 0; i < visibleProfileIds.length; i += batchSize) {
+        final batch = visibleProfileIds.skip(i).take(batchSize).toList();
+
+        Query query = _posts
+            .where('authorCPId', whereIn: batch)
+            .orderBy('createdAt', descending: true);
+
+        if (category != null && category.isNotEmpty) {
+          query = query.where('category', isEqualTo: category);
+        }
+
+        if (isPinned != null) {
+          query = query.where('isPinned', isEqualTo: isPinned);
+        }
+
+        query = query.limit(limit);
+
+        final batchStream = query.snapshots().map((snapshot) {
+          return snapshot.docs
+              .map((doc) => Post.fromFirestore(
+                  doc as DocumentSnapshot<Map<String, dynamic>>))
+              .where((post) => !post.isDeleted)
+              .toList();
+        });
+
+        streamBatches.add(batchStream);
+      }
+
+      // For single batch, yield directly
+      if (streamBatches.length == 1) {
+        yield* streamBatches.first;
+      } else {
+        // For multiple batches, combine them
+        yield* _combinePostStreams(streamBatches, limit);
+      }
+    }
+  }
+
+  /// Combine multiple post streams and maintain sort order
+  Stream<List<Post>> _combinePostStreams(
+      List<Stream<List<Post>>> streams, int limit) async* {
+    final controller = StreamController<List<Post>>();
+    final List<List<Post>> latestResults = List.filled(streams.length, []);
+    final List<StreamSubscription> subscriptions = [];
+
+    void updateResults() {
+      // Combine all results
+      final allPosts = <Post>[];
+      for (final posts in latestResults) {
+        allPosts.addAll(posts);
+      }
+
+      // Sort and limit
+      allPosts.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+      controller.add(allPosts.take(limit).toList());
+    }
+
+    // Subscribe to all streams
+    for (int i = 0; i < streams.length; i++) {
+      final subscription = streams[i].listen((posts) {
+        latestResults[i] = posts;
+        updateResults();
+      });
+      subscriptions.add(subscription);
+    }
+
+    yield* controller.stream;
+
+    // Clean up subscriptions when done
+    for (final subscription in subscriptions) {
+      await subscription.cancel();
+    }
+    await controller.close();
   }
 
   /// Get a single post by ID
@@ -167,25 +425,84 @@ class ForumRepository {
     });
   }
 
-  /// Get comments for a post
-  Future<List<Comment>> getComments(String postId) async {
+  /// Get comments for a post with optional gender filtering
+  Future<List<Comment>> getComments(
+    String postId, {
+    String? userGender,
+    bool applyGenderFilter = false,
+  }) async {
     try {
-      final QuerySnapshot snapshot = await _comments
-          .where('postId', isEqualTo: postId)
-          .orderBy('createdAt')
-          .get();
-
-      return snapshot.docs.map((doc) {
-        return Comment.fromFirestore(
-            doc as DocumentSnapshot<Map<String, dynamic>>);
-      }).toList();
+      if (applyGenderFilter && userGender != null) {
+        return await _getGenderFilteredComments(postId, userGender);
+      } else {
+        return await _getUnfilteredComments(postId);
+      }
     } catch (e) {
       throw Exception('Failed to fetch comments: $e');
     }
   }
 
-  /// Stream of comments for a post
-  Stream<List<Comment>> watchComments(String postId) {
+  Future<List<Comment>> _getUnfilteredComments(String postId) async {
+    final QuerySnapshot snapshot = await _comments
+        .where('postId', isEqualTo: postId)
+        .orderBy('createdAt')
+        .get();
+
+    return snapshot.docs.map((doc) {
+      return Comment.fromFirestore(
+          doc as DocumentSnapshot<Map<String, dynamic>>);
+    }).toList();
+  }
+
+  Future<List<Comment>> _getGenderFilteredComments(
+      String postId, String userGender) async {
+    final visibleProfileIds =
+        await _genderFilteringService.getVisibleCommunityProfileIds(userGender);
+
+    if (visibleProfileIds.isEmpty) {
+      return [];
+    }
+
+    // Batch comments queries
+    const int batchSize = 10;
+    final List<Comment> allComments = [];
+
+    for (int i = 0; i < visibleProfileIds.length; i += batchSize) {
+      final batch = visibleProfileIds.skip(i).take(batchSize).toList();
+
+      final QuerySnapshot snapshot = await _comments
+          .where('postId', isEqualTo: postId)
+          .where('authorCPId', whereIn: batch)
+          .orderBy('createdAt')
+          .get();
+
+      final batchComments = snapshot.docs.map((doc) {
+        return Comment.fromFirestore(
+            doc as DocumentSnapshot<Map<String, dynamic>>);
+      }).toList();
+
+      allComments.addAll(batchComments);
+    }
+
+    // Sort by creation date
+    allComments.sort((a, b) => a.createdAt.compareTo(b.createdAt));
+    return allComments;
+  }
+
+  /// Stream of comments for a post with optional gender filtering
+  Stream<List<Comment>> watchComments(
+    String postId, {
+    String? userGender,
+    bool applyGenderFilter = false,
+  }) async* {
+    if (applyGenderFilter && userGender != null) {
+      yield* _watchGenderFilteredComments(postId, userGender);
+    } else {
+      yield* _watchUnfilteredComments(postId);
+    }
+  }
+
+  Stream<List<Comment>> _watchUnfilteredComments(String postId) {
     return _comments
         .where('postId', isEqualTo: postId)
         .orderBy('createdAt')
@@ -194,6 +511,83 @@ class ForumRepository {
             .map((doc) => Comment.fromFirestore(
                 doc as DocumentSnapshot<Map<String, dynamic>>))
             .toList());
+  }
+
+  /// Stream gender-filtered comments for a post
+  Stream<List<Comment>> _watchGenderFilteredComments(
+      String postId, String userGender) async* {
+    await for (final visibleProfileIds in _genderFilteringService
+        .watchVisibleCommunityProfileIds(userGender)) {
+      if (visibleProfileIds.isEmpty) {
+        yield [];
+        continue;
+      }
+
+      // For comments, we can use a simpler approach since they're typically fewer in number
+      const int batchSize = 10;
+      final List<Stream<List<Comment>>> streamBatches = [];
+
+      for (int i = 0; i < visibleProfileIds.length; i += batchSize) {
+        final batch = visibleProfileIds.skip(i).take(batchSize).toList();
+
+        final batchStream = _comments
+            .where('postId', isEqualTo: postId)
+            .where('authorCPId', whereIn: batch)
+            .orderBy('createdAt')
+            .snapshots()
+            .map((snapshot) => snapshot.docs
+                .map((doc) => Comment.fromFirestore(
+                    doc as DocumentSnapshot<Map<String, dynamic>>))
+                .toList());
+
+        streamBatches.add(batchStream);
+      }
+
+      // For single batch, yield directly
+      if (streamBatches.length == 1) {
+        yield* streamBatches.first;
+      } else {
+        // For multiple batches, combine them
+        yield* _combineCommentStreams(streamBatches);
+      }
+    }
+  }
+
+  /// Combine multiple comment streams and maintain sort order
+  Stream<List<Comment>> _combineCommentStreams(
+      List<Stream<List<Comment>>> streams) async* {
+    final controller = StreamController<List<Comment>>();
+    final List<List<Comment>> latestResults = List.filled(streams.length, []);
+    final List<StreamSubscription> subscriptions = [];
+
+    void updateResults() {
+      // Combine all results
+      final allComments = <Comment>[];
+      for (final comments in latestResults) {
+        allComments.addAll(comments);
+      }
+
+      // Sort by creation date
+      allComments.sort((a, b) => a.createdAt.compareTo(b.createdAt));
+      controller.add(allComments);
+    }
+
+    // Subscribe to all streams
+    for (int i = 0; i < streams.length; i++) {
+      final subscription = streams[i].listen((comments) {
+        latestResults[i] = comments;
+        updateResults();
+      });
+      subscriptions.add(subscription);
+    }
+
+    yield* controller.stream;
+
+    // Clean up subscriptions when done
+    for (final subscription in subscriptions) {
+      await subscription.cancel();
+    }
+    await controller.close();
   }
 
   /// Add a comment to a post or reply to a comment
