@@ -17,6 +17,31 @@ import 'package:reboot_app_3/features/account/providers/ban_warning_providers.da
 import 'package:reboot_app_3/core/localization/localization.dart';
 import 'dart:math' as math;
 
+/// Helper method to get community profile ID from user UID
+Future<String?> _getCommunityProfileIdFromUserUID(
+    FirebaseFirestore firestore, String userUID) async {
+  try {
+    final doc =
+        await firestore.collection('userProfileMappings').doc(userUID).get();
+
+    if (!doc.exists || doc.data() == null) {
+      return null;
+    }
+
+    final data = doc.data()!;
+    final isDeleted = data['isDeleted'] as bool? ?? false;
+
+    if (isDeleted) {
+      return null;
+    }
+
+    return data['communityProfileId'] as String?;
+  } catch (e) {
+    print('ERROR: Failed to get community profile ID for user $userUID: $e');
+    return null;
+  }
+}
+
 /// Debug helper to log gender filtering status
 void _debugGenderFiltering(
   String providerName, {
@@ -339,14 +364,25 @@ final optimisticPostStateProvider = StateNotifierProvider.family<
 // =============================================================================
 
 /// Provider for user's interaction with a specific target
-final userInteractionProvider = FutureProvider.family.autoDispose<Interaction?,
-    ({String targetType, String targetId, String userCPId})>((ref, params) {
+final userInteractionProvider = FutureProvider.family.autoDispose<
+    Interaction?,
+    ({
+      String targetType,
+      String targetId,
+      String userCPId
+    })>((ref, params) async {
   final repository = ref.watch(forumRepositoryProvider);
   final auth = ref.watch(firebaseAuthProvider);
+  final firestore = ref.watch(firestoreProvider);
 
-  // Use current user's UID if userCPId is empty
-  final userCPId =
-      params.userCPId.isEmpty ? auth.currentUser?.uid : params.userCPId;
+  // Get community profile ID: use provided userCPId or get from user mapping
+  String? userCPId;
+  if (params.userCPId.isNotEmpty) {
+    userCPId = params.userCPId;
+  } else if (auth.currentUser != null) {
+    userCPId = await _getCommunityProfileIdFromUserUID(
+        firestore, auth.currentUser!.uid);
+  }
 
   if (userCPId == null) {
     return Future.value(null);
@@ -373,19 +409,30 @@ final optimisticUserInteractionProvider = StateNotifierProvider.family<
 /// Provider for streaming user's interaction with a specific target
 final userInteractionStreamProvider = StreamProvider.family.autoDispose<
     Interaction?,
-    ({String targetType, String targetId, String userCPId})>((ref, params) {
+    ({
+      String targetType,
+      String targetId,
+      String userCPId
+    })>((ref, params) async* {
   final repository = ref.watch(forumRepositoryProvider);
   final auth = ref.watch(firebaseAuthProvider);
+  final firestore = ref.watch(firestoreProvider);
 
-  // Use current user's UID if userCPId is empty
-  final userCPId =
-      params.userCPId.isEmpty ? auth.currentUser?.uid : params.userCPId;
-
-  if (userCPId == null) {
-    return Stream.value(null);
+  // Get community profile ID: use provided userCPId or get from user mapping
+  String? userCPId;
+  if (params.userCPId.isNotEmpty) {
+    userCPId = params.userCPId;
+  } else if (auth.currentUser != null) {
+    userCPId = await _getCommunityProfileIdFromUserUID(
+        firestore, auth.currentUser!.uid);
   }
 
-  return repository.watchUserInteraction(
+  if (userCPId == null) {
+    yield null;
+    return;
+  }
+
+  yield* repository.watchUserInteraction(
     targetType: params.targetType,
     targetId: params.targetId,
     userCPId: userCPId,
