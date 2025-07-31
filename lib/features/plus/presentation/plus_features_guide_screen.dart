@@ -4,12 +4,14 @@ import 'package:flutter/services.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:go_router/go_router.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
+import 'package:reboot_app_3/core/shared_widgets/container.dart';
 import 'package:reboot_app_3/core/shared_widgets/ta3afi_platform_icons_icons.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/core/routing/route_names.dart';
 import 'package:figma_squircle/figma_squircle.dart';
+import 'package:reboot_app_3/features/plus/presentation/feature_suggestion_modal.dart';
 
 class PlusFeaturesGuideScreen extends ConsumerWidget {
   final bool fromPurchase;
@@ -122,15 +124,6 @@ class PlusFeaturesGuideScreen extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          AppLocalizations.of(context).translate('your-plus-features'),
-          style: TextStyles.h5.copyWith(
-            color: theme.grey[900],
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        verticalSpace(Spacing.points20),
-
         // Premium Analytics
         _buildFeatureCard(
           context,
@@ -199,6 +192,20 @@ class PlusFeaturesGuideScreen extends ConsumerWidget {
               .translate('plus-priority-support-guide-desc'),
           onTap: () => _contactSupport(context),
         ),
+
+        verticalSpace(Spacing.points16),
+
+        // Feature Suggestions
+        _buildFeatureCard(
+          context,
+          theme,
+          icon: LucideIcons.lightbulb,
+          iconColor: const Color(0xFF8B5CF6),
+          title: AppLocalizations.of(context).translate('suggest-feature'),
+          description: AppLocalizations.of(context)
+              .translate('feature-suggestion-guide-desc'),
+          onTap: () => _showFeatureSuggestionModal(context),
+        ),
       ],
     );
   }
@@ -212,6 +219,7 @@ class PlusFeaturesGuideScreen extends ConsumerWidget {
     required String description,
     required VoidCallback onTap,
   }) {
+    final isArabic = Directionality.of(context) == TextDirection.rtl;
     return GestureDetector(
       onTap: () {
         HapticFeedback.lightImpact();
@@ -219,7 +227,7 @@ class PlusFeaturesGuideScreen extends ConsumerWidget {
       },
       child: Container(
         width: double.infinity,
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
           color: theme.backgroundColor,
           borderRadius: BorderRadius.circular(12),
@@ -234,16 +242,15 @@ class PlusFeaturesGuideScreen extends ConsumerWidget {
         ),
         child: Row(
           children: [
-            Container(
+            WidgetsContainer(
               padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: iconColor.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(8),
-              ),
+              backgroundColor: iconColor.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(8),
+              borderSide: BorderSide.none,
               child: Icon(
                 icon,
                 color: iconColor,
-                size: 24,
+                size: 16,
               ),
             ),
             horizontalSpace(Spacing.points16),
@@ -253,15 +260,14 @@ class PlusFeaturesGuideScreen extends ConsumerWidget {
                 children: [
                   Text(
                     title,
-                    style: TextStyles.h6.copyWith(
+                    style: TextStyles.footnoteSelected.copyWith(
                       color: theme.grey[900],
-                      fontWeight: FontWeight.w600,
                     ),
                   ),
                   verticalSpace(Spacing.points4),
                   Text(
                     description,
-                    style: TextStyles.footnote.copyWith(
+                    style: TextStyles.caption.copyWith(
                       color: theme.grey[600],
                       height: 1.4,
                     ),
@@ -269,11 +275,18 @@ class PlusFeaturesGuideScreen extends ConsumerWidget {
                 ],
               ),
             ),
-            Icon(
-              LucideIcons.chevronRight,
-              color: theme.grey[400],
-              size: 20,
-            ),
+            if (!isArabic)
+              Icon(
+                LucideIcons.chevronRight,
+                color: theme.grey[400],
+                size: 20,
+              ),
+            if (isArabic)
+              Icon(
+                LucideIcons.chevronLeft,
+                color: theme.grey[400],
+                size: 20,
+              ),
           ],
         ),
       ),
@@ -474,6 +487,15 @@ class PlusFeaturesGuideScreen extends ConsumerWidget {
           ),
         ],
       ),
+    );
+  }
+
+  void _showFeatureSuggestionModal(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => const FeatureSuggestionModal(),
     );
   }
 }

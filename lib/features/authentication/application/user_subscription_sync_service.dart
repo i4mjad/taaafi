@@ -114,6 +114,32 @@ class UserSubscriptionSyncService {
     // Refresh if last check was more than 1 hour ago
     return difference.inHours >= 1;
   }
+
+  /// Manual sync for immediate use (e.g., when community features are accessed)
+  Future<void> forceManualSync() async {
+    await updateUserSubscriptionStatus();
+  }
+
+  /// Check if current user's community profile needs sync
+  Future<bool> needsSync() async {
+    try {
+      final currentUser = _auth.currentUser;
+      if (currentUser == null) return false;
+
+      // Check if subscription status differs between live and cached
+      final isSubscriptionActive =
+          await _subscriptionService.isSubscriptionActive();
+      final profile = await _communityService.getCurrentProfile();
+
+      if (profile == null) return false;
+
+      // Return true if cached status differs from live status
+      return profile.isPlusUser != isSubscriptionActive;
+    } catch (e) {
+      print('UserSubscriptionSync: Error checking sync status - $e');
+      return false;
+    }
+  }
 }
 
 @riverpod

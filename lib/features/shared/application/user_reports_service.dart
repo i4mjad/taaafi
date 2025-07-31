@@ -22,6 +22,7 @@ class ReportTypes {
   static const String contactUs = 'RzznaQlqM7sCUTCO4Zmw';
   static const String postReport = 'WV2Lpe4V9ajwf0NmsAwN';
   static const String commentReport = 'n8LCt8NsTfCcYh0mN0e6';
+  static const String featureSuggestion = 'JYfdeI6L9Af1LUP0LhtK';
 }
 
 /// Service for handling user reports business logic
@@ -69,6 +70,16 @@ class UserReportsService {
   }) async {
     return await _submitReport(
       reportTypeId: ReportTypes.contactUs,
+      userMessage: userMessage,
+    );
+  }
+
+  /// Submit a new feature suggestion report
+  Future<ReportResult<String>> submitFeatureSuggestionReport({
+    required String userMessage,
+  }) async {
+    return await _submitReport(
+      reportTypeId: ReportTypes.featureSuggestion,
       userMessage: userMessage,
     );
   }

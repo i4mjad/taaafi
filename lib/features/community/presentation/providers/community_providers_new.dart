@@ -9,6 +9,7 @@ import '../../domain/entities/community_profile_entity.dart';
 import '../../domain/repositories/community_repository.dart';
 import '../../domain/services/community_service.dart';
 import '../../domain/services/community_service_impl.dart';
+import 'package:reboot_app_3/features/shared/models/follow_up.dart';
 
 // =============================================================================
 // EXTERNAL DEPENDENCIES
@@ -72,7 +73,6 @@ final currentCommunityProfileProvider =
 final communityProfileByIdProvider =
     StreamProvider.family<CommunityProfileEntity?, String>((ref, cpId) {
   final firestore = ref.watch(firestoreProvider);
-
   return firestore
       .collection('communityProfiles')
       .doc(cpId)
@@ -83,15 +83,23 @@ final communityProfileByIdProvider =
     }
 
     final data = snapshot.data() as Map<String, dynamic>;
-    return CommunityProfileEntity(
+    final profile = CommunityProfileEntity(
       id: snapshot.id,
       displayName: data['displayName'] ?? 'Unknown User',
       gender: data['gender'] ?? 'other',
       isAnonymous: data['isAnonymous'] ?? false,
       avatarUrl: data['avatarUrl'],
+      isPlusUser: data['isPlusUser'] as bool?,
+      shareRelapseStreaks: data['shareRelapseStreaks'] as bool? ?? false,
+      currentStreakDays: data['currentStreakDays'] as int?,
+      streakLastUpdated: data['streakLastUpdated'] != null
+          ? (data['streakLastUpdated'] as Timestamp).toDate()
+          : null,
       createdAt: (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
       updatedAt: (data['updatedAt'] as Timestamp?)?.toDate(),
     );
+
+    return profile;
   });
 });
 
@@ -129,6 +137,115 @@ final communityInterestProvider =
     StateNotifierProvider<CommunityInterestNotifier, AsyncValue<void>>((ref) {
   final service = ref.watch(communityServiceProvider);
   return CommunityInterestNotifier(service);
+});
+
+/// Calculates the relapse streak for any user ID
+final userStreakCalculatorProvider =
+    FutureProvider.family<int?, String>((ref, userId) async {
+  try {
+    print('🏆 ============================================');
+    print('🏆 STREAK CALCULATOR CALLED for user: $userId');
+    print('🏆 ============================================');
+
+    final firestore = ref.watch(firestoreProvider);
+
+    // Step 1: Get user's first date (matching StreakRepository.getUserFirstDate)
+    print('🏆 Step 1: Fetching user document for userFirstDate...');
+    final userDocSnapshot =
+        await firestore.collection('users').doc(userId).get();
+    if (!userDocSnapshot.exists) {
+      print('🏆 ❌ FAILED: User document not found for $userId');
+      return null;
+    }
+    print('🏆 ✅ User document found');
+
+    final userData = userDocSnapshot.data() as Map<String, dynamic>;
+    print('🏆 User document keys: ${userData.keys.toList()}');
+
+    // Use userFirstDate field (NOT createdAt) to match StreakRepository
+    final userFirstDateTimestamp = userData['userFirstDate'] as Timestamp?;
+    if (userFirstDateTimestamp == null) {
+      print('🏆 ❌ FAILED: No userFirstDate field found');
+      print('🏆 Available userData: $userData');
+      return null;
+    }
+
+    final userFirstDate = userFirstDateTimestamp.toDate();
+    print('🏆 ✅ User first date (userFirstDate field): $userFirstDate');
+
+    // Step 2: Get relapse follow-ups (matching StreakRepository.readFollowUpsByType)
+    print('🏆 Step 2: Fetching relapse follow-ups...');
+    final followUpsSnapshot = await firestore
+        .collection('users')
+        .doc(userId)
+        .collection('followUps')
+        .where('type', isEqualTo: FollowUpType.relapse.name)
+        .get();
+
+    print('🏆 ✅ Follow-ups query completed');
+    print('🏆 Found ${followUpsSnapshot.docs.length} relapse follow-ups');
+
+    // Convert to FollowUpModel objects and sort (matching StreakService logic)
+    final relapseFollowUps = followUpsSnapshot.docs
+        .map((doc) => FollowUpModel.fromDoc(doc))
+        .toList();
+
+    // Debug: Print all follow-ups
+    if (relapseFollowUps.isNotEmpty) {
+      print('🏆 Follow-ups details:');
+      for (int i = 0; i < relapseFollowUps.length && i < 3; i++) {
+        final followUp = relapseFollowUps[i];
+        print(
+            '🏆   - Follow-up ${i + 1}: ${followUp.time}, type: ${followUp.type.name}');
+      }
+    } else {
+      print(
+          '🏆 📝 No relapse follow-ups found - checking followUps collection...');
+
+      // Check if followUps collection exists at all
+      final allFollowUpsSnapshot = await firestore
+          .collection('users')
+          .doc(userId)
+          .collection('followUps')
+          .limit(5)
+          .get();
+
+      print(
+          '🏆 Total follow-ups in collection: ${allFollowUpsSnapshot.docs.length}');
+      if (allFollowUpsSnapshot.docs.isNotEmpty) {
+        print('🏆 Sample follow-ups:');
+        for (final doc in allFollowUpsSnapshot.docs) {
+          final data = doc.data();
+          print('🏆   - Type: ${data['type']}, Time: ${data['time']}');
+        }
+      }
+    }
+
+    // Step 3: Calculate streak (exact same logic as StreakService.calculateRelapseStreak)
+    if (relapseFollowUps.isEmpty) {
+      // No relapses, calculate days since user first date
+      final streakDays = DateTime.now().difference(userFirstDate).inDays;
+      print(
+          '🏆 🎯 RESULT: No relapses found, streak since userFirstDate: $streakDays days');
+      print('🏆 ============================================');
+      return streakDays;
+    } else {
+      // Sort by time descending and get most recent relapse
+      relapseFollowUps.sort((a, b) => b.time.compareTo(a.time));
+      final lastFollowUpDate = relapseFollowUps.first.time;
+
+      final streakDays = DateTime.now().difference(lastFollowUpDate).inDays;
+      print(
+          '🏆 🎯 RESULT: Last relapse: $lastFollowUpDate, current streak: $streakDays days');
+      print('🏆 ============================================');
+      return streakDays;
+    }
+  } catch (e, stackTrace) {
+    print('🏆 ❌ ERROR calculating streak for $userId: $e');
+    print('🏆 Stack trace: $stackTrace');
+    print('🏆 ============================================');
+    return null;
+  }
 });
 
 // =============================================================================

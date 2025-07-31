@@ -45,12 +45,28 @@ class SubscriptionNotifier extends _$SubscriptionNotifier {
       final repository = ref.read(subscriptionRepositoryProvider);
       final success = await repository.purchasePackage(package);
       if (success) {
-        // Refresh subscription info
-        state = AsyncValue.data(await service.getSubscriptionInfo());
+        print(
+            'Purchase successful, forcing fresh subscription status check...');
+
+        // Force clear any cached validation to get fresh data
+        await repository.forceClearCache();
+
+        // Wait a moment for RevenueCat entitlements to propagate
+        await Future.delayed(const Duration(seconds: 2));
+
+        // Refresh subscription info with fresh data
+        final freshInfo = await service.getSubscriptionInfo();
+        print(
+            'Fresh subscription info after purchase: status=${freshInfo.status}, isActive=${freshInfo.isActive}');
+        print(
+            'Entitlements: ${freshInfo.customerInfo?.entitlements.active.keys.toList()}');
+
+        state = AsyncValue.data(freshInfo);
         return true;
       }
       return false;
     } catch (e, st) {
+      print('Purchase failed: $e');
       state = AsyncValue.error(e, st);
       return false;
     }
@@ -102,6 +118,27 @@ class SubscriptionNotifier extends _$SubscriptionNotifier {
     } catch (e, st) {
       state = AsyncValue.error(e, st);
     }
+  }
+
+  /// Force refresh with complete cache clearing
+  Future<void> forceRefreshWithCacheClear() async {
+    print('Subscription Notifier: Force refreshing with cache clear');
+    final repository = ref.read(subscriptionRepositoryProvider);
+    await repository.forceClearCache();
+    state = AsyncValue.loading();
+
+    // Wait a moment for cache clearing to complete
+    await Future.delayed(const Duration(milliseconds: 500));
+
+    // Invalidate to trigger fresh fetch
+    ref.invalidateSelf();
+    print('Subscription Notifier: Cache cleared and state invalidated');
+  }
+
+  /// Debug entitlement fetching with comprehensive logging
+  Future<void> debugEntitlementFetching() async {
+    final repository = ref.read(subscriptionRepositoryProvider);
+    await repository.debugEntitlementFetching();
   }
 }
 

@@ -64,9 +64,9 @@ const Map<String, String> kMessagingGroupsAr = {
   "subscribe-to-group": "اشتراك",
   "unsubscribe-from-group": "إلغاء الاشتراك",
   "subscribed-to-group": "مشترك",
-  "subscribe-with-plus": "اشترك مع بلس",
-  "requires-plus-subscription": "يتطلب تعافي بلس",
-  "upgrade-to-plus-messaging": "ترقية إلى بلس",
+  "subscribe-with-plus": "اشترك مع تعافي +",
+  "requires-plus-subscription": "يتطلب تعافي +",
+  "upgrade-to-plus-messaging": "ترقية إلى تعافي +",
 
   // Status messages
   "already-subscribed-to-group": "مشترك بالفعل في هذه المجموعة",
@@ -83,7 +83,7 @@ const Map<String, String> kMessagingGroupsAr = {
 
   // UI elements
   "refresh-groups": "تحديث",
-  "plus-feature-badge": "ميزة بلس",
+  "plus-feature-badge": "ميزة تعافي +",
   "general-notifications": "الإشعارات العامة",
   "members-count": "أعضاء",
   "member-count": "عضو",
@@ -91,6 +91,6 @@ const Map<String, String> kMessagingGroupsAr = {
   // Premium messaging
   "messaging-groups-premium-title": "مواضيع الإشعارات المميزة",
   "messaging-groups-premium-description":
-      "اشترك في مواضيع إشعارات متخصصة مع تعافي بلس",
-  "messaging-groups-requires-plus": "هذه الميزة تتطلب اشتراك تعافي بلس",
+      "اشترك في مواضيع إشعارات متخصصة مع تعافي +",
+  "messaging-groups-requires-plus": "هذه الميزة تتطلب اشتراك تعافي +",
 };

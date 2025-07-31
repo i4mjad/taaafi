@@ -221,19 +221,68 @@ class CommentTileWidget extends ConsumerWidget {
           ),
         ],
 
-        // Streak display if user shares streak info
+        // Real-time streak display for Plus users who allow sharing
         authorProfileAsync.when(
           data: (authorProfile) {
-            if (authorProfile?.hasValidStreakData() == true) {
+            if (isAuthorPlusUser &&
+                (authorProfile?.shareRelapseStreaks ?? false)) {
               return Row(
                 children: [
                   const SizedBox(width: 6),
-                  StreakDisplayWidget(
-                    streakDays: authorProfile!.currentStreakDays!,
-                    fontSize: 9,
-                    iconSize: 8,
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                  Consumer(
+                    builder: (context, ref, child) {
+                      print(
+                          '🎯 CommentTile: Real-time streak check for ${comment.authorCPId}');
+                      print(
+                          '  ↳ isPlusUser: $isAuthorPlusUser, allowsSharing: ${authorProfile?.shareRelapseStreaks}');
+
+                      final streakAsync = ref.watch(
+                          userStreakCalculatorProvider(comment.authorCPId));
+
+                      return streakAsync.when(
+                        data: (streakDays) {
+                          if (streakDays == null || streakDays <= 0) {
+                            print('  ↳ No valid streak data: $streakDays');
+                            return const SizedBox.shrink();
+                          }
+
+                          print('  ↳ Showing streak: $streakDays days');
+                          return Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 4, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF22C55E).withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(4),
+                              border: Border.all(
+                                color: const Color(0xFF22C55E).withOpacity(0.3),
+                                width: 1,
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(LucideIcons.trophy,
+                                    size: 8, color: const Color(0xFF22C55E)),
+                                const SizedBox(width: 2),
+                                Text(
+                                  '${streakDays}d',
+                                  style: TextStyles.tiny.copyWith(
+                                    color: const Color(0xFF22C55E),
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 8,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                        loading: () => const SizedBox.shrink(),
+                        error: (error, stackTrace) {
+                          print('  ↳ Error calculating streak: $error');
+                          return const SizedBox.shrink();
+                        },
+                      );
+                    },
                   ),
                 ],
               );

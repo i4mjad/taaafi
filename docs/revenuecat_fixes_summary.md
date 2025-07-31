@@ -2,6 +2,21 @@
 
 ## Issues Fixed
 
+### 0. Entitlement ID Mismatch ✅ FIXED
+
+**Problem**: App code was hardcoded to look for `'plus'` entitlement, but RevenueCat Dashboard was configured with `'taaafi_plus'` entitlement ID, causing subscription status to always return false.
+
+**Solution**: 
+- Updated all hardcoded `'plus'` references to `'taaafi_plus'` to match RevenueCat Dashboard configuration
+- Fixed entitlement checking in `SubscriptionRepository.fromRevenueCat()`, `hasActiveSubscription()`, and debug widget
+- Ensured consistent entitlement ID usage across the entire codebase
+
+**Files Modified**:
+- `lib/features/plus/data/repositories/subscription_repository.dart`
+- `lib/features/plus/presentation/debug_subscription_widget.dart`
+
+**Impact**: Subscription status now correctly detects active subscriptions from RevenueCat
+
 ### 1. Multiple RevenueCat Accounts Being Created ✅ FIXED
 
 **Problem**: Every time the app loaded, RevenueCat would create new anonymous accounts due to multiple calls to `Purchases.configure()`.

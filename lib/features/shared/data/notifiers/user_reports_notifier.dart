@@ -88,6 +88,30 @@ class UserReportsNotifier extends _$UserReportsNotifier {
     }
   }
 
+  /// Submit a new feature suggestion report
+  Future<String> submitFeatureSuggestionReport({
+    required String userMessage,
+  }) async {
+    state = const AsyncValue.loading();
+    try {
+      final result = await service.submitFeatureSuggestionReport(
+        userMessage: userMessage,
+      );
+
+      if (result.isSuccess) {
+        // Refresh the reports after submission
+        state = AsyncValue.data(await service.getUserReports());
+        return result.data!;
+      } else {
+        state = AsyncValue.error(result.errorKey!, StackTrace.current);
+        throw Exception(result.errorKey!);
+      }
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+      rethrow;
+    }
+  }
+
   /// Submit a new post report
   Future<String> submitPostReport({
     required String postId,

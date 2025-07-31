@@ -48,7 +48,16 @@ lib/features/plus/
 ### Issues Resolved
 Three major integration issues were identified and resolved:
 
-#### 3.1 Multiple RevenueCat Accounts ✅ FIXED
+#### 3.1 Entitlement ID Mismatch ✅ FIXED
+**Problem**: App code was checking for `'plus'` entitlement, but RevenueCat Dashboard was configured with `'taaafi_plus'` entitlement ID.
+
+**Solution**: 
+- Updated all hardcoded `'plus'` references to match actual RevenueCat configuration: `'taaafi_plus'`
+- Fixed entitlement checking throughout subscription repository and debug tools
+
+**Impact**: Subscription status now correctly detects active subscriptions
+
+#### 3.2 Multiple RevenueCat Accounts ✅ FIXED
 **Problem**: App startup was creating multiple anonymous RevenueCat accounts due to repeated `Purchases.configure()` calls.
 
 **Solution**: 
@@ -58,7 +67,7 @@ Three major integration issues were identified and resolved:
 
 **Impact**: Eliminates account duplication, ensures clean user tracking
 
-#### 3.2 User-Specific Subscription Status ✅ FIXED  
+#### 3.3 User-Specific Subscription Status ✅ FIXED  
 **Problem**: `hasActiveSubscriptionProvider` wasn't invalidating when users changed, showing incorrect subscription status.
 
 **Solution**:
@@ -68,7 +77,7 @@ Three major integration issues were identified and resolved:
 
 **Impact**: Subscription status now correctly reflects current logged-in user
 
-#### 3.3 Purchase Attribution ✅ FIXED
+#### 3.4 Purchase Attribution ✅ FIXED
 **Problem**: Purchase flows weren't ensuring correct Firebase user was logged into RevenueCat before transactions.
 
 **Solution**:
@@ -79,7 +88,7 @@ Three major integration issues were identified and resolved:
 
 **Impact**: Guaranteed correct purchase attribution to Firebase users
 
-#### 3.4 Performance Optimization ✅ OPTIMIZED
+#### 3.5 Performance Optimization ✅ OPTIMIZED
 **Problem**: Excessive logging and redundant validation checks during app startup caused console noise and unnecessary API calls.
 
 **Solution**:

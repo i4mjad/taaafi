@@ -627,6 +627,44 @@ class _EditCommunityProfileModalState
           activeColor: const Color(0xFFFEBA01),
         ),
 
+        // Add sync button if streak sharing is enabled but no data
+        if (_shareRelapseStreaks && _currentStreakDays == null) ...[
+          const SizedBox(height: 12),
+          GestureDetector(
+            onTap: _isLoading ? null : _syncStreakData,
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: const Color(0xFFFEBA01).withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(
+                  color: const Color(0xFFFEBA01).withValues(alpha: 0.3),
+                  width: 1,
+                ),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    LucideIcons.refreshCw,
+                    size: 16,
+                    color: const Color(0xFFFEBA01),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    localizations.translate('sync-streak-data'),
+                    style: TextStyles.body.copyWith(
+                      color: const Color(0xFFFEBA01),
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+
         const SizedBox(height: 12),
 
         // Important Daily Login Requirement Notice
@@ -690,6 +728,36 @@ class _EditCommunityProfileModalState
       if (mounted) {
         setState(() {
           _isLoading = false;
+        });
+      }
+    }
+  }
+
+  Future<void> _syncStreakData() async {
+    setState(() {
+      _isLoadingStreak = true;
+    });
+
+    try {
+      final followUpService = ref.read(followUpServiceProvider);
+      final streakDays = await followUpService.calculateDaysWithoutRelapse();
+
+      setState(() {
+        _currentStreakDays = streakDays;
+        _isLoadingStreak = false;
+      });
+
+      if (mounted) {
+        getSuccessSnackBar(context, "streak-data-synced");
+      }
+    } catch (e) {
+      if (mounted) {
+        getErrorSnackBar(context, "streak-data-sync-failed");
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoadingStreak = false;
         });
       }
     }

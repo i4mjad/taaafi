@@ -17,6 +17,7 @@ import 'package:reboot_app_3/features/community/presentation/providers/community
 import 'package:reboot_app_3/features/community/data/models/post_category.dart';
 import 'package:reboot_app_3/features/community/data/models/post.dart';
 import 'package:reboot_app_3/features/account/presentation/widgets/feature_access_guard.dart';
+import 'package:reboot_app_3/features/authentication/application/user_subscription_sync_service.dart';
 
 class CommunityMainScreen extends ConsumerStatefulWidget {
   /// Optional initial tab to select when the screen opens
@@ -42,6 +43,9 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen> {
 
     // Load posts when screen initializes
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      // Sync community profile with latest subscription status
+      _syncCommunityProfile();
+
       // Load different types of posts based on initial filter
       if (_selectedFilter == 'pinned') {
         ref
@@ -63,6 +67,20 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen> {
   void dispose() {
     _scrollController.dispose();
     super.dispose();
+  }
+
+  /// Sync community profile with latest subscription status
+  Future<void> _syncCommunityProfile() async {
+    try {
+      final syncService = ref.read(userSubscriptionSyncServiceProvider);
+      if (await syncService.needsSync()) {
+        await syncService.forceManualSync();
+        print('CommunityMainScreen: Profile synced successfully');
+      }
+    } catch (e) {
+      print('CommunityMainScreen: Failed to sync profile - $e');
+      // Don't block UI if sync fails
+    }
   }
 
   String? _getFilterCategory() {

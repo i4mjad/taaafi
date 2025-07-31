@@ -9,12 +9,11 @@ import 'package:reboot_app_3/features/community/data/models/post.dart';
 import 'package:reboot_app_3/features/community/data/models/post_category.dart';
 import 'package:reboot_app_3/features/community/data/models/interaction.dart';
 import 'package:reboot_app_3/features/community/presentation/widgets/avatar_with_anonymity.dart';
-import 'package:reboot_app_3/features/community/presentation/widgets/plus_badge_widget.dart';
-import 'package:reboot_app_3/features/community/presentation/widgets/streak_display_widget.dart';
 import 'package:reboot_app_3/features/community/presentation/providers/community_providers_new.dart';
 import 'package:reboot_app_3/features/community/presentation/providers/forum_providers.dart';
 import 'package:reboot_app_3/features/community/presentation/widgets/report_content_modal.dart';
 import 'package:reboot_app_3/features/account/presentation/widgets/feature_access_guard.dart';
+import 'package:reboot_app_3/core/shared_widgets/ta3afi_platform_icons_icons.dart';
 
 class ThreadsPostCard extends ConsumerWidget {
   final Post post;
@@ -91,20 +90,49 @@ class ThreadsPostCard extends ConsumerWidget {
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Avatar with proper author anonymity
+                // Avatar with proper author anonymity and plus user frame
                 authorProfileAsync.when(
                   data: (authorProfile) {
                     final isAuthorAnonymous =
                         authorProfile?.isAnonymous ?? false;
                     final isAuthorPlusUser =
                         authorProfile?.hasPlusSubscription() ?? false;
-                    return AvatarWithAnonymity(
-                      cpId: post.authorCPId,
-                      isAnonymous: isAuthorAnonymous,
-                      size: 32,
-                      avatarUrl:
-                          isAuthorAnonymous ? null : authorProfile?.avatarUrl,
-                      isPlusUser: isAuthorPlusUser,
+
+                    return Stack(
+                      children: [
+                        AvatarWithAnonymity(
+                          cpId: post.authorCPId,
+                          isAnonymous: isAuthorAnonymous,
+                          size: 32,
+                          avatarUrl: isAuthorAnonymous
+                              ? null
+                              : authorProfile?.avatarUrl,
+                          isPlusUser: isAuthorPlusUser,
+                        ),
+                        // Plus badge icon overlay
+                        if (isAuthorPlusUser)
+                          Positioned(
+                            right: -2,
+                            bottom: -2,
+                            child: Container(
+                              width: 16,
+                              height: 16,
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFFEBA01),
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: theme.backgroundColor,
+                                  width: 1.5,
+                                ),
+                              ),
+                              child: const Icon(
+                                Ta3afiPlatformIcons.plus_icon,
+                                size: 8,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                      ],
                     );
                   },
                   loading: () => Container(
@@ -139,88 +167,160 @@ class ThreadsPostCard extends ConsumerWidget {
                       // Category flair and time
                       Row(
                         children: [
-                          // Category flair - always show, with fallback for missing categories
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 4,
-                            ),
-                            decoration: BoxDecoration(
-                              color: postCategory != null
-                                  ? postCategory.color.withValues(alpha: 0.1)
-                                  : theme.grey[100],
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(
-                                color: postCategory != null
-                                    ? postCategory.color.withValues(alpha: 0.3)
-                                    : theme.grey[300]!,
-                                width: 1,
-                              ),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(
-                                  postCategory?.icon ?? LucideIcons.tag,
-                                  size: 12,
-                                  color: postCategory?.color ?? theme.grey[600],
+                          // Category with streak badge if applicable
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              // Category flair - always show, with fallback for missing categories
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 4,
                                 ),
-                                const SizedBox(width: 4),
-                                Text(
-                                  postCategory?.getDisplayName(
-                                        localizations.locale.languageCode,
-                                      ) ??
-                                      _getLocalizedCategoryName(
-                                          post.category, localizations),
-                                  style: TextStyles.small.copyWith(
-                                    color:
-                                        postCategory?.color ?? theme.grey[600],
-                                    fontWeight: FontWeight.w600,
+                                decoration: BoxDecoration(
+                                  color: postCategory != null
+                                      ? postCategory.color
+                                          .withValues(alpha: 0.1)
+                                      : theme.grey[100],
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(
+                                    color: postCategory != null
+                                        ? postCategory.color
+                                            .withValues(alpha: 0.3)
+                                        : theme.grey[300]!,
+                                    width: 1,
                                   ),
                                 ),
-                              ],
-                            ),
-                          ),
-
-                          // Plus badge if user is a Plus user
-                          authorProfileAsync.when(
-                            data: (authorProfile) {
-                              final isAuthorPlusUser =
-                                  authorProfile?.hasPlusSubscription() ?? false;
-                              if (isAuthorPlusUser) {
-                                return Row(
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    const SizedBox(width: 6),
-                                    const PlusBadgeWidget(),
-                                  ],
-                                );
-                              }
-                              return const SizedBox.shrink();
-                            },
-                            loading: () => const SizedBox.shrink(),
-                            error: (error, stackTrace) =>
-                                const SizedBox.shrink(),
-                          ),
-
-                          // Streak display if user shares streak info
-                          authorProfileAsync.when(
-                            data: (authorProfile) {
-                              if (authorProfile?.hasValidStreakData() == true) {
-                                return Row(
-                                  children: [
-                                    const SizedBox(width: 6),
-                                    StreakDisplayWidget(
-                                      streakDays:
-                                          authorProfile!.currentStreakDays!,
+                                    Icon(
+                                      postCategory?.icon ?? LucideIcons.tag,
+                                      size: 12,
+                                      color: postCategory?.color ??
+                                          theme.grey[600],
+                                    ),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      postCategory?.getDisplayName(
+                                            localizations.locale.languageCode,
+                                          ) ??
+                                          _getLocalizedCategoryName(
+                                              post.category, localizations),
+                                      style: TextStyles.small.copyWith(
+                                        color: postCategory?.color ??
+                                            theme.grey[600],
+                                        fontWeight: FontWeight.w600,
+                                      ),
                                     ),
                                   ],
-                                );
-                              }
-                              return const SizedBox.shrink();
-                            },
-                            loading: () => const SizedBox.shrink(),
-                            error: (error, stackTrace) =>
-                                const SizedBox.shrink(),
+                                ),
+                              ),
+
+                              // Real-time streak badge next to category
+                              authorProfileAsync.when(
+                                data: (authorProfile) {
+                                  // Check if user is plus AND allows sharing
+                                  final isPlusUser =
+                                      authorProfile?.isPlusUser ?? false;
+                                  final allowsSharing =
+                                      authorProfile?.shareRelapseStreaks ??
+                                          false;
+
+                                  print(
+                                      '🎯 ThreadsPostCard: Streak check for ${post.authorCPId}');
+                                  print(
+                                      '🎯 - isPlusUser: $isPlusUser, allowsSharing: $allowsSharing');
+
+                                  if (!isPlusUser || !allowsSharing) {
+                                    print(
+                                        '🎯 ❌ Conditions not met - no streak shown');
+                                    return const SizedBox.shrink();
+                                  }
+
+                                  print(
+                                      '🎯 ✅ Conditions met - calculating streak...');
+
+                                  // Calculate streak in real-time
+                                  return Consumer(
+                                    builder: (context, ref, child) {
+                                      final streakAsync = ref.watch(
+                                          userStreakCalculatorProvider(
+                                              post.authorCPId));
+
+                                      return streakAsync.when(
+                                        data: (streakDays) {
+                                          if (streakDays == null ||
+                                              streakDays <= 0) {
+                                            print(
+                                                '🎯 ❌ Invalid streak data: $streakDays');
+                                            return const SizedBox.shrink();
+                                          }
+
+                                          print(
+                                              '🎯 🎉 SUCCESS! Showing streak: $streakDays days');
+                                          return Row(
+                                            children: [
+                                              const SizedBox(width: 6),
+                                              Container(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        horizontal: 6,
+                                                        vertical: 3),
+                                                decoration: BoxDecoration(
+                                                  color: const Color(0xFF22C55E)
+                                                      .withOpacity(0.1),
+                                                  borderRadius:
+                                                      BorderRadius.circular(6),
+                                                  border: Border.all(
+                                                    color:
+                                                        const Color(0xFF22C55E)
+                                                            .withOpacity(0.3),
+                                                    width: 1,
+                                                  ),
+                                                ),
+                                                child: Row(
+                                                  children: [
+                                                    Icon(LucideIcons.trophy,
+                                                        size: 10,
+                                                        color: const Color(
+                                                            0xFF22C55E)),
+                                                    const SizedBox(width: 3),
+                                                    Text(
+                                                      '${streakDays}d',
+                                                      style: TextStyles.tiny
+                                                          .copyWith(
+                                                        color: const Color(
+                                                            0xFF22C55E),
+                                                        fontWeight:
+                                                            FontWeight.w600,
+                                                        fontSize: 10,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ],
+                                          );
+                                        },
+                                        loading: () {
+                                          print(
+                                              '🎯 📱 Loading streak calculation...');
+                                          return const SizedBox.shrink();
+                                        },
+                                        error: (error, stackTrace) {
+                                          print('🎯 ❌ Error: $error');
+                                          return const SizedBox.shrink();
+                                        },
+                                      );
+                                    },
+                                  );
+                                },
+                                loading: () => const SizedBox.shrink(),
+                                error: (error, stackTrace) =>
+                                    const SizedBox.shrink(),
+                              ),
+                            ],
                           ),
 
                           const SizedBox(width: 8),

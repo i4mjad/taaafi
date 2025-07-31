@@ -996,6 +996,9 @@ class ForumRepository {
     DocumentSnapshot? lastDocument,
   }) async {
     try {
+      print(
+          '🔍 [DEBUG] getUserComments - Starting fetch for userCPId: $userCPId, limit: $limit');
+
       Query query = _comments
           .where('authorCPId', isEqualTo: userCPId)
           .where('isDeleted', isEqualTo: false)
@@ -1003,15 +1006,25 @@ class ForumRepository {
 
       if (lastDocument != null) {
         query = query.startAfterDocument(lastDocument);
+        print('🔍 [DEBUG] getUserComments - Using lastDocument for pagination');
       }
 
       query = query.limit(limit);
 
       final QuerySnapshot snapshot = await query.get();
+      print(
+          '🔍 [DEBUG] getUserComments - Query executed, found ${snapshot.docs.length} documents');
+
       final List<Comment> comments = snapshot.docs.map((doc) {
-        return Comment.fromFirestore(
+        final comment = Comment.fromFirestore(
             doc as DocumentSnapshot<Map<String, dynamic>>);
+        print(
+            '🔍 [DEBUG] getUserComments - Comment: ${comment.id}, body: ${comment.body.length > 50 ? comment.body.substring(0, 50) + "..." : comment.body}');
+        return comment;
       }).toList();
+
+      print(
+          '🔍 [DEBUG] getUserComments - Processed ${comments.length} comments, hasMore: ${comments.length == limit}');
 
       return CommentsPage(
         comments: comments,
@@ -1030,6 +1043,9 @@ class ForumRepository {
     DocumentSnapshot? lastDocument,
   }) async {
     try {
+      print(
+          '❤️ [DEBUG] getUserLikedPosts - Starting fetch for userCPId: $userCPId, limit: $limit');
+
       Query query = _interactions
           .where('userCPId', isEqualTo: userCPId)
           .where('targetType', isEqualTo: 'post')
@@ -1040,18 +1056,29 @@ class ForumRepository {
 
       if (lastDocument != null) {
         query = query.startAfterDocument(lastDocument);
+        print(
+            '❤️ [DEBUG] getUserLikedPosts - Using lastDocument for pagination');
       }
 
       query = query.limit(limit);
 
       final QuerySnapshot snapshot = await query.get();
+      print(
+          '❤️ [DEBUG] getUserLikedPosts - Query executed, found ${snapshot.docs.length} interactions');
+
       final List<Interaction> interactions = snapshot.docs.map((doc) {
-        return Interaction.fromFirestore(
+        final interaction = Interaction.fromFirestore(
             doc as DocumentSnapshot<Map<String, dynamic>>);
+        print(
+            '❤️ [DEBUG] getUserLikedPosts - Interaction: ${interaction.id}, targetId: ${interaction.targetId}, value: ${interaction.value}');
+        return interaction;
       }).toList();
 
       // Get the actual posts for these interactions
       final List<Post> posts = [];
+      print(
+          '❤️ [DEBUG] getUserLikedPosts - Fetching ${interactions.length} posts from interactions');
+
       for (final interaction in interactions) {
         try {
           final postDoc = await _posts.doc(interaction.targetId).get();
@@ -1060,13 +1087,26 @@ class ForumRepository {
                 postDoc as DocumentSnapshot<Map<String, dynamic>>);
             if (!post.isDeleted) {
               posts.add(post);
+              print(
+                  '❤️ [DEBUG] getUserLikedPosts - Added post: ${post.id}, title: ${post.title.length > 30 ? post.title.substring(0, 30) + "..." : post.title}');
+            } else {
+              print(
+                  '❤️ [DEBUG] getUserLikedPosts - Skipped deleted post: ${post.id}');
             }
+          } else {
+            print(
+                '❤️ [DEBUG] getUserLikedPosts - Post not found: ${interaction.targetId}');
           }
         } catch (e) {
+          print(
+              '❤️ [ERROR] getUserLikedPosts - Failed to load post ${interaction.targetId}: $e');
           // Skip posts that can't be loaded
           continue;
         }
       }
+
+      print(
+          '❤️ [DEBUG] getUserLikedPosts - Final result: ${posts.length} posts, hasMore: ${interactions.length == limit}');
 
       return LikedItemsPage(
         items: posts,
@@ -1085,6 +1125,9 @@ class ForumRepository {
     DocumentSnapshot? lastDocument,
   }) async {
     try {
+      print(
+          '💬❤️ [DEBUG] getUserLikedComments - Starting fetch for userCPId: $userCPId, limit: $limit');
+
       Query query = _interactions
           .where('userCPId', isEqualTo: userCPId)
           .where('targetType', isEqualTo: 'comment')
@@ -1095,18 +1138,29 @@ class ForumRepository {
 
       if (lastDocument != null) {
         query = query.startAfterDocument(lastDocument);
+        print(
+            '💬❤️ [DEBUG] getUserLikedComments - Using lastDocument for pagination');
       }
 
       query = query.limit(limit);
 
       final QuerySnapshot snapshot = await query.get();
+      print(
+          '💬❤️ [DEBUG] getUserLikedComments - Query executed, found ${snapshot.docs.length} interactions');
+
       final List<Interaction> interactions = snapshot.docs.map((doc) {
-        return Interaction.fromFirestore(
+        final interaction = Interaction.fromFirestore(
             doc as DocumentSnapshot<Map<String, dynamic>>);
+        print(
+            '💬❤️ [DEBUG] getUserLikedComments - Interaction: ${interaction.id}, targetId: ${interaction.targetId}, value: ${interaction.value}');
+        return interaction;
       }).toList();
 
       // Get the actual comments for these interactions
       final List<Comment> comments = [];
+      print(
+          '💬❤️ [DEBUG] getUserLikedComments - Fetching ${interactions.length} comments from interactions');
+
       for (final interaction in interactions) {
         try {
           final commentDoc = await _comments.doc(interaction.targetId).get();
@@ -1115,13 +1169,26 @@ class ForumRepository {
                 commentDoc as DocumentSnapshot<Map<String, dynamic>>);
             if (!comment.isDeleted) {
               comments.add(comment);
+              print(
+                  '💬❤️ [DEBUG] getUserLikedComments - Added comment: ${comment.id}, body: ${comment.body.length > 30 ? comment.body.substring(0, 30) + "..." : comment.body}');
+            } else {
+              print(
+                  '💬❤️ [DEBUG] getUserLikedComments - Skipped deleted comment: ${comment.id}');
             }
+          } else {
+            print(
+                '💬❤️ [DEBUG] getUserLikedComments - Comment not found: ${interaction.targetId}');
           }
         } catch (e) {
+          print(
+              '💬❤️ [ERROR] getUserLikedComments - Failed to load comment ${interaction.targetId}: $e');
           // Skip comments that can't be loaded
           continue;
         }
       }
+
+      print(
+          '💬❤️ [DEBUG] getUserLikedComments - Final result: ${comments.length} comments, hasMore: ${interactions.length == limit}');
 
       return LikedItemsPage(
         items: comments,

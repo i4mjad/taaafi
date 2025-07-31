@@ -162,6 +162,7 @@ class _TaaafiPlusScreenState
                             loading: () =>
                                 _buildLoadingPurchaseButton(context, theme),
                             error: (error, _) {
+                              print('error: $error');
                               return _buildFallbackPurchaseButton(
                                   context, theme, ref);
                             });

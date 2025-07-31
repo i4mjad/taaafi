@@ -35,6 +35,10 @@ import 'package:reboot_app_3/features/authentication/providers/user_provider.dar
 import 'package:reboot_app_3/features/account/data/app_features_config.dart';
 import 'package:reboot_app_3/features/account/presentation/widgets/feature_access_guard.dart';
 import 'package:reboot_app_3/features/plus/presentation/widgets/subscription_card.dart';
+import 'package:reboot_app_3/features/plus/data/notifiers/subscription_notifier.dart';
+import 'package:reboot_app_3/features/plus/data/repositories/subscription_repository.dart';
+import 'package:intl/intl.dart';
+import 'package:reboot_app_3/features/plus/presentation/feature_suggestion_modal.dart';
 
 class AccountScreen extends ConsumerWidget {
   const AccountScreen({super.key});
@@ -155,6 +159,16 @@ class AccountScreen extends ConsumerWidget {
                                   ),
                                 ),
                               verticalSpace(Spacing.points8),
+                              if (showMainContent)
+                                GestureDetector(
+                                  onTap: () =>
+                                      _showFeatureSuggestionModal(context, ref),
+                                  child: SettingsButton(
+                                    icon: LucideIcons.lightbulb,
+                                    textKey: 'suggest-feature',
+                                  ),
+                                ),
+                              verticalSpace(Spacing.points8),
                               SettingsButton(
                                 icon: LucideIcons.logOut,
                                 textKey: 'log-out',
@@ -254,6 +268,15 @@ class AccountScreen extends ConsumerWidget {
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) => const ContactUsModal(),
+    );
+  }
+
+  void _showFeatureSuggestionModal(BuildContext context, WidgetRef ref) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => const FeatureSuggestionModal(),
     );
   }
 }
@@ -461,6 +484,8 @@ class UserDetailsWidget extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = AppTheme.of(context);
     final currentUser = ref.watch(userNotifierProvider);
+    final subscriptionAsync = ref.watch(subscriptionNotifierProvider);
+    final locale = ref.watch(localeNotifierProvider);
 
     return Padding(
       padding: const EdgeInsets.all(4.0),
@@ -537,6 +562,156 @@ class UserDetailsWidget extends ConsumerWidget {
                             color: theme.grey[600],
                           ),
                         ),
+                        verticalSpace(Spacing.points8),
+                        // Enhanced subscription status with more details
+                        subscriptionAsync.when(
+                          data: (subscription) {
+                            final isPlus = subscription.status ==
+                                    SubscriptionStatus.plus &&
+                                subscription.isActive;
+                            final hasExpiration =
+                                subscription.expirationDate != null;
+                            final activeFeatures = subscription
+                                    .customerInfo?.entitlements.active.length ??
+                                0;
+
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                // Main subscription badge
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 8, vertical: 4),
+                                  decoration: BoxDecoration(
+                                    color: isPlus
+                                        ? theme.primary[100]
+                                        : theme.grey[100],
+                                    borderRadius: BorderRadius.circular(6),
+                                    border: Border.all(
+                                      color: isPlus
+                                          ? theme.primary[300]!
+                                          : theme.grey[300]!,
+                                      width: 0.5,
+                                    ),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(
+                                        isPlus
+                                            ? LucideIcons.star
+                                            : LucideIcons.user,
+                                        size: 14,
+                                        color: isPlus
+                                            ? theme.primary[600]
+                                            : theme.grey[600],
+                                      ),
+                                      horizontalSpace(Spacing.points4),
+                                      Text(
+                                        isPlus
+                                            ? AppLocalizations.of(context)
+                                                .translate('plus-member')
+                                            : AppLocalizations.of(context)
+                                                .translate('free-plan'),
+                                        style: TextStyles.small.copyWith(
+                                          color: isPlus
+                                              ? theme.primary[700]
+                                              : theme.grey[600],
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                // Additional details for Plus members
+                                if (isPlus) ...[
+                                  verticalSpace(Spacing.points4),
+                                  Row(
+                                    children: [
+                                      // Expiration info
+                                      if (hasExpiration) ...[
+                                        Icon(
+                                          LucideIcons.calendar,
+                                          size: 12,
+                                          color: theme.grey[500],
+                                        ),
+                                        horizontalSpace(Spacing.points4),
+                                        Text(
+                                          AppLocalizations.of(context)
+                                                  .translate('expires') +
+                                              ' ' +
+                                              _formatShortDate(
+                                                  subscription.expirationDate!,
+                                                  locale?.languageCode ?? 'en'),
+                                          style: TextStyles.small.copyWith(
+                                            color: theme.grey[500],
+                                            fontSize: 11,
+                                          ),
+                                        ),
+                                      ],
+                                      if (hasExpiration &&
+                                          activeFeatures > 0) ...[
+                                        horizontalSpace(Spacing.points8),
+                                        Container(
+                                          width: 2,
+                                          height: 2,
+                                          decoration: BoxDecoration(
+                                            color: theme.grey[400],
+                                            shape: BoxShape.circle,
+                                          ),
+                                        ),
+                                        horizontalSpace(Spacing.points8),
+                                      ],
+                                      // Active features count
+                                      if (activeFeatures > 0) ...[
+                                        Icon(
+                                          LucideIcons.checkCircle,
+                                          size: 12,
+                                          color: theme.success[600],
+                                        ),
+                                        horizontalSpace(Spacing.points4),
+                                        Text(
+                                          '$activeFeatures ${AppLocalizations.of(context).translate('features-active')}',
+                                          style: TextStyles.small.copyWith(
+                                            color: theme.grey[500],
+                                            fontSize: 11,
+                                          ),
+                                        ),
+                                      ],
+                                    ],
+                                  ),
+                                ],
+                              ],
+                            );
+                          },
+                          loading: () => Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 8, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: theme.grey[100],
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                SizedBox(
+                                  width: 14,
+                                  height: 14,
+                                  child: Spinner(strokeWidth: 1.5),
+                                ),
+                                horizontalSpace(Spacing.points4),
+                                Text(
+                                  AppLocalizations.of(context)
+                                      .translate('loading'),
+                                  style: TextStyles.small.copyWith(
+                                    color: theme.grey[600],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          error: (_, __) => const SizedBox.shrink(),
+                        ),
                       ],
                     ),
                   ],
@@ -545,7 +720,7 @@ class UserDetailsWidget extends ConsumerWidget {
             ),
             Spacer(),
             Icon(
-                Directionality.of(context) == TextDirection.rtl
+                Directionality.of(context).toString().contains('rtl')
                     ? LucideIcons.chevronLeft
                     : LucideIcons.chevronRight,
                 color: theme.grey[600]),
@@ -553,5 +728,26 @@ class UserDetailsWidget extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  /// Helper method to format short date for compact display
+  String _formatShortDate(dynamic date, String language) {
+    try {
+      DateTime dateTime;
+
+      if (date is DateTime) {
+        dateTime = date;
+      } else if (date is String) {
+        dateTime = DateTime.parse(date);
+      } else {
+        return '';
+      }
+
+      // Format as "Jul 31" or short month format
+      return DateFormat('MMM dd', language == 'ar' ? 'ar' : 'en')
+          .format(dateTime);
+    } catch (e) {
+      return '';
+    }
   }
 }

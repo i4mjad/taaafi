@@ -992,6 +992,9 @@ class UserCommentsPaginationNotifier
   Future<void> loadComments() async {
     if (state.isLoading) return;
 
+    print(
+        '📝 [DEBUG] UserCommentsPaginationNotifier.loadComments - Starting for userCPId: $_userCPId');
+
     state = state.copyWith(isLoading: true, error: null);
 
     try {
@@ -1000,13 +1003,21 @@ class UserCommentsPaginationNotifier
         limit: 10,
       );
 
+      print(
+          '📝 [DEBUG] UserCommentsPaginationNotifier.loadComments - Received ${page.comments.length} comments');
+
       state = state.copyWith(
         comments: page.comments,
         lastDocument: page.lastDocument,
         hasMore: page.hasMore,
         isLoading: false,
       );
+
+      print(
+          '📝 [DEBUG] UserCommentsPaginationNotifier.loadComments - State updated successfully');
     } catch (e) {
+      print(
+          '📝 [ERROR] UserCommentsPaginationNotifier.loadComments - Error: $e');
       state = state.copyWith(isLoading: false, error: e.toString());
     }
   }
@@ -1058,6 +1069,9 @@ class UserLikedItemsPaginationNotifier
   Future<void> loadLikedItems() async {
     if (state.isLoading) return;
 
+    print(
+        '❤️📝 [DEBUG] UserLikedItemsPaginationNotifier.loadLikedItems - Starting for userCPId: $_userCPId, itemType: $_itemType');
+
     state = state.copyWith(isLoading: true, error: null);
 
     try {
@@ -1071,13 +1085,21 @@ class UserLikedItemsPaginationNotifier
               limit: 10,
             );
 
+      print(
+          '❤️📝 [DEBUG] UserLikedItemsPaginationNotifier.loadLikedItems - Received ${page.items.length} ${_itemType}s');
+
       state = state.copyWith(
         items: page.items,
         lastDocument: page.lastDocument,
         hasMore: page.hasMore,
         isLoading: false,
       );
+
+      print(
+          '❤️📝 [DEBUG] UserLikedItemsPaginationNotifier.loadLikedItems - State updated successfully');
     } catch (e) {
+      print(
+          '❤️📝 [ERROR] UserLikedItemsPaginationNotifier.loadLikedItems - Error: $e');
       state = state.copyWith(isLoading: false, error: e.toString());
     }
   }

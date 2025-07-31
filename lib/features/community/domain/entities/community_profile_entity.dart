@@ -114,7 +114,9 @@ class CommunityProfileEntity {
 
   /// Business logic: Check if user can share relapse streaks (Plus users only)
   bool canShareRelapseStreaks() {
-    return hasPlusSubscription() && (shareRelapseStreaks ?? false);
+    final hasPlus = hasPlusSubscription();
+    final allowsSharing = shareRelapseStreaks ?? false;
+    return hasPlus && allowsSharing;
   }
 
   /// Business logic: Check if streak data is available and up to date
@@ -123,14 +125,15 @@ class CommunityProfileEntity {
       return false;
     }
 
-    // Check if streak data is not older than 24 hours
     if (streakLastUpdated == null) {
       return false;
     }
 
     final now = DateTime.now();
     final difference = now.difference(streakLastUpdated!);
-    return difference.inHours < 24;
+    final isRecent = difference.inHours < 24;
+
+    return isRecent;
   }
 
   /// Business logic: Get display name with fallback

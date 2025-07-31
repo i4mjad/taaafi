@@ -59,8 +59,9 @@ class SubscriptionInfo {
   // NEW: Create from RevenueCat data
   static SubscriptionInfo fromRevenueCat(
       CustomerInfo customerInfo, List<Package>? packages) {
-    final hasPlus = customerInfo.entitlements.active['plus']?.isActive ?? false;
-    final plusEntitlement = customerInfo.entitlements.all['plus'];
+    final hasPlus =
+        customerInfo.entitlements.active['taaafi_plus']?.isActive ?? false;
+    final plusEntitlement = customerInfo.entitlements.all['taaafi_plus'];
 
     return SubscriptionInfo(
       status: hasPlus ? SubscriptionStatus.plus : SubscriptionStatus.free,
@@ -117,6 +118,167 @@ class SubscriptionRepository {
     } else {
       await _revenueCatService.logout();
     }
+  }
+
+  /// Clear all cache keys and force fresh validation
+  Future<void> forceClearCache() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_subscriptionStatusKey);
+    await prefs.remove(_subscriptionActiveKey);
+    await prefs.remove(_subscriptionExpirationKey);
+    await prefs.remove(_subscriptionProductIdKey);
+    await prefs.remove(_subscriptionUserIdKey);
+
+    // Also force fresh user validation in RevenueCat service
+    await _revenueCatService.forceUserValidation();
+    print(
+        'Subscription Repository: All caches cleared and user validation forced');
+  }
+
+  /// COMPREHENSIVE DEBUG METHOD - Traces every step of entitlement fetching
+  Future<void> debugEntitlementFetching() async {
+    print('\n🔍 === COMPREHENSIVE ENTITLEMENT DEBUG ===');
+
+    try {
+      // Step 1: Check Firebase user
+      final firebaseUser = FirebaseAuth.instance.currentUser;
+      print('Step 1 - Firebase User: ${firebaseUser?.uid ?? "NOT LOGGED IN"}');
+
+      if (firebaseUser == null) {
+        print('❌ CRITICAL: No Firebase user logged in');
+        return;
+      }
+
+      // Step 2: Ensure user sync
+      print('Step 2 - Ensuring user sync...');
+      await _ensureUserSynced();
+
+      // Step 3: Get raw customer info from RevenueCat
+      print('Step 3 - Fetching raw customer info...');
+      final customerInfo = await _revenueCatService.getCustomerInfo();
+
+      // Step 4: Log customer info details
+      print('Step 4 - Customer Info Analysis:');
+      print('  - Original App User ID: ${customerInfo.originalAppUserId}');
+      print('  - Management URL: ${customerInfo.managementURL}');
+      print('  - First Seen: ${customerInfo.firstSeen}');
+      print('  - Latest Expiration Date: ${customerInfo.latestExpirationDate}');
+      print('  - Active Subscriptions: ${customerInfo.activeSubscriptions}');
+      print(
+          '  - All Purchased Product IDs: ${customerInfo.allPurchasedProductIdentifiers}');
+
+      // Step 5: Detailed entitlements analysis
+      print('Step 5 - Entitlements Deep Dive:');
+      final allEntitlements = customerInfo.entitlements.all;
+      final activeEntitlements = customerInfo.entitlements.active;
+
+      print('  - Total entitlements count: ${allEntitlements.length}');
+      print('  - Active entitlements count: ${activeEntitlements.length}');
+      print('  - All entitlement keys: ${allEntitlements.keys.toList()}');
+      print('  - Active entitlement keys: ${activeEntitlements.keys.toList()}');
+
+      // Step 6: Check for our specific entitlement
+      print('Step 6 - Checking for "taaafi_plus" entitlement:');
+      if (allEntitlements.containsKey('taaafi_plus')) {
+        final taaafiPlusEntitlement = allEntitlements['taaafi_plus']!;
+        print('  ✅ taaafi_plus entitlement FOUND');
+        print('  - Identifier: ${taaafiPlusEntitlement.identifier}');
+        print(
+            '  - Product Identifier: ${taaafiPlusEntitlement.productIdentifier}');
+        print('  - Is Active: ${taaafiPlusEntitlement.isActive}');
+        print('  - Will Renew: ${taaafiPlusEntitlement.willRenew}');
+        print(
+            '  - Latest Purchase Date: ${taaafiPlusEntitlement.latestPurchaseDate}');
+        print(
+            '  - Original Purchase Date: ${taaafiPlusEntitlement.originalPurchaseDate}');
+        print('  - Expiration Date: ${taaafiPlusEntitlement.expirationDate}');
+        print(
+            '  - Unsubscribe Detected At: ${taaafiPlusEntitlement.unsubscribeDetectedAt}');
+        print(
+            '  - Billing Issue Detected At: ${taaafiPlusEntitlement.billingIssueDetectedAt}');
+        print('  - Store: ${taaafiPlusEntitlement.store}');
+        print('  - Period Type: ${taaafiPlusEntitlement.periodType}');
+        print('  - Ownership Type: ${taaafiPlusEntitlement.ownershipType}');
+
+        // Check if it's in active entitlements
+        if (activeEntitlements.containsKey('taaafi_plus')) {
+          print('  ✅ taaafi_plus is in ACTIVE entitlements');
+        } else {
+          print(
+              '  ❌ taaafi_plus is NOT in active entitlements (but exists in all)');
+        }
+      } else {
+        print('  ❌ taaafi_plus entitlement NOT FOUND');
+        print('  Available entitlements:');
+        allEntitlements.forEach((key, entitlement) {
+          print(
+              '    - $key: isActive=${entitlement.isActive}, product=${entitlement.productIdentifier}');
+        });
+      }
+
+      // Step 7: Test our subscription info creation
+      print('Step 7 - Testing SubscriptionInfo creation:');
+      final packages = await _revenueCatService.getOfferings();
+      final subscriptionInfo = SubscriptionInfo.fromRevenueCat(
+          customerInfo, packages.current?.availablePackages ?? []);
+
+      print('  - Generated Status: ${subscriptionInfo.status}');
+      print('  - Generated IsActive: ${subscriptionInfo.isActive}');
+      print('  - Generated Product ID: ${subscriptionInfo.productId}');
+      print('  - Generated Expiration: ${subscriptionInfo.expirationDate}');
+
+      // Step 8: Test hasEntitlement method
+      print('Step 8 - Testing hasEntitlement method:');
+      final hasEntitlementResult =
+          subscriptionInfo.hasEntitlement('taaafi_plus');
+      print('  - hasEntitlement("taaafi_plus"): $hasEntitlementResult');
+
+      // Step 9: Test raw entitlement check
+      print('Step 9 - Raw entitlement checks:');
+      final rawActiveCheck =
+          customerInfo.entitlements.active['taaafi_plus']?.isActive ?? false;
+      final rawAllCheck =
+          customerInfo.entitlements.all['taaafi_plus']?.isActive ?? false;
+      print('  - Raw active["taaafi_plus"]?.isActive: $rawActiveCheck');
+      print('  - Raw all["taaafi_plus"]?.isActive: $rawAllCheck');
+
+      // Step 10: Check what our hasActiveSubscription would return
+      print('Step 10 - Final hasActiveSubscription logic:');
+      final hasEntitlement = subscriptionInfo.hasEntitlement('taaafi_plus');
+      final hasLegacyStatus =
+          (subscriptionInfo.status == SubscriptionStatus.plus &&
+              subscriptionInfo.isActive);
+      final finalResult = hasEntitlement || hasLegacyStatus;
+
+      print('  - hasEntitlement: $hasEntitlement');
+      print('  - hasLegacyStatus: $hasLegacyStatus');
+      print('  - Final Result: $finalResult');
+
+      if (!finalResult) {
+        print(
+            '  ❌ PROBLEM IDENTIFIED: hasActiveSubscription would return FALSE');
+        print('  🔧 Debugging suggestions:');
+        if (allEntitlements.containsKey('taaafi_plus')) {
+          final ent = allEntitlements['taaafi_plus']!;
+          if (!ent.isActive) {
+            print('    - Entitlement exists but isActive=false');
+            print('    - Check expiration date: ${ent.expirationDate}');
+            print(
+                '    - Check if subscription was cancelled: ${ent.unsubscribeDetectedAt}');
+          }
+        } else {
+          print(
+              '    - Entitlement completely missing - check RevenueCat dashboard product linking');
+        }
+      } else {
+        print('  ✅ SUCCESS: hasActiveSubscription would return TRUE');
+      }
+    } catch (e, stackTrace) {
+      print('❌ DEBUG ERROR: $e');
+      print('Stack trace: $stackTrace');
+    }
+
+    print('=== END COMPREHENSIVE ENTITLEMENT DEBUG ===\n');
   }
 
   /// Get current subscription status from RevenueCat (with caching fallback)
@@ -247,13 +409,44 @@ class SubscriptionRepository {
       await _ensureUserSynced();
 
       final info = await getSubscriptionStatus();
+
+      // Debug logging
+      print('Checking subscription status:');
+      print('  - Status: ${info.status}');
+      print('  - IsActive: ${info.isActive}');
+      print('  - CustomerInfo available: ${info.customerInfo != null}');
+
+      if (info.customerInfo != null) {
+        final entitlements = info.customerInfo!.entitlements;
+        print('  - Active entitlements: ${entitlements.active.keys.toList()}');
+        print('  - All entitlements: ${entitlements.all.keys.toList()}');
+
+        final plusEntitlement = entitlements.all['taaafi_plus'];
+        if (plusEntitlement != null) {
+          print(
+              '  - Plus entitlement: isActive=${plusEntitlement.isActive}, identifier=${plusEntitlement.identifier}');
+        } else {
+          print('  - Plus entitlement: NOT FOUND');
+        }
+      }
+
       // Use RevenueCat entitlement check if available, otherwise fallback to legacy check
-      return info.hasEntitlement('plus') ||
+      final hasEntitlement = info.hasEntitlement('taaafi_plus');
+      final hasLegacyStatus =
           (info.status == SubscriptionStatus.plus && info.isActive);
+      final result = hasEntitlement || hasLegacyStatus;
+
+      print('  - HasEntitlement(plus): $hasEntitlement');
+      print('  - HasLegacyStatus: $hasLegacyStatus');
+      print('  - Final result: $result');
+
+      return result;
     } catch (e) {
       print('Error checking active subscription: $e');
       // Fallback to cached data
       final cachedInfo = await _getCachedSubscriptionStatus();
+      print(
+          'Using cached subscription status: ${cachedInfo.isActive && cachedInfo.status == SubscriptionStatus.plus}');
       return cachedInfo.isActive &&
           cachedInfo.status == SubscriptionStatus.plus;
     }

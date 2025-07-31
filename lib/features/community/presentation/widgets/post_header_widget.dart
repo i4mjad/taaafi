@@ -73,105 +73,145 @@ class PostHeaderWidget extends ConsumerWidget {
                 children: [
                   Row(
                     children: [
-                      // Display name or anonymous
+                      // Author name and metadata
                       Expanded(
-                        child: Text(
-                          isAuthorAnonymous
-                              ? localizations.translate('anonymous')
-                              : authorProfile?.displayName ?? 'Unknown User',
-                          style: TextStyles.body.copyWith(
-                            color: theme.grey[900],
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-
-                      // Author badge if this is the post author
-                      if (showAuthorBadge &&
-                          _isCurrentUserAuthor(
-                              ref.watch(currentCommunityProfileProvider))) ...[
-                        const SizedBox(width: 8),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 6,
-                            vertical: 2,
-                          ),
-                          decoration: BoxDecoration(
-                            color: theme.primary[100],
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                          child: Text(
-                            localizations.translate('author'),
-                            style: TextStyles.tiny.copyWith(
-                              color: theme.primary[700],
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ],
-                  ),
-
-                  const SizedBox(height: 2),
-
-                  // Category and timestamp row
-                  Row(
-                    children: [
-                      // Category flair - show category or fallback
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          color: postCategory != null
-                              ? postCategory.color.withValues(alpha: 0.1)
-                              : theme.grey[100],
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: postCategory != null
-                                ? postCategory.color.withValues(alpha: 0.3)
-                                : theme.grey[300]!,
-                            width: 1,
-                          ),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Icon(
-                              postCategory?.icon ?? LucideIcons.tag,
-                              size: 12,
-                              color: postCategory?.color ?? theme.grey[600],
+                            Row(
+                              children: [
+                                // Display name
+                                Flexible(
+                                  child: Text(
+                                    isAuthorAnonymous
+                                        ? localizations.translate('anonymous')
+                                        : authorProfile?.displayName ??
+                                            'Unknown User',
+                                    style: TextStyles.body.copyWith(
+                                      fontWeight: FontWeight.w600,
+                                      color: theme.grey[900],
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+
+                                const SizedBox(width: 6),
+
+                                // Plus badge if user is a Plus user
+                                if (isAuthorPlusUser) ...[
+                                  const SizedBox(width: 6),
+                                  const PlusBadgeWidget(),
+                                ],
+                              ],
                             ),
-                            const SizedBox(width: 4),
-                            Text(
-                              postCategory?.getDisplayName(
-                                    localizations.locale.languageCode,
-                                  ) ??
-                                  _getLocalizedCategoryName(
-                                      post.category, localizations),
-                              style: TextStyles.small.copyWith(
-                                color: postCategory?.color ?? theme.grey[600],
-                                fontWeight: FontWeight.w600,
+
+                            // Category chip
+                            Container(
+                              margin: const EdgeInsets.only(top: 4),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 8, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: postCategory?.color
+                                        ?.withValues(alpha: 0.1) ??
+                                    theme.grey[100],
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                  color: postCategory?.color
+                                          ?.withValues(alpha: 0.3) ??
+                                      theme.grey[300]!,
+                                  width: 1,
+                                ),
                               ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    postCategory?.icon ?? LucideIcons.tag,
+                                    size: 12,
+                                    color:
+                                        postCategory?.color ?? theme.grey[600],
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    postCategory?.getDisplayName(
+                                          localizations.locale.languageCode,
+                                        ) ??
+                                        _getLocalizedCategoryName(
+                                            post.category, localizations),
+                                    style: TextStyles.small.copyWith(
+                                      color: postCategory?.color ??
+                                          theme.grey[600],
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+
+                            // Streak display if user shares streak info
+                            authorProfileAsync.when(
+                              data: (authorProfile) {
+                                // Check if user is plus AND allows sharing
+                                final isPlusUser =
+                                    authorProfile?.isPlusUser ?? false;
+                                final allowsSharing =
+                                    authorProfile?.shareRelapseStreaks ?? false;
+
+                                print(
+                                    '🎯 PostHeader: Real-time streak check for ${post.authorCPId}');
+                                print(
+                                    '  ↳ isPlusUser: $isPlusUser, allowsSharing: $allowsSharing');
+
+                                if (!isPlusUser || !allowsSharing) {
+                                  print(
+                                      '  ↳ Streak not shown: isPlusUser=$isPlusUser, allowsSharing=$allowsSharing');
+                                  return const SizedBox.shrink();
+                                }
+
+                                // Calculate streak in real-time
+                                return Consumer(
+                                  builder: (context, ref, child) {
+                                    final streakAsync = ref.watch(
+                                        userStreakCalculatorProvider(
+                                            post.authorCPId));
+
+                                    return streakAsync.when(
+                                      data: (streakDays) {
+                                        if (streakDays == null ||
+                                            streakDays <= 0) {
+                                          print(
+                                              '  ↳ No valid streak data: $streakDays');
+                                          return const SizedBox.shrink();
+                                        }
+
+                                        print(
+                                            '  ↳ Showing streak badge: $streakDays days');
+                                        return Row(
+                                          children: [
+                                            const SizedBox(width: 6),
+                                            StreakDisplayWidget(
+                                              streakDays: streakDays,
+                                            ),
+                                          ],
+                                        );
+                                      },
+                                      loading: () => const SizedBox.shrink(),
+                                      error: (error, stackTrace) {
+                                        print(
+                                            '  ↳ Error calculating streak: $error');
+                                        return const SizedBox.shrink();
+                                      },
+                                    );
+                                  },
+                                );
+                              },
+                              loading: () => const SizedBox.shrink(),
+                              error: (error, stackTrace) =>
+                                  const SizedBox.shrink(),
                             ),
                           ],
                         ),
                       ),
-
-                      // Plus badge if user is a Plus user
-                      if (isAuthorPlusUser) ...[
-                        const SizedBox(width: 6),
-                        const PlusBadgeWidget(),
-                      ],
-
-                      // Streak display if user shares streak info
-                      if (authorProfile?.hasValidStreakData() == true) ...[
-                        const SizedBox(width: 6),
-                        StreakDisplayWidget(
-                          streakDays: authorProfile!.currentStreakDays!,
-                        ),
-                      ],
 
                       const SizedBox(width: 8),
 

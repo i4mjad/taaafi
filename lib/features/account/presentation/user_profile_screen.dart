@@ -21,6 +21,8 @@ import 'package:reboot_app_3/features/account/providers/clean_ban_warning_provid
 import 'package:reboot_app_3/features/account/utils/ban_display_formatter.dart';
 import 'package:reboot_app_3/features/account/presentation/warning_detail_modal.dart';
 import 'package:reboot_app_3/features/account/presentation/ban_detail_modal.dart';
+import 'package:reboot_app_3/features/plus/data/notifiers/subscription_notifier.dart';
+import 'package:reboot_app_3/features/plus/data/repositories/subscription_repository.dart';
 
 class UserProfileScreen extends ConsumerWidget {
   const UserProfileScreen({super.key});
@@ -62,6 +64,11 @@ class UserProfileScreen extends ConsumerWidget {
                   // Profile Details Section
                   _buildProfileDetailsCard(
                       context, theme, userProfile, currentUser, locale),
+
+                  verticalSpace(Spacing.points24),
+
+                  // Subscription Details Section - NEW
+                  _buildSubscriptionCard(context, theme, ref),
 
                   verticalSpace(Spacing.points24),
 
@@ -781,5 +788,202 @@ class UserProfileScreen extends ConsumerWidget {
         );
       },
     );
+  }
+
+  Widget _buildSubscriptionCard(
+      BuildContext context, CustomThemeData theme, WidgetRef ref) {
+    final subscriptionState = ref.watch(subscriptionNotifierProvider);
+    final isRefreshing = subscriptionState.isRefreshing;
+    final locale = ref.watch(localeNotifierProvider);
+
+    return subscriptionState.when(
+      loading: () => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildSectionHeader(
+            context,
+            theme,
+            'subscription',
+            LucideIcons.creditCard,
+            theme.primary[600]!,
+            onRefresh: () {
+              HapticFeedback.lightImpact();
+              ref.invalidate(subscriptionNotifierProvider);
+            },
+            isRefreshing: isRefreshing,
+          ),
+          verticalSpace(Spacing.points12),
+          WidgetsContainer(
+            padding: const EdgeInsets.all(16),
+            backgroundColor: theme.backgroundColor,
+            borderSide: BorderSide(color: theme.grey[600]!, width: 0.5),
+            borderRadius: BorderRadius.circular(12),
+            child: const Center(child: Spinner()),
+          ),
+        ],
+      ),
+      error: (error, stack) => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildSectionHeader(
+            context,
+            theme,
+            'subscription',
+            LucideIcons.creditCard,
+            theme.primary[600]!,
+            onRefresh: () {
+              HapticFeedback.lightImpact();
+              ref.invalidate(subscriptionNotifierProvider);
+            },
+            isRefreshing: isRefreshing,
+          ),
+          verticalSpace(Spacing.points12),
+          WidgetsContainer(
+            padding: const EdgeInsets.all(16),
+            backgroundColor: theme.backgroundColor,
+            borderSide: BorderSide(color: theme.error[300]!, width: 0.5),
+            borderRadius: BorderRadius.circular(12),
+            child: Text(
+              AppLocalizations.of(context)
+                  .translate('error-loading-subscription'),
+              style: TextStyles.body.copyWith(color: theme.error[600]),
+            ),
+          ),
+        ],
+      ),
+      data: (subscription) {
+        final hasActiveSubscription =
+            subscription.status == SubscriptionStatus.plus &&
+                subscription.isActive;
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Dynamic section header based on subscription state
+            _buildSectionHeader(
+              context,
+              theme,
+              hasActiveSubscription
+                  ? 'plus-subscription'
+                  : 'free-plan-subscription',
+              hasActiveSubscription ? LucideIcons.star : LucideIcons.user,
+              hasActiveSubscription ? theme.primary[600]! : theme.grey[600]!,
+              onRefresh: () {
+                HapticFeedback.lightImpact();
+                ref.invalidate(subscriptionNotifierProvider);
+              },
+              isRefreshing: isRefreshing,
+            ),
+            verticalSpace(Spacing.points12),
+
+            if (hasActiveSubscription) ...[
+              // Display subscription details
+              _buildDetailRow(
+                context,
+                theme,
+                'subscription-status',
+                AppLocalizations.of(context).translate('plus-active'),
+                LucideIcons.checkCircle,
+              ),
+              if (subscription.expirationDate != null) ...[
+                verticalSpace(Spacing.points12),
+                _buildDetailRow(
+                  context,
+                  theme,
+                  'subscription-expires-on',
+                  _formatDate(context, subscription.expirationDate!,
+                      locale?.languageCode ?? 'en'),
+                  LucideIcons.calendar,
+                ),
+              ],
+              if (subscription.customerInfo != null) ...[
+                verticalSpace(Spacing.points12),
+                _buildDetailRow(
+                  context,
+                  theme,
+                  'member-since',
+                  _formatDate(context, subscription.customerInfo!.firstSeen,
+                      locale?.languageCode ?? 'en'),
+                  LucideIcons.userPlus,
+                ),
+              ],
+              // Show available entitlements
+              if (subscription.customerInfo?.entitlements.active.isNotEmpty ==
+                  true) ...[
+                verticalSpace(Spacing.points16),
+                Text(
+                  AppLocalizations.of(context).translate('active-features'),
+                  style: TextStyles.footnote.copyWith(
+                    color: theme.grey[900],
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                verticalSpace(Spacing.points8),
+                ...subscription.customerInfo!.entitlements.active.keys.map(
+                  (entitlementId) => Padding(
+                    padding: const EdgeInsets.only(bottom: 4),
+                    child: Row(
+                      children: [
+                        Icon(
+                          LucideIcons.checkCircle,
+                          size: 16,
+                          color: theme.success[600],
+                        ),
+                        horizontalSpace(Spacing.points8),
+                        Text(
+                          entitlementId,
+                          style: TextStyles.small.copyWith(
+                            color: theme.grey[700],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ] else ...[
+              // Free plan details
+              _buildDetailRow(
+                context,
+                theme,
+                'subscription-status',
+                AppLocalizations.of(context).translate('free-plan'),
+                LucideIcons.user,
+              ),
+              verticalSpace(Spacing.points12),
+              Text(
+                AppLocalizations.of(context)
+                    .translate('upgrade-to-plus-description'),
+                style: TextStyles.footnote.copyWith(
+                  color: theme.grey[600],
+                  height: 1.4,
+                ),
+              ),
+            ],
+          ],
+        );
+      },
+    );
+  }
+
+  /// Helper method to safely format dates that might be DateTime or String
+  String _formatDate(BuildContext context, dynamic date, String language) {
+    try {
+      DateTime dateTime;
+
+      if (date is DateTime) {
+        dateTime = date;
+      } else if (date is String) {
+        // Parse ISO 8601 string or other date formats
+        dateTime = DateTime.parse(date);
+      } else {
+        return AppLocalizations.of(context).translate('unknown-date');
+      }
+
+      return getDisplayDate(dateTime, language);
+    } catch (e) {
+      print('Error formatting date: $e');
+      return AppLocalizations.of(context).translate('unknown-date');
+    }
   }
 }

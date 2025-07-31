@@ -344,7 +344,7 @@ const Map<String, String> kEn = {
   "confirm_delete_comment":
       "Are you sure you want to delete this comment? This action cannot be undone.",
   "comment_deleted": "Comment deleted successfully",
-  "no_categories_found": "No categories available",
+  "no-categories_found": "No categories available",
   "pinned_section_description":
       "Important announcements and featured content that stays at the top for easy access.",
   "posts_section_description":
@@ -688,6 +688,17 @@ const Map<String, String> kEn = {
   "support-app-development-p":
       "App development takes a lot of time and effort, yet it remains free and ad-free. If you want to support the development, choose from the following options",
   "contact-us": "Contact us",
+  "suggest-feature": "Suggest Feature",
+  "feature-suggestion-description":
+      "Share your ideas to help us improve Ta'aafi! Your suggestions help shape the future of the platform and enhance the recovery experience for everyone.",
+  "feature-suggestion-note":
+      "We carefully review all suggestions and prioritize those that align with our mission to support recovery journeys. While we can't implement every idea, your input helps guide our development roadmap.",
+  "feature-suggestion-placeholder":
+      "Describe your feature idea in detail. Include how it would help your recovery journey and benefit other users...",
+  "submit-suggestion": "Submit Suggestion",
+  "feature-suggestion-submitted": "Feature suggestion submitted successfully!",
+  "feature-suggestion-guide-desc":
+      "Share innovative ideas to enhance the platform and contribute to the recovery community's growth",
   "new-note": "New Note",
   "ta3afi": "Ta'aafi App",
   "taaafi-platform": "Ta'aafi Platform",
@@ -1552,83 +1563,58 @@ const Map<String, String> kEn = {
   "subscription-main-title": "Subscribe to Ta'aafi Plus.",
   "subscription-subtitle":
       "Your subscription helps us build a stronger recovery community and deliver meaningful features that truly support your journey. Together, we're creating something powerful.",
-  "barcode-scan-title": "Barcode Scan:",
-  "barcode-scan-description": "Skip the search and log faster",
-  "custom-macro-tracking-title": "Custom Macro Tracking:",
-  "custom-macro-tracking-description":
-      "Find your balance of carbs, protein & fat",
+  "subscription-features-list-title":
+      "Support the community and unlock premium features",
+  "subscription-features-list-subtitle":
+      "Your subscription directly contributes to building a stronger recovery community.",
   "select-plan-title": "Support the community with your subscription.",
-  "yearly-plan": "YEARLY",
-  "monthly-plan": "MONTHLY",
-  "yearly-price": "\$68.98",
-  "yearly-period": "/YR",
-  "monthly-price": "\$14.98",
-  "monthly-period": "/MO",
-  "original-yearly-price": "\$179.76",
-  "savings-percentage": "62% SAVINGS",
-  "billed-yearly-info": "Billed yearly after free trial.",
-  "billed-monthly-info": "Billed monthly after free trial.",
-  "change-plans-anytime": "Change plans or cancel anytime.",
-  "start-free-trial": "Start 3-Day Free Trial",
-  "free-trial-started": "Free trial started successfully!",
+  "subscription-features-hint": "Scroll down to see all features",
+  "monthly-plan": "Monthly Support",
+  "subscription-features": "Features",
+  "subscription-benefits": "Benefits",
+  "subscription-support": "Support",
+  "subscription-community": "Community",
+  "subscription-analytics": "Analytics",
 
   // Simple Subscription Card
   "try-ta3afi-plus": "Try Ta'aafi Plus",
-  "free-trial-description": "Start your 3-day free trial, cancel anytime.",
+  "subscription-card-subtitle": "Unlock enhanced recovery features",
   "subscription-monthly-price": "\$4.99",
-  "continue": "Continue",
-
-  // Features Comparison Table
-  "what-you-get": "What you get:",
-  "free-version": "Free",
-  "premium-version": "Premium",
-  "detailed-analytics": "Detailed recovery analytics",
-  "custom-reminders": "Custom reminders",
-  "priority-support": "Priority support",
-  "special-community-badge": "Special badge in the community",
-  "feature-requests": "Request new features",
-
-  // Feature descriptions
-  "detailed-analytics-desc":
-      "Get comprehensive insights into your recovery progress",
-  "custom-reminders-desc":
-      "Set personalized reminders for your activities and goals",
-  "priority-support-desc": "Get priority assistance from our support team",
-  "special-community-badge-desc": "Stand out with an exclusive premium badge",
-  "feature-requests-desc": "Suggest and vote on new features for the app",
-
-  // Analytics insights
-  "streak-insights": "Track your longest streaks",
-  "mood-patterns": "Discover your mood patterns",
-  "trigger-analysis": "Identify trigger patterns",
-  "progress-trends": "Weekly & monthly trends",
-  "habit-correlation": "Habit correlation insights",
-
-  // Updated Personal Analytics sub-features
-  "heat-map-calendar": "Relapse Heat-Map Calendar",
+  "subscription-purchase-button": "Subscribe Now",
+  "subscription-restore-button": "Restore Purchase",
+  "subscription-processing": "Processing...",
+  "subscription-purchase-failed": "Purchase Failed",
+  "subscription-success": "Welcome to Plus!",
+  "subscription-restored": "Purchase Restored",
+  "subscription-loading": "Loading subscription...",
+  "premium-analytics": "Premium Analytics",
+  "community-perks": "Community Perks",
+  "smart-alerts": "Smart Alerts",
+  "priority-support": "Priority Support",
+  "heat-map-calendar": "Heat Map Calendar",
   "trigger-radar": "Trigger Radar",
   "risk-clock": "Risk Clock",
-  "mood-relapse-correlation": "Mood ↔ Relapse Correlation",
-
-  // Community Perks feature and sub-features
-  "community-perks": "Community Perks",
-  "community-perks-desc": "Exclusive benefits and recognition in the community",
+  "mood-correlation": "Mood Correlation",
   "plus-badge-flair": "Gold \"Plus\" Badge & Name Flair",
-  "featured-post-boost": "Featured-Post Boost",
-  "streak-overlay-avatar": "Optional Streak Overlay",
 
-  // Smart Alerts feature and sub-features
-  "smart-alerts-forecasts": "Alerts",
-  "smart-alerts-forecasts-desc":
-      "Intelligent predictions and personalized notifications",
-  "high-risk-hour-alert": "High-Risk Hour Alert",
-  "streak-vulnerability-alert": "Streak Vulnerability Alert",
-  "topic-based-pushes": "Topic-Based Pushes",
+  // New subscription profile keys
+  "plus-member": "Plus Member",
+  "free-plan": "Free Plan",
+  "subscription": "Subscription",
+  "error-loading-subscription": "Error loading subscription details",
+  "plus-subscription": "Ta'aafi Plus Subscription",
+  "free-plan-subscription": "Free Plan",
+  "plus-active": "Plus Active",
+  "product-id": "Product ID",
+  "subscription-expires-on": "Expires On",
+  "active-features": "Active Features",
+  "upgrade-to-plus-description":
+      "Upgrade to Ta'aafi Plus to unlock premium features and support the community.",
+  "unknown-date": "Unknown date",
+  "expires": "Expires",
+  "features-active": "features active",
 
-  // Smart Alerts UI translations
-  "smart-alerts-title": "Smart Alert Suite",
-  "smart-alerts-description":
-      "Get personalized notifications to help prevent relapses based on your patterns.",
+  // Smart Alerts Plus Feature
   "smart-alerts-plus-required-title": "Ta'aafi Plus Required",
   "smart-alerts-plus-required-description":
       "Smart Alerts are available exclusively for Plus subscribers. Upgrade to unlock intelligent relapse prevention notifications.",
@@ -1695,6 +1681,9 @@ const Map<String, String> kEn = {
   // Plus Streak Sharing Feature
   "days-streak": "{days} days",
   "no-streak-data": "No streak data available",
+  "sync-streak-data": "Sync Streak Data",
+  "streak-data-synced": "Streak data synced successfully",
+  "streak-data-sync-failed": "Failed to sync streak data",
   "daily-login-requirement":
       "⚠️ Important: You must log in daily to keep your streak updated in posts and comments. Your displayed streak will only update when you open the app.",
   "plus-streak-feature-info":

@@ -58,10 +58,13 @@ class _CommunityProfileSettingsScreenState
   }
 
   void _loadInitialData() {
+    print('🚀 [DEBUG] _loadInitialData - Starting initial data load');
     final profileAsync = ref.read(currentCommunityProfileProvider);
     profileAsync.whenData((profile) {
       if (profile != null) {
         final userCPId = profile.id;
+        print(
+            '🚀 [DEBUG] _loadInitialData - Loading data for userCPId: $userCPId');
         ref.read(userPostsPaginationProvider(userCPId).notifier).loadPosts();
         ref
             .read(userCommentsPaginationProvider(userCPId).notifier)
@@ -69,6 +72,12 @@ class _CommunityProfileSettingsScreenState
         ref
             .read(userLikedPostsPaginationProvider(userCPId).notifier)
             .loadLikedItems();
+        ref
+            .read(userLikedCommentsPaginationProvider(userCPId).notifier)
+            .loadLikedItems();
+        print('🚀 [DEBUG] _loadInitialData - All load methods called');
+      } else {
+        print('🚀 [DEBUG] _loadInitialData - Profile is null, skipping load');
       }
     });
   }
@@ -489,10 +498,15 @@ class _CommunityProfileSettingsScreenState
 
     return profileAsync.when(
       data: (profile) {
-        if (profile == null) return const SizedBox.shrink();
+        if (profile == null) {
+          print('📱 [DEBUG] _buildCommentsTab - Profile is null');
+          return const SizedBox.shrink();
+        }
 
         final commentsState =
             ref.watch(userCommentsPaginationProvider(profile.id));
+        print(
+            '📱 [DEBUG] _buildCommentsTab - Profile ID: ${profile.id}, Comments count: ${commentsState.comments.length}, isLoading: ${commentsState.isLoading}, error: ${commentsState.error}');
 
         if (commentsState.comments.isEmpty && !commentsState.isLoading) {
           return Center(
@@ -565,12 +579,21 @@ class _CommunityProfileSettingsScreenState
 
     return profileAsync.when(
       data: (profile) {
-        if (profile == null) return const SizedBox.shrink();
+        if (profile == null) {
+          print('📱 [DEBUG] _buildLikesTab - Profile is null');
+          return const SizedBox.shrink();
+        }
 
         final likedPostsState =
             ref.watch(userLikedPostsPaginationProvider(profile.id));
         final likedCommentsState =
             ref.watch(userLikedCommentsPaginationProvider(profile.id));
+
+        print('📱 [DEBUG] _buildLikesTab - Profile ID: ${profile.id}');
+        print(
+            '📱 [DEBUG] _buildLikesTab - Liked posts: ${likedPostsState.items.length}, isLoading: ${likedPostsState.isLoading}, error: ${likedPostsState.error}');
+        print(
+            '📱 [DEBUG] _buildLikesTab - Liked comments: ${likedCommentsState.items.length}, isLoading: ${likedCommentsState.isLoading}, error: ${likedCommentsState.error}');
 
         final totalItems =
             likedPostsState.items.length + likedCommentsState.items.length;
