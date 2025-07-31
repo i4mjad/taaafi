@@ -21,6 +21,7 @@ import 'package:reboot_app_3/features/community/presentation/providers/community
 import 'package:reboot_app_3/features/plus/data/notifiers/subscription_notifier.dart';
 import 'package:reboot_app_3/features/plus/data/repositories/subscription_repository.dart';
 import 'package:reboot_app_3/features/vault/data/follow_up/follow_up_notifier.dart';
+import 'package:reboot_app_3/features/community/domain/services/community_service.dart';
 
 class EditCommunityProfileModal extends ConsumerStatefulWidget {
   final CommunityProfileEntity profile;
@@ -408,7 +409,10 @@ class _EditCommunityProfileModalState
 
                         const SizedBox(height: 24),
 
-                        // 4. Plus Features Section (Premium features at the end)
+                        // 4. Danger Zone Section
+                        _buildDangerZoneSection(context, theme, localizations),
+
+                        // 5. Plus Features Section (Premium features at the end)
                         _buildPlusFeatureSection(context, theme, localizations),
                       ],
                     ),
@@ -483,6 +487,375 @@ class _EditCommunityProfileModalState
         ],
       ),
     );
+  }
+
+  Widget _buildDangerZoneSection(BuildContext context, CustomThemeData theme,
+      AppLocalizations localizations) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 24),
+
+        // Danger Zone Title
+        Row(
+          children: [
+            Icon(
+              LucideIcons.alertTriangle,
+              size: 20,
+              color: theme.error[600],
+            ),
+            const SizedBox(width: 8),
+            Text(
+              localizations.translate('community-delete-profile'),
+              style: TextStyles.h6.copyWith(
+                color: theme.error[700],
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
+
+        const SizedBox(height: 12),
+
+        // Description
+        Text(
+          localizations.translate('community-delete-profile-description'),
+          style: TextStyles.body.copyWith(
+            color: theme.grey[600],
+            height: 1.5,
+          ),
+        ),
+
+        const SizedBox(height: 16),
+
+        // Warning
+        WidgetsContainer(
+          padding: const EdgeInsets.all(12),
+          backgroundColor: theme.error[50],
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide(
+            color: theme.error[200]!,
+            width: 1,
+          ),
+          child: Row(
+            children: [
+              Icon(
+                LucideIcons.alertCircle,
+                size: 16,
+                color: theme.error[600],
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  localizations.translate('community-delete-profile-warning'),
+                  style: TextStyles.caption.copyWith(
+                    color: theme.error[700],
+                    height: 1.4,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        const SizedBox(height: 16),
+
+        // Delete Button
+        SizedBox(
+          width: double.infinity,
+          child: ElevatedButton(
+            onPressed: _isLoading
+                ? null
+                : () => _showDeleteConfirmationDialog(
+                    context, theme, localizations),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: theme.error[600],
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+              padding: const EdgeInsets.symmetric(vertical: 12),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  LucideIcons.trash2,
+                  size: 16,
+                  color: Colors.white,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  localizations.translate('community-delete-profile-button'),
+                  style: TextStyles.body.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  void _showDeleteConfirmationDialog(BuildContext context,
+      CustomThemeData theme, AppLocalizations localizations) {
+    final TextEditingController confirmationController =
+        TextEditingController();
+    bool canDelete = false;
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext dialogContext) {
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return AlertDialog(
+              backgroundColor: theme.backgroundColor,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              title: Row(
+                children: [
+                  Icon(
+                    LucideIcons.alertTriangle,
+                    size: 24,
+                    color: theme.error[600],
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      localizations.translate('community-delete-profile'),
+                      style: TextStyles.h5.copyWith(
+                        color: theme.error[700],
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    localizations
+                        .translate('community-delete-profile-description'),
+                    style: TextStyles.body.copyWith(
+                      color: theme.grey[700],
+                      height: 1.5,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  WidgetsContainer(
+                    padding: const EdgeInsets.all(12),
+                    backgroundColor: theme.error[50],
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide(
+                      color: theme.error[200]!,
+                      width: 1,
+                    ),
+                    child: Text(
+                      localizations
+                          .translate('community-delete-profile-warning'),
+                      style: TextStyles.caption.copyWith(
+                        color: theme.error[700],
+                        height: 1.4,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  Text(
+                    localizations.translate('community-delete-profile-confirm'),
+                    style: TextStyles.body.copyWith(
+                      color: theme.grey[700],
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  TextField(
+                    controller: confirmationController,
+                    decoration: InputDecoration(
+                      hintText: localizations
+                          .translate('community-delete-profile-confirmation'),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide(
+                          color: theme.error[500]!,
+                          width: 2,
+                        ),
+                      ),
+                    ),
+                    onChanged: (value) {
+                      setDialogState(() {
+                        canDelete = value.trim().toUpperCase() ==
+                            localizations
+                                .translate(
+                                    'community-delete-profile-confirmation')
+                                .toUpperCase();
+                      });
+                    },
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(dialogContext).pop();
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(localizations
+                            .translate('community-delete-profile-cancelled')),
+                        backgroundColor: theme.success[600],
+                      ),
+                    );
+                  },
+                  child: Text(
+                    localizations.translate('community-cancel'),
+                    style: TextStyles.body.copyWith(
+                      color: theme.grey[600],
+                    ),
+                  ),
+                ),
+                ElevatedButton(
+                  onPressed: canDelete
+                      ? () {
+                          Navigator.of(dialogContext).pop();
+                          _deleteProfile(context, localizations);
+                        }
+                      : null,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: theme.error[600],
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  child: Text(
+                    localizations.translate('community-delete-profile-button'),
+                    style: TextStyles.body.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
+  void _deleteProfile(
+      BuildContext context, AppLocalizations localizations) async {
+    // Show progress dialog
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext dialogContext) {
+        return StreamBuilder<DeletionProgress>(
+          stream: ref.read(communityServiceProvider).deleteProfile(),
+          builder: (context, snapshot) {
+            if (snapshot.hasError) {
+              return AlertDialog(
+                title:
+                    Text(localizations.translate('community-deletion-failed')),
+                content: Text(snapshot.error.toString()),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(dialogContext).pop();
+                      Navigator.of(context).pop(); // Close modal
+                    },
+                    child: Text(localizations.translate('community-cancel')),
+                  ),
+                ],
+              );
+            }
+
+            if (snapshot.hasData) {
+              final progress = snapshot.data!;
+              final isCompleted =
+                  progress.step == DeletionStep.cleaningUpMappings &&
+                      progress.completedItems == progress.totalItems;
+
+              if (isCompleted) {
+                // Auto-close after completion
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  Navigator.of(dialogContext).pop();
+                  Navigator.of(context).pop(); // Close modal
+
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(localizations
+                          .translate('community-deletion-completed')),
+                      backgroundColor: Colors.green,
+                    ),
+                  );
+
+                  // Refresh profile cache
+                  ref.refresh(currentCommunityProfileProvider);
+                  ref.refresh(hasCommunityProfileProvider);
+                });
+              }
+
+              return AlertDialog(
+                title: Text(
+                    localizations.translate('community-deletion-progress')),
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    LinearProgressIndicator(
+                      value: progress.percentage,
+                      backgroundColor: Colors.grey[300],
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(_getStepMessage(progress.step, localizations)),
+                    if (progress.totalItems > 0) ...[
+                      const SizedBox(height: 8),
+                      Text('${progress.completedItems}/${progress.totalItems}'),
+                    ],
+                  ],
+                ),
+              );
+            }
+
+            return AlertDialog(
+              title:
+                  Text(localizations.translate('community-deletion-progress')),
+              content: const Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  CircularProgressIndicator(),
+                  SizedBox(height: 16),
+                  Text('Preparing deletion...'),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  String _getStepMessage(DeletionStep step, AppLocalizations localizations) {
+    switch (step) {
+      case DeletionStep.deletingPosts:
+        return localizations.translate('community-deletion-step-1');
+      case DeletionStep.deletingComments:
+        return localizations.translate('community-deletion-step-2');
+      case DeletionStep.deletingInteractions:
+        return localizations.translate('community-deletion-step-3');
+      case DeletionStep.removingProfileData:
+        return localizations.translate('community-deletion-step-4');
+      case DeletionStep.cleaningUpMappings:
+        return localizations.translate('community-deletion-step-5');
+    }
   }
 
   Widget _buildPlusFeatureSection(BuildContext context, CustomThemeData theme,
