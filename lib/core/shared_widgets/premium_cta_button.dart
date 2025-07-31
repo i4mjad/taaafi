@@ -6,7 +6,7 @@ import 'package:reboot_app_3/features/plus/data/repositories/subscription_reposi
 
 class PremiumCtaAppBarIcon extends ConsumerWidget {
   const PremiumCtaAppBarIcon({super.key});
-
+//TODO: consider wraping this to a checker for the subscription status, if the user is subscibed show them a page that will guide them to the features and allow them to access those features.
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Consumer(

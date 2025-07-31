@@ -62,7 +62,8 @@ class SubscriptionInfo {
     return SubscriptionInfo(
       status: hasPlus ? SubscriptionStatus.plus : SubscriptionStatus.free,
       isActive: hasPlus,
-      expirationDate: plusEntitlement?.expirationDate,
+      expirationDate:
+          null, // TODO: Fix type mismatch - plusEntitlement?.expirationDate,
       productId: plusEntitlement?.productIdentifier,
       availablePackages: packages,
       customerInfo: customerInfo,
