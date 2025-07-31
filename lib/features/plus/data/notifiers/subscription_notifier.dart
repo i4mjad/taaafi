@@ -1,8 +1,10 @@
 import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:reboot_app_3/features/plus/application/subscription_service.dart';
 import 'package:reboot_app_3/features/plus/data/repositories/subscription_repository.dart';
+import 'package:reboot_app_3/features/authentication/providers/user_provider.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'subscription_notifier.g.dart';
@@ -13,6 +15,9 @@ class SubscriptionNotifier extends _$SubscriptionNotifier {
 
   @override
   FutureOr<SubscriptionInfo> build() async {
+    // Watch user changes to invalidate subscription data when user changes
+    ref.watch(userNotifierProvider);
+
     // Load initial subscription status
     return await service.getSubscriptionInfo();
   }
@@ -87,16 +92,41 @@ class SubscriptionNotifier extends _$SubscriptionNotifier {
   Future<bool> isFeatureAvailable(String featureName) async {
     return await service.isFeatureAvailable(featureName);
   }
+
+  /// Force refresh subscription data
+  Future<void> refresh() async {
+    state = const AsyncValue.loading();
+    try {
+      final info = await service.getSubscriptionInfo();
+      state = AsyncValue.data(info);
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+    }
+  }
 }
 
-// Simple provider to check subscription status
+// User-aware subscription status provider that invalidates when user changes
 @riverpod
 bool hasActiveSubscription(Ref ref) {
+  // Watch user changes to automatically refresh subscription status
+  final user = ref.watch(userNotifierProvider);
   final subscriptionAsync = ref.watch(subscriptionNotifierProvider);
 
-  return subscriptionAsync.when(
-    data: (subscription) =>
-        subscription.status == SubscriptionStatus.plus && subscription.isActive,
+  // If user is null (logged out), always return false
+  return user.when(
+    data: (userData) {
+      if (userData == null) {
+        return false; // No user logged in
+      }
+
+      return subscriptionAsync.when(
+        data: (subscription) =>
+            subscription.status == SubscriptionStatus.plus &&
+            subscription.isActive,
+        loading: () => false,
+        error: (_, __) => false,
+      );
+    },
     loading: () => false,
     error: (_, __) => false,
   );
@@ -105,13 +135,27 @@ bool hasActiveSubscription(Ref ref) {
 // Provider to check if premium analytics is available
 @riverpod
 Future<bool> isPremiumAnalyticsAvailable(Ref ref) async {
-  final notifier = ref.read(subscriptionNotifierProvider.notifier);
-  return await notifier.isFeatureAvailable('premium_analytics');
+  // Watch user changes
+  final user = ref.watch(userNotifierProvider);
+
+  return user.when(
+    data: (userData) async {
+      if (userData == null) return false;
+
+      final notifier = ref.read(subscriptionNotifierProvider.notifier);
+      return await notifier.isFeatureAvailable('premium_analytics');
+    },
+    loading: () => false,
+    error: (_, __) => false,
+  );
 }
 
 // Provider for available packages from RevenueCat
 @riverpod
 Future<List<Package>> availablePackages(Ref ref) async {
+  // Watch user changes to refresh packages if needed
+  ref.watch(userNotifierProvider);
+
   final subscription = await ref.watch(subscriptionNotifierProvider.future);
   return subscription.availablePackages ?? [];
 }

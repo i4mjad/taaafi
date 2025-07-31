@@ -7,7 +7,7 @@ part of 'subscription_notifier.dart';
 // **************************************************************************
 
 String _$hasActiveSubscriptionHash() =>
-    r'1508f52259a508c129c04b6038326e2504d04b7e';
+    r'5572df4916165f48c879e113a2b9f9fac448fe36';
 
 /// See also [hasActiveSubscription].
 @ProviderFor(hasActiveSubscription)
@@ -25,7 +25,7 @@ final hasActiveSubscriptionProvider = AutoDisposeProvider<bool>.internal(
 // ignore: unused_element
 typedef HasActiveSubscriptionRef = AutoDisposeProviderRef<bool>;
 String _$isPremiumAnalyticsAvailableHash() =>
-    r'725aed4e99833666e6ed9b17720b8f7dc2e5daef';
+    r'1e709839b82d9876e332264630cd6ae2a1da09cb';
 
 /// See also [isPremiumAnalyticsAvailable].
 @ProviderFor(isPremiumAnalyticsAvailable)
@@ -43,7 +43,7 @@ final isPremiumAnalyticsAvailableProvider =
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef IsPremiumAnalyticsAvailableRef = AutoDisposeFutureProviderRef<bool>;
-String _$availablePackagesHash() => r'728ef18ed82f021d4386eec4e2681074344574f2';
+String _$availablePackagesHash() => r'851247acc24df055dff00eb4dc6e4bbba8725b67';
 
 /// See also [availablePackages].
 @ProviderFor(availablePackages)
@@ -62,7 +62,7 @@ final availablePackagesProvider =
 // ignore: unused_element
 typedef AvailablePackagesRef = AutoDisposeFutureProviderRef<List<Package>>;
 String _$subscriptionNotifierHash() =>
-    r'95d15559007bae4ad5f40637d03484f8fdb283f4';
+    r'aa7535dc8b8d13586a6d9b3b6fc6e8b9ce7fd0f9';
 
 /// See also [SubscriptionNotifier].
 @ProviderFor(SubscriptionNotifier)

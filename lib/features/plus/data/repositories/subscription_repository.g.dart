@@ -7,7 +7,7 @@ part of 'subscription_repository.dart';
 // **************************************************************************
 
 String _$subscriptionRepositoryHash() =>
-    r'18256525278d2a9eaeef871c68776ac48be9b3c5';
+    r'c96662f6755fe0017e5d29c2c2f9fdd93a0b6565';
 
 /// See also [subscriptionRepository].
 @ProviderFor(subscriptionRepository)

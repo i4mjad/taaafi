@@ -586,16 +586,16 @@ class _EditCommunityProfileModalState
               const SizedBox(height: 8),
               if (_isLoadingStreak)
                 Text(
-                  localizations.translate('loading') ?? 'Loading...',
+                  localizations.translate('loading'),
                   style: TextStyles.caption.copyWith(
                     color: theme.grey[600],
                   ),
                 )
               else if (_currentStreakDays != null)
                 Text(
-                  localizations.translate('days-streak')?.replaceAll(
-                          '{days}', _currentStreakDays.toString()) ??
-                      '$_currentStreakDays days',
+                  localizations
+                      .translate('days-streak')
+                      .replaceAll('{days}', _currentStreakDays.toString()),
                   style: TextStyles.h6.copyWith(
                     color: const Color(0xFF22C55E),
                     fontWeight: FontWeight.bold,
@@ -603,8 +603,7 @@ class _EditCommunityProfileModalState
                 )
               else
                 Text(
-                  localizations.translate('no-streak-data') ??
-                      'No streak data available',
+                  localizations.translate('no-streak-data'),
                   style: TextStyles.caption.copyWith(
                     color: theme.grey[600],
                   ),
@@ -623,10 +622,8 @@ class _EditCommunityProfileModalState
                     _shareRelapseStreaks = value;
                   });
                 },
-          label: localizations.translate('allow-sharing-progress') ??
-              'Allow sharing my progress',
-          subtitle: localizations.translate('share-streak-description') ??
-              'When enabled, your recovery progress will be visible to other community members',
+          label: localizations.translate('allow-sharing-progress'),
+          subtitle: localizations.translate('share-streak-description'),
           activeColor: const Color(0xFFFEBA01),
         ),
 
@@ -634,8 +631,7 @@ class _EditCommunityProfileModalState
 
         // Important Daily Login Requirement Notice
         _buildInfoBox(
-          localizations.translate('daily-login-requirement') ??
-              '⚠️ Important: You must log in daily to keep your streak updated in posts and comments. Your displayed streak will only update when you open the app.',
+          localizations.translate('daily-login-requirement'),
           theme,
           isPlus: true,
           isWarning: true,
@@ -645,8 +641,7 @@ class _EditCommunityProfileModalState
 
         // Additional Info Box
         _buildInfoBox(
-          localizations.translate('plus-streak-feature-info') ??
-              '👑 Plus Feature: Share your recovery progress with the community to inspire and motivate others on their journey.',
+          localizations.translate('plus-streak-feature-info'),
           theme,
           isPlus: true,
         ),
