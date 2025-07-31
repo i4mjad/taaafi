@@ -442,6 +442,35 @@ const Map<String, String> kAr = {
   "view-post": "عرض المنشور",
   "liked-post": "منشور معجب به",
   "liked-comment": "تعليق معجب به",
+  "community-delete-profile": "حذف الملف الشخصي للمجتمع",
+  "community-delete-profile-description":
+      "سيؤدي هذا إلى حذف ملفك الشخصي في المجتمع وجميع البيانات المرتبطة بشكل دائم بما في ذلك المنشورات والتعليقات والتفاعلات.",
+  "community-delete-profile-warning":
+      "لا يمكن التراجع عن هذا الإجراء. سيظهر محتواك كـ \"مستخدم محذوف\" للآخرين.",
+  "community-delete-profile-confirm": "اكتب 'DELETE' للتأكيد",
+  "community-delete-profile-confirmation": "DELETE",
+  "community-delete-profile-button": "حذف الملف الشخصي",
+  "community-delete-profile-cancelled": "تم إلغاء حذف الملف الشخصي",
+  "community-deletion-progress": "جاري حذف الملف الشخصي...",
+  "community-deletion-step-1": "حذف المنشورات",
+  "community-deletion-step-2": "حذف التعليقات",
+  "community-deletion-step-3": "حذف التفاعلات",
+  "community-deletion-step-4": "إزالة بيانات الملف الشخصي",
+  "community-deletion-step-5": "تنظيف الروابط",
+  "community-deletion-completed": "تم حذف الملف الشخصي بنجاح",
+  "community-deletion-failed": "فشل في حذف الملف الشخصي",
+  "community-rejoin-welcome": "مرحباً بعودتك!",
+  "community-rejoin-choice":
+      "كان لديك ملف شخصي في المجتمع سابقاً. ماذا تريد أن تفعل؟",
+  "community-rejoin-restore": "استعادة ملفي الشخصي",
+  "community-rejoin-fresh": "البدء من جديد",
+  "community-rejoin-restore-description":
+      "استرد جميع منشوراتك وتعليقاتك وتفاعلاتك السابقة",
+  "community-rejoin-fresh-description":
+      "إنشاء ملف شخصي جديد، المحتوى السابق يبقى كـ \"مستخدم محذوف\"",
+  "community-restore-progress": "جاري استعادة الملف الشخصي...",
+  "community-restore-completed": "تم استعادة الملف الشخصي بنجاح",
+  "community-restore-failed": "فشل في استعادة الملف الشخصي",
   "gender-selection-warning":
       "الرجاء اختيار جنسك الحقيقي. تقديم معلومات خاطئة قد يؤدي إلى قيود على الحساب.",
   "new_thread": "منشور جديد",

@@ -431,6 +431,35 @@ const Map<String, String> kEn = {
   "view-post": "View Post",
   "liked-post": "Liked Post",
   "liked-comment": "Liked Comment",
+  "community-delete-profile": "Delete Community Profile",
+  "community-delete-profile-description":
+      "This will permanently delete your community profile and all associated data including posts, comments, and interactions.",
+  "community-delete-profile-warning":
+      "This action cannot be undone. Your content will appear as \"Deleted User\" to others.",
+  "community-delete-profile-confirm": "Type 'DELETE' to confirm",
+  "community-delete-profile-confirmation": "DELETE",
+  "community-delete-profile-button": "Delete Profile",
+  "community-delete-profile-cancelled": "Profile deletion cancelled",
+  "community-deletion-progress": "Deleting Profile...",
+  "community-deletion-step-1": "Deleting posts",
+  "community-deletion-step-2": "Deleting comments",
+  "community-deletion-step-3": "Deleting interactions",
+  "community-deletion-step-4": "Removing profile data",
+  "community-deletion-step-5": "Cleaning up mappings",
+  "community-deletion-completed": "Profile deleted successfully",
+  "community-deletion-failed": "Failed to delete profile",
+  "community-rejoin-welcome": "Welcome Back!",
+  "community-rejoin-choice":
+      "You previously had a community profile. What would you like to do?",
+  "community-rejoin-restore": "Restore My Profile",
+  "community-rejoin-fresh": "Start Fresh",
+  "community-rejoin-restore-description":
+      "Get back all your previous posts, comments, and interactions",
+  "community-rejoin-fresh-description":
+      "Create a new profile, previous content stays as \"Deleted User\"",
+  "community-restore-progress": "Restoring Profile...",
+  "community-restore-completed": "Profile restored successfully",
+  "community-restore-failed": "Failed to restore profile",
   "gender-selection-warning":
       "Please select your real gender. Providing false information may result in account restrictions.",
   "new_thread": "New Thread",
