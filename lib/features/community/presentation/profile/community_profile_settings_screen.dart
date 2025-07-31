@@ -73,6 +73,111 @@ class _CommunityProfileSettingsScreenState
     });
   }
 
+  /// Refresh posts tab
+  Future<void> _refreshPostsTab() async {
+    final profileAsync = ref.read(currentCommunityProfileProvider);
+    await profileAsync.when(
+      data: (profile) async {
+        if (profile != null) {
+          await ref
+              .read(userPostsPaginationProvider(profile.id).notifier)
+              .refresh();
+        }
+      },
+      loading: () async {},
+      error: (error, stack) async {},
+    );
+  }
+
+  /// Refresh comments tab
+  Future<void> _refreshCommentsTab() async {
+    final profileAsync = ref.read(currentCommunityProfileProvider);
+    await profileAsync.when(
+      data: (profile) async {
+        if (profile != null) {
+          await ref
+              .read(userCommentsPaginationProvider(profile.id).notifier)
+              .refresh();
+        }
+      },
+      loading: () async {},
+      error: (error, stack) async {},
+    );
+  }
+
+  /// Refresh likes tab
+  Future<void> _refreshLikesTab() async {
+    final profileAsync = ref.read(currentCommunityProfileProvider);
+    await profileAsync.when(
+      data: (profile) async {
+        if (profile != null) {
+          await Future.wait([
+            ref
+                .read(userLikedPostsPaginationProvider(profile.id).notifier)
+                .refresh(),
+            ref
+                .read(userLikedCommentsPaginationProvider(profile.id).notifier)
+                .refresh(),
+          ]);
+        }
+      },
+      loading: () async {},
+      error: (error, stack) async {},
+    );
+  }
+
+  /// Refresh current tab when switching tabs
+  void _onTabChanged(int index) {
+    setState(() {
+      selectedTabIndex = index;
+    });
+
+    // Refresh the current tab if it's empty
+    final profileAsync = ref.read(currentCommunityProfileProvider);
+    profileAsync.whenData((profile) {
+      if (profile != null) {
+        final userCPId = profile.id;
+
+        switch (index) {
+          case 0: // Posts tab
+            final postsState = ref.read(userPostsPaginationProvider(userCPId));
+            if (postsState.posts.isEmpty && !postsState.isLoading) {
+              ref
+                  .read(userPostsPaginationProvider(userCPId).notifier)
+                  .loadPosts();
+            }
+            break;
+          case 1: // Comments tab
+            final commentsState =
+                ref.read(userCommentsPaginationProvider(userCPId));
+            if (commentsState.comments.isEmpty && !commentsState.isLoading) {
+              ref
+                  .read(userCommentsPaginationProvider(userCPId).notifier)
+                  .loadComments();
+            }
+            break;
+          case 2: // Likes tab
+            final likedPostsState =
+                ref.read(userLikedPostsPaginationProvider(userCPId));
+            final likedCommentsState =
+                ref.read(userLikedCommentsPaginationProvider(userCPId));
+            if (likedPostsState.items.isEmpty && !likedPostsState.isLoading) {
+              ref
+                  .read(userLikedPostsPaginationProvider(userCPId).notifier)
+                  .loadLikedItems();
+            }
+            if (likedCommentsState.items.isEmpty &&
+                !likedCommentsState.isLoading) {
+              ref
+                  .read(userLikedCommentsPaginationProvider(userCPId).notifier)
+                  .loadLikedItems();
+            }
+            break;
+        }
+      }
+    });
+  }
+
   void _onPostsScroll() {
     if (_postsScrollController.position.pixels >=
         _postsScrollController.position.maxScrollExtent * 0.8) {
@@ -223,11 +328,7 @@ class _CommunityProfileSettingsScreenState
               ),
               // Tabs
               CommunityProfileTabs(
-                onTabChanged: (index) {
-                  setState(() {
-                    selectedTabIndex = index;
-                  });
-                },
+                onTabChanged: _onTabChanged,
                 initialIndex: selectedTabIndex,
               ),
               // Tab Content
@@ -260,16 +361,50 @@ class _CommunityProfileSettingsScreenState
   }
 
   Widget _buildTabContent(theme, localizations) {
+    Widget content;
+    String tabName;
+    VoidCallback refreshFunction;
+
     switch (selectedTabIndex) {
       case 0:
-        return _buildPostsTab(theme, localizations);
+        content = _buildPostsTab(theme, localizations);
+        tabName = localizations.translate('community-posts');
+        refreshFunction = _refreshPostsTab;
+        break;
       case 1:
-        return _buildCommentsTab(theme, localizations);
+        content = _buildCommentsTab(theme, localizations);
+        tabName = localizations.translate('community-comments');
+        refreshFunction = _refreshCommentsTab;
+        break;
       case 2:
-        return _buildLikesTab(theme, localizations);
+        content = _buildLikesTab(theme, localizations);
+        tabName = localizations.translate('community-likes');
+        refreshFunction = _refreshLikesTab;
+        break;
       default:
-        return _buildPostsTab(theme, localizations);
+        content = _buildPostsTab(theme, localizations);
+        tabName = localizations.translate('community-posts');
+        refreshFunction = _refreshPostsTab;
+        break;
     }
+
+    return Stack(
+      children: [
+        content,
+        // Floating refresh button for current tab
+        Positioned(
+          bottom: 20,
+          right: 20,
+          child: FloatingActionButton.small(
+            onPressed: refreshFunction,
+            backgroundColor: theme.primary[500],
+            foregroundColor: Colors.white,
+            tooltip: '${localizations.translate('refresh')} $tabName',
+            child: const Icon(LucideIcons.refreshCw, size: 18),
+          ),
+        ),
+      ],
+    );
   }
 
   Widget _buildPostsTab(theme, localizations) {
@@ -304,11 +439,7 @@ class _CommunityProfileSettingsScreenState
         }
 
         return RefreshIndicator(
-          onRefresh: () async {
-            ref
-                .read(userPostsPaginationProvider(profile.id).notifier)
-                .refresh();
-          },
+          onRefresh: _refreshPostsTab,
           child: ListView.builder(
             controller: _postsScrollController,
             itemCount: postsState.posts.length + (postsState.isLoading ? 1 : 0),
@@ -386,11 +517,7 @@ class _CommunityProfileSettingsScreenState
         }
 
         return RefreshIndicator(
-          onRefresh: () async {
-            ref
-                .read(userCommentsPaginationProvider(profile.id).notifier)
-                .refresh();
-          },
+          onRefresh: _refreshCommentsTab,
           child: ListView.builder(
             controller: _commentsScrollController,
             itemCount: commentsState.comments.length +
@@ -485,14 +612,7 @@ class _CommunityProfileSettingsScreenState
         });
 
         return RefreshIndicator(
-          onRefresh: () async {
-            ref
-                .read(userLikedPostsPaginationProvider(profile.id).notifier)
-                .refresh();
-            ref
-                .read(userLikedCommentsPaginationProvider(profile.id).notifier)
-                .refresh();
-          },
+          onRefresh: _refreshLikesTab,
           child: ListView.builder(
             controller: _likesScrollController,
             itemCount: allLikedItems.length + (isLoading ? 1 : 0),
