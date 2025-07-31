@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:purchases_flutter/purchases_flutter.dart';
 
 part 'subscription_repository.g.dart';
 
@@ -16,12 +17,17 @@ class SubscriptionInfo {
   final DateTime? expirationDate;
   final String? productId;
   final bool isActive;
+  // NEW: RevenueCat data
+  final List<Package>? availablePackages;
+  final CustomerInfo? customerInfo;
 
   const SubscriptionInfo({
     required this.status,
     this.expirationDate,
     this.productId,
     this.isActive = false,
+    this.availablePackages, // NEW
+    this.customerInfo, // NEW
   });
 
   SubscriptionInfo copyWith({
@@ -29,12 +35,37 @@ class SubscriptionInfo {
     DateTime? expirationDate,
     String? productId,
     bool? isActive,
+    List<Package>? availablePackages, // NEW
+    CustomerInfo? customerInfo, // NEW
   }) {
     return SubscriptionInfo(
       status: status ?? this.status,
       expirationDate: expirationDate ?? this.expirationDate,
       productId: productId ?? this.productId,
       isActive: isActive ?? this.isActive,
+      availablePackages: availablePackages ?? this.availablePackages,
+      customerInfo: customerInfo ?? this.customerInfo,
+    );
+  }
+
+  // NEW: Helper to check RevenueCat entitlements
+  bool hasEntitlement(String entitlementId) {
+    return customerInfo?.entitlements.active[entitlementId]?.isActive ?? false;
+  }
+
+  // NEW: Create from RevenueCat data
+  static SubscriptionInfo fromRevenueCat(
+      CustomerInfo customerInfo, List<Package>? packages) {
+    final hasPlus = customerInfo.entitlements.active['plus']?.isActive ?? false;
+    final plusEntitlement = customerInfo.entitlements.all['plus'];
+
+    return SubscriptionInfo(
+      status: hasPlus ? SubscriptionStatus.plus : SubscriptionStatus.free,
+      isActive: hasPlus,
+      expirationDate: plusEntitlement?.expirationDate,
+      productId: plusEntitlement?.productIdentifier,
+      availablePackages: packages,
+      customerInfo: customerInfo,
     );
   }
 }
