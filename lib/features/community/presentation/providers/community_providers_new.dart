@@ -93,10 +93,9 @@ final communityProfileByIdProvider =
       avatarUrl: data['avatarUrl'],
       isPlusUser: data['isPlusUser'] as bool?,
       shareRelapseStreaks: data['shareRelapseStreaks'] as bool? ?? false,
-      currentStreakDays: data['currentStreakDays'] as int?,
-      streakLastUpdated: data['streakLastUpdated'] != null
-          ? (data['streakLastUpdated'] as Timestamp).toDate()
-          : null,
+      // Streak data is read directly from user documents, not stored here
+      currentStreakDays: null,
+      streakLastUpdated: null,
       createdAt: (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
       updatedAt: (data['updatedAt'] as Timestamp?)?.toDate(),
     );
@@ -267,6 +266,7 @@ class CommunityProfileCreationNotifier extends StateNotifier<AsyncValue<void>> {
     required String gender,
     required bool isAnonymous,
     String? avatarUrl,
+    bool? isPlusUser,
   }) async {
     state = const AsyncValue.loading();
 
@@ -276,6 +276,7 @@ class CommunityProfileCreationNotifier extends StateNotifier<AsyncValue<void>> {
         gender: gender,
         isAnonymous: isAnonymous,
         avatarUrl: avatarUrl,
+        isPlusUser: isPlusUser,
       );
       state = const AsyncValue.data(null);
     } catch (error, stackTrace) {

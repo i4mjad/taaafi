@@ -1,47 +1,22 @@
-/// Domain entity representing a community profile
+import 'package:cloud_firestore/cloud_firestore.dart';
+
+/// Community Profile Entity
 ///
-/// This is the core business object that encapsulates all the business logic
-/// and rules for community profiles. It's independent of external frameworks
-/// and can be used across different layers of the application.
+/// Represents a user's community profile with all necessary information
+/// for participating in the community forums and interactions.
 class CommunityProfileEntity {
-  /// Unique identifier for the community profile (generated ID)
   final String id;
-
-  /// Firebase Auth User UID for reference (not used for lookups)
-  /// This enables future features like multiple community profiles per user
   final String userUID;
-
-  /// Display name shown to other community members
   final String displayName;
-
-  /// User's gender (male/female/other)
   final String gender;
-
-  /// URL to the user's avatar image
   final String? avatarUrl;
-
-  /// Whether the user posts anonymously by default
   final bool isAnonymous;
-
-  /// Whether the profile has been soft deleted
   final bool isDeleted;
-
-  /// Whether the user has an active Plus subscription
   final bool? isPlusUser;
-
-  /// Whether the user allows sharing their relapse streak information (Plus feature)
-  final bool? shareRelapseStreaks;
-
-  /// Current streak in days (only stored if user shares streaks)
+  final bool shareRelapseStreaks;
   final int? currentStreakDays;
-
-  /// Last time streak data was updated
   final DateTime? streakLastUpdated;
-
-  /// When the profile was created
   final DateTime createdAt;
-
-  /// When the profile was last updated
   final DateTime? updatedAt;
 
   const CommunityProfileEntity({
@@ -60,6 +35,25 @@ class CommunityProfileEntity {
     this.updatedAt,
   });
 
+  /// Helper method to convert timestamp fields from Firestore or JSON
+  static DateTime? _parseTimestamp(dynamic value) {
+    if (value == null) return null;
+
+    if (value is Timestamp) {
+      return value.toDate();
+    }
+
+    if (value is String) {
+      return DateTime.parse(value);
+    }
+
+    if (value is DateTime) {
+      return value;
+    }
+
+    throw ArgumentError('Invalid timestamp type: ${value.runtimeType}');
+  }
+
   /// Creates a CommunityProfileEntity from JSON data
   factory CommunityProfileEntity.fromJson(Map<String, dynamic> json) {
     return CommunityProfileEntity(
@@ -73,13 +67,9 @@ class CommunityProfileEntity {
       isPlusUser: json['isPlusUser'] as bool?,
       shareRelapseStreaks: json['shareRelapseStreaks'] as bool? ?? false,
       currentStreakDays: json['currentStreakDays'] as int?,
-      streakLastUpdated: json['streakLastUpdated'] != null
-          ? DateTime.parse(json['streakLastUpdated'] as String)
-          : null,
-      createdAt: DateTime.parse(json['createdAt'] as String),
-      updatedAt: json['updatedAt'] != null
-          ? DateTime.parse(json['updatedAt'] as String)
-          : null,
+      streakLastUpdated: _parseTimestamp(json['streakLastUpdated']),
+      createdAt: _parseTimestamp(json['createdAt'])!,
+      updatedAt: _parseTimestamp(json['updatedAt']),
     );
   }
 
@@ -95,8 +85,7 @@ class CommunityProfileEntity {
       'isDeleted': isDeleted,
       'isPlusUser': isPlusUser,
       'shareRelapseStreaks': shareRelapseStreaks,
-      'currentStreakDays': currentStreakDays,
-      'streakLastUpdated': streakLastUpdated?.toIso8601String(),
+      // Streak data is read directly from user documents, not stored in community profiles
       'createdAt': createdAt.toIso8601String(),
       'updatedAt': updatedAt?.toIso8601String(),
     };
@@ -122,7 +111,7 @@ class CommunityProfileEntity {
   /// Business logic: Check if user can share relapse streaks (Plus users only)
   bool canShareRelapseStreaks() {
     final hasPlus = hasPlusSubscription();
-    final allowsSharing = shareRelapseStreaks ?? false;
+    final allowsSharing = shareRelapseStreaks;
     return hasPlus && allowsSharing;
   }
 
