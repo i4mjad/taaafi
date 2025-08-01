@@ -4,6 +4,7 @@ import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/features/community/presentation/widgets/vote_button.dart';
 import 'package:reboot_app_3/features/community/presentation/widgets/avatar_with_anonymity.dart';
+import 'package:reboot_app_3/features/plus/data/notifiers/subscription_notifier.dart';
 
 class PostCard extends ConsumerWidget {
   final String postId;
@@ -18,6 +19,8 @@ class PostCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = AppTheme.of(context);
+
+    final isPlusUser = ref.watch(hasActiveSubscriptionProvider);
 
     return Card(
       elevation: 2,
@@ -35,9 +38,10 @@ class PostCard extends ConsumerWidget {
               // Header with author info
               Row(
                 children: [
-                  const AvatarWithAnonymity(
+                  AvatarWithAnonymity(
                     cpId: 'placeholder_id',
                     isAnonymous: false,
+                    isPlusUser: isPlusUser,
                     size: 32,
                   ),
                   const SizedBox(width: 12),

@@ -23,11 +23,11 @@ class StreakDisplayWidget extends StatelessWidget {
 
     return Container(
       padding:
-          padding ?? const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+          padding ?? const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
       decoration: BoxDecoration(
         color: const Color(0xFF22C55E)
             .withValues(alpha: 0.1), // Success green color
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: const Color(0xFF22C55E).withValues(alpha: 0.3),
           width: 1,
@@ -38,18 +38,18 @@ class StreakDisplayWidget extends StatelessWidget {
         children: [
           Icon(
             LucideIcons.trophy,
-            size: iconSize ?? 10,
+            size: iconSize ?? 12,
             color: const Color(0xFF22C55E),
           ),
-          const SizedBox(width: 3),
+          const SizedBox(width: 4),
           Text(
             localizations
                 .translate('days-streak')
                 .replaceAll('{days}', streakDays.toString()),
-            style: TextStyles.tiny.copyWith(
+            style: TextStyles.small.copyWith(
               color: const Color(0xFF22C55E),
               fontWeight: FontWeight.w600,
-              fontSize: fontSize ?? 10,
+              fontSize: fontSize,
             ),
           ),
         ],

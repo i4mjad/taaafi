@@ -61,35 +61,43 @@ class ForumService {
 
   /// Helper method to get community profile ID from user mapping
   Future<String> _getCommunityProfileId(String userUID) async {
-    final doc =
-        await _firestore.collection('userProfileMappings').doc(userUID).get();
+    try {
+      final snapshot = await _firestore
+          .collection('communityProfiles')
+          .where('userUID', isEqualTo: userUID)
+          .where('isDeleted', isEqualTo: false)
+          .limit(1)
+          .get();
 
-    if (!doc.exists || doc.data() == null) {
+      if (snapshot.docs.isEmpty) {
+        throw ForumAuthenticationException(
+          'No community profile found for user',
+          code: 'NO_COMMUNITY_PROFILE',
+        );
+      }
+
+      final doc = snapshot.docs.first;
+      final data = doc.data();
+
+      // Additional validation to ensure profile is valid
+      final isDeleted = data['isDeleted'] as bool? ?? false;
+      if (isDeleted) {
+        throw ForumAuthenticationException(
+          'Community profile has been deleted',
+          code: 'PROFILE_DELETED',
+        );
+      }
+
+      return doc.id; // Return the document ID which is the community profile ID
+    } catch (e) {
+      if (e is ForumAuthenticationException) {
+        rethrow;
+      }
       throw ForumAuthenticationException(
-        'No community profile found for user',
-        code: 'NO_COMMUNITY_PROFILE',
+        'Failed to get community profile: ${e.toString()}',
+        code: 'PROFILE_LOOKUP_FAILED',
       );
     }
-
-    final data = doc.data()!;
-    final isDeleted = data['isDeleted'] as bool? ?? false;
-
-    if (isDeleted) {
-      throw ForumAuthenticationException(
-        'Community profile has been deleted',
-        code: 'PROFILE_DELETED',
-      );
-    }
-
-    final profileId = data['communityProfileId'] as String?;
-    if (profileId == null) {
-      throw ForumAuthenticationException(
-        'Invalid community profile mapping',
-        code: 'INVALID_PROFILE_MAPPING',
-      );
-    }
-
-    return profileId;
   }
 
   /// Creates a new forum post
@@ -116,36 +124,68 @@ class ForumService {
     PostFormData postData,
     AppLocalizations localizations,
   ) async {
+    print('🚀 [ForumService] createPost started');
+    print('📝 [ForumService] Input data:');
+    print('   - Title: "${postData.title}" (${postData.title.length} chars)');
+    print(
+        '   - Content: "${postData.content.substring(0, postData.content.length > 100 ? 100 : postData.content.length)}${postData.content.length > 100 ? '...' : ''}" (${postData.content.length} chars)');
+    print('   - Category ID: ${postData.categoryId}');
+
     try {
       // 1. Check authentication
+      print('🔐 [ForumService] Step 1: Checking authentication...');
       await _ensureAuthenticated();
+      print('✅ [ForumService] Authentication check passed');
 
       // 2. Validate post data
+      print('📝 [ForumService] Step 2: Validating post data...');
       _validationService.validatePostData(postData, localizations);
+      print('✅ [ForumService] Post data validation passed');
 
       // 3. Check user permissions
+      print('🔐 [ForumService] Step 3: Checking post creation permissions...');
       await _checkPostCreationPermission(localizations);
+      print('✅ [ForumService] Permission check passed');
 
       // 4. Sanitize data
+      print('🧹 [ForumService] Step 4: Sanitizing post data...');
       final sanitizedData = postData.sanitized();
+      print('✅ [ForumService] Data sanitization completed');
+      print('📝 [ForumService] Sanitized data:');
+      print('   - Title: "${sanitizedData.title}"');
+      print('   - Content length: ${sanitizedData.content.length}');
 
       // 5. Check for rate limiting
+      print('⏱️ [ForumService] Step 5: Checking rate limits...');
       await _checkRateLimit('post_creation', localizations);
+      print('✅ [ForumService] Rate limit check passed');
 
       // 6. Get current user's community profile ID
+      print('👤 [ForumService] Step 6: Getting user profile ID...');
       final currentUser = _auth.currentUser;
       if (currentUser == null) {
+        print('❌ [ForumService] Current user is null');
         throw ForumAuthenticationException(
           localizations.translate('authentication_required'),
           code: 'USER_NOT_AUTHENTICATED',
         );
       }
+      print('✅ [ForumService] Current user found: ${currentUser.uid}');
 
       // Use the user's UID as the authorCPId for now
       // TODO: Replace with actual community profile ID when implemented
       final authorCPId = await _getCommunityProfileId(currentUser.uid);
+      print('✅ [ForumService] Author profile ID obtained: $authorCPId');
 
       // 7. Create the post
+      print('💾 [ForumService] Step 7: Creating post in repository...');
+      print('📝 [ForumService] Repository call parameters:');
+      print('   - authorCPId: $authorCPId');
+      print('   - title: "${sanitizedData.title}"');
+      print('   - content length: ${sanitizedData.content.length}');
+      print('   - categoryId: ${sanitizedData.categoryId}');
+      print('   - attachmentUrls: ${sanitizedData.attachmentUrls}');
+
       final postId = await _repository.createPost(
         authorCPId: authorCPId,
         title: sanitizedData.title,
@@ -153,15 +193,22 @@ class ForumService {
         categoryId: sanitizedData.categoryId,
         attachmentUrls: sanitizedData.attachmentUrls,
       );
+      print('✅ [ForumService] Post created successfully with ID: $postId');
 
       // 8. Log the action for analytics
+      print('📊 [ForumService] Step 8: Logging post creation for analytics...');
       await _logPostCreation(postId, sanitizedData);
+      print('✅ [ForumService] Analytics logging completed');
 
+      print('🎉 [ForumService] Post creation process completed successfully');
       return postId;
     } on ForumException {
+      print('❌ [ForumService] ForumException caught, re-throwing');
       // Re-throw forum-specific exceptions
       rethrow;
     } catch (e) {
+      print('❌ [ForumService] Unexpected error caught: $e');
+      print('❌ [ForumService] Error type: ${e.runtimeType}');
       // Convert unexpected errors to ForumException
       throw PostCreationException(
         localizations.translate('post_creation_failed'),

@@ -67,29 +67,35 @@ class ForumRepository {
       throw Exception('User not authenticated');
     }
 
-    // Get community profile ID from user mapping
-    final doc = await FirebaseFirestore.instance
-        .collection('userProfileMappings')
-        .doc(user.uid)
-        .get();
+    try {
+      final snapshot = await FirebaseFirestore.instance
+          .collection('communityProfiles')
+          .where('userUID', isEqualTo: user.uid)
+          .where('isDeleted', isEqualTo: false)
+          .limit(1)
+          .get();
 
-    if (!doc.exists || doc.data() == null) {
-      throw Exception('No community profile found for user');
+      if (snapshot.docs.isEmpty) {
+        throw Exception('No community profile found for user');
+      }
+
+      final doc = snapshot.docs.first;
+      final data = doc.data();
+
+      // Additional validation to ensure profile is valid
+      final isDeleted = data['isDeleted'] as bool? ?? false;
+      if (isDeleted) {
+        throw Exception('Community profile has been deleted');
+      }
+
+      return doc.id; // Return the document ID which is the community profile ID
+    } catch (e) {
+      if (e.toString().contains('No community profile found') ||
+          e.toString().contains('Community profile has been deleted')) {
+        rethrow;
+      }
+      throw Exception('Failed to get community profile: ${e.toString()}');
     }
-
-    final data = doc.data()!;
-    final isDeleted = data['isDeleted'] as bool? ?? false;
-
-    if (isDeleted) {
-      throw Exception('Community profile has been deleted');
-    }
-
-    final profileId = data['communityProfileId'] as String?;
-    if (profileId == null) {
-      throw Exception('Invalid community profile mapping');
-    }
-
-    return profileId;
   }
 
   /// Get post categories from Firestore
@@ -740,8 +746,18 @@ class ForumRepository {
     String? categoryId,
     List<String>? attachmentUrls,
   }) async {
+    print('💾 [ForumRepository] createPost started');
+    print('📝 [ForumRepository] Parameters received:');
+    print('   - authorCPId: $authorCPId');
+    print('   - title: "$title" (${title.length} chars)');
+    print(
+        '   - content: "${content.substring(0, content.length > 100 ? 100 : content.length)}${content.length > 100 ? '...' : ''}" (${content.length} chars)');
+    print('   - categoryId: $categoryId');
+    print('   - attachmentUrls: $attachmentUrls');
+
     try {
       final now = DateTime.now();
+      print('⏰ [ForumRepository] Timestamp created: $now');
 
       // Create post document data
       final postData = {
@@ -760,11 +776,29 @@ class ForumRepository {
         // Note: attachmentUrls not implemented yet
       };
 
+      print('📄 [ForumRepository] Firestore document data prepared:');
+      print('   - authorCPId: ${postData['authorCPId']}');
+      print('   - title: ${postData['title']}');
+      print('   - body length: ${(postData['body'] as String).length}');
+      print('   - category: ${postData['category']}');
+      print('   - isPinned: ${postData['isPinned']}');
+      print('   - isDeleted: ${postData['isDeleted']}');
+      print('   - isCommentingAllowed: ${postData['isCommentingAllowed']}');
+      print('   - score: ${postData['score']}');
+      print('   - likeCount: ${postData['likeCount']}');
+      print('   - dislikeCount: ${postData['dislikeCount']}');
+      print('   - createdAt: ${postData['createdAt']}');
+
       // Add to Firestore and get the document reference
+      print('🔄 [ForumRepository] Adding document to Firestore...');
       final docRef = await _posts.add(postData);
+      print('✅ [ForumRepository] Document added successfully');
+      print('🆔 [ForumRepository] Generated document ID: ${docRef.id}');
 
       return docRef.id;
     } catch (e) {
+      print('❌ [ForumRepository] Error creating post: $e');
+      print('❌ [ForumRepository] Error type: ${e.runtimeType}');
       throw Exception('Failed to create post: $e');
     }
   }

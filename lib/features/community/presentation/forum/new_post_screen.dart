@@ -806,12 +806,21 @@ class _NewPostScreenState extends ConsumerState<NewPostScreen> {
 
   /// Handles form submission with feature access check
   Future<void> _handleSubmit() async {
-    if (!_canSubmit) return;
+    print('🚀 [NewPostScreen] _handleSubmit called');
+
+    if (!_canSubmit) {
+      print('❌ [NewPostScreen] Cannot submit - form validation failed');
+      return;
+    }
+
+    print(
+        '✅ [NewPostScreen] Form validation passed, checking feature access...');
 
     // Double-check feature access before submitting
     final canAccess =
         await checkFeatureAccess(ref, AppFeaturesConfig.postCreation);
     if (!canAccess) {
+      print('🚫 [NewPostScreen] Post creation feature access denied');
       getErrorSnackBar(
         context,
         'post-creation-restricted',
@@ -819,6 +828,7 @@ class _NewPostScreenState extends ConsumerState<NewPostScreen> {
       return;
     }
 
+    print('✅ [NewPostScreen] Feature access granted, starting submission...');
     setState(() => _isSubmitting = true);
 
     try {
@@ -829,13 +839,23 @@ class _NewPostScreenState extends ConsumerState<NewPostScreen> {
         categoryId: ref.read(selectedCategoryProvider)?.id,
       );
 
+      print('📝 [NewPostScreen] Created PostFormData:');
+      print('   - Title: "${postData.title}" (${postData.title.length} chars)');
+      print(
+          '   - Content: "${postData.content.substring(0, postData.content.length > 50 ? 50 : postData.content.length)}${postData.content.length > 50 ? '...' : ''}" (${postData.content.length} chars)');
+      print('   - Category ID: ${postData.categoryId}');
+
       // Submit through the provider
+      print('🔄 [NewPostScreen] Calling postCreationProvider.createPost...');
       await ref.read(postCreationProvider.notifier).createPost(
             postData,
             AppLocalizations.of(context),
           );
+      print(
+          '✅ [NewPostScreen] postCreationProvider.createPost completed successfully');
     } catch (e) {
       // Error handling is done in the listener
+      print('❌ [NewPostScreen] Exception in _handleSubmit: $e');
       setState(() => _isSubmitting = false);
     }
   }
@@ -843,19 +863,30 @@ class _NewPostScreenState extends ConsumerState<NewPostScreen> {
   /// Handles post creation results
   void _handlePostCreationResult(
       AsyncValue<String?> result, AppLocalizations localizations) {
+    print(
+        '📊 [NewPostScreen] _handlePostCreationResult called with result type: ${result.runtimeType}');
+
     result.when(
       data: (postId) {
+        print('✅ [NewPostScreen] Post creation successful with ID: $postId');
         if (postId != null) {
           // Success - show success message and navigate back
+          print(
+              '🎉 [NewPostScreen] Showing success snackbar and navigating back');
           getSuccessSnackBar(context, 'post_created');
           _resetForm();
           context.pop();
+        } else {
+          print('⚠️ [NewPostScreen] Post creation returned null ID');
         }
       },
       loading: () {
+        print('⏳ [NewPostScreen] Post creation in loading state');
         // Loading state is handled by the submit button
       },
       error: (error, stackTrace) {
+        print('❌ [NewPostScreen] Post creation error: $error');
+        print('📋 [NewPostScreen] Stack trace: $stackTrace');
         setState(() => _isSubmitting = false);
         _handleError(error, localizations);
       },
@@ -864,17 +895,27 @@ class _NewPostScreenState extends ConsumerState<NewPostScreen> {
 
   /// Handles errors with appropriate snackbar messages
   void _handleError(Object error, AppLocalizations localizations) {
+    print('🔧 [NewPostScreen] _handleError called with error: $error');
+    print('🔧 [NewPostScreen] Error type: ${error.runtimeType}');
+
     if (error is PostValidationException) {
+      print(
+          '📝 [NewPostScreen] PostValidationException - code: ${error.code}, message: ${error.message}');
       // Use the error code as translation key instead of the already translated message
       final translationKey = _getValidationErrorKey(error);
+      print('🗣️ [NewPostScreen] Using translation key: $translationKey');
       getErrorSnackBar(context, translationKey);
     } else if (error is ForumAuthenticationException) {
+      print('🔐 [NewPostScreen] ForumAuthenticationException detected');
       getErrorSnackBar(context, 'authentication_required');
     } else if (error is ForumPermissionException) {
+      print('🚫 [NewPostScreen] ForumPermissionException detected');
       getErrorSnackBar(context, 'permission_denied');
     } else if (error is PostCreationException) {
+      print('📝 [NewPostScreen] PostCreationException detected');
       getErrorSnackBar(context, 'post_creation_failed');
     } else {
+      print('❓ [NewPostScreen] Unknown error type, using generic error');
       getErrorSnackBar(context, 'generic_error');
     }
   }

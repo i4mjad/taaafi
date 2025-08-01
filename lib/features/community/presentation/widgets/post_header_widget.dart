@@ -7,7 +7,6 @@ import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/features/community/data/models/post.dart';
 import 'package:reboot_app_3/features/community/data/models/post_category.dart';
 import 'package:reboot_app_3/features/community/presentation/widgets/avatar_with_anonymity.dart';
-import 'package:reboot_app_3/features/community/presentation/widgets/plus_badge_widget.dart';
 import 'package:reboot_app_3/features/community/presentation/widgets/streak_display_widget.dart';
 import 'package:reboot_app_3/features/community/presentation/providers/community_providers_new.dart';
 import 'package:reboot_app_3/features/community/presentation/providers/forum_providers.dart';
@@ -99,119 +98,135 @@ class PostHeaderWidget extends ConsumerWidget {
                                 ),
 
                                 const SizedBox(width: 6),
-
-                                // Plus badge if user is a Plus user (not for orphaned posts)
-                                if (isAuthorPlusUser && !isOrphanedPost) ...[
-                                  const SizedBox(width: 6),
-                                  const PlusBadgeWidget(),
-                                ],
                               ],
                             ),
 
-                            // Category chip
-                            Container(
-                              margin: const EdgeInsets.only(top: 4),
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 8, vertical: 2),
-                              decoration: BoxDecoration(
-                                color: postCategory?.color
-                                        .withValues(alpha: 0.1) ??
-                                    theme.grey[100],
-                                borderRadius: BorderRadius.circular(12),
-                                border: Border.all(
-                                  color: postCategory?.color
-                                          .withValues(alpha: 0.3) ??
-                                      theme.grey[300]!,
-                                  width: 1,
-                                ),
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Icon(
-                                    postCategory?.icon ?? LucideIcons.tag,
-                                    size: 12,
-                                    color:
-                                        postCategory?.color ?? theme.grey[600],
-                                  ),
-                                  const SizedBox(width: 4),
-                                  Text(
-                                    postCategory?.getDisplayName(
-                                          localizations.locale.languageCode,
-                                        ) ??
-                                        _getLocalizedCategoryName(
-                                            post.category, localizations),
-                                    style: TextStyles.small.copyWith(
-                                      color: postCategory?.color ??
-                                          theme.grey[600],
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-
-                            // Streak display if user shares streak info
-                            authorProfileAsync.when(
-                              data: (authorProfile) {
-                                // Check if user is plus AND allows sharing
-                                final isPlusUser =
-                                    authorProfile?.hasPlusSubscription() ??
-                                        false;
-                                final allowsSharing =
-                                    authorProfile?.shareRelapseStreaks ?? false;
-
-                                print(
-                                    '🎯 PostHeader: Real-time streak check for ${post.authorCPId}');
-                                print(
-                                    '  ↳ isPlusUser: $isPlusUser, allowsSharing: $allowsSharing');
-
-                                if (!isPlusUser || !allowsSharing) {
-                                  print(
-                                      '  ↳ Streak not shown: isPlusUser=$isPlusUser, allowsSharing=$allowsSharing');
-                                  return const SizedBox.shrink();
-                                }
-
-                                // Calculate streak in real-time
-                                return Consumer(
-                                  builder: (context, ref, child) {
-                                    final streakAsync = ref.watch(
-                                        userStreakCalculatorProvider(
-                                            post.authorCPId));
-
-                                    return streakAsync.when(
-                                      data: (streakDays) {
-                                        if (streakDays == null ||
-                                            streakDays <= 0) {
-                                          print(
-                                              '  ↳ No valid streak data: $streakDays');
-                                          return const SizedBox.shrink();
-                                        }
-
-                                        print(
-                                            '  ↳ Showing streak badge: $streakDays days');
-                                        return Row(
-                                          children: [
-                                            const SizedBox(width: 6),
-                                            StreakDisplayWidget(
-                                              streakDays: streakDays,
+                            // Category chip and streak display in a wrapping row
+                            const SizedBox(height: 4),
+                            Row(
+                              children: [
+                                Wrap(
+                                  spacing: 8,
+                                  runSpacing: 4,
+                                  children: [
+                                    // Category chip
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 8, vertical: 2),
+                                      decoration: BoxDecoration(
+                                        color: postCategory?.color
+                                                .withValues(alpha: 0.1) ??
+                                            theme.grey[100],
+                                        borderRadius: BorderRadius.circular(12),
+                                        border: Border.all(
+                                          color: postCategory?.color
+                                                  .withValues(alpha: 0.3) ??
+                                              theme.grey[300]!,
+                                          width: 1,
+                                        ),
+                                      ),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Icon(
+                                            postCategory?.icon ??
+                                                LucideIcons.tag,
+                                            size: 12,
+                                            color: postCategory?.color ??
+                                                theme.grey[600],
+                                          ),
+                                          const SizedBox(width: 4),
+                                          Text(
+                                            postCategory?.getDisplayName(
+                                                  localizations
+                                                      .locale.languageCode,
+                                                ) ??
+                                                _getLocalizedCategoryName(
+                                                    post.category,
+                                                    localizations),
+                                            style: TextStyles.small.copyWith(
+                                              color: postCategory?.color ??
+                                                  theme.grey[600],
+                                              fontWeight: FontWeight.w600,
                                             ),
-                                          ],
-                                        );
-                                      },
-                                      loading: () => const SizedBox.shrink(),
-                                      error: (error, stackTrace) {
-                                        print(
-                                            '  ↳ Error calculating streak: $error');
-                                        return const SizedBox.shrink();
-                                      },
-                                    );
-                                  },
-                                );
-                              },
-                              loading: () => const SizedBox.shrink(),
-                              error: (error, stackTrace) =>
-                                  const SizedBox.shrink(),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+
+                                    // Streak display if user shares streak info
+                                    ...() {
+                                      return authorProfileAsync.maybeWhen(
+                                            data: (authorProfile) {
+                                              // Check if user is plus AND allows sharing
+                                              final isPlusUser = authorProfile
+                                                      ?.hasPlusSubscription() ??
+                                                  false;
+                                              final allowsSharing = authorProfile
+                                                      ?.shareRelapseStreaks ??
+                                                  false;
+
+                                              print(
+                                                  '🎯 PostHeader: Real-time streak check for ${post.authorCPId}');
+                                              print(
+                                                  '  ↳ isPlusUser: $isPlusUser, allowsSharing: $allowsSharing');
+
+                                              if (!isPlusUser ||
+                                                  !allowsSharing) {
+                                                print(
+                                                    '  ↳ Streak not shown: isPlusUser=$isPlusUser, allowsSharing=$allowsSharing');
+                                                return <Widget>[];
+                                              }
+
+                                              // Calculate streak in real-time
+                                              return [
+                                                Consumer(
+                                                  builder:
+                                                      (context, ref, child) {
+                                                    final streakAsync = ref.watch(
+                                                        userStreakCalculatorProvider(
+                                                            post.authorCPId));
+
+                                                    return streakAsync.when(
+                                                      data: (streakDays) {
+                                                        if (streakDays ==
+                                                                null ||
+                                                            streakDays <= 0) {
+                                                          print(
+                                                              '  ↳ No valid streak data: $streakDays');
+                                                          return const SizedBox
+                                                              .shrink();
+                                                        }
+
+                                                        print(
+                                                            '  ↳ Showing streak badge: $streakDays days');
+                                                        return StreakDisplayWidget(
+                                                          streakDays:
+                                                              streakDays,
+                                                        );
+                                                      },
+                                                      loading: () =>
+                                                          const SizedBox
+                                                              .shrink(),
+                                                      error:
+                                                          (error, stackTrace) {
+                                                        print(
+                                                            '  ↳ Error calculating streak: $error');
+                                                        return const SizedBox
+                                                            .shrink();
+                                                      },
+                                                    );
+                                                  },
+                                                ),
+                                              ];
+                                            },
+                                            orElse: () => <Widget>[],
+                                          ) ??
+                                          <Widget>[];
+                                    }(),
+                                  ],
+                                ),
+                              ],
                             ),
                           ],
                         ),

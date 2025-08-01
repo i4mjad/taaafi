@@ -13,16 +13,12 @@ class PostInteractionsWidget extends ConsumerWidget {
   final Post post;
   final int commentCount;
   final VoidCallback? onCommentTap;
-  final VoidCallback? onShareTap;
-  final VoidCallback? onRepostTap;
 
   const PostInteractionsWidget({
     super.key,
     required this.post,
     required this.commentCount,
     this.onCommentTap,
-    this.onShareTap,
-    this.onRepostTap,
   });
 
   @override
@@ -73,26 +69,6 @@ class PostInteractionsWidget extends ConsumerWidget {
             style: TextStyles.caption.copyWith(
               color: theme.grey[600],
             ),
-          ),
-
-          const SizedBox(width: 24),
-
-          // Repost button
-          _buildInteractionButton(
-            theme,
-            LucideIcons.repeat2,
-            false,
-            onRepostTap,
-          ),
-
-          const SizedBox(width: 24),
-
-          // Share button
-          _buildInteractionButton(
-            theme,
-            LucideIcons.share,
-            false,
-            onShareTap,
           ),
         ],
       ),

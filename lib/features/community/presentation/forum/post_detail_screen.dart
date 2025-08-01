@@ -103,8 +103,6 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
                         post: post,
                         commentCount: _getCommentCount(commentsAsync),
                         onCommentTap: () => _scrollToComments(),
-                        onShareTap: () => _sharePost(post),
-                        onRepostTap: () => _repostPost(post),
                       ),
 
                       // Divider
@@ -281,20 +279,6 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
       duration: const Duration(milliseconds: 300),
       curve: Curves.easeInOut,
     );
-  }
-
-  void _sharePost(dynamic post) {
-    // TODO: Implement share functionality
-    if (mounted && context.mounted) {
-      getSnackBar(context, 'share_coming_soon');
-    }
-  }
-
-  void _repostPost(dynamic post) {
-    // TODO: Implement repost functionality
-    if (mounted && context.mounted) {
-      getSnackBar(context, 'repost_coming_soon');
-    }
   }
 
   void _handleCommentMore(Comment comment) {

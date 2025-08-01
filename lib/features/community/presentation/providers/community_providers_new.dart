@@ -193,22 +193,45 @@ final communityInterestProvider =
   return CommunityInterestNotifier(service);
 });
 
-/// Calculates the relapse streak for any user ID
+/// Calculates the relapse streak for any community profile ID
 final userStreakCalculatorProvider =
-    FutureProvider.family<int?, String>((ref, userId) async {
+    FutureProvider.family<int?, String>((ref, communityProfileId) async {
   try {
     print('🏆 ============================================');
-    print('🏆 STREAK CALCULATOR CALLED for user: $userId');
+    print(
+        '🏆 STREAK CALCULATOR CALLED for community profile: $communityProfileId');
     print('🏆 ============================================');
 
     final firestore = ref.watch(firestoreProvider);
 
-    // Step 1: Get user's first date (matching StreakRepository.getUserFirstDate)
-    print('🏆 Step 1: Fetching user document for userFirstDate...');
+    // Step 1: Get userUID from community profile
+    print('🏆 Step 1: Fetching community profile to get userUID...');
+    final profileDoc = await firestore
+        .collection('communityProfiles')
+        .doc(communityProfileId)
+        .get();
+
+    if (!profileDoc.exists) {
+      print('🏆 ❌ FAILED: Community profile not found for $communityProfileId');
+      return null;
+    }
+
+    final profileData = profileDoc.data() as Map<String, dynamic>;
+    final userUID = profileData['userUID'] as String?;
+
+    if (userUID == null) {
+      print('🏆 ❌ FAILED: No userUID found in community profile');
+      return null;
+    }
+
+    print('🏆 ✅ Found userUID: $userUID');
+
+    // Step 2: Get user's first date (matching StreakRepository.getUserFirstDate)
+    print('🏆 Step 2: Fetching user document for userFirstDate...');
     final userDocSnapshot =
-        await firestore.collection('users').doc(userId).get();
+        await firestore.collection('users').doc(userUID).get();
     if (!userDocSnapshot.exists) {
-      print('🏆 ❌ FAILED: User document not found for $userId');
+      print('🏆 ❌ FAILED: User document not found for $userUID');
       return null;
     }
     print('🏆 ✅ User document found');
@@ -227,11 +250,11 @@ final userStreakCalculatorProvider =
     final userFirstDate = userFirstDateTimestamp.toDate();
     print('🏆 ✅ User first date (userFirstDate field): $userFirstDate');
 
-    // Step 2: Get relapse follow-ups (matching StreakRepository.readFollowUpsByType)
-    print('🏆 Step 2: Fetching relapse follow-ups...');
+    // Step 3: Get relapse follow-ups (matching StreakRepository.readFollowUpsByType)
+    print('🏆 Step 3: Fetching relapse follow-ups...');
     final followUpsSnapshot = await firestore
         .collection('users')
-        .doc(userId)
+        .doc(userUID)
         .collection('followUps')
         .where('type', isEqualTo: FollowUpType.relapse.name)
         .get();
@@ -246,7 +269,7 @@ final userStreakCalculatorProvider =
 
     // Debug: Print all follow-ups
     if (relapseFollowUps.isNotEmpty) {
-      print('🏆 Follow-ups details:');
+      print('🏆 📋 Recent relapse follow-ups:');
       for (int i = 0; i < relapseFollowUps.length && i < 3; i++) {
         final followUp = relapseFollowUps[i];
         print(
@@ -259,7 +282,7 @@ final userStreakCalculatorProvider =
       // Check if followUps collection exists at all
       final allFollowUpsSnapshot = await firestore
           .collection('users')
-          .doc(userId)
+          .doc(userUID)
           .collection('followUps')
           .limit(5)
           .get();
@@ -275,7 +298,7 @@ final userStreakCalculatorProvider =
       }
     }
 
-    // Step 3: Calculate streak (exact same logic as StreakService.calculateRelapseStreak)
+    // Step 4: Calculate streak (exact same logic as StreakService.calculateRelapseStreak)
     if (relapseFollowUps.isEmpty) {
       // No relapses, calculate days since user first date
       final streakDays = DateTime.now().difference(userFirstDate).inDays;
@@ -295,9 +318,8 @@ final userStreakCalculatorProvider =
       return streakDays;
     }
   } catch (e, stackTrace) {
-    print('🏆 ❌ ERROR calculating streak for $userId: $e');
-    print('🏆 Stack trace: $stackTrace');
-    print('🏆 ============================================');
+    print('🏆 ❌ ERROR in userStreakCalculatorProvider: $e');
+    print('🏆 ❌ Stack trace: $stackTrace');
     return null;
   }
 });

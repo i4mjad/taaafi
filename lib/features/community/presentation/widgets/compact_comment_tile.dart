@@ -27,7 +27,7 @@ class CompactCommentTile extends ConsumerWidget {
     return GestureDetector(
       onTap: () {
         // Navigate to post detail screen
-        context.push('/community/post/${comment.postId}');
+        context.push('/community/forum/post/${comment.postId}');
       },
       child: Container(
         padding: const EdgeInsets.all(16),

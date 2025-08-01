@@ -16,9 +16,9 @@ class AvatarWithAnonymity extends ConsumerWidget {
     super.key,
     required this.cpId,
     required this.isAnonymous,
+    required this.isPlusUser,
     this.size = 40,
     this.avatarUrl,
-    this.isPlusUser = false,
   });
 
   @override

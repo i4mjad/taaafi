@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/shared_widgets/app_bar.dart';
@@ -16,6 +17,7 @@ import 'package:reboot_app_3/features/community/presentation/widgets/compact_int
 import 'package:reboot_app_3/features/community/presentation/profile/edit_community_profile_modal.dart';
 import 'package:reboot_app_3/features/community/data/models/post.dart';
 import 'package:reboot_app_3/features/community/data/models/comment.dart';
+import 'package:reboot_app_3/features/plus/data/notifiers/subscription_notifier.dart';
 
 class CommunityProfileSettingsScreen extends ConsumerStatefulWidget {
   const CommunityProfileSettingsScreen({super.key});
@@ -235,6 +237,7 @@ class _CommunityProfileSettingsScreenState
     final theme = AppTheme.of(context);
     final localizations = AppLocalizations.of(context);
     final profileAsyncValue = ref.watch(currentCommunityProfileProvider);
+    final isPlusUser = ref.watch(hasActiveSubscriptionProvider);
 
     return Scaffold(
       appBar: appBar(context, ref, "community-profile-settings", false, true),
@@ -275,6 +278,7 @@ class _CommunityProfileSettingsScreenState
                         AvatarWithAnonymity(
                           cpId: profile.id,
                           isAnonymous: profile.isAnonymous,
+                          isPlusUser: isPlusUser,
                           size: 80,
                           avatarUrl: profile.avatarUrl,
                         ),
@@ -466,7 +470,7 @@ class _CommunityProfileSettingsScreenState
               return ThreadsPostCard(
                 post: post,
                 onTap: () {
-                  // Navigate to post details if needed
+                  context.push('/community/forum/post/${post.id}');
                 },
               );
             },

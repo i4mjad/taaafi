@@ -75,10 +75,16 @@ class PostFilterParams {
   /// Determines if gender filtering should be applied based on content type
   bool get shouldApplyGenderFilter {
     // Don't apply gender filtering to:
+    // - Pinned posts (should be visible to all genders)
     // - News posts (global announcements)
     // - Challenge posts (community-wide events)
-    // Note: Pinned posts ARE gender-filtered, but admin pinned posts are visible to all
 
+    // Check for pinned posts first
+    if (isPinned == true) {
+      return false;
+    }
+
+    // Check for specific categories that should not be gender filtered
     if (category != null) {
       switch (category!.toLowerCase()) {
         case 'news':
@@ -89,7 +95,7 @@ class PostFilterParams {
       }
     }
 
-    // Default to applying gender filter for all posts including pinned
+    // Default to applying gender filter for regular posts
     return true;
   }
 
@@ -820,16 +826,35 @@ class PostCreationNotifier extends StateNotifier<AsyncValue<String?>> {
 
   Future<void> createPost(
       PostFormData postData, AppLocalizations localizations) async {
+    print('🔄 [PostCreationNotifier] createPost called');
+    print('📝 [PostCreationNotifier] PostFormData received:');
+    print('   - Title: "${postData.title}"');
+    print('   - Content length: ${postData.content.length}');
+    print('   - Category ID: ${postData.categoryId}');
+
     state = const AsyncValue.loading();
+    print('⏳ [PostCreationNotifier] State set to loading');
+
     try {
+      print('🔄 [PostCreationNotifier] Calling ForumService.createPost...');
       final postId = await _forumService.createPost(postData, localizations);
+      print(
+          '✅ [PostCreationNotifier] ForumService.createPost returned postId: $postId');
+
       state = AsyncValue.data(postId);
+      print(
+          '✅ [PostCreationNotifier] State set to success with postId: $postId');
     } catch (e, st) {
+      print('❌ [PostCreationNotifier] Error in createPost: $e');
+      print('📋 [PostCreationNotifier] Stack trace: $st');
+
       state = AsyncValue.error(e, st);
+      print('❌ [PostCreationNotifier] State set to error');
     }
   }
 
   void reset() {
+    print('🔄 [PostCreationNotifier] reset called - clearing state');
     state = const AsyncValue.data(null);
   }
 }
@@ -866,7 +891,7 @@ class PostsPaginationNotifier extends StateNotifier<PostsPaginationState> {
     }
   }
 
-  /// Loads the first page of posts with mandatory gender filtering
+  /// Loads the first page of posts with optional gender filtering
   Future<void> loadPosts({String? category, bool? isPinned}) async {
     if (state.isLoading) return;
 
@@ -909,7 +934,7 @@ class PostsPaginationNotifier extends StateNotifier<PostsPaginationState> {
     }
   }
 
-  /// Loads more posts for pagination with mandatory gender filtering
+  /// Loads more posts for pagination with optional gender filtering
   Future<void> loadMorePosts({String? category, bool? isPinned}) async {
     if (state.isLoading || !state.hasMore) return;
 

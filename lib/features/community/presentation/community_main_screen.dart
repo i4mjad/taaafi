@@ -19,6 +19,7 @@ import 'package:reboot_app_3/features/community/data/models/post.dart';
 import 'package:reboot_app_3/features/account/presentation/widgets/feature_access_guard.dart';
 import 'package:reboot_app_3/features/authentication/application/user_subscription_sync_service.dart';
 import 'package:reboot_app_3/features/community/presentation/community_onboarding_screen.dart';
+import 'package:reboot_app_3/features/plus/data/notifiers/subscription_notifier.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class CommunityMainScreen extends ConsumerStatefulWidget {
@@ -141,6 +142,7 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen> {
   Widget build(BuildContext context) {
     final theme = AppTheme.of(context);
     final screenState = ref.watch(communityScreenStateProvider);
+    final isPlusUser = ref.watch(hasActiveSubscriptionProvider);
 
     return Scaffold(
       backgroundColor: theme.backgroundColor,
@@ -180,6 +182,7 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen> {
             builder: (context, ref, child) {
               final communityProfileAsync =
                   ref.watch(currentCommunityProfileProvider);
+              final isPlusUser = ref.watch(hasActiveSubscriptionProvider);
 
               return communityProfileAsync.when(
                 data: (profile) {
@@ -191,6 +194,7 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen> {
                         child: AvatarWithAnonymity(
                           cpId: profile.id,
                           isAnonymous: profile.isAnonymous,
+                          isPlusUser: isPlusUser,
                           avatarUrl: profile.avatarUrl,
                           size: 32,
                         ),
@@ -404,53 +408,64 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen> {
     print(
         '🎯 UI: Building posts view, postsAsync state: ${postsAsync.runtimeType}');
 
-    return Column(
-      children: [
-        // Header with trend icon, "Latest Posts" text, count, and "See All" button
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          child: Row(
-            children: [
-              Icon(
-                LucideIcons.trendingUp,
-                color: theme.primary[500],
-                size: 20,
-              ),
-              const SizedBox(width: 8),
-              Text(
-                localizations.translate('latest_posts'),
-                style: TextStyles.caption.copyWith(
-                  color: theme.grey[900],
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(width: 4),
-              Text(
-                '(${localizations.translate('latest_50')})',
-                style: TextStyles.caption.copyWith(
-                  color: theme.grey[600],
-                  fontWeight: FontWeight.normal,
-                ),
-              ),
-              const Spacer(),
-              GestureDetector(
-                onTap: () {
-                  // Navigate to the full posts list screen
-                  context.goNamed(RouteNames.allPosts.name);
-                },
-                child: Text(
-                  localizations.translate('see_all'),
-                  style: TextStyles.caption.copyWith(
-                    color: theme.primary[600],
-                    fontWeight: FontWeight.w600,
+    return RefreshIndicator(
+      onRefresh: () async {
+        // Refresh the posts provider
+        ref.invalidate(mainScreenPostsProvider(null));
+        // Wait for the new data to load
+        await ref.read(mainScreenPostsProvider(null).future);
+      },
+      child: SingleChildScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        child: Column(
+          children: [
+            // Header with trend icon, "Latest Posts" text, count, and "See All" button
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              child: Row(
+                children: [
+                  Icon(
+                    LucideIcons.trendingUp,
+                    color: theme.primary[500],
+                    size: 20,
                   ),
-                ),
+                  const SizedBox(width: 8),
+                  Text(
+                    localizations.translate('latest_posts'),
+                    style: TextStyles.caption.copyWith(
+                      color: theme.grey[900],
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    '(${localizations.translate('latest_50')})',
+                    style: TextStyles.caption.copyWith(
+                      color: theme.grey[600],
+                      fontWeight: FontWeight.normal,
+                    ),
+                  ),
+                  const Spacer(),
+                  GestureDetector(
+                    onTap: () {
+                      // Navigate to the full posts list screen
+                      context.goNamed(RouteNames.allPosts.name);
+                    },
+                    child: Text(
+                      localizations.translate('see_all'),
+                      style: TextStyles.caption.copyWith(
+                        color: theme.primary[600],
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
+            ),
+            _buildStreamingPostsContent(postsAsync, localizations, theme),
+          ],
         ),
-        _buildStreamingPostsContent(postsAsync, localizations, theme),
-      ],
+      ),
     );
   }
 

@@ -13,7 +13,7 @@ import 'package:reboot_app_3/features/community/presentation/providers/community
 import 'package:reboot_app_3/features/community/presentation/providers/forum_providers.dart';
 import 'package:reboot_app_3/features/community/presentation/widgets/report_content_modal.dart';
 import 'package:reboot_app_3/features/account/presentation/widgets/feature_access_guard.dart';
-import 'package:reboot_app_3/core/shared_widgets/ta3afi_platform_icons_icons.dart';
+import 'package:reboot_app_3/features/community/presentation/widgets/streak_display_widget.dart';
 
 class ThreadsPostCard extends ConsumerWidget {
   final Post post;
@@ -90,7 +90,7 @@ class ThreadsPostCard extends ConsumerWidget {
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Avatar with proper author anonymity and plus user frame
+                // Avatar with proper author anonymity
                 authorProfileAsync.when(
                   data: (authorProfile) {
                     final isAuthorAnonymous =
@@ -98,41 +98,13 @@ class ThreadsPostCard extends ConsumerWidget {
                     final isAuthorPlusUser =
                         authorProfile?.hasPlusSubscription() ?? false;
 
-                    return Stack(
-                      children: [
-                        AvatarWithAnonymity(
-                          cpId: post.authorCPId,
-                          isAnonymous: isAuthorAnonymous,
-                          size: 32,
-                          avatarUrl: isAuthorAnonymous
-                              ? null
-                              : authorProfile?.avatarUrl,
-                          isPlusUser: isAuthorPlusUser,
-                        ),
-                        // Plus badge icon overlay
-                        if (isAuthorPlusUser)
-                          Positioned(
-                            right: -2,
-                            bottom: -2,
-                            child: Container(
-                              width: 16,
-                              height: 16,
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFFEBA01),
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                  color: theme.backgroundColor,
-                                  width: 1.5,
-                                ),
-                              ),
-                              child: const Icon(
-                                Ta3afiPlatformIcons.plus_icon,
-                                size: 8,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
-                      ],
+                    return AvatarWithAnonymity(
+                      cpId: post.authorCPId,
+                      isAnonymous: isAuthorAnonymous,
+                      size: 32,
+                      avatarUrl:
+                          isAuthorAnonymous ? null : authorProfile?.avatarUrl,
+                      isPlusUser: isAuthorPlusUser,
                     );
                   },
                   loading: () => Container(
@@ -167,15 +139,16 @@ class ThreadsPostCard extends ConsumerWidget {
                       // Category flair and time
                       Row(
                         children: [
-                          // Category with streak badge if applicable
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
+                          // Category and streak in an inline layout
+                          Wrap(
+                            spacing: 8,
+                            runSpacing: 4,
                             children: [
                               // Category flair - always show, with fallback for missing categories
                               Container(
                                 padding: const EdgeInsets.symmetric(
                                   horizontal: 8,
-                                  vertical: 4,
+                                  vertical: 2,
                                 ),
                                 decoration: BoxDecoration(
                                   color: postCategory != null
@@ -217,115 +190,77 @@ class ThreadsPostCard extends ConsumerWidget {
                                 ),
                               ),
 
-                              // Real-time streak badge next to category
-                              authorProfileAsync.when(
-                                data: (authorProfile) {
-                                  // Check if user is plus AND allows sharing
-                                  final isPlusUser =
-                                      authorProfile?.hasPlusSubscription() ??
-                                          false;
-                                  final allowsSharing =
-                                      authorProfile?.shareRelapseStreaks ??
-                                          false;
+                              // Real-time streak badge
+                              ...() {
+                                return authorProfileAsync.maybeWhen(
+                                      data: (authorProfile) {
+                                        // Check if user is plus AND allows sharing
+                                        final isPlusUser = authorProfile
+                                                ?.hasPlusSubscription() ??
+                                            false;
+                                        final allowsSharing = authorProfile
+                                                ?.shareRelapseStreaks ??
+                                            false;
 
-                                  print(
-                                      '🎯 ThreadsPostCard: Streak check for ${post.authorCPId}');
-                                  print(
-                                      '🎯 - isPlusUser: $isPlusUser, allowsSharing: $allowsSharing');
+                                        print(
+                                            '🎯 ThreadsPostCard: Streak check for ${post.authorCPId}');
+                                        print(
+                                            '🎯 - isPlusUser: $isPlusUser, allowsSharing: $allowsSharing');
 
-                                  if (!isPlusUser || !allowsSharing) {
-                                    print(
-                                        '🎯 ❌ Conditions not met - no streak shown');
-                                    return const SizedBox.shrink();
-                                  }
-
-                                  print(
-                                      '🎯 ✅ Conditions met - calculating streak...');
-
-                                  // Calculate streak in real-time
-                                  return Consumer(
-                                    builder: (context, ref, child) {
-                                      final streakAsync = ref.watch(
-                                          userStreakCalculatorProvider(
-                                              post.authorCPId));
-
-                                      return streakAsync.when(
-                                        data: (streakDays) {
-                                          if (streakDays == null ||
-                                              streakDays <= 0) {
-                                            print(
-                                                '🎯 ❌ Invalid streak data: $streakDays');
-                                            return const SizedBox.shrink();
-                                          }
-
+                                        if (!isPlusUser || !allowsSharing) {
                                           print(
-                                              '🎯 🎉 SUCCESS! Showing streak: $streakDays days');
-                                          return Row(
-                                            children: [
-                                              const SizedBox(width: 6),
-                                              Container(
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                        horizontal: 6,
-                                                        vertical: 3),
-                                                decoration: BoxDecoration(
-                                                  color: const Color(0xFF22C55E)
-                                                      .withValues(alpha: 0.1),
-                                                  borderRadius:
-                                                      BorderRadius.circular(6),
-                                                  border: Border.all(
-                                                    color:
-                                                        const Color(0xFF22C55E)
-                                                            .withValues(
-                                                                alpha: 0.3),
-                                                    width: 1,
-                                                  ),
-                                                ),
-                                                child: Row(
-                                                  children: [
-                                                    Icon(LucideIcons.trophy,
-                                                        size: 10,
-                                                        color: const Color(
-                                                            0xFF22C55E)),
-                                                    const SizedBox(width: 3),
-                                                    Text(
-                                                      '${streakDays}d',
-                                                      style: TextStyles.tiny
-                                                          .copyWith(
-                                                        color: const Color(
-                                                            0xFF22C55E),
-                                                        fontWeight:
-                                                            FontWeight.w600,
-                                                        fontSize: 10,
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                            ],
-                                          );
-                                        },
-                                        loading: () {
-                                          print(
-                                              '🎯 📱 Loading streak calculation...');
-                                          return const SizedBox.shrink();
-                                        },
-                                        error: (error, stackTrace) {
-                                          print('🎯 ❌ Error: $error');
-                                          return const SizedBox.shrink();
-                                        },
-                                      );
-                                    },
-                                  );
-                                },
-                                loading: () => const SizedBox.shrink(),
-                                error: (error, stackTrace) =>
-                                    const SizedBox.shrink(),
-                              ),
+                                              '🎯 ❌ Conditions not met - no streak shown');
+                                          return <Widget>[];
+                                        }
+
+                                        print(
+                                            '🎯 ✅ Conditions met - calculating streak...');
+
+                                        // Calculate streak in real-time
+                                        return [
+                                          Consumer(
+                                            builder: (context, ref, child) {
+                                              final streakAsync = ref.watch(
+                                                  userStreakCalculatorProvider(
+                                                      post.authorCPId));
+
+                                              return streakAsync.when(
+                                                data: (streakDays) {
+                                                  if (streakDays == null ||
+                                                      streakDays <= 0) {
+                                                    print(
+                                                        '🎯 ❌ Invalid streak data: $streakDays');
+                                                    return const SizedBox
+                                                        .shrink();
+                                                  }
+
+                                                  print(
+                                                      '🎯 🎉 SUCCESS! Showing streak: $streakDays days');
+                                                  return StreakDisplayWidget(
+                                                    streakDays: streakDays,
+                                                  );
+                                                },
+                                                loading: () =>
+                                                    const SizedBox.shrink(),
+                                                error: (error, stackTrace) {
+                                                  print(
+                                                      '🎯 ❌ Error calculating streak: $error');
+                                                  return const SizedBox
+                                                      .shrink();
+                                                },
+                                              );
+                                            },
+                                          ),
+                                        ];
+                                      },
+                                      orElse: () => <Widget>[],
+                                    ) ??
+                                    <Widget>[];
+                              }(),
                             ],
                           ),
 
-                          const SizedBox(width: 8),
+                          const Spacer(),
 
                           Text(
                             _formatTimeAgo(post.createdAt, localizations),
@@ -333,7 +268,7 @@ class ThreadsPostCard extends ConsumerWidget {
                               color: theme.grey[500],
                             ),
                           ),
-                          const Spacer(),
+                          const SizedBox(width: 8),
                           GestureDetector(
                             onTap: () => _showPostOptionsModal(context, ref),
                             child: Icon(

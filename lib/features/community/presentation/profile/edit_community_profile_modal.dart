@@ -134,6 +134,7 @@ class _EditCommunityProfileModalState
     final theme = AppTheme.of(context);
     final localizations = AppLocalizations.of(context);
     final subscriptionAsync = ref.watch(subscriptionNotifierProvider);
+    final isPlusUser = ref.watch(hasActiveSubscriptionProvider);
 
     // Check if user has Plus subscription
     final hasActiveSubscription = subscriptionAsync.maybeWhen(
@@ -256,6 +257,7 @@ class _EditCommunityProfileModalState
                                             return AvatarWithAnonymity(
                                               cpId: widget.profile.id,
                                               isAnonymous: _isAnonymous,
+                                              isPlusUser: isPlusUser,
                                               size: 40,
                                             );
                                           },
@@ -266,6 +268,7 @@ class _EditCommunityProfileModalState
                                     AvatarWithAnonymity(
                                       cpId: widget.profile.id,
                                       isAnonymous: _isAnonymous,
+                                      isPlusUser: isPlusUser,
                                       size: 40,
                                     ),
                                 ],
@@ -355,66 +358,12 @@ class _EditCommunityProfileModalState
                             ],
                           ),
 
-                        if (_imageOption == 'default' &&
-                            _currentUserImageUrl != null) ...[
-                          const SizedBox(height: 16),
-                          WidgetsContainer(
-                            padding: const EdgeInsets.all(16),
-                            backgroundColor: theme.primary[50],
-                            borderRadius: BorderRadius.circular(10.5),
-                            borderSide: BorderSide(
-                                color: theme.primary[200]!, width: 1),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Expanded(
-                                  child: Text(
-                                    localizations
-                                        .translate('will-use-following-image'),
-                                    style: TextStyles.caption
-                                        .copyWith(height: 1.4),
-                                  ),
-                                ),
-                                horizontalSpace(Spacing.points24),
-                                Container(
-                                  width: 50,
-                                  height: 50,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(50),
-                                    border:
-                                        Border.all(color: theme.primary[300]!),
-                                  ),
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(50),
-                                    child: Image.network(
-                                      _currentUserImageUrl!,
-                                      fit: BoxFit.cover,
-                                      errorBuilder:
-                                          (context, error, stackTrace) {
-                                        return Container(
-                                          color: theme.grey[200],
-                                          child: Icon(
-                                            LucideIcons.user,
-                                            color: theme.grey[600],
-                                            size: 40,
-                                          ),
-                                        );
-                                      },
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-
-                        const SizedBox(height: 24),
-
-                        // 4. Danger Zone Section
-                        _buildDangerZoneSection(context, theme, localizations),
-
-                        // 5. Plus Features Section (Premium features at the end)
+                        verticalSpace(Spacing.points16),
+                        // 4. Plus Features Section (Premium features at the end)
                         _buildPlusFeatureSection(context, theme, localizations),
+
+                        // 5. Danger Zone Section
+                        _buildDangerZoneSection(context, theme, localizations),
                       ],
                     ),
                   ),
@@ -1040,25 +989,6 @@ class _EditCommunityProfileModalState
             ),
           ),
         ],
-
-        const SizedBox(height: 12),
-
-        // Important Daily Login Requirement Notice
-        _buildInfoBox(
-          localizations.translate('daily-login-requirement'),
-          theme,
-          isPlus: true,
-          isWarning: true,
-        ),
-
-        const SizedBox(height: 8),
-
-        // Additional Info Box
-        _buildInfoBox(
-          localizations.translate('plus-streak-feature-info'),
-          theme,
-          isPlus: true,
-        ),
       ],
     );
   }

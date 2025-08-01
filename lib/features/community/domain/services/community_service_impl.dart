@@ -276,23 +276,19 @@ class CommunityServiceImpl implements CommunityService {
     }
 
     try {
-      final doc = await _firestore
-          .collection('userProfileMappings')
-          .doc(user.uid)
+      final snapshot = await _firestore
+          .collection('communityProfiles')
+          .where('userUID', isEqualTo: user.uid)
+          .where('isDeleted', isEqualTo: true)
+          .limit(1)
           .get();
 
-      if (!doc.exists || doc.data() == null) {
+      if (snapshot.docs.isEmpty) {
         return null;
       }
 
-      final data = doc.data()!;
-      final isDeleted = data['isDeleted'] as bool? ?? false;
-
-      if (isDeleted) {
-        return data['communityProfileId'] as String?;
-      }
-
-      return null;
+      final doc = snapshot.docs.first;
+      return doc.id; // Return the document ID which is the community profile ID
     } catch (e) {
       return null;
     }
@@ -326,15 +322,6 @@ class CommunityServiceImpl implements CommunityService {
             'deletedAt': null,
             'restoredAt': FieldValue.serverTimestamp(),
             'updatedAt': FieldValue.serverTimestamp(),
-          },
-        );
-
-        // Update user mapping
-        transaction.update(
-          _firestore.collection('userProfileMappings').doc(user.uid),
-          {
-            'isDeleted': false,
-            'restoredAt': FieldValue.serverTimestamp(),
           },
         );
       });
@@ -412,15 +399,15 @@ class CommunityServiceImpl implements CommunityService {
         message: 'Profile data removed',
       );
 
-      // Step 5: Clean up mappings
+      // Step 5: Mark profile as deleted
       yield DeletionProgress(
         step: DeletionStep.cleaningUpMappings,
         completedItems: 0,
         totalItems: 1,
-        message: 'Cleaning up mappings...',
+        message: 'Finalizing deletion...',
       );
 
-      await _updateUserMapping(userId, profileId, isDeleted: true);
+      await _deleteProfileData(profileId);
 
       yield DeletionProgress(
         step: DeletionStep.cleaningUpMappings,
@@ -529,15 +516,6 @@ class CommunityServiceImpl implements CommunityService {
     await _firestore.collection('communityProfiles').doc(profileId).update({
       'isDeleted': true,
       'deletedAt': FieldValue.serverTimestamp(),
-    });
-  }
-
-  /// Updates the user mapping
-  Future<void> _updateUserMapping(String userId, String profileId,
-      {required bool isDeleted}) async {
-    await _firestore.collection('userProfileMappings').doc(userId).update({
-      'isDeleted': isDeleted,
-      if (isDeleted) 'deletedAt': FieldValue.serverTimestamp(),
     });
   }
 }
