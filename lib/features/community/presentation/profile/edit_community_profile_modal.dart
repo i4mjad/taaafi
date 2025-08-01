@@ -57,7 +57,7 @@ class _EditCommunityProfileModalState
         TextEditingController(text: widget.profile.displayName);
     _isAnonymous = widget.profile.isAnonymous;
     _selectedGender = widget.profile.gender;
-    _shareRelapseStreaks = widget.profile.shareRelapseStreaks ?? false;
+    _shareRelapseStreaks = widget.profile.shareRelapseStreaks;
 
     // Set initial image option based on current profile
     _imageOption = widget.profile.avatarUrl != null ? 'default' : 'none';
@@ -382,59 +382,6 @@ class _EditCommunityProfileModalState
       style: TextStyles.h6.copyWith(
         color: theme.grey[900],
         fontWeight: FontWeight.w600,
-      ),
-    );
-  }
-
-  Widget _buildInfoBox(String text, CustomThemeData theme,
-      {bool isPlus = false, bool isWarning = false}) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: isPlus
-            ? const Color(0xFFFEBA01).withValues(alpha: 0.1)
-            : isWarning
-                ? theme.warn[50]
-                : theme.primary[50],
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-          color: isPlus
-              ? const Color(0xFFFEBA01)
-              : isWarning
-                  ? theme.warn[200]!
-                  : theme.primary[200]!,
-        ),
-      ),
-      child: Row(
-        children: [
-          Icon(
-            isPlus
-                ? LucideIcons.crown
-                : isWarning
-                    ? LucideIcons.shieldAlert
-                    : LucideIcons.info,
-            size: 20,
-            color: isPlus
-                ? const Color(0xFFFEBA01)
-                : isWarning
-                    ? theme.warn[600]
-                    : theme.grey[600],
-          ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              text,
-              style: TextStyles.caption.copyWith(
-                color: isPlus
-                    ? theme.grey[700]
-                    : isWarning
-                        ? theme.warn[700]
-                        : theme.grey[700],
-                height: 1.3,
-              ),
-            ),
-          ),
-        ],
       ),
     );
   }

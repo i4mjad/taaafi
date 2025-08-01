@@ -193,69 +193,66 @@ class ThreadsPostCard extends ConsumerWidget {
                               // Real-time streak badge
                               ...() {
                                 return authorProfileAsync.maybeWhen(
-                                      data: (authorProfile) {
-                                        // Check if user is plus AND allows sharing
-                                        final isPlusUser = authorProfile
-                                                ?.hasPlusSubscription() ??
+                                  data: (authorProfile) {
+                                    // Check if user is plus AND allows sharing
+                                    final isPlusUser =
+                                        authorProfile?.hasPlusSubscription() ??
                                             false;
-                                        final allowsSharing = authorProfile
-                                                ?.shareRelapseStreaks ??
+                                    final allowsSharing =
+                                        authorProfile?.shareRelapseStreaks ??
                                             false;
 
-                                        print(
-                                            '🎯 ThreadsPostCard: Streak check for ${post.authorCPId}');
-                                        print(
-                                            '🎯 - isPlusUser: $isPlusUser, allowsSharing: $allowsSharing');
+                                    print(
+                                        '🎯 ThreadsPostCard: Streak check for ${post.authorCPId}');
+                                    print(
+                                        '🎯 - isPlusUser: $isPlusUser, allowsSharing: $allowsSharing');
 
-                                        if (!isPlusUser || !allowsSharing) {
-                                          print(
-                                              '🎯 ❌ Conditions not met - no streak shown');
-                                          return <Widget>[];
-                                        }
+                                    if (!isPlusUser || !allowsSharing) {
+                                      print(
+                                          '🎯 ❌ Conditions not met - no streak shown');
+                                      return <Widget>[];
+                                    }
 
-                                        print(
-                                            '🎯 ✅ Conditions met - calculating streak...');
+                                    print(
+                                        '🎯 ✅ Conditions met - calculating streak...');
 
-                                        // Calculate streak in real-time
-                                        return [
-                                          Consumer(
-                                            builder: (context, ref, child) {
-                                              final streakAsync = ref.watch(
-                                                  userStreakCalculatorProvider(
-                                                      post.authorCPId));
+                                    // Calculate streak in real-time
+                                    return [
+                                      Consumer(
+                                        builder: (context, ref, child) {
+                                          final streakAsync = ref.watch(
+                                              userStreakCalculatorProvider(
+                                                  post.authorCPId));
 
-                                              return streakAsync.when(
-                                                data: (streakDays) {
-                                                  if (streakDays == null ||
-                                                      streakDays <= 0) {
-                                                    print(
-                                                        '🎯 ❌ Invalid streak data: $streakDays');
-                                                    return const SizedBox
-                                                        .shrink();
-                                                  }
+                                          return streakAsync.when(
+                                            data: (streakDays) {
+                                              if (streakDays == null ||
+                                                  streakDays <= 0) {
+                                                print(
+                                                    '🎯 ❌ Invalid streak data: $streakDays');
+                                                return const SizedBox.shrink();
+                                              }
 
-                                                  print(
-                                                      '🎯 🎉 SUCCESS! Showing streak: $streakDays days');
-                                                  return StreakDisplayWidget(
-                                                    streakDays: streakDays,
-                                                  );
-                                                },
-                                                loading: () =>
-                                                    const SizedBox.shrink(),
-                                                error: (error, stackTrace) {
-                                                  print(
-                                                      '🎯 ❌ Error calculating streak: $error');
-                                                  return const SizedBox
-                                                      .shrink();
-                                                },
+                                              print(
+                                                  '🎯 🎉 SUCCESS! Showing streak: $streakDays days');
+                                              return StreakDisplayWidget(
+                                                streakDays: streakDays,
                                               );
                                             },
-                                          ),
-                                        ];
-                                      },
-                                      orElse: () => <Widget>[],
-                                    ) ??
-                                    <Widget>[];
+                                            loading: () =>
+                                                const SizedBox.shrink(),
+                                            error: (error, stackTrace) {
+                                              print(
+                                                  '🎯 ❌ Error calculating streak: $error');
+                                              return const SizedBox.shrink();
+                                            },
+                                          );
+                                        },
+                                      ),
+                                    ];
+                                  },
+                                  orElse: () => <Widget>[],
+                                );
                               }(),
                             ],
                           ),

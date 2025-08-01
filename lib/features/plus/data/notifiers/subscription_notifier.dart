@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:reboot_app_3/features/plus/application/subscription_service.dart';
 import 'package:reboot_app_3/features/plus/data/repositories/subscription_repository.dart';
 import 'package:reboot_app_3/features/authentication/providers/user_provider.dart';

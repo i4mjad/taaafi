@@ -12,7 +12,6 @@ import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/core/routing/route_names.dart';
 import 'package:figma_squircle/figma_squircle.dart';
 import 'package:reboot_app_3/features/plus/presentation/feature_suggestion_modal.dart';
-import 'package:reboot_app_3/features/account/presentation/contact_us_modal.dart';
 import 'package:reboot_app_3/features/plus/data/notifiers/subscription_notifier.dart';
 import 'package:reboot_app_3/features/plus/data/repositories/subscription_repository.dart';
 import 'package:reboot_app_3/core/shared_widgets/custom_textarea.dart';

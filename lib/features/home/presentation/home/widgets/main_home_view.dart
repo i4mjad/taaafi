@@ -29,9 +29,9 @@ class MainHomeView extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Subscription Card
-          //TODO: consider wraping this to a checker for the subscription status, if the user is subscibed show them a page that will guide them to the features and allow them to access those features.
+
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
             child: const SubscriptionCard(),
           ),
 

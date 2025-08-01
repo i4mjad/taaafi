@@ -27,22 +27,27 @@ class CalenderWidget extends ConsumerStatefulWidget {
 class _CalenderWidgetState extends ConsumerState<CalenderWidget> {
   DateTime userFirstDate = DateTime.now();
   DateTime? _currentMonth; // Track current month to prevent redundant fetches
+  bool _isInitialized = false;
+
   @override
   void initState() {
     super.initState();
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      // Delay provider modifications to avoid build cycle issues
-      Future(() async {
-        final now = DateTime.now();
-        userFirstDate = await ref
-            .read(calendarNotifierProvider.notifier)
-            .getUserFirstDate();
-        _currentMonth = DateTime(now.year, now.month); // Set initial month
-        await ref
-            .read(calendarNotifierProvider.notifier)
-            .fetchFollowUpsForMonth(now);
-      });
+      if (!_isInitialized) {
+        _isInitialized = true;
+        // Delay provider modifications to avoid build cycle issues
+        Future(() async {
+          final now = DateTime.now();
+          userFirstDate = await ref
+              .read(calendarNotifierProvider.notifier)
+              .getUserFirstDate();
+          _currentMonth = DateTime(now.year, now.month); // Set initial month
+          await ref
+              .read(calendarNotifierProvider.notifier)
+              .fetchFollowUpsForMonth(now);
+        });
+      }
     });
   }
 
@@ -100,16 +105,19 @@ class _CalenderWidgetState extends ConsumerState<CalenderWidget> {
                       final newMonth = DateTime(
                           firstVisibleDate.year, firstVisibleDate.month);
 
-                      // Only fetch if month actually changed
-                      if (_currentMonth == null ||
-                          _currentMonth!.year != newMonth.year ||
-                          _currentMonth!.month != newMonth.month) {
+                      // Only fetch if month actually changed and we're initialized
+                      if (_isInitialized &&
+                          (_currentMonth == null ||
+                              _currentMonth!.year != newMonth.year ||
+                              _currentMonth!.month != newMonth.month)) {
                         _currentMonth = newMonth;
-                        // Delay provider modification to avoid build cycle issues
-                        Future(() {
-                          ref
-                              .read(calendarNotifierProvider.notifier)
-                              .fetchFollowUpsForMonth(firstVisibleDate);
+                        // Use microtask instead of Future to be more efficient
+                        WidgetsBinding.instance.addPostFrameCallback((_) {
+                          if (mounted) {
+                            ref
+                                .read(calendarNotifierProvider.notifier)
+                                .fetchFollowUpsForMonth(firstVisibleDate);
+                          }
                         });
                       }
                     }
@@ -155,12 +163,13 @@ class _CalenderWidgetState extends ConsumerState<CalenderWidget> {
         DateTime(userFirstDate.year, userFirstDate.month, userFirstDate.day);
 
     // Group follow-ups by date (ignoring time) to check which dates have follow-ups
-    final followUpDates = followUps
-        .map((followUp) => DateTime(
-            followUp.time.year, followUp.time.month, followUp.time.day))
-        .toSet();
+    final followUpDates = <DateTime>{};
+    for (final followUp in followUps) {
+      followUpDates.add(
+          DateTime(followUp.time.year, followUp.time.month, followUp.time.day));
+    }
 
-    List<Appointment> appointments = [];
+    final appointments = <Appointment>[];
 
     // Add green dots for empty days before today (clean days)
     for (var date = startDate;
