@@ -54,7 +54,7 @@ void _debugGenderFiltering(
   print('   Should Apply Filter: $shouldApplyFilter');
   if (userGender == null && shouldApplyFilter) {
     print(
-        '   ⚠️  WARNING: Filtering enabled but user gender is null - will show all posts');
+        '   ⚠️  INFO: Filtering enabled but user gender is null - will show NO posts');
   }
   print(
       '   Rule: ${shouldApplyFilter ? "FILTERING ENABLED (same-gender + admins)" : "FILTERING DISABLED (all users)"}');
@@ -160,6 +160,15 @@ final postCategoriesProvider = StreamProvider<List<PostCategory>>((ref) {
 // Posts Provider (with lazy loading support and mandatory gender filtering)
 final postsProvider =
     StreamProvider.family<List<Post>, String?>((ref, category) async* {
+  // Check if user has community profile before loading posts
+  final communityState = ref.watch(communityScreenStateProvider);
+
+  // Only load posts if user is in showMainContent state (has community profile)
+  if (communityState != CommunityScreenState.showMainContent) {
+    yield <Post>[];
+    return;
+  }
+
   final repository = ref.watch(forumRepositoryProvider);
   final currentProfile = ref.watch(currentCommunityProfileProvider);
 
@@ -200,6 +209,15 @@ final postsProvider =
 // Gender-aware posts provider
 final genderFilteredPostsProvider =
     StreamProvider.family<List<Post>, PostFilterParams>((ref, params) async* {
+  // Check if user has community profile before loading posts
+  final communityState = ref.watch(communityScreenStateProvider);
+
+  // Only load posts if user is in showMainContent state (has community profile)
+  if (communityState != CommunityScreenState.showMainContent) {
+    yield <Post>[];
+    return;
+  }
+
   final repository = ref.watch(forumRepositoryProvider);
   final currentProfile = ref.watch(currentCommunityProfileProvider);
 
@@ -224,6 +242,17 @@ final genderFilteredPostsProvider =
 // Main Screen Posts Provider (limited to 50 posts with optimistic deletion filtering)
 final mainScreenPostsProvider =
     StreamProvider.family<List<Post>, String?>((ref, category) async* {
+  // Check if user has community profile before loading posts
+  final communityState = ref.watch(communityScreenStateProvider);
+
+  // Only load posts if user is in showMainContent state (has community profile)
+  if (communityState != CommunityScreenState.showMainContent) {
+    print(
+        '🎯 MainScreenPostsProvider: User has no community profile, returning empty list');
+    yield <Post>[];
+    return;
+  }
+
   final repository = ref.watch(forumRepositoryProvider);
   final currentProfile = ref.watch(currentCommunityProfileProvider);
 
@@ -894,6 +923,20 @@ class PostsPaginationNotifier extends StateNotifier<PostsPaginationState> {
   /// Loads the first page of posts with optional gender filtering
   Future<void> loadPosts({String? category, bool? isPinned}) async {
     if (state.isLoading) return;
+
+    // Check if user has community profile before loading posts
+    final communityState = _ref.read(communityScreenStateProvider);
+    if (communityState != CommunityScreenState.showMainContent) {
+      print(
+          '🔍 PostsPaginationNotifier.loadPosts: User has no community profile, skipping load');
+      state = state.copyWith(
+        posts: <Post>[],
+        lastDocument: null,
+        hasMore: false,
+        isLoading: false,
+      );
+      return;
+    }
 
     state = state.copyWith(isLoading: true, error: null);
 

@@ -230,6 +230,7 @@ const Map<String, String> kAr = {
       "تطوير التطبيق يستغرق الكثير من الوقت والجهد، ومع ذلك لا يزال مجانيًا وبدون إعلانات. إذا كنت تريد دعم تطوير البرنامج اختر مايناسبك من الخيارات التالية",
   "contact-us": "تواصل معنا",
   "suggest-feature": "اقتراح ميزة",
+  "suggest-feature-plus-only": "اقتراح ميزة (الباقة المميزة فقط)",
   "feature-suggestion-description":
       "شارك أفكارك لمساعدتنا في تحسين تعافي! اقتراحاتك تساعد في تشكيل مستقبل المنصة وتعزز تجربة التعافي للجميع.",
   "feature-suggestion-note":
@@ -557,6 +558,26 @@ const Map<String, String> kAr = {
   "registration-failed": "فشل التسجيل. يرجى المحاولة مرة أخرى.",
   "verification-email-failed": "فشل في إرسال بريد التحقق",
   "verification-check-failed": "فشل في فحص حالة التحقق",
+  "finish": "البدء",
+
+  // Short stepper labels for horizontal stepper
+  "personal-info": "المعلومات الشخصية",
+  "recovery": "التعافي",
+  "verification": "التحقق",
+  "complete": "اكتمل",
+
+  // Account creation
+  "create-account": "إنشاء حساب",
+  "account-creation-explanation":
+      "أنشئ حسابك بالبريد الإلكتروني وكلمة المرور للبدء.",
+  "account-created-successfully": "تم إنشاء الحساب بنجاح!",
+  "account-creation-failed": "فشل في إنشاء الحساب. يرجى المحاولة مرة أخرى.",
+  "valid-password-required": "يرجى إدخال كلمة مرور صحيحة",
+
+  // Final step
+  "final-step": "مراجعة وإنهاء",
+  "final-step-explanation": "راجع معلوماتك ووافق على الشروط لإكمال التسجيل.",
+  "registration-summary": "ملخص التسجيل",
 
   // OAuth email verification messages
   "email-already-verified-explanation":
@@ -1134,12 +1155,24 @@ const Map<String, String> kAr = {
       "يرجى إكمال تسجيل حسابك للاستفادة من جميع الميزات",
   "confirm-details-banner": "يرجى تأكيد تفاصيل حسابك لإكمال استخدام التطبيق",
   "confirm-email-banner":
-      "يرجى تأكيد عنوان بريدك الإلكتروني للوصول إلى جميع الميزات",
-  "confirm-email": "تأكيد البريد الإلكتروني",
+      "اضغط على الزر أدناه لبدء عملية التحقق، ثم تحقق من بريدك واضغط على الرابط.",
+  "confirm-email": "بدء عملية التحقق",
+  "send-email": "إرسال البريد",
+  "check-inbox": "تحقق من البريد",
+  "verified": "تم التحقق",
+  "check-your-email": "تحقق من بريدك",
+  "email-verified": "تم التحقق من البريد",
+  "current-email": "البريد الحالي",
+  "change": "تغيير",
+  "verify-real-email-warning":
+      "تأكد من أن هذا بريد إلكتروني حقيقي يمكنك الوصول إليه. لن تتمكن من استخدام التطبيق بدون التحقق من بريدك.",
+  "wrong-email-question": "عنوان بريد خاطئ؟",
   "verify-your-email": "تحقق من بريدك الإلكتروني",
   "verification-email-sent-to": "تم إرسال رسالة تأكيد إلى",
   "check-inbox-and-click-link":
       "يرجى مراجعة صندوق الوارد والنقر على رابط التأكيد للمتابعة",
+  "check-new-email-inbox":
+      "تحقق من صندوق البريد الجديد واضغط على رابط التحقق لإكمال تغيير البريد الإلكتروني.",
   "checking": "جاري التحقق...",
   "check-verification-status": "ضغطت على الرابط",
   "sending": "جاري الإرسال...",
@@ -1160,9 +1193,11 @@ const Map<String, String> kAr = {
       "بعد تغيير بريدك الإلكتروني، ستحتاج لتسجيل الدخول مرة أخرى بالبريد الجديد لضمان الأمان.",
   "email-not-verified-yet":
       "لم يتم التأكيد بعد. تحقق من بريدك أو اطلب رسالة جديدة.",
+  "email-change-not-verified-yet":
+      "لم يتم التحقق من البريد الجديد بعد. تحقق من صندوق البريد الجديد واضغط على رابط التحقق.",
   "change-email": "تغيير البريد الإلكتروني",
   "change-email-description":
-      "إذا قمت بإدخال عنوان بريد إلكتروني خاطئ أثناء التسجيل، يمكنك تغييره هنا. سيتم إرسال رسالة تأكيد جديدة إلى العنوان الجديد.",
+      "لا تقلق! أدخل بريدك الحالي وكلمة المرور، ثم بريدك الجديد. سنرسل التحقق للعنوان الجديد. تحتاج التفاصيل الحالية الصحيحة لعمل التطبيق.",
   "new-email": "عنوان البريد الإلكتروني الجديد",
   "back": "العودة",
   "update-email": "تحديث البريد الإلكتروني",
@@ -1176,7 +1211,6 @@ const Map<String, String> kAr = {
       "فشل في تحديث البريد الإلكتروني. يرجى المحاولة مرة أخرى.",
   "requires-recent-login":
       "لأسباب أمنية، يرجى تسجيل الخروج والدخول مرة أخرى قبل تغيير بريدك الإلكتروني.",
-  "current-email": "عنوان البريد الإلكتروني الحالي",
   "new-email-same-as-current":
       "لا يمكن أن يكون البريد الإلكتروني الجديد نفس البريد الحالي",
   "user-not-found": "المستخدم غير موجود. يرجى تسجيل الدخول مرة أخرى.",

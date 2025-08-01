@@ -35,9 +35,46 @@ import 'package:reboot_app_3/features/vault/presentation/widgets/analytics/risk_
 import 'package:reboot_app_3/features/vault/presentation/widgets/analytics/mood_correlation_chart.dart';
 import 'package:reboot_app_3/features/vault/presentation/widgets/help/help_bottom_sheet.dart';
 import 'package:reboot_app_3/core/shared_widgets/ta3afi_platform_icons_icons.dart';
+import 'package:reboot_app_3/features/vault/data/analytics/analytics_notifier.dart';
+import 'package:reboot_app_3/features/vault/data/statistics/statistics_notifier.dart';
+import 'package:reboot_app_3/features/vault/data/streaks/streak_notifier.dart';
+import 'package:reboot_app_3/features/vault/data/follow_up/follow_up_notifier.dart';
+import 'package:reboot_app_3/features/vault/data/streaks/streak_duration_notifier.dart';
+import 'package:reboot_app_3/features/vault/presentation/widgets/statistics/statistics_widget.dart';
+import 'package:reboot_app_3/features/vault/data/calendar/calendar_notifier.dart';
 
 class VaultScreen extends ConsumerWidget {
   const VaultScreen({super.key});
+
+  Future<void> _refreshVaultData(WidgetRef ref) async {
+    // Refresh core data providers
+    ref.invalidate(statisticsNotifierProvider);
+    ref.invalidate(streakNotifierProvider);
+    ref.invalidate(followUpNotifierProvider);
+    ref.invalidate(calendarNotifierProvider);
+    ref.invalidate(calendarStreamProvider);
+
+    // Refresh analytics providers for premium features
+    ref.invalidate(heatMapDataProvider);
+    ref.invalidate(triggerRadarDataProvider);
+    ref.invalidate(riskClockDataProvider);
+    ref.invalidate(streakAveragesProvider);
+    ref.invalidate(moodCorrelationDataProvider);
+    ref.invalidate(cachedMoodCorrelationDataProvider);
+    ref.invalidate(premiumAnalyticsServiceProvider);
+
+    // Refresh follow-up related providers
+    ref.invalidate(followUpsProvider);
+    ref.invalidate(detailedStreakProvider);
+
+    // Wait for the main providers to refresh
+    await Future.wait([
+      ref.refresh(statisticsNotifierProvider.future),
+      ref.refresh(streakNotifierProvider.future),
+      ref.refresh(followUpNotifierProvider.future),
+      ref.refresh(calendarNotifierProvider.future),
+    ]);
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -239,24 +276,28 @@ class VaultScreen extends ConsumerWidget {
           ),
         };
 
-        return SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Shorebird update widget
-              const ShorebirdUpdateWidget(),
-              verticalSpace(Spacing.points16),
+        return RefreshIndicator(
+          onRefresh: () => _refreshVaultData(ref),
+          child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Shorebird update widget
+                const ShorebirdUpdateWidget(),
+                verticalSpace(Spacing.points16),
 
-              // Horizontal Scrollable Cards
-              _buildHorizontalCards(context, theme, orderedCards),
-              verticalSpace(Spacing.points16),
+                // Horizontal Scrollable Cards
+                _buildHorizontalCards(context, theme, orderedCards),
+                verticalSpace(Spacing.points16),
 
-              // Render ordered vault elements with consistent spacing
-              ..._buildVaultElementsWithSpacing(
-                  orderedVaultElements, vaultElementsMap),
+                // Render ordered vault elements with consistent spacing
+                ..._buildVaultElementsWithSpacing(
+                    orderedVaultElements, vaultElementsMap),
 
-              verticalSpace(Spacing.points16),
-            ],
+                verticalSpace(Spacing.points16),
+              ],
+            ),
           ),
         );
       },

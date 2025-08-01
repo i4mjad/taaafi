@@ -39,6 +39,7 @@ import 'package:reboot_app_3/features/plus/data/notifiers/subscription_notifier.
 import 'package:reboot_app_3/features/plus/data/repositories/subscription_repository.dart';
 import 'package:intl/intl.dart';
 import 'package:reboot_app_3/features/plus/presentation/feature_suggestion_modal.dart';
+import 'package:reboot_app_3/features/plus/presentation/taaafi_plus_features_list_screen.dart';
 
 class AccountScreen extends ConsumerWidget {
   const AccountScreen({super.key});
@@ -160,13 +161,35 @@ class AccountScreen extends ConsumerWidget {
                                 ),
                               verticalSpace(Spacing.points8),
                               if (showMainContent)
-                                GestureDetector(
-                                  onTap: () =>
-                                      _showFeatureSuggestionModal(context, ref),
-                                  child: SettingsButton(
-                                    icon: LucideIcons.lightbulb,
-                                    textKey: 'suggest-feature',
-                                  ),
+                                Consumer(
+                                  builder: (context, ref, child) {
+                                    final hasActiveSubscription = ref
+                                        .watch(hasActiveSubscriptionProvider);
+
+                                    if (hasActiveSubscription) {
+                                      // Show feature suggestion for Plus users
+                                      return GestureDetector(
+                                        onTap: () =>
+                                            _showFeatureSuggestionModal(
+                                                context, ref),
+                                        child: SettingsButton(
+                                          icon: LucideIcons.lightbulb,
+                                          textKey: 'suggest-feature',
+                                        ),
+                                      );
+                                    } else {
+                                      // Show premium upgrade modal for free users
+                                      return GestureDetector(
+                                        onTap: () => _showSubscriptionModal(
+                                            context, ref),
+                                        child: SettingsButton(
+                                          icon: LucideIcons.star,
+                                          textKey: 'suggest-feature-plus-only',
+                                          type: 'app',
+                                        ),
+                                      );
+                                    }
+                                  },
                                 ),
                               verticalSpace(Spacing.points8),
                               SettingsButton(
@@ -277,6 +300,16 @@ class AccountScreen extends ConsumerWidget {
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) => const FeatureSuggestionModal(),
+    );
+  }
+
+  void _showSubscriptionModal(BuildContext context, WidgetRef ref) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => const TaaafiPlusSubscriptionScreen(),
     );
   }
 }
@@ -436,7 +469,7 @@ class SettingsButton extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.all(4.0),
         child: WidgetsContainer(
-          padding: EdgeInsets.all(16),
+          padding: EdgeInsets.all(12),
           backgroundColor: theme.backgroundColor,
           borderSide: BorderSide(
               color: type == 'error' ? theme.error[600]! : theme.grey[600]!,
@@ -452,7 +485,7 @@ class SettingsButton extends StatelessWidget {
               horizontalSpace(Spacing.points8),
               Text(
                 AppLocalizations.of(context).translate(textKey),
-                style: TextStyles.footnote
+                style: TextStyles.small
                     .copyWith(color: _getTextColor(type, theme)),
               )
             ],

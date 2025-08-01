@@ -723,6 +723,7 @@ const Map<String, String> kEn = {
       "App development takes a lot of time and effort, yet it remains free and ad-free. If you want to support the development, choose from the following options",
   "contact-us": "Contact us",
   "suggest-feature": "Suggest Feature",
+  "suggest-feature-plus-only": "Suggest Feature (Plus Only)",
   "feature-suggestion-description":
       "Share your ideas to help us improve Ta'aafi! Your suggestions help shape the future of the platform and enhance the recovery experience for everyone.",
   "feature-suggestion-note":
@@ -791,6 +792,26 @@ const Map<String, String> kEn = {
   "verification-email-failed": "Failed to send verification email",
   "verification-check-failed": "Failed to check verification status",
   "finish": "Get Started",
+
+  // Short stepper labels for horizontal stepper
+  "personal-info": "Personal Info",
+  "recovery": "Recovery",
+  "verification": "Verification",
+  "complete": "Complete",
+
+  // Account creation
+  "create-account": "Create Account",
+  "account-creation-explanation":
+      "Create your account with email and password to get started.",
+  "account-created-successfully": "Account created successfully!",
+  "account-creation-failed": "Failed to create account. Please try again.",
+  "valid-password-required": "Please enter a valid password",
+
+  // Final step
+  "final-step": "Review & Complete",
+  "final-step-explanation":
+      "Review your information and accept the terms to complete your registration.",
+  "registration-summary": "Registration Summary",
 
   // OAuth email verification messages
   "email-already-verified-explanation":
@@ -1188,12 +1209,24 @@ const Map<String, String> kEn = {
   "confirm-details": "Confirm Details",
   "confirm-user-details": "Confirm",
   "confirm-email-banner":
-      "Please verify your email address to access all features",
-  "confirm-email": "Verify Email",
+      "Click the button below to start the verification process, then check your inbox and click the link.",
+  "confirm-email": "Start Verification Process",
+  "send-email": "Send Email",
+  "check-inbox": "Check Inbox",
+  "verified": "Verified",
+  "check-your-email": "Check Your Email",
+  "email-verified": "Email Verified",
+  "current-email": "Current Email",
+  "change": "Change",
+  "verify-real-email-warning":
+      "Make sure this is a real email you can access. You won't be able to use the app without verifying your email.",
+  "wrong-email-question": "Wrong email address?",
   "verify-your-email": "Check Your Email",
   "verification-email-sent-to": "A verification email has been sent to",
   "check-inbox-and-click-link":
       "Please check your inbox and click the verification link to continue",
+  "check-new-email-inbox":
+      "Check your NEW email inbox and click the verification link to complete the email change.",
   "checking": "Checking...",
   "check-verification-status": "I Clicked the Link",
   "sending": "Sending...",
@@ -1212,11 +1245,13 @@ const Map<String, String> kEn = {
       "After changing your email, you'll need to log in again with your new email for security.",
   "email-not-verified-yet":
       "Not verified yet. Check your inbox or request a new email.",
+  "email-change-not-verified-yet":
+      "New email not verified yet. Check your new email inbox and click the verification link.",
   "seconds": "s",
   "change-email": "Change Email",
   "subscribe-now": "Subscribe Now",
   "change-email-description":
-      "If you entered an incorrect email address during registration, you can change it here. A new verification email will be sent to the new address.",
+      "No worries! Enter your current email and password, then your new email. We'll send verification to the new address. You need the correct current details for the app to work.",
   "new-email": "New email address",
   "update-email": "Update Email",
   "back": "Back",
@@ -1229,7 +1264,6 @@ const Map<String, String> kEn = {
   "email-update-failed": "Failed to update email. Please try again.",
   "requires-recent-login":
       "For security reasons, please log out and log back in before changing your email.",
-  "current-email": "Current email address",
   "new-email-same-as-current": "New email cannot be the same as current email",
   "email-updated-logging-out":
       "New email verified successfully! You will now be logged out for security.",
