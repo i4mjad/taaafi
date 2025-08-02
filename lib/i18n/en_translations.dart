@@ -2473,5 +2473,68 @@ const Map<String, String> kEn = {
   "subscribed-to-group": "Subscribed",
   "upgrade-to-plus-messaging": "Upgrade to Plus",
   "subscribe-to-group": "Subscribe",
-  "requires-plus-subscription": "Requires Ta3afi Plus"
+  "requires-plus-subscription": "Requires Ta3afi Plus",
+
+  // Deletion Reasons Section
+  "deletion-reason-title": "Why are you deleting your account?",
+  "deletion-reason-subtitle":
+      "Help us understand your reason (this will help us improve our service)",
+  "deletion-reason-details": "Please provide more details",
+  "deletion-reason-details-hint":
+      "Tell us more about your experience or what we could improve...",
+
+  // Privacy & Security Reasons
+  "deletion-reason-privacy-concerns": "Privacy concerns",
+  "deletion-reason-data-security": "Data security concerns",
+
+  // App Experience Reasons
+  "deletion-reason-not-helpful": "App is not helpful for me",
+  "deletion-reason-too-complex": "App is too complex to use",
+  "deletion-reason-technical-issues": "Technical issues/bugs",
+
+  // Personal Reasons
+  "deletion-reason-no-longer-needed": "No longer need this type of app",
+  "deletion-reason-switching-apps": "Switching to another app",
+  "deletion-reason-temporary-break": "Taking a temporary break",
+
+  // Content & Features
+  "deletion-reason-missing-features": "Missing features I need",
+  "deletion-reason-content-inappropriate": "Inappropriate content",
+
+  // Support & Communication
+  "deletion-reason-poor-support": "Poor customer support",
+
+  // Other
+  "deletion-reason-other": "Other reason",
+
+  // Pending Deletion Banner
+  "account-deletion-pending": "Account deletion requested",
+  "account-deletion-pending-subtitle":
+      "Your request is being reviewed by our team",
+  "account-deletion-process-info":
+      "You can still use the app normally and cancel the request at any time",
+  "account-deletion-scheduled": "Your account will be deleted on",
+  "account-deletion-continue-using":
+      "You can still use the app normally and cancel the request at any time.",
+  "cancel-deletion": "Cancel deletion request",
+
+  // Cancellation Confirmation Dialog
+  "cancel-deletion-confirmation-title": "Cancel deletion request?",
+  "cancel-deletion-confirmation-message":
+      "Are you sure you want to cancel your account deletion request? You can always submit a new request later.",
+  "account-accessible-until": "Your account will still be accessible until",
+  "no-keep-request": "No, keep request",
+  "yes-cancel-deletion": "Yes, cancel deletion",
+
+  // Success/Error Messages
+  "deletion-request-submitted":
+      "Your account deletion request has been submitted successfully",
+  "deletion-request-failed":
+      "Failed to submit deletion request. Please try again.",
+  "deletion-canceled-successfully":
+      "Your account deletion request has been canceled",
+  "deletion-cancel-failed":
+      "Failed to cancel deletion request. Please try again.",
+
+  // Existing confirmation dialog keys (if not already present)
 };

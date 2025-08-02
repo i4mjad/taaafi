@@ -23,6 +23,9 @@ class UserDocument {
   final bool? isPlusUser;
   final Timestamp? lastPlusCheck;
 
+  // Account deletion tracking field
+  final bool? isRequestedToBeDeleted;
+
   UserDocument({
     this.uid,
     this.devicesIds,
@@ -39,6 +42,7 @@ class UserDocument {
     this.userWatchingWithoutMasturbating,
     this.isPlusUser,
     this.lastPlusCheck,
+    this.isRequestedToBeDeleted,
   });
 
   factory UserDocument.fromFirestore(DocumentSnapshot doc) {
@@ -69,6 +73,7 @@ class UserDocument {
               : null,
       isPlusUser: data['isPlusUser'],
       lastPlusCheck: data['lastPlusCheck'],
+      isRequestedToBeDeleted: data['isRequestedToBeDeleted'],
     );
   }
 
@@ -89,6 +94,7 @@ class UserDocument {
       'userWatchingWithoutMasturbating': userWatchingWithoutMasturbating ?? [],
       'isPlusUser': isPlusUser,
       'lastPlusCheck': lastPlusCheck,
+      'isRequestedToBeDeleted': isRequestedToBeDeleted,
     };
   }
 
@@ -99,7 +105,7 @@ class UserDocument {
 
   @override
   String toString() {
-    return 'UserDocument( uid: $uid, devicesIds: $devicesIds, displayName: $displayName, email: $email, gender: $gender, locale: $locale, dayOfBirth: $dayOfBirth, userFirstDate: $userFirstDate, role: $role, messagingToken: $messagingToken, userRelapses: $userRelapses, userMasturbatingWithoutWatching: $userMasturbatingWithoutWatching, userWatchingWithoutMasturbating: $userWatchingWithoutMasturbating, isPlusUser: $isPlusUser, lastPlusCheck: $lastPlusCheck)';
+    return 'UserDocument( uid: $uid, devicesIds: $devicesIds, displayName: $displayName, email: $email, gender: $gender, locale: $locale, dayOfBirth: $dayOfBirth, userFirstDate: $userFirstDate, role: $role, messagingToken: $messagingToken, userRelapses: $userRelapses, userMasturbatingWithoutWatching: $userMasturbatingWithoutWatching, userWatchingWithoutMasturbating: $userWatchingWithoutMasturbating, isPlusUser: $isPlusUser, lastPlusCheck: $lastPlusCheck, isRequestedToBeDeleted: $isRequestedToBeDeleted)';
   }
 
   UserDocument copyWith({
@@ -118,6 +124,7 @@ class UserDocument {
     List<String>? userWatchingWithoutMasturbating,
     bool? isPlusUser,
     Timestamp? lastPlusCheck,
+    bool? isRequestedToBeDeleted,
   }) {
     return UserDocument(
       uid: uid ?? this.uid,
@@ -137,6 +144,7 @@ class UserDocument {
           this.userWatchingWithoutMasturbating,
       isPlusUser: isPlusUser ?? this.isPlusUser,
       lastPlusCheck: lastPlusCheck ?? this.lastPlusCheck,
+      isRequestedToBeDeleted: isRequestedToBeDeleted ?? this.isRequestedToBeDeleted,
     );
   }
 
@@ -161,7 +169,8 @@ class UserDocument {
         listEquals(other.userWatchingWithoutMasturbating,
             userWatchingWithoutMasturbating) &&
         other.isPlusUser == isPlusUser &&
-        other.lastPlusCheck == lastPlusCheck;
+        other.lastPlusCheck == lastPlusCheck &&
+        other.isRequestedToBeDeleted == isRequestedToBeDeleted;
   }
 
   @override
@@ -180,6 +189,7 @@ class UserDocument {
         userMasturbatingWithoutWatching.hashCode ^
         userWatchingWithoutMasturbating.hashCode ^
         isPlusUser.hashCode ^
-        lastPlusCheck.hashCode;
+        lastPlusCheck.hashCode ^
+        isRequestedToBeDeleted.hashCode;
   }
 }

@@ -2437,5 +2437,60 @@ const Map<String, String> kAr = {
   "subscribed-to-group": "مشترك",
   "upgrade-to-plus-messaging": "ترقية إلى تعافي +",
   "subscribe-to-group": "اشتراك",
-  "requires-plus-subscription": "يتطلب تعافي +"
+  "requires-plus-subscription": "يتطلب تعافي +",
+
+  "deletion-reason-title": "لماذا تريد حذف حسابك؟",
+  "deletion-reason-subtitle":
+      "ساعدنا في فهم السبب (سيساعدنا هذا في تحسين خدمتنا)",
+  "deletion-reason-details": "يرجى تقديم المزيد من التفاصيل",
+  "deletion-reason-details-hint":
+      "أخبرنا المزيد عن تجربتك أو ما يمكننا تحسينه...",
+
+  // Privacy & Security Reasons
+  "deletion-reason-privacy-concerns": "مخاوف الخصوصية",
+  "deletion-reason-data-security": "مخاوف أمان البيانات",
+
+  // App Experience Reasons
+  "deletion-reason-not-helpful": "التطبيق ليس مفيداً لي",
+  "deletion-reason-too-complex": "التطبيق معقد جداً للاستخدام",
+  "deletion-reason-technical-issues": "مشاكل تقنية/أخطاء",
+
+  // Personal Reasons
+  "deletion-reason-no-longer-needed": "لم أعد بحاجة لهذا النوع من التطبيقات",
+  "deletion-reason-switching-apps": "الانتقال إلى تطبيق آخر",
+  "deletion-reason-temporary-break": "أخذ استراحة مؤقتة",
+
+  // Content & Features
+  "deletion-reason-missing-features": "ميزات مفقودة أحتاجها",
+  "deletion-reason-content-inappropriate": "محتوى غير مناسب",
+
+  // Support & Communication
+  "deletion-reason-poor-support": "دعم عملاء ضعيف",
+
+  // Other
+  "deletion-reason-other": "سبب آخر",
+
+  // Pending Deletion Banner
+  "account-deletion-pending": "تم طلب حذف الحساب",
+  "account-deletion-pending-subtitle": "طلبك قيد المراجعة من قبل فريقنا",
+  "account-deletion-process-info":
+      "يمكنك استخدام التطبيق بشكل طبيعي وإلغاء الطلب في أي وقت",
+  "account-deletion-scheduled": "سيتم حذف حسابك في",
+  "account-deletion-continue-using":
+      "يمكنك استخدام التطبيق بشكل طبيعي وإلغاء الطلب في أي وقت.",
+  "cancel-deletion": "إلغاء طلب الحذف",
+
+  // Cancellation Confirmation Dialog
+  "cancel-deletion-confirmation-title": "إلغاء طلب حذف الحساب؟",
+  "cancel-deletion-confirmation-message":
+      "هل أنت متأكد أنك تريد إلغاء طلب حذف حسابك؟ يمكنك دائماً تقديم طلب جديد لاحقاً.",
+  "account-accessible-until": "سيظل حسابك متاحاً حتى",
+  "no-keep-request": "لا، الاحتفاظ بالطلب",
+  "yes-cancel-deletion": "نعم، إلغاء الحذف",
+
+  // Success/Error Messages
+  "deletion-request-submitted": "تم تقديم طلب حذف حسابك بنجاح",
+  "deletion-request-failed": "فشل في تقديم طلب الحذف. يرجى المحاولة مرة أخرى.",
+  "deletion-canceled-successfully": "تم إلغاء طلب حذف حسابك",
+  "deletion-cancel-failed": "فشل في إلغاء طلب الحذف. يرجى المحاولة مرة أخرى.",
 };

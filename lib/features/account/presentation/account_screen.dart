@@ -26,6 +26,7 @@ import 'package:reboot_app_3/features/authentication/application/auth_service.da
 import 'package:url_launcher/url_launcher.dart';
 import 'package:reboot_app_3/features/authentication/providers/account_status_provider.dart';
 import 'package:reboot_app_3/features/authentication/providers/user_document_provider.dart';
+import 'package:reboot_app_3/core/shared_widgets/account_action_banner.dart';
 import 'package:reboot_app_3/core/shared_widgets/complete_registration_banner.dart';
 import 'package:reboot_app_3/core/shared_widgets/confirm_details_banner.dart';
 import 'package:reboot_app_3/core/shared_widgets/confirm_email_banner.dart';
@@ -81,189 +82,201 @@ class AccountScreen extends ConsumerWidget {
                                 Center(
                                   child: Spinner(),
                                 ),
-                              if (!showMainContent &&
-                                  accountStatus ==
-                                      AccountStatus.needCompleteRegistration)
-                                const CompleteRegistrationBanner(),
-                              if (!showMainContent &&
-                                  accountStatus ==
-                                      AccountStatus.needConfirmDetails)
-                                const ConfirmDetailsBanner(),
-                              if (!showMainContent &&
-                                  accountStatus ==
-                                      AccountStatus.needEmailVerification)
-                                const ConfirmEmailBanner(),
-                              if (showMainContent) const SubscriptionCard(),
-                              verticalSpace(Spacing.points16),
-                              GestureDetector(
-                                onTap: () {
-                                  HapticFeedback.mediumImpact();
-                                  context
-                                      .pushNamed(RouteNames.userProfile.name);
-                                },
-                                child: UserDetailsWidget(userProfile),
-                              ),
-                              verticalSpace(Spacing.points24),
-                              Text(
-                                AppLocalizations.of(context)
-                                    .translate('app-settings'),
-                                style: TextStyles.h6,
-                              ),
-                              verticalSpace(Spacing.points8),
-                              GestureDetector(
-                                onTap: () {
-                                  HapticFeedback.mediumImpact();
-                                  changeLanguage(context);
-                                },
-                                child: SettingsButton(
-                                  icon: LucideIcons.smartphone,
-                                  textKey: 'ui-settings',
-                                ),
-                              ),
-                              verticalSpace(Spacing.points8),
-                              GestureDetector(
-                                onTap: () {
-                                  HapticFeedback.mediumImpact();
-                                  showModalBottomSheet<void>(
-                                    context: context,
-                                    isScrollControlled: true,
-                                    isDismissible:
-                                        false, // Prevent tap outside to dismiss
-                                    enableDrag:
-                                        false, // Prevent swipe down to dismiss
-                                    builder: (BuildContext context) {
-                                      return EnhancedHomeSettingsSheet();
-                                    },
-                                  );
-                                },
-                                child: SettingsButton(
-                                  icon: LucideIcons.layoutGrid,
-                                  textKey: 'home-layout',
-                                ),
-                              ),
-                              verticalSpace(Spacing.points16),
-                              Text(
-                                AppLocalizations.of(context)
-                                    .translate('account-settings'),
-                                style: TextStyles.h6,
-                              ),
-                              verticalSpace(Spacing.points8),
-                              if (showMainContent)
+
+                              // If account deletion is pending, show only the banner
+                              if (accountStatus ==
+                                  AccountStatus.pendingDeletion)
+                                const AccountActionBanner(isFullScreen: true),
+
+                              // Show other banners and content only if not pending deletion
+                              if (accountStatus !=
+                                  AccountStatus.pendingDeletion) ...[
+                                if (!showMainContent &&
+                                    accountStatus ==
+                                        AccountStatus.needCompleteRegistration)
+                                  const CompleteRegistrationBanner(),
+                                if (!showMainContent &&
+                                    accountStatus ==
+                                        AccountStatus.needConfirmDetails)
+                                  const ConfirmDetailsBanner(),
+                                if (!showMainContent &&
+                                    accountStatus ==
+                                        AccountStatus.needEmailVerification)
+                                  const ConfirmEmailBanner(),
+                                if (showMainContent) const SubscriptionCard(),
+                                verticalSpace(Spacing.points16),
                                 GestureDetector(
                                   onTap: () {
+                                    HapticFeedback.mediumImpact();
                                     context
-                                        .pushNamed(RouteNames.userReports.name);
+                                        .pushNamed(RouteNames.userProfile.name);
+                                  },
+                                  child: UserDetailsWidget(userProfile),
+                                ),
+                                verticalSpace(Spacing.points24),
+                                Text(
+                                  AppLocalizations.of(context)
+                                      .translate('app-settings'),
+                                  style: TextStyles.h6,
+                                ),
+                                verticalSpace(Spacing.points8),
+                                GestureDetector(
+                                  onTap: () {
+                                    HapticFeedback.mediumImpact();
+                                    changeLanguage(context);
                                   },
                                   child: SettingsButton(
-                                    icon: LucideIcons.fileText,
-                                    textKey: 'my-reports',
+                                    icon: LucideIcons.smartphone,
+                                    textKey: 'ui-settings',
                                   ),
                                 ),
-                              verticalSpace(Spacing.points8),
-                              if (showMainContent)
-                                Consumer(
-                                  builder: (context, ref, child) {
-                                    final hasActiveSubscription = ref
-                                        .watch(hasActiveSubscriptionProvider);
+                                verticalSpace(Spacing.points8),
+                                GestureDetector(
+                                  onTap: () {
+                                    HapticFeedback.mediumImpact();
+                                    showModalBottomSheet<void>(
+                                      context: context,
+                                      isScrollControlled: true,
+                                      isDismissible:
+                                          false, // Prevent tap outside to dismiss
+                                      enableDrag:
+                                          false, // Prevent swipe down to dismiss
+                                      builder: (BuildContext context) {
+                                        return EnhancedHomeSettingsSheet();
+                                      },
+                                    );
+                                  },
+                                  child: SettingsButton(
+                                    icon: LucideIcons.layoutGrid,
+                                    textKey: 'home-layout',
+                                  ),
+                                ),
+                                verticalSpace(Spacing.points16),
+                                Text(
+                                  AppLocalizations.of(context)
+                                      .translate('account-settings'),
+                                  style: TextStyles.h6,
+                                ),
+                                verticalSpace(Spacing.points8),
+                                if (showMainContent)
+                                  GestureDetector(
+                                    onTap: () {
+                                      context.pushNamed(
+                                          RouteNames.userReports.name);
+                                    },
+                                    child: SettingsButton(
+                                      icon: LucideIcons.fileText,
+                                      textKey: 'my-reports',
+                                    ),
+                                  ),
+                                verticalSpace(Spacing.points8),
+                                if (showMainContent)
+                                  Consumer(
+                                    builder: (context, ref, child) {
+                                      final hasActiveSubscription = ref
+                                          .watch(hasActiveSubscriptionProvider);
 
-                                    if (hasActiveSubscription) {
-                                      // Show feature suggestion for Plus users
-                                      return GestureDetector(
-                                        onTap: () =>
-                                            _showFeatureSuggestionModal(
-                                                context, ref),
-                                        child: SettingsButton(
-                                          icon: LucideIcons.lightbulb,
-                                          textKey: 'suggest-feature',
-                                        ),
-                                      );
-                                    } else {
-                                      // Show premium upgrade modal for free users
-                                      return GestureDetector(
-                                        onTap: () => _showSubscriptionModal(
-                                            context, ref),
-                                        child: SettingsButton(
-                                          icon: LucideIcons.star,
-                                          textKey: 'suggest-feature-plus-only',
-                                          type: 'app',
-                                        ),
-                                      );
-                                    }
+                                      if (hasActiveSubscription) {
+                                        // Show feature suggestion for Plus users
+                                        return GestureDetector(
+                                          onTap: () =>
+                                              _showFeatureSuggestionModal(
+                                                  context, ref),
+                                          child: SettingsButton(
+                                            icon: LucideIcons.lightbulb,
+                                            textKey: 'suggest-feature',
+                                          ),
+                                        );
+                                      } else {
+                                        // Show premium upgrade modal for free users
+                                        return GestureDetector(
+                                          onTap: () => _showSubscriptionModal(
+                                              context, ref),
+                                          child: SettingsButton(
+                                            icon: LucideIcons.star,
+                                            textKey:
+                                                'suggest-feature-plus-only',
+                                            type: 'app',
+                                          ),
+                                        );
+                                      }
+                                    },
+                                  ),
+                                verticalSpace(Spacing.points8),
+                                SettingsButton(
+                                  icon: LucideIcons.logOut,
+                                  textKey: 'log-out',
+                                  action: () async {
+                                    await authService.signOut(context, ref);
+                                    getSuccessSnackBar(
+                                        context, 'logged-out-successfully');
                                   },
                                 ),
-                              verticalSpace(Spacing.points8),
-                              SettingsButton(
-                                icon: LucideIcons.logOut,
-                                textKey: 'log-out',
-                                action: () async {
-                                  await authService.signOut(context, ref);
-                                  getSuccessSnackBar(
-                                      context, 'logged-out-successfully');
-                                },
-                              ),
-                              verticalSpace(Spacing.points8),
-                              GestureDetector(
-                                onTap: () async {
-                                  unawaited(ref
-                                      .read(analyticsFacadeProvider)
-                                      .trackUserDeleteAccount());
+                                verticalSpace(Spacing.points8),
+                                GestureDetector(
+                                  onTap: () async {
+                                    unawaited(ref
+                                        .read(analyticsFacadeProvider)
+                                        .trackUserDeleteAccount());
 
-                                  context
-                                      .goNamed(RouteNames.accountDelete.name);
-                                },
-                                child: SettingsButton(
-                                  icon: LucideIcons.userX,
-                                  textKey: 'delete-my-account',
-                                  type: 'error',
+                                    context
+                                        .goNamed(RouteNames.accountDelete.name);
+                                  },
+                                  child: SettingsButton(
+                                    icon: LucideIcons.userX,
+                                    textKey: 'delete-my-account',
+                                    type: 'error',
+                                  ),
                                 ),
-                              ),
-                              verticalSpace(Spacing.points16),
-                              Text(
-                                AppLocalizations.of(context)
-                                    .translate('about-app'),
-                                style: TextStyles.h6,
-                              ),
-                              verticalSpace(Spacing.points8),
-                              SettingsButton(
-                                icon: LucideIcons.heart,
-                                textKey: 'version-number',
-                                type: 'app',
-                                action: () {
-                                  launchUrl(Uri.parse('https://ta3afi.app'));
-                                },
-                              ),
-                              verticalSpace(Spacing.points8),
-                              FeatureAccessGuard(
-                                featureUniqueName:
-                                    AppFeaturesConfig.contactAdmin,
-                                onTap: () => _showContactUsModal(context, ref),
-                                customBanMessage: AppLocalizations.of(context)
-                                    .translate('contact-support-restricted'),
-                                child: SettingsButton(
-                                  icon: LucideIcons.helpCircle,
-                                  textKey: 'contact-support-team',
+                                verticalSpace(Spacing.points16),
+                                Text(
+                                  AppLocalizations.of(context)
+                                      .translate('about-app'),
+                                  style: TextStyles.h6,
                                 ),
-                              ),
-                              verticalSpace(Spacing.points8),
-                              SettingsButton(
-                                icon: LucideIcons.messageCircle,
-                                textKey: 'contact-us-through-this-channels',
-                                action: () async {
-                                  await ref.read(urlLauncherProvider).launch(
-                                      Uri.parse('https://wa.me/96876691799'));
-                                },
-                              ),
-                              verticalSpace(Spacing.points8),
-                              SettingsButton(
-                                icon: LucideIcons.star,
-                                textKey: 'rate-app',
-                                action: () async {
-                                  await ref
-                                      .read(inAppRatingServiceProvider)
-                                      .requestReview(context);
-                                },
-                              ),
-                              verticalSpace(Spacing.points12),
+                                verticalSpace(Spacing.points8),
+                                SettingsButton(
+                                  icon: LucideIcons.heart,
+                                  textKey: 'version-number',
+                                  type: 'app',
+                                  action: () {
+                                    launchUrl(Uri.parse('https://ta3afi.app'));
+                                  },
+                                ),
+                                verticalSpace(Spacing.points8),
+                                FeatureAccessGuard(
+                                  featureUniqueName:
+                                      AppFeaturesConfig.contactAdmin,
+                                  onTap: () =>
+                                      _showContactUsModal(context, ref),
+                                  customBanMessage: AppLocalizations.of(context)
+                                      .translate('contact-support-restricted'),
+                                  child: SettingsButton(
+                                    icon: LucideIcons.helpCircle,
+                                    textKey: 'contact-support-team',
+                                  ),
+                                ),
+                                verticalSpace(Spacing.points8),
+                                SettingsButton(
+                                  icon: LucideIcons.messageCircle,
+                                  textKey: 'contact-us-through-this-channels',
+                                  action: () async {
+                                    await ref.read(urlLauncherProvider).launch(
+                                        Uri.parse('https://wa.me/96876691799'));
+                                  },
+                                ),
+                                verticalSpace(Spacing.points8),
+                                SettingsButton(
+                                  icon: LucideIcons.star,
+                                  textKey: 'rate-app',
+                                  action: () async {
+                                    await ref
+                                        .read(inAppRatingServiceProvider)
+                                        .requestReview(context);
+                                  },
+                                ),
+                                verticalSpace(Spacing.points12),
+                              ],
                             ],
                           ),
                         ),

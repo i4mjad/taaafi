@@ -75,7 +75,7 @@ class ScaffoldWithNestedNavigation extends StatelessWidget {
               NavigationDestination(
                 label: AppLocalizations.of(context).translate("account"),
                 icon: Icon(
-                  LucideIcons.settings,
+                  LucideIcons.user2,
                   size: 20,
                 ),
               ),

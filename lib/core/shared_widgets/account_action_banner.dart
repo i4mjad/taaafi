@@ -6,6 +6,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/routing/route_names.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
+import 'package:reboot_app_3/core/shared_widgets/pending_deletion_banner.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
@@ -28,6 +29,11 @@ class AccountActionBanner extends ConsumerWidget {
     if (accountStatus == AccountStatus.ok ||
         accountStatus == AccountStatus.loading) {
       return const SizedBox.shrink();
+    }
+
+    // Handle pending deletion with specialized banner
+    if (accountStatus == AccountStatus.pendingDeletion) {
+      return PendingDeletionBanner(isFullScreen: isFullScreen);
     }
 
     final bannerData = _getBannerData(accountStatus);
@@ -152,6 +158,7 @@ class AccountActionBanner extends ConsumerWidget {
 
       case AccountStatus.loading:
       case AccountStatus.ok:
+      case AccountStatus.pendingDeletion:
         return null;
     }
   }

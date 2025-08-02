@@ -11,6 +11,7 @@ enum AccountStatus {
   needCompleteRegistration,
   needConfirmDetails,
   needEmailVerification,
+  pendingDeletion,
 }
 
 @riverpod
@@ -35,6 +36,11 @@ AccountStatus accountStatus(Ref ref) {
           // If no document exists, user needs to complete registration
           if (doc == null) {
             return AccountStatus.needCompleteRegistration;
+          }
+
+          // Check if account deletion is pending
+          if (doc.isRequestedToBeDeleted == true) {
+            return AccountStatus.pendingDeletion;
           }
 
           // Check email verification first (only for logged in users)

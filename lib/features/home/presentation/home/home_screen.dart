@@ -11,6 +11,7 @@ import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/features/vault/presentation/vault_settings/activities_notifications_settings_screen.dart';
 import 'package:reboot_app_3/features/authentication/providers/account_status_provider.dart';
+import 'package:reboot_app_3/core/shared_widgets/account_action_banner.dart';
 import 'package:reboot_app_3/core/shared_widgets/complete_registration_banner.dart';
 import 'package:reboot_app_3/core/shared_widgets/confirm_details_banner.dart';
 import 'package:reboot_app_3/core/shared_widgets/confirm_email_banner.dart';
@@ -126,6 +127,13 @@ class HomeScreen extends ConsumerWidget {
                 child: Padding(
                   padding: EdgeInsets.symmetric(horizontal: 16.0),
                   child: ConfirmEmailBanner(isFullScreen: true),
+                ),
+              );
+            case AccountStatus.pendingDeletion:
+              return const Center(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16.0),
+                  child: AccountActionBanner(isFullScreen: true),
                 ),
               );
             case AccountStatus.ok:
