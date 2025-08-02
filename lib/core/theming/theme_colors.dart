@@ -81,6 +81,8 @@ class LightThemeColors {
   static const Color error900 = Color(0xff5e0707);
 
   static const Color calenderHeaderBackgoundColor = Color(0xffE4ECFE);
+
+  static const Color postInputBackgoundColor = Color(0xffF4F4F4);
 }
 
 const MaterialColor lightPrimarySwatch = MaterialColor(
@@ -100,10 +102,15 @@ const MaterialColor lightPrimarySwatch = MaterialColor(
 );
 
 const MaterialColor lightBackgroundSwatch =
-    MaterialColor(0xffF5F7F8, <int, Color>{});
+    MaterialColor(0xffffffff, <int, Color>{});
 
 const MaterialColor calenderHeaderBackgoundSwatch = MaterialColor(
   0xffE4ECFE,
+  <int, Color>{},
+);
+
+const MaterialColor lightPostInputBackgoundSwatch = MaterialColor(
+  0xffF4F4F4,
   <int, Color>{},
 );
 

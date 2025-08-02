@@ -870,7 +870,12 @@ class _NewPostScreenState extends ConsumerState<NewPostScreen> {
       data: (postId) {
         print('✅ [NewPostScreen] Post creation successful with ID: $postId');
         if (postId != null) {
-          // Success - show success message and navigate back
+          // Success - reset loading state, invalidate posts provider, show success message and navigate back
+          setState(() => _isSubmitting = false);
+
+          // Invalidate the posts pagination provider to refresh the posts list
+          ref.invalidate(postsPaginationProvider);
+
           print(
               '🎉 [NewPostScreen] Showing success snackbar and navigating back');
           getSuccessSnackBar(context, 'post_created');
@@ -878,6 +883,7 @@ class _NewPostScreenState extends ConsumerState<NewPostScreen> {
           context.pop();
         } else {
           print('⚠️ [NewPostScreen] Post creation returned null ID');
+          setState(() => _isSubmitting = false);
         }
       },
       loading: () {

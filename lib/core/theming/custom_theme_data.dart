@@ -12,6 +12,7 @@ class CustomThemeData {
   final MaterialColor error;
   final MaterialColor backgroundColor;
   final MaterialColor calenderHeaderBackgound;
+  final MaterialColor postInputBackgound;
 
   const CustomThemeData({
     required this.primary,
@@ -23,6 +24,7 @@ class CustomThemeData {
     required this.error,
     required this.backgroundColor,
     required this.calenderHeaderBackgound,
+    required this.postInputBackgound,
   });
 }
 
@@ -37,6 +39,7 @@ CustomThemeData getLightCustomTheme(int colorThemeIndex) {
     grey: lightGreySwatch,
     error: lightErrorSwatch,
     calenderHeaderBackgound: calenderHeaderBackgoundSwatch,
+    postInputBackgound: lightPostInputBackgoundSwatch,
   );
 }
 
@@ -50,4 +53,5 @@ const CustomThemeData darkCustomTheme = CustomThemeData(
   grey: darkGreySwatch,
   error: darkErrorSwatch,
   calenderHeaderBackgound: darkCalenderHeaderBackgoundSwatch,
+  postInputBackgound: darkPostInputBackgoundSwatch,
 );

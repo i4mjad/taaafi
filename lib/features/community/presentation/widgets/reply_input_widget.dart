@@ -43,6 +43,19 @@ class _ReplyInputWidgetState extends ConsumerState<ReplyInputWidget> {
   final TextEditingController _replyController = TextEditingController();
   bool _isSubmitting = false;
 
+  /// Helper function to localize special display name constants
+  String _getLocalizedDisplayName(
+      String displayName, AppLocalizations localizations) {
+    switch (displayName) {
+      case 'DELETED_USER':
+        return localizations.translate('community-deleted-user');
+      case 'ANONYMOUS_USER':
+        return localizations.translate('community-anonymous');
+      default:
+        return displayName;
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -71,9 +84,9 @@ class _ReplyInputWidgetState extends ConsumerState<ReplyInputWidget> {
         // Main input widget
         WidgetsContainer(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-          backgroundColor: theme.grey[100],
-          borderSide: BorderSide(color: theme.grey[300]!),
-          borderRadius: BorderRadius.circular(15),
+          backgroundColor: theme.postInputBackgound,
+          borderSide: BorderSide(color: theme.grey[300]!, width: 0.5),
+          borderRadius: BorderRadius.circular(12.5),
           child: SafeArea(
             top: false,
             child: Column(
@@ -261,9 +274,11 @@ class _ReplyInputWidgetState extends ConsumerState<ReplyInputWidget> {
 
                     return authorProfileAsync.when(
                       data: (authorProfile) {
-                        final displayName = isAnonymous
-                            ? localizations.translate('anonymous')
-                            : authorProfile?.displayName ?? 'Unknown User';
+                        final displayName = _getLocalizedDisplayName(
+                          authorProfile?.getDisplayNameWithPipeline() ??
+                              'Unknown User',
+                          localizations,
+                        );
 
                         return Text(
                           displayName,
@@ -274,18 +289,14 @@ class _ReplyInputWidgetState extends ConsumerState<ReplyInputWidget> {
                         );
                       },
                       loading: () => Text(
-                        isAnonymous
-                            ? localizations.translate('anonymous')
-                            : 'Loading...',
+                        'Loading...',
                         style: TextStyles.footnoteSelected.copyWith(
                           color: theme.grey[700],
                           fontSize: 12,
                         ),
                       ),
                       error: (error, stackTrace) => Text(
-                        isAnonymous
-                            ? localizations.translate('anonymous')
-                            : 'Unknown User',
+                        'Unknown User',
                         style: TextStyles.footnoteSelected.copyWith(
                           color: theme.grey[700],
                           fontSize: 12,

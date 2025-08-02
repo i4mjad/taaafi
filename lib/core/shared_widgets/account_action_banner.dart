@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -108,6 +109,28 @@ class AccountActionBanner extends ConsumerWidget {
                   style: TextStyles.footnote.copyWith(
                     color: Colors.white,
                     fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () {
+                  FirebaseAuth.instance.signOut();
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: theme.error[50],
+                  foregroundColor: theme.error[600],
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                child: Text(
+                  AppLocalizations.of(context).translate('sign-out'),
+                  style: TextStyles.footnote.copyWith(
+                    color: theme.error[600],
                   ),
                 ),
               ),

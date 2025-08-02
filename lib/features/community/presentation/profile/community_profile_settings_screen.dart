@@ -34,6 +34,19 @@ class _CommunityProfileSettingsScreenState
   late ScrollController _commentsScrollController;
   late ScrollController _likesScrollController;
 
+  /// Helper function to localize special display name constants
+  String _getLocalizedDisplayName(
+      String displayName, AppLocalizations localizations) {
+    switch (displayName) {
+      case 'DELETED_USER':
+        return localizations.translate('community-deleted-user');
+      case 'ANONYMOUS_USER':
+        return localizations.translate('community-anonymous');
+      default:
+        return displayName;
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -143,6 +156,13 @@ class _CommunityProfileSettingsScreenState
     setState(() {
       selectedTabIndex = index;
     });
+
+    // Invalidate profile providers to ensure fresh state
+    ref.invalidate(currentCommunityProfileProvider);
+    ref.invalidate(hasCommunityProfileProvider);
+
+    // Force refresh of community screen state to check profile status
+    ref.read(communityScreenStateProvider.notifier).refresh();
 
     // Refresh the current tab if it's empty
     final profileAsync = ref.read(currentCommunityProfileProvider);
@@ -289,10 +309,10 @@ class _CommunityProfileSettingsScreenState
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                profile.isAnonymous
-                                    ? localizations
-                                        .translate('community-anonymous')
-                                    : profile.displayName,
+                                _getLocalizedDisplayName(
+                                  profile.getDisplayNameWithPipeline(),
+                                  localizations,
+                                ),
                                 style: TextStyles.h5.copyWith(
                                   color: theme.grey[900],
                                   fontWeight: FontWeight.bold,
@@ -692,12 +712,30 @@ class _CommunityProfileSettingsScreenState
     );
   }
 
-  void _showEditProfileModal(BuildContext context, profile) {
-    showModalBottomSheet(
+  void _showEditProfileModal(BuildContext context, profile) async {
+    await showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => EditCommunityProfileModal(profile: profile),
+      builder: (context) => EditCommunityProfileModal(
+        profile: profile,
+        onProfileDeleted: () {
+          // Navigate to community onboarding since user no longer has a profile
+          context.go('/community/onboarding');
+        },
+      ),
     );
+
+    // Check if profile was deleted after modal closes (fallback check)
+    if (context.mounted) {
+      // Wait a moment for providers to update, then check
+      await Future.delayed(const Duration(milliseconds: 100));
+      final currentProfile =
+          ref.read(currentCommunityProfileProvider).valueOrNull;
+      if (currentProfile == null) {
+        // Navigate to community onboarding since user no longer has a profile
+        context.go('/community/onboarding');
+      }
+    }
   }
 }

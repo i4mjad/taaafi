@@ -413,6 +413,7 @@ const Map<String, String> kAr = {
   "report_comment_submitted": "تم إرسال بلاغ التعليق بنجاح",
   "send": "إرسال",
   "community-anonymous": "مجهول",
+  "community-deleted-user": "محذوف",
   "community-posts": "المنشورات",
   "community-edit-profile": "تعديل الملف الشخصي",
   "community-share-profile": "مشاركة الملف الشخصي",
@@ -448,8 +449,8 @@ const Map<String, String> kAr = {
       "سيؤدي هذا إلى حذف ملفك الشخصي في المجتمع وجميع البيانات المرتبطة بشكل دائم بما في ذلك المنشورات والتعليقات والتفاعلات.",
   "community-delete-profile-warning":
       "لا يمكن التراجع عن هذا الإجراء. سيظهر محتواك كـ \"مستخدم محذوف\" للآخرين.",
-  "community-delete-profile-confirm": "اكتب 'DELETE' للتأكيد",
-  "community-delete-profile-confirmation": "DELETE",
+  "community-delete-profile-confirm": "اكتب 'حذف' للتأكيد",
+  "community-delete-profile-confirmation": "حذف",
   "community-delete-profile-button": "حذف الملف الشخصي",
   "community-delete-profile-cancelled": "تم إلغاء حذف الملف الشخصي",
   "community-deletion-progress": "جاري حذف الملف الشخصي...",
@@ -460,6 +461,17 @@ const Map<String, String> kAr = {
   "community-deletion-step-5": "تنظيف الروابط",
   "community-deletion-completed": "تم حذف الملف الشخصي بنجاح",
   "community-deletion-failed": "فشل في حذف الملف الشخصي",
+  "community-deletion-preparing": "جاري التحضير للحذف...",
+  "community-deletion-marking-deleted": "جاري إنهاء الحذف...",
+  "community-profile-deleted-message":
+      "تم حذف ملفك الشخصي في المجتمع نهائياً. يمكنك إنشاء ملف شخصي جديد في أي وقت.",
+  "community-continue": "متابعة",
+  "community-profile-restored-message":
+      "تم استعادة ملفك الشخصي في المجتمع بنجاح. يمكنك الآن الوصول إلى جميع ميزات المجتمع.",
+  "community-close": "إغلاق",
+  "community-restore-not-latest": "يمكن استعادة آخر ملف شخصي محذوف فقط",
+  "community-restore-not-your-profile": "الملف الشخصي لا ينتمي للمستخدم الحالي",
+  "community-restore-not-deleted": "الملف الشخصي غير محذوف",
   "community-rejoin-welcome": "مرحباً بعودتك!",
   "community-rejoin-choice":
       "كان لديك ملف شخصي في المجتمع سابقاً. ماذا تريد أن تفعل؟",
@@ -815,9 +827,20 @@ const Map<String, String> kAr = {
   "community-features": "ما يمكنك توقعه:",
   "community-feature-1": "تواصل مع الآخرين في نفس رحلة التعافي",
   "community-feature-2": "شارك تقدمك وإنجازاتك",
-  "community-feature-3": "انضم إلى مجموعات الدعم والنقاشات",
+  "community-feature-3": "انضم إلى النقاشات وشارك تجاربك",
   "community-feature-4": "استمد التحفيز من قصص نجاح الآخرين",
   "community-feature-5": "تفاعلات خاصة ومجهولة الهوية",
+  "community-feature-1-detail":
+      "تواصل مع أشخاص يفهمون رحلتك ويشاركونك نفس الهدف. ابني علاقات هادفة مع أشخاص في نفس طريق التعافي والنمو الشخصي.",
+  "community-feature-2-detail":
+      "احتفل بإنجازاتك ومعالمك المهمة مع المجتمع. شارك تقدمك، ألهم الآخرين، وتابع رحلتك مع أقران داعمين.",
+  "community-feature-3-detail":
+      "شارك في نقاشات هادفة حول التعافي والتحديات والنجاحات. شارك تجاربك وتعلم من الآخرين في بيئة آمنة وداعمة.",
+  "community-feature-4-detail":
+      "استمد الإلهام من قصص نجاح حقيقية يشاركها أعضاء المجتمع. اقرأ عن انتصارات الآخرين، تعلم من استراتيجياتهم، وحافظ على دافعيتك في رحلتك الخاصة.",
+  "community-feature-5-detail":
+      "حافظ على خصوصيتك أثناء التواصل مع الآخرين. اختر التفاعل بهوية مجهولة عندما تفضل ذلك، مما يضمن شعورك بالأمان والراحة عند مشاركة أفكارك.",
+  "got-it": "فهمت",
   "community_coming_soon_title": "المجتمع قادم قريباً!",
   "community_coming_soon_description":
       "نحن نبني مجتمعاً داعماً حيث يمكنك التواصل مع الآخرين في رحلة تعافيهم. ترقبوا التحديثات!",

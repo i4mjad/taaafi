@@ -400,6 +400,7 @@ const Map<String, String> kEn = {
   "report_comment_submitted": "Comment report submitted successfully",
   "send": "Send",
   "community-anonymous": "Anonymous",
+  "community-deleted-user": "Deleted",
   "community-posts": "Posts",
   "community-edit-profile": "Edit Profile",
   "community-share-profile": "Share Profile",
@@ -448,6 +449,19 @@ const Map<String, String> kEn = {
   "community-deletion-step-5": "Cleaning up mappings",
   "community-deletion-completed": "Profile deleted successfully",
   "community-deletion-failed": "Failed to delete profile",
+  "community-deletion-preparing": "Preparing deletion...",
+  "community-deletion-marking-deleted": "Finalizing deletion...",
+  "community-profile-deleted-message":
+      "Your community profile has been permanently deleted. You can create a new profile anytime.",
+  "community-continue": "Continue",
+  "community-profile-restored-message":
+      "Your community profile has been successfully restored. You can now access all community features.",
+  "community-close": "Close",
+  "community-restore-not-latest":
+      "Only the latest deleted profile can be restored",
+  "community-restore-not-your-profile":
+      "Profile does not belong to current user",
+  "community-restore-not-deleted": "Profile is not deleted",
   "community-rejoin-welcome": "Welcome Back!",
   "community-rejoin-choice":
       "You previously had a community profile. What would you like to do?",
@@ -1154,9 +1168,20 @@ const Map<String, String> kEn = {
   "community-features": "What to expect:",
   "community-feature-1": "Connect with others on the same recovery journey",
   "community-feature-2": "Share your progress and achievements",
-  "community-feature-3": "Join support groups and discussions",
+  "community-feature-3": "Join discussions and share experiences",
   "community-feature-4": "Get motivated by others' success stories",
   "community-feature-5": "Private and anonymous interactions",
+  "community-feature-1-detail":
+      "Connect with like-minded individuals who understand your journey. Build meaningful relationships with people who are on the same path to recovery and personal growth.",
+  "community-feature-2-detail":
+      "Celebrate your milestones and achievements with the community. Share your progress, inspire others, and track your journey together with supportive peers.",
+  "community-feature-3-detail":
+      "Participate in thoughtful discussions about recovery, challenges, and successes. Share your experiences and learn from others in a safe, supportive environment.",
+  "community-feature-4-detail":
+      "Draw inspiration from real success stories shared by community members. Read about others' triumphs, learn from their strategies, and stay motivated on your own journey.",
+  "community-feature-5-detail":
+      "Maintain your privacy while connecting with others. Choose to interact anonymously when you prefer, ensuring you feel safe and comfortable sharing your thoughts.",
+  "got-it": "Got it",
   "community_coming_soon_title": "Community Coming Soon!",
   "community_coming_soon_description":
       "We're building a supportive community where you can connect with others on their recovery journey. Stay tuned for updates!",
@@ -1750,7 +1775,6 @@ const Map<String, String> kEn = {
       "Custom reminders are integrated throughout the app. You can set them in Activities, Goals, and other sections with enhanced customization options.",
   "support-contact-dialog":
       "As a Plus member, you get priority support. Contact us through the app settings or reach out directly for faster response times.",
-  "got-it": "Got it",
 
   // Plus Streak Sharing Feature
   "days-streak": "{days} days",

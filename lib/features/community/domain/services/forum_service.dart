@@ -65,7 +65,7 @@ class ForumService {
       final snapshot = await _firestore
           .collection('communityProfiles')
           .where('userUID', isEqualTo: userUID)
-          .where('isDeleted', isEqualTo: false)
+          .where('isDeleted', isNotEqualTo: true)
           .limit(1)
           .get();
 
@@ -79,12 +79,11 @@ class ForumService {
       final doc = snapshot.docs.first;
       final data = doc.data();
 
-      // Additional validation to ensure profile is valid
-      final isDeleted = data['isDeleted'] as bool? ?? false;
-      if (isDeleted) {
+      // Double-check that the profile is not deleted
+      if (data['isDeleted'] == true) {
         throw ForumAuthenticationException(
-          'Community profile has been deleted',
-          code: 'PROFILE_DELETED',
+          'No active community profile found for user',
+          code: 'NO_ACTIVE_COMMUNITY_PROFILE',
         );
       }
 

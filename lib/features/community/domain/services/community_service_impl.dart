@@ -147,7 +147,7 @@ class CommunityServiceImpl implements CommunityService {
     return _firestore
         .collection('communityProfiles')
         .where('userUID', isEqualTo: user.uid)
-        .where('isDeleted', isEqualTo: false)
+        .where('isDeleted', isNotEqualTo: true)
         .limit(1)
         .snapshots()
         .map((snapshot) {
@@ -157,6 +157,12 @@ class CommunityServiceImpl implements CommunityService {
 
       final doc = snapshot.docs.first;
       final data = doc.data();
+
+      // Double-check that the profile is not deleted (for safety)
+      if (data['isDeleted'] == true) {
+        return null;
+      }
+
       return CommunityProfileEntity.fromJson({
         'id': doc.id,
         ...data,
@@ -238,7 +244,7 @@ class CommunityServiceImpl implements CommunityService {
       final snapshot = await _firestore
           .collection('communityProfiles')
           .where('userUID', isEqualTo: userUID)
-          .where('isDeleted', isEqualTo: false)
+          .where('isDeleted', isNotEqualTo: true)
           .limit(1)
           .get();
 
@@ -248,6 +254,12 @@ class CommunityServiceImpl implements CommunityService {
 
       final doc = snapshot.docs.first;
       final data = doc.data();
+
+      // Double-check that the profile is not deleted (for safety)
+      if (data['isDeleted'] == true) {
+        return null;
+      }
+
       return CommunityProfileEntity.fromJson({
         'id': doc.id,
         ...data,
@@ -280,6 +292,8 @@ class CommunityServiceImpl implements CommunityService {
           .collection('communityProfiles')
           .where('userUID', isEqualTo: user.uid)
           .where('isDeleted', isEqualTo: true)
+          .orderBy('createdAt',
+              descending: true) // Get the latest created deleted profile
           .limit(1)
           .get();
 
@@ -302,7 +316,7 @@ class CommunityServiceImpl implements CommunityService {
     }
 
     try {
-      // Check if the deleted profile exists
+      // Check if the deleted profile exists and belongs to the current user
       final profileDoc = await _firestore
           .collection('communityProfiles')
           .doc(deletedProfileId)
@@ -312,9 +326,32 @@ class CommunityServiceImpl implements CommunityService {
         throw const ProfileNotFoundException('Deleted profile not found');
       }
 
+      final profileData = profileDoc.data();
+      if (profileData == null) {
+        throw const ProfileNotFoundException('Invalid profile data');
+      }
+
+      // Validate that the profile belongs to the current user
+      if (profileData['userUID'] != user.uid) {
+        throw const ProfileNotFoundException(
+            'Profile does not belong to current user');
+      }
+
+      // Validate that the profile is actually deleted
+      if (profileData['isDeleted'] != true) {
+        throw const ProfileUpdateException('Profile is not deleted');
+      }
+
+      // Validate that this is the latest deleted profile for the user
+      final latestDeletedProfileId = await getDeletedProfileId();
+      if (latestDeletedProfileId != deletedProfileId) {
+        throw const ProfileUpdateException(
+            'Only the latest deleted profile can be restored');
+      }
+
       // Restore the profile atomically
       await _firestore.runTransaction((transaction) async {
-        // Reactivate profile
+        // Simply reactivate profile
         transaction.update(
           _firestore.collection('communityProfiles').doc(deletedProfileId),
           {
@@ -352,65 +389,26 @@ class CommunityServiceImpl implements CommunityService {
 
       final profileId = profile.id;
 
-      // Step 1: Delete posts
+      // Step 1: Mark profile as deleted
       yield DeletionProgress(
-        step: DeletionStep.deletingPosts,
-        completedItems: 0,
-        totalItems: 0,
-        message: 'Counting posts...',
-      );
-
-      await _deleteUserPosts(profileId);
-
-      // Step 2: Delete comments
-      yield DeletionProgress(
-        step: DeletionStep.deletingComments,
-        completedItems: 0,
-        totalItems: 0,
-        message: 'Counting comments...',
-      );
-
-      await _deleteUserComments(profileId);
-
-      // Step 3: Delete interactions
-      yield DeletionProgress(
-        step: DeletionStep.deletingInteractions,
-        completedItems: 0,
-        totalItems: 0,
-        message: 'Counting interactions...',
-      );
-
-      await _deleteUserInteractions(profileId);
-
-      // Step 4: Remove profile data
-      yield DeletionProgress(
-        step: DeletionStep.removingProfileData,
+        step: DeletionStep.markingProfileDeleted,
         completedItems: 0,
         totalItems: 1,
-        message: 'Removing profile data...',
+        message: 'Marking profile as deleted...',
       );
 
       await _deleteProfileData(profileId);
 
       yield DeletionProgress(
-        step: DeletionStep.removingProfileData,
+        step: DeletionStep.markingProfileDeleted,
         completedItems: 1,
         totalItems: 1,
-        message: 'Profile data removed',
+        message: 'Profile marked as deleted',
       );
 
-      // Step 5: Mark profile as deleted
+      // Step 2: Complete
       yield DeletionProgress(
-        step: DeletionStep.cleaningUpMappings,
-        completedItems: 0,
-        totalItems: 1,
-        message: 'Finalizing deletion...',
-      );
-
-      await _deleteProfileData(profileId);
-
-      yield DeletionProgress(
-        step: DeletionStep.cleaningUpMappings,
+        step: DeletionStep.completed,
         completedItems: 1,
         totalItems: 1,
         message: 'Deletion completed',
@@ -420,102 +418,12 @@ class CommunityServiceImpl implements CommunityService {
     }
   }
 
-  /// Deletes all posts created by the user
-  Future<void> _deleteUserPosts(String profileId) async {
-    final postsCollection = _firestore.collection('posts');
-
-    Query query = postsCollection
-        .where('authorCPId', isEqualTo: profileId)
-        .where('isDeleted', isEqualTo: false)
-        .limit(500);
-
-    while (true) {
-      final snapshot = await query.get();
-      if (snapshot.docs.isEmpty) break;
-
-      final batch = _firestore.batch();
-      for (final doc in snapshot.docs) {
-        batch.update(doc.reference, {
-          'isDeleted': true,
-          'deletedAt': FieldValue.serverTimestamp(),
-        });
-      }
-
-      await batch.commit();
-
-      // Set up next query
-      if (snapshot.docs.length == 500) {
-        query = query.startAfterDocument(snapshot.docs.last);
-      } else {
-        break;
-      }
-    }
-  }
-
-  /// Deletes all comments created by the user
-  Future<void> _deleteUserComments(String profileId) async {
-    final commentsCollection = _firestore.collection('comments');
-
-    Query query = commentsCollection
-        .where('authorCPId', isEqualTo: profileId)
-        .where('isDeleted', isEqualTo: false)
-        .limit(500);
-
-    while (true) {
-      final snapshot = await query.get();
-      if (snapshot.docs.isEmpty) break;
-
-      final batch = _firestore.batch();
-      for (final doc in snapshot.docs) {
-        batch.update(doc.reference, {
-          'isDeleted': true,
-          'deletedAt': FieldValue.serverTimestamp(),
-        });
-      }
-
-      await batch.commit();
-
-      // Set up next query
-      if (snapshot.docs.length == 500) {
-        query = query.startAfterDocument(snapshot.docs.last);
-      } else {
-        break;
-      }
-    }
-  }
-
-  /// Deletes all interactions (likes) created by the user
-  Future<void> _deleteUserInteractions(String profileId) async {
-    final likesCollection = _firestore.collection('likes');
-
-    Query query =
-        likesCollection.where('userCPId', isEqualTo: profileId).limit(500);
-
-    while (true) {
-      final snapshot = await query.get();
-      if (snapshot.docs.isEmpty) break;
-
-      final batch = _firestore.batch();
-      for (final doc in snapshot.docs) {
-        batch.delete(doc.reference);
-      }
-
-      await batch.commit();
-
-      // Set up next query
-      if (snapshot.docs.length == 500) {
-        query = query.startAfterDocument(snapshot.docs.last);
-      } else {
-        break;
-      }
-    }
-  }
-
   /// Marks the profile as deleted
   Future<void> _deleteProfileData(String profileId) async {
     await _firestore.collection('communityProfiles').doc(profileId).update({
       'isDeleted': true,
       'deletedAt': FieldValue.serverTimestamp(),
+      'updatedAt': FieldValue.serverTimestamp(),
     });
   }
 }

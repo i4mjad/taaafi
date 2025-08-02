@@ -26,10 +26,12 @@ import 'package:reboot_app_3/features/community/domain/services/community_servic
 
 class EditCommunityProfileModal extends ConsumerStatefulWidget {
   final CommunityProfileEntity profile;
+  final VoidCallback? onProfileDeleted;
 
   const EditCommunityProfileModal({
     super.key,
     required this.profile,
+    this.onProfileDeleted,
   });
 
   @override
@@ -49,6 +51,7 @@ class _EditCommunityProfileModalState
   bool _isLoadingImage = true;
   int? _currentStreakDays;
   bool _isLoadingStreak = false;
+  bool _isDeletionCompleted = false;
 
   @override
   void initState() {
@@ -172,7 +175,10 @@ class _EditCommunityProfileModalState
                   child: Row(
                     children: [
                       IconButton(
-                        onPressed: () => Navigator.of(context).pop(),
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                          _handleModalClose();
+                        },
                         icon: const Icon(LucideIcons.x),
                         color: theme.grey[600],
                       ),
@@ -217,156 +223,164 @@ class _EditCommunityProfileModalState
 
                 // Content
                 Expanded(
-                  child: SingleChildScrollView(
-                    controller: scrollController,
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Profile Picture Preview Section
-                        const SizedBox(width: 16),
-                        WidgetsContainer(
+                  child: _isDeletionCompleted
+                      ? _buildSuccessState(theme, localizations)
+                      : SingleChildScrollView(
+                          controller: scrollController,
                           padding: const EdgeInsets.all(16),
-                          backgroundColor: theme.success[50],
-                          borderRadius: BorderRadius.circular(15),
-                          borderSide:
-                              BorderSide(color: theme.success[200]!, width: 1),
-                          child: Row(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Column(
-                                children: [
-                                  // Show preview based on selected image option
-                                  if (_imageOption == 'default' &&
-                                      _currentUserImageUrl != null &&
-                                      !_isAnonymous)
-                                    Container(
-                                      width: 40,
-                                      height: 40,
-                                      decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        border: Border.all(
-                                            color: theme.primary[300]!,
-                                            width: 2),
-                                      ),
-                                      child: ClipOval(
-                                        child: Image.network(
-                                          _currentUserImageUrl!,
-                                          fit: BoxFit.cover,
-                                          errorBuilder:
-                                              (context, error, stackTrace) {
-                                            return AvatarWithAnonymity(
-                                              cpId: widget.profile.id,
-                                              isAnonymous: _isAnonymous,
-                                              isPlusUser: isPlusUser,
-                                              size: 40,
-                                            );
-                                          },
-                                        ),
-                                      ),
-                                    )
-                                  else
-                                    AvatarWithAnonymity(
-                                      cpId: widget.profile.id,
-                                      isAnonymous: _isAnonymous,
-                                      isPlusUser: isPlusUser,
-                                      size: 40,
+                              // Profile Picture Preview Section
+                              const SizedBox(width: 16),
+                              WidgetsContainer(
+                                padding: const EdgeInsets.all(16),
+                                backgroundColor: theme.success[50],
+                                borderRadius: BorderRadius.circular(15),
+                                borderSide: BorderSide(
+                                    color: theme.success[200]!, width: 1),
+                                child: Row(
+                                  children: [
+                                    Column(
+                                      children: [
+                                        // Show preview based on selected image option
+                                        if (_imageOption == 'default' &&
+                                            _currentUserImageUrl != null &&
+                                            !_isAnonymous)
+                                          Container(
+                                            width: 40,
+                                            height: 40,
+                                            decoration: BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              border: Border.all(
+                                                  color: theme.primary[300]!,
+                                                  width: 2),
+                                            ),
+                                            child: ClipOval(
+                                              child: Image.network(
+                                                _currentUserImageUrl!,
+                                                fit: BoxFit.cover,
+                                                errorBuilder: (context, error,
+                                                    stackTrace) {
+                                                  return AvatarWithAnonymity(
+                                                    cpId: widget.profile.id,
+                                                    isAnonymous: _isAnonymous,
+                                                    isPlusUser: isPlusUser,
+                                                    size: 40,
+                                                  );
+                                                },
+                                              ),
+                                            ),
+                                          )
+                                        else
+                                          AvatarWithAnonymity(
+                                            cpId: widget.profile.id,
+                                            isAnonymous: _isAnonymous,
+                                            isPlusUser: isPlusUser,
+                                            size: 40,
+                                          ),
+                                      ],
                                     ),
-                                ],
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: PlatformSwitch(
+                                        value: _isAnonymous,
+                                        onChanged: _isLoading
+                                            ? null
+                                            : (value) {
+                                                setState(() {
+                                                  _isAnonymous = value;
+                                                });
+                                              },
+                                        label: localizations.translate(
+                                            'community-post-anonymously-by-default'),
+                                        subtitle: localizations.translate(
+                                            'community-anonymous-mode-description'),
+                                        activeColor: theme.success[500],
+                                        padding: EdgeInsets.zero,
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: PlatformSwitch(
-                                  value: _isAnonymous,
+
+                              const SizedBox(height: 20),
+                              // 1. Display Name (First and most important)
+                              _buildSectionTitle(
+                                localizations
+                                    .translate('community-display-name'),
+                                theme,
+                              ),
+                              const SizedBox(height: 8),
+                              CustomTextField(
+                                controller: _displayNameController,
+                                prefixIcon: LucideIcons.user,
+                                inputType: TextInputType.text,
+                                enabled: !_isAnonymous,
+                                validator: (value) {
+                                  if (value == null || value.trim().isEmpty) {
+                                    return localizations
+                                        .translate('field-required');
+                                  }
+                                  return null;
+                                },
+                              ),
+
+                              const SizedBox(height: 24),
+
+                              // 2. Profile Image Selection
+                              if (_isLoadingImage)
+                                const Center(
+                                  child: Padding(
+                                    padding: EdgeInsets.all(16.0),
+                                    child: Spinner(),
+                                  ),
+                                )
+                              else
+                                PlatformRadioGroup<String>(
+                                  title: localizations
+                                      .translate('community-profile-picture'),
+                                  value: _imageOption,
                                   onChanged: _isLoading
                                       ? null
                                       : (value) {
                                           setState(() {
-                                            _isAnonymous = value;
+                                            _imageOption = value!;
                                           });
                                         },
-                                  label: localizations.translate(
-                                      'community-post-anonymously-by-default'),
-                                  subtitle: localizations.translate(
-                                      'community-anonymous-mode-description'),
-                                  activeColor: theme.success[500],
-                                  padding: EdgeInsets.zero,
+                                  activeColor: theme.primary[600],
+                                  options: [
+                                    PlatformRadioOption<String>(
+                                      value: 'default',
+                                      title: localizations
+                                          .translate('default-image'),
+                                      subtitle: _currentUserImageUrl != null
+                                          ? localizations.translate(
+                                              'use-account-profile-image')
+                                          : localizations.translate(
+                                              'no-profile-image-available'),
+                                    ),
+                                    PlatformRadioOption<String>(
+                                      value: 'none',
+                                      title: localizations
+                                          .translate('without-image'),
+                                      subtitle: localizations
+                                          .translate('use-anonymous-avatar'),
+                                    ),
+                                  ],
                                 ),
-                              ),
+
+                              verticalSpace(Spacing.points16),
+                              // 4. Plus Features Section (Premium features at the end)
+                              _buildPlusFeatureSection(
+                                  context, theme, localizations),
+
+                              // 5. Danger Zone Section
+                              _buildDangerZoneSection(
+                                  context, theme, localizations),
                             ],
                           ),
                         ),
-
-                        const SizedBox(height: 20),
-                        // 1. Display Name (First and most important)
-                        _buildSectionTitle(
-                          localizations.translate('community-display-name'),
-                          theme,
-                        ),
-                        const SizedBox(height: 8),
-                        CustomTextField(
-                          controller: _displayNameController,
-                          prefixIcon: LucideIcons.user,
-                          inputType: TextInputType.text,
-                          enabled: !_isAnonymous,
-                          validator: (value) {
-                            if (value == null || value.trim().isEmpty) {
-                              return localizations.translate('field-required');
-                            }
-                            return null;
-                          },
-                        ),
-
-                        const SizedBox(height: 24),
-
-                        // 2. Profile Image Selection
-                        if (_isLoadingImage)
-                          const Center(
-                            child: Padding(
-                              padding: EdgeInsets.all(16.0),
-                              child: Spinner(),
-                            ),
-                          )
-                        else
-                          PlatformRadioGroup<String>(
-                            title: localizations
-                                .translate('community-profile-picture'),
-                            value: _imageOption,
-                            onChanged: _isLoading
-                                ? null
-                                : (value) {
-                                    setState(() {
-                                      _imageOption = value!;
-                                    });
-                                  },
-                            activeColor: theme.primary[600],
-                            options: [
-                              PlatformRadioOption<String>(
-                                value: 'default',
-                                title: localizations.translate('default-image'),
-                                subtitle: _currentUserImageUrl != null
-                                    ? localizations
-                                        .translate('use-account-profile-image')
-                                    : localizations.translate(
-                                        'no-profile-image-available'),
-                              ),
-                              PlatformRadioOption<String>(
-                                value: 'none',
-                                title: localizations.translate('without-image'),
-                                subtitle: localizations
-                                    .translate('use-anonymous-avatar'),
-                              ),
-                            ],
-                          ),
-
-                        verticalSpace(Spacing.points16),
-                        // 4. Plus Features Section (Premium features at the end)
-                        _buildPlusFeatureSection(context, theme, localizations),
-
-                        // 5. Danger Zone Section
-                        _buildDangerZoneSection(context, theme, localizations),
-                      ],
-                    ),
-                  ),
                 ),
               ],
             ),
@@ -463,8 +477,8 @@ class _EditCommunityProfileModalState
           child: ElevatedButton(
             onPressed: _isLoading
                 ? null
-                : () => _showDeleteConfirmationDialog(
-                    context, theme, localizations),
+                : () =>
+                    _showDeleteConfirmationModal(context, theme, localizations),
             style: ElevatedButton.styleFrom(
               backgroundColor: theme.error[600],
               foregroundColor: Colors.white,
@@ -496,150 +510,186 @@ class _EditCommunityProfileModalState
     );
   }
 
-  void _showDeleteConfirmationDialog(BuildContext context,
-      CustomThemeData theme, AppLocalizations localizations) {
+  void _showDeleteConfirmationModal(BuildContext context, CustomThemeData theme,
+      AppLocalizations localizations) {
     final TextEditingController confirmationController =
         TextEditingController();
     bool canDelete = false;
 
-    showDialog(
+    showModalBottomSheet(
       context: context,
-      barrierDismissible: false,
-      builder: (BuildContext dialogContext) {
+      isScrollControlled: true,
+      isDismissible: false,
+      enableDrag: false,
+      backgroundColor: Colors.transparent,
+      builder: (BuildContext modalContext) {
         return StatefulBuilder(
-          builder: (context, setDialogState) {
-            return AlertDialog(
-              backgroundColor: theme.backgroundColor,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
+          builder: (context, setModalState) {
+            return Container(
+              decoration: BoxDecoration(
+                color: theme.backgroundColor,
+                borderRadius:
+                    const BorderRadius.vertical(top: Radius.circular(16)),
               ),
-              title: Row(
-                children: [
-                  Icon(
-                    LucideIcons.alertTriangle,
-                    size: 24,
-                    color: theme.error[600],
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      localizations.translate('community-delete-profile'),
-                      style: TextStyles.h5.copyWith(
-                        color: theme.error[700],
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                ],
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.of(context).viewInsets.bottom,
               ),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    localizations
-                        .translate('community-delete-profile-description'),
-                    style: TextStyles.body.copyWith(
-                      color: theme.grey[700],
-                      height: 1.5,
+              child: Padding(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Header
+                    Row(
+                      children: [
+                        Icon(
+                          LucideIcons.alertTriangle,
+                          size: 24,
+                          color: theme.error[600],
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            localizations.translate('community-delete-profile'),
+                            style: TextStyles.h5.copyWith(
+                              color: theme.error[700],
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
-                  const SizedBox(height: 16),
-                  WidgetsContainer(
-                    padding: const EdgeInsets.all(12),
-                    backgroundColor: theme.error[50],
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide(
-                      color: theme.error[200]!,
-                      width: 1,
-                    ),
-                    child: Text(
+                    const SizedBox(height: 20),
+
+                    // Description
+                    Text(
                       localizations
-                          .translate('community-delete-profile-warning'),
-                      style: TextStyles.caption.copyWith(
-                        color: theme.error[700],
-                        height: 1.4,
+                          .translate('community-delete-profile-description'),
+                      style: TextStyles.body.copyWith(
+                        color: theme.grey[700],
+                        height: 1.5,
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 20),
-                  Text(
-                    localizations.translate('community-delete-profile-confirm'),
-                    style: TextStyles.body.copyWith(
-                      color: theme.grey[700],
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  TextField(
-                    controller: confirmationController,
-                    decoration: InputDecoration(
-                      hintText: localizations
-                          .translate('community-delete-profile-confirmation'),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
+                    const SizedBox(height: 16),
+
+                    // Warning Box
+                    WidgetsContainer(
+                      padding: const EdgeInsets.all(12),
+                      backgroundColor: theme.error[50],
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide(
+                        color: theme.error[200]!,
+                        width: 1,
                       ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: BorderSide(
-                          color: theme.error[500]!,
-                          width: 2,
+                      child: Text(
+                        localizations
+                            .translate('community-delete-profile-warning'),
+                        style: TextStyles.caption.copyWith(
+                          color: theme.error[700],
+                          height: 1.4,
                         ),
                       ),
                     ),
-                    onChanged: (value) {
-                      setDialogState(() {
-                        canDelete = value.trim().toUpperCase() ==
-                            localizations
-                                .translate(
-                                    'community-delete-profile-confirmation')
-                                .toUpperCase();
-                      });
-                    },
-                  ),
-                ],
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(dialogContext).pop();
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(localizations
-                            .translate('community-delete-profile-cancelled')),
-                        backgroundColor: theme.success[600],
+                    const SizedBox(height: 20),
+
+                    // Confirmation Input
+                    Text(
+                      localizations
+                          .translate('community-delete-profile-confirm'),
+                      style: TextStyles.body.copyWith(
+                        color: theme.grey[700],
+                        fontWeight: FontWeight.w500,
                       ),
-                    );
-                  },
-                  child: Text(
-                    localizations.translate('community-cancel'),
-                    style: TextStyles.body.copyWith(
-                      color: theme.grey[600],
                     ),
-                  ),
+                    const SizedBox(height: 8),
+                    TextField(
+                      controller: confirmationController,
+                      decoration: InputDecoration(
+                        hintText: localizations
+                            .translate('community-delete-profile-confirmation'),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: BorderSide(
+                            color: theme.error[500]!,
+                            width: 2,
+                          ),
+                        ),
+                      ),
+                      onChanged: (value) {
+                        setModalState(() {
+                          canDelete = value.trim() ==
+                              localizations.translate(
+                                  'community-delete-profile-confirmation');
+                        });
+                      },
+                    ),
+                    const SizedBox(height: 24),
+
+                    // Action Buttons
+                    Row(
+                      children: [
+                        Expanded(
+                          child: TextButton(
+                            onPressed: () {
+                              Navigator.of(modalContext).pop();
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(localizations.translate(
+                                      'community-delete-profile-cancelled')),
+                                  backgroundColor: theme.success[600],
+                                ),
+                              );
+                            },
+                            style: TextButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                            child: Text(
+                              localizations.translate('community-cancel'),
+                              style: TextStyles.body.copyWith(
+                                color: theme.grey[600],
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: canDelete
+                                ? () {
+                                    Navigator.of(modalContext).pop();
+                                    _showDeleteProgressModal(
+                                        context, localizations);
+                                  }
+                                : null,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: theme.error[600],
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                            child: Text(
+                              localizations
+                                  .translate('community-delete-profile-button'),
+                              style: TextStyles.body.copyWith(
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
-                ElevatedButton(
-                  onPressed: canDelete
-                      ? () {
-                          Navigator.of(dialogContext).pop();
-                          _deleteProfile(context, localizations);
-                        }
-                      : null,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: theme.error[600],
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                  child: Text(
-                    localizations.translate('community-delete-profile-button'),
-                    style: TextStyles.body.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-              ],
+              ),
             );
           },
         );
@@ -647,92 +697,187 @@ class _EditCommunityProfileModalState
     );
   }
 
-  void _deleteProfile(
+  void _showDeleteProgressModal(
       BuildContext context, AppLocalizations localizations) async {
-    // Show progress dialog
-    showDialog(
+    final theme = AppTheme.of(context);
+
+    showModalBottomSheet(
       context: context,
-      barrierDismissible: false,
-      builder: (BuildContext dialogContext) {
+      isDismissible: false,
+      enableDrag: false,
+      backgroundColor: Colors.transparent,
+      builder: (BuildContext modalContext) {
         return StreamBuilder<DeletionProgress>(
           stream: ref.read(communityServiceProvider).deleteProfile(),
           builder: (context, snapshot) {
             if (snapshot.hasError) {
-              return AlertDialog(
-                title:
-                    Text(localizations.translate('community-deletion-failed')),
-                content: Text(snapshot.error.toString()),
-                actions: [
-                  TextButton(
-                    onPressed: () {
-                      Navigator.of(dialogContext).pop();
-                      context.go('/community/onboarding');
-                    },
-                    child: Text(localizations.translate('community-cancel')),
-                  ),
-                ],
+              return Container(
+                decoration: BoxDecoration(
+                  color: theme.backgroundColor,
+                  borderRadius:
+                      const BorderRadius.vertical(top: Radius.circular(16)),
+                ),
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      LucideIcons.alertCircle,
+                      size: 48,
+                      color: theme.error[600],
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      localizations.translate('community-deletion-failed'),
+                      style: TextStyles.h5.copyWith(
+                        color: theme.error[700],
+                        fontWeight: FontWeight.w600,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      snapshot.error.toString(),
+                      style: TextStyles.body.copyWith(
+                        color: theme.grey[600],
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 24),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.of(modalContext).pop();
+                          context.go('/community/onboarding');
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: theme.primary[500],
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        child: Text(
+                          localizations.translate('community-cancel'),
+                          style: TextStyles.body.copyWith(
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               );
             }
 
             if (snapshot.hasData) {
               final progress = snapshot.data!;
-              final isCompleted =
-                  progress.step == DeletionStep.cleaningUpMappings &&
-                      progress.completedItems == progress.totalItems;
+              final isCompleted = progress.step == DeletionStep.completed &&
+                  progress.completedItems == progress.totalItems;
 
               if (isCompleted) {
-                // Auto-close after completion
+                // Auto-close modal and mark deletion as completed
                 WidgetsBinding.instance.addPostFrameCallback((_) {
-                  Navigator.of(dialogContext).pop();
+                  Navigator.of(modalContext).pop();
 
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(localizations
-                          .translate('community-deletion-completed')),
-                      backgroundColor: Colors.green,
-                    ),
-                  );
+                  // Invalidate all community-related providers
+                  ref.invalidate(currentCommunityProfileProvider);
+                  ref.invalidate(hasCommunityProfileProvider);
+                  ref.invalidate(hasGroupsProfileProvider);
+                  ref.read(communityScreenStateProvider.notifier).refresh();
 
-                  // Refresh profile cache
-                  ref.refresh(currentCommunityProfileProvider);
-                  ref.refresh(hasCommunityProfileProvider);
-
-                  // Navigate to community onboarding since user no longer has a profile
-                  context.go('/community/onboarding');
+                  // Mark deletion as completed
+                  setState(() {
+                    _isDeletionCompleted = true;
+                  });
                 });
               }
 
-              return AlertDialog(
-                title: Text(
-                    localizations.translate('community-deletion-progress')),
-                content: Column(
+              return Container(
+                decoration: BoxDecoration(
+                  color: theme.backgroundColor,
+                  borderRadius:
+                      const BorderRadius.vertical(top: Radius.circular(16)),
+                ),
+                padding: const EdgeInsets.all(24),
+                child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    LinearProgressIndicator(
-                      value: progress.percentage,
-                      backgroundColor: Colors.grey[300],
-                      valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
+                    Icon(
+                      LucideIcons.trash2,
+                      size: 48,
+                      color: theme.error[600],
                     ),
                     const SizedBox(height: 16),
-                    Text(_getStepMessage(progress.step, localizations)),
+                    Text(
+                      localizations.translate('community-deletion-progress'),
+                      style: TextStyles.h5.copyWith(
+                        color: theme.grey[900],
+                        fontWeight: FontWeight.w600,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 24),
+                    LinearProgressIndicator(
+                      value: progress.percentage,
+                      backgroundColor: theme.grey[200],
+                      valueColor:
+                          AlwaysStoppedAnimation<Color>(theme.error[500]!),
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      _getStepMessage(progress.step, localizations),
+                      style: TextStyles.body.copyWith(
+                        color: theme.grey[700],
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
                     if (progress.totalItems > 0) ...[
                       const SizedBox(height: 8),
-                      Text('${progress.completedItems}/${progress.totalItems}'),
+                      Text(
+                        '${progress.completedItems}/${progress.totalItems}',
+                        style: TextStyles.caption.copyWith(
+                          color: theme.grey[600],
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
                     ],
                   ],
                 ),
               );
             }
 
-            return AlertDialog(
-              title:
-                  Text(localizations.translate('community-deletion-progress')),
-              content: const Column(
+            return Container(
+              decoration: BoxDecoration(
+                color: theme.backgroundColor,
+                borderRadius:
+                    const BorderRadius.vertical(top: Radius.circular(16)),
+              ),
+              padding: const EdgeInsets.all(24),
+              child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  CircularProgressIndicator(),
-                  SizedBox(height: 16),
-                  Text('Preparing deletion...'),
+                  const CircularProgressIndicator(),
+                  const SizedBox(height: 16),
+                  Text(
+                    localizations.translate('community-deletion-progress'),
+                    style: TextStyles.h5.copyWith(
+                      color: theme.grey[900],
+                      fontWeight: FontWeight.w600,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    localizations.translate('community-deletion-preparing'),
+                    style: TextStyles.body.copyWith(
+                      color: theme.grey[600],
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
                 ],
               ),
             );
@@ -744,16 +889,10 @@ class _EditCommunityProfileModalState
 
   String _getStepMessage(DeletionStep step, AppLocalizations localizations) {
     switch (step) {
-      case DeletionStep.deletingPosts:
-        return localizations.translate('community-deletion-step-1');
-      case DeletionStep.deletingComments:
-        return localizations.translate('community-deletion-step-2');
-      case DeletionStep.deletingInteractions:
-        return localizations.translate('community-deletion-step-3');
-      case DeletionStep.removingProfileData:
-        return localizations.translate('community-deletion-step-4');
-      case DeletionStep.cleaningUpMappings:
-        return localizations.translate('community-deletion-step-5');
+      case DeletionStep.markingProfileDeleted:
+        return localizations.translate('community-deletion-marking-deleted');
+      case DeletionStep.completed:
+        return localizations.translate('community-deletion-completed');
     }
   }
 
@@ -1013,6 +1152,84 @@ class _EditCommunityProfileModalState
           _isLoadingStreak = false;
         });
       }
+    }
+  }
+
+  Widget _buildSuccessState(
+      CustomThemeData theme, AppLocalizations localizations) {
+    return Padding(
+      padding: const EdgeInsets.all(24),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            width: 80,
+            height: 80,
+            decoration: BoxDecoration(
+              color: theme.success[100],
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              LucideIcons.checkCircle,
+              size: 40,
+              color: theme.success[600],
+            ),
+          ),
+          const SizedBox(height: 24),
+          Text(
+            localizations.translate('community-deletion-completed'),
+            style: TextStyles.h5.copyWith(
+              color: theme.grey[900],
+              fontWeight: FontWeight.bold,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 12),
+          Text(
+            localizations.translate('community-profile-deleted-message'),
+            style: TextStyles.body.copyWith(
+              color: theme.grey[600],
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 32),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                _handleModalClose();
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: theme.primary[500],
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                padding: const EdgeInsets.symmetric(vertical: 12),
+              ),
+              child: Text(
+                localizations.translate('community-continue'),
+                style: TextStyles.caption.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _handleModalClose() {
+    // Check if the current profile still exists and if deletion was completed
+    final currentProfile =
+        ref.read(currentCommunityProfileProvider).valueOrNull;
+
+    // If the profile is null and deletion was completed, trigger the callback
+    if ((currentProfile == null || _isDeletionCompleted) &&
+        widget.onProfileDeleted != null) {
+      widget.onProfileDeleted!();
     }
   }
 }

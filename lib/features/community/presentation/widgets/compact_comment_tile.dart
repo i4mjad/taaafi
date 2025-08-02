@@ -17,6 +17,26 @@ class CompactCommentTile extends ConsumerWidget {
     required this.comment,
   });
 
+  /// Helper function to localize special display name constants
+  String _getLocalizedDisplayName(
+      String displayName, AppLocalizations localizations) {
+    print('🔍 [CompactComment] Localizing: "$displayName"');
+
+    switch (displayName) {
+      case 'DELETED_USER':
+        final localized = localizations.translate('community-deleted-user');
+        print('🔍 [CompactComment] DELETED_USER -> "$localized"');
+        return localized;
+      case 'ANONYMOUS_USER':
+        final localized = localizations.translate('community-anonymous');
+        print('🔍 [CompactComment] ANONYMOUS_USER -> "$localized"');
+        return localized;
+      default:
+        print('🔍 [CompactComment] Using original: "$displayName"');
+        return displayName;
+    }
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = AppTheme.of(context);
@@ -90,13 +110,27 @@ class CompactCommentTile extends ConsumerWidget {
                     children: [
                       authorProfileAsync.when(
                         data: (authorProfile) {
-                          final isAuthorAnonymous =
-                              authorProfile?.isAnonymous ?? false;
-                          final displayName = isAuthorAnonymous
-                              ? localizations.translate('community-anonymous')
-                              : (authorProfile?.displayName ??
-                                  localizations
-                                      .translate('community-unknown-user'));
+                          print(
+                              '🔍 [CompactComment] Author profile for comment ${comment.id}:');
+                          print(
+                              '🔍 [CompactComment] - Profile ID: ${authorProfile?.id}');
+                          print(
+                              '🔍 [CompactComment] - Display Name: "${authorProfile?.displayName}"');
+                          print(
+                              '🔍 [CompactComment] - Is Deleted: ${authorProfile?.isDeleted}');
+                          print(
+                              '🔍 [CompactComment] - Is Anonymous: ${authorProfile?.isAnonymous}');
+
+                          final pipelineResult = authorProfile
+                                  ?.getDisplayNameWithPipeline() ??
+                              localizations.translate('community-unknown-user');
+                          print(
+                              '🔍 [CompactComment] Pipeline result: "$pipelineResult"');
+
+                          final displayName = _getLocalizedDisplayName(
+                              pipelineResult, localizations);
+                          print(
+                              '🔍 [CompactComment] Final display name: "$displayName"');
 
                           return Text(
                             displayName,

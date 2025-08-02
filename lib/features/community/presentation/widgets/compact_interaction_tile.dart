@@ -20,6 +20,19 @@ class CompactInteractionTile extends ConsumerWidget {
     required this.isLikedPost,
   });
 
+  /// Helper function to localize special display name constants
+  String _getLocalizedDisplayName(
+      String displayName, AppLocalizations localizations) {
+    switch (displayName) {
+      case 'DELETED_USER':
+        return localizations.translate('community-deleted-user');
+      case 'ANONYMOUS_USER':
+        return localizations.translate('community-anonymous');
+      default:
+        return displayName;
+    }
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = AppTheme.of(context);
@@ -139,13 +152,11 @@ class CompactInteractionTile extends ConsumerWidget {
                 Expanded(
                   child: authorProfileAsync.when(
                     data: (authorProfile) {
-                      final isAuthorAnonymous =
-                          authorProfile?.isAnonymous ?? false;
-                      final displayName = isAuthorAnonymous
-                          ? localizations.translate('community-anonymous')
-                          : (authorProfile?.displayName ??
-                              localizations
-                                  .translate('community-unknown-user'));
+                      final displayName = _getLocalizedDisplayName(
+                        authorProfile?.getDisplayNameWithPipeline() ??
+                            localizations.translate('community-unknown-user'),
+                        localizations,
+                      );
 
                       return Text(
                         displayName,
@@ -352,13 +363,11 @@ class CompactInteractionTile extends ConsumerWidget {
                 Expanded(
                   child: authorProfileAsync.when(
                     data: (authorProfile) {
-                      final isAuthorAnonymous =
-                          authorProfile?.isAnonymous ?? false;
-                      final displayName = isAuthorAnonymous
-                          ? localizations.translate('community-anonymous')
-                          : (authorProfile?.displayName ??
-                              localizations
-                                  .translate('community-unknown-user'));
+                      final displayName = _getLocalizedDisplayName(
+                        authorProfile?.getDisplayNameWithPipeline() ??
+                            localizations.translate('community-unknown-user'),
+                        localizations,
+                      );
 
                       return Text(
                         displayName,

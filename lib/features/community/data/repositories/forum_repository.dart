@@ -71,7 +71,7 @@ class ForumRepository {
       final snapshot = await FirebaseFirestore.instance
           .collection('communityProfiles')
           .where('userUID', isEqualTo: user.uid)
-          .where('isDeleted', isEqualTo: false)
+          .where('isDeleted', isNotEqualTo: true)
           .limit(1)
           .get();
 
@@ -82,16 +82,15 @@ class ForumRepository {
       final doc = snapshot.docs.first;
       final data = doc.data();
 
-      // Additional validation to ensure profile is valid
-      final isDeleted = data['isDeleted'] as bool? ?? false;
-      if (isDeleted) {
-        throw Exception('Community profile has been deleted');
+      // Double-check that the profile is not deleted
+      if (data['isDeleted'] == true) {
+        throw Exception('No active community profile found for user');
       }
 
       return doc.id; // Return the document ID which is the community profile ID
     } catch (e) {
       if (e.toString().contains('No community profile found') ||
-          e.toString().contains('Community profile has been deleted')) {
+          e.toString().contains('No active community profile found')) {
         rethrow;
       }
       throw Exception('Failed to get community profile: ${e.toString()}');

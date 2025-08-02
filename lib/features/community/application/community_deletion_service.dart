@@ -229,7 +229,6 @@ class CommunityDeletionService {
     try {
       final snapshot = await _communityProfiles
           .where('userUID', isEqualTo: userUID)
-          .where('isDeleted', isEqualTo: false)
           .limit(1)
           .get();
 

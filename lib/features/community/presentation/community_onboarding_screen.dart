@@ -144,36 +144,7 @@ class CommunityOnboardingScreen extends ConsumerWidget {
                 ),
               ),
               const SizedBox(height: 16),
-              _buildFeatureItem(
-                context,
-                l10n.translate('community-feature-1'),
-                LucideIcons.users,
-              ),
-              const SizedBox(height: 16),
-              _buildFeatureItem(
-                context,
-                l10n.translate('community-feature-2'),
-                LucideIcons.trophy,
-              ),
-              const SizedBox(height: 16),
-              _buildFeatureItem(
-                context,
-                l10n.translate('community-feature-3'),
-                LucideIcons.messageCircle,
-              ),
-              const SizedBox(height: 16),
-              _buildFeatureItem(
-                context,
-                l10n.translate('community-feature-4'),
-                LucideIcons.heartHandshake,
-              ),
-              const SizedBox(height: 16),
-              _buildFeatureItem(
-                context,
-                l10n.translate('community-feature-5'),
-                LucideIcons.shieldCheck,
-              ),
-
+              _buildFeaturesGrid(context, theme, l10n),
               const SizedBox(height: 32),
             ],
           ),
@@ -182,29 +153,214 @@ class CommunityOnboardingScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildFeatureItem(BuildContext context, String text, IconData icon) {
-    final theme = AppTheme.of(context);
-    return WidgetsContainer(
-      backgroundColor: theme.backgroundColor,
-      borderSide: BorderSide.none,
-      child: Row(
-        children: [
-          Icon(
-            icon,
-            color: theme.primary[700],
-            size: 28,
+  Widget _buildFeaturesGrid(
+      BuildContext context, dynamic theme, AppLocalizations l10n) {
+    final features = [
+      {
+        'title': l10n.translate('community-feature-1'),
+        'detail': l10n.translate('community-feature-1-detail'),
+        'icon': LucideIcons.users,
+        'color': theme.primary[600],
+      },
+      {
+        'title': l10n.translate('community-feature-2'),
+        'detail': l10n.translate('community-feature-2-detail'),
+        'icon': LucideIcons.trophy,
+        'color': theme.success[600],
+      },
+      {
+        'title': l10n.translate('community-feature-3'),
+        'detail': l10n.translate('community-feature-3-detail'),
+        'icon': LucideIcons.messageCircle,
+        'color': theme.error[500],
+      },
+      {
+        'title': l10n.translate('community-feature-4'),
+        'detail': l10n.translate('community-feature-4-detail'),
+        'icon': LucideIcons.heartHandshake,
+        'color': theme.warn[600],
+      },
+      {
+        'title': l10n.translate('community-feature-5'),
+        'detail': l10n.translate('community-feature-5-detail'),
+        'icon': LucideIcons.shieldCheck,
+        'color': theme.grey[600],
+      },
+    ];
+
+    return Column(
+      children: features.asMap().entries.map((entry) {
+        final index = entry.key;
+        final feature = entry.value;
+
+        return Padding(
+          padding: EdgeInsets.only(
+            bottom: index < features.length - 1 ? 12 : 0,
           ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Text(
-              text,
-              style: TextStyles.footnote.copyWith(
-                height: 1.5,
+          child: _buildFeatureCard(
+            context: context,
+            theme: theme,
+            title: feature['title'] as String,
+            detail: feature['detail'] as String,
+            icon: feature['icon'] as IconData,
+            color: feature['color'] as Color,
+          ),
+        );
+      }).toList(),
+    );
+  }
+
+  Widget _buildFeatureCard({
+    required BuildContext context,
+    required dynamic theme,
+    required String title,
+    required String detail,
+    required IconData icon,
+    required Color color,
+  }) {
+    return GestureDetector(
+      onTap: () => _showFeatureDetail(context, title, detail, icon, color),
+      child: WidgetsContainer(
+        backgroundColor: theme.backgroundColor,
+        borderSide: BorderSide(color: color.withValues(alpha: 0.3), width: 1),
+        borderRadius: BorderRadius.circular(12),
+        padding: const EdgeInsets.all(16),
+        child: Row(
+          children: [
+            // Icon container
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: color.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(
+                icon,
+                color: color,
+                size: 24,
               ),
             ),
-          ),
-        ],
+            const SizedBox(width: 16),
+            // Text content
+            Expanded(
+              child: Text(
+                title,
+                style: TextStyles.caption.copyWith(
+                  height: 1.3,
+                  fontWeight: FontWeight.w600,
+                  color: theme.grey[900],
+                ),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            // Chevron
+            Icon(
+              LucideIcons.chevronRight,
+              size: 20,
+              color: theme.grey[400],
+            ),
+          ],
+        ),
       ),
+    );
+  }
+
+  void _showFeatureDetail(BuildContext context, String title, String detail,
+      IconData icon, Color color) {
+    final theme = AppTheme.of(context);
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (BuildContext context) {
+        return Container(
+          decoration: BoxDecoration(
+            color: theme.backgroundColor,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+          ),
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom,
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Header
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: color.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Icon(
+                        icon,
+                        color: color,
+                        size: 28,
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Text(
+                        title,
+                        style: TextStyles.h5.copyWith(
+                          color: theme.grey[900],
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      icon: Icon(
+                        LucideIcons.x,
+                        color: theme.grey[600],
+                        size: 20,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+
+                // Detail content
+                Text(
+                  detail,
+                  style: TextStyles.body.copyWith(
+                    color: theme.grey[700],
+                    height: 1.6,
+                  ),
+                ),
+                const SizedBox(height: 24),
+
+                // Close button
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: color,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    child: Text(
+                      AppLocalizations.of(context).translate('got-it'),
+                      style: TextStyles.body.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -217,8 +373,8 @@ class CommunityOnboardingScreen extends ConsumerWidget {
       final deletedProfileId = await service.getDeletedProfileId();
 
       if (deletedProfileId != null && context.mounted) {
-        // Show choice dialog for restoration vs fresh start
-        _showRejoinChoiceDialog(context, ref, deletedProfileId);
+        // Show choice modal for restoration vs fresh start
+        _showRejoinChoiceModal(context, ref, deletedProfileId);
       } else if (context.mounted) {
         // Show normal profile setup
         _showNormalProfileSetup(context);
@@ -241,70 +397,94 @@ class CommunityOnboardingScreen extends ConsumerWidget {
     );
   }
 
-  void _showRejoinChoiceDialog(
+  void _showRejoinChoiceModal(
       BuildContext context, WidgetRef ref, String deletedProfileId) {
     final theme = AppTheme.of(context);
     final l10n = AppLocalizations.of(context);
 
-    showDialog(
+    showModalBottomSheet(
       context: context,
-      barrierDismissible: false,
+      isScrollControlled: true,
+      isDismissible: false,
+      enableDrag: false,
+      backgroundColor: Colors.transparent,
       builder: (BuildContext context) {
-        return AlertDialog(
-          backgroundColor: theme.backgroundColor,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
+        return Container(
+          decoration: BoxDecoration(
+            color: theme.backgroundColor,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
           ),
-          title: Text(
-            l10n.translate('community-rejoin-welcome'),
-            style: TextStyles.h4.copyWith(
-              color: theme.primary[700],
-              fontWeight: FontWeight.w600,
-            ),
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom,
           ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                l10n.translate('community-rejoin-choice'),
-                style: TextStyles.body.copyWith(
-                  color: theme.grey[700],
-                  height: 1.5,
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Header
+                Row(
+                  children: [
+                    Icon(
+                      LucideIcons.userCheck,
+                      size: 24,
+                      color: theme.primary[600],
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        l10n.translate('community-rejoin-welcome'),
+                        style: TextStyles.h4.copyWith(
+                          color: theme.primary[700],
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-              const SizedBox(height: 24),
+                const SizedBox(height: 20),
 
-              // Restore option
-              _buildChoiceButton(
-                context: context,
-                theme: theme,
-                title: l10n.translate('community-rejoin-restore'),
-                description:
-                    l10n.translate('community-rejoin-restore-description'),
-                icon: LucideIcons.refreshCw,
-                onTap: () {
-                  Navigator.of(context).pop();
-                  _restoreProfile(context, ref, deletedProfileId);
-                },
-              ),
+                Text(
+                  l10n.translate('community-rejoin-choice'),
+                  style: TextStyles.body.copyWith(
+                    color: theme.grey[700],
+                    height: 1.5,
+                  ),
+                ),
+                const SizedBox(height: 24),
 
-              const SizedBox(height: 16),
+                // Restore option
+                _buildChoiceButton(
+                  context: context,
+                  theme: theme,
+                  title: l10n.translate('community-rejoin-restore'),
+                  description:
+                      l10n.translate('community-rejoin-restore-description'),
+                  icon: LucideIcons.refreshCw,
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    _restoreProfile(context, ref, deletedProfileId);
+                  },
+                ),
 
-              // Fresh start option
-              _buildChoiceButton(
-                context: context,
-                theme: theme,
-                title: l10n.translate('community-rejoin-fresh'),
-                description:
-                    l10n.translate('community-rejoin-fresh-description'),
-                icon: LucideIcons.userPlus,
-                onTap: () {
-                  Navigator.of(context).pop();
-                  _showNormalProfileSetup(context);
-                },
-              ),
-            ],
+                const SizedBox(height: 16),
+
+                // Fresh start option
+                _buildChoiceButton(
+                  context: context,
+                  theme: theme,
+                  title: l10n.translate('community-rejoin-fresh'),
+                  description:
+                      l10n.translate('community-rejoin-fresh-description'),
+                  icon: LucideIcons.userPlus,
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    _showNormalProfileSetup(context);
+                  },
+                ),
+              ],
+            ),
           ),
         );
       },
@@ -381,52 +561,217 @@ class CommunityOnboardingScreen extends ConsumerWidget {
       BuildContext context, WidgetRef ref, String deletedProfileId) async {
     final l10n = AppLocalizations.of(context);
 
-    // Show loading dialog
-    showDialog(
+    // Show loading modal
+    showModalBottomSheet(
       context: context,
-      barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        content: Row(
-          children: [
-            const CircularProgressIndicator(),
-            const SizedBox(width: 16),
-            Text(l10n.translate('community-restore-progress')),
-          ],
-        ),
+      isDismissible: false,
+      enableDrag: false,
+      builder: (modalContext) => _RestoreProgressModal(
+        ref: ref,
+        deletedProfileId: deletedProfileId,
+        l10n: l10n,
       ),
     );
+  }
+}
 
+class _RestoreProgressModal extends StatefulWidget {
+  final WidgetRef ref;
+  final String deletedProfileId;
+  final AppLocalizations l10n;
+
+  const _RestoreProgressModal({
+    required this.ref,
+    required this.deletedProfileId,
+    required this.l10n,
+  });
+
+  @override
+  State<_RestoreProgressModal> createState() => _RestoreProgressModalState();
+}
+
+class _RestoreProgressModalState extends State<_RestoreProgressModal> {
+  bool _isRestoring = true;
+  bool _isSuccess = false;
+  String? _errorMessage;
+
+  @override
+  void initState() {
+    super.initState();
+    _performRestore();
+  }
+
+  Future<void> _performRestore() async {
     try {
-      final service = ref.read(communityServiceProvider);
-      await service.restoreProfile(deletedProfileId);
+      final service = widget.ref.read(communityServiceProvider);
+      await service.restoreProfile(widget.deletedProfileId);
 
-      if (context.mounted) {
-        Navigator.of(context).pop(); // Close loading dialog
+      if (mounted) {
+        setState(() {
+          _isRestoring = false;
+          _isSuccess = true;
+        });
 
-        // Show success and navigate to community
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(l10n.translate('community-restore-completed')),
-            backgroundColor: Colors.green,
-          ),
-        );
-
-        // Refresh profile cache and navigate
-        ref.refresh(hasCommunityProfileProvider);
-        context.goNamed(RouteNames.community.name);
+        // Refresh profile cache
+        widget.ref.refresh(hasCommunityProfileProvider);
       }
     } catch (e) {
-      if (context.mounted) {
-        Navigator.of(context).pop(); // Close loading dialog
-
-        // Show error
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(l10n.translate('community-restore-failed')),
-            backgroundColor: Colors.red,
-          ),
-        );
+      if (mounted) {
+        setState(() {
+          _isRestoring = false;
+          _isSuccess = false;
+          _errorMessage = widget.l10n.translate('community-restore-failed');
+        });
       }
     }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = AppTheme.of(context);
+
+    return Container(
+      decoration: BoxDecoration(
+        color: theme.backgroundColor,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      padding: const EdgeInsets.all(24),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Handle bar
+          Container(
+            width: 40,
+            height: 4,
+            decoration: BoxDecoration(
+              color: theme.grey[300],
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+          const SizedBox(height: 24),
+
+          if (_isRestoring) ...[
+            // Loading state
+            const CircularProgressIndicator(),
+            const SizedBox(height: 20),
+            Text(
+              widget.l10n.translate('community-restore-progress'),
+              style: TextStyles.body.copyWith(
+                color: theme.grey[700],
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ] else if (_isSuccess) ...[
+            // Success state
+            Container(
+              width: 60,
+              height: 60,
+              decoration: BoxDecoration(
+                color: theme.success[100],
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                LucideIcons.check,
+                color: theme.success[600],
+                size: 30,
+              ),
+            ),
+            const SizedBox(height: 20),
+            Text(
+              widget.l10n.translate('community-restore-completed'),
+              style: TextStyles.body.copyWith(
+                color: theme.grey[900],
+                fontWeight: FontWeight.w600,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              widget.l10n.translate('community-profile-restored-message'),
+              style: TextStyles.caption.copyWith(
+                color: theme.grey[600],
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 24),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.of(context).pop(); // Close modal
+                  context.goNamed(
+                      RouteNames.community.name); // Navigate to community
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: theme.primary[600],
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: Text(
+                  widget.l10n.translate('community-continue'),
+                  style: TextStyles.body.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ),
+          ] else ...[
+            // Error state
+            Container(
+              width: 60,
+              height: 60,
+              decoration: BoxDecoration(
+                color: theme.error[100],
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                LucideIcons.x,
+                color: theme.error[600],
+                size: 30,
+              ),
+            ),
+            const SizedBox(height: 20),
+            Text(
+              _errorMessage ??
+                  widget.l10n.translate('community-restore-failed'),
+              style: TextStyles.body.copyWith(
+                color: theme.grey[900],
+                fontWeight: FontWeight.w600,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 24),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.of(context).pop(); // Close modal
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: theme.grey[600],
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: Text(
+                  widget.l10n.translate('community-close'),
+                  style: TextStyles.body.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ),
+          ],
+
+          // Safe area bottom padding
+          SizedBox(height: MediaQuery.of(context).padding.bottom),
+        ],
+      ),
+    );
   }
 }

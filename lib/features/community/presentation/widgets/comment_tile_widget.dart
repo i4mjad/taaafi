@@ -23,6 +23,19 @@ class CommentTileWidget extends ConsumerWidget {
     this.onMoreTap,
   });
 
+  /// Helper function to localize special display name constants
+  String _getLocalizedDisplayName(
+      String displayName, AppLocalizations localizations) {
+    switch (displayName) {
+      case 'DELETED_USER':
+        return localizations.translate('community-deleted-user');
+      case 'ANONYMOUS_USER':
+        return localizations.translate('community-anonymous');
+      default:
+        return displayName;
+    }
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = AppTheme.of(context);
@@ -178,9 +191,21 @@ class CommentTileWidget extends ConsumerWidget {
         // Username or anonymous indicator
         authorProfileAsync.when(
           data: (authorProfile) {
-            final displayName = isAuthorAnonymous
-                ? localizations.translate('anonymous')
-                : authorProfile?.displayName ?? 'Unknown User';
+            print('🔍 [CommentTile] Author profile for comment ${comment.id}:');
+            print('🔍 [CommentTile] - Profile ID: ${authorProfile?.id}');
+            print(
+                '🔍 [CommentTile] - Display Name: "${authorProfile?.displayName}"');
+            print('🔍 [CommentTile] - Is Deleted: ${authorProfile?.isDeleted}');
+            print(
+                '🔍 [CommentTile] - Is Anonymous: ${authorProfile?.isAnonymous}');
+
+            final pipelineResult =
+                authorProfile?.getDisplayNameWithPipeline() ?? 'Unknown User';
+            print('🔍 [CommentTile] Pipeline result: "$pipelineResult"');
+
+            final displayName =
+                _getLocalizedDisplayName(pipelineResult, localizations);
+            print('🔍 [CommentTile] Final display name: "$displayName"');
 
             return Text(
               displayName,
@@ -191,18 +216,14 @@ class CommentTileWidget extends ConsumerWidget {
             );
           },
           loading: () => Text(
-            isAuthorAnonymous
-                ? localizations.translate('anonymous')
-                : 'Loading...',
+            'Loading...',
             style: TextStyles.footnoteSelected.copyWith(
               color: theme.grey[700],
               fontSize: 14,
             ),
           ),
           error: (error, stackTrace) => Text(
-            isAuthorAnonymous
-                ? localizations.translate('anonymous')
-                : 'Unknown User',
+            'Unknown User',
             style: TextStyles.footnoteSelected.copyWith(
               color: theme.grey[700],
               fontSize: 14,

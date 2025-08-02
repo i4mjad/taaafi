@@ -24,7 +24,7 @@ Future<String?> _getCommunityProfileIdFromUserUID(
     final snapshot = await firestore
         .collection('communityProfiles')
         .where('userUID', isEqualTo: userUID)
-        .where('isDeleted', isEqualTo: false)
+        .where('isDeleted', isNotEqualTo: true)
         .limit(1)
         .get();
 
@@ -32,7 +32,15 @@ Future<String?> _getCommunityProfileIdFromUserUID(
       return null;
     }
 
-    return snapshot.docs.first.id;
+    final doc = snapshot.docs.first;
+    final data = doc.data();
+
+    // Double-check that the profile is not deleted
+    if (data['isDeleted'] == true) {
+      return null;
+    }
+
+    return doc.id;
   } catch (e) {
     print('ERROR: Failed to get community profile ID for user $userUID: $e');
     return null;

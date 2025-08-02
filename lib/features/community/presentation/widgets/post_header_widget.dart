@@ -23,6 +23,26 @@ class PostHeaderWidget extends ConsumerWidget {
     this.onMorePressed,
   });
 
+  /// Helper function to localize special display name constants
+  String _getLocalizedDisplayName(
+      String displayName, AppLocalizations localizations) {
+    print('🔍 [PostHeader] Localizing display name: "$displayName"');
+
+    switch (displayName) {
+      case 'DELETED_USER':
+        final localized = localizations.translate('community-deleted-user');
+        print('🔍 [PostHeader] DELETED_USER -> "$localized"');
+        return localized;
+      case 'ANONYMOUS_USER':
+        final localized = localizations.translate('community-anonymous');
+        print('🔍 [PostHeader] ANONYMOUS_USER -> "$localized"');
+        return localized;
+      default:
+        print('🔍 [PostHeader] Using original display name: "$displayName"');
+        return displayName;
+    }
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = AppTheme.of(context);
@@ -48,6 +68,12 @@ class PostHeaderWidget extends ConsumerWidget {
 
     return authorProfileAsync.when(
       data: (authorProfile) {
+        print('🔍 [PostHeader] Author profile loaded for post ${post.id}:');
+        print('🔍 [PostHeader] - Profile ID: ${authorProfile?.id}');
+        print(
+            '🔍 [PostHeader] - Display Name: "${authorProfile?.displayName}"');
+        print('🔍 [PostHeader] - Is Deleted: ${authorProfile?.isDeleted}');
+        print('🔍 [PostHeader] - Is Anonymous: ${authorProfile?.isAnonymous}');
         final isAuthorAnonymous = authorProfile?.isAnonymous ?? false;
         final isAuthorPlusUser = authorProfile?.hasPlusSubscription() ?? false;
         final isOrphanedPost = authorProfile?.userUID == 'orphaned-post';
@@ -82,10 +108,19 @@ class PostHeaderWidget extends ConsumerWidget {
                                 // Display name
                                 Flexible(
                                   child: Text(
-                                    isAuthorAnonymous
-                                        ? localizations.translate('anonymous')
-                                        : authorProfile?.displayName ??
-                                            'Former User',
+                                    () {
+                                      final pipelineResult = authorProfile
+                                              ?.getDisplayNameWithPipeline() ??
+                                          'Former User';
+                                      print(
+                                          '🔍 [PostHeader] Pipeline result: "$pipelineResult"');
+                                      final localizedResult =
+                                          _getLocalizedDisplayName(
+                                              pipelineResult, localizations);
+                                      print(
+                                          '🔍 [PostHeader] Final display name: "$localizedResult"');
+                                      return localizedResult;
+                                    }(),
                                     style: TextStyles.body.copyWith(
                                       fontWeight: FontWeight.w600,
                                       color: isOrphanedPost

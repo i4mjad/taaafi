@@ -1130,6 +1130,13 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen> {
           _selectedFilter = filterValue;
         });
 
+        // Invalidate profile providers to ensure fresh state
+        ref.invalidate(currentCommunityProfileProvider);
+        ref.invalidate(hasCommunityProfileProvider);
+
+        // Force refresh of community screen state to check profile status
+        ref.read(communityScreenStateProvider.notifier).refresh();
+
         // Load appropriate data based on filter
         switch (filterValue) {
           case 'pinned':

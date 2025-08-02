@@ -68,7 +68,6 @@ class GenderFilteringService {
             .where('userUID',
                 whereIn:
                     batch) // Fixed: query by userUID field, not document ID
-            .where('isDeleted', isEqualTo: false)
             .get();
 
         final batchCPIds = cpSnapshot.docs.map((doc) => doc.id).toList();
@@ -110,7 +109,6 @@ class GenderFilteringService {
       final QuerySnapshot snapshot = await _firestore
           .collection('communityProfiles')
           .where('gender', isEqualTo: gender)
-          .where('isDeleted', isEqualTo: false)
           .get();
 
       final profileIds = snapshot.docs.map((doc) => doc.id).toList();
@@ -199,7 +197,6 @@ class GenderFilteringService {
       await for (final snapshot in _firestore
           .collection('communityProfiles')
           .where('gender', isEqualTo: currentUserGender)
-          .where('isDeleted', isEqualTo: false)
           .snapshots()) {
         final sameGenderIds = snapshot.docs.map((doc) => doc.id).toList();
         print(

@@ -658,12 +658,8 @@ async function deleteVaultData(
     const subcollections = [
       'activities',
       'emotions', 
-      'streaks',
       'followups',
-      'relapses',
       'diaries',
-      'notifications',
-      'reports'
     ];
     
     for (const subcollection of subcollections) {

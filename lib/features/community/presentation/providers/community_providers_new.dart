@@ -90,6 +90,7 @@ final communityProfileByIdProvider =
       displayName: data['displayName'] ?? 'Unknown User',
       gender: data['gender'] ?? 'other',
       isAnonymous: data['isAnonymous'] ?? false,
+      isDeleted: data['isDeleted'] ?? false, // Add missing isDeleted field
       avatarUrl: data['avatarUrl'],
       isPlusUser: data['isPlusUser'] as bool?,
       shareRelapseStreaks: data['shareRelapseStreaks'] as bool? ?? false,
@@ -143,6 +144,7 @@ final communityProfileWithFallbackProvider =
       displayName: data['displayName'] ?? 'Unknown User',
       gender: data['gender'] ?? 'other',
       isAnonymous: data['isAnonymous'] ?? false,
+      isDeleted: data['isDeleted'] ?? false, // Add missing isDeleted field
       avatarUrl: data['avatarUrl'],
       isPlusUser: data['isPlusUser'] as bool?,
       shareRelapseStreaks: data['shareRelapseStreaks'] as bool? ?? false,

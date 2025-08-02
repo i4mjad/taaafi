@@ -267,6 +267,22 @@ class CommunityProfileModel {
         updatedAt.hashCode;
   }
 
+  /// Business logic: Get display name following the pipeline: deleted → anonymous → actual name
+  String getDisplayNameWithPipeline() {
+    // 1. First check if user is deleted - if yes, display "deleted" text
+    if (isDeleted) {
+      return 'DELETED_USER'; // This will be localized in the UI
+    }
+
+    // 2. Then check if they are anonymous - if yes, don't show their name
+    if (isAnonymous) {
+      return 'ANONYMOUS_USER'; // This will be localized in the UI
+    }
+
+    // 3. If neither deleted nor anonymous, display their actual name
+    return displayName.isNotEmpty ? displayName : 'Community Member';
+  }
+
   @override
   String toString() {
     return 'CommunityProfileModel(id: $id, userUID: $userUID, displayName: $displayName, gender: $gender, avatarUrl: $avatarUrl, isAnonymous: $isAnonymous, isDeleted: $isDeleted, isPlusUser: $isPlusUser, shareRelapseStreaks: $shareRelapseStreaks, currentStreakDays: $currentStreakDays, streakLastUpdated: $streakLastUpdated, createdAt: $createdAt, updatedAt: $updatedAt)';

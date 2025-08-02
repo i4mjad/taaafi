@@ -2,11 +2,8 @@ import '../entities/community_profile_entity.dart';
 
 /// Enum for deletion progress steps
 enum DeletionStep {
-  deletingPosts,
-  deletingComments,
-  deletingInteractions,
-  removingProfileData,
-  cleaningUpMappings,
+  markingProfileDeleted,
+  completed,
 }
 
 /// Progress information for community profile deletion
