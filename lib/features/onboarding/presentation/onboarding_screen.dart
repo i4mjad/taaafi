@@ -160,9 +160,10 @@ class _OnBoardingScreenState extends ConsumerState<OnBoardingScreen> {
                       padding: const EdgeInsets.symmetric(vertical: 20),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        textDirection: Localizations.localeOf(context).languageCode == 'ar' 
-                            ? TextDirection.rtl 
-                            : TextDirection.ltr,
+                        textDirection:
+                            Localizations.localeOf(context).languageCode == 'ar'
+                                ? TextDirection.rtl
+                                : TextDirection.ltr,
                         children: List.generate(4, (index) {
                           // Always use normal order, Row textDirection handles RTL
                           final stepIndex = index;
