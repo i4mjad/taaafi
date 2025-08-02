@@ -194,7 +194,7 @@ GoRouter goRouter(Ref<GoRouter> ref) {
           GoRoute(
             path: 'login',
             name: RouteNames.login.name,
-            pageBuilder: (context, state) => NoTransitionPage<void>(
+            pageBuilder: (context, state) => MaterialPage(
               name: RouteNames.login.name,
               child: LogInScreen(),
             ),

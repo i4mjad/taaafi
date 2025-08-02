@@ -1087,15 +1087,19 @@ const Map<String, String> kEn = {
       "You can reset the start date or delete follow-ups separately. This action cannot be undone. You can delete follow-ups and emotions without resetting the date. If you want a fresh start, select all options and enter the new start date.",
   "reset-to-today": "Reset start date to today",
   "vault-title": "The Vault, Your Private Space",
+  "vault-short-title": "Vault",
   "vault-description":
       "Recovery journey needs a safe space, that's why we added the vault—your private space to document your progress. Here, you'll find new diaries, exercises, and a rich library of inspiring content. The vault is your first step towards real and sustainable change.",
   "exercises-title": "Activities, Step by Step Towards Recovery",
+  "exercises-short-title": "Activities",
   "exercises-description":
       "To face challenges, we offer you exercises, a set of tasks designed with multiple levels to suit your needs, whether daily, weekly, or monthly. Each exercise is another step that steadily brings you closer to your goal.",
   "lists-title": "Lists, A Recovery Guide in Your Hands",
+  "lists-short-title": "Lists",
   "lists-description":
       "Your journey towards recovery has become clearer with the lists—a carefully curated collection from the Ta'afi team, covering important topics that help increase your awareness and understanding of addiction challenges, giving you deeper insight and better support.",
   "reminders-title": "Reminders, Don't Miss Any Step",
+  "reminders-short-title": "Reminders",
   "reminders-description":
       "Now you can add reminders to easily follow up on exercise tasks. Set your schedules and let the app remind you of your next steps, making your recovery more regular and continuous.",
   "name-should-not-be-empty": "Name field cannot be empty",
