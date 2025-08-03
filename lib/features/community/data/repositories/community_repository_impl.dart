@@ -29,13 +29,36 @@ class CommunityRepositoryImpl implements CommunityRepository {
 
   @override
   Future<CommunityProfileEntity?> getProfile(String uid) async {
+    print('🔄 Repository: Getting profile for UID: $uid');
+
     try {
+      print('🔄 Repository: Calling remote datasource...');
       final model = await _remoteDatasource.getProfile(uid);
-      return model?.toEntity();
-    } catch (e) {
+
+      if (model == null) {
+        print('❌ Repository: Remote datasource returned null');
+        return null;
+      }
+
+      print(
+          '✅ Repository: Remote datasource returned model for: ${model.displayName}');
+      print('🔄 Repository: Converting model to entity...');
+
+      final entity = model.toEntity();
+      print(
+          '✅ Repository: Successfully converted to entity: ${entity.displayName} (isDeleted: ${entity.isDeleted})');
+
+      return entity;
+    } catch (e, stackTrace) {
+      print('❌ Repository: Exception in getProfile: $e');
+      print('❌ Repository: Stack trace: $stackTrace');
+
       if (e is CommunityException) {
+        print('❌ Repository: Rethrowing CommunityException');
         rethrow;
       }
+
+      print('❌ Repository: Throwing NetworkException');
       throw NetworkException('Failed to get profile: $e');
     }
   }

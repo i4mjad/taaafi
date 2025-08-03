@@ -44,36 +44,83 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen> {
     // Set initial filter based on widget parameter or default to 'posts'
     _selectedFilter = widget.initialTab ?? 'posts';
 
-    // Load posts when screen initializes
+    // Initialize only when we're sure we should show main content
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      print('🎯 InitState: Starting community main screen initialization');
-      print('🎯 InitState: Selected filter: $_selectedFilter');
-
-      // Sync community profile with latest subscription status
-      _syncCommunityProfile();
-
-      // Check current user and profile status
-      _checkUserStatus();
-
-      // Load different types of posts based on initial filter
-      if (_selectedFilter == 'pinned') {
-        print('🎯 InitState: Loading pinned posts');
-        ref
-            .read(pinnedPostsPaginationProvider.notifier)
-            .loadPosts(isPinned: true);
-      } else if (_selectedFilter == 'news') {
-        print('🎯 InitState: Loading news posts');
-        ref
-            .read(newsPostsPaginationProvider.notifier)
-            .loadPosts(category: 'news');
-      } else {
-        print(
-            '🎯 InitState: Loading general posts with category: ${_getFilterCategory()}');
-        ref
-            .read(postsPaginationProvider.notifier)
-            .loadPosts(category: _getFilterCategory());
-      }
+      _initializeMainScreen();
     });
+  }
+
+  /// Initialize main screen only if we should actually show main content
+  void _initializeMainScreen() {
+    // Check if we actually have a profile before initializing
+    final profileAsync = ref.read(currentCommunityProfileProvider);
+
+    profileAsync.when(
+      data: (profile) {
+        if (profile != null) {
+          // Only initialize if user actually has a profile
+          _performInitialization();
+        } else {
+          print(
+              '🎯 InitState: User has no profile, skipping main screen initialization');
+        }
+      },
+      loading: () {
+        // Wait for profile to load, then check again
+        Future.delayed(Duration(milliseconds: 100), () {
+          final retryAsync = ref.read(currentCommunityProfileProvider);
+          retryAsync.maybeWhen(
+            data: (profile) {
+              if (profile != null) {
+                _performInitialization();
+              } else {
+                print(
+                    '🎯 InitState: Profile loaded as null, skipping main screen initialization');
+              }
+            },
+            orElse: () {
+              print(
+                  '🎯 InitState: Profile still loading, skipping main screen initialization');
+            },
+          );
+        });
+      },
+      error: (error, stack) {
+        print(
+            '🎯 InitState: Profile error, skipping main screen initialization: $error');
+      },
+    );
+  }
+
+  /// Perform the actual initialization logic
+  void _performInitialization() {
+    print('🎯 InitState: Starting community main screen initialization');
+    print('🎯 InitState: Selected filter: $_selectedFilter');
+
+    // Sync community profile with latest subscription status
+    _syncCommunityProfile();
+
+    // Check current user and profile status
+    _checkUserStatus();
+
+    // Load different types of posts based on initial filter
+    if (_selectedFilter == 'pinned') {
+      print('🎯 InitState: Loading pinned posts');
+      ref
+          .read(pinnedPostsPaginationProvider.notifier)
+          .loadPosts(isPinned: true);
+    } else if (_selectedFilter == 'news') {
+      print('🎯 InitState: Loading news posts');
+      ref
+          .read(newsPostsPaginationProvider.notifier)
+          .loadPosts(category: 'news');
+    } else {
+      print(
+          '🎯 InitState: Loading general posts with category: ${_getFilterCategory()}');
+      ref
+          .read(postsPaginationProvider.notifier)
+          .loadPosts(category: _getFilterCategory());
+    }
   }
 
   @override

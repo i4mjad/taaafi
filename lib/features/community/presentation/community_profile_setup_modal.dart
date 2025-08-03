@@ -16,6 +16,7 @@ import 'package:reboot_app_3/core/shared_widgets/custom_textfield.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/features/community/presentation/providers/community_providers_new.dart';
 import 'package:reboot_app_3/features/plus/data/notifiers/subscription_notifier.dart';
+import 'package:reboot_app_3/features/account/data/user_profile_notifier.dart';
 
 class CommunityProfileSetupModal extends ConsumerStatefulWidget {
   const CommunityProfileSetupModal({super.key});
@@ -532,6 +533,9 @@ class _CommunityProfileSetupModalState
       if (mounted) {
         // Invalidate the hasCommunityProfile provider to refresh the cache
         ref.refresh(hasCommunityProfileProvider);
+
+        // Invalidate the user profile provider to refresh user profile screen
+        ref.invalidate(userProfileNotifierProvider);
 
         // Notify the community screen state that onboarding is completed
         ref.read(communityScreenStateProvider.notifier).onboardingCompleted();

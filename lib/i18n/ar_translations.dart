@@ -484,6 +484,45 @@ const Map<String, String> kAr = {
   "community-restore-progress": "جاري استعادة الملف الشخصي...",
   "community-restore-completed": "تم استعادة الملف الشخصي بنجاح",
   "community-restore-failed": "فشل في استعادة الملف الشخصي",
+
+  // Enhanced Profile Selection Modal
+  "community-profile-history": "تاريخ الملفات الشخصية",
+  "select-any-profile-to-restore": "اختر أي ملف شخصي لاستعادته بالوصول الكامل",
+  "latest-profile-available-upgrade-for-more":
+      "آخر ملف شخصي متاح للاستعادة. ترقية إلى Plus للوصول لجميع الملفات",
+  "plus-user": "مستخدم Plus",
+  "latest": "الأحدث",
+  "plus-required": "Plus مطلوب",
+  "unlock-all-profiles-with-plus": "افتح جميع الملفات الشخصية مع Plus",
+  "posts": "منشورات",
+  "comments": "تعليقات",
+  "active-days": "أيام النشاط",
+  "deleted-on": "حُذف في",
+  "no-deleted-profiles-found": "لم يتم العثور على ملفات محذوفة",
+  "no-deleted-profiles-desc": "ليس لديك أي ملفات شخصية محذوفة لاستعادتها",
+  "error-loading-profiles": "خطأ في تحميل الملفات الشخصية",
+  "create-new-profile": "إنشاء ملف شخصي جديد",
+  "profile-restored-successfully": "تم استعادة الملف الشخصي بنجاح",
+  "profile-restore-failed": "فشل في استعادة الملف الشخصي",
+  "today": "اليوم",
+  "weeks-ago": "منذ {weeks} أسابيع",
+
+  // Profile Choice Modal
+  "setup-community-profile": "إعداد الملف الشخصي للمجتمع",
+  "choose-profile-setup-option": "اختر كيفية إعداد ملفك الشخصي",
+  "restore-previous-profile": "استعادة الملف الشخصي السابق",
+  "restore-previous-profile-desc": "استرد ملفك الشخصي السابق مع جميع محتوياتك",
+  "create-new-profile-desc": "ابدأ من جديد بملف شخصي جديد تماماً",
+
+  // Profile Restore Selection Modal
+  "restore-community-profile": "استعادة الملف الشخصي للمجتمع",
+  "select-profile-latest-only-or-upgrade":
+      "اختر ملف شخصي للاستعادة. الأحدث فقط متاح للمستخدمين المجانيين.",
+  "upgrade-to-unlock-all-profiles": "ترقية إلى Plus لفتح جميع الملفات الشخصية",
+  "available-profiles": "الملفات الشخصية المتاحة",
+  "created-on": "تم إنشاؤه في",
+  "restore-selected-profile": "استعادة الملف الشخصي المحدد",
+
   "gender-selection-warning":
       "الرجاء اختيار جنسك الحقيقي. تقديم معلومات خاطئة قد يؤدي إلى قيود على الحساب.",
   "new_thread": "منشور جديد",
@@ -631,7 +670,6 @@ const Map<String, String> kAr = {
   "change-lang": "تغيير اللغة",
   "ui-settings": "إعدادات الواجهة واللغة",
   "content-language": "لغة المحتوى",
-  "today": "اليوم",
   "tomorrow": "غداً",
   "specific-day": "اختر يوم البداية",
   "changed-to-ar": "تم تغيير اللغة إلى العربية",

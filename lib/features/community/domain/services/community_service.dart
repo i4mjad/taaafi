@@ -1,4 +1,5 @@
 import '../entities/community_profile_entity.dart';
+import '../entities/profile_statistics.dart';
 
 /// Enum for deletion progress steps
 enum DeletionStep {
@@ -89,10 +90,26 @@ abstract class CommunityService {
   /// Throws [AuthenticationException] if the user is not authenticated.
   Future<String?> getDeletedProfileId();
 
+  /// Gets all deleted profiles for the current user (Plus feature)
+  ///
+  /// Returns a list of all deleted profiles ordered by deletion date (newest first).
+  /// Throws [AuthenticationException] if the user is not authenticated.
+  Future<List<CommunityProfileEntity>> getAllDeletedProfiles();
+
+  /// Gets profile statistics for a specific profile
+  ///
+  /// Returns statistics like post count, comment count, etc.
+  /// Throws [AuthenticationException] if the user is not authenticated.
+  Future<ProfileStatistics> getProfileStatistics(String profileId);
+
   /// Restores a previously deleted community profile
   ///
   /// Reactivates the profile and makes it visible again.
+  /// [bypassLatestCheck] allows Plus users to restore any profile, not just the latest.
   /// Throws [AuthenticationException] if the user is not authenticated.
   /// Throws [ProfileNotFoundException] if no deleted profile exists.
-  Future<CommunityProfileEntity> restoreProfile(String deletedProfileId);
+  Future<CommunityProfileEntity> restoreProfile(
+    String deletedProfileId, {
+    bool bypassLatestCheck = false,
+  });
 }

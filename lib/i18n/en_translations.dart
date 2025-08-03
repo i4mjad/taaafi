@@ -474,6 +474,46 @@ const Map<String, String> kEn = {
   "community-restore-progress": "Restoring Profile...",
   "community-restore-completed": "Profile restored successfully",
   "community-restore-failed": "Failed to restore profile",
+
+  // Enhanced Profile Selection Modal
+  "community-profile-history": "Profile History",
+  "select-any-profile-to-restore":
+      "Select any profile to restore with full access",
+  "latest-profile-available-upgrade-for-more":
+      "Latest profile available for restore. Upgrade to Plus to access all profiles",
+  "plus-user": "Plus User",
+  "latest": "Latest",
+  "plus-required": "Plus Required",
+  "unlock-all-profiles-with-plus": "Unlock all profiles with Plus",
+  "posts": "Posts",
+  "comments": "Comments",
+  "active-days": "Active Days",
+  "deleted-on": "Deleted on",
+  "no-deleted-profiles-found": "No Deleted Profiles Found",
+  "no-deleted-profiles-desc": "You don't have any deleted profiles to restore",
+  "error-loading-profiles": "Error Loading Profiles",
+  "create-new-profile": "Create New Profile",
+  "profile-restored-successfully": "Profile restored successfully",
+  "profile-restore-failed": "Failed to restore profile",
+  "weeks-ago": "{weeks} weeks ago",
+
+  // Profile Choice Modal
+  "setup-community-profile": "Setup Community Profile",
+  "choose-profile-setup-option": "Choose how you'd like to setup your profile",
+  "restore-previous-profile": "Restore Previous Profile",
+  "restore-previous-profile-desc":
+      "Get back your previous community profile with all your content",
+  "create-new-profile-desc": "Start fresh with a brand new community profile",
+
+  // Profile Restore Selection Modal
+  "restore-community-profile": "Restore Community Profile",
+  "select-profile-latest-only-or-upgrade":
+      "Select a profile to restore. Only latest available for free users.",
+  "upgrade-to-unlock-all-profiles": "Upgrade to Plus to unlock all profiles",
+  "available-profiles": "Available Profiles",
+  "created-on": "Created on",
+  "restore-selected-profile": "Restore Selected Profile",
+
   "gender-selection-warning":
       "Please select your real gender. Providing false information may result in account restrictions.",
   "new_thread": "New Thread",

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../entities/community_profile_entity.dart';
+import '../entities/profile_statistics.dart';
 import '../repositories/community_repository.dart';
 import '../../data/exceptions/community_exceptions.dart';
 import 'community_service.dart';
@@ -282,6 +283,104 @@ class CommunityServiceImpl implements CommunityService {
 
   @override
   Future<String?> getDeletedProfileId() async {
+    print('🔄 GetDeletedProfileId: Starting...');
+
+    final user = _auth.currentUser;
+    if (user == null) {
+      print('❌ GetDeletedProfileId: User not authenticated');
+      throw const AuthenticationException('User not authenticated');
+    }
+
+    print('✅ GetDeletedProfileId: User authenticated: ${user.uid}');
+
+    try {
+      print(
+          '🔄 GetDeletedProfileId: Querying Firestore for deleted profiles...');
+
+      // First try with orderBy (might fail due to indexing)
+      QuerySnapshot<Map<String, dynamic>>? snapshot;
+
+      try {
+        print('🔄 GetDeletedProfileId: Trying query with orderBy...');
+        snapshot = await _firestore
+            .collection('communityProfiles')
+            .where('userUID', isEqualTo: user.uid)
+            .where('isDeleted', isEqualTo: true)
+            .orderBy('deletedAt',
+                descending: true) // Changed to deletedAt for consistency
+            .limit(1)
+            .get();
+        print('✅ GetDeletedProfileId: Query with orderBy succeeded');
+      } catch (orderByError) {
+        print(
+            '⚠️ GetDeletedProfileId: OrderBy failed, trying without orderBy: $orderByError');
+
+        // Fallback: get all deleted profiles and sort manually
+        snapshot = await _firestore
+            .collection('communityProfiles')
+            .where('userUID', isEqualTo: user.uid)
+            .where('isDeleted', isEqualTo: true)
+            .get();
+        print('✅ GetDeletedProfileId: Query without orderBy succeeded');
+      }
+
+      print(
+          '🔄 GetDeletedProfileId: Query completed. Found ${snapshot.docs.length} documents');
+
+      if (snapshot.docs.isEmpty) {
+        print('❌ GetDeletedProfileId: No deleted profiles found');
+        return null;
+      }
+
+      // If we have multiple docs (fallback case), sort them manually
+      QueryDocumentSnapshot<Map<String, dynamic>> doc;
+      if (snapshot.docs.length == 1) {
+        doc = snapshot.docs.first;
+        print('✅ GetDeletedProfileId: Using single document found');
+      } else {
+        print(
+            '🔄 GetDeletedProfileId: Multiple documents found (${snapshot.docs.length}), sorting manually...');
+
+        // Sort by deletedAt descending to get the most recently deleted
+        final sortedDocs = snapshot.docs.toList();
+        sortedDocs.sort((a, b) {
+          final aDeletedAt = a.data()['deletedAt'] as Timestamp?;
+          final bDeletedAt = b.data()['deletedAt'] as Timestamp?;
+
+          // Handle null values (put them at the end)
+          if (aDeletedAt == null && bDeletedAt == null) return 0;
+          if (aDeletedAt == null) return 1;
+          if (bDeletedAt == null) return -1;
+
+          return bDeletedAt.compareTo(aDeletedAt); // Descending order
+        });
+
+        doc = sortedDocs.first;
+        print('✅ GetDeletedProfileId: Using most recently deleted document');
+      }
+
+      final docData = doc.data();
+
+      print('✅ GetDeletedProfileId: Found deleted profile document');
+      print('✅ GetDeletedProfileId: Document ID: ${doc.id}');
+      print(
+          '✅ GetDeletedProfileId: Document data keys: ${docData.keys.toList()}');
+      print('✅ GetDeletedProfileId: isDeleted: ${docData['isDeleted']}');
+      print('✅ GetDeletedProfileId: userUID: ${docData['userUID']}');
+      print('✅ GetDeletedProfileId: displayName: ${docData['displayName']}');
+      print('✅ GetDeletedProfileId: deletedAt: ${docData['deletedAt']}');
+
+      print('✅ GetDeletedProfileId: Returning profile ID: ${doc.id}');
+      return doc.id; // Return the document ID which is the community profile ID
+    } catch (e, stackTrace) {
+      print('❌ GetDeletedProfileId: Exception occurred: $e');
+      print('❌ GetDeletedProfileId: Stack trace: $stackTrace');
+      return null;
+    }
+  }
+
+  @override
+  Future<List<CommunityProfileEntity>> getAllDeletedProfiles() async {
     final user = _auth.currentUser;
     if (user == null) {
       throw const AuthenticationException('User not authenticated');
@@ -292,30 +391,110 @@ class CommunityServiceImpl implements CommunityService {
           .collection('communityProfiles')
           .where('userUID', isEqualTo: user.uid)
           .where('isDeleted', isEqualTo: true)
-          .orderBy('createdAt',
-              descending: true) // Get the latest created deleted profile
-          .limit(1)
+          .orderBy('deletedAt', descending: true) // Most recently deleted first
           .get();
 
-      if (snapshot.docs.isEmpty) {
-        return null;
-      }
-
-      final doc = snapshot.docs.first;
-      return doc.id; // Return the document ID which is the community profile ID
+      return snapshot.docs
+          .map((doc) => CommunityProfileEntity.fromJson({
+                'id': doc.id,
+                ...doc.data(),
+              }))
+          .toList();
     } catch (e) {
-      return null;
+      print('Error getting all deleted profiles: $e');
+      return [];
     }
   }
 
   @override
-  Future<CommunityProfileEntity> restoreProfile(String deletedProfileId) async {
+  Future<ProfileStatistics> getProfileStatistics(String profileId) async {
     final user = _auth.currentUser;
     if (user == null) {
       throw const AuthenticationException('User not authenticated');
     }
 
     try {
+      // Get profile data first to get creation/deletion dates
+      final profileDoc =
+          await _firestore.collection('communityProfiles').doc(profileId).get();
+
+      if (!profileDoc.exists) {
+        throw const ProfileNotFoundException('Profile not found');
+      }
+
+      final profileData = profileDoc.data()!;
+      final createdAt = (profileData['createdAt'] as Timestamp).toDate();
+      final deletedAt = profileData['deletedAt'] != null
+          ? (profileData['deletedAt'] as Timestamp).toDate()
+          : null;
+
+      // Calculate active days
+      final endDate = deletedAt ?? DateTime.now();
+      final activeDays = endDate.difference(createdAt).inDays;
+
+      // Count posts
+      final postsSnapshot = await _firestore
+          .collection('forumPosts')
+          .where('authorCPId', isEqualTo: profileId)
+          .get();
+
+      // Count comments
+      final commentsSnapshot = await _firestore
+          .collection('comments')
+          .where('authorCPId', isEqualTo: profileId)
+          .get();
+
+      // Count interactions given by this profile
+      final interactionsSnapshot = await _firestore
+          .collection('interactions')
+          .where('userCPId', isEqualTo: profileId)
+          .get();
+
+      // Count interactions received on this profile's content
+      final receivedInteractionsSnapshot = await _firestore
+          .collection('interactions')
+          .where('targetAuthorCPId', isEqualTo: profileId)
+          .get();
+
+      return ProfileStatistics(
+        postCount: postsSnapshot.docs.length,
+        commentCount: commentsSnapshot.docs.length,
+        interactionCount: interactionsSnapshot.docs.length,
+        receivedInteractionCount: receivedInteractionsSnapshot.docs.length,
+        deletedAt: deletedAt,
+        activeDays: activeDays,
+      );
+    } catch (e) {
+      print('Error getting profile statistics: $e');
+      return const ProfileStatistics(
+        postCount: 0,
+        commentCount: 0,
+        interactionCount: 0,
+        receivedInteractionCount: 0,
+        activeDays: 0,
+      );
+    }
+  }
+
+  @override
+  Future<CommunityProfileEntity> restoreProfile(
+    String deletedProfileId, {
+    bool bypassLatestCheck = false,
+  }) async {
+    print('🔄 RestoreService: Starting profile restoration...');
+    print('🔄 RestoreService: Profile ID: $deletedProfileId');
+    print('🔄 RestoreService: Bypass latest check: $bypassLatestCheck');
+
+    final user = _auth.currentUser;
+    if (user == null) {
+      print('❌ RestoreService: User not authenticated');
+      throw const AuthenticationException('User not authenticated');
+    }
+
+    print('✅ RestoreService: User authenticated: ${user.uid}');
+
+    try {
+      print('🔄 RestoreService: Checking if deleted profile exists...');
       // Check if the deleted profile exists and belongs to the current user
       final profileDoc = await _firestore
           .collection('communityProfiles')
@@ -323,34 +502,68 @@ class CommunityServiceImpl implements CommunityService {
           .get();
 
       if (!profileDoc.exists) {
+        print('❌ RestoreService: Profile document does not exist');
         throw const ProfileNotFoundException('Deleted profile not found');
       }
 
+      print('✅ RestoreService: Profile document exists');
+
       final profileData = profileDoc.data();
       if (profileData == null) {
+        print('❌ RestoreService: Profile data is null');
         throw const ProfileNotFoundException('Invalid profile data');
       }
 
+      print(
+          '✅ RestoreService: Profile data loaded: ${profileData.keys.toList()}');
+
       // Validate that the profile belongs to the current user
-      if (profileData['userUID'] != user.uid) {
+      final profileUserUID = profileData['userUID'];
+      print(
+          '🔄 RestoreService: Profile userUID: $profileUserUID, Current user UID: ${user.uid}');
+
+      if (profileUserUID != user.uid) {
+        print('❌ RestoreService: Profile belongs to different user');
         throw const ProfileNotFoundException(
             'Profile does not belong to current user');
       }
 
+      print('✅ RestoreService: Profile ownership validated');
+
       // Validate that the profile is actually deleted
-      if (profileData['isDeleted'] != true) {
+      final isDeleted = profileData['isDeleted'];
+      print('🔄 RestoreService: Profile isDeleted: $isDeleted');
+
+      if (isDeleted != true) {
+        print('❌ RestoreService: Profile is not marked as deleted');
         throw const ProfileUpdateException('Profile is not deleted');
       }
 
-      // Validate that this is the latest deleted profile for the user
-      final latestDeletedProfileId = await getDeletedProfileId();
-      if (latestDeletedProfileId != deletedProfileId) {
-        throw const ProfileUpdateException(
-            'Only the latest deleted profile can be restored');
+      print('✅ RestoreService: Profile is marked as deleted');
+
+      // Validate that this is the latest deleted profile for the user (unless bypassed for Plus users)
+      if (!bypassLatestCheck) {
+        print(
+            '🔄 RestoreService: Checking if this is the latest deleted profile...');
+        final latestDeletedProfileId = await getDeletedProfileId();
+        print(
+            '🔄 RestoreService: Latest deleted profile ID: $latestDeletedProfileId');
+
+        if (latestDeletedProfileId != deletedProfileId) {
+          print('❌ RestoreService: Not the latest deleted profile');
+          throw const ProfileUpdateException(
+              'Only the latest deleted profile can be restored');
+        }
+
+        print('✅ RestoreService: This is the latest deleted profile');
+      } else {
+        print('✅ RestoreService: Latest check bypassed (Plus user)');
       }
 
+      print('🔄 RestoreService: Starting Firestore transaction...');
       // Restore the profile atomically
       await _firestore.runTransaction((transaction) async {
+        print('🔄 RestoreService: Inside transaction, updating profile...');
         // Simply reactivate profile
         transaction.update(
           _firestore.collection('communityProfiles').doc(deletedProfileId),
@@ -361,19 +574,36 @@ class CommunityServiceImpl implements CommunityService {
             'updatedAt': FieldValue.serverTimestamp(),
           },
         );
+
+        print('✅ RestoreService: Transaction update completed');
       });
 
+      print('✅ RestoreService: Firestore transaction completed successfully');
+
+      print('🔄 RestoreService: Loading restored profile from repository...');
       // Return the restored profile
       final restoredProfile = await _repository.getProfile(deletedProfileId);
       if (restoredProfile == null) {
+        print(
+            '❌ RestoreService: Failed to load restored profile from repository');
         throw const ProfileNotFoundException('Failed to load restored profile');
       }
 
+      print('✅ RestoreService: Profile restoration completed successfully!');
+      print(
+          '✅ RestoreService: Restored profile: ${restoredProfile.displayName} (${restoredProfile.id})');
+
       return restoredProfile;
-    } catch (e) {
+    } catch (e, stackTrace) {
+      print('❌ RestoreService: Exception occurred: $e');
+      print('❌ RestoreService: Stack trace: $stackTrace');
+
       if (e is CommunityException) {
+        print('❌ RestoreService: Rethrowing CommunityException');
         rethrow;
       }
+
+      print('❌ RestoreService: Throwing ProfileUpdateException');
       throw ProfileUpdateException('Failed to restore profile: $e');
     }
   }
