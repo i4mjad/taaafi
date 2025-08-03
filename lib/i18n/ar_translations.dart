@@ -1615,7 +1615,8 @@ const Map<String, String> kAr = {
 
   // Groups coming soon screen
   'groups_coming_soon_title': 'الزمالة',
-  'groups_coming_soon_description': 'تواصل مع الآخرين من خلال الزمالة.',
+  'groups_coming_soon_description':
+      'تواصل مع اخوتك من المتعافين من خلال الزمالة.',
   'groups_feature_support_groups': 'زمالات الدعم',
   'groups_feature_support_groups_desc':
       'انضم إلى مجموعات دعم صغيرة مع آخرين في رحلات تعافي مشابهة',
