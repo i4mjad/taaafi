@@ -398,6 +398,25 @@ class CommunityScreenStateNotifier extends StateNotifier<CommunityScreenState> {
 
       if (hasActiveProfile) {
         print('🎯 CommunityState: User has active profile → Show main content');
+
+        // Add small delay for newly created profiles to allow system sync
+        try {
+          final currentProfile =
+              _ref.read(currentCommunityProfileProvider).valueOrNull;
+          if (currentProfile != null) {
+            final profileAge =
+                DateTime.now().difference(currentProfile.createdAt);
+            if (profileAge.inSeconds < 5) {
+              print(
+                  '🎯 CommunityState: New profile detected (${profileAge.inSeconds}s old), adding 1s delay for system sync');
+              await Future.delayed(Duration(seconds: 1));
+            }
+          }
+        } catch (e) {
+          print(
+              '🎯 CommunityState: Could not check profile age, proceeding normally: $e');
+        }
+
         state = CommunityScreenState.showMainContent;
       } else {
         print(

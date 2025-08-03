@@ -12,6 +12,7 @@ import 'package:reboot_app_3/features/community/presentation/widgets/avatar_with
 import 'package:reboot_app_3/features/community/presentation/providers/community_providers_new.dart';
 import 'package:reboot_app_3/features/community/presentation/providers/forum_providers.dart';
 import 'package:reboot_app_3/features/community/presentation/widgets/report_content_modal.dart';
+import 'package:reboot_app_3/features/community/presentation/widgets/community_profile_modal.dart';
 import 'package:reboot_app_3/features/account/presentation/widgets/feature_access_guard.dart';
 import 'package:reboot_app_3/features/community/presentation/widgets/streak_display_widget.dart';
 
@@ -71,33 +72,56 @@ class ThreadsPostCard extends ConsumerWidget {
       orElse: () => null,
     );
 
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        decoration: BoxDecoration(
-          border: Border(
-            bottom: BorderSide(
-              color: theme.grey[100]!,
-              width: 0.5,
-            ),
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        border: Border(
+          bottom: BorderSide(
+            color: theme.grey[100]!,
+            width: 0.5,
           ),
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Header with user info
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Avatar with proper author anonymity
-                authorProfileAsync.when(
-                  data: (authorProfile) {
-                    final isAuthorAnonymous =
-                        authorProfile?.isAnonymous ?? false;
-                    final isAuthorPlusUser =
-                        authorProfile?.hasPlusSubscription() ?? false;
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header with user info
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Avatar with proper author anonymity
+              authorProfileAsync.when(
+                data: (authorProfile) {
+                  final isAuthorAnonymous = authorProfile?.isAnonymous ?? false;
+                  final isAuthorPlusUser =
+                      authorProfile?.hasPlusSubscription() ?? false;
+                  final isOrphanedPost =
+                      authorProfile?.userUID == 'orphaned-post';
 
+                  final isAvatarTappable =
+                      !isOrphanedPost && !isAuthorAnonymous;
+
+                  if (isAvatarTappable) {
+                    return InkWell(
+                      onTap: () => _showCommunityProfileModal(
+                        context,
+                        post.authorCPId,
+                        authorProfile?.displayName ?? 'Unknown User',
+                        authorProfile?.avatarUrl,
+                        isAuthorAnonymous,
+                        isAuthorPlusUser,
+                      ),
+                      borderRadius: BorderRadius.circular(16),
+                      child: AvatarWithAnonymity(
+                        cpId: post.authorCPId,
+                        isAnonymous: isAuthorAnonymous,
+                        size: 32,
+                        avatarUrl:
+                            isAuthorAnonymous ? null : authorProfile?.avatarUrl,
+                        isPlusUser: isAuthorPlusUser,
+                      ),
+                    );
+                  } else {
                     return AvatarWithAnonymity(
                       cpId: post.authorCPId,
                       isAnonymous: isAuthorAnonymous,
@@ -106,33 +130,36 @@ class ThreadsPostCard extends ConsumerWidget {
                           isAuthorAnonymous ? null : authorProfile?.avatarUrl,
                       isPlusUser: isAuthorPlusUser,
                     );
-                  },
-                  loading: () => Container(
-                    width: 32,
-                    height: 32,
-                    decoration: BoxDecoration(
-                      color: theme.grey[200],
-                      shape: BoxShape.circle,
-                    ),
-                  ),
-                  error: (error, stackTrace) => Container(
-                    width: 32,
-                    height: 32,
-                    decoration: BoxDecoration(
-                      color: theme.error[100],
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(
-                      Icons.error_outline,
-                      size: 16,
-                      color: theme.error[500],
-                    ),
+                  }
+                },
+                loading: () => Container(
+                  width: 32,
+                  height: 32,
+                  decoration: BoxDecoration(
+                    color: theme.grey[200],
+                    shape: BoxShape.circle,
                   ),
                 ),
-                const SizedBox(width: 12),
+                error: (error, stackTrace) => Container(
+                  width: 32,
+                  height: 32,
+                  decoration: BoxDecoration(
+                    color: theme.error[100],
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.error_outline,
+                    size: 16,
+                    color: theme.error[500],
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
 
-                // Content
-                Expanded(
+              // Content
+              Expanded(
+                child: GestureDetector(
+                  onTap: onTap,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -395,10 +422,10 @@ class ThreadsPostCard extends ConsumerWidget {
                     ],
                   ),
                 ),
-              ],
-            ),
-          ],
-        ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
@@ -861,6 +888,34 @@ class ThreadsPostCard extends ConsumerWidget {
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  /// Show community profile modal
+  void _showCommunityProfileModal(
+    BuildContext context,
+    String communityProfileId,
+    String displayName,
+    String? avatarUrl,
+    bool isAnonymous,
+    bool isPlusUser,
+  ) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Padding(
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom,
+        ),
+        child: CommunityProfileModal(
+          communityProfileId: communityProfileId,
+          displayName: displayName,
+          avatarUrl: avatarUrl,
+          isAnonymous: isAnonymous,
+          isPlusUser: isPlusUser,
         ),
       ),
     );

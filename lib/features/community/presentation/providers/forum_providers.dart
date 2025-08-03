@@ -264,6 +264,19 @@ final mainScreenPostsProvider =
   final repository = ref.watch(forumRepositoryProvider);
   final currentProfile = ref.watch(currentCommunityProfileProvider);
 
+  // Add small delay for newly created profiles to avoid timing issues
+  if (currentProfile.hasValue) {
+    final profile = currentProfile.value;
+    if (profile != null) {
+      final profileAge = DateTime.now().difference(profile.createdAt);
+      if (profileAge.inSeconds < 3) {
+        print(
+            '🎯 MainScreenPostsProvider: New profile detected, adding 2s delay to avoid timing issues');
+        await Future.delayed(Duration(seconds: 2));
+      }
+    }
+  }
+
   // Create filter params to determine if gender filtering should be applied
   final filterParams = PostFilterParams(category: category);
   final shouldFilter = filterParams.shouldApplyGenderFilter;

@@ -60,6 +60,8 @@ class AvatarWithAnonymity extends ConsumerWidget {
                         fit: BoxFit.cover,
                         errorBuilder: (context, error, stackTrace) {
                           // Fallback to default avatar if image fails to load
+                          print(
+                              'DEBUG: AvatarWithAnonymity - Image load error for cpId: $cpId, avatarUrl: $avatarUrl, error: $error');
                           return Container(
                             color: theme.primary[100],
                             child: Icon(

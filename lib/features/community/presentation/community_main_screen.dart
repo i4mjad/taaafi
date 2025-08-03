@@ -293,65 +293,87 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen>
   }
 
   Widget _buildForumTab() {
-    return CustomScrollView(
-      controller: _scrollController,
-      slivers: [
-        // Filter chips - sticky
-        SliverPersistentHeader(
-          pinned: true,
-          delegate: _FilterChipsDelegate(
-            filterChips: Container(
-              height: 35,
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: ListView(
-                scrollDirection: Axis.horizontal,
-                children: [
-                  _buildFilterChip(
-                    AppLocalizations.of(context).translate('community_pinned'),
-                    'pinned',
-                    LucideIcons.pin,
-                    const Color(0xFFF59E0B),
-                  ),
-                  const SizedBox(width: 8),
-                  _buildFilterChip(
-                    AppLocalizations.of(context).translate('community_posts'),
-                    'posts',
-                    LucideIcons.messageSquare,
-                    const Color(0xFF3B82F6),
-                  ),
-                  const SizedBox(width: 8),
-                  _buildFilterChip(
-                    AppLocalizations.of(context).translate('challenges'),
-                    'challenges',
-                    LucideIcons.star,
-                    const Color(0xFFEF4444),
-                  ),
-                  const SizedBox(width: 8),
-                  _buildFilterChip(
-                    AppLocalizations.of(context).translate('community_news'),
-                    'news',
-                    LucideIcons.newspaper,
-                    const Color(0xFF10B981),
-                  ),
-                  const SizedBox(width: 8),
-                  _buildFilterChip(
-                    AppLocalizations.of(context)
-                        .translate('community_categories'),
-                    'categories',
-                    LucideIcons.layoutGrid,
-                    const Color(0xFF8B5CF6),
-                  ),
-                ],
+    return RefreshIndicator(
+      onRefresh: () async {
+        // Refresh based on selected filter
+        switch (_selectedFilter) {
+          case 'posts':
+            ref.invalidate(mainScreenPostsProvider(null));
+            await ref.read(mainScreenPostsProvider(null).future);
+            break;
+          case 'pinned':
+            ref.invalidate(pinnedPostsPaginationProvider);
+            break;
+          case 'news':
+            ref.invalidate(newsPostsPaginationProvider);
+            break;
+          default:
+            ref.invalidate(mainScreenPostsProvider(null));
+            await ref.read(mainScreenPostsProvider(null).future);
+        }
+      },
+      child: CustomScrollView(
+        controller: _scrollController,
+        physics: const AlwaysScrollableScrollPhysics(),
+        slivers: [
+          // Filter chips - sticky
+          SliverPersistentHeader(
+            pinned: true,
+            delegate: _FilterChipsDelegate(
+              filterChips: Container(
+                height: 35,
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: ListView(
+                  scrollDirection: Axis.horizontal,
+                  children: [
+                    _buildFilterChip(
+                      AppLocalizations.of(context)
+                          .translate('community_pinned'),
+                      'pinned',
+                      LucideIcons.pin,
+                      const Color(0xFFF59E0B),
+                    ),
+                    const SizedBox(width: 8),
+                    _buildFilterChip(
+                      AppLocalizations.of(context).translate('community_posts'),
+                      'posts',
+                      LucideIcons.messageSquare,
+                      const Color(0xFF3B82F6),
+                    ),
+                    const SizedBox(width: 8),
+                    _buildFilterChip(
+                      AppLocalizations.of(context).translate('challenges'),
+                      'challenges',
+                      LucideIcons.star,
+                      const Color(0xFFEF4444),
+                    ),
+                    const SizedBox(width: 8),
+                    _buildFilterChip(
+                      AppLocalizations.of(context).translate('community_news'),
+                      'news',
+                      LucideIcons.newspaper,
+                      const Color(0xFF10B981),
+                    ),
+                    const SizedBox(width: 8),
+                    _buildFilterChip(
+                      AppLocalizations.of(context)
+                          .translate('community_categories'),
+                      'categories',
+                      LucideIcons.layoutGrid,
+                      const Color(0xFF8B5CF6),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
-        ),
 
-        // Scrollable Content
-        SliverToBoxAdapter(
-          child: _buildMainContent(),
-        ),
-      ],
+          // Scrollable Content
+          SliverToBoxAdapter(
+            child: _buildMainContent(),
+          ),
+        ],
+      ),
     );
   }
 
@@ -403,64 +425,53 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen>
     print(
         '🎯 UI: Building posts view, postsAsync state: ${postsAsync.runtimeType}');
 
-    return RefreshIndicator(
-      onRefresh: () async {
-        // Refresh the posts provider
-        ref.invalidate(mainScreenPostsProvider(null));
-        // Wait for the new data to load
-        await ref.read(mainScreenPostsProvider(null).future);
-      },
-      child: SingleChildScrollView(
-        physics: const AlwaysScrollableScrollPhysics(),
-        child: Column(
-          children: [
-            // Header with trend icon, "Latest Posts" text, count, and "See All" button
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              child: Row(
-                children: [
-                  Icon(
-                    LucideIcons.trendingUp,
-                    color: theme.primary[500],
-                    size: 20,
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    localizations.translate('latest_posts'),
-                    style: TextStyles.caption.copyWith(
-                      color: theme.grey[900],
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(width: 4),
-                  Text(
-                    '(${localizations.translate('latest_50')})',
-                    style: TextStyles.caption.copyWith(
-                      color: theme.grey[600],
-                      fontWeight: FontWeight.normal,
-                    ),
-                  ),
-                  const Spacer(),
-                  GestureDetector(
-                    onTap: () {
-                      // Navigate to the full posts list screen
-                      context.goNamed(RouteNames.allPosts.name);
-                    },
-                    child: Text(
-                      localizations.translate('see_all'),
-                      style: TextStyles.caption.copyWith(
-                        color: theme.primary[600],
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                ],
+    return Column(
+      children: [
+        // Header with trend icon, "Latest Posts" text, count, and "See All" button
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          child: Row(
+            children: [
+              Icon(
+                LucideIcons.trendingUp,
+                color: theme.primary[500],
+                size: 20,
               ),
-            ),
-            _buildStreamingPostsContent(postsAsync, localizations, theme),
-          ],
+              const SizedBox(width: 8),
+              Text(
+                localizations.translate('latest_posts'),
+                style: TextStyles.caption.copyWith(
+                  color: theme.grey[900],
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(width: 4),
+              Text(
+                '(${localizations.translate('latest_50')})',
+                style: TextStyles.caption.copyWith(
+                  color: theme.grey[600],
+                  fontWeight: FontWeight.normal,
+                ),
+              ),
+              const Spacer(),
+              GestureDetector(
+                onTap: () {
+                  // Navigate to the full posts list screen
+                  context.goNamed(RouteNames.allPosts.name);
+                },
+                child: Text(
+                  localizations.translate('see_all'),
+                  style: TextStyles.caption.copyWith(
+                    color: theme.primary[600],
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
-      ),
+        _buildStreamingPostsContent(postsAsync, localizations, theme),
+      ],
     );
   }
 

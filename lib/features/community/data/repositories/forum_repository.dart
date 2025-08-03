@@ -426,13 +426,19 @@ class ForumRepository {
         print(
             '🔍 ForumRepository: No posts from valid profiles, checking for orphaned posts as fallback');
 
-        final orphanedPosts =
-            await _getOrphanedPosts(limit, category, isPinned);
-        print(
-            '🔍 ForumRepository: Found ${orphanedPosts.length} orphaned posts as fallback');
+        try {
+          final orphanedPosts =
+              await _getOrphanedPosts(limit, category, isPinned);
+          print(
+              '🔍 ForumRepository: Found ${orphanedPosts.length} orphaned posts as fallback');
 
-        // For now, just return orphaned posts as fallback
-        yield orphanedPosts;
+          // For now, just return orphaned posts as fallback
+          yield orphanedPosts;
+        } catch (e) {
+          // If orphaned posts check fails (e.g., permission issues), return empty list
+          print('🔍 ForumRepository: Orphaned posts check failed: $e');
+          yield <Post>[];
+        }
       } else {
         yield genderFilteredPosts;
       }
@@ -1339,24 +1345,36 @@ class ForumRepository {
       final orphanedPosts = <Post>[];
 
       for (final post in allPosts) {
-        final profileExists = await _firestore
-            .collection('communityProfiles')
-            .doc(post.authorCPId)
-            .get()
-            .then((doc) => doc.exists);
+        try {
+          final profileExists = await _firestore
+              .collection('communityProfiles')
+              .doc(post.authorCPId)
+              .get()
+              .then((doc) => doc.exists);
 
-        if (!profileExists) {
-          orphanedPosts.add(post);
+          if (!profileExists) {
+            orphanedPosts.add(post);
+            print(
+                '🔍 ForumRepository: Found orphaned post: ${post.id} by ${post.authorCPId}');
+          }
+
+          if (orphanedPosts.length >= limit) break;
+        } catch (profileCheckError) {
+          // Skip this post if we can't check the profile (permission issues)
           print(
-              '🔍 ForumRepository: Found orphaned post: ${post.id} by ${post.authorCPId}');
+              '🔍 ForumRepository: Skipping post ${post.id} due to profile check error: $profileCheckError');
+          continue;
         }
-
-        if (orphanedPosts.length >= limit) break;
       }
 
       return orphanedPosts;
     } catch (e) {
       print('🔍 ForumRepository: Error getting orphaned posts: $e');
+      // If permission denied or other errors, return empty list instead of crashing
+      if (e.toString().contains('permission-denied')) {
+        print(
+            '🔍 ForumRepository: Permission denied - likely new profile timing issue, returning empty list');
+      }
       return [];
     }
   }
