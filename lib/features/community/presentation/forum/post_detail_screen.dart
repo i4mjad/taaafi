@@ -14,6 +14,7 @@ import 'package:reboot_app_3/features/community/presentation/widgets/post_intera
 import 'package:reboot_app_3/features/community/presentation/widgets/comment_list_widget.dart';
 import 'package:reboot_app_3/features/community/presentation/widgets/reply_input_widget.dart';
 import 'package:reboot_app_3/features/community/presentation/widgets/report_content_modal.dart';
+import 'package:reboot_app_3/features/community/presentation/widgets/community_profile_modal.dart';
 import 'package:reboot_app_3/features/community/presentation/providers/forum_providers.dart';
 import 'package:reboot_app_3/features/community/presentation/providers/community_providers_new.dart';
 import 'package:reboot_app_3/features/community/data/models/comment.dart';

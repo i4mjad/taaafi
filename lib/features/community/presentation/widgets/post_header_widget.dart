@@ -8,6 +8,7 @@ import 'package:reboot_app_3/features/community/data/models/post.dart';
 import 'package:reboot_app_3/features/community/data/models/post_category.dart';
 import 'package:reboot_app_3/features/community/presentation/widgets/avatar_with_anonymity.dart';
 import 'package:reboot_app_3/features/community/presentation/widgets/streak_display_widget.dart';
+import 'package:reboot_app_3/features/community/presentation/widgets/community_profile_modal.dart';
 import 'package:reboot_app_3/features/community/presentation/providers/community_providers_new.dart';
 import 'package:reboot_app_3/features/community/presentation/providers/forum_providers.dart';
 
@@ -80,13 +81,25 @@ class PostHeaderWidget extends ConsumerWidget {
 
         return Row(
           children: [
-            // User avatar
-            AvatarWithAnonymity(
-              cpId: post.authorCPId,
-              isAnonymous: isAuthorAnonymous,
-              size: 40,
-              avatarUrl: isAuthorAnonymous ? null : authorProfile?.avatarUrl,
-              isPlusUser: isAuthorPlusUser,
+            // User avatar - clickable to show profile
+            GestureDetector(
+              onTap: !isOrphanedPost && !isAuthorAnonymous
+                  ? () => _showCommunityProfileModal(
+                        context,
+                        post.authorCPId,
+                        authorProfile?.displayName ?? 'Unknown User',
+                        authorProfile?.avatarUrl,
+                        isAuthorAnonymous,
+                        isAuthorPlusUser,
+                      )
+                  : null,
+              child: AvatarWithAnonymity(
+                cpId: post.authorCPId,
+                isAnonymous: isAuthorAnonymous,
+                size: 40,
+                avatarUrl: isAuthorAnonymous ? null : authorProfile?.avatarUrl,
+                isPlusUser: isAuthorPlusUser,
+              ),
             ),
 
             const SizedBox(width: 12),
@@ -105,30 +118,46 @@ class PostHeaderWidget extends ConsumerWidget {
                           children: [
                             Row(
                               children: [
-                                // Display name
+                                // Display name - clickable to show profile
                                 Flexible(
-                                  child: Text(
-                                    () {
-                                      final pipelineResult = authorProfile
-                                              ?.getDisplayNameWithPipeline() ??
-                                          'Former User';
-                                      print(
-                                          '🔍 [PostHeader] Pipeline result: "$pipelineResult"');
-                                      final localizedResult =
-                                          _getLocalizedDisplayName(
-                                              pipelineResult, localizations);
-                                      print(
-                                          '🔍 [PostHeader] Final display name: "$localizedResult"');
-                                      return localizedResult;
-                                    }(),
-                                    style: TextStyles.body.copyWith(
-                                      fontWeight: FontWeight.w600,
-                                      color: isOrphanedPost
-                                          ? theme.grey[
-                                              600] // Dimmed for orphaned posts
-                                          : theme.grey[900],
+                                  child: GestureDetector(
+                                    onTap: !isOrphanedPost && !isAuthorAnonymous
+                                        ? () => _showCommunityProfileModal(
+                                              context,
+                                              post.authorCPId,
+                                              authorProfile?.displayName ??
+                                                  'Unknown User',
+                                              authorProfile?.avatarUrl,
+                                              isAuthorAnonymous,
+                                              isAuthorPlusUser,
+                                            )
+                                        : null,
+                                    child: Text(
+                                      () {
+                                        final pipelineResult = authorProfile
+                                                ?.getDisplayNameWithPipeline() ??
+                                            'Former User';
+                                        print(
+                                            '🔍 [PostHeader] Pipeline result: "$pipelineResult"');
+                                        final localizedResult =
+                                            _getLocalizedDisplayName(
+                                                pipelineResult, localizations);
+                                        print(
+                                            '🔍 [PostHeader] Final display name: "$localizedResult"');
+                                        return localizedResult;
+                                      }(),
+                                      style: TextStyles.body.copyWith(
+                                        fontWeight: FontWeight.w600,
+                                        color: isOrphanedPost
+                                            ? theme.grey[
+                                                600] // Dimmed for orphaned posts
+                                            : (!isAuthorAnonymous
+                                                ? theme.primary[700]
+                                                : theme.grey[
+                                                    900]), // Make clickable names more prominent
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
                                     ),
-                                    overflow: TextOverflow.ellipsis,
                                   ),
                                 ),
 
@@ -404,5 +433,33 @@ class PostHeaderWidget extends ConsumerWidget {
     } else {
       return localizations.translate('time-now');
     }
+  }
+
+  /// Show community profile modal
+  void _showCommunityProfileModal(
+    BuildContext context,
+    String communityProfileId,
+    String displayName,
+    String? avatarUrl,
+    bool isAnonymous,
+    bool isPlusUser,
+  ) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Padding(
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom,
+        ),
+        child: CommunityProfileModal(
+          communityProfileId: communityProfileId,
+          displayName: displayName,
+          avatarUrl: avatarUrl,
+          isAnonymous: isAnonymous,
+          isPlusUser: isPlusUser,
+        ),
+      ),
+    );
   }
 }

@@ -164,6 +164,32 @@ class UserReportsNotifier extends _$UserReportsNotifier {
     }
   }
 
+  /// Submit a new user report
+  Future<String> submitUserReport({
+    required String communityProfileId,
+    required String userMessage,
+  }) async {
+    state = const AsyncValue.loading();
+    try {
+      final result = await service.submitUserReport(
+        communityProfileId: communityProfileId,
+        userMessage: userMessage,
+      );
+
+      if (result.isSuccess) {
+        // Refresh the reports after submission
+        state = AsyncValue.data(await service.getUserReports());
+        return result.data!;
+      } else {
+        state = AsyncValue.error(result.errorKey!, StackTrace.current);
+        throw Exception(result.errorKey!);
+      }
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+      rethrow;
+    }
+  }
+
   /// Add a message to an existing report
   Future<void> addMessageToReport({
     required String reportId,

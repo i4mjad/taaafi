@@ -2554,4 +2554,20 @@ const Map<String, String> kAr = {
   "deletion-request-failed": "فشل في تقديم طلب الحذف. يرجى المحاولة مرة أخرى.",
   "deletion-canceled-successfully": "تم إلغاء طلب حذف حسابك",
   "deletion-cancel-failed": "فشل في إلغاء طلب الحذف. يرجى المحاولة مرة أخرى.",
+
+  // Community Profile Modal
+  "view-profile": "عرض الملف الشخصي",
+  "show-profile": "إظهار الملف الشخصي",
+  "user-statistics": "إحصائيات المستخدم",
+  "total-posts": "إجمالي المنشورات",
+  "total-comments": "إجمالي التعليقات",
+  "total-interactions": "إجمالي التفاعلات",
+  "interactions-received": "التفاعلات المستلمة",
+  "report-user": "الإبلاغ عن المستخدم",
+  "report-user-subtitle": "الإبلاغ عن سلوك غير لائق",
+  "report-user-placeholder": "صف المشكلة التي تريد الإبلاغ عنها...",
+  "user-reported": "تم الإبلاغ عن المستخدم بنجاح",
+  "error-reporting-user": "خطأ في الإبلاغ عن المستخدم",
+  "profile-actions": "إجراءات الملف الشخصي",
+  "error_loading_stats": "خطأ في تحميل الإحصائيات",
 };

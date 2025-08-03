@@ -23,6 +23,7 @@ class ReportTypes {
   static const String postReport = 'WV2Lpe4V9ajwf0NmsAwN';
   static const String commentReport = 'n8LCt8NsTfCcYh0mN0e6';
   static const String featureSuggestion = 'JYfdeI6L9Af1LUP0LhtK';
+  static const String userReport = 'MhVAEnH7sCR06Rv1JV2y';
 }
 
 /// Service for handling user reports business logic
@@ -113,6 +114,23 @@ class UserReportsService {
 
     return await _submitReport(
       reportTypeId: ReportTypes.commentReport,
+      userMessage: userMessage,
+      relatedContent: relatedContent,
+    );
+  }
+
+  /// Submit a new user report
+  Future<ReportResult<String>> submitUserReport({
+    required String communityProfileId,
+    required String userMessage,
+  }) async {
+    final relatedContent = {
+      'type': 'user',
+      'contentId': communityProfileId,
+    };
+
+    return await _submitReport(
+      reportTypeId: ReportTypes.userReport,
       userMessage: userMessage,
       relatedContent: relatedContent,
     );

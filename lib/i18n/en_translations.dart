@@ -2600,5 +2600,21 @@ const Map<String, String> kEn = {
   "deletion-cancel-failed":
       "Failed to cancel deletion request. Please try again.",
 
+  // Community Profile Modal
+  "view-profile": "View Profile",
+  "show-profile": "Show Profile",
+  "user-statistics": "User Statistics",
+  "total-posts": "Total Posts",
+  "total-comments": "Total Comments",
+  "total-interactions": "Total Interactions",
+  "interactions-received": "Interactions Received",
+  "report-user": "Report User",
+  "report-user-subtitle": "Report inappropriate behavior",
+  "report-user-placeholder": "Describe the issue you'd like to report...",
+  "user-reported": "User reported successfully",
+  "error-reporting-user": "Error reporting user",
+  "profile-actions": "Profile Actions",
+  "error_loading_stats": "Error loading statistics",
+
   // Existing confirmation dialog keys (if not already present)
 };

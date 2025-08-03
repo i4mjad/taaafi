@@ -7,6 +7,7 @@ import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/features/community/data/models/comment.dart';
 import 'package:reboot_app_3/features/community/presentation/widgets/avatar_with_anonymity.dart';
 import 'package:reboot_app_3/features/community/presentation/widgets/plus_badge_widget.dart';
+import 'package:reboot_app_3/features/community/presentation/widgets/community_profile_modal.dart';
 import 'package:reboot_app_3/features/community/presentation/providers/community_providers_new.dart';
 import 'package:reboot_app_3/features/community/presentation/providers/forum_providers.dart';
 import 'package:reboot_app_3/features/account/presentation/widgets/feature_access_guard.dart';
@@ -61,13 +62,37 @@ class CommentTileWidget extends ConsumerWidget {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // User avatar
-              AvatarWithAnonymity(
-                cpId: comment.authorCPId,
-                isAnonymous: isAuthorAnonymous,
-                size: 32,
-                avatarUrl: isAuthorAnonymous ? null : authorProfile?.avatarUrl,
-                isPlusUser: isAuthorPlusUser,
+              // User avatar - clickable to show profile
+              GestureDetector(
+                onTap: !isAuthorAnonymous &&
+                        authorProfile?.userUID != 'orphaned-post'
+                    ? () => showModalBottomSheet(
+                          context: context,
+                          isScrollControlled: true,
+                          backgroundColor: Colors.transparent,
+                          builder: (context) => Padding(
+                            padding: EdgeInsets.only(
+                              bottom: MediaQuery.of(context).viewInsets.bottom,
+                            ),
+                            child: CommunityProfileModal(
+                              communityProfileId: comment.authorCPId,
+                              displayName:
+                                  authorProfile?.displayName ?? 'Unknown User',
+                              avatarUrl: authorProfile?.avatarUrl,
+                              isAnonymous: isAuthorAnonymous,
+                              isPlusUser: isAuthorPlusUser,
+                            ),
+                          ),
+                        )
+                    : null,
+                child: AvatarWithAnonymity(
+                  cpId: comment.authorCPId,
+                  isAnonymous: isAuthorAnonymous,
+                  size: 32,
+                  avatarUrl:
+                      isAuthorAnonymous ? null : authorProfile?.avatarUrl,
+                  isPlusUser: isAuthorPlusUser,
+                ),
               ),
 
               const SizedBox(width: 12),
@@ -78,8 +103,14 @@ class CommentTileWidget extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // User info and timestamp
-                    _buildUserInfo(ref, theme, localizations, isAuthorAnonymous,
-                        authorProfileAsync, isAuthorPlusUser),
+                    _buildUserInfo(
+                        context,
+                        ref,
+                        theme,
+                        localizations,
+                        isAuthorAnonymous,
+                        authorProfileAsync,
+                        isAuthorPlusUser),
 
                     const SizedBox(height: 8),
 
@@ -180,6 +211,7 @@ class CommentTileWidget extends ConsumerWidget {
   }
 
   Widget _buildUserInfo(
+      BuildContext context,
       WidgetRef ref,
       dynamic theme,
       AppLocalizations localizations,
@@ -207,11 +239,37 @@ class CommentTileWidget extends ConsumerWidget {
                 _getLocalizedDisplayName(pipelineResult, localizations);
             print('🔍 [CommentTile] Final display name: "$displayName"');
 
-            return Text(
-              displayName,
-              style: TextStyles.footnoteSelected.copyWith(
-                color: theme.grey[700],
-                fontSize: 14,
+            return GestureDetector(
+              onTap: !isAuthorAnonymous &&
+                      authorProfile?.userUID != 'orphaned-post'
+                  ? () => showModalBottomSheet(
+                        context: context,
+                        isScrollControlled: true,
+                        backgroundColor: Colors.transparent,
+                        builder: (context) => Padding(
+                          padding: EdgeInsets.only(
+                            bottom: MediaQuery.of(context).viewInsets.bottom,
+                          ),
+                          child: CommunityProfileModal(
+                            communityProfileId: comment.authorCPId,
+                            displayName:
+                                authorProfile?.displayName ?? 'Unknown User',
+                            avatarUrl: authorProfile?.avatarUrl,
+                            isAnonymous: isAuthorAnonymous,
+                            isPlusUser: isAuthorPlusUser,
+                          ),
+                        ),
+                      )
+                  : null,
+              child: Text(
+                displayName,
+                style: TextStyles.footnoteSelected.copyWith(
+                  color: !isAuthorAnonymous &&
+                          authorProfile?.userUID != 'orphaned-post'
+                      ? theme.primary[700]
+                      : theme.grey[700],
+                  fontSize: 14,
+                ),
               ),
             );
           },
