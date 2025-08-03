@@ -139,7 +139,7 @@ class PlusFeaturesGuideScreen extends ConsumerWidget {
           title: AppLocalizations.of(context).translate('detailed-analytics'),
           description: AppLocalizations.of(context)
               .translate('plus-analytics-guide-desc'),
-          onTap: () => context.pushNamed(RouteNames.premiumAnalytics.name),
+          onTap: () => context.pushNamed(RouteNames.vault.name),
         ),
 
         verticalSpace(Spacing.points16),
@@ -182,7 +182,7 @@ class PlusFeaturesGuideScreen extends ConsumerWidget {
           title: AppLocalizations.of(context).translate('custom-reminders'),
           description: AppLocalizations.of(context)
               .translate('plus-custom-reminders-guide-desc'),
-          onTap: () => _showRemindersInfo(context),
+          onTap: () => context.pushNamed(RouteNames.messagingGroups.name),
         ),
 
         verticalSpace(Spacing.points16),
