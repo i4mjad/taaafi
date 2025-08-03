@@ -18,6 +18,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
@@ -65,11 +66,13 @@ import {
   Eye,
   Search,
   AlertTriangle,
+  User,
 } from 'lucide-react';
 import Link from 'next/link';
 import { toast } from 'sonner';
 import { SiteHeader } from '@/components/site-header';
 import { useTranslation } from "@/contexts/TranslationContext";
+import { useDeletionRequests, useDeletionRequestStats } from '@/hooks/useDeletionRequests';
 
 interface UserProfile {
   uid: string;
@@ -83,11 +86,36 @@ interface UserProfile {
   lastLoginAt?: Date | null;
   emailVerified: boolean;
   provider?: string;
+  isRequestedToBeDeleted?: boolean;
   metadata: {
     loginCount: number;
     lastIpAddress?: string;
     userAgent?: string;
   };
+}
+
+interface AccountDeleteRequest {
+  id: string;
+  userId: string;
+  userEmail: string;
+  userName: string;
+  requestedAt: Date;
+  reasonId: string;
+  reasonDetails?: string;
+  reasonCategory: string;
+  isCanceled: boolean;
+  isProcessed: boolean;
+  canceledAt?: Date;
+  processedAt?: Date;
+  processedBy?: string;
+  adminNotes?: string;
+}
+
+interface DeletionReason {
+  id: string;
+  translationKey: string;
+  category: 'privacy' | 'experience' | 'personal' | 'features' | 'content' | 'support' | 'other';
+  requiresDetails: boolean;
 }
 
 interface PaginationInfo {
@@ -108,6 +136,10 @@ interface UserStats {
 
 export default function UsersRoute() {
   const { t, locale } = useTranslation();
+  
+  // Fetch deletion requests and stats
+  const { deletionRequests, loading: deletionRequestsLoading } = useDeletionRequests();
+  const { stats: deletionStats, loading: statsLoading } = useDeletionRequestStats();
   
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [loading, setLoading] = useState(true);
@@ -144,6 +176,10 @@ export default function UsersRoute() {
 
   // Filters
   const [providerFilter, setProviderFilter] = useState('all');
+  const [deletionStatusFilter, setDeletionStatusFilter] = useState('all');
+  
+  // Deletion requests filters
+  const [deletionRequestStatusFilter, setDeletionRequestStatusFilter] = useState('all');
 
   const headerDictionary = {
     documents: t('appSidebar.users') || 'Users',
@@ -167,6 +203,7 @@ export default function UsersRoute() {
 
       if (searchQuery.trim()) params.append('search', searchQuery.trim());
       if (providerFilter && providerFilter !== 'all') params.append('provider', providerFilter);
+      if (deletionStatusFilter && deletionStatusFilter !== 'all') params.append('deletionStatus', deletionStatusFilter);
 
       const response = await fetch(`/api/admin/users?${params}`);
       if (!response.ok) {
@@ -206,7 +243,7 @@ export default function UsersRoute() {
       } finally {
         setLoading(false);
       }
-  }, [pagination.page, pagination.limit, providerFilter, t]);
+  }, [pagination.page, pagination.limit, providerFilter, deletionStatusFilter, t]);
 
   // Debug: Log when loadUsers dependencies change
   useEffect(() => {
@@ -214,7 +251,7 @@ export default function UsersRoute() {
     
     
     
-  }, [pagination.page, pagination.limit, providerFilter]);
+  }, [pagination.page, pagination.limit, providerFilter, deletionStatusFilter]);
 
   // Force pagination limit to 50 on component mount
   useEffect(() => {
@@ -251,6 +288,7 @@ export default function UsersRoute() {
 
     if (searchQuery.trim()) searchParams.append('search', searchQuery.trim());
     if (providerFilter && providerFilter !== 'all') searchParams.append('provider', providerFilter);
+    if (deletionStatusFilter && deletionStatusFilter !== 'all') searchParams.append('deletionStatus', deletionStatusFilter);
 
     setLoading(true);
     fetch(`/api/admin/users?${searchParams}`)
@@ -290,9 +328,72 @@ export default function UsersRoute() {
   const handleClearSearch = () => {
     setSearchQuery('');
     setProviderFilter('all');
+    setDeletionStatusFilter('all');
     setPagination(prev => ({ ...prev, page: 1 }));
     // This will trigger loadUsers due to the filter changes
   };
+
+  const handleClearDeletionFilters = () => {
+    setDeletionRequestStatusFilter('all');
+  };
+
+  const formatDeletionDate = (date: Date | string | null | undefined) => {
+    if (!date) return t('common.never') || 'Never';
+    
+    const dateObj = date instanceof Date ? date : new Date(date);
+    
+    if (isNaN(dateObj.getTime())) {
+      return t('common.unknown') || 'Unknown';
+    }
+    
+    return new Intl.DateTimeFormat(locale, {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      calendar: 'gregory',
+    }).format(dateObj);
+  };
+
+  const getDeletionReasonText = (reasonId: string) => {
+    return t(`modules.userManagement.accountDeletion.reasons.${reasonId}`) || reasonId;
+  };
+
+  const getDeletionCategoryText = (category: string) => {
+    return t(`modules.userManagement.accountDeletion.categories.${category}`) || category;
+  };
+
+  const getDeletionRequestStatusBadge = (request: AccountDeleteRequest) => {
+    if (request.isCanceled) {
+      return (
+        <Badge variant="secondary">
+          {t('modules.userManagement.accountDeletion.isCanceled') || 'Canceled'}
+        </Badge>
+      );
+    }
+    if (request.isProcessed) {
+      return (
+        <Badge variant="outline">
+          {t('modules.userManagement.accountDeletion.isProcessed') || 'Processed'}
+        </Badge>
+      );
+    }
+    return (
+      <Badge variant="destructive">
+        {t('modules.userManagement.accountDeletion.pendingDeletion') || 'Pending'}
+      </Badge>
+    );
+  };
+
+  // Filter deletion requests based on status
+  const filteredDeletionRequests = deletionRequests.filter(request => {
+    if (deletionRequestStatusFilter === 'all') return true;
+    if (deletionRequestStatusFilter === 'pending') return !request.isProcessed && !request.isCanceled;
+    if (deletionRequestStatusFilter === 'processed') return request.isProcessed;
+    if (deletionRequestStatusFilter === 'canceled') return request.isCanceled;
+    return true;
+  });
 
   const handlePageChange = (newPage: number) => {
     setPagination(prev => ({ ...prev, page: newPage }));
@@ -364,6 +465,22 @@ export default function UsersRoute() {
       <Badge variant={variants[role as keyof typeof variants] || 'outline'}>
         <Shield className="h-3 w-3 mr-1" />
         {t(`modules.userManagement.userRole.${role}`) || role}
+      </Badge>
+    );
+  };
+
+  const getDeletionStatusBadge = (isRequestedToBeDeleted?: boolean) => {
+    if (isRequestedToBeDeleted) {
+      return (
+        <Badge variant="destructive">
+          <AlertTriangle className="h-3 w-3 mr-1" />
+          {t('modules.userManagement.accountDeletion.pendingDeletion') || 'Pending Deletion'}
+        </Badge>
+      );
+    }
+    return (
+      <Badge variant="outline">
+        {t('modules.userManagement.accountDeletion.normal') || 'Normal'}
       </Badge>
     );
   };
@@ -511,6 +628,11 @@ export default function UsersRoute() {
       cell: ({ row }) => formatDate(row.original.createdAt),
     },
     {
+      accessorKey: "deletionStatus",
+      header: t('modules.userManagement.accountDeletion.status') || 'Deletion Status',
+      cell: ({ row }) => getDeletionStatusBadge(row.original.isRequestedToBeDeleted),
+    },
+    {
       id: "actions",
       cell: ({ row }) => {
         const user = row.original;
@@ -528,6 +650,14 @@ export default function UsersRoute() {
                   {t('modules.userManagement.viewDetails') || 'View Details'}
                 </Link>
               </DropdownMenuItem>
+              {user.isRequestedToBeDeleted && (
+                <DropdownMenuItem asChild>
+                  <Link href={`/${locale}/user-management/users/${user.uid}?tab=deletion`}>
+                    <AlertTriangle className="h-4 w-4 mr-2" />
+                    {t('modules.userManagement.accountDeletion.viewDeletionRequest') || 'View Deletion Request'}
+                  </Link>
+                </DropdownMenuItem>
+              )}
               <DropdownMenuItem>
                 <Edit className="h-4 w-4 mr-2" />
                 {t('common.edit')}
@@ -582,56 +712,72 @@ export default function UsersRoute() {
       <div className="flex flex-1 flex-col">
         <div className="@container/main flex flex-1 flex-col gap-2">
           <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6 px-4 lg:px-6">
-            {/* Stats Cards */}
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">
-                    {t('modules.userManagement.totalUsers') || 'Total Users'}
-                  </CardTitle>
-                  <Users className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{userStats.total.toLocaleString()}</div>
-                </CardContent>
-              </Card>
+            {/* Main Tabs */}
+            <Tabs defaultValue="users" className="space-y-6">
+              <TabsList>
+                <TabsTrigger value="users">{t('modules.userManagement.users') || 'Users'}</TabsTrigger>
+                <TabsTrigger value="deletion-requests">
+                  {t('modules.userManagement.accountDeletion.title') || 'Deletion Requests'}
+                  {!statsLoading && deletionStats.pending > 0 && (
+                    <Badge variant="destructive" className="ml-2 text-xs">
+                      {deletionStats.pending}
+                    </Badge>
+                  )}
+                </TabsTrigger>
+              </TabsList>
 
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">
-                    {t('modules.userManagement.activeUsers') || 'Active Users'}
-                  </CardTitle>
-                  <UserCheck className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{userStats.active.toLocaleString()}</div>
-                </CardContent>
-              </Card>
+              {/* Users Tab */}
+              <TabsContent value="users" className="space-y-6">
+                {/* Stats Cards */}
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                  <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                      <CardTitle className="text-sm font-medium">
+                        {t('modules.userManagement.totalUsers') || 'Total Users'}
+                      </CardTitle>
+                      <Users className="h-4 w-4 text-muted-foreground" />
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-2xl font-bold">{userStats.total.toLocaleString()}</div>
+                    </CardContent>
+                  </Card>
 
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">
-                    {t('modules.userManagement.admins') || 'Administrators'}
-                  </CardTitle>
-                  <Shield className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{userStats.admins.toLocaleString()}</div>
-                </CardContent>
-              </Card>
+                  <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                      <CardTitle className="text-sm font-medium">
+                        {t('modules.userManagement.activeUsers') || 'Active Users'}
+                      </CardTitle>
+                      <UserCheck className="h-4 w-4 text-muted-foreground" />
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-2xl font-bold">{userStats.active.toLocaleString()}</div>
+                    </CardContent>
+                  </Card>
 
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">
-                    {t('modules.userManagement.moderators') || 'Moderators'}
-                  </CardTitle>
-                  <UserCheck className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{userStats.moderators.toLocaleString()}</div>
-                </CardContent>
-              </Card>
-            </div>
+                  <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                      <CardTitle className="text-sm font-medium">
+                        {t('modules.userManagement.admins') || 'Administrators'}
+                      </CardTitle>
+                      <Shield className="h-4 w-4 text-muted-foreground" />
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-2xl font-bold">{userStats.admins.toLocaleString()}</div>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                      <CardTitle className="text-sm font-medium">
+                        {t('modules.userManagement.moderators') || 'Moderators'}
+                      </CardTitle>
+                      <UserCheck className="h-4 w-4 text-muted-foreground" />
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-2xl font-bold">{userStats.moderators.toLocaleString()}</div>
+                    </CardContent>
+                  </Card>
+                </div>
 
             {/* Users Table */}
             <Card>
@@ -705,12 +851,22 @@ export default function UsersRoute() {
                       <SelectItem value="Apple Game Center">Apple Game Center</SelectItem>
                     </SelectContent>
                   </Select>
+                  <Select value={deletionStatusFilter} onValueChange={setDeletionStatusFilter}>
+                    <SelectTrigger className="w-[180px]">
+                      <SelectValue placeholder={t('modules.userManagement.accountDeletion.filterByStatus') || 'Filter by deletion status'} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">{t('common.all')} {t('modules.userManagement.accountDeletion.statuses') || 'Users'}</SelectItem>
+                      <SelectItem value="pending">{t('modules.userManagement.accountDeletion.pendingDeletion') || 'Pending Deletion'}</SelectItem>
+                      <SelectItem value="normal">{t('modules.userManagement.accountDeletion.normal') || 'Normal'}</SelectItem>
+                    </SelectContent>
+                  </Select>
                   <div className="flex gap-2">
                     <Button onClick={handleSearch}>
                       <Search className="h-4 w-4 mr-2" />
                       {t('common.search')}
                     </Button>
-                    {(searchQuery || providerFilter !== 'all') && (
+                    {(searchQuery || providerFilter !== 'all' || deletionStatusFilter !== 'all') && (
                       <Button variant="outline" onClick={handleClearSearch}>
                         {t('modules.userManagement.clearFilters') || 'Clear Filters'}
                       </Button>
@@ -857,6 +1013,193 @@ export default function UsersRoute() {
                 )}
               </CardContent>
             </Card>
+              </TabsContent>
+
+              {/* Deletion Requests Tab */}
+              <TabsContent value="deletion-requests" className="space-y-6">
+                {/* Deletion Stats Cards */}
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                  <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                      <CardTitle className="text-sm font-medium">
+                        {t('modules.userManagement.accountDeletion.pendingDeletion') || 'Pending Requests'}
+                      </CardTitle>
+                      <AlertTriangle className="h-4 w-4 text-destructive" />
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-2xl font-bold text-destructive">
+                        {statsLoading ? '...' : deletionStats.pending.toLocaleString()}
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                      <CardTitle className="text-sm font-medium">
+                        {t('modules.userManagement.accountDeletion.isProcessed') || 'Processed'}
+                      </CardTitle>
+                      <UserCheck className="h-4 w-4 text-green-600" />
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-2xl font-bold text-green-600">
+                        {statsLoading ? '...' : deletionStats.processed.toLocaleString()}
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                      <CardTitle className="text-sm font-medium">
+                        {t('modules.userManagement.accountDeletion.isCanceled') || 'Canceled'}
+                      </CardTitle>
+                      <Users className="h-4 w-4 text-muted-foreground" />
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-2xl font-bold">
+                        {statsLoading ? '...' : deletionStats.canceled.toLocaleString()}
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                      <CardTitle className="text-sm font-medium">
+                        {t('modules.userManagement.accountDeletion.totalRequests') || 'Total Requests'}
+                      </CardTitle>
+                      <Users className="h-4 w-4 text-muted-foreground" />
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-2xl font-bold">
+                        {statsLoading ? '...' : deletionStats.total.toLocaleString()}
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                {/* Deletion Requests Table */}
+                <Card>
+                  <CardHeader>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <CardTitle>{t('modules.userManagement.accountDeletion.title') || 'Account Deletion Requests'}</CardTitle>
+                        <CardDescription>
+                          {t('modules.userManagement.accountDeletion.description') || 'Manage account deletion requests from users'}
+                        </CardDescription>
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    {/* Deletion Requests Filters */}
+                    <div className="flex flex-col gap-4 md:flex-row md:items-end mb-6">
+                      <Select value={deletionRequestStatusFilter} onValueChange={setDeletionRequestStatusFilter}>
+                        <SelectTrigger className="w-[200px]">
+                          <SelectValue placeholder={t('modules.userManagement.accountDeletion.filterByStatus') || 'Filter by status'} />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">{t('common.all')} {t('modules.userManagement.accountDeletion.statuses') || 'Requests'}</SelectItem>
+                          <SelectItem value="pending">{t('modules.userManagement.accountDeletion.pendingDeletion') || 'Pending'}</SelectItem>
+                          <SelectItem value="processed">{t('modules.userManagement.accountDeletion.isProcessed') || 'Processed'}</SelectItem>
+                          <SelectItem value="canceled">{t('modules.userManagement.accountDeletion.isCanceled') || 'Canceled'}</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <div className="flex gap-2">
+                        {deletionRequestStatusFilter !== 'all' && (
+                          <Button variant="outline" onClick={handleClearDeletionFilters}>
+                            {t('modules.userManagement.clearFilters') || 'Clear Filters'}
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Deletion Requests Table */}
+                    {deletionRequestsLoading ? (
+                      <div className="space-y-3">
+                        {[...Array(5)].map((_, i) => (
+                          <Skeleton key={i} className="h-16 w-full" />
+                        ))}
+                      </div>
+                    ) : filteredDeletionRequests.length > 0 ? (
+                      <div className="rounded-md border">
+                        <Table>
+                          <TableHeader>
+                            <TableRow>
+                              <TableHead>{t('modules.userManagement.accountDeletion.requestId') || 'Request ID'}</TableHead>
+                              <TableHead>{t('modules.userManagement.user') || 'User'}</TableHead>
+                              <TableHead>{t('modules.userManagement.accountDeletion.reasonCategory') || 'Reason'}</TableHead>
+                              <TableHead>{t('modules.userManagement.accountDeletion.requestedAt') || 'Requested At'}</TableHead>
+                              <TableHead>{t('modules.userManagement.accountDeletion.status') || 'Status'}</TableHead>
+                              <TableHead>{t('common.actions') || 'Actions'}</TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {filteredDeletionRequests.map((request) => (
+                              <TableRow key={request.id}>
+                                <TableCell>
+                                  <div className="font-mono text-sm max-w-[120px] truncate">
+                                    {request.id}
+                                  </div>
+                                </TableCell>
+                                <TableCell>
+                                  <div className="space-y-1">
+                                    <p className="text-sm font-medium">{request.userName || request.userEmail}</p>
+                                    <p className="text-xs text-muted-foreground">{request.userEmail}</p>
+                                  </div>
+                                </TableCell>
+                                <TableCell>
+                                  <div className="space-y-1">
+                                    <p className="text-sm">{getDeletionCategoryText(request.reasonCategory)}</p>
+                                    <p className="text-xs text-muted-foreground">{getDeletionReasonText(request.reasonId)}</p>
+                                  </div>
+                                </TableCell>
+                                <TableCell>
+                                  <div className="text-sm">{formatDeletionDate(request.requestedAt)}</div>
+                                </TableCell>
+                                <TableCell>
+                                  {getDeletionRequestStatusBadge(request)}
+                                </TableCell>
+                                <TableCell>
+                                  <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                      <Button variant="ghost" className="h-8 w-8 p-0">
+                                        <MoreHorizontal className="h-4 w-4" />
+                                      </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="end">
+                                      <DropdownMenuItem asChild>
+                                        <Link href={`/${locale}/user-management/users/${request.userId}?tab=deletion`}>
+                                          <Eye className="h-4 w-4 mr-2" />
+                                          {t('modules.userManagement.accountDeletion.viewDeletionRequest') || 'View Request'}
+                                        </Link>
+                                      </DropdownMenuItem>
+                                      <DropdownMenuItem asChild>
+                                        <Link href={`/${locale}/user-management/users/${request.userId}`}>
+                                          <User className="h-4 w-4 mr-2" />
+                                          {t('modules.userManagement.viewDetails') || 'View User'}
+                                        </Link>
+                                      </DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                  </DropdownMenu>
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      </div>
+                    ) : (
+                      <div className="text-center py-8">
+                        <div className="flex flex-col items-center justify-center">
+                          <AlertTriangle className="h-12 w-12 text-muted-foreground mb-4" />
+                          <p className="text-lg font-medium">{t('common.noData')}</p>
+                          <p className="text-muted-foreground">
+                            {t('modules.userManagement.accountDeletion.noDeletionRequest') || 'No deletion requests found'}
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            </Tabs>
 
             {/* Delete Confirmation Dialog */}
             <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>

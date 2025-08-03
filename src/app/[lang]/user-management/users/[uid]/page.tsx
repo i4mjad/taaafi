@@ -37,10 +37,13 @@ import UserGroupsCard from './UserGroupsCard';
 import MigrationManagementCard from './MigrationManagementCard';
 import WarningManagementCard from './components/WarningManagementCard';
 import BanManagementCard from './components/BanManagementCard';
+import DeletionManagementCard from './components/DeletionManagementCard';
 // Firebase imports
 import { useDocument } from 'react-firebase-hooks/firestore';
 import { doc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
+import { useDebugDeletionRequests, useDeletionRequests } from '@/hooks/useDeletionRequests';
+
 
 interface UserProfile {
   uid: string;
@@ -61,6 +64,7 @@ interface UserProfile {
   platform?: string;
   userFirstDate?: Date | null;
   devicesIds?: string[];
+  isRequestedToBeDeleted?: boolean;
   // Legacy array fields for migration
   userRelapses?: string[];
   userMasturbatingWithoutWatching?: string[];
@@ -77,9 +81,24 @@ export default function UserDetailsPage() {
   const params = useParams();
   const uid = params.uid as string;
   
+  // Get tab from URL parameters
+  const [searchParams] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return new URLSearchParams(window.location.search);
+    }
+    return new URLSearchParams();
+  });
+  const defaultTab = searchParams.get('tab') || 'profile';
+  
   const [notificationDialogOpen, setNotificationDialogOpen] = useState(false);
   const [authUser, setAuthUser] = useState<any>(null);
   const [authUserLoading, setAuthUserLoading] = useState(true);
+
+  // Fetch deletion requests for this user
+  const { deletionRequests, loading: deletionRequestsLoading, error: deletionRequestsError } = useDeletionRequests(uid);
+  
+  // Debug hook to see all collection data
+  const { allRequests: debugRequests } = useDebugDeletionRequests();
 
   // Use Firebase hooks to fetch user document and group memberships
   const [userSnapshot, userLoading, userError] = useDocument(
@@ -145,6 +164,7 @@ export default function UserDetailsPage() {
       platform: userData.platform,
       userFirstDate: userData.userFirstDate?.toDate() || null,
       devicesIds: userData.devicesIds || [],
+      isRequestedToBeDeleted: userData.isRequestedToBeDeleted || false,
       userRelapses: userData.userRelapses || [],
       userMasturbatingWithoutWatching: userData.userMasturbatingWithoutWatching || [],
       userWatchingWithoutMasturbating: userData.userWatchingWithoutMasturbating || [],
@@ -334,44 +354,47 @@ export default function UserDetailsPage() {
         <div className="@container/main flex flex-1 flex-col gap-2">
           <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6 px-4 lg:px-6">
             {/* Header */}
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <Button variant="outline" size="sm" asChild>
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+                <Button variant="outline" size="sm" asChild className="w-fit">
                   <Link href={`/${locale}/user-management/users`}>
                     <ArrowLeft className="h-4 w-4 mr-2" />
                     {t('common.back') || 'Back'}
                   </Link>
                 </Button>
                 <div>
-                  <h1 className="text-3xl font-bold tracking-tight">
+                  <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
                     {t('modules.userManagement.userDetails') || 'User Details'}
                   </h1>
-                  <p className="text-muted-foreground">
+                  <p className="text-muted-foreground text-sm sm:text-base">
                     {t('modules.userManagement.userDetailsDescription') || 'View and manage user information'}
                   </p>
                 </div>
               </div>
-              <Button>
+              <Button className="w-fit sm:w-auto">
                 <Edit className="h-4 w-4 mr-2" />
                 {t('common.edit')}
               </Button>
             </div>
 
             {/* User Details Tabs */}
-            <Tabs defaultValue="profile" className="space-y-6">
-              <TabsList>
-                <TabsTrigger value="profile">{t('modules.userManagement.basicInformation') || 'Profile'}</TabsTrigger>
-                <TabsTrigger value="activity">{t('modules.userManagement.activityInformation') || 'Activity'}</TabsTrigger>
-                <TabsTrigger value="devices">{t('modules.userManagement.deviceInformation') || 'Devices'}</TabsTrigger>
-                <TabsTrigger value="groups">{t('modules.userManagement.groups.title') || 'Groups'}</TabsTrigger>
-                <TabsTrigger value="migration">{t('modules.userManagement.migrationManagement.title') || 'Migration'}</TabsTrigger>
-                <TabsTrigger value="warnings">{t('modules.userManagement.warnings.title') || 'Warnings'}</TabsTrigger>
-                <TabsTrigger value="bans">{t('modules.userManagement.bans.title') || 'Bans'}</TabsTrigger>
-              </TabsList>
+            <Tabs defaultValue={defaultTab} className="space-y-6">
+              <div className="w-full overflow-x-auto">
+                <TabsList className="flex w-max min-w-full">
+                  <TabsTrigger value="profile" className="text-xs sm:text-sm whitespace-nowrap">{t('modules.userManagement.basicInformation') || 'Profile'}</TabsTrigger>
+                  <TabsTrigger value="activity" className="text-xs sm:text-sm whitespace-nowrap">{t('modules.userManagement.activityInformation') || 'Activity'}</TabsTrigger>
+                  <TabsTrigger value="devices" className="text-xs sm:text-sm whitespace-nowrap">{t('modules.userManagement.deviceInformation') || 'Devices'}</TabsTrigger>
+                  <TabsTrigger value="groups" className="text-xs sm:text-sm whitespace-nowrap">{t('modules.userManagement.groups.title') || 'Groups'}</TabsTrigger>
+                  <TabsTrigger value="migration" className="text-xs sm:text-sm whitespace-nowrap">{t('modules.userManagement.migrationManagement.title') || 'Migration'}</TabsTrigger>
+                  <TabsTrigger value="warnings" className="text-xs sm:text-sm whitespace-nowrap">{t('modules.userManagement.warnings.title') || 'Warnings'}</TabsTrigger>
+                  <TabsTrigger value="bans" className="text-xs sm:text-sm whitespace-nowrap">{t('modules.userManagement.bans.title') || 'Bans'}</TabsTrigger>
+                  <TabsTrigger value="deletion" className="text-xs sm:text-sm whitespace-nowrap">{t('modules.userManagement.accountDeletion.title') || 'Account Deletion'}</TabsTrigger>
+                </TabsList>
+              </div>
 
               {/* Profile Tab */}
               <TabsContent value="profile">
-                <div className="grid gap-6 lg:grid-cols-2 xl:grid-cols-2">
+                <div className="grid gap-6 md:grid-cols-2">
                   {/* Basic Information Card */}
                   <Card>
                     <CardHeader>
@@ -382,18 +405,18 @@ export default function UserDetailsPage() {
                     </CardHeader>
                     <CardContent className="space-y-6">
                       {/* Avatar and Name */}
-                      <div className="flex items-center gap-4">
-                        <Avatar className="h-16 w-16">
+                      <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4">
+                        <Avatar className="h-16 w-16 flex-shrink-0">
                           <AvatarImage src={user.photoURL || undefined} alt={user.displayName} />
                           <AvatarFallback className="text-lg">
                             {user.displayName?.charAt(0) || user.email.charAt(0).toUpperCase()}
                           </AvatarFallback>
                         </Avatar>
-                        <div className="space-y-1">
-                          <h3 className="text-xl font-semibold">
+                        <div className="space-y-1 text-center sm:text-left">
+                          <h3 className="text-lg sm:text-xl font-semibold break-words">
                             {user.displayName || user.email}
                           </h3>
-                          <div className="flex items-center gap-2">
+                          <div className="flex flex-col sm:flex-row items-center gap-2">
                             {getRoleBadge(user.role)}
                             {getStatusBadge(user.status)}
                           </div>
@@ -546,7 +569,7 @@ export default function UserDetailsPage() {
                     <Separator />
 
                     {/* Statistics */}
-                    <div className="grid grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                       <div className="text-center p-4 bg-muted rounded-lg">
                         <p className="text-2xl font-bold">{user.metadata.loginCount}</p>
                         <p className="text-sm text-muted-foreground">
@@ -605,7 +628,7 @@ export default function UserDetailsPage() {
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="space-y-2">
-                      <div className="flex items-center justify-between">
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                         <div className="flex items-center gap-3">
                           <MessageSquare className="h-4 w-4 text-muted-foreground" />
                           <p className="text-sm font-medium">{t('modules.userManagement.messagingToken') || 'Messaging Token'}</p>
@@ -615,17 +638,18 @@ export default function UserDetailsPage() {
                             size="sm"
                             variant="outline"
                             onClick={() => setNotificationDialogOpen(true)}
-                            className="h-8"
+                            className="h-8 w-fit"
                           >
                             <Send className="h-3 w-3 mr-1" />
-                            {t('modules.userManagement.sendNotification') || 'Send Notification'}
+                            <span className="hidden sm:inline">{t('modules.userManagement.sendNotification') || 'Send Notification'}</span>
+                            <span className="sm:hidden">Send</span>
                           </Button>
                         )}
                       </div>
-                      <div className="pl-7">
-                        <p className="text-xs text-muted-foreground font-mono break-all bg-muted p-2 rounded">
+                      <div className="pl-0 sm:pl-7">
+                        <div className="text-xs text-muted-foreground font-mono break-all bg-muted p-2 rounded overflow-hidden">
                           {user.messagingToken || t('modules.userManagement.notSpecified') || 'Not specified'}
-                        </p>
+                        </div>
                       </div>
                     </div>
 
@@ -644,7 +668,7 @@ export default function UserDetailsPage() {
                         <p className="text-sm font-medium">{t('modules.userManagement.devicesIds') || 'Device IDs'}</p>
                         <div className="space-y-1">
                           {user.devicesIds.map((deviceId, index) => (
-                            <div key={index} className="p-2 bg-muted rounded text-xs font-mono break-all">
+                            <div key={index} className="p-2 bg-muted rounded text-xs font-mono break-all overflow-hidden">
                               {deviceId}
                             </div>
                           ))}
@@ -687,6 +711,15 @@ export default function UserDetailsPage() {
                   userId={user.uid} 
                   userDisplayName={user.displayName}
                   userDevices={user.devicesIds || []}
+                />
+              </TabsContent>
+
+              {/* Account Deletion Tab */}
+              <TabsContent value="deletion">
+                <DeletionManagementCard 
+                  userId={uid}
+                  userDisplayName={user.displayName}
+                  userEmail={user.email}
                 />
               </TabsContent>
             </Tabs>
