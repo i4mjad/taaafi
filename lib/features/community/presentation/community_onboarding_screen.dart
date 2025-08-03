@@ -15,11 +15,18 @@ import 'package:reboot_app_3/core/shared_widgets/confirm_details_banner.dart';
 import 'package:reboot_app_3/core/shared_widgets/confirm_email_banner.dart';
 import 'package:reboot_app_3/core/shared_widgets/spinner.dart';
 
-class CommunityOnboardingScreen extends ConsumerWidget {
+class CommunityOnboardingScreen extends ConsumerStatefulWidget {
   const CommunityOnboardingScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<CommunityOnboardingScreen> createState() =>
+      _CommunityOnboardingScreenState();
+}
+
+class _CommunityOnboardingScreenState
+    extends ConsumerState<CommunityOnboardingScreen> {
+  @override
+  Widget build(BuildContext context) {
     final theme = AppTheme.of(context);
     final l10n = AppLocalizations.of(context);
     final accountStatus = ref.watch(accountStatusProvider);

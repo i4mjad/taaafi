@@ -349,19 +349,27 @@ class CommunityScreenStateNotifier extends StateNotifier<CommunityScreenState> {
       (previous, next) {
         next.when(
           data: (profile) {
-            if (profile != null) {
-              // User has a profile, show main content
+            print('🎯 CommunityState: Profile stream update');
+            print('🎯 CommunityState: Profile: ${profile?.id ?? 'null'}');
+            print(
+                '🎯 CommunityState: Is deleted: ${profile?.isDeleted ?? 'n/a'}');
+
+            if (profile != null && !profile.isDeleted) {
+              // User has an ACTIVE profile, show main content
+              print('🎯 CommunityState: Profile is active → Show main content');
               if (state != CommunityScreenState.showMainContent) {
                 state = CommunityScreenState.showMainContent;
               }
             } else {
-              // User doesn't have a profile, show onboarding
+              // User doesn't have an active profile, show onboarding
+              print('🎯 CommunityState: No active profile → Show onboarding');
               if (state != CommunityScreenState.needsOnboarding) {
                 state = CommunityScreenState.needsOnboarding;
               }
             }
           },
           loading: () {
+            print('🎯 CommunityState: Profile stream loading');
             // Keep current state during loading unless we're in error state
             if (state == CommunityScreenState.error) {
               state = CommunityScreenState.loading;
@@ -369,10 +377,8 @@ class CommunityScreenStateNotifier extends StateNotifier<CommunityScreenState> {
           },
           error: (error, stackTrace) {
             print('❌ Error in community profile stream: $error');
-            // On error, default to onboarding to be safe
-            if (state != CommunityScreenState.needsOnboarding) {
-              state = CommunityScreenState.needsOnboarding;
-            }
+            // On error, re-check the actual state instead of defaulting to onboarding
+            _checkCommunityState();
           },
         );
       },
@@ -384,12 +390,18 @@ class CommunityScreenStateNotifier extends StateNotifier<CommunityScreenState> {
     try {
       state = CommunityScreenState.loading;
 
-      // Check if user has a community profile
-      final hasProfile = await _communityService.hasProfile();
+      // Check if user has an ACTIVE (non-deleted) community profile
+      final hasActiveProfile = await _communityService.hasProfile();
 
-      if (hasProfile) {
+      print('🎯 CommunityState: Checking user profile state');
+      print('🎯 CommunityState: Has active profile: $hasActiveProfile');
+
+      if (hasActiveProfile) {
+        print('🎯 CommunityState: User has active profile → Show main content');
         state = CommunityScreenState.showMainContent;
       } else {
+        print(
+            '🎯 CommunityState: User has no active profile → Show onboarding');
         state = CommunityScreenState.needsOnboarding;
       }
     } catch (e) {

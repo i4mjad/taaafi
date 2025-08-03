@@ -33,7 +33,8 @@ class CommunityMainScreen extends ConsumerStatefulWidget {
       _CommunityMainScreenState();
 }
 
-class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen> {
+class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen>
+    with WidgetsBindingObserver {
   late String _selectedFilter;
   final ScrollController _scrollController = ScrollController();
 
@@ -44,56 +45,40 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen> {
     // Set initial filter based on widget parameter or default to 'posts'
     _selectedFilter = widget.initialTab ?? 'posts';
 
-    // Initialize only when we're sure we should show main content
+    // Add observer to detect when app comes to foreground
+    WidgetsBinding.instance.addObserver(this);
+
+    // Initialize community data
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      _refreshCommunityStatus();
       _initializeMainScreen();
     });
   }
 
-  /// Initialize main screen only if we should actually show main content
-  void _initializeMainScreen() {
-    // Check if we actually have a profile before initializing
-    final profileAsync = ref.read(currentCommunityProfileProvider);
-
-    profileAsync.when(
-      data: (profile) {
-        if (profile != null) {
-          // Only initialize if user actually has a profile
-          _performInitialization();
-        } else {
-          print(
-              '🎯 InitState: User has no profile, skipping main screen initialization');
-        }
-      },
-      loading: () {
-        // Wait for profile to load, then check again
-        Future.delayed(Duration(milliseconds: 100), () {
-          final retryAsync = ref.read(currentCommunityProfileProvider);
-          retryAsync.maybeWhen(
-            data: (profile) {
-              if (profile != null) {
-                _performInitialization();
-              } else {
-                print(
-                    '🎯 InitState: Profile loaded as null, skipping main screen initialization');
-              }
-            },
-            orElse: () {
-              print(
-                  '🎯 InitState: Profile still loading, skipping main screen initialization');
-            },
-          );
-        });
-      },
-      error: (error, stack) {
-        print(
-            '🎯 InitState: Profile error, skipping main screen initialization: $error');
-      },
-    );
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    if (state == AppLifecycleState.resumed) {
+      // Refresh community status when app comes back to foreground
+      _refreshCommunityStatus();
+    }
   }
 
-  /// Perform the actual initialization logic
-  void _performInitialization() {
+  /// Refreshes community status and providers
+  void _refreshCommunityStatus() {
+    print('🔄 Community Screen: Refreshing community status');
+
+    // Invalidate current profile to force fresh data
+    ref.invalidate(currentCommunityProfileProvider);
+  }
+
+  /// Public method to force refresh the community status (can be called externally)
+  void forceRefresh() {
+    _refreshCommunityStatus();
+  }
+
+  /// Initialize main screen data
+  void _initializeMainScreen() {
     print('🎯 InitState: Starting community main screen initialization');
     print('🎯 InitState: Selected filter: $_selectedFilter');
 
@@ -125,6 +110,7 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen> {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _scrollController.dispose();
     super.dispose();
   }
@@ -188,29 +174,36 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = AppTheme.of(context);
-    final screenState = ref.watch(communityScreenStateProvider);
-    final isPlusUser = ref.watch(hasActiveSubscriptionProvider);
+    final communityProfileAsync = ref.watch(currentCommunityProfileProvider);
 
     return Scaffold(
       backgroundColor: theme.backgroundColor,
-      body: _buildBody(screenState),
+      body: communityProfileAsync.when(
+        loading: () => const Center(child: Spinner()),
+        error: (error, stackTrace) {
+          print('❌ Community Main Screen: Profile error: $error');
+          // On profile error, show onboarding to be safe
+          return const CommunityOnboardingScreen();
+        },
+        data: (profile) {
+          print(
+              '🎯 Community Main Screen: Profile data: ${profile?.id ?? 'null'}');
+          print(
+              '🎯 Community Main Screen: Profile deleted: ${profile?.isDeleted ?? 'n/a'}');
+
+          // Simple logic: if user has active profile, show main content; otherwise show onboarding
+          if (profile != null && !profile.isDeleted) {
+            print(
+                '🎯 Community Main Screen: Active profile found → Show main content');
+            return _buildMainCommunityContent();
+          } else {
+            print(
+                '🎯 Community Main Screen: No active profile → Show onboarding');
+            return const CommunityOnboardingScreen();
+          }
+        },
+      ),
     );
-  }
-
-  Widget _buildBody(CommunityScreenState screenState) {
-    switch (screenState) {
-      case CommunityScreenState.loading:
-        return const Center(child: Spinner());
-
-      case CommunityScreenState.needsOnboarding:
-        return CommunityOnboardingScreen();
-
-      case CommunityScreenState.showMainContent:
-        return _buildMainCommunityContent();
-
-      case CommunityScreenState.error:
-        return _buildErrorState();
-    }
   }
 
   Widget _buildMainCommunityContent() {
@@ -295,51 +288,6 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen> {
           backgroundColor: theme.primary[500],
           child: const Icon(LucideIcons.plus, color: Colors.white),
         ),
-      ),
-    );
-  }
-
-  Widget _buildErrorState() {
-    final theme = AppTheme.of(context);
-    final localizations = AppLocalizations.of(context);
-
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            LucideIcons.alertCircle,
-            size: 64,
-            color: theme.error[500],
-          ),
-          const SizedBox(height: 16),
-          Text(
-            localizations.translate('something_went_wrong'),
-            style: TextStyles.h5.copyWith(
-              color: theme.grey[900],
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            localizations.translate('please_try_again'),
-            style: TextStyles.body.copyWith(
-              color: theme.grey[600],
-            ),
-          ),
-          const SizedBox(height: 24),
-          ElevatedButton(
-            onPressed: () {
-              ref.read(communityScreenStateProvider.notifier).refresh();
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: theme.primary[500],
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-            ),
-            child: Text(localizations.translate('try_again')),
-          ),
-        ],
       ),
     );
   }
@@ -1176,13 +1124,6 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen> {
         setState(() {
           _selectedFilter = filterValue;
         });
-
-        // Invalidate profile providers to ensure fresh state
-        ref.invalidate(currentCommunityProfileProvider);
-        ref.invalidate(hasCommunityProfileProvider);
-
-        // Force refresh of community screen state to check profile status
-        ref.read(communityScreenStateProvider.notifier).refresh();
 
         // Load appropriate data based on filter
         switch (filterValue) {

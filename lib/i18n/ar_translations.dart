@@ -2570,4 +2570,10 @@ const Map<String, String> kAr = {
   "error-reporting-user": "خطأ في الإبلاغ عن المستخدم",
   "profile-actions": "إجراءات الملف الشخصي",
   "error_loading_stats": "خطأ في تحميل الإحصائيات",
+  "cannot-restore-multiple-profiles":
+      "لا يمكن استعادة الملف الشخصي: لديك بالفعل ملف شخصي نشط في المجتمع",
+  "checking-profile-status": "جاري فحص حالة ملفك الشخصي...",
+  "no-previous-profiles-found": "لا توجد ملفات شخصية سابقة للاستعادة",
+  "profile-already-exists": "لديك بالفعل ملف شخصي نشط في المجتمع",
+  "deletion-in-progress-message": "جاري حذف الملف الشخصي. يرجى الانتظار...",
 };

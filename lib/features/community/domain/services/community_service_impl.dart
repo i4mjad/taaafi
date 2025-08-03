@@ -530,6 +530,17 @@ class CommunityServiceImpl implements CommunityService {
 
       print('✅ RestoreService: Profile ownership validated');
 
+      // Check if user already has an active profile - PREVENT MULTIPLE ACTIVE PROFILES
+      print('🔄 RestoreService: Checking for existing active profiles...');
+      final existingActiveProfile = await _getCurrentProfileByUserUID(user.uid);
+      if (existingActiveProfile != null) {
+        print(
+            '❌ RestoreService: User already has an active profile: ${existingActiveProfile.id}');
+        throw const ProfileUpdateException(
+            'Cannot restore profile: User already has an active community profile');
+      }
+      print('✅ RestoreService: No existing active profiles found');
+
       // Validate that the profile is actually deleted
       final isDeleted = profileData['isDeleted'];
       print('🔄 RestoreService: Profile isDeleted: $isDeleted');

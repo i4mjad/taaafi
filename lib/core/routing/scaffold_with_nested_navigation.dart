@@ -1,18 +1,33 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
+import 'package:reboot_app_3/features/community/presentation/providers/community_providers_new.dart';
 
-class ScaffoldWithNestedNavigation extends StatelessWidget {
+class ScaffoldWithNestedNavigation extends ConsumerWidget {
   const ScaffoldWithNestedNavigation({
     Key? key,
     required this.navigationShell,
   }) : super(key: key ?? const ValueKey('ScaffoldWithNestedNavigation'));
   final StatefulNavigationShell navigationShell;
 
-  void _goBranch(int index) {
+  void _goBranch(int index, WidgetRef ref) {
+    // Community tab index is 2 (home=0, vault=1, community=2, groups=3, account=4)
+    const int communityTabIndex = 2;
+
+    if (index == communityTabIndex) {
+      print('🔄 Tab Navigation: Community tab clicked - refreshing status');
+
+      // Refresh community status when community tab is clicked
+      ref.read(communityScreenStateProvider.notifier).refresh();
+
+      // Also invalidate the current profile provider to force fresh data
+      ref.invalidate(currentCommunityProfileProvider);
+    }
+
     navigationShell.goBranch(
       index,
       // A common pattern when using bottom navigation bars is to support
@@ -24,7 +39,7 @@ class ScaffoldWithNestedNavigation extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = AppTheme.of(context);
     return Scaffold(
       body: navigationShell,
@@ -80,7 +95,7 @@ class ScaffoldWithNestedNavigation extends StatelessWidget {
                 ),
               ),
             ],
-            onDestinationSelected: _goBranch,
+            onDestinationSelected: (index) => _goBranch(index, ref),
           )),
     );
   }

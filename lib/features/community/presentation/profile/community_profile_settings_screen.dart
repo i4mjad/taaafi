@@ -720,8 +720,8 @@ class _CommunityProfileSettingsScreenState
       builder: (context) => EditCommunityProfileModal(
         profile: profile,
         onProfileDeleted: () {
-          // Navigate to community onboarding since user no longer has a profile
-          context.go('/community/onboarding');
+          // Navigate to community root - let it decide what to show
+          // context.go('/community');
         },
       ),
     );
@@ -733,8 +733,8 @@ class _CommunityProfileSettingsScreenState
       final currentProfile =
           ref.read(currentCommunityProfileProvider).valueOrNull;
       if (currentProfile == null) {
-        // Navigate to community onboarding since user no longer has a profile
-        context.go('/community/onboarding');
+        // Navigate to community root - let it decide what to show
+        context.go('/community');
       }
     }
   }

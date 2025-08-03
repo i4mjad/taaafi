@@ -2615,6 +2615,13 @@ const Map<String, String> kEn = {
   "error-reporting-user": "Error reporting user",
   "profile-actions": "Profile Actions",
   "error_loading_stats": "Error loading statistics",
+  "cannot-restore-multiple-profiles":
+      "Cannot restore profile: You already have an active community profile",
+  "checking-profile-status": "Checking your profile status...",
+  "no-previous-profiles-found": "No previous profiles found to restore",
+  "profile-already-exists": "You already have an active community profile",
+  "deletion-in-progress-message":
+      "Profile deletion is in progress. Please wait...",
 
   // Existing confirmation dialog keys (if not already present)
 };
