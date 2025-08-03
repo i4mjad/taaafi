@@ -13,8 +13,6 @@ class AppFeaturesConfig {
   static const String commentCreation = 'comment_creation';
   static const String communityInteraction = 'community_interaction';
 
-  //TODO: introduce this later through admin control §portal
-
   // static const String directMessaging = 'direct_messaging';
   // static const String groupCreation = 'group_creation';
   // static const String feedbackSubmission = 'feedback_submission';

@@ -795,17 +795,6 @@ class _TaaafiPlusScreenState
     );
   }
 
-  void _startFreeTrial() {
-    // TODO: Implement trial start logic
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content:
-            Text(AppLocalizations.of(context).translate('free-trial-started')),
-        backgroundColor: AppTheme.of(context).primary[600],
-      ),
-    );
-  }
-
   /// Build package options with real pricing from RevenueCat
   Widget _buildPackageOptions(BuildContext context, dynamic theme,
       List<Package> packages, WidgetRef ref) {

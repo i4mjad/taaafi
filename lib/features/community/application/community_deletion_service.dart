@@ -69,8 +69,6 @@ class CommunityDeletionService {
       }
 
       final communityProfileId = profile.id;
-      print(
-          'DEBUG: Found community profile ID: $communityProfileId for user: $userUID');
 
       // Use batch operations for atomicity across collections
       final batch = _firestore.batch();

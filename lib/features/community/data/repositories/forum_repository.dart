@@ -484,41 +484,6 @@ class ForumRepository {
   }
 
   /// Combine multiple post streams and maintain sort order
-  Stream<List<Post>> _combinePostStreams(
-      List<Stream<List<Post>>> streams, int limit) async* {
-    final controller = StreamController<List<Post>>();
-    final List<List<Post>> latestResults = List.filled(streams.length, []);
-    final List<StreamSubscription> subscriptions = [];
-
-    void updateResults() {
-      // Combine all results
-      final allPosts = <Post>[];
-      for (final posts in latestResults) {
-        allPosts.addAll(posts);
-      }
-
-      // Sort and limit
-      allPosts.sort((a, b) => b.createdAt.compareTo(a.createdAt));
-      controller.add(allPosts.take(limit).toList());
-    }
-
-    // Subscribe to all streams
-    for (int i = 0; i < streams.length; i++) {
-      final subscription = streams[i].listen((posts) {
-        latestResults[i] = posts;
-        updateResults();
-      });
-      subscriptions.add(subscription);
-    }
-
-    yield* controller.stream;
-
-    // Clean up subscriptions when done
-    for (final subscription in subscriptions) {
-      await subscription.cancel();
-    }
-    await controller.close();
-  }
 
   /// Get a single post by ID
   Future<Post?> getPost(String postId) async {
