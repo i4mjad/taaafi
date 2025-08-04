@@ -782,30 +782,97 @@ class _NewPostScreenState extends ConsumerState<NewPostScreen> {
         _contentController.text.trim().isNotEmpty;
   }
 
-  /// Shows unsaved changes dialog
+  /// Shows unsaved changes modal bottom sheet
   void _showUnsavedChangesDialog() {
     final theme = AppTheme.of(context);
     final localizations = AppLocalizations.of(context);
 
-    showDialog(
+    showModalBottomSheet(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text(localizations.translate('unsaved_changes')),
-        content: Text(localizations.translate('unsaved_changes_message')),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(localizations.translate('cancel')),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              context.pop();
-            },
-            style: TextButton.styleFrom(foregroundColor: theme.error[500]),
-            child: Text(localizations.translate('discard')),
-          ),
-        ],
+      backgroundColor: theme.backgroundColor,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) => Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Title
+            Text(
+              localizations.translate('unsaved_changes'),
+              style: TextStyles.h5.copyWith(
+                color: theme.grey[900],
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: 12),
+
+            // Message
+            Text(
+              localizations.translate('unsaved_changes_message'),
+              style: TextStyles.body.copyWith(
+                color: theme.grey[700],
+              ),
+            ),
+            const SizedBox(height: 24),
+
+            // Action buttons
+            Row(
+              children: [
+                Expanded(
+                  child: TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    style: TextButton.styleFrom(
+                      backgroundColor: theme.grey[100],
+                      foregroundColor: theme.grey[700],
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                    ),
+                    child: Text(
+                      localizations.translate('cancel'),
+                      style: TextStyles.footnote.copyWith(
+                        color: theme.grey[700],
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: TextButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                      context.pop();
+                    },
+                    style: TextButton.styleFrom(
+                      backgroundColor: theme.error[500],
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                    ),
+                    child: Text(
+                      localizations.translate('discard'),
+                      style: TextStyles.footnote.copyWith(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+
+            // Bottom padding for safe area
+            const SizedBox(height: 8),
+          ],
+        ),
       ),
     );
   }
@@ -819,13 +886,19 @@ class _NewPostScreenState extends ConsumerState<NewPostScreen> {
       return;
     }
 
-    print(
-        '✅ [NewPostScreen] Form validation passed, checking feature access...');
+    print('✅ [NewPostScreen] Form validation passed, starting submission...');
+
+    // Show loader immediately so the user gets instant feedback
+    setState(() => _isSubmitting = true);
+    // Give the UI a chance to rebuild before heavy async work starts
+    await Future.delayed(Duration.zero);
 
     // Double-check feature access before submitting
     final canAccess =
         await checkFeatureAccess(ref, AppFeaturesConfig.postCreation);
     if (!canAccess) {
+      // Reset loader when access is denied
+      setState(() => _isSubmitting = false);
       print('🚫 [NewPostScreen] Post creation feature access denied');
       getErrorSnackBar(
         context,
@@ -834,8 +907,7 @@ class _NewPostScreenState extends ConsumerState<NewPostScreen> {
       return;
     }
 
-    print('✅ [NewPostScreen] Feature access granted, starting submission...');
-    setState(() => _isSubmitting = true);
+    print('✅ [NewPostScreen] Feature access granted, continuing submission...');
 
     try {
       // Create post data
@@ -879,8 +951,11 @@ class _NewPostScreenState extends ConsumerState<NewPostScreen> {
           // Success - reset loading state, invalidate posts provider, show success message and navigate back
           setState(() => _isSubmitting = false);
 
-          // Invalidate the posts pagination provider to refresh the posts list
+          // Invalidate providers to refresh the posts list across all screens
           ref.invalidate(postsPaginationProvider);
+          ref.invalidate(mainScreenPostsProvider(null));
+          ref.invalidate(pinnedPostsPaginationProvider);
+          ref.invalidate(newsPostsPaginationProvider);
 
           print(
               '🎉 [NewPostScreen] Showing success snackbar and navigating back');

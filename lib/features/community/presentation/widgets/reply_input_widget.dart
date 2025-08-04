@@ -164,9 +164,9 @@ class _ReplyInputWidgetState extends ConsumerState<ReplyInputWidget> {
                     // Send button
                     if (_replyController.text.isNotEmpty || _isSubmitting) ...[
                       const SizedBox(width: 8),
-                      CommunityCommentGuard(
-                        onAccessGranted: _isSubmitting
-                            ? () {} // No-op when submitting
+                      GestureDetector(
+                        onTap: _isSubmitting
+                            ? null
                             : () => _handleSubmit(_replyController.text),
                         child: Container(
                           padding: const EdgeInsets.symmetric(
@@ -412,20 +412,28 @@ class _ReplyInputWidgetState extends ConsumerState<ReplyInputWidget> {
   Future<void> _handleSubmit(String text) async {
     if (text.trim().isEmpty || _isSubmitting) return;
 
+    // Show loader immediately so the user gets instant feedback
+    setState(() {
+      _isSubmitting = true;
+    });
+
+    // Give the UI a chance to rebuild before heavy async work starts
+    await Future.delayed(Duration.zero);
+
     // Double-check feature access before submitting
     final canAccess =
         await checkFeatureAccess(ref, AppFeaturesConfig.commentCreation);
     if (!canAccess) {
+      // Reset loader when access is denied
+      setState(() {
+        _isSubmitting = false;
+      });
       getErrorSnackBar(
         context,
         'comment-creation-restricted',
       );
       return;
     }
-
-    setState(() {
-      _isSubmitting = true;
-    });
 
     try {
       // Get current user's community profile to determine anonymity

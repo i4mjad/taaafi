@@ -856,7 +856,7 @@ class PostCreationNotifier extends StateNotifier<AsyncValue<String?>> {
       final postId = await _forumService.createPost(postData, localizations);
 
       if (postId != null) {
-        state = const AsyncValue.data(null);
+        state = AsyncValue.data(postId);
       } else {
         state = AsyncValue.error(
           Exception('Post creation returned null ID'),

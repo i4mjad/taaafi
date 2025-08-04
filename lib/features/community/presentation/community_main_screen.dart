@@ -10,6 +10,7 @@ import 'package:reboot_app_3/core/shared_widgets/premium_cta_button.dart';
 import 'package:reboot_app_3/core/shared_widgets/spinner.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
+import 'package:reboot_app_3/features/community/presentation/forum/new_post_screen.dart';
 import 'package:reboot_app_3/features/community/presentation/widgets/threads_post_card.dart';
 import 'package:reboot_app_3/features/community/presentation/providers/forum_providers.dart';
 import 'package:reboot_app_3/features/community/presentation/widgets/avatar_with_anonymity.dart';
@@ -253,7 +254,12 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen>
       body: _buildForumTab(),
       floatingActionButton: CommunityPostGuard(
         onAccessGranted: () {
-          context.pushNamed(RouteNames.newPost.name);
+          showModalBottomSheet(
+            context: context,
+            isScrollControlled: true,
+            useSafeArea: true,
+            builder: (context) => NewPostScreen(),
+          );
         },
         child: FloatingActionButton(
           onPressed: null, // Handled by CommunityPostGuard

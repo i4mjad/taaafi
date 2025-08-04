@@ -149,7 +149,6 @@ class ForumService {
       }
 
       // Use the user's UID as the authorCPId for now
-      // TODO: Replace with actual community profile ID when implemented
       final authorCPId = await _getCommunityProfileId(currentUser.uid);
 
       // 7. Create the post

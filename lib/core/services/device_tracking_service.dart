@@ -51,11 +51,11 @@ class DeviceTrackingService {
       if (Platform.isAndroid) {
         final androidInfo = await deviceInfo.androidInfo;
         // Use Android ID as the primary identifier
-        return 'android_${androidInfo.id}';
+        return androidInfo.id;
       } else if (Platform.isIOS) {
         final iosInfo = await deviceInfo.iosInfo;
         // Use identifierForVendor as the primary identifier
-        return 'ios_${iosInfo.identifierForVendor ?? 'unknown'}';
+        return iosInfo.identifierForVendor ?? 'unknown';
       } else {
         // Fallback for other platforms
         final timestamp = DateTime.now().millisecondsSinceEpoch;
