@@ -42,7 +42,6 @@ class ForumService {
   final FirebaseAuth _auth;
   final FirebaseFirestore _firestore;
   final GenderInteractionValidator _genderValidator;
-  final BanWarningFacade _banWarningFacade;
 
   /// Creates a new ForumService instance
   ///
@@ -56,7 +55,6 @@ class ForumService {
     this._auth,
     this._firestore,
     this._genderValidator,
-    this._banWarningFacade,
   );
 
   /// Helper method to get community profile ID from user mapping
@@ -65,7 +63,7 @@ class ForumService {
       final snapshot = await _firestore
           .collection('communityProfiles')
           .where('userUID', isEqualTo: userUID)
-          .where('isDeleted', isNotEqualTo: true)
+          .where('isDeleted', isEqualTo: false)
           .limit(1)
           .get();
 

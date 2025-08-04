@@ -595,7 +595,7 @@ class _ProfileRestoreSelectionModalState
 
         getSuccessSnackBar(context, 'profile-restored-successfully');
       } else {}
-    } catch (e, stackTrace) {
+    } catch (e) {
       if (mounted) {
         setState(() {
           _isRestoring = false;

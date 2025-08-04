@@ -64,16 +64,15 @@ class CompactCommentTile extends ConsumerWidget {
                 // Author avatar
                 authorProfileAsync.when(
                   data: (authorProfile) {
-                    final isAuthorAnonymous =
-                        authorProfile?.isAnonymous ?? false;
+                    final isAuthorAnonymous = authorProfile.isAnonymous;
                     final isAuthorPlusUser =
-                        authorProfile?.hasPlusSubscription() ?? false;
+                        authorProfile.hasPlusSubscription();
 
                     return AvatarWithAnonymity(
                       cpId: comment.authorCPId,
                       isAnonymous: isAuthorAnonymous,
                       size: 32,
-                      avatarUrl: authorProfile?.avatarUrl,
+                      avatarUrl: authorProfile.avatarUrl,
                       isPlusUser: isAuthorPlusUser,
                     );
                   },

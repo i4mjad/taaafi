@@ -2,9 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
-import 'package:reboot_app_3/core/shared_widgets/container.dart';
+import 'package:reboot_app_3/core/shared_widgets/platform_dropdown.dart';
+import 'package:reboot_app_3/core/shared_widgets/platform_date_picker.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
+import 'package:reboot_app_3/core/theming/spacing.dart';
+import 'package:reboot_app_3/features/community/data/models/post_category.dart';
+import 'package:reboot_app_3/features/community/presentation/providers/forum_providers.dart';
 
 class AdvancedSearchModal extends ConsumerStatefulWidget {
   const AdvancedSearchModal({super.key});
@@ -15,16 +19,21 @@ class AdvancedSearchModal extends ConsumerStatefulWidget {
 }
 
 class _AdvancedSearchModalState extends ConsumerState<AdvancedSearchModal> {
-  String _selectedCategory = '';
+  String? _selectedCategory;
   String _selectedSortBy = 'newest_first';
-  String _authorName = '';
   DateTime? _startDate;
   DateTime? _endDate;
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     final theme = AppTheme.of(context);
     final localizations = AppLocalizations.of(context);
+    final categoriesAsync = ref.watch(postCategoriesProvider);
 
     return Container(
       padding: const EdgeInsets.all(24),
@@ -68,46 +77,40 @@ class _AdvancedSearchModalState extends ConsumerState<AdvancedSearchModal> {
           // Category Filter
           _buildFilterSection(
             title: localizations.translate('filter_by_category'),
-            child: WidgetsContainer(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              backgroundColor: theme.grey[50],
-              borderSide: BorderSide(color: theme.grey[200]!),
-              child: DropdownButtonHideUnderline(
-                child: DropdownButton<String>(
-                  value: _selectedCategory.isEmpty ? null : _selectedCategory,
-                  hint: Text(
-                    localizations.translate('select_category'),
-                    style: TextStyles.body.copyWith(color: theme.grey[600]),
+            child: categoriesAsync.when(
+              data: (categories) {
+                final items = [
+                  PlatformDropdownItem<String?>(
+                    value: null,
+                    label: localizations.translate('community_all'),
                   ),
-                  isExpanded: true,
-                  items: [
-                    DropdownMenuItem(
-                      value: '',
-                      child: Text(localizations.translate('community_all')),
-                    ),
-                    DropdownMenuItem(
-                      value: 'general',
-                      child: Text(localizations.translate('community_general')),
-                    ),
-                    DropdownMenuItem(
-                      value: 'questions',
-                      child:
-                          Text(localizations.translate('community_questions')),
-                    ),
-                    DropdownMenuItem(
-                      value: 'tips',
-                      child: Text(localizations.translate('community_tips')),
-                    ),
-                    DropdownMenuItem(
-                      value: 'support',
-                      child: Text(localizations.translate('community_support')),
-                    ),
-                  ],
+                  ...categories.map((category) => PlatformDropdownItem<String?>(
+                        value: category.id,
+                        label: category
+                            .getDisplayName(localizations.locale.languageCode),
+                      )),
+                ];
+
+                return PlatformDropdown<String?>(
+                  value: _selectedCategory,
+                  items: items,
                   onChanged: (value) {
                     setState(() {
-                      _selectedCategory = value ?? '';
+                      _selectedCategory = value;
                     });
                   },
+                  backgroundColor: theme.grey[50],
+                );
+              },
+              loading: () => Container(
+                padding: const EdgeInsets.all(16),
+                child: const CircularProgressIndicator(),
+              ),
+              error: (error, stack) => Container(
+                padding: const EdgeInsets.all(16),
+                child: Text(
+                  localizations.translate('error_loading_categories'),
+                  style: TextStyles.body.copyWith(color: theme.error[600]),
                 ),
               ),
             ),
@@ -118,68 +121,32 @@ class _AdvancedSearchModalState extends ConsumerState<AdvancedSearchModal> {
           // Sort By Filter
           _buildFilterSection(
             title: localizations.translate('sort_by'),
-            child: WidgetsContainer(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              backgroundColor: theme.grey[50],
-              borderSide: BorderSide(color: theme.grey[200]!),
-              child: DropdownButtonHideUnderline(
-                child: DropdownButton<String>(
-                  value: _selectedSortBy,
-                  isExpanded: true,
-                  items: [
-                    DropdownMenuItem(
-                      value: 'newest_first',
-                      child: Text(localizations.translate('newest_first')),
-                    ),
-                    DropdownMenuItem(
-                      value: 'oldest_first',
-                      child: Text(localizations.translate('oldest_first')),
-                    ),
-                    DropdownMenuItem(
-                      value: 'most_liked',
-                      child: Text(localizations.translate('most_liked')),
-                    ),
-                    DropdownMenuItem(
-                      value: 'most_commented',
-                      child: Text(localizations.translate('most_commented')),
-                    ),
-                  ],
-                  onChanged: (value) {
-                    setState(() {
-                      _selectedSortBy = value ?? 'newest_first';
-                    });
-                  },
+            child: PlatformDropdown<String>(
+              value: _selectedSortBy,
+              items: [
+                PlatformDropdownItem<String>(
+                  value: 'newest_first',
+                  label: localizations.translate('newest_first'),
                 ),
-              ),
-            ),
-          ),
-
-          const SizedBox(height: 20),
-
-          // Author Filter
-          _buildFilterSection(
-            title: localizations.translate('filter_by_author'),
-            child: WidgetsContainer(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              backgroundColor: theme.grey[50],
-              borderSide: BorderSide(color: theme.grey[200]!),
-              child: TextField(
-                onChanged: (value) {
-                  setState(() {
-                    _authorName = value;
-                  });
-                },
-                decoration: InputDecoration(
-                  hintText: localizations.translate('author_name'),
-                  hintStyle: TextStyles.body.copyWith(color: theme.grey[600]),
-                  border: InputBorder.none,
-                  prefixIcon: Icon(
-                    LucideIcons.user,
-                    color: theme.grey[500],
-                    size: 20,
-                  ),
+                PlatformDropdownItem<String>(
+                  value: 'oldest_first',
+                  label: localizations.translate('oldest_first'),
                 ),
-              ),
+                PlatformDropdownItem<String>(
+                  value: 'most_liked',
+                  label: localizations.translate('most_liked'),
+                ),
+                PlatformDropdownItem<String>(
+                  value: 'most_commented',
+                  label: localizations.translate('most_commented'),
+                ),
+              ],
+              onChanged: (value) {
+                setState(() {
+                  _selectedSortBy = value ?? 'newest_first';
+                });
+              },
+              backgroundColor: theme.grey[50],
             ),
           ),
 
@@ -190,62 +157,37 @@ class _AdvancedSearchModalState extends ConsumerState<AdvancedSearchModal> {
             title: localizations.translate('filter_by_date'),
             child: Column(
               children: [
-                WidgetsContainer(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                  backgroundColor: theme.grey[50],
-                  borderSide: BorderSide(color: theme.grey[200]!),
-                  child: Row(
-                    children: [
-                      Icon(
-                        LucideIcons.calendar,
-                        color: theme.grey[500],
-                        size: 20,
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Text(
-                          _startDate == null
-                              ? localizations.translate('select_start_date')
-                              : '${_startDate!.day}/${_startDate!.month}/${_startDate!.year}',
-                          style: TextStyles.body.copyWith(
-                            color: _startDate == null
-                                ? theme.grey[600]
-                                : theme.grey[900],
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
+                PlatformDatePicker(
+                  value: _startDate,
+                  onChanged: (date) {
+                    setState(() {
+                      _startDate = date;
+                      // Ensure end date is not before start date
+                      if (_endDate != null &&
+                          date != null &&
+                          _endDate!.isBefore(date)) {
+                        _endDate = null;
+                      }
+                    });
+                  },
+                  hint: localizations.translate('select_start_date'),
+                  lastDate: _endDate ?? DateTime.now(),
+                  dateFormatter: (date) =>
+                      '${date.day}/${date.month}/${date.year}',
                 ),
-                const SizedBox(height: 8),
-                WidgetsContainer(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                  backgroundColor: theme.grey[50],
-                  borderSide: BorderSide(color: theme.grey[200]!),
-                  child: Row(
-                    children: [
-                      Icon(
-                        LucideIcons.calendar,
-                        color: theme.grey[500],
-                        size: 20,
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Text(
-                          _endDate == null
-                              ? localizations.translate('select_end_date')
-                              : '${_endDate!.day}/${_endDate!.month}/${_endDate!.year}',
-                          style: TextStyles.body.copyWith(
-                            color: _endDate == null
-                                ? theme.grey[600]
-                                : theme.grey[900],
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
+                verticalSpace(Spacing.points16),
+                PlatformDatePicker(
+                  value: _endDate,
+                  onChanged: (date) {
+                    setState(() {
+                      _endDate = date;
+                    });
+                  },
+                  hint: localizations.translate('select_end_date'),
+                  firstDate: _startDate,
+                  lastDate: DateTime.now(),
+                  dateFormatter: (date) =>
+                      '${date.day}/${date.month}/${date.year}',
                 ),
               ],
             ),
@@ -260,9 +202,8 @@ class _AdvancedSearchModalState extends ConsumerState<AdvancedSearchModal> {
                 child: TextButton(
                   onPressed: () {
                     setState(() {
-                      _selectedCategory = '';
+                      _selectedCategory = null;
                       _selectedSortBy = 'newest_first';
-                      _authorName = '';
                       _startDate = null;
                       _endDate = null;
                     });
@@ -279,11 +220,10 @@ class _AdvancedSearchModalState extends ConsumerState<AdvancedSearchModal> {
               Expanded(
                 child: ElevatedButton(
                   onPressed: () {
-                    // TODO: Apply filters and close modal
+                    // Apply filters and close modal
                     Navigator.of(context).pop({
                       'category': _selectedCategory,
                       'sortBy': _selectedSortBy,
-                      'author': _authorName,
                       'startDate': _startDate,
                       'endDate': _endDate,
                     });

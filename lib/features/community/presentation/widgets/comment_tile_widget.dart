@@ -47,8 +47,8 @@ class CommentTileWidget extends ConsumerWidget {
 
     return authorProfileAsync.when(
       data: (authorProfile) {
-        final isAuthorAnonymous = authorProfile?.isAnonymous ?? false;
-        final isAuthorPlusUser = authorProfile?.hasPlusSubscription() ?? false;
+        final isAuthorAnonymous = authorProfile.isAnonymous;
+        final isAuthorPlusUser = authorProfile.hasPlusSubscription();
 
         return Container(
           padding: const EdgeInsets.all(16),
@@ -64,33 +64,28 @@ class CommentTileWidget extends ConsumerWidget {
             children: [
               // User avatar - clickable to show profile
               GestureDetector(
-                onTap: !isAuthorAnonymous &&
-                        authorProfile?.userUID != 'orphaned-post'
-                    ? () => showModalBottomSheet(
-                          context: context,
-                          isScrollControlled: true,
-                          backgroundColor: Colors.transparent,
-                          builder: (context) => Padding(
-                            padding: EdgeInsets.only(
-                              bottom: MediaQuery.of(context).viewInsets.bottom,
-                            ),
-                            child: CommunityProfileModal(
-                              communityProfileId: comment.authorCPId,
-                              displayName:
-                                  authorProfile?.displayName ?? 'Unknown User',
-                              avatarUrl: authorProfile?.avatarUrl,
-                              isAnonymous: isAuthorAnonymous,
-                              isPlusUser: isAuthorPlusUser,
-                            ),
-                          ),
-                        )
-                    : null,
+                onTap: () => showModalBottomSheet(
+                  context: context,
+                  isScrollControlled: true,
+                  backgroundColor: Colors.transparent,
+                  builder: (context) => Padding(
+                    padding: EdgeInsets.only(
+                      bottom: MediaQuery.of(context).viewInsets.bottom,
+                    ),
+                    child: CommunityProfileModal(
+                      communityProfileId: comment.authorCPId,
+                      displayName: authorProfile.displayName,
+                      avatarUrl: authorProfile.avatarUrl,
+                      isAnonymous: isAuthorAnonymous,
+                      isPlusUser: isAuthorPlusUser,
+                    ),
+                  ),
+                ),
                 child: AvatarWithAnonymity(
                   cpId: comment.authorCPId,
                   isAnonymous: isAuthorAnonymous,
                   size: 32,
-                  avatarUrl:
-                      isAuthorAnonymous ? null : authorProfile?.avatarUrl,
+                  avatarUrl: isAuthorAnonymous ? null : authorProfile.avatarUrl,
                   isPlusUser: isAuthorPlusUser,
                 ),
               ),
@@ -230,34 +225,27 @@ class CommentTileWidget extends ConsumerWidget {
                 _getLocalizedDisplayName(pipelineResult, localizations);
 
             return GestureDetector(
-              onTap: !isAuthorAnonymous &&
-                      authorProfile?.userUID != 'orphaned-post'
-                  ? () => showModalBottomSheet(
-                        context: context,
-                        isScrollControlled: true,
-                        backgroundColor: Colors.transparent,
-                        builder: (context) => Padding(
-                          padding: EdgeInsets.only(
-                            bottom: MediaQuery.of(context).viewInsets.bottom,
-                          ),
-                          child: CommunityProfileModal(
-                            communityProfileId: comment.authorCPId,
-                            displayName:
-                                authorProfile?.displayName ?? 'Unknown User',
-                            avatarUrl: authorProfile?.avatarUrl,
-                            isAnonymous: isAuthorAnonymous,
-                            isPlusUser: isAuthorPlusUser,
-                          ),
-                        ),
-                      )
-                  : null,
+              onTap: () => showModalBottomSheet(
+                context: context,
+                isScrollControlled: true,
+                backgroundColor: Colors.transparent,
+                builder: (context) => Padding(
+                  padding: EdgeInsets.only(
+                    bottom: MediaQuery.of(context).viewInsets.bottom,
+                  ),
+                  child: CommunityProfileModal(
+                    communityProfileId: comment.authorCPId,
+                    displayName: authorProfile.displayName,
+                    avatarUrl: authorProfile.avatarUrl,
+                    isAnonymous: isAuthorAnonymous,
+                    isPlusUser: isAuthorPlusUser,
+                  ),
+                ),
+              ),
               child: Text(
                 displayName,
                 style: TextStyles.footnoteSelected.copyWith(
-                  color: !isAuthorAnonymous &&
-                          authorProfile?.userUID != 'orphaned-post'
-                      ? theme.primary[700]
-                      : theme.grey[700],
+                  color: theme.primary[700],
                   fontSize: 14,
                 ),
               ),
@@ -292,8 +280,7 @@ class CommentTileWidget extends ConsumerWidget {
         // Real-time streak display for Plus users who allow sharing
         authorProfileAsync.when(
           data: (authorProfile) {
-            if (isAuthorPlusUser &&
-                (authorProfile?.shareRelapseStreaks ?? false)) {
+            if (isAuthorPlusUser && authorProfile.shareRelapseStreaks) {
               return Row(
                 children: [
                   const SizedBox(width: 6),

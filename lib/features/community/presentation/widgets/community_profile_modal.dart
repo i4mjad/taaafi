@@ -61,6 +61,18 @@ class _CommunityProfileModalState extends ConsumerState<CommunityProfileModal> {
     }
   }
 
+  /// Helper function to localize gender values
+  String _getLocalizedGender(String gender, AppLocalizations localizations) {
+    switch (gender.toLowerCase()) {
+      case 'male':
+        return localizations.translate('male');
+      case 'female':
+        return localizations.translate('female');
+      default:
+        return gender;
+    }
+  }
+
   String? _validateReportMessage(String? value) {
     final localization = AppLocalizations.of(context);
     if (value == null || value.trim().isEmpty) {
@@ -420,6 +432,25 @@ class _CommunityProfileModalState extends ConsumerState<CommunityProfileModal> {
                       style: TextStyles.caption.copyWith(
                         color: theme.grey[600],
                       ),
+                    ),
+                    verticalSpace(Spacing.points4),
+                    Row(
+                      children: [
+                        Icon(
+                          profile.gender.toLowerCase() == 'male'
+                              ? LucideIcons.user
+                              : LucideIcons.userCheck,
+                          size: 14,
+                          color: theme.grey[600],
+                        ),
+                        horizontalSpace(Spacing.points4),
+                        Text(
+                          _getLocalizedGender(profile.gender, localizations),
+                          style: TextStyles.caption.copyWith(
+                            color: theme.grey[600],
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),

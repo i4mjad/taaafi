@@ -116,16 +116,15 @@ class CompactInteractionTile extends ConsumerWidget {
               children: [
                 authorProfileAsync.when(
                   data: (authorProfile) {
-                    final isAuthorAnonymous =
-                        authorProfile?.isAnonymous ?? false;
+                    final isAuthorAnonymous = authorProfile.isAnonymous;
                     final isAuthorPlusUser =
-                        authorProfile?.hasPlusSubscription() ?? false;
+                        authorProfile.hasPlusSubscription();
 
                     return AvatarWithAnonymity(
                       cpId: post.authorCPId,
                       isAnonymous: isAuthorAnonymous,
                       size: 24,
-                      avatarUrl: authorProfile?.avatarUrl,
+                      avatarUrl: authorProfile.avatarUrl,
                       isPlusUser: isAuthorPlusUser,
                     );
                   },
@@ -153,8 +152,7 @@ class CompactInteractionTile extends ConsumerWidget {
                   child: authorProfileAsync.when(
                     data: (authorProfile) {
                       final displayName = _getLocalizedDisplayName(
-                        authorProfile?.getDisplayNameWithPipeline() ??
-                            localizations.translate('community-unknown-user'),
+                        authorProfile.getDisplayNameWithPipeline(),
                         localizations,
                       );
 
@@ -327,16 +325,15 @@ class CompactInteractionTile extends ConsumerWidget {
               children: [
                 authorProfileAsync.when(
                   data: (authorProfile) {
-                    final isAuthorAnonymous =
-                        authorProfile?.isAnonymous ?? false;
+                    final isAuthorAnonymous = authorProfile.isAnonymous;
                     final isAuthorPlusUser =
-                        authorProfile?.hasPlusSubscription() ?? false;
+                        authorProfile.hasPlusSubscription();
 
                     return AvatarWithAnonymity(
                       cpId: comment.authorCPId,
                       isAnonymous: isAuthorAnonymous,
                       size: 24,
-                      avatarUrl: authorProfile?.avatarUrl,
+                      avatarUrl: authorProfile.avatarUrl,
                       isPlusUser: isAuthorPlusUser,
                     );
                   },
@@ -364,8 +361,7 @@ class CompactInteractionTile extends ConsumerWidget {
                   child: authorProfileAsync.when(
                     data: (authorProfile) {
                       final displayName = _getLocalizedDisplayName(
-                        authorProfile?.getDisplayNameWithPipeline() ??
-                            localizations.translate('community-unknown-user'),
+                        authorProfile.getDisplayNameWithPipeline(),
                         localizations,
                       );
 

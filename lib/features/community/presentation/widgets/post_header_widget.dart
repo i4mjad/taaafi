@@ -45,7 +45,7 @@ class PostHeaderWidget extends ConsumerWidget {
     final localizations = AppLocalizations.of(context);
     final currentProfileAsync = ref.watch(currentCommunityProfileProvider);
     final authorProfileAsync =
-        ref.watch(communityProfileWithFallbackProvider(post.authorCPId));
+        ref.watch(communityProfileByIdProvider(post.authorCPId));
     final categoriesAsync = ref.watch(postCategoriesProvider);
 
     // Find the matching category for the post
@@ -64,29 +64,27 @@ class PostHeaderWidget extends ConsumerWidget {
 
     return authorProfileAsync.when(
       data: (authorProfile) {
-        final isAuthorAnonymous = authorProfile?.isAnonymous ?? false;
-        final isAuthorPlusUser = authorProfile?.hasPlusSubscription() ?? false;
-        final isOrphanedPost = authorProfile?.userUID == 'orphaned-post';
+        final isAuthorAnonymous = authorProfile.isAnonymous;
+        final isAuthorPlusUser = authorProfile.hasPlusSubscription();
+        final isOrphanedPost = authorProfile.userUID == 'orphaned-post';
 
         return Row(
           children: [
             // User avatar - clickable to show profile
             GestureDetector(
-              onTap: !isOrphanedPost && !isAuthorAnonymous
-                  ? () => _showCommunityProfileModal(
-                        context,
-                        post.authorCPId,
-                        authorProfile?.displayName ?? 'Unknown User',
-                        authorProfile?.avatarUrl,
-                        isAuthorAnonymous,
-                        isAuthorPlusUser,
-                      )
-                  : null,
+              onTap: () => _showCommunityProfileModal(
+                context,
+                post.authorCPId,
+                authorProfile.displayName,
+                authorProfile.avatarUrl,
+                isAuthorAnonymous,
+                isAuthorPlusUser,
+              ),
               child: AvatarWithAnonymity(
                 cpId: post.authorCPId,
                 isAnonymous: isAuthorAnonymous,
                 size: 40,
-                avatarUrl: isAuthorAnonymous ? null : authorProfile?.avatarUrl,
+                avatarUrl: isAuthorAnonymous ? null : authorProfile.avatarUrl,
                 isPlusUser: isAuthorPlusUser,
               ),
             ),
@@ -110,22 +108,18 @@ class PostHeaderWidget extends ConsumerWidget {
                                 // Display name - clickable to show profile
                                 Flexible(
                                   child: GestureDetector(
-                                    onTap: !isOrphanedPost && !isAuthorAnonymous
-                                        ? () => _showCommunityProfileModal(
-                                              context,
-                                              post.authorCPId,
-                                              authorProfile?.displayName ??
-                                                  'Unknown User',
-                                              authorProfile?.avatarUrl,
-                                              isAuthorAnonymous,
-                                              isAuthorPlusUser,
-                                            )
-                                        : null,
+                                    onTap: () => _showCommunityProfileModal(
+                                      context,
+                                      post.authorCPId,
+                                      authorProfile.displayName,
+                                      authorProfile.avatarUrl,
+                                      isAuthorAnonymous,
+                                      isAuthorPlusUser,
+                                    ),
                                     child: Text(
                                       () {
                                         final pipelineResult = authorProfile
-                                                ?.getDisplayNameWithPipeline() ??
-                                            'Former User';
+                                            .getDisplayNameWithPipeline();
 
                                         final localizedResult =
                                             _getLocalizedDisplayName(
@@ -211,11 +205,9 @@ class PostHeaderWidget extends ConsumerWidget {
                                         data: (authorProfile) {
                                           // Check if user is plus AND allows sharing
                                           final isPlusUser = authorProfile
-                                                  ?.hasPlusSubscription() ??
-                                              false;
-                                          final allowsSharing = authorProfile
-                                                  ?.shareRelapseStreaks ??
-                                              false;
+                                              .hasPlusSubscription();
+                                          final allowsSharing =
+                                              authorProfile.shareRelapseStreaks;
 
                                           if (!isPlusUser || !allowsSharing) {
                                             return <Widget>[];

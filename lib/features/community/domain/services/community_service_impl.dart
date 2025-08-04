@@ -145,30 +145,9 @@ class CommunityServiceImpl implements CommunityService {
       throw const AuthenticationException('User not authenticated');
     }
 
-    return _firestore
-        .collection('communityProfiles')
-        .where('userUID', isEqualTo: user.uid)
-        .where('isDeleted', isNotEqualTo: true)
-        .limit(1)
-        .snapshots()
-        .map((snapshot) {
-      if (snapshot.docs.isEmpty) {
-        return null;
-      }
-
-      final doc = snapshot.docs.first;
-      final data = doc.data();
-
-      // Double-check that the profile is not deleted (for safety)
-      if (data['isDeleted'] == true) {
-        return null;
-      }
-
-      return CommunityProfileEntity.fromJson({
-        'id': doc.id,
-        ...data,
-      });
-    });
+    // Use the repository's watchProfile method which properly handles
+    // the new profile ID-based document structure
+    return _repository.watchProfile(user.uid);
   }
 
   @override
@@ -245,7 +224,7 @@ class CommunityServiceImpl implements CommunityService {
       final snapshot = await _firestore
           .collection('communityProfiles')
           .where('userUID', isEqualTo: userUID)
-          .where('isDeleted', isNotEqualTo: true)
+          .where('isDeleted', isEqualTo: false)
           .limit(1)
           .get();
 

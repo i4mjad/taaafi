@@ -63,16 +63,10 @@ final communityServiceProvider = Provider<CommunityService>((ref) {
 // PRESENTATION LAYER PROVIDERS
 // =============================================================================
 
-/// Provider for current user's community profile
-final currentCommunityProfileProvider =
-    StreamProvider<CommunityProfileEntity?>((ref) {
-  final service = ref.watch(communityServiceProvider);
-  return service.watchProfile();
-});
-
-/// Provider to get community profile by CPId with fallback for orphaned posts
+/// Provider to get community profile by CPId - simplified version
+/// Always returns a profile, even for missing/deleted ones
 final communityProfileByIdProvider =
-    StreamProvider.family<CommunityProfileEntity?, String>((ref, cpId) {
+    StreamProvider.family<CommunityProfileEntity, String>((ref, cpId) {
   final firestore = ref.watch(firestoreProvider);
   return firestore
       .collection('communityProfiles')
@@ -80,80 +74,49 @@ final communityProfileByIdProvider =
       .snapshots()
       .map((snapshot) {
     if (!snapshot.exists) {
-      return null;
-    }
-
-    final data = snapshot.data() as Map<String, dynamic>;
-    final profile = CommunityProfileEntity(
-      id: snapshot.id,
-      userUID: data['userUID'] ?? '', // Include user UID from Firestore
-      displayName: data['displayName'] ?? 'Unknown User',
-      gender: data['gender'] ?? 'other',
-      isAnonymous: data['isAnonymous'] ?? false,
-      isDeleted: data['isDeleted'] ?? false, // Add missing isDeleted field
-      avatarUrl: data['avatarUrl'],
-      isPlusUser: data['isPlusUser'] as bool?,
-      shareRelapseStreaks: data['shareRelapseStreaks'] as bool? ?? false,
-      // Streak data is read directly from user documents, not stored here
-      currentStreakDays: null,
-      streakLastUpdated: null,
-      createdAt: (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
-      updatedAt: (data['updatedAt'] as Timestamp?)?.toDate(),
-    );
-
-    return profile;
-  });
-});
-
-/// Provider to get community profile by CPId with fallback for orphaned posts
-/// This provider returns a placeholder profile when the real profile doesn't exist
-final communityProfileWithFallbackProvider =
-    StreamProvider.family<CommunityProfileEntity?, String>((ref, cpId) {
-  final firestore = ref.watch(firestoreProvider);
-  return firestore
-      .collection('communityProfiles')
-      .doc(cpId)
-      .snapshots()
-      .map((snapshot) {
-    if (!snapshot.exists) {
-      // Return a fallback profile for orphaned posts
+      // Return a fallback profile for missing profiles
       return CommunityProfileEntity(
         id: cpId,
-        userUID: 'orphaned-post', // Special marker for orphaned posts
-        displayName: 'Former User', // Better than "Unknown User"
+        userUID: 'missing-profile',
+        displayName: 'Former User',
         gender: 'other',
-        isAnonymous: true, // Make orphaned posts anonymous for privacy
+        isAnonymous: true,
+        isDeleted: false,
         avatarUrl: null,
         isPlusUser: false,
         shareRelapseStreaks: false,
         currentStreakDays: null,
         streakLastUpdated: null,
-        createdAt:
-            DateTime.now().subtract(const Duration(days: 30)), // Old date
+        createdAt: DateTime.now().subtract(const Duration(days: 30)),
         updatedAt: null,
       );
     }
 
     final data = snapshot.data() as Map<String, dynamic>;
-    final profile = CommunityProfileEntity(
+
+    return CommunityProfileEntity(
       id: snapshot.id,
-      userUID: data['userUID'] ?? '', // Include user UID from Firestore
+      userUID: data['userUID'] ?? '',
       displayName: data['displayName'] ?? 'Unknown User',
       gender: data['gender'] ?? 'other',
       isAnonymous: data['isAnonymous'] ?? false,
-      isDeleted: data['isDeleted'] ?? false, // Add missing isDeleted field
+      isDeleted: data['isDeleted'] ?? false,
       avatarUrl: data['avatarUrl'],
       isPlusUser: data['isPlusUser'] as bool?,
       shareRelapseStreaks: data['shareRelapseStreaks'] as bool? ?? false,
-      // Streak data is read directly from user documents, not stored here
       currentStreakDays: null,
       streakLastUpdated: null,
       createdAt: (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
       updatedAt: (data['updatedAt'] as Timestamp?)?.toDate(),
     );
-
-    return profile;
   });
+});
+
+/// Provider for current user's community profile
+final currentCommunityProfileProvider =
+    StreamProvider<CommunityProfileEntity?>((ref) {
+  final service = ref.watch(communityServiceProvider);
+  return service.watchProfile();
 });
 
 /// Provider to check if current user has a community profile

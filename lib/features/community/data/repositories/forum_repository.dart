@@ -70,7 +70,7 @@ class ForumRepository {
       final snapshot = await FirebaseFirestore.instance
           .collection('communityProfiles')
           .where('userUID', isEqualTo: user.uid)
-          .where('isDeleted', isNotEqualTo: true)
+          .where('isDeleted', isEqualTo: false)
           .limit(1)
           .get();
 
@@ -158,6 +158,42 @@ class ForumRepository {
         lastDocument: lastDocument,
         category: category,
         isPinned: isPinned,
+      );
+    }
+  }
+
+  /// Search posts with advanced filtering options
+  Future<PostsPage> searchPosts({
+    int limit = 10,
+    DocumentSnapshot? lastDocument,
+    String? searchQuery,
+    String? category,
+    String sortBy = 'newest_first',
+    DateTime? startDate,
+    DateTime? endDate,
+    String? userGender,
+    bool applyGenderFilter = false,
+  }) async {
+    if (applyGenderFilter && userGender != null) {
+      return await _searchGenderFilteredPosts(
+        limit: limit,
+        lastDocument: lastDocument,
+        searchQuery: searchQuery,
+        category: category,
+        sortBy: sortBy,
+        startDate: startDate,
+        endDate: endDate,
+        userGender: userGender,
+      );
+    } else {
+      return await _searchUnfilteredPosts(
+        limit: limit,
+        lastDocument: lastDocument,
+        searchQuery: searchQuery,
+        category: category,
+        sortBy: sortBy,
+        startDate: startDate,
+        endDate: endDate,
       );
     }
   }
@@ -458,6 +494,206 @@ class ForumRepository {
       return null;
     } catch (e) {
       throw Exception('Failed to fetch post: $e');
+    }
+  }
+
+  /// Search posts without gender filtering
+  Future<PostsPage> _searchUnfilteredPosts({
+    required int limit,
+    DocumentSnapshot? lastDocument,
+    String? searchQuery,
+    String? category,
+    String sortBy = 'newest_first',
+    DateTime? startDate,
+    DateTime? endDate,
+  }) async {
+    try {
+      Query query = _posts;
+
+      // Apply category filter
+      if (category != null && category.isNotEmpty) {
+        query = query.where('category', isEqualTo: category);
+      }
+
+      // Apply date range filters
+      if (startDate != null) {
+        query = query.where('createdAt',
+            isGreaterThanOrEqualTo: Timestamp.fromDate(startDate));
+      }
+      if (endDate != null) {
+        // Add one day to endDate to include posts from the entire end date
+        final endOfDay =
+            DateTime(endDate.year, endDate.month, endDate.day, 23, 59, 59);
+        query = query.where('createdAt',
+            isLessThanOrEqualTo: Timestamp.fromDate(endOfDay));
+      }
+
+      // Apply sorting
+      switch (sortBy) {
+        case 'oldest_first':
+          query = query.orderBy('createdAt', descending: false);
+          break;
+        case 'most_liked':
+          query = query.orderBy('likeCount', descending: true);
+          break;
+        case 'most_commented':
+          // Note: We don't have a comment count field, so we'll fall back to score
+          query = query.orderBy('score', descending: true);
+          break;
+        case 'newest_first':
+        default:
+          query = query.orderBy('createdAt', descending: true);
+          break;
+      }
+
+      // Apply pagination
+      if (lastDocument != null) {
+        query = query.startAfterDocument(lastDocument);
+      }
+
+      query = query.limit(limit);
+
+      final QuerySnapshot snapshot = await query.get();
+
+      // Get all posts first
+      List<Post> posts = snapshot.docs
+          .map((doc) =>
+              Post.fromFirestore(doc as DocumentSnapshot<Map<String, dynamic>>))
+          .where((post) => !post.isDeleted)
+          .toList();
+
+      // Apply text search filter if provided (client-side filtering)
+      if (searchQuery != null && searchQuery.isNotEmpty) {
+        final lowercaseQuery = searchQuery.toLowerCase();
+        posts = posts.where((post) {
+          return post.title.toLowerCase().contains(lowercaseQuery) ||
+              post.body.toLowerCase().contains(lowercaseQuery);
+        }).toList();
+      }
+
+      return PostsPage(
+        posts: posts,
+        lastDocument: snapshot.docs.isNotEmpty ? snapshot.docs.last : null,
+        hasMore: snapshot.docs.length == limit,
+      );
+    } catch (e) {
+      throw Exception('Failed to search posts: $e');
+    }
+  }
+
+  /// Search posts with gender filtering
+  Future<PostsPage> _searchGenderFilteredPosts({
+    required int limit,
+    DocumentSnapshot? lastDocument,
+    String? searchQuery,
+    String? category,
+    String sortBy = 'newest_first',
+    DateTime? startDate,
+    DateTime? endDate,
+    required String userGender,
+  }) async {
+    try {
+      // Get visible profile IDs for gender filtering
+      final visibleProfileIds = await _genderFilteringService
+          .getVisibleCommunityProfileIds(userGender);
+
+      if (visibleProfileIds.isEmpty) {
+        return PostsPage(posts: [], lastDocument: null, hasMore: false);
+      }
+
+      // Split into batches due to Firestore 'whereIn' limit of 10
+      final List<Post> allPosts = [];
+      const int batchSize = 10;
+
+      for (int i = 0; i < visibleProfileIds.length; i += batchSize) {
+        final batch = visibleProfileIds.skip(i).take(batchSize).toList();
+
+        Query query = _posts.where('authorCPId', whereIn: batch);
+
+        // Apply category filter
+        if (category != null && category.isNotEmpty) {
+          query = query.where('category', isEqualTo: category);
+        }
+
+        // Apply date range filters
+        if (startDate != null) {
+          query = query.where('createdAt',
+              isGreaterThanOrEqualTo: Timestamp.fromDate(startDate));
+        }
+        if (endDate != null) {
+          final endOfDay =
+              DateTime(endDate.year, endDate.month, endDate.day, 23, 59, 59);
+          query = query.where('createdAt',
+              isLessThanOrEqualTo: Timestamp.fromDate(endOfDay));
+        }
+
+        // Apply sorting
+        switch (sortBy) {
+          case 'oldest_first':
+            query = query.orderBy('createdAt', descending: false);
+            break;
+          case 'most_liked':
+            query = query.orderBy('likeCount', descending: true);
+            break;
+          case 'most_commented':
+            query = query.orderBy('score', descending: true);
+            break;
+          case 'newest_first':
+          default:
+            query = query.orderBy('createdAt', descending: true);
+            break;
+        }
+
+        final snapshot = await query
+            .limit(limit * 2)
+            .get(); // Get more to account for filtering
+
+        final batchPosts = snapshot.docs
+            .map((doc) => Post.fromFirestore(
+                doc as DocumentSnapshot<Map<String, dynamic>>))
+            .where((post) => !post.isDeleted)
+            .toList();
+
+        allPosts.addAll(batchPosts);
+      }
+
+      // Apply text search filter if provided
+      List<Post> filteredPosts = allPosts;
+      if (searchQuery != null && searchQuery.isNotEmpty) {
+        final lowercaseQuery = searchQuery.toLowerCase();
+        filteredPosts = allPosts.where((post) {
+          return post.title.toLowerCase().contains(lowercaseQuery) ||
+              post.body.toLowerCase().contains(lowercaseQuery);
+        }).toList();
+      }
+
+      // Sort and limit results
+      switch (sortBy) {
+        case 'oldest_first':
+          filteredPosts.sort((a, b) => a.createdAt.compareTo(b.createdAt));
+          break;
+        case 'most_liked':
+          filteredPosts.sort((a, b) => b.likeCount.compareTo(a.likeCount));
+          break;
+        case 'most_commented':
+          filteredPosts.sort((a, b) => b.score.compareTo(a.score));
+          break;
+        case 'newest_first':
+        default:
+          filteredPosts.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+          break;
+      }
+
+      final limitedPosts = filteredPosts.take(limit).toList();
+
+      return PostsPage(
+        posts: limitedPosts,
+        lastDocument:
+            null, // For simplicity, pagination not supported with complex filtering
+        hasMore: filteredPosts.length > limit,
+      );
+    } catch (e) {
+      throw Exception('Failed to search gender-filtered posts: $e');
     }
   }
 

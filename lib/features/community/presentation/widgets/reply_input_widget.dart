@@ -275,8 +275,7 @@ class _ReplyInputWidgetState extends ConsumerState<ReplyInputWidget> {
                     return authorProfileAsync.when(
                       data: (authorProfile) {
                         final displayName = _getLocalizedDisplayName(
-                          authorProfile?.getDisplayNameWithPipeline() ??
-                              'Unknown User',
+                          authorProfile.getDisplayNameWithPipeline(),
                           localizations,
                         );
 

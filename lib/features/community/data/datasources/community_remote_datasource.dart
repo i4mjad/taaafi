@@ -64,9 +64,20 @@ class CommunityRemoteDatasourceImpl implements CommunityRemoteDatasource {
   @override
   Future<CommunityProfileModel?> getProfile(String uid) async {
     try {
-      final doc = await _profilesCollection.doc(uid).get();
+      final snapshot = await _profilesCollection
+          .where('userUID', isEqualTo: uid)
+          .limit(1)
+          .get();
 
-      if (!doc.exists || doc.data() == null) {
+      if (snapshot.docs.isEmpty) {
+        return null;
+      }
+
+      final doc = snapshot.docs.first;
+      final data = doc.data();
+
+      // Filter out deleted profiles client-side to avoid permission issues
+      if (data['isDeleted'] == true) {
         return null;
       }
 
@@ -108,7 +119,16 @@ class CommunityRemoteDatasourceImpl implements CommunityRemoteDatasource {
   @override
   Future<void> deleteProfile(String uid) async {
     try {
-      await _profilesCollection.doc(uid).delete();
+      // Find the profile document by userUID
+      final snapshot = await _profilesCollection
+          .where('userUID', isEqualTo: uid)
+          .limit(1)
+          .get();
+
+      if (snapshot.docs.isNotEmpty) {
+        // Delete the found document
+        await _profilesCollection.doc(snapshot.docs.first.id).delete();
+      }
     } on FirebaseException catch (e) {
       throw NetworkException(
         'Failed to delete profile: ${e.message}',
@@ -124,8 +144,19 @@ class CommunityRemoteDatasourceImpl implements CommunityRemoteDatasource {
   @override
   Future<bool> profileExists(String uid) async {
     try {
-      final doc = await _profilesCollection.doc(uid).get();
-      return doc.exists;
+      final snapshot = await _profilesCollection
+          .where('userUID', isEqualTo: uid)
+          .limit(1)
+          .get();
+
+      if (snapshot.docs.isEmpty) {
+        return false;
+      }
+
+      final data = snapshot.docs.first.data();
+
+      // Only consider it as existing if it's not deleted
+      return data['isDeleted'] != true;
     } on FirebaseException catch (e) {
       throw NetworkException(
         'Failed to check profile existence: ${e.message}',
@@ -141,10 +172,23 @@ class CommunityRemoteDatasourceImpl implements CommunityRemoteDatasource {
   @override
   Stream<CommunityProfileModel?> watchProfile(String uid) {
     try {
-      return _profilesCollection.doc(uid).snapshots().map((doc) {
-        if (!doc.exists || doc.data() == null) {
+      return _profilesCollection
+          .where('userUID', isEqualTo: uid)
+          .limit(1)
+          .snapshots()
+          .map((snapshot) {
+        if (snapshot.docs.isEmpty) {
           return null;
         }
+
+        final doc = snapshot.docs.first;
+        final data = doc.data();
+
+        // Filter out deleted profiles client-side to avoid permission issues
+        if (data['isDeleted'] == true) {
+          return null;
+        }
+
         return CommunityProfileModel.fromFirestore(doc);
       });
     } on FirebaseException catch (e) {

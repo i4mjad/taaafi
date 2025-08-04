@@ -50,7 +50,17 @@ class _PostsListScreenState extends ConsumerState<PostsListScreen> {
 
     // Load more posts when near the bottom
     if (scrollPosition >= _scrollController.position.maxScrollExtent - 200) {
-      ref.read(postsPaginationProvider.notifier).loadMorePosts();
+      final hasActiveSearch = _searchQuery.isNotEmpty || _activeFilters != null;
+
+      if (hasActiveSearch) {
+        // TODO: Load more search results - searchPostsPaginationProvider missing
+        // ref
+        //     .read(searchPostsPaginationProvider.notifier)
+        //     .loadMoreSearchResults();
+      } else {
+        // Load more regular posts
+        ref.read(postsPaginationProvider.notifier).loadMorePosts();
+      }
     }
   }
 
@@ -63,10 +73,28 @@ class _PostsListScreenState extends ConsumerState<PostsListScreen> {
   }
 
   void _performSearch() {
-    // TODO: Implement search logic
     setState(() {
       _searchQuery = _searchController.text;
     });
+
+    // TODO: Create search filters with current query and any active filters
+    // PostSearchFilters class is missing
+    // final filters = PostSearchFilters(
+    //   searchQuery: _searchQuery.isNotEmpty ? _searchQuery : null,
+    //   category: _activeFilters?['category'],
+    //   sortBy: _activeFilters?['sortBy'] ?? 'newest_first',
+    //   startDate: _activeFilters?['startDate'],
+    //   endDate: _activeFilters?['endDate'],
+    // );
+
+    // TODO: Perform search if we have any filters or query
+    // searchPostsPaginationProvider is missing
+    // if (filters.hasActiveFilters) {
+    //   ref.read(searchPostsPaginationProvider.notifier).searchPosts(filters);
+    // } else {
+    //   // Clear search if no filters
+    //   ref.read(searchPostsPaginationProvider.notifier).clearSearch();
+    // }
   }
 
   void _showAdvancedSearch() {
@@ -85,7 +113,8 @@ class _PostsListScreenState extends ConsumerState<PostsListScreen> {
         setState(() {
           _activeFilters = filters;
         });
-        // TODO: Apply filters to post loading
+        // Apply the filters immediately
+        _performSearch();
       }
     });
   }
@@ -96,7 +125,9 @@ class _PostsListScreenState extends ConsumerState<PostsListScreen> {
       _searchQuery = '';
       _activeFilters = null;
     });
-    // TODO: Refresh posts without filters
+    // Clear search results and refresh regular posts
+    // TODO: Clear search - searchPostsPaginationProvider missing
+    // ref.read(searchPostsPaginationProvider.notifier).clearSearch();
     ref.read(postsPaginationProvider.notifier).refresh();
   }
 
@@ -195,16 +226,6 @@ class _PostsListScreenState extends ConsumerState<PostsListScreen> {
                                     });
                                   },
                                 ),
-                              if (_activeFilters?['author']?.isNotEmpty == true)
-                                _buildFilterChip(
-                                  label:
-                                      '${localizations.translate('author')}: ${_activeFilters!['author']}',
-                                  onRemove: () {
-                                    setState(() {
-                                      _activeFilters!['author'] = '';
-                                    });
-                                  },
-                                ),
                             ],
                           ),
                         ),
@@ -286,44 +307,13 @@ class _PostsListScreenState extends ConsumerState<PostsListScreen> {
 
   Widget _buildPostsList(AppLocalizations localizations) {
     final theme = AppTheme.of(context);
-    final postsState = ref.watch(postsPaginationProvider);
 
-    if (postsState.posts.isEmpty && postsState.isLoading) {
-      return const Center(
-        child: Spinner(),
-      );
-    }
+    // Check if we have active search filters
+    final hasActiveSearch = _searchQuery.isNotEmpty || _activeFilters != null;
 
-    if (postsState.posts.isEmpty && postsState.error != null) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              LucideIcons.alertCircle,
-              size: 48,
-              color: theme.grey[400],
-            ),
-            const SizedBox(height: 16),
-            Text(
-              localizations.translate('error_loading_posts'),
-              style: TextStyles.body.copyWith(
-                color: theme.error[500],
-              ),
-            ),
-            const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: () {
-                ref.read(postsPaginationProvider.notifier).refresh();
-              },
-              child: Text(localizations.translate('retry')),
-            ),
-          ],
-        ),
-      );
-    }
-
-    if (postsState.posts.isEmpty) {
+    if (hasActiveSearch) {
+      // TODO: Show search results - search functionality disabled due to missing providers
+      // Search functionality needs to be implemented with proper providers
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -335,53 +325,108 @@ class _PostsListScreenState extends ConsumerState<PostsListScreen> {
             ),
             const SizedBox(height: 16),
             Text(
-              _searchQuery.isNotEmpty || _activeFilters != null
-                  ? localizations.translate('no_results_found')
-                  : localizations.translate('no_posts_found'),
+              'Search functionality is currently unavailable',
               style: TextStyles.body.copyWith(
                 color: theme.grey[600],
               ),
             ),
-            if (_searchQuery.isNotEmpty || _activeFilters != null)
-              Padding(
-                padding: const EdgeInsets.only(top: 16),
-                child: TextButton(
-                  onPressed: _clearFilters,
-                  child: Text(localizations.translate('clear_filters')),
-                ),
-              ),
+            const SizedBox(height: 16),
+            TextButton(
+              onPressed: _clearFilters,
+              child: Text(localizations.translate('clear_filters')),
+            ),
           ],
         ),
       );
-    }
+    } else {
+      // Show regular posts
+      final postsState = ref.watch(postsPaginationProvider);
 
-    return RefreshIndicator(
-      onRefresh: () async {
-        await ref.read(postsPaginationProvider.notifier).refresh();
-      },
-      child: ListView.builder(
-        controller: _scrollController,
-        itemCount: postsState.posts.length + (postsState.isLoading ? 1 : 0),
-        itemBuilder: (context, index) {
-          if (index == postsState.posts.length) {
-            // Loading indicator at the bottom
-            return const Center(
-              child: Padding(
-                padding: EdgeInsets.all(16.0),
-                child: Spinner(),
+      if (postsState.posts.isEmpty && postsState.isLoading) {
+        return const Center(
+          child: Spinner(),
+        );
+      }
+
+      if (postsState.posts.isEmpty && postsState.error != null) {
+        return Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                LucideIcons.alertCircle,
+                size: 48,
+                color: theme.grey[400],
               ),
-            );
-          }
+              const SizedBox(height: 16),
+              Text(
+                localizations.translate('error_loading_posts'),
+                style: TextStyles.body.copyWith(
+                  color: theme.error[500],
+                ),
+              ),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: () {
+                  ref.read(postsPaginationProvider.notifier).refresh();
+                },
+                child: Text(localizations.translate('retry')),
+              ),
+            ],
+          ),
+        );
+      }
 
-          final post = postsState.posts[index];
-          return ThreadsPostCard(
-            post: post,
-            onTap: () {
-              context.push('/community/forum/post/${post.id}');
-            },
-          );
+      if (postsState.posts.isEmpty) {
+        return Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                LucideIcons.search,
+                size: 48,
+                color: theme.grey[400],
+              ),
+              const SizedBox(height: 16),
+              Text(
+                localizations.translate('no_posts_found'),
+                style: TextStyles.body.copyWith(
+                  color: theme.grey[600],
+                ),
+              ),
+            ],
+          ),
+        );
+      }
+
+      return RefreshIndicator(
+        onRefresh: () async {
+          await ref.read(postsPaginationProvider.notifier).refresh();
         },
-      ),
-    );
+        child: ListView.builder(
+          controller: _scrollController,
+          itemCount: postsState.posts.length + (postsState.isLoading ? 1 : 0),
+          itemBuilder: (context, index) {
+            if (index == postsState.posts.length) {
+              // Loading indicator at the bottom
+              return const Center(
+                child: Padding(
+                  padding: EdgeInsets.all(16.0),
+                  child: Spinner(),
+                ),
+              );
+            }
+
+            final post = postsState.posts[index];
+            return ThreadsPostCard(
+              post: post,
+              onTap: () {
+                context.push('/community/forum/post/${post.id}');
+              },
+            );
+          },
+        ),
+      );
+    }
   }
 }

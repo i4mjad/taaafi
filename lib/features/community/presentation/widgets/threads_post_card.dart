@@ -92,45 +92,31 @@ class ThreadsPostCard extends ConsumerWidget {
               // Avatar with proper author anonymity
               authorProfileAsync.when(
                 data: (authorProfile) {
-                  final isAuthorAnonymous = authorProfile?.isAnonymous ?? false;
-                  final isAuthorPlusUser =
-                      authorProfile?.hasPlusSubscription() ?? false;
+                  final isAuthorAnonymous = authorProfile.isAnonymous;
+                  final isAuthorPlusUser = authorProfile.hasPlusSubscription();
                   final isOrphanedPost =
-                      authorProfile?.userUID == 'orphaned-post';
+                      authorProfile.userUID == 'orphaned-post';
 
-                  final isAvatarTappable =
-                      !isOrphanedPost && !isAuthorAnonymous;
-
-                  if (isAvatarTappable) {
-                    return InkWell(
-                      onTap: () => _showCommunityProfileModal(
-                        context,
-                        post.authorCPId,
-                        authorProfile?.displayName ?? 'Unknown User',
-                        authorProfile?.avatarUrl,
-                        isAuthorAnonymous,
-                        isAuthorPlusUser,
-                      ),
-                      borderRadius: BorderRadius.circular(16),
-                      child: AvatarWithAnonymity(
-                        cpId: post.authorCPId,
-                        isAnonymous: isAuthorAnonymous,
-                        size: 32,
-                        avatarUrl:
-                            isAuthorAnonymous ? null : authorProfile?.avatarUrl,
-                        isPlusUser: isAuthorPlusUser,
-                      ),
-                    );
-                  } else {
-                    return AvatarWithAnonymity(
+                  // Always make avatar tappable
+                  return InkWell(
+                    onTap: () => _showCommunityProfileModal(
+                      context,
+                      post.authorCPId,
+                      authorProfile.displayName,
+                      authorProfile.avatarUrl,
+                      isAuthorAnonymous,
+                      isAuthorPlusUser,
+                    ),
+                    borderRadius: BorderRadius.circular(16),
+                    child: AvatarWithAnonymity(
                       cpId: post.authorCPId,
                       isAnonymous: isAuthorAnonymous,
                       size: 32,
                       avatarUrl:
-                          isAuthorAnonymous ? null : authorProfile?.avatarUrl,
+                          isAuthorAnonymous ? null : authorProfile.avatarUrl,
                       isPlusUser: isAuthorPlusUser,
-                    );
-                  }
+                    ),
+                  );
                 },
                 loading: () => Container(
                   width: 32,
@@ -223,11 +209,9 @@ class ThreadsPostCard extends ConsumerWidget {
                                   data: (authorProfile) {
                                     // Check if user is plus AND allows sharing
                                     final isPlusUser =
-                                        authorProfile?.hasPlusSubscription() ??
-                                            false;
+                                        authorProfile.hasPlusSubscription();
                                     final allowsSharing =
-                                        authorProfile?.shareRelapseStreaks ??
-                                            false;
+                                        authorProfile.shareRelapseStreaks;
 
                                     if (!isPlusUser || !allowsSharing) {
                                       return <Widget>[];

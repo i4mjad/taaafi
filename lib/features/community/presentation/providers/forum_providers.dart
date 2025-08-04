@@ -13,7 +13,7 @@ import 'package:reboot_app_3/features/community/application/gender_filtering_ser
 import 'package:reboot_app_3/features/community/application/gender_interaction_validator.dart';
 import 'package:reboot_app_3/features/community/presentation/providers/community_providers_new.dart';
 import 'package:reboot_app_3/features/community/domain/entities/community_profile_entity.dart';
-import 'package:reboot_app_3/features/account/providers/ban_warning_providers.dart';
+
 import 'package:reboot_app_3/core/localization/localization.dart';
 import 'dart:math' as math;
 
@@ -24,7 +24,7 @@ Future<String?> _getCommunityProfileIdFromUserUID(
     final snapshot = await firestore
         .collection('communityProfiles')
         .where('userUID', isEqualTo: userUID)
-        .where('isDeleted', isNotEqualTo: true)
+        .where('isDeleted', isEqualTo: false)
         .limit(1)
         .get();
 
@@ -122,9 +122,8 @@ final forumServiceProvider = Provider<ForumService>((ref) {
   final auth = ref.watch(firebaseAuthProvider);
   final firestore = ref.watch(firestoreProvider);
   final genderValidator = ref.watch(genderInteractionValidatorProvider);
-  final banWarningFacade = ref.watch(banWarningFacadeProvider);
-  return ForumService(repository, validationService, auth, firestore,
-      genderValidator, banWarningFacade);
+  return ForumService(
+      repository, validationService, auth, firestore, genderValidator);
 });
 
 // Gender Filtering Service Provider
