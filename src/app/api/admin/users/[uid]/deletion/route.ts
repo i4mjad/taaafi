@@ -21,10 +21,11 @@ if (!getApps().length) {
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { uid: string } }
-) {
+  context: { params: Promise<{ uid: string }> }
+): Promise<NextResponse> {
   try {
-    const userId = params.uid;
+    const { uid } = await context.params;
+    const userId = uid;
 
     if (!userId) {
       return NextResponse.json(

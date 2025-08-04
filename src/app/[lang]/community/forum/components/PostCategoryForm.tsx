@@ -556,21 +556,21 @@ export default function PostCategoriesManagement() {
                       <Switch
                         checked={category.isActive}
                         onCheckedChange={() => handleStatusToggle(category)}
-                        size="sm"
+                        
                       />
                     </TableCell>
                     <TableCell className="text-center">
                       <Switch
                         checked={category.isForAdminOnly || false}
                         onCheckedChange={() => handleAdminOnlyToggle(category)}
-                        size="sm"
+                        
                       />
                     </TableCell>
                     <TableCell className="text-center">
                       <div className="flex items-center justify-center gap-1">
                         <Button
                           variant="ghost"
-                          size="sm"
+                          
                           onClick={() => moveCategoryUp(category)}
                           disabled={sortedCategories.findIndex(cat => cat.id === category.id) === 0}
                         >
@@ -578,7 +578,7 @@ export default function PostCategoriesManagement() {
                         </Button>
                         <Button
                           variant="ghost"
-                          size="sm"
+                          
                           onClick={() => moveCategoryDown(category)}
                           disabled={sortedCategories.findIndex(cat => cat.id === category.id) === sortedCategories.length - 1}
                         >
@@ -586,14 +586,14 @@ export default function PostCategoriesManagement() {
                         </Button>
                         <Button
                           variant="ghost"
-                          size="sm"
+                          
                           onClick={() => handleEdit(category)}
                         >
                           <Edit className="h-4 w-4" />
                         </Button>
                         <Button
                           variant="ghost"
-                          size="sm"
+                          
                           onClick={() => handleDelete(category)}
                         >
                           <Trash2 className="h-4 w-4" />

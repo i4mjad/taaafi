@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef, useEffect } from 'react';
 import { useTranslation } from '@/contexts/TranslationContext';
 import { useCollection } from 'react-firebase-hooks/firestore';
 import { collection, query, orderBy, where, deleteDoc, doc, updateDoc } from 'firebase/firestore';
@@ -296,6 +296,17 @@ export default function ForumPostsManagement() {
 
   const isAllSelected = paginatedPosts.length > 0 && selectedPosts.length === paginatedPosts.length;
   const isIndeterminate = selectedPosts.length > 0 && selectedPosts.length < paginatedPosts.length;
+  const selectAllCheckboxRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    if (selectAllCheckboxRef.current) {
+      // Find the input element within the button (Radix UI structure)
+      const input = selectAllCheckboxRef.current.querySelector('input[type="checkbox"]') as HTMLInputElement;
+      if (input) {
+        input.indeterminate = isIndeterminate;
+      }
+    }
+  }, [isIndeterminate]);
 
   if (postsLoading) {
     return (
@@ -511,9 +522,9 @@ export default function ForumPostsManagement() {
                 <TableRow>
                   <TableHead className="w-12">
                     <Checkbox
+                      ref={selectAllCheckboxRef}
                       checked={isAllSelected}
                       onCheckedChange={handleSelectAll}
-                      indeterminate={isIndeterminate}
                       aria-label={t('modules.community.posts.table.selectAll')}
                     />
                   </TableHead>

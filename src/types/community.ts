@@ -32,6 +32,7 @@ export interface ForumPost {
   isAnonymous?: boolean;   // Whether this specific post is anonymous
   isHidden?: boolean;      // Whether this post is hidden by admin
   isPinned?: boolean;      // Whether this post is pinned to the top
+  isDeleted?: boolean;     // Whether this post is soft deleted
   score: number;           // Overall score (likes - dislikes)
   likeCount: number;
   dislikeCount: number;
