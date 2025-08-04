@@ -66,8 +66,6 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen>
 
   /// Refreshes community status and providers
   void _refreshCommunityStatus() {
-    print('🔄 Community Screen: Refreshing community status');
-
     // Invalidate current profile to force fresh data
     ref.invalidate(currentCommunityProfileProvider);
   }
@@ -79,9 +77,6 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen>
 
   /// Initialize main screen data
   void _initializeMainScreen() {
-    print('🎯 InitState: Starting community main screen initialization');
-    print('🎯 InitState: Selected filter: $_selectedFilter');
-
     // Sync community profile with latest subscription status
     _syncCommunityProfile();
 
@@ -90,18 +85,14 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen>
 
     // Load different types of posts based on initial filter
     if (_selectedFilter == 'pinned') {
-      print('🎯 InitState: Loading pinned posts');
       ref
           .read(pinnedPostsPaginationProvider.notifier)
           .loadPosts(isPinned: true);
     } else if (_selectedFilter == 'news') {
-      print('🎯 InitState: Loading news posts');
       ref
           .read(newsPostsPaginationProvider.notifier)
-          .loadPosts(category: 'news');
+          .loadPosts(category: 'aqOhcyOg1z8tcij0y1S4');
     } else {
-      print(
-          '🎯 InitState: Loading general posts with category: ${_getFilterCategory()}');
       ref
           .read(postsPaginationProvider.notifier)
           .loadPosts(category: _getFilterCategory());
@@ -121,10 +112,8 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen>
       final syncService = ref.read(userSubscriptionSyncServiceProvider);
       if (await syncService.needsSync()) {
         await syncService.forceManualSync();
-        print('CommunityMainScreen: Profile synced successfully');
       }
     } catch (e) {
-      print('CommunityMainScreen: Failed to sync profile - $e');
       // Don't block UI if sync fails
     }
   }
@@ -134,21 +123,13 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen>
     try {
       final auth = FirebaseAuth.instance;
       final user = auth.currentUser;
-      print('🎯 UserStatus: Current user: ${user?.uid ?? 'Not authenticated'}');
 
       if (user != null) {
         final profileAsync = ref.read(currentCommunityProfileProvider);
         profileAsync.when(
-          data: (profile) {
-            print(
-                '🎯 UserStatus: Community profile: ${profile?.id ?? 'No profile'}, gender: ${profile?.gender}');
-          },
-          loading: () {
-            print('🎯 UserStatus: Community profile is loading...');
-          },
-          error: (error, stack) {
-            print('🎯 UserStatus: Community profile error: $error');
-          },
+          data: (profile) {},
+          loading: () {},
+          error: (error, stack) {},
         );
       }
     } catch (e) {
@@ -186,19 +167,10 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen>
           return const CommunityOnboardingScreen();
         },
         data: (profile) {
-          print(
-              '🎯 Community Main Screen: Profile data: ${profile?.id ?? 'null'}');
-          print(
-              '🎯 Community Main Screen: Profile deleted: ${profile?.isDeleted ?? 'n/a'}');
-
           // Simple logic: if user has active profile, show main content; otherwise show onboarding
           if (profile != null && !profile.isDeleted) {
-            print(
-                '🎯 Community Main Screen: Active profile found → Show main content');
             return _buildMainCommunityContent();
           } else {
-            print(
-                '🎯 Community Main Screen: No active profile → Show onboarding');
             return const CommunityOnboardingScreen();
           }
         },
@@ -421,9 +393,6 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen>
     final theme = AppTheme.of(context);
     final localizations = AppLocalizations.of(context);
     final postsAsync = ref.watch(mainScreenPostsProvider(null));
-
-    print(
-        '🎯 UI: Building posts view, postsAsync state: ${postsAsync.runtimeType}');
 
     return Column(
       children: [
@@ -833,7 +802,6 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen>
       AppLocalizations localizations, theme) {
     return postsAsync.when(
       loading: () {
-        print('🎯 UI: Posts loading...');
         return const Center(
           child: Spinner(),
         );
@@ -863,9 +831,7 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen>
         );
       },
       data: (posts) {
-        print('🎯 UI: Received ${posts.length} posts to display');
         if (posts.isEmpty) {
-          print('🎯 UI: No posts to display - showing empty state');
           return Container(
             width: double.infinity,
             child: Column(
@@ -883,7 +849,6 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen>
           );
         }
 
-        print('🎯 UI: Building list with ${posts.length} posts');
         return Column(
           children: [
             // Posts list
@@ -956,7 +921,6 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen>
     }
 
     if (postsState.posts.isEmpty && postsState.error != null) {
-      print('❌ Error loading pinned posts: ${postsState.error}');
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -1045,7 +1009,6 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen>
     }
 
     if (postsState.posts.isEmpty && postsState.error != null) {
-      print('❌ Error loading news posts: ${postsState.error}');
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -1061,7 +1024,7 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen>
               onPressed: () {
                 ref
                     .read(newsPostsPaginationProvider.notifier)
-                    .refresh(category: 'news');
+                    .refresh(category: 'aqOhcyOg1z8tcij0y1S4');
               },
               child: Text(localizations.translate('retry')),
             ),
@@ -1146,7 +1109,7 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen>
           case 'news':
             ref
                 .read(newsPostsPaginationProvider.notifier)
-                .refresh(category: 'news');
+                .refresh(category: 'aqOhcyOg1z8tcij0y1S4');
             break;
           case 'posts':
             ref.read(postsPaginationProvider.notifier).refresh();

@@ -52,26 +52,18 @@ class CommunityProfile {
 
   /// Business logic: Get display name following the pipeline: deleted → anonymous → actual name
   String getDisplayNameWithPipeline() {
-    print('🔍 [CommunityProfile] Pipeline check for profile $id:');
-    print('🔍 [CommunityProfile] - Display Name: "$displayName"');
-    print('🔍 [CommunityProfile] - Is Deleted: $isDeleted');
-    print('🔍 [CommunityProfile] - Is Anonymous: $isAnonymous');
-
     // 1. First check if user is deleted - if yes, display "deleted" text
     if (isDeleted) {
-      print('🔍 [CommunityProfile] -> Returning DELETED_USER');
       return 'DELETED_USER'; // This will be localized in the UI
     }
 
     // 2. Then check if they are anonymous - if yes, don't show their name
     if (isAnonymous) {
-      print('🔍 [CommunityProfile] -> Returning ANONYMOUS_USER');
       return 'ANONYMOUS_USER'; // This will be localized in the UI
     }
 
     // 3. If neither deleted nor anonymous, display their actual name
     final result = displayName.isNotEmpty ? displayName : 'Community Member';
-    print('🔍 [CommunityProfile] -> Returning actual name: "$result"');
     return result;
   }
 }

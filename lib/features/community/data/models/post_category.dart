@@ -9,6 +9,7 @@ class PostCategory {
   final String colorHex;
   final bool isActive;
   final int sortOrder;
+  final bool isForAdminOnly;
 
   const PostCategory({
     required this.id,
@@ -18,6 +19,7 @@ class PostCategory {
     required this.colorHex,
     required this.isActive,
     required this.sortOrder,
+    this.isForAdminOnly = false,
   });
 
   factory PostCategory.fromJson(Map<String, dynamic> json) {
@@ -29,6 +31,7 @@ class PostCategory {
       colorHex: json['colorHex'] as String,
       isActive: json['isActive'] as bool? ?? true,
       sortOrder: json['sortOrder'] as int? ?? 0,
+      isForAdminOnly: json['isForAdminOnly'] as bool? ?? false,
     );
   }
 
@@ -44,6 +47,7 @@ class PostCategory {
       colorHex: data['colorHex'] as String,
       isActive: data['isActive'] as bool? ?? true,
       sortOrder: data['sortOrder'] as int? ?? 0,
+      isForAdminOnly: data['isForAdminOnly'] as bool? ?? false,
     );
   }
 
@@ -56,6 +60,7 @@ class PostCategory {
       'colorHex': colorHex,
       'isActive': isActive,
       'sortOrder': sortOrder,
+      'isForAdminOnly': isForAdminOnly,
     };
   }
 
@@ -68,6 +73,7 @@ class PostCategory {
       'colorHex': colorHex,
       'isActive': isActive,
       'sortOrder': sortOrder,
+      'isForAdminOnly': isForAdminOnly,
     };
   }
 }

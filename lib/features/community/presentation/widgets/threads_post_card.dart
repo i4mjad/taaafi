@@ -229,19 +229,9 @@ class ThreadsPostCard extends ConsumerWidget {
                                         authorProfile?.shareRelapseStreaks ??
                                             false;
 
-                                    print(
-                                        '🎯 ThreadsPostCard: Streak check for ${post.authorCPId}');
-                                    print(
-                                        '🎯 - isPlusUser: $isPlusUser, allowsSharing: $allowsSharing');
-
                                     if (!isPlusUser || !allowsSharing) {
-                                      print(
-                                          '🎯 ❌ Conditions not met - no streak shown');
                                       return <Widget>[];
                                     }
-
-                                    print(
-                                        '🎯 ✅ Conditions met - calculating streak...');
 
                                     // Calculate streak in real-time
                                     return [
@@ -255,13 +245,9 @@ class ThreadsPostCard extends ConsumerWidget {
                                             data: (streakDays) {
                                               if (streakDays == null ||
                                                   streakDays <= 0) {
-                                                print(
-                                                    '🎯 ❌ Invalid streak data: $streakDays');
                                                 return const SizedBox.shrink();
                                               }
 
-                                              print(
-                                                  '🎯 🎉 SUCCESS! Showing streak: $streakDays days');
                                               return StreakDisplayWidget(
                                                 streakDays: streakDays,
                                               );
@@ -269,8 +255,6 @@ class ThreadsPostCard extends ConsumerWidget {
                                             loading: () =>
                                                 const SizedBox.shrink(),
                                             error: (error, stackTrace) {
-                                              print(
-                                                  '🎯 ❌ Error calculating streak: $error');
                                               return const SizedBox.shrink();
                                             },
                                           );
@@ -411,11 +395,34 @@ class ThreadsPostCard extends ConsumerWidget {
                             null,
                           ),
 
-                          Text(
-                            '0', // TODO: Add comment count
-                            style: TextStyles.caption.copyWith(
-                              color: theme.grey[600],
-                            ),
+                          const SizedBox(width: 4),
+
+                          // Comment count
+                          Consumer(
+                            builder: (context, ref, child) {
+                              final commentCountAsync =
+                                  ref.watch(postCommentCountProvider(post.id));
+                              return commentCountAsync.when(
+                                data: (count) => Text(
+                                  count.toString(),
+                                  style: TextStyles.caption.copyWith(
+                                    color: theme.grey[600],
+                                  ),
+                                ),
+                                loading: () => Text(
+                                  '0',
+                                  style: TextStyles.caption.copyWith(
+                                    color: theme.grey[600],
+                                  ),
+                                ),
+                                error: (error, stack) => Text(
+                                  '0',
+                                  style: TextStyles.caption.copyWith(
+                                    color: theme.grey[600],
+                                  ),
+                                ),
+                              );
+                            },
                           ),
                         ],
                       ),

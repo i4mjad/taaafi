@@ -58,13 +58,10 @@ class CommunityDeletionService {
       throw Exception('User not authenticated or UID mismatch');
     }
 
-    print('DEBUG: Starting community data deletion for user: $userUID');
-
     try {
       // First, get the community profile by userUID
       final profile = await _getCommunityProfileByUserUID(userUID);
       if (profile == null) {
-        print('DEBUG: No community profile found for user $userUID');
         return;
       }
 
@@ -96,18 +93,13 @@ class CommunityDeletionService {
       await _deleteCommunityInterest(batch, userUID); // Still uses userUID
       operationCount++;
 
-      print(
-          'DEBUG: Prepared $operationCount batch operations for community data deletion');
-
       // Execute all operations atomically
       if (operationCount > 0) {
         await batch.commit();
-        print('DEBUG: Successfully executed community data deletion batch');
       } else {
-        print('DEBUG: No community data found for user $userUID');
+        // No community data found for user $userUID
       }
     } catch (e) {
-      print('ERROR: Community data deletion failed for user $userUID: $e');
       throw Exception('Failed to delete community data: $e');
     }
   }
@@ -126,9 +118,6 @@ class CommunityDeletionService {
         'displayName': '[Deleted User]',
         'avatarUrl': null,
       });
-      print('DEBUG: Prepared community profile soft deletion');
-    } else {
-      print('DEBUG: No community profile found with ID $communityProfileId');
     }
   }
 
@@ -153,7 +142,6 @@ class CommunityDeletionService {
       count++;
     }
 
-    print('DEBUG: Prepared $count posts for soft deletion');
     return count;
   }
 
@@ -180,7 +168,6 @@ class CommunityDeletionService {
       }
     }
 
-    print('DEBUG: Prepared $count comments for soft deletion');
     return count;
   }
 
@@ -205,7 +192,6 @@ class CommunityDeletionService {
       }
     }
 
-    print('DEBUG: Prepared $count interactions for soft deletion');
     return count;
   }
 
@@ -217,7 +203,6 @@ class CommunityDeletionService {
 
     if (interestSnapshot.exists) {
       batch.delete(interestDoc);
-      print('DEBUG: Prepared community interest data for deletion');
     }
   }
 
@@ -236,8 +221,7 @@ class CommunityDeletionService {
 
       return snapshot.docs.first;
     } catch (e) {
-      print('ERROR: Failed to get community profile for user $userUID: $e');
-      return null;
+      throw Exception('Failed to get community profile for user $userUID: $e');
     }
   }
 
@@ -285,8 +269,7 @@ class CommunityDeletionService {
 
       return false;
     } catch (e) {
-      print('ERROR: Failed to check user community data: $e');
-      return true; // Assume data exists if check fails
+      throw Exception('Failed to check user community data: $e');
     }
   }
 
@@ -325,7 +308,7 @@ class CommunityDeletionService {
           await _interactions.where('userCPId', isEqualTo: profile.id).get();
       summary['interactions'] = interactionsQuery.docs.length;
     } catch (e) {
-      print('ERROR: Failed to get community data summary: $e');
+      throw Exception('Failed to get community data summary: $e');
     }
 
     return summary;

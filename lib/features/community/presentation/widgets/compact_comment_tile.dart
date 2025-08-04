@@ -20,19 +20,15 @@ class CompactCommentTile extends ConsumerWidget {
   /// Helper function to localize special display name constants
   String _getLocalizedDisplayName(
       String displayName, AppLocalizations localizations) {
-    print('🔍 [CompactComment] Localizing: "$displayName"');
-
     switch (displayName) {
       case 'DELETED_USER':
         final localized = localizations.translate('community-deleted-user');
-        print('🔍 [CompactComment] DELETED_USER -> "$localized"');
+
         return localized;
       case 'ANONYMOUS_USER':
         final localized = localizations.translate('community-anonymous');
-        print('🔍 [CompactComment] ANONYMOUS_USER -> "$localized"');
         return localized;
       default:
-        print('🔍 [CompactComment] Using original: "$displayName"');
         return displayName;
     }
   }
@@ -110,27 +106,12 @@ class CompactCommentTile extends ConsumerWidget {
                     children: [
                       authorProfileAsync.when(
                         data: (authorProfile) {
-                          print(
-                              '🔍 [CompactComment] Author profile for comment ${comment.id}:');
-                          print(
-                              '🔍 [CompactComment] - Profile ID: ${authorProfile?.id}');
-                          print(
-                              '🔍 [CompactComment] - Display Name: "${authorProfile?.displayName}"');
-                          print(
-                              '🔍 [CompactComment] - Is Deleted: ${authorProfile?.isDeleted}');
-                          print(
-                              '🔍 [CompactComment] - Is Anonymous: ${authorProfile?.isAnonymous}');
-
                           final pipelineResult = authorProfile
                                   ?.getDisplayNameWithPipeline() ??
                               localizations.translate('community-unknown-user');
-                          print(
-                              '🔍 [CompactComment] Pipeline result: "$pipelineResult"');
 
                           final displayName = _getLocalizedDisplayName(
                               pipelineResult, localizations);
-                          print(
-                              '🔍 [CompactComment] Final display name: "$displayName"');
 
                           return Text(
                             displayName,

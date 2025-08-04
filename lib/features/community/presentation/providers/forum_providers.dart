@@ -47,27 +47,6 @@ Future<String?> _getCommunityProfileIdFromUserUID(
   }
 }
 
-/// Debug helper to log gender filtering status
-void _debugGenderFiltering(
-  String providerName, {
-  required String? category,
-  required bool? isPinned,
-  required String? userGender,
-  required bool shouldApplyFilter,
-}) {
-  print('🔍 Gender Filtering Debug - $providerName:');
-  print('   Category: $category');
-  print('   Is Pinned: $isPinned');
-  print('   User Gender: ${userGender ?? "NULL (profile not loaded/missing)"}');
-  print('   Should Apply Filter: $shouldApplyFilter');
-  if (userGender == null && shouldApplyFilter) {
-    print(
-        '   ⚠️  INFO: Filtering enabled but user gender is null - will show NO posts');
-  }
-  print(
-      '   Rule: ${shouldApplyFilter ? "FILTERING ENABLED (same-gender + admins)" : "FILTERING DISABLED (all users)"}');
-}
-
 /// Helper class for managing post filter parameters
 class PostFilterParams {
   final int limit;
@@ -96,6 +75,7 @@ class PostFilterParams {
     if (category != null) {
       switch (category!.toLowerCase()) {
         case 'news':
+        case 'aqohcyog1z8tcij0y1s4': // News category ID
         case 'challenges':
           return false;
         default:
@@ -165,6 +145,15 @@ final postCategoriesProvider = StreamProvider<List<PostCategory>>((ref) {
   return repository.watchPostCategories();
 });
 
+// Post Categories Provider for New Post Screen (filters out admin-only categories)
+final newPostCategoriesProvider = StreamProvider<List<PostCategory>>((ref) {
+  final repository = ref.watch(forumRepositoryProvider);
+  return repository.watchPostCategories().map((categories) {
+    // Filter out admin-only categories
+    return categories.where((category) => !category.isForAdminOnly).toList();
+  });
+});
+
 // Posts Provider (with lazy loading support and mandatory gender filtering)
 final postsProvider =
     StreamProvider.family<List<Post>, String?>((ref, category) async* {
@@ -194,15 +183,6 @@ final postsProvider =
   } else if (currentProfile.hasError) {
     userGender = null;
   }
-
-  // Debug logging to verify gender filtering
-  _debugGenderFiltering(
-    'postsProvider',
-    category: category,
-    isPinned: null,
-    userGender: userGender,
-    shouldApplyFilter: shouldFilter,
-  );
 
   await for (final posts in repository.watchPosts(
     limit: 10,
@@ -255,8 +235,6 @@ final mainScreenPostsProvider =
 
   // Only load posts if user is in showMainContent state (has community profile)
   if (communityState != CommunityScreenState.showMainContent) {
-    print(
-        '🎯 MainScreenPostsProvider: User has no community profile, returning empty list');
     yield <Post>[];
     return;
   }
@@ -270,8 +248,6 @@ final mainScreenPostsProvider =
     if (profile != null) {
       final profileAge = DateTime.now().difference(profile.createdAt);
       if (profileAge.inSeconds < 3) {
-        print(
-            '🎯 MainScreenPostsProvider: New profile detected, adding 2s delay to avoid timing issues');
         await Future.delayed(Duration(seconds: 2));
       }
     }
@@ -287,20 +263,13 @@ final mainScreenPostsProvider =
   if (currentProfile.hasValue) {
     // Profile has loaded successfully
     userGender = currentProfile.value?.gender;
-    print('🎯 MainScreenPostsProvider: Profile loaded, gender: $userGender');
   } else if (currentProfile.isLoading) {
     // Profile is still loading, use null gender
     userGender = null;
-    print(
-        '🎯 MainScreenPostsProvider: Profile still loading, will use null gender');
   } else if (currentProfile.hasError) {
     // Profile has error, use null gender
     userGender = null;
-    print('🎯 MainScreenPostsProvider: Profile error: ${currentProfile.error}');
   }
-
-  print(
-      '🎯 MainScreenPostsProvider: Starting watchPosts with category: $category, userGender: $userGender, shouldFilter: $shouldFilter');
 
   await for (final posts in repository.watchPosts(
     limit: 50,
@@ -308,9 +277,6 @@ final mainScreenPostsProvider =
     userGender: userGender,
     applyGenderFilter: shouldFilter,
   )) {
-    print(
-        '🎯 MainScreenPostsProvider: Received ${posts.length} posts from repository');
-
     // Filter out optimistically deleted posts
     final filteredPosts = <Post>[];
 
@@ -320,9 +286,6 @@ final mainScreenPostsProvider =
         filteredPosts.add(post);
       }
     }
-
-    print(
-        '🎯 MainScreenPostsProvider: After filtering deleted posts: ${filteredPosts.length} posts');
 
     yield filteredPosts;
   }
@@ -426,6 +389,17 @@ final postCommentsProvider =
     StreamProvider.family.autoDispose<List<Comment>, String>((ref, postId) {
   final repository = ref.watch(forumRepositoryProvider);
   return repository.watchComments(postId);
+});
+
+/// Provider for post comment count (optimized for list views)
+final postCommentCountProvider =
+    StreamProvider.family.autoDispose<int, String>((ref, postId) {
+  final commentsStream = ref.watch(postCommentsProvider(postId));
+  return commentsStream.when(
+    data: (comments) => Stream.value(comments.length),
+    loading: () => Stream.value(0),
+    error: (error, stack) => Stream.value(0),
+  );
 });
 
 /// Provider for adding comments
@@ -876,35 +850,25 @@ class PostCreationNotifier extends StateNotifier<AsyncValue<String?>> {
 
   Future<void> createPost(
       PostFormData postData, AppLocalizations localizations) async {
-    print('🔄 [PostCreationNotifier] createPost called');
-    print('📝 [PostCreationNotifier] PostFormData received:');
-    print('   - Title: "${postData.title}"');
-    print('   - Content length: ${postData.content.length}');
-    print('   - Category ID: ${postData.categoryId}');
-
     state = const AsyncValue.loading();
-    print('⏳ [PostCreationNotifier] State set to loading');
 
     try {
-      print('🔄 [PostCreationNotifier] Calling ForumService.createPost...');
       final postId = await _forumService.createPost(postData, localizations);
-      print(
-          '✅ [PostCreationNotifier] ForumService.createPost returned postId: $postId');
 
-      state = AsyncValue.data(postId);
-      print(
-          '✅ [PostCreationNotifier] State set to success with postId: $postId');
+      if (postId != null) {
+        state = const AsyncValue.data(null);
+      } else {
+        state = AsyncValue.error(
+          Exception('Post creation returned null ID'),
+          StackTrace.current,
+        );
+      }
     } catch (e, st) {
-      print('❌ [PostCreationNotifier] Error in createPost: $e');
-      print('📋 [PostCreationNotifier] Stack trace: $st');
-
       state = AsyncValue.error(e, st);
-      print('❌ [PostCreationNotifier] State set to error');
     }
   }
 
   void reset() {
-    print('🔄 [PostCreationNotifier] reset called - clearing state');
     state = const AsyncValue.data(null);
   }
 }
@@ -948,8 +912,6 @@ class PostsPaginationNotifier extends StateNotifier<PostsPaginationState> {
     // Check if user has community profile before loading posts
     final communityState = _ref.read(communityScreenStateProvider);
     if (communityState != CommunityScreenState.showMainContent) {
-      print(
-          '🔍 PostsPaginationNotifier.loadPosts: User has no community profile, skipping load');
       state = state.copyWith(
         posts: <Post>[],
         lastDocument: null,
@@ -969,15 +931,6 @@ class PostsPaginationNotifier extends StateNotifier<PostsPaginationState> {
       final filterParams =
           PostFilterParams(category: category, isPinned: isPinned);
       final shouldApplyGenderFilter = filterParams.shouldApplyGenderFilter;
-
-      // Debug logging to verify gender filtering
-      _debugGenderFiltering(
-        'PostsPaginationNotifier.loadPosts',
-        category: category,
-        isPinned: isPinned,
-        userGender: currentProfile?.gender,
-        shouldApplyFilter: shouldApplyGenderFilter,
-      );
 
       final page = await _repository.getPosts(
         limit: 10,
@@ -1012,15 +965,6 @@ class PostsPaginationNotifier extends StateNotifier<PostsPaginationState> {
       final filterParams =
           PostFilterParams(category: category, isPinned: isPinned);
       final shouldApplyGenderFilter = filterParams.shouldApplyGenderFilter;
-
-      // Debug logging to verify gender filtering
-      _debugGenderFiltering(
-        'PostsPaginationNotifier.loadMorePosts',
-        category: category,
-        isPinned: isPinned,
-        userGender: currentProfile?.gender,
-        shouldApplyFilter: shouldApplyGenderFilter,
-      );
 
       final page = await _repository.getPosts(
         limit: 10,
@@ -1175,9 +1119,6 @@ class UserCommentsPaginationNotifier
   Future<void> loadComments() async {
     if (state.isLoading) return;
 
-    print(
-        '📝 [DEBUG] UserCommentsPaginationNotifier.loadComments - Starting for userCPId: $_userCPId');
-
     state = state.copyWith(isLoading: true, error: null);
 
     try {
@@ -1186,21 +1127,13 @@ class UserCommentsPaginationNotifier
         limit: 10,
       );
 
-      print(
-          '📝 [DEBUG] UserCommentsPaginationNotifier.loadComments - Received ${page.comments.length} comments');
-
       state = state.copyWith(
         comments: page.comments,
         lastDocument: page.lastDocument,
         hasMore: page.hasMore,
         isLoading: false,
       );
-
-      print(
-          '📝 [DEBUG] UserCommentsPaginationNotifier.loadComments - State updated successfully');
     } catch (e) {
-      print(
-          '📝 [ERROR] UserCommentsPaginationNotifier.loadComments - Error: $e');
       state = state.copyWith(isLoading: false, error: e.toString());
     }
   }
@@ -1252,9 +1185,6 @@ class UserLikedItemsPaginationNotifier
   Future<void> loadLikedItems() async {
     if (state.isLoading) return;
 
-    print(
-        '❤️📝 [DEBUG] UserLikedItemsPaginationNotifier.loadLikedItems - Starting for userCPId: $_userCPId, itemType: $_itemType');
-
     state = state.copyWith(isLoading: true, error: null);
 
     try {
@@ -1268,18 +1198,12 @@ class UserLikedItemsPaginationNotifier
               limit: 10,
             );
 
-      print(
-          '❤️📝 [DEBUG] UserLikedItemsPaginationNotifier.loadLikedItems - Received ${page.items.length} ${_itemType}s');
-
       state = state.copyWith(
         items: page.items,
         lastDocument: page.lastDocument,
         hasMore: page.hasMore,
         isLoading: false,
       );
-
-      print(
-          '❤️📝 [DEBUG] UserLikedItemsPaginationNotifier.loadLikedItems - State updated successfully');
     } catch (e) {
       print(
           '❤️📝 [ERROR] UserLikedItemsPaginationNotifier.loadLikedItems - Error: $e');

@@ -25,16 +25,9 @@ class RevenueCatAuthSyncService {
 
       // Start listening to auth state changes
       _startAuthStateListener();
-
-      print(
-          'RevenueCat Auth Sync: Successfully initialized and listening to auth changes');
     } on RevenueCatNotAvailableException catch (e) {
-      print('RevenueCat Auth Sync: Plugin not available - $e');
-      print(
-          'RevenueCat Auth Sync: Subscription features will be disabled until plugin is properly installed');
       // Don't start auth listener if RevenueCat isn't available
     } catch (e) {
-      print('RevenueCat Auth Sync: Initialization failed - $e');
       // Still start auth listener for when RevenueCat becomes available
       _startAuthStateListener();
     }
@@ -60,25 +53,20 @@ class RevenueCatAuthSyncService {
       // Skip if the user hasn't actually changed
       if (_lastSyncedUserId == newUserId) {
         // Only log occasionally to avoid spam
-        if (_shouldLogUserUnchanged()) {
-          print('RevenueCat Auth Sync: User unchanged, skipping sync');
-        }
+        if (_shouldLogUserUnchanged()) {}
         return;
       }
 
       if (user != null) {
         // User logged in: Update RevenueCat with Firebase UID
         await _revenueCatService.login(user.uid);
-        print('RevenueCat: Synced with Firebase user ${user.uid}');
         _lastSyncedUserId = user.uid;
       } else {
         // User logged out: Switch RevenueCat to anonymous mode
         await _revenueCatService.logout();
-        print('RevenueCat: Switched to anonymous mode');
         _lastSyncedUserId = null;
       }
     } catch (e) {
-      print('RevenueCat Auth Sync failed: $e');
       // Don't throw - auth sync failure shouldn't break the app
     }
   }
@@ -109,7 +97,6 @@ class RevenueCatAuthSyncService {
         _lastSyncedUserId = null;
       }
     } catch (e) {
-      print('Manual RevenueCat user sync failed: $e');
       rethrow;
     }
   }
@@ -118,8 +105,6 @@ class RevenueCatAuthSyncService {
   /// Useful when we need to ensure user is properly synced before operations
   Future<void> forceSyncCurrentUser() async {
     final currentUser = FirebaseAuth.instance.currentUser;
-    print(
-        'RevenueCat Auth Sync: Force syncing current user ${currentUser?.uid}');
 
     if (currentUser?.uid != null) {
       await _revenueCatService.login(currentUser!.uid);

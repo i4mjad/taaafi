@@ -27,19 +27,14 @@ class PostHeaderWidget extends ConsumerWidget {
   /// Helper function to localize special display name constants
   String _getLocalizedDisplayName(
       String displayName, AppLocalizations localizations) {
-    print('🔍 [PostHeader] Localizing display name: "$displayName"');
-
     switch (displayName) {
       case 'DELETED_USER':
         final localized = localizations.translate('community-deleted-user');
-        print('🔍 [PostHeader] DELETED_USER -> "$localized"');
         return localized;
       case 'ANONYMOUS_USER':
         final localized = localizations.translate('community-anonymous');
-        print('🔍 [PostHeader] ANONYMOUS_USER -> "$localized"');
         return localized;
       default:
-        print('🔍 [PostHeader] Using original display name: "$displayName"');
         return displayName;
     }
   }
@@ -69,12 +64,6 @@ class PostHeaderWidget extends ConsumerWidget {
 
     return authorProfileAsync.when(
       data: (authorProfile) {
-        print('🔍 [PostHeader] Author profile loaded for post ${post.id}:');
-        print('🔍 [PostHeader] - Profile ID: ${authorProfile?.id}');
-        print(
-            '🔍 [PostHeader] - Display Name: "${authorProfile?.displayName}"');
-        print('🔍 [PostHeader] - Is Deleted: ${authorProfile?.isDeleted}');
-        print('🔍 [PostHeader] - Is Anonymous: ${authorProfile?.isAnonymous}');
         final isAuthorAnonymous = authorProfile?.isAnonymous ?? false;
         final isAuthorPlusUser = authorProfile?.hasPlusSubscription() ?? false;
         final isOrphanedPost = authorProfile?.userUID == 'orphaned-post';
@@ -137,13 +126,11 @@ class PostHeaderWidget extends ConsumerWidget {
                                         final pipelineResult = authorProfile
                                                 ?.getDisplayNameWithPipeline() ??
                                             'Former User';
-                                        print(
-                                            '🔍 [PostHeader] Pipeline result: "$pipelineResult"');
+
                                         final localizedResult =
                                             _getLocalizedDisplayName(
                                                 pipelineResult, localizations);
-                                        print(
-                                            '🔍 [PostHeader] Final display name: "$localizedResult"');
+
                                         return localizedResult;
                                       }(),
                                       style: TextStyles.body.copyWith(
@@ -230,14 +217,7 @@ class PostHeaderWidget extends ConsumerWidget {
                                                   ?.shareRelapseStreaks ??
                                               false;
 
-                                          print(
-                                              '🎯 PostHeader: Real-time streak check for ${post.authorCPId}');
-                                          print(
-                                              '  ↳ isPlusUser: $isPlusUser, allowsSharing: $allowsSharing');
-
                                           if (!isPlusUser || !allowsSharing) {
-                                            print(
-                                                '  ↳ Streak not shown: isPlusUser=$isPlusUser, allowsSharing=$allowsSharing');
                                             return <Widget>[];
                                           }
 
@@ -253,14 +233,10 @@ class PostHeaderWidget extends ConsumerWidget {
                                                   data: (streakDays) {
                                                     if (streakDays == null ||
                                                         streakDays <= 0) {
-                                                      print(
-                                                          '  ↳ No valid streak data: $streakDays');
                                                       return const SizedBox
                                                           .shrink();
                                                     }
 
-                                                    print(
-                                                        '  ↳ Showing streak badge: $streakDays days');
                                                     return StreakDisplayWidget(
                                                       streakDays: streakDays,
                                                     );
@@ -268,8 +244,6 @@ class PostHeaderWidget extends ConsumerWidget {
                                                   loading: () =>
                                                       const SizedBox.shrink(),
                                                   error: (error, stackTrace) {
-                                                    print(
-                                                        '  ↳ Error calculating streak: $error');
                                                     return const SizedBox
                                                         .shrink();
                                                   },

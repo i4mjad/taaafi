@@ -223,21 +223,11 @@ class CommentTileWidget extends ConsumerWidget {
         // Username or anonymous indicator
         authorProfileAsync.when(
           data: (authorProfile) {
-            print('🔍 [CommentTile] Author profile for comment ${comment.id}:');
-            print('🔍 [CommentTile] - Profile ID: ${authorProfile?.id}');
-            print(
-                '🔍 [CommentTile] - Display Name: "${authorProfile?.displayName}"');
-            print('🔍 [CommentTile] - Is Deleted: ${authorProfile?.isDeleted}');
-            print(
-                '🔍 [CommentTile] - Is Anonymous: ${authorProfile?.isAnonymous}');
-
             final pipelineResult =
                 authorProfile?.getDisplayNameWithPipeline() ?? 'Unknown User';
-            print('🔍 [CommentTile] Pipeline result: "$pipelineResult"');
 
             final displayName =
                 _getLocalizedDisplayName(pipelineResult, localizations);
-            print('🔍 [CommentTile] Final display name: "$displayName"');
 
             return GestureDetector(
               onTap: !isAuthorAnonymous &&
@@ -309,22 +299,15 @@ class CommentTileWidget extends ConsumerWidget {
                   const SizedBox(width: 6),
                   Consumer(
                     builder: (context, ref, child) {
-                      print(
-                          '🎯 CommentTile: Real-time streak check for ${comment.authorCPId}');
-                      print(
-                          '  ↳ isPlusUser: $isAuthorPlusUser, allowsSharing: ${authorProfile?.shareRelapseStreaks}');
-
                       final streakAsync = ref.watch(
                           userStreakCalculatorProvider(comment.authorCPId));
 
                       return streakAsync.when(
                         data: (streakDays) {
                           if (streakDays == null || streakDays <= 0) {
-                            print('  ↳ No valid streak data: $streakDays');
                             return const SizedBox.shrink();
                           }
 
-                          print('  ↳ Showing streak: $streakDays days');
                           return Container(
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 4, vertical: 2),
@@ -358,7 +341,6 @@ class CommentTileWidget extends ConsumerWidget {
                         },
                         loading: () => const SizedBox.shrink(),
                         error: (error, stackTrace) {
-                          print('  ↳ Error calculating streak: $error');
                           return const SizedBox.shrink();
                         },
                       );

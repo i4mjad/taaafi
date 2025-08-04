@@ -6,7 +6,6 @@ import 'package:reboot_app_3/features/community/data/models/post.dart';
 import 'package:reboot_app_3/features/community/data/models/comment.dart';
 import 'package:reboot_app_3/features/community/data/models/interaction.dart';
 import 'package:reboot_app_3/features/community/application/gender_filtering_service.dart';
-import 'dart:math';
 
 /// Container for paginated posts data
 class PostsPage {
@@ -101,6 +100,7 @@ class ForumRepository {
   Future<List<PostCategory>> getPostCategories() async {
     try {
       final QuerySnapshot snapshot = await _postCategories
+          .where('isForAdminOnly', isEqualTo: false)
           .where('isActive', isEqualTo: true)
           .orderBy('sortOrder')
           .get();
@@ -118,16 +118,21 @@ class ForumRepository {
 
   /// Stream of post categories from Firestore
   Stream<List<PostCategory>> watchPostCategories() {
-    return _postCategories
-        .where('isActive', isEqualTo: true)
-        .orderBy('sortOrder')
-        .snapshots()
-        .map((snapshot) => snapshot.docs.map((doc) {
-              return PostCategory.fromFirestore(
-                doc.id,
-                doc.data() as Map<String, dynamic>,
-              );
-            }).toList());
+    try {
+      return _postCategories
+          .where('isForAdminOnly', isEqualTo: false)
+          .where('isActive', isEqualTo: true)
+          .orderBy('sortOrder')
+          .snapshots()
+          .map((snapshot) => snapshot.docs.map((doc) {
+                return PostCategory.fromFirestore(
+                  doc.id,
+                  doc.data() as Map<String, dynamic>,
+                );
+              }).toList());
+    } catch (e) {
+      throw Exception('Failed to fetch post categories: $e');
+    }
   }
 
   /// Get posts with pagination and optional gender filtering
@@ -359,40 +364,8 @@ class ForumRepository {
               .isDeleted) // This will handle missing fields thanks to default value
           .toList();
 
-      print(
-          '🔍 ForumRepository: _watchUnfilteredPosts returning ${posts.length} posts');
-      for (final post in posts) {
-        print(
-            '🔍 ForumRepository: Post ID: ${post.id}, authorCPId: ${post.authorCPId}, content: ${post.body.substring(0, min(50, post.body.length))}...');
-
-        // Check the author's profile gender
-        _checkAuthorGender(post.authorCPId);
-      }
-
       return posts;
     });
-  }
-
-  /// Debug method to check an author's gender
-  Future<void> _checkAuthorGender(String authorCPId) async {
-    try {
-      final doc = await _firestore
-          .collection('communityProfiles')
-          .doc(authorCPId)
-          .get();
-
-      if (doc.exists) {
-        final data = doc.data() as Map<String, dynamic>;
-        final gender = data['gender'] ?? 'unknown';
-        final isDeleted = data['isDeleted'] ?? false;
-        print(
-            '🔍 ForumRepository: Author $authorCPId - gender: $gender, isDeleted: $isDeleted');
-      } else {
-        print('🔍 ForumRepository: Author $authorCPId - profile not found!');
-      }
-    } catch (e) {
-      print('🔍 ForumRepository: Error checking author $authorCPId: $e');
-    }
   }
 
   /// Stream gender-filtered posts
@@ -402,41 +375,27 @@ class ForumRepository {
     bool? isPinned,
     required String userGender,
   }) async* {
-    print(
-        '🔍 ForumRepository: Starting _watchGenderFilteredPosts for gender: $userGender');
-
     // Get visible profile IDs and watch for changes
     await for (final visibleProfileIds in _genderFilteringService
         .watchVisibleCommunityProfileIds(userGender)) {
-      print(
-          '🔍 ForumRepository: Received ${visibleProfileIds.length} visible profile IDs: $visibleProfileIds');
-
       List<Post> genderFilteredPosts = [];
 
       if (visibleProfileIds.isNotEmpty) {
         // Try to get posts from valid profiles first
         genderFilteredPosts = await _getPostsFromProfiles(
             visibleProfileIds, limit, category, isPinned);
-        print(
-            '🔍 ForumRepository: Found ${genderFilteredPosts.length} posts from valid profiles');
       }
 
       // If no posts found from valid profiles, try orphaned posts as fallback
       if (genderFilteredPosts.isEmpty) {
-        print(
-            '🔍 ForumRepository: No posts from valid profiles, checking for orphaned posts as fallback');
-
         try {
           final orphanedPosts =
               await _getOrphanedPosts(limit, category, isPinned);
-          print(
-              '🔍 ForumRepository: Found ${orphanedPosts.length} orphaned posts as fallback');
 
           // For now, just return orphaned posts as fallback
           yield orphanedPosts;
         } catch (e) {
           // If orphaned posts check fails (e.g., permission issues), return empty list
-          print('🔍 ForumRepository: Orphaned posts check failed: $e');
           yield <Post>[];
         }
       } else {
@@ -454,7 +413,6 @@ class ForumRepository {
 
       for (int i = 0; i < profileIds.length; i += batchSize) {
         final batch = profileIds.skip(i).take(batchSize).toList();
-        print('🔍 ForumRepository: Querying posts for profile batch: $batch');
 
         Query query = _posts
             .where('authorCPId', whereIn: batch)
@@ -476,7 +434,6 @@ class ForumRepository {
             .where((post) => !post.isDeleted)
             .toList();
 
-        print('🔍 ForumRepository: Batch returned ${batchPosts.length} posts');
         allPosts.addAll(batchPosts);
       }
 
@@ -484,7 +441,6 @@ class ForumRepository {
       allPosts.sort((a, b) => b.createdAt.compareTo(a.createdAt));
       return allPosts.take(limit).toList();
     } catch (e) {
-      print('🔍 ForumRepository: Error getting posts from profiles: $e');
       return [];
     }
   }
@@ -716,18 +672,8 @@ class ForumRepository {
     String? categoryId,
     List<String>? attachmentUrls,
   }) async {
-    print('💾 [ForumRepository] createPost started');
-    print('📝 [ForumRepository] Parameters received:');
-    print('   - authorCPId: $authorCPId');
-    print('   - title: "$title" (${title.length} chars)');
-    print(
-        '   - content: "${content.substring(0, content.length > 100 ? 100 : content.length)}${content.length > 100 ? '...' : ''}" (${content.length} chars)');
-    print('   - categoryId: $categoryId');
-    print('   - attachmentUrls: $attachmentUrls');
-
     try {
       final now = DateTime.now();
-      print('⏰ [ForumRepository] Timestamp created: $now');
 
       // Create post document data
       final postData = {
@@ -746,29 +692,11 @@ class ForumRepository {
         // Note: attachmentUrls not implemented yet
       };
 
-      print('📄 [ForumRepository] Firestore document data prepared:');
-      print('   - authorCPId: ${postData['authorCPId']}');
-      print('   - title: ${postData['title']}');
-      print('   - body length: ${(postData['body'] as String).length}');
-      print('   - category: ${postData['category']}');
-      print('   - isPinned: ${postData['isPinned']}');
-      print('   - isDeleted: ${postData['isDeleted']}');
-      print('   - isCommentingAllowed: ${postData['isCommentingAllowed']}');
-      print('   - score: ${postData['score']}');
-      print('   - likeCount: ${postData['likeCount']}');
-      print('   - dislikeCount: ${postData['dislikeCount']}');
-      print('   - createdAt: ${postData['createdAt']}');
-
       // Add to Firestore and get the document reference
-      print('🔄 [ForumRepository] Adding document to Firestore...');
       final docRef = await _posts.add(postData);
-      print('✅ [ForumRepository] Document added successfully');
-      print('🆔 [ForumRepository] Generated document ID: ${docRef.id}');
 
       return docRef.id;
     } catch (e) {
-      print('❌ [ForumRepository] Error creating post: $e');
-      print('❌ [ForumRepository] Error type: ${e.runtimeType}');
       throw Exception('Failed to create post: $e');
     }
   }
@@ -1104,37 +1032,26 @@ class ForumRepository {
     DocumentSnapshot? lastDocument,
   }) async {
     try {
-      print(
-          '🔍 [DEBUG] getUserComments - Starting fetch for userCPId: $userCPId, limit: $limit');
-
       Query query = _comments
           .where('authorCPId', isEqualTo: userCPId)
           .orderBy('createdAt', descending: true);
 
       if (lastDocument != null) {
         query = query.startAfterDocument(lastDocument);
-        print('🔍 [DEBUG] getUserComments - Using lastDocument for pagination');
       }
 
       query = query.limit(limit);
 
       final QuerySnapshot snapshot = await query.get();
-      print(
-          '🔍 [DEBUG] getUserComments - Query executed, found ${snapshot.docs.length} documents');
 
       final List<Comment> comments = snapshot.docs
           .map((doc) {
             final comment = Comment.fromFirestore(
                 doc as DocumentSnapshot<Map<String, dynamic>>);
-            print(
-                '🔍 [DEBUG] getUserComments - Comment: ${comment.id}, body: ${comment.body.length > 50 ? comment.body.substring(0, 50) + "..." : comment.body}');
             return comment;
           })
           .where((comment) => !comment.isDeleted)
           .toList(); // Filter out deleted comments
-
-      print(
-          '🔍 [DEBUG] getUserComments - Processed ${comments.length} comments, hasMore: ${comments.length == limit}');
 
       return CommentsPage(
         comments: comments,
@@ -1153,9 +1070,6 @@ class ForumRepository {
     DocumentSnapshot? lastDocument,
   }) async {
     try {
-      print(
-          '❤️ [DEBUG] getUserLikedPosts - Starting fetch for userCPId: $userCPId, limit: $limit');
-
       Query query = _interactions
           .where('userCPId', isEqualTo: userCPId)
           .where('targetType', isEqualTo: 'post')
@@ -1165,22 +1079,16 @@ class ForumRepository {
 
       if (lastDocument != null) {
         query = query.startAfterDocument(lastDocument);
-        print(
-            '❤️ [DEBUG] getUserLikedPosts - Using lastDocument for pagination');
       }
 
       query = query.limit(limit);
 
       final QuerySnapshot snapshot = await query.get();
-      print(
-          '❤️ [DEBUG] getUserLikedPosts - Query executed, found ${snapshot.docs.length} interactions');
 
       final List<Interaction> interactions = snapshot.docs
           .map((doc) {
             final interaction = Interaction.fromFirestore(
                 doc as DocumentSnapshot<Map<String, dynamic>>);
-            print(
-                '❤️ [DEBUG] getUserLikedPosts - Interaction: ${interaction.id}, targetId: ${interaction.targetId}, value: ${interaction.value}');
             return interaction;
           })
           .where((interaction) => !interaction.isDeleted)
@@ -1188,8 +1096,6 @@ class ForumRepository {
 
       // Get the actual posts for these interactions
       final List<Post> posts = [];
-      print(
-          '❤️ [DEBUG] getUserLikedPosts - Fetching ${interactions.length} posts from interactions');
 
       for (final interaction in interactions) {
         try {
@@ -1199,26 +1105,13 @@ class ForumRepository {
                 postDoc as DocumentSnapshot<Map<String, dynamic>>);
             if (!post.isDeleted) {
               posts.add(post);
-              print(
-                  '❤️ [DEBUG] getUserLikedPosts - Added post: ${post.id}, title: ${post.title.length > 30 ? post.title.substring(0, 30) + "..." : post.title}');
-            } else {
-              print(
-                  '❤️ [DEBUG] getUserLikedPosts - Skipped deleted post: ${post.id}');
             }
-          } else {
-            print(
-                '❤️ [DEBUG] getUserLikedPosts - Post not found: ${interaction.targetId}');
           }
         } catch (e) {
-          print(
-              '❤️ [ERROR] getUserLikedPosts - Failed to load post ${interaction.targetId}: $e');
           // Skip posts that can't be loaded
           continue;
         }
       }
-
-      print(
-          '❤️ [DEBUG] getUserLikedPosts - Final result: ${posts.length} posts, hasMore: ${interactions.length == limit}');
 
       return LikedItemsPage(
         items: posts,
@@ -1237,9 +1130,6 @@ class ForumRepository {
     DocumentSnapshot? lastDocument,
   }) async {
     try {
-      print(
-          '💬❤️ [DEBUG] getUserLikedComments - Starting fetch for userCPId: $userCPId, limit: $limit');
-
       Query query = _interactions
           .where('userCPId', isEqualTo: userCPId)
           .where('targetType', isEqualTo: 'comment')
@@ -1249,22 +1139,16 @@ class ForumRepository {
 
       if (lastDocument != null) {
         query = query.startAfterDocument(lastDocument);
-        print(
-            '💬❤️ [DEBUG] getUserLikedComments - Using lastDocument for pagination');
       }
 
       query = query.limit(limit);
 
       final QuerySnapshot snapshot = await query.get();
-      print(
-          '💬❤️ [DEBUG] getUserLikedComments - Query executed, found ${snapshot.docs.length} interactions');
 
       final List<Interaction> interactions = snapshot.docs
           .map((doc) {
             final interaction = Interaction.fromFirestore(
                 doc as DocumentSnapshot<Map<String, dynamic>>);
-            print(
-                '💬❤️ [DEBUG] getUserLikedComments - Interaction: ${interaction.id}, targetId: ${interaction.targetId}, value: ${interaction.value}');
             return interaction;
           })
           .where((interaction) => !interaction.isDeleted)
@@ -1272,8 +1156,6 @@ class ForumRepository {
 
       // Get the actual comments for these interactions
       final List<Comment> comments = [];
-      print(
-          '💬❤️ [DEBUG] getUserLikedComments - Fetching ${interactions.length} comments from interactions');
 
       for (final interaction in interactions) {
         try {
@@ -1283,26 +1165,13 @@ class ForumRepository {
                 commentDoc as DocumentSnapshot<Map<String, dynamic>>);
             if (!comment.isDeleted) {
               comments.add(comment);
-              print(
-                  '💬❤️ [DEBUG] getUserLikedComments - Added comment: ${comment.id}, body: ${comment.body.length > 30 ? comment.body.substring(0, 30) + "..." : comment.body}');
-            } else {
-              print(
-                  '💬❤️ [DEBUG] getUserLikedComments - Skipped deleted comment: ${comment.id}');
             }
-          } else {
-            print(
-                '💬❤️ [DEBUG] getUserLikedComments - Comment not found: ${interaction.targetId}');
           }
         } catch (e) {
-          print(
-              '💬❤️ [ERROR] getUserLikedComments - Failed to load comment ${interaction.targetId}: $e');
           // Skip comments that can't be loaded
           continue;
         }
       }
-
-      print(
-          '💬❤️ [DEBUG] getUserLikedComments - Final result: ${comments.length} comments, hasMore: ${interactions.length == limit}');
 
       return LikedItemsPage(
         items: comments,
@@ -1319,8 +1188,6 @@ class ForumRepository {
   Future<List<Post>> _getOrphanedPosts(
       int limit, String? category, bool? isPinned) async {
     try {
-      print('🔍 ForumRepository: Checking for orphaned posts...');
-
       // Get all posts first
       Query query = _posts.orderBy('createdAt', descending: true);
 
@@ -1354,26 +1221,20 @@ class ForumRepository {
 
           if (!profileExists) {
             orphanedPosts.add(post);
-            print(
-                '🔍 ForumRepository: Found orphaned post: ${post.id} by ${post.authorCPId}');
           }
 
           if (orphanedPosts.length >= limit) break;
         } catch (profileCheckError) {
           // Skip this post if we can't check the profile (permission issues)
-          print(
-              '🔍 ForumRepository: Skipping post ${post.id} due to profile check error: $profileCheckError');
           continue;
         }
       }
 
       return orphanedPosts;
     } catch (e) {
-      print('🔍 ForumRepository: Error getting orphaned posts: $e');
       // If permission denied or other errors, return empty list instead of crashing
       if (e.toString().contains('permission-denied')) {
-        print(
-            '🔍 ForumRepository: Permission denied - likely new profile timing issue, returning empty list');
+        // Permission denied - likely new profile timing issue, returning empty list
       }
       return [];
     }

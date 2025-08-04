@@ -73,23 +73,15 @@ class _ProfileRestoreSelectionModalState
                 future:
                     ref.read(communityServiceProvider).getAllDeletedProfiles(),
                 builder: (context, snapshot) {
-                  print('🔄 ProfileRestore: Loading deleted profiles...');
-
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    print(
-                        '🔄 ProfileRestore: Still loading deleted profiles...');
                     return const Center(child: Spinner());
                   }
 
                   if (snapshot.hasError) {
-                    print(
-                        '❌ ProfileRestore: Error loading deleted profiles: ${snapshot.error}');
                     return _buildErrorState(context, theme, l10n);
                   }
 
                   final profiles = snapshot.data ?? [];
-                  print(
-                      '✅ ProfileRestore: Loaded ${profiles.length} deleted profiles');
 
                   if (profiles.isEmpty) {
                     return _buildEmptyState(context, theme, l10n);
@@ -567,88 +559,50 @@ class _ProfileRestoreSelectionModalState
   }
 
   void _restoreSelectedProfile(BuildContext context, bool hasPlus) async {
-    print('🔄 ProfileRestore: Starting restoration process...');
-    print('🔄 ProfileRestore: Selected profile ID: $_selectedProfileId');
-    print('🔄 ProfileRestore: Has Plus: $hasPlus');
-    print('🔄 ProfileRestore: Is already restoring: $_isRestoring');
-
     if (_selectedProfileId == null || _isRestoring) {
-      print(
-          '❌ ProfileRestore: Validation failed - profile ID: $_selectedProfileId, isRestoring: $_isRestoring');
       return;
     }
 
-    print('🔄 ProfileRestore: Setting isRestoring to true...');
     setState(() {
       _isRestoring = true;
     });
 
     try {
-      print('🔄 ProfileRestore: Getting community service...');
       final service = ref.read(communityServiceProvider);
 
-      print(
-          '🔄 ProfileRestore: Calling restoreProfile with ID: $_selectedProfileId, bypassLatestCheck: $hasPlus');
       await service.restoreProfile(_selectedProfileId!,
           bypassLatestCheck: hasPlus);
 
-      print('✅ ProfileRestore: Service call completed successfully');
-
       if (mounted) {
-        print(
-            '🔄 ProfileRestore: Widget still mounted, refreshing providers...');
-
         // Refresh all community-related providers
         ref.refresh(hasCommunityProfileProvider);
-        print('✅ ProfileRestore: hasCommunityProfileProvider refreshed');
 
         ref.refresh(hasGroupsProfileProvider);
-        print('✅ ProfileRestore: hasGroupsProfileProvider refreshed');
 
         ref.refresh(currentCommunityProfileProvider);
-        print('✅ ProfileRestore: currentCommunityProfileProvider refreshed');
 
         // Refresh user profile provider to update user profile screen
         ref.invalidate(userProfileNotifierProvider);
-        print('✅ ProfileRestore: userProfileNotifierProvider refreshed');
 
         // Notify community screen state that a profile is now available
         ref.read(communityScreenStateProvider.notifier).refresh();
-        print('✅ ProfileRestore: communityScreenStateProvider refreshed');
 
         // Close modal and show success
-        print('🔄 ProfileRestore: Closing modal...');
         Navigator.of(context).pop();
 
         // Navigate to main community screen (similar to after profile creation)
-        print('🔄 ProfileRestore: Navigating to main community screen...');
         context.goNamed(RouteNames.community.name);
 
-        print('🔄 ProfileRestore: Showing success snackbar...');
         getSuccessSnackBar(context, 'profile-restored-successfully');
-
-        print('✅ ProfileRestore: Restoration process completed successfully!');
-      } else {
-        print('⚠️ ProfileRestore: Widget not mounted, skipping UI updates');
-      }
+      } else {}
     } catch (e, stackTrace) {
-      print('❌ ProfileRestore: Restoration failed with error: $e');
-      print('❌ ProfileRestore: Stack trace: $stackTrace');
-
       if (mounted) {
-        print('🔄 ProfileRestore: Widget mounted, updating UI for error...');
         setState(() {
           _isRestoring = false;
         });
 
-        print('🔄 ProfileRestore: Showing error snackbar...');
         getErrorSnackBar(context, 'profile-restore-failed');
-
-        print('❌ ProfileRestore: Error handling completed');
-      } else {
-        print(
-            '⚠️ ProfileRestore: Widget not mounted during error, skipping UI updates');
-      }
+      } else {}
     }
   }
 

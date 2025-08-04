@@ -19,8 +19,6 @@ class ScaffoldWithNestedNavigation extends ConsumerWidget {
     const int communityTabIndex = 2;
 
     if (index == communityTabIndex) {
-      print('🔄 Tab Navigation: Community tab clicked - refreshing status');
-
       // Refresh community status when community tab is clicked
       ref.read(communityScreenStateProvider.notifier).refresh();
 

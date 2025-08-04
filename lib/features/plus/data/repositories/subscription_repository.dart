@@ -410,24 +410,9 @@ class SubscriptionRepository {
 
       final info = await getSubscriptionStatus();
 
-      // Debug logging
-      print('Checking subscription status:');
-      print('  - Status: ${info.status}');
-      print('  - IsActive: ${info.isActive}');
-      print('  - CustomerInfo available: ${info.customerInfo != null}');
-
       if (info.customerInfo != null) {
         final entitlements = info.customerInfo!.entitlements;
-        print('  - Active entitlements: ${entitlements.active.keys.toList()}');
-        print('  - All entitlements: ${entitlements.all.keys.toList()}');
-
         final plusEntitlement = entitlements.all['taaafi_plus'];
-        if (plusEntitlement != null) {
-          print(
-              '  - Plus entitlement: isActive=${plusEntitlement.isActive}, identifier=${plusEntitlement.identifier}');
-        } else {
-          print('  - Plus entitlement: NOT FOUND');
-        }
       }
 
       // Use RevenueCat entitlement check if available, otherwise fallback to legacy check
@@ -435,10 +420,6 @@ class SubscriptionRepository {
       final hasLegacyStatus =
           (info.status == SubscriptionStatus.plus && info.isActive);
       final result = hasEntitlement || hasLegacyStatus;
-
-      print('  - HasEntitlement(plus): $hasEntitlement');
-      print('  - HasLegacyStatus: $hasLegacyStatus');
-      print('  - Final result: $result');
 
       return result;
     } catch (e) {

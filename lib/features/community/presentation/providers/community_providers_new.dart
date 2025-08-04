@@ -116,9 +116,6 @@ final communityProfileWithFallbackProvider =
       .snapshots()
       .map((snapshot) {
     if (!snapshot.exists) {
-      print(
-          '🔍 CommunityProfile: Profile $cpId not found, creating fallback profile');
-
       // Return a fallback profile for orphaned posts
       return CommunityProfileEntity(
         id: cpId,
@@ -199,22 +196,15 @@ final communityInterestProvider =
 final userStreakCalculatorProvider =
     FutureProvider.family<int?, String>((ref, communityProfileId) async {
   try {
-    print('🏆 ============================================');
-    print(
-        '🏆 STREAK CALCULATOR CALLED for community profile: $communityProfileId');
-    print('🏆 ============================================');
-
     final firestore = ref.watch(firestoreProvider);
 
     // Step 1: Get userUID from community profile
-    print('🏆 Step 1: Fetching community profile to get userUID...');
     final profileDoc = await firestore
         .collection('communityProfiles')
         .doc(communityProfileId)
         .get();
 
     if (!profileDoc.exists) {
-      print('🏆 ❌ FAILED: Community profile not found for $communityProfileId');
       return null;
     }
 
@@ -222,38 +212,27 @@ final userStreakCalculatorProvider =
     final userUID = profileData['userUID'] as String?;
 
     if (userUID == null) {
-      print('🏆 ❌ FAILED: No userUID found in community profile');
       return null;
     }
 
-    print('🏆 ✅ Found userUID: $userUID');
-
     // Step 2: Get user's first date (matching StreakRepository.getUserFirstDate)
-    print('🏆 Step 2: Fetching user document for userFirstDate...');
     final userDocSnapshot =
         await firestore.collection('users').doc(userUID).get();
     if (!userDocSnapshot.exists) {
-      print('🏆 ❌ FAILED: User document not found for $userUID');
       return null;
     }
-    print('🏆 ✅ User document found');
 
     final userData = userDocSnapshot.data() as Map<String, dynamic>;
-    print('🏆 User document keys: ${userData.keys.toList()}');
 
     // Use userFirstDate field (NOT createdAt) to match StreakRepository
     final userFirstDateTimestamp = userData['userFirstDate'] as Timestamp?;
     if (userFirstDateTimestamp == null) {
-      print('🏆 ❌ FAILED: No userFirstDate field found');
-      print('🏆 Available userData: $userData');
       return null;
     }
 
     final userFirstDate = userFirstDateTimestamp.toDate();
-    print('🏆 ✅ User first date (userFirstDate field): $userFirstDate');
 
     // Step 3: Get relapse follow-ups (matching StreakRepository.readFollowUpsByType)
-    print('🏆 Step 3: Fetching relapse follow-ups...');
     final followUpsSnapshot = await firestore
         .collection('users')
         .doc(userUID)
@@ -261,26 +240,16 @@ final userStreakCalculatorProvider =
         .where('type', isEqualTo: FollowUpType.relapse.name)
         .get();
 
-    print('🏆 ✅ Follow-ups query completed');
-    print('🏆 Found ${followUpsSnapshot.docs.length} relapse follow-ups');
-
     // Convert to FollowUpModel objects and sort (matching StreakService logic)
     final relapseFollowUps = followUpsSnapshot.docs
         .map((doc) => FollowUpModel.fromDoc(doc))
         .toList();
 
-    // Debug: Print all follow-ups
     if (relapseFollowUps.isNotEmpty) {
-      print('🏆 📋 Recent relapse follow-ups:');
       for (int i = 0; i < relapseFollowUps.length && i < 3; i++) {
         final followUp = relapseFollowUps[i];
-        print(
-            '🏆   - Follow-up ${i + 1}: ${followUp.time}, type: ${followUp.type.name}');
       }
     } else {
-      print(
-          '🏆 📝 No relapse follow-ups found - checking followUps collection...');
-
       // Check if followUps collection exists at all
       final allFollowUpsSnapshot = await firestore
           .collection('users')
@@ -289,13 +258,9 @@ final userStreakCalculatorProvider =
           .limit(5)
           .get();
 
-      print(
-          '🏆 Total follow-ups in collection: ${allFollowUpsSnapshot.docs.length}');
       if (allFollowUpsSnapshot.docs.isNotEmpty) {
-        print('🏆 Sample follow-ups:');
         for (final doc in allFollowUpsSnapshot.docs) {
           final data = doc.data();
-          print('🏆   - Type: ${data['type']}, Time: ${data['time']}');
         }
       }
     }
@@ -304,9 +269,6 @@ final userStreakCalculatorProvider =
     if (relapseFollowUps.isEmpty) {
       // No relapses, calculate days since user first date
       final streakDays = DateTime.now().difference(userFirstDate).inDays;
-      print(
-          '🏆 🎯 RESULT: No relapses found, streak since userFirstDate: $streakDays days');
-      print('🏆 ============================================');
       return streakDays;
     } else {
       // Sort by time descending and get most recent relapse
@@ -314,9 +276,6 @@ final userStreakCalculatorProvider =
       final lastFollowUpDate = relapseFollowUps.first.time;
 
       final streakDays = DateTime.now().difference(lastFollowUpDate).inDays;
-      print(
-          '🏆 🎯 RESULT: Last relapse: $lastFollowUpDate, current streak: $streakDays days');
-      print('🏆 ============================================');
       return streakDays;
     }
   } catch (e, stackTrace) {
@@ -349,36 +308,33 @@ class CommunityScreenStateNotifier extends StateNotifier<CommunityScreenState> {
       (previous, next) {
         next.when(
           data: (profile) {
-            print('🎯 CommunityState: Profile stream update');
-            print('🎯 CommunityState: Profile: ${profile?.id ?? 'null'}');
-            print(
-                '🎯 CommunityState: Is deleted: ${profile?.isDeleted ?? 'n/a'}');
-
             if (profile != null && !profile.isDeleted) {
               // User has an ACTIVE profile, show main content
-              print('🎯 CommunityState: Profile is active → Show main content');
               if (state != CommunityScreenState.showMainContent) {
-                state = CommunityScreenState.showMainContent;
+                Future.microtask(() {
+                  state = CommunityScreenState.showMainContent;
+                });
               }
             } else {
               // User doesn't have an active profile, show onboarding
-              print('🎯 CommunityState: No active profile → Show onboarding');
               if (state != CommunityScreenState.needsOnboarding) {
-                state = CommunityScreenState.needsOnboarding;
+                Future.microtask(() {
+                  state = CommunityScreenState.needsOnboarding;
+                });
               }
             }
           },
           loading: () {
-            print('🎯 CommunityState: Profile stream loading');
             // Keep current state during loading unless we're in error state
             if (state == CommunityScreenState.error) {
-              state = CommunityScreenState.loading;
+              Future.microtask(() {
+                state = CommunityScreenState.loading;
+              });
             }
           },
           error: (error, stackTrace) {
-            print('❌ Error in community profile stream: $error');
             // On error, re-check the actual state instead of defaulting to onboarding
-            _checkCommunityState();
+            Future.microtask(() => _checkCommunityState());
           },
         );
       },
@@ -388,17 +344,14 @@ class CommunityScreenStateNotifier extends StateNotifier<CommunityScreenState> {
   /// Check if user has community profile and set appropriate state
   Future<void> _checkCommunityState() async {
     try {
-      state = CommunityScreenState.loading;
+      Future.microtask(() {
+        state = CommunityScreenState.loading;
+      });
 
       // Check if user has an ACTIVE (non-deleted) community profile
       final hasActiveProfile = await _communityService.hasProfile();
 
-      print('🎯 CommunityState: Checking user profile state');
-      print('🎯 CommunityState: Has active profile: $hasActiveProfile');
-
       if (hasActiveProfile) {
-        print('🎯 CommunityState: User has active profile → Show main content');
-
         // Add small delay for newly created profiles to allow system sync
         try {
           final currentProfile =
@@ -407,26 +360,26 @@ class CommunityScreenStateNotifier extends StateNotifier<CommunityScreenState> {
             final profileAge =
                 DateTime.now().difference(currentProfile.createdAt);
             if (profileAge.inSeconds < 5) {
-              print(
-                  '🎯 CommunityState: New profile detected (${profileAge.inSeconds}s old), adding 1s delay for system sync');
               await Future.delayed(Duration(seconds: 1));
             }
           }
         } catch (e) {
-          print(
-              '🎯 CommunityState: Could not check profile age, proceeding normally: $e');
+          // Could not check profile age, proceeding normally
         }
 
-        state = CommunityScreenState.showMainContent;
+        Future.microtask(() {
+          state = CommunityScreenState.showMainContent;
+        });
       } else {
-        print(
-            '🎯 CommunityState: User has no active profile → Show onboarding');
-        state = CommunityScreenState.needsOnboarding;
+        Future.microtask(() {
+          state = CommunityScreenState.needsOnboarding;
+        });
       }
     } catch (e) {
-      print('❌ Error checking community state: $e');
       // On error, default to onboarding to be safe
-      state = CommunityScreenState.needsOnboarding;
+      Future.microtask(() {
+        state = CommunityScreenState.needsOnboarding;
+      });
     }
   }
 
@@ -437,7 +390,9 @@ class CommunityScreenStateNotifier extends StateNotifier<CommunityScreenState> {
 
   /// Called when user completes onboarding to switch to main content
   void onboardingCompleted() {
-    state = CommunityScreenState.showMainContent;
+    Future.microtask(() {
+      state = CommunityScreenState.showMainContent;
+    });
   }
 }
 

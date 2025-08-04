@@ -27,14 +27,10 @@ class GenderFilteringService {
     if (_cachedAdminCPIds != null &&
         _lastAdminCacheUpdate != null &&
         DateTime.now().difference(_lastAdminCacheUpdate!) < _cacheExpiry) {
-      print(
-          '🔍 GenderFilteringService: Returning cached admin IDs: $_cachedAdminCPIds');
       return _cachedAdminCPIds!;
     }
 
     try {
-      print('🔍 GenderFilteringService: Fetching admin user IDs...');
-
       // Get admin user IDs from users collection
       final adminUsersSnapshot = await _firestore
           .collection('users')
@@ -44,13 +40,10 @@ class GenderFilteringService {
       final adminUserIds =
           adminUsersSnapshot.docs.map((doc) => doc.id).toList();
 
-      print(
-          '🔍 GenderFilteringService: Found ${adminUserIds.length} admin user IDs: $adminUserIds');
-
       if (adminUserIds.isEmpty) {
         _cachedAdminCPIds = [];
         _lastAdminCacheUpdate = DateTime.now();
-        print('🔍 GenderFilteringService: No admin users found');
+        // No admin users found
         return [];
       }
 
@@ -60,8 +53,6 @@ class GenderFilteringService {
 
       for (int i = 0; i < adminUserIds.length; i += batchSize) {
         final batch = adminUserIds.skip(i).take(batchSize).toList();
-        print(
-            '🔍 GenderFilteringService: Querying community profiles for admin users batch: $batch');
 
         final cpSnapshot = await _firestore
             .collection('communityProfiles')
@@ -71,8 +62,6 @@ class GenderFilteringService {
             .get();
 
         final batchCPIds = cpSnapshot.docs.map((doc) => doc.id).toList();
-        print(
-            '🔍 GenderFilteringService: Found ${batchCPIds.length} admin community profiles in batch: $batchCPIds');
 
         adminCPIds.addAll(batchCPIds);
       }
@@ -81,12 +70,8 @@ class GenderFilteringService {
       _cachedAdminCPIds = adminCPIds;
       _lastAdminCacheUpdate = DateTime.now();
 
-      print(
-          '🔍 GenderFilteringService: Total admin community profile IDs: ${adminCPIds.length} - $adminCPIds');
       return adminCPIds;
     } catch (e) {
-      print(
-          '🔍 GenderFilteringService: Error fetching admin community profiles: $e');
       return _cachedAdminCPIds ?? [];
     }
   }
@@ -119,7 +104,6 @@ class GenderFilteringService {
 
       return profileIds;
     } catch (e) {
-      print('Error fetching same gender profiles: $e');
       return _genderProfileCache[cacheKey] ?? [];
     }
   }
@@ -146,7 +130,6 @@ class GenderFilteringService {
 
       return visibleIds;
     } catch (e) {
-      print('Error fetching visible community profiles: $e');
       return [];
     }
   }
@@ -163,7 +146,7 @@ class GenderFilteringService {
           await getVisibleCommunityProfileIds(currentUserGender);
       return visibleProfileIds.contains(targetAuthorCPId);
     } catch (e) {
-      print('Error validating content interaction: $e');
+      // Error validating content interaction: $e
       // Default to allowing interaction on error to avoid blocking users
       return true;
     }
@@ -185,13 +168,8 @@ class GenderFilteringService {
   Stream<List<String>> watchVisibleCommunityProfileIds(
       String currentUserGender) async* {
     try {
-      print(
-          '🔍 GenderFilteringService: Starting watchVisibleCommunityProfileIds for gender: $currentUserGender');
-
       // Get admin IDs (cached)
       final adminIds = await getAdminCommunityProfileIds();
-      print(
-          '🔍 GenderFilteringService: Found ${adminIds.length} admin IDs: $adminIds');
 
       // Watch same-gender profiles and combine with admin IDs
       await for (final snapshot in _firestore
@@ -199,18 +177,11 @@ class GenderFilteringService {
           .where('gender', isEqualTo: currentUserGender)
           .snapshots()) {
         final sameGenderIds = snapshot.docs.map((doc) => doc.id).toList();
-        print(
-            '🔍 GenderFilteringService: Found ${sameGenderIds.length} same-gender ($currentUserGender) profile IDs: $sameGenderIds');
 
         final visibleIds = <String>{...sameGenderIds, ...adminIds}.toList();
-        print(
-            '🔍 GenderFilteringService: Total visible profile IDs: ${visibleIds.length} - $visibleIds');
-
         yield visibleIds;
       }
     } catch (e) {
-      print(
-          '🔍 GenderFilteringService: Error watching visible community profiles: $e');
       yield [];
     }
   }

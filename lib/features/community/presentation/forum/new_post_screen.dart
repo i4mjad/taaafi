@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:figma_squircle/figma_squircle.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
+import 'package:reboot_app_3/core/shared_widgets/container.dart';
 import 'package:reboot_app_3/core/shared_widgets/spinner.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/custom_theme_data.dart';
@@ -72,7 +74,7 @@ class _NewPostScreenState extends ConsumerState<NewPostScreen> {
   Future<void> _setInitialCategory() async {
     try {
       // Wait for categories to load
-      final categories = await ref.read(postCategoriesProvider.future);
+      final categories = await ref.read(newPostCategoriesProvider.future);
 
       // Find the category with the matching ID
       final matchingCategory = categories.firstWhere(
@@ -131,7 +133,7 @@ class _NewPostScreenState extends ConsumerState<NewPostScreen> {
     });
 
     // Listen to categories loading and set default to general category if none selected
-    ref.listen<AsyncValue<List<PostCategory>>>(postCategoriesProvider,
+    ref.listen<AsyncValue<List<PostCategory>>>(newPostCategoriesProvider,
         (previous, next) {
       next.whenData((categories) {
         final currentSelected = ref.read(selectedCategoryProvider);
@@ -491,16 +493,21 @@ class _NewPostScreenState extends ConsumerState<NewPostScreen> {
     return GestureDetector(
       onTap: () => _showCategorySelector(theme, localizations),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        decoration: BoxDecoration(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        decoration: ShapeDecoration(
           color: selectedCategory != null
               ? selectedCategory.color.withValues(alpha: 0.1)
               : theme.grey[100],
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: selectedCategory != null
-                ? selectedCategory.color
-                : theme.grey[300]!,
+          shape: SmoothRectangleBorder(
+            side: BorderSide(
+              color: selectedCategory != null
+                  ? selectedCategory.color
+                  : theme.grey[300]!,
+            ),
+            borderRadius: SmoothBorderRadius(
+              cornerRadius: 8,
+              cornerSmoothing: 1,
+            ),
           ),
         ),
         child: Row(
@@ -619,7 +626,7 @@ class _NewPostScreenState extends ConsumerState<NewPostScreen> {
   void _showCategorySelector(
       CustomThemeData theme, AppLocalizations localizations) {
     // Force refresh the categories provider to ensure fresh data
-    ref.invalidate(postCategoriesProvider);
+    ref.invalidate(newPostCategoriesProvider);
 
     showModalBottomSheet(
       context: context,
@@ -629,7 +636,7 @@ class _NewPostScreenState extends ConsumerState<NewPostScreen> {
       ),
       builder: (context) => Consumer(
         builder: (context, ref, child) {
-          final categoriesAsync = ref.watch(postCategoriesProvider);
+          final categoriesAsync = ref.watch(newPostCategoriesProvider);
           return _buildCategorySelectorModal(
               theme, localizations, categoriesAsync);
         },
@@ -644,6 +651,7 @@ class _NewPostScreenState extends ConsumerState<NewPostScreen> {
     AsyncValue<List<PostCategory>> categoriesAsync,
   ) {
     return Container(
+      width: double.infinity,
       padding: const EdgeInsets.all(20),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -705,13 +713,11 @@ class _NewPostScreenState extends ConsumerState<NewPostScreen> {
 
     return GestureDetector(
       onTap: () => _selectCategory(category),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-        decoration: BoxDecoration(
-          color: category.color.withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: category.color),
-        ),
+      child: WidgetsContainer(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        backgroundColor: category.color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(color: category.color),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [

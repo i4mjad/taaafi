@@ -44,9 +44,6 @@ class SubscriptionNotifier extends _$SubscriptionNotifier {
       final repository = ref.read(subscriptionRepositoryProvider);
       final success = await repository.purchasePackage(package);
       if (success) {
-        print(
-            'Purchase successful, forcing fresh subscription status check...');
-
         // Force clear any cached validation to get fresh data
         await repository.forceClearCache();
 
@@ -55,11 +52,6 @@ class SubscriptionNotifier extends _$SubscriptionNotifier {
 
         // Refresh subscription info with fresh data
         final freshInfo = await service.getSubscriptionInfo();
-        print(
-            'Fresh subscription info after purchase: status=${freshInfo.status}, isActive=${freshInfo.isActive}');
-        print(
-            'Entitlements: ${freshInfo.customerInfo?.entitlements.active.keys.toList()}');
-
         state = AsyncValue.data(freshInfo);
         return true;
       }
