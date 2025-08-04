@@ -13,6 +13,7 @@ import 'package:reboot_app_3/core/routing/route_names.dart';
 import 'package:reboot_app_3/core/utils/url_launcher_provider.dart';
 import 'package:reboot_app_3/features/plus/data/notifiers/subscription_notifier.dart';
 import 'package:figma_squircle/figma_squircle.dart';
+import 'package:reboot_app_3/core/shared_widgets/snackbar.dart';
 
 class TaaafiPlusSubscriptionScreen extends ConsumerStatefulWidget {
   const TaaafiPlusSubscriptionScreen({super.key});
@@ -877,38 +878,94 @@ class _TaaafiPlusScreenState
   /// Build fallback purchase button when packages fail to load
   Widget _buildFallbackPurchaseButton(
       BuildContext context, dynamic theme, WidgetRef ref) {
-    return GestureDetector(
-      onTap: () async {
-        HapticFeedback.mediumImpact();
-        await ref
-            .read(urlLauncherProvider)
-            .launch(Uri.parse('https://wa.me/96876691799'));
-      },
-      child: Container(
-        width: double.infinity,
-        padding: EdgeInsets.all(12),
-        decoration: ShapeDecoration(
-          color: theme.error[50],
-          shape: SmoothRectangleBorder(
-            borderRadius: SmoothBorderRadius(
-              cornerRadius: 8,
-              cornerSmoothing: 1,
+    return Column(
+      children: [
+        // Retry button
+        GestureDetector(
+          onTap: () async {
+            HapticFeedback.mediumImpact();
+            // Try to refresh packages
+            ref.invalidate(availablePackagesProvider);
+          },
+          child: Container(
+            width: double.infinity,
+            padding: EdgeInsets.all(12),
+            decoration: ShapeDecoration(
+              color: theme.primary[600],
+              shape: SmoothRectangleBorder(
+                borderRadius: SmoothBorderRadius(
+                  cornerRadius: 8,
+                  cornerSmoothing: 1,
+                ),
+              ),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  LucideIcons.refreshCw,
+                  color: theme.grey[50],
+                  size: 16,
+                ),
+                horizontalSpace(Spacing.points8),
+                Text(
+                  AppLocalizations.of(context)
+                      .translate('retry-loading-packages'),
+                  style: TextStyles.footnote.copyWith(
+                    color: theme.grey[50],
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
             ),
           ),
         ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              AppLocalizations.of(context)
-                  .translate('there-is-something-worng-contact-us'),
-              style: TextStyles.footnote.copyWith(
-                color: theme.error[600],
+        verticalSpace(Spacing.points8),
+        // Contact support button
+        GestureDetector(
+          onTap: () async {
+            HapticFeedback.mediumImpact();
+            try {
+              await ref
+                  .read(urlLauncherProvider)
+                  .launch(Uri.parse('https://wa.me/96876691799'));
+            } catch (e) {
+              getErrorSnackBar(context, 'cannot-open-whatsapp');
+            }
+          },
+          child: Container(
+            width: double.infinity,
+            padding: EdgeInsets.all(12),
+            decoration: ShapeDecoration(
+              color: theme.error[50],
+              shape: SmoothRectangleBorder(
+                borderRadius: SmoothBorderRadius(
+                  cornerRadius: 8,
+                  cornerSmoothing: 1,
+                ),
               ),
             ),
-          ],
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  LucideIcons.messageCircle,
+                  color: theme.error[600],
+                  size: 16,
+                ),
+                horizontalSpace(Spacing.points8),
+                Text(
+                  AppLocalizations.of(context)
+                      .translate('contact-support-for-help'),
+                  style: TextStyles.footnote.copyWith(
+                    color: theme.error[600],
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
-      ),
+      ],
     );
   }
 
@@ -925,16 +982,56 @@ class _TaaafiPlusScreenState
         // Navigate to Plus Features Guide with success flag
         context.pushNamed(RouteNames.plusFeaturesGuide.name,
             extra: {'fromPurchase': true});
+      } else {
+        // Handle case where purchase was not successful but no exception was thrown
+        _showErrorMessage('subscription-purchase-failed');
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content:
-              Text(AppLocalizations.of(context).translate('purchase-failed')),
-          backgroundColor: AppTheme.of(context).error[600],
-        ),
-      );
+      print('Purchase error: $e');
+      _handlePurchaseError(e);
     }
+  }
+
+  /// Handle different types of purchase errors with specific messages
+  void _handlePurchaseError(dynamic error) {
+    String errorMessageKey;
+
+    if (error is PurchasesError) {
+      switch (error.code) {
+        case PurchasesErrorCode.purchaseCancelledError:
+          // User cancelled the purchase - don't show error
+          return;
+        case PurchasesErrorCode.storeProblemError:
+          errorMessageKey = 'store-unavailable-error';
+          break;
+        case PurchasesErrorCode.purchaseNotAllowedError:
+          errorMessageKey = 'purchase-not-allowed-error';
+          break;
+        case PurchasesErrorCode.purchaseInvalidError:
+          errorMessageKey = 'purchase-invalid-error';
+          break;
+        case PurchasesErrorCode.productNotAvailableForPurchaseError:
+          errorMessageKey = 'product-unavailable-error';
+          break;
+        case PurchasesErrorCode.networkError:
+          errorMessageKey = 'network-error-try-again';
+          break;
+        case PurchasesErrorCode.unknownError:
+        default:
+          errorMessageKey = 'subscription-purchase-failed';
+          break;
+      }
+    } else {
+      // Handle other types of errors
+      errorMessageKey = 'subscription-purchase-failed';
+    }
+
+    _showErrorMessage(errorMessageKey);
+  }
+
+  /// Show error message to user
+  void _showErrorMessage(String messageKey) {
+    getErrorSnackBar(context, messageKey);
   }
 
   /// Get package period for display

@@ -2,6 +2,7 @@
 // Maintain synchronisation with English map.
 
 const Map<String, String> kAr = {
+  "founder": "المؤسس",
   "subscribe-now": "اشترك الآن",
   "welcome": "مرحبًا بك!",
   "welcome-back": "مرحباً بعودتك",
@@ -1936,6 +1937,18 @@ const Map<String, String> kAr = {
   "upgrade-to-plus-description":
       "ترقى إلى تعافي + لفتح الميزات المتميزة ودعم المجتمع.",
   "subscription-purchase-failed": "فشل الشراء",
+  "store-unavailable-error":
+      "متجر التطبيقات غير متاح مؤقتاً. يرجى المحاولة لاحقاً.",
+  "purchase-not-allowed-error":
+      "المشتريات غير مسموحة على هذا الجهاز. تحقق من قيود جهازك.",
+  "purchase-invalid-error": "هذا الشراء غير صالح. يرجى تجربة خطة اشتراك أخرى.",
+  "product-unavailable-error":
+      "خطة الاشتراك هذه غير متاحة حالياً. يرجى المحاولة لاحقاً.",
+  "network-error-try-again":
+      "خطأ في الاتصال بالشبكة. يرجى التحقق من الإنترنت والمحاولة مرة أخرى.",
+  "retry-loading-packages": "إعادة محاولة تحميل الباقات",
+  "contact-support-for-help": "تواصل مع الدعم للحصول على المساعدة",
+  "cannot-open-whatsapp": "لا يمكن فتح واتساب. يرجى التواصل مع الدعم يدوياً.",
   "subscription-success": "مرحباً بك في تعافي +!",
   "subscription-restored": "تم استرداد الشراء",
   "subscription-loading": "تحميل الاشتراك...",

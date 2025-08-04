@@ -58,139 +58,151 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
     final commentsAsync = ref.watch(postCommentsProvider(widget.postId));
     final replyState = ref.watch(replyStateProvider);
 
-    return Scaffold(
-      appBar: plainAppBar(
-          context, ref, localizations.translate('thread'), false, true),
-      backgroundColor: theme.backgroundColor,
-      body: postAsync.when(
-        data: (post) {
-          if (post == null) {
-            return _buildPostNotFound(theme, localizations);
-          }
+    return postAsync.when(
+      data: (post) {
+        if (post == null) {
+          return _buildPostNotFound(theme, localizations);
+        }
 
-          return Stack(
-            children: [
-              // Main content - constrained properly
-              Positioned.fill(
-                bottom: 100, // Leave space for reply input
-                child: SingleChildScrollView(
-                  controller: _scrollController,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Main post section
-                      Container(
-                        padding: const EdgeInsets.all(16),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // Post header
-                            PostHeaderWidget(
-                              post: post,
-                              onMorePressed: () =>
-                                  _showPostOptions(context, post),
-                            ),
-
-                            const SizedBox(height: 16),
-
-                            // Post content
-                            PostContentWidget(post: post),
-                          ],
-                        ),
-                      ),
-
-                      // Post interactions
-                      PostInteractionsWidget(
-                        post: post,
-                        commentCount: _getCommentCount(commentsAsync),
-                        onCommentTap: () => _scrollToComments(),
-                      ),
-
-                      // Divider
-                      Divider(
-                        color: theme.grey[200],
-                        height: 1,
-                      ),
-
-                      // Comments section
-                      CommentListWidget(
-                        postId: widget.postId,
-                        postAuthorCPId: post.authorCPId,
-                        onCommentMore: _handleCommentMore,
-                      ),
-
-                      // Add bottom padding to account for floating reply input
-                      const SizedBox(height: 20),
-                    ],
-                  ),
-                ),
-              ),
-
-              // Floating reply section (only show if commenting is allowed)
-              if (post.isCommentingAllowed)
-                Positioned(
-                  bottom: 16,
-                  left: 16,
-                  right: 16,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      boxShadow: [
-                        BoxShadow(
-                          color: theme.grey[300]!.withValues(alpha: 0.3),
-                          blurRadius: 8,
-                          offset: const Offset(0, -2),
-                        ),
-                      ],
-                    ),
-                    child: SafeArea(
-                      child: ReplyInputWidget(
-                        postId: widget.postId,
-                        onReplySubmitted: _handleReplySubmitted,
+        return Scaffold(
+            appBar: plainAppBar(
+                context, ref, localizations.translate('thread'), false, true,
+                actions: [
+                  // More actions button
+                  GestureDetector(
+                    onTap: () => showPostOptions(context, post),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Icon(
+                        LucideIcons.moreHorizontal,
+                        color: theme.grey[600],
                       ),
                     ),
                   ),
-                ),
-
-              // Show message when commenting is disabled
-              if (!post.isCommentingAllowed)
-                Positioned(
-                  bottom: 16,
-                  left: 16,
-                  right: 16,
-                  child: Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: theme.grey[100],
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: theme.grey[300]!),
-                    ),
-                    child: Row(
+                ]),
+            backgroundColor: theme.backgroundColor,
+            body: Stack(
+              children: [
+                // Main content - constrained properly
+                Positioned.fill(
+                  bottom: 100, // Leave space for reply input
+                  child: SingleChildScrollView(
+                    controller: _scrollController,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Icon(
-                          LucideIcons.ban,
-                          size: 20,
-                          color: theme.grey[600],
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Text(
-                            localizations
-                                .translate('commenting_disabled_on_post'),
-                            style: TextStyles.body.copyWith(
-                              color: theme.grey[600],
-                            ),
+                        // Main post section
+                        Container(
+                          padding: const EdgeInsets.all(16),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // Post header
+                              PostHeaderWidget(
+                                post: post,
+                                onMorePressed: () =>
+                                    showPostOptions(context, post),
+                              ),
+
+                              const SizedBox(height: 16),
+
+                              // Post content
+                              PostContentWidget(post: post),
+                            ],
                           ),
                         ),
+
+                        // Post interactions
+                        PostInteractionsWidget(
+                          post: post,
+                          commentCount: _getCommentCount(commentsAsync),
+                          onCommentTap: () => _scrollToComments(),
+                        ),
+
+                        // Divider
+                        Divider(
+                          color: theme.grey[200],
+                          height: 1,
+                        ),
+
+                        // Comments section
+                        CommentListWidget(
+                          postId: widget.postId,
+                          postAuthorCPId: post.authorCPId,
+                          onCommentMore: _handleCommentMore,
+                        ),
+
+                        // Add bottom padding to account for floating reply input
+                        const SizedBox(height: 20),
                       ],
                     ),
                   ),
                 ),
-            ],
-          );
-        },
-        loading: () => _buildLoadingState(theme),
-        error: (error, stack) => _buildErrorState(theme, localizations, error),
-      ),
+
+                // Floating reply section (only show if commenting is allowed)
+                if (post.isCommentingAllowed)
+                  Positioned(
+                    bottom: 16,
+                    left: 16,
+                    right: 16,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        boxShadow: [
+                          BoxShadow(
+                            color: theme.grey[300]!.withValues(alpha: 0.3),
+                            blurRadius: 8,
+                            offset: const Offset(0, -2),
+                          ),
+                        ],
+                      ),
+                      child: SafeArea(
+                        child: ReplyInputWidget(
+                          postId: widget.postId,
+                          onReplySubmitted: _handleReplySubmitted,
+                        ),
+                      ),
+                    ),
+                  ),
+
+                // Show message when commenting is disabled
+                if (!post.isCommentingAllowed)
+                  Positioned(
+                    bottom: 16,
+                    left: 16,
+                    right: 16,
+                    child: Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: theme.grey[100],
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: theme.grey[300]!),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            LucideIcons.ban,
+                            size: 20,
+                            color: theme.grey[600],
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              localizations
+                                  .translate('commenting_disabled_on_post'),
+                              style: TextStyles.body.copyWith(
+                                color: theme.grey[600],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+              ],
+            ));
+      },
+      loading: () => _buildLoadingState(theme),
+      error: (error, stack) => _buildErrorState(theme, localizations, error),
     );
   }
 
@@ -291,7 +303,7 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
     ref.refresh(postCommentsProvider(widget.postId));
   }
 
-  void _showPostOptions(BuildContext context, dynamic post) {
+  void showPostOptions(BuildContext context, dynamic post) {
     final theme = AppTheme.of(context);
     final localizations = AppLocalizations.of(context);
     final currentProfileAsync = ref.read(currentCommunityProfileProvider);

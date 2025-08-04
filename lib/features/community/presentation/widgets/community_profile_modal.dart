@@ -13,6 +13,7 @@ import 'package:reboot_app_3/features/community/domain/entities/community_profil
 import 'package:reboot_app_3/features/community/domain/entities/profile_statistics.dart';
 import 'package:reboot_app_3/features/community/presentation/providers/community_providers_new.dart';
 import 'package:reboot_app_3/features/community/presentation/widgets/avatar_with_anonymity.dart';
+import 'package:reboot_app_3/features/community/presentation/widgets/role_chip.dart';
 import 'package:reboot_app_3/features/shared/data/notifiers/user_reports_notifier.dart';
 import 'package:intl/intl.dart';
 
@@ -394,39 +395,42 @@ class _CommunityProfileModalState extends ConsumerState<CommunityProfileModal> {
                       ),
                     ),
                     verticalSpace(Spacing.points4),
-                    if (profile.isPlusUser == true) ...[
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: theme.primary[100],
-                          borderRadius: BorderRadius.circular(6),
-                          border: Border.all(
-                            color: theme.primary[300]!,
-                            width: 0.5,
+                    Row(
+                      children: [
+                        if (profile.isPlusUser == true) ...[
+                          WidgetsContainer(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 4, vertical: 2),
+                            backgroundColor: theme.primary[100],
+                            borderRadius: BorderRadius.circular(4),
+                            borderSide: BorderSide(
+                              color: theme.primary[300]!,
+                              width: 1,
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  LucideIcons.star,
+                                  size: 14,
+                                  color: theme.primary[600],
+                                ),
+                                horizontalSpace(Spacing.points4),
+                                Text(
+                                  localizations.translate('plus-member'),
+                                  style: TextStyles.small.copyWith(
+                                    color: theme.primary[700],
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              LucideIcons.star,
-                              size: 14,
-                              color: theme.primary[600],
-                            ),
-                            horizontalSpace(Spacing.points4),
-                            Text(
-                              localizations.translate('plus-member'),
-                              style: TextStyles.small.copyWith(
-                                color: theme.primary[700],
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      verticalSpace(Spacing.points8),
-                    ],
+                          horizontalSpace(Spacing.points8),
+                        ],
+                        RoleChip(role: profile.role),
+                      ],
+                    ),
+                    verticalSpace(Spacing.points8),
                     Text(
                       '${localizations.translate('member-since')} ${_formatDate(profile.createdAt, localizations.locale.languageCode)}',
                       style: TextStyles.caption.copyWith(

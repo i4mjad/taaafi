@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:reboot_app_3/core/shared_widgets/container.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
 
@@ -21,17 +22,13 @@ class StreakDisplayWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context);
 
-    return Container(
-      padding:
-          padding ?? const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-      decoration: BoxDecoration(
-        color: const Color(0xFF22C55E)
-            .withValues(alpha: 0.1), // Success green color
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: const Color(0xFF22C55E).withValues(alpha: 0.3),
-          width: 1,
-        ),
+    return WidgetsContainer(
+      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+      backgroundColor: const Color(0xFF22C55E).withValues(alpha: 0.1),
+      borderRadius: BorderRadius.circular(4),
+      borderSide: BorderSide(
+        color: const Color(0xFF22C55E).withValues(alpha: 0.3),
+        width: 1,
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,

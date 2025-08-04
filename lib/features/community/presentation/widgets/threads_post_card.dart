@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
+import 'package:reboot_app_3/core/shared_widgets/container.dart';
 import 'package:reboot_app_3/core/shared_widgets/snackbar.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
@@ -16,6 +17,7 @@ import 'package:reboot_app_3/features/community/presentation/widgets/community_p
 import 'package:reboot_app_3/features/account/presentation/widgets/feature_access_guard.dart';
 import 'package:reboot_app_3/features/account/data/app_features_config.dart';
 import 'package:reboot_app_3/features/community/presentation/widgets/streak_display_widget.dart';
+import 'package:reboot_app_3/features/community/presentation/widgets/role_chip.dart';
 
 class ThreadsPostCard extends ConsumerWidget {
   final Post post;
@@ -159,24 +161,18 @@ class ThreadsPostCard extends ConsumerWidget {
                             runSpacing: 4,
                             children: [
                               // Category flair - always show, with fallback for missing categories
-                              Container(
+                              WidgetsContainer(
                                 padding: const EdgeInsets.symmetric(
-                                  horizontal: 8,
-                                  vertical: 2,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: postCategory != null
-                                      ? postCategory.color
-                                          .withValues(alpha: 0.1)
-                                      : theme.grey[100],
-                                  borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(
-                                    color: postCategory != null
-                                        ? postCategory.color
-                                            .withValues(alpha: 0.3)
-                                        : theme.grey[300]!,
-                                    width: 1,
-                                  ),
+                                    horizontal: 4, vertical: 2),
+                                backgroundColor: postCategory?.color
+                                        .withValues(alpha: 0.1) ??
+                                    theme.grey[100],
+                                borderRadius: BorderRadius.circular(4),
+                                borderSide: BorderSide(
+                                  color: postCategory?.color
+                                          .withValues(alpha: 0.3) ??
+                                      theme.grey[300]!,
+                                  width: 1,
                                 ),
                                 child: Row(
                                   mainAxisSize: MainAxisSize.min,
@@ -202,6 +198,14 @@ class ThreadsPostCard extends ConsumerWidget {
                                     ),
                                   ],
                                 ),
+                              ),
+
+                              // Role chip - show for admins and moderators
+                              authorProfileAsync.maybeWhen(
+                                data: (authorProfile) {
+                                  return RoleChip(role: authorProfile.role);
+                                },
+                                orElse: () => const SizedBox.shrink(),
                               ),
 
                               // Real-time streak badge
@@ -278,8 +282,7 @@ class ThreadsPostCard extends ConsumerWidget {
                       // Post title
                       Text(
                         post.title,
-                        style: TextStyles.body.copyWith(
-                          fontWeight: FontWeight.w600,
+                        style: TextStyles.h6.copyWith(
                           color: theme.grey[900],
                         ),
                         maxLines: 2,
@@ -291,7 +294,7 @@ class ThreadsPostCard extends ConsumerWidget {
                       // Post content
                       Text(
                         post.body,
-                        style: TextStyles.body.copyWith(
+                        style: TextStyles.footnote.copyWith(
                           color: theme.grey[700],
                           height: 1.4,
                         ),

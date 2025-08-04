@@ -2,11 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
+import 'package:reboot_app_3/core/shared_widgets/container.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
+import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/features/community/data/models/post.dart';
 import 'package:reboot_app_3/features/community/data/models/post_category.dart';
 import 'package:reboot_app_3/features/community/presentation/widgets/avatar_with_anonymity.dart';
+import 'package:reboot_app_3/features/community/presentation/widgets/role_chip.dart';
 import 'package:reboot_app_3/features/community/presentation/widgets/streak_display_widget.dart';
 import 'package:reboot_app_3/features/community/presentation/widgets/community_profile_modal.dart';
 import 'package:reboot_app_3/features/community/presentation/providers/community_providers_new.dart';
@@ -104,6 +107,7 @@ class PostHeaderWidget extends ConsumerWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
                                 // Display name - clickable to show profile
                                 Flexible(
@@ -142,7 +146,17 @@ class PostHeaderWidget extends ConsumerWidget {
                                   ),
                                 ),
 
-                                const SizedBox(width: 6),
+                                const SizedBox(width: 8),
+
+                                // Timestamp
+                                Text(
+                                  _formatTimestamp(
+                                      post.createdAt, localizations),
+                                  style: TextStyles.caption.copyWith(
+                                    color: theme.grey[600],
+                                  ),
+                                ),
+                                const Spacer(),
                               ],
                             ),
 
@@ -150,118 +164,109 @@ class PostHeaderWidget extends ConsumerWidget {
                             const SizedBox(height: 4),
                             Row(
                               children: [
-                                Wrap(
-                                  spacing: 8,
-                                  runSpacing: 4,
-                                  children: [
-                                    // Category chip
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 8, vertical: 2),
-                                      decoration: BoxDecoration(
-                                        color: postCategory?.color
+                                Expanded(
+                                  child: Wrap(
+                                    spacing: 8,
+                                    runSpacing: 4,
+                                    children: [
+                                      // Category chip
+                                      WidgetsContainer(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 4, vertical: 2),
+                                        backgroundColor: postCategory?.color
                                                 .withValues(alpha: 0.1) ??
                                             theme.grey[100],
-                                        borderRadius: BorderRadius.circular(12),
-                                        border: Border.all(
+                                        borderRadius: BorderRadius.circular(4),
+                                        borderSide: BorderSide(
                                           color: postCategory?.color
                                                   .withValues(alpha: 0.3) ??
                                               theme.grey[300]!,
                                           width: 1,
                                         ),
-                                      ),
-                                      child: Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Icon(
-                                            postCategory?.icon ??
-                                                LucideIcons.tag,
-                                            size: 12,
-                                            color: postCategory?.color ??
-                                                theme.grey[600],
-                                          ),
-                                          const SizedBox(width: 4),
-                                          Text(
-                                            postCategory?.getDisplayName(
-                                                  localizations
-                                                      .locale.languageCode,
-                                                ) ??
-                                                _getLocalizedCategoryName(
-                                                    post.category,
-                                                    localizations),
-                                            style: TextStyles.small.copyWith(
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Icon(
+                                              postCategory?.icon ??
+                                                  LucideIcons.tag,
+                                              size: 12,
                                               color: postCategory?.color ??
                                                   theme.grey[600],
-                                              fontWeight: FontWeight.w600,
                                             ),
-                                          ),
-                                        ],
+                                            const SizedBox(width: 4),
+                                            Text(
+                                              postCategory?.getDisplayName(
+                                                    localizations
+                                                        .locale.languageCode,
+                                                  ) ??
+                                                  _getLocalizedCategoryName(
+                                                      post.category,
+                                                      localizations),
+                                              style: TextStyles.small.copyWith(
+                                                color: postCategory?.color ??
+                                                    theme.grey[600],
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
                                       ),
-                                    ),
 
-                                    // Streak display if user shares streak info
-                                    ...() {
-                                      return authorProfileAsync.maybeWhen(
-                                        data: (authorProfile) {
-                                          // Check if user is plus AND allows sharing
-                                          final isPlusUser = authorProfile
-                                              .hasPlusSubscription();
-                                          final allowsSharing =
-                                              authorProfile.shareRelapseStreaks;
+                                      RoleChip(role: authorProfile.role),
+                                      // Streak display if user shares streak info
+                                      ...() {
+                                        return authorProfileAsync.maybeWhen(
+                                          data: (authorProfile) {
+                                            // Check if user is plus AND allows sharing
+                                            final isPlusUser = authorProfile
+                                                .hasPlusSubscription();
+                                            final allowsSharing = authorProfile
+                                                .shareRelapseStreaks;
 
-                                          if (!isPlusUser || !allowsSharing) {
-                                            return <Widget>[];
-                                          }
+                                            if (!isPlusUser || !allowsSharing) {
+                                              return <Widget>[];
+                                            }
 
-                                          // Calculate streak in real-time
-                                          return [
-                                            Consumer(
-                                              builder: (context, ref, child) {
-                                                final streakAsync = ref.watch(
-                                                    userStreakCalculatorProvider(
-                                                        post.authorCPId));
+                                            // Calculate streak in real-time
+                                            return [
+                                              Consumer(
+                                                builder: (context, ref, child) {
+                                                  final streakAsync = ref.watch(
+                                                      userStreakCalculatorProvider(
+                                                          post.authorCPId));
 
-                                                return streakAsync.when(
-                                                  data: (streakDays) {
-                                                    if (streakDays == null ||
-                                                        streakDays <= 0) {
+                                                  return streakAsync.when(
+                                                    data: (streakDays) {
+                                                      if (streakDays == null ||
+                                                          streakDays <= 0) {
+                                                        return const SizedBox
+                                                            .shrink();
+                                                      }
+
+                                                      return StreakDisplayWidget(
+                                                        streakDays: streakDays,
+                                                      );
+                                                    },
+                                                    loading: () =>
+                                                        const SizedBox.shrink(),
+                                                    error: (error, stackTrace) {
                                                       return const SizedBox
                                                           .shrink();
-                                                    }
-
-                                                    return StreakDisplayWidget(
-                                                      streakDays: streakDays,
-                                                    );
-                                                  },
-                                                  loading: () =>
-                                                      const SizedBox.shrink(),
-                                                  error: (error, stackTrace) {
-                                                    return const SizedBox
-                                                        .shrink();
-                                                  },
-                                                );
-                                              },
-                                            ),
-                                          ];
-                                        },
-                                        orElse: () => <Widget>[],
-                                      );
-                                    }(),
-                                  ],
+                                                    },
+                                                  );
+                                                },
+                                              ),
+                                            ];
+                                          },
+                                          orElse: () => <Widget>[],
+                                        );
+                                      }(),
+                                    ],
+                                  ),
                                 ),
                               ],
                             ),
                           ],
-                        ),
-                      ),
-
-                      const SizedBox(width: 8),
-
-                      // Timestamp
-                      Text(
-                        _formatTimestamp(post.createdAt, localizations),
-                        style: TextStyles.caption.copyWith(
-                          color: theme.grey[600],
                         ),
                       ),
                     ],
@@ -269,22 +274,6 @@ class PostHeaderWidget extends ConsumerWidget {
                 ],
               ),
             ),
-
-            // More actions button
-            if (onMorePressed != null) ...[
-              const SizedBox(width: 8),
-              GestureDetector(
-                onTap: onMorePressed,
-                child: Container(
-                  padding: const EdgeInsets.all(4),
-                  child: Icon(
-                    LucideIcons.moreHorizontal,
-                    size: 20,
-                    color: theme.grey[600],
-                  ),
-                ),
-              ),
-            ],
           ],
         );
       },

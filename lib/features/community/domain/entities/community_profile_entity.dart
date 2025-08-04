@@ -16,6 +16,7 @@ class CommunityProfileEntity {
   final bool shareRelapseStreaks;
   final int? currentStreakDays;
   final DateTime? streakLastUpdated;
+  final String role; // 'member', 'admin', 'moderator'
   final DateTime createdAt;
   final DateTime? updatedAt;
 
@@ -31,6 +32,7 @@ class CommunityProfileEntity {
     this.shareRelapseStreaks = false,
     this.currentStreakDays,
     this.streakLastUpdated,
+    required this.role,
     required this.createdAt,
     this.updatedAt,
   });
@@ -68,6 +70,7 @@ class CommunityProfileEntity {
       shareRelapseStreaks: json['shareRelapseStreaks'] as bool? ?? false,
       currentStreakDays: json['currentStreakDays'] as int?,
       streakLastUpdated: _parseTimestamp(json['streakLastUpdated']),
+      role: json['role'] as String,
       createdAt: _parseTimestamp(json['createdAt'])!,
       updatedAt: _parseTimestamp(json['updatedAt']),
     );
@@ -85,6 +88,7 @@ class CommunityProfileEntity {
       'isDeleted': isDeleted,
       'isPlusUser': isPlusUser,
       'shareRelapseStreaks': shareRelapseStreaks,
+      'role': role,
       // Streak data is read directly from user documents, not stored in community profiles
       'createdAt': createdAt.toIso8601String(),
       'updatedAt': updatedAt?.toIso8601String(),
@@ -132,6 +136,34 @@ class CommunityProfileEntity {
     return isRecent;
   }
 
+  /// Business logic: Check if user is an admin
+  bool isAdmin() {
+    return role.toLowerCase() == 'admin';
+  }
+
+  /// Business logic: Check if user is a moderator
+  bool isModerator() {
+    return role.toLowerCase() == 'moderator';
+  }
+
+  /// Business logic: Check if user has elevated privileges (admin or moderator)
+  bool hasElevatedPrivileges() {
+    return isAdmin() || isModerator();
+  }
+
+  /// Business logic: Get localized role display name
+  String getRoleDisplayName() {
+    switch (role.toLowerCase()) {
+      case 'admin':
+        return 'Admin';
+      case 'moderator':
+        return 'Moderator';
+      case 'member':
+      default:
+        return 'Member';
+    }
+  }
+
   /// Business logic: Get display name with fallback
   String getDisplayName() {
     return displayName.isNotEmpty ? displayName : 'Community Member';
@@ -139,11 +171,6 @@ class CommunityProfileEntity {
 
   /// Business logic: Get display name following the pipeline: deleted → anonymous → actual name
   String getDisplayNameWithPipeline() {
-    print('🔍 [CommunityProfileEntity] Pipeline check for profile $id:');
-    print('🔍 [CommunityProfileEntity] - Display Name: "$displayName"');
-    print('🔍 [CommunityProfileEntity] - Is Deleted: $isDeleted');
-    print('🔍 [CommunityProfileEntity] - Is Anonymous: $isAnonymous');
-
     // 1. First check if user is deleted - if yes, display "deleted" text
     if (isDeleted) {
       print('🔍 [CommunityProfileEntity] -> Returning DELETED_USER');
@@ -183,6 +210,7 @@ class CommunityProfileEntity {
     bool? shareRelapseStreaks,
     int? currentStreakDays,
     DateTime? streakLastUpdated,
+    String? role,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
@@ -198,6 +226,7 @@ class CommunityProfileEntity {
       shareRelapseStreaks: shareRelapseStreaks ?? this.shareRelapseStreaks,
       currentStreakDays: currentStreakDays ?? this.currentStreakDays,
       streakLastUpdated: streakLastUpdated ?? this.streakLastUpdated,
+      role: role ?? this.role,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );
@@ -218,6 +247,7 @@ class CommunityProfileEntity {
         other.shareRelapseStreaks == shareRelapseStreaks &&
         other.currentStreakDays == currentStreakDays &&
         other.streakLastUpdated == streakLastUpdated &&
+        other.role == role &&
         other.createdAt == createdAt &&
         other.updatedAt == updatedAt;
   }
@@ -235,12 +265,13 @@ class CommunityProfileEntity {
         shareRelapseStreaks.hashCode ^
         currentStreakDays.hashCode ^
         streakLastUpdated.hashCode ^
+        role.hashCode ^
         createdAt.hashCode ^
         updatedAt.hashCode;
   }
 
   @override
   String toString() {
-    return 'CommunityProfileEntity(id: $id, userUID: $userUID, displayName: $displayName, gender: $gender, avatarUrl: $avatarUrl, isAnonymous: $isAnonymous, isDeleted: $isDeleted, isPlusUser: $isPlusUser, shareRelapseStreaks: $shareRelapseStreaks, currentStreakDays: $currentStreakDays, streakLastUpdated: $streakLastUpdated, createdAt: $createdAt, updatedAt: $updatedAt)';
+    return 'CommunityProfileEntity(id: $id, userUID: $userUID, displayName: $displayName, gender: $gender, avatarUrl: $avatarUrl, isAnonymous: $isAnonymous, isDeleted: $isDeleted, isPlusUser: $isPlusUser, shareRelapseStreaks: $shareRelapseStreaks, currentStreakDays: $currentStreakDays, streakLastUpdated: $streakLastUpdated, role: $role, createdAt: $createdAt, updatedAt: $updatedAt)';
   }
 }

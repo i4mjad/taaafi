@@ -49,6 +49,28 @@ class CommunityServiceImpl implements CommunityService {
       // Generate a unique community profile ID
       final profileId = _firestore.collection('communityProfiles').doc().id;
 
+      // Get user's role from user document
+      String userRole = 'member'; // Default fallback
+      try {
+        print('🔍 [CommunityService] Fetching role for user: ${user.uid}');
+        final userDoc =
+            await _firestore.collection('users').doc(user.uid).get();
+        if (userDoc.exists) {
+          final userData = userDoc.data() as Map<String, dynamic>;
+          final rawRole = userData['role'];
+          userRole = rawRole as String? ?? 'member';
+          print('🔍 [CommunityService] - User document exists');
+          print('🔍 [CommunityService] - Raw role from user doc: $rawRole');
+          print('🔍 [CommunityService] - Final user role: $userRole');
+        } else {
+          print('🔍 [CommunityService] - User document does not exist');
+        }
+      } catch (e) {
+        // If we can't fetch user role, use default 'member'
+        print(
+            '🔍 [CommunityService] Warning: Could not fetch user role, defaulting to member: $e');
+      }
+
       // Create the profile
       final now = DateTime.now();
       final profile = CommunityProfileEntity(
@@ -60,6 +82,7 @@ class CommunityServiceImpl implements CommunityService {
         isAnonymous: isAnonymous,
         isPlusUser:
             isPlusUser ?? false, // Use provided value or default to false
+        role: userRole, // Use role from user document
         createdAt: now,
         updatedAt: now,
       );
@@ -256,14 +279,8 @@ class CommunityServiceImpl implements CommunityService {
       final doc = snapshot.docs.first;
       final data = doc.data();
 
-      print('🔍 Found profile: ${doc.id}');
-      print('  - userUID: ${data['userUID']}');
-      print('  - displayName: ${data['displayName']}');
-      print('  - isDeleted: ${data['isDeleted']}');
-
       // Double-check that the profile is not deleted (for safety)
       if (data['isDeleted'] == true) {
-        print('⚠️ Profile is marked as deleted in data, returning null');
         return null;
       }
 

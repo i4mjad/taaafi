@@ -87,12 +87,21 @@ final communityProfileByIdProvider =
         shareRelapseStreaks: false,
         currentStreakDays: null,
         streakLastUpdated: null,
+        role: 'member', // Default role for missing profiles
         createdAt: DateTime.now().subtract(const Duration(days: 30)),
         updatedAt: null,
       );
     }
 
     final data = snapshot.data() as Map<String, dynamic>;
+    final role = data['role'] as String? ?? 'member';
+
+    print('🔍 [CommunityProfileProvider] Profile ${snapshot.id}:');
+    print(
+        '🔍 [CommunityProfileProvider] - Raw role from Firestore: ${data['role']}');
+    print('🔍 [CommunityProfileProvider] - Final role value: $role');
+    print(
+        '🔍 [CommunityProfileProvider] - Display name: ${data['displayName']}');
 
     return CommunityProfileEntity(
       id: snapshot.id,
@@ -106,6 +115,7 @@ final communityProfileByIdProvider =
       shareRelapseStreaks: data['shareRelapseStreaks'] as bool? ?? false,
       currentStreakDays: null,
       streakLastUpdated: null,
+      role: role, // Handle missing role field
       createdAt: (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
       updatedAt: (data['updatedAt'] as Timestamp?)?.toDate(),
     );

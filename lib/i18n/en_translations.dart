@@ -2,6 +2,7 @@
 // This file is maintained manually. Keep keys in sync with other language maps.
 
 const Map<String, String> kEn = {
+  "founder": "Founder",
   "daily": "Daily",
   "weekly": "Weekly",
   "monthly": "Monthly",
@@ -1721,6 +1722,20 @@ const Map<String, String> kEn = {
   "subscription-restore-button": "Restore Purchase",
   "subscription-processing": "Processing...",
   "subscription-purchase-failed": "Purchase Failed",
+  "store-unavailable-error":
+      "App Store is temporarily unavailable. Please try again later.",
+  "purchase-not-allowed-error":
+      "Purchases are not allowed on this device. Check your device restrictions.",
+  "purchase-invalid-error":
+      "This purchase is invalid. Please try a different subscription plan.",
+  "product-unavailable-error":
+      "This subscription plan is currently unavailable. Please try again later.",
+  "network-error-try-again":
+      "Network connection error. Please check your internet and try again.",
+  "retry-loading-packages": "Retry Loading Packages",
+  "contact-support-for-help": "Contact Support for Help",
+  "cannot-open-whatsapp":
+      "Cannot open WhatsApp. Please contact support manually.",
   "subscription-success": "Welcome to Plus!",
   "subscription-restored": "Purchase Restored",
   "subscription-loading": "Loading subscription...",
