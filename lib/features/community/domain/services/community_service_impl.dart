@@ -221,6 +221,8 @@ class CommunityServiceImpl implements CommunityService {
   Future<CommunityProfileEntity?> _getCurrentProfileByUserUID(
       String userUID) async {
     try {
+      print('🔍 _getCurrentProfileByUserUID Debug for userUID: $userUID');
+
       final snapshot = await _firestore
           .collection('communityProfiles')
           .where('userUID', isEqualTo: userUID)
@@ -228,24 +230,52 @@ class CommunityServiceImpl implements CommunityService {
           .limit(1)
           .get();
 
+      print('🔍 Query results: ${snapshot.docs.length} documents found');
+
       if (snapshot.docs.isEmpty) {
+        print('📭 No active profiles found for userUID: $userUID');
+
+        // Debug: Check if there are any profiles (including deleted ones)
+        final allProfilesSnapshot = await _firestore
+            .collection('communityProfiles')
+            .where('userUID', isEqualTo: userUID)
+            .get();
+
+        print(
+            '🔍 Total profiles (including deleted): ${allProfilesSnapshot.docs.length}');
+
+        for (final doc in allProfilesSnapshot.docs) {
+          final data = doc.data();
+          print(
+              '  - Profile ${doc.id}: isDeleted=${data['isDeleted']}, displayName=${data['displayName']}');
+        }
+
         return null;
       }
 
       final doc = snapshot.docs.first;
       final data = doc.data();
 
+      print('🔍 Found profile: ${doc.id}');
+      print('  - userUID: ${data['userUID']}');
+      print('  - displayName: ${data['displayName']}');
+      print('  - isDeleted: ${data['isDeleted']}');
+
       // Double-check that the profile is not deleted (for safety)
       if (data['isDeleted'] == true) {
+        print('⚠️ Profile is marked as deleted in data, returning null');
         return null;
       }
 
-      return CommunityProfileEntity.fromJson({
+      final profile = CommunityProfileEntity.fromJson({
         'id': doc.id,
         ...data,
       });
+
+      print('✅ Returning active profile: ${profile.id}');
+      return profile;
     } catch (e) {
-      print('Error getting profile for user $userUID: $e');
+      print('❌ Error getting profile for user $userUID: $e');
       return null;
     }
   }

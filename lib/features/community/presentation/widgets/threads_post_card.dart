@@ -14,6 +14,7 @@ import 'package:reboot_app_3/features/community/presentation/providers/forum_pro
 import 'package:reboot_app_3/features/community/presentation/widgets/report_content_modal.dart';
 import 'package:reboot_app_3/features/community/presentation/widgets/community_profile_modal.dart';
 import 'package:reboot_app_3/features/account/presentation/widgets/feature_access_guard.dart';
+import 'package:reboot_app_3/features/account/data/app_features_config.dart';
 import 'package:reboot_app_3/features/community/presentation/widgets/streak_display_widget.dart';
 
 class ThreadsPostCard extends ConsumerWidget {
@@ -33,7 +34,7 @@ class ThreadsPostCard extends ConsumerWidget {
     final currentProfileAsync = ref.watch(currentCommunityProfileProvider);
     final authorProfileAsync =
         ref.watch(communityProfileByIdProvider(post.authorCPId));
-    final categoriesAsync = ref.watch(postCategoriesProvider);
+    final categoriesAsync = ref.watch(allPostCategoriesProvider);
 
     // Get current user's CP ID
     final currentUserCPId = currentProfileAsync.maybeWhen(
@@ -308,17 +309,18 @@ class ThreadsPostCard extends ConsumerWidget {
                             builder: (context) {
                               final interaction = optimisticInteractionAsync;
                               final isLiked = interaction?.value == 1;
-                              return CommunityInteractionGuard(
-                                onAccessGranted: () =>
-                                    _handleOptimisticInteraction(
-                                        ref, 1, interaction, currentUserCPId),
-                                postId: post.id,
-                                userCPId: currentUserCPId,
+                              return GestureDetector(
+                                onTap: () => _handleOptimisticInteraction(
+                                    context,
+                                    ref,
+                                    1,
+                                    interaction,
+                                    currentUserCPId),
                                 child: _buildEngagementButton(
                                   theme,
                                   LucideIcons.thumbsUp,
                                   isLiked,
-                                  null, // No onTap since it's handled by guard
+                                  null, // No onTap since it's handled by gesture
                                   activeColor: const Color(
                                       0xFF10B981), // Green color for likes
                                 ),
@@ -342,17 +344,18 @@ class ThreadsPostCard extends ConsumerWidget {
                             builder: (context) {
                               final interaction = optimisticInteractionAsync;
                               final isDisliked = interaction?.value == -1;
-                              return CommunityInteractionGuard(
-                                onAccessGranted: () =>
-                                    _handleOptimisticInteraction(
-                                        ref, -1, interaction, currentUserCPId),
-                                postId: post.id,
-                                userCPId: currentUserCPId,
+                              return GestureDetector(
+                                onTap: () => _handleOptimisticInteraction(
+                                    context,
+                                    ref,
+                                    -1,
+                                    interaction,
+                                    currentUserCPId),
                                 child: _buildEngagementButton(
                                   theme,
                                   LucideIcons.thumbsDown,
                                   isDisliked,
-                                  null, // No onTap since it's handled by guard
+                                  null, // No onTap since it's handled by gesture
                                   activeColor: const Color(
                                       0xFFEF4444), // Red color for dislikes
                                 ),
@@ -450,8 +453,8 @@ class ThreadsPostCard extends ConsumerWidget {
     );
   }
 
-  void _handleOptimisticInteraction(WidgetRef ref, int value,
-      Interaction? interaction, String currentUserCPId) {
+  void _handleOptimisticInteraction(BuildContext context, WidgetRef ref,
+      int value, Interaction? interaction, String currentUserCPId) async {
     final oldValue = interaction?.value ?? 0;
     final newValue = oldValue == value ? 0 : value;
 
@@ -469,8 +472,38 @@ class ThreadsPostCard extends ConsumerWidget {
         .read(optimisticPostStateProvider(post.id).notifier)
         .updateOptimisticCounts(oldValue, newValue);
 
-    // 3. Process actual interaction (this will check for bans)
-    ref.read(postInteractionProvider(post.id).notifier).interact(newValue);
+    // 3. Check feature access in the background
+    try {
+      final canAccess =
+          await checkFeatureAccess(ref, AppFeaturesConfig.communityInteraction);
+
+      if (canAccess) {
+        // 4. Process actual interaction if allowed
+        ref.read(postInteractionProvider(post.id).notifier).interact(newValue);
+      } else {
+        // 5. Revert optimistic changes if banned
+        ref
+            .read(optimisticUserInteractionProvider((
+              targetType: 'post',
+              targetId: post.id,
+              userCPId: currentUserCPId,
+            )).notifier)
+            .updateOptimistically(oldValue);
+
+        ref
+            .read(optimisticPostStateProvider(post.id).notifier)
+            .updateOptimisticCounts(newValue, oldValue);
+
+        // Show ban message
+        getErrorSnackBar(
+          context,
+          'interaction-restricted',
+        );
+      }
+    } catch (e) {
+      // On error, allow the interaction (fail-safe)
+      ref.read(postInteractionProvider(post.id).notifier).interact(newValue);
+    }
   }
 
   String _formatTimeAgo(DateTime createdAt, AppLocalizations localizations) {
@@ -508,6 +541,9 @@ class ThreadsPostCard extends ConsumerWidget {
       case 'help':
         return localizations.translate('community_help');
       case 'news':
+        return localizations.translate('community_news');
+      case 'aqohcyog1z8tcij0y1s4': // News category ID (lowercase)
+      case 'aqOhcyOg1z8tcij0y1S4': // News category ID (original case)
         return localizations.translate('community_news');
       default:
         // Fallback to the original category ID if no translation is available

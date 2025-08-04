@@ -46,7 +46,7 @@ class PostHeaderWidget extends ConsumerWidget {
     final currentProfileAsync = ref.watch(currentCommunityProfileProvider);
     final authorProfileAsync =
         ref.watch(communityProfileByIdProvider(post.authorCPId));
-    final categoriesAsync = ref.watch(postCategoriesProvider);
+    final categoriesAsync = ref.watch(allPostCategoriesProvider);
 
     // Find the matching category for the post
     final postCategory = categoriesAsync.maybeWhen(
@@ -372,6 +372,9 @@ class PostHeaderWidget extends ConsumerWidget {
       case 'help':
         return localizations.translate('community_help');
       case 'news':
+        return localizations.translate('community_news');
+      case 'aqohcyog1z8tcij0y1s4': // News category ID (lowercase)
+      case 'aqOhcyOg1z8tcij0y1S4': // News category ID (original case)
         return localizations.translate('community_news');
       default:
         // Fallback to the original category ID if no translation is available

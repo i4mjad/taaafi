@@ -135,6 +135,43 @@ class ForumRepository {
     }
   }
 
+  /// Get ALL post categories (including admin-only) for display purposes
+  Future<List<PostCategory>> getAllPostCategories() async {
+    try {
+      final QuerySnapshot snapshot = await _postCategories
+          .where('isActive', isEqualTo: true)
+          .orderBy('sortOrder')
+          .get();
+
+      return snapshot.docs.map((doc) {
+        return PostCategory.fromFirestore(
+          doc.id,
+          doc.data() as Map<String, dynamic>,
+        );
+      }).toList();
+    } catch (e) {
+      throw Exception('Failed to fetch all post categories: $e');
+    }
+  }
+
+  /// Stream of ALL post categories (including admin-only) for display purposes
+  Stream<List<PostCategory>> watchAllPostCategories() {
+    try {
+      return _postCategories
+          .where('isActive', isEqualTo: true)
+          .orderBy('sortOrder')
+          .snapshots()
+          .map((snapshot) => snapshot.docs.map((doc) {
+                return PostCategory.fromFirestore(
+                  doc.id,
+                  doc.data() as Map<String, dynamic>,
+                );
+              }).toList());
+    } catch (e) {
+      throw Exception('Failed to fetch all post categories: $e');
+    }
+  }
+
   /// Get posts with pagination and optional gender filtering
   Future<PostsPage> getPosts({
     int limit = 10,
@@ -208,6 +245,38 @@ class ForumRepository {
     try {
       Query query = _posts.orderBy('createdAt', descending: true);
 
+      // Debug logging for news category
+      if (category == 'aqOhcyOg1z8tcij0y1S4') {
+        print('🔍 DEBUG: Fetching news posts with category: $category');
+
+        // Let's also check what categories actually exist in the database
+        try {
+          final allPostsSnapshot = await _posts.limit(10).get();
+          print('🔍 DEBUG: Sample of all posts in database:');
+          for (var doc in allPostsSnapshot.docs.take(5)) {
+            final data = doc.data() as Map<String, dynamic>;
+            print(
+                '🔍 DEBUG: Post ${doc.id} - category: "${data['category']}", title: "${data['title']}"');
+          }
+
+          // Check if any posts have news-related content
+          final possibleNewsSnapshot = await _posts
+              .where('category',
+                  whereIn: ['news', 'News', 'NEWS', 'aqOhcyOg1z8tcij0y1S4'])
+              .limit(5)
+              .get();
+          print(
+              '🔍 DEBUG: Posts with possible news categories: ${possibleNewsSnapshot.docs.length}');
+          for (var doc in possibleNewsSnapshot.docs) {
+            final data = doc.data() as Map<String, dynamic>;
+            print(
+                '🔍 DEBUG: News-like post ${doc.id} - category: "${data['category']}", title: "${data['title']}"');
+          }
+        } catch (e) {
+          print('🔍 DEBUG: Error checking existing posts: $e');
+        }
+      }
+
       if (category != null && category.isNotEmpty) {
         query = query.where('category', isEqualTo: category);
       }
@@ -231,6 +300,12 @@ class ForumRepository {
           .where((post) => !post
               .isDeleted) // This will handle missing fields thanks to default value
           .toList();
+
+      // Debug logging for news category
+      if (category == 'aqOhcyOg1z8tcij0y1S4') {
+        print(
+            '🔍 DEBUG: After filtering deleted posts: ${posts.length} posts remain');
+      }
 
       return PostsPage(
         posts: posts,

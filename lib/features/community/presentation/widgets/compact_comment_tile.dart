@@ -105,9 +105,8 @@ class CompactCommentTile extends ConsumerWidget {
                     children: [
                       authorProfileAsync.when(
                         data: (authorProfile) {
-                          final pipelineResult = authorProfile
-                                  ?.getDisplayNameWithPipeline() ??
-                              localizations.translate('community-unknown-user');
+                          final pipelineResult =
+                              authorProfile.getDisplayNameWithPipeline();
 
                           final displayName = _getLocalizedDisplayName(
                               pipelineResult, localizations);

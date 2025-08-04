@@ -75,7 +75,7 @@ class PostFilterParams {
     if (category != null) {
       switch (category!.toLowerCase()) {
         case 'news':
-        case 'aqohcyog1z8tcij0y1s4': // News category ID
+        case 'aqohcyog1z8tcij0y1s4': // News category ID (lowercase)
         case 'challenges':
           return false;
         default:
@@ -138,10 +138,16 @@ final genderInteractionValidatorProvider =
   return GenderInteractionValidator(genderFilteringService);
 });
 
-// Post Categories Provider
+// Post Categories Provider (excludes admin-only categories for user creation)
 final postCategoriesProvider = StreamProvider<List<PostCategory>>((ref) {
   final repository = ref.watch(forumRepositoryProvider);
   return repository.watchPostCategories();
+});
+
+// All Post Categories Provider (includes admin-only categories for display purposes)
+final allPostCategoriesProvider = StreamProvider<List<PostCategory>>((ref) {
+  final repository = ref.watch(forumRepositoryProvider);
+  return repository.watchAllPostCategories();
 });
 
 // Post Categories Provider for New Post Screen (filters out admin-only categories)

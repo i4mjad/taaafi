@@ -313,6 +313,13 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen>
                     ),
                     const SizedBox(width: 8),
                     _buildFilterChip(
+                      AppLocalizations.of(context).translate('community_news'),
+                      'news',
+                      LucideIcons.newspaper,
+                      const Color(0xFF10B981),
+                    ),
+                    const SizedBox(width: 8),
+                    _buildFilterChip(
                       AppLocalizations.of(context).translate('community_posts'),
                       'posts',
                       LucideIcons.messageSquare,
@@ -324,13 +331,6 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen>
                       'challenges',
                       LucideIcons.star,
                       const Color(0xFFEF4444),
-                    ),
-                    const SizedBox(width: 8),
-                    _buildFilterChip(
-                      AppLocalizations.of(context).translate('community_news'),
-                      'news',
-                      LucideIcons.newspaper,
-                      const Color(0xFF10B981),
                     ),
                     const SizedBox(width: 8),
                     _buildFilterChip(
