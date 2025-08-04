@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Plus, Edit, Trash2, Search, ChevronUp, ChevronDown } from 'lucide-react';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { toast } from 'sonner';
@@ -23,6 +24,7 @@ interface PostCategory {
   iconName: string;
   colorHex: string;
   isActive: boolean;
+  isForAdminOnly?: boolean;
   sortOrder: number;
 }
 
@@ -42,6 +44,7 @@ function PostCategoryForm({ category, onSubmit, onCancel, isLoading, isOpen }: P
     iconName: '',
     colorHex: '#10B981',
     isActive: true,
+    isForAdminOnly: false,
     sortOrder: 1,
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -54,6 +57,7 @@ function PostCategoryForm({ category, onSubmit, onCancel, isLoading, isOpen }: P
         iconName: category.iconName,
         colorHex: category.colorHex,
         isActive: category.isActive,
+        isForAdminOnly: category.isForAdminOnly || false,
         sortOrder: category.sortOrder,
       });
     } else {
@@ -63,6 +67,7 @@ function PostCategoryForm({ category, onSubmit, onCancel, isLoading, isOpen }: P
         iconName: '',
         colorHex: '#10B981',
         isActive: true,
+        isForAdminOnly: false,
         sortOrder: 1,
       });
     }
@@ -219,6 +224,23 @@ function PostCategoryForm({ category, onSubmit, onCancel, isLoading, isOpen }: P
             </div>
           </div>
 
+          <div className="grid grid-cols-1 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="isForAdminOnly">{t('modules.community.postCategories.isForAdminOnly') || 'Admin Only'}</Label>
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="isForAdminOnly"
+                  checked={formData.isForAdminOnly || false}
+                  onCheckedChange={(checked) => handleInputChange('isForAdminOnly', checked)}
+                />
+                <Label htmlFor="isForAdminOnly" className="text-sm font-normal">
+                  {formData.isForAdminOnly ? (t('modules.community.postCategories.adminOnlyEnabled') || 'Admin Only') : (t('modules.community.postCategories.adminOnlyDisabled') || 'Available to All')}
+                </Label>
+              </div>
+              <p className="text-sm text-muted-foreground">{t('modules.community.postCategories.isForAdminOnlyHelp') || 'When enabled, only admin users can create posts in this category'}</p>
+            </div>
+          </div>
+
           <div className="flex justify-end gap-2 pt-4">
             <Button type="button" variant="outline" onClick={onCancel}>
               {t('common.cancel')}
@@ -328,6 +350,18 @@ export default function PostCategoriesManagement() {
       toast.success(t('modules.community.postCategories.statusUpdateSuccess'));
     } catch (error) {
       console.error('Error toggling status:', error);
+      toast.error(t('modules.community.postCategories.statusUpdateError'));
+    }
+  };
+
+  const handleAdminOnlyToggle = async (category: PostCategory) => {
+    try {
+      await updateDoc(doc(db, 'postCategories', category.id), {
+        isForAdminOnly: !category.isForAdminOnly
+      });
+      toast.success(t('modules.community.postCategories.statusUpdateSuccess'));
+    } catch (error) {
+      console.error('Error toggling admin-only status:', error);
       toast.error(t('modules.community.postCategories.statusUpdateError'));
     }
   };
@@ -484,81 +518,95 @@ export default function PostCategoriesManagement() {
         </Button>
       </div>
 
-      {/* Categories List */}
-      <div className="space-y-4">
-        {sortedCategories.length === 0 ? (
-          <Card>
-            <CardContent className="py-8 text-center">
+      {/* Categories Table */}
+      <Card>
+        <CardContent className="p-0">
+          {sortedCategories.length === 0 ? (
+            <div className="py-8 text-center">
               <p className="text-muted-foreground">{t('modules.community.postCategories.noCategoriesFound')}</p>
-            </CardContent>
-          </Card>
-        ) : (
-          sortedCategories.map((category) => (
-            <Card key={category.id}>
-              <CardContent className="p-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-4">
-                    <div
-                      className="w-4 h-4 rounded-full"
-                      style={{ backgroundColor: category.colorHex }}
-                    />
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <h3 className="font-semibold">{category.name}</h3>
-                        <span className="text-muted-foreground">({category.nameAr})</span>
-                        <Badge variant={category.isActive ? 'default' : 'secondary'}>
-                          {category.isActive ? t('common.active') : t('common.inactive')}
-                        </Badge>
+            </div>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-12"></TableHead>
+                  <TableHead>{t('modules.community.postCategories.name')}</TableHead>
+                  <TableHead>{t('modules.community.postCategories.nameAr')}</TableHead>
+                  <TableHead>{t('modules.community.postCategories.iconName')}</TableHead>
+                  <TableHead className="w-20">{t('modules.community.postCategories.sortOrder')}</TableHead>
+                  <TableHead className="w-20 text-center">{t('modules.community.postCategories.isActive')}</TableHead>
+                  <TableHead className="w-24 text-center">{t('modules.community.postCategories.isForAdminOnly') || 'Admin Only'}</TableHead>
+                  <TableHead className="w-32 text-center">{t('common.actions') || 'Actions'}</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {sortedCategories.map((category) => (
+                  <TableRow key={category.id}>
+                    <TableCell>
+                      <div
+                        className="w-4 h-4 rounded-full"
+                        style={{ backgroundColor: category.colorHex }}
+                      />
+                    </TableCell>
+                    <TableCell className="font-medium">{category.name}</TableCell>
+                    <TableCell>{category.nameAr}</TableCell>
+                    <TableCell className="text-sm text-muted-foreground">{category.iconName}</TableCell>
+                    <TableCell className="text-center">{category.sortOrder}</TableCell>
+                    <TableCell className="text-center">
+                      <Switch
+                        checked={category.isActive}
+                        onCheckedChange={() => handleStatusToggle(category)}
+                        size="sm"
+                      />
+                    </TableCell>
+                    <TableCell className="text-center">
+                      <Switch
+                        checked={category.isForAdminOnly || false}
+                        onCheckedChange={() => handleAdminOnlyToggle(category)}
+                        size="sm"
+                      />
+                    </TableCell>
+                    <TableCell className="text-center">
+                      <div className="flex items-center justify-center gap-1">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => moveCategoryUp(category)}
+                          disabled={sortedCategories.findIndex(cat => cat.id === category.id) === 0}
+                        >
+                          <ChevronUp className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => moveCategoryDown(category)}
+                          disabled={sortedCategories.findIndex(cat => cat.id === category.id) === sortedCategories.length - 1}
+                        >
+                          <ChevronDown className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleEdit(category)}
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleDelete(category)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
                       </div>
-                      <p className="text-sm text-muted-foreground">
-                        {t('modules.community.postCategories.iconName')}: {category.iconName} • 
-                        {t('modules.community.postCategories.sortOrder')}: {category.sortOrder}
-                      </p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-center gap-2">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => moveCategoryUp(category)}
-                      disabled={sortedCategories.findIndex(cat => cat.id === category.id) === 0}
-                    >
-                      <ChevronUp className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => moveCategoryDown(category)}
-                      disabled={sortedCategories.findIndex(cat => cat.id === category.id) === sortedCategories.length - 1}
-                    >
-                      <ChevronDown className="h-4 w-4" />
-                    </Button>
-                    <Switch
-                      checked={category.isActive}
-                      onCheckedChange={() => handleStatusToggle(category)}
-                    />
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleEdit(category)}
-                    >
-                      <Edit className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleDelete(category)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))
-        )}
-      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
+        </CardContent>
+      </Card>
 
       {/* Form Dialog */}
       <PostCategoryForm

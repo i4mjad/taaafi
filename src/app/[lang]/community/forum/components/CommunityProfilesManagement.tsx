@@ -268,18 +268,18 @@ export default function CommunityProfilesManagement() {
               <table className="w-full border-collapse">
                 <thead>
                   <tr className="border-b">
-                    <th className="text-left py-3 px-4 font-medium">{t('modules.community.profiles.displayName')}</th>
-                    <th className="text-left py-3 px-4 font-medium">{t('modules.community.profiles.gender')}</th>
-                    <th className="text-left py-3 px-4 font-medium">{t('modules.community.profiles.isAnonymous')}</th>
-                    <th className="text-left py-3 px-4 font-medium">{t('modules.community.profiles.memberSince')}</th>
-                    <th className="text-left py-3 px-4 font-medium">{t('common.actions')}</th>
+                    <th className="text-start py-3 px-4 font-medium">{t('modules.community.profiles.displayName')}</th>
+                    <th className="text-start py-3 px-4 font-medium">{t('modules.community.profiles.gender')}</th>
+                    <th className="text-start py-3 px-4 font-medium">{t('modules.community.profiles.isAnonymous')}</th>
+                    <th className="text-start py-3 px-4 font-medium">{t('modules.community.profiles.memberSince')}</th>
+                    <th className="text-end py-3 px-4 font-medium">{t('common.actions')}</th>
                   </tr>
                 </thead>
                 <tbody>
                   {filteredProfiles.map((profile) => (
                     <tr key={profile.id} className="border-b hover:bg-muted/50">
                       <td className="py-3 px-4">
-                        <div className="flex items-center space-x-3">
+                        <div className="flex items-center gap-3">
                           <Avatar className="h-8 w-8">
                             <AvatarImage src={profile.avatarUrl} alt={profile.displayName} />
                             <AvatarFallback>
@@ -310,28 +310,30 @@ export default function CommunityProfilesManagement() {
                         </div>
                       </td>
                       <td className="py-3 px-4">
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" className="h-8 w-8 p-0">
-                              <MoreHorizontal className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem onClick={() => {
-                              setSelectedProfile(profile);
-                              setShowDetails(true);
-                            }}>
-                              <Eye className="mr-2 h-4 w-4" />
-                              {t('modules.community.profiles.viewProfile')}
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => {
-                              toast.info('Edit functionality coming soon');
-                            }}>
-                              <Edit className="mr-2 h-4 w-4" />
-                              {t('modules.community.profiles.editProfile')}
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
+                        <div className="flex justify-end">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" className="h-8 w-8 p-0">
+                                <MoreHorizontal className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem onClick={() => {
+                                setSelectedProfile(profile);
+                                setShowDetails(true);
+                              }}>
+                                <Eye className="me-2 h-4 w-4" />
+                                {t('modules.community.profiles.viewProfile')}
+                              </DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => {
+                                toast.info('Edit functionality coming soon');
+                              }}>
+                                <Edit className="me-2 h-4 w-4" />
+                                {t('modules.community.profiles.editProfile')}
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -354,7 +356,7 @@ export default function CommunityProfilesManagement() {
           
           {selectedProfile && (
             <div className="space-y-6">
-              <div className="flex items-center space-x-4">
+              <div className="flex items-center gap-4">
                 <Avatar className="h-16 w-16">
                   <AvatarImage src={selectedProfile.avatarUrl} alt={selectedProfile.displayName} />
                   <AvatarFallback className="text-lg">

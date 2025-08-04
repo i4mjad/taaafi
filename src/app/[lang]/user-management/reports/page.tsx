@@ -51,6 +51,8 @@ import {
   RotateCw,
   Shield,
   User,
+  ChevronUp,
+  ChevronDown,
 } from 'lucide-react';
 
 // Import the report types management component
@@ -78,6 +80,9 @@ interface UserReport {
   messagesCount: number;
   lastMessageFrom?: 'user' | 'admin';
   lastMessageTime?: Timestamp;
+  // User data
+  isPlusUser?: boolean;
+  userDisplayName?: string;
 }
 
 interface ReportMessage {
@@ -98,6 +103,8 @@ export default function UserReportsPage() {
   const [reportTypeFilter, setReportTypeFilter] = useState<string>('all');
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(50);
+  const [sortBy, setSortBy] = useState<'messageLength' | 'plusUser' | 'date'>('messageLength');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   
   // Bulk update state
   const [selectedReports, setSelectedReports] = useState<Set<string>>(new Set());
@@ -433,6 +440,20 @@ export default function UserReportsPage() {
     setSelectedReports(newSelected);
   };
 
+  const handleSort = (column: 'messageLength' | 'plusUser' | 'date') => {
+    if (sortBy === column) {
+      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortBy(column);
+      setSortOrder('asc');
+    }
+  };
+
+  const getSortIcon = (column: 'messageLength' | 'plusUser' | 'date') => {
+    if (sortBy !== column) return null;
+    return sortOrder === 'asc' ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />;
+  };
+
   // Build queries to prioritize pending reports from the source
   const buildQueriesWithPriorityFetch = async (): Promise<UserReport[]> => {
     const reports: UserReport[] = [];
@@ -473,7 +494,7 @@ export default function UserReportsPage() {
       }
 
       const snapshot = await getDocs(q);
-      return snapshot.docs.map(doc => ({
+      const reports = snapshot.docs.map(doc => ({
         id: doc.id,
         uid: doc.data().uid || '',
         time: doc.data().time || Timestamp.now(),
@@ -482,6 +503,31 @@ export default function UserReportsPage() {
         initialMessage: doc.data().initialMessage || doc.data().userJustification || '',
         lastUpdated: doc.data().lastUpdated || doc.data().time || Timestamp.now(),
         messagesCount: doc.data().messagesCount || 1,
+      }));
+      
+      // Fetch user data for each report
+      return await Promise.all(reports.map(async (report) => {
+        try {
+          const userQuery = query(collection(db, 'users'), where('__name__', '==', report.uid));
+          const userSnapshot = await getDocs(userQuery);
+          
+          if (!userSnapshot.empty) {
+            const userData = userSnapshot.docs[0].data();
+            return {
+              ...report,
+              isPlusUser: userData.isPlusUser || false,
+              userDisplayName: userData.displayName || '',
+            };
+          }
+        } catch (error) {
+          console.error(`Error fetching user data for ${report.uid}:`, error);
+        }
+        
+        return {
+          ...report,
+          isPlusUser: false,
+          userDisplayName: '',
+        };
       }));
     }
 
@@ -501,15 +547,40 @@ export default function UserReportsPage() {
       );
 
       const statusSnapshot = await getDocs(statusQuery);
-      const statusReports = statusSnapshot.docs.map(doc => ({
-        id: doc.id,
-        uid: doc.data().uid || '',
-        time: doc.data().time || Timestamp.now(),
-        reportTypeId: doc.data().reportTypeId || doc.data().reportType || 'dataError',
-        status: doc.data().status || 'pending',
-        initialMessage: doc.data().initialMessage || doc.data().userJustification || '',
-        lastUpdated: doc.data().lastUpdated || doc.data().time || Timestamp.now(),
-        messagesCount: doc.data().messagesCount || 1,
+      const statusReports = await Promise.all(statusSnapshot.docs.map(async (doc) => {
+        const reportData = {
+          id: doc.id,
+          uid: doc.data().uid || '',
+          time: doc.data().time || Timestamp.now(),
+          reportTypeId: doc.data().reportTypeId || doc.data().reportType || 'dataError',
+          status: doc.data().status || 'pending',
+          initialMessage: doc.data().initialMessage || doc.data().userJustification || '',
+          lastUpdated: doc.data().lastUpdated || doc.data().time || Timestamp.now(),
+          messagesCount: doc.data().messagesCount || 1,
+        };
+        
+        // Fetch user data for each report
+        try {
+          const userQuery = query(collection(db, 'users'), where('__name__', '==', reportData.uid));
+          const userSnapshot = await getDocs(userQuery);
+          
+          if (!userSnapshot.empty) {
+            const userData = userSnapshot.docs[0].data();
+            return {
+              ...reportData,
+              isPlusUser: userData.isPlusUser || false,
+              userDisplayName: userData.displayName || '',
+            };
+          }
+        } catch (error) {
+          console.error(`Error fetching user data for ${reportData.uid}:`, error);
+        }
+        
+        return {
+          ...reportData,
+          isPlusUser: false,
+          userDisplayName: '',
+        };
       }));
 
       // Handle pagination by skipping already shown reports
@@ -664,15 +735,33 @@ export default function UserReportsPage() {
       );
     }
 
-    // Sort by initial message length (shorter messages first)
+    // Apply sorting
     filtered = filtered.sort((a, b) => {
-      const lengthA = a.initialMessage?.length || 0;
-      const lengthB = b.initialMessage?.length || 0;
-      return lengthA - lengthB;
+      let compareValue = 0;
+      
+      switch (sortBy) {
+        case 'messageLength':
+          const lengthA = a.initialMessage?.length || 0;
+          const lengthB = b.initialMessage?.length || 0;
+          compareValue = lengthA - lengthB;
+          break;
+        case 'plusUser':
+          const plusA = a.isPlusUser ? 1 : 0;
+          const plusB = b.isPlusUser ? 1 : 0;
+          compareValue = plusA - plusB;
+          break;
+        case 'date':
+          compareValue = a.time.toMillis() - b.time.toMillis();
+          break;
+        default:
+          compareValue = 0;
+      }
+      
+      return sortOrder === 'asc' ? compareValue : -compareValue;
     });
 
     return filtered;
-  }, [allReports, searchQuery, dateRangeFilter]);
+  }, [allReports, searchQuery, dateRangeFilter, sortBy, sortOrder]);
 
   // Use actual database counts for stats
   const stats = useMemo(() => {
@@ -1109,6 +1198,16 @@ export default function UserReportsPage() {
                           <TableHead>{t('modules.userManagement.reports.reportId') || 'Report ID'}</TableHead>
                           <TableHead>{t('modules.userManagement.reports.userId') || 'User ID'}</TableHead>
                           <TableHead className="hidden md:table-cell">{t('modules.userManagement.reports.reportType') || 'Report Type'}</TableHead>
+                          <TableHead className="hidden xl:table-cell">
+                            <Button
+                              variant="ghost"
+                              className="h-auto p-0 hover:bg-transparent font-medium text-left justify-start"
+                              onClick={() => handleSort('plusUser')}
+                            >
+                              {t('modules.userManagement.reports.plusSubscription') || 'Plus Subscription'}
+                              {getSortIcon('plusUser')}
+                            </Button>
+                          </TableHead>
                           <TableHead>{t('modules.userManagement.reports.status') || 'Status'}</TableHead>
                           <TableHead className="hidden lg:table-cell">{t('modules.userManagement.reports.submittedDate') || 'Submitted Date'}</TableHead>
                           <TableHead className="hidden xl:table-cell">{t('modules.userManagement.reports.initialMessage') || 'Initial Message'}</TableHead>
@@ -1126,6 +1225,7 @@ export default function UserReportsPage() {
                               <TableCell><Skeleton className="h-4 w-24" /></TableCell>
                               <TableCell><Skeleton className="h-4 w-20" /></TableCell>
                               <TableCell className="hidden md:table-cell"><Skeleton className="h-4 w-16" /></TableCell>
+                              <TableCell className="hidden xl:table-cell"><Skeleton className="h-4 w-12" /></TableCell>
                               <TableCell><Skeleton className="h-4 w-16" /></TableCell>
                               <TableCell className="hidden lg:table-cell"><Skeleton className="h-4 w-32" /></TableCell>
                               <TableCell className="hidden xl:table-cell"><Skeleton className="h-4 w-40" /></TableCell>
@@ -1173,6 +1273,14 @@ export default function UserReportsPage() {
                               <TableCell className="hidden md:table-cell">
                                 <Badge variant="outline" className="text-xs">
                                   {getReportTypeName(report.reportTypeId)}
+                                </Badge>
+                              </TableCell>
+                              <TableCell className="hidden xl:table-cell">
+                                <Badge 
+                                  variant={report.isPlusUser ? "default" : "secondary"} 
+                                  className={`text-xs ${report.isPlusUser ? 'bg-amber-100 text-amber-800 border-amber-200' : 'bg-gray-100 text-gray-600 border-gray-200'}`}
+                                >
+                                  {report.isPlusUser ? '⭐ Plus' : 'Free'}
                                 </Badge>
                               </TableCell>
                               <TableCell>{getStatusBadge(report.status)}</TableCell>

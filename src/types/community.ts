@@ -17,6 +17,7 @@ export interface PostCategory {
   iconName: string;        // Icon identifier
   colorHex: string;        // Color code for UI
   isActive: boolean;
+  isForAdminOnly?: boolean; // Whether this category is restricted to admin users only
   sortOrder: number;       // Display order
   createdAt?: Date;
   updatedAt?: Date;
@@ -179,7 +180,6 @@ export interface CreateForumPostRequest {
   title: string;
   body: string;
   category: string;
-  isAnonymous?: boolean;
 }
 
 export interface UpdateForumPostRequest {

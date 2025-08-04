@@ -12,12 +12,14 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Search, MessageSquare, ThumbsUp, ThumbsDown, User, MoreHorizontal, Eye, Edit, Trash2, EyeOff } from 'lucide-react';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Search, MessageSquare, ThumbsUp, ThumbsDown, User, MoreHorizontal, Eye, Edit, Trash2, EyeOff, Plus, Pin, PinOff, X } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { format } from 'date-fns';
 import { ForumPost, Comment, Interaction } from '@/types/community';
 import { toast } from 'sonner';
 import { useRouter, useParams } from 'next/navigation';
+import ForumPostForm from './ForumPostForm';
 
 export default function ForumPostsManagement() {
   const { t } = useTranslation();
@@ -31,6 +33,11 @@ export default function ForumPostsManagement() {
   const [selectedPost, setSelectedPost] = useState<ForumPost | null>(null);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [showHideDialog, setShowHideDialog] = useState(false);
+  const [showCreateDialog, setShowCreateDialog] = useState(false);
+  const [selectedPosts, setSelectedPosts] = useState<string[]>([]);
+  const [showBulkDeleteDialog, setShowBulkDeleteDialog] = useState(false);
+  const [showBulkSoftDeleteDialog, setShowBulkSoftDeleteDialog] = useState(false);
+  const [bulkActionLoading, setBulkActionLoading] = useState(false);
 
   // Fetch forum posts
   const [postsValue, postsLoading, postsError] = useCollection(
@@ -180,6 +187,116 @@ export default function ForumPostsManagement() {
     }
   };
 
+  const handleCreatePostSuccess = () => {
+    // The ForumPostsManagement component will automatically refresh
+    // due to the real-time Firestore listener
+    setShowCreateDialog(false);
+  };
+
+  // Bulk selection handlers
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedPosts(paginatedPosts.map(post => post.id));
+    } else {
+      setSelectedPosts([]);
+    }
+  };
+
+  const handleSelectPost = (postId: string, checked: boolean) => {
+    if (checked) {
+      setSelectedPosts(prev => [...prev, postId]);
+    } else {
+      setSelectedPosts(prev => prev.filter(id => id !== postId));
+    }
+  };
+
+  const clearSelection = () => {
+    setSelectedPosts([]);
+  };
+
+  // Bulk actions
+  const handleBulkSoftDelete = async () => {
+    setBulkActionLoading(true);
+    try {
+      const batch = selectedPosts.map(postId => 
+        updateDoc(doc(db, 'forumPosts', postId), {
+          isDeleted: true,
+          updatedAt: new Date(),
+        })
+      );
+      await Promise.all(batch);
+      toast.success(t('modules.community.posts.bulkSoftDeleteSuccess', { count: selectedPosts.length }));
+      clearSelection();
+      setShowBulkSoftDeleteDialog(false);
+    } catch (error) {
+      console.error('Error soft deleting posts:', error);
+      toast.error(t('modules.community.posts.bulkActionError'));
+    } finally {
+      setBulkActionLoading(false);
+    }
+  };
+
+  const handleBulkHardDelete = async () => {
+    setBulkActionLoading(true);
+    try {
+      const batch = selectedPosts.map(postId => 
+        deleteDoc(doc(db, 'forumPosts', postId))
+      );
+      await Promise.all(batch);
+      toast.success(t('modules.community.posts.bulkHardDeleteSuccess', { count: selectedPosts.length }));
+      clearSelection();
+      setShowBulkDeleteDialog(false);
+    } catch (error) {
+      console.error('Error hard deleting posts:', error);
+      toast.error(t('modules.community.posts.bulkActionError'));
+    } finally {
+      setBulkActionLoading(false);
+    }
+  };
+
+  const handleBulkPin = async () => {
+    setBulkActionLoading(true);
+    try {
+      const batch = selectedPosts.map(postId => 
+        updateDoc(doc(db, 'forumPosts', postId), {
+          isPinned: true,
+          updatedAt: new Date(),
+        })
+      );
+      await Promise.all(batch);
+      toast.success(t('modules.community.posts.bulkPinSuccess', { count: selectedPosts.length }));
+      clearSelection();
+    } catch (error) {
+      console.error('Error pinning posts:', error);
+      toast.error(t('modules.community.posts.bulkActionError'));
+    } finally {
+      setBulkActionLoading(false);
+    }
+  };
+
+  const handleBulkUnpin = async () => {
+    setBulkActionLoading(true);
+    try {
+      const batch = selectedPosts.map(postId => 
+        updateDoc(doc(db, 'forumPosts', postId), {
+          isPinned: false,
+          updatedAt: new Date(),
+        })
+      );
+      await Promise.all(batch);
+      toast.success(t('modules.community.posts.bulkUnpinSuccess', { count: selectedPosts.length }));
+      clearSelection();
+    } catch (error) {
+      console.error('Error unpinning posts:', error);
+      toast.error(t('modules.community.posts.bulkActionError'));
+    } finally {
+      setBulkActionLoading(false);
+    }
+  };
+
+  const isAllSelected = paginatedPosts.length > 0 && selectedPosts.length === paginatedPosts.length;
+  const isIndeterminate = selectedPosts.length > 0 && selectedPosts.length < paginatedPosts.length;
+
   if (postsLoading) {
     return (
       <div className="space-y-6">
@@ -220,11 +337,17 @@ export default function ForumPostsManagement() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div>
-        <h2 className="text-2xl font-bold tracking-tight">{t('modules.community.posts.title')}</h2>
-        <p className="text-muted-foreground">
-          {t('modules.community.posts.description')}
-        </p>
+      <div className="flex justify-between items-start">
+        <div>
+          <h2 className="text-2xl font-bold tracking-tight">{t('modules.community.posts.title')}</h2>
+          <p className="text-muted-foreground">
+            {t('modules.community.posts.description')}
+          </p>
+        </div>
+        <Button onClick={() => setShowCreateDialog(true)}>
+          <Plus className="mr-2 h-4 w-4" />
+          {t('modules.community.posts.createPost')}
+        </Button>
       </div>
 
       {/* Stats Cards */}
@@ -290,6 +413,67 @@ export default function ForumPostsManagement() {
         </Card>
       </div>
 
+      {/* Bulk Actions Toolbar */}
+      {selectedPosts.length > 0 && (
+        <Card className="border-primary/20 bg-primary/5">
+          <CardContent className="py-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-4">
+                <span className="text-sm font-medium">
+                  {t('modules.community.posts.bulkActions.selected', { count: selectedPosts.length })}
+                </span>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={clearSelection}
+                >
+                  <X className="mr-2 h-4 w-4" />
+                  {t('modules.community.posts.bulkActions.clearSelection')}
+                </Button>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleBulkPin}
+                  disabled={bulkActionLoading}
+                >
+                  <Pin className="mr-2 h-4 w-4" />
+                  {t('modules.community.posts.bulkActions.pin')}
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleBulkUnpin}
+                  disabled={bulkActionLoading}
+                >
+                  <PinOff className="mr-2 h-4 w-4" />
+                  {t('modules.community.posts.bulkActions.unpin')}
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowBulkSoftDeleteDialog(true)}
+                  disabled={bulkActionLoading}
+                >
+                  <EyeOff className="mr-2 h-4 w-4" />
+                  {t('modules.community.posts.bulkActions.softDelete')}
+                </Button>
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  onClick={() => setShowBulkDeleteDialog(true)}
+                  disabled={bulkActionLoading}
+                >
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  {t('modules.community.posts.bulkActions.hardDelete')}
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-4">
         <div className="flex-1">
@@ -325,9 +509,18 @@ export default function ForumPostsManagement() {
             <Table>
               <TableHeader>
                 <TableRow>
+                  <TableHead className="w-12">
+                    <Checkbox
+                      checked={isAllSelected}
+                      onCheckedChange={handleSelectAll}
+                      indeterminate={isIndeterminate}
+                      aria-label={t('modules.community.posts.table.selectAll')}
+                    />
+                  </TableHead>
                   <TableHead>{t('modules.community.posts.table.columns.title')}</TableHead>
                   <TableHead>{t('modules.community.posts.table.columns.author')}</TableHead>
                   <TableHead>{t('modules.community.posts.table.columns.category')}</TableHead>
+                  <TableHead className="text-center">{t('modules.community.posts.table.columns.status')}</TableHead>
                   <TableHead className="text-center">{t('modules.community.posts.table.columns.likes')}</TableHead>
                   <TableHead className="text-center">{t('modules.community.posts.table.columns.dislikes')}</TableHead>
                   <TableHead className="text-center">{t('modules.community.posts.table.columns.comments')}</TableHead>
@@ -339,13 +532,20 @@ export default function ForumPostsManagement() {
               <TableBody>
                 {paginatedPosts.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={9} className="h-24 text-center">
+                    <TableCell colSpan={11} className="h-24 text-center">
                       {t('modules.community.posts.table.noData')}
                     </TableCell>
                   </TableRow>
                 ) : (
                   paginatedPosts.map((post) => (
                     <TableRow key={post.id} className={post.isHidden ? 'opacity-50' : ''}>
+                      <TableCell>
+                        <Checkbox
+                          checked={selectedPosts.includes(post.id)}
+                          onCheckedChange={(checked) => handleSelectPost(post.id, !!checked)}
+                          aria-label={t('modules.community.posts.table.selectPost')}
+                        />
+                      </TableCell>
                       <TableCell className="font-medium max-w-[300px] truncate">
                         {post.title}
                         {post.isAnonymous && (
@@ -364,6 +564,26 @@ export default function ForumPostsManagement() {
                         <Badge variant="outline">
                           {getCategoryName(post.category)}
                         </Badge>
+                      </TableCell>
+                      <TableCell className="text-center">
+                        <div className="flex items-center justify-center space-x-1">
+                          {post.isPinned && (
+                            <Badge variant="default" className="text-xs">
+                              <Pin className="h-3 w-3 mr-1" />
+                              {t('modules.community.posts.pinned')}
+                            </Badge>
+                          )}
+                          {post.isDeleted && (
+                            <Badge variant="destructive" className="text-xs">
+                              {t('modules.community.posts.deleted')}
+                            </Badge>
+                          )}
+                          {post.isHidden && (
+                            <Badge variant="secondary" className="text-xs">
+                              {t('modules.community.posts.hidden')}
+                            </Badge>
+                          )}
+                        </div>
                       </TableCell>
                       <TableCell className="text-center">
                         <div className="flex items-center justify-center space-x-1">
@@ -542,6 +762,61 @@ export default function ForumPostsManagement() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Bulk Soft Delete Confirmation Dialog */}
+      <Dialog open={showBulkSoftDeleteDialog} onOpenChange={setShowBulkSoftDeleteDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t('modules.community.posts.bulkActions.softDeleteConfirm.title')}</DialogTitle>
+            <DialogDescription>
+              {t('modules.community.posts.bulkActions.softDeleteConfirm.description', { count: selectedPosts.length })}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowBulkSoftDeleteDialog(false)}>
+              {t('common.cancel')}
+            </Button>
+            <Button 
+              variant="destructive" 
+              onClick={handleBulkSoftDelete}
+              disabled={bulkActionLoading}
+            >
+              {bulkActionLoading ? t('common.processing') : t('modules.community.posts.bulkActions.softDelete')}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Bulk Hard Delete Confirmation Dialog */}
+      <Dialog open={showBulkDeleteDialog} onOpenChange={setShowBulkDeleteDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t('modules.community.posts.bulkActions.hardDeleteConfirm.title')}</DialogTitle>
+            <DialogDescription>
+              {t('modules.community.posts.bulkActions.hardDeleteConfirm.description', { count: selectedPosts.length })}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowBulkDeleteDialog(false)}>
+              {t('common.cancel')}
+            </Button>
+            <Button 
+              variant="destructive" 
+              onClick={handleBulkHardDelete}
+              disabled={bulkActionLoading}
+            >
+              {bulkActionLoading ? t('common.processing') : t('modules.community.posts.bulkActions.hardDelete')}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Create Post Dialog */}
+      <ForumPostForm
+        isOpen={showCreateDialog}
+        onClose={() => setShowCreateDialog(false)}
+        onSuccess={handleCreatePostSuccess}
+      />
     </div>
   );
 } 
