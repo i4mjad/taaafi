@@ -11,6 +11,7 @@ import 'package:reboot_app_3/features/community/presentation/providers/community
 import 'package:reboot_app_3/features/community/presentation/providers/forum_providers.dart';
 import 'package:reboot_app_3/features/community/presentation/widgets/community_profile_tabs.dart';
 import 'package:reboot_app_3/features/community/presentation/widgets/avatar_with_anonymity.dart';
+import 'package:reboot_app_3/features/community/presentation/widgets/role_chip.dart';
 import 'package:reboot_app_3/features/community/presentation/widgets/threads_post_card.dart';
 import 'package:reboot_app_3/features/community/presentation/widgets/compact_comment_tile.dart';
 import 'package:reboot_app_3/features/community/presentation/widgets/compact_interaction_tile.dart';
@@ -319,13 +320,7 @@ class _CommunityProfileSettingsScreenState
                                 ),
                               ),
                               const SizedBox(height: 4),
-                              const SizedBox(height: 8),
-                              Text(
-                                '0 ${localizations.translate('community-followers')}',
-                                style: TextStyles.caption.copyWith(
-                                  color: theme.grey[600],
-                                ),
-                              ),
+                              RoleChip(role: profile.role),
                             ],
                           ),
                         ),

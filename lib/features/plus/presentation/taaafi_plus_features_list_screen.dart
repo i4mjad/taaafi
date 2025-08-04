@@ -257,8 +257,6 @@ class _TaaafiPlusScreenState
               _buildPersonalAnalyticsFeatureRow(context, theme, false, true),
               _buildCommunityPerksFeatureRow(context, theme, false, true),
               _buildSmartAlertsFeatureRow(context, theme, false, true),
-              _buildFeatureRowWithIcon(context, theme, 'custom-reminders',
-                  LucideIcons.bell, Color(0xFF3B82F6), true, true),
               _buildFeatureRowWithIcon(context, theme, 'priority-support',
                   LucideIcons.headphones, Color(0xFF10B981), false, true),
               _buildFeatureRowWithIcon(context, theme, 'feature-requests',
@@ -340,7 +338,7 @@ class _TaaafiPlusScreenState
                           child: Text(
                             AppLocalizations.of(context)
                                 .translate('detailed-analytics'),
-                            style: TextStyles.footnote.copyWith(
+                            style: TextStyles.caption.copyWith(
                               color: theme.grey[800],
                               fontWeight: FontWeight.w600,
                             ),
@@ -412,6 +410,8 @@ class _TaaafiPlusScreenState
                       'trigger-radar', Color(0xFFF97316)),
                   _buildInsightItem(context, theme, LucideIcons.clock,
                       'risk-clock', Color(0xFF06B6D4)),
+                  _buildInsightItem(context, theme, LucideIcons.lineChart,
+                      'streak-periods', Color(0xFFfa9347)),
                   _buildInsightItem(context, theme, LucideIcons.heartHandshake,
                       'mood-relapse-correlation', Color(0xFFEC4899),
                       isLast: true),
@@ -463,7 +463,7 @@ class _TaaafiPlusScreenState
                           child: Text(
                             AppLocalizations.of(context)
                                 .translate('community-perks'),
-                            style: TextStyles.footnote.copyWith(
+                            style: TextStyles.caption.copyWith(
                               color: theme.grey[800],
                               fontWeight: FontWeight.w600,
                             ),
@@ -531,8 +531,6 @@ class _TaaafiPlusScreenState
                 children: [
                   _buildInsightItem(context, theme, LucideIcons.crown,
                       'plus-badge-flair', Color(0xFFF59E0B)),
-                  _buildInsightItem(context, theme, LucideIcons.trendingUp,
-                      'featured-post-boost', Color(0xFF10B981)),
                   _buildInsightItem(context, theme, LucideIcons.user,
                       'streak-overlay-avatar', Color(0xFF3B82F6),
                       isLast: true),

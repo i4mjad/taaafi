@@ -1722,7 +1722,7 @@ const Map<String, String> kAr = {
   "community-perks-desc": "فوائد حصرية واعتراف في المجتمع",
   "plus-badge-flair": "شارة \"+\" ذهبية ولقب مميز",
   "featured-post-boost": "تعزيز المنشور المميز",
-  "streak-overlay-avatar": "طبقة الإنجازات الاختيارية",
+  "streak-overlay-avatar": "مشاركة الفترة الحالية (اختياري)",
 
   // Smart Alerts feature and sub-features
   "smart-alerts-forecasts": "التنبيهات",
