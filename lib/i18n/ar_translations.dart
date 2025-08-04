@@ -1671,14 +1671,14 @@ const Map<String, String> kAr = {
   "savings-percentage": "توفير 62%",
   "billed-yearly-info": "يتم الدفع سنوياً بعد التجربة المجانية.",
   "billed-monthly-info": "يتم الدفع شهرياً بعد التجربة المجانية.",
-  "change-plans-anytime": "غير الخطط أو ألغ في أي وقت.",
-  "start-free-trial": "ابدأ التجربة المجانية لـ 3 أيام",
+  "change-plans-anytime": "ألغ في أي وقت.",
+  "start-free-trial": "ابدأ التجربة المجانية لـ 7 أيام",
   "free-trial-started": "تم بدء التجربة المجانية بنجاح!",
 
   // بطاقة الاشتراك البسيطة
   "try-ta3afi-plus": "جرب تعافي +",
   "free-trial-description":
-      "ابدأ تجربتك المجانية لمدة 3 أيام، يمكنك الإلغاء في أي وقت.",
+      "ابدأ تجربتك المجانية لمدة 7 أيام، يمكنك الإلغاء في أي وقت.",
   "subscription-monthly-price": "4.99\$",
   "continue": "متابعة",
 
@@ -1729,7 +1729,7 @@ const Map<String, String> kAr = {
   "smart-alerts-forecasts-desc": "تنبؤات ذكية وإشعارات شخصية",
   "high-risk-hour-alert": "تنبيه ساعة الخطر العالي",
   "streak-vulnerability-alert": "تنبيه ضعف الإنجاز",
-  "topic-based-pushes": "إشعارات قائمة على المواضيع",
+  "topic-based-pushes": "إشعارات مخصصة بمواضيع متنوعة",
 
   // Smart Alerts UI translations
   "smart-alerts-title": "مجموعة التنبيهات الذكية",

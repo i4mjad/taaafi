@@ -181,7 +181,7 @@ const Map<String, String> kEn = {
       "Challenge your peers in the recovery journey to achieve advanced stages in the process.",
   "follow-up-peers": "Follow Up on Your Peers",
   "follow-up-peers-description":
-      "Keep up with updates from your peers in the fellowship, help them, and benefit from their recovery experiences.",
+      "Keep up with updates from your peers in the Group, help them, and benefit from their recovery experiences.",
   "starting-date": "Starting date and time",
   "activity-starting-date": "Activity starting date and time",
   "activity-ending-date": "Activity ending date and time",
@@ -354,7 +354,7 @@ const Map<String, String> kEn = {
       "Join organized challenges and activities designed to support your recovery journey and build healthy habits together.",
   "challenges_coming_soon_title": "Challenges",
   "challenges_coming_soon_description":
-      "Join exciting challenges with daily goals and community support.",
+      "Join exciting challenges with community support.",
   "challenges_feature_daily_goals": "Daily Goals",
   "challenges_feature_daily_goals_desc":
       "Set and track daily recovery milestones",
@@ -764,7 +764,7 @@ const Map<String, String> kEn = {
   "no-follow-ups-yet": "No follow up yet of this type",
   "last-follow-up": "Last follow up: ",
   "vault": "Vault",
-  "fellowship": "Group",
+  "Group": "Group",
   "about-app": "About App",
   "about-ta3afi":
       "An app to raise awareness about the dangers of pornography and addiction to it by providing content and tools to help solve the problem.",
@@ -1667,9 +1667,9 @@ const Map<String, String> kEn = {
   "author_name": "Author Name",
 
   // Groups coming soon screen
-  "groups_coming_soon_title": "Fellowship",
-  "groups_coming_soon_description": "Connect with others through fellowship.",
-  "groups_feature_support_groups": "Support Fellowship",
+  "groups_coming_soon_title": "Group",
+  "groups_coming_soon_description": "Connect with others through Group.",
+  "groups_feature_support_groups": "Support Group",
   "groups_feature_support_groups_desc":
       "Join small support groups with others on similar recovery journeys",
   "groups_feature_group_chat": "Group Chat",
@@ -1718,6 +1718,9 @@ const Map<String, String> kEn = {
   "try-ta3afi-plus": "Try Ta'aafi Plus",
   "subscription-card-subtitle": "Unlock enhanced recovery features",
   "subscription-monthly-price": "\$4.99",
+  "free-trial-description":
+      "Start your free trial for 7 days, you can cancel anytime.",
+  "start-free-trial": "Start your free trial for 7 days",
   "subscription-purchase-button": "Subscribe Now",
   "subscription-restore-button": "Restore Purchase",
   "subscription-processing": "Processing...",
@@ -2639,4 +2642,24 @@ const Map<String, String> kEn = {
       "Profile deletion is in progress. Please wait...",
 
   // Existing confirmation dialog keys (if not already present)
+  "what-you-get": "What you get",
+  "free-version": "Free",
+  "premium-version": "Premium",
+  "detailed-analytics": "Detailed Analytics",
+  "detailed-analytics-desc": "Track your progress and stay motivated",
+  "mood-relapse-correlation": "Mood Relapse Correlation",
+
+  "community-perks-desc": "Be special and show your support",
+  "streak-overlay-avatar": "Streak Overlay Avatar",
+  "smart-alerts-forecasts": "Smart Alerts",
+  "smart-alerts-forecasts-desc":
+      "Get personalized alerts based on your progress",
+  "high-risk-hour-alert": "High Risk Hour Alert",
+  "streak-vulnerability-alert": "Streak Vulnerability Alert",
+  "topic-based-pushes": "Topic-Based Notifications",
+  "priority-support-desc": "Get priority support from our team",
+  "feature-requests": "Feature Requests",
+  "feature-requests-desc": "Suggest and vote for new features",
+  "change-plans-anytime": "Change plans anytime",
+  "calender": "Calender",
 };

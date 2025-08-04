@@ -824,10 +824,18 @@ class _TaaafiPlusScreenState
         child: Column(
           children: [
             Text(
-              '${package.storeProduct.priceString}/${_getPackagePeriod(package)}',
-              style: TextStyles.footnote.copyWith(
+              AppLocalizations.of(context).translate("start-free-trial"),
+              style: TextStyles.h5.copyWith(
                 color: theme.grey[50],
-                fontWeight: FontWeight.bold,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            verticalSpace(Spacing.points4),
+            Text(
+              _formatPrice(package.storeProduct.price) +
+                  " / ${_getPackagePeriod(package)}",
+              style: TextStyles.footnoteSelected.copyWith(
+                color: Color(0xFFFEBA01),
               ),
             ),
             verticalSpace(Spacing.points4),
@@ -1037,13 +1045,24 @@ class _TaaafiPlusScreenState
     final packageType = package.packageType;
     switch (packageType) {
       case PackageType.monthly:
-        return AppLocalizations.of(context).translate('month');
+        return AppLocalizations.of(context).translate('monthly');
       case PackageType.annual:
         return AppLocalizations.of(context).translate('year');
       case PackageType.weekly:
         return AppLocalizations.of(context).translate('week');
       default:
         return AppLocalizations.of(context).translate('month');
+    }
+  }
+
+  /// Format price to display as rounded value (e.g., "$4.99")
+  String _formatPrice(double price) {
+    try {
+      // Format to 2 decimal places with dollar sign
+      return '\$${price.toStringAsFixed(2)}';
+    } catch (e) {
+      // If any error occurs, return the original price as string
+      return '\$${price.toString()}';
     }
   }
 }

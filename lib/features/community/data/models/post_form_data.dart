@@ -183,16 +183,16 @@ extension PostFormDataExtensions on PostFormData {
 /// Validation constants for post form data
 class PostFormValidationConstants {
   /// Minimum title length
-  static const int minTitleLength = 1;
+  static const int minTitleLength = 7;
 
   /// Maximum title length
-  static const int maxTitleLength = 300;
+  static const int maxTitleLength = 80;
 
   /// Minimum content length
-  static const int minContentLength = 1;
+  static const int minContentLength = 25;
 
   /// Maximum content length
-  static const int maxContentLength = 5000;
+  static const int maxContentLength = 611;
 
   /// Maximum number of attachments
   static const int maxAttachments = 5;
@@ -204,7 +204,7 @@ class PostFormValidationConstants {
   static const int maxTagLength = 50;
 
   /// Minimum word count for content
-  static const int minContentWordCount = 1;
+  static const int minContentWordCount = 7;
 
   /// Maximum word count for content
   static const int maxContentWordCount = 1000;
