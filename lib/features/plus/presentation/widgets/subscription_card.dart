@@ -9,6 +9,7 @@ import 'package:reboot_app_3/core/routing/route_names.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
+import 'package:reboot_app_3/core/utils/url_launcher_provider.dart';
 import 'package:reboot_app_3/features/plus/data/notifiers/subscription_notifier.dart';
 import 'package:reboot_app_3/features/plus/presentation/taaafi_plus_features_list_screen.dart';
 
@@ -99,6 +100,22 @@ class SubscriptionCard extends ConsumerWidget {
               ),
 
               verticalSpace(Spacing.points12),
+              GestureDetector(
+                onTap: () {
+                  ref.read(urlLauncherProvider).launch(
+                        Uri.parse('https://www.ta3afi.app/terms'),
+                      );
+                },
+                child: Text(
+                  AppLocalizations.of(context)
+                      .translate('terms-and-conditions-applied'),
+                  style: TextStyles.small.copyWith(
+                    color: theme.grey[400],
+                  ),
+                ),
+              ),
+
+              verticalSpace(Spacing.points8),
 
               // Action button - smaller and left-aligned
               Container(

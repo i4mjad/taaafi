@@ -1932,6 +1932,7 @@ const Map<String, String> kEn = {
   "last-30-days": "Last 30 Days",
   "last-90-days": "Last 90 Days",
   "no-follow-ups-found": "No follow-ups found",
+  "terms-and-conditions-applied": "Terms and Conditions Applied",
   "start-logging-to-see-data":
       "Start logging your daily follow-ups to see data here",
   "error-loading-data": "Error loading data",

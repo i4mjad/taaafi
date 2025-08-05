@@ -1603,7 +1603,7 @@ const Map<String, String> kAr = {
       "ابدأ بإضافة مُتَابعاتك اليومية بشكل مستمر لرؤية البيانات هنا",
   "error-loading-data": "خطأ في تحميل البيانات",
   "subscription-status": "حالة الاشتراك",
-
+  "terms-and-conditions-applied": "تطبق الشروط والأحكام",
   "subscription-active-warning": "لديك اشتراك تعافي+",
   "subscription-active-warning-desc":
       "لا يمكنك حذف الحساب قبل إلغاء الاشتراك. لحذف الحساب٬ قم بإلغاء الاشتراك في متجر البرامج",

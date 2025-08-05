@@ -178,6 +178,21 @@ class _TaaafiPlusScreenState
                         color: theme.grey[600],
                       ),
                     ),
+                    verticalSpace(Spacing.points8),
+                    GestureDetector(
+                      onTap: () {
+                        ref.read(urlLauncherProvider).launch(
+                              Uri.parse('https://www.ta3afi.app/terms'),
+                            );
+                      },
+                      child: Text(
+                        AppLocalizations.of(context)
+                            .translate('terms-and-conditions-applied'),
+                        style: TextStyles.small.copyWith(
+                          color: theme.grey[400],
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               ),
