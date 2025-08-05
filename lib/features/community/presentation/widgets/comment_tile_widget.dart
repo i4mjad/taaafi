@@ -82,6 +82,7 @@ class CommentTileWidget extends ConsumerWidget {
                   ),
                 ),
                 child: AvatarWithAnonymity(
+                  isDeleted: authorProfile.isDeleted,
                   cpId: comment.authorCPId,
                   isAnonymous: isAuthorAnonymous,
                   size: 32,

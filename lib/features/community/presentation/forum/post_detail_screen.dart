@@ -57,19 +57,9 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
     final postAsync = ref.watch(postDetailProvider(widget.postId));
     final commentsAsync = ref.watch(postCommentsProvider(widget.postId));
     final replyState = ref.watch(replyStateProvider);
-    print('🔍 [PostDetailScreen] build for postId: ${widget.postId}');
-    print(
-        '🔍 [PostDetailScreen] postAsync state: data=${postAsync.hasValue}, error=${postAsync.hasError}, loading=${postAsync.isLoading}');
-    if (postAsync.hasError) {
-      print(
-          '🚨 [PostDetailScreen] postAsync error content: ${postAsync.error}');
-      print(
-          '🚨 [PostDetailScreen] postAsync stackTrace: ${postAsync.stackTrace}');
-    }
 
     return postAsync.when(
       data: (post) {
-        print("✅ [PostDetailScreen] post data received: $post");
         if (post == null) {
           return _buildPostNotFound(theme, localizations);
         }
@@ -486,6 +476,7 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
+      useSafeArea: true,
       backgroundColor: Colors.transparent,
       builder: (context) => Padding(
         padding: EdgeInsets.only(
@@ -580,6 +571,7 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
+      useSafeArea: true,
       backgroundColor: Colors.transparent,
       builder: (context) => Padding(
         padding: EdgeInsets.only(
@@ -727,127 +719,136 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
     final theme = AppTheme.of(context);
     final localizations = AppLocalizations.of(context);
 
-    showDialog(
+    showModalBottomSheet(
+      isScrollControlled: true,
+      useSafeArea: true,
       context: context,
-      builder: (context) => Dialog(
-        backgroundColor: Colors.transparent,
-        child: Container(
-          margin: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: theme.backgroundColor,
-            borderRadius: BorderRadius.circular(16),
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        decoration: BoxDecoration(
+          color: theme.backgroundColor,
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(16),
+            topRight: Radius.circular(16),
           ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Header
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: theme.error[50],
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(16),
-                    topRight: Radius.circular(16),
-                  ),
-                ),
-                child: Column(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: theme.error[100],
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Icon(
-                        LucideIcons.trash2,
-                        size: 24,
-                        color: theme.error[600],
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    Text(
-                      localizations.translate('delete_comment'),
-                      style: TextStyles.h6.copyWith(
-                        color: theme.error[700],
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
-                ),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Handle bar
+            Container(
+              margin: const EdgeInsets.only(top: 12),
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: theme.grey[300],
+                borderRadius: BorderRadius.circular(2),
               ),
+            ),
 
-              // Content
-              Padding(
-                padding: const EdgeInsets.all(20),
-                child: Text(
-                  localizations.translate('confirm_delete_comment'),
-                  style: TextStyles.body.copyWith(
-                    color: theme.grey[700],
-                    height: 1.4,
+            const SizedBox(height: 20),
+
+            // Header with icon and title
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Column(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: theme.error[100],
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Icon(
+                      LucideIcons.trash2,
+                      size: 24,
+                      color: theme.error[600],
+                    ),
                   ),
-                  textAlign: TextAlign.center,
-                ),
+                  const SizedBox(height: 16),
+                  Text(
+                    localizations.translate('delete_comment'),
+                    style: TextStyles.h6.copyWith(
+                      color: theme.grey[900],
+                      fontWeight: FontWeight.w600,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    localizations.translate('confirm_delete_comment'),
+                    style: TextStyles.body.copyWith(
+                      color: theme.grey[600],
+                      height: 1.4,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
               ),
+            ),
 
-              // Actions
-              Padding(
-                padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
-                child: Row(
-                  children: [
-                    // Cancel button
-                    Expanded(
-                      child: GestureDetector(
-                        onTap: () => Navigator.of(context).pop(),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                          decoration: BoxDecoration(
-                            color: theme.grey[100],
-                            borderRadius: BorderRadius.circular(8),
+            const SizedBox(height: 24),
+
+            // Actions
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+              child: Row(
+                children: [
+                  // Cancel button
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () => Navigator.of(context).pop(),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        decoration: BoxDecoration(
+                          color: theme.grey[100],
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Text(
+                          localizations.translate('cancel'),
+                          style: TextStyles.body.copyWith(
+                            color: theme.grey[700],
+                            fontWeight: FontWeight.w600,
                           ),
-                          child: Text(
-                            localizations.translate('cancel'),
-                            style: TextStyles.body.copyWith(
-                              color: theme.grey[700],
-                              fontWeight: FontWeight.w600,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
+                          textAlign: TextAlign.center,
                         ),
                       ),
                     ),
+                  ),
 
-                    const SizedBox(width: 12),
+                  const SizedBox(width: 12),
 
-                    // Delete button
-                    Expanded(
-                      child: GestureDetector(
-                        onTap: () {
-                          Navigator.of(context).pop();
-                          _deleteComment(context, comment);
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                          decoration: BoxDecoration(
-                            color: theme.error[500],
-                            borderRadius: BorderRadius.circular(8),
+                  // Delete button
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.of(context).pop();
+                        _deleteComment(context, comment);
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        decoration: BoxDecoration(
+                          color: theme.error[500],
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Text(
+                          localizations.translate('delete'),
+                          style: TextStyles.body.copyWith(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w600,
                           ),
-                          child: Text(
-                            localizations.translate('delete'),
-                            style: TextStyles.body.copyWith(
-                              color: Colors.white,
-                              fontWeight: FontWeight.w600,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
+                          textAlign: TextAlign.center,
                         ),
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-            ],
-          ),
+            ),
+
+            // Add safe area padding for devices with bottom notches
+            const SizedBox(height: 8),
+          ],
         ),
       ),
     );
@@ -907,16 +908,26 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
     }
   }
 
-  void _deleteComment(BuildContext context, Comment comment) {
+  void _deleteComment(BuildContext context, Comment comment) async {
     // Store context reference
     final currentContext = context;
 
-    // TODO: Implement actual comment deletion logic
+    // Show brief success message immediately for better UX
     if (mounted && currentContext.mounted) {
       getSuccessSnackBar(currentContext, 'comment_deleted');
     }
 
-    // Refresh comments to remove the deleted comment
-    ref.refresh(postCommentsProvider(widget.postId));
+    try {
+      // Perform actual deletion
+      await ref.read(forumRepositoryProvider).deleteComment(comment.id);
+
+      // Refresh comments to remove the deleted comment
+      ref.refresh(postCommentsProvider(widget.postId));
+    } catch (e) {
+      // Show error message if deletion failed
+      if (mounted && currentContext.mounted) {
+        getErrorSnackBar(currentContext, 'error_deleting_comment');
+      }
+    }
   }
 }

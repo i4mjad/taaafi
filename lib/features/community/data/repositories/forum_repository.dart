@@ -809,10 +809,11 @@ class ForumRepository {
         .orderBy('createdAt')
         .get();
 
-    return snapshot.docs.map((doc) {
-      return Comment.fromFirestore(
-          doc as DocumentSnapshot<Map<String, dynamic>>);
-    }).toList();
+    return snapshot.docs
+        .map((doc) => Comment.fromFirestore(
+            doc as DocumentSnapshot<Map<String, dynamic>>))
+        .where((comment) => !comment.isDeleted)
+        .toList();
   }
 
   Future<List<Comment>> _getGenderFilteredComments(
@@ -837,10 +838,11 @@ class ForumRepository {
           .orderBy('createdAt')
           .get();
 
-      final batchComments = snapshot.docs.map((doc) {
-        return Comment.fromFirestore(
-            doc as DocumentSnapshot<Map<String, dynamic>>);
-      }).toList();
+      final batchComments = snapshot.docs
+          .map((doc) => Comment.fromFirestore(
+              doc as DocumentSnapshot<Map<String, dynamic>>))
+          .where((comment) => !comment.isDeleted)
+          .toList();
 
       allComments.addAll(batchComments);
     }
@@ -871,6 +873,7 @@ class ForumRepository {
         .map((snapshot) => snapshot.docs
             .map((doc) => Comment.fromFirestore(
                 doc as DocumentSnapshot<Map<String, dynamic>>))
+            .where((comment) => !comment.isDeleted)
             .toList());
   }
 
@@ -899,6 +902,7 @@ class ForumRepository {
             .map((snapshot) => snapshot.docs
                 .map((doc) => Comment.fromFirestore(
                     doc as DocumentSnapshot<Map<String, dynamic>>))
+                .where((comment) => !comment.isDeleted)
                 .toList());
 
         streamBatches.add(batchStream);
@@ -1285,6 +1289,18 @@ class ForumRepository {
       });
     } catch (e) {
       throw Exception('Failed to delete post: $e');
+    }
+  }
+
+  /// Soft delete a comment by setting isDeleted to true
+  Future<void> deleteComment(String commentId) async {
+    try {
+      await _comments.doc(commentId).update({
+        'isDeleted': true,
+        'updatedAt': FieldValue.serverTimestamp(),
+      });
+    } catch (e) {
+      throw Exception('Failed to delete comment: $e');
     }
   }
 

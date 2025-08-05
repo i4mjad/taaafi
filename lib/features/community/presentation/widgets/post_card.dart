@@ -39,6 +39,7 @@ class PostCard extends ConsumerWidget {
               Row(
                 children: [
                   AvatarWithAnonymity(
+                    isDeleted: false,
                     cpId: 'placeholder_id',
                     isAnonymous: false,
                     isPlusUser: isPlusUser,

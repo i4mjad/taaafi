@@ -205,6 +205,7 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen>
                       child: Padding(
                         padding: const EdgeInsets.only(left: 16, right: 16.0),
                         child: AvatarWithAnonymity(
+                          isDeleted: profile.isDeleted,
                           cpId: profile.id,
                           isAnonymous: profile.isAnonymous,
                           isPlusUser: isPlusUser,

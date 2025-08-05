@@ -376,6 +376,7 @@ class _CommunityProfileModalState extends ConsumerState<CommunityProfileModal> {
           Row(
             children: [
               AvatarWithAnonymity(
+                isDeleted: profile.isDeleted,
                 cpId: profile.id,
                 isAnonymous: profile.isAnonymous,
                 isPlusUser: profile.isPlusUser ?? false,

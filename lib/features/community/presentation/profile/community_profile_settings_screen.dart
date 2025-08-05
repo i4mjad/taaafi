@@ -297,6 +297,7 @@ class _CommunityProfileSettingsScreenState
                       children: [
                         // Profile Avatar
                         AvatarWithAnonymity(
+                          isDeleted: profile.isDeleted,
                           cpId: profile.id,
                           isAnonymous: profile.isAnonymous,
                           isPlusUser: isPlusUser,

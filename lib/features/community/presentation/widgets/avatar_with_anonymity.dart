@@ -8,6 +8,7 @@ import 'package:reboot_app_3/features/community/presentation/widgets/plus_badge_
 class AvatarWithAnonymity extends ConsumerWidget {
   final String cpId;
   final bool isAnonymous;
+  final bool isDeleted;
   final double size;
   final String? avatarUrl;
   final bool isPlusUser;
@@ -17,6 +18,7 @@ class AvatarWithAnonymity extends ConsumerWidget {
     required this.cpId,
     required this.isAnonymous,
     required this.isPlusUser,
+    required this.isDeleted,
     this.size = 40,
     this.avatarUrl,
   });
@@ -24,6 +26,9 @@ class AvatarWithAnonymity extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = AppTheme.of(context);
+
+    // Show anonymous avatar for deleted or anonymous users
+    final showAnonymousAvatar = isDeleted || isAnonymous;
 
     return Container(
       width: size,
@@ -36,9 +41,9 @@ class AvatarWithAnonymity extends ConsumerWidget {
                 width: 2.5,
               )
             : null,
-        color: isAnonymous ? theme.grey[400] : theme.primary[100],
+        color: showAnonymousAvatar ? theme.grey[400] : theme.primary[100],
       ),
-      child: isAnonymous
+      child: showAnonymousAvatar
           ? Icon(
               LucideIcons.user,
               size: size * 0.6,

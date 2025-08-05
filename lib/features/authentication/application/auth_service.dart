@@ -12,8 +12,6 @@ import 'package:reboot_app_3/features/authentication/providers/account_status_pr
 import 'package:reboot_app_3/features/authentication/providers/user_document_provider.dart';
 import 'package:reboot_app_3/core/shared_widgets/snackbar.dart';
 import 'package:reboot_app_3/features/authentication/providers/user_provider.dart';
-import 'package:reboot_app_3/features/community/presentation/providers/community_providers_new.dart'
-    hide firebaseAuthProvider;
 import 'package:reboot_app_3/features/community/presentation/providers/forum_providers.dart'
     hide firebaseAuthProvider;
 import 'package:reboot_app_3/features/vault/data/streaks/streak_repository.dart';

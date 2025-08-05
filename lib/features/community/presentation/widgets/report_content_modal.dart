@@ -172,171 +172,174 @@ class _ReportContentModalState extends ConsumerState<ReportContentModal> {
           top: 24,
           bottom: MediaQuery.of(context).viewInsets.bottom + 24,
         ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Header
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: Text(
-                    localization.translate('report_content').replaceAll(
-                        '{type}', localization.translate(contentType)),
-                    style: TextStyles.h5.copyWith(color: theme.grey[900]),
-                  ),
-                ),
-                GestureDetector(
-                  onTap: () => Navigator.of(context).pop(),
-                  child: Icon(
-                    LucideIcons.x,
-                    size: 24,
-                    color: theme.grey[600],
-                  ),
-                ),
-              ],
-            ),
-
-            verticalSpace(Spacing.points16),
-
-            // Warning message
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: theme.warn[50],
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: theme.warn[200]!),
-              ),
-              child: Row(
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Header
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Icon(
-                    LucideIcons.alertTriangle,
-                    size: 20,
-                    color: theme.warn[600],
-                  ),
-                  const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      localization.translate('report_responsibility_warning'),
-                      style: TextStyles.caption.copyWith(
-                        color: theme.warn[700],
-                        height: 1.5,
-                      ),
+                      localization.translate('report_content').replaceAll(
+                          '{type}', localization.translate(contentType)),
+                      style: TextStyles.h5.copyWith(color: theme.grey[900]),
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () => Navigator.of(context).pop(),
+                    child: Icon(
+                      LucideIcons.x,
+                      size: 24,
+                      color: theme.grey[600],
                     ),
                   ),
                 ],
               ),
-            ),
 
-            verticalSpace(Spacing.points16),
+              verticalSpace(Spacing.points16),
 
-            // Content preview
-            Text(
-              localization.translate('report_content_being_reported'),
-              style: TextStyles.body.copyWith(
-                color: theme.grey[700],
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-
-            verticalSpace(Spacing.points8),
-
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: theme.grey[50],
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: theme.grey[200]!),
-              ),
-              child: Text(
-                _contentPreview,
-                style: TextStyles.caption.copyWith(
-                  color: theme.grey[700],
-                  height: 1.4,
+              // Warning message
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: theme.warn[50],
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: theme.warn[200]!),
                 ),
-                maxLines: 4,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-
-            verticalSpace(Spacing.points16),
-
-            // Justification input
-            Text(
-              localization.translate('report_justification_label'),
-              style: TextStyles.body.copyWith(
-                color: theme.grey[700],
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-
-            verticalSpace(Spacing.points8),
-
-            CustomTextArea(
-              controller: _justificationController,
-              hint: localization.translate('report_justification_placeholder'),
-              prefixIcon: LucideIcons.fileText,
-              validator: _validateJustification,
-              enabled: !_isSubmitting,
-              height: 120,
-            ),
-
-            verticalSpace(Spacing.points8),
-
-            // Character count
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                Text(
-                  localization
-                      .translate('character_count')
-                      .replaceAll('{current}',
-                          _justificationController.text.length.toString())
-                      .replaceAll('{max}', '500'),
-                  style: TextStyles.small.copyWith(
-                    color: theme.grey[500],
-                    fontStyle: FontStyle.italic,
-                  ),
-                ),
-              ],
-            ),
-
-            verticalSpace(Spacing.points24),
-
-            // Submit button
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton.icon(
-                onPressed: _isSubmitting ? null : _submitReport,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: theme.error[600],
-                  foregroundColor: theme.grey[50],
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                icon: _isSubmitting
-                    ? SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: Spinner(
-                          strokeWidth: 2,
-                          valueColor: theme.grey[50],
+                child: Row(
+                  children: [
+                    Icon(
+                      LucideIcons.alertTriangle,
+                      size: 20,
+                      color: theme.warn[600],
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        localization.translate('report_responsibility_warning'),
+                        style: TextStyles.caption.copyWith(
+                          color: theme.warn[700],
+                          height: 1.5,
                         ),
-                      )
-                    : Icon(LucideIcons.flag, size: 20),
-                label: Text(
-                  localization.translate('submit_report'),
-                  style: TextStyles.body.copyWith(
-                    color: theme.grey[50],
-                    fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              verticalSpace(Spacing.points16),
+
+              // Content preview
+              Text(
+                localization.translate('report_content_being_reported'),
+                style: TextStyles.body.copyWith(
+                  color: theme.grey[700],
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+
+              verticalSpace(Spacing.points8),
+
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: theme.grey[50],
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: theme.grey[200]!),
+                ),
+                child: Text(
+                  _contentPreview,
+                  style: TextStyles.caption.copyWith(
+                    color: theme.grey[700],
+                    height: 1.4,
+                  ),
+                  maxLines: 4,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+
+              verticalSpace(Spacing.points16),
+
+              // Justification input
+              Text(
+                localization.translate('report_justification_label'),
+                style: TextStyles.body.copyWith(
+                  color: theme.grey[700],
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+
+              verticalSpace(Spacing.points8),
+
+              CustomTextArea(
+                controller: _justificationController,
+                hint:
+                    localization.translate('report_justification_placeholder'),
+                prefixIcon: LucideIcons.fileText,
+                validator: _validateJustification,
+                enabled: !_isSubmitting,
+                height: 120,
+              ),
+
+              verticalSpace(Spacing.points8),
+
+              // Character count
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Text(
+                    localization
+                        .translate('character_count')
+                        .replaceAll('{current}',
+                            _justificationController.text.length.toString())
+                        .replaceAll('{max}', '500'),
+                    style: TextStyles.small.copyWith(
+                      color: theme.grey[500],
+                      fontStyle: FontStyle.italic,
+                    ),
+                  ),
+                ],
+              ),
+
+              verticalSpace(Spacing.points24),
+
+              // Submit button
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  onPressed: _isSubmitting ? null : _submitReport,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: theme.error[600],
+                    foregroundColor: theme.grey[50],
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  icon: _isSubmitting
+                      ? SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: Spinner(
+                            strokeWidth: 2,
+                            valueColor: theme.grey[50],
+                          ),
+                        )
+                      : Icon(LucideIcons.flag, size: 20),
+                  label: Text(
+                    localization.translate('submit_report'),
+                    style: TextStyles.body.copyWith(
+                      color: theme.grey[50],
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

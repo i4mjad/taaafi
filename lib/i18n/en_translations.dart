@@ -1713,6 +1713,7 @@ const Map<String, String> kEn = {
   "subscription-support": "Support",
   "subscription-community": "Community",
   "subscription-analytics": "Analytics",
+  "member": "Member",
 
   // Simple Subscription Card
   "try-ta3afi-plus": "Try Ta'aafi Plus",

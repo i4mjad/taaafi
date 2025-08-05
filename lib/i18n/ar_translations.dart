@@ -1666,6 +1666,7 @@ const Map<String, String> kAr = {
   "yearly-price": "68.98\$",
   "yearly-period": "/سنة",
   "monthly-price": "14.98\$",
+  "member": "عضو",
   "monthly-period": "/شهر",
   "original-yearly-price": "179.76\$",
   "savings-percentage": "توفير 62%",

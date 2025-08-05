@@ -4,7 +4,6 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
-import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/features/community/data/models/post.dart';
 import 'package:reboot_app_3/features/community/data/models/post_category.dart';
@@ -84,6 +83,7 @@ class PostHeaderWidget extends ConsumerWidget {
                 isAuthorPlusUser,
               ),
               child: AvatarWithAnonymity(
+                isDeleted: authorProfile.isDeleted,
                 cpId: post.authorCPId,
                 isAnonymous: isAuthorAnonymous,
                 size: 40,
@@ -405,6 +405,7 @@ class PostHeaderWidget extends ConsumerWidget {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
+      useSafeArea: true,
       backgroundColor: Colors.transparent,
       builder: (context) => Padding(
         padding: EdgeInsets.only(

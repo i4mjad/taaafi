@@ -284,6 +284,8 @@ class _EditCommunityProfileModalState
                                                   errorBuilder: (context, error,
                                                       stackTrace) {
                                                     return AvatarWithAnonymity(
+                                                      isDeleted: widget
+                                                          .profile.isDeleted,
                                                       cpId: widget.profile.id,
                                                       isAnonymous: _isAnonymous,
                                                       isPlusUser: isPlusUser,
@@ -295,6 +297,8 @@ class _EditCommunityProfileModalState
                                             )
                                           else
                                             AvatarWithAnonymity(
+                                              isDeleted:
+                                                  widget.profile.isDeleted,
                                               cpId: widget.profile.id,
                                               isAnonymous: _isAnonymous,
                                               isPlusUser: isPlusUser,

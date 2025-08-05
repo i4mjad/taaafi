@@ -69,6 +69,7 @@ class CompactCommentTile extends ConsumerWidget {
                         authorProfile.hasPlusSubscription();
 
                     return AvatarWithAnonymity(
+                      isDeleted: authorProfile.isDeleted,
                       cpId: comment.authorCPId,
                       isAnonymous: isAuthorAnonymous,
                       size: 32,

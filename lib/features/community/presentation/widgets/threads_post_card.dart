@@ -112,6 +112,7 @@ class ThreadsPostCard extends ConsumerWidget {
                     ),
                     borderRadius: BorderRadius.circular(16),
                     child: AvatarWithAnonymity(
+                      isDeleted: authorProfile.isDeleted,
                       cpId: post.authorCPId,
                       isAnonymous: isAuthorAnonymous,
                       size: 32,

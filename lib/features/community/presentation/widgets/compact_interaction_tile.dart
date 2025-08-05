@@ -121,6 +121,7 @@ class CompactInteractionTile extends ConsumerWidget {
                         authorProfile.hasPlusSubscription();
 
                     return AvatarWithAnonymity(
+                      isDeleted: authorProfile.isDeleted,
                       cpId: post.authorCPId,
                       isAnonymous: isAuthorAnonymous,
                       size: 24,
@@ -330,6 +331,7 @@ class CompactInteractionTile extends ConsumerWidget {
                         authorProfile.hasPlusSubscription();
 
                     return AvatarWithAnonymity(
+                      isDeleted: authorProfile.isDeleted,
                       cpId: comment.authorCPId,
                       isAnonymous: isAuthorAnonymous,
                       size: 24,
