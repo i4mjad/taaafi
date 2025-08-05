@@ -3,6 +3,7 @@ import 'package:figma_squircle/figma_squircle.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
 import 'package:reboot_app_3/core/shared_widgets/spinner.dart';
@@ -17,6 +18,8 @@ import 'package:reboot_app_3/features/community/data/exceptions/forum_exceptions
 import 'package:reboot_app_3/features/community/presentation/providers/forum_providers.dart';
 import 'package:reboot_app_3/features/community/presentation/providers/community_providers_new.dart';
 import 'package:reboot_app_3/features/community/presentation/forum/anonymity_toggle_modal.dart';
+import 'package:reboot_app_3/features/community/presentation/forum/validation_info_modal.dart';
+import 'package:reboot_app_3/features/community/presentation/forum/validation_info_modal_preferences.dart';
 import 'package:reboot_app_3/features/account/presentation/widgets/feature_access_guard.dart';
 import 'package:reboot_app_3/features/account/data/app_features_config.dart';
 
@@ -67,6 +70,9 @@ class _NewPostScreenState extends ConsumerState<NewPostScreen> {
       if (widget.initialCategoryId != null) {
         _setInitialCategory();
       }
+
+      // Show validation info modal on first visit
+      _showValidationInfoModalIfNeeded();
     });
   }
 
@@ -80,7 +86,7 @@ class _NewPostScreenState extends ConsumerState<NewPostScreen> {
       final matchingCategory = categories.firstWhere(
         (category) => category.id == widget.initialCategoryId,
         orElse: () => const PostCategory(
-          id: 'general',
+          id: 'DFbm1WSnUyrOmtKZYWVb',
           name: 'General',
           nameAr: 'عام',
           iconName: 'chat',
@@ -97,6 +103,18 @@ class _NewPostScreenState extends ConsumerState<NewPostScreen> {
     } catch (e) {
       // If there's an error, just continue with the default category
       print('Error setting initial category: $e');
+    }
+  }
+
+  /// Shows the validation info modal if the user hasn't seen it before
+  Future<void> _showValidationInfoModalIfNeeded() async {
+    final hasSeenModal = ref.read(validationInfoModalProvider);
+    if (!hasSeenModal) {
+      // Add a small delay to ensure the screen is fully built
+      await Future.delayed(const Duration(milliseconds: 500));
+      if (mounted) {
+        _showValidationInfoModal();
+      }
     }
   }
 
@@ -153,84 +171,194 @@ class _NewPostScreenState extends ConsumerState<NewPostScreen> {
     });
 
     return Scaffold(
-      backgroundColor: theme.backgroundColor,
-      appBar: _buildAppBar(theme, localizations),
-      body: Column(
-        children: [
-          // User profile header
-          _buildUserProfileHeader(theme, localizations,
-              currentProfileAsync.asData?.value, isAnonymous),
-
-          Divider(color: theme.grey[200], height: 1),
-
-          // Main content area
-          Expanded(
-            child: _buildContentArea(theme, localizations, selectedCategory),
+      backgroundColor: Colors.transparent, // Transparent background
+      body: GestureDetector(
+        onTap: () => _handleClose(), // Dismiss on background tap
+        child: Container(
+          color: Colors.transparent, // Transparent but still tappable
+          margin: EdgeInsets.only(
+            top: MediaQuery.of(context).padding.top + 8,
           ),
+          child: GestureDetector(
+            onTap:
+                () {}, // Prevent background tap from bubbling through modal content
+            child: Container(
+              decoration: BoxDecoration(
+                color: theme.backgroundColor,
+                borderRadius:
+                    const BorderRadius.vertical(top: Radius.circular(16)),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.1),
+                    blurRadius: 10,
+                    spreadRadius: 0,
+                    offset: const Offset(0, -2),
+                  ),
+                ],
+              ),
+              child: Column(
+                children: [
+                  // Dismiss bar with tap gesture
+                  GestureDetector(
+                    onTap: () => _handleClose(),
+                    child: _buildDismissBar(theme),
+                  ),
 
-          // Bottom section with character counts
-          _buildBottomSection(theme, localizations),
-        ],
+                  // App bar content
+                  _buildAppBarContent(theme, localizations),
+
+                  // User profile header
+                  _buildUserProfileHeader(theme, localizations,
+                      currentProfileAsync.asData?.value, isAnonymous),
+
+                  Divider(color: theme.grey[200], height: 1),
+
+                  // Main content area
+                  Expanded(
+                    child: _buildContentArea(
+                        theme, localizations, selectedCategory),
+                  ),
+
+                  // Bottom section with character counts
+                  _buildBottomSection(theme, localizations),
+                ],
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }
 
-  /// Builds the app bar with close button and post button
-  PreferredSizeWidget _buildAppBar(
+  /// Builds the dismiss bar at the top of the modal
+  Widget _buildDismissBar(CustomThemeData theme) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.only(top: 12, bottom: 8),
+      child: Center(
+        child: Container(
+          width: 36,
+          height: 3,
+          decoration: BoxDecoration(
+            color: theme.grey[300],
+            borderRadius: BorderRadius.circular(2),
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// Builds the app bar content (replacing the old AppBar)
+  Widget _buildAppBarContent(
       CustomThemeData theme, AppLocalizations localizations) {
-    return AppBar(
-      backgroundColor: theme.backgroundColor,
-      elevation: 0,
-      leading: IconButton(
-        icon: const Icon(Icons.close),
-        onPressed: () => _handleClose(),
-      ),
-      title: Text(
-        localizations.translate('new_thread'),
-        style: TextStyles.h6.copyWith(
-          color: theme.grey[900],
-          fontWeight: FontWeight.w600,
+    return Container(
+      padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
+      decoration: BoxDecoration(
+        color: theme.backgroundColor,
+        border: Border(
+          bottom: BorderSide(color: theme.grey[200]!, width: 0.5),
         ),
       ),
-      centerTitle: true,
-      actions: [
-        Container(
-          margin: const EdgeInsets.only(left: 16, right: 16),
-          child: _buildPostButton(theme, localizations),
-        ),
-      ],
+      child: Row(
+        children: [
+          // Close button
+          Container(
+            width: 36,
+            height: 36,
+            decoration: BoxDecoration(
+              color: theme.grey[100],
+              borderRadius: BorderRadius.circular(18),
+            ),
+            child: IconButton(
+              icon: Icon(Icons.close, size: 20),
+              onPressed: () => _handleClose(),
+              style: IconButton.styleFrom(
+                foregroundColor: theme.grey[600],
+                padding: EdgeInsets.zero,
+              ),
+            ),
+          ),
+
+          // Title
+          Expanded(
+            child: Center(
+              child: Text(
+                localizations.translate('new_thread'),
+                style: TextStyles.h6.copyWith(
+                  color: theme.grey[900],
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ),
+
+          // Right side actions
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Info icon for validation guidelines
+              Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  color: theme.grey[100],
+                  borderRadius: BorderRadius.circular(18),
+                ),
+                child: IconButton(
+                  onPressed: () => _showValidationInfoModal(),
+                  icon: Icon(Icons.info_outline, size: 20),
+                  style: IconButton.styleFrom(
+                    foregroundColor: theme.grey[600],
+                    padding: EdgeInsets.zero,
+                  ),
+                ),
+              ),
+
+              const SizedBox(width: 12),
+
+              // Post button
+              _buildPostButton(theme, localizations),
+            ],
+          ),
+        ],
+      ),
     );
   }
 
   /// Builds the post button with loading state
   Widget _buildPostButton(
       CustomThemeData theme, AppLocalizations localizations) {
-    return TextButton(
-      onPressed: _canSubmit ? _handleSubmit : null,
-      style: TextButton.styleFrom(
-        backgroundColor: _canSubmit ? theme.primary[500] : theme.grey[300],
-        foregroundColor: Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
+    return Container(
+      height: 36,
+      child: TextButton(
+        onPressed: _canSubmit ? _handleSubmit : null,
+        style: TextButton.styleFrom(
+          backgroundColor: _canSubmit ? theme.primary[500] : theme.grey[300],
+          foregroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(18),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          minimumSize: Size.zero,
         ),
+        child: _isSubmitting
+            ? SizedBox(
+                width: 16,
+                height: 16,
+                child: Spinner(
+                  valueColor: theme.grey[50],
+                  strokeWidth: 2,
+                ),
+              )
+            : Text(
+                localizations.translate('post'),
+                style: TextStyles.footnote.copyWith(
+                  color: Colors.white,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
       ),
-      child: _isSubmitting
-          ? SizedBox(
-              width: 16,
-              height: 16,
-              child: Spinner(
-                valueColor: theme.grey[50],
-                strokeWidth: 2,
-              ),
-            )
-          : Text(
-              localizations.translate('post'),
-              style: TextStyles.footnote.copyWith(
-                color: theme.grey[50],
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
     );
   }
 
@@ -585,14 +713,24 @@ class _NewPostScreenState extends ConsumerState<NewPostScreen> {
         ),
       ),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        mainAxisAlignment: MainAxisAlignment.start,
         children: [
+          GestureDetector(
+            onTap: () => _showValidationInfoModal(),
+            child: Icon(
+              LucideIcons.badgeInfo,
+              size: 20,
+              color: theme.primary[600],
+            ),
+          ),
+          horizontalSpace(Spacing.points8),
           _buildCharacterCount(
             '${localizations.translate('title')}: ${_titleController.text.length}/${PostFormValidationConstants.maxTitleLength}',
             _titleController.text.length,
             PostFormValidationConstants.maxTitleLength,
             theme,
           ),
+          Spacer(),
           _buildCharacterCount(
             '${localizations.translate('content')}: ${_contentController.text.length}/${PostFormValidationConstants.maxContentLength}',
             _contentController.text.length,
@@ -763,6 +901,27 @@ class _NewPostScreenState extends ConsumerState<NewPostScreen> {
           ref.read(anonymousPostProvider.notifier).state = newAnonymityState;
           ref.refresh(currentCommunityProfileProvider);
         },
+      ),
+    );
+  }
+
+  /// Shows the validation info modal
+  void _showValidationInfoModal() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        decoration: const BoxDecoration(
+          color: Colors.transparent,
+        ),
+        child: ValidationInfoModal(
+          onDismiss: () {
+            Navigator.pop(context);
+            // Mark as seen so it won't show automatically again
+            ref.read(validationInfoModalProvider.notifier).markAsSeen();
+          },
+        ),
       ),
     );
   }

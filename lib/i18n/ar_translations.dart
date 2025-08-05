@@ -1582,6 +1582,27 @@ const Map<String, String> kAr = {
   "post_creation_failed": "فشل في إنشاء المنشور",
   "generic_error": "حدث خطأ. يرجى المحاولة مرة أخرى",
 
+  // Validation info modal translations
+  "post_validation_guidelines": "إرشادات المنشور",
+  "post_validation_intro":
+      "لمساعدتك في إنشاء نقاشات عالية الجودة، يرجى اتباع هذه الإرشادات عند إنشاء منشورك:",
+  "post_title_requirements": "متطلبات العنوان",
+  "post_content_requirements": "متطلبات المحتوى",
+  "additional_guidelines": "إرشادات إضافية",
+  "helpful_tips": "نصائح مفيدة",
+  "title_length_requirement": "يجب أن يكون بين {min} و {max} حرف",
+  "title_descriptive_requirement": "يجب أن يكون واضحاً ووصفياً",
+  "title_appropriate_requirement": "يجب أن يكون مناسباً ومحترماً",
+  "content_length_requirement": "يجب أن يكون بين {min} و {max} حرف",
+  "content_word_count_requirement": "يجب أن يحتوي على بين {min} و {max} كلمة",
+  "content_meaningful_requirement": "يجب أن يوفر محتوى ذا معنى",
+  "content_appropriate_requirement": "يجب أن يكون مناسباً ومحترماً",
+  "tip_choose_appropriate_category": "اختر الفئة الأنسب لمنشورك",
+  "tip_be_respectful_supportive": "كن محترماً وداعماً للآخرين",
+  "tip_avoid_spam_duplicate": "تجنب الرسائل المزعجة والمحتوى المكرر",
+  "tip_use_clear_language": "استخدم لغة واضحة ومفهومة",
+  "got_it": "فهمت!",
+
   // Forum interactions
   'likes': 'إعجابات',
   'dislikes': 'عدم إعجاب',

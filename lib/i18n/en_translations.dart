@@ -1617,6 +1617,29 @@ const Map<String, String> kEn = {
   "post_creation_failed": "Failed to create post",
   "generic_error": "An error occurred. Please try again",
 
+  // Validation info modal translations
+  "post_validation_guidelines": "Post Guidelines",
+  "post_validation_intro":
+      "To help create high-quality discussions, please follow these guidelines when creating your post:",
+  "post_title_requirements": "Title Requirements",
+  "post_content_requirements": "Content Requirements",
+  "additional_guidelines": "Additional Guidelines",
+  "helpful_tips": "Helpful Tips",
+  "title_length_requirement": "Must be between {min} and {max} characters",
+  "title_descriptive_requirement": "Should be clear and descriptive",
+  "title_appropriate_requirement": "Must be appropriate and respectful",
+  "content_length_requirement": "Must be between {min} and {max} characters",
+  "content_word_count_requirement":
+      "Must contain between {min} and {max} words",
+  "content_meaningful_requirement": "Should provide meaningful content",
+  "content_appropriate_requirement": "Must be appropriate and respectful",
+  "tip_choose_appropriate_category":
+      "Choose the most appropriate category for your post",
+  "tip_be_respectful_supportive": "Be respectful and supportive of others",
+  "tip_avoid_spam_duplicate": "Avoid spam and duplicate content",
+  "tip_use_clear_language": "Use clear and understandable language",
+  "got_it": "Got it!",
+
   // Time related
   // Forum interactions
   'likes': 'Likes',
