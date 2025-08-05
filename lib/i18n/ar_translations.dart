@@ -203,6 +203,12 @@ const Map<String, String> kAr = {
       "يجب أن تكون التواريخ الجديدة مختلفة عن التواريخ الحالية",
   "account-settings": "معلومات المستخدم",
   "app-settings": "إعدادات التطبيق",
+  "appearance": "المظهر",
+  "color-scheme": "نظام الألوان",
+  "color-scheme-description":
+      "قم بتشغيل الوضع المظلم، أو اتركه يتطابق بصريًا مع إعدادات جهازك.",
+  "light": "فاتح",
+  "dark": "مظلم",
   "user_name": "اسم المستخدم",
   "user_email": "البريد الالكتروني",
   "registered-since": "مسجل منذ:",
@@ -2630,4 +2636,14 @@ const Map<String, String> kAr = {
   "subscription-active-title": "اشتراك نشط",
   "subscription-active-message":
       "لديك اشتراك نشط في تعافي+. يرجى إلغاء اشتراكك أولاً قبل حذف حسابك. يمكنك إلغاء اشتراكك في متجر التطبيقات.",
+
+  // Profile image
+  "select-image-source": "اختر مصدر الصورة",
+  "camera": "الكاميرا",
+  "gallery": "المعرض",
+  "uploading-image": "جاري رفع الصورة...",
+  "profile-image-updated-successfully": "تم تحديث صورة الملف الشخصي بنجاح",
+  "profile-image-removed-successfully": "تم حذف صورة الملف الشخصي بنجاح",
+  "change-profile-picture": "تغيير صورة الملف الشخصي",
+  "remove-profile-picture": "حذف صورة الملف الشخصي",
 };

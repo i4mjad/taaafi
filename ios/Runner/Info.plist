@@ -38,7 +38,9 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>The application does not use this feature</string>
+	<string>This app needs access to your photo library to update your profile picture</string>
+	<key>NSCameraUsageDescription</key>
+	<string>This app needs access to your camera to take a new profile picture</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>UIBackgroundModes</key>

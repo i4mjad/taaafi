@@ -714,6 +714,12 @@ const Map<String, String> kEn = {
   "emotions-delete-desc": "All recorded emotions will be deleted",
   "account-settings": "User Information",
   "app-settings": "Settings",
+  "appearance": "Appearance",
+  "color-scheme": "Color Scheme",
+  "color-scheme-description":
+      "Turn on dark mode, or let the app visually match your device settings.",
+  "light": "Light",
+  "dark": "Dark",
   "user_name": "User Name",
   "user_email": "User Email",
   "registered-since": "Registered Since:",
@@ -2696,4 +2702,14 @@ const Map<String, String> kEn = {
   "subscription-active-title": "Active Subscription",
   "subscription-active-message":
       "You have an active Ta3afi+ subscription. Please cancel your subscription first before deleting your account. You can cancel your subscription in the App Store.",
+
+  // Profile image
+  "select-image-source": "Select Image Source",
+  "camera": "Camera",
+  "gallery": "Gallery",
+  "uploading-image": "Uploading image...",
+  "profile-image-updated-successfully": "Profile image updated successfully",
+  "profile-image-removed-successfully": "Profile image removed successfully",
+  "change-profile-picture": "Change Profile Picture",
+  "remove-profile-picture": "Remove Profile Picture",
 };

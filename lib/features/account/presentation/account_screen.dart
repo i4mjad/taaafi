@@ -31,7 +31,7 @@ import 'package:reboot_app_3/core/shared_widgets/complete_registration_banner.da
 import 'package:reboot_app_3/core/shared_widgets/confirm_details_banner.dart';
 import 'package:reboot_app_3/core/shared_widgets/confirm_email_banner.dart';
 import 'package:reboot_app_3/features/account/presentation/contact_us_modal.dart';
-import 'package:reboot_app_3/features/home/presentation/home/enhanced_home_settings_sheet.dart';
+
 import 'package:reboot_app_3/features/authentication/providers/user_provider.dart';
 import 'package:reboot_app_3/features/account/data/app_features_config.dart';
 import 'package:reboot_app_3/features/account/presentation/widgets/feature_access_guard.dart';
@@ -41,6 +41,7 @@ import 'package:reboot_app_3/features/plus/data/repositories/subscription_reposi
 import 'package:intl/intl.dart';
 import 'package:reboot_app_3/features/plus/presentation/feature_suggestion_modal.dart';
 import 'package:reboot_app_3/features/plus/presentation/taaafi_plus_features_list_screen.dart';
+import 'package:reboot_app_3/features/account/application/profile_image_service.dart';
 
 class AccountScreen extends ConsumerWidget {
   const AccountScreen({super.key});
@@ -111,50 +112,189 @@ class AccountScreen extends ConsumerWidget {
                                     context
                                         .pushNamed(RouteNames.userProfile.name);
                                   },
-                                  child: UserDetailsWidget(userProfile),
+                                  child: UserDetailsWidget(
+                                    userProfile,
+                                    onAvatarTap: (hasProfileImage) =>
+                                        _showProfileImageOptions(
+                                            context, ref, hasProfileImage),
+                                  ),
                                 ),
                                 verticalSpace(Spacing.points24),
                                 Text(
                                   AppLocalizations.of(context)
-                                      .translate('app-settings'),
+                                      .translate('appearance'),
                                   style: TextStyles.h6,
                                 ),
-                                verticalSpace(Spacing.points8),
-                                GestureDetector(
-                                  onTap: () {
-                                    HapticFeedback.mediumImpact();
-                                    changeLanguage(context);
-                                  },
-                                  child: SettingsButton(
-                                    icon: LucideIcons.smartphone,
-                                    textKey: 'ui-settings',
-                                  ),
-                                ),
-                                verticalSpace(Spacing.points8),
-                                GestureDetector(
-                                  onTap: () {
-                                    HapticFeedback.mediumImpact();
-                                    showModalBottomSheet<void>(
-                                      context: context,
-                                      isScrollControlled: true,
-                                      isDismissible:
-                                          false, // Prevent tap outside to dismiss
-                                      enableDrag:
-                                          false, // Prevent swipe down to dismiss
-                                      builder: (BuildContext context) {
-                                        return EnhancedHomeSettingsSheet();
-                                      },
-                                    );
-                                  },
-                                  child: SettingsButton(
-                                    icon: LucideIcons.layoutGrid,
-                                    textKey: 'home-layout',
-                                  ),
-                                ),
                                 verticalSpace(Spacing.points16),
+                                // Color Scheme Section
                                 Text(
                                   AppLocalizations.of(context)
-                                      .translate('account-settings'),
+                                      .translate('color-scheme'),
+                                  style: TextStyles.body.copyWith(
+                                    color: theme.grey[700],
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                verticalSpace(Spacing.points4),
+                                Text(
+                                  AppLocalizations.of(context)
+                                      .translate('color-scheme-description'),
+                                  style: TextStyles.small.copyWith(
+                                    color: theme.grey[500],
+                                    height: 1.4,
+                                  ),
+                                ),
+                                verticalSpace(Spacing.points12),
+                                Consumer(
+                                  builder: (context, ref, child) {
+                                    final themeNotifier =
+                                        ref.watch(customThemeProvider.notifier);
+                                    final isDarkMode =
+                                        themeNotifier.darkTheme == true;
+
+                                    return Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      children: [
+                                        // Light Mode Card
+                                        GestureDetector(
+                                          onTap: () {
+                                            HapticFeedback.mediumImpact();
+                                            if (isDarkMode) {
+                                              themeNotifier.toggleTheme();
+                                            }
+                                          },
+                                          child: WidgetsContainer(
+                                            width: 80,
+                                            height: 80,
+                                            padding: const EdgeInsets.all(12),
+                                            backgroundColor: Colors.white,
+                                            borderRadius:
+                                                BorderRadius.circular(12),
+                                            borderSide: BorderSide(
+                                              color: !isDarkMode
+                                                  ? theme.primary[600]!
+                                                  : theme.grey[300]!,
+                                              width: !isDarkMode ? 2 : 1,
+                                            ),
+                                            cornerSmoothing: 1,
+                                            child: Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                Icon(
+                                                  LucideIcons.sun,
+                                                  size: 20,
+                                                  color: !isDarkMode
+                                                      ? theme.primary[600]
+                                                      : Colors.grey[600],
+                                                ),
+                                                verticalSpace(Spacing.points4),
+                                                Text(
+                                                  AppLocalizations.of(context)
+                                                      .translate('light'),
+                                                  style:
+                                                      TextStyles.small.copyWith(
+                                                    color: !isDarkMode
+                                                        ? theme.primary[700]
+                                                        : Colors.grey[700],
+                                                    fontWeight: !isDarkMode
+                                                        ? FontWeight.w600
+                                                        : FontWeight.normal,
+                                                    fontSize: 11,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                        horizontalSpace(Spacing.points12),
+                                        // Dark Mode Card
+                                        GestureDetector(
+                                          onTap: () {
+                                            HapticFeedback.mediumImpact();
+                                            if (!isDarkMode) {
+                                              themeNotifier.toggleTheme();
+                                            }
+                                          },
+                                          child: WidgetsContainer(
+                                            width: 80,
+                                            height: 80,
+                                            padding: const EdgeInsets.all(12),
+                                            backgroundColor: Color(0xFF1A1A1A),
+                                            borderRadius:
+                                                BorderRadius.circular(12),
+                                            borderSide: BorderSide(
+                                              color: isDarkMode
+                                                  ? theme.primary[600]!
+                                                  : Colors.grey[300]!,
+                                              width: isDarkMode ? 2 : 1,
+                                            ),
+                                            cornerSmoothing: 1,
+                                            child: Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                Icon(
+                                                  LucideIcons.moon,
+                                                  size: 20,
+                                                  color: isDarkMode
+                                                      ? theme.primary[400]
+                                                      : Colors.grey[400],
+                                                ),
+                                                verticalSpace(Spacing.points4),
+                                                Text(
+                                                  AppLocalizations.of(context)
+                                                      .translate('dark'),
+                                                  style:
+                                                      TextStyles.small.copyWith(
+                                                    color: isDarkMode
+                                                        ? theme.primary[300]
+                                                        : Colors.grey[400],
+                                                    fontWeight: isDarkMode
+                                                        ? FontWeight.w600
+                                                        : FontWeight.normal,
+                                                    fontSize: 11,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                ),
+                                verticalSpace(Spacing.points16),
+                                // Language Section
+                                Text(
+                                  AppLocalizations.of(context)
+                                      .translate('change-lang'),
+                                  style: TextStyles.body.copyWith(
+                                    color: theme.grey[700],
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                verticalSpace(Spacing.points8),
+                                CustomSegmentedButton(
+                                  options: [
+                                    SegmentedButtonOption(
+                                        value: 'arabic',
+                                        translationKey: 'arabic'),
+                                    SegmentedButtonOption(
+                                        value: 'english',
+                                        translationKey: 'english'),
+                                  ],
+                                  selectedOption:
+                                      _getSelectedLocale(context, ref),
+                                  onChanged: (value) {
+                                    _updateThelocale(value, ref);
+                                  },
+                                ),
+                                verticalSpace(Spacing.points24),
+                                Text(
+                                  AppLocalizations.of(context)
+                                      .translate('user'),
                                   style: TextStyles.h6,
                                 ),
                                 verticalSpace(Spacing.points8),
@@ -169,6 +309,19 @@ class AccountScreen extends ConsumerWidget {
                                       textKey: 'my-reports',
                                     ),
                                   ),
+                                verticalSpace(Spacing.points8),
+                                FeatureAccessGuard(
+                                  featureUniqueName:
+                                      AppFeaturesConfig.contactAdmin,
+                                  onTap: () =>
+                                      _showContactUsModal(context, ref),
+                                  customBanMessage: AppLocalizations.of(context)
+                                      .translate('contact-support-restricted'),
+                                  child: SettingsButton(
+                                    icon: LucideIcons.helpCircle,
+                                    textKey: 'contact-support-team',
+                                  ),
+                                ),
                                 verticalSpace(Spacing.points8),
                                 if (showMainContent)
                                   Consumer(
@@ -228,52 +381,53 @@ class AccountScreen extends ConsumerWidget {
                                     type: 'error',
                                   ),
                                 ),
-                                verticalSpace(Spacing.points16),
-                                Text(
-                                  AppLocalizations.of(context)
-                                      .translate('about-app'),
-                                  style: TextStyles.h6,
+                                verticalSpace(Spacing.points24),
+                                // Contact Us and Rate App in one row
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: SettingsButton(
+                                        icon: LucideIcons.messageCircle,
+                                        textKey:
+                                            'contact-us-through-this-channels',
+                                        action: () async {
+                                          await ref
+                                              .read(urlLauncherProvider)
+                                              .launch(Uri.parse(
+                                                  'https://wa.me/96876691799'));
+                                        },
+                                      ),
+                                    ),
+                                    horizontalSpace(Spacing.points8),
+                                    Expanded(
+                                      child: SettingsButton(
+                                        icon: LucideIcons.star,
+                                        textKey: 'rate-app',
+                                        action: () async {
+                                          await ref
+                                              .read(inAppRatingServiceProvider)
+                                              .requestReview(context);
+                                        },
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                                verticalSpace(Spacing.points8),
-                                SettingsButton(
-                                  icon: LucideIcons.heart,
-                                  textKey: 'version-number',
-                                  type: 'app',
-                                  action: () {
-                                    launchUrl(Uri.parse('https://ta3afi.app'));
-                                  },
-                                ),
-                                verticalSpace(Spacing.points8),
-                                FeatureAccessGuard(
-                                  featureUniqueName:
-                                      AppFeaturesConfig.contactAdmin,
-                                  onTap: () =>
-                                      _showContactUsModal(context, ref),
-                                  customBanMessage: AppLocalizations.of(context)
-                                      .translate('contact-support-restricted'),
-                                  child: SettingsButton(
-                                    icon: LucideIcons.helpCircle,
-                                    textKey: 'contact-support-team',
+                                verticalSpace(Spacing.points24),
+                                // Version at the bottom without container
+                                Center(
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      launchUrl(
+                                          Uri.parse('https://ta3afi.app'));
+                                    },
+                                    child: Text(
+                                      AppLocalizations.of(context)
+                                          .translate('version-number'),
+                                      style: TextStyles.caption.copyWith(
+                                        color: theme.grey[600],
+                                      ),
+                                    ),
                                   ),
-                                ),
-                                verticalSpace(Spacing.points8),
-                                SettingsButton(
-                                  icon: LucideIcons.messageCircle,
-                                  textKey: 'contact-us-through-this-channels',
-                                  action: () async {
-                                    await ref.read(urlLauncherProvider).launch(
-                                        Uri.parse('https://wa.me/96876691799'));
-                                  },
-                                ),
-                                verticalSpace(Spacing.points8),
-                                SettingsButton(
-                                  icon: LucideIcons.star,
-                                  textKey: 'rate-app',
-                                  action: () async {
-                                    await ref
-                                        .read(inAppRatingServiceProvider)
-                                        .requestReview(context);
-                                  },
                                 ),
                                 verticalSpace(Spacing.points12),
                               ],
@@ -287,15 +441,6 @@ class AccountScreen extends ConsumerWidget {
                       Center(child: Text('Error: $error')),
                   loading: () => Center(child: Spinner()),
                 )));
-  }
-
-  void changeLanguage(BuildContext context) async {
-    showModalBottomSheet(
-      context: context,
-      builder: (context) {
-        return UiAndLanguageSettings();
-      },
-    );
   }
 
   void _showContactUsModal(BuildContext context, WidgetRef ref) {
@@ -323,6 +468,110 @@ class AccountScreen extends ConsumerWidget {
       useSafeArea: true,
       backgroundColor: Colors.transparent,
       builder: (context) => const TaaafiPlusSubscriptionScreen(),
+    );
+  }
+
+  SegmentedButtonOption _getSelectedLocale(
+      BuildContext context, WidgetRef ref) {
+    final locale = ref.watch(localeNotifierProvider);
+
+    if (locale?.languageCode == 'ar') {
+      return SegmentedButtonOption(value: 'arabic', translationKey: 'arabic');
+    } else if (locale?.languageCode == 'en') {
+      return SegmentedButtonOption(value: 'english', translationKey: 'english');
+    } else {
+      return SegmentedButtonOption(value: 'arabic', translationKey: 'arabic');
+    }
+  }
+
+  void _updateThelocale(SegmentedButtonOption value, WidgetRef ref) {
+    final locale = ref.watch(localeNotifierProvider);
+    final localeNotifier = ref.watch(localeNotifierProvider.notifier);
+
+    if (value.value == "arabic" && locale?.languageCode == 'en') {
+      localeNotifier.toggleLocale();
+    } else if (value.value == "english" && locale?.languageCode == 'ar') {
+      localeNotifier.toggleLocale();
+    }
+  }
+
+  void _showProfileImageOptions(
+      BuildContext context, WidgetRef ref, bool hasProfileImage) {
+    final theme = AppTheme.of(context);
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: theme.backgroundColor,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Handle bar
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: theme.grey[300],
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            verticalSpace(Spacing.points16),
+
+            // Title
+            Text(
+              AppLocalizations.of(context).translate('change-profile-picture'),
+              style: TextStyles.h6.copyWith(color: theme.grey[900]),
+            ),
+            verticalSpace(Spacing.points16),
+
+            // Change picture option
+            ListTile(
+              leading: Icon(
+                LucideIcons.camera,
+                color: theme.primary[600],
+              ),
+              title: Text(
+                AppLocalizations.of(context)
+                    .translate('change-profile-picture'),
+                style: TextStyles.body.copyWith(color: theme.grey[900]),
+              ),
+              onTap: () async {
+                Navigator.of(context).pop();
+                await ref
+                    .read(profileImageServiceProvider)
+                    .changeProfileImage(context);
+              },
+            ),
+
+            // Remove picture option (only show if user has a profile image)
+            if (hasProfileImage) ...[
+              ListTile(
+                leading: Icon(
+                  LucideIcons.trash2,
+                  color: theme.error[600],
+                ),
+                title: Text(
+                  AppLocalizations.of(context)
+                      .translate('remove-profile-picture'),
+                  style: TextStyles.body.copyWith(color: theme.error[600]),
+                ),
+                onTap: () async {
+                  Navigator.of(context).pop();
+                  await ref
+                      .read(profileImageServiceProvider)
+                      .removeProfileImage(context);
+                },
+              ),
+            ],
+
+            verticalSpace(Spacing.points16),
+          ],
+        ),
+      ),
     );
   }
 }
@@ -524,8 +773,10 @@ class UserDetailsWidget extends ConsumerWidget {
   const UserDetailsWidget(
     this.userProfile, {
     super.key,
+    this.onAvatarTap,
   });
   final UserProfile userProfile;
+  final Function(bool hasProfileImage)? onAvatarTap;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = AppTheme.of(context);
@@ -553,16 +804,46 @@ class UserDetailsWidget extends ConsumerWidget {
                     final hasProfileImage =
                         user?.photoURL != null && user!.photoURL!.isNotEmpty;
 
-                    return CircleAvatar(
-                      backgroundColor: theme.primary[50],
-                      backgroundImage:
-                          hasProfileImage ? NetworkImage(user.photoURL!) : null,
-                      child: hasProfileImage
-                          ? null
-                          : Icon(
-                              LucideIcons.user,
-                              color: theme.primary[900],
+                    return GestureDetector(
+                      onTap: onAvatarTap != null
+                          ? () => onAvatarTap!(hasProfileImage)
+                          : null,
+                      child: Stack(
+                        children: [
+                          CircleAvatar(
+                            backgroundColor: theme.primary[50],
+                            backgroundImage: hasProfileImage
+                                ? NetworkImage(user.photoURL!)
+                                : null,
+                            child: hasProfileImage
+                                ? null
+                                : Icon(
+                                    LucideIcons.user,
+                                    color: theme.primary[900],
+                                  ),
+                          ),
+                          Positioned(
+                            bottom: -2,
+                            right: -2,
+                            child: Container(
+                              padding: const EdgeInsets.all(4),
+                              decoration: BoxDecoration(
+                                color: theme.primary[600],
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: theme.backgroundColor,
+                                  width: 2,
+                                ),
+                              ),
+                              child: Icon(
+                                LucideIcons.camera,
+                                size: 12,
+                                color: Colors.white,
+                              ),
                             ),
+                          ),
+                        ],
+                      ),
                     );
                   },
                   loading: () => CircleAvatar(
