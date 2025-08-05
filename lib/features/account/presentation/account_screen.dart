@@ -42,6 +42,7 @@ import 'package:intl/intl.dart';
 import 'package:reboot_app_3/features/plus/presentation/feature_suggestion_modal.dart';
 import 'package:reboot_app_3/features/plus/presentation/taaafi_plus_features_list_screen.dart';
 import 'package:reboot_app_3/features/account/application/profile_image_service.dart';
+import 'package:shorebird_code_push/shorebird_code_push.dart';
 
 class AccountScreen extends ConsumerWidget {
   const AccountScreen({super.key});
@@ -381,7 +382,17 @@ class AccountScreen extends ConsumerWidget {
                                     type: 'error',
                                   ),
                                 ),
-                                verticalSpace(Spacing.points24),
+                                verticalSpace(Spacing.points8),
+                                // Manual Update Check
+                                SettingsButton(
+                                  icon: LucideIcons.download,
+                                  textKey: 'check-for-updates',
+                                  type: 'app',
+                                  action: () {
+                                    _showUpdateCheckModal(context, ref);
+                                  },
+                                ),
+                                verticalSpace(Spacing.points8),
                                 // Contact Us and Rate App in one row
                                 Row(
                                   children: [
@@ -495,6 +506,15 @@ class AccountScreen extends ConsumerWidget {
     }
   }
 
+  void _showUpdateCheckModal(BuildContext context, WidgetRef ref) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => const UpdateCheckModal(),
+    );
+  }
+
   void _showProfileImageOptions(
       BuildContext context, WidgetRef ref, bool hasProfileImage) {
     final theme = AppTheme.of(context);
@@ -502,7 +522,7 @@ class AccountScreen extends ConsumerWidget {
       context: context,
       backgroundColor: Colors.transparent,
       builder: (context) => Container(
-        padding: const EdgeInsets.all(20),
+        width: double.infinity,
         decoration: BoxDecoration(
           color: theme.backgroundColor,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
@@ -1076,5 +1096,364 @@ class UserDetailsWidget extends ConsumerWidget {
     } catch (e) {
       return '';
     }
+  }
+}
+
+class UpdateCheckModal extends ConsumerStatefulWidget {
+  const UpdateCheckModal({super.key});
+
+  @override
+  ConsumerState<UpdateCheckModal> createState() => _UpdateCheckModalState();
+}
+
+class _UpdateCheckModalState extends ConsumerState<UpdateCheckModal> {
+  bool _isChecking = false;
+  bool _isDownloading = false;
+  bool _updateAvailable = false;
+  bool _updateCompleted = false;
+  double _downloadProgress = 0.0;
+  String? _error;
+
+  final ShorebirdUpdater _updater = ShorebirdUpdater();
+
+  @override
+  void initState() {
+    super.initState();
+    _checkForUpdate();
+  }
+
+  Future<void> _checkForUpdate() async {
+    setState(() {
+      _isChecking = true;
+      _error = null;
+      _updateAvailable = false;
+      _updateCompleted = false;
+    });
+
+    try {
+      final updateStatus = await _updater.checkForUpdate();
+
+      if (mounted) {
+        setState(() {
+          _isChecking = false;
+          _updateAvailable = updateStatus == UpdateStatus.outdated;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isChecking = false;
+          _error = e.toString();
+        });
+      }
+    }
+  }
+
+  Future<void> _downloadUpdate() async {
+    setState(() {
+      _isDownloading = true;
+      _downloadProgress = 0.0;
+      _error = null;
+    });
+
+    // Simulate progress
+    for (int i = 0; i <= 100; i += 5) {
+      if (mounted) {
+        setState(() {
+          _downloadProgress = i.toDouble();
+        });
+        await Future.delayed(const Duration(milliseconds: 100));
+      }
+    }
+
+    try {
+      await _updater.update();
+
+      if (mounted) {
+        setState(() {
+          _isDownloading = false;
+          _updateCompleted = true;
+          _downloadProgress = 100.0;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isDownloading = false;
+          _error = e.toString();
+        });
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = AppTheme.of(context);
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: theme.backgroundColor,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Handle bar
+          Container(
+            width: 40,
+            height: 4,
+            decoration: BoxDecoration(
+              color: theme.grey[300],
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+          verticalSpace(Spacing.points20),
+
+          // Title
+          Text(
+            AppLocalizations.of(context).translate('check-for-updates'),
+            style: TextStyles.h5.copyWith(color: theme.grey[900]),
+          ),
+          verticalSpace(Spacing.points24),
+
+          // Content based on state
+          if (_isChecking) _buildCheckingContent(),
+          if (!_isChecking && _error != null) _buildErrorContent(),
+          if (!_isChecking &&
+              _error == null &&
+              !_updateAvailable &&
+              !_updateCompleted)
+            _buildUpToDateContent(),
+          if (_updateAvailable && !_isDownloading && !_updateCompleted)
+            _buildUpdateAvailableContent(),
+          if (_isDownloading) _buildDownloadingContent(),
+          if (_updateCompleted) _buildCompletedContent(),
+
+          verticalSpace(Spacing.points24),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCheckingContent() {
+    final theme = AppTheme.of(context);
+
+    return Column(
+      children: [
+        const Spinner(),
+        verticalSpace(Spacing.points16),
+        Text(
+          AppLocalizations.of(context).translate('checking-for-updates'),
+          style: TextStyles.body.copyWith(color: theme.grey[700]),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildErrorContent() {
+    final theme = AppTheme.of(context);
+
+    return Column(
+      children: [
+        Icon(
+          LucideIcons.alertCircle,
+          size: 48,
+          color: theme.error[600],
+        ),
+        verticalSpace(Spacing.points16),
+        Text(
+          AppLocalizations.of(context).translate('update-check-failed'),
+          style: TextStyles.h6.copyWith(color: theme.error[700]),
+          textAlign: TextAlign.center,
+        ),
+        verticalSpace(Spacing.points8),
+        Text(
+          _error ??
+              AppLocalizations.of(context).translate('something-went-wrong'),
+          style: TextStyles.small.copyWith(color: theme.grey[600]),
+          textAlign: TextAlign.center,
+        ),
+        verticalSpace(Spacing.points20),
+        SizedBox(
+          width: double.infinity,
+          child: ElevatedButton(
+            onPressed: _checkForUpdate,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: theme.primary[600],
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            child: Text(
+              AppLocalizations.of(context).translate('try-again'),
+              style: TextStyles.footnote.copyWith(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildUpToDateContent() {
+    final theme = AppTheme.of(context);
+
+    return Column(
+      children: [
+        Icon(
+          LucideIcons.checkCircle,
+          size: 48,
+          color: theme.success[600],
+        ),
+        verticalSpace(Spacing.points16),
+        Text(
+          AppLocalizations.of(context).translate('up-to-date'),
+          style: TextStyles.h6.copyWith(color: theme.success[700]),
+          textAlign: TextAlign.center,
+        ),
+        verticalSpace(Spacing.points8),
+        Text(
+          AppLocalizations.of(context).translate('up-to-date-message'),
+          style: TextStyles.body.copyWith(color: theme.grey[600]),
+          textAlign: TextAlign.center,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildUpdateAvailableContent() {
+    final theme = AppTheme.of(context);
+
+    return Column(
+      children: [
+        Icon(
+          LucideIcons.download,
+          size: 48,
+          color: theme.primary[600],
+        ),
+        verticalSpace(Spacing.points16),
+        Text(
+          AppLocalizations.of(context).translate('update-available'),
+          style: TextStyles.h6.copyWith(color: theme.primary[700]),
+          textAlign: TextAlign.center,
+        ),
+        verticalSpace(Spacing.points8),
+        Text(
+          AppLocalizations.of(context).translate('update-available-message'),
+          style: TextStyles.body.copyWith(color: theme.grey[600]),
+          textAlign: TextAlign.center,
+        ),
+        verticalSpace(Spacing.points20),
+        SizedBox(
+          width: double.infinity,
+          child: ElevatedButton(
+            onPressed: _downloadUpdate,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: theme.primary[600],
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            child: Text(
+              AppLocalizations.of(context).translate('update-button'),
+              style: TextStyles.footnote.copyWith(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDownloadingContent() {
+    final theme = AppTheme.of(context);
+
+    return Column(
+      children: [
+        const Spinner(),
+        verticalSpace(Spacing.points16),
+        Text(
+          AppLocalizations.of(context).translate('updating'),
+          style: TextStyles.h6.copyWith(color: theme.primary[700]),
+          textAlign: TextAlign.center,
+        ),
+        verticalSpace(Spacing.points16),
+        ClipRRect(
+          borderRadius: BorderRadius.circular(4),
+          child: LinearProgressIndicator(
+            value: _downloadProgress / 100,
+            minHeight: 8,
+            backgroundColor: theme.grey[200],
+            valueColor: AlwaysStoppedAnimation<Color>(theme.primary[600]!),
+          ),
+        ),
+        verticalSpace(Spacing.points8),
+        Text(
+          '${_downloadProgress.toStringAsFixed(0)}%',
+          style: TextStyles.small.copyWith(color: theme.primary[700]),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCompletedContent() {
+    final theme = AppTheme.of(context);
+
+    return Column(
+      children: [
+        Icon(
+          LucideIcons.checkCircle,
+          size: 48,
+          color: theme.success[600],
+        ),
+        verticalSpace(Spacing.points16),
+        Text(
+          AppLocalizations.of(context).translate('update-complete'),
+          style: TextStyles.h6.copyWith(color: theme.success[700]),
+          textAlign: TextAlign.center,
+        ),
+        verticalSpace(Spacing.points8),
+        Text(
+          AppLocalizations.of(context).translate('update-complete-message'),
+          style: TextStyles.body.copyWith(color: theme.grey[600]),
+          textAlign: TextAlign.center,
+        ),
+        verticalSpace(Spacing.points20),
+        SizedBox(
+          width: double.infinity,
+          child: ElevatedButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              // You can add restart functionality here if needed
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: theme.success[600],
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            child: Text(
+              AppLocalizations.of(context).translate('done'),
+              style: TextStyles.footnote.copyWith(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
   }
 }

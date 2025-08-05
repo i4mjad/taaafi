@@ -209,6 +209,13 @@ const Map<String, String> kAr = {
       "قم بتشغيل الوضع المظلم، أو اتركه يتطابق بصريًا مع إعدادات جهازك.",
   "light": "فاتح",
   "dark": "مظلم",
+  "check-for-updates": "البحث عن تحديثات",
+  "checking-for-updates": "جاري البحث عن تحديثات...",
+  "update-check-failed": "فشل في البحث عن تحديثات",
+  "up-to-date": "أنت محدث!",
+  "up-to-date-message": "لديك أحدث إصدار من التطبيق.",
+  "try-again": "حاول مرة أخرى",
+  "done": "تم",
   "user_name": "اسم المستخدم",
   "user_email": "البريد الالكتروني",
   "registered-since": "مسجل منذ:",
@@ -1891,7 +1898,6 @@ const Map<String, String> kAr = {
   "followup-type-mastOnly": "العادة السرية فقط",
   "followup-type-slipUp": "الزلات",
   "followup-type-all": "جميع الأنواع",
-  "done": "تم",
 
   // Mood correlation
   "mood-very-low": "منخفض جداً",

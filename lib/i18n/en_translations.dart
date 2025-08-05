@@ -720,6 +720,13 @@ const Map<String, String> kEn = {
       "Turn on dark mode, or let the app visually match your device settings.",
   "light": "Light",
   "dark": "Dark",
+  "check-for-updates": "Check for Updates",
+  "checking-for-updates": "Checking for updates...",
+  "update-check-failed": "Update check failed",
+  "up-to-date": "You're up to date!",
+  "up-to-date-message": "You have the latest version of the app.",
+  "try-again": "Try Again",
+  "done": "Done",
   "user_name": "User Name",
   "user_email": "User Email",
   "registered-since": "Registered Since:",
@@ -2032,7 +2039,6 @@ const Map<String, String> kEn = {
   "followup-type-mastOnly": "Masturbation Only",
   "followup-type-slipUp": "Slip-ups",
   "followup-type-all": "All Types",
-  "done": "Done",
 
   // Mood correlation
   "mood-very-low": "Very low",
