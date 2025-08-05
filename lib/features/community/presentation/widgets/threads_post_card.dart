@@ -769,156 +769,175 @@ class ThreadsPostCard extends ConsumerWidget {
     final theme = AppTheme.of(context);
     final localizations = AppLocalizations.of(context);
 
-    // Show confirmation dialog
-    showDialog(
+    // Show confirmation modal
+    showModalBottomSheet(
+      isScrollControlled: true,
+      useSafeArea: true,
       context: context,
-      builder: (context) => Dialog(
-        backgroundColor: Colors.transparent,
-        child: Container(
-          margin: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: theme.backgroundColor,
-            borderRadius: BorderRadius.circular(16),
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        decoration: BoxDecoration(
+          color: theme.backgroundColor,
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(16),
+            topRight: Radius.circular(16),
           ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Header
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: theme.error[50],
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(16),
-                    topRight: Radius.circular(16),
-                  ),
-                ),
-                child: Column(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: theme.error[100],
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Icon(
-                        LucideIcons.trash2,
-                        size: 24,
-                        color: theme.error[600],
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    Text(
-                      localizations.translate('delete_post'),
-                      style: TextStyles.h6.copyWith(
-                        color: theme.error[700],
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
-                ),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Handle bar
+            Container(
+              margin: const EdgeInsets.only(top: 12),
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: theme.grey[300],
+                borderRadius: BorderRadius.circular(2),
               ),
+            ),
 
-              // Content
-              Padding(
-                padding: const EdgeInsets.all(20),
-                child: Text(
-                  localizations.translate('confirm_delete_post'),
-                  style: TextStyles.body.copyWith(
-                    color: theme.grey[700],
-                    height: 1.4,
+            const SizedBox(height: 20),
+
+            // Header with icon and title
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Column(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: theme.error[100],
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Icon(
+                      LucideIcons.trash2,
+                      size: 24,
+                      color: theme.error[600],
+                    ),
                   ),
-                  textAlign: TextAlign.center,
-                ),
+                  const SizedBox(height: 16),
+                  Text(
+                    localizations.translate('delete_post'),
+                    style: TextStyles.h6.copyWith(
+                      color: theme.grey[900],
+                      fontWeight: FontWeight.w600,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    localizations.translate('confirm_delete_post'),
+                    style: TextStyles.body.copyWith(
+                      color: theme.grey[600],
+                      height: 1.4,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
               ),
+            ),
 
-              // Actions
-              Padding(
-                padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
-                child: Row(
-                  children: [
-                    // Cancel button
-                    Expanded(
-                      child: GestureDetector(
-                        onTap: () => Navigator.of(context).pop(),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                          decoration: BoxDecoration(
-                            color: theme.grey[100],
-                            borderRadius: BorderRadius.circular(8),
+            const SizedBox(height: 24),
+
+            // Actions
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+              child: Row(
+                children: [
+                  // Cancel button
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () => Navigator.of(context).pop(),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        decoration: BoxDecoration(
+                          color: theme.grey[100],
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Text(
+                          localizations.translate('cancel'),
+                          style: TextStyles.body.copyWith(
+                            color: theme.grey[700],
+                            fontWeight: FontWeight.w600,
                           ),
-                          child: Text(
-                            localizations.translate('cancel'),
-                            style: TextStyles.body.copyWith(
-                              color: theme.grey[700],
-                              fontWeight: FontWeight.w600,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
+                          textAlign: TextAlign.center,
                         ),
                       ),
                     ),
+                  ),
 
-                    const SizedBox(width: 12),
+                  const SizedBox(width: 12),
 
-                    // Delete button
-                    Expanded(
-                      child: GestureDetector(
-                        onTap: () async {
-                          Navigator.of(context).pop();
+                  // Delete button
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () async {
+                        Navigator.of(context).pop();
 
-                          // Mark as deleted optimistically for immediate UI feedback
+                        // Mark as deleted optimistically for immediate UI feedback
+                        ref
+                            .read(optimisticPostStateProvider(post.id).notifier)
+                            .markAsDeleted();
+
+                        // Show brief success message
+                        if (context.mounted) {
+                          getSuccessSnackBar(context, 'post_deleted');
+                        }
+
+                        try {
+                          // Perform actual deletion in background
+                          await ref
+                              .read(forumRepositoryProvider)
+                              .deletePost(post.id);
+
+                          // Invalidate providers to refresh post feeds
+                          ref.invalidate(postsProvider);
+                          ref.invalidate(genderFilteredPostsProvider);
+                          ref.invalidate(mainScreenPostsProvider);
+                          ref.invalidate(postsPaginationProvider);
+                          ref.invalidate(pinnedPostsPaginationProvider);
+                          ref.invalidate(newsPostsPaginationProvider);
+                          ref.invalidate(userPostsPaginationProvider);
+                          ref.invalidate(userLikedPostsPaginationProvider);
+                          ref.invalidate(userCommentsPaginationProvider);
+                        } catch (e) {
+                          // Revert optimistic deletion if failed
                           ref
                               .read(
                                   optimisticPostStateProvider(post.id).notifier)
-                              .markAsDeleted();
+                              .revertDeletion();
 
-                          // Show brief success message
+                          // Show error message only if context is still valid
                           if (context.mounted) {
-                            getSuccessSnackBar(context, 'post_deleted');
+                            getErrorSnackBar(context, 'error_deleting_post');
                           }
-
-                          try {
-                            // Perform actual deletion in background
-                            await ref
-                                .read(forumRepositoryProvider)
-                                .deletePost(post.id);
-                          } catch (e) {
-                            // Revert optimistic deletion if failed
-                            ref
-                                .read(optimisticPostStateProvider(post.id)
-                                    .notifier)
-                                .revertDeletion();
-
-                            // Show error message only if context is still valid
-                            if (context.mounted) {
-                              getErrorSnackBar(context, 'error_deleting_post');
-                            }
-                          }
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                          decoration: BoxDecoration(
-                            color: theme.error[500],
-                            borderRadius: BorderRadius.circular(8),
+                        }
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        decoration: BoxDecoration(
+                          color: theme.error[500],
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Text(
+                          localizations.translate('delete'),
+                          style: TextStyles.body.copyWith(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w600,
                           ),
-                          child: Text(
-                            localizations.translate('delete'),
-                            style: TextStyles.body.copyWith(
-                              color: Colors.white,
-                              fontWeight: FontWeight.w600,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
+                          textAlign: TextAlign.center,
                         ),
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-            ],
-          ),
+            ),
+
+            // Add safe area padding for devices with bottom notches
+            const SizedBox(height: 8),
+          ],
         ),
       ),
     );

@@ -1676,6 +1676,7 @@ const Map<String, String> kAr = {
   "start-free-trial": "ابدأ التجربة المجانية لـ 7 أيام",
   "free-trial-started": "تم بدء التجربة المجانية بنجاح!",
 
+  "no_search_results": "لا يوجد نتائج",
   // بطاقة الاشتراك البسيطة
   "try-ta3afi-plus": "جرب تعافي +",
   "free-trial-description":

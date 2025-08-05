@@ -13,6 +13,7 @@ import 'package:reboot_app_3/features/community/presentation/widgets/threads_pos
 import 'package:reboot_app_3/features/community/presentation/providers/forum_providers.dart';
 import 'package:reboot_app_3/features/community/presentation/widgets/advanced_search_modal.dart';
 import 'package:reboot_app_3/features/community/data/models/post_category.dart';
+import 'package:reboot_app_3/features/community/data/models/post_search_filters.dart';
 
 class CategoryPostsScreen extends ConsumerStatefulWidget {
   final PostCategory category;
@@ -59,9 +60,19 @@ class _CategoryPostsScreenState extends ConsumerState<CategoryPostsScreen> {
 
     // Load more posts when near the bottom
     if (scrollPosition >= _scrollController.position.maxScrollExtent - 200) {
-      ref
-          .read(postsPaginationProvider.notifier)
-          .loadMorePosts(category: widget.category.id);
+      final hasActiveSearch = _searchQuery.isNotEmpty || _activeFilters != null;
+
+      if (hasActiveSearch) {
+        // Load more search results
+        ref
+            .read(searchPostsPaginationProvider.notifier)
+            .loadMoreSearchResults();
+      } else {
+        // Load more regular posts for this category
+        ref
+            .read(postsPaginationProvider.notifier)
+            .loadMorePosts(category: widget.category.id);
+      }
     }
   }
 
@@ -74,10 +85,27 @@ class _CategoryPostsScreenState extends ConsumerState<CategoryPostsScreen> {
   }
 
   void _performSearch() {
-    // TODO: Implement search logic with category filter
     setState(() {
       _searchQuery = _searchController.text;
     });
+
+    // Create search filters with current query and any active filters
+    // Note: We automatically include the current category in the search
+    final filters = PostSearchFilters(
+      searchQuery: _searchQuery.isNotEmpty ? _searchQuery : null,
+      category: widget.category.id, // Always filter by the current category
+      sortBy: _activeFilters?['sortBy'] ?? 'newest_first',
+      startDate: _activeFilters?['startDate'],
+      endDate: _activeFilters?['endDate'],
+    );
+
+    // Perform search if we have any filters or query
+    if (filters.hasActiveFilters) {
+      ref.read(searchPostsPaginationProvider.notifier).searchPosts(filters);
+    } else {
+      // Clear search if no filters
+      ref.read(searchPostsPaginationProvider.notifier).clearSearch();
+    }
   }
 
   void _showAdvancedSearch() {
@@ -96,7 +124,8 @@ class _CategoryPostsScreenState extends ConsumerState<CategoryPostsScreen> {
         setState(() {
           _activeFilters = filters;
         });
-        // TODO: Apply filters to post loading
+        // Apply the filters immediately
+        _performSearch();
       }
     });
   }
@@ -107,7 +136,8 @@ class _CategoryPostsScreenState extends ConsumerState<CategoryPostsScreen> {
       _searchQuery = '';
       _activeFilters = null;
     });
-    // Refresh posts for this category without filters
+    // Clear search results and refresh posts for this category
+    ref.read(searchPostsPaginationProvider.notifier).clearSearch();
     ref
         .read(postsPaginationProvider.notifier)
         .refresh(category: widget.category.id);
@@ -131,6 +161,25 @@ class _CategoryPostsScreenState extends ConsumerState<CategoryPostsScreen> {
       // Ultimate fallback - return category ID
       return widget.category.id.isNotEmpty ? widget.category.id : 'Unknown';
     }
+  }
+
+  String _getSortDisplayName(String sortBy) {
+    final localizations = AppLocalizations.of(context);
+    switch (sortBy) {
+      case 'oldest_first':
+        return localizations.translate('oldest_first');
+      case 'most_liked':
+        return localizations.translate('most_liked');
+      case 'most_commented':
+        return localizations.translate('most_commented');
+      case 'newest_first':
+      default:
+        return localizations.translate('newest_first');
+    }
+  }
+
+  String _formatDate(DateTime date) {
+    return '${date.day}/${date.month}/${date.year}';
   }
 
   @override
@@ -261,14 +310,38 @@ class _CategoryPostsScreenState extends ConsumerState<CategoryPostsScreen> {
                                     });
                                   },
                                 ),
-                              if (_activeFilters?['author']?.isNotEmpty == true)
+                              // Removed category filter since we're already in a specific category
+                              if (_activeFilters?['sortBy'] != null && _activeFilters!['sortBy'] != 'newest_first')
                                 _buildFilterChip(
                                   label:
-                                      '${localizations.translate('author')}: ${_activeFilters!['author']}',
+                                      '${localizations.translate('sort_by')}: ${_getSortDisplayName(_activeFilters!['sortBy'])}',
                                   onRemove: () {
                                     setState(() {
-                                      _activeFilters!['author'] = '';
+                                      _activeFilters!['sortBy'] = 'newest_first';
                                     });
+                                    _performSearch();
+                                  },
+                                ),
+                              if (_activeFilters?['startDate'] != null)
+                                _buildFilterChip(
+                                  label:
+                                      '${localizations.translate('start_date')}: ${_formatDate(_activeFilters!['startDate'])}',
+                                  onRemove: () {
+                                    setState(() {
+                                      _activeFilters!['startDate'] = null;
+                                    });
+                                    _performSearch();
+                                  },
+                                ),
+                              if (_activeFilters?['endDate'] != null)
+                                _buildFilterChip(
+                                  label:
+                                      '${localizations.translate('end_date')}: ${_formatDate(_activeFilters!['endDate'])}',
+                                  onRemove: () {
+                                    setState(() {
+                                      _activeFilters!['endDate'] = null;
+                                    });
+                                    _performSearch();
                                   },
                                 ),
                             ],
@@ -344,106 +417,195 @@ class _CategoryPostsScreenState extends ConsumerState<CategoryPostsScreen> {
 
   Widget _buildPostsList(AppLocalizations localizations) {
     final theme = AppTheme.of(context);
-    final postsState = ref.watch(postsPaginationProvider);
+    
+    // Check if we have active search filters
+    final hasActiveSearch = _searchQuery.isNotEmpty || _activeFilters != null;
 
-    if (postsState.posts.isEmpty && postsState.isLoading) {
-      return const Center(
-        child: Spinner(),
-      );
-    }
+    if (hasActiveSearch) {
+      // Show search results
+      final searchState = ref.watch(searchPostsPaginationProvider);
 
-    if (postsState.posts.isEmpty && postsState.error != null) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              LucideIcons.alertCircle,
-              size: 48,
-              color: theme.grey[400],
-            ),
-            const SizedBox(height: 16),
-            Text(
-              localizations.translate('error_loading_posts'),
-              style: TextStyles.body.copyWith(
-                color: theme.error[500],
+      if (searchState.posts.isEmpty && searchState.isLoading) {
+        return const Center(
+          child: Spinner(),
+        );
+      }
+
+      if (searchState.posts.isEmpty && searchState.error != null) {
+        return Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                LucideIcons.alertCircle,
+                size: 48,
+                color: theme.grey[400],
               ),
-            ),
-            const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: () {
-                ref
-                    .read(postsPaginationProvider.notifier)
-                    .refresh(category: widget.category.id);
-              },
-              child: Text(localizations.translate('retry')),
-            ),
-          ],
-        ),
-      );
-    }
-
-    if (postsState.posts.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              LucideIcons.search,
-              size: 48,
-              color: theme.grey[400],
-            ),
-            const SizedBox(height: 16),
-            Text(
-              _searchQuery.isNotEmpty || _activeFilters != null
-                  ? localizations.translate('no_results_found')
-                  : localizations.translate('no_posts_in_category'),
-              style: TextStyles.body.copyWith(
-                color: theme.grey[600],
-              ),
-            ),
-            if (_searchQuery.isNotEmpty || _activeFilters != null)
-              Padding(
-                padding: const EdgeInsets.only(top: 16),
-                child: TextButton(
-                  onPressed: _clearFilters,
-                  child: Text(localizations.translate('clear_filters')),
+              const SizedBox(height: 16),
+              Text(
+                localizations.translate('error_searching_posts'),
+                style: TextStyles.body.copyWith(
+                  color: theme.error[500],
                 ),
               ),
-          ],
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: _performSearch,
+                child: Text(localizations.translate('retry')),
+              ),
+            ],
+          ),
+        );
+      }
+
+      if (searchState.posts.isEmpty) {
+        return Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                LucideIcons.search,
+                size: 48,
+                color: theme.grey[400],
+              ),
+              const SizedBox(height: 16),
+              Text(
+                localizations.translate('no_search_results'),
+                style: TextStyles.body.copyWith(
+                  color: theme.grey[600],
+                ),
+              ),
+              const SizedBox(height: 16),
+              TextButton(
+                onPressed: _clearFilters,
+                child: Text(localizations.translate('clear_filters')),
+              ),
+            ],
+          ),
+        );
+      }
+
+      return RefreshIndicator(
+        onRefresh: () async {
+          await ref.read(searchPostsPaginationProvider.notifier).refresh();
+        },
+        child: ListView.builder(
+          controller: _scrollController,
+          itemCount: searchState.posts.length + (searchState.isLoading ? 1 : 0),
+          itemBuilder: (context, index) {
+            if (index == searchState.posts.length) {
+              // Loading indicator at the bottom
+              return const Center(
+                child: Padding(
+                  padding: EdgeInsets.all(16.0),
+                  child: Spinner(),
+                ),
+              );
+            }
+
+            final post = searchState.posts[index];
+            return ThreadsPostCard(
+              post: post,
+              onTap: () {
+                context.push('/community/forum/post/${post.id}');
+              },
+            );
+          },
+        ),
+      );
+    } else {
+      // Show regular posts for this category
+      final postsState = ref.watch(postsPaginationProvider);
+
+      if (postsState.posts.isEmpty && postsState.isLoading) {
+        return const Center(
+          child: Spinner(),
+        );
+      }
+
+      if (postsState.posts.isEmpty && postsState.error != null) {
+        return Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                LucideIcons.alertCircle,
+                size: 48,
+                color: theme.grey[400],
+              ),
+              const SizedBox(height: 16),
+              Text(
+                localizations.translate('error_loading_posts'),
+                style: TextStyles.body.copyWith(
+                  color: theme.error[500],
+                ),
+              ),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: () {
+                  ref
+                      .read(postsPaginationProvider.notifier)
+                      .refresh(category: widget.category.id);
+                },
+                child: Text(localizations.translate('retry')),
+              ),
+            ],
+          ),
+        );
+      }
+
+      if (postsState.posts.isEmpty) {
+        return Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                LucideIcons.search,
+                size: 48,
+                color: theme.grey[400],
+              ),
+              const SizedBox(height: 16),
+              Text(
+                localizations.translate('no_posts_in_category'),
+                style: TextStyles.body.copyWith(
+                  color: theme.grey[600],
+                ),
+              ),
+            ],
+          ),
+        );
+      }
+
+      return RefreshIndicator(
+        onRefresh: () async {
+          await ref
+              .read(postsPaginationProvider.notifier)
+              .refresh(category: widget.category.id);
+        },
+        child: ListView.builder(
+          controller: _scrollController,
+          itemCount: postsState.posts.length + (postsState.isLoading ? 1 : 0),
+          itemBuilder: (context, index) {
+            if (index == postsState.posts.length) {
+              // Loading indicator at the bottom
+              return const Center(
+                child: Padding(
+                  padding: EdgeInsets.all(16.0),
+                  child: Spinner(),
+                ),
+              );
+            }
+
+            final post = postsState.posts[index];
+            return ThreadsPostCard(
+              post: post,
+              onTap: () {
+                context.push('/community/forum/post/${post.id}');
+              },
+            );
+          },
         ),
       );
     }
-
-    return RefreshIndicator(
-      onRefresh: () async {
-        await ref
-            .read(postsPaginationProvider.notifier)
-            .refresh(category: widget.category.id);
-      },
-      child: ListView.builder(
-        controller: _scrollController,
-        itemCount: postsState.posts.length + (postsState.isLoading ? 1 : 0),
-        itemBuilder: (context, index) {
-          if (index == postsState.posts.length) {
-            // Loading indicator at the bottom
-            return const Center(
-              child: Padding(
-                padding: EdgeInsets.all(16.0),
-                child: Spinner(),
-              ),
-            );
-          }
-
-          final post = postsState.posts[index];
-          return ThreadsPostCard(
-            post: post,
-            onTap: () {
-              context.push('/community/forum/post/${post.id}');
-            },
-          );
-        },
-      ),
-    );
   }
 }

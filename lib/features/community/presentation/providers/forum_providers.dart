@@ -6,6 +6,7 @@ import 'package:reboot_app_3/features/community/data/models/post_category.dart';
 import 'package:reboot_app_3/features/community/data/models/post.dart';
 import 'package:reboot_app_3/features/community/data/models/comment.dart';
 import 'package:reboot_app_3/features/community/data/models/interaction.dart';
+import 'package:reboot_app_3/features/community/data/models/post_search_filters.dart';
 import 'package:reboot_app_3/features/community/data/repositories/forum_repository.dart';
 import 'package:reboot_app_3/features/community/domain/services/forum_service.dart';
 import 'package:reboot_app_3/features/community/domain/services/post_validation_service.dart';
@@ -1392,5 +1393,202 @@ class UserLikedItemsPaginationState {
       error: error ?? this.error,
       lastDocument: lastDocument ?? this.lastDocument,
     );
+  }
+}
+
+// =============================================================================
+// SEARCH PROVIDERS
+// =============================================================================
+
+/// Search Posts Pagination Provider
+final searchPostsPaginationProvider = StateNotifierProvider<
+    SearchPostsPaginationNotifier, SearchPostsPaginationState>((ref) {
+  final repository = ref.watch(forumRepositoryProvider);
+  return SearchPostsPaginationNotifier(repository, ref);
+});
+
+/// State for search posts pagination
+class SearchPostsPaginationState {
+  final List<Post> posts;
+  final bool isLoading;
+  final bool hasMore;
+  final String? error;
+  final dynamic lastDocument;
+  final PostSearchFilters? activeFilters;
+
+  SearchPostsPaginationState({
+    required this.posts,
+    required this.isLoading,
+    required this.hasMore,
+    this.error,
+    this.lastDocument,
+    this.activeFilters,
+  });
+
+  factory SearchPostsPaginationState.initial() {
+    return SearchPostsPaginationState(
+      posts: [],
+      isLoading: false,
+      hasMore: true,
+    );
+  }
+
+  SearchPostsPaginationState copyWith({
+    List<Post>? posts,
+    bool? isLoading,
+    bool? hasMore,
+    String? error,
+    dynamic lastDocument,
+    PostSearchFilters? activeFilters,
+  }) {
+    return SearchPostsPaginationState(
+      posts: posts ?? this.posts,
+      isLoading: isLoading ?? this.isLoading,
+      hasMore: hasMore ?? this.hasMore,
+      error: error ?? this.error,
+      lastDocument: lastDocument ?? this.lastDocument,
+      activeFilters: activeFilters ?? this.activeFilters,
+    );
+  }
+}
+
+/// Notifier for search posts pagination
+class SearchPostsPaginationNotifier
+    extends StateNotifier<SearchPostsPaginationState> {
+  final ForumRepository _repository;
+  final Ref _ref;
+
+  SearchPostsPaginationNotifier(this._repository, this._ref)
+      : super(SearchPostsPaginationState.initial());
+
+  /// Get current user profile for gender filtering
+  Future<CommunityProfileEntity?> _getCurrentUserProfile() async {
+    try {
+      final currentProfile = _ref.read(currentCommunityProfileProvider);
+      return await currentProfile.when(
+        data: (profile) async => profile,
+        loading: () async {
+          // Wait a bit for the profile to load
+          await Future.delayed(Duration(milliseconds: 100));
+          final retryAsync = _ref.read(currentCommunityProfileProvider);
+          return retryAsync.maybeWhen(
+            data: (profile) => profile,
+            orElse: () => null,
+          );
+        },
+        error: (_, __) async => null,
+      );
+    } catch (e) {
+      print('Error getting current user profile: $e');
+      return null;
+    }
+  }
+
+  /// Search posts with the given filters
+  Future<void> searchPosts(PostSearchFilters filters) async {
+    if (state.isLoading) return;
+
+    // Check if user has community profile before searching
+    final communityState = _ref.read(communityScreenStateProvider);
+    if (communityState != CommunityScreenState.showMainContent) {
+      state = state.copyWith(
+        posts: <Post>[],
+        lastDocument: null,
+        hasMore: false,
+        isLoading: false,
+        activeFilters: filters,
+      );
+      return;
+    }
+
+    state =
+        state.copyWith(isLoading: true, error: null, activeFilters: filters);
+
+    try {
+      // Get current user's gender for mandatory filtering
+      final currentProfile = await _getCurrentUserProfile();
+
+      // Determine if gender filtering should be applied based on content type
+      final filterParams = PostFilterParams(category: filters.category);
+      final shouldApplyGenderFilter = filterParams.shouldApplyGenderFilter;
+
+      final page = await _repository.searchPosts(
+        limit: 10,
+        searchQuery: filters.searchQuery,
+        category: filters.category,
+        sortBy: filters.sortBy,
+        startDate: filters.startDate,
+        endDate: filters.endDate,
+        userGender: currentProfile?.gender,
+        applyGenderFilter: shouldApplyGenderFilter,
+      );
+
+      state = state.copyWith(
+        posts: page.posts,
+        lastDocument: page.lastDocument,
+        hasMore: page.hasMore,
+        isLoading: false,
+      );
+    } catch (e) {
+      state = state.copyWith(isLoading: false, error: e.toString());
+    }
+  }
+
+  /// Load more search results for pagination
+  Future<void> loadMoreSearchResults() async {
+    if (state.isLoading || !state.hasMore || state.activeFilters == null)
+      return;
+
+    state = state.copyWith(isLoading: true);
+
+    try {
+      // Get current user's gender for mandatory filtering
+      final currentProfile = await _getCurrentUserProfile();
+
+      // Determine if gender filtering should be applied based on content type
+      final filterParams =
+          PostFilterParams(category: state.activeFilters!.category);
+      final shouldApplyGenderFilter = filterParams.shouldApplyGenderFilter;
+
+      final page = await _repository.searchPosts(
+        limit: 10,
+        lastDocument: state.lastDocument,
+        searchQuery: state.activeFilters!.searchQuery,
+        category: state.activeFilters!.category,
+        sortBy: state.activeFilters!.sortBy,
+        startDate: state.activeFilters!.startDate,
+        endDate: state.activeFilters!.endDate,
+        userGender: currentProfile?.gender,
+        applyGenderFilter: shouldApplyGenderFilter,
+      );
+
+      state = state.copyWith(
+        posts: [...state.posts, ...page.posts],
+        lastDocument: page.lastDocument,
+        hasMore: page.hasMore,
+        isLoading: false,
+      );
+    } catch (e) {
+      state = state.copyWith(isLoading: false, error: e.toString());
+    }
+  }
+
+  /// Clear search results and reset to initial state
+  void clearSearch() {
+    state = SearchPostsPaginationState.initial();
+  }
+
+  /// Refresh search results
+  Future<void> refresh() async {
+    if (state.activeFilters != null) {
+      final filters = state.activeFilters!;
+      state =
+          SearchPostsPaginationState.initial().copyWith(activeFilters: filters);
+      await searchPosts(filters);
+    }
+  }
+
+  void reset() {
+    state = SearchPostsPaginationState.initial();
   }
 }

@@ -12,6 +12,8 @@ import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/features/community/presentation/widgets/threads_post_card.dart';
 import 'package:reboot_app_3/features/community/presentation/providers/forum_providers.dart';
 import 'package:reboot_app_3/features/community/presentation/widgets/advanced_search_modal.dart';
+import 'package:reboot_app_3/features/community/data/models/post_search_filters.dart';
+import 'package:reboot_app_3/features/community/data/models/post_category.dart';
 
 class PostsListScreen extends ConsumerStatefulWidget {
   const PostsListScreen({super.key});
@@ -53,10 +55,10 @@ class _PostsListScreenState extends ConsumerState<PostsListScreen> {
       final hasActiveSearch = _searchQuery.isNotEmpty || _activeFilters != null;
 
       if (hasActiveSearch) {
-        // TODO: Load more search results - searchPostsPaginationProvider missing
-        // ref
-        //     .read(searchPostsPaginationProvider.notifier)
-        //     .loadMoreSearchResults();
+        // Load more search results
+        ref
+            .read(searchPostsPaginationProvider.notifier)
+            .loadMoreSearchResults();
       } else {
         // Load more regular posts
         ref.read(postsPaginationProvider.notifier).loadMorePosts();
@@ -77,24 +79,22 @@ class _PostsListScreenState extends ConsumerState<PostsListScreen> {
       _searchQuery = _searchController.text;
     });
 
-    // TODO: Create search filters with current query and any active filters
-    // PostSearchFilters class is missing
-    // final filters = PostSearchFilters(
-    //   searchQuery: _searchQuery.isNotEmpty ? _searchQuery : null,
-    //   category: _activeFilters?['category'],
-    //   sortBy: _activeFilters?['sortBy'] ?? 'newest_first',
-    //   startDate: _activeFilters?['startDate'],
-    //   endDate: _activeFilters?['endDate'],
-    // );
+    // Create search filters with current query and any active filters
+    final filters = PostSearchFilters(
+      searchQuery: _searchQuery.isNotEmpty ? _searchQuery : null,
+      category: _activeFilters?['category'],
+      sortBy: _activeFilters?['sortBy'] ?? 'newest_first',
+      startDate: _activeFilters?['startDate'],
+      endDate: _activeFilters?['endDate'],
+    );
 
-    // TODO: Perform search if we have any filters or query
-    // searchPostsPaginationProvider is missing
-    // if (filters.hasActiveFilters) {
-    //   ref.read(searchPostsPaginationProvider.notifier).searchPosts(filters);
-    // } else {
-    //   // Clear search if no filters
-    //   ref.read(searchPostsPaginationProvider.notifier).clearSearch();
-    // }
+    // Perform search if we have any filters or query
+    if (filters.hasActiveFilters) {
+      ref.read(searchPostsPaginationProvider.notifier).searchPosts(filters);
+    } else {
+      // Clear search if no filters
+      ref.read(searchPostsPaginationProvider.notifier).clearSearch();
+    }
   }
 
   void _showAdvancedSearch() {
@@ -126,9 +126,29 @@ class _PostsListScreenState extends ConsumerState<PostsListScreen> {
       _activeFilters = null;
     });
     // Clear search results and refresh regular posts
-    // TODO: Clear search - searchPostsPaginationProvider missing
-    // ref.read(searchPostsPaginationProvider.notifier).clearSearch();
+    ref.read(searchPostsPaginationProvider.notifier).clearSearch();
     ref.read(postsPaginationProvider.notifier).refresh();
+  }
+
+  String _getCategoryDisplayName(String categoryId) {
+    final localizations = AppLocalizations.of(context);
+    final categoriesAsync = ref.read(postCategoriesProvider);
+
+    return categoriesAsync.when(
+      data: (categories) {
+        try {
+          final category = categories.firstWhere(
+            (cat) => cat.id == categoryId,
+          );
+          return category.getDisplayName(localizations.locale.languageCode);
+        } catch (e) {
+          // Category not found, return the ID as fallback
+          return categoryId;
+        }
+      },
+      loading: () => categoryId,
+      error: (_, __) => categoryId,
+    );
   }
 
   @override
@@ -219,7 +239,7 @@ class _PostsListScreenState extends ConsumerState<PostsListScreen> {
                                   true)
                                 _buildFilterChip(
                                   label:
-                                      '${localizations.translate('category')}: ${_activeFilters!['category']}',
+                                      '${localizations.translate('category')}: ${_getCategoryDisplayName(_activeFilters!['category'])}',
                                   onRemove: () {
                                     setState(() {
                                       _activeFilters!['category'] = '';
@@ -312,30 +332,101 @@ class _PostsListScreenState extends ConsumerState<PostsListScreen> {
     final hasActiveSearch = _searchQuery.isNotEmpty || _activeFilters != null;
 
     if (hasActiveSearch) {
-      // TODO: Show search results - search functionality disabled due to missing providers
-      // Search functionality needs to be implemented with proper providers
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              LucideIcons.search,
-              size: 48,
-              color: theme.grey[400],
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Search functionality is currently unavailable',
-              style: TextStyles.body.copyWith(
-                color: theme.grey[600],
+      // Show search results
+      final searchState = ref.watch(searchPostsPaginationProvider);
+
+      if (searchState.posts.isEmpty && searchState.isLoading) {
+        return const Center(
+          child: Spinner(),
+        );
+      }
+
+      if (searchState.posts.isEmpty && searchState.error != null) {
+        return Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                LucideIcons.alertCircle,
+                size: 48,
+                color: theme.grey[400],
               ),
-            ),
-            const SizedBox(height: 16),
-            TextButton(
-              onPressed: _clearFilters,
-              child: Text(localizations.translate('clear_filters')),
-            ),
-          ],
+              const SizedBox(height: 16),
+              Text(
+                localizations.translate('error_searching_posts'),
+                style: TextStyles.body.copyWith(
+                  color: theme.error[500],
+                ),
+              ),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: _performSearch,
+                child: Text(localizations.translate('retry')),
+              ),
+            ],
+          ),
+        );
+      }
+
+      if (searchState.posts.isEmpty) {
+        return Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                LucideIcons.search,
+                size: 48,
+                color: theme.grey[400],
+              ),
+              const SizedBox(height: 16),
+              Text(
+                localizations.translate('no_search_results'),
+                style: TextStyles.body.copyWith(
+                  color: theme.grey[600],
+                ),
+              ),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: _clearFilters,
+                child: Text(
+                  localizations.translate('clear_filters'),
+                  style: TextStyles.caption.copyWith(
+                    color: theme.primary[600],
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      }
+
+      return RefreshIndicator(
+        onRefresh: () async {
+          await ref.read(searchPostsPaginationProvider.notifier).refresh();
+        },
+        child: ListView.builder(
+          controller: _scrollController,
+          itemCount: searchState.posts.length + (searchState.isLoading ? 1 : 0),
+          itemBuilder: (context, index) {
+            if (index == searchState.posts.length) {
+              // Loading indicator at the bottom
+              return const Center(
+                child: Padding(
+                  padding: EdgeInsets.all(16.0),
+                  child: Spinner(),
+                ),
+              );
+            }
+
+            final post = searchState.posts[index];
+            return ThreadsPostCard(
+              post: post,
+              onTap: () {
+                context.push('/community/forum/post/${post.id}');
+              },
+            );
+          },
         ),
       );
     } else {

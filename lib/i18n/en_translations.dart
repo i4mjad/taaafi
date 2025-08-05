@@ -1714,6 +1714,7 @@ const Map<String, String> kEn = {
   "subscription-community": "Community",
   "subscription-analytics": "Analytics",
   "member": "Member",
+  "no_search_results": "No results found",
 
   // Simple Subscription Card
   "try-ta3afi-plus": "Try Ta'aafi Plus",
