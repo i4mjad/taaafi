@@ -598,61 +598,77 @@ class _DeleteAccountScreenState extends ConsumerState<DeleteAccountScreen> {
   void _showSubscriptionBlockDialog(BuildContext context) {
     final theme = AppTheme.of(context);
 
-    showDialog(
+    showModalBottomSheet(
       context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      backgroundColor: Colors.transparent,
       builder: (BuildContext context) {
-        return AlertDialog(
-          backgroundColor: theme.backgroundColor,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+        return Container(
+          decoration: BoxDecoration(
+            color: theme.backgroundColor,
+            borderRadius: BorderRadius.circular(16),
           ),
-          title: Row(
-            children: [
-              Icon(
-                LucideIcons.star,
-                color: theme.warn[600],
-                size: 24,
-              ),
-              horizontalSpace(Spacing.points8),
-              Expanded(
-                child: Text(
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(
+                      LucideIcons.star,
+                      color: theme.warn[600],
+                      size: 24,
+                    ),
+                    horizontalSpace(Spacing.points12),
+                    Expanded(
+                      child: Text(
+                        AppLocalizations.of(context)
+                            .translate('subscription-active-title'),
+                        style: TextStyles.h6.copyWith(
+                          color: theme.grey[900],
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                verticalSpace(Spacing.points16),
+                Text(
                   AppLocalizations.of(context)
-                      .translate('subscription-active-title'),
-                  style: TextStyles.h6.copyWith(
-                    color: theme.grey[900],
-                    fontWeight: FontWeight.w600,
+                      .translate('subscription-active-message'),
+                  style: TextStyles.body.copyWith(
+                    color: theme.grey[700],
+                    height: 1.5,
                   ),
                 ),
-              ),
-            ],
-          ),
-          content: Text(
-            AppLocalizations.of(context)
-                .translate('subscription-active-message'),
-            style: TextStyles.body.copyWith(
-              color: theme.grey[700],
-              height: 1.5,
+                verticalSpace(Spacing.points24),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: theme.primary[600],
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                    ),
+                    child: Text(
+                      AppLocalizations.of(context).translate('understood'),
+                      style: TextStyles.footnote.copyWith(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
-          actions: [
-            ElevatedButton(
-              onPressed: () => Navigator.of(context).pop(),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: theme.primary[600],
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-              child: Text(
-                AppLocalizations.of(context).translate('understood'),
-                style: TextStyles.footnote.copyWith(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-          ],
         );
       },
     );

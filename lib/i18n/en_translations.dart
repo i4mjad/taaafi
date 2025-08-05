@@ -1715,6 +1715,7 @@ const Map<String, String> kEn = {
   "subscription-analytics": "Analytics",
   "member": "Member",
   "no_search_results": "No results found",
+  "subscription-status": "Subscription Status",
 
   // Simple Subscription Card
   "try-ta3afi-plus": "Try Ta'aafi Plus",
@@ -2664,4 +2665,9 @@ const Map<String, String> kEn = {
   "feature-requests-desc": "Suggest and vote for new features",
   "change-plans-anytime": "Change plans anytime",
   "calender": "Calender",
+
+  // Subscription active modal
+  "subscription-active-title": "Active Subscription",
+  "subscription-active-message":
+      "You have an active Ta3afi+ subscription. Please cancel your subscription first before deleting your account. You can cancel your subscription in the App Store.",
 };

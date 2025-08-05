@@ -11,6 +11,7 @@ import 'package:reboot_app_3/core/shared_widgets/spinner.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
+import 'package:reboot_app_3/features/plus/presentation/plus_features_guide_screen.dart';
 import 'package:reboot_app_3/features/vault/data/models/smart_alert_settings.dart';
 import 'package:reboot_app_3/features/vault/data/smart_alerts/smart_alerts_notifier.dart';
 import 'package:reboot_app_3/features/plus/data/notifiers/subscription_notifier.dart';
@@ -193,7 +194,13 @@ class _SmartAlertsSettingsScreenState
             child: ElevatedButton(
               onPressed: () {
                 Navigator.of(context).pop();
-                // TODO: Navigate to Plus subscription screen
+
+                showModalBottomSheet(
+                  context: context,
+                  isScrollControlled: true,
+                  backgroundColor: theme.backgroundColor,
+                  builder: (context) => PlusFeaturesGuideScreen(),
+                );
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: theme.primary[600],

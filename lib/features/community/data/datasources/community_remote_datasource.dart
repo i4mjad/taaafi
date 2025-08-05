@@ -172,42 +172,26 @@ class CommunityRemoteDatasourceImpl implements CommunityRemoteDatasource {
   @override
   Stream<CommunityProfileModel?> watchProfile(String uid) {
     try {
-      print('🔍 Datasource watchProfile Debug for uid: $uid');
-
       return _profilesCollection
           .where('userUID', isEqualTo: uid)
           .where('isDeleted', isEqualTo: false)
           .limit(1)
           .snapshots()
           .map((snapshot) {
-        print(
-            '🔍 Datasource watchProfile: Received snapshot with ${snapshot.docs.length} docs');
-
         if (snapshot.docs.isEmpty) {
-          print(
-              '📭 Datasource watchProfile: No documents found, returning null');
           return null;
         }
 
         final doc = snapshot.docs.first;
         final data = doc.data();
 
-        print('🔍 Datasource watchProfile: Found document ${doc.id}');
-        print('  - userUID: ${data['userUID']}');
-        print('  - displayName: ${data['displayName']}');
-        print('  - isDeleted: ${data['isDeleted']}');
-
         // Filter out deleted profiles client-side to avoid permission issues
         if (data['isDeleted'] == true) {
-          print(
-              '⚠️ Datasource watchProfile: Profile is deleted, returning null');
           return null;
         }
 
-        print('✅ Datasource watchProfile: Creating model from doc');
         final model = CommunityProfileModel.fromFirestore(doc);
-        print(
-            '✅ Datasource watchProfile: Returning model for ${model.displayName}');
+
         return model;
       });
     } on FirebaseException catch (e) {

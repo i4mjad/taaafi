@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -73,6 +71,7 @@ class _StreakPeriodsModalState extends ConsumerState<StreakPeriodsModal> {
   }
 
   Future<void> _loadPeriods() async {
+    if (!mounted) return;
     setState(() => _isLoading = true);
 
     try {
@@ -84,16 +83,19 @@ class _StreakPeriodsModalState extends ConsumerState<StreakPeriodsModal> {
       final periods = _calculatePeriods(userFirstDate, followUps);
       _calculateChartData(periods);
 
+      if (!mounted) return;
       setState(() {
         _periods = periods;
         _isLoading = false;
       });
     } catch (e) {
+      if (!mounted) return;
       setState(() => _isLoading = false);
     }
   }
 
   void _onSegmentedButtonChanged(SegmentedButtonOption option) {
+    if (!mounted) return;
     HapticFeedback.lightImpact();
     setState(() {
       _selectedOption = option;
@@ -104,6 +106,7 @@ class _StreakPeriodsModalState extends ConsumerState<StreakPeriodsModal> {
   }
 
   void _zoomIn() {
+    if (!mounted) return;
     setState(() {
       _zoomLevel = (_zoomLevel * 1.5).clamp(1.0, 5.0);
     });
@@ -111,6 +114,7 @@ class _StreakPeriodsModalState extends ConsumerState<StreakPeriodsModal> {
   }
 
   void _zoomOut() {
+    if (!mounted) return;
     setState(() {
       _zoomLevel = (_zoomLevel / 1.5).clamp(1.0, 5.0);
     });
@@ -118,6 +122,7 @@ class _StreakPeriodsModalState extends ConsumerState<StreakPeriodsModal> {
   }
 
   void _resetZoom() {
+    if (!mounted) return;
     setState(() {
       _zoomLevel = 1.0;
       _panX = 0.0;
@@ -603,6 +608,8 @@ class _StreakPeriodsModalState extends ConsumerState<StreakPeriodsModal> {
                                                         height: 28,
                                                         child: IconButton(
                                                           onPressed: () {
+                                                            if (!mounted)
+                                                              return;
                                                             setState(() {
                                                               final maxPanY = (260 *
                                                                       (_zoomLevel -
@@ -638,6 +645,8 @@ class _StreakPeriodsModalState extends ConsumerState<StreakPeriodsModal> {
                                                             height: 28,
                                                             child: IconButton(
                                                               onPressed: () {
+                                                                if (!mounted)
+                                                                  return;
                                                                 setState(() {
                                                                   final maxPanX =
                                                                       (MediaQuery.of(context).size.width *
@@ -670,6 +679,8 @@ class _StreakPeriodsModalState extends ConsumerState<StreakPeriodsModal> {
                                                             height: 28,
                                                             child: IconButton(
                                                               onPressed: () {
+                                                                if (!mounted)
+                                                                  return;
                                                                 setState(() {
                                                                   final maxPanX =
                                                                       (MediaQuery.of(context).size.width *
@@ -704,6 +715,8 @@ class _StreakPeriodsModalState extends ConsumerState<StreakPeriodsModal> {
                                                         height: 28,
                                                         child: IconButton(
                                                           onPressed: () {
+                                                            if (!mounted)
+                                                              return;
                                                             setState(() {
                                                               final maxPanY = (260 *
                                                                       (_zoomLevel -
@@ -847,6 +860,7 @@ class _StreakPeriodsModalState extends ConsumerState<StreakPeriodsModal> {
         },
         onPanUpdate: (details) {
           if (_zoomLevel > 1.0 && details.delta.distance > 3.0) {
+            if (!mounted) return;
             setState(() {
               // More responsive pan with larger movement
               final sensitivity = 1.5;

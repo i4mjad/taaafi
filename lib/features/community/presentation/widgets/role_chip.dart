@@ -18,7 +18,6 @@ class RoleChip extends StatelessWidget {
     final theme = AppTheme.of(context);
     final localizations = AppLocalizations.of(context);
 
-    print('🔍 RoleChip role: $role');
     // Don't show chip for regular members
     if (role.toLowerCase() == 'member') {
       return const SizedBox.shrink();

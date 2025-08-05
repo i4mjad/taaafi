@@ -3,8 +3,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 /// Represents a user interaction with a post or comment
 ///
 /// This model stores likes and dislikes in a separate collection for better
-/// scalability and performance. The document ID follows the pattern:
-/// {userCPId}_{targetType}_{targetId} to prevent duplicate interactions
+/// scalability and performance. Each interaction has a unique auto-generated ID.
+/// Duplicate interactions are prevented through Firestore queries and transactions.
 class Interaction {
   final String id;
   final String targetType; // 'post' or 'comment'
@@ -71,32 +71,18 @@ class Interaction {
         'updatedAt': updatedAt != null ? Timestamp.fromDate(updatedAt!) : null,
       };
 
-  /// Generates a document ID for this interaction
-  /// Format: {userCPId}_{targetType}_{targetId}
-  static String generateDocumentId({
-    required String userCPId,
-    required String targetType,
-    required String targetId,
-  }) {
-    return '${userCPId}_${targetType}_$targetId';
-  }
-
-  /// Creates a new interaction instance
+  /// Creates a new interaction instance with an auto-generated ID
+  /// The actual document ID will be set when the document is created in Firestore
   factory Interaction.create({
     required String targetType,
     required String targetId,
     required String userCPId,
     required String type,
     required int value,
+    String? id, // Optional ID for when creating from existing document
   }) {
-    final id = generateDocumentId(
-      userCPId: userCPId,
-      targetType: targetType,
-      targetId: targetId,
-    );
-
     return Interaction(
-      id: id,
+      id: id ?? '', // Empty string will be replaced with auto-generated ID
       targetType: targetType,
       targetId: targetId,
       userCPId: userCPId,

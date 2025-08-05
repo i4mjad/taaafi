@@ -17,6 +17,7 @@ import 'package:reboot_app_3/features/vault/presentation/vault_layout_provider.d
 import 'package:reboot_app_3/features/vault/presentation/notifiers/streak_display_notifier.dart';
 import 'package:reboot_app_3/features/vault/data/streaks/streak_duration_notifier.dart';
 import 'package:reboot_app_3/features/vault/presentation/widgets/statistics/statistics_widget.dart';
+import 'package:reboot_app_3/features/vault/presentation/widgets/streaks/streak_periods_modal.dart';
 
 class StreaksViewWidget extends ConsumerWidget {
   const StreaksViewWidget({super.key});
@@ -88,6 +89,7 @@ class StreaksViewWidget extends ConsumerWidget {
                     value: streakData.relapseStreak,
                     color: followUpColors[FollowUpType.relapse]!,
                     icon: Icons.check_circle_outline,
+                    followUpType: FollowUpType.relapse,
                   ),
                 if (visibilitySettings['pornOnly'] == true)
                   _StreakData(
@@ -95,6 +97,7 @@ class StreaksViewWidget extends ConsumerWidget {
                     value: streakData.pornOnlyStreak,
                     color: followUpColors[FollowUpType.pornOnly]!,
                     icon: Icons.visibility_off_outlined,
+                    followUpType: FollowUpType.pornOnly,
                   ),
                 if (visibilitySettings['mastOnly'] == true)
                   _StreakData(
@@ -102,6 +105,7 @@ class StreaksViewWidget extends ConsumerWidget {
                     value: streakData.mastOnlyStreak,
                     color: followUpColors[FollowUpType.mastOnly]!,
                     icon: Icons.self_improvement_outlined,
+                    followUpType: FollowUpType.mastOnly,
                   ),
                 if (visibilitySettings['slipUp'] == true)
                   _StreakData(
@@ -109,6 +113,7 @@ class StreaksViewWidget extends ConsumerWidget {
                     value: streakData.slipUpStreak,
                     color: followUpColors[FollowUpType.slipUp]!,
                     icon: Icons.warning_amber_outlined,
+                    followUpType: FollowUpType.slipUp,
                   ),
               ];
 
@@ -184,12 +189,14 @@ class _StreakData {
   final int value;
   final Color color;
   final IconData icon;
+  final FollowUpType followUpType;
 
   const _StreakData({
     required this.label,
     required this.value,
     required this.color,
     required this.icon,
+    required this.followUpType,
   });
 }
 
@@ -204,58 +211,74 @@ class _StreakCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = AppTheme.of(context);
 
-    return SizedBox(
-      width: 100,
-      child: WidgetsContainer(
+    return GestureDetector(
+      onTap: () {
+        HapticFeedback.lightImpact();
+        showModalBottomSheet<void>(
+          context: context,
+          isScrollControlled: true,
+          backgroundColor: Colors.transparent,
+          constraints: BoxConstraints(
+            maxHeight: MediaQuery.of(context).size.height * 0.85,
+          ),
+          builder: (BuildContext context) {
+            return StreakPeriodsModal(followUpType: streakData.followUpType);
+          },
+        );
+      },
+      child: SizedBox(
         width: 100,
-        backgroundColor: streakData.color.withValues(alpha: 0.1),
-        borderSide: BorderSide(
-          color: streakData.color.withValues(alpha: 0.3),
-          width: 1.5,
-        ),
-        borderRadius: BorderRadius.circular(16),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            mainAxisSize: MainAxisSize.max,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(5),
-                decoration: BoxDecoration(
-                  color: streakData.color.withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(8),
+        child: WidgetsContainer(
+          width: 100,
+          backgroundColor: streakData.color.withValues(alpha: 0.1),
+          borderSide: BorderSide(
+            color: streakData.color.withValues(alpha: 0.3),
+            width: 1.5,
+          ),
+          borderRadius: BorderRadius.circular(16),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.max,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(5),
+                  decoration: BoxDecoration(
+                    color: streakData.color.withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Icon(
+                    streakData.icon,
+                    color: streakData.color,
+                    size: 18,
+                  ),
                 ),
-                child: Icon(
-                  streakData.icon,
-                  color: streakData.color,
-                  size: 18,
-                ),
-              ),
-              const SizedBox(height: 6),
-              Text(
-                '${streakData.value}',
-                style: TextStyles.h6.copyWith(
-                  color: streakData.color,
-                  fontWeight: FontWeight.w700,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 4),
-              Expanded(
-                child: Text(
-                  streakData.label,
-                  style: TextStyles.small.copyWith(
-                    color: theme.grey[700],
-                    fontWeight: FontWeight.w500,
-                    height: 1.1,
+                const SizedBox(height: 6),
+                Text(
+                  '${streakData.value}',
+                  style: TextStyles.h6.copyWith(
+                    color: streakData.color,
+                    fontWeight: FontWeight.w700,
                   ),
                   textAlign: TextAlign.center,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
                 ),
-              ),
-            ],
+                const SizedBox(height: 4),
+                Expanded(
+                  child: Text(
+                    streakData.label,
+                    style: TextStyles.small.copyWith(
+                      color: theme.grey[700],
+                      fontWeight: FontWeight.w500,
+                      height: 1.1,
+                    ),
+                    textAlign: TextAlign.center,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -371,64 +394,80 @@ class _CompactDetailedStreakCard extends StatelessWidget {
     final theme = AppTheme.of(context);
     final localization = AppLocalizations.of(context);
 
-    return WidgetsContainer(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-      backgroundColor: color.withValues(alpha: 0.05),
-      borderSide: BorderSide(color: color.withValues(alpha: 0.2), width: 1),
-      borderRadius: BorderRadius.circular(8),
-      child: Row(
-        children: [
-          // Icon
-          Icon(
-            icon,
-            size: 16,
-            color: color,
+    return GestureDetector(
+      onTap: () {
+        HapticFeedback.lightImpact();
+        showModalBottomSheet<void>(
+          context: context,
+          isScrollControlled: true,
+          backgroundColor: Colors.transparent,
+          constraints: BoxConstraints(
+            maxHeight: MediaQuery.of(context).size.height * 0.85,
           ),
-          horizontalSpace(Spacing.points8),
-          // Title
-          Expanded(
-            child: Text(
-              localization.translate(titleKey),
-              style: TextStyles.footnote.copyWith(
-                color: theme.grey[900],
-                fontWeight: FontWeight.w600,
+          builder: (BuildContext context) {
+            return StreakPeriodsModal(followUpType: followUpType);
+          },
+        );
+      },
+      child: WidgetsContainer(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+        backgroundColor: color.withValues(alpha: 0.05),
+        borderSide: BorderSide(color: color.withValues(alpha: 0.2), width: 1),
+        borderRadius: BorderRadius.circular(8),
+        child: Row(
+          children: [
+            // Icon
+            Icon(
+              icon,
+              size: 16,
+              color: color,
+            ),
+            horizontalSpace(Spacing.points8),
+            // Title
+            Expanded(
+              child: Text(
+                localization.translate(titleKey),
+                style: TextStyles.footnote.copyWith(
+                  color: theme.grey[900],
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
-          ),
-          // Time units - compact inline display
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              if (initialInfo.months > 0) ...[
+            // Time units - compact inline display
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (initialInfo.months > 0) ...[
+                  _InlineTimeUnit(
+                    value: initialInfo.months,
+                    label: localization.translate("months"),
+                    color: color,
+                  ),
+                  horizontalSpace(Spacing.points4),
+                ],
                 _InlineTimeUnit(
-                  value: initialInfo.months,
-                  label: localization.translate("months"),
+                  value: initialInfo.days,
+                  label: localization.translate("days"),
                   color: color,
                 ),
                 horizontalSpace(Spacing.points4),
-              ],
-              _InlineTimeUnit(
-                value: initialInfo.days,
-                label: localization.translate("days"),
-                color: color,
-              ),
-              horizontalSpace(Spacing.points4),
-              _InlineTimeUnit(
-                value: initialInfo.hours,
-                label: localization.translate("hours"),
-                color: color,
-              ),
-              if (initialInfo.months == 0 && initialInfo.days == 0) ...[
-                horizontalSpace(Spacing.points4),
                 _InlineTimeUnit(
-                  value: initialInfo.minutes,
-                  label: localization.translate("minutes"),
+                  value: initialInfo.hours,
+                  label: localization.translate("hours"),
                   color: color,
                 ),
+                if (initialInfo.months == 0 && initialInfo.days == 0) ...[
+                  horizontalSpace(Spacing.points4),
+                  _InlineTimeUnit(
+                    value: initialInfo.minutes,
+                    label: localization.translate("minutes"),
+                    color: color,
+                  ),
+                ],
               ],
-            ],
-          ),
-        ],
+            ),
+          ],
+        ),
       ),
     );
   }

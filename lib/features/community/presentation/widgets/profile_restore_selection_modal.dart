@@ -571,7 +571,7 @@ class _ProfileRestoreSelectionModalState
       final service = ref.read(communityServiceProvider);
 
       await service.restoreProfile(_selectedProfileId!,
-          bypassLatestCheck: hasPlus);
+          bypassLatestCheck: hasPlus, userHasPlusSubscription: hasPlus);
 
       if (mounted) {
         // Refresh all community-related providers

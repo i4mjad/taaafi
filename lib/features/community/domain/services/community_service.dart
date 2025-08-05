@@ -106,10 +106,12 @@ abstract class CommunityService {
   ///
   /// Reactivates the profile and makes it visible again.
   /// [bypassLatestCheck] allows Plus users to restore any profile, not just the latest.
+  /// [userHasPlusSubscription] determines the isPlusUser flag value for the restored profile.
   /// Throws [AuthenticationException] if the user is not authenticated.
   /// Throws [ProfileNotFoundException] if no deleted profile exists.
   Future<CommunityProfileEntity> restoreProfile(
     String deletedProfileId, {
     bool bypassLatestCheck = false,
+    bool? userHasPlusSubscription,
   });
 }

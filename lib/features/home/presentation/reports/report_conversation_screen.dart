@@ -128,7 +128,6 @@ class _ReportConversationScreenState
           // Report info header
           reportAsyncValue.when(
             data: (reports) {
-              //TODO: pass the report id to he screen instead of filtering it like this
               final report = reports.firstWhere(
                 (r) => r.id == widget.reportId,
                 orElse: () => throw Exception('Report not found'),

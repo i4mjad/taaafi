@@ -109,13 +109,6 @@ final communityProfileByIdProvider = StreamProvider.family
     final data = snapshot.data() as Map<String, dynamic>;
     final role = data['role'] as String? ?? 'member';
 
-    print('🔍 [CommunityProfileProvider] Profile ${snapshot.id}:');
-    print(
-        '🔍 [CommunityProfileProvider] - Raw role from Firestore: ${data['role']}');
-    print('🔍 [CommunityProfileProvider] - Final role value: $role');
-    print(
-        '🔍 [CommunityProfileProvider] - Display name: ${data['displayName']}');
-
     return CommunityProfileEntity(
       id: snapshot.id,
       userUID: data['userUID'] ?? '',

@@ -47,20 +47,7 @@ class PostContentWidget extends ConsumerWidget {
             overflow: maxLines != null ? TextOverflow.ellipsis : null,
           ),
         ],
-
-        // TODO: Add support for attachments in the future
-        // if (post.attachments.isNotEmpty) ...[
-        //   const SizedBox(height: 12),
-        //   _buildAttachments(),
-        // ],
       ],
     );
   }
-
-  // TODO: Implement attachment display
-  // Widget _buildAttachments() {
-  //   return Container(
-  //     // Attachment display logic
-  //   );
-  // }
 }

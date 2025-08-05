@@ -268,16 +268,6 @@ class CommentTileWidget extends ConsumerWidget {
           ),
         ),
 
-        // Plus badge for Plus users
-        if (isAuthorPlusUser) ...[
-          const SizedBox(width: 6),
-          const PlusBadgeWidget(
-            fontSize: 9,
-            iconSize: 8,
-            padding: EdgeInsets.symmetric(horizontal: 4, vertical: 1),
-          ),
-        ],
-
         // Real-time streak display for Plus users who allow sharing
         authorProfileAsync.when(
           data: (authorProfile) {

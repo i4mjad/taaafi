@@ -247,16 +247,11 @@ class ForumRepository {
 
       // Debug logging for news category
       if (category == 'aqOhcyOg1z8tcij0y1S4') {
-        print('🔍 DEBUG: Fetching news posts with category: $category');
-
         // Let's also check what categories actually exist in the database
         try {
           final allPostsSnapshot = await _posts.limit(10).get();
-          print('🔍 DEBUG: Sample of all posts in database:');
           for (var doc in allPostsSnapshot.docs.take(5)) {
             final data = doc.data() as Map<String, dynamic>;
-            print(
-                '🔍 DEBUG: Post ${doc.id} - category: "${data['category']}", title: "${data['title']}"');
           }
 
           // Check if any posts have news-related content
@@ -265,12 +260,8 @@ class ForumRepository {
                   whereIn: ['news', 'News', 'NEWS', 'aqOhcyOg1z8tcij0y1S4'])
               .limit(5)
               .get();
-          print(
-              '🔍 DEBUG: Posts with possible news categories: ${possibleNewsSnapshot.docs.length}');
           for (var doc in possibleNewsSnapshot.docs) {
             final data = doc.data() as Map<String, dynamic>;
-            print(
-                '🔍 DEBUG: News-like post ${doc.id} - category: "${data['category']}", title: "${data['title']}"');
           }
         } catch (e) {
           print('🔍 DEBUG: Error checking existing posts: $e');
@@ -775,8 +766,7 @@ class ForumRepository {
   /// Stream of a single post
   Stream<Post?> watchPost(String postId) {
     final user = FirebaseAuth.instance.currentUser;
-    print(
-        '  [ForumRepository] watchPost for postId: $postId, user: ${user?.uid}');
+
     return _posts.doc(postId).snapshots().map((doc) {
       if (doc.exists) {
         return Post.fromFirestore(
@@ -1031,16 +1021,17 @@ class ForumRepository {
   }) async {
     try {
       final userId = userCPId ?? await _currentUserCPId;
-      final docId = Interaction.generateDocumentId(
-        userCPId: userId,
-        targetType: targetType,
-        targetId: targetId,
-      );
 
-      final doc = await _interactions.doc(docId).get();
-      if (doc.exists) {
+      final query = await _interactions
+          .where('userCPId', isEqualTo: userId)
+          .where('targetType', isEqualTo: targetType)
+          .where('targetId', isEqualTo: targetId)
+          .limit(1)
+          .get();
+
+      if (query.docs.isNotEmpty) {
         return Interaction.fromFirestore(
-            doc as DocumentSnapshot<Map<String, dynamic>>);
+            query.docs.first as DocumentSnapshot<Map<String, dynamic>>);
       }
       return null;
     } catch (e) {
@@ -1068,16 +1059,17 @@ class ForumRepository {
     String? userCPId,
   }) async {
     final userId = userCPId ?? await _currentUserCPId;
-    final docId = Interaction.generateDocumentId(
-      userCPId: userId,
-      targetType: targetType,
-      targetId: targetId,
-    );
 
-    return _interactions.doc(docId).snapshots().map((doc) {
-      if (doc.exists) {
+    return _interactions
+        .where('userCPId', isEqualTo: userId)
+        .where('targetType', isEqualTo: targetType)
+        .where('targetId', isEqualTo: targetId)
+        .limit(1)
+        .snapshots()
+        .map((snapshot) {
+      if (snapshot.docs.isNotEmpty) {
         return Interaction.fromFirestore(
-            doc as DocumentSnapshot<Map<String, dynamic>>);
+            snapshot.docs.first as DocumentSnapshot<Map<String, dynamic>>);
       }
       return null;
     });
@@ -1105,15 +1097,16 @@ class ForumRepository {
   }) async {
     try {
       final userId = await _currentUserCPId;
-      final docId = Interaction.generateDocumentId(
-        userCPId: userId,
-        targetType: 'post',
-        targetId: postId,
-      );
+
+      // First, query for existing interaction outside transaction
+      final existingInteractionQuery = await _interactions
+          .where('userCPId', isEqualTo: userId)
+          .where('targetType', isEqualTo: 'post')
+          .where('targetId', isEqualTo: postId)
+          .limit(1)
+          .get();
 
       await _firestore.runTransaction((transaction) async {
-        // Get current interaction if exists
-        final interactionDoc = await transaction.get(_interactions.doc(docId));
         final postDoc = await transaction.get(_posts.doc(postId));
 
         if (!postDoc.exists) {
@@ -1125,26 +1118,50 @@ class ForumRepository {
         int likeCountChange = 0;
         int dislikeCountChange = 0;
 
-        if (interactionDoc.exists) {
+        if (existingInteractionQuery.docs.isNotEmpty) {
           // User has an existing interaction
-          final currentInteraction = Interaction.fromFirestore(
-              interactionDoc as DocumentSnapshot<Map<String, dynamic>>);
-          final oldValue = currentInteraction.value;
+          final existingDoc = existingInteractionQuery.docs.first;
+          // Re-read the interaction document within the transaction to ensure consistency
+          final interactionDoc =
+              await transaction.get(_interactions.doc(existingDoc.id));
 
-          // Calculate count changes
-          if (oldValue == 1) likeCountChange = -1;
-          if (oldValue == -1) dislikeCountChange = -1;
-          if (value == 1) likeCountChange += 1;
-          if (value == -1) dislikeCountChange += 1;
+          if (interactionDoc.exists) {
+            final currentInteraction = Interaction.fromFirestore(
+                interactionDoc as DocumentSnapshot<Map<String, dynamic>>);
+            final oldValue = currentInteraction.value;
 
-          if (value == 0) {
-            // Remove interaction
-            transaction.delete(_interactions.doc(docId));
+            // Calculate count changes
+            if (oldValue == 1) likeCountChange = -1;
+            if (oldValue == -1) dislikeCountChange = -1;
+            if (value == 1) likeCountChange += 1;
+            if (value == -1) dislikeCountChange += 1;
+
+            if (value == 0) {
+              // Remove interaction
+              transaction.delete(_interactions.doc(existingDoc.id));
+            } else {
+              // Update interaction
+              final updatedInteraction = currentInteraction.updateValue(value);
+              transaction.set(_interactions.doc(existingDoc.id),
+                  updatedInteraction.toFirestore());
+            }
           } else {
-            // Update interaction
-            final updatedInteraction = currentInteraction.updateValue(value);
-            transaction.set(
-                _interactions.doc(docId), updatedInteraction.toFirestore());
+            // Document was deleted between query and transaction, treat as new interaction
+            if (value == 1) likeCountChange = 1;
+            if (value == -1) dislikeCountChange = 1;
+
+            if (value != 0) {
+              final newInteraction = Interaction.create(
+                targetType: 'post',
+                targetId: postId,
+                userCPId: userId,
+                type: 'like',
+                value: value,
+              );
+              // Use auto-generated document ID
+              transaction.set(
+                  _interactions.doc(), newInteraction.toFirestore());
+            }
           }
         } else {
           // New interaction
@@ -1159,8 +1176,8 @@ class ForumRepository {
               type: 'like',
               value: value,
             );
-            transaction.set(
-                _interactions.doc(docId), newInteraction.toFirestore());
+            // Use auto-generated document ID
+            transaction.set(_interactions.doc(), newInteraction.toFirestore());
           }
         }
 
@@ -1188,15 +1205,16 @@ class ForumRepository {
   }) async {
     try {
       final userId = await _currentUserCPId;
-      final docId = Interaction.generateDocumentId(
-        userCPId: userId,
-        targetType: 'comment',
-        targetId: commentId,
-      );
+
+      // First, query for existing interaction outside transaction
+      final existingInteractionQuery = await _interactions
+          .where('userCPId', isEqualTo: userId)
+          .where('targetType', isEqualTo: 'comment')
+          .where('targetId', isEqualTo: commentId)
+          .limit(1)
+          .get();
 
       await _firestore.runTransaction((transaction) async {
-        // Get current interaction if exists
-        final interactionDoc = await transaction.get(_interactions.doc(docId));
         final commentDoc = await transaction.get(_comments.doc(commentId));
 
         if (!commentDoc.exists) {
@@ -1208,26 +1226,50 @@ class ForumRepository {
         int likeCountChange = 0;
         int dislikeCountChange = 0;
 
-        if (interactionDoc.exists) {
+        if (existingInteractionQuery.docs.isNotEmpty) {
           // User has an existing interaction
-          final currentInteraction = Interaction.fromFirestore(
-              interactionDoc as DocumentSnapshot<Map<String, dynamic>>);
-          final oldValue = currentInteraction.value;
+          final existingDoc = existingInteractionQuery.docs.first;
+          // Re-read the interaction document within the transaction to ensure consistency
+          final interactionDoc =
+              await transaction.get(_interactions.doc(existingDoc.id));
 
-          // Calculate count changes
-          if (oldValue == 1) likeCountChange = -1;
-          if (oldValue == -1) dislikeCountChange = -1;
-          if (value == 1) likeCountChange += 1;
-          if (value == -1) dislikeCountChange += 1;
+          if (interactionDoc.exists) {
+            final currentInteraction = Interaction.fromFirestore(
+                interactionDoc as DocumentSnapshot<Map<String, dynamic>>);
+            final oldValue = currentInteraction.value;
 
-          if (value == 0) {
-            // Remove interaction
-            transaction.delete(_interactions.doc(docId));
+            // Calculate count changes
+            if (oldValue == 1) likeCountChange = -1;
+            if (oldValue == -1) dislikeCountChange = -1;
+            if (value == 1) likeCountChange += 1;
+            if (value == -1) dislikeCountChange += 1;
+
+            if (value == 0) {
+              // Remove interaction
+              transaction.delete(_interactions.doc(existingDoc.id));
+            } else {
+              // Update interaction
+              final updatedInteraction = currentInteraction.updateValue(value);
+              transaction.set(_interactions.doc(existingDoc.id),
+                  updatedInteraction.toFirestore());
+            }
           } else {
-            // Update interaction
-            final updatedInteraction = currentInteraction.updateValue(value);
-            transaction.set(
-                _interactions.doc(docId), updatedInteraction.toFirestore());
+            // Document was deleted between query and transaction, treat as new interaction
+            if (value == 1) likeCountChange = 1;
+            if (value == -1) dislikeCountChange = 1;
+
+            if (value != 0) {
+              final newInteraction = Interaction.create(
+                targetType: 'comment',
+                targetId: commentId,
+                userCPId: userId,
+                type: 'like',
+                value: value,
+              );
+              // Use auto-generated document ID
+              transaction.set(
+                  _interactions.doc(), newInteraction.toFirestore());
+            }
           }
         } else {
           // New interaction
@@ -1242,8 +1284,8 @@ class ForumRepository {
               type: 'like',
               value: value,
             );
-            transaction.set(
-                _interactions.doc(docId), newInteraction.toFirestore());
+            // Use auto-generated document ID
+            transaction.set(_interactions.doc(), newInteraction.toFirestore());
           }
         }
 

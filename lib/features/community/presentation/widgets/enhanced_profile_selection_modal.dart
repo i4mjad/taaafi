@@ -635,7 +635,8 @@ class _EnhancedProfileSelectionModalState
 
     try {
       final service = ref.read(communityServiceProvider);
-      await service.restoreProfile(profileId, bypassLatestCheck: hasPlus);
+      await service.restoreProfile(profileId,
+          bypassLatestCheck: hasPlus, userHasPlusSubscription: hasPlus);
 
       if (mounted) {
         // Refresh profile cache

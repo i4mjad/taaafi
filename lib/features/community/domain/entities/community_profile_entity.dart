@@ -173,19 +173,16 @@ class CommunityProfileEntity {
   String getDisplayNameWithPipeline() {
     // 1. First check if user is deleted - if yes, display "deleted" text
     if (isDeleted) {
-      print('🔍 [CommunityProfileEntity] -> Returning DELETED_USER');
       return 'DELETED_USER'; // This will be localized in the UI
     }
 
     // 2. Then check if they are anonymous - if yes, don't show their name
     if (isAnonymous) {
-      print('🔍 [CommunityProfileEntity] -> Returning ANONYMOUS_USER');
       return 'ANONYMOUS_USER'; // This will be localized in the UI
     }
 
     // 3. If neither deleted nor anonymous, display their actual name
     final result = displayName.isNotEmpty ? displayName : 'Community Member';
-    print('🔍 [CommunityProfileEntity] -> Returning actual name: "$result"');
     return result;
   }
 

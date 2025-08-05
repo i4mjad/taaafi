@@ -59,8 +59,7 @@ class QuickActionsWidget extends ConsumerWidget {
         color: theme.warn[600]!,
         onTap: () {
           HapticFeedback.lightImpact();
-          //TODO: Add statistics screen (this is only for premium users)
-          // TODO: Navigate to statistics screen
+          context.goNamed(RouteNames.vault.name);
         },
       ),
     ];

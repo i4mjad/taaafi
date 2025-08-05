@@ -401,8 +401,7 @@ final postCreationProvider =
 final postDetailProvider =
     StreamProvider.family.autoDispose<Post?, String>((ref, postId) {
   final user = ref.watch(firebaseAuthProvider).currentUser;
-  print(
-      '🔍 [postDetailProvider] Creating for postId: $postId, user: ${user?.uid}');
+
   final repository = ref.watch(forumRepositoryProvider);
   return repository.watchPost(postId);
 });

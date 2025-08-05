@@ -1596,6 +1596,16 @@ const Map<String, String> kAr = {
   'search_posts': 'البحث في المنشورات',
   'search_placeholder': 'ابحث في المنشورات...',
   'filters': 'المرشحات',
+  "no-follow-ups-found": "لا يوجد مُتَابعات",
+  "start-logging-to-see-data":
+      "ابدأ بإضافة مُتَابعاتك اليومية بشكل مستمر لرؤية البيانات هنا",
+  "error-loading-data": "خطأ في تحميل البيانات",
+  "subscription-status": "حالة الاشتراك",
+
+  "subscription-active-warning": "لديك اشتراك تعافي+",
+  "subscription-active-warning-desc":
+      "لا يمكنك حذف الحساب قبل إلغاء الاشتراك. لحذف الحساب٬ قم بإلغاء الاشتراك في متجر البرامج",
+
   'search_results': 'نتائج البحث',
   'no_results_found': 'لم يتم العثور على نتائج',
   'apply_filters': 'تطبيق المرشحات',
@@ -2592,4 +2602,9 @@ const Map<String, String> kAr = {
   "no-previous-profiles-found": "لا توجد ملفات شخصية سابقة للاستعادة",
   "profile-already-exists": "لديك بالفعل ملف شخصي نشط في المجتمع",
   "deletion-in-progress-message": "جاري حذف الملف الشخصي. يرجى الانتظار...",
+
+  // Subscription active modal
+  "subscription-active-title": "اشتراك نشط",
+  "subscription-active-message":
+      "لديك اشتراك نشط في تعافي+. يرجى إلغاء اشتراكك أولاً قبل حذف حسابك. يمكنك إلغاء اشتراكك في متجر التطبيقات.",
 };
