@@ -774,6 +774,9 @@ class ForumRepository {
 
   /// Stream of a single post
   Stream<Post?> watchPost(String postId) {
+    final user = FirebaseAuth.instance.currentUser;
+    print(
+        '  [ForumRepository] watchPost for postId: $postId, user: ${user?.uid}');
     return _posts.doc(postId).snapshots().map((doc) {
       if (doc.exists) {
         return Post.fromFirestore(

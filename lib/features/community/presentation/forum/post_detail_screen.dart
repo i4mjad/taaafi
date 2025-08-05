@@ -57,9 +57,19 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
     final postAsync = ref.watch(postDetailProvider(widget.postId));
     final commentsAsync = ref.watch(postCommentsProvider(widget.postId));
     final replyState = ref.watch(replyStateProvider);
+    print('🔍 [PostDetailScreen] build for postId: ${widget.postId}');
+    print(
+        '🔍 [PostDetailScreen] postAsync state: data=${postAsync.hasValue}, error=${postAsync.hasError}, loading=${postAsync.isLoading}');
+    if (postAsync.hasError) {
+      print(
+          '🚨 [PostDetailScreen] postAsync error content: ${postAsync.error}');
+      print(
+          '🚨 [PostDetailScreen] postAsync stackTrace: ${postAsync.stackTrace}');
+    }
 
     return postAsync.when(
       data: (post) {
+        print("✅ [PostDetailScreen] post data received: $post");
         if (post == null) {
           return _buildPostNotFound(theme, localizations);
         }

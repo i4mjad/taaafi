@@ -10,6 +10,7 @@ import '../../domain/repositories/community_repository.dart';
 import '../../domain/services/community_service.dart';
 import '../../domain/services/community_service_impl.dart';
 import 'package:reboot_app_3/features/shared/models/follow_up.dart';
+import 'package:reboot_app_3/features/authentication/data/repositories/auth_repository.dart';
 
 // =============================================================================
 // EXTERNAL DEPENDENCIES
@@ -17,6 +18,9 @@ import 'package:reboot_app_3/features/shared/models/follow_up.dart';
 
 /// Provider for Firebase Firestore instance
 final firestoreProvider = Provider<FirebaseFirestore>((ref) {
+  // By watching auth state, this provider will re-create the Firestore instance
+  // whenever the user logs in or out, ensuring fresh authentication state.
+  ref.watch(authStateChangesProvider);
   return FirebaseFirestore.instance;
 });
 
@@ -43,6 +47,11 @@ final communityRemoteDatasourceProvider =
 
 /// Provider for community repository
 final communityRepositoryProvider = Provider<CommunityRepository>((ref) {
+  // This provider now depends on the auth state.
+  // When the auth state changes, this provider will be re-evaluated,
+  // creating a new CommunityRepositoryImpl with the correct (or null) user.
+  ref.watch(authStateChangesProvider);
+
   final remoteDatasource = ref.watch(communityRemoteDatasourceProvider);
   return CommunityRepositoryImpl(remoteDatasource);
 });
@@ -65,8 +74,12 @@ final communityServiceProvider = Provider<CommunityService>((ref) {
 
 /// Provider to get community profile by CPId - simplified version
 /// Always returns a profile, even for missing/deleted ones
-final communityProfileByIdProvider =
-    StreamProvider.family<CommunityProfileEntity, String>((ref, cpId) {
+final communityProfileByIdProvider = StreamProvider.family
+    .autoDispose<CommunityProfileEntity, String>((ref, cpId) {
+  // By watching the auth state, this provider will be re-evaluated
+  // whenever the user logs in or out, ensuring a fresh stream is created.
+  ref.watch(authStateChangesProvider);
+
   final firestore = ref.watch(firestoreProvider);
   return firestore
       .collection('communityProfiles')
@@ -125,12 +138,34 @@ final communityProfileByIdProvider =
 /// Provider for current user's community profile
 final currentCommunityProfileProvider =
     StreamProvider<CommunityProfileEntity?>((ref) {
-  final service = ref.watch(communityServiceProvider);
-  return service.watchProfile();
+  // Watch auth state to ensure user is authenticated before attempting to load profile
+  final authState = ref.watch(authStateChangesProvider);
+
+  return authState.when(
+    data: (user) {
+      if (user != null) {
+        // Only watch profile when there's an authenticated user
+        final service = ref.watch(communityServiceProvider);
+        return service.watchProfile();
+      } else {
+        // Return empty stream when no user is authenticated
+        return Stream.value(null);
+      }
+    },
+    loading: () => Stream.value(null),
+    error: (_, __) => Stream.error('Authentication error'),
+  );
 });
 
 /// Provider to check if current user has a community profile
 final hasCommunityProfileProvider = FutureProvider<bool>((ref) async {
+  // Wait for auth state before checking profile
+  final authState = await ref.watch(authStateChangesProvider.future);
+
+  if (authState == null) {
+    return false;
+  }
+
   final service = ref.watch(communityServiceProvider);
   return service.hasProfile();
 });
@@ -138,6 +173,13 @@ final hasCommunityProfileProvider = FutureProvider<bool>((ref) async {
 /// Provider to check if current user has a groups profile
 /// For now, this is the same as having a community profile
 final hasGroupsProfileProvider = FutureProvider<bool>((ref) async {
+  // Wait for auth state before checking profile
+  final authState = await ref.watch(authStateChangesProvider.future);
+
+  if (authState == null) {
+    return false;
+  }
+
   final service = ref.watch(communityServiceProvider);
   return service.hasProfile();
 });

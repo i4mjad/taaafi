@@ -164,8 +164,8 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen>
         loading: () => const Center(child: Spinner()),
         error: (error, stackTrace) {
           print('❌ Community Main Screen: Profile error: $error');
-          // On profile error, show onboarding to be safe
-          return const CommunityOnboardingScreen();
+          print("stackTrace: $stackTrace");
+          return const Center(child: Text('Error loading profile'));
         },
         data: (profile) {
           // Simple logic: if user has active profile, show main content; otherwise show onboarding

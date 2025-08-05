@@ -12,6 +12,10 @@ import 'package:reboot_app_3/features/authentication/providers/account_status_pr
 import 'package:reboot_app_3/features/authentication/providers/user_document_provider.dart';
 import 'package:reboot_app_3/core/shared_widgets/snackbar.dart';
 import 'package:reboot_app_3/features/authentication/providers/user_provider.dart';
+import 'package:reboot_app_3/features/community/presentation/providers/community_providers_new.dart'
+    hide firebaseAuthProvider;
+import 'package:reboot_app_3/features/community/presentation/providers/forum_providers.dart'
+    hide firebaseAuthProvider;
 import 'package:reboot_app_3/features/vault/data/streaks/streak_repository.dart';
 import 'package:reboot_app_3/features/vault/data/streaks/streak_notifier.dart';
 import 'package:reboot_app_3/core/routing/app_startup.dart';
@@ -349,6 +353,14 @@ class AuthService {
       ref.invalidate(detailedStreakInfoProvider);
       ref.invalidate(userDocumentsNotifierProvider);
       ref.invalidate(userNotifierProvider);
+      // Manually invalidate the repository provider to ensure it's recreated on next login.
+      ref.invalidate(forumRepositoryProvider);
+      // No longer needed to invalidate these manually, they depend on auth state.
+      // ref.invalidate(currentCommunityProfileProvider);
+      // // Community and forum providers
+      // ref.invalidate(communityServiceProvider);
+      // ref.invalidate(forumRepositoryProvider);
+      // ref.invalidate(forumServiceProvider);
 
       // Invalidate app startup to re-initialize RevenueCat for logout
       _invalidateAppStartup();

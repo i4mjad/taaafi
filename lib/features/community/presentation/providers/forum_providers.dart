@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:reboot_app_3/features/authentication/data/repositories/auth_repository.dart';
 import 'package:reboot_app_3/features/community/data/models/post_category.dart';
 import 'package:reboot_app_3/features/community/data/models/post.dart';
 import 'package:reboot_app_3/features/community/data/models/comment.dart';
@@ -101,7 +102,20 @@ class PostFilterParams {
 }
 
 // Forum Repository Provider
-final forumRepositoryProvider = Provider<ForumRepository>((ref) {
+final forumRepositoryProvider = Provider.autoDispose<ForumRepository>((ref) {
+  // Keep the provider alive even if no longer listened to,
+  // so it's not re-created unnecessarily.
+  final link = ref.keepAlive();
+  // When the auth state changes, this provider will be re-evaluated.
+  ref.watch(authStateChangesProvider);
+
+  // When the provider is disposed (e.g., during sign out),
+  // cancel the keepAlive link.
+  ref.onDispose(() {
+    link.close();
+  });
+
+  print('🔄 [forumRepositoryProvider] Creating new ForumRepository instance.');
   return ForumRepository();
 });
 
@@ -385,6 +399,9 @@ final postCreationProvider =
 /// Provider for a specific post detail
 final postDetailProvider =
     StreamProvider.family.autoDispose<Post?, String>((ref, postId) {
+  final user = ref.watch(firebaseAuthProvider).currentUser;
+  print(
+      '🔍 [postDetailProvider] Creating for postId: $postId, user: ${user?.uid}');
   final repository = ref.watch(forumRepositoryProvider);
   return repository.watchPost(postId);
 });
