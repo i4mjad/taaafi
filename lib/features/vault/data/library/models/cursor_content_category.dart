@@ -25,4 +25,24 @@ class CursorContentCategory {
       isActive: data['isActive'] as bool,
     );
   }
+
+  factory CursorContentCategory.fromJson(Map<String, dynamic> json) {
+    return CursorContentCategory(
+      id: json['id'] as String,
+      name: json['name'] as String,
+      nameAr: json['nameAr'] as String?,
+      iconName: json['iconName'] as String,
+      isActive: json['isActive'] as bool,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'nameAr': nameAr,
+      'iconName': iconName,
+      'isActive': isActive,
+    };
+  }
 }

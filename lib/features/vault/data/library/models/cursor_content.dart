@@ -30,4 +30,38 @@ class CursorContent {
     required this.isActive,
     required this.isDeleted,
   });
+
+  factory CursorContent.fromJson(Map<String, dynamic> json) {
+    return CursorContent(
+      id: json['id'] as String,
+      category: CursorContentCategory.fromJson(json['category'] as Map<String, dynamic>),
+      language: json['language'] as String,
+      link: json['link'] as String,
+      name: json['name'] as String,
+      nameAr: json['nameAr'] as String?,
+      owner: CursorContentOwner.fromJson(json['owner'] as Map<String, dynamic>),
+      type: CursorContentType.fromJson(json['type'] as Map<String, dynamic>),
+      createdAt: DateTime.fromMillisecondsSinceEpoch(json['createdAt'] as int),
+      updatedAt: DateTime.fromMillisecondsSinceEpoch(json['updatedAt'] as int),
+      isActive: json['isActive'] as bool,
+      isDeleted: json['isDeleted'] as bool,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'category': category.toJson(),
+      'language': language,
+      'link': link,
+      'name': name,
+      'nameAr': nameAr,
+      'owner': owner.toJson(),
+      'type': type.toJson(),
+      'createdAt': createdAt.millisecondsSinceEpoch,
+      'updatedAt': updatedAt.millisecondsSinceEpoch,
+      'isActive': isActive,
+      'isDeleted': isDeleted,
+    };
+  }
 }

@@ -25,4 +25,24 @@ class CursorContentOwner {
       isActive: data['isActive'] as bool,
     );
   }
+
+  factory CursorContentOwner.fromJson(Map<String, dynamic> json) {
+    return CursorContentOwner(
+      id: json['id'] as String,
+      name: json['name'] as String,
+      nameAr: json['nameAr'] as String?,
+      source: json['source'] as String,
+      isActive: json['isActive'] as bool,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'nameAr': nameAr,
+      'source': source,
+      'isActive': isActive,
+    };
+  }
 }

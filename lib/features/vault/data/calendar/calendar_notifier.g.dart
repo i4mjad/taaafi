@@ -43,7 +43,7 @@ final calendarServiceProvider = Provider<CalendarService>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef CalendarServiceRef = ProviderRef<CalendarService>;
-String _$calendarNotifierHash() => r'ec378fe4f66cbef83ab24811009c7e3e4145cb8c';
+String _$calendarNotifierHash() => r'87eb31d48e0e3bd06ca4953504747b1a7b75e063';
 
 /// See also [CalendarNotifier].
 @ProviderFor(CalendarNotifier)

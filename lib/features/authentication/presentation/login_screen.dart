@@ -88,7 +88,7 @@ class _LogInScreenState extends ConsumerState<LogInScreen> {
                   AppLocalizations.of(context).translate('or-login-with'),
                   style: TextStyles.caption.copyWith(color: theme.primary[600]),
                 ),
-                verticalSpace(Spacing.points12),
+                verticalSpace(Spacing.points16),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -155,6 +155,10 @@ class _LogInScreenState extends ConsumerState<LogInScreen> {
                             : SvgPicture.asset(
                                 'asset/icons/apple-icon.svg',
                                 semanticsLabel: 'Apple Logo',
+                                colorFilter: ColorFilter.mode(
+                                  theme.grey[900]!,
+                                  BlendMode.srcIn,
+                                ),
                               ),
                       ),
                     ),
@@ -291,7 +295,7 @@ class _SignInFormState extends ConsumerState<SignInForm> {
               return null;
             },
           ),
-          verticalSpace(Spacing.points8),
+          verticalSpace(Spacing.points20),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -320,7 +324,7 @@ class _SignInFormState extends ConsumerState<SignInForm> {
               ),
             ],
           ),
-          verticalSpace(Spacing.points16),
+          verticalSpace(Spacing.points20),
           GestureDetector(
             onTap: _isEmailProcessing
                 ? null

@@ -23,6 +23,25 @@ final libraryServiceProvider = AutoDisposeProvider<LibraryService>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef LibraryServiceRef = AutoDisposeProviderRef<LibraryService>;
+String _$cachedLibraryServiceHash() =>
+    r'5d27e97f11529caa0d3c7f15c4bbbdf84f90722c';
+
+/// See also [cachedLibraryService].
+@ProviderFor(cachedLibraryService)
+final cachedLibraryServiceProvider =
+    AutoDisposeProvider<CachedLibraryService>.internal(
+  cachedLibraryService,
+  name: r'cachedLibraryServiceProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$cachedLibraryServiceHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef CachedLibraryServiceRef = AutoDisposeProviderRef<CachedLibraryService>;
 String _$libraryRepositoryHash() => r'8b4acbeba8d0e25621d8453b09dd650fe877f98f';
 
 /// See also [libraryRepository].
@@ -41,7 +60,7 @@ final libraryRepositoryProvider =
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef LibraryRepositoryRef = AutoDisposeProviderRef<LibraryRepository>;
-String _$libraryNotifierHash() => r'ab85ccefc38ec64850ab32cf86e6929b28b30af4';
+String _$libraryNotifierHash() => r'e6fcdd30f5fe7fe41305dabcf733b3b0204d59d2';
 
 /// See also [LibraryNotifier].
 @ProviderFor(LibraryNotifier)

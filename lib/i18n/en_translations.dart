@@ -11,6 +11,8 @@ const Map<String, String> kEn = {
   "motivation": "Motivation",
   "dob-too-young": "You can't select a date of birth before 2010",
   "i-accept-terms-of-use": "I accept the terms of use",
+  "email-change-logout-warning":
+      "Important: You might be suddenly logged out during this process. Don't worry - this means you can now log in with your new email address.",
   "notification-promotion":
       "Get daily activities reminders, motivational quotes to inspire you on your recovery journey",
   "enable": "Enable",

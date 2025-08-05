@@ -403,7 +403,7 @@ final shouldShowReportButtonProvider = AutoDisposeFutureProvider<bool>.internal(
 // ignore: unused_element
 typedef ShouldShowReportButtonRef = AutoDisposeFutureProviderRef<bool>;
 String _$userReportsNotifierHash() =>
-    r'99123358649a00f5fdb5a6839a2ecaf0b2f257c9';
+    r'ce370ff81250dc8862a8a623e1480b69425e6285';
 
 /// See also [UserReportsNotifier].
 @ProviderFor(UserReportsNotifier)

@@ -36,29 +36,50 @@ class LibraryScreen extends ConsumerWidget {
         appBar: appBar(context, ref, "library", false, true),
         body: libraryNotifier.when(
           data: (library) => SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Container(
-                width: width,
-                child: SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      _searchWidget(theme, context),
-                      verticalSpace(Spacing.points16),
-                      LatestAdditionsWidget(library.latestContent),
-                      verticalSpace(Spacing.points16),
-                      FeaturedListsWidget(library.featuredLists),
-                      verticalSpace(Spacing.points16),
-                      ContentTypesWidget(library.contentTypes)
-                    ],
+            child: RefreshIndicator(
+              onRefresh: () async {
+                await ref.read(libraryNotifierProvider.notifier).refresh();
+              },
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Container(
+                  width: width,
+                  child: SingleChildScrollView(
+                    physics:
+                        const AlwaysScrollableScrollPhysics(), // Enables pull-to-refresh even when content is short
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        _searchWidget(theme, context),
+                        verticalSpace(Spacing.points16),
+                        LatestAdditionsWidget(library.latestContent),
+                        verticalSpace(Spacing.points16),
+                        FeaturedListsWidget(library.featuredLists),
+                        verticalSpace(Spacing.points16),
+                        ContentTypesWidget(library.contentTypes)
+                      ],
+                    ),
                   ),
                 ),
               ),
             ),
           ),
-          error: (error, stackTrace) => Center(child: Text('Error: $error')),
+          error: (error, stackTrace) => SafeArea(
+            child: RefreshIndicator(
+              onRefresh: () async {
+                await ref.read(libraryNotifierProvider.notifier).refresh();
+              },
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                child: Container(
+                  height: height -
+                      200, // Ensure sufficient height for pull-to-refresh
+                  child: Center(child: Text('Error: $error')),
+                ),
+              ),
+            ),
+          ),
           loading: () => Center(child: Spinner()),
         ));
   }

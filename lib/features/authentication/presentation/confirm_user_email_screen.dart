@@ -737,69 +737,38 @@ class _ConfirmUserEmailScreenState
 
         verticalSpace(Spacing.points16),
 
-        // Change email option (always available in step 2)
+        // Warning message about potential logout
         Container(
-          padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.all(16.0),
           decoration: BoxDecoration(
-            color: theme.warn[50],
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: theme.warn[200]!, width: 1),
+            color: theme.primary[50],
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: theme.primary[200]),
           ),
-          child: Column(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    LucideIcons.alertCircle,
-                    color: theme.warn[600],
-                    size: 16,
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    AppLocalizations.of(context)
-                        .translate('wrong-email-question'),
-                    style: TextStyles.footnote.copyWith(
-                      color: theme.warn[700],
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
+              Icon(
+                LucideIcons.badgeAlert,
+                color: theme.primary[600],
+                size: 20,
               ),
-              verticalSpace(Spacing.points8),
-              GestureDetector(
-                onTap: _showChangeEmailBottomSheet,
-                child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: theme.warn[100],
-                    borderRadius: BorderRadius.circular(6),
-                    border: Border.all(color: theme.warn[300]!, width: 1),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        LucideIcons.edit2,
-                        color: theme.warn[700],
-                        size: 14,
-                      ),
-                      const SizedBox(width: 6),
-                      Text(
-                        AppLocalizations.of(context).translate('change-email'),
-                        style: TextStyles.footnote.copyWith(
-                          color: theme.warn[700],
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  AppLocalizations.of(context)
+                      .translate('email-change-logout-warning'),
+                  style: TextStyles.body.copyWith(
+                    color: theme.primary[800],
+                    height: 1.4,
                   ),
                 ),
               ),
             ],
           ),
         ),
+
+        verticalSpace(Spacing.points16),
       ],
     );
   }
