@@ -352,12 +352,17 @@ class CommunityScreenStateNotifier extends StateNotifier<CommunityScreenState> {
   /// Check if user has community profile and set appropriate state
   Future<void> _checkCommunityState() async {
     try {
+      print('🔍 [CommunityScreenStateNotifier] Checking community state...');
       Future.microtask(() {
         state = CommunityScreenState.loading;
       });
 
       // Check if user has an ACTIVE (non-deleted) community profile
+      print(
+          '🔍 [CommunityScreenStateNotifier] Checking if user has active profile...');
       final hasActiveProfile = await _communityService.hasProfile();
+      print(
+          '🔍 [CommunityScreenStateNotifier] Has active profile: $hasActiveProfile');
 
       if (hasActiveProfile) {
         // Add small delay for newly created profiles to allow system sync
@@ -365,25 +370,37 @@ class CommunityScreenStateNotifier extends StateNotifier<CommunityScreenState> {
           final currentProfile =
               _ref.read(currentCommunityProfileProvider).valueOrNull;
           if (currentProfile != null) {
+            print(
+                '🔍 [CommunityScreenStateNotifier] Current profile found: ${currentProfile.displayName}');
             final profileAge =
                 DateTime.now().difference(currentProfile.createdAt);
             if (profileAge.inSeconds < 5) {
+              print(
+                  '🔍 [CommunityScreenStateNotifier] Profile is new, adding delay...');
               await Future.delayed(Duration(seconds: 1));
             }
           }
         } catch (e) {
+          print(
+              '🔍 [CommunityScreenStateNotifier] Error checking profile age: $e');
           // Could not check profile age, proceeding normally
         }
 
+        print(
+            '🔍 [CommunityScreenStateNotifier] Setting state to showMainContent');
         Future.microtask(() {
           state = CommunityScreenState.showMainContent;
         });
       } else {
+        print(
+            '🔍 [CommunityScreenStateNotifier] Setting state to needsOnboarding');
         Future.microtask(() {
           state = CommunityScreenState.needsOnboarding;
         });
       }
     } catch (e) {
+      print(
+          '🔍 [CommunityScreenStateNotifier] Error in _checkCommunityState: $e');
       // On error, default to onboarding to be safe
       Future.microtask(() {
         state = CommunityScreenState.needsOnboarding;

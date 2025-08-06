@@ -243,30 +243,10 @@ class ForumRepository {
     bool? isPinned,
   }) async {
     try {
-      Query query = _posts.orderBy('createdAt', descending: true);
-
-      // Debug logging for news category
-      if (category == 'aqOhcyOg1z8tcij0y1S4') {
-        // Let's also check what categories actually exist in the database
-        try {
-          final allPostsSnapshot = await _posts.limit(10).get();
-          for (var doc in allPostsSnapshot.docs.take(5)) {
-            final data = doc.data() as Map<String, dynamic>;
-          }
-
-          // Check if any posts have news-related content
-          final possibleNewsSnapshot = await _posts
-              .where('category',
-                  whereIn: ['news', 'News', 'NEWS', 'aqOhcyOg1z8tcij0y1S4'])
-              .limit(5)
-              .get();
-          for (var doc in possibleNewsSnapshot.docs) {
-            final data = doc.data() as Map<String, dynamic>;
-          }
-        } catch (e) {
-          print('🔍 DEBUG: Error checking existing posts: $e');
-        }
-      }
+      Query query = _posts
+          .where('isDeleted',
+              isEqualTo: false) // Filter deleted posts at source
+          .orderBy('createdAt', descending: true);
 
       if (category != null && category.isNotEmpty) {
         query = query.where('category', isEqualTo: category);
@@ -284,25 +264,19 @@ class ForumRepository {
 
       final QuerySnapshot snapshot = await query.get();
 
-      // Filter out deleted posts in code since some posts might not have the field
+      // Convert to Post objects - no need for client-side filtering since we filtered at source
       final posts = snapshot.docs
           .map((doc) =>
               Post.fromFirestore(doc as DocumentSnapshot<Map<String, dynamic>>))
-          .where((post) => !post
-              .isDeleted) // This will handle missing fields thanks to default value
           .toList();
 
-      // Debug logging for news category
-      if (category == 'aqOhcyOg1z8tcij0y1S4') {
-        print(
-            '🔍 DEBUG: After filtering deleted posts: ${posts.length} posts remain');
-      }
-
-      return PostsPage(
+      final result = PostsPage(
         posts: posts,
         lastDocument: snapshot.docs.isNotEmpty ? snapshot.docs.last : null,
         hasMore: snapshot.docs.length == limit,
       );
+
+      return result;
     } catch (e) {
       throw Exception('Failed to fetch posts: $e');
     }
@@ -387,6 +361,7 @@ class ForumRepository {
   }) async {
     Query query = _posts
         .where('authorCPId', whereIn: authorCPIds)
+        .where('isDeleted', isEqualTo: false) // Filter deleted posts at source
         .orderBy('createdAt', descending: true);
 
     if (category != null && category.isNotEmpty) {
@@ -407,7 +382,6 @@ class ForumRepository {
     final posts = snapshot.docs
         .map((doc) =>
             Post.fromFirestore(doc as DocumentSnapshot<Map<String, dynamic>>))
-        .where((post) => !post.isDeleted)
         .toList();
 
     return PostsPage(
@@ -447,7 +421,9 @@ class ForumRepository {
     String? category,
     bool? isPinned,
   }) {
-    Query query = _posts.orderBy('createdAt', descending: true);
+    Query query = _posts
+        .where('isDeleted', isEqualTo: false) // Filter deleted posts at source
+        .orderBy('createdAt', descending: true);
 
     if (category != null && category.isNotEmpty) {
       query = query.where('category', isEqualTo: category);
@@ -458,12 +434,10 @@ class ForumRepository {
     }
 
     return query.limit(limit).snapshots().map((snapshot) {
-      // Filter out deleted posts in code since some posts might not have the field
+      // Convert to Post objects - no client-side filtering needed
       final posts = snapshot.docs
           .map((doc) =>
               Post.fromFirestore(doc as DocumentSnapshot<Map<String, dynamic>>))
-          .where((post) => !post
-              .isDeleted) // This will handle missing fields thanks to default value
           .toList();
 
       return posts;

@@ -2028,6 +2028,7 @@ const Map<String, String> kEn = {
   "trigger-celebration": "Celebration",
   "trigger-anxiety": "Anxiety",
   "trigger-depression": "Depression",
+  "load_more": "Load more",
 
   // Risk clock
   "highest-risk-hour": "Highest risk: {hour}",

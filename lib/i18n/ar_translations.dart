@@ -1887,6 +1887,7 @@ const Map<String, String> kAr = {
   "trigger-celebration": "احتفال",
   "trigger-anxiety": "قلق",
   "trigger-depression": "اكتئاب",
+  "load_more": "تحميل المزيد",
 
   // Risk clock
   "highest-risk-hour": "أعلى خطورة: {hour}",

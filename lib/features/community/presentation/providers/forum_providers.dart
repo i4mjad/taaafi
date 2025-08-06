@@ -116,7 +116,6 @@ final forumRepositoryProvider = Provider.autoDispose<ForumRepository>((ref) {
     link.close();
   });
 
-  print('🔄 [forumRepositoryProvider] Creating new ForumRepository instance.');
   return ForumRepository();
 });
 
@@ -929,10 +928,13 @@ class PostsPaginationNotifier extends StateNotifier<PostsPaginationState> {
 
   /// Loads the first page of posts with optional gender filtering
   Future<void> loadPosts({String? category, bool? isPinned}) async {
-    if (state.isLoading) return;
+    if (state.isLoading) {
+      return;
+    }
 
     // Check if user has community profile before loading posts
     final communityState = _ref.read(communityScreenStateProvider);
+
     if (communityState != CommunityScreenState.showMainContent) {
       state = state.copyWith(
         posts: <Post>[],
@@ -947,15 +949,18 @@ class PostsPaginationNotifier extends StateNotifier<PostsPaginationState> {
 
     try {
       // Get current user's gender for mandatory filtering
+
       final currentProfile = await _getCurrentUserProfile();
 
       // Determine if gender filtering should be applied based on content type
       final filterParams =
           PostFilterParams(category: category, isPinned: isPinned);
-      final shouldApplyGenderFilter = filterParams.shouldApplyGenderFilter;
+      // TEMPORARY: Disable gender filtering for posts list screen to show all posts like main screen
+      final shouldApplyGenderFilter =
+          false; // filterParams.shouldApplyGenderFilter;
 
       final page = await _repository.getPosts(
-        limit: 10,
+        limit: 25, // Restored to 25 for better user experience
         category: category,
         isPinned: isPinned,
         userGender: currentProfile?.gender,
@@ -986,10 +991,12 @@ class PostsPaginationNotifier extends StateNotifier<PostsPaginationState> {
       // Determine if gender filtering should be applied based on content type
       final filterParams =
           PostFilterParams(category: category, isPinned: isPinned);
-      final shouldApplyGenderFilter = filterParams.shouldApplyGenderFilter;
+      // TEMPORARY: Disable gender filtering for posts list screen to show all posts like main screen
+      final shouldApplyGenderFilter =
+          false; // filterParams.shouldApplyGenderFilter;
 
       final page = await _repository.getPosts(
-        limit: 10,
+        limit: 25, // Restored to 25 for better user experience
         lastDocument: state.lastDocument,
         category: category,
         isPinned: isPinned,

@@ -11,6 +11,7 @@ import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/features/community/presentation/widgets/threads_post_card.dart';
 import 'package:reboot_app_3/features/community/presentation/providers/forum_providers.dart';
+import 'package:reboot_app_3/features/community/presentation/providers/community_providers_new.dart';
 import 'package:reboot_app_3/features/community/presentation/widgets/advanced_search_modal.dart';
 import 'package:reboot_app_3/features/community/data/models/post_search_filters.dart';
 import 'package:reboot_app_3/features/community/data/models/post_category.dart';
@@ -35,8 +36,13 @@ class _PostsListScreenState extends ConsumerState<PostsListScreen> {
     _searchController.addListener(_onSearchChanged);
     // Load posts when screen initializes
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(postsPaginationProvider.notifier).loadPosts();
+      _initializePosts();
     });
+  }
+
+  /// Initialize posts loading with debugging
+  void _initializePosts() {
+    ref.read(postsPaginationProvider.notifier).loadPosts();
   }
 
   @override
@@ -50,19 +56,17 @@ class _PostsListScreenState extends ConsumerState<PostsListScreen> {
   void _onScroll() {
     final scrollPosition = _scrollController.position.pixels;
 
-    // Load more posts when near the bottom
+    // Only auto-load for search results, not for regular posts (which use manual pagination)
     if (scrollPosition >= _scrollController.position.maxScrollExtent - 200) {
       final hasActiveSearch = _searchQuery.isNotEmpty || _activeFilters != null;
 
       if (hasActiveSearch) {
-        // Load more search results
+        // Load more search results automatically for search
         ref
             .read(searchPostsPaginationProvider.notifier)
             .loadMoreSearchResults();
-      } else {
-        // Load more regular posts
-        ref.read(postsPaginationProvider.notifier).loadMorePosts();
       }
+      // Regular posts now use manual "Load More" button instead of auto-pagination
     }
   }
 
@@ -155,6 +159,16 @@ class _PostsListScreenState extends ConsumerState<PostsListScreen> {
   Widget build(BuildContext context) {
     final theme = AppTheme.of(context);
     final localizations = AppLocalizations.of(context);
+
+    // Listen to community state changes and load posts
+    ref.listen<CommunityScreenState>(communityScreenStateProvider,
+        (previous, next) {
+      if (next == CommunityScreenState.showMainContent && previous != next) {
+        Future.delayed(Duration(milliseconds: 100), () {
+          ref.read(postsPaginationProvider.notifier).loadPosts();
+        });
+      }
+    });
 
     return Scaffold(
       appBar: appBar(
@@ -430,13 +444,12 @@ class _PostsListScreenState extends ConsumerState<PostsListScreen> {
         ),
       );
     } else {
-      // Show regular posts
+      // Show regular posts with manual pagination
+
       final postsState = ref.watch(postsPaginationProvider);
 
       if (postsState.posts.isEmpty && postsState.isLoading) {
-        return const Center(
-          child: Spinner(),
-        );
+        return const Center(child: Spinner());
       }
 
       if (postsState.posts.isEmpty && postsState.error != null) {
@@ -490,21 +503,60 @@ class _PostsListScreenState extends ConsumerState<PostsListScreen> {
         );
       }
 
+      print(
+          '🔍 [PostsListScreen] Displaying ${postsState.posts.length} posts with manual pagination');
+
       return RefreshIndicator(
         onRefresh: () async {
           await ref.read(postsPaginationProvider.notifier).refresh();
         },
         child: ListView.builder(
           controller: _scrollController,
-          itemCount: postsState.posts.length + (postsState.isLoading ? 1 : 0),
+          itemCount: postsState.posts.length + (postsState.hasMore ? 1 : 0),
           itemBuilder: (context, index) {
             if (index == postsState.posts.length) {
-              // Loading indicator at the bottom
-              return const Center(
-                child: Padding(
-                  padding: EdgeInsets.all(16.0),
-                  child: Spinner(),
-                ),
+              // Load More button at the bottom
+              return Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(16),
+                child: postsState.isLoading
+                    ? const Center(child: Spinner())
+                    : ElevatedButton(
+                        onPressed: () {
+                          print(
+                              '🔍 [PostsListScreen] Load More button pressed');
+                          ref
+                              .read(postsPaginationProvider.notifier)
+                              .loadMorePosts();
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: theme.primary[500],
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              LucideIcons.plus,
+                              size: 18,
+                              color: Colors.white,
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              localizations.translate('load_more') ??
+                                  'Load More',
+                              style: TextStyles.body.copyWith(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
               );
             }
 
