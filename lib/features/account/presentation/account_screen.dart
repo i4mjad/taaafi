@@ -41,7 +41,7 @@ import 'package:reboot_app_3/features/plus/data/repositories/subscription_reposi
 import 'package:intl/intl.dart';
 import 'package:reboot_app_3/features/plus/presentation/feature_suggestion_modal.dart';
 import 'package:reboot_app_3/features/plus/presentation/taaafi_plus_features_list_screen.dart';
-import 'package:reboot_app_3/features/account/application/profile_image_service.dart';
+
 import 'package:shorebird_code_push/shorebird_code_push.dart';
 
 class AccountScreen extends ConsumerWidget {
@@ -115,9 +115,9 @@ class AccountScreen extends ConsumerWidget {
                                   },
                                   child: UserDetailsWidget(
                                     userProfile,
-                                    onAvatarTap: (hasProfileImage) =>
-                                        _showProfileImageOptions(
-                                            context, ref, hasProfileImage),
+                                    // onAvatarTap: (hasProfileImage) =>
+                                    //     _showProfileImageOptions(
+                                    //         context, ref, hasProfileImage),
                                   ),
                                 ),
                                 verticalSpace(Spacing.points24),
@@ -440,6 +440,7 @@ class AccountScreen extends ConsumerWidget {
                                     ),
                                   ),
                                 ),
+
                                 verticalSpace(Spacing.points12),
                               ],
                             ],
@@ -515,85 +516,86 @@ class AccountScreen extends ConsumerWidget {
     );
   }
 
-  void _showProfileImageOptions(
-      BuildContext context, WidgetRef ref, bool hasProfileImage) {
-    final theme = AppTheme.of(context);
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      builder: (context) => Container(
-        width: double.infinity,
-        decoration: BoxDecoration(
-          color: theme.backgroundColor,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Handle bar
-            Container(
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: theme.grey[300],
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-            verticalSpace(Spacing.points16),
+  // Temporarily disabled profile image changing functionality
+  // void _showProfileImageOptions(
+  //     BuildContext context, WidgetRef ref, bool hasProfileImage) {
+  //   final theme = AppTheme.of(context);
+  //   showModalBottomSheet(
+  //     context: context,
+  //     backgroundColor: Colors.transparent,
+  //     builder: (context) => Container(
+  //       width: double.infinity,
+  //       decoration: BoxDecoration(
+  //         color: theme.backgroundColor,
+  //         borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+  //       ),
+  //       child: Column(
+  //         mainAxisSize: MainAxisSize.min,
+  //         children: [
+  //           // Handle bar
+  //           Container(
+  //             width: 40,
+  //             height: 4,
+  //             decoration: BoxDecoration(
+  //               color: theme.grey[300],
+  //               borderRadius: BorderRadius.circular(2),
+  //             ),
+  //           ),
+  //           verticalSpace(Spacing.points16),
 
-            // Title
-            Text(
-              AppLocalizations.of(context).translate('change-profile-picture'),
-              style: TextStyles.h6.copyWith(color: theme.grey[900]),
-            ),
-            verticalSpace(Spacing.points16),
+  //           // Title
+  //           Text(
+  //             AppLocalizations.of(context).translate('change-profile-picture'),
+  //             style: TextStyles.h6.copyWith(color: theme.grey[900]),
+  //           ),
+  //           verticalSpace(Spacing.points16),
 
-            // Change picture option
-            ListTile(
-              leading: Icon(
-                LucideIcons.camera,
-                color: theme.primary[600],
-              ),
-              title: Text(
-                AppLocalizations.of(context)
-                    .translate('change-profile-picture'),
-                style: TextStyles.body.copyWith(color: theme.grey[900]),
-              ),
-              onTap: () async {
-                Navigator.of(context).pop();
-                await ref
-                    .read(profileImageServiceProvider)
-                    .changeProfileImage(context);
-              },
-            ),
+  //           // Change picture option
+  //           ListTile(
+  //             leading: Icon(
+  //               LucideIcons.camera,
+  //               color: theme.primary[600],
+  //             ),
+  //             title: Text(
+  //               AppLocalizations.of(context)
+  //                   .translate('change-profile-picture'),
+  //               style: TextStyles.body.copyWith(color: theme.grey[900]),
+  //             ),
+  //             onTap: () async {
+  //               Navigator.of(context).pop();
+  //               await ref
+  //                   .read(profileImageServiceProvider)
+  //                   .changeProfileImage(context);
+  //             },
+  //           ),
 
-            // Remove picture option (only show if user has a profile image)
-            if (hasProfileImage) ...[
-              ListTile(
-                leading: Icon(
-                  LucideIcons.trash2,
-                  color: theme.error[600],
-                ),
-                title: Text(
-                  AppLocalizations.of(context)
-                      .translate('remove-profile-picture'),
-                  style: TextStyles.body.copyWith(color: theme.error[600]),
-                ),
-                onTap: () async {
-                  Navigator.of(context).pop();
-                  await ref
-                      .read(profileImageServiceProvider)
-                      .removeProfileImage(context);
-                },
-              ),
-            ],
+  //           // Remove picture option (only show if user has a profile image)
+  //           if (hasProfileImage) ...[
+  //             ListTile(
+  //               leading: Icon(
+  //                 LucideIcons.trash2,
+  //                 color: theme.error[600],
+  //               ),
+  //               title: Text(
+  //                 AppLocalizations.of(context)
+  //                     .translate('remove-profile-picture'),
+  //                 style: TextStyles.body.copyWith(color: theme.error[600]),
+  //               ),
+  //               onTap: () async {
+  //                 Navigator.of(context).pop();
+  //                 await ref
+  //                     .read(profileImageServiceProvider)
+  //                     .removeProfileImage(context);
+  //               },
+  //             ),
+  //           ],
 
-            verticalSpace(Spacing.points16),
-          ],
-        ),
-      ),
-    );
-  }
+  //           verticalSpace(Spacing.points16),
+  //         ],
+  //       ),
+  //     ),
+  //   );
+  // }
 }
 
 class UiAndLanguageSettings extends ConsumerWidget {
@@ -824,47 +826,59 @@ class UserDetailsWidget extends ConsumerWidget {
                     final hasProfileImage =
                         user?.photoURL != null && user!.photoURL!.isNotEmpty;
 
-                    return GestureDetector(
-                      onTap: onAvatarTap != null
-                          ? () => onAvatarTap!(hasProfileImage)
-                          : null,
-                      child: Stack(
-                        children: [
-                          CircleAvatar(
-                            backgroundColor: theme.primary[50],
-                            backgroundImage: hasProfileImage
-                                ? NetworkImage(user.photoURL!)
-                                : null,
-                            child: hasProfileImage
-                                ? null
-                                : Icon(
-                                    LucideIcons.user,
-                                    color: theme.primary[900],
-                                  ),
-                          ),
-                          Positioned(
-                            bottom: -2,
-                            right: -2,
-                            child: Container(
-                              padding: const EdgeInsets.all(4),
-                              decoration: BoxDecoration(
-                                color: theme.primary[600],
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                  color: theme.backgroundColor,
-                                  width: 2,
-                                ),
-                              ),
-                              child: Icon(
-                                LucideIcons.camera,
-                                size: 12,
-                                color: Colors.white,
-                              ),
+                    return CircleAvatar(
+                      backgroundColor: theme.primary[50],
+                      backgroundImage:
+                          hasProfileImage ? NetworkImage(user.photoURL!) : null,
+                      child: hasProfileImage
+                          ? null
+                          : Icon(
+                              LucideIcons.user,
+                              color: theme.primary[900],
                             ),
-                          ),
-                        ],
-                      ),
                     );
+                    // Temporarily disabled interactive avatar with camera icon
+                    // return GestureDetector(
+                    //   onTap: onAvatarTap != null
+                    //       ? () => onAvatarTap!(hasProfileImage)
+                    //       : null,
+                    //   child: Stack(
+                    //     children: [
+                    //       CircleAvatar(
+                    //         backgroundColor: theme.primary[50],
+                    //         backgroundImage: hasProfileImage
+                    //             ? NetworkImage(user.photoURL!)
+                    //             : null,
+                    //         child: hasProfileImage
+                    //             ? null
+                    //             : Icon(
+                    //                 LucideIcons.user,
+                    //                 color: theme.primary[900],
+                    //               ),
+                    //       ),
+                    //       Positioned(
+                    //         bottom: -2,
+                    //         right: -2,
+                    //         child: Container(
+                    //           padding: const EdgeInsets.all(4),
+                    //           decoration: BoxDecoration(
+                    //             color: theme.primary[600],
+                    //             shape: BoxShape.circle,
+                    //             border: Border.all(
+                    //               color: theme.backgroundColor,
+                    //               width: 2,
+                    //             ),
+                    //           ),
+                    //           child: Icon(
+                    //             LucideIcons.camera,
+                    //             size: 12,
+                    //             color: Colors.white,
+                    //           ),
+                    //         ),
+                    //       ),
+                    //     ],
+                    //   ),
+                    // );
                   },
                   loading: () => CircleAvatar(
                     backgroundColor: theme.primary[50],
