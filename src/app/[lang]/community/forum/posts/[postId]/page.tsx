@@ -12,6 +12,10 @@ import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Separator } from '@/components/ui/separator';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { 
   ArrowLeft, 
   MessageSquare, 
@@ -50,19 +54,29 @@ export default function PostDetailPage() {
   const [showPinPostDialog, setShowPinPostDialog] = useState(false);
   const [showDeleteCommentDialog, setShowDeleteCommentDialog] = useState(false);
   const [showHideCommentDialog, setShowHideCommentDialog] = useState(false);
+  const [isEditingPost, setIsEditingPost] = useState(false);
+  const [editFormData, setEditFormData] = useState({
+    title: '',
+    body: '',
+    category: ''
+  });
+  const [editErrors, setEditErrors] = useState<Record<string, string>>({});
 
   // Fetch the specific post
   const [postValue, postLoading, postError] = useDocument(
     doc(db, 'forumPosts', postId)
   );
 
-  // Fetch comments for this post
-  const [commentsValue] = useCollection(
+  // Fetch comments for this post - using a stable query that won't be affected by updates
+  const [commentsValue, commentsLoading, commentsError] = useCollection(
     query(
       collection(db, 'comments'), 
       where('postId', '==', postId),
       orderBy('createdAt', 'desc')
-    )
+    ),
+    {
+      snapshotListenOptions: { includeMetadataChanges: false }
+    }
   );
 
   // Fetch interactions for this post
@@ -114,12 +128,19 @@ export default function PostDetailPage() {
   const comments = useMemo(() => {
     if (!commentsValue) return [];
     
-    return commentsValue.docs.map(doc => ({
+    const processedComments = commentsValue.docs.map(doc => ({
       id: doc.id,
       ...doc.data(),
       createdAt: doc.data().createdAt?.toDate() || new Date(),
       updatedAt: doc.data().updatedAt?.toDate(),
     })) as Comment[];
+
+    // Debug logging to help identify the issue
+    console.log('Comments raw count:', commentsValue.docs.length);
+    console.log('Processed comments:', processedComments.length);
+    console.log('Comments with isDeleted:', processedComments.filter(c => c.isDeleted).length);
+    
+    return processedComments;
   }, [commentsValue]);
 
   const interactions = useMemo(() => {
@@ -140,6 +161,7 @@ export default function PostDetailPage() {
       id: doc.id,
       name: doc.data().name || 'Unknown',
       nameAr: doc.data().nameAr || 'غير معروف',
+      isForAdminOnly: doc.data().isForAdminOnly || false,
       ...doc.data(),
     }));
   }, [categoriesValue]);
@@ -190,6 +212,93 @@ export default function PostDetailPage() {
     return filteredCommentReports.filter(report => 
       report.targetId === commentId && report.status === 'pending'
     ).length;
+  };
+
+  // Initialize edit form when entering edit mode
+  const initializeEditForm = () => {
+    if (post) {
+      setEditFormData({
+        title: post.title,
+        body: post.body,
+        category: post.category
+      });
+      setEditErrors({});
+      setIsEditingPost(true);
+    }
+  };
+
+  // Validate edit form
+  const validateEditForm = (): boolean => {
+    const newErrors: Record<string, string> = {};
+
+    if (!editFormData.title.trim()) {
+      newErrors.title = t('modules.community.posts.errors.titleRequired');
+    }
+
+    if (!editFormData.body.trim()) {
+      newErrors.body = t('modules.community.posts.errors.bodyRequired');
+    }
+
+    if (!editFormData.category) {
+      newErrors.category = t('modules.community.posts.errors.categoryRequired');
+    }
+
+    setEditErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  // Handle edit form input changes
+  const handleEditInputChange = (field: keyof typeof editFormData, value: string) => {
+    setEditFormData(prev => ({ ...prev, [field]: value }));
+    if (editErrors[field]) {
+      setEditErrors(prev => ({ ...prev, [field]: '' }));
+    }
+  };
+
+  // Custom hook for post updates using react-firebase-hooks pattern
+  const usePostUpdate = () => {
+    const [isUpdating, setIsUpdating] = useState(false);
+
+    const updatePost = async (postId: string, data: Partial<typeof editFormData>) => {
+      setIsUpdating(true);
+      try {
+        await updateDoc(doc(db, 'forumPosts', postId), {
+          ...data,
+          updatedAt: new Date(),
+        });
+        return { success: true, error: null };
+      } catch (error) {
+        return { success: false, error };
+      } finally {
+        setIsUpdating(false);
+      }
+    };
+
+    return { updatePost, isUpdating };
+  };
+
+  const { updatePost, isUpdating } = usePostUpdate();
+
+  // Handle save edit
+  const handleSaveEdit = async () => {
+    if (!validateEditForm() || !post) return;
+
+    const result = await updatePost(post.id, editFormData);
+    
+    if (result.success) {
+      toast.success(t('modules.community.posts.editSuccess'));
+      setIsEditingPost(false);
+    } else {
+      console.error('Error updating post:', result.error);
+      toast.error(t('modules.community.posts.editError'));
+    }
+  };
+
+  // Handle cancel edit
+  const handleCancelEdit = () => {
+    setIsEditingPost(false);
+    setEditFormData({ title: '', body: '', category: '' });
+    setEditErrors({});
   };
 
   // Handle post actions
@@ -249,7 +358,15 @@ export default function PostDetailPage() {
     if (!selectedComment) return;
 
     try {
-      await deleteDoc(doc(db, 'comments', selectedComment.id));
+      console.log('Deleting comment:', selectedComment.id);
+      
+      // Soft delete: mark as deleted instead of removing from database
+      await updateDoc(doc(db, 'comments', selectedComment.id), {
+        isDeleted: true,
+        updatedAt: new Date(),
+      });
+      
+      console.log('Comment marked as deleted successfully');
       toast.success(t('modules.community.comments.deleteSuccess'));
       setShowDeleteCommentDialog(false);
       setSelectedComment(null);
@@ -371,9 +488,86 @@ export default function PostDetailPage() {
               </div>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="prose max-w-none">
-                <p className="whitespace-pre-wrap">{post.body}</p>
-              </div>
+              {isEditingPost ? (
+                <div className="space-y-4">
+                  {/* Edit Form */}
+                  <div className="space-y-2">
+                    <Label htmlFor="edit-title">{t('modules.community.posts.title')}</Label>
+                    <Input
+                      id="edit-title"
+                      value={editFormData.title}
+                      onChange={(e) => handleEditInputChange('title', e.target.value)}
+                      className={editErrors.title ? 'border-destructive' : ''}
+                      placeholder={t('modules.community.posts.titlePlaceholder')}
+                    />
+                    {editErrors.title && (
+                      <p className="text-sm text-destructive">{editErrors.title}</p>
+                    )}
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="edit-category">{t('modules.community.posts.category')}</Label>
+                    <Select
+                      value={editFormData.category}
+                      onValueChange={(value) => handleEditInputChange('category', value)}
+                    >
+                      <SelectTrigger className={editErrors.category ? 'border-destructive' : ''}>
+                        <SelectValue placeholder={t('modules.community.posts.selectCategory')} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {categories.map((category) => (
+                          <SelectItem key={category.id} value={category.id}>
+                            {category.name}
+                            {category.isForAdminOnly && (
+                              <span className="ml-2 text-xs text-muted-foreground">
+                                ({t('modules.community.postCategories.adminOnly')})
+                              </span>
+                            )}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    {editErrors.category && (
+                      <p className="text-sm text-destructive">{editErrors.category}</p>
+                    )}
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="edit-body">{t('modules.community.posts.body')}</Label>
+                    <Textarea
+                      id="edit-body"
+                      value={editFormData.body}
+                      onChange={(e) => handleEditInputChange('body', e.target.value)}
+                      className={`min-h-[120px] ${editErrors.body ? 'border-destructive' : ''}`}
+                      placeholder={t('modules.community.posts.bodyPlaceholder')}
+                    />
+                    {editErrors.body && (
+                      <p className="text-sm text-destructive">{editErrors.body}</p>
+                    )}
+                  </div>
+
+                  {/* Edit Actions */}
+                  <div className="flex space-x-2 pt-2">
+                    <Button 
+                      onClick={handleSaveEdit}
+                      disabled={isUpdating}
+                    >
+                      {isUpdating ? t('common.saving') : t('common.save')}
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      onClick={handleCancelEdit}
+                      disabled={isUpdating}
+                    >
+                      {t('common.cancel')}
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <div className="prose max-w-none">
+                  <p className="whitespace-pre-wrap">{post.body}</p>
+                </div>
+              )}
               
               <Separator />
               
@@ -420,14 +614,31 @@ export default function PostDetailPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              {comments.length === 0 ? (
+              {commentsError && (
+                <div className="text-center text-destructive py-4 mb-4 border border-destructive rounded p-4">
+                  <p>Error loading comments: {commentsError.message}</p>
+                  <Button variant="outline" size="sm" onClick={() => window.location.reload()} className="mt-2">
+                    Reload Page
+                  </Button>
+                </div>
+              )}
+              {commentsLoading && (
+                <div className="text-center py-8">
+                  <div className="animate-pulse space-y-4">
+                    <div className="h-4 bg-muted rounded w-3/4" />
+                    <div className="h-4 bg-muted rounded w-1/2" />
+                    <div className="h-4 bg-muted rounded w-2/3" />
+                  </div>
+                </div>
+              )}
+              {!commentsLoading && !commentsError && comments.length === 0 ? (
                 <p className="text-center text-muted-foreground py-8">
                   {t('modules.community.posts.detailPage.noComments')}
                 </p>
-              ) : (
+              ) : !commentsLoading && !commentsError && (
                 <div className="space-y-4">
                   {comments.map((comment) => (
-                    <Card key={comment.id} className={comment.isHidden ? 'opacity-50' : ''}>
+                    <Card key={comment.id} className={`${comment.isHidden ? 'opacity-50' : ''} ${comment.isDeleted ? 'border-destructive bg-destructive/5' : ''}`}>
                       <CardContent className="pt-4">
                         <div className="flex items-start justify-between">
                           <div className="flex-1">
@@ -447,8 +658,15 @@ export default function PostDetailPage() {
                                   {t('modules.community.posts.detailPage.hidden')}
                                 </Badge>
                               )}
+                              {comment.isDeleted && (
+                                <Badge variant="destructive" className="text-xs">
+                                  {t('modules.community.posts.detailPage.deleted')}
+                                </Badge>
+                              )}
                             </div>
-                            <p className="text-sm whitespace-pre-wrap mb-2">{comment.body}</p>
+                            <p className={`text-sm whitespace-pre-wrap mb-2 ${comment.isDeleted ? 'line-through text-muted-foreground italic' : ''}`}>
+                              {comment.isDeleted ? t('modules.community.posts.detailPage.deletedCommentText') : comment.body}
+                            </p>
                             <div className="flex items-center space-x-3 text-xs text-muted-foreground">
                               <div className="flex items-center space-x-1">
                                 <ThumbsUp className="h-3 w-3 text-green-600" />
@@ -493,16 +711,18 @@ export default function PostDetailPage() {
                                   t('modules.community.posts.detailPage.commentActions.hide')
                                 }
                               </DropdownMenuItem>
-                              <DropdownMenuItem 
-                                onClick={() => {
-                                  setSelectedComment(comment);
-                                  setShowDeleteCommentDialog(true);
-                                }}
-                                className="text-destructive"
-                              >
-                                <Trash2 className="mr-2 h-4 w-4" />
-                                {t('modules.community.posts.detailPage.commentActions.delete')}
-                              </DropdownMenuItem>
+                              {!comment.isDeleted && (
+                                <DropdownMenuItem 
+                                  onClick={() => {
+                                    setSelectedComment(comment);
+                                    setShowDeleteCommentDialog(true);
+                                  }}
+                                  className="text-destructive"
+                                >
+                                  <Trash2 className="mr-2 h-4 w-4" />
+                                  {t('modules.community.posts.detailPage.commentActions.delete')}
+                                </DropdownMenuItem>
+                              )}
                             </DropdownMenuContent>
                           </DropdownMenu>
                         </div>
@@ -523,7 +743,12 @@ export default function PostDetailPage() {
               <CardTitle>{t('modules.community.posts.detailPage.postActions')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-2">
-              <Button variant="outline" className="w-full justify-start">
+              <Button 
+                variant="outline" 
+                className="w-full justify-start"
+                onClick={initializeEditForm}
+                disabled={isEditingPost}
+              >
                 <Edit className="mr-2 h-4 w-4" />
                 {t('modules.community.posts.detailPage.actions.editPost')}
               </Button>

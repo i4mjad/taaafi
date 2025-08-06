@@ -47,6 +47,7 @@ export interface Comment {
   body: string;            // Comment content
   isAnonymous?: boolean;   // Whether this comment is anonymous
   isHidden?: boolean;      // Whether this comment is hidden by admin
+  isDeleted?: boolean;     // Whether this comment is soft deleted
   score: number;           // Overall score (likes - dislikes)
   likeCount: number;
   dislikeCount: number;

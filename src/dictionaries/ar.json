@@ -1644,6 +1644,8 @@
           "createError": "فشل في إنشاء المنشور",
           "updateSuccess": "تم تحديث المنشور بنجاح",
           "updateError": "فشل في تحديث المنشور",
+          "editSuccess": "تم تعديل المنشور بنجاح",
+          "editError": "فشل في تعديل المنشور",
           "deleteSuccess": "تم حذف المنشور بنجاح",
           "deleteError": "فشل في حذف المنشور",
           "bulkActions": {
@@ -1727,6 +1729,8 @@
             "noComments": "لا توجد تعليقات على هذا المنشور بعد",
             "noInteractions": "لا توجد تفاعلات على هذا المنشور بعد",
             "hidden": "مخفي",
+            "deleted": "محذوف",
+            "deletedCommentText": "تم حذف هذا التعليق",
             "moreInteractions": "{count} تفاعل إضافي",
             "accessibility": {
               "openMenu": "فتح القائمة"
@@ -1769,7 +1773,7 @@
             },
             "deleteCommentConfirm": {
               "title": "حذف التعليق",
-              "description": "هل أنت متأكد من حذف هذا التعليق نهائياً؟ لا يمكن التراجع عن هذا الإجراء."
+              "description": "هل أنت متأكد من حذف هذا التعليق؟ سيتم وضع علامة عليه كمحذوف ولكن سيتم الاحتفاظ به لأغراض الإشراف."
             },
             "reportsSection": "التقارير",
             "totalReports": "إجمالي التقارير",
@@ -2054,6 +2058,8 @@
       "clearSelection": "مسح التحديد",
       "create": "إنشاء",
       "creating": "جاري الإنشاء...",
+      "save": "حفظ",
+      "saving": "جاري الحفظ...",
       "update": "تحديث",
       "updating": "جاري التحديث...",
       "active": "نشط",

@@ -1627,6 +1627,8 @@
           "createError": "Failed to create post",
           "updateSuccess": "Post updated successfully",
           "updateError": "Failed to update post",
+          "editSuccess": "Post edited successfully",
+          "editError": "Failed to edit post",
           "deleteSuccess": "Post deleted successfully",
           "deleteError": "Failed to delete post",
           "bulkActions": {
@@ -1710,6 +1712,8 @@
             "noComments": "No comments on this post yet",
             "noInteractions": "No interactions on this post yet",
             "hidden": "Hidden",
+            "deleted": "Deleted",
+            "deletedCommentText": "This comment has been deleted",
             "moreInteractions": "{count} more interactions",
             "accessibility": {
               "openMenu": "Open menu"
@@ -1752,7 +1756,7 @@
             },
             "deleteCommentConfirm": {
               "title": "Delete Comment", 
-              "description": "Are you sure you want to permanently delete this comment? This action cannot be undone."
+              "description": "Are you sure you want to delete this comment? It will be marked as deleted but preserved for moderation purposes."
             },
             "reportsSection": "Reports",
             "totalReports": "Total Reports",
@@ -2019,6 +2023,8 @@
       "clearSelection": "Clear Selection",
       "create": "Create",
       "creating": "Creating...",
+      "save": "Save",
+      "saving": "Saving...",
       "update": "Update",
       "updating": "Updating...",
       "active": "Active",
