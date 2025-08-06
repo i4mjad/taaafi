@@ -5,6 +5,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
 import 'package:reboot_app_3/core/shared_widgets/platform_time_picker.dart';
+import 'package:reboot_app_3/core/shared_widgets/snackbar.dart';
 import 'package:reboot_app_3/core/shared_widgets/spinner.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
@@ -611,13 +612,7 @@ class _SmartAlertsSettingsModalState
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(AppLocalizations.of(context)
-                .translate('error-updating-settings')),
-            backgroundColor: AppTheme.of(context).error[500],
-          ),
-        );
+        getErrorSnackBar(context, "error-updating-settings");
       }
     } finally {
       if (mounted) {
@@ -637,23 +632,11 @@ class _SmartAlertsSettingsModalState
           .read(smartAlertsNotifierProvider.notifier)
           .calculateRiskPatterns();
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-                AppLocalizations.of(context).translate('patterns-calculated')),
-            backgroundColor: AppTheme.of(context).success[500],
-          ),
-        );
+        getSuccessSnackBar(context, "patterns-calculated");
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(AppLocalizations.of(context)
-                .translate('error-calculating-patterns')),
-            backgroundColor: AppTheme.of(context).error[500],
-          ),
-        );
+        getErrorSnackBar(context, "error-calculating-patterns");
       }
     } finally {
       if (mounted) {
@@ -672,23 +655,11 @@ class _SmartAlertsSettingsModalState
           .read(smartAlertsNotifierProvider.notifier)
           .sendTestNotification(type);
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(AppLocalizations.of(context)
-                .translate('test-notification-sent')),
-            backgroundColor: AppTheme.of(context).success[500],
-          ),
-        );
+        getSuccessSnackBar(context, "test-notification-sent");
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(AppLocalizations.of(context)
-                .translate('error-sending-notification')),
-            backgroundColor: AppTheme.of(context).error[500],
-          ),
-        );
+        getErrorSnackBar(context, "error-sending-notification");
       }
     }
   }
@@ -704,23 +675,11 @@ class _SmartAlertsSettingsModalState
           .read(smartAlertsNotifierProvider.notifier)
           .updateVulnerabilityAlertHour(newTime.hour);
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-                AppLocalizations.of(context).translate('alert-time-updated')),
-            backgroundColor: AppTheme.of(context).success[500],
-          ),
-        );
+        getSuccessSnackBar(context, "alert-time-updated");
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(AppLocalizations.of(context)
-                .translate('error-updating-alert-time')),
-            backgroundColor: AppTheme.of(context).error[500],
-          ),
-        );
+        getErrorSnackBar(context, "error-updating-alert-time");
       }
     } finally {
       if (mounted) {

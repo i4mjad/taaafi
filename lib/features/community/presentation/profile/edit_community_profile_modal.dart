@@ -153,13 +153,7 @@ class _EditCommunityProfileModalState
       onPopInvokedWithResult: (didPop, result) {
         if (!didPop && _isDeletionInProgress) {
           // Show a message that deletion is in progress
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content:
-                  Text(localizations.translate('deletion-in-progress-message')),
-              backgroundColor: theme.error[600],
-            ),
-          );
+          getErrorSnackBar(context, "deletion-in-progress-message");
         }
       },
       child: Container(
@@ -615,13 +609,8 @@ class _EditCommunityProfileModalState
                       child: TextButton(
                         onPressed: () {
                           Navigator.of(modalContext).pop();
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(localizations.translate(
-                                  'community-delete-profile-cancelled')),
-                              backgroundColor: theme.success[600],
-                            ),
-                          );
+                          getSuccessSnackBar(
+                              context, "community-delete-profile-cancelled");
                         },
                         style: TextButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 12),

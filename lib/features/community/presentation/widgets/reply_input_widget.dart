@@ -462,14 +462,7 @@ class _ReplyInputWidgetState extends ConsumerState<ReplyInputWidget> {
     } catch (error) {
       // Show error message
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              AppLocalizations.of(context).translate('error_adding_comment'),
-            ),
-            backgroundColor: AppTheme.of(context).error[500],
-          ),
-        );
+        getErrorSnackBar(context, "error_adding_comment");
       }
     } finally {
       if (mounted) {

@@ -6,6 +6,7 @@ import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/routing/route_names.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
 import 'package:reboot_app_3/core/shared_widgets/premium_blur_overlay.dart';
+import 'package:reboot_app_3/core/shared_widgets/snackbar.dart';
 import 'package:reboot_app_3/core/shared_widgets/spinner.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
@@ -645,13 +646,7 @@ class _EnhancedProfileSelectionModalState
         // Close modal and show success
         Navigator.of(context).pop();
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(AppLocalizations.of(context)
-                .translate('profile-restored-successfully')),
-            backgroundColor: AppTheme.of(context).success[600],
-          ),
-        );
+        getSuccessSnackBar(context, "profile-restored-successfully");
       }
     } catch (e) {
       if (mounted) {
@@ -659,13 +654,7 @@ class _EnhancedProfileSelectionModalState
           _isRestoring = false;
         });
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(AppLocalizations.of(context)
-                .translate('profile-restore-failed')),
-            backgroundColor: AppTheme.of(context).error[600],
-          ),
-        );
+        getErrorSnackBar(context, "profile-restore-failed");
       }
     }
   }

@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
+import 'package:reboot_app_3/core/shared_widgets/snackbar.dart';
 import 'package:reboot_app_3/core/shared_widgets/spinner.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/custom_theme_data.dart';
@@ -665,15 +666,7 @@ class _BannedScreenStatefulState extends ConsumerState<_BannedScreenStateful> {
     } catch (e) {
       // Handle logout error
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              AppLocalizations.of(context).translate('logout-error'),
-              style: TextStyles.body.copyWith(color: Colors.white),
-            ),
-            backgroundColor: theme.error[600],
-          ),
-        );
+        getErrorSnackBar(context, "logout-error");
       }
     } finally {
       if (mounted) {
@@ -715,58 +708,26 @@ class _BannedScreenStatefulState extends ConsumerState<_BannedScreenStateful> {
           if (startup != null && mounted) {
             // Navigate to home or let the app handle the routing
             // The app startup will automatically handle the navigation
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(
-                  AppLocalizations.of(context).translate('ban-status-updated'),
-                  style: TextStyles.body.copyWith(color: Colors.white),
-                ),
-                backgroundColor: Colors.green[600],
-              ),
-            );
+            getSuccessSnackBar(context, "ban-status-updated");
           }
         },
         loading: () {
           // Still loading, show a message
           if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(
-                  AppLocalizations.of(context).translate('checking-ban-status'),
-                  style: TextStyles.body.copyWith(color: Colors.white),
-                ),
-                backgroundColor: theme.primary[600],
-              ),
-            );
+            getErrorSnackBar(context, "checking-ban-status");
           }
         },
         error: (error, stack) {
           // Still banned or error occurred
           if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(
-                  AppLocalizations.of(context).translate('ban-still-active'),
-                  style: TextStyles.body.copyWith(color: Colors.white),
-                ),
-                backgroundColor: theme.error[600],
-              ),
-            );
+            getErrorSnackBar(context, "ban-still-active");
           }
         },
       );
     } catch (e) {
       // Handle refresh error
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              AppLocalizations.of(context).translate('refresh-error'),
-              style: TextStyles.body.copyWith(color: Colors.white),
-            ),
-            backgroundColor: theme.error[600],
-          ),
-        );
+        getErrorSnackBar(context, "refresh-error");
       }
     } finally {
       if (mounted) {

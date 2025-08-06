@@ -5,6 +5,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/routing/route_names.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
+import 'package:reboot_app_3/core/shared_widgets/snackbar.dart';
 import 'package:reboot_app_3/core/shared_widgets/spinner.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
@@ -306,63 +307,12 @@ class OngoingActivitySettingsSheet extends ConsumerWidget {
 
       if (success) {
         // Show success message
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              AppLocalizations.of(context).translate('activity-extended'),
-              style: TextStyles.body.copyWith(color: Colors.white),
-            ),
-            backgroundColor: AppTheme.of(context).success[600],
-            duration: Duration(seconds: 2),
-          ),
-        );
+        getSuccessSnackBar(context, "activity-extended");
+
         Navigator.pop(context); // Close settings sheet
       } else {
         // Show error message with explanation
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              AppLocalizations.of(context).translate('error-extend-activity'),
-              style: TextStyles.body.copyWith(color: Colors.white),
-            ),
-            backgroundColor: AppTheme.of(context).error[600],
-            duration: Duration(seconds: 3),
-            action: SnackBarAction(
-              label: AppLocalizations.of(context).translate('learn-more'),
-              textColor: Colors.white,
-              onPressed: () {
-                showDialog(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return AlertDialog(
-                      title: Text(
-                        AppLocalizations.of(context)
-                            .translate('extension-requirements'),
-                        style: TextStyles.h6,
-                      ),
-                      content: Text(
-                        AppLocalizations.of(context)
-                            .translate('extension-requirements-details'),
-                        style: TextStyles.body,
-                      ),
-                      actions: [
-                        TextButton(
-                          onPressed: () => Navigator.pop(context),
-                          child: Text(
-                            AppLocalizations.of(context).translate('close'),
-                            style: TextStyles.body.copyWith(
-                              color: AppTheme.of(context).primary[600],
-                            ),
-                          ),
-                        ),
-                      ],
-                    );
-                  },
-                );
-              },
-            ),
-          ),
-        );
+        getErrorSnackBar(context, "error-extend-activity");
       }
     } catch (e) {
       // Hide loading dialog if still showing
@@ -371,16 +321,7 @@ class OngoingActivitySettingsSheet extends ConsumerWidget {
       }
 
       // Show error message
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            AppLocalizations.of(context).translate('error-extend-activity'),
-            style: TextStyles.body.copyWith(color: Colors.white),
-          ),
-          backgroundColor: AppTheme.of(context).error[600],
-          duration: Duration(seconds: 3),
-        ),
-      );
+      getErrorSnackBar(context, "error-extend-activity");
     }
   }
 }

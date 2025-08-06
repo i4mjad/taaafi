@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:reboot_app_3/core/helpers/date_display_formater.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
+import 'package:reboot_app_3/core/shared_widgets/snackbar.dart';
 import 'package:reboot_app_3/core/shared_widgets/spinner.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
@@ -64,15 +65,7 @@ class FollowUpHistoryModal extends ConsumerWidget {
                 if (dayOfMonth != null) ...[
                   GestureDetector(
                     onTap: () {
-                      // Toggle sorting - we'll implement this as a simple state toggle
-                      // For now, just show a snackbar as placeholder
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(AppLocalizations.of(context)
-                              .translate('sorting-feature-coming')),
-                          duration: Duration(seconds: 2),
-                        ),
-                      );
+                      getSuccessSnackBar(context, "sorting-feature-coming");
                     },
                     child: Icon(
                       LucideIcons.arrowUpDown,

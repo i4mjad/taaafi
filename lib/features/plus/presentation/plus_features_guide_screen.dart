@@ -432,15 +432,8 @@ class PlusFeaturesGuideScreen extends ConsumerWidget {
           GestureDetector(
             onTap: () {
               HapticFeedback.lightImpact();
-              // Scroll to features section (or any other action)
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(AppLocalizations.of(context)
-                      .translate('explore-features-hint')),
-                  backgroundColor: theme.success[600],
-                  duration: const Duration(seconds: 2),
-                ),
-              );
+
+              getSuccessSnackBar(context, "explore-features-hint");
             },
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
