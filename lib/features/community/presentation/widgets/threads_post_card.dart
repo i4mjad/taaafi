@@ -285,6 +285,7 @@ class ThreadsPostCard extends ConsumerWidget {
                         post.title,
                         style: TextStyles.h6.copyWith(
                           color: theme.grey[900],
+                          height: 1.2,
                         ),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,

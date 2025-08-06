@@ -272,88 +272,104 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen>
   }
 
   Widget _buildForumTab() {
-    return RefreshIndicator(
-      onRefresh: () async {
-        // Refresh based on selected filter
-        switch (_selectedFilter) {
-          case 'posts':
-            ref.invalidate(mainScreenPostsProvider(null));
-            await ref.read(mainScreenPostsProvider(null).future);
-            break;
-          case 'pinned':
-            ref.invalidate(pinnedPostsPaginationProvider);
-            break;
-          case 'news':
-            ref.invalidate(newsPostsPaginationProvider);
-            break;
-          default:
-            ref.invalidate(mainScreenPostsProvider(null));
-            await ref.read(mainScreenPostsProvider(null).future);
-        }
-      },
-      child: CustomScrollView(
-        controller: _scrollController,
-        physics: const AlwaysScrollableScrollPhysics(),
-        slivers: [
-          // Filter chips - sticky
-          SliverPersistentHeader(
-            pinned: true,
-            delegate: _FilterChipsDelegate(
-              filterChips: Container(
-                height: 35,
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: ListView(
-                  scrollDirection: Axis.horizontal,
-                  children: [
-                    _buildFilterChip(
-                      AppLocalizations.of(context)
-                          .translate('community_pinned'),
-                      'pinned',
-                      LucideIcons.pin,
-                      const Color(0xFFF59E0B),
-                    ),
-                    const SizedBox(width: 8),
-                    _buildFilterChip(
-                      AppLocalizations.of(context).translate('community_news'),
-                      'news',
-                      LucideIcons.newspaper,
-                      const Color(0xFF10B981),
-                    ),
-                    const SizedBox(width: 8),
-                    _buildFilterChip(
-                      AppLocalizations.of(context).translate('community_posts'),
-                      'posts',
-                      LucideIcons.messageSquare,
-                      const Color(0xFF3B82F6),
-                    ),
-                    const SizedBox(width: 8),
-                    _buildFilterChip(
-                      AppLocalizations.of(context).translate('challenges'),
-                      'challenges',
-                      LucideIcons.star,
-                      const Color(0xFFEF4444),
-                    ),
-                    const SizedBox(width: 8),
-                    _buildFilterChip(
-                      AppLocalizations.of(context)
-                          .translate('community_categories'),
-                      'categories',
-                      LucideIcons.layoutGrid,
-                      const Color(0xFF8B5CF6),
-                    ),
-                  ],
-                ),
+    // Disable refresh for challenges and categories tabs
+    final shouldEnableRefresh =
+        !['challenges', 'categories'].contains(_selectedFilter);
+
+    Widget scrollView = CustomScrollView(
+      controller: _scrollController,
+      physics: const AlwaysScrollableScrollPhysics(),
+      slivers: [
+        // Filter chips - sticky
+        SliverPersistentHeader(
+          pinned: true,
+          delegate: _FilterChipsDelegate(
+            filterChips: Container(
+              height: 35,
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: ListView(
+                scrollDirection: Axis.horizontal,
+                children: [
+                  _buildFilterChip(
+                    AppLocalizations.of(context).translate('community_pinned'),
+                    'pinned',
+                    LucideIcons.pin,
+                    const Color(0xFFF59E0B),
+                  ),
+                  const SizedBox(width: 8),
+                  _buildFilterChip(
+                    AppLocalizations.of(context).translate('community_news'),
+                    'news',
+                    LucideIcons.newspaper,
+                    const Color(0xFF10B981),
+                  ),
+                  const SizedBox(width: 8),
+                  _buildFilterChip(
+                    AppLocalizations.of(context).translate('community_posts'),
+                    'posts',
+                    LucideIcons.messageSquare,
+                    const Color(0xFF3B82F6),
+                  ),
+                  const SizedBox(width: 8),
+                  _buildFilterChip(
+                    AppLocalizations.of(context).translate('challenges'),
+                    'challenges',
+                    LucideIcons.star,
+                    const Color(0xFFEF4444),
+                  ),
+                  const SizedBox(width: 8),
+                  _buildFilterChip(
+                    AppLocalizations.of(context)
+                        .translate('community_categories'),
+                    'categories',
+                    LucideIcons.layoutGrid,
+                    const Color(0xFF8B5CF6),
+                  ),
+                ],
               ),
             ),
           ),
+        ),
 
-          // Scrollable Content
-          SliverToBoxAdapter(
-            child: _buildMainContent(),
-          ),
-        ],
-      ),
+        // Scrollable Content
+        SliverToBoxAdapter(
+          child: _buildMainContent(),
+        ),
+      ],
     );
+
+    // Conditionally wrap with RefreshIndicator
+    if (shouldEnableRefresh) {
+      return RefreshIndicator(
+        onRefresh: () async {
+          // Refresh based on selected filter
+          switch (_selectedFilter) {
+            case 'posts':
+              ref.invalidate(mainScreenPostsProvider(null));
+              await ref.read(mainScreenPostsProvider(null).future);
+              break;
+            case 'pinned':
+              // Fix: Call refresh method instead of just invalidating
+              await ref
+                  .read(pinnedPostsPaginationProvider.notifier)
+                  .refresh(isPinned: true);
+              break;
+            case 'news':
+              // Fix: Call refresh method instead of just invalidating
+              await ref
+                  .read(newsPostsPaginationProvider.notifier)
+                  .refresh(category: 'aqOhcyOg1z8tcij0y1S4');
+              break;
+            default:
+              ref.invalidate(mainScreenPostsProvider(null));
+              await ref.read(mainScreenPostsProvider(null).future);
+          }
+        },
+        child: scrollView,
+      );
+    } else {
+      return scrollView;
+    }
   }
 
   Widget _buildMainContent() {

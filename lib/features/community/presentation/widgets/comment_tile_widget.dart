@@ -6,8 +6,9 @@ import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/features/community/data/models/comment.dart';
 import 'package:reboot_app_3/features/community/presentation/widgets/avatar_with_anonymity.dart';
-import 'package:reboot_app_3/features/community/presentation/widgets/plus_badge_widget.dart';
 import 'package:reboot_app_3/features/community/presentation/widgets/community_profile_modal.dart';
+import 'package:reboot_app_3/features/community/presentation/widgets/role_chip.dart';
+import 'package:reboot_app_3/features/community/presentation/widgets/streak_display_widget.dart';
 import 'package:reboot_app_3/features/community/presentation/providers/community_providers_new.dart';
 import 'package:reboot_app_3/features/community/presentation/providers/forum_providers.dart';
 import 'package:reboot_app_3/features/account/presentation/widgets/feature_access_guard.dart';
@@ -268,6 +269,20 @@ class CommentTileWidget extends ConsumerWidget {
           ),
         ),
 
+        // Role chip for admins and moderators
+        authorProfileAsync.when(
+          data: (authorProfile) {
+            return Row(
+              children: [
+                const SizedBox(width: 6),
+                RoleChip(role: authorProfile.role),
+              ],
+            );
+          },
+          loading: () => const SizedBox.shrink(),
+          error: (error, stackTrace) => const SizedBox.shrink(),
+        ),
+
         // Real-time streak display for Plus users who allow sharing
         authorProfileAsync.when(
           data: (authorProfile) {
@@ -286,35 +301,10 @@ class CommentTileWidget extends ConsumerWidget {
                             return const SizedBox.shrink();
                           }
 
-                          return Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 4, vertical: 2),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFF22C55E)
-                                  .withValues(alpha: 0.1),
-                              borderRadius: BorderRadius.circular(4),
-                              border: Border.all(
-                                color: const Color(0xFF22C55E)
-                                    .withValues(alpha: 0.3),
-                                width: 1,
-                              ),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(LucideIcons.trophy,
-                                    size: 8, color: const Color(0xFF22C55E)),
-                                const SizedBox(width: 2),
-                                Text(
-                                  '${streakDays}d',
-                                  style: TextStyles.tiny.copyWith(
-                                    color: const Color(0xFF22C55E),
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 8,
-                                  ),
-                                ),
-                              ],
-                            ),
+                          return StreakDisplayWidget(
+                            streakDays: streakDays,
+                            fontSize: 8,
+                            iconSize: 8,
                           );
                         },
                         loading: () => const SizedBox.shrink(),
