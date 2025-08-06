@@ -2040,6 +2040,8 @@ const Map<String, String> kEn = {
   "followup-type-slipUp": "Slip-ups",
   "followup-type-all": "All Types",
 
+  "fellowship": "Group",
+
   // Mood correlation
   "mood-very-low": "Very low",
   "mood-low": "Low",
