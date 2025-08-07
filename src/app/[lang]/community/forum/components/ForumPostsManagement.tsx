@@ -157,7 +157,15 @@ export default function ForumPostsManagement() {
     if (!selectedPost) return;
 
     try {
-      await deleteDoc(doc(db, 'forumPosts', selectedPost.id));
+      console.log('Deleting post:', selectedPost.id);
+      
+      // Soft delete: mark as deleted instead of removing from database
+      await updateDoc(doc(db, 'forumPosts', selectedPost.id), {
+        isDeleted: true,
+        updatedAt: new Date(),
+      });
+      
+      console.log('Post marked as deleted successfully');
       toast.success(t('modules.community.posts.deleteSuccess'));
       setShowDeleteDialog(false);
       setSelectedPost(null);
@@ -549,7 +557,7 @@ export default function ForumPostsManagement() {
                   </TableRow>
                 ) : (
                   paginatedPosts.map((post) => (
-                    <TableRow key={post.id} className={post.isHidden ? 'opacity-50' : ''}>
+                    <TableRow key={post.id} className={`${post.isHidden ? 'opacity-50' : ''} ${post.isDeleted ? 'border-destructive bg-destructive/5' : ''}`}>
                       <TableCell>
                         <Checkbox
                           checked={selectedPosts.includes(post.id)}
@@ -653,16 +661,18 @@ export default function ForumPostsManagement() {
                                 t('modules.community.posts.table.actions.hidePost')
                               }
                             </DropdownMenuItem>
-                            <DropdownMenuItem 
-                              onClick={() => {
-                                setSelectedPost(post);
-                                setShowDeleteDialog(true);
-                              }}
-                              className="text-destructive"
-                            >
-                              <Trash2 className="mr-2 h-4 w-4" />
-                              {t('modules.community.posts.table.actions.deletePost')}
-                            </DropdownMenuItem>
+                            {!post.isDeleted && (
+                              <DropdownMenuItem 
+                                onClick={() => {
+                                  setSelectedPost(post);
+                                  setShowDeleteDialog(true);
+                                }}
+                                className="text-destructive"
+                              >
+                                <Trash2 className="mr-2 h-4 w-4" />
+                                {t('modules.community.posts.table.actions.deletePost')}
+                              </DropdownMenuItem>
+                            )}
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </TableCell>

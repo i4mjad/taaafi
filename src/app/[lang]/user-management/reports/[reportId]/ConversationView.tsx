@@ -15,6 +15,9 @@ import {
   Shield,
   MessageCircle,
   Clock,
+  ChevronDown,
+  ChevronUp,
+  Zap,
 } from 'lucide-react';
 
 // Firebase imports
@@ -56,6 +59,49 @@ export default function ConversationView({ reportId, reportStatus, onStatusChang
   const { t, locale } = useTranslation();
   const [newMessage, setNewMessage] = useState('');
   const [isSending, setIsSending] = useState(false);
+  const [showQuickReplies, setShowQuickReplies] = useState(false);
+
+  // Quick reply templates
+  const quickReplies = [
+    {
+      title: "🟡 مشكلة في البيانات – لا يوجد خلل",
+      message: "تمت مراجعة بياناتك، ولم نجد أي خلل. تأكد من تحديث التطبيق، وإذا المشكلة مستمرة، أرسل لنا تفاصيل أو صورة وسنساعدك فورًا 💛"
+    },
+    {
+      title: "🟡 المشكلة بسبب عدم إدخال المتابعات",
+      message: "تمت المراجعة، ويبدو أنك لم تُدخل بعض المتابعات اليومية. أضف المتابعات من التقويم لتحديث الإحصائيات بدقة، والمداومة مهمة لدقة البيانات 💛"
+    },
+    {
+      title: "🟡 المشكلة تم حلها واستعادة البيانات",
+      message: "تم حل المشكلة الآن، وتم استعادة البيانات لحسابك. تقدر تراجعها داخل التطبيق، وإذا لاحظت شيء ناقص بلغنا فورًا 💛"
+    },
+    {
+      title: "🟡 المشكلة لا يوجد شيء مفقود",
+      message: "تمت مراجعة بياناتك ولم نجد أي بيانات مفقودة. هل أنت متأكد أنك لم تقم بإعادة التعيين من قبل؟ إذا عندك تفاصيل إضافية بلغنا 💛"
+    },
+    {
+      title: "🟡 الأيام غير صحيحة",
+      message: "يرجى مراجعة تاريخ البداية من التقويم، قد يكون فيه يوم ناقص. إذا تقدر ترسل لنا التفاصيل، نساعدك بشكل أدق بإذن الله 💛"
+    },
+    {
+      title: "🟡 الاتهام بفقد البيانات بعد التحديث",
+      message: "نعتذر عن الإرباك، تم استرجاع بياناتك الآن بعد المراجعة. نحرص على الحفاظ على بيانات الجميع، ونقدّر صبرك وثقتك 💛"
+    },
+    {
+      title: "🟡 طلب تصفير البيانات",
+      message: "يمكنك تصفير الإحصائيات من داخل التطبيق عبر صفحة \"الحساب\" > \"إعادة ضبط الإحصائيات\". وإذا احتجت مساعدة، نحن معك 💛"
+    },
+    {
+      title: "🟡 اقتراحات مميزة",
+      message: "اقتراحك رائع ومفيد جدًا 🙏 نعمل على تطوير ميزات مثل [اذكر الميزة]، وإن شاء الله تشوفها قريبًا ضمن التحديثات القادمة 💛"
+    }
+  ];
+
+  // Handle quick reply selection
+  const handleQuickReplySelect = (message: string) => {
+    setNewMessage(message);
+    setShowQuickReplies(false);
+  };
 
   // Fetch conversation messages
   const [messagesSnapshot, messagesLoading, messagesError] = useCollection(
@@ -304,9 +350,47 @@ export default function ConversationView({ reportId, reportStatus, onStatusChang
           )}
         </div>
 
+        {/* Quick Replies */}
+        {canSendMessage && (
+          <div className="border-t pt-4">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowQuickReplies(!showQuickReplies)}
+              className="mb-3 flex items-center gap-2"
+            >
+              <Zap className="h-4 w-4" />
+              الردود السريعة
+              {showQuickReplies ? (
+                <ChevronUp className="h-4 w-4" />
+              ) : (
+                <ChevronDown className="h-4 w-4" />
+              )}
+            </Button>
+            
+            {showQuickReplies && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-4 max-h-60 overflow-y-auto">
+                {quickReplies.map((reply, index) => (
+                  <Button
+                    key={index}
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleQuickReplySelect(reply.message)}
+                    className="text-right justify-start h-auto p-3 text-wrap border border-gray-200 hover:bg-yellow-50 hover:border-yellow-300"
+                  >
+                    <div className="text-xs text-right leading-relaxed">
+                      {reply.title}
+                    </div>
+                  </Button>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Message Input */}
         {canSendMessage ? (
-          <div className="space-y-3 border-t pt-4">
+          <div className="space-y-3">
             <div>
               <Textarea
                 value={newMessage}

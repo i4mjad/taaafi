@@ -306,7 +306,15 @@ export default function PostDetailPage() {
     if (!post) return;
 
     try {
-      await deleteDoc(doc(db, 'forumPosts', post.id));
+      console.log('Deleting post:', post.id);
+      
+      // Soft delete: mark as deleted instead of removing from database
+      await updateDoc(doc(db, 'forumPosts', post.id), {
+        isDeleted: true,
+        updatedAt: new Date(),
+      });
+      
+      console.log('Post marked as deleted successfully');
       toast.success(t('modules.community.posts.deleteSuccess'));
       router.push(`/${lang}/community/forum`);
     } catch (error) {
@@ -449,7 +457,7 @@ export default function PostDetailPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Post Content */}
         <div className="lg:col-span-2 space-y-6">
-          <Card>
+          <Card className={post.isDeleted ? 'border-destructive bg-destructive/5' : ''}>
             <CardHeader>
               <div className="flex items-start justify-between">
                 <div>
@@ -469,6 +477,11 @@ export default function PostDetailPage() {
                       <Badge variant="default" className="ml-2">
                         <Pin className="h-3 w-3 mr-1" />
                         {t('modules.community.posts.pinned')}
+                      </Badge>
+                    )}
+                    {post.isDeleted && (
+                      <Badge variant="destructive" className="ml-2">
+                        {t('modules.community.posts.detailPage.deleted')}
                       </Badge>
                     )}
                   </CardTitle>
@@ -565,7 +578,9 @@ export default function PostDetailPage() {
                 </div>
               ) : (
                 <div className="prose max-w-none">
-                  <p className="whitespace-pre-wrap">{post.body}</p>
+                  <p className={`whitespace-pre-wrap ${post.isDeleted ? 'line-through text-muted-foreground italic' : ''}`}>
+                    {post.isDeleted ? t('modules.community.posts.detailPage.deletedPostText') : post.body}
+                  </p>
                 </div>
               )}
               
@@ -778,14 +793,16 @@ export default function PostDetailPage() {
                 <Lock className="mr-2 h-4 w-4" />
                 {t('modules.community.posts.detailPage.actions.lockComments')}
               </Button>
-              <Button 
-                variant="destructive" 
-                className="w-full justify-start"
-                onClick={() => setShowDeletePostDialog(true)}
-              >
-                <Trash2 className="mr-2 h-4 w-4" />
-                {t('modules.community.posts.detailPage.actions.deletePost')}
-              </Button>
+              {!post.isDeleted && (
+                <Button 
+                  variant="destructive" 
+                  className="w-full justify-start"
+                  onClick={() => setShowDeletePostDialog(true)}
+                >
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  {t('modules.community.posts.detailPage.actions.deletePost')}
+                </Button>
+              )}
             </CardContent>
           </Card>
 
