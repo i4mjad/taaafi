@@ -5,6 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import PostCategoriesManagement from "./components/PostCategoryForm";
 import CommunityProfilesManagement from "./components/CommunityProfilesManagement";
 import ForumPostsManagement from "./components/ForumPostsManagement";
+import ForumCommentsManagement from "./components/ForumCommentsManagement";
 import CommunityAnalytics from "./components/CommunityAnalytics";
 
 export default function ForumPage() {
@@ -20,8 +21,9 @@ export default function ForumPage() {
       </div>
       
       <Tabs defaultValue="posts" className="w-full">
-        <TabsList className="grid w-full grid-cols-4 mb-6">
+        <TabsList className="grid w-full grid-cols-5 mb-6">
           <TabsTrigger value="posts">{t('modules.community.posts.title')}</TabsTrigger>
+          <TabsTrigger value="comments">{t('modules.community.comments.title')}</TabsTrigger>
           <TabsTrigger value="profiles">{t('modules.community.profiles.title')}</TabsTrigger>
           <TabsTrigger value="categories">{t('modules.community.postCategories.title')}</TabsTrigger>
           <TabsTrigger value="analytics">{t('modules.community.analytics.title')}</TabsTrigger>
@@ -29,6 +31,9 @@ export default function ForumPage() {
         
         <TabsContent value="posts" className="space-y-4">
           <ForumPostsManagement />
+        </TabsContent>
+        <TabsContent value="comments" className="space-y-4">
+          <ForumCommentsManagement />
         </TabsContent>
         
         <TabsContent value="profiles" className="space-y-4">

@@ -12,6 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Separator } from '@/components/ui/separator';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import {
   ArrowLeft,
   Copy,
@@ -36,6 +37,7 @@ import { db } from '@/lib/firebase';
 
 // Import conversation component
 import ConversationView from './ConversationView';
+import MigrationManagementCard from '../../users/[uid]/MigrationManagementCard';
 
 // Import notification payload utilities
 import { createReportUpdatePayload } from '@/utils/notificationPayloads';
@@ -56,6 +58,9 @@ interface UserProfile {
   createdAt: Timestamp;
   lastLoginAt?: Timestamp;
   messagingToken?: string;
+  userRelapses?: string[];
+  userMasturbatingWithoutWatching?: string[];
+  userWatchingWithoutMasturbating?: string[];
 }
 
 export default function ReportDetailsPage() {
@@ -66,6 +71,7 @@ export default function ReportDetailsPage() {
 
   const [selectedStatus, setSelectedStatus] = useState<string>('');
   const [isUpdating, setIsUpdating] = useState(false);
+  const [migrationDialogOpen, setMigrationDialogOpen] = useState(false);
 
   // Fetch report data using react-firebase-hooks
   const [reportSnapshot, reportLoading, reportError] = useDocument(
@@ -107,6 +113,9 @@ export default function ReportDetailsPage() {
     createdAt: userSnapshot.data().createdAt || Timestamp.now(),
     lastLoginAt: userSnapshot.data().lastLoginAt,
     messagingToken: userSnapshot.data().messagingToken,
+    userRelapses: userSnapshot.data().userRelapses,
+    userMasturbatingWithoutWatching: userSnapshot.data().userMasturbatingWithoutWatching,
+    userWatchingWithoutMasturbating: userSnapshot.data().userWatchingWithoutMasturbating,
   } : null;
 
   // Fetch related post if the report is for a post
@@ -878,6 +887,9 @@ export default function ReportDetailsPage() {
                               {t('modules.userManagement.reports.reportDetails.viewUserProfile') || 'View User Profile'}
                             </Link>
                           </Button>
+                          <Button variant="default" size="sm" className="w-full" onClick={() => setMigrationDialogOpen(true)}>
+                            {t('modules.userManagement.reports.reportDetails.quickMigrationCheck') || 'Quick Migration Check'}
+                          </Button>
                         </>
                       ) : (
                         <div className="text-center py-4">
@@ -904,6 +916,19 @@ export default function ReportDetailsPage() {
           </div>
         </div>
       </div>
+
+      {user && (
+        <Dialog open={migrationDialogOpen} onOpenChange={setMigrationDialogOpen}>
+          <DialogContent className="max-w-3xl">
+            <DialogHeader>
+              <DialogTitle>
+                {t('modules.userManagement.reports.reportDetails.quickMigrationCheck') || 'Quick Migration Check'}
+              </DialogTitle>
+            </DialogHeader>
+            <MigrationManagementCard userId={user.uid} user={user} />
+          </DialogContent>
+        </Dialog>
+      )}
     </>
   );
 } 

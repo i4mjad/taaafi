@@ -257,7 +257,7 @@ export default function ConversationView({ reportId, reportStatus, onStatusChang
     }
   };
 
-  const remainingChars = 220 - newMessage.length;
+  const remainingChars = 1000 - newMessage.length;
 
   if (messagesError) {
     return (
@@ -397,12 +397,12 @@ export default function ConversationView({ reportId, reportStatus, onStatusChang
                 onChange={(e) => setNewMessage(e.target.value)}
                 placeholder={t('modules.userManagement.reports.reportDetails.messagePlaceholder') || 'Type your message to the user...'}
                 rows={3}
-                maxLength={220}
+                maxLength={1000}
                 disabled={isSending}
               />
               <div className="flex justify-between items-center mt-2">
                 <span className="text-sm text-muted-foreground">
-                  {t('modules.userManagement.reports.reportDetails.maxCharacters') || 'Maximum 220 characters'}
+                  {t('modules.userManagement.reports.reportDetails.maxCharacters') || 'Maximum 1000 characters'}
                 </span>
                 <span className={`text-sm ${remainingChars < 20 ? 'text-orange-600' : 'text-muted-foreground'}`}>
                   {remainingChars} {t('modules.userManagement.reports.reportDetails.charactersRemaining') || 'characters remaining'}

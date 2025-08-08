@@ -40,6 +40,7 @@ import Link from 'next/link';
 import { ForumPost, Comment, Interaction } from '@/types/community';
 import { UserReport, REPORT_TYPE_IDS, ReportWithContext } from '@/types/reports';
 import { toast } from 'sonner';
+import ModerationActionDialog from '../../components/ModerationActionDialog';
 
 export default function PostDetailPage() {
   const { t } = useTranslation();
@@ -61,6 +62,12 @@ export default function PostDetailPage() {
     category: ''
   });
   const [editErrors, setEditErrors] = useState<Record<string, string>>({});
+  const [moderationOpen, setModerationOpen] = useState(false);
+  const [moderationTarget, setModerationTarget] = useState<
+    | { kind: 'post'; id: string; title: string; authorCPId: string; isHidden?: boolean; isDeleted?: boolean }
+    | { kind: 'comment'; id: string; title?: string; authorCPId: string; isHidden?: boolean; isDeleted?: boolean }
+    | null
+  >(null);
 
   // Fetch the specific post
   const [postValue, postLoading, postError] = useDocument(
@@ -340,6 +347,30 @@ export default function PostDetailPage() {
       console.error('Error hiding post:', error);
       toast.error(t('modules.community.posts.hideError'));
     }
+  };
+
+  const openModerationForPost = () => {
+    if (!post) return;
+    setModerationTarget({
+      kind: 'post',
+      id: post.id,
+      title: post.title,
+      authorCPId: post.authorCPId,
+      isHidden: post.isHidden,
+      isDeleted: post.isDeleted,
+    });
+    setModerationOpen(true);
+  };
+  const openModerationForComment = (comment: Comment) => {
+    setModerationTarget({
+      kind: 'comment',
+      id: comment.id,
+      title: undefined,
+      authorCPId: comment.authorCPId,
+      isHidden: comment.isHidden,
+      isDeleted: comment.isDeleted,
+    });
+    setModerationOpen(true);
   };
 
   const handlePinPost = async () => {
@@ -726,6 +757,10 @@ export default function PostDetailPage() {
                                   t('modules.community.posts.detailPage.commentActions.hide')
                                 }
                               </DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => openModerationForComment(comment)}>
+                                <AlertCircle className="mr-2 h-4 w-4" />
+                                {t('modules.community.posts.moderation.quickModerate')}
+                              </DropdownMenuItem>
                               {!comment.isDeleted && (
                                 <DropdownMenuItem 
                                   onClick={() => {
@@ -777,6 +812,14 @@ export default function PostDetailPage() {
                   t('modules.community.posts.detailPage.actions.unhidePost') : 
                   t('modules.community.posts.detailPage.actions.hidePost')
                 }
+              </Button>
+              <Button 
+                variant="outline" 
+                className="w-full justify-start"
+                onClick={openModerationForPost}
+              >
+                <AlertCircle className="mr-2 h-4 w-4" />
+                {t('modules.community.posts.moderation.quickModerate')}
               </Button>
               <Button 
                 variant="outline" 
@@ -1087,6 +1130,22 @@ export default function PostDetailPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Moderation Action Dialog */}
+      {moderationTarget && (
+        <ModerationActionDialog
+          isOpen={moderationOpen}
+          onOpenChange={(open) => {
+            setModerationOpen(open);
+            if (!open) setModerationTarget(null);
+          }}
+          targetType={moderationTarget.kind === 'post' ? 'post' : 'comment'}
+          targetId={moderationTarget.id}
+          targetTitle={moderationTarget.title}
+          authorCPId={moderationTarget.authorCPId}
+          contentStatus={{ isHidden: !!moderationTarget.isHidden, isDeleted: !!moderationTarget.isDeleted }}
+        />
+      )}
     </div>
   );
 } 

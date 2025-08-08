@@ -103,8 +103,8 @@ export default function UserReportsPage() {
   const [reportTypeFilter, setReportTypeFilter] = useState<string>('all');
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(50);
-  const [sortBy, setSortBy] = useState<'messageLength' | 'plusUser' | 'date'>('messageLength');
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+  const [sortBy, setSortBy] = useState<'messageLength' | 'plusUser' | 'date'>('date');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   
   // Bulk update state
   const [selectedReports, setSelectedReports] = useState<Set<string>>(new Set());
@@ -1246,9 +1246,12 @@ export default function UserReportsPage() {
                               </TableCell>
                               <TableCell>
                                 <div className="flex items-center gap-1 min-w-0">
-                                  <span className="font-mono text-xs sm:text-sm max-w-[80px] sm:max-w-[120px] truncate">
+                                  <Link 
+                                    href={`/${locale}/user-management/reports/${report.id}`}
+                                    className="font-mono text-xs sm:text-sm max-w-[80px] sm:max-w-[120px] truncate text-blue-600 hover:underline"
+                                  >
                                     {report.id}
-                                  </span>
+                                  </Link>
                                   <Button
                                     variant="ghost"
                                     size="sm"

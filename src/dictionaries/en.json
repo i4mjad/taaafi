@@ -960,7 +960,7 @@
             "messageLabel": "Your Message",
             "messagePlaceholder": "Type your message to the user...",
             "messageHelp": "Your message will be sent to the user immediately",
-            "maxCharacters": "Maximum 220 characters",
+            "maxCharacters": "Maximum 1000 characters",
             "charactersRemaining": "characters remaining",
             "conversationHistory": "Conversation History",
             "noMessages": "No messages in this conversation yet",
@@ -997,7 +997,8 @@
             "parentPost": "Parent Post",
             "viewPost": "View Post",
             "viewParentPost": "View Parent Post",
-            "relatedItemNotFound": "The reported item could not be found or may have been deleted."
+            "relatedItemNotFound": "The reported item could not be found or may have been deleted.",
+            "quickMigrationCheck": "Quick Migration Check"
           },
           "messageNotifications": {
             "title": "New Message from Admin",
@@ -1769,6 +1770,64 @@
             "viewAllPostReports": "View All Post Reports",
             "viewAllCommentReports": "View All Comment Reports",
             "commentByAuthor": "Comment by {author}"
+          },
+          "moderation": {
+            "title": "Quick Moderation",
+            "description": "Issue a warning or ban to the author and optionally hide/delete this {type} in one step.",
+            "author": "Author",
+            "content": "Content",
+            "apply": "Apply",
+            "quickModerate": "Quick Moderate",
+            "success": "Moderation action applied",
+            "error": "Failed to apply moderation action",
+            "errors": {
+              "userUidMissing": "Cannot find author's user UID from community profile"
+            },
+            "contentActions": {
+              "title": "Content Actions",
+              "hide": "Hide",
+              "unhide": "Unhide",
+              "delete": "Soft Delete"
+            },
+            "reasonPresets": {
+              "label": "Community rule presets",
+              "placeholder": "Select a preset reason (optional)",
+              "custom": "Custom reason"
+            }
+          }
+        },
+        "rules": {
+          "no_personal_contact": {
+            "title": "No personal contact sharing",
+            "description": "Sharing social accounts, phone numbers, emails, or any contact methods is strictly prohibited. Violations may lead to a permanent ban."
+          },
+          "respect": {
+            "title": "Respect all members",
+            "description": "No abuse, bullying, mockery, or harassment in any form, direct or indirect."
+          },
+          "anonymous_not_abuse": {
+            "title": "Anonymity is not a license to harm",
+            "description": "Anonymous posting is for safe expression, not for abuse or inappropriate topics."
+          },
+          "inappropriate_content": {
+            "title": "No harmful or inappropriate content",
+            "description": "Includes hate, violence or discrimination; sexual/explicit content; misinformation; or product/service promotion."
+          },
+          "no_medical_advice": {
+            "title": "No specialized medical/psychological advice",
+            "description": "This forum does not replace professionals. Do not provide diagnosis or direct treatments."
+          },
+          "honesty_with_empathy": {
+            "title": "Be honest with empathy",
+            "description": "Share experiences and opinions without harming others. Honesty is welcome; cruelty is not."
+          },
+          "report_responsibility": {
+            "title": "Reporting is a shared responsibility",
+            "description": "Report any content or account that threatens community safety. Reports are reviewed confidentially."
+          },
+          "admin_rights": {
+            "title": "Admin may edit or remove content",
+            "description": "We may take any action needed to maintain community safety."
           }
         },
         "comments": {

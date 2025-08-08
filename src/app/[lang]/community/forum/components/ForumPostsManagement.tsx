@@ -13,8 +13,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Search, MessageSquare, ThumbsUp, ThumbsDown, User, MoreHorizontal, Eye, Edit, Trash2, EyeOff, Plus, Pin, PinOff, X } from 'lucide-react';
+import { Search, MessageSquare, ThumbsUp, ThumbsDown, User, MoreHorizontal, Eye, Edit, Trash2, EyeOff, Plus, Pin, PinOff, X, AlertCircle } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import ModerationActionDialog from './ModerationActionDialog';
 import { format } from 'date-fns';
 import { ForumPost, Comment, Interaction } from '@/types/community';
 import { toast } from 'sonner';
@@ -28,12 +29,15 @@ export default function ForumPostsManagement() {
   const lang = params.lang as string;
   const [search, setSearch] = useState('');
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
+  const [genderFilter, setGenderFilter] = useState<'all' | 'male' | 'female' | 'other'>('all');
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [selectedPost, setSelectedPost] = useState<ForumPost | null>(null);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [showHideDialog, setShowHideDialog] = useState(false);
   const [showCreateDialog, setShowCreateDialog] = useState(false);
+  const [moderationOpen, setModerationOpen] = useState(false);
+  const [moderationPost, setModerationPost] = useState<ForumPost | null>(null);
   const [selectedPosts, setSelectedPosts] = useState<string[]>([]);
   const [showBulkDeleteDialog, setShowBulkDeleteDialog] = useState(false);
   const [showBulkSoftDeleteDialog, setShowBulkSoftDeleteDialog] = useState(false);
@@ -57,6 +61,11 @@ export default function ForumPostsManagement() {
   // Fetch post categories
   const [categoriesValue] = useCollection(
     query(collection(db, 'postCategories'), orderBy('sortOrder'))
+  );
+
+  // Fetch community profiles to derive gender by authorCPId
+  const [profilesValue] = useCollection(
+    query(collection(db, 'communityProfiles'))
   );
 
   const posts = useMemo(() => {
@@ -103,6 +112,16 @@ export default function ForumPostsManagement() {
     }));
   }, [categoriesValue]);
 
+  const cpGenderById = useMemo(() => {
+    const map = new Map<string, 'male' | 'female' | 'other'>();
+    if (!profilesValue) return map;
+    for (const d of profilesValue.docs) {
+      const g = (d.data().gender as 'male' | 'female' | 'other') || 'other';
+      map.set(d.id, g);
+    }
+    return map;
+  }, [profilesValue]);
+
   // Apply filters
   const filteredPosts = useMemo(() => {
     return posts.filter(post => {
@@ -111,10 +130,11 @@ export default function ForumPostsManagement() {
         post.body.toLowerCase().includes(search.toLowerCase());
       
       const matchesCategory = categoryFilter === 'all' || post.category === categoryFilter;
+      const matchesGender = genderFilter === 'all' || cpGenderById.get(post.authorCPId) === genderFilter;
       
-      return matchesSearch && matchesCategory;
+      return matchesSearch && matchesCategory && matchesGender;
     });
-  }, [posts, search, categoryFilter]);
+  }, [posts, search, categoryFilter, genderFilter, cpGenderById]);
 
   // Get paginated posts
   const paginatedPosts = useMemo(() => {
@@ -151,6 +171,11 @@ export default function ForumPostsManagement() {
   const handleViewDetails = (post: ForumPost) => {
     // Navigate to post detail page
     router.push(`/${lang}/community/forum/posts/${post.id}`);
+  };
+
+  const openModerationForPost = (post: ForumPost) => {
+    setModerationPost(post);
+    setModerationOpen(true);
   };
 
   const handleDeletePost = async () => {
@@ -494,7 +519,7 @@ export default function ForumPostsManagement() {
       )}
 
       {/* Filters */}
-      <div className="flex flex-col sm:flex-row gap-4">
+      <div className="flex flex-col md:flex-row gap-4">
         <div className="flex-1">
           <div className="relative">
             <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -517,6 +542,17 @@ export default function ForumPostsManagement() {
                 {category.name}
               </SelectItem>
             ))}
+          </SelectContent>
+        </Select>
+        <Select value={genderFilter} onValueChange={(v) => setGenderFilter(v as any)}>
+          <SelectTrigger className="w-[200px]">
+            <SelectValue placeholder={t('modules.community.posts.filterByGender')} />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">{t('common.all')}</SelectItem>
+            <SelectItem value="male">{t('modules.community.profiles.male')}</SelectItem>
+            <SelectItem value="female">{t('modules.community.profiles.female')}</SelectItem>
+            <SelectItem value="other">{t('modules.community.profiles.other')}</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -557,12 +593,17 @@ export default function ForumPostsManagement() {
                   </TableRow>
                 ) : (
                   paginatedPosts.map((post) => (
-                    <TableRow key={post.id} className={`${post.isHidden ? 'opacity-50' : ''} ${post.isDeleted ? 'border-destructive bg-destructive/5' : ''}`}>
-                      <TableCell>
+                    <TableRow
+                      key={post.id}
+                      onClick={() => handleViewDetails(post)}
+                      className={`cursor-pointer hover:bg-accent/40 ${post.isHidden ? 'opacity-50' : ''} ${post.isDeleted ? 'border-destructive bg-destructive/5' : ''}`}
+                    >
+                      <TableCell onClick={(e) => e.stopPropagation()}>
                         <Checkbox
                           checked={selectedPosts.includes(post.id)}
                           onCheckedChange={(checked) => handleSelectPost(post.id, !!checked)}
                           aria-label={t('modules.community.posts.table.selectPost')}
+                          onClick={(e) => e.stopPropagation()}
                         />
                       </TableCell>
                       <TableCell className="font-medium max-w-[300px] truncate">
@@ -632,10 +673,10 @@ export default function ForumPostsManagement() {
                           {format(post.createdAt, 'MMM dd, yyyy')}
                         </span>
                       </TableCell>
-                      <TableCell className="text-right">
+                      <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" className="h-8 w-8 p-0">
+                            <Button variant="ghost" className="h-8 w-8 p-0" onClick={(e) => e.stopPropagation()}>
                               <span className="sr-only">{t('modules.community.posts.table.accessibility.openMenu')}</span>
                               <MoreHorizontal className="h-4 w-4" />
                             </Button>
@@ -645,6 +686,10 @@ export default function ForumPostsManagement() {
                               <Eye className="mr-2 h-4 w-4" />
                               {t('modules.community.posts.table.actions.viewDetails')}
                             </DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => openModerationForPost(post)}>
+                                <AlertCircle className="mr-2 h-4 w-4" />
+                                {t('modules.community.posts.moderation.quickModerate')}
+                              </DropdownMenuItem>
                             <DropdownMenuItem>
                               <Edit className="mr-2 h-4 w-4" />
                               {t('modules.community.posts.table.actions.editPost')}
@@ -838,6 +883,19 @@ export default function ForumPostsManagement() {
         onClose={() => setShowCreateDialog(false)}
         onSuccess={handleCreatePostSuccess}
       />
+
+      {/* Moderation Dialog */}
+      {moderationPost && (
+        <ModerationActionDialog
+          isOpen={moderationOpen}
+          onOpenChange={setModerationOpen}
+          targetType="post"
+          targetId={moderationPost.id}
+          targetTitle={moderationPost.title}
+          authorCPId={moderationPost.authorCPId}
+          contentStatus={{ isHidden: !!moderationPost.isHidden, isDeleted: !!moderationPost.isDeleted }}
+        />
+      )}
     </div>
   );
 } 

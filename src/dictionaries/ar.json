@@ -976,7 +976,7 @@
             "messageLabel": "رسالتك",
             "messagePlaceholder": "اكتب رسالتك للمستخدم...",
             "messageHelp": "سيتم إرسال رسالتك للمستخدم فوراً",
-            "maxCharacters": "الحد الأقصى 220 حرف",
+            "maxCharacters": "الحد الأقصى 1000 حرف",
             "charactersRemaining": "حرف متبقي",
             "conversationHistory": "تاريخ المحادثة",
             "noMessages": "لا توجد رسائل في هذه المحادثة بعد",
@@ -1013,7 +1013,8 @@
             "parentPost": "المنشور الرئيسي",
             "viewPost": "عرض المنشور",
             "viewParentPost": "عرض المنشور الرئيسي",
-            "relatedItemNotFound": "لم يتم العثور على العنصر المُبلغ عنه أو ربما تم حذفه."
+            "relatedItemNotFound": "لم يتم العثور على العنصر المُبلغ عنه أو ربما تم حذفه.",
+            "quickMigrationCheck": "فحص الهجرة السريع"
           },
           "messageNotifications": {
             "title": "رسالة جديدة من المدير",
@@ -1787,6 +1788,30 @@
             "viewAllCommentReports": "عرض جميع تقارير التعليقات",
             "commentByAuthor": "تعليق بواسطة {author}"
           },
+          "moderation": {
+            "title": "إشراف سريع",
+            "description": "أصدر تحذيراً أو حظراً للكاتب وأخفي/احذف هذا {type} بخطوة واحدة.",
+            "author": "الكاتب",
+            "content": "المحتوى",
+            "apply": "تطبيق",
+            "quickModerate": "إشراف سريع",
+            "success": "تم تطبيق إجراء الإشراف",
+            "error": "فشل في تطبيق إجراء الإشراف",
+            "errors": {
+              "userUidMissing": "لا يمكن العثور على UID للمستخدم من ملف المجتمع"
+            },
+            "contentActions": {
+              "title": "إجراءات المحتوى",
+              "hide": "إخفاء",
+              "unhide": "إظهار",
+              "delete": "حذف مؤقت"
+            },
+            "reasonPresets": {
+              "label": "قواعد المجتمع (مسبقة)",
+              "placeholder": "اختر سبباً جاهزاً (اختياري)",
+              "custom": "سبب مخصص"
+            }
+          },
           "totalAcrossAllPosts": "الإجمالي عبر جميع المنشورات",
           "likesAndDislikes": "إعجابات وعدم إعجابات",
           "tryAdjustingFilters": "حاول تعديل معايير البحث أو التصفية",
@@ -1805,6 +1830,40 @@
           "comments": "{count} تعليق",
           "score": "النقاط: {score}",
           "detailDateTimeFormat": "dd MMMM, yyyy HH:mm"
+        },
+        "rules": {
+          "no_personal_contact": {
+            "title": "ممنوع مشاركة وسائل التواصل",
+            "description": "يُحظر مشاركة حسابات التواصل أو الأرقام أو البريد أو أي وسيلة تواصل. قد يؤدي الخرق إلى حظر دائم."
+          },
+          "respect": {
+            "title": "احترام جميع الأعضاء",
+            "description": "لا إساءة أو تنمر أو سخرية أو تهجم بأي شكل مباشر أو غير مباشر."
+          },
+          "anonymous_not_abuse": {
+            "title": "النشر المجهول ليس للإساءة",
+            "description": "الهدف من المجهول هو الأمان للتعبير لا للإساءة أو طرح مواضيع غير لائقة."
+          },
+          "inappropriate_content": {
+            "title": "ممنوع المحتوى غير المناسب أو الضار",
+            "description": "يشمل الكراهية أو العنف أو التفرقة، المحتوى الجنسي/الخارج، المعلومات المضللة، أو الترويج لمنتجات وخدمات."
+          },
+          "no_medical_advice": {
+            "title": "ممنوع النصائح الطبية/النفسية المتخصصة",
+            "description": "المنتدى ليس بديلاً عن المختصين. لا تقدّم تشخيصاً أو علاجاً مباشراً."
+          },
+          "honesty_with_empathy": {
+            "title": "كن صادقاً بإنسانية",
+            "description": "شارك تجربتك ورأيك دون تجريح. نرحب بالصدق ونرفض القسوة."
+          },
+          "report_responsibility": {
+            "title": "التبليغ مسؤولية جماعية",
+            "description": "بلّغ عن أي محتوى/حساب يهدد سلامة المجتمع. جميع البلاغات تُراجع بسرية."
+          },
+          "admin_rights": {
+            "title": "للإدارة حق التعديل أو الحذف",
+            "description": "نحتفظ بحق اتخاذ أي إجراء يحفظ سلامة المجتمع."
+          }
         },
         "comments": {
           "title": "التعليقات",
