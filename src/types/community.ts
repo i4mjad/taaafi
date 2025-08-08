@@ -6,6 +6,7 @@ export interface CommunityProfile {
   isAnonymous: boolean;    // Whether user posts anonymously by default
   postAnonymouslyByDefault?: boolean; // Alternative naming from cursor rule
   referralCode?: string;   // Optional referral code
+  userUID?: string;        // User UID in users collection (source of truth for user details)
   createdAt: Date;
   updatedAt?: Date;
 }

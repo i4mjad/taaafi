@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useTranslation } from '@/contexts/TranslationContext';
 import { useCollection } from 'react-firebase-hooks/firestore';
 import { collection, query, orderBy } from 'firebase/firestore';
@@ -13,19 +13,23 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Search, User, Users, UserCheck, Eye, Edit, MoreHorizontal } from 'lucide-react';
+import { Search, User, Users, UserCheck, Eye, Edit, MoreHorizontal, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { format } from 'date-fns';
 import { CommunityProfile } from '@/types/community';
 import { toast } from 'sonner';
+import { useRouter } from 'next/navigation';
 
 export default function CommunityProfilesManagement() {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
+  const router = useRouter();
   const [search, setSearch] = useState('');
   const [genderFilter, setGenderFilter] = useState<string>('all');
   const [anonymousFilter, setAnonymousFilter] = useState<string>('all');
   const [selectedProfile, setSelectedProfile] = useState<CommunityProfile | null>(null);
   const [showDetails, setShowDetails] = useState(false);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [pageSize, setPageSize] = useState<number>(10);
 
   // Fetch community profiles
   const [value, loading, error] = useCollection(
@@ -58,6 +62,21 @@ export default function CommunityProfilesManagement() {
       return matchesSearch && matchesGender && matchesAnonymous;
     });
   }, [profiles, search, genderFilter, anonymousFilter]);
+
+  // Reset to first page when filters or page size change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [search, genderFilter, anonymousFilter, pageSize]);
+
+  const totalPages = useMemo(() => {
+    return Math.max(1, Math.ceil(filteredProfiles.length / pageSize));
+  }, [filteredProfiles.length, pageSize]);
+
+  const paginatedProfiles = useMemo(() => {
+    const startIndex = (currentPage - 1) * pageSize;
+    const endIndex = startIndex + pageSize;
+    return filteredProfiles.slice(startIndex, endIndex);
+  }, [filteredProfiles, currentPage, pageSize]);
 
   // Calculate stats
   const stats = useMemo(() => {
@@ -276,7 +295,7 @@ export default function CommunityProfilesManagement() {
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredProfiles.map((profile) => (
+                  {paginatedProfiles.map((profile) => (
                     <tr key={profile.id} className="border-b hover:bg-muted/50">
                       <td className="py-3 px-4">
                         <div className="flex items-center gap-3">
@@ -326,6 +345,13 @@ export default function CommunityProfilesManagement() {
                                 {t('modules.community.profiles.viewProfile')}
                               </DropdownMenuItem>
                               <DropdownMenuItem onClick={() => {
+                                const uid = (profile as any).userUID || profile.id;
+                                router.push(`/${locale}/user-management/users/${uid}`);
+                              }}>
+                                <User className="me-2 h-4 w-4" />
+                                {t('modules.userManagement.userDetails') || 'View user details'}
+                              </DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => {
                                 toast.info('Edit functionality coming soon');
                               }}>
                                 <Edit className="me-2 h-4 w-4" />
@@ -342,6 +368,48 @@ export default function CommunityProfilesManagement() {
             </div>
           )}
         </CardContent>
+        {filteredProfiles.length > 0 && (
+          <div className="px-6 pb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-muted-foreground">{t('common.itemsPerPage') || 'Items per page'}:</span>
+              <Select value={String(pageSize)} onValueChange={(val) => setPageSize(Number(val))}>
+                <SelectTrigger className="w-20">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="10">10</SelectItem>
+                  <SelectItem value="25">25</SelectItem>
+                  <SelectItem value="50">50</SelectItem>
+                  <SelectItem value="100">100</SelectItem>
+                </SelectContent>
+              </Select>
+              <span className="text-sm text-muted-foreground">
+                {(() => {
+                  const start = (currentPage - 1) * pageSize + 1;
+                  const end = Math.min(currentPage * pageSize, filteredProfiles.length);
+                  return `${start}-${end} of ${filteredProfiles.length}`;
+                })()}
+              </span>
+            </div>
+            <div className="flex items-center gap-2 justify-end">
+              <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => setCurrentPage(1)} disabled={currentPage === 1}>
+                <ChevronsLeft className="h-4 w-4" />
+              </Button>
+              <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1}>
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+              <span className="text-sm text-muted-foreground">
+                {t('common.page') || 'Page'} {currentPage} / {totalPages}
+              </span>
+              <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages}>
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+              <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => setCurrentPage(totalPages)} disabled={currentPage === totalPages}>
+                <ChevronsRight className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        )}
       </Card>
 
       {/* Profile Details Dialog */}
