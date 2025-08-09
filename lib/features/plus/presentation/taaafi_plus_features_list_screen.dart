@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/foundation.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
@@ -847,7 +848,7 @@ class _TaaafiPlusScreenState
             ),
             verticalSpace(Spacing.points4),
             Text(
-              _formatPrice(package.storeProduct.price) +
+              _formatPrice(package.storeProduct) +
                   " / ${_getPackagePeriod(package)}",
               style: TextStyles.footnoteSelected.copyWith(
                 color: Color(0xFFFEBA01),
@@ -907,6 +908,7 @@ class _TaaafiPlusScreenState
             HapticFeedback.mediumImpact();
             // Try to refresh packages
             ref.invalidate(availablePackagesProvider);
+            ref.invalidate(subscriptionNotifierProvider);
           },
           child: Container(
             width: double.infinity,
@@ -1070,14 +1072,33 @@ class _TaaafiPlusScreenState
     }
   }
 
-  /// Format price to display as rounded value (e.g., "$4.99")
-  String _formatPrice(double price) {
+  /// Format price using the store's localized currency from RevenueCat
+  String _formatPrice(StoreProduct product) {
     try {
-      // Format to 2 decimal places with dollar sign
-      return '\$${price.toStringAsFixed(2)}';
+      if (kDebugMode) {
+        print(
+            '[Pricing] productId=${product.identifier}, priceString=${product.priceString}, currency=${product.currencyCode}, amount=${product.price}');
+      }
+
+      final localized = product.priceString;
+      if (localized.isNotEmpty) {
+        if (kDebugMode) print('[Pricing] using localized priceString');
+        return localized;
+      }
+
+      // Fallbacks if localized string is unavailable
+      final currency = product.currencyCode;
+      final amount = product.price;
+      if (kDebugMode)
+        print('[Pricing] fallback currency=$currency amount=$amount');
+      if (currency.isNotEmpty) {
+        return '$currency ${amount.toStringAsFixed(2)}';
+      }
+      if (kDebugMode) print('[Pricing] ultimate fallback amount only');
+      return amount.toStringAsFixed(2);
     } catch (e) {
-      // If any error occurs, return the original price as string
-      return '\$${price.toString()}';
+      if (kDebugMode) print('[Pricing] error formatting price: $e');
+      return product.price.toString();
     }
   }
 }
