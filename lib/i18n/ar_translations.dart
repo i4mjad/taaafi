@@ -239,6 +239,7 @@ const Map<String, String> kAr = {
   "about-ta3afi":
       "تطبيق للتوعية بمخاطر المواد الإباحية وما يؤدي الإدمان عليها عن طريق تقديم محتوى وأدوات تساعد في حل المشكلة.",
   "version-number": "النسخة 5.3.1",
+  "app-loading": "جاري التهيئة...",
   "what-is-all-of-those": "ما هو الفرق بين هذه الأرقام؟",
   "contact-us-through-this-channels": "تواصل معنا",
   "support-app-development": "ادعم تطوير التطبيق",

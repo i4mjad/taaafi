@@ -785,6 +785,7 @@ const Map<String, String> kEn = {
       "An app to raise awareness about the dangers of pornography and addiction to it by providing content and tools to help solve the problem.",
   "version-number": "Version 5.3.1",
   "what-is-all-of-those": "What's the difference between these numbers?",
+  "app-loading": "Initializing...",
   "processing": "Processing...",
   "dismiss": "Dismiss",
   "contact-us-through-this-channels": "Contact us",

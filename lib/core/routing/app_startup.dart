@@ -143,7 +143,7 @@ class AppStartupLoadingWidget extends StatelessWidget {
             Spinner(),
             verticalSpace(Spacing.points16),
             Text(
-              'Initializing...',
+              AppLocalizations.of(context).translate('app-loading'),
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: theme.grey[700],
                   ),
