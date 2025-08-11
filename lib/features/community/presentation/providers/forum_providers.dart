@@ -935,6 +935,18 @@ class PostsPaginationNotifier extends StateNotifier<PostsPaginationState> {
     final communityState = _ref.read(communityScreenStateProvider);
 
     if (communityState != CommunityScreenState.showMainContent) {
+      // Instead of immediately returning empty, try again after a short delay
+      // This handles the timing issue when switching to community tab
+      Future.delayed(Duration(milliseconds: 500), () {
+        final retryState = _ref.read(communityScreenStateProvider);
+        if (retryState == CommunityScreenState.showMainContent &&
+            state.posts.isEmpty &&
+            !state.isLoading) {
+          // Retry loading posts now that community state is ready
+          loadPosts(category: category, isPinned: isPinned);
+        }
+      });
+
       state = state.copyWith(
         posts: <Post>[],
         lastDocument: null,

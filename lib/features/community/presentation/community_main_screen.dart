@@ -878,6 +878,9 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen>
           physics: const NeverScrollableScrollPhysics(),
           itemCount: posts.length,
           itemBuilder: (context, index) {
+            // Safe index access to prevent range errors
+            if (index >= posts.length) return Container();
+
             final post = posts[index];
             return ThreadsPostCard(
               post: post,
@@ -999,14 +1002,18 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen>
       );
     }
 
-    // Show only first 5 posts as preview
-    final previewPosts = postsState.posts.take(5).toList();
+    // Show only first 5 posts as preview with safe access
+    final allPosts = postsState.posts ?? [];
+    final previewPosts = allPosts.take(5).toList();
 
     return ListView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       itemCount: previewPosts.length,
       itemBuilder: (context, index) {
+        // Safe index access to prevent range errors
+        if (index >= previewPosts.length) return Container();
+
         final post = previewPosts[index];
         return ThreadsPostCard(
           post: post,
@@ -1087,14 +1094,18 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen>
       );
     }
 
-    // Show only first 5 posts as preview
-    final previewPosts = postsState.posts.take(5).toList();
+    // Show only first 5 posts as preview with safe access
+    final allPosts = postsState.posts ?? [];
+    final previewPosts = allPosts.take(5).toList();
 
     return ListView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       itemCount: previewPosts.length,
       itemBuilder: (context, index) {
+        // Safe index access to prevent range errors
+        if (index >= previewPosts.length) return Container();
+
         final post = previewPosts[index];
         return ThreadsPostCard(
           post: post,
