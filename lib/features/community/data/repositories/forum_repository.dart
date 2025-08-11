@@ -278,6 +278,9 @@ class ForumRepository {
 
       return result;
     } catch (e) {
+      print('🔥 ERROR: Failed to fetch unfiltered posts: $e');
+      print(
+          '🔗 If this is an index error, check the link in the error message above for Firestore index requirements');
       throw Exception('Failed to fetch posts: $e');
     }
   }
@@ -355,6 +358,9 @@ class ForumRepository {
         hasMore: hasMore,
       );
     } catch (e) {
+      print('🔥 ERROR: Failed to fetch gender-filtered posts: $e');
+      print(
+          '🔗 If this is an index error, check the link in the error message above for Firestore index requirements');
       throw Exception('Failed to fetch gender-filtered posts: $e');
     }
   }
@@ -585,6 +591,9 @@ class ForumRepository {
         hasMore: snapshot.docs.length == limit,
       );
     } catch (e) {
+      print('🔥 ERROR: Failed to search posts: $e');
+      print(
+          '🔗 If this is an index error, check the link in the error message above for Firestore index requirements');
       throw Exception('Failed to search posts: $e');
     }
   }
@@ -701,6 +710,9 @@ class ForumRepository {
         hasMore: filteredPosts.length > limit,
       );
     } catch (e) {
+      print('🔥 ERROR: Failed to search gender-filtered posts: $e');
+      print(
+          '🔗 If this is an index error, check the link in the error message above for Firestore index requirements');
       throw Exception('Failed to search gender-filtered posts: $e');
     }
   }
@@ -901,6 +913,8 @@ class ForumRepository {
         'body': body,
         'parentFor': parentFor ?? 'post',
         'parentId': parentId ?? postId,
+        'isDeleted': false,
+        'isHidden': false,
         'score': 0,
         'likeCount': 0,
         'dislikeCount': 0,
@@ -934,6 +948,7 @@ class ForumRepository {
         'isPinned': false,
         'isDeleted': false,
         'isCommentingAllowed': true,
+        'isHidden': false,
         'score': 0,
         'likeCount': 0,
         'dislikeCount': 0,
@@ -1335,6 +1350,9 @@ class ForumRepository {
         hasMore: posts.length == limit,
       );
     } catch (e) {
+      print('🔥 ERROR: Failed to fetch user posts: $e');
+      print(
+          '🔗 If this is an index error, check the link in the error message above for Firestore index requirements');
       throw Exception('Failed to fetch user posts: $e');
     }
   }
@@ -1373,6 +1391,9 @@ class ForumRepository {
         hasMore: comments.length == limit,
       );
     } catch (e) {
+      print('🔥 ERROR: Failed to fetch user comments: $e');
+      print(
+          '🔗 If this is an index error, check the link in the error message above for Firestore index requirements');
       throw Exception('Failed to fetch user comments: $e');
     }
   }

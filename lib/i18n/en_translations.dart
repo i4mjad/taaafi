@@ -1424,6 +1424,9 @@ const Map<String, String> kEn = {
   "contact-us-placeholder": "Describe your question or issue...",
   "contact-us-note": "We're here to help",
   "send-request": "Send Request",
+  "content-hidden-by-admin": "Content hidden by admin",
+  "post-hidden-by-admin": "Post hidden by admin",
+  "comment-hidden-by-admin": "Comment hidden by admin",
   "contact-request-submitted":
       "Your message has been sent! We'll respond within 24 hours.",
   "max-active-reports-reached":

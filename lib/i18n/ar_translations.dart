@@ -1366,6 +1366,9 @@ const Map<String, String> kAr = {
   "contact-us-placeholder": "صف سؤالك أو مشكلتك...",
   "contact-us-note": "نحن هنا لمساعدتك",
   "send-request": "إرسال الطلب",
+  "content-hidden-by-admin": "تم إخفاء المحتوى من قبل المشرف",
+  "post-hidden-by-admin": "تم إخفاء المنشور من قبل المشرف",
+  "comment-hidden-by-admin": "تم إخفاء التعليق من قبل المشرف",
   "contact-request-submitted": "تم إرسال رسالتك! سنرد خلال 24 ساعة.",
   "max-active-reports-reached":
       "لديك بالفعل 2 تقارير نشطة من هذا النوع. يرجى انتظار حلها قبل إرسال تقرير جديد.",

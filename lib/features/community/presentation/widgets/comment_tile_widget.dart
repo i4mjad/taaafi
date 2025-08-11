@@ -113,11 +113,18 @@ class CommentTileWidget extends ConsumerWidget {
 
                     // Comment body
                     Text(
-                      comment.body,
+                      comment.isHidden
+                          ? localizations.translate('comment-hidden-by-admin')
+                          : comment.body,
                       style: TextStyles.caption.copyWith(
-                        color: theme.grey[800],
+                        color: comment.isHidden
+                            ? theme.grey[600]
+                            : theme.grey[800],
                         fontSize: 15,
                         height: 1.4,
+                        fontStyle: comment.isHidden
+                            ? FontStyle.italic
+                            : FontStyle.normal,
                       ),
                     ),
 
@@ -218,53 +225,58 @@ class CommentTileWidget extends ConsumerWidget {
     return Row(
       children: [
         // Username or anonymous indicator
-        authorProfileAsync.when(
-          data: (authorProfile) {
-            final pipelineResult =
-                authorProfile?.getDisplayNameWithPipeline() ?? 'Unknown User';
+        Flexible(
+          child: authorProfileAsync.when(
+            data: (authorProfile) {
+              final pipelineResult =
+                  authorProfile?.getDisplayNameWithPipeline() ?? 'Unknown User';
 
-            final displayName =
-                _getLocalizedDisplayName(pipelineResult, localizations);
+              final displayName =
+                  _getLocalizedDisplayName(pipelineResult, localizations);
 
-            return GestureDetector(
-              onTap: () => showModalBottomSheet(
-                context: context,
-                isScrollControlled: true,
-                backgroundColor: Colors.transparent,
-                builder: (context) => Padding(
-                  padding: EdgeInsets.only(
-                    bottom: MediaQuery.of(context).viewInsets.bottom,
-                  ),
-                  child: CommunityProfileModal(
-                    communityProfileId: comment.authorCPId,
-                    displayName: authorProfile.displayName,
-                    avatarUrl: authorProfile.avatarUrl,
-                    isAnonymous: isAuthorAnonymous,
-                    isPlusUser: isAuthorPlusUser,
+              return GestureDetector(
+                onTap: () => showModalBottomSheet(
+                  context: context,
+                  isScrollControlled: true,
+                  backgroundColor: Colors.transparent,
+                  builder: (context) => Padding(
+                    padding: EdgeInsets.only(
+                      bottom: MediaQuery.of(context).viewInsets.bottom,
+                    ),
+                    child: CommunityProfileModal(
+                      communityProfileId: comment.authorCPId,
+                      displayName: authorProfile.displayName,
+                      avatarUrl: authorProfile.avatarUrl,
+                      isAnonymous: isAuthorAnonymous,
+                      isPlusUser: isAuthorPlusUser,
+                    ),
                   ),
                 ),
-              ),
-              child: Text(
-                displayName,
-                style: TextStyles.footnoteSelected.copyWith(
-                  color: theme.primary[700],
-                  fontSize: 14,
+                child: Text(
+                  displayName,
+                  style: TextStyles.footnoteSelected.copyWith(
+                    color: theme.primary[700],
+                    fontSize: 14,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
+              );
+            },
+            loading: () => Text(
+              'Loading...',
+              style: TextStyles.footnoteSelected.copyWith(
+                color: theme.grey[700],
+                fontSize: 14,
+                overflow: TextOverflow.ellipsis,
               ),
-            );
-          },
-          loading: () => Text(
-            'Loading...',
-            style: TextStyles.footnoteSelected.copyWith(
-              color: theme.grey[700],
-              fontSize: 14,
             ),
-          ),
-          error: (error, stackTrace) => Text(
-            'Unknown User',
-            style: TextStyles.footnoteSelected.copyWith(
-              color: theme.grey[700],
-              fontSize: 14,
+            error: (error, stackTrace) => Text(
+              'Unknown User',
+              style: TextStyles.footnoteSelected.copyWith(
+                color: theme.grey[700],
+                fontSize: 14,
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
           ),
         ),

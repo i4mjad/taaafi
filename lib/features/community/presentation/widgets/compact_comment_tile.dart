@@ -157,10 +157,14 @@ class CompactCommentTile extends ConsumerWidget {
 
             // Comment content
             Text(
-              comment.body,
+              comment.isHidden
+                  ? localizations.translate('comment-hidden-by-admin')
+                  : comment.body,
               style: TextStyles.body.copyWith(
-                color: theme.grey[800],
+                color: comment.isHidden ? theme.grey[600] : theme.grey[800],
                 height: 1.4,
+                fontStyle:
+                    comment.isHidden ? FontStyle.italic : FontStyle.normal,
               ),
               maxLines: 3,
               overflow: TextOverflow.ellipsis,

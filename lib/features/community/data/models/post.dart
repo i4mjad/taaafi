@@ -9,6 +9,7 @@ class Post {
   final bool isPinned;
   final bool isDeleted;
   final bool isCommentingAllowed;
+  final bool isHidden;
   final int score;
   final int likeCount;
   final int dislikeCount;
@@ -24,6 +25,7 @@ class Post {
     this.isPinned = false,
     this.isDeleted = false,
     this.isCommentingAllowed = true,
+    this.isHidden = false,
     required this.score,
     required this.likeCount,
     required this.dislikeCount,
@@ -41,6 +43,7 @@ class Post {
         isPinned: doc.data()!["isPinned"] ?? false,
         isDeleted: doc.data()!["isDeleted"] ?? false,
         isCommentingAllowed: doc.data()!["isCommentingAllowed"] ?? true,
+        isHidden: doc.data()!["isHidden"] ?? false,
         score: doc.data()!["score"] ?? 0,
         likeCount: doc.data()!["likeCount"] ?? 0,
         dislikeCount: doc.data()!["dislikeCount"] ?? 0,
@@ -57,6 +60,7 @@ class Post {
         'isPinned': isPinned,
         'isDeleted': isDeleted,
         'isCommentingAllowed': isCommentingAllowed,
+        'isHidden': isHidden,
         'score': score,
         'likeCount': likeCount,
         'dislikeCount': dislikeCount,
@@ -74,6 +78,7 @@ class Post {
         'isPinned': isPinned,
         'isDeleted': isDeleted,
         'isCommentingAllowed': isCommentingAllowed,
+        'isHidden': isHidden,
         'score': score,
         'likeCount': likeCount,
         'dislikeCount': dislikeCount,
@@ -91,6 +96,7 @@ class Post {
     bool? isPinned,
     bool? isDeleted,
     bool? isCommentingAllowed,
+    bool? isHidden,
     int? score,
     int? likeCount,
     int? dislikeCount,
@@ -106,6 +112,7 @@ class Post {
       isPinned: isPinned ?? this.isPinned,
       isDeleted: isDeleted ?? this.isDeleted,
       isCommentingAllowed: isCommentingAllowed ?? this.isCommentingAllowed,
+      isHidden: isHidden ?? this.isHidden,
       score: score ?? this.score,
       likeCount: likeCount ?? this.likeCount,
       dislikeCount: dislikeCount ?? this.dislikeCount,
@@ -126,6 +133,7 @@ class Post {
         other.isPinned == isPinned &&
         other.isDeleted == isDeleted &&
         other.isCommentingAllowed == isCommentingAllowed &&
+        other.isHidden == isHidden &&
         other.score == score &&
         other.likeCount == likeCount &&
         other.dislikeCount == dislikeCount &&
@@ -144,6 +152,7 @@ class Post {
       isPinned,
       isDeleted,
       isCommentingAllowed,
+      isHidden,
       score,
       likeCount,
       dislikeCount,
@@ -154,6 +163,6 @@ class Post {
 
   @override
   String toString() {
-    return 'Post(id: $id, authorCPId: $authorCPId, title: $title, body: $body, category: $category, isPinned: $isPinned, isDeleted: $isDeleted, isCommentingAllowed: $isCommentingAllowed, score: $score, likeCount: $likeCount, dislikeCount: $dislikeCount, createdAt: $createdAt, updatedAt: $updatedAt)';
+    return 'Post(id: $id, authorCPId: $authorCPId, title: $title, body: $body, category: $category, isPinned: $isPinned, isDeleted: $isDeleted, isCommentingAllowed: $isCommentingAllowed, isHidden: $isHidden, score: $score, likeCount: $likeCount, dislikeCount: $dislikeCount, createdAt: $createdAt, updatedAt: $updatedAt)';
   }
 }
