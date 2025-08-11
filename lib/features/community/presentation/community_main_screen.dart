@@ -16,7 +16,6 @@ import 'package:reboot_app_3/features/community/presentation/providers/forum_pro
 import 'package:reboot_app_3/features/community/presentation/widgets/avatar_with_anonymity.dart';
 import 'package:reboot_app_3/features/community/presentation/providers/community_providers_new.dart';
 import 'package:reboot_app_3/features/community/data/models/post_category.dart';
-import 'package:reboot_app_3/features/community/data/models/post.dart';
 import 'package:reboot_app_3/features/account/presentation/widgets/feature_access_guard.dart';
 import 'package:reboot_app_3/features/authentication/application/user_subscription_sync_service.dart';
 import 'package:reboot_app_3/features/community/presentation/community_onboarding_screen.dart';
@@ -345,8 +344,7 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen>
           // Refresh based on selected filter
           switch (_selectedFilter) {
             case 'posts':
-              ref.invalidate(mainScreenPostsProvider(null));
-              await ref.read(mainScreenPostsProvider(null).future);
+              await ref.read(postsPaginationProvider.notifier).refresh();
               break;
             case 'pinned':
               // Fix: Call refresh method instead of just invalidating
@@ -361,8 +359,7 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen>
                   .refresh(category: 'aqOhcyOg1z8tcij0y1S4');
               break;
             default:
-              ref.invalidate(mainScreenPostsProvider(null));
-              await ref.read(mainScreenPostsProvider(null).future);
+              await ref.read(postsPaginationProvider.notifier).refresh();
           }
         },
         child: scrollView,
@@ -415,7 +412,8 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen>
   Widget _buildPostsView() {
     final theme = AppTheme.of(context);
     final localizations = AppLocalizations.of(context);
-    final postsAsync = ref.watch(mainScreenPostsProvider(null));
+    // Use the pagination provider instead of stream for better performance
+    final postsState = ref.watch(postsPaginationProvider);
 
     return Column(
       children: [
@@ -462,7 +460,7 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen>
             ],
           ),
         ),
-        _buildStreamingPostsContent(postsAsync, localizations, theme),
+        _buildPaginatedPostsContent(postsState, localizations, theme),
       ],
     );
   }
@@ -821,117 +819,114 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen>
     }
   }
 
-  Widget _buildStreamingPostsContent(AsyncValue<List<Post>> postsAsync,
-      AppLocalizations localizations, theme) {
-    return postsAsync.when(
-      loading: () {
-        return const Center(
-          child: Spinner(),
-        );
-      },
-      error: (error, stack) {
-        print('❌ Error loading posts: $error');
-        print('❌ Stack trace: $stack');
-        return Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                localizations.translate('error_loading_posts'),
-                style: TextStyles.body.copyWith(
-                  color: theme.error[500],
-                ),
-              ),
-              const SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: () {
-                  ref.invalidate(mainScreenPostsProvider(null));
-                },
-                child: Text(localizations.translate('retry')),
-              ),
-            ],
-          ),
-        );
-      },
-      data: (posts) {
-        if (posts.isEmpty) {
-          return Container(
-            width: double.infinity,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Text(
-                  localizations.translate('no_posts_found'),
-                  style: TextStyles.body.copyWith(
-                    color: theme.grey[600],
-                  ),
-                ),
-              ],
-            ),
-          );
-        }
+  Widget _buildPaginatedPostsContent(
+      dynamic postsState, AppLocalizations localizations, theme) {
+    if (postsState.posts.isEmpty && postsState.isLoading) {
+      return const Center(
+        child: Spinner(),
+      );
+    }
 
-        return Column(
+    if (postsState.posts.isEmpty && postsState.error != null) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // Posts list
-            ListView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: posts.length,
-              itemBuilder: (context, index) {
-                final post = posts[index];
-                return ThreadsPostCard(
-                  post: post,
-                  onTap: () {
-                    context.push('/community/forum/post/${post.id}');
-                  },
-                );
-              },
+            Text(
+              localizations.translate('error_loading_posts'),
+              style: TextStyles.body.copyWith(
+                color: theme.error[500],
+              ),
             ),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () {
+                ref.read(postsPaginationProvider.notifier).refresh();
+              },
+              child: Text(localizations.translate('retry')),
+            ),
+          ],
+        ),
+      );
+    }
 
-            // Show All button at the end
-            if (posts.length >=
-                20) // Show button when there are enough posts to warrant "Show All"
-              Container(
-                width: double.infinity,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-                child: ElevatedButton(
-                  onPressed: () {
-                    context.goNamed(RouteNames.allPosts.name);
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: theme.primary[500],
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+    final posts = postsState.posts;
+
+    if (posts.isEmpty) {
+      return Container(
+        width: double.infinity,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Text(
+              localizations.translate('no_posts_found'),
+              style: TextStyles.body.copyWith(
+                color: theme.grey[600],
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return Column(
+      children: [
+        // Posts list
+        ListView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: posts.length,
+          itemBuilder: (context, index) {
+            final post = posts[index];
+            return ThreadsPostCard(
+              post: post,
+              onTap: () {
+                context.push('/community/forum/post/${post.id}');
+              },
+            );
+          },
+        ),
+
+        // Show All button at the end
+        if (posts.length >=
+            20) // Show button when there are enough posts to warrant "Show All"
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+            child: ElevatedButton(
+              onPressed: () {
+                context.goNamed(RouteNames.allPosts.name);
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: theme.primary[500],
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    localizations.translate('show_all_posts'),
+                    style: TextStyles.body.copyWith(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        localizations.translate('show_all_posts'),
-                        style: TextStyles.body.copyWith(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      const Icon(
-                        LucideIcons.arrowRight,
-                        size: 18,
-                        color: Colors.white,
-                      ),
-                    ],
+                  const SizedBox(width: 8),
+                  const Icon(
+                    LucideIcons.arrowRight,
+                    size: 18,
+                    color: Colors.white,
                   ),
-                ),
+                ],
               ),
-          ],
-        );
-      },
+            ),
+          ),
+      ],
     );
   }
 

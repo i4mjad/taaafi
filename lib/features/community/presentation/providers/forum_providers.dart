@@ -955,9 +955,7 @@ class PostsPaginationNotifier extends StateNotifier<PostsPaginationState> {
       // Determine if gender filtering should be applied based on content type
       final filterParams =
           PostFilterParams(category: category, isPinned: isPinned);
-      // TEMPORARY: Disable gender filtering for posts list screen to show all posts like main screen
-      final shouldApplyGenderFilter =
-          false; // filterParams.shouldApplyGenderFilter;
+      final shouldApplyGenderFilter = filterParams.shouldApplyGenderFilter;
 
       final page = await _repository.getPosts(
         limit: 25, // Restored to 25 for better user experience
@@ -991,9 +989,7 @@ class PostsPaginationNotifier extends StateNotifier<PostsPaginationState> {
       // Determine if gender filtering should be applied based on content type
       final filterParams =
           PostFilterParams(category: category, isPinned: isPinned);
-      // TEMPORARY: Disable gender filtering for posts list screen to show all posts like main screen
-      final shouldApplyGenderFilter =
-          false; // filterParams.shouldApplyGenderFilter;
+      final shouldApplyGenderFilter = filterParams.shouldApplyGenderFilter;
 
       final page = await _repository.getPosts(
         limit: 25, // Restored to 25 for better user experience

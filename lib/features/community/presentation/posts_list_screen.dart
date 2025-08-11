@@ -503,9 +503,6 @@ class _PostsListScreenState extends ConsumerState<PostsListScreen> {
         );
       }
 
-      print(
-          '🔍 [PostsListScreen] Displaying ${postsState.posts.length} posts with manual pagination');
-
       return RefreshIndicator(
         onRefresh: () async {
           await ref.read(postsPaginationProvider.notifier).refresh();
@@ -523,8 +520,6 @@ class _PostsListScreenState extends ConsumerState<PostsListScreen> {
                     ? const Center(child: Spinner())
                     : ElevatedButton(
                         onPressed: () {
-                          print(
-                              '🔍 [PostsListScreen] Load More button pressed');
                           ref
                               .read(postsPaginationProvider.notifier)
                               .loadMorePosts();
@@ -547,8 +542,7 @@ class _PostsListScreenState extends ConsumerState<PostsListScreen> {
                             ),
                             const SizedBox(width: 8),
                             Text(
-                              localizations.translate('load_more') ??
-                                  'Load More',
+                              localizations.translate('load_more'),
                               style: TextStyles.body.copyWith(
                                 color: Colors.white,
                                 fontWeight: FontWeight.w600,

@@ -282,7 +282,8 @@ class ForumRepository {
     }
   }
 
-  /// Get posts with gender filtering applied at source
+  /// Get posts with gender filtering applied AFTER fetching
+  /// This is much more efficient than batching through 666 profiles
   Future<PostsPage> _getGenderFilteredPosts({
     required int limit,
     DocumentSnapshot? lastDocument,
@@ -291,7 +292,7 @@ class ForumRepository {
     required String userGender,
   }) async {
     try {
-      // Get allowed community profile IDs (same gender + admins)
+      // Get allowed community profile IDs (same gender + admins + founders)
       final visibleProfileIds = await _genderFilteringService
           .getVisibleCommunityProfileIds(userGender);
 
@@ -299,96 +300,63 @@ class ForumRepository {
         return const PostsPage(posts: [], hasMore: false);
       }
 
-      // Firestore whereIn has a limit of 10, so we need to batch queries if more than 10 IDs
-      const int batchSize = 10;
-      final List<Post> allPosts = [];
-      DocumentSnapshot? globalLastDoc = lastDocument;
-      int remainingLimit = limit;
+      // NEW EFFICIENT APPROACH: Get posts first, then filter by gender
+      // This avoids the need for 67 separate queries!
+      Query query = _posts
+          .where('isDeleted', isEqualTo: false)
+          .orderBy('createdAt', descending: true);
 
-      for (int i = 0;
-          i < visibleProfileIds.length && remainingLimit > 0;
-          i += batchSize) {
-        final batch = visibleProfileIds.skip(i).take(batchSize).toList();
+      if (category != null && category.isNotEmpty) {
+        query = query.where('category', isEqualTo: category);
+      }
 
-        final batchResult = await _executeGenderFilteredQuery(
-          authorCPIds: batch,
-          limit: remainingLimit,
-          lastDocument: globalLastDoc,
-          category: category,
-          isPinned: isPinned,
-        );
+      if (isPinned != null) {
+        query = query.where('isPinned', isEqualTo: isPinned);
+      }
 
-        allPosts.addAll(batchResult.posts);
-        remainingLimit -= batchResult.posts.length;
+      if (lastDocument != null) {
+        query = query.startAfterDocument(lastDocument);
+      }
 
-        // Update last document for pagination
-        if (batchResult.lastDocument != null) {
-          globalLastDoc = batchResult.lastDocument;
-        }
+      // Get more posts than needed to account for filtering
+      // This ensures we get enough posts after gender filtering
+      final multiplier =
+          10; // Optimized to ensure admin/founder posts are found
+      query = query.limit(limit * multiplier);
 
-        // If this batch returned fewer posts than requested, we've reached the end
-        if (batchResult.posts.length <
-            (remainingLimit + batchResult.posts.length) /
-                (i ~/ batchSize + 1)) {
-          break;
+      final QuerySnapshot snapshot = await query.get();
+
+      // Convert visible profile IDs to Set for O(1) lookup
+      final visibleProfileSet = visibleProfileIds.toSet();
+
+      // Filter posts by visible profile IDs
+      final filteredPosts = <Post>[];
+      DocumentSnapshot? lastValidDoc;
+
+      for (final doc in snapshot.docs) {
+        final post =
+            Post.fromFirestore(doc as DocumentSnapshot<Map<String, dynamic>>);
+        if (visibleProfileSet.contains(post.authorCPId)) {
+          filteredPosts.add(post);
+          lastValidDoc = doc;
+          if (filteredPosts.length >= limit) {
+            break;
+          }
         }
       }
 
-      // Sort all posts by creation date (since they came from different batches)
-      allPosts.sort((a, b) => b.createdAt.compareTo(a.createdAt));
-
-      // Take only the requested limit
-      final limitedPosts = allPosts.take(limit).toList();
+      // Determine if there are more posts
+      final hasMore = filteredPosts.length == limit &&
+          snapshot.docs.length == limit * multiplier;
 
       return PostsPage(
-        posts: limitedPosts,
-        lastDocument: globalLastDoc,
-        hasMore:
-            allPosts.length >= limit && visibleProfileIds.length > batchSize,
+        posts: filteredPosts,
+        lastDocument: lastValidDoc,
+        hasMore: hasMore,
       );
     } catch (e) {
       throw Exception('Failed to fetch gender-filtered posts: $e');
     }
-  }
-
-  /// Execute a single batched gender-filtered query
-  Future<PostsPage> _executeGenderFilteredQuery({
-    required List<String> authorCPIds,
-    required int limit,
-    DocumentSnapshot? lastDocument,
-    String? category,
-    bool? isPinned,
-  }) async {
-    Query query = _posts
-        .where('authorCPId', whereIn: authorCPIds)
-        .where('isDeleted', isEqualTo: false) // Filter deleted posts at source
-        .orderBy('createdAt', descending: true);
-
-    if (category != null && category.isNotEmpty) {
-      query = query.where('category', isEqualTo: category);
-    }
-
-    if (isPinned != null) {
-      query = query.where('isPinned', isEqualTo: isPinned);
-    }
-
-    if (lastDocument != null) {
-      query = query.startAfterDocument(lastDocument);
-    }
-
-    query = query.limit(limit);
-    final QuerySnapshot snapshot = await query.get();
-
-    final posts = snapshot.docs
-        .map((doc) =>
-            Post.fromFirestore(doc as DocumentSnapshot<Map<String, dynamic>>))
-        .toList();
-
-    return PostsPage(
-      posts: posts,
-      lastDocument: snapshot.docs.isNotEmpty ? snapshot.docs.last : null,
-      hasMore: snapshot.docs.length == limit,
-    );
   }
 
   /// Stream of posts from Firestore with optional gender filtering

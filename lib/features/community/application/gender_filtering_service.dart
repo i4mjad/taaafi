@@ -18,9 +18,9 @@ class GenderFilteringService {
 
   static const Duration _cacheExpiry = Duration(minutes: 30);
 
-  /// Get admin community profile IDs with caching
+  /// Get admin and founder community profile IDs with caching
   ///
-  /// Returns a list of community profile IDs that belong to admin users.
+  /// Returns a list of community profile IDs that belong to admin or founder users.
   /// Results are cached for 30 minutes to improve performance.
   Future<List<String>> getAdminCommunityProfileIds() async {
     // Return cached data if still valid
@@ -31,11 +31,10 @@ class GenderFilteringService {
     }
 
     try {
-      // Get admin user IDs from users collection
+      // Get admin AND founder user IDs from users collection
       final adminUsersSnapshot = await _firestore
           .collection('users')
-          .where('role', isEqualTo: 'admin')
-          .get();
+          .where('role', whereIn: ['admin', 'founder']).get();
 
       final adminUserIds =
           adminUsersSnapshot.docs.map((doc) => doc.id).toList();
@@ -43,11 +42,11 @@ class GenderFilteringService {
       if (adminUserIds.isEmpty) {
         _cachedAdminCPIds = [];
         _lastAdminCacheUpdate = DateTime.now();
-        // No admin users found
+        // No admin or founder users found
         return [];
       }
 
-      // Get community profiles for admin users in batches (Firestore whereIn limit is 10)
+      // Get community profiles for admin/founder users in batches (Firestore whereIn limit is 10)
       final List<String> adminCPIds = [];
       const int batchSize = 10;
 
@@ -81,7 +80,8 @@ class GenderFilteringService {
   /// [gender] The gender to filter by ('male' or 'female')
   /// Returns a list of community profile IDs for users of the specified gender
   Future<List<String>> getSameGenderProfileIds(String gender) async {
-    final cacheKey = 'gender_$gender';
+    final normalized = gender.trim().toLowerCase();
+    final cacheKey = 'gender_$normalized';
 
     // Check cache validity
     if (_genderProfileCache.containsKey(cacheKey) &&
@@ -91,10 +91,26 @@ class GenderFilteringService {
     }
 
     try {
-      final QuerySnapshot snapshot = await _firestore
-          .collection('communityProfiles')
-          .where('gender', isEqualTo: gender)
-          .get();
+      // Handle legacy/mixed-case data by querying common variants
+      final variants = <String>{
+        normalized,
+        _capitalize(normalized),
+        normalized.toUpperCase(),
+      }.toList();
+
+      QuerySnapshot snapshot;
+      try {
+        snapshot = await _firestore
+            .collection('communityProfiles')
+            .where('gender', whereIn: variants)
+            .get();
+      } catch (_) {
+        // Fallback to exact match on normalized if whereIn not permitted
+        snapshot = await _firestore
+            .collection('communityProfiles')
+            .where('gender', isEqualTo: normalized)
+            .get();
+      }
 
       final profileIds = snapshot.docs.map((doc) => doc.id).toList();
 
@@ -106,6 +122,11 @@ class GenderFilteringService {
     } catch (e) {
       return _genderProfileCache[cacheKey] ?? [];
     }
+  }
+
+  String _capitalize(String s) {
+    if (s.isEmpty) return s;
+    return s[0].toUpperCase() + s.substring(1).toLowerCase();
   }
 
   /// Get community profile IDs that should be visible to the current user
@@ -168,17 +189,25 @@ class GenderFilteringService {
   Stream<List<String>> watchVisibleCommunityProfileIds(
       String currentUserGender) async* {
     try {
+      final normalized = currentUserGender.trim().toLowerCase();
+
       // Get admin IDs (cached)
       final adminIds = await getAdminCommunityProfileIds();
 
       // Watch same-gender profiles and combine with admin IDs
       await for (final snapshot in _firestore
           .collection('communityProfiles')
-          .where('gender', isEqualTo: currentUserGender)
+          .where('gender',
+              whereIn: <String>{
+                normalized,
+                _capitalize(normalized),
+                normalized.toUpperCase(),
+              }.toList())
           .snapshots()) {
         final sameGenderIds = snapshot.docs.map((doc) => doc.id).toList();
 
         final visibleIds = <String>{...sameGenderIds, ...adminIds}.toList();
+
         yield visibleIds;
       }
     } catch (e) {
