@@ -238,7 +238,7 @@ const Map<String, String> kAr = {
   "start-your-journy": "إبدأ رحلة التعافي",
   "about-ta3afi":
       "تطبيق للتوعية بمخاطر المواد الإباحية وما يؤدي الإدمان عليها عن طريق تقديم محتوى وأدوات تساعد في حل المشكلة.",
-  "version-number": "النسخة 5.3.0 (2)",
+  "version-number": "النسخة 5.3.1",
   "what-is-all-of-those": "ما هو الفرق بين هذه الأرقام؟",
   "contact-us-through-this-channels": "تواصل معنا",
   "support-app-development": "ادعم تطوير التطبيق",
