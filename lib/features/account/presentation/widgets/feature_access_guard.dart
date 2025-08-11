@@ -16,7 +16,6 @@ import '../../../../core/routing/route_names.dart';
 import '../../../../core/helpers/date_display_formater.dart';
 import '../../data/app_features_config.dart';
 import '../../../../core/shared_widgets/snackbar.dart';
-import '../../../community/presentation/providers/forum_providers.dart';
 
 /// Widget that guards access to specific features based on user bans
 class FeatureAccessGuard extends ConsumerWidget {
@@ -788,76 +787,5 @@ class CommunityCommentGuard extends StatelessWidget {
           AppLocalizations.of(context).translate('comment-creation-restricted'),
       child: child,
     );
-  }
-}
-
-/// Guard for community interactions (likes, dislikes, etc.)
-/// Provides instant feedback using quick action pattern
-class CommunityInteractionGuard extends ConsumerWidget {
-  final VoidCallback onAccessGranted;
-  final Widget child;
-  final String? postId;
-  final String? userCPId;
-
-  const CommunityInteractionGuard({
-    super.key,
-    required this.onAccessGranted,
-    required this.child,
-    this.postId,
-    this.userCPId,
-  });
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return QuickActionGuard(
-      featureUniqueName: AppFeaturesConfig.communityInteraction,
-      onAccessGranted: onAccessGranted,
-      onAccessDenied: postId != null && userCPId != null
-          ? () => _revertOptimisticChanges(ref)
-          : null,
-      child: child,
-    );
-  }
-
-  void _revertOptimisticChanges(WidgetRef ref) {
-    // Revert optimistic interaction changes if user is banned
-    if (postId != null && userCPId != null) {
-      try {
-        // Get the real interaction state from server
-        final realInteractionAsync = ref.read(
-          userInteractionProvider((
-            targetType: 'post',
-            targetId: postId!,
-            userCPId: userCPId!,
-          )),
-        );
-
-        // Get the real post state from server
-        final realPostAsync = ref.read(postDetailProvider(postId!));
-
-        realInteractionAsync.whenData((realInteraction) {
-          // Revert optimistic interaction state to real state
-          ref
-              .read(optimisticUserInteractionProvider((
-                targetType: 'post',
-                targetId: postId!,
-                userCPId: userCPId!,
-              )).notifier)
-              .revertOptimistic(realInteraction);
-        });
-
-        realPostAsync.whenData((realPost) {
-          if (realPost != null) {
-            // Revert optimistic counts to real counts
-            ref
-                .read(optimisticPostStateProvider(postId!).notifier)
-                .revertOptimisticCounts(
-                    realPost.likeCount, realPost.dislikeCount);
-          }
-        });
-      } catch (e) {
-        debugPrint('Error reverting optimistic changes: $e');
-      }
-    }
   }
 }

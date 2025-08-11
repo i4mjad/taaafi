@@ -7,7 +7,6 @@ import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/features/community/data/models/post.dart';
 import 'package:reboot_app_3/features/community/presentation/providers/forum_providers.dart';
 import 'package:reboot_app_3/features/community/presentation/providers/community_providers_new.dart';
-import 'package:reboot_app_3/features/account/presentation/widgets/feature_access_guard.dart';
 
 class PostInteractionsWidget extends ConsumerWidget {
   final Post post;
@@ -139,11 +138,8 @@ class _UserInteractionButton extends ConsumerWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        CommunityInteractionGuard(
-          onAccessGranted: () =>
-              _handleOptimisticInteraction(ref, currentUserCPId),
-          postId: post.id,
-          userCPId: currentUserCPId,
+        GestureDetector(
+          onTap: () => _handleOptimisticInteraction(ref, currentUserCPId),
           child: Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(

@@ -11,7 +11,6 @@ class AppFeaturesConfig {
   static const String contactAdmin = 'contact_admin';
   static const String postCreation = 'post_creation';
   static const String commentCreation = 'comment_creation';
-  static const String communityInteraction = 'community_interaction';
 
   // static const String directMessaging = 'direct_messaging';
   // static const String groupCreation = 'group_creation';

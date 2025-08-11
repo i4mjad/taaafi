@@ -11,7 +11,6 @@ import 'package:reboot_app_3/features/community/presentation/widgets/role_chip.d
 import 'package:reboot_app_3/features/community/presentation/widgets/streak_display_widget.dart';
 import 'package:reboot_app_3/features/community/presentation/providers/community_providers_new.dart';
 import 'package:reboot_app_3/features/community/presentation/providers/forum_providers.dart';
-import 'package:reboot_app_3/features/account/presentation/widgets/feature_access_guard.dart';
 
 class CommentTileWidget extends ConsumerWidget {
   final Comment comment;
@@ -466,8 +465,8 @@ class _CommentInteractionButton extends ConsumerWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        CommunityInteractionGuard(
-          onAccessGranted: isLoading ? () {} : () => _handleInteraction(ref),
+        GestureDetector(
+          onTap: isLoading ? () {} : () => _handleInteraction(ref),
           child: Container(
             padding: const EdgeInsets.all(0),
             decoration: BoxDecoration(

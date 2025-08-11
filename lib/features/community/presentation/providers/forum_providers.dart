@@ -760,8 +760,7 @@ class PostInteractionNotifier extends StateNotifier<AsyncValue<void>> {
     } catch (e, st) {
       state = AsyncValue.error(e, st);
 
-      // If interaction failed (likely due to ban), optimistic changes will be reverted
-      // by the CommunityInteractionGuard's _revertOptimisticChanges method
+      // If interaction failed, the error will be handled by the forum service
     }
   }
 }

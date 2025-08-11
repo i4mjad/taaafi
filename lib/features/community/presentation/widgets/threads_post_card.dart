@@ -14,8 +14,7 @@ import 'package:reboot_app_3/features/community/presentation/providers/community
 import 'package:reboot_app_3/features/community/presentation/providers/forum_providers.dart';
 import 'package:reboot_app_3/features/community/presentation/widgets/report_content_modal.dart';
 import 'package:reboot_app_3/features/community/presentation/widgets/community_profile_modal.dart';
-import 'package:reboot_app_3/features/account/presentation/widgets/feature_access_guard.dart';
-import 'package:reboot_app_3/features/account/data/app_features_config.dart';
+
 import 'package:reboot_app_3/features/community/presentation/widgets/streak_display_widget.dart';
 import 'package:reboot_app_3/features/community/presentation/widgets/role_chip.dart';
 
@@ -477,38 +476,8 @@ class ThreadsPostCard extends ConsumerWidget {
         .read(optimisticPostStateProvider(post.id).notifier)
         .updateOptimisticCounts(oldValue, newValue);
 
-    // 3. Check feature access in the background
-    try {
-      final canAccess =
-          await checkFeatureAccess(ref, AppFeaturesConfig.communityInteraction);
-
-      if (canAccess) {
-        // 4. Process actual interaction if allowed
-        ref.read(postInteractionProvider(post.id).notifier).interact(newValue);
-      } else {
-        // 5. Revert optimistic changes if banned
-        ref
-            .read(optimisticUserInteractionProvider((
-              targetType: 'post',
-              targetId: post.id,
-              userCPId: currentUserCPId,
-            )).notifier)
-            .updateOptimistically(oldValue);
-
-        ref
-            .read(optimisticPostStateProvider(post.id).notifier)
-            .updateOptimisticCounts(newValue, oldValue);
-
-        // Show ban message
-        getErrorSnackBar(
-          context,
-          'interaction-restricted',
-        );
-      }
-    } catch (e) {
-      // On error, allow the interaction (fail-safe)
-      ref.read(postInteractionProvider(post.id).notifier).interact(newValue);
-    }
+    // 3. Process actual interaction
+    ref.read(postInteractionProvider(post.id).notifier).interact(newValue);
   }
 
   String _formatTimeAgo(DateTime createdAt, AppLocalizations localizations) {

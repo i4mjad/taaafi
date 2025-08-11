@@ -283,10 +283,7 @@ class ForumService {
       // 2. Validate interaction value
       _validateInteractionValue(value, localizations);
 
-      // 3. Check user permissions
-      await _checkVotingPermission(localizations);
-
-      // 4. Validate gender-based interaction rules
+      // 3. Validate gender-based interaction rules
       final currentUserGender = await _getCurrentUserGender();
       if (currentUserGender != null) {
         await _genderValidator.validateCanInteractWithPost(
@@ -297,10 +294,10 @@ class ForumService {
         );
       }
 
-      // 5. Check if post exists
+      // 4. Check if post exists
       await _ensurePostExists(postId, localizations);
 
-      // 6. Check for rate limiting
+      // 5. Check for rate limiting
       await _checkRateLimit('interaction', localizations);
 
       // 6. Perform the interaction
@@ -347,10 +344,7 @@ class ForumService {
       // 2. Validate interaction value
       _validateInteractionValue(value, localizations);
 
-      // 3. Check user permissions
-      await _checkVotingPermission(localizations);
-
-      // 4. Validate gender-based interaction rules
+      // 3. Validate gender-based interaction rules
       final currentUserGender = await _getCurrentUserGender();
       if (currentUserGender != null) {
         await _genderValidator.validateCanInteractWithComment(
@@ -361,10 +355,10 @@ class ForumService {
         );
       }
 
-      // 5. Check if comment exists
+      // 4. Check if comment exists
       await _ensureCommentExists(commentId, localizations);
 
-      // 6. Check for rate limiting
+      // 5. Check for rate limiting
       await _checkRateLimit('interaction', localizations);
 
       // 6. Perform the interaction
@@ -605,41 +599,6 @@ class ForumService {
               .replaceAll('{type}', banType),
           action: 'create_comment',
           code: 'COMMENT_CREATION_BANNED',
-        );
-      }
-    } catch (e) {
-      if (e is ForumPermissionException) {
-        rethrow;
-      }
-      // Fail-safe: allow on error
-    }
-  }
-
-  /// Checks if the user has permission to vote
-  ///
-  /// Throws [ForumPermissionException] if user doesn't have permission
-  Future<void> _checkVotingPermission(AppLocalizations localizations) async {
-    try {
-      final facade = BanWarningFacade();
-      final canAccess = await facade.canUserAccessFeature(
-        AppFeaturesConfig.communityInteraction,
-      );
-
-      if (!canAccess) {
-        final ban = await facade.getCurrentUserFeatureBan(
-          AppFeaturesConfig.communityInteraction,
-        );
-
-        final banType = ban?.severity == BanSeverity.permanent
-            ? 'permanently'
-            : 'temporarily';
-
-        throw ForumPermissionException(
-          localizations
-              .translate('interaction_banned')
-              .replaceAll('{type}', banType),
-          action: 'interact',
-          code: 'INTERACTION_BANNED',
         );
       }
     } catch (e) {
