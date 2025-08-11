@@ -26,6 +26,9 @@ class UserDocument {
   // Account deletion tracking field
   final bool? isRequestedToBeDeleted;
 
+  // Data restoration tracking field
+  final bool? hasCheckedForDataLoss;
+
   UserDocument({
     this.uid,
     this.devicesIds,
@@ -43,6 +46,7 @@ class UserDocument {
     this.isPlusUser,
     this.lastPlusCheck,
     this.isRequestedToBeDeleted,
+    this.hasCheckedForDataLoss,
   });
 
   factory UserDocument.fromFirestore(DocumentSnapshot doc) {
@@ -74,6 +78,7 @@ class UserDocument {
       isPlusUser: data['isPlusUser'],
       lastPlusCheck: data['lastPlusCheck'],
       isRequestedToBeDeleted: data['isRequestedToBeDeleted'],
+      hasCheckedForDataLoss: data['hasCheckedForDataLoss'],
     );
   }
 
@@ -95,6 +100,7 @@ class UserDocument {
       'isPlusUser': isPlusUser,
       'lastPlusCheck': lastPlusCheck,
       'isRequestedToBeDeleted': isRequestedToBeDeleted,
+      'hasCheckedForDataLoss': hasCheckedForDataLoss,
     };
   }
 

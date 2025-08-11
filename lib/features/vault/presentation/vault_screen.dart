@@ -43,6 +43,7 @@ import 'package:reboot_app_3/features/vault/data/follow_up/follow_up_notifier.da
 import 'package:reboot_app_3/features/vault/data/streaks/streak_duration_notifier.dart';
 import 'package:reboot_app_3/features/vault/presentation/widgets/statistics/statistics_widget.dart';
 import 'package:reboot_app_3/features/vault/data/calendar/calendar_notifier.dart';
+import 'package:reboot_app_3/features/vault/presentation/widgets/data_restoration/data_restoration_button.dart';
 
 class VaultScreen extends ConsumerWidget {
   const VaultScreen({super.key});
@@ -294,6 +295,9 @@ class VaultScreen extends ConsumerWidget {
                 // Shorebird update widget
                 const ShorebirdUpdateWidget(),
                 verticalSpace(Spacing.points16),
+
+                // Data restoration button (for eligible users)
+                const DataRestorationButton(),
 
                 // Horizontal Scrollable Cards
                 _buildHorizontalCards(context, theme, orderedCards),
