@@ -16,7 +16,9 @@ import 'package:reboot_app_3/features/community/presentation/widgets/avatar_with
 import 'package:reboot_app_3/features/community/presentation/widgets/role_chip.dart';
 import 'package:reboot_app_3/features/shared/data/notifiers/user_reports_notifier.dart';
 import 'package:intl/intl.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
+//TODO: create a cleaner way to display memeber since datete
 class CommunityProfileModal extends ConsumerStatefulWidget {
   final String communityProfileId;
   final String displayName;
@@ -83,6 +85,38 @@ class _CommunityProfileModalState extends ConsumerState<CommunityProfileModal> {
       return localization.translate('character-limit-exceeded');
     }
     return null;
+  }
+
+  /// Get Firebase Auth user creation date by UID
+  Future<DateTime?> _getFirebaseAuthCreationDate(String userUID) async {
+    try {
+      // Since we can't directly access other users' auth metadata,
+      // we'll try to get it from the users collection which stores it during registration
+      final userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userUID)
+          .get();
+
+      if (userDoc.exists) {
+        final data = userDoc.data();
+        if (data != null && data.containsKey('userFirstDate')) {
+          final timestamp = data['userFirstDate'] as Timestamp?;
+          return timestamp?.toDate();
+        }
+      }
+
+      // Fallback: if userFirstDate is not available, return null
+      return null;
+    } catch (e) {
+      // If we can't get the auth creation date, return null
+      return null;
+    }
+  }
+
+  /// Check if role should show member since date (only for member and user roles)
+  bool _shouldShowMemberSinceDate(String role) {
+    final normalizedRole = role.toLowerCase();
+    return normalizedRole == 'member' || normalizedRole == 'user';
   }
 
   Future<void> _submitReport() async {
@@ -432,13 +466,42 @@ class _CommunityProfileModalState extends ConsumerState<CommunityProfileModal> {
                       ],
                     ),
                     verticalSpace(Spacing.points8),
-                    Text(
-                      '${localizations.translate('member-since')} ${_formatDate(profile.createdAt, localizations.locale.languageCode)}',
-                      style: TextStyles.caption.copyWith(
-                        color: theme.grey[600],
+                    // Only show member since date for member and user roles
+                    if (_shouldShowMemberSinceDate(profile.role)) ...[
+                      FutureBuilder<DateTime?>(
+                        future: _getFirebaseAuthCreationDate(profile.userUID),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return Container(
+                              width: 120,
+                              height: 16,
+                              decoration: BoxDecoration(
+                                color: theme.grey[200],
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                            );
+                          } else if (snapshot.hasData &&
+                              snapshot.data != null) {
+                            return Text(
+                              '${localizations.translate('member-since')} ${_formatDate(snapshot.data!, localizations.locale.languageCode)}',
+                              style: TextStyles.caption.copyWith(
+                                color: theme.grey[600],
+                              ),
+                            );
+                          } else {
+                            // Fallback to profile creation date if Firebase auth date is not available
+                            return Text(
+                              '${localizations.translate('member-since')} ${_formatDate(profile.createdAt, localizations.locale.languageCode)}',
+                              style: TextStyles.caption.copyWith(
+                                color: theme.grey[600],
+                              ),
+                            );
+                          }
+                        },
                       ),
-                    ),
-                    verticalSpace(Spacing.points4),
+                      verticalSpace(Spacing.points4),
+                    ],
                     Row(
                       children: [
                         Icon(
