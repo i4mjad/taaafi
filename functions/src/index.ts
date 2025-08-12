@@ -1,5 +1,6 @@
 import {onRequest} from 'firebase-functions/v2/https';
 import {onCall} from 'firebase-functions/v2/https';
+import {onDocumentCreated, onDocumentUpdated} from 'firebase-functions/v2/firestore';
 import * as admin from 'firebase-admin';
 
 // Initialize Firebase Admin
@@ -24,6 +25,18 @@ const translations = {
     'streak-at-risk': 'Your streak may be vulnerable. Consider checking in with your support network.',
     'notification-sent-successfully': 'FCM notification sent successfully',
     'notification-failed': 'Failed to send FCM notification',
+    
+    // Community notification translations
+    'new-comment-on-post': 'New Comment',
+    'someone-commented-on-your-post': 'Someone commented on your post "{postTitle}"',
+    'liked-your-post': 'Post Liked',
+    'disliked-your-post': 'Post Disliked',
+    'liked-your-comment': 'Comment Liked',
+    'disliked-your-comment': 'Comment Disliked',
+    'someone-liked-your-post': 'Someone liked your post "{title}"',
+    'someone-disliked-your-post': 'Someone disliked your post "{title}"',
+    'someone-liked-your-comment': 'Someone liked your comment "{title}"',
+    'someone-disliked-your-comment': 'Someone disliked your comment "{title}"',
   },
   ar: {
     'high-risk-hour-alert': 'تنبيه ساعة الخطر العالي',
@@ -39,12 +52,40 @@ const translations = {
     'streak-at-risk': 'قد يكون إنجازك في خطر. فكر في التواصل مع شبكة الدعم الخاصة بك.',
     'notification-sent-successfully': 'تم إرسال الإشعار بنجاح',
     'notification-failed': 'فشل في إرسال الإشعار',
+    
+    // Community notification translations
+    'new-comment-on-post': 'تعليق جديد',
+    'someone-commented-on-your-post': 'علق أحدهم على منشورك "{postTitle}"',
+    'liked-your-post': 'إعجاب بالمنشور',
+    'disliked-your-post': 'عدم إعجاب بالمنشور',
+    'liked-your-comment': 'إعجاب بالتعليق',
+    'disliked-your-comment': 'عدم إعجاب بالتعليق',
+    'someone-liked-your-post': 'أعجب أحدهم بمنشورك "{title}"',
+    'someone-disliked-your-post': 'لم يعجب أحدهم بمنشورك "{title}"',
+    'someone-liked-your-comment': 'أعجب أحدهم بتعليقك "{title}"',
+    'someone-disliked-your-comment': 'لم يعجب أحدهم بتعليقك "{title}"',
   }
 };
 
 // Helper function to translate based on locale
 function translate(key: string, locale: string = 'en', replacements?: Record<string, string | number>): string {
-  const languageCode = locale.split('-')[0]; // Handle locales like 'en-US'
+  // Map full language names to language codes
+  let languageCode: string;
+  const lowerLocale = locale.toLowerCase();
+  
+  if (lowerLocale === 'arabic' || lowerLocale === 'ar') {
+    languageCode = 'ar';
+  } else if (lowerLocale === 'english' || lowerLocale === 'en') {
+    languageCode = 'en';
+  } else {
+    // Handle other formats like 'en-US' by taking first part
+    languageCode = locale.split('-')[0].toLowerCase();
+    // Final fallback mapping
+    if (languageCode === 'arabic') languageCode = 'ar';
+    else if (languageCode === 'english') languageCode = 'en';
+    else if (!['en', 'ar'].includes(languageCode)) languageCode = 'en';
+  }
+  
   const supportedLocale = ['en', 'ar'].includes(languageCode) ? languageCode : 'en';
   
   let translation = translations[supportedLocale as keyof typeof translations]?.[key] ||
@@ -288,6 +329,196 @@ async function analyzeStreakVulnerability(
     
   } catch (error) {
     console.error(`❌ Error analyzing streak vulnerability: ${error}`);
+  }
+}
+
+// Community notification handler functions
+async function handleCommentNotification(commentData: any, commentId: string): Promise<void> {
+  try {
+    const { postId, authorCPId: commenterCPId } = commentData;
+    
+    console.log(`💬 New comment notification: comment ${commentId} on post ${postId} by ${commenterCPId}`);
+    
+    // Get the post to find the post owner
+    const postDoc = await admin.firestore().collection('forumPosts').doc(postId).get();
+    if (!postDoc.exists) {
+      console.log('⚠️ Post not found, skipping notification');
+      return;
+    }
+    
+    const postData = postDoc.data()!;
+    const postOwnerCPId = postData.authorCPId;
+    
+    // Don't notify if commenting on own post
+    if (postOwnerCPId === commenterCPId) {
+      console.log('ℹ️ User commented on own post, skipping notification');
+      return;
+    }
+    
+    // Get post owner's community profile to get the userUID
+    const postOwnerCPDoc = await admin.firestore().collection('communityProfiles').doc(postOwnerCPId).get();
+    if (!postOwnerCPDoc.exists) {
+      console.log('⚠️ Post owner community profile not found, skipping notification');
+      return;
+    }
+    
+    const postOwnerCPData = postOwnerCPDoc.data()!;
+    const postOwnerUserUID = postOwnerCPData.userUID;
+    
+    if (!postOwnerUserUID) {
+      console.log('⚠️ Post owner community profile missing userUID, skipping notification');
+      return;
+    }
+    
+    // Get post owner's user document to check if they exist and get locale
+    const postOwnerUserDoc = await admin.firestore().collection('users').doc(postOwnerUserUID).get();
+    if (!postOwnerUserDoc.exists) {
+      console.log('⚠️ Post owner not found in users collection, skipping notification');
+      return;
+    }
+    
+    const postOwnerUserData = postOwnerUserDoc.data()!;
+    const locale = postOwnerUserData.locale || 'en';
+    
+    // Prepare notification content
+    const title = translate('new-comment-on-post', locale);
+    const postTitle = postData.title && postData.title.length > 30 
+      ? postData.title.substring(0, 30) + '...' 
+      : postData.title || 'your post';
+    const body = translate('someone-commented-on-your-post', locale, {
+      postTitle: postTitle
+    });
+    
+    console.log(`📱 Sending comment notification to user ${postOwnerUserUID} (CP: ${postOwnerCPId}) in locale: ${locale}`);
+    
+    // Send FCM notification
+    const success = await sendFCMNotification(postOwnerUserUID, title, body, locale, {
+      type: 'community_notification',
+      screen: 'postDetails',
+      postId: postId,
+      commentId: commentId,
+      notificationType: 'comment'
+    });
+    
+    if (success) {
+      console.log('✅ Comment notification sent successfully');
+    } else {
+      console.log('❌ Failed to send comment notification');
+    }
+    
+  } catch (error) {
+    console.error('❌ Error handling comment notification:', error);
+    // Log but don't throw - notification failure shouldn't crash the function
+  }
+}
+
+async function handleInteractionNotification(interactionData: any): Promise<void> {
+  try {
+    const { targetType, targetId, userCPId: interactorCPId, value } = interactionData;
+    
+    console.log(`👍 New interaction notification: ${targetType} ${targetId} by ${interactorCPId} value ${value}`);
+    
+    // Only notify for likes and dislikes, not neutral (0)
+    if (value === 0) {
+      console.log('ℹ️ Neutral interaction, skipping notification');
+      return;
+    }
+    
+    let targetOwnerCPId: string;
+    let targetTitle: string;
+    let postId: string;
+    
+    if (targetType === 'post') {
+      const postDoc = await admin.firestore().collection('forumPosts').doc(targetId).get();
+      if (!postDoc.exists) {
+        console.log('⚠️ Post not found, skipping notification');
+        return;
+      }
+      
+      const postData = postDoc.data()!;
+      targetOwnerCPId = postData.authorCPId;
+      targetTitle = postData.title || 'your post';
+      postId = targetId;
+    } else if (targetType === 'comment') {
+      const commentDoc = await admin.firestore().collection('comments').doc(targetId).get();
+      if (!commentDoc.exists) {
+        console.log('⚠️ Comment not found, skipping notification');
+        return;
+      }
+      
+      const commentData = commentDoc.data()!;
+      targetOwnerCPId = commentData.authorCPId;
+      targetTitle = commentData.body && commentData.body.length > 30 
+        ? commentData.body.substring(0, 30) + '...' 
+        : commentData.body || 'your comment';
+      postId = commentData.postId; // Comments have postId field
+    } else {
+      console.log(`⚠️ Unknown target type: ${targetType}, skipping notification`);
+      return;
+    }
+    
+    // Don't notify if interacting with own content
+    if (targetOwnerCPId === interactorCPId) {
+      console.log('ℹ️ User interacted with own content, skipping notification');
+      return;
+    }
+    
+    // Get target owner's community profile to get the userUID
+    const targetOwnerCPDoc = await admin.firestore().collection('communityProfiles').doc(targetOwnerCPId).get();
+    if (!targetOwnerCPDoc.exists) {
+      console.log('⚠️ Target owner community profile not found, skipping notification');
+      return;
+    }
+    
+    const targetOwnerCPData = targetOwnerCPDoc.data()!;
+    const targetOwnerUserUID = targetOwnerCPData.userUID;
+    
+    if (!targetOwnerUserUID) {
+      console.log('⚠️ Target owner community profile missing userUID, skipping notification');
+      return;
+    }
+    
+    // Get target owner's user document
+    const targetOwnerUserDoc = await admin.firestore().collection('users').doc(targetOwnerUserUID).get();
+    if (!targetOwnerUserDoc.exists) {
+      console.log('⚠️ Target owner not found in users collection, skipping notification');
+      return;
+    }
+    
+    const targetOwnerUserData = targetOwnerUserDoc.data()!;
+    const locale = targetOwnerUserData.locale || 'en';
+    
+    // Determine notification type
+    const isLike = value === 1;
+    const actionKey = isLike ? 'liked' : 'disliked';
+    const titleKey = `${actionKey}-your-${targetType}`;
+    
+    const title = translate(titleKey, locale);
+    const body = translate(`someone-${actionKey}-your-${targetType}`, locale, {
+      title: targetTitle
+    });
+    
+    console.log(`📱 Sending interaction notification to user ${targetOwnerUserUID} (CP: ${targetOwnerCPId}) in locale: ${locale}`);
+    
+    // Send FCM notification
+    const success = await sendFCMNotification(targetOwnerUserUID, title, body, locale, {
+      type: 'community_notification',
+      screen: 'postDetails',
+      postId: postId,
+      targetId: targetId,
+      notificationType: 'interaction',
+      interactionType: actionKey
+    });
+    
+    if (success) {
+      console.log('✅ Interaction notification sent successfully');
+    } else {
+      console.log('❌ Failed to send interaction notification');
+    }
+    
+  } catch (error) {
+    console.error('❌ Error handling interaction notification:', error);
+    // Log but don't throw
   }
 }
 
@@ -779,3 +1010,71 @@ async function createDeletionAuditRecord(
     throw error;
   }
 }
+
+// Community Notification Triggers
+
+// Trigger when a new comment is created
+export const onCommentCreate = onDocumentCreated(
+  {
+    document: 'comments/{commentId}',
+    region: 'us-central1',
+  },
+  async (event) => {
+    const commentData = event.data?.data();
+    const commentId = event.params.commentId;
+    
+    if (!commentData) {
+      console.log('❌ No comment data found in trigger');
+      return;
+    }
+    
+    console.log(`🔥 Comment created trigger fired for: ${commentId}`);
+    await handleCommentNotification(commentData, commentId);
+  }
+);
+
+// Trigger when a new interaction is created
+export const onInteractionCreate = onDocumentCreated(
+  {
+    document: 'interactions/{interactionId}',
+    region: 'us-central1',
+  },
+  async (event) => {
+    const interactionData = event.data?.data();
+    const interactionId = event.params.interactionId;
+    
+    if (!interactionData) {
+      console.log('❌ No interaction data found in trigger');
+      return;
+    }
+    
+    console.log(`🔥 Interaction created trigger fired for: ${interactionId}`);
+    await handleInteractionNotification(interactionData);
+  }
+);
+
+// Trigger when an interaction is updated (like/dislike changes)
+export const onInteractionUpdate = onDocumentUpdated(
+  {
+    document: 'interactions/{interactionId}',
+    region: 'us-central1',
+  },
+  async (event) => {
+    const before = event.data?.before.data();
+    const after = event.data?.after.data();
+    const interactionId = event.params.interactionId;
+    
+    if (!before || !after) {
+      console.log('❌ No before/after data found in interaction update trigger');
+      return;
+    }
+    
+    // Only trigger if value changed (like/dislike changed)
+    if (before.value !== after.value) {
+      console.log(`🔥 Interaction updated trigger fired for: ${interactionId} (${before.value} -> ${after.value})`);
+      await handleInteractionNotification(after);
+    } else {
+      console.log(`ℹ️ Interaction updated but value unchanged for: ${interactionId}`);
+    }
+  }
+);

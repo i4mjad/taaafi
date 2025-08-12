@@ -140,8 +140,28 @@ class NotificationsScreen extends ConsumerWidget {
     // Extract screen parameter from notification data
     final screen = _extractScreenParameter(notification.additionalData);
 
-    // Handle navigation based on screen parameter
-    if (screen != null && screen.isNotEmpty) {
+    // Handle navigation based on notification type
+    if (notification.isCommunityNotification) {
+      // Handle community notifications
+      final postId = notification.postId;
+      if (postId != null && postId.isNotEmpty) {
+        try {
+          // Navigate to the post detail
+          context.pushNamed(
+            RouteNames.postDetail.name,
+            pathParameters: {'postId': postId},
+          );
+        } catch (e) {
+          // Fallback: if post detail navigation fails, go to community
+          try {
+            context.pushNamed(RouteNames.community.name);
+          } catch (e2) {
+            // Last fallback: stay on notifications screen
+            print('Failed to navigate to post or community: $e');
+          }
+        }
+      }
+    } else if (screen != null && screen.isNotEmpty) {
       try {
         // Handle special cases with parameters
         if (screen == 'reportConversation' || screen == 'reportDetails') {
@@ -151,6 +171,26 @@ class NotificationsScreen extends ConsumerWidget {
               RouteNames.reportConversation.name,
               pathParameters: {'reportId': reportId},
             );
+          }
+        } else if (screen == 'postDetails') {
+          // Handle community post navigation from legacy notifications
+          final postId =
+              notification.postId ?? notification.additionalData?['postId'];
+          if (postId != null) {
+            try {
+              context.pushNamed(
+                RouteNames.postDetail.name,
+                pathParameters: {'postId': postId},
+              );
+            } catch (e) {
+              // Fallback: if post detail navigation fails, go to community
+              try {
+                context.pushNamed(RouteNames.community.name);
+              } catch (e2) {
+                // Last fallback: stay on notifications screen
+                print('Failed to navigate to post or community: $e');
+              }
+            }
           }
         } else {
           // Direct navigation to the specified screen

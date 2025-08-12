@@ -445,6 +445,29 @@ class MessagingService with WidgetsBindingObserver {
         }
       }
 
+      // Handle community post navigation
+      if (screen == 'postDetails') {
+        final postId = data['postId'];
+        if (postId != null) {
+          // Navigate to post detail, fallback to community if navigation fails
+          try {
+            GoRouter.of(ctx).goNamed(
+              RouteNames.postDetail.name,
+              pathParameters: {'postId': postId},
+            );
+          } catch (e) {
+            // If post detail route doesn't exist or navigation fails, go to community
+            try {
+              GoRouter.of(ctx).goNamed(RouteNames.community.name);
+            } catch (e2) {
+              // Last fallback to notifications
+              GoRouter.of(ctx).goNamed(RouteNames.notifications.name);
+            }
+          }
+          return;
+        }
+      }
+
       // Direct navigation - screen parameter should match route name
       try {
         GoRouter.of(ctx).goNamed(screen);

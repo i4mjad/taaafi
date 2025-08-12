@@ -66,4 +66,24 @@ class AppNotification {
       additionalData: additionalData ?? this.additionalData,
     );
   }
+
+  // Community notification convenience properties
+  String? get postId => additionalData?['postId'] as String?;
+  String? get commentId => additionalData?['commentId'] as String?;
+  String? get notificationType =>
+      additionalData?['notificationType'] as String?;
+  String? get interactionType => additionalData?['interactionType'] as String?;
+  String? get screen => additionalData?['screen'] as String?;
+
+  // Check if this is a community notification
+  bool get isCommunityNotification =>
+      additionalData?['type'] == 'community_notification' ||
+      notificationType == 'comment' ||
+      notificationType == 'interaction';
+
+  // Check if this is a report notification (for backwards compatibility)
+  bool get isReportNotification =>
+      reportId.isNotEmpty ||
+      reportStatus != 'general' ||
+      additionalData?['reportId'] != null;
 }
