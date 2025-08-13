@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/helpers/date_display_formater.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
+import 'package:reboot_app_3/core/routing/route_names.dart';
 import 'package:reboot_app_3/core/shared_widgets/app_bar.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
 import 'package:reboot_app_3/core/shared_widgets/custom_textfield.dart';
@@ -133,7 +134,8 @@ class _DiariesScreenState extends ConsumerState<DiariesScreen> {
                 .read(diariesNotifierProvider.notifier)
                 .createEmptyDiary();
             if (mounted) {
-              context.go('/vault/diaries/diary/$diaryId');
+              context.goNamed(RouteNames.diary.name,
+                  pathParameters: {'id': diaryId});
             }
           } catch (e) {
             if (mounted) {
@@ -284,8 +286,8 @@ class _DiaryWidgetState extends ConsumerState<DiaryWidget> {
                 0,
                 0),
             child: GestureDetector(
-              onTap: () =>
-                  context.go("/vault/diaries/diary/${widget.diary.id}"),
+              onTap: () => context.goNamed(RouteNames.diary.name,
+                  pathParameters: {'id': widget.diary.id}),
               onHorizontalDragUpdate: (details) {
                 if (locale.languageCode == 'ar') {
                   // For Arabic: slide left (negative delta)

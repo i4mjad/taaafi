@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:reboot_app_3/core/routing/route_names.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
@@ -192,8 +193,10 @@ class _CommunityActivitySectionState
                     borderColor: theme.success[200]!,
                     onTap: () {
                       // Navigate to create post with general category selected
-                      context.push(
-                          '/community/forum/new?categoryId=DFbm1WSnUyrOmtKZYWVb');
+                      context.goNamed(RouteNames.newPost.name,
+                          queryParameters: {
+                            'categoryId': 'DFbm1WSnUyrOmtKZYWVb'
+                          });
                     },
                   ),
                 ),
@@ -208,8 +211,10 @@ class _CommunityActivitySectionState
                     borderColor: theme.warn[200]!,
                     onTap: () {
                       // Navigate to create post with support category selected
-                      context.push(
-                          '/community/forum/new?categoryId=mQFCsyIwAk5KcVPSH3NS');
+                      context.goNamed(RouteNames.newPost.name,
+                          queryParameters: {
+                            'categoryId': 'mQFCsyIwAk5KcVPSH3NS'
+                          });
                     },
                   ),
                 ),

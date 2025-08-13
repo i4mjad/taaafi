@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:reboot_app_3/core/routing/route_names.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/shared_widgets/app_bar.dart';
@@ -45,7 +46,8 @@ class _ForumHomeScreenState extends ConsumerState<ForumHomeScreen> {
                   child: PostCard(
                     postId: 'post_$index',
                     onTap: () {
-                      context.push('/community/forum/post/post_$index');
+                      context.goNamed(RouteNames.postDetail.name,
+                          pathParameters: {'postId': 'post_$index'});
                     },
                   ),
                 );
@@ -56,7 +58,7 @@ class _ForumHomeScreenState extends ConsumerState<ForumHomeScreen> {
       ),
       floatingActionButton: CommunityPostGuard(
         onAccessGranted: () {
-          context.push('/community/forum/new');
+          context.goNamed(RouteNames.newPost.name);
         },
         child: FloatingActionButton(
           onPressed: null, // Handled by CommunityPostGuard

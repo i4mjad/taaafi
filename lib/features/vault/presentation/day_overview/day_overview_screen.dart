@@ -515,7 +515,8 @@ class NoteDailyRecordWidget extends ConsumerWidget {
     final theme = AppTheme.of(context);
     final locale = ref.watch(localeNotifierProvider);
     return GestureDetector(
-      onTap: () => context.go("/vault/diaries/diary/${note.id}"),
+      onTap: () => context
+          .goNamed(RouteNames.diary.name, pathParameters: {'id': note.id}),
       child: WidgetsContainer(
         padding: EdgeInsets.all(12),
         backgroundColor: theme.backgroundColor,

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:reboot_app_3/core/routing/route_names.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
@@ -43,7 +44,8 @@ class CompactCommentTile extends ConsumerWidget {
     return GestureDetector(
       onTap: () {
         // Navigate to post detail screen
-        context.push('/community/forum/post/${comment.postId}');
+        context.goNamed(RouteNames.postDetail.name,
+            pathParameters: {'postId': comment.postId});
       },
       child: Container(
         padding: const EdgeInsets.all(16),

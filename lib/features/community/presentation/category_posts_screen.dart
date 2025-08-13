@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:reboot_app_3/core/routing/route_names.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/shared_widgets/app_bar.dart';
@@ -311,13 +312,15 @@ class _CategoryPostsScreenState extends ConsumerState<CategoryPostsScreen> {
                                   },
                                 ),
                               // Removed category filter since we're already in a specific category
-                              if (_activeFilters?['sortBy'] != null && _activeFilters!['sortBy'] != 'newest_first')
+                              if (_activeFilters?['sortBy'] != null &&
+                                  _activeFilters!['sortBy'] != 'newest_first')
                                 _buildFilterChip(
                                   label:
                                       '${localizations.translate('sort_by')}: ${_getSortDisplayName(_activeFilters!['sortBy'])}',
                                   onRemove: () {
                                     setState(() {
-                                      _activeFilters!['sortBy'] = 'newest_first';
+                                      _activeFilters!['sortBy'] =
+                                          'newest_first';
                                     });
                                     _performSearch();
                                   },
@@ -417,7 +420,7 @@ class _CategoryPostsScreenState extends ConsumerState<CategoryPostsScreen> {
 
   Widget _buildPostsList(AppLocalizations localizations) {
     final theme = AppTheme.of(context);
-    
+
     // Check if we have active search filters
     final hasActiveSearch = _searchQuery.isNotEmpty || _activeFilters != null;
 
@@ -507,7 +510,8 @@ class _CategoryPostsScreenState extends ConsumerState<CategoryPostsScreen> {
             return ThreadsPostCard(
               post: post,
               onTap: () {
-                context.push('/community/forum/post/${post.id}');
+                context.goNamed(RouteNames.postDetail.name,
+                    pathParameters: {'postId': post.id});
               },
             );
           },
@@ -600,7 +604,8 @@ class _CategoryPostsScreenState extends ConsumerState<CategoryPostsScreen> {
             return ThreadsPostCard(
               post: post,
               onTap: () {
-                context.push('/community/forum/post/${post.id}');
+                context.goNamed(RouteNames.postDetail.name,
+                    pathParameters: {'postId': post.id});
               },
             );
           },

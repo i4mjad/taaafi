@@ -4,6 +4,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:go_router/go_router.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
+import 'package:reboot_app_3/core/routing/route_names.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
 import 'package:reboot_app_3/core/shared_widgets/custom_textfield.dart';
 import 'package:reboot_app_3/core/shared_widgets/platform_switch.dart';
@@ -725,7 +726,7 @@ class _EditCommunityProfileModalState
                           // Navigate to community instead of trying to pop modal
                           // This avoids navigation stack issues
                           if (context.mounted) {
-                            context.go('/community');
+                            context.goNamed(RouteNames.community.name);
                           }
                         },
                         style: ElevatedButton.styleFrom(
@@ -774,7 +775,7 @@ class _EditCommunityProfileModalState
                   // Navigate to community root instead of trying to pop
                   // This avoids navigation stack issues when the profile is deleted
                   if (context.mounted) {
-                    context.go('/community');
+                    context.goNamed(RouteNames.community.name);
                   }
                 });
               }
@@ -1184,7 +1185,7 @@ class _EditCommunityProfileModalState
                 // Navigate to community instead of trying to pop modal
                 // This avoids navigation stack issues after profile deletion
                 if (context.mounted) {
-                  context.go('/community');
+                  context.goNamed(RouteNames.community.name);
                 }
               },
               style: ElevatedButton.styleFrom(

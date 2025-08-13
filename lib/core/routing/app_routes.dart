@@ -36,7 +36,7 @@ import 'package:reboot_app_3/features/messaging/presentation/messaging_groups_sc
 import 'package:reboot_app_3/features/community/presentation/community_onboarding_screen.dart';
 import 'package:reboot_app_3/features/community/presentation/groups_onboarding_screen.dart';
 import 'package:reboot_app_3/features/community/presentation/community_main_screen.dart';
-import 'package:reboot_app_3/features/community/presentation/forum/forum_home_screen.dart';
+
 import 'package:reboot_app_3/features/community/presentation/groups/group_list_screen.dart';
 import 'package:reboot_app_3/features/community/presentation/groups/groups_coming_soon_screen.dart';
 import 'package:reboot_app_3/features/community/presentation/forum/post_detail_screen.dart';
@@ -526,48 +526,38 @@ GoRouter goRouter(Ref<GoRouter> ref) {
                     },
                   ),
                   GoRoute(
-                    path: 'forum',
-                    name: RouteNames.forumHome.name,
+                    path: 'post/:postId',
+                    name: RouteNames.postDetail.name,
                     pageBuilder: (context, state) => MaterialPage<void>(
-                      name: RouteNames.forumHome.name,
-                      child: ForumHomeScreen(),
+                      name: RouteNames.postDetail.name,
+                      child: PostDetailScreen(
+                          postId: state.pathParameters['postId']!),
                     ),
-                    routes: [
-                      GoRoute(
-                        path: 'post/:postId',
-                        name: RouteNames.postDetail.name,
-                        pageBuilder: (context, state) => MaterialPage<void>(
-                          name: RouteNames.postDetail.name,
-                          child: PostDetailScreen(
-                              postId: state.pathParameters['postId']!),
-                        ),
-                      ),
-                      GoRoute(
-                        path: 'new',
+                  ),
+                  GoRoute(
+                    path: 'new',
+                    name: RouteNames.newPost.name,
+                    pageBuilder: (context, state) {
+                      // Get initial category ID from query parameters
+                      final initialCategoryId =
+                          state.uri.queryParameters['categoryId'];
+                      return MaterialPage<void>(
                         name: RouteNames.newPost.name,
-                        pageBuilder: (context, state) {
-                          // Get initial category ID from query parameters
-                          final initialCategoryId =
-                              state.uri.queryParameters['categoryId'];
-                          return MaterialPage<void>(
-                            name: RouteNames.newPost.name,
-                            child: NewPostScreen(
-                                initialCategoryId: initialCategoryId),
-                          );
-                        },
+                        child:
+                            NewPostScreen(initialCategoryId: initialCategoryId),
+                      );
+                    },
+                  ),
+                  GoRoute(
+                    path: 'post/:postId/comment/:commentId/reply',
+                    name: RouteNames.replyComposer.name,
+                    pageBuilder: (context, state) => MaterialPage<void>(
+                      name: RouteNames.replyComposer.name,
+                      child: ReplyComposerScreen(
+                        postId: state.pathParameters['postId']!,
+                        parentId: state.pathParameters['commentId']!,
                       ),
-                      GoRoute(
-                        path: 'post/:postId/comment/:commentId/reply',
-                        name: RouteNames.replyComposer.name,
-                        pageBuilder: (context, state) => MaterialPage<void>(
-                          name: RouteNames.replyComposer.name,
-                          child: ReplyComposerScreen(
-                            postId: state.pathParameters['postId']!,
-                            parentId: state.pathParameters['commentId']!,
-                          ),
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
 
                   GoRoute(

@@ -885,7 +885,8 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen>
             return ThreadsPostCard(
               post: post,
               onTap: () {
-                context.push('/community/forum/post/${post.id}');
+                context.goNamed(RouteNames.postDetail.name,
+                    pathParameters: {'postId': post.id});
               },
             );
           },
@@ -1018,7 +1019,8 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen>
         return ThreadsPostCard(
           post: post,
           onTap: () {
-            context.push('/community/forum/post/${post.id}');
+            context.goNamed(RouteNames.postDetail.name,
+                pathParameters: {'postId': post.id});
           },
         );
       },
@@ -1110,7 +1112,8 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen>
         return ThreadsPostCard(
           post: post,
           onTap: () {
-            context.push('/community/forum/post/${post.id}');
+            context.goNamed(RouteNames.postDetail.name,
+                pathParameters: {'postId': post.id});
           },
         );
       },

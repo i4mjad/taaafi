@@ -40,7 +40,6 @@ enum RouteNames {
   groups, // New groups main route
   // Community routes
   communityOnboarding,
-  forumHome,
   // Groups routes
   groupsOnboarding,
   postDetail,
