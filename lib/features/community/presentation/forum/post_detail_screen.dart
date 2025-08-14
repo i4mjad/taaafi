@@ -14,6 +14,7 @@ import 'package:reboot_app_3/features/community/presentation/widgets/post_intera
 import 'package:reboot_app_3/features/community/presentation/widgets/comment_list_widget.dart';
 import 'package:reboot_app_3/features/community/presentation/widgets/reply_input_widget.dart';
 import 'package:reboot_app_3/features/community/presentation/widgets/report_content_modal.dart';
+import 'package:reboot_app_3/features/community/presentation/widgets/compact_comment_modal.dart';
 
 import 'package:reboot_app_3/features/community/presentation/providers/forum_providers.dart';
 import 'package:reboot_app_3/features/community/presentation/providers/community_providers_new.dart';
@@ -30,6 +31,7 @@ class PostDetailScreen extends ConsumerStatefulWidget {
 
 class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
   final ScrollController _scrollController = ScrollController();
+  Comment? _replyToComment; // Store comment for reply context
 
   @override
   void initState() {
@@ -129,7 +131,12 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
                         CommentListWidget(
                           postId: widget.postId,
                           postAuthorCPId: post.authorCPId,
-                          onCommentMore: _handleCommentMore,
+                          onCommentMore:
+                              _handleCommentTap, // Comment tap opens compact modal
+                          onCommentReply:
+                              _handleCommentReply, // Reply button shows input
+                          onCommentOptions:
+                              _showCommentOptionsModal, // 3 dots opens options
                         ),
 
                         // Add bottom padding to account for floating reply input
@@ -158,7 +165,25 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
                       child: SafeArea(
                         child: ReplyInputWidget(
                           postId: widget.postId,
-                          onReplySubmitted: _handleReplySubmitted,
+                          parentFor: replyState.isReplying ? 'comment' : 'post',
+                          parentId: replyState.isReplying
+                              ? replyState.replyToCommentId
+                              : widget.postId,
+                          replyingToUsername: replyState.replyToUsername,
+                          replyToComment:
+                              replyState.isReplying ? _replyToComment : null,
+                          hideReplyContext: !replyState.isReplying,
+                          onReplySubmitted: () {
+                            _handleReplySubmitted();
+                            // Clear reply state and comment after submitting
+                            ref.read(replyStateProvider.notifier).cancelReply();
+                            _replyToComment = null;
+                          },
+                          onCancelReply: () {
+                            // Clear reply state and comment when user cancels
+                            ref.read(replyStateProvider.notifier).cancelReply();
+                            _replyToComment = null;
+                          },
                         ),
                       ),
                     ),
@@ -294,8 +319,14 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
     );
   }
 
-  void _handleCommentMore(Comment comment) {
-    _showCommentOptions(context, comment);
+  void _handleCommentTap(Comment comment) {
+    // Comment body tap -> show compact modal with comment and its replies
+    _showCompactCommentModal(context, comment);
+  }
+
+  void _handleCommentReply(Comment comment) {
+    // Reply button tap -> show reply input in post screen
+    _showReplyInputInPost(comment);
   }
 
   void _handleReplySubmitted() {
@@ -490,101 +521,6 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
     );
   }
 
-  void _showCommentOptions(BuildContext context, Comment comment) {
-    final theme = AppTheme.of(context);
-    final localizations = AppLocalizations.of(context);
-    final currentProfileAsync = ref.read(currentCommunityProfileProvider);
-
-    // Check if current user owns this comment
-    bool isOwnComment = false;
-    currentProfileAsync.whenData((profile) {
-      isOwnComment = profile?.id == comment.authorCPId;
-    });
-
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      builder: (context) => Container(
-        decoration: BoxDecoration(
-          color: theme.backgroundColor,
-          borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(16),
-            topRight: Radius.circular(16),
-          ),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Handle bar
-            Container(
-              margin: const EdgeInsets.only(top: 12),
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: theme.grey[300],
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-
-            const SizedBox(height: 20),
-
-            // Report Comment Option
-            _buildModalOption(
-              context,
-              theme,
-              localizations,
-              icon: LucideIcons.flag,
-              title: localizations.translate('report_comment'),
-              subtitle: localizations.translate('report_inappropriate_content'),
-              onTap: () {
-                Navigator.of(context).pop();
-                _showReportCommentModal(context, comment);
-              },
-            ),
-
-            // Delete Comment Option (only if user owns the comment)
-            if (isOwnComment) ...[
-              const SizedBox(height: 8),
-              _buildModalOption(
-                context,
-                theme,
-                localizations,
-                icon: LucideIcons.trash2,
-                title: localizations.translate('delete_comment'),
-                subtitle: localizations.translate('permanently_delete_comment'),
-                isDestructive: true,
-                onTap: () {
-                  Navigator.of(context).pop();
-                  _showDeleteCommentConfirmation(context, comment);
-                },
-              ),
-            ],
-
-            const SizedBox(height: 20),
-          ],
-        ),
-      ),
-    );
-  }
-
-  void _showReportCommentModal(BuildContext context, Comment comment) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      useSafeArea: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => Padding(
-        padding: EdgeInsets.only(
-          bottom: MediaQuery.of(context).viewInsets.bottom,
-        ),
-        child: ReportContentModal(
-          contentType: ReportContentType.comment,
-          comment: comment,
-        ),
-      ),
-    );
-  }
-
   void _showDeletePostConfirmation(BuildContext context, dynamic post) {
     final theme = AppTheme.of(context);
     final localizations = AppLocalizations.of(context);
@@ -719,6 +655,288 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
             // Add safe area padding for devices with bottom notches
             const SizedBox(height: 8),
           ],
+        ),
+      ),
+    );
+  }
+
+  void _toggleCommenting(BuildContext context, dynamic post) async {
+    // Store a reference to the current context and widget state
+    final currentContext = context;
+    final wasCommentingAllowed = post.isCommentingAllowed;
+
+    try {
+      // Use the repository to toggle commenting
+      await ref.read(forumRepositoryProvider).togglePostCommenting(
+            postId: post.id,
+            isCommentingAllowed: !post.isCommentingAllowed,
+          );
+
+      // Show success message only if widget is still mounted and context is still valid
+      if (mounted && currentContext.mounted) {
+        final messageKey =
+            wasCommentingAllowed ? 'commenting_disabled' : 'commenting_enabled';
+        getSuccessSnackBar(currentContext, messageKey);
+      }
+    } catch (e) {
+      // Show error message only if widget is still mounted and context is still valid
+      if (mounted && currentContext.mounted) {
+        getErrorSnackBar(currentContext, 'error_toggle_commenting');
+      }
+    }
+  }
+
+  void _deletePost(BuildContext context, dynamic post) async {
+    // Store context reference
+    final currentContext = context;
+
+    // Mark as deleted optimistically for immediate UI feedback
+    ref.read(optimisticPostStateProvider(post.id).notifier).markAsDeleted();
+
+    // Show brief success message and navigate back immediately
+    if (mounted && currentContext.mounted) {
+      getSuccessSnackBar(currentContext, 'post_deleted');
+      // Use GoRouter navigation instead of Navigator.pop()
+      currentContext.pop();
+    }
+
+    try {
+      // Perform actual deletion in background
+      await ref.read(forumRepositoryProvider).deletePost(post.id);
+
+      // Invalidate providers to refresh post feeds
+      ref.invalidate(postsProvider);
+      ref.invalidate(genderFilteredPostsProvider);
+      ref.invalidate(mainScreenPostsProvider);
+      ref.invalidate(postsPaginationProvider);
+      ref.invalidate(pinnedPostsPaginationProvider);
+      ref.invalidate(newsPostsPaginationProvider);
+      ref.invalidate(userPostsPaginationProvider);
+      ref.invalidate(userLikedPostsPaginationProvider);
+      ref.invalidate(userCommentsPaginationProvider);
+    } catch (e) {
+      // Revert optimistic deletion if failed (though user won't see it since they navigated back)
+      ref.read(optimisticPostStateProvider(post.id).notifier).revertDeletion();
+
+      // Show error message if user is still in app and context is valid
+      if (mounted && currentContext.mounted) {
+        getErrorSnackBar(currentContext, 'error_deleting_post');
+      }
+    }
+  }
+
+  void _showReplyInputInPost(Comment comment) async {
+    // Store the comment for preview display
+    _replyToComment = comment;
+
+    // Get the actual username from the community profile
+    final authorProfile =
+        await ref.read(communityProfileByIdProvider(comment.authorCPId).future);
+    final displayName = authorProfile.getDisplayNameWithPipeline();
+    final localizations = AppLocalizations.of(context);
+
+    // Localize special display names
+    String finalDisplayName = displayName;
+    switch (displayName) {
+      case 'DELETED_USER':
+        finalDisplayName = localizations.translate('community-deleted-user');
+        break;
+      case 'ANONYMOUS_USER':
+        finalDisplayName = localizations.translate('community-anonymous');
+        break;
+    }
+
+    // Set reply state to show context in main reply input
+    ref.read(replyStateProvider.notifier).startReply(
+          commentId: comment.id,
+          username: finalDisplayName,
+        );
+
+    // Scroll to bottom to show the reply input
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _scrollController.animateTo(
+        _scrollController.position.maxScrollExtent,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
+    });
+  }
+
+  void _showCompactCommentModal(BuildContext context, Comment comment) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => CompactCommentModal(
+        comment: comment,
+        onReplySubmitted: () {
+          // Refresh comments when a new reply is submitted
+          ref.refresh(postCommentsProvider(widget.postId));
+        },
+      ),
+    );
+  }
+
+  void _showCommentOptionsModal(Comment comment) {
+    final theme = AppTheme.of(context);
+    final localizations = AppLocalizations.of(context);
+    final currentProfileAsync = ref.read(currentCommunityProfileProvider);
+
+    // Check if current user owns this comment
+    bool isOwnComment = false;
+    currentProfileAsync.whenData((profile) {
+      isOwnComment = profile?.id == comment.authorCPId;
+    });
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        decoration: BoxDecoration(
+          color: theme.backgroundColor,
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(16),
+            topRight: Radius.circular(16),
+          ),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Handle bar
+            Container(
+              margin: const EdgeInsets.only(top: 12),
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: theme.grey[300],
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+
+            const SizedBox(height: 20),
+
+            // Report Comment Option
+            _buildCommentOption(
+              context,
+              theme,
+              localizations,
+              icon: LucideIcons.flag,
+              title: localizations.translate('report_comment'),
+              subtitle: localizations.translate('report_inappropriate_content'),
+              onTap: () {
+                Navigator.of(context).pop();
+                _showReportCommentModal(context, comment);
+              },
+            ),
+
+            // Delete Comment Option (only if user owns the comment)
+            if (isOwnComment) ...[
+              const SizedBox(height: 8),
+              _buildCommentOption(
+                context,
+                theme,
+                localizations,
+                icon: LucideIcons.trash2,
+                title: localizations.translate('delete_comment'),
+                subtitle: localizations.translate('permanently_delete_comment'),
+                isDestructive: true,
+                onTap: () {
+                  Navigator.of(context).pop();
+                  _showDeleteCommentConfirmation(context, comment);
+                },
+              ),
+            ],
+
+            const SizedBox(height: 20),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCommentOption(
+    BuildContext context,
+    dynamic theme,
+    AppLocalizations localizations, {
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required VoidCallback onTap,
+    bool isDestructive = false,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(16),
+        margin: const EdgeInsets.symmetric(horizontal: 16),
+        decoration: BoxDecoration(
+          color: isDestructive ? theme.error[50] : theme.grey[50],
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: isDestructive ? theme.error[100] : theme.grey[100],
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(
+                icon,
+                size: 20,
+                color: isDestructive ? theme.error[600] : theme.grey[700],
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyles.body.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: isDestructive ? theme.error[700] : theme.grey[900],
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    subtitle,
+                    style: TextStyles.caption.copyWith(
+                      color: isDestructive ? theme.error[600] : theme.grey[600],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Icon(
+              localizations.locale.languageCode == 'ar'
+                  ? LucideIcons.chevronLeft
+                  : LucideIcons.chevronRight,
+              size: 16,
+              color: isDestructive ? theme.error[500] : theme.grey[500],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showReportCommentModal(BuildContext context, Comment comment) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Padding(
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom,
+        ),
+        child: ReportContentModal(
+          contentType: ReportContentType.comment,
+          comment: comment,
         ),
       ),
     );
@@ -863,90 +1081,31 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
     );
   }
 
-  void _toggleCommenting(BuildContext context, dynamic post) async {
-    // Store a reference to the current context and widget state
-    final currentContext = context;
-    final wasCommentingAllowed = post.isCommentingAllowed;
-
-    try {
-      // Use the repository to toggle commenting
-      await ref.read(forumRepositoryProvider).togglePostCommenting(
-            postId: post.id,
-            isCommentingAllowed: !post.isCommentingAllowed,
-          );
-
-      // Show success message only if widget is still mounted and context is still valid
-      if (mounted && currentContext.mounted) {
-        final messageKey =
-            wasCommentingAllowed ? 'commenting_disabled' : 'commenting_enabled';
-        getSuccessSnackBar(currentContext, messageKey);
-      }
-    } catch (e) {
-      // Show error message only if widget is still mounted and context is still valid
-      if (mounted && currentContext.mounted) {
-        getErrorSnackBar(currentContext, 'error_toggle_commenting');
-      }
-    }
-  }
-
-  void _deletePost(BuildContext context, dynamic post) async {
-    // Store context reference
-    final currentContext = context;
-
-    // Mark as deleted optimistically for immediate UI feedback
-    ref.read(optimisticPostStateProvider(post.id).notifier).markAsDeleted();
-
-    // Show brief success message and navigate back immediately
-    if (mounted && currentContext.mounted) {
-      getSuccessSnackBar(currentContext, 'post_deleted');
-      // Use GoRouter navigation instead of Navigator.pop()
-      currentContext.pop();
-    }
-
-    try {
-      // Perform actual deletion in background
-      await ref.read(forumRepositoryProvider).deletePost(post.id);
-
-      // Invalidate providers to refresh post feeds
-      ref.invalidate(postsProvider);
-      ref.invalidate(genderFilteredPostsProvider);
-      ref.invalidate(mainScreenPostsProvider);
-      ref.invalidate(postsPaginationProvider);
-      ref.invalidate(pinnedPostsPaginationProvider);
-      ref.invalidate(newsPostsPaginationProvider);
-      ref.invalidate(userPostsPaginationProvider);
-      ref.invalidate(userLikedPostsPaginationProvider);
-      ref.invalidate(userCommentsPaginationProvider);
-    } catch (e) {
-      // Revert optimistic deletion if failed (though user won't see it since they navigated back)
-      ref.read(optimisticPostStateProvider(post.id).notifier).revertDeletion();
-
-      // Show error message if user is still in app and context is valid
-      if (mounted && currentContext.mounted) {
-        getErrorSnackBar(currentContext, 'error_deleting_post');
-      }
-    }
-  }
-
   void _deleteComment(BuildContext context, Comment comment) async {
-    // Store context reference
-    final currentContext = context;
-
-    // Show brief success message immediately for better UX
-    if (mounted && currentContext.mounted) {
-      getSuccessSnackBar(currentContext, 'comment_deleted');
-    }
-
     try {
-      // Perform actual deletion
       await ref.read(forumRepositoryProvider).deleteComment(comment.id);
 
-      // Refresh comments to remove the deleted comment
+      // Refresh the comments list
       ref.refresh(postCommentsProvider(widget.postId));
+
+      if (context.mounted) {
+        // Show success message
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Comment deleted successfully'),
+            backgroundColor: AppTheme.of(context).success[600],
+          ),
+        );
+      }
     } catch (e) {
-      // Show error message if deletion failed
-      if (mounted && currentContext.mounted) {
-        getErrorSnackBar(currentContext, 'error_deleting_comment');
+      if (context.mounted) {
+        // Show error message
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to delete comment'),
+            backgroundColor: AppTheme.of(context).error[600],
+          ),
+        );
       }
     }
   }

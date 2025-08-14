@@ -23,6 +23,7 @@ class ReplyInputWidget extends ConsumerStatefulWidget {
   final Comment? replyToComment;
   final VoidCallback? onReplySubmitted;
   final VoidCallback? onCancelReply;
+  final bool hideReplyContext; // New parameter to hide reply context
 
   const ReplyInputWidget({
     super.key,
@@ -33,6 +34,7 @@ class ReplyInputWidget extends ConsumerStatefulWidget {
     this.replyToComment,
     this.onReplySubmitted,
     this.onCancelReply,
+    this.hideReplyContext = false,
   });
 
   @override
@@ -91,7 +93,8 @@ class _ReplyInputWidgetState extends ConsumerState<ReplyInputWidget> {
             top: false,
             child: Column(
               children: [
-                if (widget.replyToComment != null) ...[
+                if (widget.replyToComment != null &&
+                    !widget.hideReplyContext) ...[
                   _buildReplyContext(
                       theme, localizations, widget.replyToComment!),
                   verticalSpace(Spacing.points8)

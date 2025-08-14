@@ -1,6 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:reboot_app_3/features/community/data/models/post_form_data.dart';
+import 'package:reboot_app_3/features/community/data/models/comment.dart';
+import 'package:reboot_app_3/features/community/data/models/comment_thread.dart';
 import 'package:reboot_app_3/features/community/data/repositories/forum_repository.dart';
 import 'package:reboot_app_3/features/community/domain/services/post_validation_service.dart';
 import 'package:reboot_app_3/features/community/data/exceptions/forum_exceptions.dart';
@@ -699,5 +701,93 @@ class ForumService {
         : value == -1
             ? 'dislike'
             : 'neutral';
+  }
+
+  /// Reply to a comment
+  Future<void> replyToComment({
+    required String commentId,
+    required String content,
+    required AppLocalizations localizations,
+  }) async {
+    try {
+      // 1. Check authentication
+      await _ensureAuthenticated();
+
+      // 2. Validate comment content
+      _validateCommentContent(content, localizations);
+
+      // 3. Check user permissions
+      await _checkCommentCreationPermission(localizations);
+
+      // 4. Get the parent comment to determine the post ID
+      final commentThread = await _repository.getCommentThread(commentId);
+      final parentComment = commentThread.parentComment;
+
+      // 5. Validate gender-based interaction rules
+      final currentUserGender = await _getCurrentUserGender();
+      if (currentUserGender != null) {
+        await _genderValidator.validateCanReplyToComment(
+          currentUserGender: currentUserGender,
+          parentCommentId: commentId,
+          localizations: localizations,
+          applyGenderFilter: true,
+        );
+      }
+
+      // 6. Check for rate limiting
+      await _checkRateLimit('comment_creation', localizations);
+
+      // 7. Create the reply
+      await _repository.addComment(
+        postId: parentComment.postId,
+        body: content.trim(),
+        parentFor: 'comment',
+        parentId: commentId,
+      );
+
+      // 8. Log the action for analytics
+      await _logCommentCreation(parentComment.postId, content);
+    } on CommentCreationException {
+      // Re-throw comment creation exceptions
+      rethrow;
+    } catch (e) {
+      // Convert unexpected errors to CommentCreationException
+      throw CommentCreationException(
+        localizations.translate('reply_creation_failed'),
+        reason: 'unexpected_error',
+        details: e.toString(),
+        code: 'REPLY_CREATION_FAILED',
+      );
+    }
+  }
+
+  /// Get comment thread (comment + its replies)
+  Future<CommentThread> getCommentThread(String commentId) async {
+    try {
+      await _ensureAuthenticated();
+      return await _repository.getCommentThread(commentId);
+    } catch (e) {
+      throw CommentCreationException(
+        'Failed to load comment thread',
+        reason: 'thread_loading_failed',
+        details: e.toString(),
+        code: 'THREAD_LOADING_FAILED',
+      );
+    }
+  }
+
+  /// Get nested comments for a post
+  Future<Map<String, List<Comment>>> getNestedComments(String postId) async {
+    try {
+      await _ensureAuthenticated();
+      return await _repository.getNestedComments(postId);
+    } catch (e) {
+      throw CommentCreationException(
+        'Failed to load nested comments',
+        reason: 'nested_comments_loading_failed',
+        details: e.toString(),
+        code: 'NESTED_COMMENTS_LOADING_FAILED',
+      );
+    }
   }
 }

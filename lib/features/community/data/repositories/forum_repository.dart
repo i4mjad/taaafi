@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:reboot_app_3/features/community/data/models/post_category.dart';
 import 'package:reboot_app_3/features/community/data/models/post.dart';
 import 'package:reboot_app_3/features/community/data/models/comment.dart';
+import 'package:reboot_app_3/features/community/data/models/comment_thread.dart';
 import 'package:reboot_app_3/features/community/data/models/interaction.dart';
 import 'package:reboot_app_3/features/community/application/gender_filtering_service.dart';
 
@@ -750,6 +751,7 @@ class ForumRepository {
   Future<List<Comment>> _getUnfilteredComments(String postId) async {
     final QuerySnapshot snapshot = await _comments
         .where('postId', isEqualTo: postId)
+        .where('parentFor', isEqualTo: 'post') // Only get parent comments
         .orderBy('createdAt')
         .get();
 
@@ -778,6 +780,7 @@ class ForumRepository {
 
       final QuerySnapshot snapshot = await _comments
           .where('postId', isEqualTo: postId)
+          .where('parentFor', isEqualTo: 'post') // Only get parent comments
           .where('authorCPId', whereIn: batch)
           .orderBy('createdAt')
           .get();
@@ -812,6 +815,7 @@ class ForumRepository {
   Stream<List<Comment>> _watchUnfilteredComments(String postId) {
     return _comments
         .where('postId', isEqualTo: postId)
+        .where('parentFor', isEqualTo: 'post') // Only get parent comments
         .orderBy('createdAt')
         .snapshots()
         .map((snapshot) => snapshot.docs
@@ -840,6 +844,7 @@ class ForumRepository {
 
         final batchStream = _comments
             .where('postId', isEqualTo: postId)
+            .where('parentFor', isEqualTo: 'post') // Only get parent comments
             .where('authorCPId', whereIn: batch)
             .orderBy('createdAt')
             .snapshots()
@@ -918,13 +923,229 @@ class ForumRepository {
         'score': 0,
         'likeCount': 0,
         'dislikeCount': 0,
+        'replyCount': 0,
         'createdAt': FieldValue.serverTimestamp(),
         'updatedAt': null,
       };
 
-      await _comments.add(commentData);
+      // Use a batch write to add comment and update parent reply count
+      final batch = _firestore.batch();
+
+      // Add the new comment
+      final commentRef = _comments.doc();
+      batch.set(commentRef, commentData);
+
+      // If this is a reply to a comment, increment the parent's reply count
+      if (parentFor == 'comment' && parentId != null) {
+        final parentCommentRef = _comments.doc(parentId);
+        batch.update(parentCommentRef, {
+          'replyCount': FieldValue.increment(1),
+        });
+      }
+
+      await batch.commit();
     } catch (e) {
       throw Exception('Failed to add comment: $e');
+    }
+  }
+
+  /// Get replies for a specific comment
+  Future<List<Comment>> getCommentReplies(String commentId) async {
+    try {
+      final QuerySnapshot snapshot = await _comments
+          .where('parentFor', isEqualTo: 'comment')
+          .where('parentId', isEqualTo: commentId)
+          .orderBy(
+              'createdAt') // TODO: Index required - see firestore_indexes_required.md
+          .get();
+
+      final comments = snapshot.docs
+          .map((doc) => Comment.fromFirestore(
+              doc as DocumentSnapshot<Map<String, dynamic>>))
+          .where((comment) => !comment.isDeleted)
+          .toList();
+
+      // Manual sort as fallback (in case index is not ready)
+      comments.sort((a, b) => a.createdAt.compareTo(b.createdAt));
+      return comments;
+    } catch (e) {
+      // If index error, try without orderBy as temporary fallback
+      if (e.toString().contains('index') || e.toString().contains('Index')) {
+        try {
+          final QuerySnapshot fallbackSnapshot = await _comments
+              .where('parentFor', isEqualTo: 'comment')
+              .where('parentId', isEqualTo: commentId)
+              .get();
+
+          final comments = fallbackSnapshot.docs
+              .map((doc) => Comment.fromFirestore(
+                  doc as DocumentSnapshot<Map<String, dynamic>>))
+              .where((comment) => !comment.isDeleted)
+              .toList();
+
+          // Sort manually since we can't use orderBy
+          comments.sort((a, b) => a.createdAt.compareTo(b.createdAt));
+          return comments;
+        } catch (fallbackError) {
+          throw Exception('Failed to fetch comment replies: $fallbackError');
+        }
+      }
+      throw Exception('Failed to fetch comment replies: $e');
+    }
+  }
+
+  /// Stream of replies for a specific comment
+  Stream<List<Comment>> watchCommentReplies(String commentId) {
+    return _comments
+        .where('parentFor', isEqualTo: 'comment')
+        .where('parentId', isEqualTo: commentId)
+        .orderBy(
+            'createdAt') // TODO: Index required - see firestore_indexes_required.md
+        .snapshots()
+        .map((snapshot) {
+      final comments = snapshot.docs
+          .map((doc) => Comment.fromFirestore(
+              doc as DocumentSnapshot<Map<String, dynamic>>))
+          .where((comment) => !comment.isDeleted)
+          .toList();
+
+      // Manual sort to ensure correct order
+      comments.sort((a, b) => a.createdAt.compareTo(b.createdAt));
+      return comments;
+    });
+  }
+
+  /// Fallback stream without orderBy (for when index is not ready)
+  Stream<List<Comment>> watchCommentRepliesWithoutOrder(String commentId) {
+    return _comments
+        .where('parentFor', isEqualTo: 'comment')
+        .where('parentId', isEqualTo: commentId)
+        .snapshots()
+        .map((snapshot) {
+      final comments = snapshot.docs
+          .map((doc) => Comment.fromFirestore(
+              doc as DocumentSnapshot<Map<String, dynamic>>))
+          .where((comment) => !comment.isDeleted)
+          .toList();
+
+      // Manual sort since we can't use orderBy
+      comments.sort((a, b) => a.createdAt.compareTo(b.createdAt));
+      return comments;
+    });
+  }
+
+  /// Get a comment thread (parent comment + replies)
+  Future<CommentThread> getCommentThread(String commentId) async {
+    try {
+      // Get the parent comment
+      final parentDoc = await _comments.doc(commentId).get();
+      if (!parentDoc.exists) {
+        throw Exception('Comment not found');
+      }
+
+      final parentComment = Comment.fromFirestore(
+          parentDoc as DocumentSnapshot<Map<String, dynamic>>);
+
+      // Get replies
+      final replies = await getCommentReplies(commentId);
+
+      return CommentThread(
+        parentComment: parentComment,
+        replies: replies,
+        hasMoreReplies: replies.length < parentComment.replyCount,
+        totalReplyCount: parentComment.replyCount,
+        loadedReplyCount: replies.length,
+      );
+    } catch (e) {
+      throw Exception('Failed to fetch comment thread: $e');
+    }
+  }
+
+  /// Get nested comments hierarchy for a post
+  Future<Map<String, List<Comment>>> getNestedComments(String postId) async {
+    try {
+      // Get all comments for the post
+      final QuerySnapshot snapshot = await _comments
+          .where('postId', isEqualTo: postId)
+          .orderBy('createdAt')
+          .get();
+
+      final allComments = snapshot.docs
+          .map((doc) => Comment.fromFirestore(
+              doc as DocumentSnapshot<Map<String, dynamic>>))
+          .where((comment) => !comment.isDeleted)
+          .toList();
+
+      // Group comments by parentId
+      final Map<String, List<Comment>> commentMap = {};
+
+      for (final comment in allComments) {
+        final parentId = comment.parentId;
+        if (commentMap[parentId] == null) {
+          commentMap[parentId] = [];
+        }
+        commentMap[parentId]!.add(comment);
+      }
+
+      return commentMap;
+    } catch (e) {
+      throw Exception('Failed to fetch nested comments: $e');
+    }
+  }
+
+  /// Increment reply count for a comment
+  Future<void> incrementReplyCount(String commentId) async {
+    try {
+      await _comments.doc(commentId).update({
+        'replyCount': FieldValue.increment(1),
+      });
+    } catch (e) {
+      throw Exception('Failed to increment reply count: $e');
+    }
+  }
+
+  /// Decrement reply count for a comment
+  Future<void> decrementReplyCount(String commentId) async {
+    try {
+      await _comments.doc(commentId).update({
+        'replyCount': FieldValue.increment(-1),
+      });
+    } catch (e) {
+      throw Exception('Failed to decrement reply count: $e');
+    }
+  }
+
+  /// Delete a comment and handle reply count updates
+  Future<void> deleteComment(String commentId) async {
+    try {
+      final batch = _firestore.batch();
+
+      // Get the comment to be deleted
+      final commentDoc = await _comments.doc(commentId).get();
+      if (!commentDoc.exists) {
+        throw Exception('Comment not found');
+      }
+
+      final comment = Comment.fromFirestore(
+          commentDoc as DocumentSnapshot<Map<String, dynamic>>);
+
+      // Mark comment as deleted
+      batch.update(_comments.doc(commentId), {
+        'isDeleted': true,
+        'updatedAt': FieldValue.serverTimestamp(),
+      });
+
+      // If this is a reply, decrement parent's reply count
+      if (comment.isReply) {
+        final parentCommentRef = _comments.doc(comment.parentId);
+        batch.update(parentCommentRef, {
+          'replyCount': FieldValue.increment(-1),
+        });
+      }
+
+      await batch.commit();
+    } catch (e) {
+      throw Exception('Failed to delete comment: $e');
     }
   }
 
@@ -1288,18 +1509,6 @@ class ForumRepository {
       });
     } catch (e) {
       throw Exception('Failed to delete post: $e');
-    }
-  }
-
-  /// Soft delete a comment by setting isDeleted to true
-  Future<void> deleteComment(String commentId) async {
-    try {
-      await _comments.doc(commentId).update({
-        'isDeleted': true,
-        'updatedAt': FieldValue.serverTimestamp(),
-      });
-    } catch (e) {
-      throw Exception('Failed to delete comment: $e');
     }
   }
 

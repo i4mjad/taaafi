@@ -15,13 +15,21 @@ import 'package:reboot_app_3/features/community/presentation/providers/forum_pro
 class CommentTileWidget extends ConsumerWidget {
   final Comment comment;
   final bool isAuthor;
-  final VoidCallback? onMoreTap;
+  final VoidCallback? onMoreTap; // 3 dots - for comment options
+  final VoidCallback? onCommentTap; // Comment body tap - for compact modal
+  final VoidCallback? onReplyTap;
+  final int nestingLevel;
+  final bool isCondensed;
 
   const CommentTileWidget({
     super.key,
     required this.comment,
     this.isAuthor = false,
     this.onMoreTap,
+    this.onCommentTap,
+    this.onReplyTap,
+    this.nestingLevel = 0,
+    this.isCondensed = false,
   });
 
   /// Helper function to localize special display name constants
@@ -50,94 +58,110 @@ class CommentTileWidget extends ConsumerWidget {
         final isAuthorAnonymous = authorProfile.isAnonymous;
         final isAuthorPlusUser = authorProfile.hasPlusSubscription();
 
-        return Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            border: Border(
-              bottom: BorderSide(
-                color: theme.grey[100]!,
+        return GestureDetector(
+          onTap: () =>
+              onCommentTap?.call(), // Tap comment to open compact modal
+          child: Container(
+            padding: EdgeInsets.only(
+              left: 16 + (nestingLevel * 16.0), // Indent based on nesting level
+              right: 16,
+              top: 16,
+              bottom: 16,
+            ),
+            decoration: BoxDecoration(
+              border: Border(
+                bottom: BorderSide(
+                  color: theme.grey[100]!,
+                ),
+                left: nestingLevel > 0
+                    ? BorderSide(
+                        color: theme.grey[300]!,
+                        width: 2,
+                      )
+                    : BorderSide.none,
               ),
             ),
-          ),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // User avatar - clickable to show profile
-              GestureDetector(
-                onTap: () => showModalBottomSheet(
-                  context: context,
-                  isScrollControlled: true,
-                  backgroundColor: Colors.transparent,
-                  builder: (context) => Padding(
-                    padding: EdgeInsets.only(
-                      bottom: MediaQuery.of(context).viewInsets.bottom,
-                    ),
-                    child: CommunityProfileModal(
-                      communityProfileId: comment.authorCPId,
-                      displayName: authorProfile.displayName,
-                      avatarUrl: authorProfile.avatarUrl,
-                      isAnonymous: isAuthorAnonymous,
-                      isPlusUser: isAuthorPlusUser,
-                    ),
-                  ),
-                ),
-                child: AvatarWithAnonymity(
-                  isDeleted: authorProfile.isDeleted,
-                  cpId: comment.authorCPId,
-                  isAnonymous: isAuthorAnonymous,
-                  size: 32,
-                  avatarUrl: isAuthorAnonymous ? null : authorProfile.avatarUrl,
-                  isPlusUser: isAuthorPlusUser,
-                ),
-              ),
-
-              const SizedBox(width: 12),
-
-              // Comment content
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // User info and timestamp
-                    _buildUserInfo(
-                        context,
-                        ref,
-                        theme,
-                        localizations,
-                        isAuthorAnonymous,
-                        authorProfileAsync,
-                        isAuthorPlusUser),
-
-                    const SizedBox(height: 8),
-
-                    // Comment body
-                    Text(
-                      comment.isHidden
-                          ? localizations.translate('comment-hidden-by-admin')
-                          : comment.body,
-                      style: TextStyles.caption.copyWith(
-                        color: comment.isHidden
-                            ? theme.grey[600]
-                            : theme.grey[800],
-                        fontSize: 15,
-                        height: 1.4,
-                        fontStyle: comment.isHidden
-                            ? FontStyle.italic
-                            : FontStyle.normal,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // User avatar - clickable to show profile
+                GestureDetector(
+                  onTap: () => showModalBottomSheet(
+                    context: context,
+                    isScrollControlled: true,
+                    backgroundColor: Colors.transparent,
+                    builder: (context) => Padding(
+                      padding: EdgeInsets.only(
+                        bottom: MediaQuery.of(context).viewInsets.bottom,
+                      ),
+                      child: CommunityProfileModal(
+                        communityProfileId: comment.authorCPId,
+                        displayName: authorProfile.displayName,
+                        avatarUrl: authorProfile.avatarUrl,
+                        isAnonymous: isAuthorAnonymous,
+                        isPlusUser: isAuthorPlusUser,
                       ),
                     ),
-
-                    const SizedBox(height: 12),
-
-                    // Actions row
-                    _buildInteractionButtons(
-                        context, ref, theme, localizations),
-                  ],
+                  ),
+                  child: AvatarWithAnonymity(
+                    isDeleted: authorProfile.isDeleted,
+                    cpId: comment.authorCPId,
+                    isAnonymous: isAuthorAnonymous,
+                    size: 32,
+                    avatarUrl:
+                        isAuthorAnonymous ? null : authorProfile.avatarUrl,
+                    isPlusUser: isAuthorPlusUser,
+                  ),
                 ),
-              ),
-            ],
-          ),
-        );
+
+                const SizedBox(width: 12),
+
+                // Comment content
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // User info and timestamp
+                      _buildUserInfo(
+                          context,
+                          ref,
+                          theme,
+                          localizations,
+                          isAuthorAnonymous,
+                          authorProfileAsync,
+                          isAuthorPlusUser),
+
+                      const SizedBox(height: 8),
+
+                      // Comment body
+                      Text(
+                        comment.isHidden
+                            ? localizations.translate('comment-hidden-by-admin')
+                            : comment.body,
+                        style: TextStyles.caption.copyWith(
+                          color: comment.isHidden
+                              ? theme.grey[600]
+                              : theme.grey[800],
+                          fontSize: 15,
+                          height: 1.4,
+                          fontStyle: comment.isHidden
+                              ? FontStyle.italic
+                              : FontStyle.normal,
+                        ),
+                      ),
+
+                      const SizedBox(height: 12),
+
+                      // Actions row
+                      _buildInteractionButtons(
+                          context, ref, theme, localizations),
+                    ],
+                  ),
+                ),
+              ],
+            ), // Close Row (child of Container)
+          ), // Close Container (child of GestureDetector)
+        ); // Close GestureDetector
       },
       loading: () => _buildLoadingState(theme),
       error: (error, stackTrace) =>
@@ -405,8 +429,48 @@ class CommentTileWidget extends ConsumerWidget {
           count: comment.dislikeCount,
         ),
 
+        const SizedBox(width: 24),
+
+        // Reply button
+        if (!isCondensed) _buildReplyButton(context, ref, theme, localizations),
+
         const Spacer(),
       ],
+    );
+  }
+
+  Widget _buildReplyButton(
+    BuildContext context,
+    WidgetRef ref,
+    dynamic theme,
+    AppLocalizations localizations,
+  ) {
+    return GestureDetector(
+      onTap: onReplyTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              LucideIcons.messageCircle,
+              size: 18,
+              color: theme.grey[500],
+            ),
+            if (comment.hasReplies) ...[
+              const SizedBox(width: 6),
+              Text(
+                comment.replyCount.toString(),
+                style: TextStyles.tiny.copyWith(
+                  color: theme.grey[600],
+                  fontWeight: FontWeight.w500,
+                  fontSize: 13,
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
     );
   }
 

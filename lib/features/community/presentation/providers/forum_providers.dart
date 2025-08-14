@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -5,18 +6,18 @@ import 'package:reboot_app_3/features/authentication/data/repositories/auth_repo
 import 'package:reboot_app_3/features/community/data/models/post_category.dart';
 import 'package:reboot_app_3/features/community/data/models/post.dart';
 import 'package:reboot_app_3/features/community/data/models/comment.dart';
+import 'package:reboot_app_3/features/community/data/models/comment_thread.dart';
 import 'package:reboot_app_3/features/community/data/models/interaction.dart';
 import 'package:reboot_app_3/features/community/data/models/post_search_filters.dart';
 import 'package:reboot_app_3/features/community/data/repositories/forum_repository.dart';
 import 'package:reboot_app_3/features/community/domain/services/forum_service.dart';
 import 'package:reboot_app_3/features/community/domain/services/post_validation_service.dart';
+import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/features/community/data/models/post_form_data.dart';
 import 'package:reboot_app_3/features/community/application/gender_filtering_service.dart';
 import 'package:reboot_app_3/features/community/application/gender_interaction_validator.dart';
 import 'package:reboot_app_3/features/community/presentation/providers/community_providers_new.dart';
 import 'package:reboot_app_3/features/community/domain/entities/community_profile_entity.dart';
-
-import 'package:reboot_app_3/core/localization/localization.dart';
 import 'dart:math' as math;
 
 /// Helper method to get community profile ID from user UID
@@ -451,6 +452,62 @@ final optimisticPostStateProvider = StateNotifierProvider.family<
     ),
   );
 });
+
+// =============================================================================
+// NESTED COMMENTS PROVIDERS
+// =============================================================================
+
+/// Provider for comment replies - uses fallback for missing indexes
+final commentRepliesProvider =
+    StreamProvider.family.autoDispose<List<Comment>, String>(
+  (ref, commentId) {
+    final repository = ref.watch(forumRepositoryProvider);
+
+    // For now, use the fallback query until indexes are created
+    // TODO: Switch back to repository.watchCommentReplies(commentId) after creating index
+    print('Using fallback query for comment replies (index not ready)');
+    return repository.watchCommentRepliesWithoutOrder(commentId);
+  },
+);
+
+/// Provider for comment thread (parent comment + replies)
+final commentThreadProvider =
+    FutureProvider.family.autoDispose<CommentThread, String>(
+  (ref, commentId) async {
+    final repository = ref.watch(forumRepositoryProvider);
+    return repository.getCommentThread(commentId);
+  },
+);
+
+/// Provider for nested comments hierarchy
+final nestedCommentsProvider =
+    FutureProvider.family.autoDispose<Map<String, List<Comment>>, String>(
+  (ref, postId) async {
+    final repository = ref.watch(forumRepositoryProvider);
+    return repository.getNestedComments(postId);
+  },
+);
+
+/// Provider for reply input state management
+final replyInputStateProvider =
+    StateNotifierProvider<ReplyInputStateNotifier, ReplyInputState>(
+  (ref) => ReplyInputStateNotifier(),
+);
+
+/// Provider for nested modal stack management
+final nestedModalStackProvider =
+    StateNotifierProvider<NestedModalStackNotifier, List<String>>(
+  (ref) => NestedModalStackNotifier(),
+);
+
+/// Provider for adding replies to comments
+final addReplyProvider =
+    StateNotifierProvider.family<AddReplyNotifier, AsyncValue<void>, String>(
+  (ref, commentId) {
+    final service = ref.watch(forumServiceProvider);
+    return AddReplyNotifier(service, commentId);
+  },
+);
 
 // =============================================================================
 // INTERACTION PROVIDERS
@@ -1603,5 +1660,117 @@ class SearchPostsPaginationNotifier
 
   void reset() {
     state = SearchPostsPaginationState.initial();
+  }
+}
+
+// =============================================================================
+// NESTED COMMENTS STATE NOTIFIERS
+// =============================================================================
+
+/// State for reply input management
+class ReplyInputState {
+  final String? replyingToCommentId;
+  final String? replyingToUsername;
+  final bool isVisible;
+  final int nestingLevel;
+
+  const ReplyInputState({
+    this.replyingToCommentId,
+    this.replyingToUsername,
+    this.isVisible = false,
+    this.nestingLevel = 0,
+  });
+
+  ReplyInputState copyWith({
+    String? replyingToCommentId,
+    String? replyingToUsername,
+    bool? isVisible,
+    int? nestingLevel,
+  }) {
+    return ReplyInputState(
+      replyingToCommentId: replyingToCommentId ?? this.replyingToCommentId,
+      replyingToUsername: replyingToUsername ?? this.replyingToUsername,
+      isVisible: isVisible ?? this.isVisible,
+      nestingLevel: nestingLevel ?? this.nestingLevel,
+    );
+  }
+}
+
+/// State notifier for reply input
+class ReplyInputStateNotifier extends StateNotifier<ReplyInputState> {
+  ReplyInputStateNotifier() : super(const ReplyInputState());
+
+  void showReplyInput({
+    required String commentId,
+    required String username,
+    int nestingLevel = 0,
+  }) {
+    state = state.copyWith(
+      replyingToCommentId: commentId,
+      replyingToUsername: username,
+      isVisible: true,
+      nestingLevel: nestingLevel,
+    );
+  }
+
+  void hideReplyInput() {
+    state = const ReplyInputState();
+  }
+
+  void setNestingLevel(int level) {
+    state = state.copyWith(nestingLevel: level);
+  }
+}
+
+/// State notifier for nested modal stack
+class NestedModalStackNotifier extends StateNotifier<List<String>> {
+  NestedModalStackNotifier() : super([]);
+
+  void pushModal(String commentId) {
+    state = [...state, commentId];
+  }
+
+  void popModal() {
+    if (state.isNotEmpty) {
+      state = state.sublist(0, state.length - 1);
+    }
+  }
+
+  void clearStack() {
+    state = [];
+  }
+
+  bool get hasModals => state.isNotEmpty;
+  int get stackDepth => state.length;
+  String? get currentModal => state.isNotEmpty ? state.last : null;
+  List<String> get modalStack => List.from(state);
+}
+
+/// State notifier for adding replies
+class AddReplyNotifier extends StateNotifier<AsyncValue<void>> {
+  final ForumService _service;
+  final String _commentId;
+
+  AddReplyNotifier(this._service, this._commentId)
+      : super(const AsyncValue.data(null));
+
+  Future<void> addReply({
+    required String content,
+    required AppLocalizations localizations,
+  }) async {
+    if (state.isLoading) return;
+
+    state = const AsyncValue.loading();
+
+    try {
+      await _service.replyToComment(
+        commentId: _commentId,
+        content: content,
+        localizations: localizations,
+      );
+      state = const AsyncValue.data(null);
+    } catch (error, stackTrace) {
+      state = AsyncValue.error(error, stackTrace);
+    }
   }
 }

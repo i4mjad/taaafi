@@ -12,6 +12,10 @@ class Comment {
   final int dislikeCount;
   final DateTime createdAt;
   final DateTime? updatedAt;
+  // Nested comment fields
+  final String parentFor; // 'post' or 'comment'
+  final String parentId; // post ID or parent comment ID
+  final int replyCount; // Number of direct replies
 
   const Comment({
     required this.id,
@@ -25,6 +29,9 @@ class Comment {
     required this.dislikeCount,
     required this.createdAt,
     this.updatedAt,
+    required this.parentFor,
+    required this.parentId,
+    this.replyCount = 0,
   });
 
   factory Comment.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) =>
@@ -41,6 +48,9 @@ class Comment {
         createdAt: (doc.data()!["createdAt"] as Timestamp?)?.toDate() ??
             DateTime.now(),
         updatedAt: (doc.data()!["updatedAt"] as Timestamp?)?.toDate(),
+        parentFor: doc.data()!["parentFor"] ?? "post",
+        parentId: doc.data()!["parentId"] ?? doc.data()!["postId"],
+        replyCount: doc.data()!["replyCount"] ?? 0,
       );
 
   Map<String, dynamic> toJson() => {
@@ -55,6 +65,9 @@ class Comment {
         'dislikeCount': dislikeCount,
         'createdAt': createdAt.toIso8601String(),
         'updatedAt': updatedAt?.toIso8601String(),
+        'parentFor': parentFor,
+        'parentId': parentId,
+        'replyCount': replyCount,
       };
 
   /// Converts Comment to Firestore document data
@@ -70,6 +83,9 @@ class Comment {
         'dislikeCount': dislikeCount,
         'createdAt': Timestamp.fromDate(createdAt),
         'updatedAt': updatedAt != null ? Timestamp.fromDate(updatedAt!) : null,
+        'parentFor': parentFor,
+        'parentId': parentId,
+        'replyCount': replyCount,
       };
 
   /// Creates a copy of this comment with updated values
@@ -85,6 +101,9 @@ class Comment {
     int? dislikeCount,
     DateTime? createdAt,
     DateTime? updatedAt,
+    String? parentFor,
+    String? parentId,
+    int? replyCount,
   }) {
     return Comment(
       id: id ?? this.id,
@@ -98,6 +117,9 @@ class Comment {
       dislikeCount: dislikeCount ?? this.dislikeCount,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
+      parentFor: parentFor ?? this.parentFor,
+      parentId: parentId ?? this.parentId,
+      replyCount: replyCount ?? this.replyCount,
     );
   }
 
@@ -115,7 +137,10 @@ class Comment {
         other.likeCount == likeCount &&
         other.dislikeCount == dislikeCount &&
         other.createdAt == createdAt &&
-        other.updatedAt == updatedAt;
+        other.updatedAt == updatedAt &&
+        other.parentFor == parentFor &&
+        other.parentId == parentId &&
+        other.replyCount == replyCount;
   }
 
   @override
@@ -132,11 +157,19 @@ class Comment {
       dislikeCount,
       createdAt,
       updatedAt,
+      parentFor,
+      parentId,
+      replyCount,
     );
   }
 
   @override
   String toString() {
-    return 'Comment(id: $id, postId: $postId, authorCPId: $authorCPId, body: $body, isDeleted: $isDeleted, isHidden: $isHidden, score: $score, likeCount: $likeCount, dislikeCount: $dislikeCount, createdAt: $createdAt, updatedAt: $updatedAt)';
+    return 'Comment(id: $id, postId: $postId, authorCPId: $authorCPId, body: $body, isDeleted: $isDeleted, isHidden: $isHidden, score: $score, likeCount: $likeCount, dislikeCount: $dislikeCount, createdAt: $createdAt, updatedAt: $updatedAt, parentFor: $parentFor, parentId: $parentId, replyCount: $replyCount)';
   }
+
+  // Helper methods for nested comments
+  bool get isTopLevelComment => parentFor == 'post';
+  bool get isReply => parentFor == 'comment';
+  bool get hasReplies => replyCount > 0;
 }

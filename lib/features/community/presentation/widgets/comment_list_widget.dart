@@ -11,13 +11,17 @@ import 'package:reboot_app_3/features/community/presentation/providers/forum_pro
 class CommentListWidget extends ConsumerWidget {
   final String postId;
   final String postAuthorCPId;
-  final Function(Comment)? onCommentMore;
+  final Function(Comment)? onCommentMore; // Comment tap -> compact modal
+  final Function(Comment)? onCommentReply; // Reply button -> reply input
+  final Function(Comment)? onCommentOptions; // 3 dots -> options modal
 
   const CommentListWidget({
     super.key,
     required this.postId,
     required this.postAuthorCPId,
     this.onCommentMore,
+    this.onCommentReply,
+    this.onCommentOptions,
   });
 
   @override
@@ -42,8 +46,15 @@ class CommentListWidget extends ConsumerWidget {
             return CommentTileWidget(
               comment: comment,
               isAuthor: comment.authorCPId == postAuthorCPId,
-              onMoreTap:
-                  onCommentMore != null ? () => onCommentMore!(comment) : null,
+              onMoreTap: onCommentOptions != null
+                  ? () => onCommentOptions!(comment)
+                  : null, // 3 dots -> options modal
+              onCommentTap: onCommentMore != null
+                  ? () => onCommentMore!(comment)
+                  : null, // Comment tap -> compact modal
+              onReplyTap: onCommentReply != null
+                  ? () => onCommentReply!(comment)
+                  : null,
             );
           },
         );
