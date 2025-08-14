@@ -114,7 +114,7 @@ class CommentTileWidget extends ConsumerWidget {
                   ),
                 ),
 
-                const SizedBox(width: 12),
+                const SizedBox(width: 16),
 
                 // Comment content
                 Expanded(
@@ -245,190 +245,198 @@ class CommentTileWidget extends ConsumerWidget {
       bool isAuthorAnonymous,
       AsyncValue authorProfileAsync,
       bool isAuthorPlusUser) {
-    return Row(
-      crossAxisAlignment:
-          CrossAxisAlignment.center, // Ensure proper vertical alignment
-      children: [
-        // Username or anonymous indicator
-        authorProfileAsync.when(
-          data: (authorProfile) {
-            final pipelineResult =
-                authorProfile?.getDisplayNameWithPipeline() ?? 'Unknown User';
+    return authorProfileAsync.when(
+      data: (authorProfile) {
+        final pipelineResult =
+            authorProfile?.getDisplayNameWithPipeline() ?? 'Unknown User';
+        final displayName =
+            _getLocalizedDisplayName(pipelineResult, localizations);
 
-            final displayName =
-                _getLocalizedDisplayName(pipelineResult, localizations);
+        return Row(
+          children: [
+            // User info section - similar to post header
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // FIRST row for badges, timestamp, and 3-dots
+                  Container(
+                    margin: const EdgeInsets.only(bottom: 4),
+                    child: Row(
+                      children: [
+                        // Badges container - only add spacing between existing badges
+                        Row(
+                          children: [
+                            // Build badges list dynamically to avoid unnecessary spacing
+                            ...() {
+                              final List<Widget> badges = [];
 
-            return GestureDetector(
-              onTap: () => showModalBottomSheet(
-                context: context,
-                isScrollControlled: true,
-                backgroundColor: Colors.transparent,
-                builder: (context) => Padding(
-                  padding: EdgeInsets.only(
-                    bottom: MediaQuery.of(context).viewInsets.bottom,
+                              // Role chip
+                              if (authorProfile.role != null &&
+                                  authorProfile.role!.isNotEmpty) {
+                                badges.add(RoleChip(role: authorProfile.role));
+                              }
+
+                              // Streak display
+                              if (isAuthorPlusUser &&
+                                  authorProfile.shareRelapseStreaks) {
+                                badges.add(Consumer(
+                                  builder: (context, ref, child) {
+                                    final streakAsync = ref.watch(
+                                        userStreakCalculatorProvider(
+                                            comment.authorCPId));
+
+                                    return streakAsync.when(
+                                      data: (streakDays) {
+                                        if (streakDays == null ||
+                                            streakDays <= 0) {
+                                          return const SizedBox.shrink();
+                                        }
+                                        return StreakDisplayWidget(
+                                          streakDays: streakDays,
+                                          fontSize: 8,
+                                          iconSize: 8,
+                                        );
+                                      },
+                                      loading: () => const SizedBox.shrink(),
+                                      error: (error, stackTrace) =>
+                                          const SizedBox.shrink(),
+                                    );
+                                  },
+                                ));
+                              }
+
+                              // Author badge
+                              if (isAuthor) {
+                                badges.add(Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 6, vertical: 2),
+                                  decoration: BoxDecoration(
+                                    color: theme.primary[50],
+                                    borderRadius: BorderRadius.circular(4),
+                                  ),
+                                  child: Text(
+                                    localizations.translate('author'),
+                                    style: TextStyles.tiny.copyWith(
+                                      color: theme.primary[700],
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ));
+                              }
+
+                              // Add spacing only between existing badges
+                              final List<Widget> spacedBadges = [];
+                              for (int i = 0; i < badges.length; i++) {
+                                spacedBadges.add(badges[i]);
+                                // Add spacing between badges (not after the last one)
+                                if (i < badges.length - 1) {
+                                  spacedBadges.add(const SizedBox(width: 6));
+                                }
+                              }
+
+                              return spacedBadges;
+                            }(),
+                          ],
+                        ),
+
+                        // Spacer between badges and timestamp/3dots
+                        const Spacer(),
+
+                        // Timestamp
+                        Text(
+                          _formatTimestamp(comment.createdAt),
+                          style: TextStyles.caption.copyWith(
+                            color: theme.grey[600],
+                            fontSize: 12,
+                          ),
+                        ),
+
+                        const SizedBox(width: 8),
+
+                        // 3 dots button
+                        if (onMoreTap != null)
+                          GestureDetector(
+                            onTap: onMoreTap,
+                            child: Container(
+                              padding: const EdgeInsets.all(4),
+                              child: Icon(
+                                LucideIcons.moreHorizontal,
+                                size: 16,
+                                color: theme.grey[500],
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
                   ),
-                  child: CommunityProfileModal(
-                    communityProfileId: comment.authorCPId,
-                    displayName: authorProfile.displayName,
-                    avatarUrl: authorProfile.avatarUrl,
-                    isAnonymous: isAuthorAnonymous,
-                    isPlusUser: isAuthorPlusUser,
+
+                  // SECOND row for name only
+                  Row(
+                    children: [
+                      // Display name - clickable
+                      GestureDetector(
+                        onTap: () => showModalBottomSheet(
+                          context: context,
+                          isScrollControlled: true,
+                          backgroundColor: Colors.transparent,
+                          builder: (context) => Padding(
+                            padding: EdgeInsets.only(
+                              bottom: MediaQuery.of(context).viewInsets.bottom,
+                            ),
+                            child: CommunityProfileModal(
+                              communityProfileId: comment.authorCPId,
+                              displayName: authorProfile.displayName,
+                              avatarUrl: authorProfile.avatarUrl,
+                              isAnonymous: isAuthorAnonymous,
+                              isPlusUser: isAuthorPlusUser,
+                            ),
+                          ),
+                        ),
+                        child: Text(
+                          displayName,
+                          style: TextStyles.footnoteSelected.copyWith(
+                            color: theme.primary[700],
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
                   ),
-                ),
+                ],
               ),
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(
-                  maxWidth: 120, // Limit username width to prevent overflow
-                ),
-                child: Text(
-                  displayName,
-                  style: TextStyles.footnoteSelected.copyWith(
-                    color: theme.primary[700],
-                    fontSize: 14,
-                  ),
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 1,
-                ),
-              ),
-            );
-          },
-          loading: () => ConstrainedBox(
-            constraints: const BoxConstraints(
-              maxWidth: 120, // Consistent width constraint
             ),
+          ],
+        );
+      },
+      loading: () => Row(
+        children: [
+          Expanded(
             child: Text(
               'Loading...',
               style: TextStyles.footnoteSelected.copyWith(
                 color: theme.grey[700],
                 fontSize: 14,
               ),
-              overflow: TextOverflow.ellipsis,
-              maxLines: 1,
             ),
           ),
-          error: (error, stackTrace) => ConstrainedBox(
-            constraints: const BoxConstraints(
-              maxWidth: 120, // Consistent width constraint
-            ),
+        ],
+      ),
+      error: (error, stackTrace) => Row(
+        children: [
+          Expanded(
             child: Text(
               'Unknown User',
               style: TextStyles.footnoteSelected.copyWith(
                 color: theme.grey[700],
                 fontSize: 14,
               ),
-              overflow: TextOverflow.ellipsis,
-              maxLines: 1,
-            ),
-          ),
-        ),
-
-        // Role chip for admins and moderators
-        authorProfileAsync.when(
-          data: (authorProfile) {
-            return Row(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                const SizedBox(width: 6),
-                RoleChip(role: authorProfile.role),
-              ],
-            );
-          },
-          loading: () => const SizedBox.shrink(),
-          error: (error, stackTrace) => const SizedBox.shrink(),
-        ),
-
-        // Real-time streak display for Plus users who allow sharing
-        authorProfileAsync.when(
-          data: (authorProfile) {
-            if (isAuthorPlusUser && authorProfile.shareRelapseStreaks) {
-              return Row(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  const SizedBox(width: 6),
-                  Consumer(
-                    builder: (context, ref, child) {
-                      final streakAsync = ref.watch(
-                          userStreakCalculatorProvider(comment.authorCPId));
-
-                      return streakAsync.when(
-                        data: (streakDays) {
-                          if (streakDays == null || streakDays <= 0) {
-                            return const SizedBox.shrink();
-                          }
-
-                          return StreakDisplayWidget(
-                            streakDays: streakDays,
-                            fontSize: 8,
-                            iconSize: 8,
-                          );
-                        },
-                        loading: () => const SizedBox.shrink(),
-                        error: (error, stackTrace) {
-                          return const SizedBox.shrink();
-                        },
-                      );
-                    },
-                  ),
-                ],
-              );
-            }
-            return const SizedBox.shrink();
-          },
-          loading: () => const SizedBox.shrink(),
-          error: (error, stackTrace) => const SizedBox.shrink(),
-        ),
-
-        // Author badge
-        if (isAuthor) ...[
-          const SizedBox(width: 8),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-            decoration: BoxDecoration(
-              color: theme.primary[50],
-              borderRadius: BorderRadius.circular(4),
-            ),
-            child: Text(
-              localizations.translate('author'),
-              style: TextStyles.tiny.copyWith(
-                color: theme.primary[700],
-                fontWeight: FontWeight.w500,
-                height: 1.2, // Consistent line height
-              ),
             ),
           ),
         ],
-
-        const SizedBox(width: 8),
-
-        // Timestamp
-        Text(
-          _formatTimestamp(comment.createdAt),
-          style: TextStyles.caption.copyWith(
-            color: theme.grey[500],
-            fontSize: 12,
-            height: 1.2, // Consistent line height for alignment
-          ),
-        ),
-
-        const Spacer(),
-
-        if (onMoreTap != null)
-          GestureDetector(
-            onTap: onMoreTap,
-            child: Container(
-              width: 24,
-              height: 24,
-              alignment: Alignment.center,
-              child: Icon(
-                LucideIcons.moreHorizontal,
-                size: 16,
-                color: theme.grey[500],
-              ),
-            ),
-          ),
-      ],
+      ),
     );
   }
 

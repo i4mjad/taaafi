@@ -177,14 +177,14 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
                           onReplySubmitted: () async {
                             // Store comment reference before clearing
                             final commentToShow = _replyToComment;
-                            
+
                             // Handle reply submission
                             _handleReplySubmitted();
-                            
+
                             // Clear reply state first
                             ref.read(replyStateProvider.notifier).cancelReply();
                             _replyToComment = null;
-                            
+
                             // Wait for the comments to refresh and then show modal
                             if (commentToShow != null) {
                               _showCommentReplyModalAfterSubmit(commentToShow);

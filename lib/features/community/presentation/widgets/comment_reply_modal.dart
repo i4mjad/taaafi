@@ -18,13 +18,11 @@ import 'package:reboot_app_3/features/community/presentation/widgets/avatar_with
 
 class CommentReplyModal extends ConsumerStatefulWidget {
   final Comment parentComment;
-  final int nestingLevel;
   final VoidCallback? onReplySubmitted;
 
   const CommentReplyModal({
     super.key,
     required this.parentComment,
-    this.nestingLevel = 0,
     this.onReplySubmitted,
   });
 
@@ -89,13 +87,10 @@ class _CommentReplyModalState extends ConsumerState<CommentReplyModal> {
               Expanded(
                 child: Column(
                   children: [
-                    // Parent comment (condensed view)
-                    _buildParentCommentView(theme, localizations),
-
-                    // Divider
-                    Divider(
-                      color: theme.grey[200],
-                      height: 1,
+                    // Parent comment (condensed view) - Flexible to handle tight spaces
+                    Flexible(
+                      flex: 0,
+                      child: _buildParentCommentView(theme, localizations),
                     ),
 
                     // Replies list
@@ -143,51 +138,14 @@ class _CommentReplyModalState extends ConsumerState<CommentReplyModal> {
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       child: Row(
         children: [
-          // Back button (if nested)
-          if (widget.nestingLevel > 0) ...[
-            GestureDetector(
-              onTap: () => Navigator.of(context).pop(),
-              child: Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: theme.grey[100],
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Icon(
-                  localizations.locale.languageCode == 'ar'
-                      ? LucideIcons.chevronRight
-                      : LucideIcons.chevronLeft,
-                  size: 20,
-                  color: theme.grey[600],
-                ),
-              ),
-            ),
-            const SizedBox(width: 12),
-          ],
-
           // Title
           Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  localizations.translate('reply_modal_title'),
-                  style: TextStyles.h6.copyWith(
-                    color: theme.grey[900],
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                if (widget.nestingLevel > 0)
-                  Text(
-                    localizations.translate('thread_depth').replaceAll(
-                          '{level}',
-                          widget.nestingLevel.toString(),
-                        ),
-                    style: TextStyles.caption.copyWith(
-                      color: theme.grey[500],
-                    ),
-                  ),
-              ],
+            child: Text(
+              localizations.translate('reply_modal_title'),
+              style: TextStyles.h6.copyWith(
+                color: theme.grey[900],
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ),
 
@@ -218,9 +176,15 @@ class _CommentReplyModalState extends ConsumerState<CommentReplyModal> {
       padding: const EdgeInsets.all(16),
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
-        color: theme.grey[25],
+        color: theme.grey[50], // More visible background
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: theme.grey[200]!),
+        boxShadow: [
+          BoxShadow(
+            color: theme.grey[200]!.withValues(alpha: 0.3),
+            blurRadius: 4,
+            offset: const Offset(0, 1),
+          ),
+        ],
       ),
       child: Consumer(
         builder: (context, ref, child) {
@@ -231,6 +195,10 @@ class _CommentReplyModalState extends ConsumerState<CommentReplyModal> {
             data: (authorProfile) {
               final isAuthorAnonymous = authorProfile.isAnonymous;
               final isAuthorPlusUser = authorProfile.hasPlusSubscription();
+              final displayName = _getLocalizedDisplayName(
+                authorProfile.getDisplayNameWithPipeline(),
+                localizations,
+              );
 
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -242,7 +210,7 @@ class _CommentReplyModalState extends ConsumerState<CommentReplyModal> {
                         isDeleted: authorProfile.isDeleted,
                         cpId: widget.parentComment.authorCPId,
                         isAnonymous: isAuthorAnonymous,
-                        size: 36,
+                        size: 40, // Slightly larger
                         avatarUrl:
                             isAuthorAnonymous ? null : authorProfile.avatarUrl,
                         isPlusUser: isAuthorPlusUser,
@@ -252,60 +220,90 @@ class _CommentReplyModalState extends ConsumerState<CommentReplyModal> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            // Username
+                            // Username with enhanced styling
                             Text(
-                              _getLocalizedDisplayName(
-                                authorProfile.getDisplayNameWithPipeline(),
-                                localizations,
-                              ),
+                              displayName,
                               style: TextStyles.footnoteSelected.copyWith(
                                 color: theme.primary[700],
-                                fontSize: 15,
-                                fontWeight: FontWeight.w600,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w700,
                               ),
                             ),
-
-                            // Timestamp
+                            const SizedBox(height: 2),
+                            // Timestamp with improved styling
                             Text(
                               _formatTimestamp(widget.parentComment.createdAt),
                               style: TextStyles.caption.copyWith(
-                                color: theme.grey[500],
-                                fontSize: 12,
+                                color: theme.grey[600],
+                                fontSize: 13,
+                                fontWeight: FontWeight.w500,
                               ),
                             ),
                           ],
                         ),
                       ),
+                      // Original comment indicator
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: theme.primary[100],
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Text(
+                          localizations.translate('original_comment'),
+                          style: TextStyles.tiny.copyWith(
+                            color: theme.primary[700],
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
                     ],
                   ),
 
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 16),
 
-                  // Comment body
-                  Text(
-                    widget.parentComment.body,
-                    style: TextStyles.body.copyWith(
-                      color: theme.grey[800],
-                      fontSize: 15,
-                      height: 1.4,
+                  // Comment body with enhanced styling
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: theme.backgroundColor,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      widget.parentComment.body,
+                      style: TextStyles.body.copyWith(
+                        color: theme.grey[900],
+                        fontSize: 15,
+                        height: 1.5,
+                      ),
                     ),
                   ),
                 ],
               );
             },
-            loading: () => const Center(
-              child: SizedBox(
-                height: 20,
-                width: 20,
-                child: CircularProgressIndicator(strokeWidth: 2),
+            loading: () => Container(
+              padding: const EdgeInsets.all(24),
+              child: const Center(
+                child: SizedBox(
+                  height: 24,
+                  width: 24,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                ),
               ),
             ),
             error: (error, stackTrace) => Container(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: theme.error[50],
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: theme.error[200]!),
+              ),
               child: Text(
                 'Error loading comment',
                 style: TextStyles.caption.copyWith(
-                  color: theme.error[600],
+                  color: theme.error[700],
+                  fontWeight: FontWeight.w500,
                 ),
               ),
             ),
@@ -364,7 +362,6 @@ class _CommentReplyModalState extends ConsumerState<CommentReplyModal> {
               margin: const EdgeInsets.only(bottom: 16),
               child: CommentTileWidget(
                 comment: reply,
-                nestingLevel: 0, // Flatten nesting in modal
                 onReplyTap: null, // Remove nesting - no reply button in modal
                 onMoreTap: () => _handleReplyMore(reply), // 3 dots for options
                 onCommentTap: null, // No compact modal in reply modal
