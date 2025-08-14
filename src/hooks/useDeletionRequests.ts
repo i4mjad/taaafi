@@ -15,10 +15,12 @@ import {
   serverTimestamp,
   getDocs,
   setDoc,
-  documentId
+  documentId,
+  startAfter,
+  QueryDocumentSnapshot
 } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
-import { useState } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 
 interface AccountDeleteRequest {
   id: string;
@@ -38,49 +40,91 @@ interface AccountDeleteRequest {
 }
 
 export function useDeletionRequests(userId?: string) {
-  // Try different query approaches to debug the issue
-  const [snapshot, loading, error] = useCollection(
-    userId
-      ? query(
-          collection(db, 'accountDeleteRequests'),
-          where('userId', '==', userId)
-          // Removed orderBy to avoid potential index issues
-        )
-      : query(
-          collection(db, 'accountDeleteRequests'),
-          limit(50)
-        )
-  );
+  const [allRequests, setAllRequests] = useState<AccountDeleteRequest[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
 
-  // Minimal logging for debugging (only errors and critical info)
-  if (error) {
-    console.error('🔍 Deletion Requests Error:', error.message);
-  }
-
-  const deletionRequests: AccountDeleteRequest[] = 
-    snapshot?.docs.map((doc) => {
-      const data = doc.data() as DocumentData;
+  const fetchAllRequests = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
       
-      return {
-        id: doc.id,
-        userId: data.userId,
-        userEmail: data.userEmail,
-        userName: data.userName,
-        requestedAt: data.requestedAt?.toDate() || new Date(),
-        reasonId: data.reasonId,
-        reasonDetails: data.reasonDetails,
-        reasonCategory: data.reasonCategory,
-        isCanceled: data.isCanceled || false,
-        isProcessed: data.isProcessed || false,
-        canceledAt: data.canceledAt?.toDate(),
-        processedAt: data.processedAt?.toDate(),
-        processedBy: data.processedBy,
-        adminNotes: data.adminNotes,
-      };
-    }) || [];
+      const queryRef = userId
+        ? query(
+            collection(db, 'accountDeleteRequests'),
+            where('userId', '==', userId),
+            orderBy('requestedAt', 'asc')
+          )
+        : query(
+            collection(db, 'accountDeleteRequests'),
+            orderBy('requestedAt', 'asc'),
+            limit(500) // Fetch more requests to ensure we get all statuses
+          );
 
-  // Sort manually since we removed orderBy from query
-  deletionRequests.sort((a, b) => b.requestedAt.getTime() - a.requestedAt.getTime());
+      const snapshot = await getDocs(queryRef);
+      
+      const requests: AccountDeleteRequest[] = snapshot.docs.map((doc) => {
+        const data = doc.data() as DocumentData;
+        return {
+          id: doc.id,
+          userId: data.userId,
+          userEmail: data.userEmail,
+          userName: data.userName,
+          requestedAt: data.requestedAt?.toDate() || new Date(),
+          reasonId: data.reasonId,
+          reasonDetails: data.reasonDetails,
+          reasonCategory: data.reasonCategory,
+          isCanceled: data.isCanceled || false,
+          isProcessed: data.isProcessed || false,
+          canceledAt: data.canceledAt?.toDate(),
+          processedAt: data.processedAt?.toDate(),
+          processedBy: data.processedBy,
+          adminNotes: data.adminNotes,
+        };
+      });
+
+      // Apply client-side sorting
+      requests.sort((a, b) => {
+        const getPriority = (request: AccountDeleteRequest) => {
+          if (request.isProcessed) return 2; // Processed last
+          if (request.isCanceled) return 1; // Canceled middle
+          return 0; // Pending first
+        };
+        
+        const priorityA = getPriority(a);
+        const priorityB = getPriority(b);
+        
+        if (priorityA !== priorityB) {
+          return priorityA - priorityB;
+        }
+        
+        return a.requestedAt.getTime() - b.requestedAt.getTime();
+      });
+
+      setAllRequests(requests);
+      
+      // Debug logging
+      if (!userId) {
+        const statusBreakdown = {
+          pending: requests.filter(r => !r.isProcessed && !r.isCanceled).length,
+          canceled: requests.filter(r => r.isCanceled).length,
+          processed: requests.filter(r => r.isProcessed).length,
+          total: requests.length
+        };
+        console.log('🔍 Deletion Requests Breakdown:', statusBreakdown);
+      }
+      
+    } catch (err) {
+      console.error('🔍 Deletion Requests Error:', err);
+      setError(err as Error);
+    } finally {
+      setLoading(false);
+    }
+  }, [userId]);
+
+  useEffect(() => {
+    fetchAllRequests();
+  }, [fetchAllRequests]);
 
   const [processing, setProcessing] = useState(false);
 
@@ -168,28 +212,43 @@ export function useDeletionRequests(userId?: string) {
   };
 
   return {
-    deletionRequests,
+    deletionRequests: allRequests,
     loading,
     error,
     processing,
     approveRequest,
     rejectRequest,
     updateAdminNotes,
+    refetch: fetchAllRequests,
   };
 }
 
 export function useDeletionRequestsByStatus(status: 'pending' | 'processed' | 'canceled') {
-  const [snapshot, loading, error] = useCollection(
-    query(
-      collection(db, 'accountDeleteRequests'),
-      status === 'pending' 
-        ? where('isProcessed', '==', false)
-        : status === 'processed'
-        ? where('isProcessed', '==', true)
-        : where('isCanceled', '==', true),
-      orderBy('requestedAt', 'desc'),
+  // Build query based on status with proper conditions
+  let queryConstraints;
+  if (status === 'pending') {
+    queryConstraints = [
+      where('isProcessed', '==', false),
+      where('isCanceled', '==', false),
+      orderBy('requestedAt', 'asc'),
       limit(100)
-    )
+    ];
+  } else if (status === 'processed') {
+    queryConstraints = [
+      where('isProcessed', '==', true),
+      orderBy('requestedAt', 'asc'),
+      limit(100)
+    ];
+  } else { // canceled
+    queryConstraints = [
+      where('isCanceled', '==', true),
+      orderBy('requestedAt', 'asc'),
+      limit(100)
+    ];
+  }
+
+  const [snapshot, loading, error] = useCollection(
+    query(collection(db, 'accountDeleteRequests'), ...queryConstraints)
   );
 
   const deletionRequests: AccountDeleteRequest[] = 

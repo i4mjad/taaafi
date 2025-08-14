@@ -180,6 +180,12 @@ export default function UsersRoute() {
   
   // Deletion requests filters
   const [deletionRequestStatusFilter, setDeletionRequestStatusFilter] = useState('all');
+  
+  // Deletion requests pagination
+  const [deletionRequestsPagination, setDeletionRequestsPagination] = useState({
+    pageIndex: 0,
+    pageSize: 20,
+  });
 
   const headerDictionary = {
     documents: t('appSidebar.users') || 'Users',
@@ -335,6 +341,10 @@ export default function UsersRoute() {
 
   const handleClearDeletionFilters = () => {
     setDeletionRequestStatusFilter('all');
+    setDeletionRequestsPagination({
+      pageIndex: 0,
+      pageSize: 20
+    });
   };
 
   const formatDeletionDate = (date: Date | string | null | undefined) => {
@@ -394,6 +404,28 @@ export default function UsersRoute() {
     if (deletionRequestStatusFilter === 'canceled') return request.isCanceled;
     return true;
   });
+
+  // Paginate deletion requests
+  const totalDeletionRequests = filteredDeletionRequests.length;
+  const totalDeletionPages = Math.ceil(totalDeletionRequests / deletionRequestsPagination.pageSize);
+  const paginatedDeletionRequests = filteredDeletionRequests.slice(
+    deletionRequestsPagination.pageIndex * deletionRequestsPagination.pageSize,
+    (deletionRequestsPagination.pageIndex + 1) * deletionRequestsPagination.pageSize
+  );
+
+  const handleDeletionPageChange = (newPageIndex: number) => {
+    setDeletionRequestsPagination(prev => ({
+      ...prev,
+      pageIndex: newPageIndex
+    }));
+  };
+
+  const handleDeletionPageSizeChange = (newPageSize: number) => {
+    setDeletionRequestsPagination({
+      pageIndex: 0, // Reset to first page
+      pageSize: newPageSize
+    });
+  };
 
   const handlePageChange = (newPage: number) => {
     setPagination(prev => ({ ...prev, page: newPage }));
@@ -1118,7 +1150,7 @@ export default function UsersRoute() {
                           <Skeleton key={i} className="h-16 w-full" />
                         ))}
                       </div>
-                    ) : filteredDeletionRequests.length > 0 ? (
+                    ) : paginatedDeletionRequests.length > 0 ? (
                       <div className="rounded-md border overflow-x-auto">
                         <Table>
                           <TableHeader>
@@ -1133,7 +1165,7 @@ export default function UsersRoute() {
                             </TableRow>
                           </TableHeader>
                           <TableBody>
-                            {filteredDeletionRequests.map((request) => (
+                            {paginatedDeletionRequests.map((request) => (
                               <TableRow key={request.id}>
                                 <TableCell>
                                   <div className="font-mono text-sm max-w-[120px] truncate">
@@ -1215,6 +1247,79 @@ export default function UsersRoute() {
                           <p className="text-muted-foreground">
                             {t('modules.userManagement.accountDeletion.noDeletionRequest') || 'No deletion requests found'}
                           </p>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Deletion Requests Pagination */}
+                    {paginatedDeletionRequests.length > 0 && (
+                      <div className="flex items-center justify-between space-x-2 py-4">
+                        <div className="text-sm text-muted-foreground">
+                          {t('modules.userManagement.showingResults')
+                            ?.replace('{start}', (deletionRequestsPagination.pageIndex * deletionRequestsPagination.pageSize + 1).toString())
+                            ?.replace('{end}', Math.min((deletionRequestsPagination.pageIndex + 1) * deletionRequestsPagination.pageSize, totalDeletionRequests).toString())
+                            ?.replace('{total}', totalDeletionRequests.toString()) || 
+                            `Showing ${deletionRequestsPagination.pageIndex * deletionRequestsPagination.pageSize + 1} to ${Math.min((deletionRequestsPagination.pageIndex + 1) * deletionRequestsPagination.pageSize, totalDeletionRequests)} of ${totalDeletionRequests} results`}
+                        </div>
+                        <div className="flex items-center space-x-4">
+                          <div className="flex items-center space-x-2">
+                            <p className="text-sm font-medium">{t('modules.userManagement.rowsPerPage') || 'Rows per page'}</p>
+                            <Select
+                              value={`${deletionRequestsPagination.pageSize}`}
+                              onValueChange={(value) => handleDeletionPageSizeChange(Number(value))}
+                            >
+                              <SelectTrigger className="w-20">
+                                <SelectValue placeholder={deletionRequestsPagination.pageSize} />
+                              </SelectTrigger>
+                              <SelectContent side="top">
+                                {[10, 20, 50, 100].map((pageSize) => (
+                                  <SelectItem key={pageSize} value={`${pageSize}`}>
+                                    {pageSize}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <p className="text-sm font-medium">{t('modules.userManagement.page') || 'Page'}</p>
+                            <span className="text-sm text-muted-foreground">
+                              {deletionRequestsPagination.pageIndex + 1} {t('modules.userManagement.of') || 'of'} {totalDeletionPages}
+                            </span>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleDeletionPageChange(0)}
+                              disabled={deletionRequestsPagination.pageIndex === 0}
+                            >
+                              <ChevronsLeftIcon className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleDeletionPageChange(deletionRequestsPagination.pageIndex - 1)}
+                              disabled={deletionRequestsPagination.pageIndex === 0}
+                            >
+                              <ChevronLeftIcon className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleDeletionPageChange(deletionRequestsPagination.pageIndex + 1)}
+                              disabled={deletionRequestsPagination.pageIndex >= totalDeletionPages - 1}
+                            >
+                              <ChevronRightIcon className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleDeletionPageChange(totalDeletionPages - 1)}
+                              disabled={deletionRequestsPagination.pageIndex >= totalDeletionPages - 1}
+                            >
+                              <ChevronsRightIcon className="h-4 w-4" />
+                            </Button>
+                          </div>
                         </div>
                       </div>
                     )}

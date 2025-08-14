@@ -64,7 +64,7 @@ import { toast } from 'sonner';
 
 // Firebase imports - using react-firebase-hooks
 import { useCollection } from 'react-firebase-hooks/firestore';
-import { collection, query, orderBy, where, Timestamp, deleteDoc, doc, limit, startAfter, getDocs, getDoc, QueryDocumentSnapshot, DocumentData, updateDoc, writeBatch, addDoc, increment } from 'firebase/firestore';
+import { collection, query, orderBy, where, Timestamp, deleteDoc, doc, limit, startAfter, getDocs, getDoc, QueryDocumentSnapshot, DocumentData, updateDoc, writeBatch, addDoc, increment, FieldValue } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
@@ -108,8 +108,8 @@ export default function UserReportsPage() {
   const [reportTypeFilter, setReportTypeFilter] = useState<string>('all');
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(50);
-  const [sortBy, setSortBy] = useState<'messageLength' | 'plusUser' | 'date'>('date');
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+  const [sortBy, setSortBy] = useState<'messageLength' | 'date'>('date');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc'); // Default to newest first
   
   // Bulk update state
   const [selectedReports, setSelectedReports] = useState<Set<string>>(new Set());
@@ -562,7 +562,7 @@ export default function UserReportsPage() {
         if (!shouldIncrement && !shouldUpdateStatus) {
           return; // Skip if nothing to change
         }
-        const updatePayload: Record<string, unknown> = {
+        const updatePayload: { [x: string]: FieldValue | Partial<unknown> | undefined } = {
           lastUpdated: now,
         };
         if (shouldIncrement) {
@@ -615,7 +615,7 @@ export default function UserReportsPage() {
     setSelectedReports(newSelected);
   };
 
-  const handleSort = (column: 'messageLength' | 'plusUser' | 'date') => {
+  const handleSort = (column: 'messageLength' | 'date') => {
     if (sortBy === column) {
       setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
     } else {
@@ -624,7 +624,7 @@ export default function UserReportsPage() {
     }
   };
 
-  const getSortIcon = (column: 'messageLength' | 'plusUser' | 'date') => {
+  const getSortIcon = (column: 'messageLength' | 'date') => {
     if (sortBy !== column) return null;
     return sortOrder === 'asc' ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />;
   };
@@ -918,8 +918,18 @@ export default function UserReportsPage() {
       );
     }
 
-    // Apply sorting
+    // Apply sorting - always prioritize plus users first, then sort by specified criteria
     filtered = filtered.sort((a, b) => {
+      // First priority: Plus users always come first
+      const plusA = a.isPlusUser ? 1 : 0;
+      const plusB = b.isPlusUser ? 1 : 0;
+      const plusComparison = plusB - plusA; // Plus users (1) come before regular users (0)
+      
+      if (plusComparison !== 0) {
+        return plusComparison;
+      }
+      
+      // Second priority: Sort by selected criteria within each group (plus/regular)
       let compareValue = 0;
       
       switch (sortBy) {
@@ -927,11 +937,6 @@ export default function UserReportsPage() {
           const lengthA = a.initialMessage?.length || 0;
           const lengthB = b.initialMessage?.length || 0;
           compareValue = lengthA - lengthB;
-          break;
-        case 'plusUser':
-          const plusA = a.isPlusUser ? 1 : 0;
-          const plusB = b.isPlusUser ? 1 : 0;
-          compareValue = plusA - plusB;
           break;
         case 'date':
           compareValue = a.time.toMillis() - b.time.toMillis();
@@ -1422,20 +1427,10 @@ export default function UserReportsPage() {
                               aria-label="Select all reports"
                             />
                           </TableHead>
-                          <TableHead>{t('modules.userManagement.reports.reportId') || 'Report ID'}</TableHead>
-                          <TableHead>{t('modules.userManagement.reports.userId') || 'User ID'}</TableHead>
+
                           <TableHead className="hidden md:table-cell">{t('modules.userManagement.reports.reportType') || 'Report Type'}</TableHead>
                           <TableHead className="hidden xl:table-cell">{t('modules.userManagement.reports.userCreatedAt') || 'User Created'}</TableHead>
-                          <TableHead className="hidden xl:table-cell">
-                            <Button
-                              variant="ghost"
-                              className="h-auto p-0 hover:bg-transparent font-medium text-left justify-start"
-                              onClick={() => handleSort('plusUser')}
-                            >
-                              {t('modules.userManagement.reports.plusSubscription') || 'Plus Subscription'}
-                              {getSortIcon('plusUser')}
-                            </Button>
-                          </TableHead>
+
                           <TableHead>{t('modules.userManagement.reports.status') || 'Status'}</TableHead>
                           <TableHead className="hidden lg:table-cell">{t('modules.userManagement.reports.submittedDate') || 'Submitted Date'}</TableHead>
                           <TableHead className="hidden xl:table-cell">{t('modules.userManagement.reports.initialMessage') || 'Initial Message'}</TableHead>
@@ -1451,8 +1446,6 @@ export default function UserReportsPage() {
                           [...Array(itemsPerPage)].map((_, i) => (
                             <TableRow key={i}>
                               <TableCell><Skeleton className="h-4 w-4" /></TableCell>
-                              <TableCell><Skeleton className="h-4 w-24" /></TableCell>
-                              <TableCell><Skeleton className="h-4 w-20" /></TableCell>
                               <TableCell className="hidden md:table-cell"><Skeleton className="h-4 w-16" /></TableCell>
                               <TableCell className="hidden xl:table-cell"><Skeleton className="h-4 w-12" /></TableCell>
                               <TableCell><Skeleton className="h-4 w-16" /></TableCell>
@@ -1465,7 +1458,10 @@ export default function UserReportsPage() {
                           ))
                         ) : (
                           filteredReports.map((report) => (
-                            <TableRow key={report.id}>
+                            <TableRow 
+                              key={report.id}
+                              className={report.isPlusUser ? 'bg-amber-50 hover:bg-amber-100' : ''}
+                            >
                               <TableCell>
                                 <Checkbox
                                   checked={selectedReports.has(report.id)}
@@ -1473,35 +1469,7 @@ export default function UserReportsPage() {
                                   aria-label={`Select report ${report.id}`}
                                 />
                               </TableCell>
-                              <TableCell>
-                                <div className="flex items-center gap-1 min-w-0">
-                                  <Link 
-                                    href={`/${locale}/user-management/reports/${report.id}`}
-                                    className="font-mono text-xs sm:text-sm max-w-[80px] sm:max-w-[120px] truncate text-blue-600 hover:underline"
-                                  >
-                                    {report.id}
-                                  </Link>
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => copyToClipboard(report.id, 'Report ID')}
-                                    className="hidden sm:flex h-6 w-6 p-0"
-                                  >
-                                    <Copy className="h-3 w-3" />
-                                  </Button>
-                                </div>
-                              </TableCell>
-                              <TableCell>
-                                <Link 
-                                  href={`/${locale}/user-management/users/${report.uid}`}
-                                  className="text-blue-600 hover:underline font-mono text-xs sm:text-sm block"
-                                >
-                                  <span className="max-w-[80px] sm:max-w-[120px] truncate block">
-                                    {truncateText(report.uid, 8)}
-                                  </span>
-                                  <ExternalLink className="h-3 w-3 inline ml-1" />
-                                </Link>
-                              </TableCell>
+
                               <TableCell className="hidden md:table-cell">
                                 <Badge variant="outline" className="text-xs">
                                   {getReportTypeName(report.reportTypeId)}
@@ -1514,14 +1482,7 @@ export default function UserReportsPage() {
                                   <span className="text-xs text-muted-foreground">{t('common.unknown') || 'Unknown'}</span>
                                 )}
                               </TableCell>
-                              <TableCell className="hidden xl:table-cell">
-                                <Badge 
-                                  variant={report.isPlusUser ? "default" : "secondary"} 
-                                  className={`text-xs ${report.isPlusUser ? 'bg-amber-100 text-amber-800 border-amber-200' : 'bg-gray-100 text-gray-600 border-gray-200'}`}
-                                >
-                                  {report.isPlusUser ? '⭐ Plus' : 'Free'}
-                                </Badge>
-                              </TableCell>
+
                               <TableCell>{getStatusBadge(report.status)}</TableCell>
                               <TableCell className="hidden lg:table-cell">
                                 <span className="text-xs sm:text-sm">{formatDate(report.time)}</span>
@@ -1750,6 +1711,38 @@ export default function UserReportsPage() {
               <label className="text-sm font-medium">
                 {t('modules.userManagement.reports.bulkReply.messageLabel') || 'Message'}
               </label>
+              <div className="flex flex-col gap-2">
+                <Select 
+                  value="" 
+                  onValueChange={(value) => {
+                    if (value) {
+                      setBulkReplyMessage(t(`modules.userManagement.reports.bulkReply.presetMessages.${value}`) || '');
+                    }
+                  }}
+                  disabled={isBulkReplying}
+                >
+                  <SelectTrigger className="w-full h-10">
+                    <SelectValue placeholder={t('modules.userManagement.reports.bulkReply.presetMessages.label') || 'Select preset message'} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="outdatedVersion">
+                      {locale === 'ar' ? 'تطبيق قديم - تحديث مطلوب' : 'Outdated App - Update Required'}
+                    </SelectItem>
+                    <SelectItem value="issueResolved">
+                      {locale === 'ar' ? 'تم حل المشكلة' : 'Issue Resolved'}
+                    </SelectItem>
+                    <SelectItem value="underInvestigation">
+                      {locale === 'ar' ? 'قيد التحقيق' : 'Under Investigation'}
+                    </SelectItem>
+                    <SelectItem value="moreInfoNeeded">
+                      {locale === 'ar' ? 'مطلوب معلومات إضافية' : 'More Information Needed'}
+                    </SelectItem>
+                    <SelectItem value="contactSupport">
+                      {locale === 'ar' ? 'تواصل مع الدعم' : 'Contact Support'}
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
               <Textarea
                 value={bulkReplyMessage}
                 onChange={(e) => setBulkReplyMessage(e.target.value)}

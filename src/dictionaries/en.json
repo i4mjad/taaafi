@@ -907,7 +907,15 @@
             "statusNote": "If selected, status will be updated only for reports that can transition to the chosen status.",
             "validation": "Please enter a message, select reports, and pick a status",
             "nothingToDo": "No reports can be updated or messaged based on current selection",
-            "error": "Failed to perform bulk reply/status update"
+            "error": "Failed to perform bulk reply/status update",
+            "presetMessages": {
+              "label": "Preset Messages",
+              "outdatedVersion": "Please update to the latest version of the app to ensure optimal performance and access to the newest features.",
+              "issueResolved": "Thank you for your report. The issue has been resolved. Please try again and let us know if you continue to experience problems.",
+              "underInvestigation": "We have received your report and our team is currently investigating the issue. We will update you once we have more information.",
+              "moreInfoNeeded": "Thank you for your report. Could you please provide more details about the issue you're experiencing?",
+              "contactSupport": "For faster assistance with this issue, please contact our support team directly through the app's help section."
+            }
           },
           "selectStatus": "Select status",
           "manageReportTypes": "Manage Report Types",
