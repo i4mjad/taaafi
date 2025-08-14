@@ -483,7 +483,7 @@ class _PostsListScreenState extends ConsumerState<PostsListScreen> {
         );
       }
 
-      if (postsState.posts.isEmpty) {
+      if (postsState.posts.isEmpty && !postsState.hasMore) {
         return Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,

@@ -350,8 +350,23 @@ class ForumRepository {
       }
 
       // Determine if there are more posts
-      final hasMore = filteredPosts.length == limit &&
-          snapshot.docs.length == limit * multiplier;
+      // Simple logic: if we got exactly the limit of filtered posts AND we fetched the full batch size,
+      // then there are likely more posts. Also check if we stopped processing early due to reaching limit.
+      bool hasMore = false;
+      if (filteredPosts.length == limit) {
+        // If we got our full limit of posts, check if there might be more
+        // Case 1: We fetched the full multiplied limit, suggesting more documents exist
+        // Case 2: We broke early from the loop (more unprocessed documents remain)
+        final reachedFullBatch = snapshot.docs.length == limit * multiplier;
+        final brokeEarlyFromLoop = snapshot.docs.length > filteredPosts.length;
+        hasMore = reachedFullBatch || brokeEarlyFromLoop;
+      } else if (filteredPosts.length < limit &&
+          snapshot.docs.length == limit * multiplier) {
+        // Edge case: we got fewer filtered posts than limit but fetched full batch
+        // This could mean there are more posts, but they got filtered out
+        // Let's be optimistic and say there might be more
+        hasMore = true;
+      }
 
       return PostsPage(
         posts: filteredPosts,

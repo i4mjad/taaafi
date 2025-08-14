@@ -1007,7 +1007,8 @@ class PostsPaginationNotifier extends StateNotifier<PostsPaginationState> {
       state = state.copyWith(
         posts: <Post>[],
         lastDocument: null,
-        hasMore: false,
+        hasMore:
+            true, // Keep hasMore true so the Load More button appears once posts are loaded
         isLoading: false,
       );
       return;
