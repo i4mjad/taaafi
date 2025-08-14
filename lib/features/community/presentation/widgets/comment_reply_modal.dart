@@ -6,7 +6,7 @@ import 'package:reboot_app_3/core/shared_widgets/spinner.dart';
 
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
-import 'package:reboot_app_3/core/theming/spacing.dart';
+
 import 'package:reboot_app_3/features/community/data/models/comment.dart';
 import 'package:reboot_app_3/features/community/presentation/providers/forum_providers.dart';
 import 'package:reboot_app_3/features/community/presentation/providers/community_providers_new.dart';
@@ -14,6 +14,7 @@ import 'package:reboot_app_3/features/community/presentation/providers/community
 import 'package:reboot_app_3/features/community/presentation/widgets/comment_tile_widget.dart';
 import 'package:reboot_app_3/features/community/presentation/widgets/reply_input_widget.dart';
 import 'package:reboot_app_3/features/community/presentation/widgets/report_content_modal.dart';
+import 'package:reboot_app_3/features/community/presentation/widgets/avatar_with_anonymity.dart';
 
 class CommentReplyModal extends ConsumerStatefulWidget {
   final Comment parentComment;
@@ -119,7 +120,8 @@ class _CommentReplyModalState extends ConsumerState<CommentReplyModal> {
                     postId: widget.parentComment.postId,
                     parentFor: 'comment',
                     parentId: widget.parentComment.id,
-                    replyToComment: widget.parentComment,
+                    hideReplyContext:
+                        true, // Hide comment preview since parent is already visible above
                     onReplySubmitted: () {
                       // Refresh replies and notify parent
                       ref.refresh(
@@ -216,34 +218,128 @@ class _CommentReplyModalState extends ConsumerState<CommentReplyModal> {
       padding: const EdgeInsets.all(16),
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
-        color: theme.grey[50],
+        color: theme.grey[25],
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: theme.grey[200]!),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Label
-          Text(
-            localizations.translate('parent_comment'),
-            style: TextStyles.caption.copyWith(
-              color: theme.grey[600],
-              fontWeight: FontWeight.w500,
+      child: Consumer(
+        builder: (context, ref, child) {
+          final authorProfileAsync = ref.watch(
+              communityProfileByIdProvider(widget.parentComment.authorCPId));
+
+          return authorProfileAsync.when(
+            data: (authorProfile) {
+              final isAuthorAnonymous = authorProfile.isAnonymous;
+              final isAuthorPlusUser = authorProfile.hasPlusSubscription();
+
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Header with avatar and user info
+                  Row(
+                    children: [
+                      AvatarWithAnonymity(
+                        isDeleted: authorProfile.isDeleted,
+                        cpId: widget.parentComment.authorCPId,
+                        isAnonymous: isAuthorAnonymous,
+                        size: 36,
+                        avatarUrl:
+                            isAuthorAnonymous ? null : authorProfile.avatarUrl,
+                        isPlusUser: isAuthorPlusUser,
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Username
+                            Text(
+                              _getLocalizedDisplayName(
+                                authorProfile.getDisplayNameWithPipeline(),
+                                localizations,
+                              ),
+                              style: TextStyles.footnoteSelected.copyWith(
+                                color: theme.primary[700],
+                                fontSize: 15,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+
+                            // Timestamp
+                            Text(
+                              _formatTimestamp(widget.parentComment.createdAt),
+                              style: TextStyles.caption.copyWith(
+                                color: theme.grey[500],
+                                fontSize: 12,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 12),
+
+                  // Comment body
+                  Text(
+                    widget.parentComment.body,
+                    style: TextStyles.body.copyWith(
+                      color: theme.grey[800],
+                      fontSize: 15,
+                      height: 1.4,
+                    ),
+                  ),
+                ],
+              );
+            },
+            loading: () => const Center(
+              child: SizedBox(
+                height: 20,
+                width: 20,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              ),
             ),
-          ),
-
-          verticalSpace(Spacing.points8),
-
-          // Comment tile (condensed)
-          CommentTileWidget(
-            comment: widget.parentComment,
-            isCondensed: true,
-            onMoreTap: null, // Disable options for condensed parent view
-            onCommentTap: null, // Disable tap for condensed parent view
-          ),
-        ],
+            error: (error, stackTrace) => Container(
+              padding: const EdgeInsets.all(12),
+              child: Text(
+                'Error loading comment',
+                style: TextStyles.caption.copyWith(
+                  color: theme.error[600],
+                ),
+              ),
+            ),
+          );
+        },
       ),
     );
+  }
+
+  /// Helper function to localize special display name constants
+  String _getLocalizedDisplayName(
+      String displayName, AppLocalizations localizations) {
+    switch (displayName) {
+      case 'DELETED_USER':
+        return localizations.translate('community-deleted-user');
+      case 'ANONYMOUS_USER':
+        return localizations.translate('community-anonymous');
+      default:
+        return displayName;
+    }
+  }
+
+  /// Helper function to format timestamp
+  String _formatTimestamp(DateTime timestamp) {
+    final now = DateTime.now();
+    final difference = now.difference(timestamp);
+
+    if (difference.inMinutes < 60) {
+      return '${difference.inMinutes}m';
+    } else if (difference.inHours < 24) {
+      return '${difference.inHours}h';
+    } else {
+      return '${difference.inDays}d';
+    }
   }
 
   Widget _buildRepliesList(
@@ -268,8 +364,8 @@ class _CommentReplyModalState extends ConsumerState<CommentReplyModal> {
               margin: const EdgeInsets.only(bottom: 16),
               child: CommentTileWidget(
                 comment: reply,
-                nestingLevel: widget.nestingLevel + 1,
-                onReplyTap: () => _openNestedReplyModal(reply),
+                nestingLevel: 0, // Flatten nesting in modal
+                onReplyTap: null, // Remove nesting - no reply button in modal
                 onMoreTap: () => _handleReplyMore(reply), // 3 dots for options
                 onCommentTap: null, // No compact modal in reply modal
               ),
@@ -398,30 +494,6 @@ class _CommentReplyModalState extends ConsumerState<CommentReplyModal> {
         ),
       ),
     );
-  }
-
-  void _openNestedReplyModal(Comment reply) {
-    // Push modal to stack and open new modal
-    ref.read(nestedModalStackProvider.notifier).pushModal(reply.id);
-
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      useSafeArea: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => CommentReplyModal(
-        parentComment: reply,
-        nestingLevel: widget.nestingLevel + 1,
-        onReplySubmitted: () {
-          // Refresh this level's replies
-          ref.refresh(commentRepliesProvider(widget.parentComment.id));
-          widget.onReplySubmitted?.call();
-        },
-      ),
-    ).then((_) {
-      // Pop modal from stack when closed
-      ref.read(nestedModalStackProvider.notifier).popModal();
-    });
   }
 
   void _handleReplyMore(Comment reply) {

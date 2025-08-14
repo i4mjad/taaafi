@@ -15,6 +15,7 @@ import 'package:reboot_app_3/features/community/presentation/widgets/comment_lis
 import 'package:reboot_app_3/features/community/presentation/widgets/reply_input_widget.dart';
 import 'package:reboot_app_3/features/community/presentation/widgets/report_content_modal.dart';
 import 'package:reboot_app_3/features/community/presentation/widgets/compact_comment_modal.dart';
+import 'package:reboot_app_3/features/community/presentation/widgets/comment_reply_modal.dart';
 
 import 'package:reboot_app_3/features/community/presentation/providers/forum_providers.dart';
 import 'package:reboot_app_3/features/community/presentation/providers/community_providers_new.dart';
@@ -173,11 +174,21 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
                           replyToComment:
                               replyState.isReplying ? _replyToComment : null,
                           hideReplyContext: !replyState.isReplying,
-                          onReplySubmitted: () {
+                          onReplySubmitted: () async {
+                            // Store comment reference before clearing
+                            final commentToShow = _replyToComment;
+                            
+                            // Handle reply submission
                             _handleReplySubmitted();
-                            // Clear reply state and comment after submitting
+                            
+                            // Clear reply state first
                             ref.read(replyStateProvider.notifier).cancelReply();
                             _replyToComment = null;
+                            
+                            // Wait for the comments to refresh and then show modal
+                            if (commentToShow != null) {
+                              _showCommentReplyModalAfterSubmit(commentToShow);
+                            }
                           },
                           onCancelReply: () {
                             // Clear reply state and comment when user cancels
@@ -776,6 +787,27 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
         },
       ),
     );
+  }
+
+  void _showCommentReplyModalAfterSubmit(Comment parentComment) {
+    // Use WidgetsBinding to ensure the UI has finished updating
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted && context.mounted) {
+        showModalBottomSheet(
+          context: context,
+          isScrollControlled: true,
+          useSafeArea: true,
+          backgroundColor: Colors.transparent,
+          builder: (modalContext) => CommentReplyModal(
+            parentComment: parentComment,
+            onReplySubmitted: () {
+              // Refresh comments when a new reply is submitted in the modal
+              ref.refresh(postCommentsProvider(widget.postId));
+            },
+          ),
+        );
+      }
+    });
   }
 
   void _showCommentOptionsModal(Comment comment) {

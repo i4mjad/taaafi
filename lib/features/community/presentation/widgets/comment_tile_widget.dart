@@ -246,60 +246,78 @@ class CommentTileWidget extends ConsumerWidget {
       AsyncValue authorProfileAsync,
       bool isAuthorPlusUser) {
     return Row(
+      crossAxisAlignment:
+          CrossAxisAlignment.center, // Ensure proper vertical alignment
       children: [
         // Username or anonymous indicator
-        Flexible(
-          child: authorProfileAsync.when(
-            data: (authorProfile) {
-              final pipelineResult =
-                  authorProfile?.getDisplayNameWithPipeline() ?? 'Unknown User';
+        authorProfileAsync.when(
+          data: (authorProfile) {
+            final pipelineResult =
+                authorProfile?.getDisplayNameWithPipeline() ?? 'Unknown User';
 
-              final displayName =
-                  _getLocalizedDisplayName(pipelineResult, localizations);
+            final displayName =
+                _getLocalizedDisplayName(pipelineResult, localizations);
 
-              return GestureDetector(
-                onTap: () => showModalBottomSheet(
-                  context: context,
-                  isScrollControlled: true,
-                  backgroundColor: Colors.transparent,
-                  builder: (context) => Padding(
-                    padding: EdgeInsets.only(
-                      bottom: MediaQuery.of(context).viewInsets.bottom,
-                    ),
-                    child: CommunityProfileModal(
-                      communityProfileId: comment.authorCPId,
-                      displayName: authorProfile.displayName,
-                      avatarUrl: authorProfile.avatarUrl,
-                      isAnonymous: isAuthorAnonymous,
-                      isPlusUser: isAuthorPlusUser,
-                    ),
+            return GestureDetector(
+              onTap: () => showModalBottomSheet(
+                context: context,
+                isScrollControlled: true,
+                backgroundColor: Colors.transparent,
+                builder: (context) => Padding(
+                  padding: EdgeInsets.only(
+                    bottom: MediaQuery.of(context).viewInsets.bottom,
                   ),
+                  child: CommunityProfileModal(
+                    communityProfileId: comment.authorCPId,
+                    displayName: authorProfile.displayName,
+                    avatarUrl: authorProfile.avatarUrl,
+                    isAnonymous: isAuthorAnonymous,
+                    isPlusUser: isAuthorPlusUser,
+                  ),
+                ),
+              ),
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(
+                  maxWidth: 120, // Limit username width to prevent overflow
                 ),
                 child: Text(
                   displayName,
                   style: TextStyles.footnoteSelected.copyWith(
                     color: theme.primary[700],
                     fontSize: 14,
-                    overflow: TextOverflow.ellipsis,
                   ),
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
                 ),
-              );
-            },
-            loading: () => Text(
+              ),
+            );
+          },
+          loading: () => ConstrainedBox(
+            constraints: const BoxConstraints(
+              maxWidth: 120, // Consistent width constraint
+            ),
+            child: Text(
               'Loading...',
               style: TextStyles.footnoteSelected.copyWith(
                 color: theme.grey[700],
                 fontSize: 14,
-                overflow: TextOverflow.ellipsis,
               ),
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
             ),
-            error: (error, stackTrace) => Text(
+          ),
+          error: (error, stackTrace) => ConstrainedBox(
+            constraints: const BoxConstraints(
+              maxWidth: 120, // Consistent width constraint
+            ),
+            child: Text(
               'Unknown User',
               style: TextStyles.footnoteSelected.copyWith(
                 color: theme.grey[700],
                 fontSize: 14,
-                overflow: TextOverflow.ellipsis,
               ),
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
             ),
           ),
         ),
@@ -308,6 +326,8 @@ class CommentTileWidget extends ConsumerWidget {
         authorProfileAsync.when(
           data: (authorProfile) {
             return Row(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 const SizedBox(width: 6),
                 RoleChip(role: authorProfile.role),
@@ -323,6 +343,8 @@ class CommentTileWidget extends ConsumerWidget {
           data: (authorProfile) {
             if (isAuthorPlusUser && authorProfile.shareRelapseStreaks) {
               return Row(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   const SizedBox(width: 6),
                   Consumer(
@@ -372,6 +394,7 @@ class CommentTileWidget extends ConsumerWidget {
               style: TextStyles.tiny.copyWith(
                 color: theme.primary[700],
                 fontWeight: FontWeight.w500,
+                height: 1.2, // Consistent line height
               ),
             ),
           ),
@@ -385,6 +408,7 @@ class CommentTileWidget extends ConsumerWidget {
           style: TextStyles.caption.copyWith(
             color: theme.grey[500],
             fontSize: 12,
+            height: 1.2, // Consistent line height for alignment
           ),
         ),
 
@@ -393,10 +417,15 @@ class CommentTileWidget extends ConsumerWidget {
         if (onMoreTap != null)
           GestureDetector(
             onTap: onMoreTap,
-            child: Icon(
-              LucideIcons.moreHorizontal,
-              size: 16,
-              color: theme.grey[500],
+            child: Container(
+              width: 24,
+              height: 24,
+              alignment: Alignment.center,
+              child: Icon(
+                LucideIcons.moreHorizontal,
+                size: 16,
+                color: theme.grey[500],
+              ),
             ),
           ),
       ],
