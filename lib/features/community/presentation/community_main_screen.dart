@@ -160,7 +160,11 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen>
     return Scaffold(
       backgroundColor: theme.backgroundColor,
       body: communityProfileAsync.when(
-        loading: () => const Center(child: Spinner()),
+        loading: () => Container(
+          width: double.infinity,
+          height: double.infinity,
+          child: const Center(child: Spinner()),
+        ),
         error: (error, stackTrace) {
           print('❌ Community Main Screen: Profile error: $error');
           print("stackTrace: $stackTrace");
@@ -232,10 +236,12 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen>
                       shape: BoxShape.circle,
                       color: theme.grey[300],
                     ),
-                    child: Icon(
-                      LucideIcons.user,
-                      size: 20,
-                      color: theme.grey[600],
+                    child: Center(
+                      child: Icon(
+                        LucideIcons.user,
+                        size: 20,
+                        color: theme.grey[600],
+                      ),
                     ),
                   ),
                 ),
@@ -710,8 +716,12 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen>
               ),
             );
           },
-          loading: () => const Center(
-            child: Spinner(),
+          loading: () => Container(
+            width: double.infinity,
+            height: 200,
+            child: const Center(
+              child: Spinner(),
+            ),
           ),
           error: (error, stackTrace) => Center(
             child: Column(
@@ -822,8 +832,12 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen>
   Widget _buildPaginatedPostsContent(
       dynamic postsState, AppLocalizations localizations, theme) {
     if (postsState.posts.isEmpty && postsState.isLoading) {
-      return const Center(
-        child: Spinner(),
+      return Container(
+        width: double.infinity,
+        height: 200,
+        child: const Center(
+          child: Spinner(),
+        ),
       );
     }
 
@@ -937,8 +951,12 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen>
   Widget _buildPinnedPostsContent(
       dynamic postsState, AppLocalizations localizations, theme) {
     if (postsState.posts.isEmpty && postsState.isLoading) {
-      return const Center(
-        child: Spinner(),
+      return Container(
+        width: double.infinity,
+        height: 200,
+        child: const Center(
+          child: Spinner(),
+        ),
       );
     }
 
@@ -1030,8 +1048,12 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen>
   Widget _buildNewsPostsContent(
       dynamic postsState, AppLocalizations localizations, theme) {
     if (postsState.posts.isEmpty && postsState.isLoading) {
-      return const Center(
-        child: Spinner(),
+      return Container(
+        width: double.infinity,
+        height: 200,
+        child: const Center(
+          child: Spinner(),
+        ),
       );
     }
 
