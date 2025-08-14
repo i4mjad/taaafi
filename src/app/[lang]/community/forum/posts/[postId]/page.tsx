@@ -96,6 +96,11 @@ export default function PostDetailPage() {
     )
   );
 
+  // Fetch community profiles for author details (name, gender, anonymity preference)
+  const [profilesValue] = useCollection(
+    query(collection(db, 'communityProfiles'))
+  );
+
   // Fetch post categories
   const [categoriesValue] = useCollection(
     query(collection(db, 'postCategories'), orderBy('sortOrder'))
@@ -172,6 +177,20 @@ export default function PostDetailPage() {
       ...doc.data(),
     }));
   }, [categoriesValue]);
+
+  const profilesById = useMemo(() => {
+    const map = new Map<string, { displayName: string; gender: 'male' | 'female' | 'other'; isAnonymous?: boolean }>();
+    if (!profilesValue) return map;
+    for (const d of profilesValue.docs) {
+      const data = d.data();
+      map.set(d.id, {
+        displayName: data.displayName || 'Unknown',
+        gender: (data.gender as 'male' | 'female' | 'other') || 'other',
+        isAnonymous: data.isAnonymous,
+      });
+    }
+    return map;
+  }, [profilesValue]);
 
   const postReports = useMemo(() => {
     if (!postReportsValue) return [];
@@ -691,6 +710,20 @@ export default function PostDetailPage() {
                             <div className="flex items-center space-x-2 mb-2">
                               <User className="h-3 w-3 text-muted-foreground" />
                               <span className="text-sm font-medium">{comment.authorCPId}</span>
+                              {(() => {
+                                const profile = profilesById.get(comment.authorCPId);
+                                if (!profile) return null;
+                                return (
+                                  <>
+                                    <span className="text-xs text-muted-foreground">• {profile.displayName}</span>
+                                    <Badge variant="outline" className="text-xs">
+                                      {profile.gender === 'male' && (t('modules.community.profiles.male') || 'Male')}
+                                      {profile.gender === 'female' && (t('modules.community.profiles.female') || 'Female')}
+                                      {profile.gender === 'other' && (t('modules.community.profiles.other') || 'Other')}
+                                    </Badge>
+                                  </>
+                                );
+                              })()}
                               <span className="text-xs text-muted-foreground">
                                 {format(comment.createdAt, 'MMM dd, yyyy HH:mm')}
                               </span>

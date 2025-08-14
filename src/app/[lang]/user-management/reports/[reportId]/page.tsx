@@ -44,7 +44,7 @@ import { createReportUpdatePayload } from '@/utils/notificationPayloads';
 
 // Import types
 import { UserReport as ExtendedUserReport, REPORT_TYPE_IDS } from '@/types/reports';
-import { ForumPost, Comment } from '@/types/community';
+import { ForumPost, Comment, CommunityProfile } from '@/types/community';
 
 // Use the extended UserReport from types
 type UserReport = ExtendedUserReport;
@@ -134,6 +134,14 @@ export default function ReportDetailsPage() {
       : null
   );
 
+  // Fetch related community profile if the report is for a user
+  const [relatedProfileSnapshot] = useDocument(
+    (report?.relatedContent?.type === 'user' && report.relatedContent.contentId) ||
+    (report?.targetType === 'user' && report.targetId)
+      ? doc(db, 'communityProfiles', report.relatedContent?.contentId || report.targetId!)
+      : null
+  );
+
   // Parse related post data
   const relatedPost: ForumPost | null = relatedPostSnapshot?.exists() ? {
     id: relatedPostSnapshot.id,
@@ -149,6 +157,14 @@ export default function ReportDetailsPage() {
     createdAt: relatedCommentSnapshot.data()?.createdAt?.toDate() || new Date(),
     updatedAt: relatedCommentSnapshot.data()?.updatedAt?.toDate(),
   } as Comment : null;
+
+  // Parse related profile data
+  const relatedProfile: CommunityProfile | null = relatedProfileSnapshot?.exists() ? {
+    id: relatedProfileSnapshot.id,
+    ...relatedProfileSnapshot.data(),
+    createdAt: relatedProfileSnapshot.data()?.createdAt?.toDate() || new Date(),
+    updatedAt: relatedProfileSnapshot.data()?.updatedAt?.toDate(),
+  } as CommunityProfile : null;
 
   // Fetch the parent post for a comment (if the report is for a comment)
   const [parentPostSnapshot] = useDocument(
@@ -560,22 +576,30 @@ export default function ReportDetailsPage() {
                     </CardContent>
                   </Card>
 
-                  {/* Related Item */}
-                  {(relatedPost || relatedComment) && (
+                  {/* Related Content */}
+                  {(relatedPost || relatedComment || relatedProfile) && (
                     <Card>
                       <CardHeader>
                         <CardTitle className="flex items-center gap-2">
-                          {relatedPost ? <FileText className="h-5 w-5" /> : <MessageSquare className="h-5 w-5" />}
-                          {relatedPost 
+                          {relatedPost ? (
+                            <FileText className="h-5 w-5" />
+                          ) : relatedComment ? (
+                            <MessageSquare className="h-5 w-5" />
+                          ) : (
+                            <User className="h-5 w-5" />
+                          )}
+                          {relatedPost
                             ? (t('modules.userManagement.reports.reportDetails.reportedPost') || 'Reported Post')
-                            : (t('modules.userManagement.reports.reportDetails.reportedComment') || 'Reported Comment')
-                          }
+                            : relatedComment
+                              ? (t('modules.userManagement.reports.reportDetails.reportedComment') || 'Reported Comment')
+                              : (t('modules.userManagement.reports.reportDetails.reportedUser') || 'Reported User')}
                         </CardTitle>
                         <CardDescription>
                           {relatedPost 
                             ? (t('modules.userManagement.reports.reportDetails.postReportedDescription') || 'The forum post that was reported')
-                            : (t('modules.userManagement.reports.reportDetails.commentReportedDescription') || 'The comment that was reported')
-                          }
+                            : relatedComment
+                              ? (t('modules.userManagement.reports.reportDetails.commentReportedDescription') || 'The comment that was reported')
+                              : (t('modules.userManagement.reports.reportDetails.userReportedDescription') || 'The user profile that was reported')}
                         </CardDescription>
                       </CardHeader>
                       <CardContent className="space-y-4">
@@ -728,7 +752,77 @@ export default function ReportDetailsPage() {
                           </div>
                         )}
 
-                        {!relatedPost && !relatedComment && (report.relatedContent?.contentId || report.targetId) && (
+                        {relatedProfile && (
+                          <div className="space-y-3">
+                            <div className="grid grid-cols-2 gap-4">
+                              <div>
+                                <Label className="text-sm font-medium">
+                                  {t('modules.community.profiles.displayName') || 'Display Name'}
+                                </Label>
+                                <div className="mt-1">
+                                  <span className="text-sm font-medium">{relatedProfile.displayName}</span>
+                                </div>
+                              </div>
+
+                              <div>
+                                <Label className="text-sm font-medium">
+                                  {t('modules.community.profiles.gender') || 'Gender'}
+                                </Label>
+                                <div className="mt-1">
+                                  <Badge variant="outline">
+                                    {relatedProfile.gender === 'male' && (t('modules.community.profiles.male') || 'Male')}
+                                    {relatedProfile.gender === 'female' && (t('modules.community.profiles.female') || 'Female')}
+                                    {relatedProfile.gender === 'other' && (t('modules.community.profiles.other') || 'Other')}
+                                  </Badge>
+                                </div>
+                              </div>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4">
+                              <div>
+                                <Label className="text-sm font-medium">
+                                  {t('modules.community.profiles.isAnonymous') || 'Anonymous'}
+                                </Label>
+                                <div className="mt-1">
+                                  <Badge variant={relatedProfile.isAnonymous ? 'secondary' : 'default'}>
+                                    {relatedProfile.isAnonymous ? (t('common.yes') || 'Yes') : (t('common.no') || 'No')}
+                                  </Badge>
+                                </div>
+                              </div>
+
+                              <div>
+                                <Label className="text-sm font-medium">
+                                  {t('modules.community.profiles.memberSince') || 'Member Since'}
+                                </Label>
+                                <div className="mt-1">
+                                  <span className="text-sm">{new Intl.DateTimeFormat(locale, {
+                                    year: 'numeric',
+                                    month: 'long',
+                                    day: 'numeric',
+                                    hour: '2-digit',
+                                    minute: '2-digit',
+                                  }).format(relatedProfile.createdAt)}</span>
+                                </div>
+                              </div>
+                            </div>
+
+                            <div className="flex items-center justify-between">
+                              <div className="text-xs text-muted-foreground">
+                                ID: <span className="font-mono">{relatedProfile.id}</span>
+                              </div>
+                              <div className="flex space-x-2">
+                                <Button variant="outline" size="sm" asChild>
+                                  <Link href={`/${locale}/user-management/users/${(relatedProfile as any).userUID || relatedProfile.id}`}>
+                                    <ExternalLink className="h-3 w-3 mr-2" />
+                                    {t('modules.userManagement.reports.reportDetails.viewUserProfile') || 'View User Profile'}
+                                  </Link>
+                                </Button>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        {!relatedPost && !relatedComment && !relatedProfile && (report.relatedContent?.contentId || report.targetId) && (
                           <div className="text-center py-4">
                             <AlertCircle className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
                             <p className="text-sm text-muted-foreground">

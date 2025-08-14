@@ -11,7 +11,7 @@ export interface UserReport {
   messagesCount: number;
   // New related content structure
   relatedContent?: {
-    type: 'post' | 'comment';  // Type of the reported content (extensible for future types)
+    type: 'post' | 'comment' | 'user';  // Type of the reported content (now includes user profiles)
     contentId: string;         // ID of the reported post or comment
   };
   // Legacy fields for backward compatibility

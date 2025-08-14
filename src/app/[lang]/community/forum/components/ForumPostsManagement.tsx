@@ -21,6 +21,7 @@ import { ForumPost, Comment, Interaction } from '@/types/community';
 import { toast } from 'sonner';
 import { useRouter, useParams } from 'next/navigation';
 import ForumPostForm from './ForumPostForm';
+import PostDetailContent from './PostDetailContent';
 
 export default function ForumPostsManagement() {
   const { t } = useTranslation();
@@ -42,6 +43,7 @@ export default function ForumPostsManagement() {
   const [showBulkDeleteDialog, setShowBulkDeleteDialog] = useState(false);
   const [showBulkSoftDeleteDialog, setShowBulkSoftDeleteDialog] = useState(false);
   const [bulkActionLoading, setBulkActionLoading] = useState(false);
+  const [previewPostId, setPreviewPostId] = useState<string | null>(null);
 
   // Fetch forum posts
   const [postsValue, postsLoading, postsError] = useCollection(
@@ -169,8 +171,8 @@ export default function ForumPostsManagement() {
   }, [posts, comments, interactions]);
 
   const handleViewDetails = (post: ForumPost) => {
-    // Navigate to post detail page
-    router.push(`/${lang}/community/forum/posts/${post.id}`);
+    // Open preview dialog for the post
+    setPreviewPostId(post.id);
   };
 
   const openModerationForPost = (post: ForumPost) => {
@@ -785,6 +787,23 @@ export default function ForumPostsManagement() {
           )}
         </CardContent>
       </Card>
+
+      {/* Post Preview Dialog */}
+      <Dialog open={!!previewPostId} onOpenChange={(open) => !open && setPreviewPostId(null)}>
+        <DialogContent className="max-w-[90vw] w-[1200px] h-[80vh] overflow-auto">
+          <DialogHeader>
+            <DialogTitle>{t('modules.community.posts.detailPage.title')}</DialogTitle>
+            <DialogDescription>
+              {t('modules.community.posts.detailPage.viewingPost') || 'Viewing post details'}
+            </DialogDescription>
+          </DialogHeader>
+          {previewPostId && (
+            <div className="w-full">
+              <PostDetailContent postId={previewPostId} lang={lang} hideHeader />
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
 
       {/* Delete Confirmation Dialog */}
       <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>

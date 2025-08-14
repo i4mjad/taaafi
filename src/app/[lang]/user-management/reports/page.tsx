@@ -1,10 +1,11 @@
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { SiteHeader } from '@/components/site-header';
 import { useTranslation } from "@/contexts/TranslationContext";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -53,6 +54,7 @@ import {
   User,
   ChevronUp,
   ChevronDown,
+  MessageCircle,
 } from 'lucide-react';
 
 // Import the report types management component
@@ -62,12 +64,14 @@ import { toast } from 'sonner';
 
 // Firebase imports - using react-firebase-hooks
 import { useCollection } from 'react-firebase-hooks/firestore';
-import { collection, query, orderBy, where, Timestamp, deleteDoc, doc, limit, startAfter, getDocs, QueryDocumentSnapshot, DocumentData, updateDoc, writeBatch } from 'firebase/firestore';
+import { collection, query, orderBy, where, Timestamp, deleteDoc, doc, limit, startAfter, getDocs, getDoc, QueryDocumentSnapshot, DocumentData, updateDoc, writeBatch, addDoc, increment } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 // Import notification payload utilities
-import { createReportUpdatePayload } from '@/utils/notificationPayloads';
+import { createReportUpdatePayload, createNewMessagePayload } from '@/utils/notificationPayloads';
+import MigrationManagementCard from '@/app/[lang]/user-management/users/[uid]/MigrationManagementCard';
+import ReportQuickDialog from './components/ReportQuickDialog';
 
 interface UserReport {
   id: string;
@@ -83,6 +87,7 @@ interface UserReport {
   // User data
   isPlusUser?: boolean;
   userDisplayName?: string;
+  userCreatedAt?: Timestamp;
 }
 
 interface ReportMessage {
@@ -111,6 +116,11 @@ export default function UserReportsPage() {
   const [bulkUpdateStatus, setBulkUpdateStatus] = useState<string>('');
   const [isBulkUpdating, setIsBulkUpdating] = useState(false);
   const [bulkUpdateDialogOpen, setBulkUpdateDialogOpen] = useState(false);
+  // Bulk reply state
+  const [bulkReplyDialogOpen, setBulkReplyDialogOpen] = useState(false);
+  const [bulkReplyMessage, setBulkReplyMessage] = useState('');
+  const [bulkReplyStatus, setBulkReplyStatus] = useState<string>('');
+  const [isBulkReplying, setIsBulkReplying] = useState(false);
   
   // Pagination state for Firestore
   const [lastVisible, setLastVisible] = useState<QueryDocumentSnapshot<DocumentData> | null>(null);
@@ -127,11 +137,40 @@ export default function UserReportsPage() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [reportToDelete, setReportToDelete] = useState<UserReport | null>(null);
 
+  // Migration dialog state
+  const [migrationDialogOpen, setMigrationDialogOpen] = useState(false);
+  const [migrationDialogUserId, setMigrationDialogUserId] = useState<string | null>(null);
+  const [migrationDialogUser, setMigrationDialogUser] = useState<any | null>(null);
+  const [quickDialogOpen, setQuickDialogOpen] = useState(false);
+  const [quickDialogReportId, setQuickDialogReportId] = useState<string | null>(null);
+
   // Custom state for paginated data fetching
   const [allReports, setAllReports] = useState<UserReport[]>([]);
   const [reportsLoading, setReportsLoading] = useState(true);
   const [reportsError, setReportsError] = useState<Error | null>(null);
   const [lastMessagesLoading, setLastMessagesLoading] = useState(false);
+  const userCreatedAtCache = useRef<Map<string, Timestamp>>(new Map());
+
+  // Fetch user createdAt from Auth via admin API and cache per session
+  const fetchUserAuthCreatedAt = async (userId: string): Promise<Timestamp | undefined> => {
+    if (userCreatedAtCache.current.has(userId)) {
+      return userCreatedAtCache.current.get(userId);
+    }
+    try {
+      const resp = await fetch(`/api/admin/users/${userId}`);
+      if (!resp.ok) return undefined;
+      const data = await resp.json();
+      const iso = data?.user?.createdAt;
+      if (iso) {
+        const ts = Timestamp.fromDate(new Date(iso));
+        userCreatedAtCache.current.set(userId, ts);
+        return ts;
+      }
+    } catch (e) {
+      console.warn('Failed to fetch auth createdAt for user', userId, e);
+    }
+    return undefined;
+  };
   
   // Status counts state
   const [statusCounts, setStatusCounts] = useState({
@@ -363,6 +402,47 @@ export default function UserReportsPage() {
     await Promise.allSettled(notificationPromises);
   };
 
+  // Send new message notifications to users for bulk replies
+  const sendBulkMessageNotificationsToUsers = async (reports: UserReport[]) => {
+    const notificationPromises = reports.map(async (report) => {
+      try {
+        // Fetch user data for messaging token and locale
+        const userSnapshot = await getDocs(query(collection(db, 'users'), where('__name__', '==', report.uid)));
+        if (userSnapshot.empty) return;
+
+        const userData = userSnapshot.docs[0].data();
+        if (!userData.messagingToken || !userData.locale) return;
+
+        const userLocale = userData.locale === 'arabic' ? 'ar' : 'en';
+        const title = userLocale === 'ar' ? 'رسالة جديدة من المدير' : 'New Message from Admin';
+        const body = userLocale === 'ar' ? 'لديك رسالة جديدة بخصوص تقريرك' : 'You have a new message regarding your report';
+
+        const payload = createNewMessagePayload(
+          title,
+          body,
+          report.id,
+          'admin',
+          userLocale
+        );
+
+        return fetch('/api/admin/notifications/send', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            token: userData.messagingToken,
+            ...payload
+          }),
+        });
+      } catch (error) {
+        console.error(`Error sending message notification for report ${report.id}:`, error);
+      }
+    });
+
+    await Promise.allSettled(notificationPromises);
+  };
+
   const handleBulkStatusUpdate = async () => {
     if (!bulkUpdateStatus || selectedReports.size === 0) {
       toast.error(t('modules.userManagement.reports.bulkUpdate.selectStatusAndReports') || 'Please select reports and a status');
@@ -427,6 +507,101 @@ export default function UserReportsPage() {
       setSelectedReports(new Set());
     } else {
       setSelectedReports(new Set(filteredReports.map(report => report.id)));
+    }
+  };
+
+  // Bulk reply + status update handler
+  const handleBulkReplyAndStatusUpdate = async () => {
+    const chosenStatus = bulkReplyStatus || bulkUpdateStatus;
+    if (!bulkReplyMessage.trim() || selectedReports.size === 0 || !chosenStatus) {
+      toast.error(t('modules.userManagement.reports.bulkReply.validation') || 'Please enter a message, select reports, and pick a status');
+      return;
+    }
+
+    const selectedReportsList = filteredReports.filter(report => selectedReports.has(report.id));
+
+    // Determine which reports can receive messages (not closed/finalized)
+    const canMessage = selectedReportsList.filter(r => r.status !== 'closed' && r.status !== 'finalized');
+
+    // Validate status transitions for all selected
+    const { valid: validForStatus, invalid: invalidForStatus } = validateBulkStatusUpdate(selectedReportsList, chosenStatus);
+
+    if (invalidForStatus.length > 0) {
+      toast.warning(`${invalidForStatus.length} report(s) cannot be updated to ${chosenStatus} due to invalid status transitions. Proceeding with ${validForStatus.length} valid updates.`);
+    }
+
+    // If nothing to do
+    if (canMessage.length === 0 && validForStatus.length === 0) {
+      toast.error(t('modules.userManagement.reports.bulkReply.nothingToDo') || 'No reports can be updated or messaged based on current selection');
+      return;
+    }
+
+    setIsBulkReplying(true);
+    try {
+      const now = Timestamp.now();
+
+      // 1) Add messages to subcollections for reports that can receive messages
+      const messagePromises = canMessage.map(async (report) => {
+        return addDoc(collection(db, 'usersReports', report.id, 'messages'), {
+          reportId: report.id,
+          senderId: 'admin',
+          senderRole: 'admin',
+          message: bulkReplyMessage.trim(),
+          timestamp: now,
+          isRead: false,
+        });
+      });
+      await Promise.allSettled(messagePromises);
+
+      // 2) Batch update statuses and metadata
+      const batch = writeBatch(db);
+      selectedReportsList.forEach((report) => {
+        const reportRef = doc(db, 'usersReports', report.id);
+        const shouldIncrement = canMessage.some(r => r.id === report.id);
+        const shouldUpdateStatus = validForStatus.some(r => r.id === report.id);
+        if (!shouldIncrement && !shouldUpdateStatus) {
+          return; // Skip if nothing to change
+        }
+        const updatePayload: Record<string, unknown> = {
+          lastUpdated: now,
+        };
+        if (shouldIncrement) {
+          updatePayload.messagesCount = increment(1);
+        }
+        if (shouldUpdateStatus) {
+          updatePayload.status = chosenStatus;
+        }
+        batch.update(reportRef, updatePayload);
+      });
+      await batch.commit();
+
+      // 3) Send notifications
+      if (canMessage.length > 0) {
+        await sendBulkMessageNotificationsToUsers(canMessage);
+      }
+      if (validForStatus.length > 0) {
+        await sendBulkNotificationsToUsers(validForStatus, chosenStatus);
+      }
+
+      toast.success(
+        `${canMessage.length} message(s) sent, ${validForStatus.length} status update(s) applied${invalidForStatus.length > 0 ? `, ${invalidForStatus.length} status update(s) skipped` : ''}.`
+      );
+
+      // Reset UI state
+      setSelectedReports(new Set());
+      setBulkReplyMessage('');
+      setBulkReplyStatus('');
+      setBulkReplyDialogOpen(false);
+      setBulkUpdateStatus('');
+
+      // Refresh data
+      fetchReports(currentPage, false);
+      fetchStatusCounts();
+    } catch (error) {
+      console.error('Error performing bulk reply/status update:', error);
+      toast.error(t('modules.userManagement.reports.bulkReply.error') || 'Failed to perform bulk reply/status update');
+    } finally {
+      setIsBulkReplying(false);
     }
   };
 
@@ -513,20 +688,24 @@ export default function UserReportsPage() {
           
           if (!userSnapshot.empty) {
             const userData = userSnapshot.docs[0].data();
+            const createdAtAuth = await fetchUserAuthCreatedAt(report.uid);
             return {
               ...report,
               isPlusUser: userData.isPlusUser || false,
               userDisplayName: userData.displayName || '',
+              userCreatedAt: createdAtAuth || undefined,
             };
           }
         } catch (error) {
           console.error(`Error fetching user data for ${report.uid}:`, error);
         }
         
+        const createdAtAuth = await fetchUserAuthCreatedAt(report.uid);
         return {
           ...report,
           isPlusUser: false,
           userDisplayName: '',
+          userCreatedAt: createdAtAuth || undefined,
         };
       }));
     }
@@ -566,20 +745,24 @@ export default function UserReportsPage() {
           
           if (!userSnapshot.empty) {
             const userData = userSnapshot.docs[0].data();
+            const createdAtAuth = await fetchUserAuthCreatedAt(reportData.uid);
             return {
               ...reportData,
               isPlusUser: userData.isPlusUser || false,
               userDisplayName: userData.displayName || '',
+              userCreatedAt: createdAtAuth || undefined,
             };
           }
         } catch (error) {
           console.error(`Error fetching user data for ${reportData.uid}:`, error);
         }
         
+        const createdAtAuth = await fetchUserAuthCreatedAt(reportData.uid);
         return {
           ...reportData,
           isPlusUser: false,
           userDisplayName: '',
+          userCreatedAt: createdAtAuth || undefined,
         };
       }));
 
@@ -817,6 +1000,24 @@ export default function UserReportsPage() {
       hour: '2-digit',
       minute: '2-digit',
     }).format(timestamp.toDate());
+  };
+
+  // Open migration dialog for a given user
+  const openMigrationDialog = async (userId: string) => {
+    try {
+      const userRef = doc(db, 'users', userId);
+      const userSnap = await getDoc(userRef);
+      if (userSnap.exists()) {
+        setMigrationDialogUserId(userId);
+        setMigrationDialogUser(userSnap.data());
+        setMigrationDialogOpen(true);
+      } else {
+        toast.error(t('modules.userManagement.reports.errors.userNotFound') || 'User not found for this report');
+      }
+    } catch (e) {
+      console.error('Error loading user for migration dialog:', e);
+      toast.error(t('modules.userManagement.reports.errors.loadingFailed') || 'Failed to load user');
+    }
   };
 
   const truncateText = (text: string, maxLength: number = 50) => {
@@ -1147,6 +1348,32 @@ export default function UserReportsPage() {
                         </>
                       )}
                     </Button>
+
+                    {/* Bulk Reply + Status Button */}
+                    <Button
+                      variant="secondary"
+                      onClick={() => {
+                        // Prefill the reply status with selected bulkUpdateStatus if set
+                        setBulkReplyStatus(bulkUpdateStatus);
+                        setBulkReplyDialogOpen(true);
+                      }}
+                      disabled={isBulkReplying}
+                      className="flex items-center justify-center gap-2 h-10 w-full sm:w-auto min-w-[180px] text-sm"
+                    >
+                      {isBulkReplying ? (
+                        <>
+                          <RotateCw className="h-4 w-4 animate-spin" />
+                          <span className="hidden sm:inline">{t('modules.userManagement.reports.bulkReply.replying') || 'Replying...'}</span>
+                          <span className="sm:hidden">Replying...</span>
+                        </>
+                      ) : (
+                        <>
+                          <MessageCircle className="h-4 w-4" />
+                          <span className="hidden sm:inline">{t('modules.userManagement.reports.bulkReply.replyAndUpdate') || 'Reply + Update Status'}</span>
+                          <span className="sm:hidden">Reply + Update</span>
+                        </>
+                      )}
+                    </Button>
                   </div>
                 </CardContent>
               </Card>
@@ -1198,6 +1425,7 @@ export default function UserReportsPage() {
                           <TableHead>{t('modules.userManagement.reports.reportId') || 'Report ID'}</TableHead>
                           <TableHead>{t('modules.userManagement.reports.userId') || 'User ID'}</TableHead>
                           <TableHead className="hidden md:table-cell">{t('modules.userManagement.reports.reportType') || 'Report Type'}</TableHead>
+                          <TableHead className="hidden xl:table-cell">{t('modules.userManagement.reports.userCreatedAt') || 'User Created'}</TableHead>
                           <TableHead className="hidden xl:table-cell">
                             <Button
                               variant="ghost"
@@ -1213,6 +1441,7 @@ export default function UserReportsPage() {
                           <TableHead className="hidden xl:table-cell">{t('modules.userManagement.reports.initialMessage') || 'Initial Message'}</TableHead>
                           <TableHead className="hidden sm:table-cell">{t('modules.userManagement.reports.messagesCount') || 'Messages'}</TableHead>
                           <TableHead className="hidden lg:table-cell">{t('modules.userManagement.reports.lastMessageFrom') || 'Last Message From'}</TableHead>
+                          <TableHead className="hidden md:table-cell">{t('modules.userManagement.reports.migration') || 'Migration'}</TableHead>
                           <TableHead className="text-right">{t('modules.userManagement.reports.actions') || 'Actions'}</TableHead>
                         </TableRow>
                       </TableHeader>
@@ -1279,6 +1508,13 @@ export default function UserReportsPage() {
                                 </Badge>
                               </TableCell>
                               <TableCell className="hidden xl:table-cell">
+                                {report.userCreatedAt ? (
+                                  <span className="text-xs sm:text-sm">{formatDate(report.userCreatedAt)}</span>
+                                ) : (
+                                  <span className="text-xs text-muted-foreground">{t('common.unknown') || 'Unknown'}</span>
+                                )}
+                              </TableCell>
+                              <TableCell className="hidden xl:table-cell">
                                 <Badge 
                                   variant={report.isPlusUser ? "default" : "secondary"} 
                                   className={`text-xs ${report.isPlusUser ? 'bg-amber-100 text-amber-800 border-amber-200' : 'bg-gray-100 text-gray-600 border-gray-200'}`}
@@ -1322,6 +1558,15 @@ export default function UserReportsPage() {
                                   </div>
                                 )}
                               </TableCell>
+                              <TableCell className="hidden md:table-cell">
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => openMigrationDialog(report.uid)}
+                                >
+                                  {t('modules.userManagement.reports.viewMigrationStatus') || 'Migration Status'}
+                                </Button>
+                              </TableCell>
                               <TableCell className="text-right">
                                 <DropdownMenu>
                                   <DropdownMenuTrigger asChild>
@@ -1335,6 +1580,12 @@ export default function UserReportsPage() {
                                         <Eye className="h-4 w-4 mr-2" />
                                         {t('modules.userManagement.reports.viewDetails') || 'View Details'}
                                       </Link>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem
+                                      onClick={() => { setQuickDialogReportId(report.id); setQuickDialogOpen(true); }}
+                                    >
+                                      <FileText className="h-4 w-4 mr-2" />
+                                      {t('modules.userManagement.reports.quickManage') || 'Quick Manage'}
                                     </DropdownMenuItem>
                                     <DropdownMenuSeparator />
                                     <DropdownMenuItem asChild>
@@ -1483,6 +1734,76 @@ export default function UserReportsPage() {
         </DialogContent>
       </Dialog>
 
+      {/* Bulk Reply Dialog */}
+      <Dialog open={bulkReplyDialogOpen} onOpenChange={setBulkReplyDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              {t('modules.userManagement.reports.bulkReply.title') || 'Bulk Reply and Status Update'}
+            </DialogTitle>
+            <DialogDescription>
+              {t('modules.userManagement.reports.bulkReply.description') || `Send one reply to ${selectedReports.size} selected report(s) and update their status.`}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3">
+            <div className="flex flex-col gap-2">
+              <label className="text-sm font-medium">
+                {t('modules.userManagement.reports.bulkReply.messageLabel') || 'Message'}
+              </label>
+              <Textarea
+                value={bulkReplyMessage}
+                onChange={(e) => setBulkReplyMessage(e.target.value)}
+                placeholder={t('modules.userManagement.reports.bulkReply.messagePlaceholder') || 'Type your message to the selected users...'}
+                rows={4}
+                maxLength={1000}
+                disabled={isBulkReplying}
+              />
+              <div className="text-xs text-muted-foreground self-end">
+                {(1000 - bulkReplyMessage.length)} {t('modules.userManagement.reports.reportDetails.charactersRemaining') || 'characters remaining'}
+              </div>
+            </div>
+            <div className="flex flex-col gap-2">
+              <label className="text-sm font-medium">
+                {t('modules.userManagement.reports.bulkReply.updateStatusTo') || 'Update status to'}
+              </label>
+              <Select value={bulkReplyStatus} onValueChange={setBulkReplyStatus}>
+                <SelectTrigger className="w-full h-10">
+                  <SelectValue placeholder={t('modules.userManagement.reports.selectStatus') || 'Select status'} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="pending">{t('modules.userManagement.reports.statusPending') || 'Pending'}</SelectItem>
+                  <SelectItem value="inProgress">{t('modules.userManagement.reports.statusInProgress') || 'In Progress'}</SelectItem>
+                  <SelectItem value="waitingForAdminResponse">{t('modules.userManagement.reports.statusWaitingForAdminResponse') || 'Waiting for Admin Response'}</SelectItem>
+                  <SelectItem value="closed">{t('modules.userManagement.reports.statusClosed') || 'Closed'}</SelectItem>
+                  <SelectItem value="finalized">{t('modules.userManagement.reports.statusFinalized') || 'Finalized'}</SelectItem>
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-muted-foreground">
+                {t('modules.userManagement.reports.bulkReply.statusNote') || 'Status will be updated only for reports that can transition to the chosen status.'}
+              </p>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setBulkReplyDialogOpen(false)}>
+              {t('common.cancel') || 'Cancel'}
+            </Button>
+            <Button onClick={handleBulkReplyAndStatusUpdate} disabled={isBulkReplying || bulkReplyMessage.trim().length === 0}>
+              {isBulkReplying ? (
+                <>
+                  <RotateCw className="h-4 w-4 mr-2 animate-spin" />
+                  {t('modules.userManagement.reports.bulkReply.replying') || 'Replying...'}
+                </>
+              ) : (
+                <>
+                  <MessageCircle className="h-4 w-4 mr-2" />
+                  {t('modules.userManagement.reports.bulkReply.sendReplies') || 'Send Replies'}
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       {/* Delete Report Dialog */}
       <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <DialogContent>
@@ -1500,6 +1821,34 @@ export default function UserReportsPage() {
               {t('common.delete') || 'Delete'}
             </Button>
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Quick Manage Report Dialog */}
+      <ReportQuickDialog
+        reportId={quickDialogReportId}
+        open={quickDialogOpen}
+        onOpenChange={setQuickDialogOpen}
+      />
+
+      {/* Migration Status Dialog */}
+      <Dialog open={migrationDialogOpen} onOpenChange={setMigrationDialogOpen}>
+        <DialogContent className="max-w-3xl">
+          <DialogHeader>
+            <DialogTitle>{t('modules.userManagement.reports.viewMigrationStatus') || 'Migration Status'}</DialogTitle>
+            <DialogDescription>
+              {migrationDialogUserId ? (
+                t('modules.userManagement.reports.migrationDialogDescription') || 'Followups migration status for this user'
+              ) : null}
+            </DialogDescription>
+          </DialogHeader>
+          {migrationDialogUserId && migrationDialogUser ? (
+            <MigrationManagementCard userId={migrationDialogUserId} user={migrationDialogUser} />
+          ) : (
+            <div className="py-8">
+              <Skeleton className="h-24 w-full" />
+            </div>
+          )}
         </DialogContent>
       </Dialog>
     </>

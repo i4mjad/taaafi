@@ -895,7 +895,7 @@ export default function UsersRoute() {
                   </div>
                 ) : (
                   <>
-                    <div className="rounded-md border">
+                    <div className="rounded-md border overflow-x-auto">
                       <Table>
                         <TableHeader>
                           {table.getHeaderGroups().map((headerGroup) => (
@@ -1119,7 +1119,7 @@ export default function UsersRoute() {
                         ))}
                       </div>
                     ) : filteredDeletionRequests.length > 0 ? (
-                      <div className="rounded-md border">
+                      <div className="rounded-md border overflow-x-auto">
                         <Table>
                           <TableHeader>
                             <TableRow>
@@ -1127,6 +1127,7 @@ export default function UsersRoute() {
                               <TableHead>{t('modules.userManagement.user') || 'User'}</TableHead>
                               <TableHead>{t('modules.userManagement.accountDeletion.reasonCategory') || 'Reason'}</TableHead>
                               <TableHead>{t('modules.userManagement.accountDeletion.requestedAt') || 'Requested At'}</TableHead>
+                              <TableHead>{t('modules.userManagement.accountDeletion.daysSinceRequest') || 'Days Since'}</TableHead>
                               <TableHead>{t('modules.userManagement.accountDeletion.status') || 'Status'}</TableHead>
                               <TableHead>{t('common.actions') || 'Actions'}</TableHead>
                             </TableRow>
@@ -1145,14 +1146,35 @@ export default function UsersRoute() {
                                     <p className="text-xs text-muted-foreground">{request.userEmail}</p>
                                   </div>
                                 </TableCell>
-                                <TableCell>
-                                  <div className="space-y-1">
+                                <TableCell className="align-top">
+                                  <div className="space-y-1 max-w-[320px] md:max-w-none">
                                     <p className="text-sm">{getDeletionCategoryText(request.reasonCategory)}</p>
                                     <p className="text-xs text-muted-foreground">{getDeletionReasonText(request.reasonId)}</p>
+                                    {request.reasonDetails && request.reasonDetails.trim().length > 0 && (
+                                      <p className="text-xs text-muted-foreground whitespace-pre-wrap break-words break-anywhere">
+                                        <span className="font-medium">{t('modules.userManagement.accountDeletion.reasonDetails') || 'Reason Details'}: </span>
+                                        <span>{request.reasonDetails}</span>
+                                      </p>
+                                    )}
                                   </div>
                                 </TableCell>
                                 <TableCell>
                                   <div className="text-sm">{formatDeletionDate(request.requestedAt)}</div>
+                                </TableCell>
+                                <TableCell>
+                                  <div className="text-sm font-medium">
+                                    {(() => {
+                                      const startDate = request.requestedAt instanceof Date ? request.requestedAt : new Date(request.requestedAt);
+                                      const endDate = request.isCanceled && request.canceledAt
+                                        ? (request.canceledAt instanceof Date ? request.canceledAt : new Date(request.canceledAt))
+                                        : request.isProcessed && request.processedAt
+                                          ? (request.processedAt instanceof Date ? request.processedAt : new Date(request.processedAt))
+                                          : new Date();
+                                      const diffMs = Math.max(0, endDate.getTime() - startDate.getTime());
+                                      const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+                                      return t('modules.userManagement.accountDeletion.daysSince', { count: days });
+                                    })()}
+                                  </div>
                                 </TableCell>
                                 <TableCell>
                                   {getDeletionRequestStatusBadge(request)}
