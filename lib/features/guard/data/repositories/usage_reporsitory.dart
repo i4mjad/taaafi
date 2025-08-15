@@ -1,10 +1,13 @@
 import 'dart:io';
 import 'package:flutter/services.dart';
 import 'package:reboot_app_3/features/guard/data/models.dart';
+import 'dart:convert';
 
 final _chan = const MethodChannel('analytics.usage');
-Future<Map<String, dynamic>> _invoke(String method) {
-  return _chan.invokeMethod(method).then((v) => Map<String, dynamic>.from(v));
+
+Future<Map<String, dynamic>> _invoke(String method) async {
+  final raw = await _chan.invokeMethod(method);
+  return raw is String ? jsonDecode(raw) : Map<String, dynamic>.from(raw);
 }
 
 Future<UsageSnapshot> loadSnapshot() async {

@@ -69,5 +69,14 @@
         <data android:scheme="@string/fb_login_protocol_scheme"/>
       </intent-filter>
     </activity>
+
+    <receiver android:name="com.amjadkhalfan.reboot_app_3.ScreenReceiver" android:exported="false">
+      <intent-filter>
+        <action android:name="android.intent.action.USER_PRESENT"/>
+      </intent-filter>
+    </receiver>
+    <receiver android:name="com.amjadkhalfan.reboot_app_3.BootReceiver" android:exported="false">
+      <intent-filter><action android:name="android.intent.action.BOOT_COMPLETED"/></intent-filter>
+    </receiver>
   </application>
 </manifest>

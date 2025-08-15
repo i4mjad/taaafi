@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/shared_widgets/app_bar.dart';
+import 'package:reboot_app_3/features/analytics/presentation/widgets/usage_access_banner.dart';
 
 class GuardScreen extends ConsumerWidget {
   const GuardScreen({super.key});
@@ -17,6 +18,8 @@ class GuardScreen extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Usage Access Permission Banner
+            const UsageAccessBanner(),
             // Hero Focus Score Card
             Card(
               shape: RoundedRectangleBorder(
