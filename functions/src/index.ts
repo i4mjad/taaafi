@@ -29,6 +29,8 @@ const translations = {
     // Community notification translations
     'new-comment-on-post': 'New Comment',
     'someone-commented-on-your-post': 'Someone commented on your post "{postTitle}"',
+    'new-reply-to-comment': 'New Reply',
+    'someone-replied-to-your-comment': 'Someone replied to your comment "{commentText}"',
     'liked-your-post': 'Post Liked',
     'disliked-your-post': 'Post Disliked',
     'liked-your-comment': 'Comment Liked',
@@ -56,6 +58,8 @@ const translations = {
     // Community notification translations
     'new-comment-on-post': 'تعليق جديد',
     'someone-commented-on-your-post': 'علق أحدهم على منشورك "{postTitle}"',
+    'new-reply-to-comment': 'رد جديد',
+    'someone-replied-to-your-comment': 'رد أحدهم على تعليقك "{commentText}"',
     'liked-your-post': 'إعجاب بالمنشور',
     'disliked-your-post': 'عدم إعجاب بالمنشور',
     'liked-your-comment': 'إعجاب بالتعليق',
@@ -332,12 +336,126 @@ async function analyzeStreakVulnerability(
   }
 }
 
+// Helper function to get user gender from community profile
+async function getUserGender(communityProfileId: string): Promise<string | null> {
+  try {
+    const cpDoc = await admin.firestore().collection('communityProfiles').doc(communityProfileId).get();
+    if (!cpDoc.exists) {
+      console.log(`⚠️ Community profile not found: ${communityProfileId}`);
+      return null;
+    }
+    
+    const cpData = cpDoc.data()!;
+    return cpData.gender || null;
+  } catch (error) {
+    console.error(`❌ Error getting user gender for CP ${communityProfileId}:`, error);
+    return null;
+  }
+}
+
+// Helper function to check gender compatibility and mark comment as deleted if needed
+async function checkGenderCompatibilityAndMarkDeleted(commentData: any, commentId: string): Promise<void> {
+  try {
+    const { authorCPId: commenterCPId, parentFor, parentId } = commentData;
+    
+    console.log(`🔍 Checking gender compatibility for comment ${commentId} by ${commenterCPId} (parentFor: ${parentFor}, parentId: ${parentId})`);
+    
+    // Get commenter's gender
+    const commenterGender = await getUserGender(commenterCPId);
+    if (!commenterGender) {
+      console.log(`⚠️ Could not get commenter gender, skipping gender check`);
+      return;
+    }
+    
+    let parentAuthorGender: string | null = null;
+    
+    // Get parent author's gender based on parentFor type
+    if (parentFor === 'post') {
+      // Get post author's gender
+      const postDoc = await admin.firestore().collection('forumPosts').doc(parentId).get();
+      if (!postDoc.exists) {
+        console.log(`⚠️ Post not found: ${parentId}, skipping gender check`);
+        return;
+      }
+      
+      const postData = postDoc.data()!;
+      const postAuthorCPId = postData.authorCPId;
+      parentAuthorGender = await getUserGender(postAuthorCPId);
+      
+    } else if (parentFor === 'comment') {
+      // Get parent comment author's gender
+      const parentCommentDoc = await admin.firestore().collection('comments').doc(parentId).get();
+      if (!parentCommentDoc.exists) {
+        console.log(`⚠️ Parent comment not found: ${parentId}, skipping gender check`);
+        return;
+      }
+      
+      const parentCommentData = parentCommentDoc.data()!;
+      const parentCommentAuthorCPId = parentCommentData.authorCPId;
+      parentAuthorGender = await getUserGender(parentCommentAuthorCPId);
+    } else {
+      console.log(`⚠️ Unknown parentFor type: ${parentFor}, skipping gender check`);
+      return;
+    }
+    
+    if (!parentAuthorGender) {
+      console.log(`⚠️ Could not get parent author gender, skipping gender check`);
+      return;
+    }
+    
+    // Compare genders
+    console.log(`👥 Gender comparison: commenter(${commenterGender}) vs parent(${parentAuthorGender})`);
+    
+    if (commenterGender !== parentAuthorGender) {
+      // Genders don't match - mark comment as deleted
+      console.log(`🚫 Gender mismatch detected! Marking comment ${commentId} as deleted`);
+      
+      await admin.firestore().collection('comments').doc(commentId).update({
+        isDeleted: true,
+        deletedAt: admin.firestore.FieldValue.serverTimestamp(),
+        deletedReason: 'gender_mismatch'
+      });
+      
+      console.log(`✅ Comment ${commentId} marked as deleted due to gender mismatch`);
+    } else {
+      console.log(`✅ Gender match confirmed for comment ${commentId}`);
+    }
+    
+  } catch (error) {
+    console.error(`❌ Error checking gender compatibility for comment ${commentId}:`, error);
+    // Don't throw - we don't want to break the entire flow if gender checking fails
+  }
+}
+
 // Community notification handler functions
 async function handleCommentNotification(commentData: any, commentId: string): Promise<void> {
   try {
+    const { postId, authorCPId: commenterCPId, parentFor, parentId } = commentData;
+    
+    console.log(`💬 New comment notification: comment ${commentId} (parentFor: ${parentFor}, parentId: ${parentId}) by ${commenterCPId}`);
+    
+    // Handle different types of comments
+    if (parentFor === 'post') {
+      // This is a comment on a post
+      await handlePostCommentNotification(commentData, commentId);
+    } else if (parentFor === 'comment') {
+      // This is a reply to a comment
+      await handleCommentReplyNotification(commentData, commentId);
+    } else {
+      console.log(`⚠️ Unknown parentFor type: ${parentFor}, skipping notification`);
+    }
+    
+  } catch (error) {
+    console.error('❌ Error handling comment notification:', error);
+    // Log but don't throw - notification failure shouldn't crash the function
+  }
+}
+
+async function handlePostCommentNotification(commentData: any, commentId: string): Promise<void> {
+  try {
     const { postId, authorCPId: commenterCPId } = commentData;
     
-    console.log(`💬 New comment notification: comment ${commentId} on post ${postId} by ${commenterCPId}`);
+    console.log(`💬 Handling post comment notification: comment ${commentId} on post ${postId} by ${commenterCPId}`);
     
     // Get the post to find the post owner
     const postDoc = await admin.firestore().collection('forumPosts').doc(postId).get();
@@ -389,7 +507,7 @@ async function handleCommentNotification(commentData: any, commentId: string): P
       postTitle: postTitle
     });
     
-    console.log(`📱 Sending comment notification to user ${postOwnerUserUID} (CP: ${postOwnerCPId}) in locale: ${locale}`);
+    console.log(`📱 Sending post comment notification to user ${postOwnerUserUID} (CP: ${postOwnerCPId}) in locale: ${locale}`);
     
     // Send FCM notification
     const success = await sendFCMNotification(postOwnerUserUID, title, body, locale, {
@@ -401,14 +519,92 @@ async function handleCommentNotification(commentData: any, commentId: string): P
     });
     
     if (success) {
-      console.log('✅ Comment notification sent successfully');
+      console.log('✅ Post comment notification sent successfully');
     } else {
-      console.log('❌ Failed to send comment notification');
+      console.log('❌ Failed to send post comment notification');
     }
     
   } catch (error) {
-    console.error('❌ Error handling comment notification:', error);
-    // Log but don't throw - notification failure shouldn't crash the function
+    console.error('❌ Error handling post comment notification:', error);
+  }
+}
+
+async function handleCommentReplyNotification(commentData: any, commentId: string): Promise<void> {
+  try {
+    const { postId, authorCPId: replierCPId, parentId: parentCommentId } = commentData;
+    
+    console.log(`💬 Handling comment reply notification: reply ${commentId} to comment ${parentCommentId} by ${replierCPId}`);
+    
+    // Get the parent comment to find the comment owner
+    const parentCommentDoc = await admin.firestore().collection('comments').doc(parentCommentId).get();
+    if (!parentCommentDoc.exists) {
+      console.log('⚠️ Parent comment not found, skipping notification');
+      return;
+    }
+    
+    const parentCommentData = parentCommentDoc.data()!;
+    const commentOwnerCPId = parentCommentData.authorCPId;
+    
+    // Don't notify if replying to own comment
+    if (commentOwnerCPId === replierCPId) {
+      console.log('ℹ️ User replied to own comment, skipping notification');
+      return;
+    }
+    
+    // Get comment owner's community profile to get the userUID
+    const commentOwnerCPDoc = await admin.firestore().collection('communityProfiles').doc(commentOwnerCPId).get();
+    if (!commentOwnerCPDoc.exists) {
+      console.log('⚠️ Comment owner community profile not found, skipping notification');
+      return;
+    }
+    
+    const commentOwnerCPData = commentOwnerCPDoc.data()!;
+    const commentOwnerUserUID = commentOwnerCPData.userUID;
+    
+    if (!commentOwnerUserUID) {
+      console.log('⚠️ Comment owner community profile missing userUID, skipping notification');
+      return;
+    }
+    
+    // Get comment owner's user document to check if they exist and get locale
+    const commentOwnerUserDoc = await admin.firestore().collection('users').doc(commentOwnerUserUID).get();
+    if (!commentOwnerUserDoc.exists) {
+      console.log('⚠️ Comment owner not found in users collection, skipping notification');
+      return;
+    }
+    
+    const commentOwnerUserData = commentOwnerUserDoc.data()!;
+    const locale = commentOwnerUserData.locale || 'en';
+    
+    // Prepare notification content
+    const title = translate('new-reply-to-comment', locale);
+    const commentText = parentCommentData.body && parentCommentData.body.length > 30 
+      ? parentCommentData.body.substring(0, 30) + '...' 
+      : parentCommentData.body || 'your comment';
+    const body = translate('someone-replied-to-your-comment', locale, {
+      commentText: commentText
+    });
+    
+    console.log(`📱 Sending comment reply notification to user ${commentOwnerUserUID} (CP: ${commentOwnerCPId}) in locale: ${locale}`);
+    
+    // Send FCM notification
+    const success = await sendFCMNotification(commentOwnerUserUID, title, body, locale, {
+      type: 'community_notification',
+      screen: 'postDetails',
+      postId: postId,
+      commentId: commentId,
+      parentCommentId: parentCommentId,
+      notificationType: 'commentReply'
+    });
+    
+    if (success) {
+      console.log('✅ Comment reply notification sent successfully');
+    } else {
+      console.log('❌ Failed to send comment reply notification');
+    }
+    
+  } catch (error) {
+    console.error('❌ Error handling comment reply notification:', error);
   }
 }
 
@@ -1029,6 +1225,11 @@ export const onCommentCreate = onDocumentCreated(
     }
     
     console.log(`🔥 Comment created trigger fired for: ${commentId}`);
+    
+    // Check gender compatibility and mark as deleted if needed
+    await checkGenderCompatibilityAndMarkDeleted(commentData, commentId);
+    
+    // Handle notifications
     await handleCommentNotification(commentData, commentId);
   }
 );
