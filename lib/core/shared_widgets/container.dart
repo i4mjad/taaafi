@@ -33,7 +33,7 @@ class WidgetsContainer extends StatelessWidget {
       height: height,
       padding: padding ?? EdgeInsets.all(16),
       decoration: ShapeDecoration(
-        color: backgroundColor ?? theme.primary.withOpacity(0.1),
+        color: backgroundColor ?? theme.primary.withValues(alpha: 0.1),
         shadows: boxShadow,
         shape: SmoothRectangleBorder(
           borderRadius: SmoothBorderRadius(
@@ -43,7 +43,7 @@ class WidgetsContainer extends StatelessWidget {
           ),
           side: borderSide ??
               BorderSide(
-                color: theme.primary.withOpacity(0.4),
+                color: theme.primary.withValues(alpha: 0.4),
                 width: 1.0,
               ),
         ),

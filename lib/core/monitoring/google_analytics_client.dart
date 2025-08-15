@@ -1,4 +1,5 @@
 import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:reboot_app_3/core/monitoring/analytics_client.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -201,11 +202,11 @@ class GoogleAnalyticsClient implements AnalyticsClient {
 }
 
 @Riverpod(keepAlive: true)
-GoogleAnalyticsClient googleAnalyticsClient(GoogleAnalyticsClientRef ref) {
+GoogleAnalyticsClient googleAnalyticsClient(Ref ref) {
   return GoogleAnalyticsClient(ref.watch(firebaseAnalyticsProvider));
 }
 
 @Riverpod(keepAlive: true)
-FirebaseAnalytics firebaseAnalytics(FirebaseAnalyticsRef ref) {
+FirebaseAnalytics firebaseAnalytics(Ref ref) {
   return FirebaseAnalytics.instance;
 }

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:reboot_app_3/core/monitoring/error_logger.dart';
 import 'package:reboot_app_3/features/authentication/data/models/user_document.dart';
@@ -10,75 +11,93 @@ part 'user_document_provider.g.dart';
 class UserDocumentsNotifier extends _$UserDocumentsNotifier {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  StreamSubscription<User?>? _authSubscription;
 
   @override
   FutureOr<UserDocument?> build() async {
     // Listen to auth state changes and refetch user document accordingly
-    _auth.authStateChanges().listen((user) {
+    _authSubscription = _auth.authStateChanges().listen((user) async {
       if (user != null) {
-        _fetchUserDocument();
+        // User logged in, fetch their document
+        final document = await getUserDocument(user.uid);
+        state = AsyncValue.data(document);
       } else {
+        // User logged out
         state = const AsyncValue.data(null);
       }
     });
-    return await _fetchUserDocument();
-  }
 
-  Future<UserDocument?> _fetchUserDocument() async {
-    try {
-      state = const AsyncLoading(); // Indicate loading state
+    // Clean up subscription when provider is disposed
+    ref.onDispose(() {
+      _authSubscription?.cancel();
+    });
 
-      final uid = _auth.currentUser?.uid;
-      if (uid == null) {
-        state = AsyncValue.data(null); // Update state with error
-        throw Exception("User ID is null");
-      }
-
-      final doc = await _firestore
-          .collection('users')
-          .doc(uid)
-          .get(GetOptions(source: Source.server));
-      if (!doc.exists) {
-        state = AsyncValue.data(null); // Update state with error
-        return null; // No document found
-      }
-
-      var userDocument = UserDocument.fromFirestore(doc);
-
-      state = AsyncValue.data(userDocument); // Update state with data
-      return userDocument;
-    } catch (e, stack) {
-      state = AsyncValue.error(e, stack); // Update state with error
+    final currentUser = _auth.currentUser;
+    if (currentUser == null) {
       return null;
     }
+
+    return await getUserDocument(currentUser.uid);
   }
 
   Future<UserDocument?> getUserDocument(String uid) async {
     try {
-      if (uid == null) {
-        state = AsyncValue.data(null); // Update state with error
-        throw Exception("User ID is null");
+      // Validate the uid before making the Firestore call
+      if (uid.isEmpty) {
+        ref.read(errorLoggerProvider).logException(
+              'Invalid UID: Empty string provided for document path',
+              StackTrace.current,
+            );
+        return null;
       }
 
       final doc = await _firestore
           .collection('users')
           .doc(uid)
           .get(GetOptions(source: Source.server));
+
       if (!doc.exists) {
-        state = AsyncValue.data(null); // Update state with error
         return null; // No document found
       }
 
-      var userDocument = UserDocument.fromFirestore(doc);
+      final data = doc.data();
+      if (data == null) {
+        return null;
+      }
 
-      return userDocument;
+      // Check if the document has any non-null fields
+      final hasAnyData = data.values.any((value) => value != null);
+      if (!hasAnyData) {
+        return null;
+      }
+
+      var userDocument = UserDocument.fromFirestore(doc);
+      return userDocument.uid != null ? userDocument : null;
     } catch (e, stackTrace) {
       ref.read(errorLoggerProvider).logException(e, stackTrace);
       return null;
     }
   }
 
-  bool isLegacyUserDocument(UserDocument userDocument) {
+  bool isLegacyUserDocument(UserDocument? userDocument) {
+    if (userDocument == null) return false;
+
+    // Check if all fields are null except messagingToken
+    final allFieldsNull = userDocument.uid == null &&
+        userDocument.devicesIds == null &&
+        userDocument.displayName == null &&
+        userDocument.email == null &&
+        userDocument.gender == null &&
+        userDocument.locale == null &&
+        userDocument.dayOfBirth == null &&
+        userDocument.userFirstDate == null &&
+        userDocument.role == null &&
+        userDocument.userRelapses == null &&
+        userDocument.userMasturbatingWithoutWatching == null &&
+        userDocument.userWatchingWithoutMasturbating == null;
+
+    if (allFieldsNull) return false;
+
     return userDocument.devicesIds == null ||
         userDocument.messagingToken == null ||
         userDocument.role == null;
@@ -93,7 +112,6 @@ class UserDocumentsNotifier extends _$UserDocumentsNotifier {
   bool hasMissingData(UserDocument userDocument) {
     return userDocument.displayName == null ||
         userDocument.email == null ||
-        userDocument.gender == null ||
         userDocument.locale == null ||
         userDocument.uid == null ||
         userDocument.dayOfBirth == null ||

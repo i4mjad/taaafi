@@ -15,67 +15,76 @@ publish_to: "none" # Remove this line if you wish to publish to pub.dev
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 5.1.0+1
+version: 5.3.1+1
 
 environment:
   sdk: ">=3.0.0 <=4.0.0"
 
 dependencies:
+  app_settings: ^6.1.1
   cloud_firestore: ^5.0.2
+  cloud_functions: ^5.6.2
+  device_info_plus: ^11.5.0
   dio: ^5.8.0+1
-  device_info_plus: ^10.1.0
-  in_app_review: ^2.0.10
-  figma_squircle: ^0.5.3
-  rxdart: ^0.28.0
+  figma_squircle: ^0.6.3
   firebase_analytics: ^11.2.1
   firebase_auth: ^5.1.1
   firebase_core: ^3.1.1
   firebase_crashlytics: ^4.1.2
   firebase_messaging: ^15.1.2
-  flutter_flavorizr: ^2.2.3
-  lottie: ^3.2.0
-  firebase_remote_config: ^5.0.4
+  firebase_remote_config: ^5.4.7
+  firebase_storage: ^12.4.9
+  fl_chart: ^1.0.0
   flutter:
     sdk: flutter
-  flutter_local_notifications: ^17.2.1
+  flutter_advanced_segment: ^3.1.0
+  flutter_app_badger: ^1.5.0
+  flutter_flavorizr: ^2.2.3
+  flutter_local_notifications: ^19.3.0
   flutter_localizations:
     sdk: flutter
   flutter_markdown: ^0.7.3
-  flutter_quill: ^10.5.14
+  flutter_quill: ^11.4.1
   flutter_riverpod: ^2.3.2
   flutter_svg: any
   force_update_helper: ^0.1.4
-  go_router: ^14.1.4
-  google_sign_in: ^6.0.2
+  go_router: ^16.0.0
+  google_sign_in: ^5.4.4
   grouped_list: ^6.0.0
-  intl: ^0.19.0
+  in_app_review: ^2.0.10
+  intl: 0.20.2
+  lottie: ^3.2.0
   lucide_icons: ^0.257.0
   mixpanel_flutter: ^2.3.3
-  path: null
+  path: ^1.9.0
   provider: ^6.0.2
+  restart_app: ^1.3.2
   riverpod_annotation: ^2.3.5
-  sentry_flutter: ^8.9.0
-  shared_preferences: ^2.0.15
+  rxdart: ^0.28.0
+  shared_preferences: ^2.5.3
   shimmer: ^3.0.0
-  sign_in_with_apple: ^6.1.1
-  syncfusion_flutter_calendar: ^26.2.11+1
+  shorebird_code_push: ^2.0.4
+  sign_in_with_apple: ^7.0.1
+  sqflite: ^2.4.1
+  syncfusion_flutter_calendar: ^30.1.38
   time_picker_spinner_pop_up: ^2.0.0
   url_launcher: ^6.1.3
   uuid: ^4.5.0
-  app_settings: ^5.1.1
+  purchases_flutter: ^9.1.0
+  image_picker: ^1.0.4
 
 flavorizr:
   ide: "vscode"
   app:
     android:
       flavorDimensions: "flavor-type"
-    
+
   flavors:
     prod:
       app:
         name: "Taaafi Platform"
       android:
-        applicationId: "com.amjadkhalfan.reboot_app_3"  
+        applicationId: "com.amjadkhalfan.reboot_app_3"
       ios:
         bundleId: "com.amjadkhalfan.RebootApp"
 
@@ -234,11 +243,11 @@ flutter:
     - asset/illustrations/vault-hero-image.svg
     - asset/illustrations/vault-hero-image-02.svg
     - asset/illustrations/community-animation.json
+    - asset/illustrations/warning.json
+    - asset/illustrations/error.json
     - asset/illustrations/plus-hero-image.svg
     - asset/icons/apple-icon.svg
     - asset/icons/google-icon.svg
-    - asset/i18n/en.json
-    - asset/i18n/ar.json
     - shorebird.yaml
 
   # An image asset can refer to one or more resolution-specific "variants", see
@@ -268,5 +277,8 @@ flutter:
         - asset: asset/fonts/ExpoArabic-SemiBold.ttf
           weight: 700
           style: normal
-        
-  
+    - family: Ta3afiPlatformIcons
+      fonts:
+        - asset: asset/fonts/Ta3afiPlatformIcons.ttf
+dependency_overrides:
+  intl: 0.20.2

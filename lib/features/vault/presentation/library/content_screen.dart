@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/shared_widgets/app_bar.dart';
 import 'package:reboot_app_3/core/shared_widgets/custom_textfield.dart';
+import 'package:reboot_app_3/core/shared_widgets/spinner.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/features/vault/application/library/library_notifier.dart';
@@ -155,9 +156,7 @@ class _ContentScreenState extends ConsumerState<ContentScreen> {
                           ? Center(
                               child: Padding(
                                 padding: EdgeInsets.all(8.0),
-                                child: CircularProgressIndicator(
-                                  color: theme.primary[700],
-                                ),
+                                child: Spinner(),
                               ),
                             )
                           : const SizedBox();

@@ -1,3 +1,4 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mixpanel_flutter/mixpanel_flutter.dart';
 import 'package:reboot_app_3/core/monitoring/analytics_client.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -191,8 +192,7 @@ class MixpanelAnalyticsClient implements AnalyticsClient {
 }
 
 @Riverpod(keepAlive: true)
-Future<MixpanelAnalyticsClient> mixpanelAnalyticsClient(
-    MixpanelAnalyticsClientRef ref) async {
+Future<MixpanelAnalyticsClient> mixpanelAnalyticsClient(Ref ref) async {
   final mixpanel = await Mixpanel.init(
     "ac8731373dcf0a35a44d43ab1e3ea5f1",
     trackAutomaticEvents: true,
@@ -201,7 +201,7 @@ Future<MixpanelAnalyticsClient> mixpanelAnalyticsClient(
 }
 
 @Riverpod(keepAlive: true)
-Future<Mixpanel> mixpanel(MixpanelRef ref) async {
+Future<Mixpanel> mixpanel(Ref ref) async {
   return await Mixpanel.init(
     "ac8731373dcf0a35a44d43ab1e3ea5f1",
     trackAutomaticEvents: true,

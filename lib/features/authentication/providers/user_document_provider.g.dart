@@ -7,7 +7,7 @@ part of 'user_document_provider.dart';
 // **************************************************************************
 
 String _$userDocumentsNotifierHash() =>
-    r'0741916ed3742a74053b8e844aec9e28362ba800';
+    r'2dbc176639bae429e0b69fe08dd0bfcf52515138';
 
 /// See also [UserDocumentsNotifier].
 @ProviderFor(UserDocumentsNotifier)
@@ -24,4 +24,4 @@ final userDocumentsNotifierProvider = AutoDisposeAsyncNotifierProvider<
 
 typedef _$UserDocumentsNotifier = AutoDisposeAsyncNotifier<UserDocument?>;
 // ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

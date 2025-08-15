@@ -6,10 +6,12 @@ import 'package:reboot_app_3/core/routing/route_names.dart';
 import 'package:reboot_app_3/core/shared_widgets/app_bar.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
 import 'package:reboot_app_3/core/shared_widgets/custom_textfield.dart';
+import 'package:reboot_app_3/core/shared_widgets/spinner.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/core/utils/icon_mapper.dart';
+import 'package:reboot_app_3/core/utils/localization_helper.dart';
 import 'package:reboot_app_3/features/vault/application/library/library_notifier.dart';
 import 'package:reboot_app_3/features/vault/data/library/models/cursor_content_list.dart';
 
@@ -57,7 +59,12 @@ class _ContentScreenState extends ConsumerState<ContentListsScreen> {
     setState(() {
       String searchQuery = searchController.text.toLowerCase();
       filteredData = content
-          .where((item) => item.name.toLowerCase().contains(searchQuery))
+          .where((item) =>
+              item.name.toLowerCase().contains(searchQuery) ||
+              (item.nameAr?.toLowerCase().contains(searchQuery) ?? false) ||
+              item.description.toLowerCase().contains(searchQuery) ||
+              (item.descriptionAr?.toLowerCase().contains(searchQuery) ??
+                  false))
           .toList();
     });
   }
@@ -94,9 +101,7 @@ class _ContentScreenState extends ConsumerState<ContentListsScreen> {
               Expanded(
                 child: _isLoading
                     ? Center(
-                        child: CircularProgressIndicator(
-                          color: theme.primary[700],
-                        ),
+                        child: Spinner(),
                       )
                     : filteredData.isEmpty
                         ? Center(
@@ -172,7 +177,8 @@ class FeaturedListItemWidget extends StatelessWidget {
             horizontalSpace(Spacing.points4),
             Expanded(
               child: Text(
-                listItem.name,
+                LocalizationHelper.getLocalizedName(
+                    context, listItem.name, listItem.nameAr),
                 style: TextStyles.small.copyWith(
                   color: theme.grey[900],
                 ),

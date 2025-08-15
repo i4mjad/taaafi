@@ -6,6 +6,9 @@ import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:reboot_app_3/features/community/presentation/community_feedback_modal.dart';
+import 'package:reboot_app_3/features/account/data/app_features_config.dart';
+import 'package:reboot_app_3/features/account/presentation/widgets/feature_access_guard.dart';
 
 class CommunityComingSoonScreen extends ConsumerWidget {
   const CommunityComingSoonScreen({super.key});
@@ -47,6 +50,39 @@ class CommunityComingSoonScreen extends ConsumerWidget {
                   ),
                 ),
                 const SizedBox(height: 16),
+                // Feedback button with feature access guard
+                FeatureAccessGuard(
+                  featureUniqueName: AppFeaturesConfig.contactAdmin,
+                  onTap: () => _showFeedbackModal(context, ref),
+                  customBanMessage: AppLocalizations.of(context)
+                      .translate('contact-support-restricted'),
+                  child: WidgetsContainer(
+                    padding: EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+                    backgroundColor: theme.primary[600],
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide.none,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          LucideIcons.messageSquare,
+                          size: 20,
+                          color: theme.grey[50],
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          l10n.translate('share-your-ideas'),
+                          style: TextStyles.body.copyWith(
+                            color: theme.grey[50],
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 16),
                 _buildFeatureItem(
                   context,
                   l10n.translate('community-feature-1'),
@@ -75,6 +111,8 @@ class CommunityComingSoonScreen extends ConsumerWidget {
                   l10n.translate('community-feature-5'),
                   LucideIcons.shieldCheck,
                 ),
+
+                const SizedBox(height: 32),
               ],
             ),
           ),
@@ -88,10 +126,7 @@ class CommunityComingSoonScreen extends ConsumerWidget {
     return WidgetsContainer(
       backgroundColor: theme.backgroundColor,
       // boxShadow: Shadows.mainShadows,
-      borderSide: BorderSide(
-        color: theme.grey[200]!,
-        width: 0.75,
-      ),
+      borderSide: BorderSide.none,
       child: Row(
         children: [
           Icon(
@@ -110,6 +145,15 @@ class CommunityComingSoonScreen extends ConsumerWidget {
           ),
         ],
       ),
+    );
+  }
+
+  void _showFeedbackModal(BuildContext context, WidgetRef ref) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => const CommunityFeedbackModal(),
     );
   }
 }

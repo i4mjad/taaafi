@@ -6,7 +6,7 @@ part of 'tasks_by_date_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$tasksByDateRangeHash() => r'8dcf1de6de5e4c461c640f777579469614cfd03d';
+String _$tasksByDateRangeHash() => r'aa30dae065073c4107bf779b7ce3a94655a6a8f7';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -157,6 +157,8 @@ class TasksByDateRangeProvider
   }
 }
 
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
 mixin TasksByDateRangeRef
     on AutoDisposeFutureProviderRef<List<OngoingActivityTask>> {
   /// The parameter `startDate` of this provider.
@@ -177,4 +179,4 @@ class _TasksByDateRangeProviderElement
   DateTime get endDate => (origin as TasksByDateRangeProvider).endDate;
 }
 // ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

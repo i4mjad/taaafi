@@ -16,20 +16,28 @@ import 'package:reboot_app_3/core/routing/route_names.dart';
 import 'package:reboot_app_3/core/shared_widgets/app_bar.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
 import 'package:reboot_app_3/core/shared_widgets/custom_textfield.dart';
+import 'package:reboot_app_3/core/shared_widgets/spinner.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/features/authentication/application/auth_service.dart';
-import 'package:sentry_flutter/sentry_flutter.dart';
 
-class LogInScreen extends ConsumerWidget {
+class LogInScreen extends ConsumerStatefulWidget {
   const LogInScreen({super.key});
 
   static final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey =
       GlobalKey<ScaffoldMessengerState>();
 
+  @override
+  ConsumerState<LogInScreen> createState() => _LogInScreenState();
+}
+
+class _LogInScreenState extends ConsumerState<LogInScreen> {
+  bool _isAppleProcessing = false;
+  bool _isGoogleProcessing = false;
+
   void _showError(BuildContext context, String message) {
-    scaffoldMessengerKey.currentState?.showSnackBar(
+    LogInScreen.scaffoldMessengerKey.currentState?.showSnackBar(
       SnackBar(
         content: Text(AppLocalizations.of(context).translate(message)),
       ),
@@ -37,11 +45,11 @@ class LogInScreen extends ConsumerWidget {
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final authService = ref.watch(authServiceProvider);
     final theme = AppTheme.of(context);
     return ScaffoldMessenger(
-      key: scaffoldMessengerKey,
+      key: LogInScreen.scaffoldMessengerKey,
       child: Scaffold(
         backgroundColor: theme.backgroundColor,
         appBar: appBar(context, ref, 'login', true, true),
@@ -80,81 +88,141 @@ class LogInScreen extends ConsumerWidget {
                   AppLocalizations.of(context).translate('or-login-with'),
                   style: TextStyles.caption.copyWith(color: theme.primary[600]),
                 ),
-                verticalSpace(Spacing.points12),
+                verticalSpace(Spacing.points16),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     GestureDetector(
-                      onTap: () async {
-                        HapticFeedback.lightImpact();
-                        if (!Platform.isIOS) {
-                          _showError(context, "cannot-login-with-apple");
-                          return;
-                        }
-                        unawaited(
-                            ref.read(analyticsFacadeProvider).trackUserLogin());
-                        try {
-                          final user =
-                              await authService.signInWithApple(context);
-                          if (user != null) {
-                            FirebaseCrashlytics.instance
-                                .setUserIdentifier(user.uid);
-                            FirebaseAnalytics.instance.setUserId(id: user.uid);
-                          }
-                        } catch (e) {
-                          _showError(context, e.toString());
-                        }
-                      },
+                      onTap: _isAppleProcessing
+                          ? null
+                          : () async {
+                              HapticFeedback.lightImpact();
+                              if (!Platform.isIOS) {
+                                _showError(context, "cannot-login-with-apple");
+                                return;
+                              }
+
+                              setState(() {
+                                _isAppleProcessing = true;
+                              });
+
+                              try {
+                                unawaited(ref
+                                    .read(analyticsFacadeProvider)
+                                    .trackUserLogin());
+                                final user =
+                                    await authService.signInWithApple(context);
+                                if (user != null) {
+                                  FirebaseCrashlytics.instance
+                                      .setUserIdentifier(user.uid);
+                                  FirebaseAnalytics.instance
+                                      .setUserId(id: user.uid);
+                                }
+                              } catch (e) {
+                                _showError(context, e.toString());
+                              } finally {
+                                if (mounted) {
+                                  setState(() {
+                                    _isAppleProcessing = false;
+                                  });
+                                }
+                              }
+                            },
                       child: Container(
                         height: 60,
                         width: 60,
                         padding: EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                            color: theme.primary[50],
+                            color: _isAppleProcessing
+                                ? theme.grey[300]
+                                : theme.primary[50],
                             borderRadius: BorderRadius.circular(150),
                             border: Border.all(
-                              color: theme.primary[100]!,
+                              color: _isAppleProcessing
+                                  ? theme.grey[400]!
+                                  : theme.primary[100]!,
                               width: 1,
                             )),
-                        child: SvgPicture.asset(
-                          'asset/icons/apple-icon.svg',
-                          semanticsLabel: 'Apple Logo',
-                        ),
+                        child: _isAppleProcessing
+                            ? SizedBox(
+                                width: 24,
+                                height: 24,
+                                child: Spinner(
+                                  strokeWidth: 2,
+                                  valueColor: theme.primary[600],
+                                ),
+                              )
+                            : SvgPicture.asset(
+                                'asset/icons/apple-icon.svg',
+                                semanticsLabel: 'Apple Logo',
+                                colorFilter: ColorFilter.mode(
+                                  theme.grey[900]!,
+                                  BlendMode.srcIn,
+                                ),
+                              ),
                       ),
                     ),
                     horizontalSpace(Spacing.points4),
                     GestureDetector(
-                      onTap: () async {
-                        HapticFeedback.lightImpact();
-                        unawaited(
-                            ref.read(analyticsFacadeProvider).trackUserLogin());
-                        try {
-                          final user =
-                              await authService.signInWithGoogle(context);
-                          if (user != null) {
-                            FirebaseCrashlytics.instance
-                                .setUserIdentifier(user.uid);
-                            FirebaseAnalytics.instance.setUserId(id: user.uid);
-                          }
-                        } catch (e) {
-                          _showError(context, e.toString());
-                        }
-                      },
+                      onTap: _isGoogleProcessing
+                          ? null
+                          : () async {
+                              HapticFeedback.lightImpact();
+
+                              setState(() {
+                                _isGoogleProcessing = true;
+                              });
+
+                              try {
+                                unawaited(ref
+                                    .read(analyticsFacadeProvider)
+                                    .trackUserLogin());
+                                final user =
+                                    await authService.signInWithGoogle(context);
+                                if (user != null) {
+                                  FirebaseCrashlytics.instance
+                                      .setUserIdentifier(user.uid);
+                                  FirebaseAnalytics.instance
+                                      .setUserId(id: user.uid);
+                                }
+                              } catch (e) {
+                                _showError(context, e.toString());
+                              } finally {
+                                if (mounted) {
+                                  setState(() {
+                                    _isGoogleProcessing = false;
+                                  });
+                                }
+                              }
+                            },
                       child: Container(
                         height: 60,
                         width: 60,
                         padding: EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                            color: theme.primary[50],
+                            color: _isGoogleProcessing
+                                ? theme.grey[300]
+                                : theme.primary[50],
                             borderRadius: BorderRadius.circular(150),
                             border: Border.all(
-                              color: theme.primary[100]!,
+                              color: _isGoogleProcessing
+                                  ? theme.grey[400]!
+                                  : theme.primary[100]!,
                               width: 1,
                             )),
-                        child: SvgPicture.asset(
-                          'asset/icons/google-icon.svg',
-                          semanticsLabel: 'Google Logo',
-                        ),
+                        child: _isGoogleProcessing
+                            ? SizedBox(
+                                width: 24,
+                                height: 24,
+                                child: Spinner(
+                                  strokeWidth: 2,
+                                  valueColor: theme.primary[600],
+                                ),
+                              )
+                            : SvgPicture.asset(
+                                'asset/icons/google-icon.svg',
+                                semanticsLabel: 'Google Logo',
+                              ),
                       ),
                     ),
                   ],
@@ -168,15 +236,28 @@ class LogInScreen extends ConsumerWidget {
   }
 }
 
-class SignInForm extends ConsumerWidget {
+class SignInForm extends ConsumerStatefulWidget {
   SignInForm({super.key});
 
+  @override
+  ConsumerState<SignInForm> createState() => _SignInFormState();
+}
+
+class _SignInFormState extends ConsumerState<SignInForm> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
+  bool _isEmailProcessing = false;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  void dispose() {
+    emailController.dispose();
+    passwordController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final theme = AppTheme.of(context);
     final authService = ref.watch(authServiceProvider);
     return Form(
@@ -203,6 +284,7 @@ class SignInForm extends ConsumerWidget {
           CustomTextField(
             controller: passwordController,
             obscureText: true,
+            showObscureToggle: true,
             hint: AppLocalizations.of(context).translate('password'),
             prefixIcon: LucideIcons.lock,
             inputType: TextInputType.visiblePassword,
@@ -213,7 +295,7 @@ class SignInForm extends ConsumerWidget {
               return null;
             },
           ),
-          verticalSpace(Spacing.points8),
+          verticalSpace(Spacing.points20),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -242,46 +324,69 @@ class SignInForm extends ConsumerWidget {
               ),
             ],
           ),
-          verticalSpace(Spacing.points16),
+          verticalSpace(Spacing.points20),
           GestureDetector(
-            onTap: () async {
-              HapticFeedback.lightImpact();
-              final email = emailController.value.text;
-              final password = passwordController.value.text;
+            onTap: _isEmailProcessing
+                ? null
+                : () async {
+                    HapticFeedback.lightImpact();
+                    final email = emailController.value.text;
+                    final password = passwordController.value.text;
 
-              if (_formKey.currentState!.validate()) {
-                unawaited(ref.read(analyticsFacadeProvider).trackUserLogin());
-                try {
-                  final user = await authService.signInWithEmail(
-                    context,
-                    email,
-                    password,
-                  );
-                  if (user != null) {
-                    await Sentry.configureScope(
-                      (scope) => scope.setUser(SentryUser(id: user.uid)),
-                    );
-                  }
-                } catch (e) {
-                  LogInScreen.scaffoldMessengerKey.currentState?.showSnackBar(
-                    SnackBar(
-                      content: Text(
-                          AppLocalizations.of(context).translate(e.toString())),
-                    ),
-                  );
-                }
-              }
-            },
+                    if (_formKey.currentState!.validate()) {
+                      setState(() {
+                        _isEmailProcessing = true;
+                      });
+
+                      try {
+                        unawaited(
+                            ref.read(analyticsFacadeProvider).trackUserLogin());
+                        final user = await authService.signInWithEmail(
+                          context,
+                          email,
+                          password,
+                        );
+                      } catch (e) {
+                        LogInScreen.scaffoldMessengerKey.currentState
+                            ?.showSnackBar(
+                          SnackBar(
+                            content: Text(AppLocalizations.of(context)
+                                .translate(e.toString())),
+                          ),
+                        );
+                      } finally {
+                        if (mounted) {
+                          setState(() {
+                            _isEmailProcessing = false;
+                          });
+                        }
+                      }
+                    }
+                  },
             child: WidgetsContainer(
-              backgroundColor: theme.primary[600],
+              backgroundColor:
+                  _isEmailProcessing ? theme.grey[400] : theme.primary[600],
               width: MediaQuery.of(context).size.width - (16 + 16),
               padding: EdgeInsets.only(top: 12, bottom: 12),
               borderRadius: BorderRadius.circular(10.5),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+                  if (_isEmailProcessing) ...[
+                    SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: Spinner(
+                        strokeWidth: 2,
+                        valueColor: Colors.white,
+                      ),
+                    ),
+                    horizontalSpace(Spacing.points8),
+                  ],
                   Text(
-                    AppLocalizations.of(context).translate('login'),
+                    _isEmailProcessing
+                        ? AppLocalizations.of(context).translate('processing')
+                        : AppLocalizations.of(context).translate('login'),
                     style: TextStyles.footnoteSelected
                         .copyWith(color: theme.grey[50]),
                   ),

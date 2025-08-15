@@ -50,7 +50,6 @@ class MigerationRepository {
     }
   }
 
-//TODO: review this
   Future<void> bulkFollowUpsInsertion(List<FollowUpModel> followUps) async {
     final collectionRef = _firestore
         .collection('users')

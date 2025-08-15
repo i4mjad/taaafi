@@ -15,13 +15,52 @@ import 'package:reboot_app_3/core/shared_widgets/app_bar.dart';
 import 'package:reboot_app_3/core/shared_widgets/custom_segmented_button.dart';
 import 'package:reboot_app_3/core/shared_widgets/custom_textfield.dart';
 import 'package:reboot_app_3/core/shared_widgets/snackbar.dart';
+import 'package:reboot_app_3/core/shared_widgets/spinner.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
-import 'package:reboot_app_3/core/utils/url_launcher_provider.dart';
 import 'package:reboot_app_3/features/authentication/application/migration_service.dart';
 import 'package:reboot_app_3/features/authentication/data/models/user_document.dart';
 import 'package:reboot_app_3/features/authentication/providers/user_document_provider.dart';
+
+// Helper function to extract line number from stack trace
+Map<String, String> getExceptionLocationInfo(StackTrace stackTrace) {
+  String stackTraceString = stackTrace.toString();
+  List<String> lines = stackTraceString.split('\n');
+  Map<String, String> result = {
+    'raw_trace': lines.isNotEmpty ? lines[0] : 'Unknown location',
+    'file': 'Unknown file',
+    'line': 'Unknown line',
+    'column': 'Unknown column',
+    'method': 'Unknown method'
+  };
+
+  // Parse the first relevant line to extract file, line, and column information
+  if (lines.length > 1) {
+    // Typical format: "#1      _ConfirmUserDetailsScreenState._method (file:///path/to/file.dart:123:45)"
+    String traceLine =
+        lines[1]; // Use the immediate caller where the exception occurred
+
+    // Extract method name - everything before the file path
+    final methodMatch = RegExp(r'#\d+\s+(.+?)\s+\(').firstMatch(traceLine);
+    if (methodMatch != null && methodMatch.groupCount >= 1) {
+      result['method'] = methodMatch.group(1) ?? 'Unknown method';
+    }
+
+    // Extract file path, line, and column
+    final locationMatch =
+        RegExp(r'\((.+?):(\d+):(\d+)\)').firstMatch(traceLine);
+    if (locationMatch != null && locationMatch.groupCount >= 3) {
+      result['file'] = locationMatch.group(1) ?? 'Unknown file';
+      result['line'] = locationMatch.group(2) ?? 'Unknown line';
+      result['column'] = locationMatch.group(3) ?? 'Unknown column';
+    }
+
+    result['raw_trace'] = traceLine;
+  }
+
+  return result;
+}
 
 class ConfirmUserDetailsScreen extends ConsumerStatefulWidget {
   const ConfirmUserDetailsScreen({Key? key}) : super(key: key);
@@ -97,7 +136,7 @@ class _ConfirmUserDetailsScreenState
 
     return Scaffold(
       backgroundColor: theme.backgroundColor,
-      appBar: appBar(context, ref, 'confirm-your-details', true, false),
+      appBar: appBar(context, ref, 'review-your-details', true, true),
       body: userDocumentAsyncValue.when(
         data: (userDocument) {
           if (userDocument == null) {
@@ -271,26 +310,6 @@ class _ConfirmUserDetailsScreenState
                             : () async {
                                 setState(() => _isProcessing = true);
 
-                                // Add this before attempting migration
-                                final validationError =
-                                    validateUserDocument(userDocument);
-                                if (validationError != null) {
-                                  ref.read(errorLoggerProvider).logException(
-                                    Exception(validationError),
-                                    StackTrace.current,
-                                    context: {
-                                      'validation_context': {
-                                        'user_id': userDocument.uid,
-                                        'error': validationError,
-                                      }
-                                    },
-                                  );
-                                  getErrorSnackBar(
-                                      context, "invalid-user-data");
-                                  setState(() => _isProcessing = false);
-                                  return;
-                                }
-
                                 // Validate date of birth
                                 if (selectedBirthDate != null &&
                                     selectedBirthDate!
@@ -326,22 +345,6 @@ class _ConfirmUserDetailsScreenState
                                 }
 
                                 try {
-                                  // Log migration attempt
-                                  ref.read(errorLoggerProvider).logException(
-                                    Exception('Migration Attempt'),
-                                    StackTrace.current,
-                                    context: {
-                                      'user_id': userDocument.uid,
-                                      'display_name':
-                                          displayNameController.text,
-                                      'email': emailController.text,
-                                      'selected_birth_date':
-                                          selectedBirthDate?.toString(),
-                                      'selected_locale': selectedLocale?.value,
-                                      'selected_gender': selectedGender?.value,
-                                    },
-                                  );
-
                                   // Create new user document
                                   final newUserDoc = UserDocument(
                                     uid: userDocument.uid ??
@@ -379,19 +382,31 @@ class _ConfirmUserDetailsScreenState
                                   if (!mounted) return;
                                   context.goNamed(RouteNames.home.name);
                                 } catch (e, stackTrace) {
-                                  // Log error with context
+                                  // Log error with context and specific error details
+                                  final locationInfo =
+                                      getExceptionLocationInfo(stackTrace);
                                   ref.read(errorLoggerProvider).logException(
                                     e,
-                                    stackTrace,
+                                    stackTrace, // Use the actual caught stackTrace
                                     context: {
-                                      'user_id': userDocument.uid,
-                                      'display_name':
-                                          displayNameController.text,
-                                      'email': emailController.text,
-                                      'selected_birth_date':
-                                          selectedBirthDate?.toString(),
-                                      'selected_locale': selectedLocale?.value,
-                                      'selected_gender': selectedGender?.value,
+                                      'error_type': e.runtimeType.toString(),
+                                      'error_message': e.toString(),
+                                      'source_file': locationInfo['file'],
+                                      'source_line': locationInfo['line'],
+                                      'source_column': locationInfo['column'],
+                                      'source_method': locationInfo['method'],
+                                      'migration_context': {
+                                        'user_id': userDocument.uid,
+                                        'display_name':
+                                            displayNameController.text,
+                                        'email': emailController.text,
+                                        'selected_birth_date':
+                                            selectedBirthDate?.toString(),
+                                        'selected_locale':
+                                            selectedLocale?.value,
+                                        'selected_gender':
+                                            selectedGender?.value,
+                                      }
                                     },
                                   );
 
@@ -435,10 +450,9 @@ class _ConfirmUserDetailsScreenState
                                   SizedBox(
                                     height: 20,
                                     width: 20,
-                                    child: CircularProgressIndicator(
+                                    child: Spinner(
                                       strokeWidth: 2,
-                                      valueColor: AlwaysStoppedAnimation<Color>(
-                                          theme.grey[50]!),
+                                      valueColor: theme.grey[50],
                                     ),
                                   ),
                                   SizedBox(width: 8),
@@ -452,70 +466,11 @@ class _ConfirmUserDetailsScreenState
                               )
                             : Text(
                                 AppLocalizations.of(context)
-                                    .translate('start-your-journy'),
+                                    .translate('confirm-user-details'),
                                 style: TextStyles.caption
                                     .copyWith(color: theme.grey[50]),
                               ),
                       ),
-                      if (true) ...[
-                        verticalSpace(Spacing.points8),
-                        ElevatedButton(
-                          onPressed: () {
-                            final body = '''
-                                Debug Information:
-                                UID: ${userDocument.uid}
-                                Original Document State:
-                                - Display Name: ${userDocument.displayName}
-                                - Email: ${userDocument.email}
-                                - DOB: ${userDocument.dayOfBirth?.toDate()}
-                                - Gender: ${userDocument.gender}
-                                - Locale: ${userDocument.locale}
-
-                                New Values Entered:
-                                - Display Name: ${displayNameController.text}
-                                - Email: ${emailController.text}
-                                - DOB: $selectedBirthDate
-                                - Gender: ${selectedGender?.value}
-                                - Locale: ${selectedLocale?.value}
-                                ''';
-
-                            final Uri emailLaunchUri = Uri(
-                              scheme: 'mailto',
-                              path: 'admin@ta3afi.app',
-                              query: encodeQueryParameters({
-                                'subject': 'Migration Error Report',
-                                'body': body,
-                              }),
-                            );
-
-                            ref
-                                .read(urlLauncherProvider)
-                                .launch(emailLaunchUri);
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: theme.backgroundColor,
-                            minimumSize: const Size.fromHeight(48),
-                            shape: SmoothRectangleBorder(
-                              borderRadius: SmoothBorderRadius(
-                                cornerRadius: 10.5,
-                                cornerSmoothing: 1,
-                              ),
-                              side: BorderSide(
-                                color: theme.grey[500]!,
-                                width: 0.25,
-                              ),
-                            ),
-                          ),
-                          child: Text(
-                            AppLocalizations.of(context)
-                                .translate('contact-support'),
-                            style: TextStyles.small.copyWith(
-                              color: theme.grey[500]!,
-                            ),
-                          ),
-                        ),
-                        verticalSpace(Spacing.points16),
-                      ],
                     ],
                   )
                 ],
@@ -527,7 +482,7 @@ class _ConfirmUserDetailsScreenState
           child: Text('Error: $error'),
         ),
         loading: () => Center(
-          child: CircularProgressIndicator(),
+          child: Spinner(),
         ),
       ),
     );

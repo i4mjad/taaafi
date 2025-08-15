@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:reboot_app_3/core/monitoring/analytics_facade.dart';
 import 'package:reboot_app_3/core/monitoring/logger_navigator_observer.dart';
@@ -9,16 +10,44 @@ import 'package:reboot_app_3/core/routing/not_found_screen.dart';
 import 'package:reboot_app_3/core/routing/route_names.dart';
 import 'package:reboot_app_3/core/routing/scaffold_with_nested_navigation.dart';
 import 'package:reboot_app_3/features/account/presentation/account_screen.dart';
+import 'package:reboot_app_3/features/account/presentation/banned_screen.dart';
 import 'package:reboot_app_3/features/account/presentation/delete_account_screen.dart';
+import 'package:reboot_app_3/features/account/presentation/account_deletion_login_screen.dart';
+import 'package:reboot_app_3/features/account/presentation/account_deletion_loading_screen.dart';
+import 'package:reboot_app_3/features/account/presentation/user_profile_screen.dart';
+import 'package:reboot_app_3/features/plus/presentation/taaafi_plus_features_list_screen.dart';
+import 'package:reboot_app_3/features/plus/presentation/plus_features_guide_screen.dart';
+import 'package:reboot_app_3/features/community/presentation/posts_list_screen.dart';
+import 'package:reboot_app_3/features/community/presentation/category_posts_screen.dart';
+import 'package:reboot_app_3/features/community/data/models/post_category.dart';
+import 'package:reboot_app_3/features/home/presentation/reports/user_reports_screen.dart';
+import 'package:reboot_app_3/features/home/presentation/reports/report_conversation_screen.dart';
+import 'package:reboot_app_3/features/notifications/presentation/notifications_screen.dart';
 import 'package:reboot_app_3/features/authentication/presentation/complete_account_registeration.dart';
 import 'package:reboot_app_3/features/authentication/presentation/confirm_user_details_screen.dart';
+import 'package:reboot_app_3/features/authentication/presentation/confirm_user_email_screen.dart';
 import 'package:reboot_app_3/features/authentication/presentation/forgot_password_screen.dart';
 import 'package:reboot_app_3/features/authentication/presentation/login_screen.dart';
 import 'package:reboot_app_3/features/authentication/presentation/signup_screen.dart';
 import 'package:reboot_app_3/features/authentication/providers/user_document_provider.dart';
 import 'package:reboot_app_3/features/authentication/data/repositories/auth_repository.dart';
-import 'package:reboot_app_3/features/community/presentation/community_comin_soon_screen.dart';
-import 'package:reboot_app_3/features/home/presentation/day_overview/day_overview_screen.dart';
+import 'package:reboot_app_3/features/messaging/presentation/messaging_groups_screen.dart';
+
+import 'package:reboot_app_3/features/community/presentation/community_onboarding_screen.dart';
+import 'package:reboot_app_3/features/community/presentation/groups_onboarding_screen.dart';
+import 'package:reboot_app_3/features/community/presentation/community_main_screen.dart';
+
+import 'package:reboot_app_3/features/community/presentation/groups/group_list_screen.dart';
+import 'package:reboot_app_3/features/community/presentation/groups/groups_coming_soon_screen.dart';
+import 'package:reboot_app_3/features/community/presentation/forum/post_detail_screen.dart';
+import 'package:reboot_app_3/features/community/presentation/forum/new_post_screen.dart';
+import 'package:reboot_app_3/features/community/presentation/forum/reply_composer_screen.dart';
+import 'package:reboot_app_3/features/community/presentation/groups/group_detail_screen.dart';
+import 'package:reboot_app_3/features/community/presentation/groups/group_chat_screen.dart';
+import 'package:reboot_app_3/features/community/presentation/groups/group_challenge_screen.dart';
+import 'package:reboot_app_3/features/community/presentation/challenges/global_challenge_list_screen.dart';
+import 'package:reboot_app_3/features/community/presentation/profile/community_profile_settings_screen.dart';
+import 'package:reboot_app_3/features/vault/presentation/day_overview/day_overview_screen.dart';
 import 'package:reboot_app_3/features/home/presentation/home/home_screen.dart';
 import 'package:reboot_app_3/features/onboarding/presentation/onboarding_screen.dart';
 import 'package:reboot_app_3/features/vault/presentation/activities/activities_screen.dart';
@@ -34,18 +63,46 @@ import 'package:reboot_app_3/features/vault/presentation/library/content_type_sc
 import 'package:reboot_app_3/features/vault/presentation/library/library_screen.dart';
 import 'package:reboot_app_3/features/vault/presentation/library/list_screen.dart';
 import 'package:reboot_app_3/features/vault/presentation/vault_settings/activities_notifications_settings_screen.dart';
+import 'package:reboot_app_3/features/vault/presentation/vault_settings/smart_alerts_settings_screen.dart';
 import 'package:reboot_app_3/features/vault/presentation/vault_settings/vault_settings_screen.dart';
 import 'package:reboot_app_3/features/vault/presentation/vault_screen.dart';
+import 'package:reboot_app_3/features/vault/presentation/premium_analytics_screen.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:sentry_flutter/sentry_flutter.dart';
+import 'package:reboot_app_3/features/authentication/data/models/user_document.dart';
+import 'package:reboot_app_3/core/routing/route_security_service.dart';
+import 'package:reboot_app_3/features/account/application/startup_security_service.dart';
+import 'dart:async';
+import 'package:firebase_auth/firebase_auth.dart';
 
 part 'app_routes.g.dart';
 
 @riverpod
-GoRouter goRouter(GoRouterRef ref) {
+GoRouter goRouter(Ref<GoRouter> ref) {
   final authState = ref.watch(authStateChangesProvider);
   final userDocumentState = ref.watch(userDocumentsNotifierProvider);
   final userDocumentNotifier = ref.read(userDocumentsNotifierProvider.notifier);
+  final routeSecurityService = ref.read(routeSecurityServiceProvider);
+
+  // Build a merged stream to trigger router refreshes whenever auth state OR
+  // user-document state changes.
+  final refreshController = StreamController<void>(sync: true);
+
+  // Listen to auth state stream
+  final authSubscription = authStateChanges(ref).listen((_) {
+    if (!refreshController.isClosed) refreshController.add(null);
+  });
+
+  // Listen to user-document provider updates
+  ref.listen<AsyncValue<UserDocument?>>(userDocumentsNotifierProvider,
+      (prev, next) {
+    if (!refreshController.isClosed) refreshController.add(null);
+  });
+
+  // Ensure we clean up subscriptions
+  ref.onDispose(() {
+    authSubscription.cancel();
+    refreshController.close();
+  });
 
   return GoRouter(
     initialLocation: '/home',
@@ -53,73 +110,21 @@ GoRouter goRouter(GoRouterRef ref) {
     debugLogDiagnostics: false,
     observers: [
       GoRouterObserver(ref.read(analyticsFacadeProvider)),
-      SentryNavigatorObserver()
     ],
-    refreshListenable: GoRouterRefreshStream(authStateChanges(ref)),
+    refreshListenable: GoRouterRefreshStream(refreshController.stream),
     redirect: (context, state) async {
-      final isLoggedIn = authState.asData?.value != null;
-
-      if (isLoggedIn) {
-        // Fetch the user document state
-        final isLoading = userDocumentState is AsyncLoading;
-        final hasError = userDocumentState is AsyncError;
-        final userDocument = userDocumentState.valueOrNull;
-
-        // If we're loading, show loading screen
-        if (isLoading) {
-          if (state.matchedLocation != '/loading') {
-            return '/loading';
-          }
-          return null;
-        }
-
-        // If document is null or has errors, redirect to complete account registration
-        if (userDocument == null || hasError) {
-          if (state.matchedLocation != '/completeAccountRegisteration') {
-            return '/completeAccountRegisteration';
-          }
-          return null;
-        }
-
-        // Now we can safely check the document properties since we know userDocument is not null
-        final isLegacy =
-            userDocumentNotifier.isLegacyUserDocument(userDocument);
-        final isNew = userDocumentNotifier.isNewUserDocument(userDocument);
-
-        // Check for missing required data
-        if (!isLegacy && userDocumentNotifier.hasMissingData(userDocument)) {
-          if (state.matchedLocation != '/completeAccountRegisteration') {
-            return '/completeAccountRegisteration';
-          }
-          return null;
-        }
-
-        // Only check for old structure if the document exists and is actually a legacy document
-        // This prevents redirecting new signups to confirmProfileDetails
-        if (isLegacy && userDocument.role == null) {
-          if (state.matchedLocation != '/confirmProfileDetails') {
-            return '/confirmProfileDetails';
-          }
-          return null;
-        }
-
-        // Allow navigation to other routes if the user has the new document structure
-        if (isNew) {
-          if (state.matchedLocation.startsWith('/onboarding') ||
-              state.matchedLocation == '/loading') {
-            return '/home';
-          }
-          return null;
-        }
-      } else {
-        // Non-logged-in user trying to access protected routes
-        final isAuthRoute = state.matchedLocation.startsWith('/onboarding');
-        if (!isAuthRoute && state.matchedLocation != '/onboarding') {
-          return '/onboarding';
-        }
+      // Use the RouteSecurityService to handle both authentication and security checks
+      // This provides comprehensive protection against device bans, user bans, etc.
+      try {
+        final redirectPath = await routeSecurityService.getRedirectPath(state);
+        return redirectPath;
+      } catch (e) {
+        print('ERROR: RouteSecurityService failed: $e');
+        // Simple fallback - let RouteSecurityService handle all logic
+        // If it fails, we'll just allow the navigation to proceed
+        // This prevents infinite redirect loops while still providing basic protection
+        return null;
       }
-
-      return null;
     },
     routes: [
       GoRoute(
@@ -131,6 +136,54 @@ GoRouter goRouter(GoRouterRef ref) {
         ),
       ),
       GoRoute(
+        path: '/banned',
+        name: RouteNames.banned.name,
+        pageBuilder: (context, state) {
+          // Get the security result from the route security service
+          final securityCheckResult =
+              routeSecurityService.getLastSecurityResult();
+
+          SecurityStartupResult result;
+
+          if (securityCheckResult != null) {
+            // Convert the SecurityCheckResult to SecurityStartupResult
+            result = routeSecurityService
+                .convertToStartupResult(securityCheckResult);
+          } else {
+            // Fallback if no security result is available
+            result = SecurityStartupResult.userBanned(
+              message:
+                  'Your account has been restricted from accessing the application.',
+              userId: FirebaseAuth.instance.currentUser?.uid ?? '',
+            );
+          }
+
+          return NoTransitionPage<void>(
+            name: RouteNames.banned.name,
+            child: AppBannedWidget(securityResult: result),
+          );
+        },
+      ),
+      // Account deletion login screen - accessible to unauthenticated users
+      GoRoute(
+        path: '/account-deletion-login',
+        name: RouteNames.accountDeletionLogin.name,
+        pageBuilder: (context, state) => MaterialPage(
+          name: RouteNames.accountDeletionLogin.name,
+          child: AccountDeletionLoginScreen(),
+        ),
+      ),
+      // Account deletion loading screen - accessible to unauthenticated users
+      GoRoute(
+        path: '/account-deletion-loading',
+        name: RouteNames.accountDeletionLoading.name,
+        pageBuilder: (context, state) => MaterialPage(
+          name: RouteNames.accountDeletionLoading.name,
+          child: AccountDeletionLoadingScreen(),
+        ),
+      ),
+      // Onboarding routes: Non authenticated users
+      GoRoute(
         name: RouteNames.onboarding.name,
         path: '/onboarding',
         pageBuilder: (context, state) => NoTransitionPage<void>(
@@ -141,7 +194,7 @@ GoRouter goRouter(GoRouterRef ref) {
           GoRoute(
             path: 'login',
             name: RouteNames.login.name,
-            pageBuilder: (context, state) => NoTransitionPage<void>(
+            pageBuilder: (context, state) => MaterialPage(
               name: RouteNames.login.name,
               child: LogInScreen(),
             ),
@@ -166,32 +219,16 @@ GoRouter goRouter(GoRouterRef ref) {
           ),
         ],
       ),
-      GoRoute(
-        path: '/completeAccountRegisteration',
-        name: RouteNames.completeAccountRegisteration.name,
-        pageBuilder: (context, state) => NoTransitionPage<void>(
-          name: RouteNames.completeAccountRegisteration.name,
-          child: CompleteAccountRegisterationScreen(),
-        ),
-      ),
-      GoRoute(
-        path: '/confirmProfileDetails',
-        name: RouteNames.confirmUserDetails.name,
-        pageBuilder: (context, state) => NoTransitionPage(
-          name: RouteNames.confirmUserDetails.name,
-          child: ConfirmUserDetailsScreen(),
-        ),
-      ),
       StatefulShellRoute.indexedStack(
         pageBuilder: (context, state, navigationShell) => NoTransitionPage(
           name: 'main',
           child: ScaffoldWithNestedNavigation(navigationShell: navigationShell),
         ),
         branches: [
+          // * Home
           StatefulShellBranch(
             observers: [
               GoRouterObserver(ref.read(analyticsFacadeProvider)),
-              SentryNavigatorObserver()
             ],
             navigatorKey: shellNavigatorHomeKey,
             routes: [
@@ -204,41 +241,46 @@ GoRouter goRouter(GoRouterRef ref) {
                 ),
                 routes: [
                   GoRoute(
-                    path: "dayOverview/:date",
-                    name: RouteNames.dayOverview.name,
-                    pageBuilder: (context, state) => MaterialPage(
-                      name: RouteNames.dayOverview.name,
-                      child: DayOverviewScreen(
-                        date: DateTime.parse(state.pathParameters["date"]!),
-                      ),
+                    path: 'completeAccountRegisteration',
+                    name: RouteNames.completeAccountRegisteration.name,
+                    pageBuilder: (context, state) => MaterialPage<void>(
+                      name: RouteNames.completeAccountRegisteration.name,
+                      child: CompleteAccountRegisterationScreen(),
                     ),
-                  )
+                  ),
+                  GoRoute(
+                    path: 'confirmProfileDetails',
+                    name: RouteNames.confirmUserDetails.name,
+                    pageBuilder: (context, state) => MaterialPage<void>(
+                      name: RouteNames.confirmUserDetails.name,
+                      child: ConfirmUserDetailsScreen(),
+                    ),
+                  ),
+                  GoRoute(
+                    path: 'confirmUserEmail',
+                    name: RouteNames.confirmUserEmail.name,
+                    pageBuilder: (context, state) => MaterialPage<void>(
+                      name: RouteNames.confirmUserEmail.name,
+                      child: ConfirmUserEmailScreen(),
+                    ),
+                  ),
+                  GoRoute(
+                    path: 'notifications',
+                    name: RouteNames.notifications.name,
+                    pageBuilder: (context, state) => MaterialPage<void>(
+                      name: RouteNames.notifications.name,
+                      child: NotificationsScreen(),
+                    ),
+                  ),
                 ],
               ),
             ],
           ),
-          StatefulShellBranch(
-            navigatorKey: shellNavigatorFellowshipKey,
-            routes: [
-              GoRoute(
-                name: RouteNames.community.name,
-                path: '/community',
-                pageBuilder: (context, state) => NoTransitionPage<void>(
-                  key: state.pageKey,
-                  name: state.name,
-                  child: CommunityComingSoonScreen(),
-                ),
-                routes: [
-                  //! Add Pages
-                ],
-              ),
-            ],
-          ),
+          // * Vault
           StatefulShellBranch(
             navigatorKey: shellNavigatorVaultKey,
             observers: [
               GoRouterObserver(ref.read(analyticsFacadeProvider)),
-              SentryNavigatorObserver()
             ],
             routes: [
               GoRoute(
@@ -249,6 +291,16 @@ GoRouter goRouter(GoRouterRef ref) {
                   child: VaultScreen(),
                 ),
                 routes: [
+                  GoRoute(
+                    path: "dayOverview/:date",
+                    name: RouteNames.dayOverview.name,
+                    pageBuilder: (context, state) => MaterialPage(
+                      name: RouteNames.dayOverview.name,
+                      child: DayOverviewScreen(
+                        date: DateTime.parse(state.pathParameters["date"]!),
+                      ),
+                    ),
+                  ),
                   GoRoute(
                     path: "activities",
                     name: RouteNames.activities.name,
@@ -348,13 +400,12 @@ GoRouter goRouter(GoRouterRef ref) {
                         ),
                       ),
                       GoRoute(
-                        path: "contentType/:typeId/:typeName",
+                        path: "contentType/:typeId",
                         name: RouteNames.contentType.name,
                         pageBuilder: (context, state) => MaterialPage(
                           name: RouteNames.contentType.name,
                           child: ContentTypeScreen(
                             state.pathParameters["typeId"]!,
-                            state.pathParameters["typeName"]!,
                           ),
                         ),
                       )
@@ -376,17 +427,248 @@ GoRouter goRouter(GoRouterRef ref) {
                           child: ActivitiesNotificationsSettingsScreen(),
                         ),
                       ),
+                      GoRoute(
+                        path: "smartAlertsSettings",
+                        name: RouteNames.smartAlertsSettings.name,
+                        pageBuilder: (context, state) => MaterialPage(
+                          name: RouteNames.smartAlertsSettings.name,
+                          child: SmartAlertsSettingsScreen(),
+                        ),
+                      ),
                     ],
+                  ),
+                  GoRoute(
+                    path: "premiumAnalytics",
+                    name: RouteNames.premiumAnalytics.name,
+                    pageBuilder: (context, state) => MaterialPage(
+                      name: RouteNames.premiumAnalytics.name,
+                      child: PremiumAnalyticsScreen(),
+                    ),
+                  ),
+                  GoRoute(
+                    path: "messagingGroups",
+                    name: RouteNames.messagingGroups.name,
+                    pageBuilder: (context, state) => MaterialPage(
+                      name: RouteNames.messagingGroups.name,
+                      child: MessagingGroupsScreen(),
+                    ),
                   ),
                 ],
               ),
             ],
           ),
+
+          // * Community
+          StatefulShellBranch(
+            navigatorKey: shellNavigatorFellowshipKey,
+            routes: [
+              GoRoute(
+                name: RouteNames.community.name,
+                path: '/community',
+                pageBuilder: (context, state) {
+                  // Get initial tab from query parameters
+                  final initialTab = state.uri.queryParameters['tab'];
+                  return NoTransitionPage<void>(
+                    key: state.pageKey,
+                    name: state.name,
+                    child: CommunityMainScreen(initialTab: initialTab),
+                  );
+                },
+                routes: [
+                  // NEW onboarding route
+                  GoRoute(
+                    path: 'onboarding',
+                    name: RouteNames.communityOnboarding.name,
+                    pageBuilder: (context, state) => MaterialPage<void>(
+                      name: RouteNames.communityOnboarding.name,
+                      child: CommunityOnboardingScreen(),
+                    ),
+                  ),
+                  GoRoute(
+                    path: 'allPosts',
+                    name: RouteNames.allPosts.name,
+                    pageBuilder: (context, state) => MaterialPage<void>(
+                      name: RouteNames.allPosts.name,
+                      child: PostsListScreen(),
+                    ),
+                  ),
+                  GoRoute(
+                    path:
+                        'category/:categoryId/:categoryName/:categoryNameAr/:categoryIcon/:categoryColor',
+                    name: RouteNames.categoryPosts.name,
+                    pageBuilder: (context, state) {
+                      // Parse the category from the path parameters
+                      final categoryId = state.pathParameters['categoryId']!;
+                      final categoryName = Uri.decodeComponent(
+                          state.pathParameters['categoryName']!);
+                      final categoryNameAr = Uri.decodeComponent(
+                          state.pathParameters['categoryNameAr']!);
+                      final categoryIcon =
+                          state.pathParameters['categoryIcon']!;
+                      final categoryColor =
+                          state.pathParameters['categoryColor']!;
+
+                      // Create PostCategory object
+                      final category = PostCategory(
+                        id: categoryId,
+                        name: categoryName,
+                        nameAr: categoryNameAr,
+                        iconName: categoryIcon,
+                        colorHex: categoryColor,
+                        isActive: true,
+                        sortOrder: 0, // Default sort order
+                      );
+
+                      return MaterialPage<void>(
+                        name: RouteNames.categoryPosts.name,
+                        child: CategoryPostsScreen(category: category),
+                      );
+                    },
+                  ),
+                  GoRoute(
+                    path: 'post/:postId',
+                    name: RouteNames.postDetail.name,
+                    pageBuilder: (context, state) => MaterialPage<void>(
+                      name: RouteNames.postDetail.name,
+                      child: PostDetailScreen(
+                          postId: state.pathParameters['postId']!),
+                    ),
+                  ),
+                  GoRoute(
+                    path: 'new',
+                    name: RouteNames.newPost.name,
+                    pageBuilder: (context, state) {
+                      // Get initial category ID from query parameters
+                      final initialCategoryId =
+                          state.uri.queryParameters['categoryId'];
+                      return MaterialPage<void>(
+                        name: RouteNames.newPost.name,
+                        child:
+                            NewPostScreen(initialCategoryId: initialCategoryId),
+                      );
+                    },
+                  ),
+                  GoRoute(
+                    path: 'post/:postId/comment/:commentId/reply',
+                    name: RouteNames.replyComposer.name,
+                    pageBuilder: (context, state) => MaterialPage<void>(
+                      name: RouteNames.replyComposer.name,
+                      child: ReplyComposerScreen(
+                        postId: state.pathParameters['postId']!,
+                        parentId: state.pathParameters['commentId']!,
+                      ),
+                    ),
+                  ),
+
+                  GoRoute(
+                    path: 'challenges',
+                    name: RouteNames.globalChallengeList.name,
+                    pageBuilder: (context, state) => MaterialPage<void>(
+                      name: RouteNames.globalChallengeList.name,
+                      child: GlobalChallengeListScreen(),
+                    ),
+                  ),
+                  GoRoute(
+                    path: 'profile',
+                    name: RouteNames.communityProfile.name,
+                    pageBuilder: (context, state) => MaterialPage<void>(
+                      name: RouteNames.communityProfile.name,
+                      child: CommunityProfileSettingsScreen(),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          // * Groups
+          StatefulShellBranch(
+            navigatorKey: shellNavigatorGroupsKey,
+            routes: [
+              GoRoute(
+                name: RouteNames.groups.name,
+                path: '/groups',
+                // COMMENTED OUT: Redirect to groups onboarding if user lacks a groups profile
+                // redirect: (context, state) async {
+                //   // Skip redirect if already going to onboarding
+                //   if (state.matchedLocation.contains('/onboarding')) {
+                //     return null;
+                //   }
+
+                //   // Check if user has a groups profile
+                //   try {
+                //     // Wait for the provider to load
+                //     final hasProfile =
+                //         await ref.read(hasGroupsProfileProvider.future);
+
+                //     if (!hasProfile) {
+                //       return '/groups/onboarding';
+                //     }
+                //     return null;
+                //   } catch (e) {
+                //     // On error, redirect to onboarding to be safe
+                //     return '/groups/onboarding';
+                //   }
+                // },
+                pageBuilder: (context, state) => NoTransitionPage<void>(
+                  key: state.pageKey,
+                  name: state.name,
+                  child:
+                      GroupsComingSoonScreen(), // Always show coming soon screen
+                ),
+                routes: [
+                  // Groups onboarding route
+                  GoRoute(
+                    path: 'onboarding',
+                    name: RouteNames.groupsOnboarding.name,
+                    pageBuilder: (context, state) => MaterialPage<void>(
+                      name: RouteNames.groupsOnboarding.name,
+                      child: GroupsOnboardingScreen(),
+                    ),
+                  ),
+                  GoRoute(
+                    path: 'list',
+                    name: RouteNames.groupList.name,
+                    pageBuilder: (context, state) => MaterialPage<void>(
+                      name: RouteNames.groupList.name,
+                      child: GroupListScreen(),
+                    ),
+                  ),
+                  GoRoute(
+                    path: ':groupId',
+                    name: RouteNames.groupDetail.name,
+                    pageBuilder: (context, state) => MaterialPage<void>(
+                      name: RouteNames.groupDetail.name,
+                      child: GroupDetailScreen(
+                          groupId: state.pathParameters['groupId']!),
+                    ),
+                  ),
+                  GoRoute(
+                    path: ':groupId/chat',
+                    name: RouteNames.groupChat.name,
+                    pageBuilder: (context, state) => MaterialPage<void>(
+                      name: RouteNames.groupChat.name,
+                      child: GroupChatScreen(
+                          groupId: state.pathParameters['groupId']!),
+                    ),
+                  ),
+                  GoRoute(
+                    path: ':groupId/challenge',
+                    name: RouteNames.groupChallenge.name,
+                    pageBuilder: (context, state) => MaterialPage<void>(
+                      name: RouteNames.groupChallenge.name,
+                      child: GroupChallengeScreen(
+                          groupId: state.pathParameters['groupId']!),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          // * Account
           StatefulShellBranch(
             navigatorKey: shellNavigatorAccountKey,
             observers: [
               GoRouterObserver(ref.read(analyticsFacadeProvider)),
-              SentryNavigatorObserver()
             ],
             routes: [
               GoRoute(
@@ -398,12 +680,62 @@ GoRouter goRouter(GoRouterRef ref) {
                 ),
                 routes: [
                   GoRoute(
+                    path: 'profile',
+                    name: RouteNames.userProfile.name,
+                    pageBuilder: (context, state) => MaterialPage(
+                      name: RouteNames.userProfile.name,
+                      child: UserProfileScreen(),
+                    ),
+                  ),
+                  GoRoute(
+                    path: 'ta3afi-plus',
+                    name: RouteNames.ta3afiPlus.name,
+                    pageBuilder: (context, state) => MaterialPage(
+                      name: RouteNames.ta3afiPlus.name,
+                      child: TaaafiPlusSubscriptionScreen(),
+                    ),
+                  ),
+                  GoRoute(
+                    path: 'plus-features-guide',
+                    name: RouteNames.plusFeaturesGuide.name,
+                    pageBuilder: (context, state) {
+                      final extra = state.extra as Map<String, dynamic>?;
+                      final fromPurchase = extra?['fromPurchase'] ?? false;
+
+                      return MaterialPage(
+                        name: RouteNames.plusFeaturesGuide.name,
+                        child:
+                            PlusFeaturesGuideScreen(fromPurchase: fromPurchase),
+                      );
+                    },
+                  ),
+                  GoRoute(
                     path: 'account-delete',
                     name: RouteNames.accountDelete.name,
                     pageBuilder: (context, state) => MaterialPage(
                       name: RouteNames.accountDelete.name,
                       child: DeleteAccountScreen(),
                     ),
+                  ),
+                  GoRoute(
+                    path: 'reports',
+                    name: RouteNames.userReports.name,
+                    pageBuilder: (context, state) => MaterialPage(
+                      name: RouteNames.userReports.name,
+                      child: UserReportsScreen(),
+                    ),
+                    routes: [
+                      GoRoute(
+                        path: 'conversation/:reportId',
+                        name: RouteNames.reportConversation.name,
+                        pageBuilder: (context, state) => MaterialPage(
+                          name: RouteNames.reportConversation.name,
+                          child: ReportConversationScreen(
+                            reportId: state.pathParameters['reportId']!,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),

@@ -1,0 +1,511 @@
+# Community Module – Implementation Plan (Revision D)
+
+**Status: Draft** · Last updated: $(date)
+
+---
+
+## 1. Project Skeleton
+
+```text
+lib/features/community/
+ ├─ data/
+ │    ├─ models/
+ │    ├─ repositories/
+ │    └─ datasources/
+ ├─ domain/
+ │    ├─ services/
+ │    └─ usecases/
+ ├─ presentation/
+ │    ├─ forum/
+ │    ├─ groups/
+ │    ├─ challenges/
+ │    ├─ profile/
+ │    ├─ widgets/
+ │    └─ providers/
+ └─ routing/
+```
+
+---
+
+## 2. Firestore Collections & Fields
+
+| Collection | Document ID | Important Fields | Sub-collections |
+|------------|-------------|------------------|-----------------|
+| **forumPosts** | `postId` | `authorCPId`, `title`, `body`, `category`, `isAnonymous`, `score`, `createdAt`, `updatedAt` | — |
+| **comments** | `commentId` | `postId`, `authorCPId`, `body`, `isAnonymous`, `score`, `createdAt`, `updatedAt` | — |
+| **interactions** | `interactionId` | `targetType` (post/comment), `targetId`, `userCPId`, `type` (like), `value` (-1／0／1), `createdAt` | — |
+| **groups** | `groupId` | `name`, `description`, `memberCount`, `capacity`, `gender`, `createdAt` | `members`, `chatMessages`, `challenges` |
+| **globalChallenges** | `chalId` | `name`, `start`, `end`, … | `tasks` |
+| **communityProfiles** | `cpId` | `displayName`, `gender`, `avatarUrl`, `isAnonymous`, `referralCode` | — |
+| **users** | `uid` | `referralCode` (set once) | — |
+
+Composite indexes required:
+* `forumPosts` ⇒ orderBy `score` desc, `createdAt` desc
+* `comments` ⇒ orderBy `postId`, `createdAt` (for comments on posts)
+* `comments` ⇒ orderBy `score` desc (for top comments)
+* `interactions` ⇒ orderBy `targetType`, `targetId`, `userCPId` (for user's interaction on specific target)
+* `interactions` ⇒ orderBy `targetType`, `targetId`, `createdAt` (for all interactions on target)
+* `interactions` ⇒ orderBy `userCPId`, `createdAt` (for user's interaction history)
+
+**Comment Structure**: Comments are simple replies to posts only - no nested comments. This simplifies the data model, UI complexity, and reduces potential for spam/abuse.
+
+**Interactions Architecture**: 
+- **Separate Collection**: `interactions` collection instead of nested sub-collections for better scalability
+- **Unified Structure**: Single collection handles both post and comment interactions
+- **Efficient Querying**: Composite indexes support fast lookup patterns
+- **User-Centric**: Easy to query all interactions by a specific user
+- **Extensible**: `type` field allows future interaction types beyond likes (reactions, saves, etc.)
+- **Atomic Operations**: Document ID format ensures safe upserts without race conditions
+
+---
+
+## 3. Data Models (Freezed examples)
+
+```dart
+@freezed
+class Post with _$Post {
+  const factory Post({
+    required String id,
+    required String authorCPId,
+    required String title,
+    required String body,
+    required String category,
+    required bool isAnonymous,
+    required int score,
+    required DateTime createdAt,
+    DateTime? updatedAt,
+  }) = _Post;
+
+  factory Post.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) =>
+      Post(
+        id: doc.id,
+        authorCPId: doc.data()!["authorCPId"],
+        title: doc.data()!["title"],
+        body: doc.data()!["body"],
+        category: doc.data()!["category"],
+        isAnonymous: doc.data()!["isAnonymous"],
+        score: doc.data()!["score"] ?? 0,
+        createdAt: (doc.data()!["createdAt"] as Timestamp).toDate(),
+        updatedAt: (doc.data()!["updatedAt"] as Timestamp?)?.toDate(),
+      );
+}
+
+@freezed
+class Comment with _$Comment {
+  const factory Comment({
+    required String id,
+    required String postId,
+    required String authorCPId,
+    required String body,
+    required bool isAnonymous,
+    required int score,
+    required DateTime createdAt,
+    DateTime? updatedAt,
+  }) = _Comment;
+
+  factory Comment.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) =>
+      Comment(
+        id: doc.id,
+        postId: doc.data()!["postId"],
+        authorCPId: doc.data()!["authorCPId"],
+        body: doc.data()!["body"],
+        isAnonymous: doc.data()!["isAnonymous"],
+        score: doc.data()!["score"] ?? 0,
+        createdAt: (doc.data()!["createdAt"] as Timestamp).toDate(),
+        updatedAt: (doc.data()!["updatedAt"] as Timestamp?)?.toDate(),
+      );
+}
+```
+
+```dart
+@freezed
+class Interaction with _$Interaction {
+  const factory Interaction({
+    required String id,
+    required String targetType, // 'post' or 'comment'
+    required String targetId, // postId or commentId
+    required String userCPId,
+    required String type, // 'like' (extensible for future types)
+    required int value, // 1 for like, -1 for dislike, 0 for neutral
+    required DateTime createdAt,
+  }) = _Interaction;
+
+  factory Interaction.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) =>
+      Interaction(
+        id: doc.id,
+        targetType: doc.data()!["targetType"],
+        targetId: doc.data()!["targetId"],
+        userCPId: doc.data()!["userCPId"],
+        type: doc.data()!["type"],
+        value: doc.data()!["value"],
+        createdAt: (doc.data()!["createdAt"] as Timestamp).toDate(),
+      );
+}
+```
+
+Additional models: `Group`, `GroupMember`, `ChatMessage`, `Challenge`, `ChallengeTask`, `CommunityProfile` (all follow same pattern).
+
+---
+
+## 4. Repository APIs (Forum excerpt)
+
+```dart
+class ForumRepository {
+  final _posts = FirebaseFirestore.instance.collection('forumPosts');
+  final _comments = FirebaseFirestore.instance.collection('comments');
+  final _interactions = FirebaseFirestore.instance.collection('interactions');
+
+  Future<String> createPost(PostFormData d) { … }
+  Stream<List<Post>> watchPosts({PostFilter? filter});
+  Stream<Post> watchPost(String id);
+  
+  Stream<List<Comment>> watchComments({required String postId}) {
+    return _comments
+        .where('postId', isEqualTo: postId)
+        .orderBy('createdAt')
+        .snapshots()
+        .map((snapshot) => snapshot.docs
+            .map((doc) => Comment.fromFirestore(doc))
+            .toList());
+  }
+
+  Future<void> addComment({
+    required String postId,
+    required String body,
+    bool isAnonymous = false,
+  }) {
+    return _comments.add({
+      'postId': postId,
+      'authorCPId': _currentCPId,
+      'body': body,
+      'isAnonymous': isAnonymous,
+      'createdAt': FieldValue.serverTimestamp(),
+      'score': 0,
+    });
+  }
+
+  Future<void> likePost(String postId, int value) {
+    return _interactions.doc('${_currentCPId}_post_$postId').set({
+      'targetType': 'post',
+      'targetId': postId,
+      'userCPId': _currentCPId,
+      'type': 'like',
+      'value': value, // 1 for like, -1 for dislike, 0 for neutral
+      'createdAt': FieldValue.serverTimestamp(),
+    });
+  }
+  
+  Future<void> likeComment({
+    required String commentId,
+    required int value,
+  }) {
+    return _interactions.doc('${_currentCPId}_comment_$commentId').set({
+      'targetType': 'comment',
+      'targetId': commentId,
+      'userCPId': _currentCPId,
+      'type': 'like',
+      'value': value, // 1 for like, -1 for dislike, 0 for neutral
+      'createdAt': FieldValue.serverTimestamp(),
+    });
+  }
+
+  Stream<List<Interaction>> watchPostInteractions(String postId) {
+    return _interactions
+        .where('targetType', isEqualTo: 'post')
+        .where('targetId', isEqualTo: postId)
+        .snapshots()
+        .map((snapshot) => snapshot.docs
+            .map((doc) => Interaction.fromFirestore(doc))
+            .toList());
+  }
+
+  Stream<List<Interaction>> watchCommentInteractions(String commentId) {
+    return _interactions
+        .where('targetType', isEqualTo: 'comment')
+        .where('targetId', isEqualTo: commentId)
+        .snapshots()
+        .map((snapshot) => snapshot.docs
+            .map((doc) => Interaction.fromFirestore(doc))
+            .toList());
+  }
+
+  Future<Interaction?> getUserInteraction({
+    required String targetType,
+    required String targetId,
+    required String userCPId,
+  }) async {
+    final doc = await _interactions.doc('${userCPId}_${targetType}_$targetId').get();
+    return doc.exists ? Interaction.fromFirestore(doc) : null;
+  }
+}
+```
+
+Similar repositories: `GroupsRepository`, `ChallengesRepository`, `ProfileRepository`.
+
+---
+
+## 5. Domain Services (Forum excerpt)
+
+```dart
+class ForumService {
+  ForumService(this._repo);
+
+  Future<void> publishPost(PostFormData data) {
+    if (data.title.length < 5 || data.body.length < 10) {
+      throw ForumValidationException();
+    }
+    return _repo.createPost(data);
+  }
+
+  Future<void> addComment({
+    required String postId,
+    required String body,
+    required bool isAnonymous,
+  }) {
+    if (body.length < 3) {
+      throw ForumValidationException('Comment too short');
+    }
+    return _repo.addComment(
+      postId: postId,
+      body: body,
+      isAnonymous: isAnonymous,
+    );
+  }
+
+  Future<void> likePost({
+    required String postId,
+    required int value, // 1 for like, -1 for dislike, 0 for neutral
+  }) => _repo.likePost(postId, value);
+
+  Future<void> likeComment({
+    required String commentId,
+    required int value, // 1 for like, -1 for dislike, 0 for neutral
+  }) => _repo.likeComment(commentId: commentId, value: value);
+}
+```
+
+---
+
+## 6. Riverpod Providers
+
+```dart
+final forumRepositoryProvider = Provider((ref) => ForumRepository());
+final forumServiceProvider = Provider((ref) => ForumService(ref.watch(forumRepositoryProvider)));
+
+final postsProvider = StreamProvider.autoDispose<List<Post>>((ref) {
+  final filter = ref.watch(postsFilterProvider);
+  return ref.watch(forumRepositoryProvider).watchPosts(filter: filter);
+});
+
+final postDetailProvider = StreamProvider.family.autoDispose<Post, String>((ref, id) {
+  return ref.watch(forumRepositoryProvider).watchPost(id);
+});
+
+final commentsProvider = StreamProvider.family.autoDispose<List<Comment>, String>((ref, postId) {
+  return ref.watch(forumRepositoryProvider).watchComments(postId: postId);
+});
+
+final postInteractionsProvider = StreamProvider.family.autoDispose<List<Interaction>, String>((ref, postId) {
+  return ref.watch(forumRepositoryProvider).watchPostInteractions(postId);
+});
+
+final commentInteractionsProvider = StreamProvider.family.autoDispose<List<Interaction>, String>((ref, commentId) {
+  return ref.watch(forumRepositoryProvider).watchCommentInteractions(commentId);
+});
+
+final userInteractionProvider = FutureProvider.family.autoDispose<Interaction?, ({String targetType, String targetId, String userCPId})>((ref, params) {
+  return ref.watch(forumRepositoryProvider).getUserInteraction(
+    targetType: params.targetType,
+    targetId: params.targetId,
+    userCPId: params.userCPId,
+  );
+});
+```
+
+Analogous for groups, challenges, profiles.
+
+```dart
+// NEW – checks if the current user already has a community profile
+autoDisposeFutureProvider<bool> hasCommunityProfileProvider = FutureProvider<bool>((ref) async {
+  final uid = FirebaseAuth.instance.currentUser!.uid;
+  final doc = await FirebaseFirestore.instance.collection('communityProfiles').doc(uid).get();
+  return doc.exists;
+});
+```
+
+---
+
+## 7. Routing Integration (GoRouter)
+
+```dart
+GoRoute(
+  name: RouteNames.community.name,
+  path: '/community',
+  // NEW: redirect to onboarding if user lacks a community profile
+  redirect: (context, state) {
+    final hasProfile = context.read(hasCommunityProfileProvider).maybeWhen(
+      data: (v) => v,
+      orElse: () => false,
+    );
+    if (!hasProfile) return '/community/onboarding';
+    return null;
+  },
+  pageBuilder: (_, __) => NoTransitionPage(child: ForumHomeScreen()),
+  routes: [
+    // NEW onboarding route
+    GoRoute(path: 'onboarding', builder: (_, __) => CommunityOnboardingScreen()),
+    GoRoute(path: 'forum', builder: (_, __) => ForumHomeScreen(), routes: [
+      GoRoute(path: 'post/:postId', builder: (c, s) => PostDetailScreen(postId: s.pathParameters['postId']!)),
+      GoRoute(path: 'new', builder: (_, __) => NewPostScreen()),
+    ]),
+    GoRoute(path: 'groups', builder: (_, __) => GroupListScreen(), routes: [ … ]),
+    GoRoute(path: 'challenges', builder: (_, __) => GlobalChallengeListScreen()),
+    GoRoute(path: 'profile', builder: (_, __) => CommunityProfileSettingsScreen()),
+  ],
+),
+```
+
+---
+
+## 8. UI Widgets & Screens
+
+* **ForumHomeScreen** – posts list, category chips, segmented filter, FAB.
+* **PostDetailScreen** – header, body, `LikeBar`, simple comment list, `ReplyInputWidget`.
+* **Shared Widgets** – `PostCard`, `CommentTileWidget` (flat structure), `LikeButton`, `AvatarWithAnonymity`, `MemberChip`, `TaskTile`, `ProgressBar`.
+* **CommentTileWidget** – simplified flat structure with like/dislike buttons, no nesting complexity.
+* **GroupListScreen**, **GroupDetailScreen** (tabs), **GroupChatScreen**, **GroupChallengeScreen**.
+* **GlobalChallengeListScreen**, **CommunityProfileSettingsScreen**.
+* **CommunityOnboardingScreen** – one-time setup: AvatarPicker · displayName · gender · anonymous-by-default switch · (optional) referral code input.
+
+**Like/Dislike System**: Uses thumbs up/down icons instead of arrow voting. Interactions stored in separate `interactions` collection for better scalability and querying. Maintains same scoring system (1 for like, -1 for dislike, 0 for neutral). Document ID format: `{userCPId}_{targetType}_{targetId}` for efficient upserts.
+
+**Simplified Comment System**: Comments are direct replies to posts only. No nested threading, which reduces UI complexity, improves performance, and prevents deep conversation trees that can become hard to follow on mobile.
+
+Reuse `WidgetsContainer`, `TextStyles`, `AppTheme`, `FeatureAccessGuard`.
+
+---
+
+## 9. Groups Module (summary)
+* Collections: `groups`, sub-collections `members`, `chatMessages`, `challenges`.
+* Providers: `groupsProvider`, `groupDetailProvider`.
+* Join/Leave via `GroupsService`.
+
+---
+
+## 10. GroupChat Module
+* Path: `groups/:groupId/chatMessages`.
+* Cloud Function `checkGroupChatQuota` limits 100 messages/day.
+* `GroupChatService.sendMessage` → callable + Firestore add.
+
+---
+
+## 11. Challenges (Global & Group)
+* Collections per spec `globalChallenges` and `groups/:id/challenges`.
+* `ChallengesRepository` & providers for lists and progress.
+
+---
+
+## 12. Community Profile & Referral Code
+* Collection `communityProfiles`.
+* Referral code saved **once** under `users/{uid}`.
+* Service throws `ReferralAlreadySetException` on second attempt.
+
+---
+
+## 13. Access Control & Bans
+* Reuse `activeBansProvider`.
+* Actions wrapped in `BanGuard` (postCreate, commentCreate, like, chat, groupJoin).
+
+---
+
+## 14. Remote Config Flags
+* `community_enabled`, `global_challenges_enabled`, `group_chat_enabled`.
+
+---
+
+## 15. Firestore Security Rules (snippet)
+
+```rules
+match /forumPosts/{postId} {
+  allow read: if true;
+  allow create: if request.auth != null && !isBanned('postCreate');
+  allow update, delete: if resource.data.authorCPId == currentCPId;
+}
+
+match /comments/{commentId} {
+  allow read: if true;
+  allow create: if request.auth != null && !isBanned('commentCreate') && 
+                 request.resource.data.postId is string;
+  allow update, delete: if resource.data.authorCPId == currentCPId;
+}
+
+match /interactions/{interactionId} {
+  allow read: if true;
+  allow create: if request.auth != null && !isBanned('like') &&
+                 request.resource.data.userCPId == currentCPId &&
+                 request.resource.data.targetType in ['post', 'comment'] &&
+                 request.resource.data.type == 'like';
+  allow update, delete: if resource.data.userCPId == currentCPId;
+}
+
+match /groups/{groupId}/chatMessages/{msgId} {
+  allow create: if isMember(groupId) && !overQuota() && !isBanned('chat');
+}
+```
+
+---
+
+## 16. Utilities from `core`
+* Theming / TextStyles – `core/theming`.
+* Localization – `core/localization`.
+* Network – `dio_provider.dart`.
+* Analytics – `analytics_facade.dart`.
+* Helpers – `helpers/date_display_formatter.dart`, `FeatureAccessGuard`, `snackbar.dart`.
+
+---
+
+## 17. Analytics & Monitoring
+
+| Event | Params |
+|-------|--------|
+| `community_post_create` | `category`, `anonymous` |
+| `community_comment_add` | `postId` |
+| `community_like` | `target`, `value` |
+| `community_chat_message` | `groupId` |
+
+Errors captured via Sentry in services.
+
+---
+
+## 18. Testing Matrix
+
+* **Unit** – validation, like idempotency, repository emulator tests, interaction document ID generation.
+* **Widget** – golden tests for `PostCard`, `CommentTileWidget`.
+* **Integration** – create post, like transaction with separate collection, comment creation, quotas via CF emulator, interaction querying performance.
+
+---
+
+## 19. Continuous Delivery & Feature Toggle
+
+1. Ship behind Remote Config `community_enabled = false`.
+2. QA on dev Firebase project.
+3. Gradual rollout 5 % → 25 % → 100 %.
+
+---
+
+## 20. Timeline (Remaining Work)
+
+| Task | Est. |
+|------|------|
+| Groups + Chat | 2 d |
+| Challenges module | 1 d |
+| Profile & referral | 0.5 d |
+| Rules & CFs | 0.5 d |
+| Localization & polish | 0.5 d |
+| Tests & CI updates | 1 d |
+| QA & rollout | 1 d |
+| **Total** | **6 d** |
+
+---
+
+> **Note:** This plan assumes prior completion of the Forum (Posts & Comments) basics outlined earlier. 

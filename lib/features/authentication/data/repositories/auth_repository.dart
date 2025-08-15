@@ -127,7 +127,7 @@ class AuthRepository {
 }
 
 @riverpod
-AuthRepository authRepository(AuthRepositoryRef ref) {
+AuthRepository authRepository(Ref ref) {
   return AuthRepository(ref.watch(firebaseAuthProvider),
       ref.watch(firestoreInstanceProvider), ref);
 }

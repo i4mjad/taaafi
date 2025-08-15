@@ -6,7 +6,7 @@ part of 'activity_details_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$activityDetailsHash() => r'0d57e4994be595c50deffd17ef74f728792c58b2';
+String _$activityDetailsHash() => r'615e0739096d7f419dcb6bdb38ad6dacf908da60';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -142,6 +142,8 @@ class ActivityDetailsProvider extends AutoDisposeFutureProvider<Activity> {
   }
 }
 
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
 mixin ActivityDetailsRef on AutoDisposeFutureProviderRef<Activity> {
   /// The parameter `activityId` of this provider.
   String get activityId;
@@ -155,4 +157,4 @@ class _ActivityDetailsProviderElement
   String get activityId => (origin as ActivityDetailsProvider).activityId;
 }
 // ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

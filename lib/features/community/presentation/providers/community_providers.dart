@@ -1,44 +1,43 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:reboot_app_3/features/community/data/repositories/community_repository.dart';
-import 'package:reboot_app_3/features/community/domain/services/community_service.dart';
-import 'package:reboot_app_3/features/community/presentation/notifiers/community_notifier.dart';
 
-part 'community_providers.g.dart';
+import '../../data/datasources/community_remote_datasource.dart';
+import '../../data/repositories/community_repository_impl.dart';
+import '../../domain/repositories/community_repository.dart';
+import '../../domain/services/community_service.dart';
+import '../../domain/services/community_service_impl.dart';
 
-/// Provider for the Firestore instance
+// External dependencies
 final firestoreProvider = Provider<FirebaseFirestore>((ref) {
   return FirebaseFirestore.instance;
 });
 
-/// Provider for SharedPreferences instance
-final sharedPreferencesProvider =
-    FutureProvider<SharedPreferences>((ref) async {
-  return await SharedPreferences.getInstance();
+final firebaseAuthProvider = Provider<FirebaseAuth>((ref) {
+  return FirebaseAuth.instance;
 });
 
-/// Provider for the CommunityRepository
-final communityRepositoryProvider = Provider<CommunityRepository>((ref) {
+final sharedPreferencesProvider = Provider<SharedPreferences>((ref) {
+  throw UnimplementedError('SharedPreferences must be overridden in main()');
+});
+
+// Data layer
+final communityRemoteDatasourceProvider =
+    Provider<CommunityRemoteDatasource>((ref) {
   final firestore = ref.watch(firestoreProvider);
-  return CommunityRepository(firestore);
+  return CommunityRemoteDatasourceImpl(firestore);
 });
 
-/// Provider for the CommunityService
-final communityServiceProvider = FutureProvider<CommunityService>((ref) async {
+final communityRepositoryProvider = Provider<CommunityRepository>((ref) {
+  final remoteDatasource = ref.watch(communityRemoteDatasourceProvider);
+  return CommunityRepositoryImpl(remoteDatasource);
+});
+
+// Domain layer
+final communityServiceProvider = Provider<CommunityService>((ref) {
   final repository = ref.watch(communityRepositoryProvider);
-  final prefs = await SharedPreferences.getInstance();
-  return CommunityService(repository, prefs);
-});
-
-/// Provider for the CommunityNotifier
-@riverpod
-CommunityNotifier communityNotifier(CommunityNotifierRef ref) {
-  return CommunityNotifier();
-}
-
-/// Provider for tracking if the user has shown interest
-final hasShownInterestProvider = FutureProvider<bool>((ref) async {
-  final prefs = await SharedPreferences.getInstance();
-  return prefs.getBool('community_interest_recorded') ?? false;
+  final auth = ref.watch(firebaseAuthProvider);
+  final firestore = ref.watch(firestoreProvider);
+  return CommunityServiceImpl(repository, auth, firestore);
 });

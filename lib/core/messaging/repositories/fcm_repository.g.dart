@@ -6,7 +6,7 @@ part of 'fcm_repository.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$fcmRepositoryHash() => r'9a77322f5a2ed97d2608f83dff02f775c9fefbe8';
+String _$fcmRepositoryHash() => r'401bffe86d6a50d788793a7a5ea0441e8b9d82e1';
 
 /// See also [fcmRepository].
 @ProviderFor(fcmRepository)
@@ -20,8 +20,10 @@ final fcmRepositoryProvider = Provider<FirebaseMessagingRepository>.internal(
   allTransitiveDependencies: null,
 );
 
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
 typedef FcmRepositoryRef = ProviderRef<FirebaseMessagingRepository>;
-String _$fcmHash() => r'8af107ce8b7d6a6b400981a32a252885bd1d9d93';
+String _$fcmHash() => r'2e8395ce0a6dadbabdca29e88ac263a5f08e901b';
 
 /// See also [fcm].
 @ProviderFor(fcm)
@@ -34,8 +36,10 @@ final fcmProvider = Provider<FirebaseMessaging>.internal(
   allTransitiveDependencies: null,
 );
 
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
 typedef FcmRef = ProviderRef<FirebaseMessaging>;
-String _$fcmAuthHash() => r'b36da5b8e41bb9246a1566970da84036c633e8d2';
+String _$fcmAuthHash() => r'9eb82be0f62e9cdd62b50303d58313016a903f5f';
 
 /// See also [fcmAuth].
 @ProviderFor(fcmAuth)
@@ -48,8 +52,10 @@ final fcmAuthProvider = Provider<FirebaseAuth>.internal(
   allTransitiveDependencies: null,
 );
 
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
 typedef FcmAuthRef = ProviderRef<FirebaseAuth>;
-String _$fcmFirestoreHash() => r'9bade8377b97cf8a4e9e2cb4afe540b3ecfcabf4';
+String _$fcmFirestoreHash() => r'3aa053e398f1cf61c63fe31142666d468daa8765';
 
 /// See also [fcmFirestore].
 @ProviderFor(fcmFirestore)
@@ -62,6 +68,8 @@ final fcmFirestoreProvider = Provider<FirebaseFirestore>.internal(
   allTransitiveDependencies: null,
 );
 
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
 typedef FcmFirestoreRef = ProviderRef<FirebaseFirestore>;
 // ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

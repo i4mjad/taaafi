@@ -1,0 +1,94 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+## Ta’aafi Plus – **Personal Analytics**
+
+**Business Requirements (functional & user-experience only)**
+
+---
+
+### 1. Relapse Heat-Map Calendar
+
+1. **Core purpose**: give every Plus member a fast, colour-coded overview of their relapse history and clean streaks.
+2. **Display rules**
+
+   * Each day in the last 12 months must appear as a square:
+
+     * Clean = green Slip-up = amber Porn/Masturbation = red (exact legend stays consistent).
+   * Above the grid, always show three live numbers: the user’s **average clean days in the past 7 / 30 / 90 days**.
+3. **Interaction**
+
+   * Tapping any square opens a bottom sheet with the full follow-up note and timestamp.
+4. **Premium gate**: non-Plus users may see only the past 14 days; Plus unlocks the full year + averages.
+5. **Empty state**: if the user has < 3 follow-ups logged, show an onboarding card explaining how to start logging.
+6. **Language**: surface UI and legend in both Arabic (RTL) and English.
+
+---
+
+### 2. Trigger Radar
+
+1. **Core purpose**: transform subjective “triggers” into a quantified, visual chart the user can act upon.
+2. **Display rules**
+
+   * Radar / spider chart with one axis per trigger tag (stress, boredom, late night, etc.).
+   * Chart must represent **latest 30 days** only, so progress is quickly visible.
+3. **Interaction**
+
+   * Long-press any axis to see absolute relapse count for that trigger plus a tip (“Try a walk before bed”).
+   * When < 3 distinct triggers exist, show an educational prompt encouraging the user to tag future relapses.
+4. **Premium gate**: trigger radar is invisible in the free tier; upgrading instantly reveals the chart.
+
+---
+
+### 3. Risk Clock
+
+1. **Core purpose**: highlight the specific hours in a day when a user is statistically most vulnerable.
+2. **Display rules**
+
+   * 24-hour circular ring divided into hourly segments with gradient intensity proportional to risk.
+   * The single highest-risk hour must be visually emphasised (e.g., glow or bold border).
+3. **Interaction**
+
+   * Tap any hour to show relapse percentage and actionable tip (“Schedule a call with your accountability partner at this time”).
+4. **Contextual nudges**
+
+   * A banner below the clock invites the user to enable the **High-Risk Hour Alert** push notification.
+5. **Premium gate**: entire clock restricted to Plus subscribers.
+
+---
+
+### 4. Mood ↔ Relapse Correlation
+
+1. **Core purpose**: help users recognise how emotional state affects relapse likelihood.
+2. **Display rules**
+
+   * Dual-axis chart (bars for mood frequency, line for relapse count) spanning the past 30 days.
+   * Mood scale from -5 (very low) to +5 (very high) must be labelled and colour-coded.
+3. **Interpretation assist**
+
+   * If correlation > 0.4, show an inline insight card (“Lower moods are strongly linked to slips. Consider your coping plan.”).
+4. **Privacy**: results are strictly private; never surfaced to other users.
+5. **Premium gate**: full chart reserved for Plus members; free users see a locked placeholder.
+
+---
+
+### 5. General Requirements Applicable to All Four Features
+
+* **One-stop dashboard**: all analytics widgets live on a dedicated “Insights” screen accessible from the main tab bar for Plus users.
+* **Load time**: dashboard must render complete charts in ≤ 2 seconds on a 3G connection.
+* **Accessibility**: provide colour-blind-safe palettes and respect font-size scaling; support full RTL layout.
+* **Data freshness**: widgets must always reflect data up to **last follow-up saved** (≤ 1 hour lag acceptable).
+* **Localization**: Arabic as first-class language; all static and dynamic text must have translations.
+* **Security & privacy**: analytics are visible **only to the account owner**; data never shared to community feed.
+
+---
+
+### 6. Out-of-Scope (deferred)
+
+* Recovery Plan checklist
+* Addiction Self-Test
+* Image posting & custom reaction perks
+
+These business requirements define what success looks like from the user’s perspective; technical design and implementation details are left to the engineering team / Cursor AI agent.

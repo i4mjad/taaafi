@@ -7,7 +7,7 @@ part of 'providers.dart';
 // **************************************************************************
 
 String _$activityRepositoryHash() =>
-    r'51e136acf3d6521702b06237e2343c0adb3073b0';
+    r'47f21e0931c037641110b2861f2fa044d1c6083f';
 
 /// See also [activityRepository].
 @ProviderFor(activityRepository)
@@ -21,8 +21,10 @@ final activityRepositoryProvider = Provider<ActivityRepository>.internal(
   allTransitiveDependencies: null,
 );
 
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
 typedef ActivityRepositoryRef = ProviderRef<ActivityRepository>;
-String _$firebaseAuthHash() => r'46c40b7c5cf8ab936c0daa96a6af106bd2ae5d51';
+String _$firebaseAuthHash() => r'cb440927c3ab863427fd4b052a8ccba4c024c863';
 
 /// See also [firebaseAuth].
 @ProviderFor(firebaseAuth)
@@ -35,8 +37,10 @@ final firebaseAuthProvider = Provider<FirebaseAuth>.internal(
   allTransitiveDependencies: null,
 );
 
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
 typedef FirebaseAuthRef = ProviderRef<FirebaseAuth>;
-String _$firestoreHash() => r'e271f8f7be694ee819f397232f4d140c15a5f921';
+String _$firestoreHash() => r'a56abe42f3fb3ee8bfee4e56b46a7bf8561bdc93';
 
 /// See also [firestore].
 @ProviderFor(firestore)
@@ -49,8 +53,10 @@ final firestoreProvider = Provider<FirebaseFirestore>.internal(
   allTransitiveDependencies: null,
 );
 
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
 typedef FirestoreRef = ProviderRef<FirebaseFirestore>;
-String _$activityServiceHash() => r'a95a99fead96df2dbcb086a6e5cd93191570b277';
+String _$activityServiceHash() => r'43e6b9ea6f57ce6a62a48a5d110a41dc6bcdd8ee';
 
 /// See also [activityService].
 @ProviderFor(activityService)
@@ -64,6 +70,8 @@ final activityServiceProvider = AutoDisposeProvider<ActivityService>.internal(
   allTransitiveDependencies: null,
 );
 
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
 typedef ActivityServiceRef = AutoDisposeProviderRef<ActivityService>;
 // ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

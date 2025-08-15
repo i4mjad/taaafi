@@ -10,6 +10,7 @@ import 'package:reboot_app_3/core/shared_widgets/app_bar.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
 import 'package:reboot_app_3/core/shared_widgets/custom_segmented_button.dart';
 import 'package:reboot_app_3/core/shared_widgets/custom_textfield.dart';
+import 'package:reboot_app_3/core/shared_widgets/spinner.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
@@ -89,7 +90,7 @@ class _UpdateUserProfileModalSheetState
         data: (userProfile) {
           if (userProfile == null) {
             return Center(
-              child: CircularProgressIndicator(),
+              child: Spinner(),
             );
           }
 
@@ -289,7 +290,7 @@ class _UpdateUserProfileModalSheetState
           child: Text('Error: $error'),
         ),
         loading: () => Center(
-          child: CircularProgressIndicator(),
+          child: Spinner(),
         ),
       ),
     );
@@ -301,7 +302,7 @@ class _UpdateUserProfileModalSheetState
       builder: (BuildContext context) {
         final theme = AppTheme.of(context);
         return AlertDialog(
-          actionsAlignment: MainAxisAlignment.start,
+          actionsAlignment: MainAxisAlignment.end,
           backgroundColor: theme.backgroundColor,
           title: Text(
             AppLocalizations.of(context).translate('confirm-your-details-p'),
@@ -316,26 +317,32 @@ class _UpdateUserProfileModalSheetState
                 '${AppLocalizations.of(context).translate('first-name')}: ${nameController.text}',
                 style: TextStyles.small,
               ),
+              verticalSpace(Spacing.points8),
               Text(
                 '${AppLocalizations.of(context).translate('email')}: ${emailController.text}',
                 style: TextStyles.small,
               ),
+              verticalSpace(Spacing.points8),
               Text(
                 '${AppLocalizations.of(context).translate('date-of-birth')}: ${dobController.text}',
                 style: TextStyles.small,
               ),
+              verticalSpace(Spacing.points8),
               Text(
                 '${AppLocalizations.of(context).translate('starting-date')}: ${userFirstDateController.text}',
                 style: TextStyles.small,
               ),
+              verticalSpace(Spacing.points8),
               Text(
                 '${AppLocalizations.of(context).translate('role')}: ${roleController.text}',
                 style: TextStyles.small,
               ),
+              verticalSpace(Spacing.points8),
               Text(
                 '${AppLocalizations.of(context).translate('gender')}: ${AppLocalizations.of(context).translate(selectedGender.translationKey)}',
                 style: TextStyles.small,
               ),
+              verticalSpace(Spacing.points8),
               Text(
                 '${AppLocalizations.of(context).translate('preferred-language')}: ${AppLocalizations.of(context).translate(selectedLocale.translationKey)}',
                 style: TextStyles.small,

@@ -25,7 +25,7 @@ AppBar appBar(BuildContext context, WidgetRef ref, String? titleTranslationKey,
     surfaceTintColor: theme.backgroundColor,
     centerTitle: false,
     shadowColor: theme.grey[100],
-    actions: loadedActions(ref, showLocaleChangeIcon, actions),
+    actions: loadedActions(context, ref, showLocaleChangeIcon, actions),
     leading: showBackButton
         ? IconButton(
             color: theme.grey[600],
@@ -57,7 +57,7 @@ AppBar plainAppBar(BuildContext context, WidgetRef ref, String? title,
     surfaceTintColor: theme.backgroundColor,
     centerTitle: false,
     shadowColor: theme.grey[100],
-    actions: loadedActions(ref, showLocaleChangeIcon, actions),
+    actions: loadedActions(context, ref, showLocaleChangeIcon, actions),
     leading: showBackButton
         ? IconButton(
             icon: const Icon(Icons.arrow_back),
@@ -77,8 +77,9 @@ AppBar plainAppBar(BuildContext context, WidgetRef ref, String? title,
   );
 }
 
-List<Widget> loadedActions(
-    WidgetRef ref, bool showLocaleChangeIcon, List<Widget>? actions) {
+List<Widget> loadedActions(BuildContext context, WidgetRef ref,
+    bool showLocaleChangeIcon, List<Widget>? actions) {
+  final theme = AppTheme.of(context);
   var actionsList = actions ?? [];
   if (showLocaleChangeIcon) {
     actionsList.add(
@@ -90,7 +91,7 @@ List<Widget> loadedActions(
           padding: const EdgeInsets.only(right: 16, left: 16),
           child: Icon(
             LucideIcons.languages,
-            color: Colors.black,
+            color: theme.grey[900],
           ),
         ),
       ),

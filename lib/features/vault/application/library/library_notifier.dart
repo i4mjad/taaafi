@@ -1,7 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:reboot_app_3/features/vault/data/library/library_repository.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../data/library/library_service.dart';
+import '../../data/library/cached_library_service.dart';
 import '../../data/library/models/cursor_content.dart';
 import '../../data/library/models/cursor_content_list.dart';
 import '../../data/library/models/cursor_content_type.dart';
@@ -10,7 +12,7 @@ part 'library_notifier.g.dart';
 
 @riverpod
 class LibraryNotifier extends _$LibraryNotifier {
-  LibraryService get _service => ref.read(libraryServiceProvider);
+  CachedLibraryService get _service => ref.read(cachedLibraryServiceProvider);
 
   @override
   FutureOr<
@@ -19,27 +21,35 @@ class LibraryNotifier extends _$LibraryNotifier {
         List<CursorContentList> featuredLists,
         List<CursorContentType> contentTypes,
       })> build() async {
-    // Fetch initial data
-    final results = await Future.wait([
-      _service.getLatestContent(),
-      _service.getFeaturedLists(),
-      _service.getContentTypes(),
-    ]);
+    // Use cached service to get library data
+    return await _service.getLibraryData();
+  }
 
-    final latestContent = results[0] as List<CursorContent>;
-    final featuredLists = results[1] as List<CursorContentList>;
-    final contentTypes = results[2] as List<CursorContentType>;
+  /// Force refresh the library data
+  Future<void> refresh() async {
+    state = const AsyncValue.loading();
+    try {
+      final data = await _service.refreshData();
+      state = AsyncValue.data(data);
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+    }
+  }
 
-    return (
-      latestContent: latestContent,
-      featuredLists: featuredLists,
-      contentTypes: contentTypes,
-    );
+  /// Clear cache and reload
+  Future<void> clearCacheAndReload() async {
+    await _service.clearCache();
+    ref.invalidateSelf();
   }
 
   /// Fetches content for a specific type
   Future<List<CursorContent>> getContentByType(String typeId) async {
     return await _service.getContentByType(typeId);
+  }
+
+  /// Fetches a content type by ID
+  Future<CursorContentType> getContentTypeById(String typeId) async {
+    return await _service.getContentTypeById(typeId);
   }
 
   /// Fetches all content lists
@@ -65,12 +75,17 @@ class LibraryNotifier extends _$LibraryNotifier {
 }
 
 @riverpod
-LibraryService libraryService(LibraryServiceRef ref) {
+LibraryService libraryService(Ref ref) {
   return LibraryService(ref.watch(libraryRepositoryProvider));
 }
 
 @riverpod
-LibraryRepository libraryRepository(LibraryRepositoryRef ref) {
+CachedLibraryService cachedLibraryService(Ref ref) {
+  return CachedLibraryService(ref.watch(libraryServiceProvider));
+}
+
+@riverpod
+LibraryRepository libraryRepository(Ref ref) {
   return LibraryRepository(FirebaseFirestore.instance, ref);
 }
 

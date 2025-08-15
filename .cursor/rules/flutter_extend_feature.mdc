@@ -1,0 +1,56 @@
+---
+id: flutter_extend_feature
+trigger: manual
+scope: "**/*.dart"
+---
+
+# Extend Feature Functionality Scaffold Rules
+
+## Purpose
+Generate boilerplate and tests for adding a new functionality within an existing feature, using snake_case filenames.
+
+## Generation Templates
+For adding `{functionality_name}` to feature `{feature_name}`:
+```
+lib/
+  features/
+    {feature_name}/
+      domain/
+        usecases/
+          {functionality_name}_usecase.dart   # defines `FunctionalityNameUseCase`
+      data/
+        datasources/
+          {functionality_name}_datasource.dart  # data access
+        dtos/
+          {functionality_name}_dto.dart         # defines `FunctionalityNameDto`
+        mappers/
+          {functionality_name}_mapper.dart      # maps Entity↔Dto
+        repositories/
+          {feature_name}_repository_impl.dart   # updated with new method
+      presentation/
+        widgets/
+          {functionality_name}_widget.dart     # UI for functionality
+      providers/
+        {functionality_name}_provider.dart    # `@riverpod` provider
+
+test/
+  features/
+    {feature_name}/
+      domain/usecases/
+        {functionality_name}_usecase_test.dart
+      data/mappers/
+        {functionality_name}_mapper_test.dart
+```
+
+## Placeholders
+- `{feature_name}`: snake_case feature (e.g., `user_profile`).
+- `{FunctionalityName}`: PascalCase (e.g., `UpdateAvatar`).
+- `{functionality_name}`: snake_case (e.g., `update_avatar`).
+
+## Prompt Example
+```markdown
+@agent extend-feature
+feature_name: user_profile
+functionality_name: update_avatar
+GenerateTests: true
+```

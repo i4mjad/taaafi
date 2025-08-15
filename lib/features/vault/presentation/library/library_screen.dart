@@ -7,11 +7,13 @@ import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/routing/route_names.dart';
 import 'package:reboot_app_3/core/shared_widgets/app_bar.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
+import 'package:reboot_app_3/core/shared_widgets/spinner.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/custom_theme_data.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/core/utils/icon_mapper.dart';
+import 'package:reboot_app_3/core/utils/localization_helper.dart';
 import 'package:reboot_app_3/core/utils/url_launcher_provider.dart';
 import 'package:reboot_app_3/features/vault/application/library/library_notifier.dart';
 import 'package:reboot_app_3/features/vault/data/library/models/cursor_content.dart';
@@ -34,30 +36,51 @@ class LibraryScreen extends ConsumerWidget {
         appBar: appBar(context, ref, "library", false, true),
         body: libraryNotifier.when(
           data: (library) => SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Container(
-                width: width,
-                child: SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      _searchWidget(theme, context),
-                      verticalSpace(Spacing.points16),
-                      LatestAdditionsWidget(library.latestContent),
-                      verticalSpace(Spacing.points16),
-                      FeaturedListsWidget(library.featuredLists),
-                      verticalSpace(Spacing.points16),
-                      ContentTypesWidget(library.contentTypes)
-                    ],
+            child: RefreshIndicator(
+              onRefresh: () async {
+                await ref.read(libraryNotifierProvider.notifier).refresh();
+              },
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Container(
+                  width: width,
+                  child: SingleChildScrollView(
+                    physics:
+                        const AlwaysScrollableScrollPhysics(), // Enables pull-to-refresh even when content is short
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        _searchWidget(theme, context),
+                        verticalSpace(Spacing.points16),
+                        LatestAdditionsWidget(library.latestContent),
+                        verticalSpace(Spacing.points16),
+                        FeaturedListsWidget(library.featuredLists),
+                        verticalSpace(Spacing.points16),
+                        ContentTypesWidget(library.contentTypes)
+                      ],
+                    ),
                   ),
                 ),
               ),
             ),
           ),
-          error: (error, stackTrace) => Center(child: Text('Error: $error')),
-          loading: () => Center(child: CircularProgressIndicator()),
+          error: (error, stackTrace) => SafeArea(
+            child: RefreshIndicator(
+              onRefresh: () async {
+                await ref.read(libraryNotifierProvider.notifier).refresh();
+              },
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                child: Container(
+                  height: height -
+                      200, // Ensure sufficient height for pull-to-refresh
+                  child: Center(child: Text('Error: $error')),
+                ),
+              ),
+            ),
+          ),
+          loading: () => Center(child: Spinner()),
         ));
   }
 
@@ -194,7 +217,6 @@ class ContentTypeWidget extends StatelessWidget {
           RouteNames.contentType.name,
           pathParameters: {
             'typeId': contentTypeItem.id,
-            'typeName': contentTypeItem.name
           },
         );
       },
@@ -233,7 +255,8 @@ class ContentTypeWidget extends StatelessWidget {
                   color: theme.primary[700]),
               verticalSpace(Spacing.points8),
               Text(
-                AppLocalizations.of(context).translate(contentTypeItem.name),
+                LocalizationHelper.getLocalizedName(
+                    context, contentTypeItem.name, contentTypeItem.nameAr),
                 textAlign: TextAlign.center,
                 style: TextStyles.caption.copyWith(
                   color: theme.grey[900],
@@ -364,16 +387,18 @@ class LastAdditionItemWidget extends ConsumerWidget {
                 // This handles long text with ellipsis and restricts it to one line
                 Text(
                   contentItem.name,
-                  style: TextStyles.footnote.copyWith(
-                    color: theme.grey[800],
-                  ),
+
+                  style: TextStyles.footnote
+                      .copyWith(color: theme.grey[800], height: 1.2),
+
                   maxLines: 2, // Restrict to one line
                   overflow: TextOverflow
                       .ellipsis, // Add ellipsis at the end of the text
                 ),
                 Spacer(),
                 Text(
-                  contentItem.owner.name,
+                  LocalizationHelper.getLocalizedName(context,
+                      contentItem.owner.name, contentItem.owner.nameAr),
                   style: TextStyles.small.copyWith(
                     color: theme.grey[500],
                   ),
@@ -457,7 +482,9 @@ class FeaturedListItemWidget extends StatelessWidget {
     final theme = AppTheme.of(context);
     return GestureDetector(
       onTap: () {
-        context.go('/vault/library/list/${listItem.id}');
+        context.goNamed(RouteNames.libraryList.name, pathParameters: {
+          "id": listItem.id,
+        });
       },
       child: WidgetsContainer(
         padding: EdgeInsets.all(8),
@@ -493,7 +520,8 @@ class FeaturedListItemWidget extends StatelessWidget {
             horizontalSpace(Spacing.points4),
             Expanded(
               child: Text(
-                listItem.name,
+                LocalizationHelper.getLocalizedName(
+                    context, listItem.name, listItem.nameAr),
                 style: TextStyles.small.copyWith(
                   color: theme.grey[900],
                 ),

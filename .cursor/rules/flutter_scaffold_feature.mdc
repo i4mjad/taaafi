@@ -1,0 +1,63 @@
+---
+id: flutter_scaffold_feature
+trigger: manual
+scope: "**/*.dart"
+---
+
+# New Feature Scaffold Rules
+
+## Purpose
+Generate full folder structure and boilerplate for a brand-new feature slice—UI through data—with snake_case filenames.
+
+## Placeholders
+- `{feature_name}`: snake_case identifier (e.g., `user_profile`).
+- `{FeatureName}`: PascalCase class prefix (e.g., `UserProfile`).
+
+## Folder & File Templates
+```
+lib/
+  features/
+    {feature_name}/
+      domain/
+        entities/
+          {feature_name}_entity.dart        # defines `FeatureNameEntity`
+        repositories/
+          i_{feature_name}_repository.dart   # interface `IFeatureNameRepository`
+        usecases/
+          get_{feature_name}_usecase.dart    # `GetFeatureNameUseCase`
+          create_{feature_name}_usecase.dart # `CreateFeatureNameUseCase`
+      data/
+        datasources/
+          {feature_name}_datasource.dart     # data access class
+        dtos/
+          {feature_name}_dto.dart            # defines `FeatureNameDto`
+        mappers/
+          {feature_name}_mapper.dart         # maps Entity↔Dto
+        repositories/
+          {feature_name}_repository_impl.dart # implements `I{FeatureName}Repository`
+      presentation/
+        widgets/
+          {feature_name}_screen.dart         # main screen
+          {feature_name}_widget.dart         # reusable widgets
+      providers/
+        {feature_name}_provider.dart        # `@riverpod` provider
+
+test/
+  features/
+    {feature_name}/
+      domain/entities/
+        {feature_name}_entity_test.dart
+      domain/usecases/
+        get_{feature_name}_usecase_test.dart
+        create_{feature_name}_usecase_test.dart
+      data/mappers/
+        {feature_name}_mapper_test.dart
+```
+
+## Prompt Example
+```markdown
+@agent scaffold-new-feature
+feature_name: user_profile
+DataSource: firebase_firestore
+GenerateTests: true
+```

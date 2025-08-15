@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'fcm_repository.g.dart';
@@ -38,6 +39,12 @@ class FirebaseMessagingRepository {
         );
       }
 
+      // Check if user document exists
+      final docRef = await _firestore.collection('users').doc(uid).get();
+      if (!docRef.exists) {
+        return; // Skip updating if document doesn't exist
+      }
+
       await _firestore.collection('users').doc(uid).set({
         'messagingToken': await _messaging.getToken(),
         'lastTokenUpdate': FieldValue.serverTimestamp(),
@@ -50,7 +57,7 @@ class FirebaseMessagingRepository {
 }
 
 @Riverpod(keepAlive: true)
-FirebaseMessagingRepository fcmRepository(FcmRepositoryRef ref) {
+FirebaseMessagingRepository fcmRepository(Ref ref) {
   return FirebaseMessagingRepository(
     ref.watch(fcmProvider),
     ref.watch(fcmAuthProvider),
@@ -59,16 +66,16 @@ FirebaseMessagingRepository fcmRepository(FcmRepositoryRef ref) {
 }
 
 @Riverpod(keepAlive: true)
-FirebaseMessaging fcm(FcmRef ref) {
+FirebaseMessaging fcm(Ref ref) {
   return FirebaseMessaging.instance;
 }
 
 @Riverpod(keepAlive: true)
-FirebaseAuth fcmAuth(FcmAuthRef ref) {
+FirebaseAuth fcmAuth(Ref ref) {
   return FirebaseAuth.instance;
 }
 
 @Riverpod(keepAlive: true)
-FirebaseFirestore fcmFirestore(FcmFirestoreRef ref) {
+FirebaseFirestore fcmFirestore(Ref ref) {
   return FirebaseFirestore.instance;
 }

@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:reboot_app_3/app.dart';
 import 'package:reboot_app_3/core/messaging/services/fcm_service.dart';
+import 'package:reboot_app_3/core/services/device_tracking_service.dart';
 import 'package:reboot_app_3/core/monitoring/error_logger.dart';
 import 'package:reboot_app_3/core/monitoring/mixpanel_analytics_client.dart';
 import 'package:reboot_app_3/core/utils/url_launcher_provider.dart';
@@ -28,8 +29,15 @@ Future<void> runMainApp() async {
 
   // * Preload MixpanelAnalyticsClient, so we can make unawaited analytics calls
   await container.read(mixpanelAnalyticsClientProvider.future);
+
+  // * Set global container reference for FCM service
+  MessagingService.setGlobalContainer(container);
+
   // * Initialize Notification settings
   await MessagingService.instance.init();
+
+  // * Initialize Device Tracking Service
+  await DeviceTrackingService.instance.init();
 
   //Setup error handeling pages
   registerErrorHandlers(container);

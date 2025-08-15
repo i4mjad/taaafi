@@ -7,6 +7,7 @@ import 'package:reboot_app_3/core/helpers/date_display_formater.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/shared_widgets/app_bar.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
+import 'package:reboot_app_3/core/shared_widgets/spinner.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/custom_theme_data.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
@@ -91,7 +92,7 @@ class OngoingActivitiyScreen extends ConsumerWidget {
       },
       loading: () => Scaffold(
         backgroundColor: theme.backgroundColor,
-        body: const Center(child: CircularProgressIndicator()),
+        body: const Center(child: Spinner()),
       ),
       error: (error, _) => Scaffold(
         backgroundColor: theme.backgroundColor,
@@ -492,10 +493,9 @@ class _ScheduledTaskDetailsSheetState
                           SizedBox(
                             width: 16,
                             height: 16,
-                            child: CircularProgressIndicator(
+                            child: Spinner(
                               strokeWidth: 2,
-                              valueColor: AlwaysStoppedAnimation<Color>(
-                                  widget.theme.primary[50]!),
+                              valueColor: widget.theme.primary[50],
                             ),
                           ),
                           horizontalSpace(Spacing.points8),
@@ -580,10 +580,9 @@ class _ScheduledTaskDetailsSheetState
                               SizedBox(
                                 width: 16,
                                 height: 16,
-                                child: CircularProgressIndicator(
+                                child: Spinner(
                                   strokeWidth: 2,
-                                  valueColor: AlwaysStoppedAnimation<Color>(
-                                      widget.theme.error[50]!),
+                                  valueColor: widget.theme.error[50],
                                 ),
                               ),
                               horizontalSpace(Spacing.points8),

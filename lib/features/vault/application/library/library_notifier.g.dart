@@ -6,7 +6,7 @@ part of 'library_notifier.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$libraryServiceHash() => r'bf78100b25129a202b38d294afa01e0c4a848e3d';
+String _$libraryServiceHash() => r'636f85e8605ad2ca84ece3c3d61141141d106c23';
 
 /// See also [libraryService].
 @ProviderFor(libraryService)
@@ -20,8 +20,29 @@ final libraryServiceProvider = AutoDisposeProvider<LibraryService>.internal(
   allTransitiveDependencies: null,
 );
 
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
 typedef LibraryServiceRef = AutoDisposeProviderRef<LibraryService>;
-String _$libraryRepositoryHash() => r'305912e3737fbe1883d6078cd167ad5fa50a0df8';
+String _$cachedLibraryServiceHash() =>
+    r'5d27e97f11529caa0d3c7f15c4bbbdf84f90722c';
+
+/// See also [cachedLibraryService].
+@ProviderFor(cachedLibraryService)
+final cachedLibraryServiceProvider =
+    AutoDisposeProvider<CachedLibraryService>.internal(
+  cachedLibraryService,
+  name: r'cachedLibraryServiceProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$cachedLibraryServiceHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef CachedLibraryServiceRef = AutoDisposeProviderRef<CachedLibraryService>;
+String _$libraryRepositoryHash() => r'8b4acbeba8d0e25621d8453b09dd650fe877f98f';
 
 /// See also [libraryRepository].
 @ProviderFor(libraryRepository)
@@ -36,8 +57,10 @@ final libraryRepositoryProvider =
   allTransitiveDependencies: null,
 );
 
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
 typedef LibraryRepositoryRef = AutoDisposeProviderRef<LibraryRepository>;
-String _$libraryNotifierHash() => r'299a67bf0281e5ad67177a82236d8cf1f4f8c9c3';
+String _$libraryNotifierHash() => r'e6fcdd30f5fe7fe41305dabcf733b3b0204d59d2';
 
 /// See also [LibraryNotifier].
 @ProviderFor(LibraryNotifier)
@@ -81,4 +104,4 @@ final contentListNotifierProvider = AutoDisposeAsyncNotifierProvider<
 
 typedef _$ContentListNotifier = AutoDisposeAsyncNotifier<List<CursorContent>>;
 // ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

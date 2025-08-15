@@ -1,0 +1,140 @@
+---
+id: flutter_refactoring_rules
+trigger: always
+scope: "**/*.dart"
+---
+
+# Refactoring & Clean Architecture Rules (Modular Feature-Centric)
+
+## Preferences & Conventions
+- **Dependency Injection**: Riverpod (`@riverpod` code-generated providers).
+- **DTO Naming**: Suffix `Dto` (e.g., `user_dto.dart` defining `UserDto`).
+- **External Services**: Use Firebase packages only (`cloud_firestore`, `firebase_auth`, etc.).
+- **Feature Stability**: Refactor all existing features; no legacy exemptions.
+
+## Clean Architecture Enforcement
+- **Layer separation**:
+  - **Presentation**: UI widgets and Riverpod providers only.
+  - **Domain**: Entities, use cases, repository interfaces (one file per concept).
+  - **Data**: Data sources, DTOs, mappers, repository implementations (one file per concept).
+- **Dependency flow**: Only inward (`data → domain → presentation`).
+
+## Naming & File Conventions
+Each domain concept lives in its own file under the feature directory:
+- **Entity**: `domain/entities/{entity_name}.dart` → class `EntityName`
+- **Repository interface**: `domain/repositories/i_{entity_name}_repository.dart` → `IEntityNameRepository`
+- **Use case**: `domain/usecases/{usecase_name}.dart` → `UsecaseName` (e.g., `get_user_usecase.dart`)
+- **Data source**: `data/datasources/{datasource_name}.dart`
+- **DTO**: `data/dtos/{dto_name}.dart` → `DtoName` (e.g., `user_dto.dart`)
+- **Mapper**: `data/mappers/{mapper_name}.dart`
+- **Repository impl**: `data/repositories/{entity_name}_repository_impl.dart` → `EntityNameRepositoryImpl`
+- **Widget**: `presentation/widgets/{widget_name}.dart`
+- **Provider**: `providers/{provider_name}.dart` (annotated `@riverpod`)
+
+## Folder Structure
+```text
+lib/
+  features/
+    {feature_name}/
+      domain/
+        entities/
+          user_entity.dart
+          role_entity.dart
+        repositories/
+          i_user_repository.dart
+          i_role_repository.dart
+        usecases/
+          get_user_usecase.dart
+          create_user_usecase.dart
+          assign_role_usecase.dart
+      data/
+        datasources/
+          user_datasource.dart
+          role_datasource.dart
+        dtos/
+          user_dto.dart
+          role_dto.dart
+        mappers/
+          user_mapper.dart
+          role_mapper.dart
+        repositories/
+          user_repository_impl.dart
+          role_repository_impl.dart
+      presentation/
+        widgets/
+          user_list_screen.dart
+          role_selection_dialog.dart
+      providers/
+        user_provider.dart
+        role_provider.dart
+```
+
+## Code Quality & Style
+- Enforce `analysis_options.yaml` (e.g., `effective_dart`, `pedantic`).
+- Report lint violations (deprecated APIs, TODO/FIXME, unused imports).
+- Auto-run `dart format --fix`.
+- Fail CI on analyzer errors/warnings.
+
+## Test-Driven Development (TDD)
+- **Test-first**: Write/update tests before refactoring.
+- **Cycle**: Red → Green → Refactor.
+- **Agent support**:
+```markdown
+@agent scaffold-test
+feature_name: user_management
+concept: get_user_usecase
+```
+- **Enforcement**: Block changes without corresponding tests under `test/features/{feature_name}/`.
+
+## Unit Testing Enforcement
+- **Coverage**: ≥80% for domain/use cases and mappers.
+- **Frameworks**: `package:test` + `mocktail`.
+- **Placement**:
+```text
+test/
+  features/
+    {feature_name}/
+      domain/usecases/
+        get_user_usecase_test.dart
+      data/mappers/
+        user_mapper_test.dart
+```
+
+## Preliminary Feature Analysis
+```markdown
+@agent analyze-feature
+feature_name: user_management
+analyze:
+  - domain_concepts
+  - direct_data_imports
+  - code_smells
+  - workflow_summary
+```
+
+## Migration Steps for an Existing Feature
+1. **Analyze** with `@agent analyze-feature`.
+2. **Migrate**:
+```markdown
+@agent migrate-feature
+feature_name: user_management
+apply_clean_architecture: true
+remove_direct_imports:
+  - firebase_analytics
+  - firebase_crashlytics
+refactor_providers: true
+generate_missing_tests: true
+```
+3. **Review** file structure, names, tests.
+4. **Format & Analyze**:
+```bash
+dart format --fix
+flutter analyze
+```
+5. **Fix or add tests** under `test/features/user_management/`.
+6. **Merge** and ensure CI passes.
+
+## Best Practices
+- **Atomic Commits**: One concept/use case per commit.
+- **Peer Review**: SOLID and Clean Architecture compliance.
+- **Continuous Enforcement**: Treat lint/TDD/coverage failures as blockers.
+- **Iterate Rules** to cover new patterns.

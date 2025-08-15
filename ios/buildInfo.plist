@@ -7,7 +7,7 @@
     <key>provisioningProfiles</key>
     <dict>
       <key>com.amjadkhalfan.RebootApp</key>
-      <string>taaafi-codemagic-profile</string> <!-- Replace with your provisioning profile name -->
+      <string>dist-cert-codemagic</string> <!-- Replace with your provisioning profile name -->
     </dict>
     <key>teamID</key>
     <string>JA8SVE4GX4</string> <!-- Replace with your actual Team ID -->

@@ -19,9 +19,11 @@ final firebaseAuthProvider = AutoDisposeProvider<FirebaseAuth>.internal(
   allTransitiveDependencies: null,
 );
 
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
 typedef FirebaseAuthRef = AutoDisposeProviderRef<FirebaseAuth>;
 String _$userProfileNotifierHash() =>
-    r'b5ef65a87aa6be4d3cfbe7b6086c674a1a7bc3e8';
+    r'd934be65b007c2a9953c9b14da95c17f91f42a6d';
 
 /// See also [UserProfileNotifier].
 @ProviderFor(UserProfileNotifier)
@@ -38,4 +40,4 @@ final userProfileNotifierProvider = AutoDisposeAsyncNotifierProvider<
 
 typedef _$UserProfileNotifier = AutoDisposeAsyncNotifier<UserProfile?>;
 // ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

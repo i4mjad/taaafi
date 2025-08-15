@@ -9,6 +9,7 @@ import 'package:reboot_app_3/core/shared_widgets/app_bar.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
 import 'package:reboot_app_3/core/shared_widgets/custom_textfield.dart';
 import 'package:reboot_app_3/core/shared_widgets/snackbar.dart';
+import 'package:reboot_app_3/core/shared_widgets/spinner.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
@@ -103,7 +104,7 @@ class ActivityOverviewScreen extends ConsumerWidget {
       },
       loading: () => Scaffold(
         backgroundColor: theme.backgroundColor,
-        body: const Center(child: CircularProgressIndicator()),
+        body: const Center(child: Spinner()),
       ),
       error: (error, _) => Scaffold(
         backgroundColor: theme.backgroundColor,

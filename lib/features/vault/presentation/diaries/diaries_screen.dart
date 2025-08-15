@@ -4,9 +4,12 @@ import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/helpers/date_display_formater.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
+import 'package:reboot_app_3/core/routing/route_names.dart';
 import 'package:reboot_app_3/core/shared_widgets/app_bar.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
 import 'package:reboot_app_3/core/shared_widgets/custom_textfield.dart';
+import 'package:reboot_app_3/core/shared_widgets/snackbar.dart';
+import 'package:reboot_app_3/core/shared_widgets/spinner.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
@@ -111,7 +114,7 @@ class _DiariesScreenState extends ConsumerState<DiariesScreen> {
                           );
                         },
                         loading: () => const Center(
-                          child: CircularProgressIndicator(),
+                          child: Spinner(),
                         ),
                         error: (error, stack) => Center(
                           child: Text('Error: ${error.toString()}'),
@@ -131,13 +134,12 @@ class _DiariesScreenState extends ConsumerState<DiariesScreen> {
                 .read(diariesNotifierProvider.notifier)
                 .createEmptyDiary();
             if (mounted) {
-              context.go('/vault/diaries/diary/$diaryId');
+              context.goNamed(RouteNames.diary.name,
+                  pathParameters: {'id': diaryId});
             }
           } catch (e) {
             if (mounted) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Failed to create diary: $e')),
-              );
+              getErrorSnackBar(context, "error-creating-diary");
             }
           }
         },
@@ -219,9 +221,7 @@ class _DiaryWidgetState extends ConsumerState<DiaryWidget> {
                           .deleteDiary(widget.diary.id);
                     } catch (e) {
                       if (context.mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Failed to delete diary: $e')),
-                        );
+                        getErrorSnackBar(context, "error-deleting-diary");
                       }
                     }
                   }
@@ -257,9 +257,7 @@ class _DiaryWidgetState extends ConsumerState<DiaryWidget> {
                           .deleteDiary(widget.diary.id);
                     } catch (e) {
                       if (context.mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Failed to delete diary: $e')),
-                        );
+                        getErrorSnackBar(context, "error-deleting-diary");
                       }
                     }
                   }
@@ -288,8 +286,8 @@ class _DiaryWidgetState extends ConsumerState<DiaryWidget> {
                 0,
                 0),
             child: GestureDetector(
-              onTap: () =>
-                  context.go("/vault/diaries/diary/${widget.diary.id}"),
+              onTap: () => context.goNamed(RouteNames.diary.name,
+                  pathParameters: {'id': widget.diary.id}),
               onHorizontalDragUpdate: (details) {
                 if (locale.languageCode == 'ar') {
                   // For Arabic: slide left (negative delta)
