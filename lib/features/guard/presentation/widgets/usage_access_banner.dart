@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:reboot_app_3/features/analytics/application/usage_access_provider.dart';
+import 'package:reboot_app_3/features/guard/application/usage_access_provider.dart';
 import 'package:reboot_app_3/features/guard/application/usage_permissions.dart';
 
 class UsageAccessBanner extends ConsumerWidget {
