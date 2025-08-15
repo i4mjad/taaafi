@@ -8,6 +8,9 @@ import 'package:reboot_app_3/features/guard/application/permission_lifecycle.dar
 import 'package:reboot_app_3/features/guard/application/usage_access_provider.dart';
 import 'package:reboot_app_3/features/guard/presentation/screens/usage_access_intro_sheet.dart';
 import 'package:reboot_app_3/features/guard/presentation/widgets/usage_access_banner.dart';
+import 'package:reboot_app_3/features/guard/application/ios_lifecycle_observer.dart';
+import 'package:reboot_app_3/features/guard/presentation/widgets/ios_auth_banner.dart';
+import 'package:reboot_app_3/features/guard/presentation/widgets/ios_picker_controls.dart';
 
 class GuardScreen extends ConsumerWidget {
   const GuardScreen({super.key});
@@ -18,6 +21,9 @@ class GuardScreen extends ConsumerWidget {
 
     // Register lifecycle observer to handle app resume
     ref.watch(permissionLifecycleProvider);
+
+    // Register iOS lifecycle observer to handle Screen Time auth
+    ref.watch(iosLifecycleProvider);
 
     // Check permission status and show intro sheet on first run
     WidgetsBinding.instance.addPostFrameCallback((_) async {
@@ -44,6 +50,14 @@ class GuardScreen extends ConsumerWidget {
           children: [
             // Usage Access Permission Banner
             const UsageAccessBanner(),
+
+            // iOS Screen Time Banner
+            const IosAuthBanner(),
+            const SizedBox(height: 12),
+
+            // iOS Picker Controls
+            const IosPickerControls(),
+            const SizedBox(height: 16),
 
             // Hero Focus Score Card (muted when permission missing)
             Consumer(
