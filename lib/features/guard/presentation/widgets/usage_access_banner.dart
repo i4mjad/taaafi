@@ -13,12 +13,19 @@ class UsageAccessBanner extends ConsumerWidget {
     return usageAccessAsync.when(
       data: (isGranted) {
         if (!isGranted) {
+          // QA Instrumentation - Log when banner is shown
+          print('📱 [QA] Usage Access Banner shown (permission missing)');
+
           return MaterialBanner(
             leading: const Icon(Icons.lock_outline),
-            content: const Text('Usage Access required to show Focus Score'),
+            content:
+                const Text('Usage Access is required to compute Focus Score.'),
             actions: [
               TextButton(
                 onPressed: () async {
+                  // QA Instrumentation - Log when Enable CTA is tapped
+                  print('📱 [QA] Usage Access Banner - "Enable" CTA tapped');
+
                   await openUsageAccessSettings();
                   // Refresh the provider after settings are opened
                   ref.invalidate(usageAccessGrantedProvider);
