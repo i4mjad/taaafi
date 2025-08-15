@@ -2732,4 +2732,7 @@ const Map<String, String> kAr = {
   "profile-image-removed-successfully": "تم حذف صورة الملف الشخصي بنجاح",
   "change-profile-picture": "تغيير صورة الملف الشخصي",
   "remove-profile-picture": "حذف صورة الملف الشخصي",
+
+  //Guard
+  "guard": "الحصن",
 };

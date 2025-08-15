@@ -13,3 +13,5 @@ final shellNavigatorGroupsKey =
     GlobalKey<NavigatorState>(debugLabel: 'groupsShell');
 final shellNavigatorAccountKey =
     GlobalKey<NavigatorState>(debugLabel: 'accountShell');
+final shellNavigatorGuardKey =
+    GlobalKey<NavigatorState>(debugLabel: 'guardShell');

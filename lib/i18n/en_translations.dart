@@ -2800,4 +2800,7 @@ const Map<String, String> kEn = {
   "profile-image-removed-successfully": "Profile image removed successfully",
   "change-profile-picture": "Change Profile Picture",
   "remove-profile-picture": "Remove Profile Picture",
+
+  //Guard
+  "guard": "Guard",
 };
