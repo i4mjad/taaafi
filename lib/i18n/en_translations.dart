@@ -1707,6 +1707,34 @@ const Map<String, String> kEn = {
   'thumbs_up': 'Thumbs Up',
   'thumbs_down': 'Thumbs Down',
   'interaction_failed': 'Interaction failed',
+
+  // Guard/Focus feature
+  'guard': 'Guard',
+  'focus_score': 'Focus Score',
+  'screen_time_today': 'Screen Time Today',
+  'total_screen_time': 'Total screen time',
+  'focus_breaks': 'Focus breaks',
+  'pickups': 'Pickups',
+  'top_apps': 'Top Apps',
+  'most_used': 'Most Used',
+  'time_offline': 'Time Offline',
+  'of_your_day': 'of your day',
+  'block_now': 'Block Now',
+  'live': 'LIVE',
+  'refresh_now': 'Refresh now',
+  'no_app_usage_data': 'No app usage data yet',
+  'start_monitoring_to_see_results': 'Start monitoring to see results',
+  'select_apps_and_sites': 'Select apps & sites',
+  'start_monitoring': 'Start monitoring',
+  'hourly_monitoring_started': 'Hourly monitoring started',
+  'usage_access_required': 'Usage Access is required to compute Focus Score',
+  'focus_controls': 'Focus Controls',
+  'choose_apps_to_monitor': 'Choose apps to monitor',
+  'begin_usage_tracking': 'Begin usage tracking',
+
+  'last_7_days': 'Last 7 Days',
+
+  'error_loading_data': 'Error loading data',
   'invalid_interaction_value': 'Invalid interaction value',
 
   'community_posts': 'Posts',
@@ -2802,5 +2830,4 @@ const Map<String, String> kEn = {
   "remove-profile-picture": "Remove Profile Picture",
 
   //Guard
-  "guard": "Guard",
 };

@@ -1671,6 +1671,32 @@ const Map<String, String> kAr = {
   'interaction_failed': 'فشل التفاعل',
   'invalid_interaction_value': 'قيمة تفاعل غير صحيحة',
 
+  // Guard/Focus feature - ميزة الحماية والتركيز
+  'guard': 'الحصن',
+  'focus_score': 'نقاط التركيز',
+  'screen_time_today': 'وقت الشاشة اليوم',
+  'total_screen_time': 'إجمالي وقت الشاشة',
+  'focus_breaks': 'فترات انقطاع التركيز',
+  'pickups': 'مرات فتح الجهاز',
+  'top_apps': 'التطبيقات الأكثر استخداماً',
+  'most_used': 'الأكثر استخداماً',
+  'time_offline': 'الوقت دون اتصال',
+  'of_your_day': 'من يومك',
+  'block_now': 'احجب الآن',
+  'live': 'مباشر',
+  'refresh_now': 'تحديث الآن',
+  'no_app_usage_data': 'لا توجد بيانات استخدام للتطبيقات بعد',
+  'start_monitoring_to_see_results': 'ابدأ المراقبة لرؤية النتائج',
+  'select_apps_and_sites': 'اختر التطبيقات والمواقع',
+  'start_monitoring': 'ابدأ المراقبة',
+  'hourly_monitoring_started': 'بدأت المراقبة كل ساعة',
+  'usage_access_required': 'صلاحية الوصول للاستخدام مطلوبة لحساب نقاط التركيز',
+  'focus_controls': 'أدوات التحكم في التركيز',
+  'choose_apps_to_monitor': 'اختر التطبيقات لمراقبتها',
+  'begin_usage_tracking': 'ابدأ تتبع الاستخدام',
+  'last_7_days': 'آخر ٧ أيام',
+  'error_loading_data': 'خطأ في تحميل البيانات',
+
   // Posts list and search
   'latest_posts': 'أحدث المنشورات',
   'see_all': 'عرض الكل',
@@ -2734,5 +2760,4 @@ const Map<String, String> kAr = {
   "remove-profile-picture": "حذف صورة الملف الشخصي",
 
   //Guard
-  "guard": "الحصن",
 };

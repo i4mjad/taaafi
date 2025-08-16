@@ -12,7 +12,11 @@ import 'package:reboot_app_3/features/guard/application/ios_lifecycle_observer.d
 import 'package:reboot_app_3/features/guard/application/ios_focus_providers.dart';
 import 'package:reboot_app_3/features/guard/presentation/widgets/ios_auth_banner.dart';
 import 'package:reboot_app_3/features/guard/presentation/widgets/ios_picker_controls.dart';
-import 'package:reboot_app_3/features/guard/presentation/widgets/real_data_display.dart';
+import 'package:reboot_app_3/features/guard/presentation/widgets/opal_style_focus_display.dart';
+import 'package:reboot_app_3/core/localization/localization.dart';
+import 'package:reboot_app_3/core/theming/custom_theme_data.dart';
+import 'package:reboot_app_3/core/theming/text_styles.dart';
+import 'package:reboot_app_3/core/shared_widgets/container.dart';
 
 class GuardScreen extends ConsumerWidget {
   const GuardScreen({super.key});
@@ -20,6 +24,7 @@ class GuardScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = AppTheme.of(context);
+    final localizations = AppLocalizations.of(context);
 
     // Register lifecycle observer to handle app resume
     ref.watch(permissionLifecycleProvider);
@@ -54,148 +59,262 @@ class GuardScreen extends ConsumerWidget {
     });
 
     return Scaffold(
-      appBar: appBar(context, ref, "guard", false, false),
+      appBar: appBar(context, ref, "guard", false, false, actions: [
+        const IosPickerControls(),
+      ]),
       backgroundColor: theme.backgroundColor,
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Usage Access Permission Banner
-            const UsageAccessBanner(),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Usage Access Permission Banner
+              const UsageAccessBanner(),
 
-            // iOS Screen Time Banner
-            const IosAuthBanner(),
-            const SizedBox(height: 12),
+              // iOS Screen Time Banner
+              const IosAuthBanner(),
+              const SizedBox(height: 12),
 
-            // iOS Picker Controls
-            const IosPickerControls(),
-            const SizedBox(height: 16),
+              // Beautiful Opal-style Focus Score Card
+              Consumer(
+                builder: (context, ref, child) {
+                  final usageAccessAsync =
+                      ref.watch(usageAccessGrantedProvider);
 
-            // Real Focus Score Card (muted when permission missing)
-            Consumer(
-              builder: (context, ref, child) {
-                final usageAccessAsync = ref.watch(usageAccessGrantedProvider);
+                  return usageAccessAsync.when(
+                    data: (isGranted) {
+                      final heroCard = const OpalFocusScoreCard();
 
-                return usageAccessAsync.when(
-                  data: (isGranted) {
-                    final heroCard = const RealUsageMetricsCard();
-
-                    if (!isGranted) {
-                      // Mute the card when permission is missing
-                      return Stack(
-                        children: [
-                          IgnorePointer(
-                            ignoring: true,
-                            child: Opacity(
-                              opacity: 0.4,
-                              child: heroCard,
+                      if (!isGranted) {
+                        // Mute the card when permission is missing
+                        return Stack(
+                          children: [
+                            IgnorePointer(
+                              ignoring: true,
+                              child: Opacity(
+                                opacity: 0.4,
+                                child: heroCard,
+                              ),
                             ),
-                          ),
-                          Positioned.fill(
-                            child: Center(
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 12,
-                                  vertical: 6,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .surface
-                                      .withOpacity(0.9),
-                                  borderRadius: BorderRadius.circular(20),
-                                  border: Border.all(
-                                    color:
-                                        Theme.of(context).colorScheme.outline,
+                            Positioned.fill(
+                              child: Center(
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                    vertical: 6,
                                   ),
-                                ),
-                                child: Text(
-                                  'Permission required',
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .bodySmall
-                                      ?.copyWith(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .onSurfaceVariant,
-                                      ),
+                                  decoration: BoxDecoration(
+                                    color: theme.backgroundColor,
+                                    borderRadius: BorderRadius.circular(20),
+                                    border: Border.all(
+                                      color:
+                                          Theme.of(context).colorScheme.outline,
+                                    ),
+                                  ),
+                                  child: Text(
+                                    localizations
+                                        .translate('usage_access_required'),
+                                    style: TextStyles.caption.copyWith(
+                                      color: theme.grey[600],
+                                    ),
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
-                        ],
-                      );
-                    }
+                          ],
+                        );
+                      }
 
-                    return heroCard;
-                  },
-                  loading: () => Card(
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16)),
-                    child: Container(
-                      height: 136,
-                      child: const Center(
-                        child: CircularProgressIndicator(),
-                      ),
-                    ),
-                  ),
-                  error: (_, __) => Card(
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16)),
-                    child: Container(
-                      height: 136,
-                      child: const Center(
-                        child: Text('Error loading Focus Score'),
-                      ),
-                    ),
-                  ),
-                );
-              },
-            ),
-            const SizedBox(height: 24),
-
-            // Real app usage data
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text('Today\'s Top Apps',
-                    style:
-                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                IconButton(
-                  onPressed: () {
-                    // Refresh data manually
-                    ref.invalidate(iosSnapshotProvider);
-                  },
-                  icon: const Icon(Icons.refresh),
-                  tooltip: 'Refresh data',
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            const Expanded(
-              child: RealAppUsageList(),
-            ),
-
-            const SizedBox(height: 24),
-
-            // Weekly Trends placeholder
-            const Text('Last 7 Days',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 12),
-            Container(
-              height: 180,
-              width: double.infinity,
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.surfaceVariant,
-                borderRadius: BorderRadius.circular(16),
+                      return heroCard;
+                    },
+                    loading: () =>
+                        const Center(child: CircularProgressIndicator()),
+                    error: (error, stackTrace) =>
+                        Center(child: Text('Error: $error')),
+                  );
+                },
               ),
-              alignment: Alignment.center,
-              child: const Text('Bar Chart Placeholder'),
-            ),
-          ],
+              const SizedBox(height: 24),
+
+              // Top Apps Section with Live indicator
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    localizations.translate('top_apps'),
+                    style: TextStyles.h6.copyWith(
+                      color: theme.grey[900],
+                    ),
+                  ),
+                  Row(
+                    children: [
+                      // Live indicator
+                      Container(
+                        width: 8,
+                        height: 8,
+                        decoration: const BoxDecoration(
+                          color: Colors.green,
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        localizations.translate('live'),
+                        style: TextStyles.tiny.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.green,
+                          letterSpacing: 1.0,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      IconButton(
+                        onPressed: () {
+                          // Trigger manual refresh
+                          final currentCount = ref.read(manualRefreshProvider);
+                          ref.read(manualRefreshProvider.notifier).state =
+                              currentCount + 1;
+                        },
+                        icon: const Icon(Icons.refresh),
+                        tooltip: localizations.translate('refresh_now'),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+
+              // Beautiful App Usage List
+              const OpalAppUsageList(),
+
+              const SizedBox(height: 16),
+
+              // Time Offline Section (Opal-style)
+              // _TimeOfflineSection(
+              //   theme: theme,
+              //   localizations: localizations,
+              // ),
+            ],
+          ),
         ),
       ),
     );
   }
 }
+
+/// Time Offline section similar to Opal design
+// class _TimeOfflineSection extends StatelessWidget {
+//   final CustomThemeData theme;
+//   final AppLocalizations localizations;
+
+//   const _TimeOfflineSection({
+//     required this.theme,
+//     required this.localizations,
+//   });
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return WidgetsContainer(
+//       backgroundColor: theme.backgroundColor,
+//       borderRadius: BorderRadius.circular(20),
+//       padding: const EdgeInsets.all(20),
+//       child: Row(
+//         children: [
+//           // Offline icon
+//           Container(
+//             width: 48,
+//             height: 48,
+//             decoration: BoxDecoration(
+//               color: theme.primary[50],
+//               shape: BoxShape.circle,
+//             ),
+//             child: Icon(
+//               Icons.offline_bolt,
+//               color: theme.primary[500],
+//               size: 24,
+//             ),
+//           ),
+//           const SizedBox(width: 16),
+
+//           // Time offline info
+//           Expanded(
+//             child: Column(
+//               crossAxisAlignment: CrossAxisAlignment.start,
+//               children: [
+//                 Text(
+//                   localizations.translate('time_offline'),
+//                   style: TextStyles.h6.copyWith(
+//                     color: theme.grey[900],
+//                   ),
+//                 ),
+//                 const SizedBox(height: 4),
+//                 Text(
+//                   '10h 38m', // This would come from actual data
+//                   style: TextStyles.h4.copyWith(
+//                     color: theme.grey[900],
+//                     fontWeight: FontWeight.w600,
+//                   ),
+//                 ),
+//                 const SizedBox(height: 4),
+//                 Text(
+//                   '62% ${localizations.translate('of_your_day')}',
+//                   style: TextStyles.caption.copyWith(
+//                     color: theme.grey[600],
+//                   ),
+//                 ),
+//               ],
+//             ),
+//           ),
+
+//           // Block Now button (Opal-style)
+//           Container(
+//             decoration: BoxDecoration(
+//               gradient: LinearGradient(
+//                 colors: [
+//                   const Color(0xFF10B981),
+//                   const Color(0xFF34D399),
+//                 ],
+//                 begin: Alignment.topLeft,
+//                 end: Alignment.bottomRight,
+//               ),
+//               borderRadius: BorderRadius.circular(24),
+//             ),
+//             child: Material(
+//               color: Colors.transparent,
+//               child: InkWell(
+//                 borderRadius: BorderRadius.circular(24),
+//                 onTap: () {
+//                   // Block functionality would go here
+//                 },
+//                 child: Padding(
+//                   padding: const EdgeInsets.symmetric(
+//                     horizontal: 20,
+//                     vertical: 12,
+//                   ),
+//                   child: Row(
+//                     mainAxisSize: MainAxisSize.min,
+//                     children: [
+//                       Icon(
+//                         Icons.play_arrow,
+//                         color: Colors.white,
+//                         size: 18,
+//                       ),
+//                       const SizedBox(width: 8),
+//                       Text(
+//                         localizations.translate('block_now'),
+//                         style: TextStyles.footnote.copyWith(
+//                           color: Colors.white,
+//                           fontWeight: FontWeight.w600,
+//                         ),
+//                       ),
+//                     ],
+//                   ),
+//                 ),
+//               ),
+//             ),
+//           ),
+//         ],
+//       ),
+//     );
+//   }
+// }

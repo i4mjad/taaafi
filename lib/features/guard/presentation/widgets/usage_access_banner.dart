@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:reboot_app_3/features/guard/application/usage_access_provider.dart';
 import 'package:reboot_app_3/features/guard/application/usage_permissions.dart';
+import 'package:reboot_app_3/core/localization/localization.dart';
 
 class UsageAccessBanner extends ConsumerWidget {
   const UsageAccessBanner({super.key});
@@ -9,6 +10,7 @@ class UsageAccessBanner extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final usageAccessAsync = ref.watch(usageAccessGrantedProvider);
+    final localizations = AppLocalizations.of(context);
 
     return usageAccessAsync.when(
       data: (isGranted) {
@@ -18,8 +20,7 @@ class UsageAccessBanner extends ConsumerWidget {
 
           return MaterialBanner(
             leading: const Icon(Icons.lock_outline),
-            content:
-                const Text('Usage Access is required to compute Focus Score.'),
+            content: Text(localizations.translate('usage_access_required')),
             actions: [
               TextButton(
                 onPressed: () async {
@@ -30,7 +31,7 @@ class UsageAccessBanner extends ConsumerWidget {
                   // Refresh the provider after settings are opened
                   ref.invalidate(usageAccessGrantedProvider);
                 },
-                child: const Text('Enable'),
+                child: Text(localizations.translate('enable')),
               ),
             ],
           );

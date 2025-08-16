@@ -39,3 +39,20 @@ Future<Map<String, dynamic>> iosGetSnapshot() async {
   final map = await _call('ios_getSnapshot');
   return Map<String, dynamic>.from((map ?? {}) as Map);
 }
+
+Future<Map<String, dynamic>> androidGetSnapshot() async {
+  if (!Platform.isAndroid) return {};
+  try {
+    final map = await _call('android_getSnapshot');
+    return Map<String, dynamic>.from((map ?? {}) as Map);
+  } catch (e) {
+    focusLog('androidGetSnapshot error', data: e);
+    // Return mock data for development
+    return {
+      'apps': [],
+      'pickups': 0,
+      'notifications': 0,
+      'generatedAt': DateTime.now().toIso8601String(),
+    };
+  }
+}

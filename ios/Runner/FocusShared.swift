@@ -16,5 +16,10 @@ enum FocusShared {
 
 extension DeviceActivityName {
     static let everyHour = Self("everyHour")
+    static let realtimeUpdates = Self("realtimeUpdates")
+}
+
+extension DeviceActivityEvent.Name {
+    static let usageThreshold = Self("usageThreshold")
 }
 

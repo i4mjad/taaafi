@@ -40,16 +40,31 @@ final class FocusBridge {
         FocusLogger.d("FamilyActivityPicker presented")
     }
 
-    // 3) Start an hourly DeviceActivity monitor (context name: everyHour)
+    // 3) Start frequent DeviceActivity monitoring (every 5 minutes + events)
     func startHourlyMonitoring() throws {
-        FocusLogger.d("startHourlyMonitoring")
-        let schedule = DeviceActivitySchedule(
+        FocusLogger.d("startRealtimeMonitoring")
+        
+        // 5-minute intervals for regular updates
+        let frequentSchedule = DeviceActivitySchedule(
             intervalStart: DateComponents(minute: 0),
-            intervalEnd:   DateComponents(minute: 59),
+            intervalEnd: DateComponents(minute: 4, second: 59),
             repeats: true
         )
-        try DeviceActivityCenter().startMonitoring(.everyHour, during: schedule)
-        FocusLogger.d("hourly monitoring started")
+        
+        // Set up usage threshold events for real-time notifications
+        let events: [DeviceActivityEvent.Name: DeviceActivityEvent] = [
+            .usageThreshold: DeviceActivityEvent(
+                applications: FocusSelectionStore.load()?.applicationTokens ?? Set(),
+                threshold: DateComponents(minute: 1) // Trigger every 1 minute of usage
+            )
+        ]
+        
+        try DeviceActivityCenter().startMonitoring(
+            .realtimeUpdates, 
+            during: frequentSchedule,
+            events: events
+        )
+        FocusLogger.d("realtime monitoring started (5min intervals + 1min thresholds)")
     }
 
     // 4) Read last snapshot from App Group
