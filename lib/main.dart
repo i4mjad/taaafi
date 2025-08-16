@@ -19,6 +19,10 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+void main() async {
+  await runMainApp();
+}
+
 Future<void> runMainApp() async {
   WidgetsFlutterBinding.ensureInitialized();
   //Initalize Firebase
