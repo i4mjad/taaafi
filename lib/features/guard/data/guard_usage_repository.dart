@@ -1,31 +1,41 @@
 import 'dart:io';
 import 'package:flutter/services.dart';
+import '../../../core/logging/focus_log.dart';
 
 const MethodChannel _chan = MethodChannel('analytics.usage');
 
+Future<T?> _call<T>(String method, [dynamic args]) async {
+  final t0 = DateTime.now();
+  focusLog('Dart→Native $method', data: args);
+  try {
+    final res = await _chan.invokeMethod<T>(method, args);
+    focusLog(
+        'Native→Dart $method OK (${DateTime.now().difference(t0).inMilliseconds} ms)',
+        data: res);
+    return res;
+  } catch (e) {
+    focusLog('Native→Dart $method ERROR', data: e);
+    rethrow;
+  }
+}
+
 Future<void> iosRequestAuthorization() async {
   if (!Platform.isIOS) return;
-  await _chan.invokeMethod('ios_requestAuthorization');
+  await _call('ios_requestAuthorization');
 }
 
 Future<void> iosPresentPicker() async {
   if (!Platform.isIOS) return;
-  await _chan.invokeMethod('ios_presentPicker');
+  await _call('ios_presentPicker');
 }
 
 Future<void> iosStartMonitoring() async {
   if (!Platform.isIOS) return;
-  await _chan.invokeMethod('ios_startMonitoring');
+  await _call('ios_startMonitoring');
 }
 
 Future<Map<String, dynamic>> iosGetSnapshot() async {
   if (!Platform.isIOS) return {};
-  final map = await _chan.invokeMethod('ios_getSnapshot');
+  final map = await _call('ios_getSnapshot');
   return Map<String, dynamic>.from((map ?? {}) as Map);
-}
-
-Future<bool> iosGetAuthorizationStatus() async {
-  if (!Platform.isIOS) return true;
-  final res = await _chan.invokeMethod('ios_getAuthorizationStatus');
-  return res == true;
 }

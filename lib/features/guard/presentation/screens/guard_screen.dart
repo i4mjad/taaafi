@@ -9,8 +9,10 @@ import 'package:reboot_app_3/features/guard/application/usage_access_provider.da
 import 'package:reboot_app_3/features/guard/presentation/screens/usage_access_intro_sheet.dart';
 import 'package:reboot_app_3/features/guard/presentation/widgets/usage_access_banner.dart';
 import 'package:reboot_app_3/features/guard/application/ios_lifecycle_observer.dart';
+import 'package:reboot_app_3/features/guard/application/ios_focus_providers.dart';
 import 'package:reboot_app_3/features/guard/presentation/widgets/ios_auth_banner.dart';
 import 'package:reboot_app_3/features/guard/presentation/widgets/ios_picker_controls.dart';
+import 'package:reboot_app_3/features/guard/presentation/widgets/real_data_display.dart';
 
 class GuardScreen extends ConsumerWidget {
   const GuardScreen({super.key});
@@ -28,6 +30,17 @@ class GuardScreen extends ConsumerWidget {
     // Check permission status and show intro sheet on first run
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (Platform.isAndroid) {
+        final hasSeenIntro = await getHasSeenUsageAccessIntro();
+        if (!hasSeenIntro && context.mounted) {
+          final usageAccessAsync = ref.read(usageAccessGrantedProvider);
+          usageAccessAsync.whenData((isGranted) {
+            if (!isGranted && context.mounted) {
+              showUsageAccessIntroSheet(context);
+            }
+          });
+        }
+      }
+      if (Platform.isIOS) {
         final hasSeenIntro = await getHasSeenUsageAccessIntro();
         if (!hasSeenIntro && context.mounted) {
           final usageAccessAsync = ref.read(usageAccessGrantedProvider);
@@ -59,54 +72,14 @@ class GuardScreen extends ConsumerWidget {
             const IosPickerControls(),
             const SizedBox(height: 16),
 
-            // Hero Focus Score Card (muted when permission missing)
+            // Real Focus Score Card (muted when permission missing)
             Consumer(
               builder: (context, ref, child) {
                 final usageAccessAsync = ref.watch(usageAccessGrantedProvider);
 
                 return usageAccessAsync.when(
                   data: (isGranted) {
-                    final heroCard = Card(
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16)),
-                      child: Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            // Focus gauge placeholder
-                            Container(
-                              width: 120,
-                              height: 120,
-                              decoration: BoxDecoration(
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .surfaceVariant,
-                                shape: BoxShape.circle,
-                              ),
-                              alignment: Alignment.center,
-                              child: const Text(
-                                '85',
-                                style: TextStyle(
-                                    fontSize: 32, fontWeight: FontWeight.bold),
-                              ),
-                            ),
-                            // KPIs placeholder
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: const [
-                                _Kpi(label: 'Focused time', value: '4h 30m'),
-                                SizedBox(height: 8),
-                                _Kpi(
-                                    label: 'Distracting time', value: '1h 15m'),
-                                SizedBox(height: 8),
-                                _Kpi(label: 'Pickups', value: '23'),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
+                    final heroCard = const RealUsageMetricsCard();
 
                     if (!isGranted) {
                       // Mute the card when permission is missing
@@ -182,26 +155,26 @@ class GuardScreen extends ConsumerWidget {
             ),
             const SizedBox(height: 24),
 
-            // Top Apps Section
-            const Text('Today\'s Top Apps',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            // Real app usage data
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text('Today\'s Top Apps',
+                    style:
+                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                IconButton(
+                  onPressed: () {
+                    // Refresh data manually
+                    ref.invalidate(iosSnapshotProvider);
+                  },
+                  icon: const Icon(Icons.refresh),
+                  tooltip: 'Refresh data',
+                ),
+              ],
+            ),
             const SizedBox(height: 12),
-            Expanded(
-              child: ListView.builder(
-                itemCount: 5,
-                itemBuilder: (context, index) {
-                  return ListTile(
-                    leading: const CircleAvatar(child: Icon(Icons.apps)),
-                    title: Text('App ${index + 1}'),
-                    subtitle: LinearProgressIndicator(
-                      value: 0.3 * (index + 1),
-                      minHeight: 8,
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    trailing: const Text('45m'),
-                  );
-                },
-              ),
+            const Expanded(
+              child: RealAppUsageList(),
             ),
 
             const SizedBox(height: 24),
@@ -223,24 +196,6 @@ class GuardScreen extends ConsumerWidget {
           ],
         ),
       ),
-    );
-  }
-}
-
-class _Kpi extends StatelessWidget {
-  final String label;
-  final String value;
-  const _Kpi({required this.label, required this.value});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(value,
-            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-        Text(label, style: const TextStyle(fontSize: 12, color: Colors.grey)),
-      ],
     );
   }
 }

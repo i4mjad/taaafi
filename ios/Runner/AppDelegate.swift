@@ -15,20 +15,44 @@ import Flutter
       Task { @MainActor in
         switch call.method {
         case "ios_requestAuthorization":
-          do { try await FocusBridge.shared.requestAuthorization(); result(true) }
-          catch { result(FlutterError(code: "auth_failed", message: error.localizedDescription, details: nil)) }
+          FocusLogger.d("ios_requestAuthorization:start")
+          do { 
+            try await FocusBridge.shared.requestAuthorization()
+            FocusLogger.d("ios_requestAuthorization:done true")
+            result(true) 
+          }
+          catch { 
+            FocusLogger.e("ios_requestAuthorization:error \(error)")
+            result(FlutterError(code: "auth_failed", message: error.localizedDescription, details: nil)) 
+          }
 
         case "ios_presentPicker":
-          FocusBridge.shared.presentPicker(); result(nil)
+          FocusLogger.d("ios_presentPicker:start")
+          FocusBridge.shared.presentPicker()
+          FocusLogger.d("ios_presentPicker:done")
+          result(nil)
 
         case "ios_startMonitoring":
-          do { try FocusBridge.shared.startHourlyMonitoring(); result(true) }
-          catch { result(FlutterError(code: "monitor_failed", message: error.localizedDescription, details: nil)) }
+          FocusLogger.d("ios_startMonitoring:start")
+          do { 
+            try FocusBridge.shared.startHourlyMonitoring()
+            FocusLogger.d("ios_startMonitoring:done true")
+            result(true) 
+          }
+          catch { 
+            FocusLogger.e("ios_startMonitoring:error \(error)")
+            result(FlutterError(code: "monitor_failed", message: error.localizedDescription, details: nil)) 
+          }
 
         case "ios_getSnapshot":
-          result(FocusBridge.shared.getLastSnapshot())
+          FocusLogger.d("ios_getSnapshot:start")
+          let snapshot = FocusBridge.shared.getLastSnapshot()
+          FocusLogger.d("ios_getSnapshot:done", snapshot)
+          result(snapshot)
 
-        default: result(FlutterMethodNotImplemented)
+        default: 
+          FocusLogger.d("unknown method: \(call.method)")
+          result(FlutterMethodNotImplemented)
         }
       }
     }

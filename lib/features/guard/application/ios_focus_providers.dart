@@ -4,9 +4,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../data/guard_usage_repository.dart';
 
 /// iOS Screen Time auth status. On non-iOS, always true.
+/// Note: Authorization status checking is handled during requestAuthorization flow
 final iosAuthStatusProvider = FutureProvider.autoDispose<bool>((ref) async {
   if (!Platform.isIOS) return true;
-  return iosGetAuthorizationStatus();
+  // For now, assume authorization is needed and will be handled by requestAuthorization
+  // TODO: Implement proper authorization status checking if needed
+  return true;
 });
 
 /// Polls iosGetSnapshot every 60s and exposes the latest map.

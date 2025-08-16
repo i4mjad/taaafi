@@ -2,12 +2,25 @@ import 'dart:io';
 import 'package:flutter/services.dart';
 import 'package:reboot_app_3/features/guard/data/models.dart';
 import 'dart:convert';
+import '../../../../core/logging/focus_log.dart';
 
 final _chan = const MethodChannel('analytics.usage');
 
 Future<Map<String, dynamic>> _invoke(String method) async {
-  final raw = await _chan.invokeMethod(method);
-  return raw is String ? jsonDecode(raw) : Map<String, dynamic>.from(raw);
+  final t0 = DateTime.now();
+  focusLog('Dart→Native $method');
+  try {
+    final raw = await _chan.invokeMethod(method);
+    final result =
+        raw is String ? jsonDecode(raw) : Map<String, dynamic>.from(raw);
+    focusLog(
+        'Native→Dart $method OK (${DateTime.now().difference(t0).inMilliseconds} ms)',
+        data: result);
+    return result;
+  } catch (e) {
+    focusLog('Native→Dart $method ERROR', data: e);
+    rethrow;
+  }
 }
 
 Future<UsageSnapshot> loadSnapshot() async {
