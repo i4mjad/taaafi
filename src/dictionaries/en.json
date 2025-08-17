@@ -1754,6 +1754,8 @@
             "deleted": "Deleted",
             "deletedCommentText": "This comment has been deleted",
             "deletedPostText": "This post has been deleted",
+            "deletedPostNotice": "This post is deleted but its content remains visible for moderation purposes",
+            "deletedCommentNotice": "This comment is deleted but its content remains visible for moderation purposes",
             "moreInteractions": "{count} more interactions",
             "accessibility": {
               "openMenu": "Open menu"

@@ -1771,6 +1771,8 @@
             "deleted": "محذوف",
             "deletedCommentText": "تم حذف هذا التعليق",
             "deletedPostText": "تم حذف هذا المنشور",
+            "deletedPostNotice": "هذا المنشور محذوف ولكن محتواه لا يزال مرئياً لأغراض الإشراف",
+            "deletedCommentNotice": "هذا التعليق محذوف ولكن محتواه لا يزال مرئياً لأغراض الإشراف",
             "moreInteractions": "{count} تفاعل إضافي",
             "accessibility": {
               "openMenu": "فتح القائمة"

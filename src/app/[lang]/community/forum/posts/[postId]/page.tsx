@@ -628,9 +628,14 @@ export default function PostDetailPage() {
                 </div>
               ) : (
                 <div className="prose max-w-none">
-                  <p className={`whitespace-pre-wrap ${post.isDeleted ? 'line-through text-muted-foreground italic' : ''}`}>
-                    {post.isDeleted ? t('modules.community.posts.detailPage.deletedPostText') : post.body}
+                  <p className={`whitespace-pre-wrap ${post.isDeleted ? 'opacity-75 italic' : ''}`}>
+                    {post.body}
                   </p>
+                  {post.isDeleted && (
+                    <div className="mt-2 p-2 bg-destructive/10 border border-destructive/20 rounded text-sm text-destructive">
+                      <span className="font-medium">⚠️ {t('modules.community.posts.detailPage.deletedPostNotice')}</span>
+                    </div>
+                  )}
                 </div>
               )}
               
@@ -743,9 +748,14 @@ export default function PostDetailPage() {
                                 </Badge>
                               )}
                             </div>
-                            <p className={`text-sm whitespace-pre-wrap mb-2 ${comment.isDeleted ? 'line-through text-muted-foreground italic' : ''}`}>
-                              {comment.isDeleted ? t('modules.community.posts.detailPage.deletedCommentText') : comment.body}
+                            <p className={`text-sm whitespace-pre-wrap mb-2 ${comment.isDeleted ? 'opacity-75 italic' : ''}`}>
+                              {comment.body}
                             </p>
+                            {comment.isDeleted && (
+                              <div className="mb-2 p-2 bg-destructive/10 border border-destructive/20 rounded text-xs text-destructive">
+                                <span className="font-medium">⚠️ {t('modules.community.posts.detailPage.deletedCommentNotice')}</span>
+                              </div>
+                            )}
                             <div className="flex items-center space-x-3 text-xs text-muted-foreground">
                               <div className="flex items-center space-x-1">
                                 <ThumbsUp className="h-3 w-3 text-green-600" />
