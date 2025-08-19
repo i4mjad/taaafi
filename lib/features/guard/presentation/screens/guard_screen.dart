@@ -9,14 +9,15 @@ import 'package:reboot_app_3/features/guard/application/usage_access_provider.da
 import 'package:reboot_app_3/features/guard/presentation/screens/usage_access_intro_sheet.dart';
 import 'package:reboot_app_3/features/guard/presentation/widgets/usage_access_banner.dart';
 import 'package:reboot_app_3/features/guard/application/ios_lifecycle_observer.dart';
-import 'package:reboot_app_3/features/guard/application/ios_focus_providers.dart';
 import 'package:reboot_app_3/features/guard/presentation/widgets/ios_auth_banner.dart';
 import 'package:reboot_app_3/features/guard/presentation/widgets/ios_picker_controls.dart';
 import 'package:reboot_app_3/features/guard/presentation/widgets/opal_style_focus_display.dart';
+import 'package:reboot_app_3/features/guard/application/ios_focus_providers.dart';
+import 'package:reboot_app_3/features/guard/data/guard_usage_repository.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
-import 'package:reboot_app_3/core/theming/custom_theme_data.dart';
+// Removed unused import: custom_theme_data
 import 'package:reboot_app_3/core/theming/text_styles.dart';
-import 'package:reboot_app_3/core/shared_widgets/container.dart';
+// Removed unused import: container
 
 class GuardScreen extends ConsumerWidget {
   const GuardScreen({super.key});
@@ -61,6 +62,129 @@ class GuardScreen extends ConsumerWidget {
     return Scaffold(
       appBar: appBar(context, ref, "guard", false, false, actions: [
         const IosPickerControls(),
+        IconButton(
+          tooltip: localizations.translate('view_logs'),
+          icon: const Icon(Icons.list_alt),
+          onPressed: () async {
+            if (!context.mounted) return;
+            await showModalBottomSheet(
+              context: context,
+              useSafeArea: true,
+              isScrollControlled: true,
+              showDragHandle: true,
+              backgroundColor: AppTheme.of(context).backgroundColor,
+              builder: (ctx) {
+                final sheetTheme = AppTheme.of(ctx);
+                return SafeArea(
+                  child: DraggableScrollableSheet(
+                    expand: false,
+                    initialChildSize: 0.6,
+                    minChildSize: 0.3,
+                    maxChildSize: 0.95,
+                    builder: (context, controller) {
+                      return Consumer(
+                        builder: (context, ref, _) {
+                          final logsAsync = ref.watch(nativeLogsProvider);
+                          final theme = AppTheme.of(context);
+                          return logsAsync.when(
+                            data: (logs) => Container(
+                              color: sheetTheme.backgroundColor,
+                              child: Column(
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 8.0),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        // Count label for quick debugging/visibility
+                                        Text(
+                                          '${localizations.translate('logs')}: ${logs.length}',
+                                          style: TextStyles.caption.copyWith(
+                                            color: theme.grey[600],
+                                          ),
+                                        ),
+                                        Row(
+                                          children: [
+                                            IconButton(
+                                              tooltip: localizations
+                                                  .translate('refresh_now'),
+                                              onPressed: () {
+                                                // force re-fetch
+                                                ref.invalidate(
+                                                    nativeLogsProvider);
+                                              },
+                                              icon: const Icon(Icons.refresh),
+                                            ),
+                                            TextButton.icon(
+                                              onPressed: () async {
+                                                await clearNativeLogs();
+                                                ref.invalidate(
+                                                    nativeLogsProvider);
+                                              },
+                                              icon: const Icon(
+                                                  Icons.delete_sweep),
+                                              label: Text(
+                                                localizations
+                                                    .translate('clear'),
+                                                style: TextStyles.footnote
+                                                    .copyWith(
+                                                  color: theme.grey[900],
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  Divider(height: 1, color: theme.grey[200]),
+                                  Expanded(
+                                    child: ListView.builder(
+                                      controller: controller,
+                                      itemCount: logs.length,
+                                      itemBuilder: (context, index) {
+                                        final line = logs[index];
+                                        return Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 16, vertical: 10),
+                                          child: Text(
+                                            line,
+                                            style: TextStyles.footnote.copyWith(
+                                              color: theme.grey[900],
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            loading: () => const Center(
+                              child: Padding(
+                                padding: EdgeInsets.all(24.0),
+                                child: CircularProgressIndicator(),
+                              ),
+                            ),
+                            error: (e, _) => Padding(
+                              padding: const EdgeInsets.all(16.0),
+                              child: Text('Error: $e',
+                                  style: TextStyles.footnote.copyWith(
+                                    color: theme.grey[900],
+                                  )),
+                            ),
+                          );
+                        },
+                      );
+                    },
+                  ),
+                );
+              },
+            );
+          },
+        ),
       ]),
       backgroundColor: theme.backgroundColor,
       body: SingleChildScrollView(
@@ -206,12 +330,12 @@ class GuardScreen extends ConsumerWidget {
 // class _TimeOfflineSection extends StatelessWidget {
 //   final CustomThemeData theme;
 //   final AppLocalizations localizations;
-
+//
 //   const _TimeOfflineSection({
 //     required this.theme,
 //     required this.localizations,
 //   });
-
+//
 //   @override
 //   Widget build(BuildContext context) {
 //     return WidgetsContainer(
@@ -235,7 +359,7 @@ class GuardScreen extends ConsumerWidget {
 //             ),
 //           ),
 //           const SizedBox(width: 16),
-
+//
 //           // Time offline info
 //           Expanded(
 //             child: Column(
@@ -265,7 +389,7 @@ class GuardScreen extends ConsumerWidget {
 //               ],
 //             ),
 //           ),
-
+//
 //           // Block Now button (Opal-style)
 //           Container(
 //             decoration: BoxDecoration(

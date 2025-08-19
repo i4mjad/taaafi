@@ -12,6 +12,7 @@ import DeviceActivity
 enum FocusShared {
   static let appGroupId = "group.com.taaafi.app"
   static let lastSnapshotKey = "FocusLastSnapshot"
+  static let logsKey = "FocusLogs"
 }
 
 extension DeviceActivityName {
@@ -21,5 +22,20 @@ extension DeviceActivityName {
 
 extension DeviceActivityEvent.Name {
     static let usageThreshold = Self("usageThreshold")
+}
+
+// MARK: - Shared helpers
+
+extension FocusShared {
+  /// Append a log line into the shared App Group log buffer (capped to 200 lines)
+  static func appendLog(_ line: String) {
+    let ud = UserDefaults(suiteName: appGroupId) ?? UserDefaults.standard // Simulator fallback
+    var logs = ud.stringArray(forKey: logsKey) ?? []
+    logs.append(line)
+    if logs.count > 200 {
+      logs.removeFirst(logs.count - 200)
+    }
+    ud.set(logs, forKey: logsKey)
+  }
 }
 

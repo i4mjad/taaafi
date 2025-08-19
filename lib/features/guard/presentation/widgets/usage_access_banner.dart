@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:reboot_app_3/features/guard/application/usage_access_provider.dart';
-import 'package:reboot_app_3/features/guard/application/usage_permissions.dart';
+// Removed unused import: usage_permissions
+import 'package:reboot_app_3/features/guard/data/guard_usage_repository.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
 
 class UsageAccessBanner extends ConsumerWidget {
@@ -27,7 +28,9 @@ class UsageAccessBanner extends ConsumerWidget {
                   // QA Instrumentation - Log when Enable CTA is tapped
                   print('📱 [QA] Usage Access Banner - "Enable" CTA tapped');
 
-                  await openUsageAccessSettings();
+                  // Use unified facade for Android
+                  await const FocusFacade()
+                      .requestPermissionsAndStartMonitoring();
                   // Refresh the provider after settings are opened
                   ref.invalidate(usageAccessGrantedProvider);
                 },

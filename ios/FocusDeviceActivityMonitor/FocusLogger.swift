@@ -15,12 +15,14 @@ enum FocusLogger {
         #if DEBUG || LOG_FOCUS
         logger.debug("\(msg, privacy: .public)")
         #endif
+        FocusShared.appendLog("D [Monitor] \(msg)")
     }
     
     @inlinable static func e(_ msg: String) {
         #if DEBUG || LOG_FOCUS
         logger.error("\(msg, privacy: .public)")
         #endif
+        FocusShared.appendLog("E [Monitor] \(msg)")
     }
     
     @inlinable static func d(_ msg: String, _ data: Any) {
@@ -28,6 +30,10 @@ enum FocusLogger {
         let dataStr = String(describing: data)
         let truncated = dataStr.count <= 300 ? dataStr : String(dataStr.prefix(300)) + "…"
         logger.debug("\(msg, privacy: .public) — \(truncated, privacy: .public)")
+        #else
+        let dataStr = String(describing: data)
+        let truncated = dataStr.count <= 300 ? dataStr : String(dataStr.prefix(300)) + "…"
         #endif
+        FocusShared.appendLog("D [Monitor] \(msg) — \(truncated)")
     }
 }

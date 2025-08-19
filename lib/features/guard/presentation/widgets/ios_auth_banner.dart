@@ -25,7 +25,8 @@ class IosAuthBanner extends ConsumerWidget {
           actions: [
             TextButton(
               onPressed: () async {
-                await iosRequestAuthorization();
+                await const FocusFacade()
+                    .requestPermissionsAndStartMonitoring();
                 ref.invalidate(iosAuthStatusProvider);
               },
               child: const Text('Enable'),

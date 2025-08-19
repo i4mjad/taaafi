@@ -61,6 +61,21 @@ final iosSnapshotProvider =
 /// Manual refresh provider for immediate updates
 final manualRefreshProvider = StateProvider.autoDispose<int>((ref) => 0);
 
+/// Native logs provider
+final nativeLogsProvider =
+    FutureProvider.autoDispose<List<String>>((ref) async {
+  // Refetch when manually refreshed
+  ref.watch(manualRefreshProvider);
+  // tiny delay to allow latest writes flush
+  await Future<void>.delayed(const Duration(milliseconds: 50));
+  try {
+    return await getNativeLogs();
+  } catch (e) {
+    focusLog('nativeLogsProvider error', data: e);
+    return const [];
+  }
+});
+
 /// Android snapshot provider - polls every 30s
 final androidSnapshotProvider =
     StreamProvider.autoDispose<Map<String, dynamic>>((ref) async* {

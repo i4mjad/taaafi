@@ -40,6 +40,45 @@ Future<Map<String, dynamic>> iosGetSnapshot() async {
   return Map<String, dynamic>.from((map ?? {}) as Map);
 }
 
+Future<List<String>> getNativeLogs() async {
+  if (Platform.isIOS) {
+    final res = await _call<List<dynamic>>('ios_getLogs');
+    final list =
+        (res ?? const []).map((e) => e.toString()).toList(growable: false);
+    return list.isEmpty ? readUiLogs() : list;
+  } else if (Platform.isAndroid) {
+    final res = await _call<List<dynamic>>('android_getLogs');
+    final list =
+        (res ?? const []).map((e) => e.toString()).toList(growable: false);
+    return list.isEmpty ? readUiLogs() : list;
+  }
+  return readUiLogs();
+}
+
+Future<void> clearNativeLogs() async {
+  if (Platform.isIOS) {
+    await _call('ios_clearLogs');
+  } else if (Platform.isAndroid) {
+    await _call('android_clearLogs');
+  }
+  clearUiLogs();
+}
+
+/// One source of truth facade for permissions and setup
+class FocusFacade {
+  const FocusFacade();
+
+  Future<void> requestPermissionsAndStartMonitoring() async {
+    if (Platform.isIOS) {
+      await iosRequestAuthorization();
+      await iosStartMonitoring();
+    } else if (Platform.isAndroid) {
+      // On Android, open Usage Access settings screen for the user
+      await _call('android_requestUsageAccess');
+    }
+  }
+}
+
 Future<Map<String, dynamic>> androidGetSnapshot() async {
   if (!Platform.isAndroid) return {};
   try {

@@ -50,6 +50,20 @@ import Flutter
           FocusLogger.d("ios_getSnapshot:done", snapshot)
           result(snapshot)
 
+        case "ios_getLogs":
+          FocusLogger.d("ios_getLogs:start")
+          let ud = UserDefaults(suiteName: FocusShared.appGroupId) ?? UserDefaults.standard
+          let logs = ud.stringArray(forKey: FocusShared.logsKey) ?? []
+          FocusLogger.d("ios_getLogs:done count=\(logs.count)")
+          result(logs)
+
+        case "ios_clearLogs":
+          FocusLogger.d("ios_clearLogs:start")
+          let ud = UserDefaults(suiteName: FocusShared.appGroupId) ?? UserDefaults.standard
+          ud.removeObject(forKey: FocusShared.logsKey)
+          FocusLogger.d("ios_clearLogs:done")
+          result(true)
+
         default: 
           FocusLogger.d("unknown method: \(call.method)")
           result(FlutterMethodNotImplemented)
