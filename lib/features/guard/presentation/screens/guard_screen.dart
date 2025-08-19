@@ -84,7 +84,7 @@ class GuardScreen extends ConsumerWidget {
                     builder: (context, controller) {
                       return Consumer(
                         builder: (context, ref, _) {
-                          final logsAsync = ref.watch(nativeLogsProvider);
+                          final logsAsync = ref.watch(logsStreamProvider);
                           final theme = AppTheme.of(context);
                           return logsAsync.when(
                             data: (logs) => Container(
@@ -99,12 +99,10 @@ class GuardScreen extends ConsumerWidget {
                                           MainAxisAlignment.spaceBetween,
                                       children: [
                                         // Count label for quick debugging/visibility
-                                        Text(
-                                          '${localizations.translate('logs')}: ${logs.length}',
-                                          style: TextStyles.caption.copyWith(
-                                            color: theme.grey[600],
-                                          ),
-                                        ),
+                                        Text('${logs.length}',
+                                            style: TextStyles.caption.copyWith(
+                                              color: theme.grey[600],
+                                            )),
                                         Row(
                                           children: [
                                             IconButton(

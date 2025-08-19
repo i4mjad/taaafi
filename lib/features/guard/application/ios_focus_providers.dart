@@ -76,6 +76,42 @@ final nativeLogsProvider =
   }
 });
 
+/// Streaming logs provider (polls periodically and emits only on change)
+final logsStreamProvider =
+    StreamProvider.autoDispose<List<String>>((ref) async* {
+  // Also respond to manual refresh trigger
+  ref.watch(manualRefreshProvider);
+
+  List<String> last = const [];
+
+  // initial fetch
+  try {
+    final initial = await getNativeLogs();
+    last = initial;
+    yield initial;
+  } catch (e) {
+    focusLog('logsStreamProvider initial error', data: e);
+    yield const <String>[];
+  }
+
+  // poll every second
+  yield* Stream.periodic(const Duration(seconds: 1)).asyncMap((_) async {
+    try {
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+      final current = await getNativeLogs();
+      return current;
+    } catch (e) {
+      focusLog('logsStreamProvider poll error', data: e);
+      return last;
+    }
+  }).where((current) {
+    final changed =
+        current.length != last.length || current.join('\n') != last.join('\n');
+    if (changed) last = current;
+    return changed;
+  });
+});
+
 /// Android snapshot provider - polls every 30s
 final androidSnapshotProvider =
     StreamProvider.autoDispose<Map<String, dynamic>>((ref) async* {
