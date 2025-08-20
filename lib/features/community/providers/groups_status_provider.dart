@@ -10,6 +10,7 @@ enum GroupsStatus {
   canJoinGroup,
   alreadyInGroup,
   canCreateGroup,
+  hasInvitations,
 }
 
 @riverpod
@@ -44,6 +45,15 @@ GroupsStatus groupsStatus(Ref ref) {
 
           if (isInGroup) {
             return GroupsStatus.alreadyInGroup;
+          }
+
+          // TODO: Check if user has pending invitations
+          // For now, we'll simulate having invitations for demo purposes
+          final hasInvitations =
+              false; // TODO: Replace with actual invitation check
+
+          if (hasInvitations) {
+            return GroupsStatus.hasInvitations;
           }
 
           return GroupsStatus.canJoinGroup;

@@ -1592,6 +1592,61 @@ const Map<String, String> kAr = {
   "groups-already-in-group-message":
       "أنت بالفعل عضو في زمالة. يمكنك أن تكون في زمالة واحدة فقط في الوقت الواحد",
 
+  // Join Group Modal
+  "join-group-title": "الإنضمام إلى زمالة",
+
+  "hide-identity-description":
+      "تفعيل هذا الخيار يخفي بياناتك الأساسية (الاسم والجنس) عن أعضاء الزمالة ثم يتطلب الخيار لإظهار هويتك لأعضاء الزمالة",
+  "join-specific-group": "الانضمام لزمالة معينة",
+  "enter-group-code": "أدخل رمز الزمالة",
+  "group-code-required": "رمز الزمالة مطلوب",
+  "join-button": "الانضمام",
+  "join-randomly": "الإنضمام بشكل عشوائي",
+  "join-randomly-description":
+      "هذه الخاصية المميزة ستقوم بالبحث عن زمالة تحتوي على مُعقد شاعر البحث سيكون عن مشاعر التي تناسب معك",
+  "find-group-button": "البحث عن زمالة",
+
+  // Create Group Modal
+  "create-group-title": "إنشاء زمالة",
+  "group-name": "اسم الزمالة",
+  "enter-group-name": "أدخل اسم الزمالة",
+  "group-name-required": "اسم الزمالة مطلوب",
+  "member-count": "عدد الأعضاء",
+  "enter-member-count": "أدخل عدد الأعضاء",
+  "member-count-required": "عدد الأعضاء مطلوب",
+  "member-count-invalid": "عدد الأعضاء يجب أن يكون بين 2 و 50",
+  "group-type": "نوع الزمالة",
+  "group-type-public": "عامة",
+  "group-type-private": "خاصة",
+  "group-type-public-description":
+      "في الزمالة العامة، يمكن للأعضاء المتعافين الانضمام إليها عشوائياً كذلك يمكنهم دعوتهم للانضمام عن طريق رمز الزمالة",
+  "group-type-private-description":
+      "في الزمالة الخاصة، يمكن الانضمام إليها فقط عن طريق رمز الزمالة لا يمكنهم الانضمام لزمالة عشوائياً",
+  "group-joining-methods": "طرق الانضمام للزمالة",
+  "select-joining-method": "اختر طريقة الانضمام",
+  "joining-method-any": "أي طريقة",
+  "joining-method-any-description":
+      "يمكن للأشخاص الانضمام عشوائياً، أو بدعوة من المدير، أو برمز المجموعة",
+  "joining-method-admin-only": "دعوة المدير فقط",
+  "joining-method-admin-only-description":
+      "يمكن فقط للأشخاص المدعوين من المدير الانضمام إلى هذه المجموعة",
+  "joining-method-code-only": "رمز المجموعة فقط",
+  "joining-method-code-only-description":
+      "يمكن فقط للأشخاص الذين لديهم رمز المجموعة الانضمام إلى هذه المجموعة",
+  "confirm-selection": "تأكيد الاختيار",
+  "create-group-button": "إنشاء الزمالة",
+
+  // Group Invitations
+  "group-invitations-title": "دعوات الزمالة",
+  "invitations-count": "لديك {count} دعوات معلقة",
+  "you-have-invitations": "لديك {count} دعوة زمالة في انتظار ردك",
+  "invited-by": "مدعو من {inviter}",
+  "member-count-text": "{count} أعضاء",
+  "accept-invitation": "قبول",
+  "decline-invitation": "رفض",
+  "view-invitations": "عرض الدعوات",
+  "join-other-group": "الانضمام لزمالة أخرى",
+
   "default-image": "الصورة الافتراضية",
   "use-account-profile-image": "استخدم صورة ملفك الشخصي",
   "use-anonymous-avatar": "استخدم صورة رمزية مجهولة بدلاً من ذلك",
@@ -2682,7 +2737,6 @@ const Map<String, String> kAr = {
   "cannot-unsubscribe-all-users":
       "لا يمكن إلغاء الاشتراك من مجموعة المستخدمين الافتراضية",
   "plus-feature-badge": "ميزة تعافي +",
-  "member-count": "عضو",
   "members-count": "أعضاء",
   "default-group": "المجموعة الافتراضية",
   "subscribed-to-group": "مشترك",

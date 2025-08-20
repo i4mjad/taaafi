@@ -16,6 +16,10 @@ import 'package:reboot_app_3/core/shared_widgets/confirm_details_banner.dart';
 import 'package:reboot_app_3/core/shared_widgets/confirm_email_banner.dart';
 import 'package:reboot_app_3/core/shared_widgets/spinner.dart';
 import 'package:reboot_app_3/features/community/presentation/community_profile_setup_modal.dart';
+import 'package:reboot_app_3/features/community/presentation/groups/modals/join_group_modal.dart';
+import 'package:reboot_app_3/features/community/presentation/groups/modals/create_group_modal.dart';
+import 'package:reboot_app_3/features/community/presentation/groups/modals/group_invitations_modal.dart';
+import 'package:reboot_app_3/features/community/domain/entities/group_invitation_entity.dart';
 
 class GroupsMainScreen extends ConsumerWidget {
   const GroupsMainScreen({super.key});
@@ -85,6 +89,9 @@ class GroupsMainScreen extends ConsumerWidget {
 
       case GroupsStatus.alreadyInGroup:
         return _buildAlreadyInGroupScreen(context, ref, theme, l10n);
+
+      case GroupsStatus.hasInvitations:
+        return _buildHasInvitationsScreen(context, ref, theme, l10n);
 
       case GroupsStatus.canJoinGroup:
       case GroupsStatus.canCreateGroup:
@@ -286,6 +293,190 @@ class GroupsMainScreen extends ConsumerWidget {
     );
   }
 
+  Widget _buildHasInvitationsScreen(BuildContext context, WidgetRef ref,
+      CustomThemeData theme, AppLocalizations l10n) {
+    // Demo invitations - in real implementation, this would come from a provider
+    final invitations = _getDemoInvitations();
+
+    return SafeArea(
+      child: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(32.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const SizedBox(height: 20),
+
+              // Main illustration
+              Center(
+                child: SvgPicture.asset(
+                  'asset/illustrations/groups-main-illustration.svg',
+                  height: 200,
+                ),
+              ),
+
+              const SizedBox(height: 40),
+
+              // Main title
+              Text(
+                l10n.translate('groups-main-title'),
+                style: TextStyles.h2.copyWith(
+                  color: theme.grey[900],
+                ),
+                textAlign: TextAlign.center,
+              ),
+
+              const SizedBox(height: 16),
+
+              // Invitations message
+              Text(
+                l10n.translate('you-have-invitations').replaceAll(
+                      '{count}',
+                      invitations.length.toString(),
+                    ),
+                style: TextStyles.body.copyWith(
+                  color: theme.grey[700],
+                  height: 1.4,
+                ),
+                textAlign: TextAlign.center,
+              ),
+
+              const SizedBox(height: 32),
+
+              // Quick preview of first invitation
+              if (invitations.isNotEmpty) ...[
+                WidgetsContainer(
+                  backgroundColor: theme.primary[50],
+                  borderSide: BorderSide(
+                    color: theme.primary[200]!,
+                    width: 1,
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: theme.primary[100],
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Icon(
+                          LucideIcons.mail,
+                          size: 20,
+                          color: theme.primary[600],
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              invitations.first.groupName,
+                              style: TextStyles.body.copyWith(
+                                color: theme.primary[700],
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              l10n.translate('invited-by').replaceAll(
+                                    '{inviter}',
+                                    invitations.first.inviterName,
+                                  ),
+                              style: TextStyles.caption.copyWith(
+                                color: theme.grey[600],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      if (invitations.length > 1)
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: theme.primary[600],
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Text(
+                            '+${invitations.length - 1}',
+                            style: TextStyles.caption.copyWith(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 24),
+              ],
+
+              // View Invitations button
+              GestureDetector(
+                onTap: () => _showInvitationsModal(context, invitations),
+                child: WidgetsContainer(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+                  backgroundColor: theme.primary[600],
+                  borderRadius: BorderRadius.circular(10.5),
+                  borderSide: BorderSide.none,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        LucideIcons.mail,
+                        size: 16,
+                        color: Colors.white,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        l10n.translate('view-invitations'),
+                        style: TextStyles.footnote.copyWith(
+                          color: Colors.white,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 16),
+
+              // Join Other Group button
+              GestureDetector(
+                onTap: () => _showJoinGroupModal(context, ref),
+                child: WidgetsContainer(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+                  backgroundColor: theme.primary[100],
+                  borderRadius: BorderRadius.circular(10.5),
+                  borderSide: BorderSide(
+                    color: theme.primary[200]!,
+                    width: 1,
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        l10n.translate('join-other-group'),
+                        style: TextStyles.footnote.copyWith(
+                          color: theme.primary[900],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 32),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildNeedsCommunityProfileButton(BuildContext context, WidgetRef ref,
       CustomThemeData theme, AppLocalizations l10n) {
     return GestureDetector(
@@ -452,16 +643,65 @@ class GroupsMainScreen extends ConsumerWidget {
   }
 
   void _showJoinGroupModal(BuildContext context, WidgetRef ref) {
-    // TODO: Implement join group modal
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Join Group feature coming soon')),
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => const JoinGroupModal(),
     );
   }
 
   void _showCreateGroupModal(BuildContext context, WidgetRef ref) {
-    // TODO: Implement create group modal
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Create Group feature coming soon')),
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => const CreateGroupModal(),
     );
+  }
+
+  void _showInvitationsModal(
+      BuildContext context, List<GroupInvitationEntity> invitations) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => GroupInvitationsModal(invitations: invitations),
+    );
+  }
+
+  List<GroupInvitationEntity> _getDemoInvitations() {
+    // Demo data - in real implementation, this would come from a provider
+    return [
+      GroupInvitationEntity(
+        id: '1',
+        groupId: 'group1',
+        groupName: 'Recovery Support Circle',
+        inviterName: 'أحمد محمد',
+        invitedAt: DateTime.now().subtract(const Duration(hours: 2)),
+        groupDescription: 'A supportive community for people in recovery',
+        memberCount: 12,
+        groupType: 'private',
+      ),
+      GroupInvitationEntity(
+        id: '2',
+        groupId: 'group2',
+        groupName: 'Daily Motivation Group',
+        inviterName: 'سارة علي',
+        invitedAt: DateTime.now().subtract(const Duration(days: 1)),
+        groupDescription: 'Share daily motivation and support each other',
+        memberCount: 25,
+        groupType: 'public',
+      ),
+      GroupInvitationEntity(
+        id: '3',
+        groupId: 'group3',
+        groupName: 'Weekend Warriors',
+        inviterName: 'محمد حسن',
+        invitedAt: DateTime.now().subtract(const Duration(days: 3)),
+        memberCount: 8,
+        groupType: 'private',
+      ),
+    ];
   }
 }

@@ -1640,6 +1640,61 @@ const Map<String, String> kEn = {
   "groups-already-in-group-message":
       "You are already a member of a group. You can only be in one group at a time",
 
+  // Join Group Modal
+  "join-group-title": "Join Group",
+  "hide-identity-description":
+      "Enable this option to hide your basic information (name and gender) from members in the group, then display your number for members of the group only",
+  "join-specific-group": "Join Specific Group",
+  "enter-group-code": "Enter group code",
+  "group-code-required": "Group code is required",
+  "join-button": "Join",
+  "join-randomly": "Join Randomly",
+  "join-randomly-description":
+      "This private feature allows you to search for a group that contains complex feelings. The search will be for feelings that match yours",
+  "find-group-button": "Find Group",
+
+  // Create Group Modal
+  "create-group-title": "Create Group",
+  "group-name": "Group Name",
+  "enter-group-name": "Enter group name",
+  "group-name-required": "Group name is required",
+  "member-count": "Member Count",
+  "enter-member-count": "Enter member count",
+  "member-count-required": "Member count is required",
+  "member-count-invalid": "Member count must be between 2 and 50",
+  "group-type": "Group Type",
+  "group-type-public": "Public",
+  "group-type-private": "Private",
+  "group-type-public-description":
+      "In a public group, it is possible for members to find and join this group randomly. You can also invite members to join through the group code",
+  "group-type-private-description":
+      "In a private group, only those invited can join this group through invitation",
+  "group-joining-methods": "Group Joining Methods",
+  "select-joining-method": "Select joining method",
+  "joining-method-any": "Any",
+  "joining-method-any-description":
+      "People can join randomly, by admin invitation, or by group code",
+  "joining-method-admin-only": "Admin Invitation Only",
+  "joining-method-admin-only-description":
+      "Only people invited by the admin can join this group",
+  "joining-method-code-only": "Group Code Only",
+  "joining-method-code-only-description":
+      "Only people with the group code can join this group",
+  "confirm-selection": "Confirm Selection",
+  "create-group-button": "Create Group",
+
+  // Group Invitations
+  "group-invitations-title": "Group Invitations",
+  "invitations-count": "You have {count} pending invitations",
+  "you-have-invitations":
+      "You have {count} group invitation(s) waiting for your response",
+  "invited-by": "Invited by {inviter}",
+  "member-count-text": "{count} members",
+  "accept-invitation": "Accept",
+  "decline-invitation": "Decline",
+  "view-invitations": "View Invitations",
+  "join-other-group": "Join Other Group",
+
   "default-image": "Default Image",
   "use-account-profile-image": "Use your account profile image",
   "use-anonymous-avatar": "Use anonymous avatar instead",
@@ -2723,7 +2778,6 @@ const Map<String, String> kEn = {
   "unsubscription-failed": "Failed to unsubscribe from group",
   "cannot-unsubscribe-all-users": "Cannot unsubscribe from default user group",
   "plus-feature-badge": "Plus Feature",
-  "member-count": "member",
   "members-count": "members",
   "default-group": "Default Group",
   "subscribed-to-group": "Subscribed",
