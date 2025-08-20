@@ -1,2 +1,6 @@
 #include? "Pods/Target Support Files/Pods-Runner/Pods-Runner.debug.xcconfig"
 #include "Generated.xcconfig"
+
+FLUTTER_TARGET=lib/main.dart
+BUNDLE_NAME=Ta'aafi Platform
+BUNDLE_DISPLAY_NAME=Ta'aafi Platform

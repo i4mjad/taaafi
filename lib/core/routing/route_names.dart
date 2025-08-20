@@ -58,4 +58,5 @@ enum RouteNames {
   banned,
   allPosts,
   categoryPosts,
+  guard,
 }
