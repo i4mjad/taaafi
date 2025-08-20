@@ -1569,6 +1569,24 @@ const Map<String, String> kAr = {
   "community-profile-settings": "الملف الشخصي",
   "groups-feature-4": "تتبع إنجازات ومعالم المجموعة",
   "groups-feature-5": "تفاعلات خاصة وآمنة للمجموعة",
+
+  // Groups main screen
+  "groups-main-title": "زمالات تعافي",
+  "groups-main-feature-1-title": "لست وحدك",
+  "groups-main-feature-1-desc":
+      "تعرف على التجارب المختلفة وشارك تجربتك مع مجموعة من المتعافين لتبادل الخبرات واكتشاف التحديات في رحلة التعافي",
+  "groups-main-feature-2-title": "الخصوصية أولاً!",
+  "groups-main-feature-2-desc":
+      "يمكنك مشاركة رحلة تعافيك والتحديات التي تواجهها بسرية تامة بدون إظهار هويتك",
+  "groups-main-feature-3-title": "تحدَ زملائك",
+  "groups-main-feature-3-desc":
+      "تحدَ زملائك في رحلة التعافي لتحقيق مراحل متقدمة في رحلة التعافي",
+  "groups-main-feature-4-title": "تابع تحديثات زملائك",
+  "groups-main-feature-4-desc":
+      "تابع تحديثات من قبل زملائك في الزمالة وساعدهم واستفد من خبراتهم في التعافي",
+  "groups-main-join-button": "الإنضمام إلى زمالة",
+  "groups-main-create-button": "إنشاء زمالة",
+
   "default-image": "الصورة الافتراضية",
   "use-account-profile-image": "استخدم صورة ملفك الشخصي",
   "use-anonymous-avatar": "استخدم صورة رمزية مجهولة بدلاً من ذلك",

@@ -1617,6 +1617,24 @@ const Map<String, String> kEn = {
   "community-profile-settings": "Community Profile",
   "groups-feature-4": "Track group achievements and milestones",
   "groups-feature-5": "Private and secure group interactions",
+
+  // Groups main screen
+  "groups-main-title": "Ta'aafi Groups",
+  "groups-main-feature-1-title": "You're not alone",
+  "groups-main-feature-1-desc":
+      "Get to know different experiences and share your experience with a group of recovering people to exchange experiences and discover challenges in the recovery journey",
+  "groups-main-feature-2-title": "Privacy first!",
+  "groups-main-feature-2-desc":
+      "You can share your recovery journey and the challenges you face in complete secrecy without showing your identity",
+  "groups-main-feature-3-title": "Challenge your colleagues",
+  "groups-main-feature-3-desc":
+      "Challenge your colleagues in the recovery journey to achieve advanced stages in the recovery journey",
+  "groups-main-feature-4-title": "Follow your colleagues' updates",
+  "groups-main-feature-4-desc":
+      "Follow updates from your colleagues in the fellowship and help them and benefit from their experiences in recovery",
+  "groups-main-join-button": "Join a Fellowship",
+  "groups-main-create-button": "Create Fellowship",
+
   "default-image": "Default Image",
   "use-account-profile-image": "Use your account profile image",
   "use-anonymous-avatar": "Use anonymous avatar instead",

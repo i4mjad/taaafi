@@ -39,7 +39,7 @@ import 'package:reboot_app_3/features/community/presentation/groups_onboarding_s
 import 'package:reboot_app_3/features/community/presentation/community_main_screen.dart';
 
 import 'package:reboot_app_3/features/community/presentation/groups/group_list_screen.dart';
-import 'package:reboot_app_3/features/community/presentation/groups/groups_coming_soon_screen.dart';
+
 import 'package:reboot_app_3/features/community/presentation/forum/post_detail_screen.dart';
 import 'package:reboot_app_3/features/community/presentation/forum/new_post_screen.dart';
 import 'package:reboot_app_3/features/community/presentation/forum/reply_composer_screen.dart';
@@ -631,8 +631,7 @@ GoRouter goRouter(Ref<GoRouter> ref) {
                 pageBuilder: (context, state) => NoTransitionPage<void>(
                   key: state.pageKey,
                   name: state.name,
-                  child:
-                      GroupsComingSoonScreen(), // Always show coming soon screen
+                  child: const GroupsOnboardingScreen(),
                 ),
                 routes: [
                   // Groups onboarding route

@@ -246,6 +246,7 @@ flutter:
     - asset/illustrations/app-icon.png
     - asset/illustrations/app-logo.png
     - asset/illustrations/vault-hero-image.svg
+    - asset/illustrations/groups-main-illustration.svg
     - asset/illustrations/vault-hero-image-02.svg
     - asset/illustrations/community-animation.json
     - asset/illustrations/warning.json

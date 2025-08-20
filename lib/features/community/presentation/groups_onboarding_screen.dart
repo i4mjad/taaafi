@@ -7,6 +7,8 @@ import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/features/community/presentation/community_profile_setup_modal.dart';
+import 'package:reboot_app_3/features/community/presentation/groups_main_screen.dart';
+import 'package:reboot_app_3/features/community/presentation/providers/community_providers_new.dart';
 import 'package:reboot_app_3/features/authentication/providers/account_status_provider.dart';
 import 'package:reboot_app_3/features/authentication/providers/user_document_provider.dart';
 import 'package:reboot_app_3/core/shared_widgets/account_action_banner.dart';
@@ -24,6 +26,7 @@ class GroupsOnboardingScreen extends ConsumerWidget {
     final l10n = AppLocalizations.of(context);
     final accountStatus = ref.watch(accountStatusProvider);
     final userDocAsync = ref.watch(userDocumentsNotifierProvider);
+    final hasGroupsProfileAsync = ref.watch(hasGroupsProfileProvider);
 
     return Scaffold(
       backgroundColor: theme.backgroundColor,
@@ -63,7 +66,19 @@ class GroupsOnboardingScreen extends ConsumerWidget {
                 ),
               );
             case AccountStatus.ok:
-              return _buildMainContent(context, ref, theme, l10n);
+              return hasGroupsProfileAsync.when(
+                loading: () => const Center(child: Spinner()),
+                error: (err, _) => _buildMainContent(context, ref, theme, l10n),
+                data: (hasProfile) {
+                  if (hasProfile) {
+                    // User has a community profile, show the main groups screen
+                    return const GroupsMainScreen();
+                  } else {
+                    // User needs to set up profile, show onboarding
+                    return _buildMainContent(context, ref, theme, l10n);
+                  }
+                },
+              );
           }
         },
       ),
