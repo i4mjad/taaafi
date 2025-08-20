@@ -1,5 +1,5 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:reboot_app_3/features/community/data/models/group.dart';
+import 'package:reboot_app_3/features/shared/models/group.dart';
 
 part 'group_membership_provider.g.dart';
 

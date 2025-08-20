@@ -5,7 +5,7 @@ import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/shared_widgets/app_bar.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
-import 'package:reboot_app_3/features/community/presentation/widgets/group_card.dart';
+import 'package:reboot_app_3/features/groups/presentation/widgets/group_card.dart';
 
 class GroupListScreen extends ConsumerStatefulWidget {
   const GroupListScreen({super.key});

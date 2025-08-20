@@ -2914,5 +2914,17 @@ const Map<String, String> kEn = {
   "change-profile-picture": "Change Profile Picture",
   "remove-profile-picture": "Remove Profile Picture",
 
+  // Group Members
+  "group-members": "Group Members",
+  "online": "Online",
+  "offline": "Offline",
+  "last-seen": "Last seen",
+
+  "minutes-ago-plural": "{count} minutes ago",
+  "hours-ago-plural": "{count} hours ago",
+  "days-ago-plural": "{count} days ago",
+  "weeks-ago-plural": "{count} weeks ago",
+  "member-count-plural": "{count} members",
+
   //Guard
 };

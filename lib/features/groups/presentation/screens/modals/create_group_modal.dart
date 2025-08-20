@@ -7,7 +7,7 @@ import 'package:reboot_app_3/core/shared_widgets/custom_textfield.dart';
 import 'package:reboot_app_3/core/shared_widgets/platform_dropdown.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
-import 'package:reboot_app_3/features/community/presentation/groups/modals/group_joining_methods_modal.dart';
+import 'package:reboot_app_3/features/groups/presentation/screens/modals/group_joining_methods_modal.dart';
 
 enum GroupType { public, private }
 

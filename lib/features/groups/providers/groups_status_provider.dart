@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:reboot_app_3/features/community/presentation/providers/community_providers_new.dart';
-import 'package:reboot_app_3/features/community/providers/group_membership_provider.dart';
+import 'package:reboot_app_3/features/groups/providers/group_membership_provider.dart';
 
 part 'groups_status_provider.g.dart';
 

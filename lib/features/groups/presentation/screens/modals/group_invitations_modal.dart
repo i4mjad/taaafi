@@ -5,7 +5,7 @@ import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
-import 'package:reboot_app_3/features/community/domain/entities/group_invitation_entity.dart';
+import 'package:reboot_app_3/features/shared/models/group_invitation_entity.dart';
 
 class GroupInvitationsModal extends ConsumerStatefulWidget {
   final List<GroupInvitationEntity> invitations;

@@ -7,7 +7,7 @@ import 'package:reboot_app_3/core/shared_widgets/custom_textfield.dart';
 import 'package:reboot_app_3/core/shared_widgets/platform_switch.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
-import 'package:reboot_app_3/features/community/providers/group_membership_provider.dart';
+import 'package:reboot_app_3/features/groups/providers/group_membership_provider.dart';
 
 class JoinGroupModal extends ConsumerStatefulWidget {
   const JoinGroupModal({super.key});

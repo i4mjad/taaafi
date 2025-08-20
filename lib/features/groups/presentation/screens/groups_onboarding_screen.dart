@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
-import 'package:reboot_app_3/features/community/presentation/groups_main_screen.dart';
+import 'package:reboot_app_3/features/groups/presentation/screens/groups_main_screen.dart';
 import 'package:reboot_app_3/features/authentication/providers/account_status_provider.dart';
 import 'package:reboot_app_3/features/authentication/providers/user_document_provider.dart';
 import 'package:reboot_app_3/core/shared_widgets/account_action_banner.dart';

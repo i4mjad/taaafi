@@ -7,7 +7,7 @@ import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/core/theming/custom_theme_data.dart';
 import 'package:lucide_icons/lucide_icons.dart';
-import 'package:reboot_app_3/features/community/providers/groups_status_provider.dart';
+import 'package:reboot_app_3/features/groups/providers/groups_status_provider.dart';
 import 'package:reboot_app_3/features/authentication/providers/account_status_provider.dart';
 import 'package:reboot_app_3/features/authentication/providers/user_document_provider.dart';
 import 'package:reboot_app_3/core/shared_widgets/account_action_banner.dart';
@@ -16,11 +16,11 @@ import 'package:reboot_app_3/core/shared_widgets/confirm_details_banner.dart';
 import 'package:reboot_app_3/core/shared_widgets/confirm_email_banner.dart';
 import 'package:reboot_app_3/core/shared_widgets/spinner.dart';
 import 'package:reboot_app_3/features/community/presentation/community_profile_setup_modal.dart';
-import 'package:reboot_app_3/features/community/presentation/groups/modals/join_group_modal.dart';
-import 'package:reboot_app_3/features/community/presentation/groups/modals/create_group_modal.dart';
-import 'package:reboot_app_3/features/community/presentation/groups/modals/group_invitations_modal.dart';
-import 'package:reboot_app_3/features/community/domain/entities/group_invitation_entity.dart';
-import 'package:reboot_app_3/features/community/presentation/groups/group_content_screen.dart';
+import 'package:reboot_app_3/features/groups/presentation/screens/modals/join_group_modal.dart';
+import 'package:reboot_app_3/features/groups/presentation/screens/modals/create_group_modal.dart';
+import 'package:reboot_app_3/features/groups/presentation/screens/modals/group_invitations_modal.dart';
+import 'package:reboot_app_3/features/shared/models/group_invitation_entity.dart';
+import 'package:reboot_app_3/features/groups/presentation/screens/group_content_screen.dart';
 
 class GroupsMainScreen extends ConsumerWidget {
   const GroupsMainScreen({super.key});

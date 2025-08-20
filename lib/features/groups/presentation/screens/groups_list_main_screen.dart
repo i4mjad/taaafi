@@ -7,16 +7,17 @@ import 'package:reboot_app_3/core/shared_widgets/app_bar.dart';
 import 'package:reboot_app_3/core/shared_widgets/premium_cta_button.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
-import 'package:reboot_app_3/features/community/presentation/widgets/community_section_card.dart';
+import 'package:reboot_app_3/features/shared/presentation/widgets/community_section_card.dart';
 
-class GroupsMainScreen extends ConsumerStatefulWidget {
-  const GroupsMainScreen({super.key});
+class GroupsListMainScreen extends ConsumerStatefulWidget {
+  const GroupsListMainScreen({super.key});
 
   @override
-  ConsumerState<GroupsMainScreen> createState() => _GroupsMainScreenState();
+  ConsumerState<GroupsListMainScreen> createState() =>
+      _GroupsListMainScreenState();
 }
 
-class _GroupsMainScreenState extends ConsumerState<GroupsMainScreen> {
+class _GroupsListMainScreenState extends ConsumerState<GroupsListMainScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = AppTheme.of(context);

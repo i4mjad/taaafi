@@ -35,17 +35,17 @@ import 'package:reboot_app_3/features/authentication/data/repositories/auth_repo
 import 'package:reboot_app_3/features/messaging/presentation/messaging_groups_screen.dart';
 
 import 'package:reboot_app_3/features/community/presentation/community_onboarding_screen.dart';
-import 'package:reboot_app_3/features/community/presentation/groups_onboarding_screen.dart';
+import 'package:reboot_app_3/features/groups/presentation/screens/groups_onboarding_screen.dart';
 import 'package:reboot_app_3/features/community/presentation/community_main_screen.dart';
 
-import 'package:reboot_app_3/features/community/presentation/groups/group_list_screen.dart';
+import 'package:reboot_app_3/features/groups/presentation/screens/group_list_screen.dart';
 
 import 'package:reboot_app_3/features/community/presentation/forum/post_detail_screen.dart';
 import 'package:reboot_app_3/features/community/presentation/forum/new_post_screen.dart';
 import 'package:reboot_app_3/features/community/presentation/forum/reply_composer_screen.dart';
-import 'package:reboot_app_3/features/community/presentation/groups/group_detail_screen.dart';
-import 'package:reboot_app_3/features/community/presentation/groups/group_chat_screen.dart';
-import 'package:reboot_app_3/features/community/presentation/groups/group_challenge_screen.dart';
+import 'package:reboot_app_3/features/groups/presentation/screens/group_detail_screen.dart';
+import 'package:reboot_app_3/features/groups/presentation/screens/group_chat_screen.dart';
+import 'package:reboot_app_3/features/groups/presentation/screens/group_challenge_screen.dart';
 import 'package:reboot_app_3/features/community/presentation/challenges/global_challenge_list_screen.dart';
 import 'package:reboot_app_3/features/community/presentation/profile/community_profile_settings_screen.dart';
 import 'package:reboot_app_3/features/vault/presentation/day_overview/day_overview_screen.dart';

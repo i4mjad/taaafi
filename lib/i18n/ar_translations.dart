@@ -2844,5 +2844,21 @@ const Map<String, String> kAr = {
   "change-profile-picture": "تغيير صورة الملف الشخصي",
   "remove-profile-picture": "حذف صورة الملف الشخصي",
 
+  // Group Members
+  "group-members": "أعضاء المجموعة",
+  "online": "متصل",
+  "offline": "غير متصل",
+  "last-seen": "آخر ظهور",
+
+  "minutes-ago-plural": "منذ {count} دقائق",
+
+  "hours-ago-plural": "منذ {count} ساعات",
+
+  "days-ago-plural": "منذ {count} أيام",
+
+  "weeks-ago-plural": "منذ {count} أسابيع",
+
+  "member-count-plural": "{count} أعضاء",
+
   //Guard
 };
