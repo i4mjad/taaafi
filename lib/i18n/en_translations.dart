@@ -1634,6 +1634,11 @@ const Map<String, String> kEn = {
       "Follow updates from your colleagues in the group and help them and benefit from their experiences in recovery",
   "groups-main-join-button": "Join a Group",
   "groups-main-create-button": "Create Group",
+  "groups-need-profile-message":
+      "You need to set up your community profile first to join or create groups",
+  "groups-already-in-group-button": "Already in Group",
+  "groups-already-in-group-message":
+      "You are already a member of a group. You can only be in one group at a time",
 
   "default-image": "Default Image",
   "use-account-profile-image": "Use your account profile image",

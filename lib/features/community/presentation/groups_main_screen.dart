@@ -7,6 +7,7 @@ import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/core/theming/custom_theme_data.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:reboot_app_3/features/community/providers/groups_status_provider.dart';
 import 'package:reboot_app_3/features/authentication/providers/account_status_provider.dart';
 import 'package:reboot_app_3/features/authentication/providers/user_document_provider.dart';
 import 'package:reboot_app_3/core/shared_widgets/account_action_banner.dart';
@@ -14,6 +15,7 @@ import 'package:reboot_app_3/core/shared_widgets/complete_registration_banner.da
 import 'package:reboot_app_3/core/shared_widgets/confirm_details_banner.dart';
 import 'package:reboot_app_3/core/shared_widgets/confirm_email_banner.dart';
 import 'package:reboot_app_3/core/shared_widgets/spinner.dart';
+import 'package:reboot_app_3/features/community/presentation/community_profile_setup_modal.dart';
 
 class GroupsMainScreen extends ConsumerWidget {
   const GroupsMainScreen({super.key});
@@ -24,6 +26,7 @@ class GroupsMainScreen extends ConsumerWidget {
     final l10n = AppLocalizations.of(context);
     final accountStatus = ref.watch(accountStatusProvider);
     final userDocAsync = ref.watch(userDocumentsNotifierProvider);
+    final groupsStatus = ref.watch(groupsStatusProvider);
 
     return Scaffold(
       backgroundColor: theme.backgroundColor,
@@ -63,14 +66,33 @@ class GroupsMainScreen extends ConsumerWidget {
                 ),
               );
             case AccountStatus.ok:
-              return _buildMainContent(context, ref, theme, l10n);
+              return _buildGroupsContent(
+                  context, ref, theme, l10n, groupsStatus);
           }
         },
       ),
     );
   }
 
-  Widget _buildMainContent(BuildContext context, WidgetRef ref,
+  Widget _buildGroupsContent(BuildContext context, WidgetRef ref,
+      CustomThemeData theme, AppLocalizations l10n, GroupsStatus groupsStatus) {
+    switch (groupsStatus) {
+      case GroupsStatus.loading:
+        return const Center(child: Spinner());
+
+      case GroupsStatus.needsCommunityProfile:
+        return _buildNeedsCommunityProfileScreen(context, ref, theme, l10n);
+
+      case GroupsStatus.alreadyInGroup:
+        return _buildAlreadyInGroupScreen(context, ref, theme, l10n);
+
+      case GroupsStatus.canJoinGroup:
+      case GroupsStatus.canCreateGroup:
+        return _buildGroupsIntroScreen(context, ref, theme, l10n);
+    }
+  }
+
+  Widget _buildGroupsIntroScreen(BuildContext context, WidgetRef ref,
       CustomThemeData theme, AppLocalizations l10n) {
     return SafeArea(
       child: SingleChildScrollView(
@@ -143,62 +165,237 @@ class GroupsMainScreen extends ConsumerWidget {
 
               const SizedBox(height: 48),
 
-              // Join Group button
-              GestureDetector(
-                onTap: () => _showJoinGroupModal(context, ref),
-                child: WidgetsContainer(
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
-                  backgroundColor: theme.primary[600],
-                  borderRadius: BorderRadius.circular(10.5),
-                  borderSide: BorderSide.none,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        l10n.translate('groups-main-join-button'),
-                        style: TextStyles.footnote.copyWith(
-                          color: Colors.white,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 16),
-
-              // Create Group button
-              GestureDetector(
-                onTap: () => _showCreateGroupModal(context, ref),
-                child: WidgetsContainer(
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
-                  backgroundColor: theme.primary[100],
-                  borderRadius: BorderRadius.circular(10.5),
-                  borderSide: BorderSide(
-                    color: theme.primary[200]!,
-                    width: 1,
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        l10n.translate('groups-main-create-button'),
-                        style: TextStyles.footnote.copyWith(
-                          color: theme.primary[900],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
+              // Action buttons for joining/creating groups
+              _buildJoinAndCreateButtons(context, ref, theme, l10n),
 
               const SizedBox(height: 32),
             ],
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildNeedsCommunityProfileScreen(BuildContext context, WidgetRef ref,
+      CustomThemeData theme, AppLocalizations l10n) {
+    return SafeArea(
+      child: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(32.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const SizedBox(height: 20),
+
+              // Main illustration
+              Center(
+                child: SvgPicture.asset(
+                  'asset/illustrations/groups-main-illustration.svg',
+                  height: 200,
+                ),
+              ),
+
+              const SizedBox(height: 40),
+
+              // Main title
+              Text(
+                l10n.translate('groups-main-title'),
+                style: TextStyles.h2.copyWith(
+                  color: theme.grey[900],
+                ),
+                textAlign: TextAlign.center,
+              ),
+
+              const SizedBox(height: 16),
+
+              // Need profile message
+              Text(
+                l10n.translate('groups-need-profile-message'),
+                style: TextStyles.body.copyWith(
+                  color: theme.grey[700],
+                  height: 1.4,
+                ),
+                textAlign: TextAlign.center,
+              ),
+
+              const SizedBox(height: 48),
+
+              // Setup Profile button
+              _buildNeedsCommunityProfileButton(context, ref, theme, l10n),
+
+              const SizedBox(height: 32),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAlreadyInGroupScreen(BuildContext context, WidgetRef ref,
+      CustomThemeData theme, AppLocalizations l10n) {
+    return SafeArea(
+      child: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(32.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const SizedBox(height: 20),
+
+              // Main illustration
+              Center(
+                child: SvgPicture.asset(
+                  'asset/illustrations/groups-main-illustration.svg',
+                  height: 200,
+                ),
+              ),
+
+              const SizedBox(height: 40),
+
+              // Main title
+              Text(
+                l10n.translate('groups-main-title'),
+                style: TextStyles.h2.copyWith(
+                  color: theme.grey[900],
+                ),
+                textAlign: TextAlign.center,
+              ),
+
+              const SizedBox(height: 16),
+
+              // Already in group message
+              Text(
+                l10n.translate('groups-already-in-group-message'),
+                style: TextStyles.body.copyWith(
+                  color: theme.grey[700],
+                  height: 1.4,
+                ),
+                textAlign: TextAlign.center,
+              ),
+
+              const SizedBox(height: 48),
+
+              // Already in group button (disabled state)
+              _buildAlreadyInGroupButton(context, ref, theme, l10n),
+
+              const SizedBox(height: 32),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNeedsCommunityProfileButton(BuildContext context, WidgetRef ref,
+      CustomThemeData theme, AppLocalizations l10n) {
+    return GestureDetector(
+      onTap: () => _showProfileSetupModal(context, ref),
+      child: WidgetsContainer(
+        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+        backgroundColor: theme.primary[600],
+        borderRadius: BorderRadius.circular(10.5),
+        borderSide: BorderSide.none,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              LucideIcons.userPlus,
+              size: 16,
+              color: Colors.white,
+            ),
+            const SizedBox(width: 8),
+            Text(
+              l10n.translate('groups-setup-button'),
+              style: TextStyles.footnote.copyWith(
+                color: Colors.white,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAlreadyInGroupButton(BuildContext context, WidgetRef ref,
+      CustomThemeData theme, AppLocalizations l10n) {
+    return WidgetsContainer(
+      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+      backgroundColor: theme.success[600],
+      borderRadius: BorderRadius.circular(10.5),
+      borderSide: BorderSide.none,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            LucideIcons.check,
+            size: 16,
+            color: Colors.white,
+          ),
+          const SizedBox(width: 8),
+          Text(
+            l10n.translate('groups-already-in-group-button'),
+            style: TextStyles.footnote.copyWith(
+              color: Colors.white,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildJoinAndCreateButtons(BuildContext context, WidgetRef ref,
+      CustomThemeData theme, AppLocalizations l10n) {
+    return Column(
+      children: [
+        // Join Group button
+        GestureDetector(
+          onTap: () => _showJoinGroupModal(context, ref),
+          child: WidgetsContainer(
+            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+            backgroundColor: theme.primary[600],
+            borderRadius: BorderRadius.circular(10.5),
+            borderSide: BorderSide.none,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  l10n.translate('groups-main-join-button'),
+                  style: TextStyles.footnote.copyWith(
+                    color: Colors.white,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+
+        const SizedBox(height: 16),
+
+        // Create Group button
+        GestureDetector(
+          onTap: () => _showCreateGroupModal(context, ref),
+          child: WidgetsContainer(
+            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+            backgroundColor: theme.primary[100],
+            borderRadius: BorderRadius.circular(10.5),
+            borderSide: BorderSide(
+              color: theme.primary[200]!,
+              width: 1,
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  l10n.translate('groups-main-create-button'),
+                  style: TextStyles.footnote.copyWith(
+                    color: theme.primary[900],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -242,6 +439,15 @@ class GroupsMainScreen extends ConsumerWidget {
           ),
         ),
       ],
+    );
+  }
+
+  void _showProfileSetupModal(BuildContext context, WidgetRef ref) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => const CommunityProfileSetupModal(),
     );
   }
 

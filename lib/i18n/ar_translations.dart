@@ -1586,6 +1586,11 @@ const Map<String, String> kAr = {
       "تابع تحديثات من قبل زملائك في الزمالة وساعدهم واستفد من خبراتهم في التعافي",
   "groups-main-join-button": "الإنضمام إلى زمالة",
   "groups-main-create-button": "إنشاء زمالة",
+  "groups-need-profile-message":
+      "تحتاج إلى إعداد ملفك الشخصي في المجتمع أولاً للانضمام أو إنشاء زمالات",
+  "groups-already-in-group-button": "بالفعل في زمالة",
+  "groups-already-in-group-message":
+      "أنت بالفعل عضو في زمالة. يمكنك أن تكون في زمالة واحدة فقط في الوقت الواحد",
 
   "default-image": "الصورة الافتراضية",
   "use-account-profile-image": "استخدم صورة ملفك الشخصي",
