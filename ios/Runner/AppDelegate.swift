@@ -79,6 +79,10 @@ import Flutter
     // Removes notifications from Notification Center
     UNUserNotificationCenter.current().removeAllDeliveredNotifications()
     UIApplication.shared.applicationIconBadgeNumber = 0 // Resets the badge count
+    // Ensure monitoring is running each time app becomes active
+    Task { @MainActor in
+      do { try FocusBridge.shared.startHourlyMonitoring() } catch { /* ignore */ }
+    }
   }
 
   
