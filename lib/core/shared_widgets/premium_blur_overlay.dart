@@ -151,7 +151,7 @@ class PremiumBlurOverlay extends StatelessWidget {
             boxShadow: Shadows.mainShadows,
           ),
           child: Icon(
-            Ta3afiPlatformIcons.plus_icon, // Using custom plus icon
+            Ta3afiPlatformIcons.plus, // Using custom plus icon
             color: const Color(0xFFFEBA01),
             size: 24,
           ),

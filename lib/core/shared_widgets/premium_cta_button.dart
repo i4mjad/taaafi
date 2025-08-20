@@ -37,7 +37,7 @@ class PremiumCtaAppBarIcon extends ConsumerWidget {
             child: Stack(
               children: [
                 Icon(
-                  Ta3afiPlatformIcons.plus_icon,
+                  Ta3afiPlatformIcons.plus,
                   color:
                       hasSubscription ? Colors.green : const Color(0xFFFEBA01),
                   size: 20,

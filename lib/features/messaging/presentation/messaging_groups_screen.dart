@@ -402,7 +402,7 @@ class _GroupCard extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Icon(
-                        Ta3afiPlatformIcons.plus_icon,
+                        Ta3afiPlatformIcons.plus,
                         color: const Color(0xFFFEBA01),
                         size: 12,
                       ),
@@ -483,8 +483,7 @@ class _GroupCard extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Ta3afiPlatformIcons.plus_icon,
-                  size: 16, color: Colors.black),
+              Icon(Ta3afiPlatformIcons.plus, size: 16, color: Colors.black),
               horizontalSpace(Spacing.points8),
               Text(
                 localization.translate('upgrade-to-plus-messaging'),

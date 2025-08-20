@@ -138,7 +138,7 @@ class _ProfileRestoreSelectionModalState
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Icon(
-                        Ta3afiPlatformIcons.plus_icon,
+                        Ta3afiPlatformIcons.plus,
                         color: Colors.white,
                         size: 12,
                       ),

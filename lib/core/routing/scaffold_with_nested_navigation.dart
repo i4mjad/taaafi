@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -71,13 +72,15 @@ class ScaffoldWithNestedNavigation extends ConsumerWidget {
                   size: 20,
                 ),
               ),
-              NavigationDestination(
-                label: AppLocalizations.of(context).translate("guard"),
-                icon: Icon(
-                  LucideIcons.castle,
-                  size: 20,
+              //TODO: remove this when done with this feature
+              if (kDebugMode)
+                NavigationDestination(
+                  label: AppLocalizations.of(context).translate("guard"),
+                  icon: Icon(
+                    LucideIcons.castle,
+                    size: 20,
+                  ),
                 ),
-              ),
               NavigationDestination(
                 label: AppLocalizations.of(context).translate("community"),
                 icon: Icon(

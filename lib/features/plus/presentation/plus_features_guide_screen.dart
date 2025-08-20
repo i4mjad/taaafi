@@ -97,7 +97,7 @@ class PlusFeaturesGuideScreen extends ConsumerWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Icon(
-                Ta3afiPlatformIcons.plus_icon,
+                Ta3afiPlatformIcons.plus,
                 color: const Color(0xFFFEBA01),
                 size: 32,
               ),
@@ -645,7 +645,7 @@ class _PlusContactUsModalState extends ConsumerState<PlusContactUsModal> {
                         child: Row(
                           children: [
                             Icon(
-                              Ta3afiPlatformIcons.plus_icon,
+                              Ta3afiPlatformIcons.plus,
                               color: const Color(0xFFFEBA01),
                               size: 24,
                             ),

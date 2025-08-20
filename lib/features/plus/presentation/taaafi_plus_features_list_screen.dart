@@ -85,7 +85,7 @@ class _TaaafiPlusScreenState
                         ),
                         horizontalSpace(Spacing.points16),
                         Icon(
-                          Ta3afiPlatformIcons.plus_icon,
+                          Ta3afiPlatformIcons.plus,
                           color: const Color(0xFFFEBA01),
                           size: 60,
                         ),

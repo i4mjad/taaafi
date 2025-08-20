@@ -484,7 +484,7 @@ class VaultScreen extends ConsumerWidget {
                     ],
                   ),
                   child: Icon(
-                    Ta3afiPlatformIcons.plus_icon,
+                    Ta3afiPlatformIcons.plus,
                     color: Colors.black,
                     size: 12, // Larger icon size
                   ),

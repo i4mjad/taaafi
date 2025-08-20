@@ -18,6 +18,6 @@ class Ta3afiPlatformIcons {
   static const _kFontFam = 'Ta3afiPlatformIcons';
   static const String? _kFontPkg = null;
 
-  static const IconData plus_icon =
-      IconData(0xe800, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData plus =
+      IconData(0xe801, fontFamily: _kFontFam, fontPackage: _kFontPkg);
 }

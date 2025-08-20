@@ -140,7 +140,7 @@ class _EnhancedProfileSelectionModalState
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Icon(
-                        Ta3afiPlatformIcons.plus_icon,
+                        Ta3afiPlatformIcons.plus,
                         color: Colors.white,
                         size: 12,
                       ),
@@ -499,7 +499,7 @@ class _EnhancedProfileSelectionModalState
       child: Row(
         children: [
           Icon(
-            Ta3afiPlatformIcons.plus_icon,
+            Ta3afiPlatformIcons.plus,
             color: Colors.white,
             size: 16,
           ),
