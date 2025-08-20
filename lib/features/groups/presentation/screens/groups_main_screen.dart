@@ -89,7 +89,7 @@ class GroupsMainScreen extends ConsumerWidget {
         return _buildNeedsCommunityProfileScreen(context, ref, theme, l10n);
 
       case GroupsStatus.alreadyInGroup:
-        return const GroupContentScreen();
+        return const GroupScreen();
 
       case GroupsStatus.hasInvitations:
         return _buildHasInvitationsScreen(context, ref, theme, l10n);

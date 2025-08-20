@@ -46,8 +46,8 @@ class GroupMember {
   });
 }
 
-class GroupContentScreen extends ConsumerWidget {
-  const GroupContentScreen({super.key});
+class GroupScreen extends ConsumerWidget {
+  const GroupScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
