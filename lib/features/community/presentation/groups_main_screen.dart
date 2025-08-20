@@ -20,6 +20,7 @@ import 'package:reboot_app_3/features/community/presentation/groups/modals/join_
 import 'package:reboot_app_3/features/community/presentation/groups/modals/create_group_modal.dart';
 import 'package:reboot_app_3/features/community/presentation/groups/modals/group_invitations_modal.dart';
 import 'package:reboot_app_3/features/community/domain/entities/group_invitation_entity.dart';
+import 'package:reboot_app_3/features/community/presentation/groups/group_content_screen.dart';
 
 class GroupsMainScreen extends ConsumerWidget {
   const GroupsMainScreen({super.key});
@@ -88,7 +89,7 @@ class GroupsMainScreen extends ConsumerWidget {
         return _buildNeedsCommunityProfileScreen(context, ref, theme, l10n);
 
       case GroupsStatus.alreadyInGroup:
-        return _buildAlreadyInGroupScreen(context, ref, theme, l10n);
+        return const GroupContentScreen();
 
       case GroupsStatus.hasInvitations:
         return _buildHasInvitationsScreen(context, ref, theme, l10n);
@@ -229,61 +230,6 @@ class GroupsMainScreen extends ConsumerWidget {
 
               // Setup Profile button
               _buildNeedsCommunityProfileButton(context, ref, theme, l10n),
-
-              const SizedBox(height: 32),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildAlreadyInGroupScreen(BuildContext context, WidgetRef ref,
-      CustomThemeData theme, AppLocalizations l10n) {
-    return SafeArea(
-      child: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(32.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              const SizedBox(height: 20),
-
-              // Main illustration
-              Center(
-                child: SvgPicture.asset(
-                  'asset/illustrations/groups-main-illustration.svg',
-                  height: 200,
-                ),
-              ),
-
-              const SizedBox(height: 40),
-
-              // Main title
-              Text(
-                l10n.translate('groups-main-title'),
-                style: TextStyles.h2.copyWith(
-                  color: theme.grey[900],
-                ),
-                textAlign: TextAlign.center,
-              ),
-
-              const SizedBox(height: 16),
-
-              // Already in group message
-              Text(
-                l10n.translate('groups-already-in-group-message'),
-                style: TextStyles.body.copyWith(
-                  color: theme.grey[700],
-                  height: 1.4,
-                ),
-                textAlign: TextAlign.center,
-              ),
-
-              const SizedBox(height: 48),
-
-              // Already in group button (disabled state)
-              _buildAlreadyInGroupButton(context, ref, theme, l10n),
 
               const SizedBox(height: 32),
             ],
@@ -503,33 +449,6 @@ class GroupsMainScreen extends ConsumerWidget {
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildAlreadyInGroupButton(BuildContext context, WidgetRef ref,
-      CustomThemeData theme, AppLocalizations l10n) {
-    return WidgetsContainer(
-      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
-      backgroundColor: theme.success[600],
-      borderRadius: BorderRadius.circular(10.5),
-      borderSide: BorderSide.none,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            LucideIcons.check,
-            size: 16,
-            color: Colors.white,
-          ),
-          const SizedBox(width: 8),
-          Text(
-            l10n.translate('groups-already-in-group-button'),
-            style: TextStyles.footnote.copyWith(
-              color: Colors.white,
-            ),
-          ),
-        ],
       ),
     );
   }

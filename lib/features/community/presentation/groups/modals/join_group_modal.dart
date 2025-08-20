@@ -7,6 +7,7 @@ import 'package:reboot_app_3/core/shared_widgets/custom_textfield.dart';
 import 'package:reboot_app_3/core/shared_widgets/platform_switch.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
+import 'package:reboot_app_3/features/community/providers/group_membership_provider.dart';
 
 class JoinGroupModal extends ConsumerStatefulWidget {
   const JoinGroupModal({super.key});
@@ -244,25 +245,37 @@ class _JoinGroupModalState extends ConsumerState<JoinGroupModal> {
       _isLoading = true;
     });
 
-    // TODO: Implement join group with code logic
+    // Simulate joining group with code
     Future.delayed(const Duration(seconds: 2), () {
       if (mounted) {
         setState(() {
           _isLoading = false;
         });
+
+        // Join the group using the provider
+        ref
+            .read(groupMembershipNotifierProvider.notifier)
+            .joinGroupWithCode(groupCode);
+
         Navigator.of(context).pop();
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Joined group with code: $groupCode')),
+          SnackBar(
+              content: Text(AppLocalizations.of(context)
+                  .translate('group-joined-successfully'))),
         );
       }
     });
   }
 
   void _joinRandomGroup() {
-    // TODO: Implement random group join logic
+    // Join a random group using the provider
+    ref.read(groupMembershipNotifierProvider.notifier).joinRandomGroup();
+
     Navigator.of(context).pop();
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Finding a random group...')),
+      SnackBar(
+          content: Text(AppLocalizations.of(context)
+              .translate('group-joined-successfully'))),
     );
   }
 }

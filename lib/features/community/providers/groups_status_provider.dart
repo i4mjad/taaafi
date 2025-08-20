@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:reboot_app_3/features/community/presentation/providers/community_providers_new.dart';
+import 'package:reboot_app_3/features/community/providers/group_membership_provider.dart';
 
 part 'groups_status_provider.g.dart';
 
@@ -17,6 +18,7 @@ enum GroupsStatus {
 GroupsStatus groupsStatus(Ref ref) {
   final hasCommunityProfileAsync = ref.watch(hasCommunityProfileProvider);
   final currentProfileAsync = ref.watch(currentCommunityProfileProvider);
+  final groupMembership = ref.watch(groupMembershipNotifierProvider);
 
   // If community profile check is still loading, return loading status
   if (hasCommunityProfileAsync.isLoading) {
@@ -37,11 +39,8 @@ GroupsStatus groupsStatus(Ref ref) {
             return GroupsStatus.needsCommunityProfile;
           }
 
-          // TODO: Check if user is already in a group
-          // For now, we'll assume they can join a group
-          // This should be updated when group membership data is available
-          final isInGroup =
-              false; // TODO: Replace with actual group membership check
+          // Check if user is already in a group using the group membership provider
+          final isInGroup = groupMembership != null;
 
           if (isInGroup) {
             return GroupsStatus.alreadyInGroup;
