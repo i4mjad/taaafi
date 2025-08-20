@@ -1631,9 +1631,9 @@ const Map<String, String> kEn = {
       "Challenge your colleagues in the recovery journey to achieve advanced stages in the recovery journey",
   "groups-main-feature-4-title": "Follow your colleagues' updates",
   "groups-main-feature-4-desc":
-      "Follow updates from your colleagues in the fellowship and help them and benefit from their experiences in recovery",
-  "groups-main-join-button": "Join a Fellowship",
-  "groups-main-create-button": "Create Fellowship",
+      "Follow updates from your colleagues in the group and help them and benefit from their experiences in recovery",
+  "groups-main-join-button": "Join a Group",
+  "groups-main-create-button": "Create Group",
 
   "default-image": "Default Image",
   "use-account-profile-image": "Use your account profile image",
