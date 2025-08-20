@@ -824,7 +824,7 @@ const Map<String, String> kEn = {
   "about-app": "About App",
   "about-ta3afi":
       "An app to raise awareness about the dangers of pornography and addiction to it by providing content and tools to help solve the problem.",
-  "version-number": "Version 5.3.1 (1)",
+  "version-number": "Version 5.3.1 (2)",
   "what-is-all-of-those": "What's the difference between these numbers?",
   "app-loading": "Initializing...",
   "processing": "Processing...",
