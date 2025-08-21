@@ -172,6 +172,7 @@ const Map<String, String> kEn = {
   "remove-activity": "Remove Activity",
   "taaafi-groups": "Ta'aafi Groups",
   "group": "Group",
+  "group-updates": "Group Updates",
   "not-alone": "You Are Not Alone",
   "not-alone-description":
       "Learn about different experiences and share your own with a group of recovering individuals to exchange knowledge and discover challenges in the recovery journey.",
