@@ -109,7 +109,7 @@ class GroupSettingsScreen extends ConsumerWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: theme.backgroundColor[500],
           borderRadius: BorderRadius.circular(8),
           border: Border.all(
             color: theme.grey[200]!,
@@ -174,7 +174,7 @@ class GroupSettingsScreen extends ConsumerWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         decoration: BoxDecoration(
-          color: const Color(0xFFFCE7E7), // error-50 from design
+          color: theme.error[50],
           borderRadius: BorderRadius.circular(8),
           border: Border.all(
             color: theme.grey[200]!,
@@ -188,14 +188,13 @@ class GroupSettingsScreen extends ConsumerWidget {
               width: 24,
               height: 24,
               decoration: BoxDecoration(
-                color: const Color(0xFFDF1111)
-                    .withOpacity(0.1), // error-500 with opacity
+                color: theme.error[100],
                 borderRadius: BorderRadius.circular(6),
               ),
               child: Icon(
                 icon,
                 size: 16,
-                color: const Color(0xFFDF1111), // error-500 from design
+                color: theme.error[500],
               ),
             ),
 
@@ -206,7 +205,7 @@ class GroupSettingsScreen extends ConsumerWidget {
               child: Text(
                 title,
                 style: TextStyles.body.copyWith(
-                  color: const Color(0xFFDF1111), // error-500 from design
+                  color: theme.error[500],
                   fontWeight: FontWeight.w500,
                 ),
                 textAlign: TextAlign.right,
@@ -269,7 +268,7 @@ class GroupSettingsScreen extends ConsumerWidget {
               child: Text(
                 l10n.translate('leave-group'),
                 style: TextStyles.body.copyWith(
-                  color: const Color(0xFFDF1111), // error-500
+                  color: theme.error[500],
                   fontWeight: FontWeight.w600,
                 ),
               ),
