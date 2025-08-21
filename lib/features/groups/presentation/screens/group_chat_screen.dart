@@ -22,6 +22,8 @@ class ChatMessage {
   final DateTime dateTime;
   final bool isCurrentUser;
   final Color avatarColor;
+  final ChatMessage? replyToMessage; // The message being replied to
+  final String? replyToMessageId; // ID of the message being replied to
 
   const ChatMessage({
     required this.id,
@@ -31,7 +33,33 @@ class ChatMessage {
     required this.dateTime,
     required this.isCurrentUser,
     required this.avatarColor,
+    this.replyToMessage,
+    this.replyToMessageId,
   });
+
+  ChatMessage copyWith({
+    String? id,
+    String? content,
+    String? senderName,
+    String? time,
+    DateTime? dateTime,
+    bool? isCurrentUser,
+    Color? avatarColor,
+    ChatMessage? replyToMessage,
+    String? replyToMessageId,
+  }) {
+    return ChatMessage(
+      id: id ?? this.id,
+      content: content ?? this.content,
+      senderName: senderName ?? this.senderName,
+      time: time ?? this.time,
+      dateTime: dateTime ?? this.dateTime,
+      isCurrentUser: isCurrentUser ?? this.isCurrentUser,
+      avatarColor: avatarColor ?? this.avatarColor,
+      replyToMessage: replyToMessage ?? this.replyToMessage,
+      replyToMessageId: replyToMessageId ?? this.replyToMessageId,
+    );
+  }
 }
 
 /// Model for grouped chat messages by date (for fallback use)
@@ -43,6 +71,35 @@ class GroupedMessages {
     required this.date,
     required this.messages,
   });
+}
+
+/// Reply state for managing message replies
+class ChatReplyState {
+  final bool isReplying;
+  final ChatMessage? replyToMessage;
+  final String? replyToMessageId;
+
+  const ChatReplyState({
+    this.isReplying = false,
+    this.replyToMessage,
+    this.replyToMessageId,
+  });
+
+  ChatReplyState copyWith({
+    bool? isReplying,
+    ChatMessage? replyToMessage,
+    String? replyToMessageId,
+  }) {
+    return ChatReplyState(
+      isReplying: isReplying ?? this.isReplying,
+      replyToMessage: replyToMessage ?? this.replyToMessage,
+      replyToMessageId: replyToMessageId ?? this.replyToMessageId,
+    );
+  }
+
+  ChatReplyState clear() {
+    return const ChatReplyState();
+  }
 }
 
 class GroupChatScreen extends ConsumerStatefulWidget {
@@ -58,6 +115,7 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen> {
   final TextEditingController _messageController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   bool _isSubmitting = false;
+  ChatReplyState _replyState = const ChatReplyState();
 
   @override
   void initState() {
@@ -184,6 +242,7 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen> {
       BuildContext context, CustomThemeData theme, ChatMessage message) {
     return GestureDetector(
       onLongPress: () => _showReportModal(context, theme, message),
+      onHorizontalDragEnd: (details) => _handleSwipeToReply(details, message),
       child: Container(
         margin: const EdgeInsets.only(bottom: 16),
         child: Row(
@@ -271,6 +330,11 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen> {
                       color: theme.grey[200],
                     ),
 
+                    // Reply preview (show if this message is a reply)
+                    if (message.replyToMessage != null)
+                      _buildMessageReplyPreview(
+                          context, theme, message.replyToMessage!),
+
                     // Message content with proper text wrapping
                     Text(
                       message.content,
@@ -295,6 +359,44 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen> {
         ),
       ),
     );
+  }
+
+  void _handleSwipeToReply(DragEndDetails details, ChatMessage message) {
+    // Check if it's a right swipe (positive velocity for LTR, negative for RTL)
+    final isRTL = Directionality.of(context) == TextDirection.rtl;
+    final threshold = 100.0; // Minimum velocity to trigger reply
+
+    bool shouldReply = false;
+    if (isRTL) {
+      shouldReply = details.primaryVelocity! < -threshold;
+    } else {
+      shouldReply = details.primaryVelocity! > threshold;
+    }
+
+    if (shouldReply) {
+      _startReplyToMessage(message);
+    }
+  }
+
+  void _startReplyToMessage(ChatMessage message) {
+    setState(() {
+      _replyState = ChatReplyState(
+        isReplying: true,
+        replyToMessage: message,
+        replyToMessageId: message.id,
+      );
+    });
+
+    // Auto-focus the input field
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      FocusScope.of(context).requestFocus(FocusNode());
+    });
+  }
+
+  void _cancelReply() {
+    setState(() {
+      _replyState = const ChatReplyState();
+    });
   }
 
   void _showReportModal(
@@ -599,105 +701,242 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen> {
         ),
       ),
       child: SafeArea(
-        child: WidgetsContainer(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-          backgroundColor: theme.postInputBackgound,
-          borderSide: BorderSide(color: theme.grey[300]!, width: 0.5),
-          borderRadius: BorderRadius.circular(12.5),
-          child: Row(
-            children: [
-              // User avatar
-              _buildUserAvatar(context, theme),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Reply preview (show when replying)
+            if (_replyState.isReplying && _replyState.replyToMessage != null)
+              _buildReplyPreview(context, theme, l10n),
 
-              const SizedBox(width: 10),
+            // Input area
+            WidgetsContainer(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              backgroundColor: theme.postInputBackgound,
+              borderSide: BorderSide(color: theme.grey[300]!, width: 0.5),
+              borderRadius: BorderRadius.circular(12.5),
+              child: Row(
+                children: [
+                  // User avatar
+                  _buildUserAvatar(context, theme),
 
-              // Text input
-              Expanded(
-                child: TextField(
-                  controller: _messageController,
-                  enabled: !_isSubmitting,
-                  maxLines: null,
-                  minLines: 1,
-                  keyboardType: TextInputType.multiline,
-                  textInputAction: TextInputAction.newline,
-                  decoration: InputDecoration(
-                    hintText: l10n.translate('type-your-message'),
-                    hintStyle: TextStyles.caption.copyWith(
-                      color: theme.grey[700],
+                  const SizedBox(width: 10),
+
+                  // Text input
+                  Expanded(
+                    child: TextField(
+                      controller: _messageController,
+                      enabled: !_isSubmitting,
+                      maxLines: null,
+                      minLines: 1,
+                      keyboardType: TextInputType.multiline,
+                      textInputAction: TextInputAction.newline,
+                      decoration: InputDecoration(
+                        hintText: l10n.translate('type-your-message'),
+                        hintStyle: TextStyles.caption.copyWith(
+                          color: theme.grey[700],
+                        ),
+                        border: InputBorder.none,
+                        contentPadding: EdgeInsets.zero,
+                        isDense: true,
+                      ),
+                      style: TextStyles.body.copyWith(
+                        color: theme.grey[900],
+                        fontSize: 14,
+                      ),
+                      onSubmitted: _handleSubmit,
                     ),
-                    border: InputBorder.none,
-                    contentPadding: EdgeInsets.zero,
-                    isDense: true,
                   ),
-                  style: TextStyles.body.copyWith(
-                    color: theme.grey[900],
-                    fontSize: 14,
-                  ),
-                  onSubmitted: _handleSubmit,
-                ),
+
+                  // Send button
+                  if (_messageController.text.isNotEmpty || _isSubmitting) ...[
+                    const SizedBox(width: 8),
+                    GestureDetector(
+                      onTap: _isSubmitting
+                          ? null
+                          : () => _handleSubmit(_messageController.text),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: _isSubmitting
+                              ? theme.grey[400]
+                              : theme.primary[600],
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: _isSubmitting
+                            ? Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  SizedBox(
+                                    width: 12,
+                                    height: 12,
+                                    child: Spinner(
+                                      strokeWidth: 2,
+                                      valueColor: theme.grey[100]!,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 6),
+                                  Text(
+                                    l10n.translate('send'),
+                                    style: TextStyles.caption.copyWith(
+                                      color: theme.grey[100],
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ],
+                              )
+                            : Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    Icons.send,
+                                    size: 14,
+                                    color: theme.grey[100],
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    l10n.translate('send'),
+                                    style: TextStyles.caption.copyWith(
+                                      color: theme.grey[100],
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                      ),
+                    ),
+                  ],
+                ],
               ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
-              // Send button
-              if (_messageController.text.isNotEmpty || _isSubmitting) ...[
-                const SizedBox(width: 8),
-                GestureDetector(
-                  onTap: _isSubmitting
-                      ? null
-                      : () => _handleSubmit(_messageController.text),
-                  child: Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                    decoration: BoxDecoration(
-                      color:
-                          _isSubmitting ? theme.grey[400] : theme.primary[600],
-                      borderRadius: BorderRadius.circular(16),
+  Widget _buildReplyPreview(
+      BuildContext context, CustomThemeData theme, AppLocalizations l10n) {
+    final replyMessage = _replyState.replyToMessage!;
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: theme.primary[50],
+        borderRadius: BorderRadius.circular(8),
+        border: Border(
+          left: BorderSide(color: theme.primary[500]!, width: 3),
+        ),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(
+                      LucideIcons.reply,
+                      size: 16,
+                      color: theme.primary[600],
                     ),
-                    child: _isSubmitting
-                        ? Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              SizedBox(
-                                width: 12,
-                                height: 12,
-                                child: Spinner(
-                                  strokeWidth: 2,
-                                  valueColor: theme.grey[100]!,
-                                ),
-                              ),
-                              const SizedBox(width: 6),
-                              Text(
-                                l10n.translate('send'),
-                                style: TextStyles.caption.copyWith(
-                                  color: theme.grey[100],
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ],
-                          )
-                        : Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                Icons.send,
-                                size: 14,
-                                color: theme.grey[100],
-                              ),
-                              const SizedBox(width: 4),
-                              Text(
-                                l10n.translate('send'),
-                                style: TextStyles.caption.copyWith(
-                                  color: theme.grey[100],
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ],
-                          ),
+                    const SizedBox(width: 6),
+                    Text(
+                      l10n.translate('replying-to'),
+                      style: TextStyles.caption.copyWith(
+                        color: theme.primary[600],
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      replyMessage.senderName,
+                      style: TextStyles.caption.copyWith(
+                        color: theme.primary[700],
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  replyMessage.content,
+                  style: TextStyles.caption.copyWith(
+                    color: theme.grey[700],
                   ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ],
+            ),
+          ),
+          const SizedBox(width: 8),
+          GestureDetector(
+            onTap: _cancelReply,
+            child: Container(
+              padding: const EdgeInsets.all(4),
+              decoration: BoxDecoration(
+                color: theme.grey[200],
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                LucideIcons.x,
+                size: 14,
+                color: theme.grey[600],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMessageReplyPreview(BuildContext context, CustomThemeData theme,
+      ChatMessage originalMessage) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.all(8),
+      decoration: BoxDecoration(
+        color: theme.grey[100],
+        borderRadius: BorderRadius.circular(6),
+        border: Border(
+          left: BorderSide(color: theme.primary[400]!, width: 2),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                LucideIcons.reply,
+                size: 12,
+                color: theme.primary[600],
+              ),
+              const SizedBox(width: 4),
+              Text(
+                originalMessage.senderName,
+                style: TextStyles.caption.copyWith(
+                  color: theme.primary[700],
+                  fontWeight: FontWeight.w600,
+                  fontSize: 11,
+                ),
+              ),
             ],
           ),
-        ),
+          const SizedBox(height: 2),
+          Text(
+            originalMessage.content,
+            style: TextStyles.caption.copyWith(
+              color: theme.grey[600],
+              fontSize: 11,
+            ),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
       ),
     );
   }
@@ -733,11 +972,22 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen> {
 
     try {
       // TODO: Implement actual message sending to group chat
+      // Include reply information if replying
+      if (_replyState.isReplying) {
+        // TODO: Send message with reply information
+        print(
+            'Sending reply to message ${_replyState.replyToMessageId}: $text');
+      } else {
+        // TODO: Send regular message
+        print('Sending message: $text');
+      }
+
       await Future.delayed(
           const Duration(seconds: 1)); // Simulate network request
 
-      // Clear the input
+      // Clear the input and reply state
       _messageController.clear();
+      _cancelReply();
 
       // Scroll to bottom
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -810,6 +1060,17 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen> {
         dateTime: yesterday.copyWith(hour: 14, minute: 30),
         isCurrentUser: true,
         avatarColor: Colors.blue,
+        replyToMessage: ChatMessage(
+          id: '3',
+          content:
+              'المجد للتعافي وكل ما يتعلق بالتعافي من كل أمور التعافي المتعافية.',
+          senderName: 'سيف حمد',
+          time: '14:23 مساءً',
+          dateTime: yesterday.copyWith(hour: 14, minute: 23),
+          isCurrentUser: false,
+          avatarColor: Colors.orange,
+        ),
+        replyToMessageId: '3',
       ),
       ChatMessage(
         id: '5',
@@ -848,6 +1109,16 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen> {
         dateTime: now.copyWith(hour: 8, minute: 20),
         isCurrentUser: false,
         avatarColor: Colors.green,
+        replyToMessage: ChatMessage(
+          id: '7',
+          content: 'صباح النور! بدأت اليوم بتمارين التأمل',
+          senderName: 'يوسف يعقوب',
+          time: '08:15 صباحًا',
+          dateTime: now.copyWith(hour: 8, minute: 15),
+          isCurrentUser: true,
+          avatarColor: Colors.blue,
+        ),
+        replyToMessageId: '7',
       ),
       ChatMessage(
         id: '9',

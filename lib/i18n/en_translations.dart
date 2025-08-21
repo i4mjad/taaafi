@@ -2941,4 +2941,5 @@ const Map<String, String> kEn = {
   "confirm-report-message":
       "Are you sure you want to report this message? This action cannot be undone.",
   "confirm-submit-report": "Submit Report",
+  "replying-to": "Replying to",
 };

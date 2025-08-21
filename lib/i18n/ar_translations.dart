@@ -2875,4 +2875,5 @@ const Map<String, String> kAr = {
   "confirm-report-message":
       "هل أنت متأكد من الإبلاغ عن هذه الرسالة؟ لا يمكن التراجع عن هذا الإجراء.",
   "confirm-submit-report": "إرسال البلاغ",
+  "replying-to": "رد على",
 };
