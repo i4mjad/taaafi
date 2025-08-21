@@ -111,11 +111,16 @@ class GroupChatScreen extends ConsumerStatefulWidget {
   ConsumerState<GroupChatScreen> createState() => _GroupChatScreenState();
 }
 
-class _GroupChatScreenState extends ConsumerState<GroupChatScreen> {
+class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
+    with TickerProviderStateMixin {
   final TextEditingController _messageController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   bool _isSubmitting = false;
   ChatReplyState _replyState = const ChatReplyState();
+
+  // Animation for reply preview dismissal
+  late AnimationController _replyPreviewController;
+  late Animation<double> _replyPreviewAnimation;
 
   @override
   void initState() {
@@ -123,12 +128,24 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen> {
     _messageController.addListener(() {
       setState(() {});
     });
+
+    // Initialize reply preview animation
+    _replyPreviewController = AnimationController(
+      duration: const Duration(milliseconds: 250),
+      vsync: this,
+    );
+    _replyPreviewAnimation = CurvedAnimation(
+      parent: _replyPreviewController,
+      curve: Curves.easeIn,
+    );
+    _replyPreviewController.value = 1.0; // Start fully visible
   }
 
   @override
   void dispose() {
     _messageController.dispose();
     _scrollController.dispose();
+    _replyPreviewController.dispose();
     super.dispose();
   }
 
@@ -373,6 +390,9 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen> {
       );
     });
 
+    // Animate in the reply preview
+    _replyPreviewController.forward();
+
     // Auto-focus the input field
     WidgetsBinding.instance.addPostFrameCallback((_) {
       FocusScope.of(context).requestFocus(FocusNode());
@@ -380,8 +400,11 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen> {
   }
 
   void _cancelReply() {
-    setState(() {
-      _replyState = const ChatReplyState();
+    // Animate out the reply preview
+    _replyPreviewController.reverse().then((_) {
+      setState(() {
+        _replyState = const ChatReplyState();
+      });
     });
   }
 
@@ -805,77 +828,89 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen> {
       BuildContext context, CustomThemeData theme, AppLocalizations l10n) {
     final replyMessage = _replyState.replyToMessage!;
 
-    return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: theme.primary[50],
-        borderRadius: BorderRadius.circular(8),
-        border: Border(
-          left: BorderSide(color: theme.primary[500]!, width: 3),
-        ),
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Icon(
-                      LucideIcons.reply,
-                      size: 16,
-                      color: theme.primary[600],
-                    ),
-                    const SizedBox(width: 6),
-                    Text(
-                      l10n.translate('replying-to'),
-                      style: TextStyles.caption.copyWith(
-                        color: theme.primary[600],
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      replyMessage.senderName,
-                      style: TextStyles.caption.copyWith(
-                        color: theme.primary[700],
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  replyMessage.content,
-                  style: TextStyles.caption.copyWith(
-                    color: theme.grey[700],
-                  ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(width: 8),
-          GestureDetector(
-            onTap: _cancelReply,
+    return AnimatedBuilder(
+      animation: _replyPreviewAnimation,
+      builder: (context, child) {
+        return Transform.translate(
+          offset: Offset(0,
+              (1 - _replyPreviewAnimation.value) * 60), // Slide down 60 pixels
+          child: Opacity(
+            opacity: _replyPreviewAnimation.value,
             child: Container(
-              padding: const EdgeInsets.all(4),
+              margin: const EdgeInsets.only(bottom: 8),
+              padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: theme.grey[200],
-                shape: BoxShape.circle,
+                color: theme.primary[50],
+                borderRadius: BorderRadius.circular(8),
+                border: Border(
+                  left: BorderSide(color: theme.primary[500]!, width: 3),
+                ),
               ),
-              child: Icon(
-                LucideIcons.x,
-                size: 14,
-                color: theme.grey[600],
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(
+                              LucideIcons.reply,
+                              size: 16,
+                              color: theme.primary[600],
+                            ),
+                            const SizedBox(width: 6),
+                            Text(
+                              l10n.translate('replying-to'),
+                              style: TextStyles.caption.copyWith(
+                                color: theme.primary[600],
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              replyMessage.senderName,
+                              style: TextStyles.caption.copyWith(
+                                color: theme.primary[700],
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          replyMessage.content,
+                          style: TextStyles.caption.copyWith(
+                            color: theme.grey[700],
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  GestureDetector(
+                    onTap: _cancelReply,
+                    child: Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                        color: theme.grey[200],
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        LucideIcons.x,
+                        size: 14,
+                        color: theme.grey[600],
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 
@@ -973,7 +1008,12 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen> {
 
       // Clear the input and reply state
       _messageController.clear();
-      _cancelReply();
+      if (_replyState.isReplying) {
+        setState(() {
+          _replyState = const ChatReplyState();
+        });
+        _replyPreviewController.value = 1.0; // Reset animation for next reply
+      }
 
       // Scroll to bottom
       WidgetsBinding.instance.addPostFrameCallback((_) {
