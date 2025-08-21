@@ -8,6 +8,7 @@ import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/core/theming/custom_theme_data.dart';
 import 'package:reboot_app_3/features/groups/providers/group_membership_provider.dart';
+import 'package:reboot_app_3/features/groups/presentation/screens/group_chat_screen.dart';
 
 /// Model for update items in the group
 class GroupUpdateItem {
@@ -162,7 +163,7 @@ class GroupScreen extends ConsumerWidget {
         decoration: BoxDecoration(
           color: color,
           shape: BoxShape.circle,
-          border: Border.all(color: Colors.white, width: 2),
+          border: Border.all(color: Colors.white, width: 1),
         ),
       ),
     );
@@ -232,13 +233,14 @@ class GroupScreen extends ConsumerWidget {
           const SizedBox(width: 12),
 
           // User Avatar (middle)
+          //TODO: Change this to the real avatar
           Container(
-            width: 40,
-            height: 40,
+            width: 36,
+            height: 36,
             decoration: BoxDecoration(
               color: update.iconColor,
               shape: BoxShape.circle,
-              border: Border.all(color: Colors.white, width: 2),
+              border: Border.all(color: Colors.white, width: 0.75),
             ),
             child: update.icon != null
                 ? Icon(
@@ -305,7 +307,7 @@ class GroupScreen extends ConsumerWidget {
                   backgroundColor: theme.primary[50]!,
                   borderColor: theme.primary[200]!,
                   textColor: theme.primary[900]!,
-                  onTap: () => _showComingSoon(context, l10n),
+                  onTap: () => _navigateToChat(context),
                 ),
               ),
             ],
@@ -400,6 +402,14 @@ class GroupScreen extends ConsumerWidget {
   void _showComingSoon(BuildContext context, AppLocalizations l10n) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(l10n.translate('coming-soon'))),
+    );
+  }
+
+  void _navigateToChat(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => const GroupChatScreen(),
+      ),
     );
   }
 

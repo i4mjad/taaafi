@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -460,23 +461,24 @@ GoRouter goRouter(Ref<GoRouter> ref) {
           ),
 
           // * Guard
-          StatefulShellBranch(
-            navigatorKey: shellNavigatorGuardKey,
-            observers: [
-              GoRouterObserver(ref.read(analyticsFacadeProvider)),
-            ],
-            routes: [
-              GoRoute(
-                name: RouteNames.guard.name,
-                path: '/guard',
-                pageBuilder: (context, state) => MaterialPage(
+          if (kDebugMode) ...[
+            StatefulShellBranch(
+              navigatorKey: shellNavigatorGuardKey,
+              observers: [
+                GoRouterObserver(ref.read(analyticsFacadeProvider)),
+              ],
+              routes: [
+                GoRoute(
                   name: RouteNames.guard.name,
-                  child: GuardScreen(),
+                  path: '/guard',
+                  pageBuilder: (context, state) => MaterialPage(
+                    name: RouteNames.guard.name,
+                    child: GuardScreen(),
+                  ),
                 ),
-              ),
-            ],
-          ),
-
+              ],
+            ),
+          ],
           // * Community
           StatefulShellBranch(
             navigatorKey: shellNavigatorFellowshipKey,

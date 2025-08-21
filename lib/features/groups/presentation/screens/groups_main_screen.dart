@@ -20,7 +20,7 @@ import 'package:reboot_app_3/features/groups/presentation/screens/modals/join_gr
 import 'package:reboot_app_3/features/groups/presentation/screens/modals/create_group_modal.dart';
 import 'package:reboot_app_3/features/groups/presentation/screens/modals/group_invitations_modal.dart';
 import 'package:reboot_app_3/features/shared/models/group_invitation_entity.dart';
-import 'package:reboot_app_3/features/groups/presentation/screens/group_content_screen.dart';
+import 'package:reboot_app_3/features/groups/presentation/screens/group_screen.dart';
 
 class GroupsMainScreen extends ConsumerWidget {
   const GroupsMainScreen({super.key});

@@ -2927,4 +2927,14 @@ const Map<String, String> kEn = {
   "member-count-plural": "{count} members",
 
   //Guard
+
+  // Report Message
+  "report-message": "Report Message",
+  "report-reason": "Why are you reporting this message?",
+  "report-inappropriate-content": "Inappropriate Content",
+  "report-harassment": "Harassment or Bullying",
+  "report-spam": "Spam or Unwanted Content",
+  "report-hate-speech": "Hate Speech",
+  "report-other-reason": "Other Reason",
+  "report-submitted": "Report submitted successfully",
 };

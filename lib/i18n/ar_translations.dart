@@ -2861,4 +2861,14 @@ const Map<String, String> kAr = {
   "member-count-plural": "{count} أعضاء",
 
   //Guard
+
+  // Report Message
+  "report-message": "الإبلاغ عن الرسالة",
+  "report-reason": "لماذا تقوم بالإبلاغ عن هذه الرسالة؟",
+  "report-inappropriate-content": "محتوى غير مناسب",
+  "report-harassment": "مضايقة أو تنمر",
+  "report-spam": "رسائل مزعجة أو محتوى غير مرغوب فيه",
+  "report-hate-speech": "خطاب كراهية",
+  "report-other-reason": "سبب آخر",
+  "report-submitted": "تم إرسال البلاغ بنجاح",
 };
