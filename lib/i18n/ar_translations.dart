@@ -1661,6 +1661,35 @@ const Map<String, String> kAr = {
   "leave-group-confirm-title": "مغادرة الزمالة",
   "leave-group-confirm-message":
       "هل أنت متأكد من رغبتك في مغادرة هذه الزمالة؟ لن تتمكن من الوصول إلى المحادثات والتحديثات بعد المغادرة.",
+
+  // Notification Settings
+  "enable-notifications": "تفعيل الإشعارات",
+  "message-notifications": "إشعارات الرسائل",
+  "update-notifications": "إشعارات التحديثات",
+  "challenge-reminders": "تذكيرات التحديات",
+
+  // Member Settings
+  "supervisor": "مشرف",
+  "member": "عضو",
+  "join-date": "تاريخ الانضمام",
+  "change-to-member": "تغيير إلى عضو",
+  "change-to-supervisor": "تغيير إلى مشرف",
+  "remove-from-group": "إزالة من الزمالة",
+  "remove-member-confirm-title": "إزالة العضو",
+  "remove-member-confirm-message":
+      "هل أنت متأكد من رغبتك في إزالة {name} من الزمالة؟",
+  "remove": "إزالة",
+
+  // Privacy Settings
+  "show-identity-description":
+      "تفعيل هذا الخيار يجعل بياناتك الأساسية (الاسم والنوع) مرئية لأعضاء الزمالة، ويعطيل الخيار لإبقاء كمجهول",
+  "make-messages-public": "تحويل الرسالة عامة/خاصة",
+  "make-messages-public-description":
+      "عن تحويل الرسالة إلى عامة يمكن لأي أحد الانضمام عنواننا",
+
+  // Chat Settings
+  "chat-settings-coming-soon-desc": "إعدادات المحادثة ستكون متاحة قريباً",
+
   "points": "نقاط",
   "coming-soon": "قريباً",
 
@@ -1878,7 +1907,6 @@ const Map<String, String> kAr = {
   "yearly-price": "68.98\$",
   "yearly-period": "/سنة",
   "monthly-price": "14.98\$",
-  "member": "عضو",
   "monthly-period": "/شهر",
   "original-yearly-price": "179.76\$",
   "savings-percentage": "توفير 62%",
@@ -1957,7 +1985,7 @@ const Map<String, String> kAr = {
   "smart-alerts-beta-notice":
       "التنبيهات الذكية في مرحلة تجريبية حالياً. نحن نحسن هذه الميزة باستمرار بناء على ملاحظات المستخدمين.",
   "notifications-disabled-banner": "فعّل الإشعارات لتلقي نصائح منع الانتكاس",
-  "enable-notifications": "تفعيل الإشعارات",
+
   "high-risk-hour-description":
       "احصل على إشعار قبل 30 دقيقة من ساعة الخطر الأعلى إحصائياً للانتكاس",
   "vulnerability-alert-description":

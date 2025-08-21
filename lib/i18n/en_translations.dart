@@ -1709,6 +1709,35 @@ const Map<String, String> kEn = {
   "leave-group-confirm-title": "Leave Group",
   "leave-group-confirm-message":
       "Are you sure you want to leave this group? You won't be able to access the chats and updates after leaving.",
+
+  // Notification Settings
+  "enable-notifications": "Enable Notifications",
+  "message-notifications": "Message Notifications",
+  "update-notifications": "Update Notifications",
+  "challenge-reminders": "Challenge Reminders",
+
+  // Member Settings
+  "supervisor": "Supervisor",
+  "member": "Member",
+  "join-date": "Join Date",
+  "change-to-member": "Change to Member",
+  "change-to-supervisor": "Change to Supervisor",
+  "remove-from-group": "Remove from Group",
+  "remove-member-confirm-title": "Remove Member",
+  "remove-member-confirm-message":
+      "Are you sure you want to remove {name} from the group?",
+  "remove": "Remove",
+
+  // Privacy Settings
+  "show-identity-description":
+      "Enable this option to make your basic information (name and gender) visible to group members, and disable the option to stay anonymous",
+  "make-messages-public": "Make Messages Public/Private",
+  "make-messages-public-description":
+      "When you make the message public, anyone can join our address",
+
+  // Chat Settings
+  "chat-settings-coming-soon-desc": "Chat settings will be available soon",
+
   "points": "points",
   "coming-soon": "Coming soon",
 
@@ -1919,7 +1948,6 @@ const Map<String, String> kEn = {
   "subscription-support": "Support",
   "subscription-community": "Community",
   "subscription-analytics": "Analytics",
-  "member": "Member",
   "no_search_results": "No results found",
   "subscription-status": "Subscription Status",
 
@@ -2023,7 +2051,7 @@ const Map<String, String> kEn = {
       "Smart Alerts is currently in beta. We're actively improving this feature based on user feedback.",
   "notifications-disabled-banner":
       "Enable notifications to receive relapse-prevention tips",
-  "enable-notifications": "Enable Notifications",
+
   "high-risk-hour-description":
       "Get notified 30 minutes before your statistically highest risk hour for relapse",
   "vulnerability-alert-description":

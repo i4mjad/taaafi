@@ -7,6 +7,10 @@ import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/core/theming/custom_theme_data.dart';
+import 'package:reboot_app_3/features/groups/presentation/screens/group_notification_settings_screen.dart';
+import 'package:reboot_app_3/features/groups/presentation/screens/group_member_settings_screen.dart';
+import 'package:reboot_app_3/features/groups/presentation/screens/group_privacy_settings_screen.dart';
+import 'package:reboot_app_3/features/groups/presentation/screens/group_chat_settings_screen.dart';
 
 class GroupSettingsScreen extends ConsumerWidget {
   const GroupSettingsScreen({super.key});
@@ -35,7 +39,7 @@ class GroupSettingsScreen extends ConsumerWidget {
                     l10n: l10n,
                     icon: LucideIcons.bell,
                     title: l10n.translate('notification-settings'),
-                    onTap: () => _showComingSoon(context, l10n),
+                    onTap: () => _navigateToNotificationSettings(context),
                   ),
 
                   verticalSpace(Spacing.points8),
@@ -47,7 +51,7 @@ class GroupSettingsScreen extends ConsumerWidget {
                     l10n: l10n,
                     icon: LucideIcons.users,
                     title: l10n.translate('member-settings'),
-                    onTap: () => _showComingSoon(context, l10n),
+                    onTap: () => _navigateToMemberSettings(context),
                   ),
 
                   verticalSpace(Spacing.points8),
@@ -59,7 +63,7 @@ class GroupSettingsScreen extends ConsumerWidget {
                     l10n: l10n,
                     icon: LucideIcons.shield,
                     title: l10n.translate('privacy-settings'),
-                    onTap: () => _showComingSoon(context, l10n),
+                    onTap: () => _navigateToPrivacySettings(context),
                   ),
 
                   verticalSpace(Spacing.points8),
@@ -71,7 +75,7 @@ class GroupSettingsScreen extends ConsumerWidget {
                     l10n: l10n,
                     icon: LucideIcons.messageCircle,
                     title: l10n.translate('chat-settings'),
-                    onTap: () => _showComingSoon(context, l10n),
+                    onTap: () => _navigateToChatSettings(context),
                   ),
 
                   const Spacer(),
@@ -276,6 +280,38 @@ class GroupSettingsScreen extends ConsumerWidget {
           ],
         );
       },
+    );
+  }
+
+  void _navigateToNotificationSettings(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => const GroupNotificationSettingsScreen(),
+      ),
+    );
+  }
+
+  void _navigateToMemberSettings(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => const GroupMemberSettingsScreen(),
+      ),
+    );
+  }
+
+  void _navigateToPrivacySettings(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => const GroupPrivacySettingsScreen(),
+      ),
+    );
+  }
+
+  void _navigateToChatSettings(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => const GroupChatSettingsScreen(),
+      ),
     );
   }
 }
