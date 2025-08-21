@@ -345,8 +345,8 @@ class _GroupChallengeScreenState extends ConsumerState<GroupChallengeScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'مهامك الحالية',
-            style: TextStyles.h5.copyWith(
+            AppLocalizations.of(context).translate('my_tasks'),
+            style: TextStyles.h6.copyWith(
               color: theme.grey[900],
             ),
           ),

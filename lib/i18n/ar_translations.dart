@@ -1682,7 +1682,7 @@ const Map<String, String> kAr = {
 
   // Leaderboard
   "leaderboard": "لوحة النتائج",
-
+  "my_tasks": "مهامي",
   // Privacy Settings
   "show-identity-description":
       "تفعيل هذا الخيار يجعل بياناتك الأساسية (الاسم والنوع) مرئية لأعضاء الزمالة، ويعطيل الخيار لإبقاء كمجهول",
