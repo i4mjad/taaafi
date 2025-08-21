@@ -372,102 +372,94 @@ class _GroupChallengeScreenState extends ConsumerState<GroupChallengeScreen> {
     return Container(
       margin: EdgeInsets.only(bottom: Spacing.points12.value),
       child: WidgetsContainer(
-        backgroundColor: Colors.white,
-        borderSide: BorderSide(
-          color: task.isCompleted ? theme.success[200]! : theme.grey[200]!,
-          width: 1,
-        ),
-        child: Padding(
-          padding: EdgeInsets.all(Spacing.points16.value),
-          child: Row(
-            children: [
-              // Task content (left side)
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      task.title,
-                      style: TextStyles.body.copyWith(
-                        color: theme.grey[900],
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    verticalSpace(Spacing.points4),
-                    Text(
-                      task.subtitle,
-                      style: TextStyles.caption.copyWith(
-                        color: theme.grey[600],
-                      ),
-                    ),
-                    if (task.statusText != null) ...[
-                      verticalSpace(Spacing.points8),
-                      Text(
-                        task.statusText!,
-                        style: TextStyles.small.copyWith(
-                          color: task.statusColor ?? theme.warn[600],
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
-                  ],
-                ),
-              ),
-
-              horizontalSpace(Spacing.points16),
-
-              // Number and checkbox (right side)
-              Column(
-                children: [
-                  // Checkbox
-                  Container(
-                    width: 28,
-                    height: 28,
-                    decoration: BoxDecoration(
-                      color: task.isCompleted
-                          ? theme.success[500]
-                          : Colors.transparent,
-                      border: Border.all(
-                        color: task.isCompleted
-                            ? theme.success[500]!
-                            : theme.grey[300]!,
-                        width: 2,
-                      ),
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    child: task.isCompleted
-                        ? Icon(
-                            Icons.check,
-                            color: Colors.white,
-                            size: 18,
-                          )
-                        : null,
+        backgroundColor: theme.backgroundColor,
+        padding: EdgeInsets.fromLTRB(16, 12, 16, 12),
+        borderSide: BorderSide(color: theme.grey[600]!, width: 0.5),
+        child: Row(
+          children: [
+            // Task content (left side)
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  task.title,
+                  style: TextStyles.footnoteSelected.copyWith(
+                    color: theme.grey[900],
                   ),
-
-                  verticalSpace(Spacing.points12),
-
-                  // Number
-                  Container(
-                    width: 28,
-                    height: 28,
-                    decoration: BoxDecoration(
-                      color: theme.primary[100],
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    child: Center(
-                      child: Text(
-                        '$number',
-                        style: TextStyles.caption.copyWith(
-                          color: theme.primary[700],
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
+                ),
+                verticalSpace(Spacing.points4),
+                Text(
+                  task.subtitle,
+                  style: TextStyles.small.copyWith(
+                    color: theme.grey[700],
+                  ),
+                ),
+                if (task.statusText != null) ...[
+                  verticalSpace(Spacing.points4),
+                  Text(
+                    task.statusText!,
+                    style: TextStyles.small.copyWith(
+                      color: task.statusColor ?? theme.warn[600],
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
                 ],
-              ),
-            ],
-          ),
+              ],
+            ),
+
+            Spacer(),
+
+            // Number and checkbox (right side)
+            Row(
+              children: [
+                // Number
+                Container(
+                  width: 24,
+                  height: 24,
+                  decoration: BoxDecoration(
+                    color: theme.primary[100],
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Center(
+                    child: Text(
+                      '$number',
+                      style: TextStyles.small.copyWith(
+                        color: theme.primary[700],
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+
+                horizontalSpace(Spacing.points8),
+
+                // Checkbox
+                Container(
+                  width: 24,
+                  height: 24,
+                  decoration: BoxDecoration(
+                    color: task.isCompleted
+                        ? theme.success[500]
+                        : Colors.transparent,
+                    border: Border.all(
+                      color: task.isCompleted
+                          ? theme.success[500]!
+                          : theme.grey[400]!,
+                      width: 2,
+                    ),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: task.isCompleted
+                      ? Icon(
+                          Icons.check,
+                          color: Colors.white,
+                          size: 16,
+                        )
+                      : null,
+                ),
+              ],
+            ),
+          ],
         ),
       ),
     );
