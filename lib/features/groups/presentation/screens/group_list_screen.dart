@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
+import 'package:reboot_app_3/core/routing/route_names.dart';
 import 'package:reboot_app_3/core/shared_widgets/app_bar.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
@@ -83,7 +84,10 @@ class _GroupListScreenState extends ConsumerState<GroupListScreen> {
                   child: GroupCard(
                     groupId: 'group_$index',
                     onTap: () {
-                      context.push('/community/groups/group_$index');
+                      context.goNamed(
+                        RouteNames.groupDetail.name,
+                        pathParameters: {'groupId': 'group_$index'},
+                      );
                     },
                   ),
                 );

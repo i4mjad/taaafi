@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/shared_widgets/app_bar.dart';
@@ -247,6 +248,7 @@ class GroupSettingsScreen extends ConsumerWidget {
   }
 
   void _navigateToMemberSettings(BuildContext context) {
+    // TODO: Add GoRouter route for group member settings
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => const GroupMemberSettingsScreen(),
@@ -255,6 +257,7 @@ class GroupSettingsScreen extends ConsumerWidget {
   }
 
   void _navigateToPrivacySettings(BuildContext context) {
+    // TODO: Add GoRouter route for group privacy settings
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => const GroupPrivacySettingsScreen(),
@@ -263,6 +266,7 @@ class GroupSettingsScreen extends ConsumerWidget {
   }
 
   void _navigateToChatSettings(BuildContext context) {
+    // TODO: Add GoRouter route for group chat settings
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => const GroupChatSettingsScreen(),

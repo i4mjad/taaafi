@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
+import 'package:reboot_app_3/core/routing/route_names.dart';
 import 'package:reboot_app_3/core/shared_widgets/app_bar.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/core/theming/custom_theme_data.dart';
 import 'package:reboot_app_3/features/groups/providers/group_membership_provider.dart';
-import 'package:reboot_app_3/features/groups/presentation/screens/group_chat_screen.dart';
-import 'package:reboot_app_3/features/groups/presentation/screens/group_updates_screen.dart';
-import 'package:reboot_app_3/features/groups/presentation/screens/group_settings_screen.dart';
 
 /// Model for update items in the group
 class GroupUpdateItem {
@@ -81,7 +80,7 @@ class GroupScreen extends ConsumerWidget {
           ),
 
           // Bottom sections (Chat and Challenges)
-          _buildBottomSections(context, theme, l10n),
+          _buildBottomSections(context, theme, l10n, membership.group.id),
         ],
       ),
     );
@@ -272,8 +271,8 @@ class GroupScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildBottomSections(
-      BuildContext context, CustomThemeData theme, AppLocalizations l10n) {
+  Widget _buildBottomSections(BuildContext context, CustomThemeData theme,
+      AppLocalizations l10n, String groupId) {
     return Container(
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -292,7 +291,7 @@ class GroupScreen extends ConsumerWidget {
                   backgroundColor: theme.secondary[50]!,
                   borderColor: theme.secondary[200]!,
                   textColor: theme.secondary[900]!,
-                  onTap: () => _showComingSoon(context, l10n),
+                  onTap: () => _navigateToChallenges(context, groupId),
                 ),
               ),
 
@@ -309,7 +308,7 @@ class GroupScreen extends ConsumerWidget {
                   backgroundColor: theme.primary[50]!,
                   borderColor: theme.primary[200]!,
                   textColor: theme.primary[900]!,
-                  onTap: () => _navigateToChat(context),
+                  onTap: () => _navigateToChat(context, groupId),
                 ),
               ),
             ],
@@ -331,7 +330,7 @@ class GroupScreen extends ConsumerWidget {
                   backgroundColor: theme.grey[50]!,
                   borderColor: theme.grey[200]!,
                   textColor: theme.grey[900]!,
-                  onTap: () => _navigateToSettings(context),
+                  onTap: () => _navigateToSettings(context, groupId),
                 ),
               ),
 
@@ -348,7 +347,7 @@ class GroupScreen extends ConsumerWidget {
                   backgroundColor: theme.tint[50]!,
                   borderColor: theme.tint[200]!,
                   textColor: theme.tint[900]!,
-                  onTap: () => _navigateToUpdates(context),
+                  onTap: () => _navigateToUpdates(context, groupId),
                 ),
               ),
             ],
@@ -401,33 +400,31 @@ class GroupScreen extends ConsumerWidget {
     );
   }
 
-  void _showComingSoon(BuildContext context, AppLocalizations l10n) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(l10n.translate('coming-soon'))),
+  void _navigateToChat(BuildContext context, String groupId) {
+    context.goNamed(
+      RouteNames.groupChat.name,
+      pathParameters: {'groupId': groupId},
     );
   }
 
-  void _navigateToChat(BuildContext context) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => const GroupChatScreen(),
-      ),
+  void _navigateToUpdates(BuildContext context, String groupId) {
+    context.goNamed(
+      RouteNames.groupUpdates.name,
+      pathParameters: {'groupId': groupId},
     );
   }
 
-  void _navigateToUpdates(BuildContext context) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => const GroupUpdatesScreen(),
-      ),
+  void _navigateToSettings(BuildContext context, String groupId) {
+    context.goNamed(
+      RouteNames.groupSettings.name,
+      pathParameters: {'groupId': groupId},
     );
   }
 
-  void _navigateToSettings(BuildContext context) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => const GroupSettingsScreen(),
-      ),
+  void _navigateToChallenges(BuildContext context, String groupId) {
+    context.goNamed(
+      RouteNames.groupChallenge.name,
+      pathParameters: {'groupId': groupId},
     );
   }
 

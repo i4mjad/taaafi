@@ -49,6 +49,8 @@ enum RouteNames {
   groupDetail,
   groupChat,
   groupChallenge,
+  groupUpdates,
+  groupSettings,
   globalChallengeList,
   communityProfile,
   userReports,

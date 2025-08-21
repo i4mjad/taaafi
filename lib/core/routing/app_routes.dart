@@ -47,6 +47,8 @@ import 'package:reboot_app_3/features/community/presentation/forum/reply_compose
 import 'package:reboot_app_3/features/groups/presentation/screens/group_detail_screen.dart';
 import 'package:reboot_app_3/features/groups/presentation/screens/group_chat_screen.dart';
 import 'package:reboot_app_3/features/groups/presentation/screens/group_challenge_screen.dart';
+import 'package:reboot_app_3/features/groups/presentation/screens/group_updates_screen.dart';
+import 'package:reboot_app_3/features/groups/presentation/screens/group_settings_screen.dart';
 import 'package:reboot_app_3/features/community/presentation/challenges/global_challenge_list_screen.dart';
 import 'package:reboot_app_3/features/community/presentation/profile/community_profile_settings_screen.dart';
 import 'package:reboot_app_3/features/vault/presentation/day_overview/day_overview_screen.dart';
@@ -678,6 +680,22 @@ GoRouter goRouter(Ref<GoRouter> ref) {
                       name: RouteNames.groupChallenge.name,
                       child: GroupChallengeScreen(
                           groupId: state.pathParameters['groupId']!),
+                    ),
+                  ),
+                  GoRoute(
+                    path: ':groupId/updates',
+                    name: RouteNames.groupUpdates.name,
+                    pageBuilder: (context, state) => MaterialPage<void>(
+                      name: RouteNames.groupUpdates.name,
+                      child: const GroupUpdatesScreen(),
+                    ),
+                  ),
+                  GoRoute(
+                    path: ':groupId/settings',
+                    name: RouteNames.groupSettings.name,
+                    pageBuilder: (context, state) => MaterialPage<void>(
+                      name: RouteNames.groupSettings.name,
+                      child: const GroupSettingsScreen(),
                     ),
                   ),
                 ],

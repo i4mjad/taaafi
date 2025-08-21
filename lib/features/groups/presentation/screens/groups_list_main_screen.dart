@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:reboot_app_3/core/routing/route_names.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/shared_widgets/app_bar.dart';
 import 'package:reboot_app_3/core/shared_widgets/premium_cta_button.dart';
@@ -55,7 +56,7 @@ class _GroupsListMainScreenState extends ConsumerState<GroupsListMainScreen> {
             description: 'Join support groups with others on the same journey',
             memberCount: '1.2k members',
             onTap: () {
-              context.push('/groups/list');
+              context.goNamed(RouteNames.groupList.name);
             },
           ),
           const SizedBox(height: 16),
@@ -65,7 +66,7 @@ class _GroupsListMainScreenState extends ConsumerState<GroupsListMainScreen> {
             description: 'Open discussions about recovery and wellness',
             memberCount: '856 members',
             onTap: () {
-              context.push('/groups/list');
+              context.goNamed(RouteNames.groupList.name);
             },
           ),
           const SizedBox(height: 16),
@@ -75,7 +76,7 @@ class _GroupsListMainScreenState extends ConsumerState<GroupsListMainScreen> {
             description: 'Share and discover helpful tips and strategies',
             memberCount: '2.1k members',
             onTap: () {
-              context.push('/groups/list');
+              context.goNamed(RouteNames.groupList.name);
             },
           ),
           const SizedBox(height: 16),
@@ -85,7 +86,7 @@ class _GroupsListMainScreenState extends ConsumerState<GroupsListMainScreen> {
             description: 'Find accountability partners for your journey',
             memberCount: '423 members',
             onTap: () {
-              context.push('/groups/list');
+              context.goNamed(RouteNames.groupList.name);
             },
           ),
           const SizedBox(height: 16),
@@ -95,7 +96,7 @@ class _GroupsListMainScreenState extends ConsumerState<GroupsListMainScreen> {
             description: 'Join groups focused on learning and growth',
             memberCount: '267 members',
             onTap: () {
-              context.push('/groups/list');
+              context.goNamed(RouteNames.groupList.name);
             },
           ),
         ],
