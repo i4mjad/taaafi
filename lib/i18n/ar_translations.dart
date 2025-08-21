@@ -1690,6 +1690,18 @@ const Map<String, String> kAr = {
   // Chat Settings
   "chat-settings-coming-soon-desc": "إعدادات المحادثة ستكون متاحة قريباً",
 
+  // Leave Group Modal
+  "leave-group-warning-messages":
+      "الرسائل التي تمت مشاركتها سيتم حذفها من محادثة الزمالة عند المغادرة.",
+  "leave-group-warning-challenges":
+      "سيتم إزالتك من كل التحديات التي قمت بالمشاركة فيها في الزمالة",
+  "leave-group-warning-updates":
+      "سيتم إزالة كل التحديثات التي قمت بمشاركتها في الزمالة",
+  "leave-group-warning-privacy":
+      "سيتم إعادة تعيين إعدادات الخصوصية. في حالة انضمامك لزمالة أخرى، يجب عليك تحديث إعدادات الخصوصية",
+  "leave-group-24hour-restriction":
+      "لن تتمكن من الانضمام لأي زمالة خلال 24 ساعة من المغادرة",
+
   "points": "نقاط",
   "coming-soon": "قريباً",
 

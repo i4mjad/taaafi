@@ -1738,6 +1738,18 @@ const Map<String, String> kEn = {
   // Chat Settings
   "chat-settings-coming-soon-desc": "Chat settings will be available soon",
 
+  // Leave Group Modal
+  "leave-group-warning-messages":
+      "Messages you've shared will be deleted from the group chat when you leave.",
+  "leave-group-warning-challenges":
+      "You will be removed from all challenges you participated in the group",
+  "leave-group-warning-updates":
+      "All updates you shared in the group will be removed",
+  "leave-group-warning-privacy":
+      "Privacy settings will be reset. If you join another group, you'll need to update your privacy settings",
+  "leave-group-24hour-restriction":
+      "You won't be able to join any group for 24 hours after leaving",
+
   "points": "points",
   "coming-soon": "Coming soon",
 

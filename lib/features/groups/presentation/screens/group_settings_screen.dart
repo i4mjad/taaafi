@@ -11,6 +11,7 @@ import 'package:reboot_app_3/features/groups/presentation/screens/group_notifica
 import 'package:reboot_app_3/features/groups/presentation/screens/group_member_settings_screen.dart';
 import 'package:reboot_app_3/features/groups/presentation/screens/group_privacy_settings_screen.dart';
 import 'package:reboot_app_3/features/groups/presentation/screens/group_chat_settings_screen.dart';
+import 'package:reboot_app_3/features/groups/presentation/widgets/leave_group_modal.dart';
 
 class GroupSettingsScreen extends ConsumerWidget {
   const GroupSettingsScreen({super.key});
@@ -228,57 +229,11 @@ class GroupSettingsScreen extends ConsumerWidget {
   }
 
   void _showLeaveGroupDialog(BuildContext context, AppLocalizations l10n) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        final theme = AppTheme.of(context);
-
-        return AlertDialog(
-          backgroundColor: theme.backgroundColor,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          title: Text(
-            l10n.translate('leave-group-confirm-title'),
-            style: TextStyles.h5.copyWith(
-              color: theme.grey[900],
-            ),
-            textAlign: TextAlign.center,
-          ),
-          content: Text(
-            l10n.translate('leave-group-confirm-message'),
-            style: TextStyles.body.copyWith(
-              color: theme.grey[700],
-            ),
-            textAlign: TextAlign.center,
-          ),
-          actionsAlignment: MainAxisAlignment.spaceEvenly,
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: Text(
-                l10n.translate('cancel'),
-                style: TextStyles.body.copyWith(
-                  color: theme.grey[600],
-                ),
-              ),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-                // TODO: Implement leave group functionality
-                _showComingSoon(context, l10n);
-              },
-              child: Text(
-                l10n.translate('leave-group'),
-                style: TextStyles.body.copyWith(
-                  color: theme.error[500],
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-          ],
-        );
+    LeaveGroupModal.show(
+      context,
+      onLeaveGroup: () {
+        // TODO: Implement leave group functionality
+        _showComingSoon(context, l10n);
       },
     );
   }
