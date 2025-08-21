@@ -240,9 +240,12 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen> {
 
   Widget _buildMessageItem(
       BuildContext context, CustomThemeData theme, ChatMessage message) {
-    return GestureDetector(
+    return _AnimatedSwipeMessage(
+      key: Key(message.id),
+      message: message,
+      theme: theme,
       onLongPress: () => _showReportModal(context, theme, message),
-      onHorizontalDragEnd: (details) => _handleSwipeToReply(details, message),
+      onSwipeToReply: () => _startReplyToMessage(message),
       child: Container(
         margin: const EdgeInsets.only(bottom: 16),
         child: Row(
@@ -359,23 +362,6 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen> {
         ),
       ),
     );
-  }
-
-  void _handleSwipeToReply(DragEndDetails details, ChatMessage message) {
-    // Check if it's a right swipe (positive velocity for LTR, negative for RTL)
-    final isRTL = Directionality.of(context) == TextDirection.rtl;
-    final threshold = 100.0; // Minimum velocity to trigger reply
-
-    bool shouldReply = false;
-    if (isRTL) {
-      shouldReply = details.primaryVelocity! < -threshold;
-    } else {
-      shouldReply = details.primaryVelocity! > threshold;
-    }
-
-    if (shouldReply) {
-      _startReplyToMessage(message);
-    }
   }
 
   void _startReplyToMessage(ChatMessage message) {
@@ -1139,5 +1125,183 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen> {
         avatarColor: Colors.blue,
       ),
     ];
+  }
+}
+
+/// Animated swipe message widget for reply functionality
+class _AnimatedSwipeMessage extends StatefulWidget {
+  final ChatMessage message;
+  final CustomThemeData theme;
+  final Widget child;
+  final VoidCallback onLongPress;
+  final VoidCallback onSwipeToReply;
+
+  const _AnimatedSwipeMessage({
+    super.key,
+    required this.message,
+    required this.theme,
+    required this.child,
+    required this.onLongPress,
+    required this.onSwipeToReply,
+  });
+
+  @override
+  State<_AnimatedSwipeMessage> createState() => _AnimatedSwipeMessageState();
+}
+
+class _AnimatedSwipeMessageState extends State<_AnimatedSwipeMessage>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _animationController;
+  late Animation<double> _slideAnimation;
+  late Animation<double> _replyIconAnimation;
+
+  double _dragOffset = 0.0;
+  static const double _maxSwipeDistance = 80.0;
+  static const double _replyThreshold = 60.0;
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 200),
+      vsync: this,
+    );
+    _slideAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeOut,
+    ));
+    _replyIconAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.elasticOut,
+    ));
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
+
+  void _handlePanStart(DragStartDetails details) {
+    // Start of pan gesture - could be used for haptic feedback
+  }
+
+  void _handlePanUpdate(DragUpdateDetails details) {
+    final isRTL = Directionality.of(context) == TextDirection.rtl;
+    final delta = details.delta.dx;
+
+    // Only allow swipe in the correct direction (left for LTR, right for RTL)
+    final isCorrectDirection = isRTL ? delta > 0 : delta < 0;
+
+    if (isCorrectDirection) {
+      setState(() {
+        _dragOffset = (_dragOffset + (isRTL ? delta : -delta))
+            .clamp(0.0, _maxSwipeDistance);
+      });
+
+      // Update animation progress based on drag offset
+      final progress = (_dragOffset / _maxSwipeDistance).clamp(0.0, 1.0);
+      _animationController.value = progress;
+    }
+  }
+
+  void _handlePanEnd(DragEndDetails details) {
+    final shouldTriggerReply = _dragOffset >= _replyThreshold;
+
+    if (shouldTriggerReply) {
+      // Trigger reply
+      widget.onSwipeToReply();
+      // Animate to show completion
+      _animationController.forward().then((_) {
+        _resetAnimation();
+      });
+    } else {
+      // Animate back to original position
+      _resetAnimation();
+    }
+  }
+
+  void _resetAnimation() {
+    _animationController.reverse().then((_) {
+      setState(() {
+        _dragOffset = 0.0;
+      });
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isRTL = Directionality.of(context) == TextDirection.rtl;
+
+    return GestureDetector(
+      onLongPress: widget.onLongPress,
+      onPanStart: _handlePanStart,
+      onPanUpdate: _handlePanUpdate,
+      onPanEnd: _handlePanEnd,
+      child: Stack(
+        children: [
+          // Reply icon that appears during swipe
+          Positioned.fill(
+            child: AnimatedBuilder(
+              animation: _replyIconAnimation,
+              builder: (context, child) {
+                final iconOpacity = _replyIconAnimation.value.clamp(0.0, 1.0);
+                final iconScale = _replyIconAnimation.value.clamp(0.0, 1.0);
+
+                if (iconOpacity == 0) return const SizedBox.shrink();
+
+                return Align(
+                  alignment:
+                      isRTL ? Alignment.centerLeft : Alignment.centerRight,
+                  child: Padding(
+                    padding: EdgeInsets.only(
+                      left: isRTL ? 20 : 0,
+                      right: isRTL ? 0 : 20,
+                    ),
+                    child: Transform.scale(
+                      scale: iconScale,
+                      child: Opacity(
+                        opacity: iconOpacity,
+                        child: Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: widget.theme.primary[100],
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            LucideIcons.reply,
+                            size: 20,
+                            color: widget.theme.primary[600],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+
+          // Message content with slide animation
+          AnimatedBuilder(
+            animation: _slideAnimation,
+            builder: (context, child) {
+              final slideValue = _dragOffset * (isRTL ? 1 : -1);
+
+              return Transform.translate(
+                offset: Offset(slideValue, 0),
+                child: widget.child,
+              );
+            },
+          ),
+        ],
+      ),
+    );
   }
 }
