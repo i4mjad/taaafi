@@ -2871,4 +2871,8 @@ const Map<String, String> kAr = {
   "report-hate-speech": "خطاب كراهية",
   "report-other-reason": "سبب آخر",
   "report-submitted": "تم إرسال البلاغ بنجاح",
+  "confirm-report": "تأكيد البلاغ",
+  "confirm-report-message":
+      "هل أنت متأكد من الإبلاغ عن هذه الرسالة؟ لا يمكن التراجع عن هذا الإجراء.",
+  "confirm-submit-report": "إرسال البلاغ",
 };

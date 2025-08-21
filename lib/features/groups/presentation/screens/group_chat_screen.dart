@@ -433,7 +433,7 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen> {
     return GestureDetector(
       onTap: () {
         Navigator.of(context).pop();
-        _submitReport(context, l10n, reasonKey);
+        _showReportConfirmation(context, theme, l10n, reasonKey);
       },
       child: Container(
         width: double.infinity,
@@ -461,11 +461,117 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen> {
               ),
             ),
             Icon(
-              LucideIcons.chevronRight,
+              Directionality.of(context) == TextDirection.rtl
+                  ? LucideIcons.chevronLeft
+                  : LucideIcons.chevronRight,
               color: theme.grey[400],
               size: 16,
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  void _showReportConfirmation(BuildContext context, CustomThemeData theme,
+      AppLocalizations l10n, String reasonKey) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        decoration: BoxDecoration(
+          color: theme.backgroundColor,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Handle bar
+                Container(
+                  margin: const EdgeInsets.only(bottom: 20),
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: theme.grey[300],
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+
+                // Title
+                Text(
+                  l10n.translate('confirm-report'),
+                  style: TextStyles.h5.copyWith(
+                    color: theme.grey[900],
+                  ),
+                ),
+
+                const SizedBox(height: 16),
+
+                // Message
+                Text(
+                  l10n.translate('confirm-report-message'),
+                  style: TextStyles.body.copyWith(
+                    color: theme.grey[700],
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+
+                const SizedBox(height: 32),
+
+                // Action buttons
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextButton(
+                        onPressed: () => Navigator.of(context).pop(),
+                        style: TextButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            side: BorderSide(color: theme.grey[300]!, width: 1),
+                          ),
+                        ),
+                        child: Text(
+                          l10n.translate('cancel'),
+                          style: TextStyles.body.copyWith(
+                            color: theme.grey[600],
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                          _submitReport(context, l10n, reasonKey);
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: theme.primary[500],
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        child: Text(
+                          l10n.translate('confirm-submit-report'),
+                          style: TextStyles.body.copyWith(
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 16),
+              ],
+            ),
+          ),
         ),
       ),
     );

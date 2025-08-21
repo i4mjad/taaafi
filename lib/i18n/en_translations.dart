@@ -2937,4 +2937,8 @@ const Map<String, String> kEn = {
   "report-hate-speech": "Hate Speech",
   "report-other-reason": "Other Reason",
   "report-submitted": "Report submitted successfully",
+  "confirm-report": "Confirm Report",
+  "confirm-report-message":
+      "Are you sure you want to report this message? This action cannot be undone.",
+  "confirm-submit-report": "Submit Report",
 };
