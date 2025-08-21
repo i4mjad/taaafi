@@ -2052,6 +2052,9 @@ const Map<String, String> kEn = {
   "expires": "Expires",
   "features-active": "features active",
 
+  // Leaderboard
+  "leaderboard": "Leaderboard",
+
   // Smart Alerts Plus Feature
   "smart-alerts-plus-required-title": "Ta'aafi Plus Required",
   "smart-alerts-plus-required-description":

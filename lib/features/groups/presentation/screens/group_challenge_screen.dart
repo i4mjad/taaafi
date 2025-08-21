@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/shared_widgets/app_bar.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
@@ -82,24 +81,27 @@ class _GroupChallengeScreenState extends ConsumerState<GroupChallengeScreen> {
       backgroundColor: theme.backgroundColor,
       appBar: plainAppBar(context, ref, 'التحديات', false, true),
       body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Leaderboard section
-            _buildLeaderboardSection(context, theme, l10n),
+        child: Padding(
+          padding: EdgeInsets.symmetric(vertical: Spacing.points16.value),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Leaderboard section
+              _buildLeaderboardSection(context, theme, l10n),
 
-            verticalSpace(Spacing.points24),
+              verticalSpace(Spacing.points32),
 
-            // Active challenges section
-            _buildActiveChallengesSection(context, theme, l10n),
+              // Active challenges section
+              _buildActiveChallengesSection(context, theme, l10n),
 
-            verticalSpace(Spacing.points24),
+              verticalSpace(Spacing.points32),
 
-            // Current tasks section
-            _buildCurrentTasksSection(context, theme, l10n),
+              // Current tasks section
+              _buildCurrentTasksSection(context, theme, l10n),
 
-            verticalSpace(Spacing.points24),
-          ],
+              verticalSpace(Spacing.points32),
+            ],
+          ),
         ),
       ),
     );
@@ -118,8 +120,8 @@ class _GroupChallengeScreenState extends ConsumerState<GroupChallengeScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'لوحة النتائج',
-            style: TextStyles.h5.copyWith(
+            AppLocalizations.of(context).translate('leaderboard'),
+            style: TextStyles.h6.copyWith(
               color: theme.grey[900],
             ),
           ),
@@ -160,61 +162,73 @@ class _GroupChallengeScreenState extends ConsumerState<GroupChallengeScreen> {
     LeaderboardParticipant participant,
   ) {
     return Padding(
-      padding: EdgeInsets.symmetric(vertical: Spacing.points8.value),
+      padding: EdgeInsets.symmetric(
+        vertical: Spacing.points4.value,
+        horizontal: Spacing.points4.value,
+      ),
       child: Row(
         children: [
-          // Rank and name (left side)
-          Expanded(
-            child: Row(
-              children: [
-                Text(
-                  participant.pointsText,
-                  style: TextStyles.footnote.copyWith(
-                    color: theme.grey[600],
-                  ),
-                ),
-              ],
-            ),
+          // Trophy/Medal icon for all participants
+          // Container(
+          //   width: 24,
+          //   height: 24,
+          //   decoration: BoxDecoration(
+          //     color: _getTrophyColor(participant.rank),
+          //     shape: BoxShape.circle,
+          //   ),
+          //   child: participant.rank <= 3
+          //       ? Icon(
+          //           LucideIcons.crown,
+          //           size: 14,
+          //           color: Colors.white,
+          //         )
+          //       : Icon(
+          //           LucideIcons.thumbsDown,
+          //           size: 14,
+          //           color: Colors.white,
+          //         ),
+          // ),
+
+          Text(
+            "🥇",
+            style: TextStyles.h5,
           ),
+          horizontalSpace(Spacing.points8),
 
-          horizontalSpace(Spacing.points12),
-
-          // Avatar and name (center-right)
+          // Avatar
           Container(
-            width: 36,
-            height: 36,
+            width: 30,
+            height: 30,
             decoration: BoxDecoration(
               color: participant.avatarColor,
               shape: BoxShape.circle,
             ),
           ),
 
-          horizontalSpace(Spacing.points8),
-
-          // Trophy icon for top performers
-          if (participant.rank <= 3)
-            Container(
-              width: 20,
-              height: 20,
-              decoration: BoxDecoration(
-                color: _getTrophyColor(participant.rank),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                LucideIcons.crown,
-                size: 12,
-                color: Colors.white,
-              ),
-            ),
-
-          horizontalSpace(Spacing.points8),
-
-          // Name (rightmost)
+          horizontalSpace(Spacing.points4),
+          // Name (right side)
           Text(
             participant.name,
-            style: TextStyles.body.copyWith(
+            style: TextStyles.footnoteSelected.copyWith(
               color: theme.grey[900],
-              fontWeight: FontWeight.w500,
+            ),
+          ),
+          horizontalSpace(Spacing.points8),
+
+          // Dotted line separator
+          Expanded(
+            child: Container(
+              height: 1,
+              color: theme.grey[200],
+            ),
+          ),
+
+          horizontalSpace(Spacing.points8),
+          // Points (leftmost)
+          Text(
+            participant.pointsText,
+            style: TextStyles.footnote.copyWith(
+              color: theme.grey[600],
             ),
           ),
         ],
@@ -236,22 +250,23 @@ class _GroupChallengeScreenState extends ConsumerState<GroupChallengeScreen> {
         children: [
           Text(
             'التحديات النشطة',
-            style: TextStyles.h5.copyWith(
+            style: TextStyles.h6.copyWith(
               color: theme.grey[900],
             ),
           ),
           verticalSpace(Spacing.points16),
-          SizedBox(
-            height: 140,
-            child: ListView.separated(
-              scrollDirection: Axis.horizontal,
-              itemCount: challenges.length,
-              separatorBuilder: (context, index) =>
-                  horizontalSpace(Spacing.points12),
-              itemBuilder: (context, index) {
-                final challenge = challenges[index];
-                return _buildActiveChallengeCard(context, theme, challenge);
-              },
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            padding: EdgeInsets.symmetric(horizontal: Spacing.points16.value),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: challenges.map((challenge) {
+                return Padding(
+                  padding:
+                      EdgeInsets.symmetric(horizontal: Spacing.points4.value),
+                  child: _buildActiveChallengeCard(context, theme, challenge),
+                );
+              }).toList(),
             ),
           ),
         ],
@@ -264,67 +279,57 @@ class _GroupChallengeScreenState extends ConsumerState<GroupChallengeScreen> {
     CustomThemeData theme,
     ActiveChallenge challenge,
   ) {
-    return WidgetsContainer(
-      width: 140,
-      backgroundColor: theme.backgroundColor,
-      borderSide: BorderSide(
-        color: theme.grey[200]!,
-        width: 1,
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          // Circular progress indicator
-          SizedBox(
-            width: 60,
-            height: 60,
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                CircularProgressIndicator(
-                  value: challenge.progressPercentage / 100,
-                  backgroundColor: theme.grey[200],
-                  valueColor:
-                      AlwaysStoppedAnimation<Color>(theme.success[500]!),
-                  strokeWidth: 4,
+    final screenWidth = MediaQuery.of(context).size.width;
+    final cardWidth = screenWidth * 0.5; // 50% of screen width
+
+    return SizedBox(
+        width: cardWidth,
+        child: WidgetsContainer(
+          backgroundColor: theme.grey[50],
+          borderSide: BorderSide(
+            color: theme.grey[200]!,
+            width: 1,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Challenge icon
+              Container(
+                padding: EdgeInsets.all(Spacing.points8.value),
+                decoration: BoxDecoration(
+                  color: theme.grey[200],
+                  shape: BoxShape.circle,
                 ),
-                Text(
-                  '${challenge.progressPercentage}%',
-                  style: TextStyles.footnote.copyWith(
-                    color: theme.grey[900],
-                    fontWeight: FontWeight.w600,
-                  ),
+                child: Text("🗓️"),
+              ),
+              verticalSpace(Spacing.points4),
+
+              // Challenge title
+              Text(
+                challenge.title,
+                style: TextStyles.smallBold.copyWith(
+                  color: theme.grey[700],
                 ),
-              ],
-            ),
+                textAlign: TextAlign.center,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+
+              verticalSpace(Spacing.points8),
+
+              // Date
+              Text(
+                challenge.dateText,
+                style: TextStyles.small.copyWith(
+                  color: theme.grey[500],
+                ),
+                textAlign: TextAlign.center,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
           ),
-
-          verticalSpace(Spacing.points12),
-
-          // Challenge title
-          Text(
-            challenge.title,
-            style: TextStyles.caption.copyWith(
-              color: theme.grey[700],
-            ),
-            textAlign: TextAlign.center,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-          ),
-
-          verticalSpace(Spacing.points4),
-
-          // Date
-          Text(
-            challenge.dateText,
-            style: TextStyles.small.copyWith(
-              color: theme.grey[500],
-            ),
-            textAlign: TextAlign.center,
-          ),
-        ],
-      ),
-    );
+        ));
   }
 
   Widget _buildCurrentTasksSection(
@@ -367,113 +372,105 @@ class _GroupChallengeScreenState extends ConsumerState<GroupChallengeScreen> {
     return Container(
       margin: EdgeInsets.only(bottom: Spacing.points12.value),
       child: WidgetsContainer(
-        backgroundColor: theme.backgroundColor,
+        backgroundColor: Colors.white,
         borderSide: BorderSide(
           color: task.isCompleted ? theme.success[200]! : theme.grey[200]!,
           width: 1,
         ),
-        child: Row(
-          children: [
-            // Task content (left side)
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    task.title,
-                    style: TextStyles.body.copyWith(
-                      color: theme.grey[900],
+        child: Padding(
+          padding: EdgeInsets.all(Spacing.points16.value),
+          child: Row(
+            children: [
+              // Task content (left side)
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      task.title,
+                      style: TextStyles.body.copyWith(
+                        color: theme.grey[900],
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
-                  ),
-                  verticalSpace(Spacing.points4),
-                  Text(
-                    task.subtitle,
-                    style: TextStyles.caption.copyWith(
-                      color: theme.grey[600],
-                    ),
-                  ),
-                  if (task.statusText != null) ...[
                     verticalSpace(Spacing.points4),
                     Text(
-                      task.statusText!,
-                      style: TextStyles.small.copyWith(
-                        color: task.statusColor ?? theme.warn[600],
+                      task.subtitle,
+                      style: TextStyles.caption.copyWith(
+                        color: theme.grey[600],
                       ),
                     ),
+                    if (task.statusText != null) ...[
+                      verticalSpace(Spacing.points8),
+                      Text(
+                        task.statusText!,
+                        style: TextStyles.small.copyWith(
+                          color: task.statusColor ?? theme.warn[600],
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
                   ],
+                ),
+              ),
+
+              horizontalSpace(Spacing.points16),
+
+              // Number and checkbox (right side)
+              Column(
+                children: [
+                  // Checkbox
+                  Container(
+                    width: 28,
+                    height: 28,
+                    decoration: BoxDecoration(
+                      color: task.isCompleted
+                          ? theme.success[500]
+                          : Colors.transparent,
+                      border: Border.all(
+                        color: task.isCompleted
+                            ? theme.success[500]!
+                            : theme.grey[300]!,
+                        width: 2,
+                      ),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: task.isCompleted
+                        ? Icon(
+                            Icons.check,
+                            color: Colors.white,
+                            size: 18,
+                          )
+                        : null,
+                  ),
+
+                  verticalSpace(Spacing.points12),
+
+                  // Number
+                  Container(
+                    width: 28,
+                    height: 28,
+                    decoration: BoxDecoration(
+                      color: theme.primary[100],
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    child: Center(
+                      child: Text(
+                        '$number',
+                        style: TextStyles.caption.copyWith(
+                          color: theme.primary[700],
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
                 ],
               ),
-            ),
-
-            horizontalSpace(Spacing.points16),
-
-            // Number and checkbox (right side)
-            Column(
-              children: [
-                // Checkbox
-                Container(
-                  width: 24,
-                  height: 24,
-                  decoration: BoxDecoration(
-                    color: task.isCompleted
-                        ? theme.success[500]
-                        : Colors.transparent,
-                    border: Border.all(
-                      color: task.isCompleted
-                          ? theme.success[500]!
-                          : theme.grey[400]!,
-                      width: 2,
-                    ),
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  child: task.isCompleted
-                      ? Icon(
-                          Icons.check,
-                          color: Colors.white,
-                          size: 16,
-                        )
-                      : null,
-                ),
-
-                verticalSpace(Spacing.points8),
-
-                // Number
-                Container(
-                  width: 24,
-                  height: 24,
-                  decoration: BoxDecoration(
-                    color: theme.primary[100],
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Center(
-                    child: Text(
-                      '$number',
-                      style: TextStyles.caption.copyWith(
-                        color: theme.primary[700],
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
-  }
-
-  Color _getTrophyColor(int rank) {
-    switch (rank) {
-      case 1:
-        return Colors.amber;
-      case 2:
-        return Colors.grey.shade400;
-      case 3:
-        return Colors.orange.shade700;
-      default:
-        return Colors.grey;
-    }
   }
 
   List<LeaderboardParticipant> _getDemoLeaderboard() {
@@ -517,26 +514,28 @@ class _GroupChallengeScreenState extends ConsumerState<GroupChallengeScreen> {
     return [
       ActiveChallenge(
         id: '1',
-        title: 'تحدي كتابة المذكرات',
+        title: 'تحدي المتابعة اليومية',
         progressPercentage: 28,
-        dateText: 'ينتهي 28 يناير',
+        dateText: 'متبقي: 28 يوم',
       ),
       ActiveChallenge(
         id: '2',
-        title: 'تحدي المتابعة اليومية',
+        title: 'تحدي كتابة المذكرات',
         progressPercentage: 28,
-        dateText: 'ينتهي 28 يناير',
+        dateText: 'متبقي: 28 يوم',
       ),
       ActiveChallenge(
         id: '3',
-        title: 'تحدي التأمل',
+        title: 'تحدي',
         progressPercentage: 28,
-        dateText: 'ينتهي 28 يناير',
+        dateText: 'متبقي: 28 يوم',
       ),
     ];
   }
 
   List<CurrentTask> _getDemoCurrentTasks() {
+    final theme = AppTheme.of(context);
+
     return [
       CurrentTask(
         id: '1',
@@ -546,18 +545,19 @@ class _GroupChallengeScreenState extends ConsumerState<GroupChallengeScreen> {
       ),
       CurrentTask(
         id: '2',
-        title: 'اقرأ المتابعة اليومية',
+        title: 'أضف المتابعة اليومية',
         subtitle: 'تحدي المتابعة اليومية',
         isCompleted: false,
         statusText: 'متبقي 8 ساعات و 28 دقيقة',
+        statusColor: theme.warn[600],
       ),
       CurrentTask(
         id: '3',
-        title: 'اضف المتابعة اليومية',
+        title: 'أضف المتابعة اليومية',
         subtitle: 'تحدي المتابعة اليومية',
         isCompleted: false,
         statusText: 'متبقي ساعتان و 28 دقيقة',
-        statusColor: Colors.red,
+        statusColor: theme.error[500],
       ),
     ];
   }

@@ -1680,6 +1680,9 @@ const Map<String, String> kAr = {
       "هل أنت متأكد من رغبتك في إزالة {name} من الزمالة؟",
   "remove": "إزالة",
 
+  // Leaderboard
+  "leaderboard": "لوحة النتائج",
+
   // Privacy Settings
   "show-identity-description":
       "تفعيل هذا الخيار يجعل بياناتك الأساسية (الاسم والنوع) مرئية لأعضاء الزمالة، ويعطيل الخيار لإبقاء كمجهول",
