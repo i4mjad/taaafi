@@ -10,6 +10,7 @@ import 'package:reboot_app_3/core/theming/custom_theme_data.dart';
 import 'package:reboot_app_3/features/groups/providers/group_membership_provider.dart';
 import 'package:reboot_app_3/features/groups/presentation/screens/group_chat_screen.dart';
 import 'package:reboot_app_3/features/groups/presentation/screens/group_updates_screen.dart';
+import 'package:reboot_app_3/features/groups/presentation/screens/group_settings_screen.dart';
 
 /// Model for update items in the group
 class GroupUpdateItem {
@@ -330,7 +331,7 @@ class GroupScreen extends ConsumerWidget {
                   backgroundColor: theme.grey[50]!,
                   borderColor: theme.grey[200]!,
                   textColor: theme.grey[900]!,
-                  onTap: () => _showComingSoon(context, l10n),
+                  onTap: () => _navigateToSettings(context),
                 ),
               ),
 
@@ -418,6 +419,14 @@ class GroupScreen extends ConsumerWidget {
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => const GroupUpdatesScreen(),
+      ),
+    );
+  }
+
+  void _navigateToSettings(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => const GroupSettingsScreen(),
       ),
     );
   }

@@ -1652,7 +1652,15 @@ const Map<String, String> kAr = {
   "group-recent-updates": "التحديثات الأخيرة",
   "group-challenges": "التحديات",
   "group-leaderboard": "المتصدرين",
-  "group-settings": "الإعدادات",
+  "group-settings": "إعدادات الزمالة",
+  "notification-settings": "إعدادات الإشعارات",
+  "member-settings": "إعدادات الأعضاء",
+  "privacy-settings": "إعدادات الخصوصية",
+  "chat-settings": "إعدادات المحادثة",
+  "leave-group": "مغادرة الزمالة",
+  "leave-group-confirm-title": "مغادرة الزمالة",
+  "leave-group-confirm-message":
+      "هل أنت متأكد من رغبتك في مغادرة هذه الزمالة؟ لن تتمكن من الوصول إلى المحادثات والتحديثات بعد المغادرة.",
   "points": "نقاط",
   "coming-soon": "قريباً",
 

@@ -1700,7 +1700,15 @@ const Map<String, String> kEn = {
   "group-recent-updates": "Recent Updates",
   "group-challenges": "Challenges",
   "group-leaderboard": "Leaderboard",
-  "group-settings": "Settings",
+  "group-settings": "Group Settings",
+  "notification-settings": "Notification Settings",
+  "member-settings": "Member Settings",
+  "privacy-settings": "Privacy Settings",
+  "chat-settings": "Chat Settings",
+  "leave-group": "Leave Group",
+  "leave-group-confirm-title": "Leave Group",
+  "leave-group-confirm-message":
+      "Are you sure you want to leave this group? You won't be able to access the chats and updates after leaving.",
   "points": "points",
   "coming-soon": "Coming soon",
 

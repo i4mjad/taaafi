@@ -1,0 +1,282 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lucide_icons/lucide_icons.dart';
+import 'package:reboot_app_3/core/localization/localization.dart';
+import 'package:reboot_app_3/core/shared_widgets/app_bar.dart';
+import 'package:reboot_app_3/core/theming/app-themes.dart';
+import 'package:reboot_app_3/core/theming/spacing.dart';
+import 'package:reboot_app_3/core/theming/text_styles.dart';
+import 'package:reboot_app_3/core/theming/custom_theme_data.dart';
+
+class GroupSettingsScreen extends ConsumerWidget {
+  const GroupSettingsScreen({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = AppTheme.of(context);
+    final l10n = AppLocalizations.of(context);
+
+    return Scaffold(
+      backgroundColor: theme.backgroundColor,
+      appBar: appBar(context, ref, "group-settings", false, true),
+      body: Column(
+        children: [
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Column(
+                children: [
+                  verticalSpace(Spacing.points16),
+
+                  // Notification Settings
+                  _buildSettingsItem(
+                    context: context,
+                    theme: theme,
+                    l10n: l10n,
+                    icon: LucideIcons.bell,
+                    title: l10n.translate('notification-settings'),
+                    onTap: () => _showComingSoon(context, l10n),
+                  ),
+
+                  verticalSpace(Spacing.points8),
+
+                  // Member Settings
+                  _buildSettingsItem(
+                    context: context,
+                    theme: theme,
+                    l10n: l10n,
+                    icon: LucideIcons.users,
+                    title: l10n.translate('member-settings'),
+                    onTap: () => _showComingSoon(context, l10n),
+                  ),
+
+                  verticalSpace(Spacing.points8),
+
+                  // Privacy Settings
+                  _buildSettingsItem(
+                    context: context,
+                    theme: theme,
+                    l10n: l10n,
+                    icon: LucideIcons.shield,
+                    title: l10n.translate('privacy-settings'),
+                    onTap: () => _showComingSoon(context, l10n),
+                  ),
+
+                  verticalSpace(Spacing.points8),
+
+                  // Chat Settings
+                  _buildSettingsItem(
+                    context: context,
+                    theme: theme,
+                    l10n: l10n,
+                    icon: LucideIcons.messageCircle,
+                    title: l10n.translate('chat-settings'),
+                    onTap: () => _showComingSoon(context, l10n),
+                  ),
+
+                  const Spacer(),
+
+                  // Leave Group - Destructive action at bottom
+                  _buildDestructiveItem(
+                    context: context,
+                    theme: theme,
+                    l10n: l10n,
+                    icon: LucideIcons.logOut,
+                    title: l10n.translate('leave-group'),
+                    onTap: () => _showLeaveGroupDialog(context, l10n),
+                  ),
+
+                  verticalSpace(Spacing.points32),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSettingsItem({
+    required BuildContext context,
+    required CustomThemeData theme,
+    required AppLocalizations l10n,
+    required IconData icon,
+    required String title,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(
+            color: theme.grey[200]!,
+            width: 0.75,
+          ),
+        ),
+        child: Row(
+          children: [
+            // Icon
+            Container(
+              width: 24,
+              height: 24,
+              decoration: BoxDecoration(
+                color: theme.grey[100],
+                borderRadius: BorderRadius.circular(6),
+              ),
+              child: Icon(
+                icon,
+                size: 16,
+                color: theme.grey[600],
+              ),
+            ),
+
+            horizontalSpace(Spacing.points12),
+
+            // Title
+            Expanded(
+              child: Text(
+                title,
+                style: TextStyles.body.copyWith(
+                  color: theme.grey[900],
+                  fontWeight: FontWeight.w500,
+                ),
+                textAlign: TextAlign.right,
+              ),
+            ),
+
+            horizontalSpace(Spacing.points8),
+
+            // Arrow
+            Icon(
+              Icons.arrow_forward_ios,
+              size: 16,
+              color: theme.grey[400],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDestructiveItem({
+    required BuildContext context,
+    required CustomThemeData theme,
+    required AppLocalizations l10n,
+    required IconData icon,
+    required String title,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        decoration: BoxDecoration(
+          color: const Color(0xFFFCE7E7), // error-50 from design
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(
+            color: theme.grey[200]!,
+            width: 0.75,
+          ),
+        ),
+        child: Row(
+          children: [
+            // Icon
+            Container(
+              width: 24,
+              height: 24,
+              decoration: BoxDecoration(
+                color: const Color(0xFFDF1111)
+                    .withOpacity(0.1), // error-500 with opacity
+                borderRadius: BorderRadius.circular(6),
+              ),
+              child: Icon(
+                icon,
+                size: 16,
+                color: const Color(0xFFDF1111), // error-500 from design
+              ),
+            ),
+
+            horizontalSpace(Spacing.points12),
+
+            // Title
+            Expanded(
+              child: Text(
+                title,
+                style: TextStyles.body.copyWith(
+                  color: const Color(0xFFDF1111), // error-500 from design
+                  fontWeight: FontWeight.w500,
+                ),
+                textAlign: TextAlign.right,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showComingSoon(BuildContext context, AppLocalizations l10n) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(l10n.translate('coming-soon'))),
+    );
+  }
+
+  void _showLeaveGroupDialog(BuildContext context, AppLocalizations l10n) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        final theme = AppTheme.of(context);
+
+        return AlertDialog(
+          backgroundColor: theme.backgroundColor,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          title: Text(
+            l10n.translate('leave-group-confirm-title'),
+            style: TextStyles.h5.copyWith(
+              color: theme.grey[900],
+            ),
+            textAlign: TextAlign.center,
+          ),
+          content: Text(
+            l10n.translate('leave-group-confirm-message'),
+            style: TextStyles.body.copyWith(
+              color: theme.grey[700],
+            ),
+            textAlign: TextAlign.center,
+          ),
+          actionsAlignment: MainAxisAlignment.spaceEvenly,
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text(
+                l10n.translate('cancel'),
+                style: TextStyles.body.copyWith(
+                  color: theme.grey[600],
+                ),
+              ),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                // TODO: Implement leave group functionality
+                _showComingSoon(context, l10n);
+              },
+              child: Text(
+                l10n.translate('leave-group'),
+                style: TextStyles.body.copyWith(
+                  color: const Color(0xFFDF1111), // error-500
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
