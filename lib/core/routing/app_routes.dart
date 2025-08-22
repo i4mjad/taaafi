@@ -40,6 +40,7 @@ import 'package:reboot_app_3/features/groups/presentation/screens/groups_onboard
 import 'package:reboot_app_3/features/community/presentation/community_main_screen.dart';
 
 import 'package:reboot_app_3/features/groups/presentation/screens/group_list_screen.dart';
+import 'package:reboot_app_3/features/groups/presentation/screens/groups_exploration_screen.dart';
 
 import 'package:reboot_app_3/features/community/presentation/forum/post_detail_screen.dart';
 import 'package:reboot_app_3/features/community/presentation/forum/new_post_screen.dart';
@@ -653,6 +654,14 @@ GoRouter goRouter(Ref<GoRouter> ref) {
                     pageBuilder: (context, state) => MaterialPage<void>(
                       name: RouteNames.groupList.name,
                       child: GroupListScreen(),
+                    ),
+                  ),
+                  GoRoute(
+                    path: 'explore',
+                    name: RouteNames.groupExploration.name,
+                    pageBuilder: (context, state) => MaterialPage<void>(
+                      name: RouteNames.groupExploration.name,
+                      child: const GroupsExplorationScreen(),
                     ),
                   ),
                   GoRoute(

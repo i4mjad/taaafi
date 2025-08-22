@@ -54,9 +54,13 @@ Represents the public/anonymous identity in community/groups.
 
 **New fields**
 - `handle` (string, unique, immutable) — CP mention handle (see constraints below)
+  - **UI Status**: ❌ No handle creation or display UI
 - `handleLower` (string, unique) — lowercased for lookups
+  - **UI Status**: ❌ Not implemented
 - `nextJoinAllowedAt` (timestamp) — cooldown enforcement
+  - **UI Status**: ⚠️ Warning shown in leave modal but no countdown timer
 - `rejoinCooldownOverrideUntil` (timestamp|null) — override window for system admin
+  - **UI Status**: ❌ No system admin override UI
 
 **Handle constraints**
 - Regex (conceptual): `^[\p{L}\p{Nd}_]{3,20}$` (Arabic/Latin letters, digits, underscore)
@@ -186,20 +190,32 @@ Forum comments (no mentions currently).
 
 **Fields**
 - `name` (string, 1–60)
+  - **UI Status**: ✅ Input field in CreateGroupModal
 - `description` (string, 0–500; optional)
+  - **UI Status**: ✅ Input field in CreateGroupModal
 - `gender` (string: `"male"|"female"`) — stamped from creator CP
+  - **UI Status**: ⚠️ Stored but no gender filtering UI visible
 - `memberCapacity` (number; **default 6**; may be set >6 only if creator is Plus at creation)
+  - **UI Status**: ✅ Input in CreateGroupModal but no capacity display in group
 - `adminCpId` (string) — FK → `communityProfiles`
+  - **UI Status**: ⚠️ Used but no admin indicators in UI
 - `createdByCpId` (string) — FK → `communityProfiles`
 - `visibility` (string: `"public"|"private"`)
+  - **UI Status**: ✅ Selector in CreateGroupModal
 - `joinMethod` (string: `"any"|"admin_only"|"code_only"`)
+  - **UI Status**: ✅ Full selector in GroupJoiningMethodsModal
 - `joinCodeHash` (string|null) — salted **hash** (for `code_only`)
+  - **UI Status**: ❌ No code generation UI
 - `joinCodeExpiresAt` (timestamp|null)
+  - **UI Status**: ❌ No expiry settings UI
 - `joinCodeMaxUses` (number|null)
+  - **UI Status**: ❌ No usage limit UI
 - `joinCodeUseCount` (number, default 0)
 - `isActive` (boolean, default true)
 - `isPaused` (boolean, default false)
+  - **UI Status**: ❌ No pause functionality UI
 - `pauseReason` (string|null)
+  - **UI Status**: ❌ Not implemented
 - `createdAt` (timestamp)
 - `updatedAt` (timestamp)
 
@@ -223,12 +239,15 @@ Forum comments (no mentions currently).
 - `groupId` (string) — FK → `groups`
 - `cpId` (string) — FK → `communityProfiles`
 - `role` (string: `"admin"|"member"`)
+  - **UI Status**: ❌ No role differentiation in UI
 - `isActive` (boolean, default true)
 - `joinedAt` (timestamp)
 - `leftAt` (timestamp|null)
+  - **UI Status**: ✅ Leave functionality implemented
 
 - **Scoreboard (denormalized)**
   - `pointsTotal` (number, default 0)
+    - **UI Status**: ✅ Displayed in leaderboard
 
 **Indexes**
 - `(groupId asc, isActive desc, pointsTotal desc)`
@@ -246,15 +265,26 @@ Forum comments (no mentions currently).
 - `groupId` (string) — FK → `groups`
 - `senderCpId` (string) — FK → `communityProfiles`
 - `body` (string, 1–5000)
+  - **UI Status**: ✅ Full chat UI with input
 - `replyToMessageId` (string|null)
+  - **UI Status**: ✅ Swipe to reply implemented
 - `quotedPreview` (string|null) — small excerpt
+  - **UI Status**: ✅ Reply preview shown
 - `mentions` (array<string> cpIds) — resolved from `@handle`
+  - **UI Status**: ❌ No @mention system
 - `mentionHandles` (array<string>) — for rendering (optional)
+  - **UI Status**: ❌ Not implemented
 - `tokens` (array<string>) — tokenized terms for search (Arabic‑aware)
+  - **UI Status**: ❌ No search UI
 - `isDeleted` (boolean, default false)
 - `isHidden` (boolean, default false)
 - `moderation` (map) — `{ status: "pending"|"approved"|"blocked", reason?: string }`
+  - **UI Status**: ❌ No moderation UI
 - `createdAt` (timestamp)
+
+**Additional UI Features**:
+- Voice messages (no schema support)
+- Message reactions (no schema support)
 
 **Indexes**
 - `(groupId asc, createdAt desc)`
@@ -268,13 +298,17 @@ Forum comments (no mentions currently).
 **Fields**
 - `groupId` (string) — FK → `groups`
 - `title` (string, 1–80)
+  - **UI Status**: ✅ Displayed in challenges screen
 - `description` (string, 0–500)
+  - **UI Status**: ✅ Displayed with progress
 - `startAt` (timestamp)
 - `endAt` (timestamp)
 - `createdByCpId` (string) — FK → `communityProfiles`
 - `isActive` (boolean, default true)
 - `createdAt` (timestamp)
 - `updatedAt` (timestamp)
+
+**UI Gap**: ❌ No admin UI to create challenges
 
 **Indexes**
 - `(groupId asc, isActive desc, startAt desc)`
@@ -287,12 +321,20 @@ Forum comments (no mentions currently).
 **Fields**
 - `challengeId` (string) — FK → `group_challenges`
 - `title` (string, 1–80)
+  - **UI Status**: ✅ Displayed in task list
 - `description` (string, 0–500)
+  - **UI Status**: ✅ Shown as subtitle
 - `points` (number; allowed: **1,5,10,25,50**)
+  - **UI Status**: ✅ Points displayed correctly
 - `requireApproval` (boolean, default false)
+  - **UI Status**: ❌ No approval workflow UI
 - `isActive` (boolean, default true)
 - `createdAt` (timestamp)
 - `updatedAt` (timestamp)
+
+**UI Gaps**: 
+- ❌ No admin UI to create tasks
+- ❌ No approval UI for pending completions
 
 **Indexes**
 - `(challengeId asc, isActive desc)`
@@ -309,7 +351,9 @@ Forum comments (no mentions currently).
 - `cpId` (string) — FK → `communityProfiles`
 - `completedAt` (timestamp)
 - `status` (string: `"auto_approved"|"pending"|"approved"|"rejected"`)
+  - **UI Status**: ⚠️ Completion toggle exists but no approval UI
 - `approvedByCpId` (string|null)
+  - **UI Status**: ❌ No approval workflow
 
 **Transaction logic**
 - On create:
@@ -334,9 +378,13 @@ Forum comments (no mentions currently).
 - `cpId` (string) — invitee
 - `createdByCpId` (string) — inviter (admin)
 - `status` (string: `"pending"|"accepted"|"revoked"|"expired"`)
+  - **UI Status**: ✅ Accept/decline in GroupInvitationsModal
 - `createdAt` (timestamp)
+  - **UI Status**: ✅ Shows time ago (hours/days)
 - `expiresAt` (timestamp|null)
 - `resolvedAt` (timestamp|null)
+
+**UI Gap**: ❌ No admin UI to send invitations
 
 **Indexes**
 - `(cpId asc, status asc, createdAt desc)`
@@ -455,4 +503,39 @@ Multi‑device token tracking for reliable push delivery and rotation.
 - Backfill `communityProfiles.handle` for existing CPs with suggested slugs (confirm once).
 - Optionally add a `features` record `("groups")` for ban/allow UI consistency.
 - No changes required to `comments`, `usersReports` storage format—only **new `relatedContent.type` values** are added.
+
+---
+
+## K) UI Implementation Gaps Summary
+
+### Critical Missing UI Components
+1. **Admin Tools**
+   - No challenge/task creation interface
+   - No task approval workflow for `requireApproval`
+   - No invitation sending UI for admin_only groups
+   - No join code generation/management UI
+   - No group pause/close functionality
+
+2. **Core Features**
+   - No handle creation/display system
+   - No @mentions implementation
+   - No search functionality despite token support
+   - No moderation tools for messages
+
+3. **Display Gaps**
+   - No admin/member role indicators
+   - No capacity limits display
+   - No countdown timer for cooldown (only warning)
+   - No gender-based filtering visible
+
+### UI Features Without Schema Support
+1. **Voice Messages** - Recording UI exists but no storage fields
+2. **Message Reactions** - Emoji UI but no reaction storage
+3. **Hide Identity Toggle** - UI option but no persistence field
+
+### Recommendations
+- Prioritize admin tools for content creation and management
+- Implement handle system for mentions
+- Add search UI to utilize tokenization
+- Consider schema updates for voice messages and reactions
 

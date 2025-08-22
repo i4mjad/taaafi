@@ -36,16 +36,19 @@
 
 ## 2) Group Structure & Membership
 
-1. A group has a **gender** (`male`/`female`) stamped from the creator’s CP. Only users with matching CP gender may join.
+1. A group has a **gender** (`male`/`female`) stamped from the creator's CP. Only users with matching CP gender may join.
 2. **One active group at a time** per CP. Leaving is allowed at any time.
-3. After leaving, a user **must wait 24h** before joining another group (**visible countdown**).  
+3. After leaving, a user **must wait 24h** before joining another group (**visible countdown**).
    - System Admin may **remove the wait for a specific user** (per‑CP override).
+   - **UI Available**: Leave group modal (`LeaveGroupModal`) with 24-hour restriction warning display.
 4. **Admin requirement & capacities**
    - Anyone can create a group up to **6 members**.
    - To create a group with **capacity > 6**, the **admin must be a Plus user** at creation time.
    - If the admin later loses Plus, the group remains as is (no retroactive changes).
+   - **UI Available**: Create group modal (`CreateGroupModal`) with member count input.
 
 5. Members can be removed by **Group Admin** or **System Admin**.
+   - **UI Available**: Group member settings screen (`GroupMemberSettingsScreen`) with remove member functionality.
 6. Groups are **persistent**; states: `active`, `paused`, `closed` (changed only by Group Admin or System Admin).
 
 ---
@@ -55,15 +58,19 @@
 A group has two orthogonal properties:
 
 - **Visibility:** `public` (discoverable) or `private` (not discoverable).
+  - **UI Available**: Group type selector in `CreateGroupModal` (public/private).
 - **Join Method:** one of:
   - `any`: visible **public** groups can be joined directly (capacity/gender/cooldown permitting).
   - `admin_only`: join via explicit **invite** from the Group Admin (not discoverable).
   - `code_only`: join with a **code**; group may be public (listed but locked) or private (not listed).
+  - **UI Available**: Join method selector modal (`GroupJoiningMethodsModal`) with all three options.
 
 **Constraints**
 - `any` requires `visibility = public`.
 - `admin_only` uses invites (single‑use or multi‑use with expiry).
+  - **UI Available**: Group invitations modal (`GroupInvitationsModal`) with accept/decline functionality.
 - `code_only` uses a **hashed** join code with expiry and optional max uses; attempts are rate‑limited.
+  - **UI Available**: Join group modal (`JoinGroupModal`) with code input field.
 
 **Join attempt checks (in order)**
 1. User feature not banned (via existing bans/features model).
@@ -73,14 +80,22 @@ A group has two orthogonal properties:
 5. Group **capacity** not exceeded.
 6. Join method validation: direct/valid invite/valid code.
 
+**Additional UI**:
+- Group list screen (`GroupListScreen`) for browsing public groups.
+- Join random group functionality in `JoinGroupModal`.
+
 ---
 
 ## 4) Communication Channel (Chat)
 
 - **Text‑only** real‑time group chat.
+  - **UI Available**: Group chat screen (`GroupChatScreen`) with message list and input field.
 - **WhatsApp‑style replies** (quote original message; not threaded).
+  - **UI Available**: Reply functionality with swipe gesture and reply preview in `GroupChatScreen`.
 - `@mentions` using **unique CP handles** (see §8 Mentions).
+  - **UI Not Available**: No mentions implementation found.
 - **In‑group search only** (no cross‑group search). Search is token‑based and Arabic‑aware.
+  - **UI Not Available**: No search functionality implemented in chat.
 - **No external links or personal contact info** (blocked by moderation rules).
 - Message states:
   - `isDeleted` (hard user delete or admin delete)
@@ -89,24 +104,38 @@ A group has two orthogonal properties:
 
 Notifications:
 - New group messages → push (respecting user opt‑in).
+  - **UI Available**: Group notification settings screen (`GroupNotificationSettingsScreen`).
+
+**Additional UI**:
+- Chat settings screen (`GroupChatSettingsScreen`).
+- Voice message recording functionality in `GroupChatScreen`.
+- Message reactions with emoji in `GroupChatScreen`.
 
 ---
 
 ## 5) Challenges, Tasks & Points
 
 - **Group Admin** creates **Challenges** (visible to all members) with `startAt`/`endAt`.
+  - **UI Not Available**: No challenge creation UI for admins.
 - Each Challenge contains **Tasks**. Each Task has **points** ∈ {**1, 5, 10, 25, 50**}.
+  - **UI Available**: Task display in `GroupChallengeScreen` showing task title, subtitle, and completion status.
 - **Task verification**
   - `requireApproval = false` → auto‑approved; points credited immediately.
   - `requireApproval = true` → completion enters `pending`; admin approves/rejects; points credited on approve.
+  - **UI Not Available**: No task approval UI for admins.
 - **Scoreboard** is **per‑member only**:
   - Show current members with their total points (leavers are not shown).
   - Points accumulate from Task Completions; stored denormalized on membership for fast reads.
+  - **UI Available**: Leaderboard section in `GroupChallengeScreen` showing member rankings and points.
 
 Notifications:
 - New challenge/task created.
 - Task reminders (configured by admin).
 - Scoreboard updates (optional; avoid spam).
+
+**Additional UI**:
+- Active challenges display with progress percentage in `GroupChallengeScreen`.
+- Task completion toggle functionality in `GroupChallengeScreen`.
 
 ---
 
@@ -123,8 +152,9 @@ Notifications:
 
 ## 7) Integration With Existing Data
 
-- **Plus status** → from `users.isPlusUser` (CP’s mirror is optional and informational).
+- **Plus status** → from `users.isPlusUser` (CP's mirror is optional and informational).
 - **Community Profile (CP)** → used as the identity in all group operations.
+  - **UI Available**: Community profile setup modal (`CommunityProfileSetupModal`) integrated in groups flow.
 - **Device/messaging tokens** → from `users.messagingToken`; no new collection is required at launch.
 - **Bans/Warnings/Features** → reuse existing collections to block the `groups` feature if needed.
 
@@ -141,6 +171,8 @@ Notifications:
 - Handle uniqueness:
   - Reserve with a `reserved_handles/{handleLower}` document to avoid races.
   - One‑time selection; immutable afterwards (admin can force change only for abuse).
+
+**UI Not Available**: No handle or mentions functionality implemented.
 
 ---
 
@@ -200,4 +232,48 @@ Notifications:
 - Weekly task completion rate per active member.
 - 7‑day retention of group members.
 - Report rate per 1,000 messages (should trend low).
+
+---
+
+## Additional UI Features Not Mentioned in Requirements
+
+### Screens and Navigation
+1. **Groups Onboarding Screen** (`GroupsOnboardingScreen`): Initial onboarding flow for new users to the groups feature.
+2. **Groups Main Screen** (`GroupsMainScreen`): Central hub showing group status and actions based on user state.
+3. **Group Updates Screen** (`GroupUpdatesScreen`): Dedicated screen for group updates/announcements.
+4. **Privacy Settings Screen** (`GroupPrivacySettingsScreen`): Dedicated privacy controls for group members.
+5. **Group Detail Screen** (`GroupDetailScreen`): Additional group information display.
+
+### Chat Features
+1. **Voice Messages**: Voice recording and playback functionality in group chat.
+2. **Message Reactions**: Emoji reactions on messages (similar to other messaging apps).
+3. **Swipe to Reply**: WhatsApp-style swipe gesture for replying to messages.
+4. **Hide Identity Toggle**: Option in join modal to hide identity when joining groups (privacy feature).
+
+### Group Management
+1. **Group Card Widget** (`GroupCard`): Reusable component for displaying group information in lists.
+2. **Group Members Modal**: Bottom sheet showing all group members with their details.
+3. **Invitation Time Display**: Shows how long ago an invitation was sent (hours/days ago).
+
+### Settings Organization
+1. **Separate Settings Screens**: Modular approach with dedicated screens for:
+   - Notification settings
+   - Member management settings  
+   - Privacy settings
+   - Chat settings
+
+### Visual Elements
+1. **Progress Indicators**: Visual progress bars for challenges.
+2. **Status Badges**: Visual indicators for group type (public/private).
+3. **Countdown Display**: Visual countdown timer after leaving a group (though actual cooldown logic not implemented).
+
+### Missing Core Features
+1. **No Admin Challenge/Task Creation UI**: Admin cannot create new challenges or tasks.
+2. **No Task Approval UI**: Admin cannot approve/reject pending task completions.
+3. **No Search in Chat**: In-group message search not implemented.
+4. **No Mentions System**: Handle creation and @mentions not implemented.
+5. **No Actual Cooldown Logic**: 24-hour cooldown is mentioned in UI but not enforced.
+6. **No Gender Filtering**: Gender-based group restrictions not visible in UI.
+7. **No Capacity Enforcement UI**: Member capacity limits not clearly shown.
+8. **No Group State Management**: No UI for pausing/closing groups.
 

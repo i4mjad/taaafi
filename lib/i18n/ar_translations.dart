@@ -1679,7 +1679,6 @@ const Map<String, String> kAr = {
   "remove-member-confirm-message":
       "هل أنت متأكد من رغبتك في إزالة {name} من الزمالة؟",
   "remove": "إزالة",
-
   // Leaderboard
   "leaderboard": "لوحة النتائج",
   "my_tasks": "مهامي",
@@ -2928,4 +2927,46 @@ const Map<String, String> kAr = {
       "هل أنت متأكد من الإبلاغ عن هذه الرسالة؟ لا يمكن التراجع عن هذا الإجراء.",
   "confirm-submit-report": "إرسال البلاغ",
   "replying-to": "رد على",
+
+  // Groups Exploration
+  "already-in-group": "أنت منضم بالفعل إلى مجموعة",
+  "leave-current-group-to-explore":
+      "اترك مجموعتك الحالية لاستكشاف مجموعات أخرى",
+  "search-groups-placeholder": "ابحث في المجموعات بالاسم أو العلامات...",
+  "all-groups": "جميع المجموعات",
+  "male-groups": "مجموعات الذكور",
+  "female-groups": "مجموعات الإناث",
+  "open-join": "انضمام مفتوح",
+  "code-required": "كود مطلوب",
+  "groups-found": "تم العثور على {count} مجموعات",
+  "no-groups-found": "لم يتم العثور على مجموعات",
+  "try-different-filters": "جرب تعديل البحث أو الفلاتر",
+  "sort-groups": "ترتيب المجموعات",
+  "newest-first": "الأحدث أولاً",
+  "oldest-first": "الأقدم أولاً",
+  "most-members": "الأكثر أعضاءً",
+  "least-members": "الأقل أعضاءً",
+  "most-active": "الأكثر نشاطاً",
+  "explore-groups": "استكشاف المجموعات",
+  "explore-groups-description":
+      "تصفح واكتشف مجموعات الدعم التي تناسب اهتماماتك",
+  "explore-groups-button": "استكشاف المجموعات",
+  "explore-groups-navigation": "فتح استكشاف المجموعات...",
+
+  // Group Card
+  "group-member-count": "أعضاء",
+  "group-challenge-count": "تحديات",
+  "group-active": "نشط",
+  "group-inactive": "غير نشط",
+  "male-only": "ذكور فقط",
+  "female-only": "إناث فقط",
+  "mixed": "مختلط",
+  "group-full": "المجموعة ممتلئة",
+  "join-with-code": "انضم بالكود",
+  "join-group": "انضم للمجموعة",
+  "just-created": "تم إنشاؤها للتو",
+  "group-months-ago": "منذ {months} أشهر",
+  "group-days-ago": "منذ {days} أيام",
+  "group-hours-ago": "منذ {hours} ساعات",
+  "joined-group-successfully": "تم الانضمام بنجاح إلى {groupName}!",
 };

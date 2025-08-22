@@ -46,6 +46,7 @@ enum RouteNames {
   newPost,
   replyComposer,
   groupList,
+  groupExploration,
   groupDetail,
   groupChat,
   groupChallenge,

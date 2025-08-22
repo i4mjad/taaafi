@@ -8,6 +8,8 @@ import 'package:reboot_app_3/core/shared_widgets/platform_switch.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/features/groups/providers/group_membership_provider.dart';
+import 'package:go_router/go_router.dart';
+import 'package:reboot_app_3/core/routing/route_names.dart';
 
 class JoinGroupModal extends ConsumerStatefulWidget {
   const JoinGroupModal({super.key});
@@ -182,9 +184,9 @@ class _JoinGroupModalState extends ConsumerState<JoinGroupModal> {
 
           const SizedBox(height: 32),
 
-          // Random Join Section
+          // Explore Groups Section
           Text(
-            l10n.translate('join-randomly'),
+            l10n.translate('explore-groups'),
             style: TextStyles.h5.copyWith(
               color: theme.grey[900],
             ),
@@ -193,7 +195,7 @@ class _JoinGroupModalState extends ConsumerState<JoinGroupModal> {
           const SizedBox(height: 12),
 
           Text(
-            l10n.translate('join-randomly-description'),
+            l10n.translate('explore-groups-description'),
             style: TextStyles.caption.copyWith(
               color: theme.grey[600],
               height: 1.4,
@@ -202,9 +204,9 @@ class _JoinGroupModalState extends ConsumerState<JoinGroupModal> {
 
           const SizedBox(height: 16),
 
-          // Random Join Button
+          // Explore Groups Button
           GestureDetector(
-            onTap: _joinRandomGroup,
+            onTap: _exploreGroups,
             child: WidgetsContainer(
               padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
               backgroundColor: theme.primary[600],
@@ -213,8 +215,14 @@ class _JoinGroupModalState extends ConsumerState<JoinGroupModal> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+                  Icon(
+                    LucideIcons.search,
+                    size: 16,
+                    color: Colors.white,
+                  ),
+                  const SizedBox(width: 8),
                   Text(
-                    l10n.translate('find-group-button'),
+                    l10n.translate('explore-groups-button'),
                     style: TextStyles.footnote.copyWith(
                       color: Colors.white,
                     ),
@@ -267,15 +275,9 @@ class _JoinGroupModalState extends ConsumerState<JoinGroupModal> {
     });
   }
 
-  void _joinRandomGroup() {
-    // Join a random group using the provider
-    ref.read(groupMembershipNotifierProvider.notifier).joinRandomGroup();
-
+  void _exploreGroups() {
     Navigator.of(context).pop();
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-          content: Text(AppLocalizations.of(context)
-              .translate('group-joined-successfully'))),
-    );
+    // Navigate to groups exploration screen using GoRouter
+    context.goNamed(RouteNames.groupExploration.name);
   }
 }
