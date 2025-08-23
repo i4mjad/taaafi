@@ -164,17 +164,41 @@ class _LeaveGroupModalState extends ConsumerState<LeaveGroupModal> {
                     width: double.infinity,
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     decoration: BoxDecoration(
-                      color: theme.error[500],
+                      color: _isLoading ? theme.error[300] : theme.error[500],
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: Text(
-                      l10n.translate('leave-group'),
-                      style: TextStyles.footnote.copyWith(
-                        color: theme.grey[50],
-                        fontWeight: FontWeight.w600,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
+                    child: _isLoading
+                        ? Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              SizedBox(
+                                width: 16,
+                                height: 16,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                    theme.grey[50]!,
+                                  ),
+                                ),
+                              ),
+                              horizontalSpace(Spacing.points8),
+                              Text(
+                                l10n.translate('leaving-group'),
+                                style: TextStyles.footnote.copyWith(
+                                  color: theme.grey[50],
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          )
+                        : Text(
+                            l10n.translate('leave-group'),
+                            style: TextStyles.footnote.copyWith(
+                              color: theme.grey[50],
+                              fontWeight: FontWeight.w600,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
                   ),
                 ),
 
@@ -182,22 +206,22 @@ class _LeaveGroupModalState extends ConsumerState<LeaveGroupModal> {
 
                 // Close button (cancel)
                 GestureDetector(
-                  onTap: () => Navigator.of(context).pop(),
+                  onTap: _isLoading ? null : () => Navigator.of(context).pop(),
                   child: Container(
                     width: double.infinity,
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     decoration: BoxDecoration(
-                      color: theme.grey[100],
+                      color: _isLoading ? theme.grey[50] : theme.grey[100],
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(
-                        color: theme.grey[300]!,
+                        color: _isLoading ? theme.grey[200]! : theme.grey[300]!,
                         width: 1,
                       ),
                     ),
                     child: Text(
                       l10n.translate('close'),
                       style: TextStyles.footnote.copyWith(
-                        color: theme.grey[900],
+                        color: _isLoading ? theme.grey[400] : theme.grey[900],
                         fontWeight: FontWeight.w500,
                       ),
                       textAlign: TextAlign.center,
