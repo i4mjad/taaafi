@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
@@ -6,14 +7,18 @@ import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/core/theming/custom_theme_data.dart';
+import 'package:reboot_app_3/features/groups/application/groups_controller.dart';
+import 'package:reboot_app_3/features/community/presentation/providers/community_providers_new.dart';
 
-class LeaveGroupModal extends StatelessWidget {
-  final VoidCallback onLeaveGroup;
+class LeaveGroupModal extends ConsumerStatefulWidget {
+  const LeaveGroupModal({super.key});
 
-  const LeaveGroupModal({
-    super.key,
-    required this.onLeaveGroup,
-  });
+  @override
+  ConsumerState<LeaveGroupModal> createState() => _LeaveGroupModalState();
+}
+
+class _LeaveGroupModalState extends ConsumerState<LeaveGroupModal> {
+  bool _isLoading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -150,10 +155,7 @@ class LeaveGroupModal extends StatelessWidget {
               children: [
                 // Leave Group button (destructive)
                 GestureDetector(
-                  onTap: () {
-                    Navigator.of(context).pop();
-                    onLeaveGroup();
-                  },
+                  onTap: _isLoading ? null : _leaveGroup,
                   child: Container(
                     width: double.infinity,
                     padding: const EdgeInsets.symmetric(vertical: 16),
@@ -209,6 +211,58 @@ class LeaveGroupModal extends StatelessWidget {
     );
   }
 
+  Future<void> _leaveGroup() async {
+    final l10n = AppLocalizations.of(context);
+    
+    setState(() => _isLoading = true);
+
+    try {
+      // Get current community profile
+      final profileAsync = ref.read(currentCommunityProfileProvider);
+      final profile = await profileAsync.first;
+      
+      if (profile == null) {
+        _showError(l10n.translate('profile-required'));
+        return;
+      }
+
+      final result = await ref.read(groupsControllerProvider.notifier).leaveGroup(
+        cpId: profile.id,
+      );
+
+      if (!mounted) return;
+
+      if (result.success) {
+        Navigator.of(context).pop();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(l10n.translate('left-group-successfully')),
+            backgroundColor: Colors.green,
+          ),
+        );
+      } else {
+        _showError(result.errorMessage ?? l10n.translate('leave-group-failed'));
+      }
+    } catch (error) {
+      if (mounted) {
+        _showError(l10n.translate('unexpected-error'));
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
+
+  void _showError(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.red,
+      ),
+    );
+  }
+
   Widget _buildWarningItem({
     required BuildContext context,
     required CustomThemeData theme,
@@ -251,18 +305,13 @@ class LeaveGroupModal extends StatelessWidget {
   }
 
   /// Show the leave group modal
-  static void show(
-    BuildContext context, {
-    required VoidCallback onLeaveGroup,
-  }) {
+  static void show(BuildContext context) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       useSafeArea: true,
       backgroundColor: AppTheme.of(context).backgroundColor,
-      builder: (context) => LeaveGroupModal(
-        onLeaveGroup: onLeaveGroup,
-      ),
+      builder: (context) => const LeaveGroupModal(),
     );
   }
 }

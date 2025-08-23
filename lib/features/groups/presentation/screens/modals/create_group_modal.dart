@@ -8,6 +8,9 @@ import 'package:reboot_app_3/core/shared_widgets/platform_dropdown.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/features/groups/presentation/screens/modals/group_joining_methods_modal.dart';
+import 'package:reboot_app_3/features/groups/application/groups_controller.dart';
+import 'package:reboot_app_3/features/community/presentation/providers/community_providers_new.dart';
+import 'package:reboot_app_3/features/groups/domain/entities/join_result_entity.dart';
 
 enum GroupType { public, private }
 
@@ -20,6 +23,7 @@ class CreateGroupModal extends ConsumerStatefulWidget {
 
 class _CreateGroupModalState extends ConsumerState<CreateGroupModal> {
   final _groupNameController = TextEditingController();
+  final _descriptionController = TextEditingController();
   final _memberCountController = TextEditingController();
   GroupType _groupType = GroupType.public;
   GroupJoiningMethod? _joiningMethod;
@@ -28,6 +32,7 @@ class _CreateGroupModalState extends ConsumerState<CreateGroupModal> {
   @override
   void dispose() {
     _groupNameController.dispose();
+    _descriptionController.dispose();
     _memberCountController.dispose();
     super.dispose();
   }
@@ -98,6 +103,27 @@ class _CreateGroupModalState extends ConsumerState<CreateGroupModal> {
               }
               return null;
             },
+          ),
+
+          const SizedBox(height: 24),
+
+          // Group Description
+          Text(
+            l10n.translate('group-description'),
+            style: TextStyles.body.copyWith(
+              color: theme.grey[900],
+            ),
+          ),
+
+          const SizedBox(height: 8),
+
+          CustomTextField(
+            controller: _descriptionController,
+            hint: l10n.translate('enter-group-description'),
+            prefixIcon: LucideIcons.fileText,
+            inputType: TextInputType.multiline,
+            maxLines: 3,
+            validator: (value) => null,
           ),
 
           const SizedBox(height: 24),
@@ -274,54 +300,105 @@ class _CreateGroupModalState extends ConsumerState<CreateGroupModal> {
     );
   }
 
-  void _createGroup() {
+  Future<void> _createGroup() async {
+    final l10n = AppLocalizations.of(context);
     final groupName = _groupNameController.text.trim();
+    final description = _descriptionController.text.trim();
     final memberCountText = _memberCountController.text.trim();
 
+    // Validation
     if (groupName.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text(
-                AppLocalizations.of(context).translate('group-name-required'))),
-      );
+      _showError(l10n.translate('group-name-required'));
       return;
     }
 
     if (memberCountText.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text(AppLocalizations.of(context)
-                .translate('member-count-required'))),
-      );
+      _showError(l10n.translate('member-count-required'));
       return;
     }
 
     final memberCount = int.tryParse(memberCountText);
     if (memberCount == null || memberCount < 2 || memberCount > 50) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text(AppLocalizations.of(context)
-                .translate('member-count-invalid'))),
-      );
+      _showError(l10n.translate('member-count-invalid'));
       return;
     }
 
-    setState(() {
-      _isLoading = true;
-    });
+    if (_joiningMethod == null) {
+      _showError(l10n.translate('joining-method-required'));
+      return;
+    }
 
-    // TODO: Implement create group logic
-    Future.delayed(const Duration(seconds: 2), () {
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
+    setState(() => _isLoading = true);
+
+    try {
+      // Get current community profile
+      final profileAsync = ref.read(currentCommunityProfileProvider);
+      final profile = await profileAsync.first;
+      
+      if (profile == null) {
+        _showError(l10n.translate('profile-required'));
+        return;
+      }
+
+      // Check if user is Plus (for capacity > 6)
+      final isPlus = profile.isPlusUser ?? false;
+
+      // Map joining method to domain value
+      String joinMethod;
+      switch (_joiningMethod!) {
+        case GroupJoiningMethod.any:
+          joinMethod = 'any';
+          break;
+        case GroupJoiningMethod.adminInviteOnly:
+          joinMethod = 'admin_only';
+          break;
+        case GroupJoiningMethod.groupCodeOnly:
+          joinMethod = 'code_only';
+          break;
+      }
+
+      // Create group
+      final result = await ref.read(groupsControllerProvider.notifier).createGroup(
+        name: groupName,
+        description: description,
+        memberCapacity: memberCount,
+        visibility: _groupType == GroupType.public ? 'public' : 'private',
+        joinMethod: joinMethod,
+        creatorCpId: profile.id,
+        isCreatorPlusUser: isPlus,
+      );
+
+      if (!mounted) return;
+
+      if (result.success) {
         Navigator.of(context).pop();
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Created group: $groupName')),
+          SnackBar(
+            content: Text(l10n.translate('group-created-successfully')),
+            backgroundColor: Colors.green,
+          ),
         );
+      } else {
+        _showError(result.errorMessage ?? l10n.translate('group-creation-failed'));
       }
-    });
+    } catch (error) {
+      if (mounted) {
+        _showError(l10n.translate('unexpected-error'));
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
+
+  void _showError(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.red,
+      ),
+    );
   }
 
   void _showJoiningMethodsModal(BuildContext context) {

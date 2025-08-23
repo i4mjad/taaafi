@@ -10,6 +10,9 @@ import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/features/groups/providers/group_membership_provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:reboot_app_3/core/routing/route_names.dart';
+import 'package:reboot_app_3/features/groups/application/groups_controller.dart';
+import 'package:reboot_app_3/features/community/presentation/providers/community_providers_new.dart';
+import 'package:reboot_app_3/features/groups/domain/entities/join_result_entity.dart';
 
 class JoinGroupModal extends ConsumerStatefulWidget {
   const JoinGroupModal({super.key});
@@ -238,41 +241,93 @@ class _JoinGroupModalState extends ConsumerState<JoinGroupModal> {
     );
   }
 
-  void _joinGroup() {
+  Future<void> _joinGroup() async {
+    final l10n = AppLocalizations.of(context);
     final groupCode = _groupCodeController.text.trim();
+    
     if (groupCode.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text(
-                AppLocalizations.of(context).translate('group-code-required'))),
-      );
+      _showError(l10n.translate('group-code-required'));
       return;
     }
 
-    setState(() {
-      _isLoading = true;
-    });
+    setState(() => _isLoading = true);
 
-    // Simulate joining group with code
-    Future.delayed(const Duration(seconds: 2), () {
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
+    try {
+      // Get current community profile
+      final profileAsync = ref.read(currentCommunityProfileProvider);
+      final profile = await profileAsync.first;
+      
+      if (profile == null) {
+        _showError(l10n.translate('profile-required'));
+        return;
+      }
 
-        // Join the group using the provider
-        ref
-            .read(groupMembershipNotifierProvider.notifier)
-            .joinGroupWithCode(groupCode);
+      // For now, assume we're joining a demo group ID
+      // In a real app, you might need to find the group by code first
+      const demoGroupId = 'demo_group_id';
 
+      final result = await ref.read(groupsControllerProvider.notifier).joinGroupWithCode(
+        groupId: demoGroupId,
+        joinCode: groupCode,
+        cpId: profile.id,
+      );
+
+      if (!mounted) return;
+
+      if (result.success) {
         Navigator.of(context).pop();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-              content: Text(AppLocalizations.of(context)
-                  .translate('group-joined-successfully'))),
+            content: Text(l10n.translate('group-joined-successfully')),
+            backgroundColor: Colors.green,
+          ),
         );
+      } else {
+        _showError(_getJoinErrorMessage(result, l10n));
       }
-    });
+    } catch (error) {
+      if (mounted) {
+        _showError(l10n.translate('unexpected-error'));
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
+
+  String _getJoinErrorMessage(JoinResultEntity result, AppLocalizations l10n) {
+    switch (result.errorType) {
+      case JoinErrorType.alreadyInGroup:
+        return l10n.translate('already-in-group-error');
+      case JoinErrorType.cooldownActive:
+        return l10n.translate('cooldown-active-error');
+      case JoinErrorType.capacityFull:
+        return l10n.translate('group-full-error');
+      case JoinErrorType.invalidCode:
+      case JoinErrorType.expiredCode:
+        return l10n.translate('invalid-join-code-error');
+      case JoinErrorType.genderMismatch:
+        return l10n.translate('gender-mismatch-error');
+      case JoinErrorType.groupNotFound:
+        return l10n.translate('group-not-found-error');
+      case JoinErrorType.groupInactive:
+      case JoinErrorType.groupPaused:
+        return l10n.translate('group-inactive-error');
+      case JoinErrorType.userBanned:
+        return l10n.translate('user-banned-error');
+      default:
+        return result.errorMessage ?? l10n.translate('join-group-failed');
+    }
+  }
+
+  void _showError(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.red,
+      ),
+    );
   }
 
   void _exploreGroups() {
