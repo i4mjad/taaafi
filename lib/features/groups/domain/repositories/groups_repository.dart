@@ -1,0 +1,51 @@
+import '../entities/group_entity.dart';
+import '../entities/group_membership_entity.dart';
+import '../entities/join_result_entity.dart';
+
+abstract class GroupsRepository {
+  /// Get current user's active membership
+  Future<GroupMembershipEntity?> getCurrentMembership(String cpId);
+
+  /// Get group by ID
+  Future<GroupEntity?> getGroupById(String groupId);
+
+  /// Get public groups for discovery
+  Stream<List<GroupEntity>> getPublicGroups();
+
+  /// Create a new group
+  Future<CreateGroupResultEntity> createGroup({
+    required String name,
+    required String description,
+    required int memberCapacity,
+    required String visibility,
+    required String joinMethod,
+    required String creatorCpId,
+    String? joinCode,
+    DateTime? joinCodeExpiresAt,
+    int? joinCodeMaxUses,
+  });
+
+  /// Join a group by ID (for public groups with 'any' join method)
+  Future<JoinResultEntity> joinGroupDirectly({
+    required String groupId,
+    required String cpId,
+  });
+
+  /// Join a group using a code
+  Future<JoinResultEntity> joinGroupWithCode({
+    required String groupId,
+    required String joinCode,
+    required String cpId,
+  });
+
+  /// Leave current group
+  Future<LeaveResultEntity> leaveGroup({
+    required String cpId,
+  });
+
+  /// Check if user can join groups (cooldown, existing membership, etc.)
+  Future<bool> canJoinGroup(String cpId);
+
+  /// Get next allowed join time for user
+  Future<DateTime?> getNextJoinAllowedAt(String cpId);
+}
