@@ -20,54 +20,61 @@ Future<GroupsStatus> groupsStatus(Ref ref) async {
   final currentProfileAsync = ref.watch(currentCommunityProfileProvider);
   final groupMembershipAsync = ref.watch(groupMembershipNotifierProvider);
 
-  // If community profile check is still loading, return loading status
-  if (hasCommunityProfileAsync.isLoading) {
+  // Check if any provider is still loading
+  if (hasCommunityProfileAsync.isLoading || 
+      currentProfileAsync.isLoading || 
+      groupMembershipAsync.isLoading) {
     return GroupsStatus.loading;
   }
 
-  return await hasCommunityProfileAsync.when(
-    data: (hasCommunityProfile) async {
-      // If user doesn't have a community profile, they need to create one first
-      if (!hasCommunityProfile) {
-        return GroupsStatus.needsCommunityProfile;
-      }
+  // Check for errors in any provider
+  if (hasCommunityProfileAsync.hasError || 
+      currentProfileAsync.hasError || 
+      groupMembershipAsync.hasError) {
+    print('Provider error detected:');
+    if (hasCommunityProfileAsync.hasError) {
+      print('  hasCommunityProfileAsync error: ${hasCommunityProfileAsync.error}');
+    }
+    if (currentProfileAsync.hasError) {
+      print('  currentProfileAsync error: ${currentProfileAsync.error}');
+    }
+    if (groupMembershipAsync.hasError) {
+      print('  groupMembershipAsync error: ${groupMembershipAsync.error}');
+    }
+    return GroupsStatus.needsCommunityProfile;
+  }
 
-      // If user has a community profile, check if they're already in a group
-      return await currentProfileAsync.when(
-        data: (profile) async {
-          if (profile == null) {
-            return GroupsStatus.needsCommunityProfile;
-          }
+  // All providers have data, now process the values
+  final hasCommunityProfile = hasCommunityProfileAsync.value;
+  final currentProfile = currentProfileAsync.value;
+  final groupMembership = groupMembershipAsync.value;
 
-          // Check if user is already in a group using the group membership provider
-          return await groupMembershipAsync.when(
-            data: (groupMembership) async {
-              final isInGroup = groupMembership != null;
+  print('hasCommunityProfile: $hasCommunityProfile');
+  print('currentProfile: ${currentProfile?.id}');
+  print('groupMembership: ${groupMembership?.group.id}');
 
-              if (isInGroup) {
-                return GroupsStatus.alreadyInGroup;
-              }
+  // If user doesn't have a community profile, they need to create one first
+  if (hasCommunityProfile != true) {
+    return GroupsStatus.needsCommunityProfile;
+  }
 
-              // TODO: Check if user has pending invitations
-              // For now, we'll simulate having invitations for demo purposes
-              final hasInvitations =
-                  false; // TODO: Replace with actual invitation check
+  // If current profile is null, user needs to create a community profile
+  if (currentProfile == null) {
+    return GroupsStatus.needsCommunityProfile;
+  }
 
-              if (hasInvitations) {
-                return GroupsStatus.hasInvitations;
-              }
+  // Check if user is already in a group
+  if (groupMembership != null) {
+    return GroupsStatus.alreadyInGroup;
+  }
 
-              return GroupsStatus.canJoinGroup;
-            },
-            error: (_, __) async => GroupsStatus.needsCommunityProfile,
-            loading: () async => GroupsStatus.loading,
-          );
-        },
-        error: (_, __) async => GroupsStatus.needsCommunityProfile,
-        loading: () async => GroupsStatus.loading,
-      );
-    },
-    error: (_, __) async => GroupsStatus.needsCommunityProfile,
-    loading: () async => GroupsStatus.loading,
-  );
+  // TODO: Check if user has pending invitations
+  // For now, we'll simulate having invitations for demo purposes
+  final hasInvitations = false; // TODO: Replace with actual invitation check
+
+  if (hasInvitations) {
+    return GroupsStatus.hasInvitations;
+  }
+
+  return GroupsStatus.canJoinGroup;
 }
