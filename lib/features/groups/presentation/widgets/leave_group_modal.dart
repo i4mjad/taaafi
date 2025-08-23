@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
-import 'package:reboot_app_3/core/routing/route_names.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
@@ -283,13 +281,8 @@ class _LeaveGroupModalState extends ConsumerState<LeaveGroupModal> {
           ),
         );
         
-        // Navigate back to groups main screen after a brief delay
-        Future.delayed(const Duration(milliseconds: 500), () {
-          if (context.mounted) {
-            context.goNamed(RouteNames.groups.name);
-            print('LeaveGroupModal: Navigated to groups main screen');
-          }
-        });
+        // Navigation will be handled by GroupSettingsScreen watching membership changes
+        print('LeaveGroupModal: Leave successful, GroupSettingsScreen will handle navigation');
       } else {
         _showError(result.errorMessage ?? l10n.translate('leave-group-failed'));
       }

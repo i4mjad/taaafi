@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
+import 'package:reboot_app_3/core/routing/route_names.dart';
 import 'package:reboot_app_3/core/shared_widgets/app_bar.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
@@ -12,12 +14,49 @@ import 'package:reboot_app_3/features/groups/presentation/screens/group_member_s
 import 'package:reboot_app_3/features/groups/presentation/screens/group_privacy_settings_screen.dart';
 import 'package:reboot_app_3/features/groups/presentation/screens/group_chat_settings_screen.dart';
 import 'package:reboot_app_3/features/groups/presentation/widgets/leave_group_modal.dart';
+import 'package:reboot_app_3/features/groups/providers/group_membership_provider.dart';
 
-class GroupSettingsScreen extends ConsumerWidget {
+class GroupSettingsScreen extends ConsumerStatefulWidget {
   const GroupSettingsScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<GroupSettingsScreen> createState() => _GroupSettingsScreenState();
+}
+
+class _GroupSettingsScreenState extends ConsumerState<GroupSettingsScreen> {
+  
+  @override
+  void initState() {
+    super.initState();
+    
+    // Listen for group membership changes
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.listen<AsyncValue<GroupMembership?>>(
+        groupMembershipNotifierProvider,
+        (previous, next) {
+          // If membership becomes null (user left group), navigate to groups main
+          if (previous != null && 
+              previous.hasValue && 
+              previous.value != null &&
+              next.hasValue && 
+              next.value == null) {
+            
+            print('GroupSettingsScreen: Detected user left group, navigating to groups main');
+            
+            // Navigate to groups main screen
+            Future.delayed(const Duration(milliseconds: 100), () {
+              if (mounted) {
+                context.goNamed(RouteNames.groups.name);
+              }
+            });
+          }
+        },
+      );
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final theme = AppTheme.of(context);
     final l10n = AppLocalizations.of(context);
 
