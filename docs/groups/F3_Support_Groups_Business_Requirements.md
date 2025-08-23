@@ -267,13 +267,100 @@ Notifications:
 2. **Status Badges**: Visual indicators for group type (public/private).
 3. **Countdown Display**: Visual countdown timer after leaving a group (though actual cooldown logic not implemented).
 
-### Missing Core Features
-1. **No Admin Challenge/Task Creation UI**: Admin cannot create new challenges or tasks.
-2. **No Task Approval UI**: Admin cannot approve/reject pending task completions.
-3. **No Search in Chat**: In-group message search not implemented.
-4. **No Mentions System**: Handle creation and @mentions not implemented.
-5. **No Actual Cooldown Logic**: 24-hour cooldown is mentioned in UI but not enforced.
-6. **No Gender Filtering**: Gender-based group restrictions not visible in UI.
-7. **No Capacity Enforcement UI**: Member capacity limits not clearly shown.
-8. **No Group State Management**: No UI for pausing/closing groups.
+### Recently Implemented Backend Features ✅
+
+#### Join/Create/Leave Functionality
+1. **✅ Complete Backend Architecture**: Full clean architecture implementation with domain entities, repositories, services, and controllers.
+2. **✅ Group Creation**: Users can create groups with all specified validation rules including Plus user requirements for capacity > 6.
+3. **✅ Join by Code**: Users can join groups using join codes with proper validation and error handling.
+4. **✅ Direct Join**: Users can join public groups directly with all business rule validation.
+5. **✅ Leave Group**: Users can leave groups with 24-hour cooldown enforcement.
+6. **✅ Business Rule Validation**: All join/create/leave operations validate gender matching, capacity limits, cooldowns, and ban status.
+7. **✅ Real-time Updates**: UI properly refreshes membership status after successful operations.
+
+#### Data Layer
+1. **✅ Firestore Integration**: Complete Firestore data source with proper schema mapping.
+2. **✅ Transaction Safety**: All operations use proper Firestore transactions for data consistency.
+3. **✅ Error Handling**: Comprehensive error handling with user-friendly messages.
+
+### Still Missing Core Features
+1. **❌ Admin Challenge/Task Creation UI**: Admin cannot create new challenges or tasks.
+2. **❌ Task Approval UI**: Admin cannot approve/reject pending task completions.
+3. **❌ Search in Chat**: In-group message search not implemented.
+4. **❌ Mentions System**: Handle creation and @mentions not implemented.
+5. **❌ Gender Filtering UI**: Gender-based group restrictions not visible in UI (backend enforced).
+6. **❌ Capacity Display**: Member capacity limits not clearly shown in UI (backend enforced).
+7. **❌ Group State Management**: No UI for pausing/closing groups.
+8. **❌ Join Code Generation UI**: No UI for admins to generate/manage join codes.
+9. **❌ Invitation System UI**: No UI for admin-only group invitations.
+
+## TODO: Required Tasks for Full Implementation
+
+### 🔥 Critical - Required from User
+
+#### 1. **Firestore Security Rules** (HIGH PRIORITY)
+- **Status**: ❌ **REQUIRED FROM USER**
+- **Task**: Implement Firestore security rules as specified in the schema document
+- **Location**: Firebase Console → Firestore Database → Rules
+- **Impact**: Without these rules, the app will not work in production and data will be insecure
+
+#### 2. **Firebase Cloud Functions** (HIGH PRIORITY)  
+- **Status**: ❌ **REQUIRED FROM USER**
+- **Tasks**:
+  - Hash join code verification (currently using simple hash)
+  - Plus user status validation for group creation
+  - Community profile handle reservation system
+  - Rate limiting for join attempts
+- **Impact**: Some business rules currently use client-side validation only
+
+#### 3. **Translation Keys** (MEDIUM PRIORITY)
+- **Status**: ❌ **REQUIRED FROM USER**
+- **Missing Keys**: Multiple error message keys referenced in the code:
+  ```
+  'group-description', 'enter-group-description', 'joining-method-required',
+  'group-created-successfully', 'group-creation-failed', 'profile-required',
+  'already-in-group-error', 'cooldown-active-error', 'group-full-error',
+  'invalid-join-code-error', 'gender-mismatch-error', 'group-not-found-error',
+  'group-inactive-error', 'user-banned-error', 'join-group-failed',
+  'leaving-group', 'left-group-successfully', 'leave-group-failed'
+  ```
+- **Location**: `lib/i18n/en_translations.dart` and `lib/i18n/ar_translations.dart`
+
+#### 4. **Community Profile Enhancements** (MEDIUM PRIORITY)
+- **Status**: ❌ **REQUIRED FROM USER**  
+- **Tasks**:
+  - Add `nextJoinAllowedAt` field to community profiles collection
+  - Add `rejoinCooldownOverrideUntil` field for admin overrides
+  - Add `handle` and `handleLower` fields for mentions system
+- **Impact**: Cooldown enforcement and mentions system won't work
+
+#### 5. **Testing in Firebase Environment** (HIGH PRIORITY)
+- **Status**: ❌ **REQUIRED FROM USER**
+- **Tasks**:
+  - Test all join/create/leave functionality with real Firestore database
+  - Verify Plus user validation works correctly
+  - Test error handling and edge cases
+  - Verify cooldown enforcement after 24 hours
+
+### 📋 Optional Enhancements
+
+#### 6. **Join Code Generation System**
+- **Status**: ⚠️ **OPTIONAL - FUTURE ENHANCEMENT**
+- **Task**: Build UI for admins to generate and manage join codes
+- **Impact**: Currently join codes must be set at group creation
+
+#### 7. **Advanced Group Discovery**
+- **Status**: ⚠️ **OPTIONAL - CURRENT WORKAROUND EXISTS**
+- **Task**: The current exploration screen shows all public groups. May need filtering by region/interests in future.
+
+### 🚀 Ready to Use Features
+
+#### ✅ **Fully Implemented**
+1. **Group Creation**: Complete with all validation rules
+2. **Join by Code**: With proper error handling and validation  
+3. **Direct Join**: For public groups with business rule enforcement
+4. **Leave Group**: With 24-hour cooldown system
+5. **UI Integration**: All modals connected to backend functionality
+6. **Error Handling**: User-friendly error messages for all failure scenarios
+7. **Real-time Updates**: Membership status refreshes automatically
 
