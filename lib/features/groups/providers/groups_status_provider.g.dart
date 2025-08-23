@@ -6,11 +6,11 @@ part of 'groups_status_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$groupsStatusHash() => r'a6cbf1032952e40ca8bf8ec52072c9393bb5a0a9';
+String _$groupsStatusHash() => r'c6fa4de4c8a18da49502568fb1fb3968852895a3';
 
 /// See also [groupsStatus].
 @ProviderFor(groupsStatus)
-final groupsStatusProvider = AutoDisposeProvider<GroupsStatus>.internal(
+final groupsStatusProvider = AutoDisposeFutureProvider<GroupsStatus>.internal(
   groupsStatus,
   name: r'groupsStatusProvider',
   debugGetCreateSourceHash:
@@ -21,6 +21,6 @@ final groupsStatusProvider = AutoDisposeProvider<GroupsStatus>.internal(
 
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
-typedef GroupsStatusRef = AutoDisposeProviderRef<GroupsStatus>;
+typedef GroupsStatusRef = AutoDisposeFutureProviderRef<GroupsStatus>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

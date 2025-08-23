@@ -252,7 +252,7 @@ class _JoinGroupModalState extends ConsumerState<JoinGroupModal> {
 
     setState(() => _isLoading = true);
 
-        try {
+    try {
       // Get current community profile
       final profileAsync = ref.read(currentCommunityProfileProvider);
       final profile = await profileAsync.when(
@@ -260,7 +260,7 @@ class _JoinGroupModalState extends ConsumerState<JoinGroupModal> {
         loading: () async => null,
         error: (_, __) async => null,
       );
-      
+
       if (profile == null) {
         _showError(l10n.translate('profile-required'));
         return;

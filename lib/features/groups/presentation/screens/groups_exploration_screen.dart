@@ -13,7 +13,6 @@ import 'package:reboot_app_3/core/theming/custom_theme_data.dart';
 import 'package:reboot_app_3/features/groups/presentation/widgets/public_group_card.dart';
 import 'package:reboot_app_3/features/groups/presentation/screens/modals/join_group_modal.dart';
 
-
 enum GroupFilter { all, male, female, needsCode, openJoin }
 
 enum GroupSort { newest, oldest, mostMembers, leastMembers, mostActive }

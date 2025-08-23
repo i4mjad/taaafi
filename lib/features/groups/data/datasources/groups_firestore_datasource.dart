@@ -33,9 +33,9 @@ class GroupsFirestoreDataSource implements GroupsDataSource {
   Future<GroupModel?> getGroupById(String groupId) async {
     try {
       final doc = await _firestore.collection('groups').doc(groupId).get();
-      
+
       if (!doc.exists) return null;
-      
+
       return GroupModel.fromFirestore(doc);
     } catch (e, stackTrace) {
       log('Error getting group by ID: $e', stackTrace: stackTrace);
@@ -65,7 +65,8 @@ class GroupsFirestoreDataSource implements GroupsDataSource {
   @override
   Future<String> createGroup(GroupModel group) async {
     try {
-      final docRef = await _firestore.collection('groups').add(group.toFirestore());
+      final docRef =
+          await _firestore.collection('groups').add(group.toFirestore());
       return docRef.id;
     } catch (e, stackTrace) {
       log('Error creating group: $e', stackTrace: stackTrace);
@@ -139,7 +140,8 @@ class GroupsFirestoreDataSource implements GroupsDataSource {
   @override
   Future<DateTime?> getNextJoinAllowedAt(String cpId) async {
     try {
-      final cpDoc = await _firestore.collection('communityProfiles').doc(cpId).get();
+      final cpDoc =
+          await _firestore.collection('communityProfiles').doc(cpId).get();
       if (!cpDoc.exists) return null;
 
       final data = cpDoc.data()!;
@@ -147,7 +149,8 @@ class GroupsFirestoreDataSource implements GroupsDataSource {
       final overrideUntil = data['rejoinCooldownOverrideUntil'] as Timestamp?;
 
       // Check if override is active
-      if (overrideUntil != null && DateTime.now().isBefore(overrideUntil.toDate())) {
+      if (overrideUntil != null &&
+          DateTime.now().isBefore(overrideUntil.toDate())) {
         return null; // No cooldown due to override
       }
 
@@ -218,7 +221,8 @@ class GroupsFirestoreDataSource implements GroupsDataSource {
   @override
   Future<bool> isUserPlus(String cpId) async {
     try {
-      final cpDoc = await _firestore.collection('communityProfiles').doc(cpId).get();
+      final cpDoc =
+          await _firestore.collection('communityProfiles').doc(cpId).get();
       if (!cpDoc.exists) return false;
 
       final userUID = cpDoc.data()!['userUID'] as String;
@@ -235,7 +239,8 @@ class GroupsFirestoreDataSource implements GroupsDataSource {
   @override
   Future<String?> getUserGender(String cpId) async {
     try {
-      final cpDoc = await _firestore.collection('communityProfiles').doc(cpId).get();
+      final cpDoc =
+          await _firestore.collection('communityProfiles').doc(cpId).get();
       if (!cpDoc.exists) return null;
 
       return cpDoc.data()!['gender'] as String?;
@@ -263,7 +268,8 @@ class GroupsFirestoreDataSource implements GroupsDataSource {
 
   // Helper method to get user ID from community profile ID
   Future<String> _getUserIdFromCpId(String cpId) async {
-    final cpDoc = await _firestore.collection('communityProfiles').doc(cpId).get();
+    final cpDoc =
+        await _firestore.collection('communityProfiles').doc(cpId).get();
     if (!cpDoc.exists) throw Exception('Community profile not found');
     return cpDoc.data()!['userUID'] as String;
   }

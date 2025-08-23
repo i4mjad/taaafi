@@ -31,7 +31,7 @@ class GroupsMainScreen extends ConsumerWidget {
     final l10n = AppLocalizations.of(context);
     final accountStatus = ref.watch(accountStatusProvider);
     final userDocAsync = ref.watch(userDocumentsNotifierProvider);
-    final groupsStatus = ref.watch(groupsStatusProvider);
+    final groupsStatusAsync = ref.watch(groupsStatusProvider);
 
     return Scaffold(
       backgroundColor: theme.backgroundColor,
@@ -71,8 +71,12 @@ class GroupsMainScreen extends ConsumerWidget {
                 ),
               );
             case AccountStatus.ok:
-              return _buildGroupsContent(
-                  context, ref, theme, l10n, groupsStatus);
+              return groupsStatusAsync.when(
+                data: (groupsStatus) => _buildGroupsContent(
+                    context, ref, theme, l10n, groupsStatus),
+                loading: () => const Center(child: Spinner()),
+                error: (err, _) => Center(child: Text(err.toString())),
+              );
           }
         },
       ),

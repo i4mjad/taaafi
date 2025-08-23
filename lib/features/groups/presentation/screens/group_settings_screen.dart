@@ -222,12 +222,6 @@ class GroupSettingsScreen extends ConsumerWidget {
     );
   }
 
-  void _showComingSoon(BuildContext context, AppLocalizations l10n) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(l10n.translate('coming-soon'))),
-    );
-  }
-
   void _showLeaveGroupDialog(BuildContext context, AppLocalizations l10n) {
     showModalBottomSheet(
       context: context,

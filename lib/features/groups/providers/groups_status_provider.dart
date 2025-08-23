@@ -15,53 +15,59 @@ enum GroupsStatus {
 }
 
 @riverpod
-GroupsStatus groupsStatus(Ref ref) {
+Future<GroupsStatus> groupsStatus(Ref ref) async {
   final hasCommunityProfileAsync = ref.watch(hasCommunityProfileProvider);
   final currentProfileAsync = ref.watch(currentCommunityProfileProvider);
-  final groupMembership = ref.watch(groupMembershipNotifierProvider);
+  final groupMembershipAsync = ref.watch(groupMembershipNotifierProvider);
 
   // If community profile check is still loading, return loading status
   if (hasCommunityProfileAsync.isLoading) {
     return GroupsStatus.loading;
   }
 
-  return hasCommunityProfileAsync.when(
-    data: (hasCommunityProfile) {
+  return await hasCommunityProfileAsync.when(
+    data: (hasCommunityProfile) async {
       // If user doesn't have a community profile, they need to create one first
       if (!hasCommunityProfile) {
         return GroupsStatus.needsCommunityProfile;
       }
 
       // If user has a community profile, check if they're already in a group
-      return currentProfileAsync.when(
-        data: (profile) {
+      return await currentProfileAsync.when(
+        data: (profile) async {
           if (profile == null) {
             return GroupsStatus.needsCommunityProfile;
           }
 
           // Check if user is already in a group using the group membership provider
-          final isInGroup = groupMembership != null;
+          return await groupMembershipAsync.when(
+            data: (groupMembership) async {
+              final isInGroup = groupMembership != null;
 
-          if (isInGroup) {
-            return GroupsStatus.alreadyInGroup;
-          }
+              if (isInGroup) {
+                return GroupsStatus.alreadyInGroup;
+              }
 
-          // TODO: Check if user has pending invitations
-          // For now, we'll simulate having invitations for demo purposes
-          final hasInvitations =
-              false; // TODO: Replace with actual invitation check
+              // TODO: Check if user has pending invitations
+              // For now, we'll simulate having invitations for demo purposes
+              final hasInvitations =
+                  false; // TODO: Replace with actual invitation check
 
-          if (hasInvitations) {
-            return GroupsStatus.hasInvitations;
-          }
+              if (hasInvitations) {
+                return GroupsStatus.hasInvitations;
+              }
 
-          return GroupsStatus.canJoinGroup;
+              return GroupsStatus.canJoinGroup;
+            },
+            error: (_, __) async => GroupsStatus.needsCommunityProfile,
+            loading: () async => GroupsStatus.loading,
+          );
         },
-        error: (_, __) => GroupsStatus.needsCommunityProfile,
-        loading: () => GroupsStatus.loading,
+        error: (_, __) async => GroupsStatus.needsCommunityProfile,
+        loading: () async => GroupsStatus.loading,
       );
     },
-    error: (_, __) => GroupsStatus.needsCommunityProfile,
-    loading: () => GroupsStatus.loading,
+    error: (_, __) async => GroupsStatus.needsCommunityProfile,
+    loading: () async => GroupsStatus.loading,
   );
 }

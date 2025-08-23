@@ -10,6 +10,7 @@
 ## 0) Goals & Non‑Goals
 
 ### Goals
+
 - Provide small, safe, **gender‑specific** support groups centered on mutual accountability.
 - Enable **real‑time chat**, **task‑based challenges**, and a **member scoreboard**.
 - Keep discovery/joining simple with **three join methods**: `any`, `admin_only`, `code_only`.
@@ -17,6 +18,7 @@
 - Keep **privacy/anonymity** via Community Profile identities (CP).
 
 ### Non‑Goals
+
 - No inter‑group public leaderboards or global rankings.
 - No voice/video at launch (chat is **text‑only**).
 - No auto moderation collection; moderation state is stored per message/challenge/task in‑document.
@@ -66,6 +68,7 @@ A group has two orthogonal properties:
   - **UI Available**: Join method selector modal (`GroupJoiningMethodsModal`) with all three options.
 
 **Constraints**
+
 - `any` requires `visibility = public`.
 - `admin_only` uses invites (single‑use or multi‑use with expiry).
   - **UI Available**: Group invitations modal (`GroupInvitationsModal`) with accept/decline functionality.
@@ -73,6 +76,7 @@ A group has two orthogonal properties:
   - **UI Available**: Join group modal (`JoinGroupModal`) with code input field.
 
 **Join attempt checks (in order)**
+
 1. User feature not banned (via existing bans/features model).
 2. CP gender matches group gender.
 3. User has **no other active group**.
@@ -81,6 +85,7 @@ A group has two orthogonal properties:
 6. Join method validation: direct/valid invite/valid code.
 
 **Additional UI**:
+
 - Group list screen (`GroupListScreen`) for browsing public groups.
 - Join random group functionality in `JoinGroupModal`.
 
@@ -103,10 +108,12 @@ A group has two orthogonal properties:
   - `moderation.status` in {`pending`,`approved`,`blocked`} with optional reason.
 
 Notifications:
+
 - New group messages → push (respecting user opt‑in).
   - **UI Available**: Group notification settings screen (`GroupNotificationSettingsScreen`).
 
 **Additional UI**:
+
 - Chat settings screen (`GroupChatSettingsScreen`).
 - Voice message recording functionality in `GroupChatScreen`.
 - Message reactions with emoji in `GroupChatScreen`.
@@ -129,11 +136,13 @@ Notifications:
   - **UI Available**: Leaderboard section in `GroupChallengeScreen` showing member rankings and points.
 
 Notifications:
+
 - New challenge/task created.
 - Task reminders (configured by admin).
 - Scoreboard updates (optional; avoid spam).
 
 **Additional UI**:
+
 - Active challenges display with progress percentage in `GroupChallengeScreen`.
 - Task completion toggle functionality in `GroupChallengeScreen`.
 
@@ -238,6 +247,7 @@ Notifications:
 ## Additional UI Features Not Mentioned in Requirements
 
 ### Screens and Navigation
+
 1. **Groups Onboarding Screen** (`GroupsOnboardingScreen`): Initial onboarding flow for new users to the groups feature.
 2. **Groups Main Screen** (`GroupsMainScreen`): Central hub showing group status and actions based on user state.
 3. **Group Updates Screen** (`GroupUpdatesScreen`): Dedicated screen for group updates/announcements.
@@ -245,17 +255,20 @@ Notifications:
 5. **Group Detail Screen** (`GroupDetailScreen`): Additional group information display.
 
 ### Chat Features
+
 1. **Voice Messages**: Voice recording and playback functionality in group chat.
 2. **Message Reactions**: Emoji reactions on messages (similar to other messaging apps).
 3. **Swipe to Reply**: WhatsApp-style swipe gesture for replying to messages.
 4. **Hide Identity Toggle**: Option in join modal to hide identity when joining groups (privacy feature).
 
 ### Group Management
+
 1. **Group Card Widget** (`GroupCard`): Reusable component for displaying group information in lists.
 2. **Group Members Modal**: Bottom sheet showing all group members with their details.
 3. **Invitation Time Display**: Shows how long ago an invitation was sent (hours/days ago).
 
 ### Settings Organization
+
 1. **Separate Settings Screens**: Modular approach with dedicated screens for:
    - Notification settings
    - Member management settings  
@@ -263,6 +276,7 @@ Notifications:
    - Chat settings
 
 ### Visual Elements
+
 1. **Progress Indicators**: Visual progress bars for challenges.
 2. **Status Badges**: Visual indicators for group type (public/private).
 3. **Countdown Display**: Visual countdown timer after leaving a group (though actual cooldown logic not implemented).
@@ -270,6 +284,7 @@ Notifications:
 ### Recently Implemented Backend Features ✅
 
 #### Join/Create/Leave Functionality
+
 1. **✅ Complete Backend Architecture**: Full clean architecture implementation with domain entities, repositories, services, and controllers.
 2. **✅ Group Creation**: Users can create groups with all specified validation rules including Plus user requirements for capacity > 6.
 3. **✅ Join by Code**: Users can join groups using join codes with proper validation and error handling.
@@ -279,11 +294,13 @@ Notifications:
 7. **✅ Real-time Updates**: UI properly refreshes membership status after successful operations.
 
 #### Data Layer
+
 1. **✅ Firestore Integration**: Complete Firestore data source with proper schema mapping.
 2. **✅ Transaction Safety**: All operations use proper Firestore transactions for data consistency.
 3. **✅ Error Handling**: Comprehensive error handling with user-friendly messages.
 
 ### Still Missing Core Features
+
 1. **❌ Admin Challenge/Task Creation UI**: Admin cannot create new challenges or tasks.
 2. **❌ Task Approval UI**: Admin cannot approve/reject pending task completions.
 3. **❌ Search in Chat**: In-group message search not implemented.
@@ -299,12 +316,14 @@ Notifications:
 ### 🔥 Critical - Required from User
 
 #### 1. **Firestore Security Rules** (HIGH PRIORITY)
+
 - **Status**: ❌ **REQUIRED FROM USER**
 - **Task**: Implement Firestore security rules as specified in the schema document
 - **Location**: Firebase Console → Firestore Database → Rules
 - **Impact**: Without these rules, the app will not work in production and data will be insecure
 
 #### 2. **Firebase Cloud Functions** (HIGH PRIORITY)  
+
 - **Status**: ❌ **REQUIRED FROM USER**
 - **Tasks**:
   - Hash join code verification (currently using simple hash)
@@ -314,8 +333,10 @@ Notifications:
 - **Impact**: Some business rules currently use client-side validation only
 
 #### 3. **Translation Keys** (MEDIUM PRIORITY)
+
 - **Status**: ❌ **REQUIRED FROM USER**
 - **Missing Keys**: Multiple error message keys referenced in the code:
+
   ```
   'group-description', 'enter-group-description', 'joining-method-required',
   'group-created-successfully', 'group-creation-failed', 'profile-required',
@@ -324,9 +345,11 @@ Notifications:
   'group-inactive-error', 'user-banned-error', 'join-group-failed',
   'leaving-group', 'left-group-successfully', 'leave-group-failed'
   ```
+
 - **Location**: `lib/i18n/en_translations.dart` and `lib/i18n/ar_translations.dart`
 
 #### 4. **Community Profile Enhancements** (MEDIUM PRIORITY)
+
 - **Status**: ❌ **REQUIRED FROM USER**  
 - **Tasks**:
   - Add `nextJoinAllowedAt` field to community profiles collection
@@ -335,6 +358,7 @@ Notifications:
 - **Impact**: Cooldown enforcement and mentions system won't work
 
 #### 5. **Testing in Firebase Environment** (HIGH PRIORITY)
+
 - **Status**: ❌ **REQUIRED FROM USER**
 - **Tasks**:
   - Test all join/create/leave functionality with real Firestore database
@@ -345,17 +369,20 @@ Notifications:
 ### 📋 Optional Enhancements
 
 #### 6. **Join Code Generation System**
+
 - **Status**: ⚠️ **OPTIONAL - FUTURE ENHANCEMENT**
 - **Task**: Build UI for admins to generate and manage join codes
 - **Impact**: Currently join codes must be set at group creation
 
 #### 7. **Advanced Group Discovery**
+
 - **Status**: ⚠️ **OPTIONAL - CURRENT WORKAROUND EXISTS**
 - **Task**: The current exploration screen shows all public groups. May need filtering by region/interests in future.
 
 ### 🚀 Ready to Use Features
 
 #### ✅ **Fully Implemented**
+
 1. **Group Creation**: Complete with all validation rules
 2. **Join by Code**: With proper error handling and validation  
 3. **Direct Join**: For public groups with business rule enforcement
@@ -363,4 +390,3 @@ Notifications:
 5. **UI Integration**: All modals connected to backend functionality
 6. **Error Handling**: User-friendly error messages for all failure scenarios
 7. **Real-time Updates**: Membership status refreshes automatically
-
