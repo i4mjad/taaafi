@@ -44,4 +44,7 @@ abstract class GroupsDataSource {
 
   /// Get current member count for a group
   Future<int> getGroupMemberCount(String groupId);
+
+  /// Get all active members of a group
+  Future<List<GroupMembershipModel>> getGroupMembers(String groupId);
 }

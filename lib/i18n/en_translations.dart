@@ -1480,6 +1480,9 @@ const Map<String, String> kEn = {
   "recovery-follow-up-question":
       "When do you want to start tracking your recovery? We will start counting from the date you choose",
   "notifications": "Notifications",
+  "chat": "Chat",
+  "privacy": "Privacy",
+  "leave": "Leave",
   "clear-all": "Clear All",
   "no-notifications": "No Notifications",
   "no-notifications-description": "You'll see updates about your reports here",
@@ -2839,6 +2842,20 @@ const Map<String, String> kEn = {
   "created": "Created",
   "group-admin": "Admin",
   "group-member": "Member",
+
+  "error-loading-member": "Failed to load member",
+  "report-user": "Report User",
+  "report-inappropriate-behavior": "Report inappropriate behavior",
+  "promote-to-admin": "Promote to Admin",
+  "grant-admin-privileges": "Grant admin privileges",
+  "demote-to-member": "Demote to Member",
+  "remove-admin-privileges": "Remove admin privileges",
+
+  "permanently-remove-member": "Permanently remove this member",
+  "group-members": "Group Members",
+  "no-members-found": "No members found",
+  "error-loading-members": "Failed to load group members",
+  "not-in-group": "You are not in a group",
   "refresh-groups": "Refresh",
   "subscription-successful": "Successfully subscribed to group",
   "subscription-failed": "Failed to subscribe to group",
@@ -2922,7 +2939,7 @@ const Map<String, String> kEn = {
   "total-comments": "Total Comments",
   "total-interactions": "Total Interactions",
   "interactions-received": "Interactions Received",
-  "report-user": "Report User",
+
   "report-user-subtitle": "Report inappropriate behavior",
   "report-user-placeholder": "Describe the issue you'd like to report...",
   "user-reported": "User reported successfully",
@@ -2975,7 +2992,7 @@ const Map<String, String> kEn = {
   "remove-profile-picture": "Remove Profile Picture",
 
   // Group Members
-  "group-members": "Group Members",
+
   "online": "Online",
   "offline": "Offline",
   "last-seen": "Last seen",

@@ -1421,6 +1421,9 @@ const Map<String, String> kAr = {
   "recovery-follow-up-question":
       "متى تريد البدء في متابعة تعافيك؟ التاريخ الذي ستقوم باختياره، سنقوم ببدء العد منه",
   "notifications": "الإشعارات",
+  "chat": "المحادثة",
+  "privacy": "الخصوصية",
+  "leave": "مغادرة",
   "clear-all": "مسح الكل",
   "no-notifications": "لا توجد إشعارات",
   "no-notifications-description": "ستظهر هنا التحديثات حول تقاريرك",
@@ -2796,6 +2799,20 @@ const Map<String, String> kAr = {
   "created": "تم الإنشاء",
   "group-admin": "مدير",
   "group-member": "عضو",
+
+  "error-loading-member": "فشل في تحميل العضو",
+  "report-user": "الإبلاغ عن المستخدم",
+  "report-inappropriate-behavior": "الإبلاغ عن سلوك غير لائق",
+  "promote-to-admin": "ترقية إلى مدير",
+  "grant-admin-privileges": "منح صلاحيات الإدارة",
+  "demote-to-member": "تخفيض إلى عضو",
+  "remove-admin-privileges": "إزالة صلاحيات الإدارة",
+
+  "permanently-remove-member": "إزالة هذا العضو نهائياً",
+  "group-members": "أعضاء الزمالة",
+  "no-members-found": "لا يوجد أعضاء",
+  "error-loading-members": "فشل في تحميل أعضاء الزمالة",
+  "not-in-group": "أنت لست في زمالة",
   "refresh-groups": "تحديث",
   "subscription-successful": "تم الاشتراك في المجموعة بنجاح",
   "subscription-failed": "فشل في الاشتراك في المجموعة",
@@ -2874,7 +2891,6 @@ const Map<String, String> kAr = {
   "total-comments": "إجمالي التعليقات",
   "total-interactions": "إجمالي التفاعلات",
   "interactions-received": "التفاعلات المستلمة",
-  "report-user": "الإبلاغ عن المستخدم",
   "report-user-subtitle": "الإبلاغ عن سلوك غير لائق",
   "report-user-placeholder": "صف المشكلة التي تريد الإبلاغ عنها...",
   "user-reported": "تم الإبلاغ عن المستخدم بنجاح",
@@ -2904,7 +2920,6 @@ const Map<String, String> kAr = {
   "remove-profile-picture": "حذف صورة الملف الشخصي",
 
   // Group Members
-  "group-members": "أعضاء المجموعة",
   "online": "متصل",
   "offline": "غير متصل",
   "last-seen": "آخر ظهور",

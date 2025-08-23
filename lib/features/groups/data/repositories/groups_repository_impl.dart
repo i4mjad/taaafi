@@ -404,6 +404,17 @@ class GroupsRepositoryImpl implements GroupsRepository {
     return await _dataSource.getGroupMemberCount(groupId);
   }
 
+  @override
+  Future<List<GroupMembershipEntity>> getGroupMembers(String groupId) async {
+    try {
+      final memberships = await _dataSource.getGroupMembers(groupId);
+      return memberships.map((m) => m.toEntity()).toList();
+    } catch (e, stackTrace) {
+      log('Error in getGroupMembers: $e', stackTrace: stackTrace);
+      rethrow;
+    }
+  }
+
   // Helper method for hashing join codes
   // In production, use bcrypt or similar
   String _hashJoinCode(String code) {

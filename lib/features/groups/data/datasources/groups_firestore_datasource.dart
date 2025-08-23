@@ -266,6 +266,25 @@ class GroupsFirestoreDataSource implements GroupsDataSource {
     }
   }
 
+  @override
+  Future<List<GroupMembershipModel>> getGroupMembers(String groupId) async {
+    try {
+      final querySnapshot = await _firestore
+          .collection('group_memberships')
+          .where('groupId', isEqualTo: groupId)
+          .where('isActive', isEqualTo: true)
+          .orderBy('joinedAt', descending: false)
+          .get();
+
+      return querySnapshot.docs
+          .map((doc) => GroupMembershipModel.fromFirestore(doc))
+          .toList();
+    } catch (e, stackTrace) {
+      log('Error getting group members: $e', stackTrace: stackTrace);
+      rethrow;
+    }
+  }
+
   // Helper method to get user ID from community profile ID
   Future<String> _getUserIdFromCpId(String cpId) async {
     final cpDoc =

@@ -7,7 +7,7 @@ part of 'group_membership_provider.dart';
 // **************************************************************************
 
 String _$groupMembershipNotifierHash() =>
-    r'3ca5350d9f818309b954ab2ddebccf98a9e61cfe';
+    r'7bfd38dec61cff8a711f19d1eeb4c8a44b822a78';
 
 /// Provider for current user's group membership using real backend
 ///

@@ -51,4 +51,7 @@ abstract class GroupsRepository {
 
   /// Get current member count for a group
   Future<int> getGroupMemberCount(String groupId);
+
+  /// Get all active members of a group
+  Future<List<GroupMembershipEntity>> getGroupMembers(String groupId);
 }

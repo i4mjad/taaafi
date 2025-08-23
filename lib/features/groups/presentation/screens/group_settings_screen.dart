@@ -5,16 +5,18 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/routing/route_names.dart';
 import 'package:reboot_app_3/core/shared_widgets/app_bar.dart';
+import 'package:reboot_app_3/core/shared_widgets/container.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/core/theming/custom_theme_data.dart';
 import 'package:reboot_app_3/features/groups/presentation/screens/group_notification_settings_screen.dart';
-import 'package:reboot_app_3/features/groups/presentation/screens/group_member_settings_screen.dart';
+
 import 'package:reboot_app_3/features/groups/presentation/screens/group_privacy_settings_screen.dart';
 import 'package:reboot_app_3/features/groups/presentation/screens/group_chat_settings_screen.dart';
 import 'package:reboot_app_3/features/groups/presentation/widgets/leave_group_modal.dart';
 import 'package:reboot_app_3/features/groups/presentation/widgets/group_details_widget.dart';
+import 'package:reboot_app_3/features/groups/presentation/widgets/group_members_list.dart';
 
 class GroupSettingsScreen extends ConsumerStatefulWidget {
   const GroupSettingsScreen({super.key});
@@ -51,73 +53,84 @@ class _GroupSettingsScreenState extends ConsumerState<GroupSettingsScreen> {
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   verticalSpace(Spacing.points16),
 
                   // Group Details Card
                   const GroupDetailsWidget(),
 
+                  verticalSpace(Spacing.points16),
+
+                  // Settings actions row
+                  Row(
+                    children: [
+                      // Notifications
+                      Expanded(
+                        child: _buildActionCard(
+                          context: context,
+                          theme: theme,
+                          l10n: l10n,
+                          icon: LucideIcons.bell,
+                          title: l10n.translate('notifications'),
+                          onTap: () => _navigateToNotificationSettings(context),
+                        ),
+                      ),
+
+                      horizontalSpace(Spacing.points8),
+
+                      // Chat
+                      Expanded(
+                        child: _buildActionCard(
+                          context: context,
+                          theme: theme,
+                          l10n: l10n,
+                          icon: LucideIcons.messageCircle,
+                          title: l10n.translate('chat'),
+                          onTap: () => _navigateToChatSettings(context),
+                        ),
+                      ),
+
+                      horizontalSpace(Spacing.points8),
+
+                      // Privacy
+                      Expanded(
+                        child: _buildActionCard(
+                          context: context,
+                          theme: theme,
+                          l10n: l10n,
+                          icon: LucideIcons.shield,
+                          title: l10n.translate('privacy'),
+                          onTap: () => _navigateToPrivacySettings(context),
+                        ),
+                      ),
+
+                      horizontalSpace(Spacing.points8),
+
+                      // Leave
+                      Expanded(
+                        child: _buildActionCard(
+                          context: context,
+                          theme: theme,
+                          l10n: l10n,
+                          icon: LucideIcons.logOut,
+                          title: l10n.translate('leave'),
+                          onTap: () => _showLeaveGroupDialog(context, l10n),
+                          isDestructive: true,
+                        ),
+                      ),
+                    ],
+                  ),
+
                   verticalSpace(Spacing.points24),
 
-                  // Notification Settings
-                  _buildSettingsItem(
-                    context: context,
-                    theme: theme,
-                    l10n: l10n,
-                    icon: LucideIcons.bell,
-                    title: l10n.translate('notification-settings'),
-                    onTap: () => _navigateToNotificationSettings(context),
-                  ),
+                  // Group Members List
+                  const GroupMembersList(),
 
-                  verticalSpace(Spacing.points8),
-
-                  // Member Settings
-                  _buildSettingsItem(
-                    context: context,
-                    theme: theme,
-                    l10n: l10n,
-                    icon: LucideIcons.users,
-                    title: l10n.translate('member-settings'),
-                    onTap: () => _navigateToMemberSettings(context),
-                  ),
-
-                  verticalSpace(Spacing.points8),
-
-                  // Privacy Settings
-                  _buildSettingsItem(
-                    context: context,
-                    theme: theme,
-                    l10n: l10n,
-                    icon: LucideIcons.shield,
-                    title: l10n.translate('privacy-settings'),
-                    onTap: () => _navigateToPrivacySettings(context),
-                  ),
-
-                  verticalSpace(Spacing.points8),
-
-                  // Chat Settings
-                  _buildSettingsItem(
-                    context: context,
-                    theme: theme,
-                    l10n: l10n,
-                    icon: LucideIcons.messageCircle,
-                    title: l10n.translate('chat-settings'),
-                    onTap: () => _navigateToChatSettings(context),
-                  ),
+                  verticalSpace(Spacing.points24),
 
                   const Spacer(),
-
-                  // Leave Group - Destructive action at bottom
-                  _buildDestructiveItem(
-                    context: context,
-                    theme: theme,
-                    l10n: l10n,
-                    icon: LucideIcons.logOut,
-                    title: l10n.translate('leave-group'),
-                    onTap: () => _showLeaveGroupDialog(context, l10n),
-                  ),
-
-                  verticalSpace(Spacing.points32),
                 ],
               ),
             ),
@@ -127,120 +140,57 @@ class _GroupSettingsScreenState extends ConsumerState<GroupSettingsScreen> {
     );
   }
 
-  Widget _buildSettingsItem({
+  Widget _buildActionCard({
     required BuildContext context,
     required CustomThemeData theme,
     required AppLocalizations l10n,
     required IconData icon,
     required String title,
     required VoidCallback onTap,
+    bool isDestructive = false,
   }) {
     return GestureDetector(
       onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-        decoration: BoxDecoration(
-          color: theme.backgroundColor[500],
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(
-            color: theme.grey[200]!,
-            width: 0.75,
-          ),
+      child: WidgetsContainer(
+        padding: const EdgeInsets.all(12),
+        backgroundColor:
+            isDestructive ? theme.error[50] : theme.backgroundColor,
+        borderRadius: BorderRadius.circular(15),
+        borderSide: BorderSide(
+          color: isDestructive ? theme.error[200]! : theme.grey[100]!,
+          width: 0.75,
         ),
-        child: Row(
+        cornerSmoothing: 1,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
             // Icon
             Container(
-              width: 24,
-              height: 24,
+              width: 40,
+              height: 40,
               decoration: BoxDecoration(
-                color: theme.grey[100],
-                borderRadius: BorderRadius.circular(6),
+                color: Colors.transparent,
+                borderRadius: BorderRadius.circular(8),
               ),
               child: Icon(
                 icon,
-                size: 16,
-                color: theme.grey[600],
+                size: 18,
+                color: isDestructive ? theme.error[600] : theme.grey[700],
               ),
             ),
 
-            horizontalSpace(Spacing.points12),
+            verticalSpace(Spacing.points8),
 
             // Title
-            Expanded(
-              child: Text(
-                title,
-                style: TextStyles.body.copyWith(
-                  color: theme.grey[900],
-                  fontWeight: FontWeight.w500,
-                ),
-                textAlign: TextAlign.right,
+            Text(
+              title,
+              style: TextStyles.small.copyWith(
+                color: isDestructive ? theme.error[700] : theme.grey[900],
+                fontWeight: FontWeight.w500,
               ),
-            ),
-
-            horizontalSpace(Spacing.points8),
-
-            // Arrow
-            Icon(
-              Icons.arrow_forward_ios,
-              size: 16,
-              color: theme.grey[400],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildDestructiveItem({
-    required BuildContext context,
-    required CustomThemeData theme,
-    required AppLocalizations l10n,
-    required IconData icon,
-    required String title,
-    required VoidCallback onTap,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-        decoration: BoxDecoration(
-          color: theme.error[50],
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(
-            color: theme.grey[200]!,
-            width: 0.75,
-          ),
-        ),
-        child: Row(
-          children: [
-            // Icon
-            Container(
-              width: 24,
-              height: 24,
-              decoration: BoxDecoration(
-                color: theme.error[100],
-                borderRadius: BorderRadius.circular(6),
-              ),
-              child: Icon(
-                icon,
-                size: 16,
-                color: theme.error[500],
-              ),
-            ),
-
-            horizontalSpace(Spacing.points12),
-
-            // Title
-            Expanded(
-              child: Text(
-                title,
-                style: TextStyles.body.copyWith(
-                  color: theme.error[500],
-                  fontWeight: FontWeight.w500,
-                ),
-                textAlign: TextAlign.right,
-              ),
+              textAlign: TextAlign.center,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
           ],
         ),
@@ -263,15 +213,6 @@ class _GroupSettingsScreenState extends ConsumerState<GroupSettingsScreen> {
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => const GroupNotificationSettingsScreen(),
-      ),
-    );
-  }
-
-  void _navigateToMemberSettings(BuildContext context) {
-    // TODO: Add GoRouter route for group member settings
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => const GroupMemberSettingsScreen(),
       ),
     );
   }
