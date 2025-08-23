@@ -69,12 +69,15 @@ Future<GroupMembership?> groupMembershipNotifier(ref) async {
       throw Exception('Group not found: ${membership.groupId}');
     }
 
+    // Get actual member count
+    final actualMemberCount = await repository.getGroupMemberCount(group.id);
+
     // Convert to legacy Group model for compatibility
     final legacyGroup = Group(
       id: group.id,
       name: group.name,
       description: group.description,
-      memberCount: 0, // Will need to be fetched separately
+      memberCount: actualMemberCount,
       capacity: group.memberCapacity,
       gender: group.gender,
       createdAt: group.createdAt,

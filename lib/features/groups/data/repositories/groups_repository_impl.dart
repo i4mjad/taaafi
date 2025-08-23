@@ -399,6 +399,11 @@ class GroupsRepositoryImpl implements GroupsRepository {
     return await _dataSource.getNextJoinAllowedAt(cpId);
   }
 
+  @override
+  Future<int> getGroupMemberCount(String groupId) async {
+    return await _dataSource.getGroupMemberCount(groupId);
+  }
+
   // Helper method for hashing join codes
   // In production, use bcrypt or similar
   String _hashJoinCode(String code) {

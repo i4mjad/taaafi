@@ -48,4 +48,7 @@ abstract class GroupsRepository {
 
   /// Get next allowed join time for user
   Future<DateTime?> getNextJoinAllowedAt(String cpId);
+
+  /// Get current member count for a group
+  Future<int> getGroupMemberCount(String groupId);
 }
