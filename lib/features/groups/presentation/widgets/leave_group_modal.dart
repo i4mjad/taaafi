@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
+import 'package:reboot_app_3/core/routing/route_names.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
@@ -245,13 +247,25 @@ class _LeaveGroupModalState extends ConsumerState<LeaveGroupModal> {
         ref.invalidate(groupsStatusProvider);
         print('LeaveGroupModal: Providers invalidated after successful leave');
         
+        // Close the modal first
         Navigator.of(context).pop();
+        
+        // Show success message
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(l10n.translate('left-group-successfully')),
             backgroundColor: Colors.green,
+            duration: const Duration(seconds: 2),
           ),
         );
+        
+        // Navigate back to groups main screen after a brief delay
+        Future.delayed(const Duration(milliseconds: 500), () {
+          if (context.mounted) {
+            context.goNamed(RouteNames.groups.name);
+            print('LeaveGroupModal: Navigated to groups main screen');
+          }
+        });
       } else {
         _showError(result.errorMessage ?? l10n.translate('leave-group-failed'));
       }

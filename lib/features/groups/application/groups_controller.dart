@@ -50,7 +50,8 @@ class GroupsController extends _$GroupsController {
         // Refresh membership and status providers after successful creation
         ref.invalidate(groupMembershipNotifierProvider);
         ref.invalidate(groupsStatusProvider);
-        print('GroupsController: Group created successfully, providers invalidated');
+        print(
+            'GroupsController: Group created successfully, providers invalidated');
       }
 
       return result;
@@ -80,12 +81,14 @@ class GroupsController extends _$GroupsController {
         // Refresh membership and status providers after successful join
         ref.invalidate(groupMembershipNotifierProvider);
         ref.invalidate(groupsStatusProvider);
-        print('GroupsController: Joined group successfully, providers invalidated');
+        print(
+            'GroupsController: Joined group successfully, providers invalidated');
       }
 
       return result;
     } catch (error, stackTrace) {
-      log('Error in joinGroupDirectly controller: $error', stackTrace: stackTrace);
+      log('Error in joinGroupDirectly controller: $error',
+          stackTrace: stackTrace);
       print('GroupsController.joinGroupDirectly error: $error');
       return const JoinResultEntity.error(
         JoinErrorType.groupNotFound,
@@ -112,12 +115,14 @@ class GroupsController extends _$GroupsController {
         // Refresh membership and status providers after successful join
         ref.invalidate(groupMembershipNotifierProvider);
         ref.invalidate(groupsStatusProvider);
-        print('GroupsController: Joined group with code successfully, providers invalidated');
+        print(
+            'GroupsController: Joined group with code successfully, providers invalidated');
       }
 
       return result;
     } catch (error, stackTrace) {
-      log('Error in joinGroupWithCode controller: $error', stackTrace: stackTrace);
+      log('Error in joinGroupWithCode controller: $error',
+          stackTrace: stackTrace);
       print('GroupsController.joinGroupWithCode error: $error');
       return const JoinResultEntity.error(
         JoinErrorType.invalidCode,
@@ -138,14 +143,16 @@ class GroupsController extends _$GroupsController {
         // Refresh all relevant providers after leaving
         ref.invalidate(groupMembershipNotifierProvider);
         ref.invalidate(groupsStatusProvider);
-        
+
         // Also invalidate any other group-related providers
         if (ref.exists(publicGroupsProvider)) {
           ref.invalidate(publicGroupsProvider);
         }
-        
-        print('GroupsController: Left group successfully, all providers invalidated');
-        print('GroupsController: Next join allowed at: ${result.nextJoinAllowedAt}');
+
+        print(
+            'GroupsController: Left group successfully, all providers invalidated');
+        print(
+            'GroupsController: Next join allowed at: ${result.nextJoinAllowedAt}');
       }
 
       return result;
@@ -164,7 +171,8 @@ Future<GroupMembershipEntity?> currentGroupMembership(ref, String cpId) async {
     final service = ref.read(groupsServiceProvider);
     return await service.getCurrentMembership(cpId);
   } catch (error, stackTrace) {
-    log('Error in currentGroupMembership provider: $error', stackTrace: stackTrace);
+    log('Error in currentGroupMembership provider: $error',
+        stackTrace: stackTrace);
     print('currentGroupMembership provider error: $error');
     rethrow;
   }
