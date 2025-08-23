@@ -1,5 +1,7 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:reboot_app_3/features/shared/models/group.dart';
+import 'package:reboot_app_3/features/community/presentation/providers/community_providers_new.dart';
+import 'package:reboot_app_3/features/groups/application/groups_providers.dart';
 
 part 'group_membership_provider.g.dart';
 
@@ -32,66 +34,48 @@ class GroupMembership {
   }
 }
 
-/// Notifier for managing group membership state
+/// Provider for current user's group membership using real backend
 @riverpod
-class GroupMembershipNotifier extends _$GroupMembershipNotifier {
-  @override
-  GroupMembership? build() {
-    // Initially, user is not in any group
-    return null;
-  }
-
-  /// Simulates joining a random group
-  void joinRandomGroup() {
-    final demoGroup = Group(
-      id: 'demo_group_1',
-      name: 'دعم التعافي اليومي',
-      description: 'مجموعة دعم للأشخاص الذين يسعون للتعافي من الإدمان',
-      memberCount: 3,
-      capacity: 6,
-      gender: 'male', // This should match user's gender in real implementation
-      createdAt: DateTime.now().subtract(const Duration(days: 15)),
-      updatedAt: DateTime.now(),
-    );
-
-    state = GroupMembership(
-      group: demoGroup,
-      joinedAt: DateTime.now(),
-      memberRole: 'member',
-      totalPoints: 0,
-    );
-  }
-
-  /// Simulates joining a group with a specific code
-  void joinGroupWithCode(String code) {
-    final demoGroup = Group(
-      id: 'demo_group_code_$code',
-      name: 'مجموعة $code',
-      description: 'مجموعة دعم خاصة',
-      memberCount: 5,
-      capacity: 8,
-      gender: 'male', // This should match user's gender in real implementation
-      createdAt: DateTime.now().subtract(const Duration(days: 30)),
-      updatedAt: DateTime.now(),
-    );
-
-    state = GroupMembership(
-      group: demoGroup,
-      joinedAt: DateTime.now(),
-      memberRole: 'member',
-      totalPoints: 0,
-    );
-  }
-
-  /// Simulates leaving the current group
-  void leaveGroup() {
-    state = null;
-  }
-
-  /// Updates the user's points in the group
-  void updatePoints(int newPoints) {
-    if (state != null) {
-      state = state!.copyWith(totalPoints: newPoints);
-    }
-  }
+Future<GroupMembership?> groupMembershipNotifier(ref) async {
+  // Get current community profile
+  final profileAsync = ref.watch(currentCommunityProfileProvider);
+  
+  return await profileAsync.when(
+    data: (profile) async {
+      if (profile == null) return null;
+      
+      // Get membership from backend
+      final service = ref.read(groupsServiceProvider);
+      final membership = await service.getCurrentMembership(profile.id);
+      
+      if (membership == null) return null;
+      
+      // Get group details
+      final group = await ref.read(groupsServiceProvider).getPublicGroups().first
+          .where((groups) => groups.any((g) => g.id == membership.groupId))
+          .map((groups) => groups.firstWhere((g) => g.id == membership.groupId))
+          .first;
+      
+      // Convert to legacy Group model for compatibility
+      final legacyGroup = Group(
+        id: group.id,
+        name: group.name,
+        description: group.description,
+        memberCount: 0, // Will need to be fetched separately
+        capacity: group.memberCapacity,
+        gender: group.gender,
+        createdAt: group.createdAt,
+        updatedAt: group.updatedAt,
+      );
+      
+      return GroupMembership(
+        group: legacyGroup,
+        joinedAt: membership.joinedAt,
+        memberRole: membership.role,
+        totalPoints: membership.pointsTotal,
+      );
+    },
+    loading: () async => null,
+    error: (_, __) async => null,
+  );
 }
