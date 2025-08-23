@@ -24,41 +24,34 @@ class GroupSettingsScreen extends ConsumerStatefulWidget {
 }
 
 class _GroupSettingsScreenState extends ConsumerState<GroupSettingsScreen> {
-  
-  @override
-  void initState() {
-    super.initState();
-    
-    // Listen for group membership changes
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.listen<AsyncValue<GroupMembership?>>(
-        groupMembershipNotifierProvider,
-        (previous, next) {
-          // If membership becomes null (user left group), navigate to groups main
-          if (previous != null && 
-              previous.hasValue && 
-              previous.value != null &&
-              next.hasValue && 
-              next.value == null) {
-            
-            print('GroupSettingsScreen: Detected user left group, navigating to groups main');
-            
-            // Navigate to groups main screen
-            Future.delayed(const Duration(milliseconds: 100), () {
-              if (mounted) {
-                context.goNamed(RouteNames.groups.name);
-              }
-            });
-          }
-        },
-      );
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
     final theme = AppTheme.of(context);
     final l10n = AppLocalizations.of(context);
+
+    // Listen for group membership changes
+    ref.listen<AsyncValue<GroupMembership?>>(
+      groupMembershipNotifierProvider,
+      (previous, next) {
+        // If membership becomes null (user left group), navigate to groups main
+        if (previous != null && 
+            previous.hasValue && 
+            previous.value != null &&
+            next.hasValue && 
+            next.value == null) {
+          
+          print('GroupSettingsScreen: Detected user left group, navigating to groups main');
+          
+          // Navigate to groups main screen
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted) {
+              context.goNamed(RouteNames.groups.name);
+            }
+          });
+        }
+      },
+    );
 
     return Scaffold(
       backgroundColor: theme.backgroundColor,
