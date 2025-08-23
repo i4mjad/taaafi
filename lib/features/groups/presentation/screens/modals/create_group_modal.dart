@@ -51,250 +51,253 @@ class _CreateGroupModalState extends ConsumerState<CreateGroupModal> {
           topRight: Radius.circular(20),
         ),
       ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          // Header with close button
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const SizedBox(width: 24), // Balance the close button
-              Text(
-                l10n.translate('create-group-title'),
-                style: TextStyles.h4.copyWith(
-                  color: theme.grey[900],
-                ),
-              ),
-              GestureDetector(
-                onTap: () => Navigator.of(context).pop(),
-                child: Container(
-                  padding: const EdgeInsets.all(4),
-                  child: Icon(
-                    LucideIcons.x,
-                    size: 20,
-                    color: theme.grey[600],
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            // Header with close button
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const SizedBox(width: 24), // Balance the close button
+                Text(
+                  l10n.translate('create-group-title'),
+                  style: TextStyles.h4.copyWith(
+                    color: theme.grey[900],
                   ),
                 ),
-              ),
-            ],
-          ),
-
-          const SizedBox(height: 32),
-
-          // Group Name
-          Text(
-            l10n.translate('group-name'),
-            style: TextStyles.body.copyWith(
-              color: theme.grey[900],
-            ),
-          ),
-
-          const SizedBox(height: 8),
-
-          CustomTextField(
-            controller: _groupNameController,
-            hint: l10n.translate('enter-group-name'),
-            prefixIcon: LucideIcons.users,
-            inputType: TextInputType.text,
-            validator: (value) {
-              if (value?.isEmpty ?? true) {
-                return l10n.translate('group-name-required');
-              }
-              return null;
-            },
-          ),
-
-          const SizedBox(height: 24),
-
-          // Group Description
-          Text(
-            l10n.translate('group-description'),
-            style: TextStyles.body.copyWith(
-              color: theme.grey[900],
-            ),
-          ),
-
-          const SizedBox(height: 8),
-
-          CustomTextArea(
-            controller: _descriptionController,
-            hint: l10n.translate('enter-group-description'),
-            prefixIcon: LucideIcons.fileText,
-            maxLines: 3,
-            validator: (value) => null,
-          ),
-
-          const SizedBox(height: 24),
-
-          // Member Count
-          Text(
-            l10n.translate('member-count'),
-            style: TextStyles.body.copyWith(
-              color: theme.grey[900],
-            ),
-          ),
-
-          const SizedBox(height: 8),
-
-          CustomTextField(
-            controller: _memberCountController,
-            hint: l10n.translate('enter-member-count'),
-            prefixIcon: LucideIcons.hash,
-            inputType: TextInputType.number,
-            validator: (value) {
-              if (value?.isEmpty ?? true) {
-                return l10n.translate('member-count-required');
-              }
-              final count = int.tryParse(value!);
-              if (count == null || count < 2 || count > 50) {
-                return l10n.translate('member-count-invalid');
-              }
-              return null;
-            },
-          ),
-
-          const SizedBox(height: 24),
-
-          // Group Type
-          Text(
-            l10n.translate('group-type'),
-            style: TextStyles.body.copyWith(
-              color: theme.grey[900],
-            ),
-          ),
-
-          const SizedBox(height: 8),
-
-          PlatformDropdown<GroupType>(
-            value: _groupType,
-            items: [
-              PlatformDropdownItem(
-                value: GroupType.public,
-                label: l10n.translate('group-type-public'),
-              ),
-              PlatformDropdownItem(
-                value: GroupType.private,
-                label: l10n.translate('group-type-private'),
-              ),
-            ],
-            onChanged: (value) {
-              if (value != null) {
-                setState(() {
-                  _groupType = value;
-                });
-              }
-            },
-            backgroundColor: theme.grey[50],
-          ),
-
-          const SizedBox(height: 12),
-
-          Text(
-            _groupType == GroupType.public
-                ? l10n.translate('group-type-public-description')
-                : l10n.translate('group-type-private-description'),
-            style: TextStyles.caption.copyWith(
-              color: theme.grey[600],
-              height: 1.4,
-            ),
-          ),
-
-          const SizedBox(height: 24),
-
-          // Group Joining Methods
-          Text(
-            l10n.translate('group-joining-methods'),
-            style: TextStyles.body.copyWith(
-              color: theme.grey[900],
-            ),
-          ),
-
-          const SizedBox(height: 8),
-
-          GestureDetector(
-            onTap: () => _showJoiningMethodsModal(context),
-            child: WidgetsContainer(
-              backgroundColor: theme.grey[50],
-              borderSide: BorderSide(
-                color: theme.grey[200]!,
-                width: 1,
-              ),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      _joiningMethod != null
-                          ? _getJoiningMethodLabel(_joiningMethod!, l10n)
-                          : l10n.translate('select-joining-method'),
-                      style: TextStyles.body.copyWith(
-                        color: _joiningMethod != null
-                            ? theme.grey[900]
-                            : theme.grey[500],
-                      ),
+                GestureDetector(
+                  onTap: () => Navigator.of(context).pop(),
+                  child: Container(
+                    padding: const EdgeInsets.all(4),
+                    child: Icon(
+                      LucideIcons.x,
+                      size: 20,
+                      color: theme.grey[600],
                     ),
                   ),
-                  Icon(
-                    LucideIcons.chevronDown,
-                    size: 20,
-                    color: theme.grey[600],
-                  ),
-                ],
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 32),
+
+            // Group Name
+            Text(
+              l10n.translate('group-name'),
+              style: TextStyles.body.copyWith(
+                color: theme.grey[900],
               ),
             ),
-          ),
 
-          if (_joiningMethod != null) ...[
-            const SizedBox(height: 12),
+            const SizedBox(height: 8),
+
+            CustomTextField(
+              controller: _groupNameController,
+              hint: l10n.translate('enter-group-name'),
+              prefixIcon: LucideIcons.users,
+              inputType: TextInputType.text,
+              validator: (value) {
+                if (value?.isEmpty ?? true) {
+                  return l10n.translate('group-name-required');
+                }
+                return null;
+              },
+            ),
+
+            const SizedBox(height: 24),
+
+            // Group Description
             Text(
-              _getJoiningMethodDescription(_joiningMethod!, l10n),
+              l10n.translate('group-description'),
+              style: TextStyles.body.copyWith(
+                color: theme.grey[900],
+              ),
+            ),
+
+            const SizedBox(height: 8),
+
+            CustomTextArea(
+              controller: _descriptionController,
+              hint: l10n.translate('enter-group-description'),
+              prefixIcon: LucideIcons.fileText,
+              maxLines: 3,
+              validator: (value) => null,
+            ),
+
+            const SizedBox(height: 24),
+
+            // Member Count
+            Text(
+              l10n.translate('member-count'),
+              style: TextStyles.body.copyWith(
+                color: theme.grey[900],
+              ),
+            ),
+
+            const SizedBox(height: 8),
+
+            CustomTextField(
+              controller: _memberCountController,
+              hint: l10n.translate('enter-member-count'),
+              prefixIcon: LucideIcons.hash,
+              inputType: TextInputType.number,
+              validator: (value) {
+                if (value?.isEmpty ?? true) {
+                  return l10n.translate('member-count-required');
+                }
+                final count = int.tryParse(value!);
+                if (count == null || count < 2 || count > 50) {
+                  return l10n.translate('member-count-invalid');
+                }
+                return null;
+              },
+            ),
+
+            const SizedBox(height: 24),
+
+            // Group Type
+            Text(
+              l10n.translate('group-type'),
+              style: TextStyles.body.copyWith(
+                color: theme.grey[900],
+              ),
+            ),
+
+            const SizedBox(height: 8),
+
+            PlatformDropdown<GroupType>(
+              value: _groupType,
+              items: [
+                PlatformDropdownItem(
+                  value: GroupType.public,
+                  label: l10n.translate('group-type-public'),
+                ),
+                PlatformDropdownItem(
+                  value: GroupType.private,
+                  label: l10n.translate('group-type-private'),
+                ),
+              ],
+              onChanged: (value) {
+                if (value != null) {
+                  setState(() {
+                    _groupType = value;
+                  });
+                }
+              },
+              backgroundColor: theme.grey[50],
+            ),
+
+            const SizedBox(height: 12),
+
+            Text(
+              _groupType == GroupType.public
+                  ? l10n.translate('group-type-public-description')
+                  : l10n.translate('group-type-private-description'),
               style: TextStyles.caption.copyWith(
                 color: theme.grey[600],
                 height: 1.4,
               ),
             ),
-          ],
 
-          const SizedBox(height: 32),
+            const SizedBox(height: 24),
 
-          // Create Button
-          GestureDetector(
-            onTap: _isLoading ? null : _createGroup,
-            child: WidgetsContainer(
-              padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
-              backgroundColor:
-                  _isLoading ? theme.grey[300] : theme.primary[600],
-              borderRadius: BorderRadius.circular(10.5),
-              borderSide: BorderSide.none,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  if (_isLoading) ...[
-                    SizedBox(
-                      width: 16,
-                      height: 16,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        valueColor: AlwaysStoppedAnimation<Color>(
-                          theme.grey[600]!,
+            // Group Joining Methods
+            Text(
+              l10n.translate('group-joining-methods'),
+              style: TextStyles.body.copyWith(
+                color: theme.grey[900],
+              ),
+            ),
+
+            const SizedBox(height: 8),
+
+            GestureDetector(
+              onTap: () => _showJoiningMethodsModal(context),
+              child: WidgetsContainer(
+                backgroundColor: theme.grey[50],
+                borderSide: BorderSide(
+                  color: theme.grey[200]!,
+                  width: 1,
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        _joiningMethod != null
+                            ? _getJoiningMethodLabel(_joiningMethod!, l10n)
+                            : l10n.translate('select-joining-method'),
+                        style: TextStyles.body.copyWith(
+                          color: _joiningMethod != null
+                              ? theme.grey[900]
+                              : theme.grey[500],
                         ),
                       ),
                     ),
-                    const SizedBox(width: 8),
-                  ],
-                  Text(
-                    l10n.translate('create-group-button'),
-                    style: TextStyles.footnote.copyWith(
-                      color: _isLoading ? theme.grey[600] : Colors.white,
+                    Icon(
+                      LucideIcons.chevronDown,
+                      size: 20,
+                      color: theme.grey[600],
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
-          ),
 
-          const SizedBox(height: 24),
-        ],
+            if (_joiningMethod != null) ...[
+              const SizedBox(height: 12),
+              Text(
+                _getJoiningMethodDescription(_joiningMethod!, l10n),
+                style: TextStyles.caption.copyWith(
+                  color: theme.grey[600],
+                  height: 1.4,
+                ),
+              ),
+            ],
+
+            const SizedBox(height: 32),
+
+            // Create Button
+            GestureDetector(
+              onTap: _isLoading ? null : _createGroup,
+              child: WidgetsContainer(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+                backgroundColor:
+                    _isLoading ? theme.grey[300] : theme.primary[600],
+                borderRadius: BorderRadius.circular(10.5),
+                borderSide: BorderSide.none,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    if (_isLoading) ...[
+                      SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            theme.grey[600]!,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                    ],
+                    Text(
+                      l10n.translate('create-group-button'),
+                      style: TextStyles.footnote.copyWith(
+                        color: _isLoading ? theme.grey[600] : Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 24),
+          ],
+        ),
       ),
     );
   }

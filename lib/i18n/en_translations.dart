@@ -3020,6 +3020,26 @@ const Map<String, String> kEn = {
   "explore-groups-button": "Explore Groups",
   "explore-groups-navigation": "Opening groups exploration...",
 
+//Groups
+  'group-description': 'Group Description',
+  'enter-group-description': 'Enter group description',
+  'joining-method-required': 'Please select a joining method',
+  'group-created-successfully': 'Group created successfully!',
+  'group-creation-failed': 'Failed to create group',
+  'profile-required': 'Community profile required',
+  'already-in-group-error': 'You must leave your current group first',
+  'cooldown-active-error': 'You must wait before joining another group',
+  'group-full-error': 'This group is full',
+  'invalid-join-code-error': 'Invalid or expired join code',
+  'gender-mismatch-error': 'Gender requirements not met',
+  'group-not-found-error': 'Group not found',
+  'group-inactive-error': 'This group is no longer active',
+  'user-banned-error': 'You are banned from joining groups',
+  'join-group-failed': 'Failed to join group',
+  'leaving-group': 'Leaving group...',
+  'left-group-successfully': 'Successfully left the group',
+  'leave-group-failed': 'Failed to leave group',
+
   // Group Card
   "group-member-count": "members",
   "group-challenge-count": "challenges",

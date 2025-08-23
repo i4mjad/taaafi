@@ -2969,4 +2969,24 @@ const Map<String, String> kAr = {
   "group-days-ago": "منذ {days} أيام",
   "group-hours-ago": "منذ {hours} ساعات",
   "joined-group-successfully": "تم الانضمام بنجاح إلى {groupName}!",
+
+  //Gropus
+  'group-description': 'وصف الزمالة',
+  'enter-group-description': 'أدخل وصف الزمالة',
+  'joining-method-required': 'يرجى تحديد طريقة الانضمام',
+  'group-created-successfully': 'تم إنشاء الزمالة بنجاح!',
+  'group-creation-failed': 'فشل إنشاء الزمالة',
+  'profile-required': 'يتطلب ملف شخصي في المجتمع',
+  'already-in-group-error': 'يجب أن تترك مجموعتك الحالية أولاً',
+  'cooldown-active-error': 'يجب أن تنتظر قبل الانضمام إلى مجموعة أخرى',
+  'group-full-error': 'الزمالة ممتلئة',
+  'invalid-join-code-error': 'كود الانضمام غير صالح أو منتهي الصلاحية',
+  'gender-mismatch-error': 'لا تفي المتطلبات الجنسية',
+  'group-not-found-error': 'لم يتم العثور على المجموعة',
+  'group-inactive-error': 'الزمالة غير نشطة',
+  'user-banned-error': 'أنت ممنوع من الانضمام إلى الزمالات',
+  'join-group-failed': 'فشل الانضمام إلى الزمالة',
+  'leaving-group': 'ترك الزمالة...',
+  'left-group-successfully': 'تم ترك الزمالة بنجاح',
+  'leave-group-failed': 'فشل ترك الزمالة'
 };

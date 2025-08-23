@@ -3,6 +3,8 @@ import 'dart:developer';
 import '../domain/entities/group_entity.dart';
 import '../domain/entities/group_membership_entity.dart';
 import '../domain/entities/join_result_entity.dart';
+import '../providers/group_membership_provider.dart';
+import '../providers/groups_status_provider.dart';
 
 import 'groups_providers.dart';
 
@@ -29,8 +31,6 @@ class GroupsController extends _$GroupsController {
     DateTime? joinCodeExpiresAt,
     int? joinCodeMaxUses,
   }) async {
-    state = const AsyncValue.loading();
-
     try {
       final service = ref.read(groupsServiceProvider);
       final result = await service.createGroup(
@@ -47,18 +47,16 @@ class GroupsController extends _$GroupsController {
       );
 
       if (result.success) {
-        // Refresh membership provider after successful creation
-        ref.invalidate(currentGroupMembershipProvider);
-        state = const AsyncValue.data(null);
-      } else {
-        state = const AsyncValue.data(null);
+        // Refresh membership and status providers after successful creation
+        ref.invalidate(groupMembershipNotifierProvider);
+        ref.invalidate(groupsStatusProvider);
+        print('GroupsController: Group created successfully, providers invalidated');
       }
 
       return result;
     } catch (error, stackTrace) {
       log('Error in createGroup controller: $error', stackTrace: stackTrace);
       print('GroupsController.createGroup error: $error');
-      state = AsyncValue.error(error, stackTrace);
       return CreateGroupResultEntity.error(
         CreateGroupErrorType.invalidName,
         'Unexpected error occurred',
@@ -71,8 +69,6 @@ class GroupsController extends _$GroupsController {
     required String groupId,
     required String cpId,
   }) async {
-    state = const AsyncValue.loading();
-
     try {
       final service = ref.read(groupsServiceProvider);
       final result = await service.joinGroupDirectly(
@@ -81,18 +77,16 @@ class GroupsController extends _$GroupsController {
       );
 
       if (result.success) {
-        // Refresh membership provider after successful join
-        ref.invalidate(currentGroupMembershipProvider);
-        state = const AsyncValue.data(null);
-      } else {
-        state = const AsyncValue.data(null);
+        // Refresh membership and status providers after successful join
+        ref.invalidate(groupMembershipNotifierProvider);
+        ref.invalidate(groupsStatusProvider);
+        print('GroupsController: Joined group successfully, providers invalidated');
       }
 
       return result;
     } catch (error, stackTrace) {
       log('Error in joinGroupDirectly controller: $error', stackTrace: stackTrace);
       print('GroupsController.joinGroupDirectly error: $error');
-      state = AsyncValue.error(error, stackTrace);
       return const JoinResultEntity.error(
         JoinErrorType.groupNotFound,
         'Unexpected error occurred',
@@ -106,8 +100,6 @@ class GroupsController extends _$GroupsController {
     required String joinCode,
     required String cpId,
   }) async {
-    state = const AsyncValue.loading();
-
     try {
       final service = ref.read(groupsServiceProvider);
       final result = await service.joinGroupWithCode(
@@ -117,18 +109,16 @@ class GroupsController extends _$GroupsController {
       );
 
       if (result.success) {
-        // Refresh membership provider after successful join
-        ref.invalidate(currentGroupMembershipProvider);
-        state = const AsyncValue.data(null);
-      } else {
-        state = const AsyncValue.data(null);
+        // Refresh membership and status providers after successful join
+        ref.invalidate(groupMembershipNotifierProvider);
+        ref.invalidate(groupsStatusProvider);
+        print('GroupsController: Joined group with code successfully, providers invalidated');
       }
 
       return result;
     } catch (error, stackTrace) {
       log('Error in joinGroupWithCode controller: $error', stackTrace: stackTrace);
       print('GroupsController.joinGroupWithCode error: $error');
-      state = AsyncValue.error(error, stackTrace);
       return const JoinResultEntity.error(
         JoinErrorType.invalidCode,
         'Unexpected error occurred',
@@ -140,25 +130,21 @@ class GroupsController extends _$GroupsController {
   Future<LeaveResultEntity> leaveGroup({
     required String cpId,
   }) async {
-    state = const AsyncValue.loading();
-
     try {
       final service = ref.read(groupsServiceProvider);
       final result = await service.leaveGroup(cpId: cpId);
 
       if (result.success) {
-        // Refresh membership provider after leaving
-        ref.invalidate(currentGroupMembershipProvider);
-        state = const AsyncValue.data(null);
-      } else {
-        state = const AsyncValue.data(null);
+        // Refresh membership and status providers after leaving
+        ref.invalidate(groupMembershipNotifierProvider);
+        ref.invalidate(groupsStatusProvider);
+        print('GroupsController: Left group successfully, providers invalidated');
       }
 
       return result;
     } catch (error, stackTrace) {
       log('Error in leaveGroup controller: $error', stackTrace: stackTrace);
       print('GroupsController.leaveGroup error: $error');
-      state = AsyncValue.error(error, stackTrace);
       return const LeaveResultEntity.error('Unexpected error occurred');
     }
   }

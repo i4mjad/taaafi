@@ -578,6 +578,7 @@ class GroupsMainScreen extends ConsumerWidget {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
+      useSafeArea: true,
       backgroundColor: Colors.transparent,
       builder: (context) => const CreateGroupModal(),
     );
