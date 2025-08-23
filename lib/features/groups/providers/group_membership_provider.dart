@@ -60,13 +60,15 @@ Future<GroupMembership?> groupMembershipNotifier(ref) async {
     print('groupMembershipNotifier: Found membership for group ${membership.groupId}');
 
     // Get group details
-    final group = await ref
+    final publicGroups = await ref
         .read(groupsServiceProvider)
         .getPublicGroups()
-        .first
-        .where((groups) => groups.any((g) => g.id == membership.groupId))
-        .map((groups) => groups.firstWhere((g) => g.id == membership.groupId))
         .first;
+    
+    final group = publicGroups.firstWhere(
+      (g) => g.id == membership.groupId,
+      orElse: () => throw Exception('Group not found: ${membership.groupId}'),
+    );
 
     // Convert to legacy Group model for compatibility
     final legacyGroup = Group(
