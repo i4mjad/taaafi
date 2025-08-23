@@ -37,61 +37,68 @@ class GroupMembership {
 /// Provider for current user's group membership using real backend
 @riverpod
 Future<GroupMembership?> groupMembershipNotifier(ref) async {
-  // Get current community profile
+  // Get current community profile using .when() to handle all AsyncValue states
   final profileAsync = ref.watch(currentCommunityProfileProvider);
 
-  // Check if profile is still loading
-  if (profileAsync.isLoading) {
-    return null; // Return null for loading state
-  }
+  return profileAsync.when(
+    data: (profile) async {
+      if (profile == null) {
+        print('groupMembershipNotifier: No community profile found');
+        return null;
+      }
 
-  // Check for errors
-  if (profileAsync.hasError) {
-    print('groupMembershipNotifier error: ${profileAsync.error}');
-    return null;
-  }
+      try {
+        // Get membership from backend
+        final service = ref.read(groupsServiceProvider);
+        final membership = await service.getCurrentMembership(profile.id);
 
-  // Get the profile value
-  final profile = profileAsync.value;
-  if (profile == null) return null;
+        if (membership == null) {
+          print('groupMembershipNotifier: No active membership found for user ${profile.id}');
+          return null;
+        }
 
-  try {
-    // Get membership from backend
-    final service = ref.read(groupsServiceProvider);
-    final membership = await service.getCurrentMembership(profile.id);
+        // Get group details
+        final group = await ref
+            .read(groupsServiceProvider)
+            .getPublicGroups()
+            .first
+            .where((groups) => groups.any((g) => g.id == membership.groupId))
+            .map((groups) => groups.firstWhere((g) => g.id == membership.groupId))
+            .first;
 
-    if (membership == null) return null;
+        // Convert to legacy Group model for compatibility
+        final legacyGroup = Group(
+          id: group.id,
+          name: group.name,
+          description: group.description,
+          memberCount: 0, // Will need to be fetched separately
+          capacity: group.memberCapacity,
+          gender: group.gender,
+          createdAt: group.createdAt,
+          updatedAt: group.updatedAt,
+        );
 
-    // Get group details
-    final group = await ref
-        .read(groupsServiceProvider)
-        .getPublicGroups()
-        .first
-        .where((groups) => groups.any((g) => g.id == membership.groupId))
-        .map((groups) => groups.firstWhere((g) => g.id == membership.groupId))
-        .first;
-
-    // Convert to legacy Group model for compatibility
-    final legacyGroup = Group(
-      id: group.id,
-      name: group.name,
-      description: group.description,
-      memberCount: 0, // Will need to be fetched separately
-      capacity: group.memberCapacity,
-      gender: group.gender,
-      createdAt: group.createdAt,
-      updatedAt: group.updatedAt,
-    );
-
-    return GroupMembership(
-      group: legacyGroup,
-      joinedAt: membership.joinedAt,
-      memberRole: membership.role,
-      totalPoints: membership.pointsTotal,
-    );
-  } catch (error, stackTrace) {
-    print('Error in groupMembershipNotifier: $error');
-    print('StackTrace: $stackTrace');
-    return null;
-  }
+        print('groupMembershipNotifier: Successfully loaded membership for group ${group.name}');
+        return GroupMembership(
+          group: legacyGroup,
+          joinedAt: membership.joinedAt,
+          memberRole: membership.role,
+          totalPoints: membership.pointsTotal,
+        );
+      } catch (error, stackTrace) {
+        print('Error in groupMembershipNotifier: $error');
+        print('StackTrace: $stackTrace');
+        return null;
+      }
+    },
+    loading: () async {
+      print('groupMembershipNotifier: Community profile is loading...');
+      return null;
+    },
+    error: (error, stackTrace) async {
+      print('groupMembershipNotifier error: $error');
+      print('StackTrace: $stackTrace');
+      return null;
+    },
+  );
 }
