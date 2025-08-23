@@ -7,15 +7,15 @@ part of 'group_membership_provider.dart';
 // **************************************************************************
 
 String _$groupMembershipNotifierHash() =>
-    r'08f1fe147eaf77849215bef0159e70ee9ffa787f';
+    r'02d7f933ee9312fd90c257e68b164c9287fa7e44';
 
-/// Notifier for managing group membership state
+/// Provider for current user's group membership using real backend
 ///
-/// Copied from [GroupMembershipNotifier].
-@ProviderFor(GroupMembershipNotifier)
-final groupMembershipNotifierProvider = AutoDisposeNotifierProvider<
-    GroupMembershipNotifier, GroupMembership?>.internal(
-  GroupMembershipNotifier.new,
+/// Copied from [groupMembershipNotifier].
+@ProviderFor(groupMembershipNotifier)
+final groupMembershipNotifierProvider =
+    AutoDisposeFutureProvider<GroupMembership?>.internal(
+  groupMembershipNotifier,
   name: r'groupMembershipNotifierProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
       ? null
@@ -24,6 +24,9 @@ final groupMembershipNotifierProvider = AutoDisposeNotifierProvider<
   allTransitiveDependencies: null,
 );
 
-typedef _$GroupMembershipNotifier = AutoDisposeNotifier<GroupMembership?>;
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef GroupMembershipNotifierRef
+    = AutoDisposeFutureProviderRef<GroupMembership?>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/shared_widgets/app_bar.dart';
@@ -230,12 +229,12 @@ class GroupSettingsScreen extends ConsumerWidget {
   }
 
   void _showLeaveGroupDialog(BuildContext context, AppLocalizations l10n) {
-    LeaveGroupModal.show(
-      context,
-      onLeaveGroup: () {
-        // TODO: Implement leave group functionality
-        _showComingSoon(context, l10n);
-      },
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      backgroundColor: AppTheme.of(context).backgroundColor,
+      builder: (context) => const LeaveGroupModal(),
     );
   }
 

@@ -213,22 +213,27 @@ class _LeaveGroupModalState extends ConsumerState<LeaveGroupModal> {
 
   Future<void> _leaveGroup() async {
     final l10n = AppLocalizations.of(context);
-    
+
     setState(() => _isLoading = true);
 
-    try {
+        try {
       // Get current community profile
       final profileAsync = ref.read(currentCommunityProfileProvider);
-      final profile = await profileAsync.first;
+      final profile = await profileAsync.when(
+        data: (profile) async => profile,
+        loading: () async => null,
+        error: (_, __) async => null,
+      );
       
       if (profile == null) {
         _showError(l10n.translate('profile-required'));
         return;
       }
 
-      final result = await ref.read(groupsControllerProvider.notifier).leaveGroup(
-        cpId: profile.id,
-      );
+      final result =
+          await ref.read(groupsControllerProvider.notifier).leaveGroup(
+                cpId: profile.id,
+              );
 
       if (!mounted) return;
 

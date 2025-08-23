@@ -1,6 +1,5 @@
 import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
 import '../models/group_model.dart';
 import '../models/group_membership_model.dart';
@@ -8,9 +7,8 @@ import 'groups_datasource.dart';
 
 class GroupsFirestoreDataSource implements GroupsDataSource {
   final FirebaseFirestore _firestore;
-  final FirebaseAuth _auth;
 
-  const GroupsFirestoreDataSource(this._firestore, this._auth);
+  const GroupsFirestoreDataSource(this._firestore);
 
   @override
   Future<GroupMembershipModel?> getCurrentMembership(String cpId) async {

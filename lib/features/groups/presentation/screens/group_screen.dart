@@ -55,33 +55,49 @@ class GroupScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = AppTheme.of(context);
     final l10n = AppLocalizations.of(context);
-    final membership = ref.watch(groupMembershipNotifierProvider);
+    final membershipAsync = ref.watch(groupMembershipNotifierProvider);
 
-    if (membership == null) {
-      return Scaffold(
+    return membershipAsync.when(
+      data: (membership) {
+        if (membership == null) {
+          return Scaffold(
+            backgroundColor: theme.backgroundColor,
+            body: const Center(
+              child: Text('خطأ: لم يتم العثور على عضوية في مجموعة'),
+            ),
+          );
+        }
+
+        return Scaffold(
+          backgroundColor: theme.backgroundColor,
+          appBar: appBar(context, ref, "group", false, false),
+          body: Column(
+            children: [
+              // Group header
+              _buildGroupHeader(context, theme, l10n, membership),
+
+              // Content
+              Expanded(
+                child: _buildContent(context, theme, l10n),
+              ),
+
+              // Bottom sections (Chat and Challenges)
+              _buildBottomSections(context, theme, l10n, membership.group.id),
+            ],
+          ),
+        );
+      },
+      loading: () => Scaffold(
         backgroundColor: theme.backgroundColor,
         body: const Center(
-          child: Text('خطأ: لم يتم العثور على عضوية في مجموعة'),
+          child: CircularProgressIndicator(),
         ),
-      );
-    }
-
-    return Scaffold(
-      backgroundColor: theme.backgroundColor,
-      appBar: appBar(context, ref, "group", false, false),
-      body: Column(
-        children: [
-          // Group header
-          _buildGroupHeader(context, theme, l10n, membership),
-
-          // Content
-          Expanded(
-            child: _buildContent(context, theme, l10n),
-          ),
-
-          // Bottom sections (Chat and Challenges)
-          _buildBottomSections(context, theme, l10n, membership.group.id),
-        ],
+      ),
+      error: (error, stackTrace) => Scaffold(
+        backgroundColor: theme.backgroundColor,
+        body: Center(
+          child: Text('خطأ: ${error.toString()}'),
+        ),
       ),
     );
   }

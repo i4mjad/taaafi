@@ -7,7 +7,7 @@ import 'package:reboot_app_3/core/shared_widgets/custom_textfield.dart';
 import 'package:reboot_app_3/core/shared_widgets/platform_switch.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
-import 'package:reboot_app_3/features/groups/providers/group_membership_provider.dart';
+
 import 'package:go_router/go_router.dart';
 import 'package:reboot_app_3/core/routing/route_names.dart';
 import 'package:reboot_app_3/features/groups/application/groups_controller.dart';
@@ -244,7 +244,7 @@ class _JoinGroupModalState extends ConsumerState<JoinGroupModal> {
   Future<void> _joinGroup() async {
     final l10n = AppLocalizations.of(context);
     final groupCode = _groupCodeController.text.trim();
-    
+
     if (groupCode.isEmpty) {
       _showError(l10n.translate('group-code-required'));
       return;
@@ -252,10 +252,14 @@ class _JoinGroupModalState extends ConsumerState<JoinGroupModal> {
 
     setState(() => _isLoading = true);
 
-    try {
+        try {
       // Get current community profile
       final profileAsync = ref.read(currentCommunityProfileProvider);
-      final profile = await profileAsync.first;
+      final profile = await profileAsync.when(
+        data: (profile) async => profile,
+        loading: () async => null,
+        error: (_, __) async => null,
+      );
       
       if (profile == null) {
         _showError(l10n.translate('profile-required'));
@@ -266,11 +270,12 @@ class _JoinGroupModalState extends ConsumerState<JoinGroupModal> {
       // In a real app, you might need to find the group by code first
       const demoGroupId = 'demo_group_id';
 
-      final result = await ref.read(groupsControllerProvider.notifier).joinGroupWithCode(
-        groupId: demoGroupId,
-        joinCode: groupCode,
-        cpId: profile.id,
-      );
+      final result =
+          await ref.read(groupsControllerProvider.notifier).joinGroupWithCode(
+                groupId: demoGroupId,
+                joinCode: groupCode,
+                cpId: profile.id,
+              );
 
       if (!mounted) return;
 

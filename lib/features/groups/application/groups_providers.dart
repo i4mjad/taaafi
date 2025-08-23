@@ -21,8 +21,7 @@ FirebaseAuth firebaseAuth(ref) => FirebaseAuth.instance;
 @riverpod
 GroupsDataSource groupsDataSource(ref) {
   final firestore = ref.watch(firestoreProvider);
-  final auth = ref.watch(firebaseAuthProvider);
-  return GroupsFirestoreDataSource(firestore, auth);
+  return GroupsFirestoreDataSource(firestore);
 }
 
 @riverpod

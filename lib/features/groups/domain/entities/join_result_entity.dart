@@ -1,3 +1,5 @@
+import 'package:reboot_app_3/features/groups/domain/entities/group_membership_entity.dart';
+
 /// Represents the result of attempting to join a group
 class JoinResultEntity {
   final bool success;

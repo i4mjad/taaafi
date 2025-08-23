@@ -39,23 +39,26 @@ class GroupMembership {
 Future<GroupMembership?> groupMembershipNotifier(ref) async {
   // Get current community profile
   final profileAsync = ref.watch(currentCommunityProfileProvider);
-  
+
   return await profileAsync.when(
     data: (profile) async {
       if (profile == null) return null;
-      
+
       // Get membership from backend
       final service = ref.read(groupsServiceProvider);
       final membership = await service.getCurrentMembership(profile.id);
-      
+
       if (membership == null) return null;
-      
+
       // Get group details
-      final group = await ref.read(groupsServiceProvider).getPublicGroups().first
+      final group = await ref
+          .read(groupsServiceProvider)
+          .getPublicGroups()
+          .first
           .where((groups) => groups.any((g) => g.id == membership.groupId))
           .map((groups) => groups.firstWhere((g) => g.id == membership.groupId))
           .first;
-      
+
       // Convert to legacy Group model for compatibility
       final legacyGroup = Group(
         id: group.id,
@@ -67,7 +70,7 @@ Future<GroupMembership?> groupMembershipNotifier(ref) async {
         createdAt: group.createdAt,
         updatedAt: group.updatedAt,
       );
-      
+
       return GroupMembership(
         group: legacyGroup,
         joinedAt: membership.joinedAt,

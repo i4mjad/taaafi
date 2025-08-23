@@ -2,7 +2,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../domain/entities/group_entity.dart';
 import '../domain/entities/group_membership_entity.dart';
 import '../domain/entities/join_result_entity.dart';
-import '../domain/services/groups_service.dart';
+
 import 'groups_providers.dart';
 
 part 'groups_controller.g.dart';

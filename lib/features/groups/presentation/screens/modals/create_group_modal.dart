@@ -4,13 +4,13 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
 import 'package:reboot_app_3/core/shared_widgets/custom_textfield.dart';
+import 'package:reboot_app_3/core/shared_widgets/custom_textarea.dart';
 import 'package:reboot_app_3/core/shared_widgets/platform_dropdown.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/features/groups/presentation/screens/modals/group_joining_methods_modal.dart';
 import 'package:reboot_app_3/features/groups/application/groups_controller.dart';
 import 'package:reboot_app_3/features/community/presentation/providers/community_providers_new.dart';
-import 'package:reboot_app_3/features/groups/domain/entities/join_result_entity.dart';
 
 enum GroupType { public, private }
 
@@ -117,11 +117,10 @@ class _CreateGroupModalState extends ConsumerState<CreateGroupModal> {
 
           const SizedBox(height: 8),
 
-          CustomTextField(
+          CustomTextArea(
             controller: _descriptionController,
             hint: l10n.translate('enter-group-description'),
             prefixIcon: LucideIcons.fileText,
-            inputType: TextInputType.multiline,
             maxLines: 3,
             validator: (value) => null,
           ),
@@ -330,10 +329,14 @@ class _CreateGroupModalState extends ConsumerState<CreateGroupModal> {
 
     setState(() => _isLoading = true);
 
-    try {
+        try {
       // Get current community profile
       final profileAsync = ref.read(currentCommunityProfileProvider);
-      final profile = await profileAsync.first;
+      final profile = await profileAsync.when(
+        data: (profile) async => profile,
+        loading: () async => null,
+        error: (_, __) async => null,
+      );
       
       if (profile == null) {
         _showError(l10n.translate('profile-required'));
@@ -358,15 +361,17 @@ class _CreateGroupModalState extends ConsumerState<CreateGroupModal> {
       }
 
       // Create group
-      final result = await ref.read(groupsControllerProvider.notifier).createGroup(
-        name: groupName,
-        description: description,
-        memberCapacity: memberCount,
-        visibility: _groupType == GroupType.public ? 'public' : 'private',
-        joinMethod: joinMethod,
-        creatorCpId: profile.id,
-        isCreatorPlusUser: isPlus,
-      );
+      final result = await ref
+          .read(groupsControllerProvider.notifier)
+          .createGroup(
+            name: groupName,
+            description: description,
+            memberCapacity: memberCount,
+            visibility: _groupType == GroupType.public ? 'public' : 'private',
+            joinMethod: joinMethod,
+            creatorCpId: profile.id,
+            isCreatorPlusUser: isPlus,
+          );
 
       if (!mounted) return;
 
@@ -379,7 +384,8 @@ class _CreateGroupModalState extends ConsumerState<CreateGroupModal> {
           ),
         );
       } else {
-        _showError(result.errorMessage ?? l10n.translate('group-creation-failed'));
+        _showError(
+            result.errorMessage ?? l10n.translate('group-creation-failed'));
       }
     } catch (error) {
       if (mounted) {

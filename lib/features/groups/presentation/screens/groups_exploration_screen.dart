@@ -12,7 +12,7 @@ import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/core/theming/custom_theme_data.dart';
 import 'package:reboot_app_3/features/groups/presentation/widgets/public_group_card.dart';
 import 'package:reboot_app_3/features/groups/presentation/screens/modals/join_group_modal.dart';
-import 'package:reboot_app_3/features/groups/providers/group_membership_provider.dart';
+
 
 enum GroupFilter { all, male, female, needsCode, openJoin }
 
@@ -58,7 +58,8 @@ class _GroupsExplorationScreenState
   Widget build(BuildContext context) {
     final theme = AppTheme.of(context);
     final l10n = AppLocalizations.of(context);
-    final groupMembership = ref.watch(groupMembershipNotifierProvider);
+    // TODO: Check group membership properly
+    const groupMembership = null;
 
     // Don't show exploration if user is already in a group
     if (groupMembership != null) {
@@ -428,8 +429,8 @@ class _GroupsExplorationScreenState
           _isLoading = false;
         });
 
-        // Simulate successful join
-        ref.read(groupMembershipNotifierProvider.notifier).joinRandomGroup();
+        // TODO: Implement actual join logic with backend
+        // For now, just show success message
 
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -438,6 +439,7 @@ class _GroupsExplorationScreenState
                   .translate('joined-group-successfully')
                   .replaceAll('{groupName}', group.name),
             ),
+            backgroundColor: Colors.green,
           ),
         );
       }
