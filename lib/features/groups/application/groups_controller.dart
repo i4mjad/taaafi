@@ -1,4 +1,5 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'dart:developer';
 import '../domain/entities/group_entity.dart';
 import '../domain/entities/group_membership_entity.dart';
 import '../domain/entities/join_result_entity.dart';
@@ -55,6 +56,8 @@ class GroupsController extends _$GroupsController {
 
       return result;
     } catch (error, stackTrace) {
+      log('Error in createGroup controller: $error', stackTrace: stackTrace);
+      print('GroupsController.createGroup error: $error');
       state = AsyncValue.error(error, stackTrace);
       return CreateGroupResultEntity.error(
         CreateGroupErrorType.invalidName,
@@ -87,6 +90,8 @@ class GroupsController extends _$GroupsController {
 
       return result;
     } catch (error, stackTrace) {
+      log('Error in joinGroupDirectly controller: $error', stackTrace: stackTrace);
+      print('GroupsController.joinGroupDirectly error: $error');
       state = AsyncValue.error(error, stackTrace);
       return const JoinResultEntity.error(
         JoinErrorType.groupNotFound,
@@ -121,6 +126,8 @@ class GroupsController extends _$GroupsController {
 
       return result;
     } catch (error, stackTrace) {
+      log('Error in joinGroupWithCode controller: $error', stackTrace: stackTrace);
+      print('GroupsController.joinGroupWithCode error: $error');
       state = AsyncValue.error(error, stackTrace);
       return const JoinResultEntity.error(
         JoinErrorType.invalidCode,
@@ -149,6 +156,8 @@ class GroupsController extends _$GroupsController {
 
       return result;
     } catch (error, stackTrace) {
+      log('Error in leaveGroup controller: $error', stackTrace: stackTrace);
+      print('GroupsController.leaveGroup error: $error');
       state = AsyncValue.error(error, stackTrace);
       return const LeaveResultEntity.error('Unexpected error occurred');
     }
@@ -158,27 +167,51 @@ class GroupsController extends _$GroupsController {
 /// Provider for current user's group membership
 @riverpod
 Future<GroupMembershipEntity?> currentGroupMembership(ref, String cpId) async {
-  final service = ref.read(groupsServiceProvider);
-  return await service.getCurrentMembership(cpId);
+  try {
+    final service = ref.read(groupsServiceProvider);
+    return await service.getCurrentMembership(cpId);
+  } catch (error, stackTrace) {
+    log('Error in currentGroupMembership provider: $error', stackTrace: stackTrace);
+    print('currentGroupMembership provider error: $error');
+    rethrow;
+  }
 }
 
 /// Provider for public groups stream
 @riverpod
 Stream<List<GroupEntity>> publicGroups(ref) {
-  final service = ref.read(groupsServiceProvider);
-  return service.getPublicGroups();
+  try {
+    final service = ref.read(groupsServiceProvider);
+    return service.getPublicGroups();
+  } catch (error, stackTrace) {
+    log('Error in publicGroups provider: $error', stackTrace: stackTrace);
+    print('publicGroups provider error: $error');
+    rethrow;
+  }
 }
 
 /// Provider to check if user can join groups
 @riverpod
 Future<bool> canJoinGroup(ref, String cpId) async {
-  final service = ref.read(groupsServiceProvider);
-  return await service.canJoinGroup(cpId);
+  try {
+    final service = ref.read(groupsServiceProvider);
+    return await service.canJoinGroup(cpId);
+  } catch (error, stackTrace) {
+    log('Error in canJoinGroup provider: $error', stackTrace: stackTrace);
+    print('canJoinGroup provider error: $error');
+    return false; // Default to false on error for safety
+  }
 }
 
 /// Provider for next join allowed time
 @riverpod
 Future<DateTime?> nextJoinAllowedAt(ref, String cpId) async {
-  final service = ref.read(groupsServiceProvider);
-  return await service.getNextJoinAllowedAt(cpId);
+  try {
+    final service = ref.read(groupsServiceProvider);
+    return await service.getNextJoinAllowedAt(cpId);
+  } catch (error, stackTrace) {
+    log('Error in nextJoinAllowedAt provider: $error', stackTrace: stackTrace);
+    print('nextJoinAllowedAt provider error: $error');
+    return null; // Default to no restriction on error
+  }
 }

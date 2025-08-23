@@ -7,7 +7,7 @@ part of 'groups_controller.dart';
 // **************************************************************************
 
 String _$currentGroupMembershipHash() =>
-    r'109340764f7c9bd330c460db71f6fb2f1fdcfa70';
+    r'885ac9960c583eb4949e130d7bd8208acd5110fa';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -176,7 +176,7 @@ class _CurrentGroupMembershipProviderElement
   String get cpId => (origin as CurrentGroupMembershipProvider).cpId;
 }
 
-String _$publicGroupsHash() => r'97ebc04beef3384b3dfce3d1a6a6c9d7ac443414';
+String _$publicGroupsHash() => r'758ff4f57e5243f76e2f8b37106d399afd261ce6';
 
 /// Provider for public groups stream
 ///
@@ -195,7 +195,7 @@ final publicGroupsProvider =
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef PublicGroupsRef = AutoDisposeStreamProviderRef<List<GroupEntity>>;
-String _$canJoinGroupHash() => r'd86c32fce2157d4cdbc68234ef45c27d2ca3c534';
+String _$canJoinGroupHash() => r'f9f766c1da606912bea87727067b64584f006d4a';
 
 /// Provider to check if user can join groups
 ///
@@ -337,7 +337,7 @@ class _CanJoinGroupProviderElement
   String get cpId => (origin as CanJoinGroupProvider).cpId;
 }
 
-String _$nextJoinAllowedAtHash() => r'bd10aed6d51d7379f12ba557fc5f478d8ecc32c2';
+String _$nextJoinAllowedAtHash() => r'deb6ebf1bc373029b7f90778d1364286227987c5';
 
 /// Provider for next join allowed time
 ///
@@ -480,7 +480,7 @@ class _NextJoinAllowedAtProviderElement
   String get cpId => (origin as NextJoinAllowedAtProvider).cpId;
 }
 
-String _$groupsControllerHash() => r'c5aaa176ca1a7ab67dac48a7111f1015b50bf142';
+String _$groupsControllerHash() => r'abff4f71a97966316be838d97abf512bdea32ee3';
 
 /// Controller for handling group actions (join, create, leave)
 ///

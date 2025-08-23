@@ -2,6 +2,7 @@ import '../entities/group_entity.dart';
 import '../entities/group_membership_entity.dart';
 import '../entities/join_result_entity.dart';
 import '../repositories/groups_repository.dart';
+import 'dart:developer';
 
 class GroupsService {
   final GroupsRepository _repository;
@@ -10,12 +11,24 @@ class GroupsService {
 
   /// Get current user's active membership
   Future<GroupMembershipEntity?> getCurrentMembership(String cpId) async {
-    return await _repository.getCurrentMembership(cpId);
+    try {
+      return await _repository.getCurrentMembership(cpId);
+    } catch (error, stackTrace) {
+      log('Error in GroupsService.getCurrentMembership: $error', stackTrace: stackTrace);
+      print('GroupsService.getCurrentMembership error: $error');
+      rethrow;
+    }
   }
 
   /// Get public groups for discovery
   Stream<List<GroupEntity>> getPublicGroups() {
-    return _repository.getPublicGroups();
+    try {
+      return _repository.getPublicGroups();
+    } catch (error, stackTrace) {
+      log('Error in GroupsService.getPublicGroups: $error', stackTrace: stackTrace);
+      print('GroupsService.getPublicGroups error: $error');
+      rethrow;
+    }
   }
 
   /// Create a new group with business logic validation
@@ -70,34 +83,43 @@ class GroupsService {
       );
     }
 
-    // Check if user already has an active membership
-    final currentMembership = await _repository.getCurrentMembership(creatorCpId);
-    if (currentMembership != null) {
+    try {
+      // Check if user already has an active membership
+      final currentMembership = await _repository.getCurrentMembership(creatorCpId);
+      if (currentMembership != null) {
+        return const CreateGroupResultEntity.error(
+          CreateGroupErrorType.alreadyInGroup,
+          'You must leave your current group before creating a new one',
+        );
+      }
+
+      // Check cooldown
+      if (!await _repository.canJoinGroup(creatorCpId)) {
+        return const CreateGroupResultEntity.error(
+          CreateGroupErrorType.cooldownActive,
+          'You must wait before joining or creating another group',
+        );
+      }
+
+      return await _repository.createGroup(
+        name: name.trim(),
+        description: description.trim(),
+        memberCapacity: memberCapacity,
+        visibility: visibility,
+        joinMethod: joinMethod,
+        creatorCpId: creatorCpId,
+        joinCode: joinCode,
+        joinCodeExpiresAt: joinCodeExpiresAt,
+        joinCodeMaxUses: joinCodeMaxUses,
+      );
+    } catch (error, stackTrace) {
+      log('Error in GroupsService.createGroup: $error', stackTrace: stackTrace);
+      print('GroupsService.createGroup error: $error');
       return const CreateGroupResultEntity.error(
-        CreateGroupErrorType.alreadyInGroup,
-        'You must leave your current group before creating a new one',
+        CreateGroupErrorType.invalidName,
+        'Failed to create group. Please try again.',
       );
     }
-
-    // Check cooldown
-    if (!await _repository.canJoinGroup(creatorCpId)) {
-      return const CreateGroupResultEntity.error(
-        CreateGroupErrorType.cooldownActive,
-        'You must wait before joining or creating another group',
-      );
-    }
-
-    return await _repository.createGroup(
-      name: name.trim(),
-      description: description.trim(),
-      memberCapacity: memberCapacity,
-      visibility: visibility,
-      joinMethod: joinMethod,
-      creatorCpId: creatorCpId,
-      joinCode: joinCode,
-      joinCodeExpiresAt: joinCodeExpiresAt,
-      joinCodeMaxUses: joinCodeMaxUses,
-    );
   }
 
   /// Join a group directly (for public groups with 'any' join method)
@@ -105,27 +127,36 @@ class GroupsService {
     required String groupId,
     required String cpId,
   }) async {
-    // Check if user already has an active membership
-    final currentMembership = await _repository.getCurrentMembership(cpId);
-    if (currentMembership != null) {
+    try {
+      // Check if user already has an active membership
+      final currentMembership = await _repository.getCurrentMembership(cpId);
+      if (currentMembership != null) {
+        return const JoinResultEntity.error(
+          JoinErrorType.alreadyInGroup,
+          'You must leave your current group before joining another',
+        );
+      }
+
+      // Check cooldown
+      if (!await _repository.canJoinGroup(cpId)) {
+        return const JoinResultEntity.error(
+          JoinErrorType.cooldownActive,
+          'You must wait before joining another group',
+        );
+      }
+
+      return await _repository.joinGroupDirectly(
+        groupId: groupId,
+        cpId: cpId,
+      );
+    } catch (error, stackTrace) {
+      log('Error in GroupsService.joinGroupDirectly: $error', stackTrace: stackTrace);
+      print('GroupsService.joinGroupDirectly error: $error');
       return const JoinResultEntity.error(
-        JoinErrorType.alreadyInGroup,
-        'You must leave your current group before joining another',
+        JoinErrorType.groupNotFound,
+        'Failed to join group. Please try again.',
       );
     }
-
-    // Check cooldown
-    if (!await _repository.canJoinGroup(cpId)) {
-      return const JoinResultEntity.error(
-        JoinErrorType.cooldownActive,
-        'You must wait before joining another group',
-      );
-    }
-
-    return await _repository.joinGroupDirectly(
-      groupId: groupId,
-      cpId: cpId,
-    );
   }
 
   /// Join a group using a code
@@ -141,52 +172,79 @@ class GroupsService {
       );
     }
 
-    // Check if user already has an active membership
-    final currentMembership = await _repository.getCurrentMembership(cpId);
-    if (currentMembership != null) {
+    try {
+      // Check if user already has an active membership
+      final currentMembership = await _repository.getCurrentMembership(cpId);
+      if (currentMembership != null) {
+        return const JoinResultEntity.error(
+          JoinErrorType.alreadyInGroup,
+          'You must leave your current group before joining another',
+        );
+      }
+
+      // Check cooldown
+      if (!await _repository.canJoinGroup(cpId)) {
+        return const JoinResultEntity.error(
+          JoinErrorType.cooldownActive,
+          'You must wait before joining another group',
+        );
+      }
+
+      return await _repository.joinGroupWithCode(
+        groupId: groupId,
+        joinCode: joinCode.trim(),
+        cpId: cpId,
+      );
+    } catch (error, stackTrace) {
+      log('Error in GroupsService.joinGroupWithCode: $error', stackTrace: stackTrace);
+      print('GroupsService.joinGroupWithCode error: $error');
       return const JoinResultEntity.error(
-        JoinErrorType.alreadyInGroup,
-        'You must leave your current group before joining another',
+        JoinErrorType.invalidCode,
+        'Failed to join group. Please try again.',
       );
     }
-
-    // Check cooldown
-    if (!await _repository.canJoinGroup(cpId)) {
-      return const JoinResultEntity.error(
-        JoinErrorType.cooldownActive,
-        'You must wait before joining another group',
-      );
-    }
-
-    return await _repository.joinGroupWithCode(
-      groupId: groupId,
-      joinCode: joinCode.trim(),
-      cpId: cpId,
-    );
   }
 
   /// Leave current group
   Future<LeaveResultEntity> leaveGroup({
     required String cpId,
   }) async {
-    // Check if user has an active membership
-    final currentMembership = await _repository.getCurrentMembership(cpId);
-    if (currentMembership == null) {
-      return const LeaveResultEntity.error(
-        'You are not currently in any group',
-      );
-    }
+    try {
+      // Check if user has an active membership
+      final currentMembership = await _repository.getCurrentMembership(cpId);
+      if (currentMembership == null) {
+        return const LeaveResultEntity.error(
+          'You are not currently in any group',
+        );
+      }
 
-    return await _repository.leaveGroup(cpId: cpId);
+      return await _repository.leaveGroup(cpId: cpId);
+    } catch (error, stackTrace) {
+      log('Error in GroupsService.leaveGroup: $error', stackTrace: stackTrace);
+      print('GroupsService.leaveGroup error: $error');
+      return const LeaveResultEntity.error('Failed to leave group. Please try again.');
+    }
   }
 
   /// Check if user can join groups
   Future<bool> canJoinGroup(String cpId) async {
-    return await _repository.canJoinGroup(cpId);
+    try {
+      return await _repository.canJoinGroup(cpId);
+    } catch (error, stackTrace) {
+      log('Error in GroupsService.canJoinGroup: $error', stackTrace: stackTrace);
+      print('GroupsService.canJoinGroup error: $error');
+      return false; // Default to false on error for safety
+    }
   }
 
   /// Get next allowed join time for user
   Future<DateTime?> getNextJoinAllowedAt(String cpId) async {
-    return await _repository.getNextJoinAllowedAt(cpId);
+    try {
+      return await _repository.getNextJoinAllowedAt(cpId);
+    } catch (error, stackTrace) {
+      log('Error in GroupsService.getNextJoinAllowedAt: $error', stackTrace: stackTrace);
+      print('GroupsService.getNextJoinAllowedAt error: $error');
+      return null; // Default to no restriction on error
+    }
   }
 }
