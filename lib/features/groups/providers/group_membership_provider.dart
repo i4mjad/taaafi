@@ -40,7 +40,7 @@ Future<GroupMembership?> groupMembershipNotifier(ref) async {
   try {
     // Use .future to get the actual future value, bypassing AsyncValue entirely
     final profile = await ref.watch(currentCommunityProfileProvider.future);
-    
+
     if (profile == null) {
       print('groupMembershipNotifier: No community profile found');
       return null;
@@ -53,22 +53,21 @@ Future<GroupMembership?> groupMembershipNotifier(ref) async {
     final membership = await service.getCurrentMembership(profile.id);
 
     if (membership == null) {
-      print('groupMembershipNotifier: No active membership found for user ${profile.id}');
+      print(
+          'groupMembershipNotifier: No active membership found for user ${profile.id}');
       return null;
     }
 
-    print('groupMembershipNotifier: Found membership for group ${membership.groupId}');
+    print(
+        'groupMembershipNotifier: Found membership for group ${membership.groupId}');
 
-    // Get group details
-    final publicGroups = await ref
-        .read(groupsServiceProvider)
-        .getPublicGroups()
-        .first;
-    
-    final group = publicGroups.firstWhere(
-      (g) => g.id == membership.groupId,
-      orElse: () => throw Exception('Group not found: ${membership.groupId}'),
-    );
+    // Get specific group details by ID (not the entire public groups list)
+    final repository = ref.read(groupsRepositoryProvider);
+    final group = await repository.getGroupById(membership.groupId);
+
+    if (group == null) {
+      throw Exception('Group not found: ${membership.groupId}');
+    }
 
     // Convert to legacy Group model for compatibility
     final legacyGroup = Group(
@@ -82,7 +81,8 @@ Future<GroupMembership?> groupMembershipNotifier(ref) async {
       updatedAt: group.updatedAt,
     );
 
-    print('groupMembershipNotifier: Successfully loaded membership for group ${group.name}');
+    print(
+        'groupMembershipNotifier: Successfully loaded membership for group ${group.name}');
     return GroupMembership(
       group: legacyGroup,
       joinedAt: membership.joinedAt,
