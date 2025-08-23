@@ -13,7 +13,9 @@ import 'package:reboot_app_3/features/groups/providers/group_membership_provider
 import 'package:reboot_app_3/features/groups/providers/groups_status_provider.dart';
 
 class LeaveGroupModal extends ConsumerStatefulWidget {
-  const LeaveGroupModal({super.key});
+  final VoidCallback? onLeaveSuccess;
+  
+  const LeaveGroupModal({super.key, this.onLeaveSuccess});
 
   @override
   ConsumerState<LeaveGroupModal> createState() => _LeaveGroupModalState();
@@ -281,8 +283,11 @@ class _LeaveGroupModalState extends ConsumerState<LeaveGroupModal> {
           ),
         );
         
-        // Navigation will be handled by GroupSettingsScreen watching membership changes
-        print('LeaveGroupModal: Leave successful, GroupSettingsScreen will handle navigation');
+        // Trigger success callback for navigation
+        if (widget.onLeaveSuccess != null) {
+          widget.onLeaveSuccess!();
+          print('LeaveGroupModal: Called onLeaveSuccess callback');
+        }
       } else {
         _showError(result.errorMessage ?? l10n.translate('leave-group-failed'));
       }

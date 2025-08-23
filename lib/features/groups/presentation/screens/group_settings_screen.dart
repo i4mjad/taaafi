@@ -14,44 +14,31 @@ import 'package:reboot_app_3/features/groups/presentation/screens/group_member_s
 import 'package:reboot_app_3/features/groups/presentation/screens/group_privacy_settings_screen.dart';
 import 'package:reboot_app_3/features/groups/presentation/screens/group_chat_settings_screen.dart';
 import 'package:reboot_app_3/features/groups/presentation/widgets/leave_group_modal.dart';
-import 'package:reboot_app_3/features/groups/providers/group_membership_provider.dart';
 
 class GroupSettingsScreen extends ConsumerStatefulWidget {
   const GroupSettingsScreen({super.key});
 
   @override
-  ConsumerState<GroupSettingsScreen> createState() => _GroupSettingsScreenState();
+  ConsumerState<GroupSettingsScreen> createState() =>
+      _GroupSettingsScreenState();
 }
 
 class _GroupSettingsScreenState extends ConsumerState<GroupSettingsScreen> {
+  void _handleLeaveSuccess() {
+    print('GroupSettingsScreen: User left group successfully, navigating to groups main');
+    
+    // Navigate to groups main screen
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        context.goNamed(RouteNames.groups.name);
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     final theme = AppTheme.of(context);
     final l10n = AppLocalizations.of(context);
-
-    // Listen for group membership changes
-    ref.listen<AsyncValue<GroupMembership?>>(
-      groupMembershipNotifierProvider,
-      (previous, next) {
-        // If membership becomes null (user left group), navigate to groups main
-        if (previous != null && 
-            previous.hasValue && 
-            previous.value != null &&
-            next.hasValue && 
-            next.value == null) {
-          
-          print('GroupSettingsScreen: Detected user left group, navigating to groups main');
-          
-          // Navigate to groups main screen
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (mounted) {
-              context.goNamed(RouteNames.groups.name);
-            }
-          });
-        }
-      },
-    );
 
     return Scaffold(
       backgroundColor: theme.backgroundColor,
@@ -260,7 +247,7 @@ class _GroupSettingsScreenState extends ConsumerState<GroupSettingsScreen> {
       isScrollControlled: true,
       useSafeArea: true,
       backgroundColor: AppTheme.of(context).backgroundColor,
-      builder: (context) => const LeaveGroupModal(),
+      builder: (context) => LeaveGroupModal(onLeaveSuccess: _handleLeaveSuccess),
     );
   }
 
