@@ -11,6 +11,7 @@ import 'package:reboot_app_3/features/community/presentation/providers/community
 import 'package:reboot_app_3/features/groups/presentation/widgets/group_member_item.dart';
 import 'package:reboot_app_3/features/groups/providers/group_membership_provider.dart';
 import 'package:reboot_app_3/features/groups/providers/group_members_provider.dart';
+import 'package:reboot_app_3/features/groups/application/groups_providers.dart';
 
 class GroupMembersList extends ConsumerWidget {
   const GroupMembersList({super.key});
@@ -46,17 +47,36 @@ class GroupMembersList extends ConsumerWidget {
             final groupMembersAsync =
                 ref.watch(groupMembersProvider(currentMembership.group.id));
 
-            return groupMembersAsync.when(
-              loading: () => _buildLoadingState(theme),
-              error: (error, _) => _buildErrorState(theme, l10n),
-              data: (members) {
-                return _buildMembersList(
-                  context,
-                  theme,
-                  l10n,
-                  members,
-                  currentMembership.memberRole == 'admin',
-                  currentProfile.id,
+            // Get group entity to access creator information
+            final groupRepository = ref.read(groupsRepositoryProvider);
+
+            return FutureBuilder(
+              future: groupRepository.getGroupById(currentMembership.group.id),
+              builder: (context, groupSnapshot) {
+                if (groupSnapshot.connectionState == ConnectionState.waiting) {
+                  return _buildLoadingState(theme);
+                }
+
+                if (groupSnapshot.hasError || !groupSnapshot.hasData) {
+                  return _buildErrorState(theme, l10n);
+                }
+
+                final groupEntity = groupSnapshot.data!;
+
+                return groupMembersAsync.when(
+                  loading: () => _buildLoadingState(theme),
+                  error: (error, _) => _buildErrorState(theme, l10n),
+                  data: (members) {
+                    return _buildMembersList(
+                      context,
+                      theme,
+                      l10n,
+                      members,
+                      currentMembership.memberRole == 'admin',
+                      currentProfile.id,
+                      groupEntity.createdByCpId,
+                    );
+                  },
                 );
               },
             );
@@ -73,6 +93,7 @@ class GroupMembersList extends ConsumerWidget {
     List members,
     bool isCurrentUserAdmin,
     String currentUserCpId,
+    String groupCreatorCpId,
   ) {
     if (members.isEmpty) {
       return WidgetsContainer(
@@ -151,6 +172,7 @@ class GroupMembersList extends ConsumerWidget {
                   membershipEntity: members[i],
                   isCurrentUserAdmin: isCurrentUserAdmin,
                   currentUserCpId: currentUserCpId,
+                  groupCreatorCpId: groupCreatorCpId,
                 ),
                 if (i < members.length - 1)
                   Divider(

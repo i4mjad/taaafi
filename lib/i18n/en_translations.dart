@@ -2856,6 +2856,8 @@ const Map<String, String> kEn = {
   "no-members-found": "No members found",
   "error-loading-members": "Failed to load group members",
   "not-in-group": "You are not in a group",
+  "cannot-demote-group-creator": "Cannot demote the group creator",
+  "cannot-remove-group-creator": "Cannot remove the group creator",
   "refresh-groups": "Refresh",
   "subscription-successful": "Successfully subscribed to group",
   "subscription-failed": "Failed to subscribe to group",

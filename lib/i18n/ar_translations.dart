@@ -2813,6 +2813,8 @@ const Map<String, String> kAr = {
   "no-members-found": "لا يوجد أعضاء",
   "error-loading-members": "فشل في تحميل أعضاء الزمالة",
   "not-in-group": "أنت لست في زمالة",
+  "cannot-demote-group-creator": "لا يمكن تخفيض مؤسس الزمالة",
+  "cannot-remove-group-creator": "لا يمكن إزالة مؤسس الزمالة",
   "refresh-groups": "تحديث",
   "subscription-successful": "تم الاشتراك في المجموعة بنجاح",
   "subscription-failed": "فشل في الاشتراك في المجموعة",

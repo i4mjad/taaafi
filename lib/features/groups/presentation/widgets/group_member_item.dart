@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/shared_widgets/action_modal.dart';
+import 'package:reboot_app_3/core/shared_widgets/snackbar.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
@@ -33,12 +34,14 @@ class GroupMemberItem extends ConsumerWidget {
   final GroupMembershipEntity membershipEntity;
   final bool isCurrentUserAdmin;
   final String currentUserCpId;
+  final String groupCreatorCpId;
 
   const GroupMemberItem({
     super.key,
     required this.membershipEntity,
     required this.isCurrentUserAdmin,
     required this.currentUserCpId,
+    required this.groupCreatorCpId,
   });
 
   @override
@@ -345,13 +348,16 @@ class GroupMemberItem extends ConsumerWidget {
 
     // Admin-only actions
     if (isCurrentUserAdmin) {
-      // Promote/Demote action
+      final isGroupCreator = memberInfo.membership.cpId == groupCreatorCpId;
+
+      // Promote/Demote action (not allowed for group creator)
       if (memberInfo.membership.role == 'admin') {
         actions.add(ActionItem(
           icon: LucideIcons.userMinus,
           title: l10n.translate('demote-to-member'),
           subtitle: l10n.translate('remove-admin-privileges'),
-          onTap: () => _demoteToMember(context, memberInfo, l10n),
+          onTap: () =>
+              _demoteToMember(context, memberInfo, l10n, isGroupCreator),
         ));
       } else {
         actions.add(ActionItem(
@@ -362,13 +368,13 @@ class GroupMemberItem extends ConsumerWidget {
         ));
       }
 
-      // Remove from group action
+      // Remove from group action (not allowed for group creator)
       actions.add(ActionItem(
         icon: LucideIcons.userX,
         title: l10n.translate('remove-from-group'),
         subtitle: l10n.translate('permanently-remove-member'),
         isDestructive: true,
-        onTap: () => _removeMember(context, memberInfo, l10n),
+        onTap: () => _removeMember(context, memberInfo, l10n, isGroupCreator),
       ));
     }
 
@@ -391,16 +397,26 @@ class GroupMemberItem extends ConsumerWidget {
     );
   }
 
-  void _demoteToMember(
-      BuildContext context, GroupMemberInfo memberInfo, AppLocalizations l10n) {
+  void _demoteToMember(BuildContext context, GroupMemberInfo memberInfo,
+      AppLocalizations l10n, bool isGroupCreator) {
+    if (isGroupCreator) {
+      getErrorSnackBar(context, 'cannot-demote-group-creator');
+      return;
+    }
+
     // TODO: Implement demote to member functionality
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(l10n.translate('coming-soon'))),
     );
   }
 
-  void _removeMember(
-      BuildContext context, GroupMemberInfo memberInfo, AppLocalizations l10n) {
+  void _removeMember(BuildContext context, GroupMemberInfo memberInfo,
+      AppLocalizations l10n, bool isGroupCreator) {
+    if (isGroupCreator) {
+      getErrorSnackBar(context, 'cannot-remove-group-creator');
+      return;
+    }
+
     // TODO: Implement remove member functionality
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(l10n.translate('coming-soon'))),
