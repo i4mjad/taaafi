@@ -159,7 +159,8 @@ class GroupsController extends _$GroupsController {
     } catch (error, stackTrace) {
       log('Error in leaveGroup controller: $error', stackTrace: stackTrace);
       print('GroupsController.leaveGroup error: $error');
-      return const LeaveResultEntity.error(null); // UI layer will handle translation based on error type
+      return const LeaveResultEntity.error(
+          null); // UI layer will handle translation based on error type
     }
   }
 }

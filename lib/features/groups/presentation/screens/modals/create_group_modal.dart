@@ -397,7 +397,8 @@ class _CreateGroupModalState extends ConsumerState<CreateGroupModal> {
     }
   }
 
-  String _getCreateErrorMessage(CreateGroupResultEntity result, AppLocalizations l10n) {
+  String _getCreateErrorMessage(
+      CreateGroupResultEntity result, AppLocalizations l10n) {
     switch (result.errorType) {
       case CreateGroupErrorType.cooldownActive:
         return l10n.translate('cooldown-active-create-error');

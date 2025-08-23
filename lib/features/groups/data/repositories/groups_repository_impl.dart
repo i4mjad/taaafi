@@ -60,7 +60,8 @@ class GroupsRepositoryImpl implements GroupsRepository {
   }) async {
     try {
       // Check if user already has active membership
-      final existingMembership = await _dataSource.getCurrentMembership(creatorCpId);
+      final existingMembership =
+          await _dataSource.getCurrentMembership(creatorCpId);
       if (existingMembership != null) {
         return const CreateGroupResultEntity.error(
           CreateGroupErrorType.alreadyInGroup,
@@ -94,7 +95,7 @@ class GroupsRepositoryImpl implements GroupsRepository {
       }
 
       final now = DateTime.now();
-      
+
       // Hash join code if provided
       String? joinCodeHash;
       if (joinCode != null && joinCode.trim().isNotEmpty) {
@@ -362,15 +363,16 @@ class GroupsRepositoryImpl implements GroupsRepository {
       // Get current membership
       final membership = await _dataSource.getCurrentMembership(cpId);
       if (membership == null) {
-        return const LeaveResultEntity.error(null); // UI layer will handle translation based on error type
+        return const LeaveResultEntity.error(
+            null); // UI layer will handle translation based on error type
       }
 
       // Update membership to inactive
       final updatedMembership = GroupMembershipModel.fromEntity(
         membership.toEntity().copyWith(
-          isActive: false,
-          leftAt: DateTime.now(),
-        ),
+              isActive: false,
+              leftAt: DateTime.now(),
+            ),
       );
 
       await _dataSource.updateMembership(updatedMembership);
@@ -382,7 +384,8 @@ class GroupsRepositoryImpl implements GroupsRepository {
       return LeaveResultEntity.success(nextJoinAllowedAt);
     } catch (e, stackTrace) {
       log('Error in leaveGroup: $e', stackTrace: stackTrace);
-      return const LeaveResultEntity.error(null); // UI layer will handle translation based on error type
+      return const LeaveResultEntity.error(
+          null); // UI layer will handle translation based on error type
     }
   }
 
