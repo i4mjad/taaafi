@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
+import 'package:reboot_app_3/core/shared_widgets/snackbar.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
@@ -275,13 +276,7 @@ class _LeaveGroupModalState extends ConsumerState<LeaveGroupModal> {
         Navigator.of(context).pop();
         
         // Show success message
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(l10n.translate('left-group-successfully')),
-            backgroundColor: Colors.green,
-            duration: const Duration(seconds: 2),
-          ),
-        );
+        getSuccessSnackBar(context, 'left-group-successfully');
         
         // Trigger success callback for navigation
         if (widget.onLeaveSuccess != null) {
@@ -303,12 +298,7 @@ class _LeaveGroupModalState extends ConsumerState<LeaveGroupModal> {
   }
 
   void _showError(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: Colors.red,
-      ),
-    );
+    getSystemSnackBar(context, message);
   }
 
   Widget _buildWarningItem({

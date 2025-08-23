@@ -4,6 +4,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
 import 'package:reboot_app_3/core/shared_widgets/custom_textfield.dart';
+import 'package:reboot_app_3/core/shared_widgets/snackbar.dart';
 import 'package:reboot_app_3/core/shared_widgets/platform_switch.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
@@ -281,12 +282,7 @@ class _JoinGroupModalState extends ConsumerState<JoinGroupModal> {
 
       if (result.success) {
         Navigator.of(context).pop();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(l10n.translate('group-joined-successfully')),
-            backgroundColor: Colors.green,
-          ),
-        );
+        getSuccessSnackBar(context, 'group-joined-successfully');
       } else {
         _showError(_getJoinErrorMessage(result, l10n));
       }
@@ -327,12 +323,7 @@ class _JoinGroupModalState extends ConsumerState<JoinGroupModal> {
   }
 
   void _showError(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: Colors.red,
-      ),
-    );
+    getSystemSnackBar(context, message);
   }
 
   void _exploreGroups() {

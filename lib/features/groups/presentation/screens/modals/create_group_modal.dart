@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
+import 'package:reboot_app_3/core/shared_widgets/snackbar.dart';
 import 'package:reboot_app_3/core/shared_widgets/custom_textfield.dart';
 import 'package:reboot_app_3/core/shared_widgets/custom_textarea.dart';
 import 'package:reboot_app_3/core/shared_widgets/platform_dropdown.dart';
@@ -380,12 +381,7 @@ class _CreateGroupModalState extends ConsumerState<CreateGroupModal> {
 
       if (result.success) {
         Navigator.of(context).pop();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(l10n.translate('group-created-successfully')),
-            backgroundColor: Colors.green,
-          ),
-        );
+        getSuccessSnackBar(context, 'group-created-successfully');
       } else {
         _showError(
             result.errorMessage ?? l10n.translate('group-creation-failed'));
@@ -402,12 +398,7 @@ class _CreateGroupModalState extends ConsumerState<CreateGroupModal> {
   }
 
   void _showError(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: Colors.red,
-      ),
-    );
+    getSystemSnackBar(context, message);
   }
 
   void _showJoiningMethodsModal(BuildContext context) {

@@ -25,8 +25,9 @@ class GroupSettingsScreen extends ConsumerStatefulWidget {
 
 class _GroupSettingsScreenState extends ConsumerState<GroupSettingsScreen> {
   void _handleLeaveSuccess() {
-    print('GroupSettingsScreen: User left group successfully, navigating to groups main');
-    
+    print(
+        'GroupSettingsScreen: User left group successfully, navigating to groups main');
+
     // Navigate to groups main screen
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
@@ -247,7 +248,8 @@ class _GroupSettingsScreenState extends ConsumerState<GroupSettingsScreen> {
       isScrollControlled: true,
       useSafeArea: true,
       backgroundColor: AppTheme.of(context).backgroundColor,
-      builder: (context) => LeaveGroupModal(onLeaveSuccess: _handleLeaveSuccess),
+      builder: (context) =>
+          LeaveGroupModal(onLeaveSuccess: _handleLeaveSuccess),
     );
   }
 
