@@ -12,6 +12,7 @@ import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/features/groups/presentation/screens/modals/group_joining_methods_modal.dart';
 import 'package:reboot_app_3/features/groups/application/groups_controller.dart';
 import 'package:reboot_app_3/features/community/presentation/providers/community_providers_new.dart';
+import 'package:reboot_app_3/features/groups/domain/entities/join_result_entity.dart';
 
 enum GroupType { public, private }
 
@@ -383,8 +384,7 @@ class _CreateGroupModalState extends ConsumerState<CreateGroupModal> {
         Navigator.of(context).pop();
         getSuccessSnackBar(context, 'group-created-successfully');
       } else {
-        _showError(
-            result.errorMessage ?? l10n.translate('group-creation-failed'));
+        _showError(_getCreateErrorMessage(result, l10n));
       }
     } catch (error) {
       if (mounted) {
@@ -394,6 +394,25 @@ class _CreateGroupModalState extends ConsumerState<CreateGroupModal> {
       if (mounted) {
         setState(() => _isLoading = false);
       }
+    }
+  }
+
+  String _getCreateErrorMessage(CreateGroupResultEntity result, AppLocalizations l10n) {
+    switch (result.errorType) {
+      case CreateGroupErrorType.cooldownActive:
+        return l10n.translate('cooldown-active-create-error');
+      case CreateGroupErrorType.alreadyInGroup:
+        return l10n.translate('already-in-group-error');
+      case CreateGroupErrorType.invalidName:
+        return l10n.translate('group-name-invalid');
+      case CreateGroupErrorType.invalidCapacity:
+        return l10n.translate('member-count-invalid');
+      case CreateGroupErrorType.capacityRequiresPlusUser:
+        return l10n.translate('member-count-requires-plus');
+      case CreateGroupErrorType.invalidGender:
+        return l10n.translate('gender-requirements-not-met');
+      default:
+        return result.errorMessage ?? l10n.translate('group-creation-failed');
     }
   }
 

@@ -89,7 +89,7 @@ class GroupsService {
       if (currentMembership != null) {
         return const CreateGroupResultEntity.error(
           CreateGroupErrorType.alreadyInGroup,
-          'You must leave your current group before creating a new one',
+          null, // UI layer will handle translation based on error type
         );
       }
 
@@ -97,7 +97,7 @@ class GroupsService {
       if (!await _repository.canJoinGroup(creatorCpId)) {
         return const CreateGroupResultEntity.error(
           CreateGroupErrorType.cooldownActive,
-          'You must wait before joining or creating another group',
+          null, // UI layer will handle translation based on error type
         );
       }
 
@@ -117,7 +117,7 @@ class GroupsService {
       print('GroupsService.createGroup error: $error');
       return const CreateGroupResultEntity.error(
         CreateGroupErrorType.invalidName,
-        'Failed to create group. Please try again.',
+        null, // UI layer will handle translation based on error type
       );
     }
   }
@@ -133,7 +133,7 @@ class GroupsService {
       if (currentMembership != null) {
         return const JoinResultEntity.error(
           JoinErrorType.alreadyInGroup,
-          'You must leave your current group before joining another',
+          null, // UI layer will handle translation based on error type
         );
       }
 
@@ -141,7 +141,7 @@ class GroupsService {
       if (!await _repository.canJoinGroup(cpId)) {
         return const JoinResultEntity.error(
           JoinErrorType.cooldownActive,
-          'You must wait before joining another group',
+          null, // UI layer will handle translation based on error type
         );
       }
 
@@ -154,7 +154,7 @@ class GroupsService {
       print('GroupsService.joinGroupDirectly error: $error');
       return const JoinResultEntity.error(
         JoinErrorType.groupNotFound,
-        'Failed to join group. Please try again.',
+        null, // UI layer will handle translation based on error type
       );
     }
   }
@@ -178,7 +178,7 @@ class GroupsService {
       if (currentMembership != null) {
         return const JoinResultEntity.error(
           JoinErrorType.alreadyInGroup,
-          'You must leave your current group before joining another',
+          null, // UI layer will handle translation based on error type
         );
       }
 
@@ -186,7 +186,7 @@ class GroupsService {
       if (!await _repository.canJoinGroup(cpId)) {
         return const JoinResultEntity.error(
           JoinErrorType.cooldownActive,
-          'You must wait before joining another group',
+          null, // UI layer will handle translation based on error type
         );
       }
 
@@ -200,7 +200,7 @@ class GroupsService {
       print('GroupsService.joinGroupWithCode error: $error');
       return const JoinResultEntity.error(
         JoinErrorType.invalidCode,
-        'Failed to join group. Please try again.',
+        null, // UI layer will handle translation based on error type
       );
     }
   }
@@ -222,7 +222,7 @@ class GroupsService {
     } catch (error, stackTrace) {
       log('Error in GroupsService.leaveGroup: $error', stackTrace: stackTrace);
       print('GroupsService.leaveGroup error: $error');
-      return const LeaveResultEntity.error('Failed to leave group. Please try again.');
+      return const LeaveResultEntity.error(null); // UI layer will handle translation based on error type
     }
   }
 

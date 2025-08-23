@@ -64,7 +64,7 @@ class GroupsRepositoryImpl implements GroupsRepository {
       if (existingMembership != null) {
         return const CreateGroupResultEntity.error(
           CreateGroupErrorType.alreadyInGroup,
-          'You must leave your current group before creating a new one',
+          null, // UI layer will handle translation based on error type
         );
       }
 
@@ -72,7 +72,7 @@ class GroupsRepositoryImpl implements GroupsRepository {
       if (!await _dataSource.canJoinGroup(creatorCpId)) {
         return const CreateGroupResultEntity.error(
           CreateGroupErrorType.cooldownActive,
-          'You must wait before joining or creating another group',
+          null, // UI layer will handle translation based on error type
         );
       }
 
@@ -145,7 +145,7 @@ class GroupsRepositoryImpl implements GroupsRepository {
       log('Error in createGroup: $e', stackTrace: stackTrace);
       return const CreateGroupResultEntity.error(
         CreateGroupErrorType.invalidName,
-        'Failed to create group. Please try again.',
+        null, // UI layer will handle translation based on error type
       );
     }
   }
@@ -161,7 +161,7 @@ class GroupsRepositoryImpl implements GroupsRepository {
       if (group == null) {
         return const JoinResultEntity.error(
           JoinErrorType.groupNotFound,
-          'Group not found',
+          null, // UI layer will handle translation based on error type
         );
       }
 
@@ -169,7 +169,7 @@ class GroupsRepositoryImpl implements GroupsRepository {
       if (!group.isActive) {
         return const JoinResultEntity.error(
           JoinErrorType.groupInactive,
-          'This group is no longer active',
+          null, // UI layer will handle translation based on error type
         );
       }
 
@@ -193,7 +193,7 @@ class GroupsRepositoryImpl implements GroupsRepository {
       if (memberCount >= group.memberCapacity) {
         return const JoinResultEntity.error(
           JoinErrorType.capacityFull,
-          'This group is full',
+          null, // UI layer will handle translation based on error type
         );
       }
 
@@ -202,7 +202,7 @@ class GroupsRepositoryImpl implements GroupsRepository {
       if (userGender != group.gender) {
         return const JoinResultEntity.error(
           JoinErrorType.genderMismatch,
-          'Gender requirements not met for this group',
+          null, // UI layer will handle translation based on error type
         );
       }
 
@@ -210,7 +210,7 @@ class GroupsRepositoryImpl implements GroupsRepository {
       if (!await _dataSource.canJoinGroup(cpId)) {
         return const JoinResultEntity.error(
           JoinErrorType.cooldownActive,
-          'You must wait before joining another group',
+          null, // UI layer will handle translation based on error type
         );
       }
 
@@ -219,7 +219,7 @@ class GroupsRepositoryImpl implements GroupsRepository {
       if (existingMembership != null) {
         return const JoinResultEntity.error(
           JoinErrorType.alreadyInGroup,
-          'You must leave your current group first',
+          null, // UI layer will handle translation based on error type
         );
       }
 
@@ -242,7 +242,7 @@ class GroupsRepositoryImpl implements GroupsRepository {
       log('Error in joinGroupDirectly: $e', stackTrace: stackTrace);
       return const JoinResultEntity.error(
         JoinErrorType.groupNotFound,
-        'Failed to join group. Please try again.',
+        null, // UI layer will handle translation based on error type
       );
     }
   }
@@ -259,7 +259,7 @@ class GroupsRepositoryImpl implements GroupsRepository {
       if (group == null) {
         return const JoinResultEntity.error(
           JoinErrorType.groupNotFound,
-          'Group not found',
+          null, // UI layer will handle translation based on error type
         );
       }
 
@@ -267,7 +267,7 @@ class GroupsRepositoryImpl implements GroupsRepository {
       if (!group.isActive) {
         return const JoinResultEntity.error(
           JoinErrorType.groupInactive,
-          'This group is no longer active',
+          null, // UI layer will handle translation based on error type
         );
       }
 
@@ -290,7 +290,7 @@ class GroupsRepositoryImpl implements GroupsRepository {
       if (!await _dataSource.verifyJoinCode(groupId, joinCode)) {
         return const JoinResultEntity.error(
           JoinErrorType.invalidCode,
-          'Invalid or expired join code',
+          null, // UI layer will handle translation based on error type
         );
       }
 
@@ -299,7 +299,7 @@ class GroupsRepositoryImpl implements GroupsRepository {
       if (memberCount >= group.memberCapacity) {
         return const JoinResultEntity.error(
           JoinErrorType.capacityFull,
-          'This group is full',
+          null, // UI layer will handle translation based on error type
         );
       }
 
@@ -308,7 +308,7 @@ class GroupsRepositoryImpl implements GroupsRepository {
       if (userGender != group.gender) {
         return const JoinResultEntity.error(
           JoinErrorType.genderMismatch,
-          'Gender requirements not met for this group',
+          null, // UI layer will handle translation based on error type
         );
       }
 
@@ -316,7 +316,7 @@ class GroupsRepositoryImpl implements GroupsRepository {
       if (!await _dataSource.canJoinGroup(cpId)) {
         return const JoinResultEntity.error(
           JoinErrorType.cooldownActive,
-          'You must wait before joining another group',
+          null, // UI layer will handle translation based on error type
         );
       }
 
@@ -325,7 +325,7 @@ class GroupsRepositoryImpl implements GroupsRepository {
       if (existingMembership != null) {
         return const JoinResultEntity.error(
           JoinErrorType.alreadyInGroup,
-          'You must leave your current group first',
+          null, // UI layer will handle translation based on error type
         );
       }
 
@@ -351,7 +351,7 @@ class GroupsRepositoryImpl implements GroupsRepository {
       log('Error in joinGroupWithCode: $e', stackTrace: stackTrace);
       return const JoinResultEntity.error(
         JoinErrorType.invalidCode,
-        'Failed to join group. Please try again.',
+        null, // UI layer will handle translation based on error type
       );
     }
   }
@@ -362,7 +362,7 @@ class GroupsRepositoryImpl implements GroupsRepository {
       // Get current membership
       final membership = await _dataSource.getCurrentMembership(cpId);
       if (membership == null) {
-        return const LeaveResultEntity.error('You are not in any group');
+        return const LeaveResultEntity.error(null); // UI layer will handle translation based on error type
       }
 
       // Update membership to inactive
@@ -382,8 +382,7 @@ class GroupsRepositoryImpl implements GroupsRepository {
       return LeaveResultEntity.success(nextJoinAllowedAt);
     } catch (e, stackTrace) {
       log('Error in leaveGroup: $e', stackTrace: stackTrace);
-      return const LeaveResultEntity.error(
-          'Failed to leave group. Please try again.');
+      return const LeaveResultEntity.error(null); // UI layer will handle translation based on error type
     }
   }
 

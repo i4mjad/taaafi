@@ -20,7 +20,7 @@ class JoinResultEntity {
         errorType = null,
         membership = membership;
 
-  const JoinResultEntity.error(JoinErrorType type, String message)
+  const JoinResultEntity.error(JoinErrorType type, String? message)
       : success = false,
         errorType = type,
         errorMessage = message,
@@ -62,7 +62,7 @@ class CreateGroupResultEntity {
         errorType = null,
         membership = membership;
 
-  const CreateGroupResultEntity.error(CreateGroupErrorType type, String message)
+  const CreateGroupResultEntity.error(CreateGroupErrorType type, String? message)
       : success = false,
         errorType = type,
         errorMessage = message,
@@ -97,7 +97,7 @@ class LeaveResultEntity {
         errorMessage = null,
         nextJoinAllowedAt = nextJoinAllowedAt;
 
-  const LeaveResultEntity.error(String message)
+  const LeaveResultEntity.error(String? message)
       : success = false,
         errorMessage = message,
         nextJoinAllowedAt = null;

@@ -60,7 +60,7 @@ class GroupsController extends _$GroupsController {
       print('GroupsController.createGroup error: $error');
       return CreateGroupResultEntity.error(
         CreateGroupErrorType.invalidName,
-        'Unexpected error occurred',
+        null, // UI layer will handle translation based on error type
       );
     }
   }
@@ -92,7 +92,7 @@ class GroupsController extends _$GroupsController {
       print('GroupsController.joinGroupDirectly error: $error');
       return const JoinResultEntity.error(
         JoinErrorType.groupNotFound,
-        'Unexpected error occurred',
+        null, // UI layer will handle translation based on error type
       );
     }
   }
@@ -126,7 +126,7 @@ class GroupsController extends _$GroupsController {
       print('GroupsController.joinGroupWithCode error: $error');
       return const JoinResultEntity.error(
         JoinErrorType.invalidCode,
-        'Unexpected error occurred',
+        null, // UI layer will handle translation based on error type
       );
     }
   }
@@ -159,7 +159,7 @@ class GroupsController extends _$GroupsController {
     } catch (error, stackTrace) {
       log('Error in leaveGroup controller: $error', stackTrace: stackTrace);
       print('GroupsController.leaveGroup error: $error');
-      return const LeaveResultEntity.error('Unexpected error occurred');
+      return const LeaveResultEntity.error(null); // UI layer will handle translation based on error type
     }
   }
 }
