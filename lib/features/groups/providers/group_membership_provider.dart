@@ -38,11 +38,8 @@ class GroupMembership {
 @riverpod
 Future<GroupMembership?> groupMembershipNotifier(ref) async {
   try {
-    // Simply watch the community profile - let Riverpod handle AsyncValue states
-    final profileAsync = ref.watch(currentCommunityProfileProvider);
-    
-    // Extract profile value - this will be null if loading/error
-    final profile = profileAsync.valueOrNull;
+    // Use .future to get the actual future value, bypassing AsyncValue entirely
+    final profile = await ref.watch(currentCommunityProfileProvider.future);
     
     if (profile == null) {
       print('groupMembershipNotifier: No community profile found');
