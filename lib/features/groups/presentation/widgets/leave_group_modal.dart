@@ -9,6 +9,8 @@ import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/core/theming/custom_theme_data.dart';
 import 'package:reboot_app_3/features/groups/application/groups_controller.dart';
 import 'package:reboot_app_3/features/community/presentation/providers/community_providers_new.dart';
+import 'package:reboot_app_3/features/groups/providers/group_membership_provider.dart';
+import 'package:reboot_app_3/features/groups/providers/groups_status_provider.dart';
 
 class LeaveGroupModal extends ConsumerStatefulWidget {
   const LeaveGroupModal({super.key});
@@ -238,6 +240,11 @@ class _LeaveGroupModalState extends ConsumerState<LeaveGroupModal> {
       if (!mounted) return;
 
       if (result.success) {
+        // Explicitly invalidate providers to ensure UI updates
+        ref.invalidate(groupMembershipNotifierProvider);
+        ref.invalidate(groupsStatusProvider);
+        print('LeaveGroupModal: Providers invalidated after successful leave');
+        
         Navigator.of(context).pop();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -306,17 +313,6 @@ class _LeaveGroupModalState extends ConsumerState<LeaveGroupModal> {
           ),
         ),
       ],
-    );
-  }
-
-  /// Show the leave group modal
-  static void show(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      useSafeArea: true,
-      backgroundColor: AppTheme.of(context).backgroundColor,
-      builder: (context) => const LeaveGroupModal(),
     );
   }
 }

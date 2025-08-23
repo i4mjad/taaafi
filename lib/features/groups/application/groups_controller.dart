@@ -135,10 +135,17 @@ class GroupsController extends _$GroupsController {
       final result = await service.leaveGroup(cpId: cpId);
 
       if (result.success) {
-        // Refresh membership and status providers after leaving
+        // Refresh all relevant providers after leaving
         ref.invalidate(groupMembershipNotifierProvider);
         ref.invalidate(groupsStatusProvider);
-        print('GroupsController: Left group successfully, providers invalidated');
+        
+        // Also invalidate any other group-related providers
+        if (ref.exists(publicGroupsProvider)) {
+          ref.invalidate(publicGroupsProvider);
+        }
+        
+        print('GroupsController: Left group successfully, all providers invalidated');
+        print('GroupsController: Next join allowed at: ${result.nextJoinAllowedAt}');
       }
 
       return result;
