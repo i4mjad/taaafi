@@ -21,19 +21,20 @@ Future<GroupsStatus> groupsStatus(Ref ref) async {
   final groupMembershipAsync = ref.watch(groupMembershipNotifierProvider);
 
   // Check if any provider is still loading
-  if (hasCommunityProfileAsync.isLoading || 
-      currentProfileAsync.isLoading || 
+  if (hasCommunityProfileAsync.isLoading ||
+      currentProfileAsync.isLoading ||
       groupMembershipAsync.isLoading) {
     return GroupsStatus.loading;
   }
 
   // Check for errors in any provider
-  if (hasCommunityProfileAsync.hasError || 
-      currentProfileAsync.hasError || 
+  if (hasCommunityProfileAsync.hasError ||
+      currentProfileAsync.hasError ||
       groupMembershipAsync.hasError) {
     print('Provider error detected:');
     if (hasCommunityProfileAsync.hasError) {
-      print('  hasCommunityProfileAsync error: ${hasCommunityProfileAsync.error}');
+      print(
+          '  hasCommunityProfileAsync error: ${hasCommunityProfileAsync.error}');
     }
     if (currentProfileAsync.hasError) {
       print('  currentProfileAsync error: ${currentProfileAsync.error}');

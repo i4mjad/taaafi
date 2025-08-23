@@ -40,45 +40,58 @@ Future<GroupMembership?> groupMembershipNotifier(ref) async {
   // Get current community profile
   final profileAsync = ref.watch(currentCommunityProfileProvider);
 
-  return await profileAsync.when(
-    data: (profile) async {
-      if (profile == null) return null;
+  // Check if profile is still loading
+  if (profileAsync.isLoading) {
+    return null; // Return null for loading state
+  }
 
-      // Get membership from backend
-      final service = ref.read(groupsServiceProvider);
-      final membership = await service.getCurrentMembership(profile.id);
+  // Check for errors
+  if (profileAsync.hasError) {
+    print('groupMembershipNotifier error: ${profileAsync.error}');
+    return null;
+  }
 
-      if (membership == null) return null;
+  // Get the profile value
+  final profile = profileAsync.value;
+  if (profile == null) return null;
 
-      // Get group details
-      final group = await ref
-          .read(groupsServiceProvider)
-          .getPublicGroups()
-          .first
-          .where((groups) => groups.any((g) => g.id == membership.groupId))
-          .map((groups) => groups.firstWhere((g) => g.id == membership.groupId))
-          .first;
+  try {
+    // Get membership from backend
+    final service = ref.read(groupsServiceProvider);
+    final membership = await service.getCurrentMembership(profile.id);
 
-      // Convert to legacy Group model for compatibility
-      final legacyGroup = Group(
-        id: group.id,
-        name: group.name,
-        description: group.description,
-        memberCount: 0, // Will need to be fetched separately
-        capacity: group.memberCapacity,
-        gender: group.gender,
-        createdAt: group.createdAt,
-        updatedAt: group.updatedAt,
-      );
+    if (membership == null) return null;
 
-      return GroupMembership(
-        group: legacyGroup,
-        joinedAt: membership.joinedAt,
-        memberRole: membership.role,
-        totalPoints: membership.pointsTotal,
-      );
-    },
-    loading: () async => null,
-    error: (_, __) async => null,
-  );
+    // Get group details
+    final group = await ref
+        .read(groupsServiceProvider)
+        .getPublicGroups()
+        .first
+        .where((groups) => groups.any((g) => g.id == membership.groupId))
+        .map((groups) => groups.firstWhere((g) => g.id == membership.groupId))
+        .first;
+
+    // Convert to legacy Group model for compatibility
+    final legacyGroup = Group(
+      id: group.id,
+      name: group.name,
+      description: group.description,
+      memberCount: 0, // Will need to be fetched separately
+      capacity: group.memberCapacity,
+      gender: group.gender,
+      createdAt: group.createdAt,
+      updatedAt: group.updatedAt,
+    );
+
+    return GroupMembership(
+      group: legacyGroup,
+      joinedAt: membership.joinedAt,
+      memberRole: membership.role,
+      totalPoints: membership.pointsTotal,
+    );
+  } catch (error, stackTrace) {
+    print('Error in groupMembershipNotifier: $error');
+    print('StackTrace: $stackTrace');
+    return null;
+  }
 }
