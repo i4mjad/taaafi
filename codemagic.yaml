@@ -67,39 +67,49 @@ workflows:
         - SHOREBIRD
       vars:
         APP_STORE_APPLE_ID: 1531562469
+        XCODE_WORKSPACE: "Runner.xcworkspace"
+        XCODE_SCHEME: "Runner-NoDA" # Scheme that does NOT build/embed the Device Activity extension
     scripts:
       - name: Install Shorebird
         script: |
-          # Install Shorebird
           curl --proto '=https' --tlsv1.2 https://raw.githubusercontent.com/shorebirdtech/install/main/install.sh -sSf | bash
-
-          # Add Shorebird to PATH
           echo PATH="$HOME/.shorebird/bin:$PATH" >> $CM_ENV
+
+      - name: Select Xcode scheme
+        script: |
+          xcode-project select --workspace "ios/$XCODE_WORKSPACE" --scheme "$XCODE_SCHEME"
+
       - name: Set up code signing settings on Xcode project
-        script: xcode-project use-profiles
+        script: |
+          xcode-project use-profiles --workspace "ios/$XCODE_WORKSPACE" --scheme "$XCODE_SCHEME"
+
       - name: Get Flutter packages
         script: |
           flutter packages pub get
+
       - name: Install pods
         script: |
           find . -name "Podfile" -execdir pod install \;
+
       - name: Update Info.plist
         script: |
-          # Extract version and build number from codemagic.yaml
           VERSION=$(cat pubspec.yaml | grep 'version:' | head -1 | awk '{print $2}' | cut -d '+' -f 1)
           BUILD_NUMBER=$(($(app-store-connect get-latest-testflight-build-number "$APP_STORE_APPLE_ID") + 1))
-
-          # Path to Info.plist
           PLIST_PATH="./ios/Runner/Info.plist"
-
-          # Update CFBundleShortVersionString and CFBundleVersion in Info.plist
           /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $VERSION" "$PLIST_PATH"
           /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $BUILD_NUMBER" "$PLIST_PATH"
 
+      - name: Guard ensure extension is NOT embedded
+        script: |
+          if grep -q "Embed App Extensions" ios/Runner.xcodeproj/project.pbxproj && \
+             grep -q "FocusDeviceActivityMonitor" ios/Runner.xcodeproj/project.pbxproj; then
+            echo "❌ Extension still embedded in Runner target. Remove it from Embed App Extensions & Target Dependencies."
+            exit 1
+          fi
+          echo "✅ No extension embedded."
+
       - name: Flutter build ipa (Shorebird release)
         script: |
-          VERSION=$(cat pubspec.yaml | grep 'version:' | head -1 | awk '{print $2}' | cut -d '+' -f 1)
-          BUILD_NUMBER=$(app-store-connect get-latest-testflight-build-number "$APP_STORE_APPLE_ID")
           shorebird release ios --flutter-version=3.32.5 --export-options-plist=ios/buildInfo.plist
     artifacts:
       - build/ios/ipa/*.ipa
@@ -129,31 +139,47 @@ workflows:
         - SHOREBIRD
       vars:
         APP_STORE_APPLE_ID: 1531562469
+        XCODE_WORKSPACE: "Runner.xcworkspace"
+        XCODE_SCHEME: "Runner-NoDA"
     scripts:
       - name: Install Shorebird
         script: |
-          # Install Shorebird
           curl --proto '=https' --tlsv1.2 https://raw.githubusercontent.com/shorebirdtech/install/main/install.sh -sSf | bash
-
-          # Add Shorebird to PATH
           echo PATH="$HOME/.shorebird/bin:$PATH" >> $CM_ENV
+
+      - name: Select Xcode scheme
+        script: |
+          xcode-project select --workspace "ios/$XCODE_WORKSPACE" --scheme "$XCODE_SCHEME"
+
       - name: Set up code signing settings on Xcode project
-        script: xcode-project use-profiles
+        script: |
+          xcode-project use-profiles --workspace "ios/$XCODE_WORKSPACE" --scheme "$XCODE_SCHEME"
+
       - name: Get Flutter packages
         script: |
           flutter packages pub get
+
       - name: Install pods
         script: |
           find . -name "Podfile" -execdir pod install \;
+
+      - name: Guard ensure extension is NOT embedded
+        script: |
+          if grep -q "Embed App Extensions" ios/Runner.xcodeproj/project.pbxproj && \
+             grep -q "FocusDeviceActivityMonitor" ios/Runner.xcodeproj/project.pbxproj; then
+            echo "❌ Extension still embedded in Runner target. Remove it first."
+            exit 1
+          fi
+          echo "✅ No extension embedded."
+
       - name: Determine Release Version
         script: |
           VERSION=$(cat pubspec.yaml | grep 'version:' | head -1 | awk '{print $2}' | cut -d '+' -f 1)
           BUILD_NUMBER=$(app-store-connect get-latest-testflight-build-number "$APP_STORE_APPLE_ID")
           RELEASE_VERSION="$VERSION+$BUILD_NUMBER"
-          # Persist for subsequent steps
           echo "RELEASE_VERSION=$RELEASE_VERSION" >> $CM_ENV
+
       - name: Shorebird Patch
-        # Run `shorebird patch ios` to patch the specified release.
         script: |
           shorebird patch ios \
             --release-version="$RELEASE_VERSION" \
@@ -239,42 +265,63 @@ workflows:
         APP_STORE_APPLE_ID: 1531562469
         PACKAGE_NAME: "com.amjadkhalfan.reboot_app_3"
         GOOGLE_PLAY_TRACK: alpha
+        XCODE_WORKSPACE: "Runner.xcworkspace"
+        XCODE_SCHEME: "Runner-NoDA"
     scripts:
       - name: Install Shorebird
         script: |
-          # Install Shorebird
           curl --proto '=https' --tlsv1.2 https://raw.githubusercontent.com/shorebirdtech/install/main/install.sh -sSf | bash
-
-          # Add Shorebird to PATH
           echo PATH="$HOME/.shorebird/bin:$PATH" >> $CM_ENV
+
+      - name: Select Xcode scheme
+        script: |
+          xcode-project select --workspace "ios/$XCODE_WORKSPACE" --scheme "$XCODE_SCHEME"
+
       - name: Set up code signing settings on Xcode project
-        script: xcode-project use-profiles
+        script: |
+          xcode-project use-profiles --workspace "ios/$XCODE_WORKSPACE" --scheme "$XCODE_SCHEME"
+
       - name: Set up local.properties
         script: |
           echo "flutter.sdk=$HOME/programs/flutter" > "$CM_BUILD_DIR/android/local.properties"
+
       - name: Get Flutter packages
         script: |
           flutter packages pub get
+
       - name: Install pods
         script: |
           find . -name "Podfile" -execdir pod install \;
+
+      - name: Guard ensure extension is NOT embedded
+        script: |
+          if grep -q "Embed App Extensions" ios/Runner.xcodeproj/project.pbxproj && \
+             grep -q "FocusDeviceActivityMonitor" ios/Runner.xcodeproj/project.pbxproj; then
+            echo "❌ Extension still embedded in Runner target. Remove it first."
+            exit 1
+          fi
+          echo "✅ No extension embedded."
+
       - name: Determine Android Release Version
         script: |
           VERSION=$(cat pubspec.yaml | grep 'version:' | head -1 | awk '{print $2}' | cut -d '+' -f 1)
           BUILD_NUMBER_ANDROID=$(google-play get-latest-build-number --package-name "$PACKAGE_NAME" --tracks="$GOOGLE_PLAY_TRACK")
           ANDROID_RELEASE_VERSION="$VERSION+$BUILD_NUMBER_ANDROID"
           echo "ANDROID_RELEASE_VERSION=$ANDROID_RELEASE_VERSION" >> $CM_ENV
+
       - name: Determine iOS Release Version
         script: |
           VERSION=$(cat pubspec.yaml | grep 'version:' | head -1 | awk '{print $2}' | cut -d '+' -f 1)
           BUILD_NUMBER_IOS=$(app-store-connect get-latest-testflight-build-number "$APP_STORE_APPLE_ID")
           IOS_RELEASE_VERSION="$VERSION+$BUILD_NUMBER_IOS"
           echo "IOS_RELEASE_VERSION=$IOS_RELEASE_VERSION" >> $CM_ENV
+
       - name: Shorebird Patch Android
         script: |
           shorebird patch android \
             --release-version="$ANDROID_RELEASE_VERSION" \
             --target lib/main_prod.dart
+
       - name: Shorebird Patch iOS
         script: |
           shorebird patch ios \
@@ -312,25 +359,34 @@ workflows:
         APP_STORE_APPLE_ID: 1531562469
         PACKAGE_NAME: "com.amjadkhalfan.reboot_app_3"
         GOOGLE_PLAY_TRACK: alpha
+        XCODE_WORKSPACE: "Runner.xcworkspace"
+        XCODE_SCHEME: "Runner-NoDA"
     scripts:
       - name: Install Shorebird
         script: |
-          # Install Shorebird
           curl --proto '=https' --tlsv1.2 https://raw.githubusercontent.com/shorebirdtech/install/main/install.sh -sSf | bash
-
-          # Add Shorebird to PATH
           echo PATH="$HOME/.shorebird/bin:$PATH" >> $CM_ENV
+
+      - name: Select Xcode scheme
+        script: |
+          xcode-project select --workspace "ios/$XCODE_WORKSPACE" --scheme "$XCODE_SCHEME"
+
       - name: Set up code signing settings on Xcode project
-        script: xcode-project use-profiles
+        script: |
+          xcode-project use-profiles --workspace "ios/$XCODE_WORKSPACE" --scheme "$XCODE_SCHEME"
+
       - name: Set up local.properties
         script: |
           echo "flutter.sdk=$HOME/programs/flutter" > "$CM_BUILD_DIR/android/local.properties"
+
       - name: Get Flutter packages
         script: |
           flutter packages pub get
+
       - name: Install pods
         script: |
           find . -name "Podfile" -execdir pod install \;
+
       - name: Prepare Android build number
         script: |
           VERSION=$(cat pubspec.yaml | grep 'version:' | head -1 | awk '{print $2}' | cut -d '+' -f 1)
@@ -341,6 +397,7 @@ workflows:
           fi
           echo "VERSION=$VERSION" >> $CM_ENV
           echo "ANDROID_BUILD_NUMBER=$BUILD_NUMBER" >> $CM_ENV
+
       - name: Update Info.plist for iOS
         script: |
           VERSION=$(cat pubspec.yaml | grep 'version:' | head -1 | awk '{print $2}' | cut -d '+' -f 1)
@@ -349,12 +406,23 @@ workflows:
           /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $VERSION" "$PLIST_PATH"
           /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $BUILD_NUMBER_IOS" "$PLIST_PATH"
           echo "IOS_BUILD_NUMBER=$BUILD_NUMBER_IOS" >> $CM_ENV
+
+      - name: Guard ensure extension is NOT embedded
+        script: |
+          if grep -q "Embed App Extensions" ios/Runner.xcodeproj/project.pbxproj && \
+             grep -q "FocusDeviceActivityMonitor" ios/Runner.xcodeproj/project.pbxproj; then
+            echo "❌ Extension still embedded in Runner target. Remove it first."
+            exit 1
+          fi
+          echo "✅ No extension embedded."
+
       - name: Shorebird Release Android
         script: |
           shorebird release android --flutter-version=3.32.5 \
             --build-name=$VERSION \
             --build-number=$ANDROID_BUILD_NUMBER \
             --target lib/main_prod.dart
+
       - name: Shorebird Release iOS
         script: |
           shorebird release ios --flutter-version=3.32.5 \
