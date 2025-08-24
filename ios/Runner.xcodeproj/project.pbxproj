@@ -13,7 +13,7 @@
 		5EA8F1FB30CEAEBC11E567D2 /* Pods_RunnerTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AB23BEC135D5F41194871325 /* Pods_RunnerTests.framework */; };
 		6D3DB6FB2E50AF9F00140714 /* FocusLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D3DB6FA2E50AF9F00140714 /* FocusLogger.swift */; };
 		6DB3DF082E507DAD0063474F /* DeviceActivity.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6DB3DF072E507DAD0063474F /* DeviceActivity.framework */; };
-		6DB3DF102E507DAD0063474F /* FocusDeviceActivityMonitor.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 6DB3DF062E507DAD0063474F /* FocusDeviceActivityMonitor.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		/* 6DB3DF102E507DAD0063474F FocusDeviceActivityMonitor.appex in Embed Foundation Extensions - DISABLED */ 
 		6DB3DF212E507F730063474F /* FamilyPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DB3DF1C2E507F730063474F /* FamilyPickerView.swift */; };
 		6DB3DF222E507F730063474F /* FocusSelectionStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DB3DF1E2E507F730063474F /* FocusSelectionStore.swift */; };
 		6DB3DF232E507F730063474F /* FocusShared.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DB3DF1F2E507F730063474F /* FocusShared.swift */; };
@@ -46,7 +46,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
-				6DB3DF102E507DAD0063474F /* FocusDeviceActivityMonitor.appex in Embed Foundation Extensions */,
+				/* 6DB3DF102E507DAD0063474F FocusDeviceActivityMonitor.appex in Embed Foundation Extensions - DISABLED */
 			);
 			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -206,7 +206,7 @@
 			children = (
 				97C146EE1CF9000F007C117D /* Runner.app */,
 				331C8081294A63A400263BE5 /* RunnerTests.xctest */,
-				6DB3DF062E507DAD0063474F /* FocusDeviceActivityMonitor.appex */,
+				/* 6DB3DF062E507DAD0063474F FocusDeviceActivityMonitor.appex - DISABLED */
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -286,7 +286,7 @@
 				97C146EB1CF9000F007C117D /* Frameworks */,
 				97C146EC1CF9000F007C117D /* Resources */,
 				9705A1C41CF9048500538489 /* Embed Frameworks */,
-				6DB3DF112E507DAD0063474F /* Embed Foundation Extensions */,
+				/* 6DB3DF112E507DAD0063474F Embed Foundation Extensions - DISABLED */
 				3B06AD1E1E4923F5004D2608 /* Thin Binary */,
 				66E837351622007F3D4D19FB /* [CP] Copy Pods Resources */,
 				7421985DD294C8E5AF81D4AF /* [CP] Embed Pods Frameworks */,
@@ -339,7 +339,7 @@
 			targets = (
 				97C146ED1CF9000F007C117D /* Runner */,
 				331C8080294A63A400263BE5 /* RunnerTests */,
-				6DB3DF052E507DAD0063474F /* FocusDeviceActivityMonitor */,
+				/* 6DB3DF052E507DAD0063474F FocusDeviceActivityMonitor - DISABLED */
 			);
 		};
 /* End PBXProject section */

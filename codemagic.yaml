@@ -67,17 +67,17 @@ workflows:
         - SHOREBIRD
       vars:
         APP_STORE_APPLE_ID: 1531562469
-        XCODE_WORKSPACE: "Runner.xcworkspace"
-        XCODE_SCHEME: "Runner-NoDA" # Scheme that does NOT build/embed the Device Activity extension
+        # XCODE_WORKSPACE: "Runner.xcworkspace"
+        # XCODE_SCHEME: "Runner-NoDA" # Scheme that does NOT build/embed the Device Activity extension
     scripts:
       - name: Install Shorebird
         script: |
           curl --proto '=https' --tlsv1.2 https://raw.githubusercontent.com/shorebirdtech/install/main/install.sh -sSf | bash
           echo PATH="$HOME/.shorebird/bin:$PATH" >> $CM_ENV
 
-      - name: Set up code signing settings on Xcode project
-        script: |
-          xcode-project use-profiles --workspace "ios/$XCODE_WORKSPACE" --scheme "$XCODE_SCHEME"
+      # - name: Set up code signing settings on Xcode project
+      #   script: |
+      #     xcode-project use-profiles --workspace "ios/$XCODE_WORKSPACE" --scheme "$XCODE_SCHEME"
 
       - name: Get Flutter packages
         script: |
@@ -95,16 +95,16 @@ workflows:
           /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $VERSION" "$PLIST_PATH"
           /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $BUILD_NUMBER" "$PLIST_PATH"
 
-      - name: Remove Device Activity Extension from build
-        script: |
-          # Create backup of project file
-          cp ios/Runner.xcodeproj/project.pbxproj ios/Runner.xcodeproj/project.pbxproj.backup
-          
-          # Remove the extension from Embed Foundation Extensions build phase (two lines)
-          sed -i '' '/6DB3DF102E507DAD0063474F.*FocusDeviceActivityMonitor\.appex.*Embed Foundation Extensions/d' ios/Runner.xcodeproj/project.pbxproj
-          sed -i '' '/6DB3DF102E507DAD0063474F.*FocusDeviceActivityMonitor\.appex in Embed Foundation Extensions/d' ios/Runner.xcodeproj/project.pbxproj
-          
-          echo "✅ Device Activity Extension removed from build process"
+      # - name: Remove Device Activity Extension from build
+      #   script: |
+      #     # Create backup of project file
+      #     cp ios/Runner.xcodeproj/project.pbxproj ios/Runner.xcodeproj/project.pbxproj.backup
+      #     
+      #     # Remove the extension from Embed Foundation Extensions build phase (two lines)
+      #     sed -i '' '/6DB3DF102E507DAD0063474F.*FocusDeviceActivityMonitor\.appex.*Embed Foundation Extensions/d' ios/Runner.xcodeproj/project.pbxproj
+      #     sed -i '' '/6DB3DF102E507DAD0063474F.*FocusDeviceActivityMonitor\.appex in Embed Foundation Extensions/d' ios/Runner.xcodeproj/project.pbxproj
+      #     
+      #     echo "✅ Device Activity Extension removed from build process"
 
       - name: Flutter build ipa (Shorebird release)
         script: |
@@ -137,17 +137,17 @@ workflows:
         - SHOREBIRD
       vars:
         APP_STORE_APPLE_ID: 1531562469
-        XCODE_WORKSPACE: "Runner.xcworkspace"
-        XCODE_SCHEME: "Runner-NoDA"
+        # XCODE_WORKSPACE: "Runner.xcworkspace"
+        # XCODE_SCHEME: "Runner-NoDA"
     scripts:
       - name: Install Shorebird
         script: |
           curl --proto '=https' --tlsv1.2 https://raw.githubusercontent.com/shorebirdtech/install/main/install.sh -sSf | bash
           echo PATH="$HOME/.shorebird/bin:$PATH" >> $CM_ENV
 
-      - name: Set up code signing settings on Xcode project
-        script: |
-          xcode-project use-profiles --workspace "ios/$XCODE_WORKSPACE" --scheme "$XCODE_SCHEME"
+      # - name: Set up code signing settings on Xcode project
+      #   script: |
+      #     xcode-project use-profiles --workspace "ios/$XCODE_WORKSPACE" --scheme "$XCODE_SCHEME"
 
       - name: Get Flutter packages
         script: |
@@ -157,16 +157,16 @@ workflows:
         script: |
           find . -name "Podfile" -execdir pod install \;
 
-      - name: Remove Device Activity Extension from build
-        script: |
-          # Create backup of project file
-          cp ios/Runner.xcodeproj/project.pbxproj ios/Runner.xcodeproj/project.pbxproj.backup
-          
-          # Remove the extension from Embed Foundation Extensions build phase (two lines)
-          sed -i '' '/6DB3DF102E507DAD0063474F.*FocusDeviceActivityMonitor\.appex.*Embed Foundation Extensions/d' ios/Runner.xcodeproj/project.pbxproj
-          sed -i '' '/6DB3DF102E507DAD0063474F.*FocusDeviceActivityMonitor\.appex in Embed Foundation Extensions/d' ios/Runner.xcodeproj/project.pbxproj
-          
-          echo "✅ Device Activity Extension removed from build process"
+      # - name: Remove Device Activity Extension from build
+      #   script: |
+      #     # Create backup of project file
+      #     cp ios/Runner.xcodeproj/project.pbxproj ios/Runner.xcodeproj/project.pbxproj.backup
+      #     
+      #     # Remove the extension from Embed Foundation Extensions build phase (two lines)
+      #     sed -i '' '/6DB3DF102E507DAD0063474F.*FocusDeviceActivityMonitor\.appex.*Embed Foundation Extensions/d' ios/Runner.xcodeproj/project.pbxproj
+      #     sed -i '' '/6DB3DF102E507DAD0063474F.*FocusDeviceActivityMonitor\.appex in Embed Foundation Extensions/d' ios/Runner.xcodeproj/project.pbxproj
+      #     
+      #     echo "✅ Device Activity Extension removed from build process"
 
       - name: Determine Release Version
         script: |
@@ -261,17 +261,17 @@ workflows:
         APP_STORE_APPLE_ID: 1531562469
         PACKAGE_NAME: "com.amjadkhalfan.reboot_app_3"
         GOOGLE_PLAY_TRACK: alpha
-        XCODE_WORKSPACE: "Runner.xcworkspace"
-        XCODE_SCHEME: "Runner-NoDA"
+        # XCODE_WORKSPACE: "Runner.xcworkspace"
+        # XCODE_SCHEME: "Runner-NoDA"
     scripts:
       - name: Install Shorebird
         script: |
           curl --proto '=https' --tlsv1.2 https://raw.githubusercontent.com/shorebirdtech/install/main/install.sh -sSf | bash
           echo PATH="$HOME/.shorebird/bin:$PATH" >> $CM_ENV
 
-      - name: Set up code signing settings on Xcode project
-        script: |
-          xcode-project use-profiles --workspace "ios/$XCODE_WORKSPACE" --scheme "$XCODE_SCHEME"
+      # - name: Set up code signing settings on Xcode project
+      #   script: |
+      #     xcode-project use-profiles --workspace "ios/$XCODE_WORKSPACE" --scheme "$XCODE_SCHEME"
 
       - name: Set up local.properties
         script: |
@@ -285,16 +285,16 @@ workflows:
         script: |
           find . -name "Podfile" -execdir pod install \;
 
-      - name: Remove Device Activity Extension from build
-        script: |
-          # Create backup of project file
-          cp ios/Runner.xcodeproj/project.pbxproj ios/Runner.xcodeproj/project.pbxproj.backup
-          
-          # Remove the extension from Embed Foundation Extensions build phase (two lines)
-          sed -i '' '/6DB3DF102E507DAD0063474F.*FocusDeviceActivityMonitor\.appex.*Embed Foundation Extensions/d' ios/Runner.xcodeproj/project.pbxproj
-          sed -i '' '/6DB3DF102E507DAD0063474F.*FocusDeviceActivityMonitor\.appex in Embed Foundation Extensions/d' ios/Runner.xcodeproj/project.pbxproj
-          
-          echo "✅ Device Activity Extension removed from build process"
+      # - name: Remove Device Activity Extension from build
+      #   script: |
+      #     # Create backup of project file
+      #     cp ios/Runner.xcodeproj/project.pbxproj ios/Runner.xcodeproj/project.pbxproj.backup
+      #     
+      #     # Remove the extension from Embed Foundation Extensions build phase (two lines)
+      #     sed -i '' '/6DB3DF102E507DAD0063474F.*FocusDeviceActivityMonitor\.appex.*Embed Foundation Extensions/d' ios/Runner.xcodeproj/project.pbxproj
+      #     sed -i '' '/6DB3DF102E507DAD0063474F.*FocusDeviceActivityMonitor\.appex in Embed Foundation Extensions/d' ios/Runner.xcodeproj/project.pbxproj
+      #     
+      #     echo "✅ Device Activity Extension removed from build process"
 
       - name: Determine Android Release Version
         script: |
@@ -353,17 +353,17 @@ workflows:
         APP_STORE_APPLE_ID: 1531562469
         PACKAGE_NAME: "com.amjadkhalfan.reboot_app_3"
         GOOGLE_PLAY_TRACK: alpha
-        XCODE_WORKSPACE: "Runner.xcworkspace"
-        XCODE_SCHEME: "Runner-NoDA"
+        # XCODE_WORKSPACE: "Runner.xcworkspace"
+        # XCODE_SCHEME: "Runner-NoDA"
     scripts:
       - name: Install Shorebird
         script: |
           curl --proto '=https' --tlsv1.2 https://raw.githubusercontent.com/shorebirdtech/install/main/install.sh -sSf | bash
           echo PATH="$HOME/.shorebird/bin:$PATH" >> $CM_ENV
 
-      - name: Set up code signing settings on Xcode project
-        script: |
-          xcode-project use-profiles --workspace "ios/$XCODE_WORKSPACE" --scheme "$XCODE_SCHEME"
+      # - name: Set up code signing settings on Xcode project
+      #   script: |
+      #     xcode-project use-profiles --workspace "ios/$XCODE_WORKSPACE" --scheme "$XCODE_SCHEME"
 
       - name: Set up local.properties
         script: |
@@ -397,16 +397,16 @@ workflows:
           /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $BUILD_NUMBER_IOS" "$PLIST_PATH"
           echo "IOS_BUILD_NUMBER=$BUILD_NUMBER_IOS" >> $CM_ENV
 
-      - name: Remove Device Activity Extension from build
-        script: |
-          # Create backup of project file
-          cp ios/Runner.xcodeproj/project.pbxproj ios/Runner.xcodeproj/project.pbxproj.backup
-          
-          # Remove the extension from Embed Foundation Extensions build phase (two lines)
-          sed -i '' '/6DB3DF102E507DAD0063474F.*FocusDeviceActivityMonitor\.appex.*Embed Foundation Extensions/d' ios/Runner.xcodeproj/project.pbxproj
-          sed -i '' '/6DB3DF102E507DAD0063474F.*FocusDeviceActivityMonitor\.appex in Embed Foundation Extensions/d' ios/Runner.xcodeproj/project.pbxproj
-          
-          echo "✅ Device Activity Extension removed from build process"
+      # - name: Remove Device Activity Extension from build
+      #   script: |
+      #     # Create backup of project file
+      #     cp ios/Runner.xcodeproj/project.pbxproj ios/Runner.xcodeproj/project.pbxproj.backup
+      #     
+      #     # Remove the extension from Embed Foundation Extensions build phase (two lines)
+      #     sed -i '' '/6DB3DF102E507DAD0063474F.*FocusDeviceActivityMonitor\.appex.*Embed Foundation Extensions/d' ios/Runner.xcodeproj/project.pbxproj
+      #     sed -i '' '/6DB3DF102E507DAD0063474F.*FocusDeviceActivityMonitor\.appex in Embed Foundation Extensions/d' ios/Runner.xcodeproj/project.pbxproj
+      #     
+      #     echo "✅ Device Activity Extension removed from build process"
 
       - name: Shorebird Release Android
         script: |
