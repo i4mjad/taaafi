@@ -76,7 +76,9 @@ workflows:
           # Add Shorebird to PATH
           echo PATH="$HOME/.shorebird/bin:$PATH" >> $CM_ENV
       - name: Set up code signing settings on Xcode project
-        script: xcode-project use-profiles
+        script: |
+          xcode-project use-profiles --profile-name="codemagic-dist-prof" --bundle-id="com.amjadkhalfan.RebootApp"
+          xcode-project use-profiles --profile-name="gaurd-ext-profile" --bundle-id="com.amjadkhalfan.RebootApp.FocusDeviceActivityMonitor"
       - name: Get Flutter packages
         script: |
           flutter packages pub get
@@ -138,7 +140,9 @@ workflows:
           # Add Shorebird to PATH
           echo PATH="$HOME/.shorebird/bin:$PATH" >> $CM_ENV
       - name: Set up code signing settings on Xcode project
-        script: xcode-project use-profiles
+        script: |
+          xcode-project use-profiles --profile-name="codemagic-dist-prof" --bundle-id="com.amjadkhalfan.RebootApp"
+          xcode-project use-profiles --profile-name="gaurd-ext-profile" --bundle-id="com.amjadkhalfan.RebootApp.FocusDeviceActivityMonitor"
       - name: Get Flutter packages
         script: |
           flutter packages pub get
@@ -248,7 +252,9 @@ workflows:
           # Add Shorebird to PATH
           echo PATH="$HOME/.shorebird/bin:$PATH" >> $CM_ENV
       - name: Set up code signing settings on Xcode project
-        script: xcode-project use-profiles
+        script: |
+          xcode-project use-profiles --profile-name="codemagic-dist-prof" --bundle-id="com.amjadkhalfan.RebootApp"
+          xcode-project use-profiles --profile-name="gaurd-ext-profile" --bundle-id="com.amjadkhalfan.RebootApp.FocusDeviceActivityMonitor"
       - name: Set up local.properties
         script: |
           echo "flutter.sdk=$HOME/programs/flutter" > "$CM_BUILD_DIR/android/local.properties"
@@ -321,7 +327,9 @@ workflows:
           # Add Shorebird to PATH
           echo PATH="$HOME/.shorebird/bin:$PATH" >> $CM_ENV
       - name: Set up code signing settings on Xcode project
-        script: xcode-project use-profiles
+        script: |
+          xcode-project use-profiles --profile-name="codemagic-dist-prof" --bundle-id="com.amjadkhalfan.RebootApp"
+          xcode-project use-profiles --profile-name="gaurd-ext-profile" --bundle-id="com.amjadkhalfan.RebootApp.FocusDeviceActivityMonitor"
       - name: Set up local.properties
         script: |
           echo "flutter.sdk=$HOME/programs/flutter" > "$CM_BUILD_DIR/android/local.properties"
