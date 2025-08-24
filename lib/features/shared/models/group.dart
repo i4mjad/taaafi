@@ -7,6 +7,7 @@ class Group {
   final int memberCount;
   final int capacity;
   final String gender;
+  final String joinMethod; // 'any' | 'admin_only' | 'code_only'
   final DateTime createdAt;
   final DateTime? updatedAt;
 
@@ -17,6 +18,7 @@ class Group {
     required this.memberCount,
     required this.capacity,
     required this.gender,
+    required this.joinMethod,
     required this.createdAt,
     this.updatedAt,
   });
@@ -29,6 +31,7 @@ class Group {
         memberCount: doc.data()!["memberCount"] ?? 0,
         capacity: doc.data()!["capacity"],
         gender: doc.data()!["gender"],
+        joinMethod: doc.data()!["joinMethod"] ?? 'any',
         createdAt: (doc.data()!["createdAt"] as Timestamp).toDate(),
         updatedAt: (doc.data()!["updatedAt"] as Timestamp?)?.toDate(),
       );
@@ -40,6 +43,7 @@ class Group {
         'memberCount': memberCount,
         'capacity': capacity,
         'gender': gender,
+        'joinMethod': joinMethod,
         'createdAt': createdAt.toIso8601String(),
         'updatedAt': updatedAt?.toIso8601String(),
       };

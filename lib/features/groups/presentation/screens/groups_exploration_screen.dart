@@ -14,6 +14,9 @@ import 'package:reboot_app_3/features/groups/presentation/widgets/public_group_c
 import 'package:reboot_app_3/features/groups/presentation/screens/modals/join_group_modal.dart';
 import 'package:reboot_app_3/features/groups/providers/filtered_public_groups_provider.dart';
 import 'package:reboot_app_3/features/groups/domain/entities/group_entity.dart';
+import 'package:reboot_app_3/features/groups/application/groups_controller.dart';
+import 'package:reboot_app_3/features/community/presentation/providers/community_providers_new.dart';
+import 'package:reboot_app_3/features/groups/domain/entities/join_result_entity.dart';
 
 enum GroupFilter { all, needsCode, openJoin }
 
@@ -466,33 +469,58 @@ class _GroupsExplorationScreenState
     }
   }
 
-  void _performDirectJoin(DiscoverableGroup group) {
+  Future<void> _performDirectJoin(DiscoverableGroup group) async {
+    final l10n = AppLocalizations.of(context);
+    
     setState(() {
       _isLoading = true;
     });
 
-    // TODO: Implement actual join logic
-    Future.delayed(const Duration(seconds: 2), () {
+    try {
+      // Get current community profile
+      final profileAsync = ref.read(currentCommunityProfileProvider);
+      final profile = await profileAsync.when(
+        data: (profile) async => profile,
+        loading: () async => null,
+        error: (_, __) async => null,
+      );
+
+      if (profile == null) {
+        _showError(l10n.translate('profile-required'));
+        return;
+      }
+
+      final result = await ref.read(groupsControllerProvider.notifier).joinGroupDirectly(
+        groupId: group.id,
+        cpId: profile.id,
+      );
+
+      if (!mounted) return;
+
+      if (result.success) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              l10n.translate('joined-group-successfully')
+                  .replaceAll('{groupName}', group.name),
+            ),
+            backgroundColor: Theme.of(context).colorScheme.primary,
+          ),
+        );
+      } else {
+        _showError(_getJoinErrorMessage(result, l10n));
+      }
+    } catch (error) {
+      if (mounted) {
+        _showError(l10n.translate('unexpected-error'));
+      }
+    } finally {
       if (mounted) {
         setState(() {
           _isLoading = false;
         });
-
-        // TODO: Implement actual join logic with backend
-        // For now, just show success message
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              AppLocalizations.of(context)
-                  .translate('joined-group-successfully')
-                  .replaceAll('{groupName}', group.name),
-            ),
-            backgroundColor: Colors.green,
-          ),
-        );
       }
-    });
+    }
   }
 
   void _performSearch() {
@@ -642,5 +670,39 @@ class _GroupsExplorationScreenState
     tags.add('Community');
 
     return tags;
+  }
+
+  void _showError(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Theme.of(context).colorScheme.error,
+      ),
+    );
+  }
+
+  String _getJoinErrorMessage(JoinResultEntity result, AppLocalizations l10n) {
+    switch (result.errorType) {
+      case JoinErrorType.alreadyInGroup:
+        return l10n.translate('already-in-group-error');
+      case JoinErrorType.cooldownActive:
+        return l10n.translate('cooldown-active-error');
+      case JoinErrorType.capacityFull:
+        return l10n.translate('group-full-error');
+      case JoinErrorType.invalidCode:
+      case JoinErrorType.expiredCode:
+        return l10n.translate('invalid-join-code-error');
+      case JoinErrorType.genderMismatch:
+        return l10n.translate('gender-mismatch-error');
+      case JoinErrorType.groupNotFound:
+        return l10n.translate('group-not-found-error');
+      case JoinErrorType.groupInactive:
+      case JoinErrorType.groupPaused:
+        return l10n.translate('group-inactive-error');
+      case JoinErrorType.userBanned:
+        return l10n.translate('user-banned-error');
+      default:
+        return result.errorMessage ?? l10n.translate('join-group-failed');
+    }
   }
 }

@@ -3088,4 +3088,17 @@ const Map<String, String> kEn = {
   "group-days-ago": "{days} days ago",
   "group-hours-ago": "{hours} hours ago",
   "joined-group-successfully": "Successfully joined {groupName}!",
+
+  // Group Join Code Card translations
+  "group-sharing": "Group Sharing",
+  "join-code": "Join Code",
+  "group-id": "Group ID",
+  "code-only-admin-desc": "Share this code with others to let them join your group.",
+  "code-only-member-desc": "This group uses join codes. Ask the admin for the code to invite others.",
+  "any-join-desc": "Anyone can join this group using the group ID below.",
+  "admin-only-admin-desc": "This group is invitation-only. You can send invites to let people join.",
+  "admin-only-member-desc": "This group is invitation-only. Only admins can invite new members.",
+  "copied-to-clipboard": "Copied to clipboard!",
+  "join-code-not-retrievable": "Join codes cannot be retrieved once created for security reasons. Remember to save your code when creating the group.",
+  "invitation-feature-coming-soon": "Invitation management features are coming soon.",
 };

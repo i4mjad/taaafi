@@ -3018,5 +3018,18 @@ const Map<String, String> kAr = {
   'join-group-failed': 'فشل الانضمام إلى الزمالة',
   'leaving-group': 'ترك الزمالة...',
   'left-group-successfully': 'تم ترك الزمالة بنجاح',
-  'leave-group-failed': 'فشل ترك الزمالة'
+  'leave-group-failed': 'فشل ترك الزمالة',
+
+  // Group Join Code Card translations
+  'group-sharing': 'مشاركة الزمالة',
+  'join-code': 'كود الانضمام',
+  'group-id': 'معرف الزمالة',
+  'code-only-admin-desc': 'شارك هذا الكود مع الآخرين للسماح لهم بالانضمام إلى زمالتك.',
+  'code-only-member-desc': 'تستخدم هذه الزمالة أكواد الانضمام. اطلب الكود من المشرف لدعوة الآخرين.',
+  'any-join-desc': 'يمكن لأي شخص الانضمام إلى هذه الزمالة باستخدام معرف الزمالة أدناه.',
+  'admin-only-admin-desc': 'هذه الزمالة بدعوة فقط. يمكنك إرسال دعوات للسماح للأشخاص بالانضمام.',
+  'admin-only-member-desc': 'هذه الزمالة بدعوة فقط. يمكن للمشرفين فقط دعوة أعضاء جدد.',
+  'copied-to-clipboard': 'تم النسخ إلى الحافظة!',
+  'join-code-not-retrievable': 'لا يمكن استرداد أكواد الانضمام بعد إنشائها لأسباب أمنية. تذكر حفظ الكود عند إنشاء الزمالة.',
+  'invitation-feature-coming-soon': 'ميزات إدارة الدعوات قادمة قريباً.',
 };

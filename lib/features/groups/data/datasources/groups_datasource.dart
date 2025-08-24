@@ -63,4 +63,7 @@ abstract class GroupsDataSource {
 
   /// Mark a group as inactive/deleted
   Future<void> markGroupAsInactive(String groupId);
+  
+  /// Find group by join code
+  Future<GroupModel?> findGroupByJoinCode(String joinCode);
 }

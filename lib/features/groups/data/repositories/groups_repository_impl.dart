@@ -569,6 +569,17 @@ class GroupsRepositoryImpl implements GroupsRepository {
     }
   }
 
+  @override
+  Future<GroupEntity?> findGroupByJoinCode(String joinCode) async {
+    try {
+      final group = await _dataSource.findGroupByJoinCode(joinCode);
+      return group?.toEntity();
+    } catch (e, stackTrace) {
+      log('Error in findGroupByJoinCode: $e', stackTrace: stackTrace);
+      rethrow;
+    }
+  }
+
   // Helper method for hashing join codes
   // In production, use bcrypt or similar
   String _hashJoinCode(String code) {

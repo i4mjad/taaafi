@@ -247,4 +247,15 @@ class GroupsService {
       return null; // Default to no restriction on error
     }
   }
+
+  /// Find group by join code
+  Future<GroupEntity?> findGroupByJoinCode(String joinCode) async {
+    try {
+      return await _repository.findGroupByJoinCode(joinCode);
+    } catch (error, stackTrace) {
+      log('Error in GroupsService.findGroupByJoinCode: $error', stackTrace: stackTrace);
+      print('GroupsService.findGroupByJoinCode error: $error');
+      return null;
+    }
+  }
 }

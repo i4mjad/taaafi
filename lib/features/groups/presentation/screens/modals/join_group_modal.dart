@@ -12,6 +12,7 @@ import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:go_router/go_router.dart';
 import 'package:reboot_app_3/core/routing/route_names.dart';
 import 'package:reboot_app_3/features/groups/application/groups_controller.dart';
+import 'package:reboot_app_3/features/groups/application/groups_providers.dart';
 import 'package:reboot_app_3/features/community/presentation/providers/community_providers_new.dart';
 import 'package:reboot_app_3/features/groups/domain/entities/join_result_entity.dart';
 
@@ -267,13 +268,18 @@ class _JoinGroupModalState extends ConsumerState<JoinGroupModal> {
         return;
       }
 
-      // For now, assume we're joining a demo group ID
-      // In a real app, you might need to find the group by code first
-      const demoGroupId = 'demo_group_id';
+      // Find the group by join code first
+      final groupsService = ref.read(groupsServiceProvider);
+      final group = await groupsService.findGroupByJoinCode(groupCode);
+      
+      if (group == null) {
+        _showError(l10n.translate('invalid-join-code-error'));
+        return;
+      }
 
       final result =
           await ref.read(groupsControllerProvider.notifier).joinGroupWithCode(
-                groupId: demoGroupId,
+                groupId: group.id,
                 joinCode: groupCode,
                 cpId: profile.id,
               );

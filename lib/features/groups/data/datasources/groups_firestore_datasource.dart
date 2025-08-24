@@ -349,6 +349,47 @@ class GroupsFirestoreDataSource implements GroupsDataSource {
     }
   }
 
+  @override
+  Future<GroupModel?> findGroupByJoinCode(String joinCode) async {
+    try {
+      // Hash the join code using the same method used when storing
+      final codeHash = joinCode.hashCode.toString();
+      
+      // Query groups where joinCodeHash matches and group is active
+      final querySnapshot = await _firestore
+          .collection('groups')
+          .where('joinCodeHash', isEqualTo: codeHash)
+          .where('isActive', isEqualTo: true)
+          .where('joinMethod', isEqualTo: 'code_only')
+          .limit(1)
+          .get();
+
+      if (querySnapshot.docs.isEmpty) return null;
+
+      // Verify the join code is still valid
+      final groupDoc = querySnapshot.docs.first;
+      final data = groupDoc.data();
+      
+      // Check expiry
+      final expiresAt = data['joinCodeExpiresAt'] as Timestamp?;
+      if (expiresAt != null && DateTime.now().isAfter(expiresAt.toDate())) {
+        return null;
+      }
+      
+      // Check usage limit
+      final maxUses = data['joinCodeMaxUses'] as int?;
+      final useCount = data['joinCodeUseCount'] as int? ?? 0;
+      if (maxUses != null && useCount >= maxUses) {
+        return null;
+      }
+
+      return GroupModel.fromFirestore(groupDoc);
+    } catch (e, stackTrace) {
+      log('Error finding group by join code: $e', stackTrace: stackTrace);
+      rethrow;
+    }
+  }
+
   // Helper method to get user ID from community profile ID
   Future<String> _getUserIdFromCpId(String cpId) async {
     final cpDoc =

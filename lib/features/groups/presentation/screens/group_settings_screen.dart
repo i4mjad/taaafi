@@ -15,7 +15,7 @@ import 'package:reboot_app_3/features/groups/presentation/screens/group_notifica
 import 'package:reboot_app_3/features/groups/presentation/screens/group_privacy_settings_screen.dart';
 import 'package:reboot_app_3/features/groups/presentation/screens/group_chat_settings_screen.dart';
 import 'package:reboot_app_3/features/groups/presentation/widgets/leave_group_modal.dart';
-import 'package:reboot_app_3/features/groups/presentation/widgets/group_details_widget.dart';
+import 'package:reboot_app_3/features/groups/presentation/widgets/group_overview_card.dart';
 import 'package:reboot_app_3/features/groups/presentation/widgets/group_members_list.dart';
 
 class GroupSettingsScreen extends ConsumerStatefulWidget {
@@ -58,8 +58,8 @@ class _GroupSettingsScreenState extends ConsumerState<GroupSettingsScreen> {
                 children: [
                   verticalSpace(Spacing.points16),
 
-                  // Group Details Card
-                  const GroupDetailsWidget(),
+                  // Group Overview Card (combines details and join code)
+                  const GroupOverviewCard(),
 
                   verticalSpace(Spacing.points16),
 

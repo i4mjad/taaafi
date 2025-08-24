@@ -80,6 +80,7 @@ Future<GroupMembership?> groupMembershipNotifier(ref) async {
       memberCount: actualMemberCount,
       capacity: group.memberCapacity,
       gender: group.gender,
+      joinMethod: group.joinMethod,
       createdAt: group.createdAt,
       updatedAt: group.updatedAt,
     );
