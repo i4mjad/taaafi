@@ -352,13 +352,10 @@ class GroupsFirestoreDataSource implements GroupsDataSource {
   @override
   Future<GroupModel?> findGroupByJoinCode(String joinCode) async {
     try {
-      // Hash the join code using the same method used when storing
-      final codeHash = joinCode.hashCode.toString();
-      
-      // Query groups where joinCodeHash matches and group is active
+      // Query groups where joinCode matches and group is active
       final querySnapshot = await _firestore
           .collection('groups')
-          .where('joinCodeHash', isEqualTo: codeHash)
+          .where('joinCode', isEqualTo: joinCode)
           .where('isActive', isEqualTo: true)
           .where('joinMethod', isEqualTo: 'code_only')
           .limit(1)
@@ -369,13 +366,13 @@ class GroupsFirestoreDataSource implements GroupsDataSource {
       // Verify the join code is still valid
       final groupDoc = querySnapshot.docs.first;
       final data = groupDoc.data();
-      
+
       // Check expiry
       final expiresAt = data['joinCodeExpiresAt'] as Timestamp?;
       if (expiresAt != null && DateTime.now().isAfter(expiresAt.toDate())) {
         return null;
       }
-      
+
       // Check usage limit
       final maxUses = data['joinCodeMaxUses'] as int?;
       final useCount = data['joinCodeUseCount'] as int? ?? 0;

@@ -3024,12 +3024,43 @@ const Map<String, String> kAr = {
   'group-sharing': 'مشاركة الزمالة',
   'join-code': 'كود الانضمام',
   'group-id': 'معرف الزمالة',
-  'code-only-admin-desc': 'شارك هذا الكود مع الآخرين للسماح لهم بالانضمام إلى زمالتك.',
-  'code-only-member-desc': 'تستخدم هذه الزمالة أكواد الانضمام. اطلب الكود من المشرف لدعوة الآخرين.',
-  'any-join-desc': 'يمكن لأي شخص الانضمام إلى هذه الزمالة باستخدام معرف الزمالة أدناه.',
-  'admin-only-admin-desc': 'هذه الزمالة بدعوة فقط. يمكنك إرسال دعوات للسماح للأشخاص بالانضمام.',
-  'admin-only-member-desc': 'هذه الزمالة بدعوة فقط. يمكن للمشرفين فقط دعوة أعضاء جدد.',
+  'code-only-admin-desc':
+      'شارك هذا الكود مع الآخرين للسماح لهم بالانضمام إلى زمالتك.',
+  'code-only-member-desc':
+      'تستخدم هذه الزمالة أكواد الانضمام. اطلب الكود من المشرف لدعوة الآخرين.',
+  'any-join-desc':
+      'يمكن لأي شخص الانضمام إلى هذه الزمالة باستخدام معرف الزمالة أدناه.',
+  'admin-only-admin-desc':
+      'هذه الزمالة بدعوة فقط. يمكنك إرسال دعوات للسماح للأشخاص بالانضمام.',
+  'admin-only-member-desc':
+      'هذه الزمالة بدعوة فقط. يمكن للمشرفين فقط دعوة أعضاء جدد.',
   'copied-to-clipboard': 'تم النسخ إلى الحافظة!',
-  'join-code-not-retrievable': 'لا يمكن استرداد أكواد الانضمام بعد إنشائها لأسباب أمنية. تذكر حفظ الكود عند إنشاء الزمالة.',
+
   'invitation-feature-coming-soon': 'ميزات إدارة الدعوات قادمة قريباً.',
+
+  // Group creation success modal
+  'group-created-successfully-title': 'تم إنشاء الزمالة بنجاح!',
+  'your-join-code': 'كود الانضمام الخاص بك',
+  'copy-code': 'نسخ الكود',
+  'join-code-copied': 'تم نسخ كود الانضمام إلى الحافظة!',
+
+  // Group Privacy Settings
+  'user-privacy-settings': 'إعدادات الخصوصية الشخصية',
+  'user-privacy-description': 'تحكم في كيفية ظهور هويتك لأعضاء الزمالة',
+  'admin-group-settings': 'إعدادات خصوصية الزمالة (المشرف)',
+  'admin-group-settings-description': 'إدارة رؤية الزمالة وطرق الانضمام',
+  'make-group-public': 'جعل الزمالة عامة',
+  'make-group-public-description': 'السماح للآخرين باكتشاف الزمالة',
+  'group-join-method': 'طريقة الانضمام للزمالة',
+  'group-join-method-description':
+      'اختر كيف يمكن للأشخاص الانضمام إلى هذه الزمالة',
+  'join-method-any': 'يمكن لأي شخص الانضمام',
+  'join-method-any-description': 'أعضاء الزمالة والزوار يمكنهم الانضمام مباشرة',
+  'join-method-admin-only': 'دعوة المشرف فقط',
+  'join-method-admin-only-description': 'المشرف فقط يمكنه إرسال دعوات للانضمام',
+  'join-method-code-only': 'كود الانضمام مطلوب',
+  'join-method-code-only-description':
+      'الأعضاء يحتاجون كود للانضمام إلى الزمالة',
+  'join-method-any-requires-public': 'هذا الخيار يتطلب أن تكون الزمالة عامة',
+  'current-join-code': 'كود الانضمام الحالي',
 };

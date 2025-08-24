@@ -48,25 +48,29 @@ class CreateGroupResultEntity {
   final String? errorMessage;
   final CreateGroupErrorType? errorType;
   final GroupMembershipEntity? membership;
+  final String? generatedJoinCode; // NEW: Generated join code for code_only groups
 
   const CreateGroupResultEntity({
     required this.success,
     this.errorMessage,
     this.errorType,
     this.membership,
+    this.generatedJoinCode,
   });
 
-  const CreateGroupResultEntity.success(GroupMembershipEntity membership)
+  const CreateGroupResultEntity.success(GroupMembershipEntity membership, {String? joinCode})
       : success = true,
         errorMessage = null,
         errorType = null,
-        membership = membership;
+        membership = membership,
+        generatedJoinCode = joinCode;
 
   const CreateGroupResultEntity.error(CreateGroupErrorType type, String? message)
       : success = false,
         errorType = type,
         errorMessage = message,
-        membership = null;
+        membership = null,
+        generatedJoinCode = null;
 }
 
 /// Types of errors that can occur when creating a group

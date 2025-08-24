@@ -72,8 +72,9 @@ A group has two orthogonal properties:
 - `any` requires `visibility = public`.
 - `admin_only` uses invites (single‑use or multi‑use with expiry).
   - **UI Available**: Group invitations modal (`GroupInvitationsModal`) with accept/decline functionality.
-- `code_only` uses a **hashed** join code with expiry and optional max uses; attempts are rate‑limited.
+- `code_only` uses **automatically generated 5-character** join codes (mixed letters/numbers) stored as plain text with expiry and optional max uses; attempts are rate‑limited.
   - **UI Available**: Join group modal (`JoinGroupModal`) with code input field.
+  - **Auto-Generation**: Join codes are automatically generated as random 5-character strings (e.g., "A7K2M") during group creation for `code_only` groups.
 
 **Join attempt checks (in order)**
 
@@ -280,6 +281,7 @@ Notifications:
 1. **Progress Indicators**: Visual progress bars for challenges.
 2. **Status Badges**: Visual indicators for group type (public/private).
 3. **Countdown Display**: Visual countdown timer after leaving a group (though actual cooldown logic not implemented).
+4. **Join Code Success Modal**: Modal displaying generated join codes with copy functionality and security warnings for `code_only` groups.
 
 ### Recently Implemented Backend Features ✅
 
@@ -287,11 +289,12 @@ Notifications:
 
 1. **✅ Complete Backend Architecture**: Full clean architecture implementation with domain entities, repositories, services, and controllers.
 2. **✅ Group Creation**: Users can create groups with all specified validation rules including Plus user requirements for capacity > 6.
-3. **✅ Join by Code**: Users can join groups using join codes with proper validation and error handling.
-4. **✅ Direct Join**: Users can join public groups directly with all business rule validation.
-5. **✅ Leave Group**: Users can leave groups with 24-hour cooldown enforcement.
-6. **✅ Business Rule Validation**: All join/create/leave operations validate gender matching, capacity limits, cooldowns, and ban status.
-7. **✅ Real-time Updates**: UI properly refreshes membership status after successful operations.
+3. **✅ Automatic Join Code Generation**: System automatically generates secure 5-character join codes (A-Z, 0-9) for `code_only` groups during creation.
+4. **✅ Join by Code**: Users can join groups using join codes with proper validation and error handling.
+5. **✅ Direct Join**: Users can join public groups directly with all business rule validation.
+6. **✅ Leave Group**: Users can leave groups with 24-hour cooldown enforcement.
+7. **✅ Business Rule Validation**: All join/create/leave operations validate gender matching, capacity limits, cooldowns, and ban status.
+8. **✅ Real-time Updates**: UI properly refreshes membership status after successful operations.
 
 #### Data Layer
 

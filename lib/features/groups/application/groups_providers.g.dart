@@ -89,5 +89,24 @@ final groupsServiceProvider = AutoDisposeProvider<GroupsService>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef GroupsServiceRef = AutoDisposeProviderRef<GroupsService>;
+String _$groupPrivacyServiceHash() =>
+    r'888e401f83d4a51fe5785099c12cdc7aad2abf09';
+
+/// See also [groupPrivacyService].
+@ProviderFor(groupPrivacyService)
+final groupPrivacyServiceProvider =
+    AutoDisposeProvider<GroupPrivacyService>.internal(
+  groupPrivacyService,
+  name: r'groupPrivacyServiceProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$groupPrivacyServiceHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef GroupPrivacyServiceRef = AutoDisposeProviderRef<GroupPrivacyService>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

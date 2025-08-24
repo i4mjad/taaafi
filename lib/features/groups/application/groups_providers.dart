@@ -7,6 +7,8 @@ import '../domain/services/groups_service.dart';
 import '../data/datasources/groups_datasource.dart';
 import '../data/datasources/groups_firestore_datasource.dart';
 import '../data/repositories/groups_repository_impl.dart';
+import 'group_privacy_service.dart';
+import '../../community/presentation/providers/community_providers_new.dart';
 
 part 'groups_providers.g.dart';
 
@@ -35,4 +37,11 @@ GroupsRepository groupsRepository(ref) {
 GroupsService groupsService(ref) {
   final repository = ref.watch(groupsRepositoryProvider);
   return GroupsService(repository);
+}
+
+@riverpod
+GroupPrivacyService groupPrivacyService(ref) {
+  final groupsRepository = ref.watch(groupsRepositoryProvider);
+  final communityRepository = ref.watch(communityRepositoryProvider);
+  return GroupPrivacyService(groupsRepository, communityRepository);
 }

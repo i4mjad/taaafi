@@ -12,7 +12,7 @@ class GroupModel extends GroupEntity {
     required super.createdByCpId,
     required super.visibility,
     required super.joinMethod,
-    super.joinCodeHash,
+    super.joinCode,
     super.joinCodeExpiresAt,
     super.joinCodeMaxUses,
     super.joinCodeUseCount = 0,
@@ -36,7 +36,7 @@ class GroupModel extends GroupEntity {
       createdByCpId: data['createdByCpId'] as String,
       visibility: data['visibility'] as String,
       joinMethod: data['joinMethod'] as String,
-      joinCodeHash: data['joinCodeHash'] as String?,
+      joinCode: data['joinCode'] as String?,
       joinCodeExpiresAt: data['joinCodeExpiresAt'] != null
           ? (data['joinCodeExpiresAt'] as Timestamp).toDate()
           : null,
@@ -61,7 +61,7 @@ class GroupModel extends GroupEntity {
       'createdByCpId': createdByCpId,
       'visibility': visibility,
       'joinMethod': joinMethod,
-      'joinCodeHash': joinCodeHash,
+      'joinCode': joinCode,
       'joinCodeExpiresAt': joinCodeExpiresAt != null
           ? Timestamp.fromDate(joinCodeExpiresAt!)
           : null,
@@ -87,7 +87,7 @@ class GroupModel extends GroupEntity {
       createdByCpId: entity.createdByCpId,
       visibility: entity.visibility,
       joinMethod: entity.joinMethod,
-      joinCodeHash: entity.joinCodeHash,
+      joinCode: entity.joinCode,
       joinCodeExpiresAt: entity.joinCodeExpiresAt,
       joinCodeMaxUses: entity.joinCodeMaxUses,
       joinCodeUseCount: entity.joinCodeUseCount,
@@ -111,7 +111,7 @@ class GroupModel extends GroupEntity {
       createdByCpId: createdByCpId,
       visibility: visibility,
       joinMethod: joinMethod,
-      joinCodeHash: joinCodeHash,
+      joinCode: joinCode,
       joinCodeExpiresAt: joinCodeExpiresAt,
       joinCodeMaxUses: joinCodeMaxUses,
       joinCodeUseCount: joinCodeUseCount,

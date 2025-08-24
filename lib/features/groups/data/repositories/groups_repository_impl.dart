@@ -2,6 +2,7 @@ import '../../domain/entities/group_entity.dart';
 import '../../domain/entities/group_membership_entity.dart';
 import '../../domain/entities/join_result_entity.dart';
 import '../../domain/repositories/groups_repository.dart';
+import '../../utils/join_code_generator.dart';
 import '../datasources/groups_datasource.dart';
 import '../models/group_model.dart';
 import '../models/group_membership_model.dart';
@@ -96,11 +97,16 @@ class GroupsRepositoryImpl implements GroupsRepository {
 
       final now = DateTime.now();
 
-      // Hash join code if provided
-      String? joinCodeHash;
-      if (joinCode != null && joinCode.trim().isNotEmpty) {
-        // Simple hash - should use bcrypt in production
-        joinCodeHash = _hashJoinCode(joinCode.trim());
+      // Generate join code automatically for code_only groups
+      String? generatedJoinCode;
+
+      if (joinMethod == 'code_only') {
+        // Generate a random 5-character join code
+        generatedJoinCode = JoinCodeGenerator.generate();
+        print('Generated join code for group: $generatedJoinCode');
+      } else if (joinCode != null && joinCode.trim().isNotEmpty) {
+        // Handle manual join code if provided (legacy support)
+        generatedJoinCode = joinCode.trim();
       }
 
       // Create group model
@@ -114,7 +120,7 @@ class GroupsRepositoryImpl implements GroupsRepository {
         createdByCpId: creatorCpId,
         visibility: visibility,
         joinMethod: joinMethod,
-        joinCodeHash: joinCodeHash,
+        joinCode: generatedJoinCode,
         joinCodeExpiresAt: joinCodeExpiresAt,
         joinCodeMaxUses: joinCodeMaxUses,
         joinCodeUseCount: 0,
@@ -141,7 +147,10 @@ class GroupsRepositoryImpl implements GroupsRepository {
 
       await _dataSource.createMembership(membership);
 
-      return CreateGroupResultEntity.success(membership.toEntity());
+      return CreateGroupResultEntity.success(
+        membership.toEntity(),
+        joinCode: generatedJoinCode, // Return the generated join code
+      );
     } catch (e, stackTrace) {
       log('Error in createGroup: $e', stackTrace: stackTrace);
       return const CreateGroupResultEntity.error(
@@ -580,10 +589,65 @@ class GroupsRepositoryImpl implements GroupsRepository {
     }
   }
 
-  // Helper method for hashing join codes
-  // In production, use bcrypt or similar
-  String _hashJoinCode(String code) {
-    // Simple hash - replace with proper bcrypt implementation
-    return code.hashCode.toString();
+  @override
+  Future<void> updateGroupPrivacySettings({
+    required String groupId,
+    required String adminCpId,
+    String? visibility,
+    String? joinMethod,
+    String? joinCode,
+    DateTime? joinCodeExpiresAt,
+    int? joinCodeMaxUses,
+  }) async {
+    try {
+      // Get the current group
+      final currentGroup = await _dataSource.getGroupById(groupId);
+      if (currentGroup == null) {
+        throw Exception('Group not found: $groupId');
+      }
+
+      // Verify admin permissions
+      if (currentGroup.adminCpId != adminCpId) {
+        throw Exception('Only group admin can update privacy settings');
+      }
+
+      // Prepare updates
+      String? newJoinCode;
+      if (joinCode != null && joinCode.trim().isNotEmpty) {
+        newJoinCode = joinCode.trim();
+      } else if (joinMethod == 'code_only' && currentGroup.joinCode == null) {
+        // Generate a new join code for code_only groups that don't have one
+        newJoinCode = JoinCodeGenerator.generate();
+      }
+
+      // Validate visibility and join method combination
+      if (visibility != null && joinMethod != null) {
+        if (joinMethod == 'any' && visibility != 'public') {
+          throw Exception('Groups with "any" join method must be public');
+        }
+      } else if (joinMethod == 'any' && currentGroup.visibility != 'public') {
+        throw Exception('Groups with "any" join method must be public');
+      } else if (visibility == 'private' && currentGroup.joinMethod == 'any') {
+        throw Exception('Private groups cannot have "any" join method');
+      }
+
+      // Create updated group model
+      final updatedGroup = GroupModel.fromEntity(
+        currentGroup.toEntity().copyWith(
+              visibility: visibility ?? currentGroup.visibility,
+              joinMethod: joinMethod ?? currentGroup.joinMethod,
+              joinCode: newJoinCode ?? currentGroup.joinCode,
+              joinCodeExpiresAt:
+                  joinCodeExpiresAt ?? currentGroup.joinCodeExpiresAt,
+              joinCodeMaxUses: joinCodeMaxUses ?? currentGroup.joinCodeMaxUses,
+              updatedAt: DateTime.now(),
+            ),
+      );
+
+      await _dataSource.updateGroup(updatedGroup);
+    } catch (e, stackTrace) {
+      log('Error in updateGroupPrivacySettings: $e', stackTrace: stackTrace);
+      rethrow;
+    }
   }
 }

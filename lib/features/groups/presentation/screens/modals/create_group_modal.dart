@@ -10,6 +10,7 @@ import 'package:reboot_app_3/core/shared_widgets/platform_dropdown.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/features/groups/presentation/screens/modals/group_joining_methods_modal.dart';
+import 'package:reboot_app_3/features/groups/presentation/screens/modals/group_created_success_modal.dart';
 import 'package:reboot_app_3/features/groups/application/groups_controller.dart';
 import 'package:reboot_app_3/features/community/presentation/providers/community_providers_new.dart';
 import 'package:reboot_app_3/features/groups/domain/entities/join_result_entity.dart';
@@ -382,7 +383,18 @@ class _CreateGroupModalState extends ConsumerState<CreateGroupModal> {
 
       if (result.success) {
         Navigator.of(context).pop();
-        getSuccessSnackBar(context, 'group-created-successfully');
+        
+        // Show success modal with join code if generated
+        showModalBottomSheet(
+          context: context,
+          isScrollControlled: true,
+          backgroundColor: Colors.transparent,
+          isDismissible: true,
+          builder: (context) => GroupCreatedSuccessModal(
+            groupName: groupName,
+            generatedJoinCode: result.generatedJoinCode,
+          ),
+        );
       } else {
         _showError(_getCreateErrorMessage(result, l10n));
       }

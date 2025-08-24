@@ -3093,12 +3093,46 @@ const Map<String, String> kEn = {
   "group-sharing": "Group Sharing",
   "join-code": "Join Code",
   "group-id": "Group ID",
-  "code-only-admin-desc": "Share this code with others to let them join your group.",
-  "code-only-member-desc": "This group uses join codes. Ask the admin for the code to invite others.",
+  "code-only-admin-desc":
+      "Share this code with others to let them join your group.",
+  "code-only-member-desc":
+      "This group uses join codes. Ask the admin for the code to invite others.",
   "any-join-desc": "Anyone can join this group using the group ID below.",
-  "admin-only-admin-desc": "This group is invitation-only. You can send invites to let people join.",
-  "admin-only-member-desc": "This group is invitation-only. Only admins can invite new members.",
+  "admin-only-admin-desc":
+      "This group is invitation-only. You can send invites to let people join.",
+  "admin-only-member-desc":
+      "This group is invitation-only. Only admins can invite new members.",
   "copied-to-clipboard": "Copied to clipboard!",
-  "join-code-not-retrievable": "Join codes cannot be retrieved once created for security reasons. Remember to save your code when creating the group.",
-  "invitation-feature-coming-soon": "Invitation management features are coming soon.",
+
+  "invitation-feature-coming-soon":
+      "Invitation management features are coming soon.",
+
+  // Group creation success modal
+  "group-created-successfully-title": "Group Created Successfully!",
+  "your-join-code": "Your Join Code",
+  "copy-code": "Copy Code",
+  "join-code-copied": "Join code copied to clipboard!",
+
+  // Group Privacy Settings
+  "user-privacy-settings": "Personal Privacy Settings",
+  "user-privacy-description":
+      "Control how your identity appears to group members",
+  "admin-group-settings": "Group Privacy Settings (Admin)",
+  "admin-group-settings-description":
+      "Manage group visibility and joining methods",
+  "make-group-public": "Make Group Public",
+  "make-group-public-description":
+      "Allow the group to be discoverable by others",
+  "group-join-method": "Group Joining Method",
+  "group-join-method-description": "Choose how people can join this group",
+  "join-method-any": "Anyone Can Join",
+  "join-method-any-description": "Group members and visitors can join directly",
+  "join-method-admin-only": "Admin Invitation Only",
+  "join-method-admin-only-description":
+      "Only admin can send invitations to join",
+  "join-method-code-only": "Join Code Required",
+  "join-method-code-only-description": "Members need a code to join the group",
+  "join-method-any-requires-public":
+      "This option requires the group to be public",
+  "current-join-code": "Current Join Code",
 };

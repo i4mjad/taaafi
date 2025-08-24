@@ -8,7 +8,7 @@ class GroupEntity {
   final String createdByCpId;
   final String visibility; // 'public' | 'private'
   final String joinMethod; // 'any' | 'admin_only' | 'code_only'
-  final String? joinCodeHash;
+  final String? joinCode; // Plain text join code
   final DateTime? joinCodeExpiresAt;
   final int? joinCodeMaxUses;
   final int joinCodeUseCount;
@@ -28,7 +28,7 @@ class GroupEntity {
     required this.createdByCpId,
     required this.visibility,
     required this.joinMethod,
-    this.joinCodeHash,
+    this.joinCode,
     this.joinCodeExpiresAt,
     this.joinCodeMaxUses,
     this.joinCodeUseCount = 0,
@@ -49,7 +49,7 @@ class GroupEntity {
     String? createdByCpId,
     String? visibility,
     String? joinMethod,
-    String? joinCodeHash,
+    String? joinCode,
     DateTime? joinCodeExpiresAt,
     int? joinCodeMaxUses,
     int? joinCodeUseCount,
@@ -69,7 +69,7 @@ class GroupEntity {
       createdByCpId: createdByCpId ?? this.createdByCpId,
       visibility: visibility ?? this.visibility,
       joinMethod: joinMethod ?? this.joinMethod,
-      joinCodeHash: joinCodeHash ?? this.joinCodeHash,
+      joinCode: joinCode ?? this.joinCode,
       joinCodeExpiresAt: joinCodeExpiresAt ?? this.joinCodeExpiresAt,
       joinCodeMaxUses: joinCodeMaxUses ?? this.joinCodeMaxUses,
       joinCodeUseCount: joinCodeUseCount ?? this.joinCodeUseCount,

@@ -73,7 +73,18 @@ abstract class GroupsRepository {
 
   /// Mark a group as inactive/deleted
   Future<void> markGroupAsInactive(String groupId);
-  
+
   /// Find group by join code
   Future<GroupEntity?> findGroupByJoinCode(String joinCode);
+
+  /// Update group privacy settings (visibility and join method)
+  Future<void> updateGroupPrivacySettings({
+    required String groupId,
+    required String adminCpId,
+    String? visibility,
+    String? joinMethod,
+    String? joinCode,
+    DateTime? joinCodeExpiresAt,
+    int? joinCodeMaxUses,
+  });
 }

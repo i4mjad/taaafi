@@ -366,33 +366,55 @@ class GroupOverviewCard extends ConsumerWidget {
               ),
             ),
             verticalSpace(Spacing.points4),
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: theme.warn[50],
-                borderRadius: BorderRadius.circular(6),
-                border: Border.all(color: theme.warn[200]!, width: 0.5),
-              ),
-              child: Row(
-                children: [
-                  Icon(
-                    LucideIcons.alertTriangle,
-                    color: theme.warn[600],
-                    size: 14,
-                  ),
-                  horizontalSpace(Spacing.points4),
-                  Expanded(
-                    child: Text(
-                      l10n.translate('join-code-not-retrievable'),
+            // Show join code if available
+            if (group.joinCode != null) ...[
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: theme.primary[50],
+                  borderRadius: BorderRadius.circular(6),
+                  border: Border.all(color: theme.primary[200]!, width: 0.5),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      LucideIcons.key,
+                      color: theme.primary[600],
+                      size: 14,
+                    ),
+                    horizontalSpace(Spacing.points4),
+                    Text(
+                      '${l10n.translate('join-code')}: ',
                       style: TextStyles.small.copyWith(
-                        color: theme.warn[700],
+                        color: theme.primary[700],
                         fontSize: 11,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
-                  ),
-                ],
+                    Text(
+                      group.joinCode!,
+                      style: TextStyles.small.copyWith(
+                        color: theme.primary[900],
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700,
+                        fontFamily: 'monospace',
+                        letterSpacing: 1,
+                      ),
+                    ),
+                    const Spacer(),
+                    GestureDetector(
+                      onTap: () =>
+                          _copyToClipboard(group.joinCode!, context, l10n),
+                      child: Icon(
+                        LucideIcons.copy,
+                        color: theme.primary[600],
+                        size: 14,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
+            ],
           ];
         } else {
           return [

@@ -232,15 +232,18 @@ class _GroupsExplorationScreenState
                               color: theme.grey[600],
                             ),
                           ),
-                          error: (_, __) => Text(
-                            l10n.translate('groups-found').replaceAll(
-                                  '{count}',
-                                  '0',
-                                ),
-                            style: TextStyles.caption.copyWith(
-                              color: theme.grey[600],
-                            ),
-                          ),
+                          error: (error, stackTrace) {
+                            print(error);
+                            return Text(
+                              l10n.translate('groups-found').replaceAll(
+                                    '{count}',
+                                    '0',
+                                  ),
+                              style: TextStyles.caption.copyWith(
+                                color: theme.grey[600],
+                              ),
+                            );
+                          },
                         );
                       },
                     ),
@@ -471,7 +474,7 @@ class _GroupsExplorationScreenState
 
   Future<void> _performDirectJoin(DiscoverableGroup group) async {
     final l10n = AppLocalizations.of(context);
-    
+
     setState(() {
       _isLoading = true;
     });
@@ -490,10 +493,11 @@ class _GroupsExplorationScreenState
         return;
       }
 
-      final result = await ref.read(groupsControllerProvider.notifier).joinGroupDirectly(
-        groupId: group.id,
-        cpId: profile.id,
-      );
+      final result =
+          await ref.read(groupsControllerProvider.notifier).joinGroupDirectly(
+                groupId: group.id,
+                cpId: profile.id,
+              );
 
       if (!mounted) return;
 
@@ -501,7 +505,8 @@ class _GroupsExplorationScreenState
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              l10n.translate('joined-group-successfully')
+              l10n
+                  .translate('joined-group-successfully')
                   .replaceAll('{groupName}', group.name),
             ),
             backgroundColor: Theme.of(context).colorScheme.primary,

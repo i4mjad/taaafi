@@ -204,8 +204,8 @@ Forum comments (no mentions currently).
   - **UI Status**: ✅ Selector in CreateGroupModal
 - `joinMethod` (string: `"any"|"admin_only"|"code_only"`)
   - **UI Status**: ✅ Full selector in GroupJoiningMethodsModal
-- `joinCodeHash` (string|null) — salted **hash** (for `code_only`)
-  - **UI Status**: ❌ No code generation UI
+- `joinCode` (string|null) — plain text automatically generated 5-character join code (for `code_only`)
+  - **UI Status**: ✅ Automatic generation with success modal display
 - `joinCodeExpiresAt` (timestamp|null)
   - **UI Status**: ❌ No expiry settings UI
 - `joinCodeMaxUses` (number|null)
@@ -491,10 +491,11 @@ Multi‑device token tracking for reliable push delivery and rotation.
 ## I) Minimal Cloud Functions (Overview)
 
 1. **Create/Update Group (capacity guard)**: reject `memberCapacity > 6` if creator/admin is not Plus (check `users.isPlusUser` via `communityProfiles.userUID`).
-2. **Join With Code**: verify salted hash (bcrypt/argon2id), expiry, and usage increments; apply rate limit.
-3. **Handle Reservation**: reserve `handleLower`, then write `communityProfiles.handle` and `handleLower`.
-4. **Task Completion Approval**: idempotent approval updates points exactly once (transaction).
-5. **Cooldown Enforcement**: on leave, set `nextJoinAllowedAt = now + 24h`; system admin UI can set `rejoinCooldownOverrideUntil`.
+2. **Join Code Generation**: automatically generate secure 5-character codes (A-Z, 0-9) for `code_only` groups during creation.
+3. **Join With Code**: verify plain text code match, expiry, and usage increments; apply rate limit.
+4. **Handle Reservation**: reserve `handleLower`, then write `communityProfiles.handle` and `handleLower`.
+5. **Task Completion Approval**: idempotent approval updates points exactly once (transaction).
+6. **Cooldown Enforcement**: on leave, set `nextJoinAllowedAt = now + 24h`; system admin UI can set `rejoinCooldownOverrideUntil`.
 
 ---
 
@@ -513,7 +514,7 @@ Multi‑device token tracking for reliable push delivery and rotation.
    - No challenge/task creation interface
    - No task approval workflow for `requireApproval`
    - No invitation sending UI for admin_only groups
-   - No join code generation/management UI
+   - ✅ **Join code generation** - Automatic generation with success modal (COMPLETED)
    - No group pause/close functionality
 
 2. **Core Features**
@@ -538,4 +539,58 @@ Multi‑device token tracking for reliable push delivery and rotation.
 - Implement handle system for mentions
 - Add search UI to utilize tokenization
 - Consider schema updates for voice messages and reactions
+
+## L) Recently Implemented: Join Code Generation System ✅
+
+### 🔐 **Automatic Join Code Generation**
+
+**Implementation Status**: ✅ **FULLY COMPLETED**
+
+#### **Features Implemented**
+
+1. **Automatic Generation**: System generates secure 5-character join codes for `code_only` groups
+2. **Format**: Random combinations of uppercase letters (A-Z) and numbers (0-9)
+3. **Examples**: "A7K2M", "X9B4C", "L5P8Q"
+4. **Storage**: Plain text codes stored for easy admin access and sharing
+5. **User Experience**: Beautiful success modal with copy functionality and persistent access
+
+#### **Technical Implementation**
+
+```dart
+// JoinCodeGenerator utility
+class JoinCodeGenerator {
+  static String generate() {
+    // Generates 5-character codes: A-Z, 0-9
+    return "A7K2M"; // Example output
+  }
+}
+
+// Automatic generation in repository
+if (joinMethod == 'code_only') {
+  generatedJoinCode = JoinCodeGenerator.generate();
+  // Store as plain text for easy access
+}
+```
+
+#### **UI Components Added**
+
+1. **GroupCreatedSuccessModal**: Displays generated join code with copy functionality
+2. **Group Overview Card**: Shows join code persistently for admins with copy button
+3. **Copy Functionality**: One-tap copying with success feedback
+4. **Responsive Design**: Works on all device sizes with proper spacing
+
+#### **User Flow**
+
+1. User creates group with `joinMethod = 'code_only'`
+2. System automatically generates 5-character join code
+3. Success modal displays the code with copy button for easy sharing
+4. User can copy the code and share it with others
+5. Code is stored as plain text for easy future access
+
+#### **Security Features**
+
+- **Plain Text Storage**: Codes stored directly for easy admin access and sharing
+- **Persistent Access**: Admins can always view and share their group's join code
+- **Simplified User Experience**: No complex security warnings or temporary access
+- **Proper Validation**: Format validation and duplicate prevention
 
