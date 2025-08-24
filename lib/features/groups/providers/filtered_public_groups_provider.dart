@@ -20,10 +20,20 @@ Stream<List<GroupEntity>> filteredPublicGroups(
   // Get public groups stream
   final groupsService = ref.watch(groupsServiceProvider);
 
-  // Listen to public groups and filter by user gender
+  // Listen to public groups and filter by user gender and group status
   await for (final allGroups in groupsService.getPublicGroups()) {
-    // Filter groups by user's gender (only show groups that match user's gender or are mixed)
+    // Filter groups by user's gender and group status
     final filteredGroups = allGroups.where((group) {
+      // Only show active groups (exclude deleted/inactive groups)
+      if (!group.isActive) {
+        return false;
+      }
+
+      // Don't show paused groups
+      if (group.isPaused) {
+        return false;
+      }
+
       // Convert user gender to lowercase for comparison
       final userGender = userProfile.gender.toLowerCase();
       final groupGender = group.gender.toLowerCase();

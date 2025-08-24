@@ -54,4 +54,23 @@ abstract class GroupsRepository {
 
   /// Get all active members of a group
   Future<List<GroupMembershipEntity>> getGroupMembers(String groupId);
+
+  /// Get active members of a group sorted by join date (oldest first)
+  Future<List<GroupMembershipEntity>> getActiveGroupMembersSorted(
+      String groupId);
+
+  /// Promote a member to admin role
+  Future<void> promoteMemberToAdmin({
+    required String groupId,
+    required String cpId,
+  });
+
+  /// Update group admin
+  Future<void> updateGroupAdmin({
+    required String groupId,
+    required String newAdminCpId,
+  });
+
+  /// Mark a group as inactive/deleted
+  Future<void> markGroupAsInactive(String groupId);
 }

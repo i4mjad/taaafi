@@ -367,6 +367,28 @@ class GroupsRepositoryImpl implements GroupsRepository {
             null); // UI layer will handle translation based on error type
       }
 
+      final groupId = membership.groupId;
+
+      // Get group details
+      final group = await _dataSource.getGroupById(groupId);
+      if (group == null) {
+        return const LeaveResultEntity.error(null); // Group not found
+      }
+
+      // Check if the user is an admin
+      final isUserAdmin = membership.role == 'admin';
+      final isUserGroupAdmin = group.adminCpId == cpId;
+
+      if (isUserAdmin || isUserGroupAdmin) {
+        // User is admin, check if they are the only admin
+        final isOnlyAdmin = await _isOnlyAdmin(groupId, cpId);
+        if (isOnlyAdmin) {
+          // User is the only admin, need to handle admin transition or group deletion
+          await _handleAdminLeaving(groupId, cpId, group);
+        }
+        // If there are other admins, user can leave normally without special handling
+      }
+
       // Update membership to inactive
       final updatedMembership = GroupMembershipModel.fromEntity(
         membership.toEntity().copyWith(
@@ -386,6 +408,72 @@ class GroupsRepositoryImpl implements GroupsRepository {
       log('Error in leaveGroup: $e', stackTrace: stackTrace);
       return const LeaveResultEntity.error(
           null); // UI layer will handle translation based on error type
+    }
+  }
+
+  /// Check if the user is the only admin in the group
+  Future<bool> _isOnlyAdmin(String groupId, String cpId) async {
+    try {
+      // Get all active members of the group
+      final activeMembers =
+          await _dataSource.getActiveGroupMembersSorted(groupId);
+
+      // Count admins (excluding the leaving user)
+      final otherAdmins = activeMembers
+          .where((member) => member.cpId != cpId && member.role == 'admin')
+          .toList();
+
+      return otherAdmins.isEmpty;
+    } catch (e, stackTrace) {
+      log('Error in _isOnlyAdmin: $e', stackTrace: stackTrace);
+      rethrow;
+    }
+  }
+
+  /// Handle the scenario when the only admin is leaving the group
+  Future<void> _handleAdminLeaving(
+    String groupId,
+    String leavingAdminCpId,
+    GroupModel group,
+  ) async {
+    try {
+      // Get all active members of the group sorted by join date (oldest first)
+      final activeMembers =
+          await _dataSource.getActiveGroupMembersSorted(groupId);
+
+      // Filter out the leaving admin
+      final remainingMembers = activeMembers
+          .where((member) => member.cpId != leavingAdminCpId)
+          .toList();
+
+      if (remainingMembers.isEmpty) {
+        // User is the only member, mark group as inactive/deleted
+        log('Group $groupId has no remaining members, marking as inactive');
+        await _dataSource.markGroupAsInactive(groupId);
+      } else {
+        // Promote the oldest remaining member to admin
+        final oldestMember =
+            remainingMembers.first; // Already sorted oldest first
+
+        log('Promoting member ${oldestMember.cpId} to admin for group $groupId (only admin leaving)');
+
+        // Promote the member to admin role
+        await _dataSource.promoteMemberToAdmin(
+          groupId: groupId,
+          cpId: oldestMember.cpId,
+        );
+
+        // Update the group's main admin
+        await updateGroupAdmin(
+          groupId: groupId,
+          newAdminCpId: oldestMember.cpId,
+        );
+
+        log('Successfully promoted ${oldestMember.cpId} to admin for group $groupId');
+      }
+    } catch (e, stackTrace) {
+      log('Error in _handleAdminLeaving: $e', stackTrace: stackTrace);
+      rethrow;
     }
   }
 
@@ -411,6 +499,72 @@ class GroupsRepositoryImpl implements GroupsRepository {
       return memberships.map((m) => m.toEntity()).toList();
     } catch (e, stackTrace) {
       log('Error in getGroupMembers: $e', stackTrace: stackTrace);
+      rethrow;
+    }
+  }
+
+  @override
+  Future<List<GroupMembershipEntity>> getActiveGroupMembersSorted(
+      String groupId) async {
+    try {
+      final memberships =
+          await _dataSource.getActiveGroupMembersSorted(groupId);
+      return memberships.map((m) => m.toEntity()).toList();
+    } catch (e, stackTrace) {
+      log('Error in getActiveGroupMembersSorted: $e', stackTrace: stackTrace);
+      rethrow;
+    }
+  }
+
+  @override
+  Future<void> promoteMemberToAdmin({
+    required String groupId,
+    required String cpId,
+  }) async {
+    try {
+      await _dataSource.promoteMemberToAdmin(
+        groupId: groupId,
+        cpId: cpId,
+      );
+    } catch (e, stackTrace) {
+      log('Error in promoteMemberToAdmin: $e', stackTrace: stackTrace);
+      rethrow;
+    }
+  }
+
+  @override
+  Future<void> updateGroupAdmin({
+    required String groupId,
+    required String newAdminCpId,
+  }) async {
+    try {
+      // Get the group
+      final group = await _dataSource.getGroupById(groupId);
+      if (group == null) {
+        throw Exception('Group not found: $groupId');
+      }
+
+      // Update the group's adminCpId
+      final updatedGroup = GroupModel.fromEntity(
+        group.toEntity().copyWith(
+              adminCpId: newAdminCpId,
+              updatedAt: DateTime.now(),
+            ),
+      );
+
+      await _dataSource.updateGroup(updatedGroup);
+    } catch (e, stackTrace) {
+      log('Error in updateGroupAdmin: $e', stackTrace: stackTrace);
+      rethrow;
+    }
+  }
+
+  @override
+  Future<void> markGroupAsInactive(String groupId) async {
+    try {
+      await _dataSource.markGroupAsInactive(groupId);
+    } catch (e, stackTrace) {
+      log('Error in markGroupAsInactive: $e', stackTrace: stackTrace);
       rethrow;
     }
   }

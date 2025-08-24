@@ -47,4 +47,20 @@ abstract class GroupsDataSource {
 
   /// Get all active members of a group
   Future<List<GroupMembershipModel>> getGroupMembers(String groupId);
+
+  /// Get active members of a group sorted by join date (oldest first)
+  Future<List<GroupMembershipModel>> getActiveGroupMembersSorted(
+      String groupId);
+
+  /// Update group
+  Future<void> updateGroup(GroupModel group);
+
+  /// Promote a member to admin role
+  Future<void> promoteMemberToAdmin({
+    required String groupId,
+    required String cpId,
+  });
+
+  /// Mark a group as inactive/deleted
+  Future<void> markGroupAsInactive(String groupId);
 }

@@ -285,6 +285,70 @@ class GroupsFirestoreDataSource implements GroupsDataSource {
     }
   }
 
+  @override
+  Future<List<GroupMembershipModel>> getActiveGroupMembersSorted(
+      String groupId) async {
+    try {
+      final querySnapshot = await _firestore
+          .collection('group_memberships')
+          .where('groupId', isEqualTo: groupId)
+          .where('isActive', isEqualTo: true)
+          .orderBy('joinedAt', descending: false) // oldest first
+          .get();
+
+      return querySnapshot.docs
+          .map((doc) => GroupMembershipModel.fromFirestore(doc))
+          .toList();
+    } catch (e, stackTrace) {
+      log('Error getting active group members sorted: $e',
+          stackTrace: stackTrace);
+      rethrow;
+    }
+  }
+
+  @override
+  Future<void> updateGroup(GroupModel group) async {
+    try {
+      await _firestore
+          .collection('groups')
+          .doc(group.id)
+          .update(group.toFirestore());
+    } catch (e, stackTrace) {
+      log('Error updating group: $e', stackTrace: stackTrace);
+      rethrow;
+    }
+  }
+
+  @override
+  Future<void> promoteMemberToAdmin({
+    required String groupId,
+    required String cpId,
+  }) async {
+    try {
+      final membershipId = '${groupId}_$cpId';
+      await _firestore
+          .collection('group_memberships')
+          .doc(membershipId)
+          .update({'role': 'admin'});
+    } catch (e, stackTrace) {
+      log('Error promoting member to admin: $e', stackTrace: stackTrace);
+      rethrow;
+    }
+  }
+
+  @override
+  Future<void> markGroupAsInactive(String groupId) async {
+    try {
+      await _firestore.collection('groups').doc(groupId).update({
+        'isActive': false,
+        'updatedAt': Timestamp.now(),
+      });
+    } catch (e, stackTrace) {
+      log('Error marking group as inactive: $e', stackTrace: stackTrace);
+      rethrow;
+    }
+  }
+
   // Helper method to get user ID from community profile ID
   Future<String> _getUserIdFromCpId(String cpId) async {
     final cpDoc =

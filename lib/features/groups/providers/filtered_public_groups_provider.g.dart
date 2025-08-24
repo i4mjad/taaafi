@@ -7,7 +7,7 @@ part of 'filtered_public_groups_provider.dart';
 // **************************************************************************
 
 String _$filteredPublicGroupsHash() =>
-    r'b5e772e5ad9b932458edb93d971cec2fc997ef9d';
+    r'6898182f3f867f196cb149381d4e592c50cf10c0';
 
 /// Provider that fetches public groups filtered by current user's gender
 ///
