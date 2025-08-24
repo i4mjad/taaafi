@@ -75,10 +75,6 @@ workflows:
           curl --proto '=https' --tlsv1.2 https://raw.githubusercontent.com/shorebirdtech/install/main/install.sh -sSf | bash
           echo PATH="$HOME/.shorebird/bin:$PATH" >> $CM_ENV
 
-      - name: Select Xcode scheme
-        script: |
-          xcode-project select --workspace "ios/$XCODE_WORKSPACE" --scheme "$XCODE_SCHEME"
-
       - name: Set up code signing settings on Xcode project
         script: |
           xcode-project use-profiles --workspace "ios/$XCODE_WORKSPACE" --scheme "$XCODE_SCHEME"
@@ -146,10 +142,6 @@ workflows:
         script: |
           curl --proto '=https' --tlsv1.2 https://raw.githubusercontent.com/shorebirdtech/install/main/install.sh -sSf | bash
           echo PATH="$HOME/.shorebird/bin:$PATH" >> $CM_ENV
-
-      - name: Select Xcode scheme
-        script: |
-          xcode-project select --workspace "ios/$XCODE_WORKSPACE" --scheme "$XCODE_SCHEME"
 
       - name: Set up code signing settings on Xcode project
         script: |
@@ -273,10 +265,6 @@ workflows:
           curl --proto '=https' --tlsv1.2 https://raw.githubusercontent.com/shorebirdtech/install/main/install.sh -sSf | bash
           echo PATH="$HOME/.shorebird/bin:$PATH" >> $CM_ENV
 
-      - name: Select Xcode scheme
-        script: |
-          xcode-project select --workspace "ios/$XCODE_WORKSPACE" --scheme "$XCODE_SCHEME"
-
       - name: Set up code signing settings on Xcode project
         script: |
           xcode-project use-profiles --workspace "ios/$XCODE_WORKSPACE" --scheme "$XCODE_SCHEME"
@@ -366,10 +354,6 @@ workflows:
         script: |
           curl --proto '=https' --tlsv1.2 https://raw.githubusercontent.com/shorebirdtech/install/main/install.sh -sSf | bash
           echo PATH="$HOME/.shorebird/bin:$PATH" >> $CM_ENV
-
-      - name: Select Xcode scheme
-        script: |
-          xcode-project select --workspace "ios/$XCODE_WORKSPACE" --scheme "$XCODE_SCHEME"
 
       - name: Set up code signing settings on Xcode project
         script: |
