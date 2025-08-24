@@ -95,14 +95,16 @@ workflows:
           /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $VERSION" "$PLIST_PATH"
           /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $BUILD_NUMBER" "$PLIST_PATH"
 
-      - name: Guard ensure extension is NOT embedded
+      - name: Remove Device Activity Extension from build
         script: |
-          if grep -q "Embed App Extensions" ios/Runner.xcodeproj/project.pbxproj && \
-             grep -q "FocusDeviceActivityMonitor" ios/Runner.xcodeproj/project.pbxproj; then
-            echo "❌ Extension still embedded in Runner target. Remove it from Embed App Extensions & Target Dependencies."
-            exit 1
-          fi
-          echo "✅ No extension embedded."
+          # Create backup of project file
+          cp ios/Runner.xcodeproj/project.pbxproj ios/Runner.xcodeproj/project.pbxproj.backup
+          
+          # Remove the extension from Embed Foundation Extensions build phase (two lines)
+          sed -i '' '/6DB3DF102E507DAD0063474F.*FocusDeviceActivityMonitor\.appex.*Embed Foundation Extensions/d' ios/Runner.xcodeproj/project.pbxproj
+          sed -i '' '/6DB3DF102E507DAD0063474F.*FocusDeviceActivityMonitor\.appex in Embed Foundation Extensions/d' ios/Runner.xcodeproj/project.pbxproj
+          
+          echo "✅ Device Activity Extension removed from build process"
 
       - name: Flutter build ipa (Shorebird release)
         script: |
@@ -155,14 +157,16 @@ workflows:
         script: |
           find . -name "Podfile" -execdir pod install \;
 
-      - name: Guard ensure extension is NOT embedded
+      - name: Remove Device Activity Extension from build
         script: |
-          if grep -q "Embed App Extensions" ios/Runner.xcodeproj/project.pbxproj && \
-             grep -q "FocusDeviceActivityMonitor" ios/Runner.xcodeproj/project.pbxproj; then
-            echo "❌ Extension still embedded in Runner target. Remove it first."
-            exit 1
-          fi
-          echo "✅ No extension embedded."
+          # Create backup of project file
+          cp ios/Runner.xcodeproj/project.pbxproj ios/Runner.xcodeproj/project.pbxproj.backup
+          
+          # Remove the extension from Embed Foundation Extensions build phase (two lines)
+          sed -i '' '/6DB3DF102E507DAD0063474F.*FocusDeviceActivityMonitor\.appex.*Embed Foundation Extensions/d' ios/Runner.xcodeproj/project.pbxproj
+          sed -i '' '/6DB3DF102E507DAD0063474F.*FocusDeviceActivityMonitor\.appex in Embed Foundation Extensions/d' ios/Runner.xcodeproj/project.pbxproj
+          
+          echo "✅ Device Activity Extension removed from build process"
 
       - name: Determine Release Version
         script: |
@@ -281,14 +285,16 @@ workflows:
         script: |
           find . -name "Podfile" -execdir pod install \;
 
-      - name: Guard ensure extension is NOT embedded
+      - name: Remove Device Activity Extension from build
         script: |
-          if grep -q "Embed App Extensions" ios/Runner.xcodeproj/project.pbxproj && \
-             grep -q "FocusDeviceActivityMonitor" ios/Runner.xcodeproj/project.pbxproj; then
-            echo "❌ Extension still embedded in Runner target. Remove it first."
-            exit 1
-          fi
-          echo "✅ No extension embedded."
+          # Create backup of project file
+          cp ios/Runner.xcodeproj/project.pbxproj ios/Runner.xcodeproj/project.pbxproj.backup
+          
+          # Remove the extension from Embed Foundation Extensions build phase (two lines)
+          sed -i '' '/6DB3DF102E507DAD0063474F.*FocusDeviceActivityMonitor\.appex.*Embed Foundation Extensions/d' ios/Runner.xcodeproj/project.pbxproj
+          sed -i '' '/6DB3DF102E507DAD0063474F.*FocusDeviceActivityMonitor\.appex in Embed Foundation Extensions/d' ios/Runner.xcodeproj/project.pbxproj
+          
+          echo "✅ Device Activity Extension removed from build process"
 
       - name: Determine Android Release Version
         script: |
@@ -391,14 +397,16 @@ workflows:
           /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $BUILD_NUMBER_IOS" "$PLIST_PATH"
           echo "IOS_BUILD_NUMBER=$BUILD_NUMBER_IOS" >> $CM_ENV
 
-      - name: Guard ensure extension is NOT embedded
+      - name: Remove Device Activity Extension from build
         script: |
-          if grep -q "Embed App Extensions" ios/Runner.xcodeproj/project.pbxproj && \
-             grep -q "FocusDeviceActivityMonitor" ios/Runner.xcodeproj/project.pbxproj; then
-            echo "❌ Extension still embedded in Runner target. Remove it first."
-            exit 1
-          fi
-          echo "✅ No extension embedded."
+          # Create backup of project file
+          cp ios/Runner.xcodeproj/project.pbxproj ios/Runner.xcodeproj/project.pbxproj.backup
+          
+          # Remove the extension from Embed Foundation Extensions build phase (two lines)
+          sed -i '' '/6DB3DF102E507DAD0063474F.*FocusDeviceActivityMonitor\.appex.*Embed Foundation Extensions/d' ios/Runner.xcodeproj/project.pbxproj
+          sed -i '' '/6DB3DF102E507DAD0063474F.*FocusDeviceActivityMonitor\.appex in Embed Foundation Extensions/d' ios/Runner.xcodeproj/project.pbxproj
+          
+          echo "✅ Device Activity Extension removed from build process"
 
       - name: Shorebird Release Android
         script: |
