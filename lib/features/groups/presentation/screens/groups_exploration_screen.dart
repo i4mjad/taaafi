@@ -12,8 +12,10 @@ import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/core/theming/custom_theme_data.dart';
 import 'package:reboot_app_3/features/groups/presentation/widgets/public_group_card.dart';
 import 'package:reboot_app_3/features/groups/presentation/screens/modals/join_group_modal.dart';
+import 'package:reboot_app_3/features/groups/providers/filtered_public_groups_provider.dart';
+import 'package:reboot_app_3/features/groups/domain/entities/group_entity.dart';
 
-enum GroupFilter { all, male, female, needsCode, openJoin }
+enum GroupFilter { all, needsCode, openJoin }
 
 enum GroupSort { newest, oldest, mostMembers, leastMembers, mostActive }
 
@@ -146,22 +148,6 @@ class _GroupsExplorationScreenState
                       _buildFilterChip(
                         theme,
                         l10n,
-                        GroupFilter.male,
-                        l10n.translate('male-groups'),
-                        LucideIcons.userCheck,
-                      ),
-                      horizontalSpace(Spacing.points8),
-                      _buildFilterChip(
-                        theme,
-                        l10n,
-                        GroupFilter.female,
-                        l10n.translate('female-groups'),
-                        LucideIcons.userCheck,
-                      ),
-                      horizontalSpace(Spacing.points8),
-                      _buildFilterChip(
-                        theme,
-                        l10n,
                         GroupFilter.openJoin,
                         l10n.translate('open-join'),
                         LucideIcons.unlock,
@@ -220,14 +206,40 @@ class _GroupsExplorationScreenState
                     const Spacer(),
 
                     // Results Count
-                    Text(
-                      l10n.translate('groups-found').replaceAll(
-                            '{count}',
-                            _getFilteredGroups().length.toString(),
+                    Consumer(
+                      builder: (context, ref, child) {
+                        final groupsAsync =
+                            ref.watch(filteredPublicGroupsProvider);
+                        return groupsAsync.when(
+                          data: (groups) => Text(
+                            l10n.translate('groups-found').replaceAll(
+                                  '{count}',
+                                  _getFilteredGroups(groups).length.toString(),
+                                ),
+                            style: TextStyles.caption.copyWith(
+                              color: theme.grey[600],
+                            ),
                           ),
-                      style: TextStyles.caption.copyWith(
-                        color: theme.grey[600],
-                      ),
+                          loading: () => Text(
+                            l10n.translate('groups-found').replaceAll(
+                                  '{count}',
+                                  '...',
+                                ),
+                            style: TextStyles.caption.copyWith(
+                              color: theme.grey[600],
+                            ),
+                          ),
+                          error: (_, __) => Text(
+                            l10n.translate('groups-found').replaceAll(
+                                  '{count}',
+                                  '0',
+                                ),
+                            style: TextStyles.caption.copyWith(
+                              color: theme.grey[600],
+                            ),
+                          ),
+                        );
+                      },
                     ),
                   ],
                 ),
@@ -239,7 +251,44 @@ class _GroupsExplorationScreenState
           Expanded(
             child: _isLoading
                 ? const Center(child: Spinner())
-                : _buildGroupsList(theme, l10n),
+                : Consumer(
+                    builder: (context, ref, child) {
+                      final groupsAsync =
+                          ref.watch(filteredPublicGroupsProvider);
+                      return groupsAsync.when(
+                        data: (groups) => _buildGroupsList(theme, l10n, groups),
+                        loading: () => const Center(child: Spinner()),
+                        error: (error, stackTrace) => Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                LucideIcons.alertCircle,
+                                size: 64,
+                                color: theme.error[400],
+                              ),
+                              verticalSpace(Spacing.points16),
+                              Text(
+                                l10n.translate('error-loading-groups'),
+                                style: TextStyles.h6.copyWith(
+                                  color: theme.error[600],
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                              verticalSpace(Spacing.points8),
+                              Text(
+                                error.toString(),
+                                style: TextStyles.body.copyWith(
+                                  color: theme.grey[500],
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
           ),
         ],
       ),
@@ -297,8 +346,9 @@ class _GroupsExplorationScreenState
     );
   }
 
-  Widget _buildGroupsList(CustomThemeData theme, AppLocalizations l10n) {
-    final filteredGroups = _getFilteredGroups();
+  Widget _buildGroupsList(CustomThemeData theme, AppLocalizations l10n,
+      List<GroupEntity> allGroups) {
+    final filteredGroups = _getFilteredGroups(allGroups);
 
     if (filteredGroups.isEmpty) {
       return Center(
@@ -460,8 +510,10 @@ class _GroupsExplorationScreenState
     });
   }
 
-  List<DiscoverableGroup> _getFilteredGroups() {
-    var groups = _getDemoGroups();
+  List<DiscoverableGroup> _getFilteredGroups(List<GroupEntity> allGroups) {
+    // Convert GroupEntity to DiscoverableGroup
+    var groups =
+        allGroups.map((group) => _mapGroupEntityToDiscoverable(group)).toList();
 
     // Apply search filter
     if (_searchQuery.isNotEmpty) {
@@ -476,14 +528,8 @@ class _GroupsExplorationScreenState
       }).toList();
     }
 
-    // Apply category filter
+    // Apply category filter (no gender filters anymore)
     switch (_selectedFilter) {
-      case GroupFilter.male:
-        groups = groups.where((g) => g.gender == 'male').toList();
-        break;
-      case GroupFilter.female:
-        groups = groups.where((g) => g.gender == 'female').toList();
-        break;
       case GroupFilter.needsCode:
         groups = groups.where((g) => g.joinMethod == 'code_only').toList();
         break;
@@ -509,9 +555,8 @@ class _GroupsExplorationScreenState
         groups.sort((a, b) => a.memberCount.compareTo(b.memberCount));
         break;
       case GroupSort.mostActive:
-        // Sort by last activity (mock)
-        groups.sort((a, b) =>
-            (b.lastActivityTime ?? '').compareTo(a.lastActivityTime ?? ''));
+        // Sort by creation time since we don't have lastActivityTime in GroupEntity
+        groups.sort((a, b) => b.createdAt.compareTo(a.createdAt));
         break;
     }
 
@@ -537,79 +582,65 @@ class _GroupsExplorationScreenState
     }
   }
 
-  // Demo data generator
-  List<DiscoverableGroup> _getDemoGroups() {
-    return [
-      DiscoverableGroup(
-        id: 'group_1',
-        name: 'دعم التعافي اليومي',
-        description:
-            'مجموعة دعم للأشخاص الذين يسعون للتعافي من الإدمان والعادات السيئة. نتشارك التجارب والتحديات اليومية.',
-        memberCount: 8,
-        capacity: 12,
-        gender: 'male',
-        joinMethod: 'any',
-        createdAt: DateTime.now().subtract(const Duration(days: 15)),
-        lastActivityTime: '2 hours ago',
-        tags: ['Recovery', 'Support', 'Arabic'],
-        challengesCount: 5,
-      ),
-      DiscoverableGroup(
-        id: 'group_2',
-        name: 'Women Empowerment Circle',
-        description:
-            'A supportive community for women working on personal growth, breaking bad habits, and building confidence.',
-        memberCount: 6,
-        capacity: 10,
-        gender: 'female',
-        joinMethod: 'code_only',
-        createdAt: DateTime.now().subtract(const Duration(days: 8)),
-        lastActivityTime: '1 hour ago',
-        tags: ['Women', 'Empowerment', 'Growth'],
-        challengesCount: 3,
-      ),
-      DiscoverableGroup(
-        id: 'group_3',
-        name: 'Mindful Living',
-        description:
-            'Focus on mindfulness, meditation, and healthy lifestyle choices. Open to all genders.',
-        memberCount: 12,
-        capacity: 15,
-        gender: 'mixed',
-        joinMethod: 'any',
-        createdAt: DateTime.now().subtract(const Duration(days: 22)),
-        lastActivityTime: '30 minutes ago',
-        tags: ['Mindfulness', 'Meditation', 'Health'],
-        challengesCount: 8,
-      ),
-      DiscoverableGroup(
-        id: 'group_4',
-        name: 'Fitness & Wellness Journey',
-        description:
-            'Supporting each other in fitness goals, healthy eating, and overall wellness improvement.',
-        memberCount: 15,
-        capacity: 20,
-        gender: 'mixed',
-        joinMethod: 'any',
-        createdAt: DateTime.now().subtract(const Duration(days: 45)),
-        lastActivityTime: '4 hours ago',
-        tags: ['Fitness', 'Health', 'Wellness'],
-        challengesCount: 12,
-      ),
-      DiscoverableGroup(
-        id: 'group_5',
-        name: 'Digital Detox Warriors',
-        description:
-            'Breaking free from social media addiction and excessive screen time. Let\'s reclaim our time!',
-        memberCount: 4,
-        capacity: 8,
-        gender: 'male',
-        joinMethod: 'code_only',
-        createdAt: DateTime.now().subtract(const Duration(days: 3)),
-        lastActivityTime: '6 hours ago',
-        tags: ['Digital Detox', 'Screen Time', 'Focus'],
-        challengesCount: 2,
-      ),
-    ];
+  /// Maps a GroupEntity to DiscoverableGroup for UI compatibility
+  DiscoverableGroup _mapGroupEntityToDiscoverable(GroupEntity group) {
+    return DiscoverableGroup(
+      id: group.id,
+      name: group.name,
+      description: group.description,
+      memberCount: 0, // TODO: Get actual member count from backend
+      capacity: group.memberCapacity,
+      gender: group.gender,
+      joinMethod: group.joinMethod,
+      createdAt: group.createdAt,
+      lastActivityTime: _formatLastActivity(group.updatedAt),
+      tags: _generateTagsFromGroup(group),
+      challengesCount: 0, // TODO: Get actual challenges count from backend
+    );
+  }
+
+  /// Formats the last activity time for display
+  String _formatLastActivity(DateTime updatedAt) {
+    final now = DateTime.now();
+    final difference = now.difference(updatedAt);
+
+    if (difference.inMinutes < 1) {
+      return 'Just now';
+    } else if (difference.inHours < 1) {
+      return '${difference.inMinutes}m ago';
+    } else if (difference.inDays < 1) {
+      return '${difference.inHours}h ago';
+    } else if (difference.inDays < 7) {
+      return '${difference.inDays}d ago';
+    } else {
+      return '${(difference.inDays / 7).floor()}w ago';
+    }
+  }
+
+  /// Generates tags based on group properties
+  List<String> _generateTagsFromGroup(GroupEntity group) {
+    final tags = <String>[];
+
+    // Add gender tag
+    if (group.gender == 'male') {
+      tags.add('Male');
+    } else if (group.gender == 'female') {
+      tags.add('Female');
+    } else {
+      tags.add('Mixed');
+    }
+
+    // Add join method tag
+    if (group.joinMethod == 'code_only') {
+      tags.add('Code Required');
+    } else if (group.joinMethod == 'any') {
+      tags.add('Open Join');
+    }
+
+    // Add generic tags
+    tags.add('Support');
+    tags.add('Community');
+
+    return tags;
   }
 }
