@@ -81,6 +81,7 @@ Future<GroupMembership?> groupMembershipNotifier(ref) async {
       capacity: group.memberCapacity,
       gender: group.gender,
       joinMethod: group.joinMethod,
+      joinCode: group.joinCode, // Include join code from GroupEntity
       createdAt: group.createdAt,
       updatedAt: group.updatedAt,
     );

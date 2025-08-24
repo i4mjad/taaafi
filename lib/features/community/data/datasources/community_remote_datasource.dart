@@ -64,8 +64,24 @@ class CommunityRemoteDatasourceImpl implements CommunityRemoteDatasource {
   @override
   Future<CommunityProfileModel?> getProfile(String uid) async {
     try {
+      // First try to get by document ID (community profile ID)
+      final docSnapshot = await _profilesCollection.doc(uid).get();
+
+      if (docSnapshot.exists) {
+        final data = docSnapshot.data()!;
+
+        // Filter out deleted profiles
+        if (data['isDeleted'] == true) {
+          return null;
+        }
+
+        return CommunityProfileModel.fromFirestore(docSnapshot);
+      }
+
+      // If not found by document ID, try querying by userUID (Firebase Auth UID)
       final snapshot = await _profilesCollection
           .where('userUID', isEqualTo: uid)
+          .where('isDeleted', isEqualTo: false)
           .limit(1)
           .get();
 
@@ -88,6 +104,7 @@ class CommunityRemoteDatasourceImpl implements CommunityRemoteDatasource {
         e.code,
       );
     } catch (e) {
+      print('❌ Datasource getProfile: Unexpected error: $e');
       throw NetworkException(
         'Unexpected error getting profile: $e',
       );
@@ -172,27 +189,43 @@ class CommunityRemoteDatasourceImpl implements CommunityRemoteDatasource {
   @override
   Stream<CommunityProfileModel?> watchProfile(String uid) {
     try {
+      // First try to watch by document ID (community profile ID)
       return _profilesCollection
-          .where('userUID', isEqualTo: uid)
-          .where('isDeleted', isEqualTo: false)
-          .limit(1)
+          .doc(uid)
           .snapshots()
-          .map((snapshot) {
-        if (snapshot.docs.isEmpty) {
-          return null;
+          .asyncExpand((docSnapshot) {
+        if (docSnapshot.exists) {
+          final data = docSnapshot.data()!;
+
+          // Filter out deleted profiles
+          if (data['isDeleted'] == true) {
+            return Stream.value(null);
+          }
+
+          return Stream.value(CommunityProfileModel.fromFirestore(docSnapshot));
         }
 
-        final doc = snapshot.docs.first;
-        final data = doc.data();
+        // If not found by document ID, try watching by userUID (Firebase Auth UID)
+        return _profilesCollection
+            .where('userUID', isEqualTo: uid)
+            .where('isDeleted', isEqualTo: false)
+            .limit(1)
+            .snapshots()
+            .map((snapshot) {
+          if (snapshot.docs.isEmpty) {
+            return null;
+          }
 
-        // Filter out deleted profiles client-side to avoid permission issues
-        if (data['isDeleted'] == true) {
-          return null;
-        }
+          final doc = snapshot.docs.first;
+          final data = doc.data();
 
-        final model = CommunityProfileModel.fromFirestore(doc);
+          // Filter out deleted profiles client-side to avoid permission issues
+          if (data['isDeleted'] == true) {
+            return null;
+          }
 
-        return model;
+          return CommunityProfileModel.fromFirestore(doc);
+        });
       });
     } on FirebaseException catch (e) {
       print('❌ Datasource watchProfile: Firebase error: $e');

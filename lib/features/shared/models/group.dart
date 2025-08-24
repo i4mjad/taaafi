@@ -8,6 +8,7 @@ class Group {
   final int capacity;
   final String gender;
   final String joinMethod; // 'any' | 'admin_only' | 'code_only'
+  final String? joinCode; // Plain text join code for code_only groups
   final DateTime createdAt;
   final DateTime? updatedAt;
 
@@ -19,6 +20,7 @@ class Group {
     required this.capacity,
     required this.gender,
     required this.joinMethod,
+    this.joinCode,
     required this.createdAt,
     this.updatedAt,
   });
@@ -32,6 +34,7 @@ class Group {
         capacity: doc.data()!["capacity"],
         gender: doc.data()!["gender"],
         joinMethod: doc.data()!["joinMethod"] ?? 'any',
+        joinCode: doc.data()!["joinCode"] as String?,
         createdAt: (doc.data()!["createdAt"] as Timestamp).toDate(),
         updatedAt: (doc.data()!["updatedAt"] as Timestamp?)?.toDate(),
       );
@@ -44,6 +47,7 @@ class Group {
         'capacity': capacity,
         'gender': gender,
         'joinMethod': joinMethod,
+        'joinCode': joinCode,
         'createdAt': createdAt.toIso8601String(),
         'updatedAt': updatedAt?.toIso8601String(),
       };

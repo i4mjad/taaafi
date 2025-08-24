@@ -2962,7 +2962,7 @@ const Map<String, String> kAr = {
   "male-groups": "مجموعات الذكور",
   "female-groups": "مجموعات الإناث",
   "open-join": "انضمام مفتوح",
-  "code-required": "كود مطلوب",
+  "code-required": "رمز مطلوب",
   "groups-found": "تم العثور على {count} مجموعات",
   "no-groups-found": "لم يتم العثور على مجموعات",
   "try-different-filters": "جرب تعديل البحث أو الفلاتر",
@@ -2987,7 +2987,7 @@ const Map<String, String> kAr = {
   "female-only": "إناث فقط",
   "mixed": "مختلط",
   "group-full": "المجموعة ممتلئة",
-  "join-with-code": "انضم بالكود",
+  "join-with-code": "انضم بالرمز",
   "join-group": "انضم للمجموعة",
   "just-created": "تم إنشاؤها للتو",
   "group-months-ago": "منذ {months} أشهر",
@@ -3007,7 +3007,7 @@ const Map<String, String> kAr = {
   'cooldown-active-create-error':
       'يجب أن تنتظر قبل الانضمام أو إنشاء زمالة أخرى',
   'group-full-error': 'الزمالة ممتلئة',
-  'invalid-join-code-error': 'كود الانضمام غير صالح أو منتهي الصلاحية',
+  'invalid-join-code-error': 'رمز الانضمام غير صالح أو منتهي الصلاحية',
   'gender-mismatch-error': 'لا تفي المتطلبات الجنسية',
   'gender-requirements-not-met': 'لا تفي المتطلبات الجنسية',
   'group-name-invalid': 'اسم الزمالة غير صالح',
@@ -3022,12 +3022,12 @@ const Map<String, String> kAr = {
 
   // Group Join Code Card translations
   'group-sharing': 'مشاركة الزمالة',
-  'join-code': 'كود الانضمام',
+  'join-code': 'رمز الانضمام',
   'group-id': 'معرف الزمالة',
   'code-only-admin-desc':
-      'شارك هذا الكود مع الآخرين للسماح لهم بالانضمام إلى زمالتك.',
+      'شارك هذا الرمز مع الآخرين للسماح لهم بالانضمام إلى زمالتك.',
   'code-only-member-desc':
-      'تستخدم هذه الزمالة أكواد الانضمام. اطلب الكود من المشرف لدعوة الآخرين.',
+      'تستخدم هذه الزمالة رموز الانضمام. اطلب الرمز من المشرف لدعوة الآخرين.',
   'any-join-desc':
       'يمكن لأي شخص الانضمام إلى هذه الزمالة باستخدام معرف الزمالة أدناه.',
   'admin-only-admin-desc':
@@ -3040,9 +3040,9 @@ const Map<String, String> kAr = {
 
   // Group creation success modal
   'group-created-successfully-title': 'تم إنشاء الزمالة بنجاح!',
-  'your-join-code': 'كود الانضمام الخاص بك',
-  'copy-code': 'نسخ الكود',
-  'join-code-copied': 'تم نسخ كود الانضمام إلى الحافظة!',
+  'your-join-code': 'رمز الانضمام الخاص بك',
+  'copy-code': 'نسخ الرمز',
+  'join-code-copied': 'تم نسخ رمز الانضمام إلى الحافظة!',
 
   // Group Privacy Settings
   'user-privacy-settings': 'إعدادات الخصوصية الشخصية',
@@ -3058,9 +3058,9 @@ const Map<String, String> kAr = {
   'join-method-any-description': 'أعضاء الزمالة والزوار يمكنهم الانضمام مباشرة',
   'join-method-admin-only': 'دعوة المشرف فقط',
   'join-method-admin-only-description': 'المشرف فقط يمكنه إرسال دعوات للانضمام',
-  'join-method-code-only': 'كود الانضمام مطلوب',
+  'join-method-code-only': 'رمز الانضمام مطلوب',
   'join-method-code-only-description':
-      'الأعضاء يحتاجون كود للانضمام إلى الزمالة',
+      'الأعضاء يحتاجون رمز للانضمام إلى الزمالة',
   'join-method-any-requires-public': 'هذا الخيار يتطلب أن تكون الزمالة عامة',
-  'current-join-code': 'كود الانضمام الحالي',
+  'current-join-code': 'رمز الانضمام الحالي',
 };
