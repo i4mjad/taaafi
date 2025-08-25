@@ -5,6 +5,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/routing/route_names.dart';
 import 'package:reboot_app_3/core/shared_widgets/app_bar.dart';
+import 'package:reboot_app_3/core/shared_widgets/container.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
@@ -48,6 +49,17 @@ class GroupMember {
   });
 }
 
+/// Model for coming soon features
+class ComingSoonFeature {
+  final IconData icon;
+  final String title;
+
+  const ComingSoonFeature({
+    required this.icon,
+    required this.title,
+  });
+}
+
 class GroupScreen extends ConsumerWidget {
   const GroupScreen({super.key});
 
@@ -62,8 +74,8 @@ class GroupScreen extends ConsumerWidget {
         if (membership == null) {
           return Scaffold(
             backgroundColor: theme.backgroundColor,
-            body: const Center(
-              child: Text('خطأ: لم يتم العثور على عضوية في مجموعة'),
+            body: Center(
+              child: Text(l10n.translate('error-no-group-membership')),
             ),
           );
         }
@@ -71,19 +83,25 @@ class GroupScreen extends ConsumerWidget {
         return Scaffold(
           backgroundColor: theme.backgroundColor,
           appBar: appBar(context, ref, "group", false, false),
-          body: Column(
-            children: [
-              // Group header
-              _buildGroupHeader(context, theme, l10n, membership),
+          body: SingleChildScrollView(
+            padding: const EdgeInsets.only(bottom: 20), // Add bottom padding
+            child: Column(
+              children: [
+                // Descriptive section about groups feature
+                _buildDescriptiveSection(context, theme, l10n, membership),
 
-              // Content
-              Expanded(
-                child: _buildContent(context, theme, l10n),
-              ),
+                // Group header (commented for later use)
+                // _buildGroupHeader(context, theme, l10n, membership),
 
-              // Bottom sections (Chat and Challenges)
-              _buildBottomSections(context, theme, l10n, membership.group.id),
-            ],
+                // Content (commented for later use)
+                // Expanded(
+                //   child: _buildContent(context, theme, l10n),
+                // ),
+
+                // Bottom sections
+                _buildBottomSections(context, theme, l10n, membership.group.id),
+              ],
+            ),
           ),
         );
       },
@@ -96,55 +114,223 @@ class GroupScreen extends ConsumerWidget {
       error: (error, stackTrace) => Scaffold(
         backgroundColor: theme.backgroundColor,
         body: Center(
-          child: Text('خطأ: ${error.toString()}'),
+          child: Text('${l10n.translate('error')}: ${error.toString()}'),
         ),
       ),
     );
   }
 
-  Widget _buildGroupHeader(BuildContext context, CustomThemeData theme,
+  // Commented for later use
+  // Widget _buildGroupHeader(BuildContext context, CustomThemeData theme,
+  //     AppLocalizations l10n, GroupMembership membership) {
+  //   return Container(
+  //     padding: const EdgeInsets.all(20),
+  //     child: Column(
+  //       crossAxisAlignment: CrossAxisAlignment.start,
+  //       children: [
+  //         // Group name
+  //         Text(
+  //           l10n.translate('group-name'),
+  //           style: TextStyles.h5.copyWith(
+  //             color: theme.grey[900],
+  //           ),
+  //         ),
+  //
+  //         const SizedBox(height: 8),
+  //
+  //         // Member count and avatars
+  //         Row(
+  //           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //           children: [
+  //             // Member count with green dot
+  //             // Member avatars
+  //             _buildMemberAvatars(context, l10n),
+  //             Row(
+  //               children: [
+  //                 Container(
+  //                   width: 8,
+  //                   height: 8,
+  //                   decoration: const BoxDecoration(
+  //                     color: Colors.green,
+  //                     shape: BoxShape.circle,
+  //                   ),
+  //                 ),
+  //                 const SizedBox(width: 8),
+  //                 Text(
+  //                   l10n.translate('members-online-now'),
+  //                   style: TextStyles.body.copyWith(
+  //                     color: theme.grey[700],
+  //                     fontWeight: FontWeight.w500,
+  //                   ),
+  //                 ),
+  //               ],
+  //             ),
+  //           ],
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
+
+  // Commented for later use
+  // Widget _buildMemberAvatars(BuildContext context, AppLocalizations l10n) {
+  //   return GestureDetector(
+  //     onTap: () => _showGroupMembers(context, l10n),
+  //     child: SizedBox(
+  //       width: 92, // Width for 4 avatars: 32 + (3 * 20) = 92px
+  //       height: 32,
+  //       child: Stack(
+  //         children: [
+  //           _buildAvatar(Colors.orange, 0),
+  //           _buildAvatar(Colors.blue, 1),
+  //           _buildAvatar(Colors.purple, 2),
+  //           _buildAvatar(Colors.green, 3),
+  //         ],
+  //       ),
+  //     ),
+  //   );
+  // }
+
+  // Commented for later use
+  // Widget _buildAvatar(Color color, int index) {
+  //   return Positioned(
+  //     left: index * 20.0, // Overlap by 12px (32px width - 20px spacing)
+  //     child: Container(
+  //       width: 32,
+  //       height: 32,
+  //       decoration: BoxDecoration(
+  //         color: color,
+  //         shape: BoxShape.circle,
+  //         border: Border.all(color: Colors.white, width: 1),
+  //       ),
+  //     ),
+  //   );
+  // }
+
+  // Commented for later use
+  // Widget _buildContent(
+  //     BuildContext context, CustomThemeData theme, AppLocalizations l10n) {
+  //   return Column(
+  //     crossAxisAlignment: CrossAxisAlignment.start,
+  //     children: [
+  //       // Recent updates title
+  //       Padding(
+  //         padding: const EdgeInsets.symmetric(horizontal: 20),
+  //         child: Text(
+  //           l10n.translate('recent-updates'),
+  //           style: TextStyles.h6.copyWith(
+  //             color: theme.grey[900],
+  //           ),
+  //         ),
+  //       ),
+  //
+  //       const SizedBox(height: 16),
+  //
+  //       // Updates list
+  //       Expanded(
+  //         child: ListView.builder(
+  //           padding: const EdgeInsets.symmetric(horizontal: 20),
+  //           itemCount: _getDemoUpdates().length,
+  //           itemBuilder: (context, index) {
+  //             final update = _getDemoUpdates()[index];
+  //             return _buildUpdateItem(context, theme, update, index);
+  //           },
+  //         ),
+  //       ),
+  //     ],
+  //   );
+  // }
+
+  Widget _buildDescriptiveSection(BuildContext context, CustomThemeData theme,
       AppLocalizations l10n, GroupMembership membership) {
-    return Container(
+    return Padding(
       padding: const EdgeInsets.all(20),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          // Group name
+          // Group name as title
           Text(
-            'اسم الزمالة',
-            style: TextStyles.h5.copyWith(
+            membership.group.name,
+            style: TextStyles.h4.copyWith(
               color: theme.grey[900],
+              fontWeight: FontWeight.bold,
             ),
+            textAlign: TextAlign.center,
           ),
 
-          const SizedBox(height: 8),
+          const SizedBox(height: 16),
 
-          // Member count and avatars
+          // Description
+          Text(
+            l10n.translate('groups-feature-description'),
+            style: TextStyles.body.copyWith(
+              color: theme.grey[700],
+              height: 1.5,
+            ),
+            textAlign: TextAlign.center,
+          ),
+
+          const SizedBox(height: 24),
+
+          // Coming soon cards section
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              // Member count with green dot
-              // Member avatars
-              _buildMemberAvatars(context, l10n),
-              Row(
-                children: [
-                  Container(
-                    width: 8,
-                    height: 8,
-                    decoration: const BoxDecoration(
-                      color: Colors.green,
-                      shape: BoxShape.circle,
+              // Shared Challenges card
+              Expanded(
+                child: _buildComingSoonCard(
+                  context: context,
+                  theme: theme,
+                  l10n: l10n,
+                  title: l10n.translate('shared-challenges'),
+                  subtitle: l10n.translate('join-exciting-challenges'),
+                  icon: LucideIcons.target,
+                  features: [
+                    ComingSoonFeature(
+                      icon: LucideIcons.calendar,
+                      title: l10n.translate('daily-goals'),
                     ),
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    '3 متحدين الآن',
-                    style: TextStyles.body.copyWith(
-                      color: theme.grey[700],
-                      fontWeight: FontWeight.w500,
+                    ComingSoonFeature(
+                      icon: LucideIcons.users,
+                      title: l10n.translate('community-support'),
                     ),
-                  ),
-                ],
+                    ComingSoonFeature(
+                      icon: LucideIcons.trophy,
+                      title: l10n.translate('achievements-rewards'),
+                    ),
+                  ],
+                  cardColor: theme.secondary[50]!,
+                  borderColor: theme.secondary[200]!,
+                ),
+              ),
+
+              const SizedBox(width: 16),
+
+              // Shared Updates card
+              Expanded(
+                child: _buildComingSoonCard(
+                  context: context,
+                  theme: theme,
+                  l10n: l10n,
+                  title: l10n.translate('shared-updates'),
+                  subtitle: l10n.translate('share-updates-with-members'),
+                  icon: LucideIcons.heart,
+                  features: [
+                    ComingSoonFeature(
+                      icon: LucideIcons.trendingUp,
+                      title: l10n.translate('progress-sharing'),
+                    ),
+                    ComingSoonFeature(
+                      icon: LucideIcons.flag,
+                      title: l10n.translate('milestone-updates'),
+                    ),
+                    ComingSoonFeature(
+                      icon: LucideIcons.heart,
+                      title: l10n.translate('encouragement-posts'),
+                    ),
+                  ],
+                  cardColor: theme.primary[50]!,
+                  borderColor: theme.primary[200]!,
+                ),
               ),
             ],
           ),
@@ -153,139 +339,200 @@ class GroupScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildMemberAvatars(BuildContext context, AppLocalizations l10n) {
-    return GestureDetector(
-      onTap: () => _showGroupMembers(context, l10n),
-      child: SizedBox(
-        width: 92, // Width for 4 avatars: 32 + (3 * 20) = 92px
-        height: 32,
-        child: Stack(
-          children: [
-            _buildAvatar(Colors.orange, 0),
-            _buildAvatar(Colors.blue, 1),
-            _buildAvatar(Colors.purple, 2),
-            _buildAvatar(Colors.green, 3),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildAvatar(Color color, int index) {
-    return Positioned(
-      left: index * 20.0, // Overlap by 12px (32px width - 20px spacing)
-      child: Container(
-        width: 32,
-        height: 32,
-        decoration: BoxDecoration(
-          color: color,
-          shape: BoxShape.circle,
-          border: Border.all(color: Colors.white, width: 1),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildContent(
-      BuildContext context, CustomThemeData theme, AppLocalizations l10n) {
+  Widget _buildComingSoonCard({
+    required BuildContext context,
+    required CustomThemeData theme,
+    required AppLocalizations l10n,
+    required String title,
+    required String subtitle,
+    required IconData icon,
+    required List<ComingSoonFeature> features,
+    required Color cardColor,
+    required Color borderColor,
+  }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Recent updates title
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: Text(
-            'التحديثات الأخيرة',
-            style: TextStyles.h6.copyWith(
-              color: theme.grey[900],
+        // Header with icon and "Soon" badge
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            WidgetsContainer(
+              backgroundColor: theme.backgroundColor,
+              borderRadius: BorderRadius.circular(8),
+              borderSide: BorderSide(color: borderColor, width: 1),
+              cornerSmoothing: 0.6,
+              padding: const EdgeInsets.all(8),
+              child: Icon(
+                icon,
+                size: 24,
+                color: theme.grey[700],
+              ),
             ),
+            const Spacer(),
+            WidgetsContainer(
+              backgroundColor: theme.grey[200]!,
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide.none,
+              cornerSmoothing: 0.8,
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              child: Text(
+                l10n.translate('coming-soon'),
+                style: TextStyles.caption.copyWith(
+                  color: theme.grey[700],
+                  fontSize: 10,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+          ],
+        ),
+
+        const SizedBox(height: 12), // Reduced spacing
+
+        // Title
+        Text(
+          title,
+          style: TextStyles.h5.copyWith(
+            color: theme.grey[900],
+            fontWeight: FontWeight.bold,
           ),
         ),
 
-        const SizedBox(height: 16),
+        const SizedBox(height: 6), // Reduced spacing
 
-        // Updates list
-        Expanded(
-          child: ListView.builder(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            itemCount: _getDemoUpdates().length,
-            itemBuilder: (context, index) {
-              final update = _getDemoUpdates()[index];
-              return _buildUpdateItem(context, theme, update, index);
-            },
+        // Subtitle
+        Text(
+          subtitle,
+          style: TextStyles.smallBold.copyWith(
+            color: theme.grey[600],
+            height: 1.3, // Reduced line height
+          ),
+        ),
+
+        const SizedBox(height: 16), // Reduced spacing
+
+        // What's Coming section
+        WidgetsContainer(
+          backgroundColor: Colors.white.withValues(alpha: 0.5),
+          borderRadius: BorderRadius.circular(12),
+          borderSide:
+              BorderSide(color: borderColor.withValues(alpha: 0.3), width: 1),
+          cornerSmoothing: 0.8,
+          padding: const EdgeInsets.all(10), // Reduced padding
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                l10n.translate('whats-coming'),
+                style: TextStyles.caption.copyWith(
+                  color: theme.grey[700],
+                  fontWeight: FontWeight.w600,
+                  fontSize: 12,
+                ),
+              ),
+              const SizedBox(height: 6), // Reduced spacing
+              // Features list
+              ...features
+                  .map((feature) => Padding(
+                        padding:
+                            const EdgeInsets.only(bottom: 4), // Reduced spacing
+                        child: Row(
+                          children: [
+                            Icon(
+                              feature.icon,
+                              size: 16,
+                              color: theme.grey[600],
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                feature.title,
+                                style: TextStyles.caption.copyWith(
+                                  color: theme.grey[700],
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ))
+                  .toList(),
+            ],
           ),
         ),
       ],
     );
   }
 
-  Widget _buildUpdateItem(BuildContext context, CustomThemeData theme,
-      GroupUpdateItem update, int index) {
-    // Even-numbered items (index 1, 3, 5... which are 2nd, 4th, 6th items) get background
-    final isEvenItem = (index + 1) % 2 == 0;
-
-    return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-      decoration: isEvenItem
-          ? BoxDecoration(
-              color: theme.grey[50],
-              borderRadius: BorderRadius.circular(8),
-            )
-          : null,
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        textDirection: TextDirection.rtl, // RTL layout for Arabic
-        children: [
-          // Time (rightmost in RTL)
-          Text(
-            update.time,
-            style: TextStyles.caption.copyWith(
-              color: theme.grey[500],
-              fontWeight: FontWeight.w400,
-              fontSize: 12,
-            ),
-          ),
-
-          const SizedBox(width: 12),
-
-          // User Avatar (middle)
-          //TODO: Change this to the real avatar
-          Container(
-            width: 36,
-            height: 36,
-            decoration: BoxDecoration(
-              color: update.iconColor,
-              shape: BoxShape.circle,
-              border: Border.all(color: Colors.white, width: 0.75),
-            ),
-            child: update.icon != null
-                ? Icon(
-                    update.icon,
-                    size: 16,
-                    color: Colors.white,
-                  )
-                : null,
-          ),
-
-          const SizedBox(width: 12),
-
-          // Main text content (leftmost in RTL)
-          Expanded(
-            child: Text(
-              update.title,
-              style: TextStyles.smallBold.copyWith(
-                color: theme.grey[900],
-                fontWeight: FontWeight.w400,
-                height: 1.4,
-              ),
-              textAlign: TextAlign.right,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+  // Commented for later use
+  //   //     GroupUpdateItem update, int index) {
+  //   // Even-numbered items (index 1, 3, 5... which are 2nd, 4th, 6th items) get background
+  //   final isEvenItem = (index + 1) % 2 == 0;
+  //
+  //   return Container(
+  //     margin: const EdgeInsets.only(bottom: 8),
+  //     padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+  //     decoration: isEvenItem
+  //         ? BoxDecoration(
+  //             color: theme.grey[50],
+  //             borderRadius: BorderRadius.circular(8),
+  //           )
+  //         : null,
+  //     child: Row(
+  //       crossAxisAlignment: CrossAxisAlignment.center,
+  //       textDirection: TextDirection.rtl, // RTL layout for Arabic
+  //       children: [
+  //         // Time (rightmost in RTL)
+  //         Text(
+  //           update.time,
+  //           style: TextStyles.caption.copyWith(
+  //             color: theme.grey[500],
+  //             fontWeight: FontWeight.w400,
+  //             fontSize: 12,
+  //           ),
+  //         ),
+  //
+  //         const SizedBox(width: 12),
+  //
+  //         // User Avatar (middle)
+  //         //TODO: Change this to the real avatar
+  //         Container(
+  //           width: 36,
+  //           height: 36,
+  //           decoration: BoxDecoration(
+  //             color: update.iconColor,
+  //             shape: BoxShape.circle,
+  //             border: Border.all(color: Colors.white, width: 0.75),
+  //           ),
+  //           child: update.icon != null
+  //               ? Icon(
+  //                   update.icon,
+  //                   size: 16,
+  //                   color: Colors.white,
+  //                 )
+  //               : null,
+  //         ),
+  //
+  //         const SizedBox(width: 12),
+  //
+  //         // Main text content (leftmost in RTL)
+  //         Expanded(
+  //           child: Text(
+  //             update.title,
+  //             style: TextStyles.smallBold.copyWith(
+  //               color: theme.grey[900],
+  //               fontWeight: FontWeight.w400,
+  //               height: 1.4,
+  //             ),
+  //             textAlign: TextAlign.right,
+  //           ),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 
   Widget _buildBottomSections(BuildContext context, CustomThemeData theme,
       AppLocalizations l10n, String groupId) {
@@ -293,34 +540,34 @@ class GroupScreen extends ConsumerWidget {
       padding: const EdgeInsets.all(16),
       child: Column(
         children: [
-          // Top row: Challenges and Chat
+          // Top row: Chat only (Challenges commented for later use)
           Row(
             children: [
-              // Challenges section (top left)
-              Expanded(
-                child: _buildBottomSection(
-                  context: context,
-                  theme: theme,
-                  l10n: l10n,
-                  icon: LucideIcons.trophy,
-                  label: 'التحديات',
-                  backgroundColor: theme.secondary[50]!,
-                  borderColor: theme.secondary[200]!,
-                  textColor: theme.secondary[900]!,
-                  onTap: () => _navigateToChallenges(context, groupId),
-                ),
-              ),
+              // Challenges section (commented for later use)
+              // Expanded(
+              //   child: _buildBottomSection(
+              //     context: context,
+              //     theme: theme,
+              //     l10n: l10n,
+              //     icon: LucideIcons.trophy,
+              //     label: l10n.translate('challenges'),
+              //     backgroundColor: theme.secondary[50]!,
+              //     borderColor: theme.secondary[200]!,
+              //     textColor: theme.secondary[900]!,
+              //     onTap: () => _navigateToChallenges(context, groupId),
+              //   ),
+              // ),
+              //
+              // const SizedBox(width: 8),
 
-              const SizedBox(width: 8),
-
-              // Chat section (top right)
+              // Chat section
               Expanded(
                 child: _buildBottomSection(
                   context: context,
                   theme: theme,
                   l10n: l10n,
                   icon: LucideIcons.messageCircle,
-                  label: 'المحادثة',
+                  label: l10n.translate('chat'),
                   backgroundColor: theme.primary[50]!,
                   borderColor: theme.primary[200]!,
                   textColor: theme.primary[900]!,
@@ -332,17 +579,17 @@ class GroupScreen extends ConsumerWidget {
 
           const SizedBox(height: 8),
 
-          // Bottom row: Settings and Updates
+          // Bottom row: Settings only (Updates commented for later use)
           Row(
             children: [
-              // Settings section (bottom left)
+              // Settings section
               Expanded(
                 child: _buildBottomSection(
                   context: context,
                   theme: theme,
                   l10n: l10n,
                   icon: LucideIcons.settings,
-                  label: 'الإعدادات',
+                  label: l10n.translate('settings'),
                   backgroundColor: theme.grey[50]!,
                   borderColor: theme.grey[200]!,
                   textColor: theme.grey[900]!,
@@ -350,22 +597,22 @@ class GroupScreen extends ConsumerWidget {
                 ),
               ),
 
-              const SizedBox(width: 8),
-
-              // Updates section (bottom right)
-              Expanded(
-                child: _buildBottomSection(
-                  context: context,
-                  theme: theme,
-                  l10n: l10n,
-                  icon: LucideIcons.layers,
-                  label: 'التحديثات',
-                  backgroundColor: theme.tint[50]!,
-                  borderColor: theme.tint[200]!,
-                  textColor: theme.tint[900]!,
-                  onTap: () => _navigateToUpdates(context, groupId),
-                ),
-              ),
+              // Updates section (commented for later use)
+              // const SizedBox(width: 8),
+              //
+              // Expanded(
+              //   child: _buildBottomSection(
+              //     context: context,
+              //     theme: theme,
+              //     l10n: l10n,
+              //     icon: LucideIcons.layers,
+              //     label: l10n.translate('updates'),
+              //     backgroundColor: theme.tint[50]!,
+              //     borderColor: theme.tint[200]!,
+              //     textColor: theme.tint[900]!,
+              //     onTap: () => _navigateToUpdates(context, groupId),
+              //   ),
+              // ),
             ],
           ),
         ],
@@ -386,13 +633,12 @@ class GroupScreen extends ConsumerWidget {
   }) {
     return GestureDetector(
       onTap: onTap,
-      child: Container(
+      child: WidgetsContainer(
+        backgroundColor: backgroundColor,
+        borderRadius: BorderRadius.circular(8),
+        borderSide: BorderSide(color: borderColor, width: 1),
+        cornerSmoothing: 0.6,
         padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: backgroundColor,
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: borderColor, width: 1),
-        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -423,12 +669,13 @@ class GroupScreen extends ConsumerWidget {
     );
   }
 
-  void _navigateToUpdates(BuildContext context, String groupId) {
-    context.goNamed(
-      RouteNames.groupUpdates.name,
-      pathParameters: {'groupId': groupId},
-    );
-  }
+  // Commented for later use
+  // void _navigateToUpdates(BuildContext context, String groupId) {
+  //   context.goNamed(
+  //     RouteNames.groupUpdates.name,
+  //     pathParameters: {'groupId': groupId},
+  //   );
+  // }
 
   void _navigateToSettings(BuildContext context, String groupId) {
     context.goNamed(
@@ -437,88 +684,92 @@ class GroupScreen extends ConsumerWidget {
     );
   }
 
-  void _navigateToChallenges(BuildContext context, String groupId) {
-    context.goNamed(
-      RouteNames.groupChallenge.name,
-      pathParameters: {'groupId': groupId},
-    );
-  }
+  // Commented for later use
+  // void _navigateToChallenges(BuildContext context, String groupId) {
+  //   context.goNamed(
+  //     RouteNames.groupChallenge.name,
+  //     pathParameters: {'groupId': groupId},
+  //   );
+  // }
 
-  List<GroupUpdateItem> _getDemoUpdates() {
-    return [
-      GroupUpdateItem(
-        id: '1',
-        title: 'أكمل صلاة الفجر اليوم ستين يوم بدون إجابة بالورده',
-        time: '12:00',
-        icon: null,
-        iconColor: Colors.grey[400]!,
-      ),
-      GroupUpdateItem(
-        id: '2',
-        title: 'أكمل يوسف يوسف بـ 5 أيام بدون إجابة',
-        time: '12:00',
-        icon: null,
-        iconColor: Colors.orange[400]!,
-      ),
-      GroupUpdateItem(
-        id: '3',
-        title: 'تقدم يوسف يوسف إلى المركز الأول في تحدي 30 يوم بدون إجابة',
-        time: '12:00',
-        icon: null,
-        iconColor: Colors.red[400]!,
-      ),
-      GroupUpdateItem(
-        id: '4',
-        title: 'أنهى سيف حمد مقام اليوم',
-        time: '12:00',
-        icon: null,
-        iconColor: Colors.brown[400]!,
-      ),
-    ];
-  }
+  // Commented for later use
+  // List<GroupUpdateItem> _getDemoUpdates() {
+  //   return [
+  //     GroupUpdateItem(
+  //       id: '1',
+  //       title: 'أكمل صلاة الفجر اليوم ستين يوم بدون إجابة بالورده',
+  //       time: '12:00',
+  //       icon: null,
+  //       iconColor: Colors.grey[400]!,
+  //     ),
+  //     GroupUpdateItem(
+  //       id: '2',
+  //       title: 'أكمل يوسف يوسف بـ 5 أيام بدون إجابة',
+  //       time: '12:00',
+  //       icon: null,
+  //       iconColor: Colors.orange[400]!,
+  //     ),
+  //     GroupUpdateItem(
+  //       id: '3',
+  //       title: 'تقدم يوسف يوسف إلى المركز الأول في تحدي 30 يوم بدون إجابة',
+  //       time: '12:00',
+  //       icon: null,
+  //       iconColor: Colors.red[400]!,
+  //     ),
+  //     GroupUpdateItem(
+  //       id: '4',
+  //       title: 'أنهى سيف حمد مقام اليوم',
+  //       time: '12:00',
+  //       icon: null,
+  //       iconColor: Colors.brown[400]!,
+  //     ),
+  //   ];
+  // }
 
-  List<GroupMember> _getDemoMembers() {
-    return [
-      GroupMember(
-        id: '1',
-        name: 'أحمد محمد',
-        avatarColor: Colors.orange,
-        status: MemberStatus.online,
-      ),
-      GroupMember(
-        id: '2',
-        name: 'سارة أحمد',
-        avatarColor: Colors.blue,
-        status: MemberStatus.offline,
-        lastSeen: DateTime.now().subtract(const Duration(minutes: 15)),
-      ),
-      GroupMember(
-        id: '3',
-        name: 'محمد علي',
-        avatarColor: Colors.purple,
-        status: MemberStatus.offline,
-        lastSeen: DateTime.now().subtract(const Duration(hours: 2)),
-      ),
-      GroupMember(
-        id: '4',
-        name: 'فاطمة حسن',
-        avatarColor: Colors.green,
-        status: MemberStatus.offline,
-        lastSeen: DateTime.now().subtract(const Duration(days: 1)),
-      ),
-    ];
-  }
+  // Commented for later use
+  // List<GroupMember> _getDemoMembers() {
+  //   return [
+  //     GroupMember(
+  //       id: '1',
+  //       name: 'أحمد محمد',
+  //       avatarColor: Colors.orange,
+  //       status: MemberStatus.online,
+  //     ),
+  //     GroupMember(
+  //       id: '2',
+  //       name: 'سارة أحمد',
+  //       avatarColor: Colors.blue,
+  //       status: MemberStatus.offline,
+  //       lastSeen: DateTime.now().subtract(const Duration(minutes: 15)),
+  //     ),
+  //     GroupMember(
+  //       id: '3',
+  //       name: 'محمد علي',
+  //       avatarColor: Colors.purple,
+  //       status: MemberStatus.offline,
+  //       lastSeen: DateTime.now().subtract(const Duration(hours: 2)),
+  //     ),
+  //     GroupMember(
+  //       id: '4',
+  //       name: 'فاطمة حسن',
+  //       avatarColor: Colors.green,
+  //       status: MemberStatus.offline,
+  //       lastSeen: DateTime.now().subtract(const Duration(days: 1)),
+  //     ),
+  //   ];
+  // }
 
-  void _showGroupMembers(BuildContext context, AppLocalizations l10n) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => GroupMembersModal(
-        members: _getDemoMembers(),
-      ),
-    );
-  }
+  // Commented for later use
+  // void _showGroupMembers(BuildContext context, AppLocalizations l10n) {
+  //   showModalBottomSheet(
+  //     context: context,
+  //     isScrollControlled: true,
+  //     backgroundColor: Colors.transparent,
+  //     builder: (context) => GroupMembersModal(
+  //       members: _getDemoMembers(),
+  //     ),
+  //   );
+  // }
 }
 
 /// Modal bottom sheet for displaying group members

@@ -288,7 +288,7 @@ const Map<String, String> kEn = {
   "community-general": "General",
   "community-questions": "Questions",
   "community-tips": "Tips",
-  "community-support": "Support",
+  "community-support": "Community Support",
   "community-discussions": "Discussions",
   "community-all": "All",
   "community-likes": "likes",
@@ -1621,6 +1621,26 @@ const Map<String, String> kEn = {
   "community-profile-settings": "Community Profile",
   "groups-feature-4": "Track group achievements and milestones",
   "groups-feature-5": "Private and secure group interactions",
+
+  // Groups screen translations
+  "groups-feature-title": "Groups Feature",
+  "groups-feature-description":
+      "Connect with a supportive community of people on a shared recovery journey. Share experiences and get support in a safe and respectful environment.",
+  "shared-updates": "Updates",
+  "shared-challenges": "Challenges",
+  "error-no-group-membership": "Error: No group membership found",
+  "error": "Error",
+
+  // Coming soon section
+  "join-exciting-challenges":
+      "Join exciting challenges with community support.",
+  "share-updates-with-members": "Share your updates with other group members.",
+  "whats-coming": "What's Coming:",
+  "daily-goals": "Daily Goals",
+  "achievements-rewards": "Achievements & Rewards",
+  "progress-sharing": "Progress Sharing",
+  "milestone-updates": "Milestone Updates",
+  "encouragement-posts": "Encouragement Posts",
 
   // Groups main screen
   "groups-main-title": "Ta'aafi Groups",

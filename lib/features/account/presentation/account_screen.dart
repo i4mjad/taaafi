@@ -105,8 +105,7 @@ class AccountScreen extends ConsumerWidget {
                                     accountStatus ==
                                         AccountStatus.needEmailVerification)
                                   const ConfirmEmailBanner(),
-                                if (showMainContent) const SubscriptionCard(),
-                                verticalSpace(Spacing.points16),
+
                                 GestureDetector(
                                   onTap: () {
                                     HapticFeedback.mediumImpact();
