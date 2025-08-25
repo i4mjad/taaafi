@@ -8,7 +8,6 @@ import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/features/community/data/models/post.dart';
 import 'package:reboot_app_3/features/community/data/models/post_category.dart';
 import 'package:reboot_app_3/features/community/presentation/widgets/avatar_with_anonymity.dart';
-import 'package:reboot_app_3/features/community/presentation/widgets/role_chip.dart';
 import 'package:reboot_app_3/features/community/presentation/widgets/streak_display_widget.dart';
 import 'package:reboot_app_3/features/community/presentation/widgets/community_profile_modal.dart';
 import 'package:reboot_app_3/features/community/presentation/providers/community_providers_new.dart';
@@ -109,7 +108,7 @@ class PostHeaderWidget extends ConsumerWidget {
                             Row(
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
-                                // Display name - clickable to show profile
+                                // Display name with role icon - clickable to show profile
                                 Flexible(
                                   child: GestureDetector(
                                     onTap: () => _showCommunityProfileModal(
@@ -120,33 +119,88 @@ class PostHeaderWidget extends ConsumerWidget {
                                       isAuthorAnonymous,
                                       isAuthorPlusUser,
                                     ),
-                                    child: Text(
-                                      () {
-                                        final pipelineResult = authorProfile
-                                            .getDisplayNameWithPipeline();
+                                    child: ConstrainedBox(
+                                      constraints:
+                                          const BoxConstraints(maxWidth: 200),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          // Role icon (only show for founder and admin)
+                                          if (authorProfile.role
+                                                      .toLowerCase() ==
+                                                  'founder' ||
+                                              authorProfile.role
+                                                      .toLowerCase() ==
+                                                  'admin') ...[
+                                            () {
+                                              final roleData = _getRoleIconData(
+                                                  authorProfile.role
+                                                      .toLowerCase());
+                                              return Icon(
+                                                roleData.icon,
+                                                size: 16,
+                                                color: roleData.color,
+                                              );
+                                            }(),
+                                            const SizedBox(width: 4),
+                                          ],
+                                          Flexible(
+                                            child: Text(
+                                              () {
+                                                final pipelineResult = authorProfile
+                                                    .getDisplayNameWithPipeline();
 
-                                        final localizedResult =
-                                            _getLocalizedDisplayName(
-                                                pipelineResult, localizations);
+                                                final localizedResult =
+                                                    _getLocalizedDisplayName(
+                                                        pipelineResult,
+                                                        localizations);
 
-                                        return localizedResult;
-                                      }(),
-                                      style: TextStyles.body.copyWith(
-                                        fontWeight: FontWeight.w600,
-                                        color: isOrphanedPost
-                                            ? theme.grey[
-                                                600] // Dimmed for orphaned posts
-                                            : (!isAuthorAnonymous
-                                                ? theme.primary[700]
-                                                : theme.grey[
-                                                    900]), // Make clickable names more prominent
+                                                return localizedResult;
+                                              }(),
+                                              style: TextStyles.body.copyWith(
+                                                fontWeight: FontWeight.w600,
+                                                color: () {
+                                                  if (isOrphanedPost) {
+                                                    return theme.grey[
+                                                        600]; // Dimmed for orphaned posts
+                                                  }
+                                                  // Apply role color for founder/admin
+                                                  if (authorProfile.role
+                                                              .toLowerCase() ==
+                                                          'founder' ||
+                                                      authorProfile.role
+                                                              .toLowerCase() ==
+                                                          'admin') {
+                                                    final roleData =
+                                                        _getRoleIconData(
+                                                            authorProfile.role
+                                                                .toLowerCase());
+                                                    return roleData.color;
+                                                  }
+                                                  // Default color logic
+                                                  return !isAuthorAnonymous
+                                                      ? theme.primary[700]
+                                                      : theme.grey[900];
+                                                }(),
+                                              ),
+                                              overflow: TextOverflow.ellipsis,
+                                              maxLines: 1,
+                                            ),
+                                          ),
+                                        ],
                                       ),
-                                      overflow: TextOverflow.ellipsis,
                                     ),
                                   ),
                                 ),
 
-                                const SizedBox(width: 8),
+                                const SizedBox(width: 4),
+                                Text(
+                                  '•',
+                                  style: TextStyles.h6.copyWith(
+                                    color: theme.grey[600],
+                                  ),
+                                ),
+                                const SizedBox(width: 4),
 
                                 // Timestamp
                                 Text(
@@ -212,7 +266,6 @@ class PostHeaderWidget extends ConsumerWidget {
                                         ),
                                       ),
 
-                                      RoleChip(role: authorProfile.role),
                                       // Streak display if user shares streak info
                                       ...() {
                                         return authorProfileAsync.maybeWhen(
@@ -421,4 +474,37 @@ class PostHeaderWidget extends ConsumerWidget {
       ),
     );
   }
+
+  /// Get role icon and color data based on role
+  _RoleIconData _getRoleIconData(String role) {
+    switch (role) {
+      case 'admin':
+        return _RoleIconData(
+          icon: LucideIcons.shield,
+          color: const Color(0xFF2563EB), // Blue color for admin
+        );
+      case 'founder':
+        return _RoleIconData(
+          icon: LucideIcons.personStanding,
+          color: const Color(0xFF7C3AED), // Purple color for founder
+        );
+      case 'member':
+      default:
+        return _RoleIconData(
+          icon: LucideIcons.user,
+          color: const Color(0xFF6B7280), // Gray color for member
+        );
+    }
+  }
+}
+
+/// Data class for role icon information
+class _RoleIconData {
+  final IconData icon;
+  final Color color;
+
+  const _RoleIconData({
+    required this.icon,
+    required this.color,
+  });
 }

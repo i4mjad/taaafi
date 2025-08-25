@@ -3,6 +3,7 @@
 
 const Map<String, String> kAr = {
   "founder": "المؤسس",
+  "anonymous_user": "مجهول",
   "subscribe-now": "اشترك الآن",
   "welcome": "مرحبًا بك!",
   "welcome-back": "مرحباً بعودتك",
@@ -1590,7 +1591,7 @@ const Map<String, String> kAr = {
   "daily-goals": "الأهداف اليومية",
   "achievements-rewards": "الإنجازات والمكافآت",
   "progress-sharing": "مشاركة التقدم",
-  "milestone-updates": "تحديثات المعالم",
+  "milestone-updates": "تحديثات الرحلة",
   "encouragement-posts": "منشورات التشجيع",
 
   // Groups main screen

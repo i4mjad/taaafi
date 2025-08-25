@@ -3113,6 +3113,7 @@ const Map<String, String> kEn = {
   "group-sharing": "Group Sharing",
   "join-code": "Join Code",
   "group-id": "Group ID",
+  "anonymous_user": "Anonymous",
   "code-only-admin-desc":
       "Share this code with others to let them join your group.",
   "code-only-member-desc":

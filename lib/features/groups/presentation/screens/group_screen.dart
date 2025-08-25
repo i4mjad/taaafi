@@ -419,7 +419,7 @@ class GroupScreen extends ConsumerWidget {
 
         // What's Coming section
         WidgetsContainer(
-          backgroundColor: Colors.white.withValues(alpha: 0.5),
+          backgroundColor: theme.grey[50],
           borderRadius: BorderRadius.circular(12),
           borderSide:
               BorderSide(color: borderColor.withValues(alpha: 0.3), width: 1),
@@ -702,9 +702,10 @@ class GroupScreen extends ConsumerWidget {
     );
   }
 
-  void _showShareModal(BuildContext context, AppLocalizations l10n, GroupMembership membership) {
+  void _showShareModal(
+      BuildContext context, AppLocalizations l10n, GroupMembership membership) {
     final joinCode = membership.group.joinCode;
-    
+
     if (joinCode == null) {
       // Handle case where there's no join code (shouldn't happen but good to be safe)
       ScaffoldMessenger.of(context).showSnackBar(
@@ -733,7 +734,8 @@ class GroupScreen extends ConsumerWidget {
     );
   }
 
-  void _shareAsPost(BuildContext context, AppLocalizations l10n, GroupMembership membership) {
+  void _shareAsPost(
+      BuildContext context, AppLocalizations l10n, GroupMembership membership) {
     // TODO: Implement community post sharing
     // For now, show a message that this feature is coming soon
     ScaffoldMessenger.of(context).showSnackBar(
@@ -741,9 +743,11 @@ class GroupScreen extends ConsumerWidget {
     );
   }
 
-  void _shareToSocial(BuildContext context, AppLocalizations l10n, String joinCode) {
-    final shareMessage = l10n.translate('group-share-message').replaceAll('{code}', joinCode);
-    
+  void _shareToSocial(
+      BuildContext context, AppLocalizations l10n, String joinCode) {
+    final shareMessage =
+        l10n.translate('group-share-message').replaceAll('{code}', joinCode);
+
     Share.share(
       shareMessage,
       subject: l10n.translate('share-group'),

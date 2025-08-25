@@ -33,7 +33,7 @@ class WidgetsContainer extends StatelessWidget {
       height: height,
       padding: padding ?? EdgeInsets.all(16),
       decoration: ShapeDecoration(
-        color: backgroundColor ?? theme.primary.withValues(alpha: 0.1),
+        color: backgroundColor ?? theme.grey[50],
         shadows: boxShadow,
         shape: SmoothRectangleBorder(
           borderRadius: SmoothBorderRadius(

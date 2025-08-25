@@ -46,9 +46,10 @@ class PostContentWidget extends ConsumerWidget {
         if (post.title.isNotEmpty) ...[
           Text(
             post.title,
-            style: TextStyles.h6.copyWith(
+            style: TextStyles.bodyLarge.copyWith(
               fontWeight: FontWeight.w600,
               color: theme.grey[900],
+              height: 1.4,
             ),
           ),
           const SizedBox(height: 8),

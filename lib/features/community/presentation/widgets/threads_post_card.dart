@@ -16,7 +16,6 @@ import 'package:reboot_app_3/features/community/presentation/widgets/report_cont
 import 'package:reboot_app_3/features/community/presentation/widgets/community_profile_modal.dart';
 
 import 'package:reboot_app_3/features/community/presentation/widgets/streak_display_widget.dart';
-import 'package:reboot_app_3/features/community/presentation/widgets/role_chip.dart';
 
 class ThreadsPostCard extends ConsumerWidget {
   final Post post;
@@ -114,7 +113,7 @@ class ThreadsPostCard extends ConsumerWidget {
                       isDeleted: authorProfile.isDeleted,
                       cpId: post.authorCPId,
                       isAnonymous: isAuthorAnonymous,
-                      size: 32,
+                      size: 28,
                       avatarUrl:
                           isAuthorAnonymous ? null : authorProfile.avatarUrl,
                       isPlusUser: isAuthorPlusUser,
@@ -122,16 +121,16 @@ class ThreadsPostCard extends ConsumerWidget {
                   );
                 },
                 loading: () => Container(
-                  width: 32,
-                  height: 32,
+                  width: 28,
+                  height: 28,
                   decoration: BoxDecoration(
                     color: theme.grey[200],
                     shape: BoxShape.circle,
                   ),
                 ),
                 error: (error, stackTrace) => Container(
-                  width: 32,
-                  height: 32,
+                  width: 28,
+                  height: 28,
                   decoration: BoxDecoration(
                     color: theme.error[100],
                     shape: BoxShape.circle,
@@ -152,62 +151,92 @@ class ThreadsPostCard extends ConsumerWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Category flair and time
+                      // Display name, role and streak row
                       Row(
                         children: [
-                          // Category and streak in an inline layout
-                          Wrap(
-                            spacing: 8,
-                            runSpacing: 4,
-                            children: [
-                              // Category flair - always show, with fallback for missing categories
-                              WidgetsContainer(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 4, vertical: 2),
-                                backgroundColor: postCategory?.color
-                                        .withValues(alpha: 0.1) ??
-                                    theme.grey[100],
-                                borderRadius: BorderRadius.circular(4),
-                                borderSide: BorderSide(
-                                  color: postCategory?.color
-                                          .withValues(alpha: 0.3) ??
-                                      theme.grey[300]!,
-                                  width: 1,
-                                ),
+                          // Display name with role icon and anonymity logic
+                          authorProfileAsync.when(
+                            data: (authorProfile) {
+                              final isAuthorAnonymous =
+                                  authorProfile.isAnonymous;
+                              final displayName = isAuthorAnonymous
+                                  ? localizations.translate('anonymous_user')
+                                  : authorProfile.displayName;
+
+                              // Get role icon and color
+                              final roleData = _getRoleIconData(
+                                  authorProfile.role.toLowerCase());
+
+                              return ConstrainedBox(
+                                constraints:
+                                    const BoxConstraints(maxWidth: 150),
                                 child: Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    Icon(
-                                      postCategory?.icon ?? LucideIcons.tag,
-                                      size: 12,
-                                      color: postCategory?.color ??
-                                          theme.grey[600],
-                                    ),
-                                    const SizedBox(width: 4),
-                                    Text(
-                                      postCategory?.getDisplayName(
-                                            localizations.locale.languageCode,
-                                          ) ??
-                                          _getLocalizedCategoryName(
-                                              post.category, localizations),
-                                      style: TextStyles.small.copyWith(
-                                        color: postCategory?.color ??
-                                            theme.grey[600],
-                                        fontWeight: FontWeight.w600,
+                                    // Role icon (only show for founder and admin)
+                                    if (authorProfile.role.toLowerCase() ==
+                                            'founder' ||
+                                        authorProfile.role.toLowerCase() ==
+                                            'admin') ...[
+                                      Icon(
+                                        roleData.icon,
+                                        size: 14,
+                                        color: roleData.color,
+                                      ),
+                                      const SizedBox(width: 4),
+                                    ],
+                                    Flexible(
+                                      child: Text(
+                                        displayName,
+                                        style: TextStyles.footnoteSelected
+                                            .copyWith(
+                                          color: (authorProfile.role
+                                                          .toLowerCase() ==
+                                                      'founder' ||
+                                                  authorProfile.role
+                                                          .toLowerCase() ==
+                                                      'admin')
+                                              ? roleData.color
+                                              : theme.grey[700],
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                        overflow: TextOverflow.ellipsis,
+                                        maxLines: 1,
                                       ),
                                     ),
                                   ],
                                 ),
+                              );
+                            },
+                            loading: () => Container(
+                              width: 80,
+                              height: 16,
+                              decoration: BoxDecoration(
+                                color: theme.grey[200],
+                                borderRadius: BorderRadius.circular(4),
                               ),
-
-                              // Role chip - show for admins and moderators
-                              authorProfileAsync.maybeWhen(
-                                data: (authorProfile) {
-                                  return RoleChip(role: authorProfile.role);
-                                },
-                                orElse: () => const SizedBox.shrink(),
+                            ),
+                            error: (error, stackTrace) => ConstrainedBox(
+                              constraints: const BoxConstraints(maxWidth: 150),
+                              child: Text(
+                                localizations.translate('unknown_user'),
+                                style: TextStyles.body.copyWith(
+                                  color: theme.grey[600],
+                                  fontWeight: FontWeight.w600,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
                               ),
+                            ),
+                          ),
 
+                          const SizedBox(width: 8),
+
+                          // Streak badge
+                          Wrap(
+                            spacing: 8,
+                            runSpacing: 4,
+                            children: [
                               // Real-time streak badge
                               ...() {
                                 return authorProfileAsync.maybeWhen(
@@ -259,13 +288,6 @@ class ThreadsPostCard extends ConsumerWidget {
 
                           const Spacer(),
 
-                          Text(
-                            _formatTimeAgo(post.createdAt, localizations),
-                            style: TextStyles.small.copyWith(
-                              color: theme.grey[500],
-                            ),
-                          ),
-                          const SizedBox(width: 8),
                           GestureDetector(
                             onTap: () => _showPostOptionsModal(context, ref),
                             child: Icon(
@@ -279,15 +301,68 @@ class ThreadsPostCard extends ConsumerWidget {
 
                       const SizedBox(height: 8),
 
-                      // Post title
-                      Text(
-                        post.title,
-                        style: TextStyles.h6.copyWith(
-                          color: theme.grey[900],
-                          height: 1.2,
+                      // Post title with time
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: Text(
+                              post.title,
+                              style: TextStyles.h6.copyWith(
+                                color: theme.grey[900],
+                                height: 1.2,
+                              ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            _formatTimeAgo(post.createdAt, localizations),
+                            style: TextStyles.small.copyWith(
+                              color: theme.grey[500],
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      const SizedBox(height: 8),
+
+                      // Category flair - moved below title
+                      WidgetsContainer(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 4, vertical: 2),
+                        backgroundColor:
+                            postCategory?.color.withValues(alpha: 0.1) ??
+                                theme.grey[100],
+                        borderRadius: BorderRadius.circular(4),
+                        borderSide: BorderSide(
+                          color: postCategory?.color.withValues(alpha: 0.3) ??
+                              theme.grey[300]!,
+                          width: 1,
                         ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              postCategory?.icon ?? LucideIcons.tag,
+                              size: 12,
+                              color: postCategory?.color ?? theme.grey[600],
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              postCategory?.getDisplayName(
+                                    localizations.locale.languageCode,
+                                  ) ??
+                                  _getLocalizedCategoryName(
+                                      post.category, localizations),
+                              style: TextStyles.small.copyWith(
+                                color: postCategory?.color ?? theme.grey[600],
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
 
                       const SizedBox(height: 8),
@@ -940,4 +1015,37 @@ class ThreadsPostCard extends ConsumerWidget {
       ),
     );
   }
+
+  /// Get role icon and color data based on role
+  _RoleIconData _getRoleIconData(String role) {
+    switch (role) {
+      case 'admin':
+        return _RoleIconData(
+          icon: LucideIcons.shield,
+          color: const Color(0xFF2563EB), // Blue color for admin
+        );
+      case 'founder':
+        return _RoleIconData(
+          icon: LucideIcons.personStanding,
+          color: const Color(0xFF7C3AED), // Purple color for founder
+        );
+      case 'member':
+      default:
+        return _RoleIconData(
+          icon: LucideIcons.user,
+          color: const Color(0xFF6B7280), // Gray color for member
+        );
+    }
+  }
+}
+
+/// Data class for role icon information
+class _RoleIconData {
+  final IconData icon;
+  final Color color;
+
+  const _RoleIconData({
+    required this.icon,
+    required this.color,
+  });
 }

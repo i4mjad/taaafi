@@ -114,6 +114,8 @@ class GroupMemberItem extends ConsumerWidget {
                   children: [
                     // Name and role badge
                     Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
                           _getLocalizedDisplayName(
