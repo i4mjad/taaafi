@@ -75,7 +75,7 @@ class GroupMemberItem extends ConsumerWidget {
           padding: const EdgeInsets.all(16),
           child: Row(
             children: [
-              // Avatar
+              // Avatar - always show, but different for anonymous users
               Container(
                 width: 48,
                 height: 48,
@@ -89,20 +89,22 @@ class GroupMemberItem extends ConsumerWidget {
                     width: 2,
                   ),
                 ),
-                child: memberInfo.avatarUrl != null
-                    ? ClipOval(
-                        child: Image.network(
-                          memberInfo.avatarUrl!,
-                          width: 48,
-                          height: 48,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) =>
-                              _buildDefaultAvatar(theme, memberInfo),
-                        ),
-                      )
-                    : _buildDefaultAvatar(theme, memberInfo),
+                child: memberInfo.isAnonymous
+                    ? _buildAnonymousAvatar(theme, memberInfo)
+                    : (memberInfo.avatarUrl != null
+                        ? ClipOval(
+                            child: Image.network(
+                              memberInfo.avatarUrl!,
+                              width: 48,
+                              height: 48,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) =>
+                                  _buildDefaultAvatar(theme, memberInfo),
+                            ),
+                          )
+                        : _buildDefaultAvatar(theme, memberInfo)),
               ),
-// ATGBA
+
               horizontalSpace(Spacing.points16),
 
               // Member details
@@ -286,7 +288,17 @@ class GroupMemberItem extends ConsumerWidget {
 
   Widget _buildDefaultAvatar(dynamic theme, GroupMemberInfo memberInfo) {
     return Icon(
-      memberInfo.isAnonymous ? LucideIcons.userX : LucideIcons.user,
+      LucideIcons.user,
+      color: memberInfo.membership.role == 'admin'
+          ? theme.primary[600]
+          : theme.grey[600],
+      size: 24,
+    );
+  }
+
+  Widget _buildAnonymousAvatar(dynamic theme, GroupMemberInfo memberInfo) {
+    return Icon(
+      LucideIcons.user,
       color: memberInfo.membership.role == 'admin'
           ? theme.primary[600]
           : theme.grey[600],
