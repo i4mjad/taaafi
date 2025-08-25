@@ -188,9 +188,15 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
     }
 
     // Simple ListView with date separators
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
     return ListView.builder(
       controller: _scrollController,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: EdgeInsets.symmetric(
+        horizontal: (screenWidth * 0.04).clamp(12.0, 20.0),
+        vertical: (screenHeight * 0.01).clamp(6.0, 12.0),
+      ),
       itemCount: messages.length,
       itemBuilder: (context, index) {
         final message = messages[index];
@@ -220,6 +226,7 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
     final today = DateTime(now.year, now.month, now.day);
     final yesterday = today.subtract(const Duration(days: 1));
     final messageDate = DateTime(date.year, date.month, date.day);
+    final screenHeight = MediaQuery.of(context).size.height;
 
     String dateText;
     if (messageDate == today) {
@@ -236,10 +243,15 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
     }
 
     return Container(
-      margin: const EdgeInsets.symmetric(vertical: 16),
+      margin: EdgeInsets.symmetric(
+          vertical: (screenHeight * 0.02).clamp(12.0, 20.0)),
       child: Center(
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          padding: EdgeInsets.symmetric(
+            horizontal:
+                (MediaQuery.of(context).size.width * 0.03).clamp(10.0, 16.0),
+            vertical: (screenHeight * 0.008).clamp(4.0, 8.0),
+          ),
           decoration: BoxDecoration(
             color: theme.grey[100],
             borderRadius: BorderRadius.circular(12),
@@ -259,6 +271,21 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
 
   Widget _buildMessageItem(BuildContext context, CustomThemeData theme,
       ChatMessage message, ChatTextSize chatTextSize) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
+    // Calculate responsive dimensions
+    final avatarSize = screenWidth * 0.08; // 8% of screen width, min 24, max 36
+    final clampedAvatarSize = avatarSize.clamp(24.0, 36.0);
+
+    // Message bubble widths: current user gets 40% of screen, others get 65%
+    final currentUserMaxWidth = screenWidth * 0.65;
+    final otherUserMaxWidth = screenWidth * 0.65;
+
+    // Responsive spacing
+    final horizontalSpacing = screenWidth * 0.02; // 2% of screen width
+    final clampedSpacing = horizontalSpacing.clamp(6.0, 12.0);
+
     return _AnimatedSwipeMessage(
       key: Key(message.id),
       message: message,
@@ -266,7 +293,8 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
       onLongPress: () => _showReportModal(context, theme, message),
       onSwipeToReply: () => _startReplyToMessage(message),
       child: Container(
-        margin: const EdgeInsets.only(bottom: 16),
+        margin:
+            EdgeInsets.only(bottom: screenHeight * 0.02), // 2% of screen height
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           textDirection: Directionality.of(context), // Support both RTL and LTR
@@ -277,30 +305,32 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
             // Avatar - only show for other users' messages
             if (!message.isCurrentUser) ...[
               Container(
-                width: 30,
-                height: 30,
+                width: clampedAvatarSize,
+                height: clampedAvatarSize,
                 decoration: BoxDecoration(
                   color: message.avatarColor,
                   shape: BoxShape.circle,
                   border: Border.all(color: Colors.white, width: 1),
                 ),
               ),
-              const SizedBox(width: 8),
+              SizedBox(width: clampedSpacing),
             ],
 
             // For current user messages, add equivalent spacing where avatar would be
-            if (message.isCurrentUser) const SizedBox(width: 8),
+            if (message.isCurrentUser) SizedBox(width: clampedSpacing),
 
             // Message bubble - different sizing for current user vs others
             Container(
               constraints: BoxConstraints(
                 maxWidth: message.isCurrentUser
-                    ? 152
-                    : 239, // Match Figma design widths
+                    ? currentUserMaxWidth
+                    : otherUserMaxWidth, // Responsive widths based on screen size
               ),
               child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                padding: EdgeInsets.symmetric(
+                  horizontal: screenWidth * 0.03, // 3% of screen width
+                  vertical: screenHeight * 0.01, // 1% of screen height
+                ),
                 decoration: BoxDecoration(
                   color: message.isCurrentUser
                       ? theme.primary[50]
@@ -376,7 +406,8 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
             ),
 
             // For other user messages, add some spacing on the right
-            if (!message.isCurrentUser) const SizedBox(width: 50),
+            if (!message.isCurrentUser)
+              SizedBox(width: screenWidth * 0.12), // 12% of screen width
           ],
         ),
       ),
@@ -703,8 +734,11 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
 
   Widget _buildInputArea(
       BuildContext context, CustomThemeData theme, AppLocalizations l10n) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final responsivePadding = (screenWidth * 0.04).clamp(12.0, 20.0);
+
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(responsivePadding),
       decoration: BoxDecoration(
         color: theme.grey[50],
         border: Border(
@@ -721,7 +755,10 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
 
             // Input area
             WidgetsContainer(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              padding: EdgeInsets.symmetric(
+                horizontal: (screenWidth * 0.03).clamp(8.0, 16.0),
+                vertical: (screenWidth * 0.02).clamp(6.0, 10.0),
+              ),
               backgroundColor: theme.postInputBackgound,
               borderSide: BorderSide(color: theme.grey[300]!, width: 0.5),
               borderRadius: BorderRadius.circular(12.5),
@@ -730,7 +767,7 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
                   // User avatar
                   _buildUserAvatar(context, theme),
 
-                  const SizedBox(width: 10),
+                  SizedBox(width: (screenWidth * 0.025).clamp(8.0, 12.0)),
 
                   // Text input
                   Expanded(
@@ -760,14 +797,16 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
 
                   // Send button
                   if (_messageController.text.isNotEmpty || _isSubmitting) ...[
-                    const SizedBox(width: 8),
+                    SizedBox(width: (screenWidth * 0.02).clamp(6.0, 10.0)),
                     GestureDetector(
                       onTap: _isSubmitting
                           ? null
                           : () => _handleSubmit(_messageController.text),
                       child: Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 12, vertical: 6),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: (screenWidth * 0.03).clamp(10.0, 16.0),
+                          vertical: (screenWidth * 0.015).clamp(4.0, 8.0),
+                        ),
                         decoration: BoxDecoration(
                           color: _isSubmitting
                               ? theme.grey[400]
@@ -829,18 +868,22 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
   Widget _buildReplyPreview(
       BuildContext context, CustomThemeData theme, AppLocalizations l10n) {
     final replyMessage = _replyState.replyToMessage!;
+    final screenWidth = MediaQuery.of(context).size.width;
 
     return AnimatedBuilder(
       animation: _replyPreviewAnimation,
       builder: (context, child) {
         return Transform.translate(
-          offset: Offset(0,
-              (1 - _replyPreviewAnimation.value) * 60), // Slide down 60 pixels
+          offset: Offset(
+              0,
+              (1 - _replyPreviewAnimation.value) *
+                  (screenWidth * 0.15)), // Responsive slide distance
           child: Opacity(
             opacity: _replyPreviewAnimation.value,
             child: Container(
-              margin: const EdgeInsets.only(bottom: 8),
-              padding: const EdgeInsets.all(12),
+              margin: EdgeInsets.only(
+                  bottom: (screenWidth * 0.02).clamp(6.0, 10.0)),
+              padding: EdgeInsets.all((screenWidth * 0.03).clamp(10.0, 16.0)),
               decoration: BoxDecoration(
                 color: theme.primary[50],
                 borderRadius: BorderRadius.circular(8),
@@ -952,9 +995,10 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
           const SizedBox(height: 2),
           Text(
             originalMessage.content,
-            style: TextStyles.caption.copyWith(
+            style: TextStyles.small.copyWith(
               color: theme.grey[600],
-              fontSize: 11,
+              // fontSize: 11,
+              height: 1.3,
             ),
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
@@ -967,15 +1011,20 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
   Widget _buildUserAvatar(BuildContext context, CustomThemeData theme) {
     final user = FirebaseAuth.instance.currentUser;
     final userImageUrl = user?.photoURL;
+    final screenWidth = MediaQuery.of(context).size.width;
+
+    // Responsive avatar radius: 3.5% of screen width, clamped between 12-18
+    final avatarRadius = (screenWidth * 0.035).clamp(12.0, 18.0);
+    final iconSize = avatarRadius * 1.3; // Icon size proportional to avatar
 
     return CircleAvatar(
-      radius: 14,
+      radius: avatarRadius,
       backgroundColor: theme.primary[100],
       backgroundImage: userImageUrl != null ? NetworkImage(userImageUrl) : null,
       child: userImageUrl == null
           ? Icon(
               Icons.person,
-              size: 18,
+              size: iconSize,
               color: theme.primary[700],
             )
           : null,
@@ -1198,8 +1247,8 @@ class _AnimatedSwipeMessageState extends State<_AnimatedSwipeMessage>
   late Animation<double> _replyIconAnimation;
 
   double _dragOffset = 0.0;
-  static const double _maxSwipeDistance = 80.0;
-  static const double _replyThreshold = 60.0;
+  late double _maxSwipeDistance;
+  late double _replyThreshold;
 
   @override
   void initState() {
@@ -1280,6 +1329,11 @@ class _AnimatedSwipeMessageState extends State<_AnimatedSwipeMessage>
   @override
   Widget build(BuildContext context) {
     final isRTL = Directionality.of(context) == TextDirection.rtl;
+    final screenWidth = MediaQuery.of(context).size.width;
+
+    // Calculate responsive swipe distances: 20% of screen width for max, 15% for threshold
+    _maxSwipeDistance = (screenWidth * 0.2).clamp(60.0, 100.0);
+    _replyThreshold = (screenWidth * 0.15).clamp(45.0, 75.0);
 
     return GestureDetector(
       onLongPress: widget.onLongPress,
