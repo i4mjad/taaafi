@@ -5,6 +5,7 @@ import '../entities/community_profile_entity.dart';
 import '../entities/profile_statistics.dart';
 import '../repositories/community_repository.dart';
 import '../../data/exceptions/community_exceptions.dart';
+import '../../data/models/notification_preferences.dart';
 import 'community_service.dart';
 
 /// Implementation of community service
@@ -109,6 +110,7 @@ class CommunityServiceImpl implements CommunityService {
     bool? isAnonymous,
     bool? isPlusUser,
     bool? shareRelapseStreaks,
+    NotificationPreferences? notificationPreferences,
   }) async {
     final user = _auth.currentUser;
     if (user == null) {
@@ -129,6 +131,8 @@ class CommunityServiceImpl implements CommunityService {
         isPlusUser: isPlusUser ?? currentProfile.isPlusUser,
         shareRelapseStreaks:
             shareRelapseStreaks ?? currentProfile.shareRelapseStreaks,
+        notificationPreferences:
+            notificationPreferences ?? currentProfile.notificationPreferences,
         updatedAt: DateTime.now(),
       );
 

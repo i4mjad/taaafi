@@ -59,7 +59,10 @@ class AccountScreen extends ConsumerWidget {
     return Scaffold(
         backgroundColor: theme.backgroundColor,
         appBar: appBar(context, ref, 'account', false, true, actions: [
-          PremiumCtaAppBarIcon(),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            child: PremiumCtaAppBarIcon(),
+          ),
         ]),
         body: userDocAsync.when(
             loading: () => const Center(child: Spinner()),

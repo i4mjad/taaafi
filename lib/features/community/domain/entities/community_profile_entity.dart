@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:reboot_app_3/features/community/data/models/notification_preferences.dart';
 
 /// Community Profile Entity
 ///
@@ -19,6 +20,7 @@ class CommunityProfileEntity {
   final String role; // 'member', 'admin', 'moderator'
   final DateTime createdAt;
   final DateTime? updatedAt;
+  final NotificationPreferences? notificationPreferences;
 
   const CommunityProfileEntity({
     required this.id,
@@ -35,6 +37,7 @@ class CommunityProfileEntity {
     required this.role,
     required this.createdAt,
     this.updatedAt,
+    this.notificationPreferences,
   });
 
   /// Helper method to convert timestamp fields from Firestore or JSON
@@ -73,6 +76,10 @@ class CommunityProfileEntity {
       role: json['role'] as String,
       createdAt: _parseTimestamp(json['createdAt'])!,
       updatedAt: _parseTimestamp(json['updatedAt']),
+      notificationPreferences: json['notificationPreferences'] != null
+          ? NotificationPreferences.fromJson(
+              json['notificationPreferences'] as Map<String, dynamic>)
+          : null,
     );
   }
 
@@ -92,6 +99,7 @@ class CommunityProfileEntity {
       // Streak data is read directly from user documents, not stored in community profiles
       'createdAt': createdAt.toIso8601String(),
       'updatedAt': updatedAt?.toIso8601String(),
+      'notificationPreferences': notificationPreferences?.toJson(),
     };
   }
 
@@ -210,6 +218,7 @@ class CommunityProfileEntity {
     String? role,
     DateTime? createdAt,
     DateTime? updatedAt,
+    NotificationPreferences? notificationPreferences,
   }) {
     return CommunityProfileEntity(
       id: id ?? this.id,
@@ -226,6 +235,8 @@ class CommunityProfileEntity {
       role: role ?? this.role,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
+      notificationPreferences:
+          notificationPreferences ?? this.notificationPreferences,
     );
   }
 
@@ -246,7 +257,8 @@ class CommunityProfileEntity {
         other.streakLastUpdated == streakLastUpdated &&
         other.role == role &&
         other.createdAt == createdAt &&
-        other.updatedAt == updatedAt;
+        other.updatedAt == updatedAt &&
+        other.notificationPreferences == notificationPreferences;
   }
 
   @override
@@ -264,11 +276,12 @@ class CommunityProfileEntity {
         streakLastUpdated.hashCode ^
         role.hashCode ^
         createdAt.hashCode ^
-        updatedAt.hashCode;
+        updatedAt.hashCode ^
+        notificationPreferences.hashCode;
   }
 
   @override
   String toString() {
-    return 'CommunityProfileEntity(id: $id, userUID: $userUID, displayName: $displayName, gender: $gender, avatarUrl: $avatarUrl, isAnonymous: $isAnonymous, isDeleted: $isDeleted, isPlusUser: $isPlusUser, shareRelapseStreaks: $shareRelapseStreaks, currentStreakDays: $currentStreakDays, streakLastUpdated: $streakLastUpdated, role: $role, createdAt: $createdAt, updatedAt: $updatedAt)';
+    return 'CommunityProfileEntity(id: $id, userUID: $userUID, displayName: $displayName, gender: $gender, avatarUrl: $avatarUrl, isAnonymous: $isAnonymous, isDeleted: $isDeleted, isPlusUser: $isPlusUser, shareRelapseStreaks: $shareRelapseStreaks, currentStreakDays: $currentStreakDays, streakLastUpdated: $streakLastUpdated, role: $role, createdAt: $createdAt, updatedAt: $updatedAt, notificationPreferences: $notificationPreferences)';
   }
 }

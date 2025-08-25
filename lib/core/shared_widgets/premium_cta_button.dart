@@ -40,7 +40,7 @@ class PremiumCtaAppBarIcon extends ConsumerWidget {
                   Ta3afiPlatformIcons.plus,
                   color:
                       hasSubscription ? Colors.green : const Color(0xFFFEBA01),
-                  size: 20,
+                  // size: 20,
                 ),
               ],
             ),

@@ -5,6 +5,7 @@ import '../domain/entities/group_membership_entity.dart';
 import '../domain/entities/join_result_entity.dart';
 import '../providers/group_membership_provider.dart';
 import '../providers/groups_status_provider.dart';
+import '../../community/application/notification_service.dart';
 
 import 'groups_providers.dart';
 
@@ -78,6 +79,15 @@ class GroupsController extends _$GroupsController {
       );
 
       if (result.success) {
+        // Initialize notification preferences for new group member
+        try {
+          final notificationService = ref.read(notificationServiceProvider);
+          await notificationService.initializeNotificationPreferences();
+        } catch (e) {
+          print('Warning: Failed to initialize notification preferences: $e');
+          // Don't fail the join operation if notification setup fails
+        }
+
         // Refresh membership and status providers after successful join
         ref.invalidate(groupMembershipNotifierProvider);
         ref.invalidate(groupsStatusProvider);
@@ -112,6 +122,15 @@ class GroupsController extends _$GroupsController {
       );
 
       if (result.success) {
+        // Initialize notification preferences for new group member
+        try {
+          final notificationService = ref.read(notificationServiceProvider);
+          await notificationService.initializeNotificationPreferences();
+        } catch (e) {
+          print('Warning: Failed to initialize notification preferences: $e');
+          // Don't fail the join operation if notification setup fails
+        }
+
         // Refresh membership and status providers after successful join
         ref.invalidate(groupMembershipNotifierProvider);
         ref.invalidate(groupsStatusProvider);

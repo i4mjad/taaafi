@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:reboot_app_3/features/community/domain/entities/community_profile_entity.dart';
+import 'package:reboot_app_3/features/community/data/models/notification_preferences.dart';
 
 /// Data model for community profiles
 ///
@@ -49,6 +50,9 @@ class CommunityProfileModel {
   /// When the profile was last updated
   final DateTime? updatedAt;
 
+  /// User's notification preferences for community features
+  final NotificationPreferences? notificationPreferences;
+
   const CommunityProfileModel({
     required this.id,
     required this.userUID,
@@ -64,6 +68,7 @@ class CommunityProfileModel {
     required this.role,
     required this.createdAt,
     this.updatedAt,
+    this.notificationPreferences,
   });
 
   /// Helper method to convert timestamp fields from Firestore or JSON
@@ -102,6 +107,10 @@ class CommunityProfileModel {
       role: json['role'] as String,
       createdAt: _parseTimestamp(json['createdAt'])!,
       updatedAt: _parseTimestamp(json['updatedAt']),
+      notificationPreferences: json['notificationPreferences'] != null
+          ? NotificationPreferences.fromJson(
+              json['notificationPreferences'] as Map<String, dynamic>)
+          : null,
     );
   }
 
@@ -128,6 +137,10 @@ class CommunityProfileModel {
       updatedAt: data['updatedAt'] != null
           ? (data['updatedAt'] as Timestamp).toDate()
           : null,
+      notificationPreferences: data['notificationPreferences'] != null
+          ? NotificationPreferences.fromJson(
+              data['notificationPreferences'] as Map<String, dynamic>)
+          : null,
     );
   }
 
@@ -148,6 +161,7 @@ class CommunityProfileModel {
       role: entity.role,
       createdAt: entity.createdAt,
       updatedAt: entity.updatedAt,
+      notificationPreferences: entity.notificationPreferences,
     );
   }
 
@@ -167,6 +181,7 @@ class CommunityProfileModel {
       // Streak data is read directly from user documents, not stored in community profiles
       'createdAt': createdAt.toIso8601String(),
       'updatedAt': updatedAt?.toIso8601String(),
+      'notificationPreferences': notificationPreferences?.toJson(),
     };
   }
 
@@ -185,6 +200,7 @@ class CommunityProfileModel {
       // Streak data is read directly from user documents, not stored in community profiles
       'createdAt': Timestamp.fromDate(createdAt),
       'updatedAt': updatedAt != null ? Timestamp.fromDate(updatedAt!) : null,
+      'notificationPreferences': notificationPreferences?.toJson(),
     };
   }
 
@@ -205,6 +221,7 @@ class CommunityProfileModel {
       role: role,
       createdAt: createdAt,
       updatedAt: updatedAt,
+      notificationPreferences: notificationPreferences,
     );
   }
 
@@ -224,6 +241,7 @@ class CommunityProfileModel {
     String? role,
     DateTime? createdAt,
     DateTime? updatedAt,
+    NotificationPreferences? notificationPreferences,
   }) {
     return CommunityProfileModel(
       id: id ?? this.id,
@@ -240,6 +258,8 @@ class CommunityProfileModel {
       role: role ?? this.role,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
+      notificationPreferences:
+          notificationPreferences ?? this.notificationPreferences,
     );
   }
 
@@ -260,7 +280,8 @@ class CommunityProfileModel {
         other.streakLastUpdated == streakLastUpdated &&
         other.role == role &&
         other.createdAt == createdAt &&
-        other.updatedAt == updatedAt;
+        other.updatedAt == updatedAt &&
+        other.notificationPreferences == notificationPreferences;
   }
 
   @override
@@ -278,7 +299,8 @@ class CommunityProfileModel {
         streakLastUpdated.hashCode ^
         role.hashCode ^
         createdAt.hashCode ^
-        updatedAt.hashCode;
+        updatedAt.hashCode ^
+        notificationPreferences.hashCode;
   }
 
   /// Business logic: Get display name following the pipeline: deleted → anonymous → actual name
@@ -299,6 +321,6 @@ class CommunityProfileModel {
 
   @override
   String toString() {
-    return 'CommunityProfileModel(id: $id, userUID: $userUID, displayName: $displayName, gender: $gender, avatarUrl: $avatarUrl, isAnonymous: $isAnonymous, isDeleted: $isDeleted, isPlusUser: $isPlusUser, shareRelapseStreaks: $shareRelapseStreaks, currentStreakDays: $currentStreakDays, streakLastUpdated: $streakLastUpdated, role: $role, createdAt: $createdAt, updatedAt: $updatedAt)';
+    return 'CommunityProfileModel(id: $id, userUID: $userUID, displayName: $displayName, gender: $gender, avatarUrl: $avatarUrl, isAnonymous: $isAnonymous, isDeleted: $isDeleted, isPlusUser: $isPlusUser, shareRelapseStreaks: $shareRelapseStreaks, currentStreakDays: $currentStreakDays, streakLastUpdated: $streakLastUpdated, role: $role, createdAt: $createdAt, updatedAt: $updatedAt, notificationPreferences: $notificationPreferences)';
   }
 }
