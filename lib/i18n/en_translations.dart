@@ -3189,4 +3189,14 @@ const Map<String, String> kEn = {
   "what-can-you-do": "What can you do while you wait?",
   "cooldown-activities":
       "• Explore available groups\n• Focus on your current journey\n• Use other app features\n• Plan which group to join next",
+
+  // Chat text size settings
+  "chat-text-size": "Message Text Size",
+  "chat-text-size-description":
+      "Choose a comfortable text size for reading messages",
+  "text-size-small": "Small",
+  "text-size-large": "Large",
+  "message-preview": "Message Preview",
+  "sample-message": "This is a sample message to show the selected text size",
+  "sample-sender-name": "Sample Sender",
 };

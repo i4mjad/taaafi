@@ -3116,4 +3116,13 @@ const Map<String, String> kAr = {
   'what-can-you-do': 'ماذا يمكنك فعله أثناء الانتظار؟',
   'cooldown-activities':
       '• استكشاف الزمالات المتاحة\n• التركيز على رحلتك الحالية\n• استخدام ميزات التطبيق الأخرى\n• التخطيط للزمالة التي ستنضم إليها لاحقاً',
+
+  // Chat text size settings
+  'chat-text-size': 'حجم نص الرسائل',
+  'chat-text-size-description': 'اختر حجم النص المناسب لقراءة الرسائل براحة',
+  'text-size-small': 'صغير',
+  'text-size-large': 'كبير',
+  'message-preview': 'معاينة الرسالة',
+  'sample-message': 'هذه رسالة تجريبية لإظهار حجم النص المحدد',
+  'sample-sender-name': 'المرسل التجريبي',
 };

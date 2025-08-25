@@ -12,6 +12,7 @@ import 'package:reboot_app_3/core/theming/custom_theme_data.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
 import 'package:reboot_app_3/core/shared_widgets/spinner.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:reboot_app_3/core/theming/chat_text_size_provider.dart';
 
 /// Model for chat message
 class ChatMessage {
@@ -153,6 +154,7 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
   Widget build(BuildContext context) {
     final theme = AppTheme.of(context);
     final l10n = AppLocalizations.of(context);
+    final chatTextSize = ref.watch(chatTextSizeProvider);
 
     return Scaffold(
       backgroundColor: theme.backgroundColor,
@@ -161,7 +163,7 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
         children: [
           // Messages list
           Expanded(
-            child: _buildMessagesList(context, theme, l10n),
+            child: _buildMessagesList(context, theme, l10n, chatTextSize),
           ),
 
           // Input area
@@ -171,8 +173,8 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
     );
   }
 
-  Widget _buildMessagesList(
-      BuildContext context, CustomThemeData theme, AppLocalizations l10n) {
+  Widget _buildMessagesList(BuildContext context, CustomThemeData theme,
+      AppLocalizations l10n, ChatTextSize chatTextSize) {
     final messages = _getDemoMessages();
 
     // Simple fallback to ensure messages show up
@@ -199,7 +201,7 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
                 !_isSameDay(message.dateTime, messages[index - 1].dateTime))
               _buildDateSeparator(context, theme, l10n, message.dateTime),
 
-            _buildMessageItem(context, theme, message),
+            _buildMessageItem(context, theme, message, chatTextSize),
           ],
         );
       },
@@ -255,8 +257,8 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
     );
   }
 
-  Widget _buildMessageItem(
-      BuildContext context, CustomThemeData theme, ChatMessage message) {
+  Widget _buildMessageItem(BuildContext context, CustomThemeData theme,
+      ChatMessage message, ChatTextSize chatTextSize) {
     return _AnimatedSwipeMessage(
       key: Key(message.id),
       message: message,
@@ -355,10 +357,10 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
                       _buildMessageReplyPreview(
                           context, theme, message.replyToMessage!),
 
-                    // Message content with proper text wrapping
+                    // Message content with proper text wrapping and dynamic text size
                     Text(
                       message.content,
-                      style: TextStyles.caption.copyWith(
+                      style: chatTextSize.textStyle.copyWith(
                         color: theme.grey[800],
                         height: 1.5,
                       ),
