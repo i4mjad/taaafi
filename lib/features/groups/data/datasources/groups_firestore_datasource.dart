@@ -180,12 +180,12 @@ class GroupsFirestoreDataSource implements GroupsDataSource {
       if (!groupDoc.exists) return false;
 
       final data = groupDoc.data()!;
-      final storedHash = data['joinCodeHash'] as String?;
+      final storedJoinCode = data['joinCode'] as String?;
       final expiresAt = data['joinCodeExpiresAt'] as Timestamp?;
       final maxUses = data['joinCodeMaxUses'] as int?;
       final useCount = data['joinCodeUseCount'] as int? ?? 0;
 
-      if (storedHash == null) return false;
+      if (storedJoinCode == null) return false;
 
       // Check expiry
       if (expiresAt != null && DateTime.now().isAfter(expiresAt.toDate())) {
@@ -197,9 +197,8 @@ class GroupsFirestoreDataSource implements GroupsDataSource {
         return false;
       }
 
-      // Simple hash comparison (use bcrypt in production)
-      final codeHash = joinCode.hashCode.toString();
-      return codeHash == storedHash;
+      // Direct comparison of plain text join codes
+      return joinCode.trim() == storedJoinCode.trim();
     } catch (e, stackTrace) {
       log('Error verifying join code: $e', stackTrace: stackTrace);
       rethrow;
@@ -353,11 +352,12 @@ class GroupsFirestoreDataSource implements GroupsDataSource {
   Future<GroupModel?> findGroupByJoinCode(String joinCode) async {
     try {
       // Query groups where joinCode matches and group is active
+      // Include both 'code_only' and 'any' join methods since both can accept join codes
       final querySnapshot = await _firestore
           .collection('groups')
           .where('joinCode', isEqualTo: joinCode)
           .where('isActive', isEqualTo: true)
-          .where('joinMethod', isEqualTo: 'code_only')
+          .where('joinMethod', whereIn: ['code_only', 'any'])
           .limit(1)
           .get();
 

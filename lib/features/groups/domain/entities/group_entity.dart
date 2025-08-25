@@ -4,6 +4,7 @@ class GroupEntity {
   final String description;
   final String gender; // 'male' | 'female'
   final int memberCapacity;
+  final int memberCount; // Current number of active members
   final String adminCpId;
   final String createdByCpId;
   final String visibility; // 'public' | 'private'
@@ -24,6 +25,7 @@ class GroupEntity {
     required this.description,
     required this.gender,
     required this.memberCapacity,
+    required this.memberCount,
     required this.adminCpId,
     required this.createdByCpId,
     required this.visibility,
@@ -45,6 +47,7 @@ class GroupEntity {
     String? description,
     String? gender,
     int? memberCapacity,
+    int? memberCount,
     String? adminCpId,
     String? createdByCpId,
     String? visibility,
@@ -65,6 +68,7 @@ class GroupEntity {
       description: description ?? this.description,
       gender: gender ?? this.gender,
       memberCapacity: memberCapacity ?? this.memberCapacity,
+      memberCount: memberCount ?? this.memberCount,
       adminCpId: adminCpId ?? this.adminCpId,
       createdByCpId: createdByCpId ?? this.createdByCpId,
       visibility: visibility ?? this.visibility,

@@ -3135,4 +3135,31 @@ const Map<String, String> kEn = {
   "join-method-any-requires-public":
       "This option requires the group to be public",
   "current-join-code": "Current Join Code",
+  "open-join-info":
+      "This group allows open joining. Users can find and join directly from the group exploration screen.",
+  "join-group-with-code": "Join Group with Code",
+  "join-code-placeholder": "Enter 5-character code",
+  "group-weeks-ago": "{weeks} weeks ago",
+
+  // Join cooldown timer
+  "join-cooldown-active": "Join Cooldown Active",
+  "join-cooldown-description":
+      "You must wait before joining another group after leaving your previous one.",
+  "time-remaining": "Time Remaining",
+  "join-cooldown-info":
+      "You can explore groups and join once the cooldown expires.",
+  "countdown-days-hours-minutes": "{days}d {hours}h {minutes}m",
+  "countdown-day-hours-minutes": "{hours}h {minutes}m",
+  "countdown-hours-minutes-seconds": "{hours}:{minutes}:{seconds}",
+  "countdown-minutes-seconds": "{minutes}:{seconds}",
+  "wait-to-join": "Wait to Join",
+  "unavailable": "Unavailable",
+
+  // Groups cooldown screen
+  "groups-cooldown-title": "Join Cooldown Active",
+  "groups-cooldown-message":
+      "You recently left a group and must wait before joining another one. This helps maintain group stability and prevents abuse.",
+  "what-can-you-do": "What can you do while you wait?",
+  "cooldown-activities":
+      "• Explore available groups\n• Focus on your current journey\n• Use other app features\n• Plan which group to join next",
 };

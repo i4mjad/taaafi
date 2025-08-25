@@ -7,6 +7,8 @@ import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/core/theming/custom_theme_data.dart';
+import 'package:reboot_app_3/features/groups/application/groups_controller.dart';
+import 'package:reboot_app_3/features/community/presentation/providers/community_providers_new.dart';
 
 /// Model for public groups that can be discovered and joined
 class DiscoverableGroup {
@@ -361,44 +363,103 @@ class PublicGroupCard extends ConsumerWidget {
     final isCapacityFull = group.memberCount >= group.capacity;
     final needsCode = group.joinMethod == 'code_only';
 
-    return GestureDetector(
-      onTap: isCapacityFull ? null : onJoin,
-      child: Container(
-        padding: EdgeInsets.symmetric(vertical: Spacing.points12.value),
-        decoration: BoxDecoration(
-          color: isCapacityFull
-              ? theme.grey[200]
-              : needsCode
-                  ? theme.warn[500]
-                  : theme.primary[600],
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              isCapacityFull
-                  ? LucideIcons.userX
-                  : needsCode
-                      ? LucideIcons.key
-                      : LucideIcons.userPlus,
-              size: 16,
-              color: isCapacityFull ? theme.grey[500] : Colors.white,
+    return Consumer(
+      builder: (context, ref, child) {
+        final profileAsync = ref.watch(currentCommunityProfileProvider);
+        
+        return profileAsync.when(
+          data: (profile) {
+            if (profile == null) {
+              return _buildDisabledButton(theme, l10n, 'profile-required', LucideIcons.userX);
+            }
+            
+            final canJoinAsync = ref.watch(canJoinGroupProvider(profile.id));
+            return canJoinAsync.when(
+              data: (canJoin) {
+                if (!canJoin) {
+                  return _buildDisabledButton(theme, l10n, 'cooldown-active', LucideIcons.clock);
+                }
+                
+                return GestureDetector(
+                  onTap: isCapacityFull ? null : onJoin,
+                  child: Container(
+                    padding: EdgeInsets.symmetric(vertical: Spacing.points12.value),
+                    decoration: BoxDecoration(
+                      color: isCapacityFull
+                          ? theme.grey[200]
+                          : needsCode
+                              ? theme.warn[500]
+                              : theme.primary[600],
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          isCapacityFull
+                              ? LucideIcons.userX
+                              : needsCode
+                                  ? LucideIcons.key
+                                  : LucideIcons.userPlus,
+                          size: 16,
+                          color: isCapacityFull ? theme.grey[500] : Colors.white,
+                        ),
+                        horizontalSpace(Spacing.points8),
+                        Text(
+                          isCapacityFull
+                              ? l10n.translate('group-full')
+                              : needsCode
+                                  ? l10n.translate('join-with-code')
+                                  : l10n.translate('join-group'),
+                          style: TextStyles.footnote.copyWith(
+                            color: isCapacityFull ? theme.grey[500] : Colors.white,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+              loading: () => _buildDisabledButton(theme, l10n, 'loading', LucideIcons.loader),
+              error: (_, __) => _buildDisabledButton(theme, l10n, 'error', LucideIcons.alertCircle),
+            );
+          },
+          loading: () => _buildDisabledButton(theme, l10n, 'loading', LucideIcons.loader),
+          error: (_, __) => _buildDisabledButton(theme, l10n, 'error', LucideIcons.alertCircle),
+        );
+      },
+    );
+  }
+  
+  Widget _buildDisabledButton(CustomThemeData theme, AppLocalizations l10n, String reasonKey, IconData icon) {
+    return Container(
+      padding: EdgeInsets.symmetric(vertical: Spacing.points12.value),
+      decoration: BoxDecoration(
+        color: theme.grey[200],
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            icon,
+            size: 16,
+            color: theme.grey[500],
+          ),
+          horizontalSpace(Spacing.points8),
+          Text(
+            reasonKey == 'cooldown-active' 
+                ? l10n.translate('wait-to-join')
+                : reasonKey == 'loading'
+                    ? l10n.translate('loading')
+                    : l10n.translate('unavailable'),
+            style: TextStyles.footnote.copyWith(
+              color: theme.grey[500],
+              fontWeight: FontWeight.w600,
             ),
-            horizontalSpace(Spacing.points8),
-            Text(
-              isCapacityFull
-                  ? l10n.translate('group-full')
-                  : needsCode
-                      ? l10n.translate('join-with-code')
-                      : l10n.translate('join-group'),
-              style: TextStyles.footnote.copyWith(
-                color: isCapacityFull ? theme.grey[500] : Colors.white,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

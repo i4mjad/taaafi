@@ -3063,4 +3063,31 @@ const Map<String, String> kAr = {
       'الأعضاء يحتاجون رمز للانضمام إلى الزمالة',
   'join-method-any-requires-public': 'هذا الخيار يتطلب أن تكون الزمالة عامة',
   'current-join-code': 'رمز الانضمام الحالي',
+  'open-join-info':
+      'تسمح هذه الزمالة بالانضمام المفتوح. يمكن للمستخدمين العثور عليها والانضمام إليها مباشرة من شاشة استكشاف الزمالات.',
+  'join-group-with-code': 'انضم للزمالة برمز',
+  'join-code-placeholder': 'أدخل الرمز المكون من 5 أحرف',
+  'group-weeks-ago': 'منذ {weeks} أسابيع',
+
+  // Join cooldown timer
+  'join-cooldown-active': 'فترة انتظار الانضمام نشطة',
+  'join-cooldown-description':
+      'يجب عليك الانتظار قبل الانضمام إلى زمالة أخرى بعد ترك زمالتك السابقة.',
+  'time-remaining': 'الوقت المتبقي',
+  'join-cooldown-info':
+      'يمكنك استكشاف الزمالات والانضمام بمجرد انتهاء فترة الانتظار.',
+  'countdown-days-hours-minutes': '{days}ي {hours}س {minutes}د',
+  'countdown-day-hours-minutes': '{hours}س {minutes}د',
+  'countdown-hours-minutes-seconds': '{hours}:{minutes}:{seconds}',
+  'countdown-minutes-seconds': '{minutes}:{seconds}',
+  'wait-to-join': 'انتظر للانضمام',
+  'unavailable': 'غير متاح',
+
+  // Groups cooldown screen
+  'groups-cooldown-title': 'فترة انتظار الانضمام نشطة',
+  'groups-cooldown-message':
+      'لقد تركت زمالة مؤخراً ويجب عليك الانتظار قبل الانضمام إلى أخرى. هذا يساعد في الحفاظ على استقرار الزمالات ومنع إساءة الاستخدام.',
+  'what-can-you-do': 'ماذا يمكنك فعله أثناء الانتظار؟',
+  'cooldown-activities':
+      '• استكشاف الزمالات المتاحة\n• التركيز على رحلتك الحالية\n• استخدام ميزات التطبيق الأخرى\n• التخطيط للزمالة التي ستنضم إليها لاحقاً',
 };

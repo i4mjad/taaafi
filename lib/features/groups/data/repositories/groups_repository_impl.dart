@@ -38,9 +38,47 @@ class GroupsRepositoryImpl implements GroupsRepository {
   @override
   Stream<List<GroupEntity>> getPublicGroups() {
     try {
-      return _dataSource
-          .getPublicGroups()
-          .map((groups) => groups.map((g) => g.toEntity()).toList());
+      return _dataSource.getPublicGroups().asyncMap((groups) async {
+        // For each group, get the real member count
+        final enhancedGroups = <GroupEntity>[];
+
+        for (final group in groups) {
+          try {
+            final memberCount = await _dataSource.getGroupMemberCount(group.id);
+
+            // Create a new GroupModel with the real member count
+            final enhancedGroup = GroupModel(
+              id: group.id,
+              name: group.name,
+              description: group.description,
+              gender: group.gender,
+              memberCapacity: group.memberCapacity,
+              memberCount: memberCount,
+              adminCpId: group.adminCpId,
+              createdByCpId: group.createdByCpId,
+              visibility: group.visibility,
+              joinMethod: group.joinMethod,
+              joinCode: group.joinCode,
+              joinCodeExpiresAt: group.joinCodeExpiresAt,
+              joinCodeMaxUses: group.joinCodeMaxUses,
+              joinCodeUseCount: group.joinCodeUseCount,
+              isActive: group.isActive,
+              isPaused: group.isPaused,
+              pauseReason: group.pauseReason,
+              createdAt: group.createdAt,
+              updatedAt: group.updatedAt,
+            );
+
+            enhancedGroups.add(enhancedGroup.toEntity());
+          } catch (e) {
+            // If member count fetch fails, still include group with 0 count
+            log('Failed to get member count for group ${group.id}: $e');
+            enhancedGroups.add(group.toEntity());
+          }
+        }
+
+        return enhancedGroups;
+      });
     } catch (e, stackTrace) {
       log('Error in getPublicGroups: $e', stackTrace: stackTrace);
       rethrow;
@@ -116,6 +154,7 @@ class GroupsRepositoryImpl implements GroupsRepository {
         description: description.trim(),
         gender: userGender,
         memberCapacity: memberCapacity,
+        memberCount: 1, // Creator is the first member
         adminCpId: creatorCpId,
         createdByCpId: creatorCpId,
         visibility: visibility,
@@ -288,8 +327,8 @@ class GroupsRepositoryImpl implements GroupsRepository {
         );
       }
 
-      // Check join method
-      if (group.joinMethod != 'code_only') {
+      // Check join method - both 'code_only' and 'any' can accept join codes
+      if (group.joinMethod != 'code_only' && group.joinMethod != 'any') {
         return const JoinResultEntity.error(
           JoinErrorType.invalidJoinMethod,
           'This group does not accept join codes',

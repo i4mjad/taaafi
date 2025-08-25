@@ -6,17 +6,21 @@ import 'package:reboot_app_3/core/shared_widgets/app_bar.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
 import 'package:reboot_app_3/core/shared_widgets/custom_textfield.dart';
 import 'package:reboot_app_3/core/shared_widgets/spinner.dart';
+import 'package:reboot_app_3/core/shared_widgets/snackbar.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/core/theming/custom_theme_data.dart';
 import 'package:reboot_app_3/features/groups/presentation/widgets/public_group_card.dart';
-import 'package:reboot_app_3/features/groups/presentation/screens/modals/join_group_modal.dart';
+import 'package:reboot_app_3/features/groups/presentation/screens/modals/simple_join_code_modal.dart';
+
 import 'package:reboot_app_3/features/groups/providers/filtered_public_groups_provider.dart';
 import 'package:reboot_app_3/features/groups/domain/entities/group_entity.dart';
 import 'package:reboot_app_3/features/groups/application/groups_controller.dart';
 import 'package:reboot_app_3/features/community/presentation/providers/community_providers_new.dart';
 import 'package:reboot_app_3/features/groups/domain/entities/join_result_entity.dart';
+import 'package:go_router/go_router.dart';
+import 'package:reboot_app_3/core/routing/route_names.dart';
 
 enum GroupFilter { all, needsCode, openJoin }
 
@@ -452,19 +456,39 @@ class _GroupsExplorationScreenState
 
   void _showGroupDetails(BuildContext context, DiscoverableGroup group) {
     // TODO: Navigate to group detail screen
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('View details for ${group.name}')),
-    );
+    getSystemSnackBar(
+        context, 'Feature coming soon: View details for ${group.name}');
   }
 
-  void _joinGroup(BuildContext context, DiscoverableGroup group) {
+  Future<void> _joinGroup(BuildContext context, DiscoverableGroup group) async {
+    final l10n = AppLocalizations.of(context);
+
+    // Check if user can join (cooldown check)
+    final profileAsync = ref.read(currentCommunityProfileProvider);
+    final profile = await profileAsync.when(
+      data: (profile) async => profile,
+      loading: () async => null,
+      error: (_, __) async => null,
+    );
+
+    if (profile == null) {
+      getErrorSnackBar(context, 'profile-required');
+      return;
+    }
+
+    final canJoin = await ref.read(canJoinGroupProvider(profile.id).future);
+    if (!canJoin) {
+      getErrorSnackBar(context, 'cooldown-active-error');
+      return;
+    }
+
     if (group.joinMethod == 'code_only') {
-      // Show join with code modal
+      // Show simple join with code modal
       showModalBottomSheet(
         context: context,
         isScrollControlled: true,
         backgroundColor: Colors.transparent,
-        builder: (context) => const JoinGroupModal(),
+        builder: (context) => SimpleJoinCodeModal(groupName: group.name),
       );
     } else {
       // Direct join for 'any' method
@@ -502,16 +526,11 @@ class _GroupsExplorationScreenState
       if (!mounted) return;
 
       if (result.success) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              l10n
-                  .translate('joined-group-successfully')
-                  .replaceAll('{groupName}', group.name),
-            ),
-            backgroundColor: Theme.of(context).colorScheme.primary,
-          ),
-        );
+        getSuccessSnackBar(context, 'group-joined-successfully');
+        // Navigate to group screen after successful join
+        if (mounted) {
+          context.goNamed(RouteNames.groups.name);
+        }
       } else {
         _showError(_getJoinErrorMessage(result, l10n));
       }
@@ -544,7 +563,7 @@ class _GroupsExplorationScreenState
   }
 
   List<DiscoverableGroup> _getFilteredGroups(List<GroupEntity> allGroups) {
-    // Convert GroupEntity to DiscoverableGroup
+    // Convert GroupEntity to DiscoverableGroup with real member counts
     var groups =
         allGroups.map((group) => _mapGroupEntityToDiscoverable(group)).toList();
 
@@ -615,75 +634,53 @@ class _GroupsExplorationScreenState
     }
   }
 
-  /// Maps a GroupEntity to DiscoverableGroup for UI compatibility
+  /// Maps GroupEntity to DiscoverableGroup with real member count
   DiscoverableGroup _mapGroupEntityToDiscoverable(GroupEntity group) {
     return DiscoverableGroup(
       id: group.id,
       name: group.name,
       description: group.description,
-      memberCount: 0, // TODO: Get actual member count from backend
+      memberCount: group.memberCount, // Real member count from backend
       capacity: group.memberCapacity,
       gender: group.gender,
       joinMethod: group.joinMethod,
       createdAt: group.createdAt,
-      lastActivityTime: _formatLastActivity(group.updatedAt),
-      tags: _generateTagsFromGroup(group),
-      challengesCount: 0, // TODO: Get actual challenges count from backend
+      lastActivityTime:
+          _formatLastActivity(group.updatedAt, AppLocalizations.of(context)),
+      tags: [], // Only show real tags when available from backend
+      challengesCount: 0, // Will be loaded separately to avoid blocking UI
     );
   }
 
   /// Formats the last activity time for display
-  String _formatLastActivity(DateTime updatedAt) {
+  String _formatLastActivity(DateTime updatedAt, AppLocalizations l10n) {
     final now = DateTime.now();
     final difference = now.difference(updatedAt);
 
     if (difference.inMinutes < 1) {
-      return 'Just now';
+      return l10n.translate('just-created');
     } else if (difference.inHours < 1) {
-      return '${difference.inMinutes}m ago';
+      return l10n
+          .translate('group-hours-ago')
+          .replaceAll('{hours}', difference.inHours.toString());
     } else if (difference.inDays < 1) {
-      return '${difference.inHours}h ago';
+      return l10n
+          .translate('group-days-ago')
+          .replaceAll('{days}', difference.inDays.toString());
     } else if (difference.inDays < 7) {
-      return '${difference.inDays}d ago';
+      return l10n
+          .translate('group-days-ago')
+          .replaceAll('{days}', difference.inDays.toString());
     } else {
-      return '${(difference.inDays / 7).floor()}w ago';
+      final weeks = (difference.inDays / 7).floor();
+      return l10n
+          .translate('group-weeks-ago')
+          .replaceAll('{weeks}', weeks.toString());
     }
-  }
-
-  /// Generates tags based on group properties
-  List<String> _generateTagsFromGroup(GroupEntity group) {
-    final tags = <String>[];
-
-    // Add gender tag
-    if (group.gender == 'male') {
-      tags.add('Male');
-    } else if (group.gender == 'female') {
-      tags.add('Female');
-    } else {
-      tags.add('Mixed');
-    }
-
-    // Add join method tag
-    if (group.joinMethod == 'code_only') {
-      tags.add('Code Required');
-    } else if (group.joinMethod == 'any') {
-      tags.add('Open Join');
-    }
-
-    // Add generic tags
-    tags.add('Support');
-    tags.add('Community');
-
-    return tags;
   }
 
   void _showError(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: Theme.of(context).colorScheme.error,
-      ),
-    );
+    getErrorSnackBar(context, 'join-group-failed');
   }
 
   String _getJoinErrorMessage(JoinResultEntity result, AppLocalizations l10n) {

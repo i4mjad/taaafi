@@ -6,6 +6,7 @@ import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/helpers/date_display_formater.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
 import 'package:reboot_app_3/core/shared_widgets/spinner.dart';
+import 'package:reboot_app_3/core/shared_widgets/snackbar.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/custom_theme_data.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
@@ -437,9 +438,9 @@ class GroupOverviewCard extends ConsumerWidget {
               height: 1.3,
             ),
           ),
-          verticalSpace(Spacing.points8),
+          verticalSpace(Spacing.points4),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+            padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
               color: theme.primary[50],
               borderRadius: BorderRadius.circular(6),
@@ -447,44 +448,18 @@ class GroupOverviewCard extends ConsumerWidget {
             ),
             child: Row(
               children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        l10n.translate('group-id'),
-                        style: TextStyles.small.copyWith(
-                          color: theme.grey[600],
-                          fontSize: 10,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      Text(
-                        group.id,
-                        style: TextStyles.caption.copyWith(
-                          fontFamily: 'monospace',
-                          fontWeight: FontWeight.w600,
-                          color: theme.grey[900],
-                          fontSize: 11,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
-                  ),
+                Icon(
+                  LucideIcons.info,
+                  color: theme.primary[600],
+                  size: 14,
                 ),
-                GestureDetector(
-                  onTap: () => _copyToClipboard(group.id, context, l10n),
-                  child: Container(
-                    padding: const EdgeInsets.all(6),
-                    decoration: BoxDecoration(
-                      color: theme.primary[100],
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    child: Icon(
-                      LucideIcons.copy,
-                      color: theme.primary[600],
-                      size: 14,
+                horizontalSpace(Spacing.points4),
+                Expanded(
+                  child: Text(
+                    l10n.translate('open-join-info'),
+                    style: TextStyles.small.copyWith(
+                      color: theme.primary[700],
+                      fontSize: 11,
                     ),
                   ),
                 ),
@@ -600,14 +575,7 @@ class GroupOverviewCard extends ConsumerWidget {
   void _copyToClipboard(
       String text, BuildContext context, AppLocalizations l10n) {
     Clipboard.setData(ClipboardData(text: text));
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(l10n.translate('copied-to-clipboard')),
-        duration: const Duration(seconds: 2),
-        backgroundColor: AppTheme.of(context).success[600],
-      ),
-    );
+    getSuccessSnackBar(context, 'join-code-copied');
   }
 
   Color _getGenderColor(String gender, CustomThemeData theme) {

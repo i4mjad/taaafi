@@ -102,7 +102,7 @@ class GroupMemberItem extends ConsumerWidget {
                       )
                     : _buildDefaultAvatar(theme, memberInfo),
               ),
-
+// ATGBA
               horizontalSpace(Spacing.points16),
 
               // Member details
@@ -111,63 +111,45 @@ class GroupMemberItem extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // Name and role badge
-                    Row(
+                    Column(
                       children: [
-                        Expanded(
-                          child: Text(
-                            _getLocalizedDisplayName(
-                                memberInfo.displayName, l10n),
-                            style: TextStyles.footnote.copyWith(
-                              color: theme.grey[900],
-                              fontWeight: FontWeight.w600,
-                            ),
-                            overflow: TextOverflow.ellipsis,
+                        Text(
+                          _getLocalizedDisplayName(
+                              memberInfo.displayName, l10n),
+                          style: TextStyles.footnote.copyWith(
+                            color: theme.grey[900],
+                            fontWeight: FontWeight.w600,
                           ),
+                          overflow: TextOverflow.ellipsis,
                         ),
-                        horizontalSpace(Spacing.points8),
+                        verticalSpace(Spacing.points4),
                         // Role badge
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 6, vertical: 2),
-                          decoration: BoxDecoration(
-                            color: memberInfo.membership.role == 'admin'
-                                ? theme.primary[100]
-                                : theme.grey[100],
-                            borderRadius: BorderRadius.circular(4),
-                            border: Border.all(
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              memberInfo.membership.role == 'admin'
+                                  ? LucideIcons.crown
+                                  : LucideIcons.user,
+                              size: 10,
                               color: memberInfo.membership.role == 'admin'
-                                  ? theme.primary[300]!
-                                  : theme.grey[300]!,
-                              width: 0.5,
+                                  ? theme.primary[600]
+                                  : theme.grey[600],
                             ),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                memberInfo.membership.role == 'admin'
-                                    ? LucideIcons.crown
-                                    : LucideIcons.user,
-                                size: 10,
+                            const SizedBox(width: 2),
+                            Text(
+                              memberInfo.membership.role == 'admin'
+                                  ? l10n.translate('group-admin')
+                                  : l10n.translate('group-member'),
+                              style: TextStyles.small.copyWith(
                                 color: memberInfo.membership.role == 'admin'
-                                    ? theme.primary[600]
+                                    ? theme.primary[700]
                                     : theme.grey[600],
+                                fontSize: 10,
+                                fontWeight: FontWeight.w600,
                               ),
-                              const SizedBox(width: 2),
-                              Text(
-                                memberInfo.membership.role == 'admin'
-                                    ? l10n.translate('group-admin')
-                                    : l10n.translate('group-member'),
-                                style: TextStyles.small.copyWith(
-                                  color: memberInfo.membership.role == 'admin'
-                                      ? theme.primary[700]
-                                      : theme.grey[600],
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
                       ],
                     ),

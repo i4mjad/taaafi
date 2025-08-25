@@ -47,95 +47,89 @@ class _GroupSettingsScreenState extends ConsumerState<GroupSettingsScreen> {
     return Scaffold(
       backgroundColor: theme.backgroundColor,
       appBar: appBar(context, ref, "group-settings", false, true),
-      body: Column(
-        children: [
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.start,
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              verticalSpace(Spacing.points16),
+
+              // Group Overview Card (combines details and join code)
+              const GroupOverviewCard(),
+
+              verticalSpace(Spacing.points16),
+
+              // Settings actions row
+              Row(
                 children: [
-                  verticalSpace(Spacing.points16),
-
-                  // Group Overview Card (combines details and join code)
-                  const GroupOverviewCard(),
-
-                  verticalSpace(Spacing.points16),
-
-                  // Settings actions row
-                  Row(
-                    children: [
-                      // Notifications
-                      Expanded(
-                        child: _buildActionCard(
-                          context: context,
-                          theme: theme,
-                          l10n: l10n,
-                          icon: LucideIcons.bell,
-                          title: l10n.translate('notifications'),
-                          onTap: () => _navigateToNotificationSettings(context),
-                        ),
-                      ),
-
-                      horizontalSpace(Spacing.points8),
-
-                      // Chat
-                      Expanded(
-                        child: _buildActionCard(
-                          context: context,
-                          theme: theme,
-                          l10n: l10n,
-                          icon: LucideIcons.messageCircle,
-                          title: l10n.translate('chat'),
-                          onTap: () => _navigateToChatSettings(context),
-                        ),
-                      ),
-
-                      horizontalSpace(Spacing.points8),
-
-                      // Privacy
-                      Expanded(
-                        child: _buildActionCard(
-                          context: context,
-                          theme: theme,
-                          l10n: l10n,
-                          icon: LucideIcons.shield,
-                          title: l10n.translate('privacy'),
-                          onTap: () => _navigateToPrivacySettings(context),
-                        ),
-                      ),
-
-                      horizontalSpace(Spacing.points8),
-
-                      // Leave
-                      Expanded(
-                        child: _buildActionCard(
-                          context: context,
-                          theme: theme,
-                          l10n: l10n,
-                          icon: LucideIcons.logOut,
-                          title: l10n.translate('leave'),
-                          onTap: () => _showLeaveGroupDialog(context, l10n),
-                          isDestructive: true,
-                        ),
-                      ),
-                    ],
+                  // Notifications
+                  Expanded(
+                    child: _buildActionCard(
+                      context: context,
+                      theme: theme,
+                      l10n: l10n,
+                      icon: LucideIcons.bell,
+                      title: l10n.translate('notifications'),
+                      onTap: () => _navigateToNotificationSettings(context),
+                    ),
                   ),
 
-                  verticalSpace(Spacing.points24),
+                  horizontalSpace(Spacing.points8),
 
-                  // Group Members List
-                  const GroupMembersList(),
+                  // Chat
+                  Expanded(
+                    child: _buildActionCard(
+                      context: context,
+                      theme: theme,
+                      l10n: l10n,
+                      icon: LucideIcons.messageCircle,
+                      title: l10n.translate('chat'),
+                      onTap: () => _navigateToChatSettings(context),
+                    ),
+                  ),
 
-                  verticalSpace(Spacing.points24),
+                  horizontalSpace(Spacing.points8),
 
-                  const Spacer(),
+                  // Privacy
+                  Expanded(
+                    child: _buildActionCard(
+                      context: context,
+                      theme: theme,
+                      l10n: l10n,
+                      icon: LucideIcons.shield,
+                      title: l10n.translate('privacy'),
+                      onTap: () => _navigateToPrivacySettings(context),
+                    ),
+                  ),
+
+                  horizontalSpace(Spacing.points8),
+
+                  // Leave
+                  Expanded(
+                    child: _buildActionCard(
+                      context: context,
+                      theme: theme,
+                      l10n: l10n,
+                      icon: LucideIcons.logOut,
+                      title: l10n.translate('leave'),
+                      onTap: () => _showLeaveGroupDialog(context, l10n),
+                      isDestructive: true,
+                    ),
+                  ),
                 ],
               ),
-            ),
+
+              verticalSpace(Spacing.points24),
+
+              // Group Members List
+              const GroupMembersList(),
+
+              verticalSpace(Spacing.points24),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

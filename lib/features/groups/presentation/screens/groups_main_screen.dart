@@ -21,6 +21,7 @@ import 'package:reboot_app_3/features/groups/presentation/screens/modals/create_
 import 'package:reboot_app_3/features/groups/presentation/screens/modals/group_invitations_modal.dart';
 import 'package:reboot_app_3/features/shared/models/group_invitation_entity.dart';
 import 'package:reboot_app_3/features/groups/presentation/screens/group_screen.dart';
+import 'package:reboot_app_3/features/groups/presentation/widgets/join_cooldown_timer.dart';
 
 class GroupsMainScreen extends ConsumerWidget {
   const GroupsMainScreen({super.key});
@@ -91,6 +92,9 @@ class GroupsMainScreen extends ConsumerWidget {
 
       case GroupsStatus.needsCommunityProfile:
         return _buildNeedsCommunityProfileScreen(context, ref, theme, l10n);
+
+      case GroupsStatus.cooldownActive:
+        return _buildCooldownActiveScreen(context, ref, theme, l10n);
 
       case GroupsStatus.alreadyInGroup:
         return const GroupScreen();
@@ -591,6 +595,61 @@ class GroupsMainScreen extends ConsumerWidget {
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) => GroupInvitationsModal(invitations: invitations),
+    );
+  }
+
+  Widget _buildCooldownActiveScreen(BuildContext context, WidgetRef ref,
+      CustomThemeData theme, AppLocalizations l10n) {
+    return SafeArea(
+      child: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const SizedBox(height: 24),
+
+              // Main illustration
+              Center(
+                child: SvgPicture.asset(
+                  'asset/illustrations/groups-main-illustration.svg',
+                  height: 200,
+                ),
+              ),
+
+              const SizedBox(height: 40),
+
+              // Main title
+              Text(
+                l10n.translate('groups-cooldown-title'),
+                style: TextStyles.h3.copyWith(
+                  color: theme.grey[900],
+                ),
+                textAlign: TextAlign.center,
+              ),
+
+              const SizedBox(height: 16),
+
+              // Cooldown message
+              Text(
+                l10n.translate('groups-cooldown-message'),
+                style: TextStyles.body.copyWith(
+                  color: theme.grey[700],
+                  height: 1.4,
+                ),
+                textAlign: TextAlign.center,
+              ),
+
+              const SizedBox(height: 32),
+
+              // Countdown Timer
+              const JoinCooldownTimer(),
+
+              const SizedBox(height: 24),
+            ],
+          ),
+        ),
+      ),
     );
   }
 

@@ -5,9 +5,9 @@ import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
 import 'package:reboot_app_3/core/shared_widgets/custom_textfield.dart';
 import 'package:reboot_app_3/core/shared_widgets/snackbar.dart';
-import 'package:reboot_app_3/core/shared_widgets/platform_switch.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
+import 'package:reboot_app_3/core/theming/spacing.dart';
 
 import 'package:go_router/go_router.dart';
 import 'package:reboot_app_3/core/routing/route_names.dart';
@@ -16,21 +16,25 @@ import 'package:reboot_app_3/features/groups/application/groups_providers.dart';
 import 'package:reboot_app_3/features/community/presentation/providers/community_providers_new.dart';
 import 'package:reboot_app_3/features/groups/domain/entities/join_result_entity.dart';
 
-class JoinGroupModal extends ConsumerStatefulWidget {
-  const JoinGroupModal({super.key});
+class SimpleJoinCodeModal extends ConsumerStatefulWidget {
+  final String groupName;
+  
+  const SimpleJoinCodeModal({
+    super.key,
+    required this.groupName,
+  });
 
   @override
-  ConsumerState<JoinGroupModal> createState() => _JoinGroupModalState();
+  ConsumerState<SimpleJoinCodeModal> createState() => _SimpleJoinCodeModalState();
 }
 
-class _JoinGroupModalState extends ConsumerState<JoinGroupModal> {
-  final _groupCodeController = TextEditingController();
-  bool _hideIdentity = false;
+class _SimpleJoinCodeModalState extends ConsumerState<SimpleJoinCodeModal> {
+  final _joinCodeController = TextEditingController();
   bool _isLoading = false;
 
   @override
   void dispose() {
-    _groupCodeController.dispose();
+    _joinCodeController.dispose();
     super.dispose();
   }
 
@@ -57,10 +61,13 @@ class _JoinGroupModalState extends ConsumerState<JoinGroupModal> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               const SizedBox(width: 24), // Balance the close button
-              Text(
-                l10n.translate('join-group-title'),
-                style: TextStyles.h4.copyWith(
-                  color: theme.grey[900],
+              Expanded(
+                child: Text(
+                  l10n.translate('join-group-with-code'),
+                  style: TextStyles.h5.copyWith(
+                    color: theme.grey[900],
+                  ),
+                  textAlign: TextAlign.center,
                 ),
               ),
               GestureDetector(
@@ -77,79 +84,64 @@ class _JoinGroupModalState extends ConsumerState<JoinGroupModal> {
             ],
           ),
 
-          const SizedBox(height: 32),
+          verticalSpace(Spacing.points16),
 
-          // Hide Identity Section
-          WidgetsContainer(
-            backgroundColor: theme.grey[50],
-            borderSide: BorderSide.none,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+          // Group info
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: theme.grey[50],
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: theme.grey[200]!, width: 0.5),
+            ),
+            child: Row(
               children: [
-                Row(
-                  children: [
-                    Icon(
-                      LucideIcons.heart,
-                      size: 20,
-                      color: theme.grey[700],
-                    ),
-                    const SizedBox(width: 12),
-                    Text(
-                      l10n.translate('hide-identity'),
-                      style: TextStyles.body.copyWith(
-                        color: theme.grey[900],
-                      ),
-                    ),
-                    const Spacer(),
-                    PlatformSwitch(
-                      value: _hideIdentity,
-                      onChanged: (value) {
-                        setState(() {
-                          _hideIdentity = value;
-                        });
-                      },
-                    ),
-                  ],
+                Icon(
+                  LucideIcons.users,
+                  color: theme.primary[600],
+                  size: 20,
                 ),
-                const SizedBox(height: 12),
-                Text(
-                  l10n.translate('hide-identity-description'),
-                  style: TextStyles.caption.copyWith(
-                    color: theme.grey[600],
-                    height: 1.4,
+                horizontalSpace(Spacing.points8),
+                Expanded(
+                  child: Text(
+                    widget.groupName,
+                    style: TextStyles.body.copyWith(
+                      color: theme.grey[900],
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                 ),
               ],
             ),
           ),
 
-          const SizedBox(height: 24),
+          verticalSpace(Spacing.points16),
 
-          // Join Specific Group Section
+          // Join code input
           Text(
-            l10n.translate('join-specific-group'),
-            style: TextStyles.h5.copyWith(
-              color: theme.grey[900],
+            l10n.translate('enter-join-code'),
+            style: TextStyles.body.copyWith(
+              color: theme.grey[700],
+              fontWeight: FontWeight.w500,
             ),
           ),
 
-          const SizedBox(height: 16),
+          verticalSpace(Spacing.points8),
 
-          // Group Code Input
           CustomTextField(
-            controller: _groupCodeController,
-            hint: l10n.translate('enter-group-code'),
-            prefixIcon: LucideIcons.hash,
+            controller: _joinCodeController,
+            hint: l10n.translate('join-code-placeholder'),
+            prefixIcon: LucideIcons.key,
             inputType: TextInputType.text,
             validator: (value) {
               if (value?.isEmpty ?? true) {
-                return l10n.translate('group-code-required');
+                return l10n.translate('join-code-required');
               }
               return null;
             },
           ),
 
-          const SizedBox(height: 16),
+          verticalSpace(Spacing.points20),
 
           // Join Button
           GestureDetector(
@@ -158,7 +150,7 @@ class _JoinGroupModalState extends ConsumerState<JoinGroupModal> {
               padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
               backgroundColor:
                   _isLoading ? theme.grey[300] : theme.primary[600],
-              borderRadius: BorderRadius.circular(10.5),
+              borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide.none,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -174,12 +166,13 @@ class _JoinGroupModalState extends ConsumerState<JoinGroupModal> {
                         ),
                       ),
                     ),
-                    const SizedBox(width: 8),
+                    horizontalSpace(Spacing.points8),
                   ],
                   Text(
-                    l10n.translate('join-button'),
+                    l10n.translate('join-group'),
                     style: TextStyles.footnote.copyWith(
                       color: _isLoading ? theme.grey[600] : Colors.white,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
                 ],
@@ -187,57 +180,7 @@ class _JoinGroupModalState extends ConsumerState<JoinGroupModal> {
             ),
           ),
 
-          const SizedBox(height: 32),
-
-          // Explore Groups Section
-          Text(
-            l10n.translate('explore-groups'),
-            style: TextStyles.h5.copyWith(
-              color: theme.grey[900],
-            ),
-          ),
-
-          const SizedBox(height: 12),
-
-          Text(
-            l10n.translate('explore-groups-description'),
-            style: TextStyles.caption.copyWith(
-              color: theme.grey[600],
-              height: 1.4,
-            ),
-          ),
-
-          const SizedBox(height: 16),
-
-          // Explore Groups Button
-          GestureDetector(
-            onTap: _exploreGroups,
-            child: WidgetsContainer(
-              padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
-              backgroundColor: theme.primary[600],
-              borderRadius: BorderRadius.circular(10.5),
-              borderSide: BorderSide.none,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    LucideIcons.search,
-                    size: 16,
-                    color: Colors.white,
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    l10n.translate('explore-groups-button'),
-                    style: TextStyles.footnote.copyWith(
-                      color: Colors.white,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-
-          const SizedBox(height: 24),
+          verticalSpace(Spacing.points16),
         ],
       ),
     );
@@ -245,10 +188,10 @@ class _JoinGroupModalState extends ConsumerState<JoinGroupModal> {
 
   Future<void> _joinGroup() async {
     final l10n = AppLocalizations.of(context);
-    final groupCode = _groupCodeController.text.trim();
+    final joinCode = _joinCodeController.text.trim();
 
-    if (groupCode.isEmpty) {
-      _showError(l10n.translate('group-code-required'));
+    if (joinCode.isEmpty) {
+      getErrorSnackBar(context, 'join-code-required');
       return;
     }
 
@@ -264,23 +207,23 @@ class _JoinGroupModalState extends ConsumerState<JoinGroupModal> {
       );
 
       if (profile == null) {
-        _showError(l10n.translate('profile-required'));
+        getErrorSnackBar(context, 'profile-required');
         return;
       }
 
       // Find the group by join code first
       final groupsService = ref.read(groupsServiceProvider);
-      final group = await groupsService.findGroupByJoinCode(groupCode);
-
+      final group = await groupsService.findGroupByJoinCode(joinCode);
+      
       if (group == null) {
-        _showError(l10n.translate('invalid-join-code-error'));
+        getErrorSnackBar(context, 'invalid-join-code-error');
         return;
       }
 
       final result =
           await ref.read(groupsControllerProvider.notifier).joinGroupWithCode(
                 groupId: group.id,
-                joinCode: groupCode,
+                joinCode: joinCode,
                 cpId: profile.id,
               );
 
@@ -294,11 +237,11 @@ class _JoinGroupModalState extends ConsumerState<JoinGroupModal> {
           context.goNamed(RouteNames.groups.name);
         }
       } else {
-        _showError(_getJoinErrorMessage(result, l10n));
+        getErrorSnackBar(context, _getJoinErrorMessage(result, l10n));
       }
     } catch (error) {
       if (mounted) {
-        _showError(l10n.translate('unexpected-error'));
+        getErrorSnackBar(context, 'unexpected-error');
       }
     } finally {
       if (mounted) {
@@ -310,35 +253,25 @@ class _JoinGroupModalState extends ConsumerState<JoinGroupModal> {
   String _getJoinErrorMessage(JoinResultEntity result, AppLocalizations l10n) {
     switch (result.errorType) {
       case JoinErrorType.alreadyInGroup:
-        return l10n.translate('already-in-group-error');
+        return 'already-in-group-error';
       case JoinErrorType.cooldownActive:
-        return l10n.translate('cooldown-active-error');
+        return 'cooldown-active-error';
       case JoinErrorType.capacityFull:
-        return l10n.translate('group-full-error');
+        return 'group-full-error';
       case JoinErrorType.invalidCode:
       case JoinErrorType.expiredCode:
-        return l10n.translate('invalid-join-code-error');
+        return 'invalid-join-code-error';
       case JoinErrorType.genderMismatch:
-        return l10n.translate('gender-mismatch-error');
+        return 'gender-mismatch-error';
       case JoinErrorType.groupNotFound:
-        return l10n.translate('group-not-found-error');
+        return 'group-not-found-error';
       case JoinErrorType.groupInactive:
       case JoinErrorType.groupPaused:
-        return l10n.translate('group-inactive-error');
+        return 'group-inactive-error';
       case JoinErrorType.userBanned:
-        return l10n.translate('user-banned-error');
+        return 'user-banned-error';
       default:
-        return result.errorMessage ?? l10n.translate('join-group-failed');
+        return 'join-group-failed';
     }
-  }
-
-  void _showError(String message) {
-    getSystemSnackBar(context, message);
-  }
-
-  void _exploreGroups() {
-    Navigator.of(context).pop();
-    // Navigate to groups exploration screen using GoRouter
-    context.goNamed(RouteNames.groupExploration.name);
   }
 }

@@ -2,12 +2,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:reboot_app_3/features/community/presentation/providers/community_providers_new.dart';
 import 'package:reboot_app_3/features/groups/providers/group_membership_provider.dart';
+import 'package:reboot_app_3/features/groups/application/groups_controller.dart';
 
 part 'groups_status_provider.g.dart';
 
 enum GroupsStatus {
   loading,
   needsCommunityProfile,
+  cooldownActive,
   canJoinGroup,
   alreadyInGroup,
   canCreateGroup,
@@ -67,6 +69,12 @@ Future<GroupsStatus> groupsStatus(Ref ref) async {
   // Check if user is already in a group
   if (groupMembership != null) {
     return GroupsStatus.alreadyInGroup;
+  }
+
+  // Check if user has cooldown active
+  final canJoinAsync = ref.watch(canJoinGroupProvider(currentProfile.id));
+  if (canJoinAsync.hasValue && !canJoinAsync.value!) {
+    return GroupsStatus.cooldownActive;
   }
 
   // TODO: Check if user has pending invitations
