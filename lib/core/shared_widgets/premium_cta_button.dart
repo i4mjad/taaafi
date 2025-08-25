@@ -32,18 +32,14 @@ class PremiumCtaAppBarIcon extends ConsumerWidget {
                   });
             }
           },
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Stack(
-              children: [
-                Icon(
-                  Ta3afiPlatformIcons.plus,
-                  color:
-                      hasSubscription ? Colors.green : const Color(0xFFFEBA01),
-                  // size: 20,
-                ),
-              ],
-            ),
+          child: Stack(
+            children: [
+              Icon(
+                Ta3afiPlatformIcons.plus,
+                color: hasSubscription ? Colors.green : const Color(0xFFFEBA01),
+                // size: 20,
+              ),
+            ],
           ),
         );
       },

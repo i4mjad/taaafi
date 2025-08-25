@@ -825,7 +825,7 @@ const Map<String, String> kEn = {
   "about-app": "About App",
   "about-ta3afi":
       "An app to raise awareness about the dangers of pornography and addiction to it by providing content and tools to help solve the problem.",
-  "version-number": "Version 5.3.1 (2)",
+  "version-number": "Version 5.4.0",
   "what-is-all-of-those": "What's the difference between these numbers?",
   "app-loading": "Initializing...",
   "processing": "Processing...",
@@ -3117,6 +3117,13 @@ const Map<String, String> kEn = {
       "Share this code with others to let them join your group.",
   "code-only-member-desc":
       "This group uses join codes. Ask the admin for the code to invite others.",
+  "share-group": "Share Group",
+  "share-as-post": "Share as Community Post",
+  "share-as-post-subtitle": "Share this group with the community",
+  "share-to-social": "Share to Social Media",
+  "share-to-social-subtitle": "Share group invitation with friends",
+  "group-share-message":
+      "Join our support group on Ta'aafi! Use code: {code} to join and start your recovery journey with us.\n\nDownload the app: https://ta3afi.app\nFollow us: @ta3afi",
   "any-join-desc": "Anyone can join this group using the group ID below.",
   "admin-only-admin-desc":
       "This group is invitation-only. You can send invites to let people join.",

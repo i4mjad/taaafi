@@ -31,17 +31,14 @@ import 'package:reboot_app_3/core/shared_widgets/complete_registration_banner.da
 import 'package:reboot_app_3/core/shared_widgets/confirm_details_banner.dart';
 import 'package:reboot_app_3/core/shared_widgets/confirm_email_banner.dart';
 import 'package:reboot_app_3/features/account/presentation/contact_us_modal.dart';
-
 import 'package:reboot_app_3/features/authentication/providers/user_provider.dart';
 import 'package:reboot_app_3/features/account/data/app_features_config.dart';
 import 'package:reboot_app_3/features/account/presentation/widgets/feature_access_guard.dart';
-import 'package:reboot_app_3/features/plus/presentation/widgets/subscription_card.dart';
 import 'package:reboot_app_3/features/plus/data/notifiers/subscription_notifier.dart';
 import 'package:reboot_app_3/features/plus/data/repositories/subscription_repository.dart';
 import 'package:intl/intl.dart';
 import 'package:reboot_app_3/features/plus/presentation/feature_suggestion_modal.dart';
 import 'package:reboot_app_3/features/plus/presentation/taaafi_plus_features_list_screen.dart';
-
 import 'package:shorebird_code_push/shorebird_code_push.dart';
 
 class AccountScreen extends ConsumerWidget {
@@ -60,7 +57,7 @@ class AccountScreen extends ConsumerWidget {
         backgroundColor: theme.backgroundColor,
         appBar: appBar(context, ref, 'account', false, true, actions: [
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: PremiumCtaAppBarIcon(),
           ),
         ]),

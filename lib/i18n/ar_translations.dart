@@ -239,7 +239,7 @@ const Map<String, String> kAr = {
   "start-your-journy": "إبدأ رحلة التعافي",
   "about-ta3afi":
       "تطبيق للتوعية بمخاطر المواد الإباحية وما يؤدي الإدمان عليها عن طريق تقديم محتوى وأدوات تساعد في حل المشكلة.",
-  "version-number": "النسخة 5.3.1 (2)",
+  "version-number": "النسخة 5.4.0",
   "app-loading": "جاري التهيئة...",
   "what-is-all-of-those": "ما هو الفرق بين هذه الأرقام؟",
   "contact-us-through-this-channels": "تواصل معنا",
@@ -3047,6 +3047,13 @@ const Map<String, String> kAr = {
       'شارك هذا الرمز مع الآخرين للسماح لهم بالانضمام إلى زمالتك.',
   'code-only-member-desc':
       'تستخدم هذه الزمالة رموز الانضمام. اطلب الرمز من المشرف لدعوة الآخرين.',
+  'share-group': 'مشاركة الزمالة',
+  'share-as-post': 'مشاركة كمنشور مجتمعي',
+  'share-as-post-subtitle': 'شارك هذه الزمالة مع المجتمع',
+  'share-to-social': 'مشاركة في وسائل التواصل',
+  'share-to-social-subtitle': 'شارك دعوة الزمالة مع الأصدقاء',
+  'group-share-message':
+      'انضم إلى زمالة الدعم في تعافي! استخدم الرمز: {code} للانضمام وبدء رحلة التعافي معنا.\n\nحمّل التطبيق: https://ta3afi.app\nتابعنا: @ta3afi',
   'any-join-desc':
       'يمكن لأي شخص الانضمام إلى هذه الزمالة باستخدام معرف الزمالة أدناه.',
   'admin-only-admin-desc':
