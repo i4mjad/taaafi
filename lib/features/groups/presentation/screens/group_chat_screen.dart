@@ -123,6 +123,11 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
   late AnimationController _replyPreviewController;
   late Animation<double> _replyPreviewAnimation;
 
+  // Highlight effect for scrolled-to messages
+  String? _highlightedMessageId;
+  AnimationController? _highlightController;
+  Animation<double>? _highlightAnimation;
+
   @override
   void initState() {
     super.initState();
@@ -140,6 +145,19 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
       curve: Curves.easeIn,
     );
     _replyPreviewController.value = 1.0; // Start fully visible
+
+    // Initialize highlight animation
+    _highlightController = AnimationController(
+      duration: const Duration(milliseconds: 1500),
+      vsync: this,
+    );
+    _highlightAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _highlightController!,
+      curve: Curves.easeInOut,
+    ));
   }
 
   @override
@@ -147,6 +165,7 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
     _messageController.dispose();
     _scrollController.dispose();
     _replyPreviewController.dispose();
+    _highlightController?.dispose();
     super.dispose();
   }
 
@@ -326,82 +345,122 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
                     ? currentUserMaxWidth
                     : otherUserMaxWidth, // Responsive widths based on screen size
               ),
-              child: Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: screenWidth * 0.03, // 3% of screen width
-                  vertical: screenHeight * 0.01, // 1% of screen height
-                ),
-                decoration: BoxDecoration(
-                  color: message.isCurrentUser
-                      ? theme.primary[50]
-                      : theme.grey[50],
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(
-                      color: message.isCurrentUser
-                          ? theme.primary[200]!
-                          : theme.grey[200]!,
-                      width: 0.5),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    // Name and time row - sender first, then time
-                    Row(
+              child: AnimatedBuilder(
+                animation: _highlightAnimation ?? kAlwaysCompleteAnimation,
+                builder: (context, child) {
+                  final isHighlighted = _highlightedMessageId == message.id;
+                  final highlightIntensity =
+                      isHighlighted ? (_highlightAnimation?.value ?? 0.0) : 0.0;
+
+                  return Container(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: screenWidth * 0.03, // 3% of screen width
+                      vertical: screenHeight * 0.01, // 1% of screen height
+                    ),
+                    decoration: BoxDecoration(
+                      color: isHighlighted
+                          ? Color.lerp(
+                              message.isCurrentUser
+                                  ? theme.primary[50]
+                                  : theme.grey[50],
+                              theme.primary[100],
+                              highlightIntensity *
+                                  0.6, // Fade between normal and highlight color
+                            )
+                          : (message.isCurrentUser
+                              ? theme.primary[50]
+                              : theme.grey[50]),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color: isHighlighted
+                            ? Color.lerp(
+                                message.isCurrentUser
+                                    ? theme.primary[200]!
+                                    : theme.grey[200]!,
+                                theme.primary[400]!,
+                                highlightIntensity,
+                              )!
+                            : (message.isCurrentUser
+                                ? theme.primary[200]!
+                                : theme.grey[200]!),
+                        width: isHighlighted
+                            ? (0.5 + highlightIntensity * 1.5)
+                            : 0.5,
+                      ),
+                      boxShadow: isHighlighted && highlightIntensity > 0.3
+                          ? [
+                              BoxShadow(
+                                color: theme.primary[300]!
+                                    .withOpacity(highlightIntensity * 0.3),
+                                blurRadius: 8.0 * highlightIntensity,
+                                spreadRadius: 2.0 * highlightIntensity,
+                              ),
+                            ]
+                          : null,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisSize: MainAxisSize.min,
-                      textDirection: Directionality.of(context),
                       children: [
-                        // Sender name first
-                        Text(
-                          message.senderName,
-                          style: TextStyles.smallBold.copyWith(
-                            color: theme.grey[900],
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                          ),
+                        // Name and time row - sender first, then time
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          textDirection: Directionality.of(context),
+                          children: [
+                            // Sender name first
+                            Text(
+                              message.senderName,
+                              style: TextStyles.smallBold.copyWith(
+                                color: theme.grey[900],
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+
+                            Spacer(),
+
+                            // Time second
+                            Text(
+                              message.time,
+                              style: TextStyles.caption.copyWith(
+                                color: theme.grey[300],
+                                fontSize: 8,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
                         ),
 
-                        Spacer(),
+                        // Divider line
+                        Container(
+                          height: 0.5,
+                          margin: const EdgeInsets.symmetric(vertical: 4),
+                          color: theme.grey[200],
+                        ),
 
-                        // Time second
+                        // Reply preview (show if this message is a reply)
+                        if (message.replyToMessage != null)
+                          _buildMessageReplyPreview(
+                              context, theme, message.replyToMessage!),
+
+                        // Message content with proper text wrapping and dynamic text size
                         Text(
-                          message.time,
-                          style: TextStyles.caption.copyWith(
-                            color: theme.grey[300],
-                            fontSize: 8,
-                            fontWeight: FontWeight.w500,
+                          message.content,
+                          style: chatTextSize.textStyle.copyWith(
+                            color: theme.grey[800],
+                            height: 1.5,
                           ),
+                          textAlign:
+                              Directionality.of(context) == TextDirection.rtl
+                                  ? TextAlign.right
+                                  : TextAlign.left,
+                          softWrap: true,
+                          overflow: TextOverflow.visible,
                         ),
                       ],
                     ),
-
-                    // Divider line
-                    Container(
-                      height: 0.5,
-                      margin: const EdgeInsets.symmetric(vertical: 4),
-                      color: theme.grey[200],
-                    ),
-
-                    // Reply preview (show if this message is a reply)
-                    if (message.replyToMessage != null)
-                      _buildMessageReplyPreview(
-                          context, theme, message.replyToMessage!),
-
-                    // Message content with proper text wrapping and dynamic text size
-                    Text(
-                      message.content,
-                      style: chatTextSize.textStyle.copyWith(
-                        color: theme.grey[800],
-                        height: 1.5,
-                      ),
-                      textAlign: Directionality.of(context) == TextDirection.rtl
-                          ? TextAlign.right
-                          : TextAlign.left,
-                      softWrap: true,
-                      overflow: TextOverflow.visible,
-                    ),
-                  ],
-                ),
+                  );
+                },
               ),
             ),
 
@@ -437,6 +496,56 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
     _replyPreviewController.reverse().then((_) {
       setState(() {
         _replyState = const ChatReplyState();
+      });
+    });
+  }
+
+  /// Finds the index of a message in the list by its ID
+  int? _findMessageIndex(String messageId) {
+    final messages = _getDemoMessages();
+    for (int i = 0; i < messages.length; i++) {
+      if (messages[i].id == messageId) {
+        return i;
+      }
+    }
+    return null;
+  }
+
+  /// Scrolls to a specific message by its ID with smooth animation
+  void _scrollToMessage(String messageId) {
+    final messageIndex = _findMessageIndex(messageId);
+    if (messageIndex == null || !_scrollController.hasClients) return;
+
+    // Set the message to be highlighted
+    setState(() {
+      _highlightedMessageId = messageId;
+    });
+
+    // Calculate approximate item height and position
+    // Each message item has variable height, but we can estimate
+    final estimatedItemHeight =
+        120.0; // Approximate height per message including spacing
+    final targetPosition = messageIndex * estimatedItemHeight;
+
+    // Animate to the target position
+    _scrollController
+        .animateTo(
+      targetPosition.clamp(0.0, _scrollController.position.maxScrollExtent),
+      duration: const Duration(milliseconds: 500),
+      curve: Curves.easeInOut,
+    )
+        .then((_) {
+      // Start highlight animation after scroll completes
+      _highlightController?.forward().then((_) {
+        // Clear highlight after animation completes
+        Future.delayed(const Duration(milliseconds: 500), () {
+          if (mounted) {
+            setState(() {
+              _highlightedMessageId = null;
+            });
+            _highlightController?.reset();
+          }
+        });
       });
     });
   }
@@ -961,49 +1070,62 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
 
   Widget _buildMessageReplyPreview(BuildContext context, CustomThemeData theme,
       ChatMessage originalMessage) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.all(8),
-      decoration: BoxDecoration(
-        color: theme.grey[100],
-        borderRadius: BorderRadius.circular(6),
-        border: Border(
-          left: BorderSide(color: theme.primary[400]!, width: 2),
+    return GestureDetector(
+      onTap: () {
+        // Scroll to the original message when reply preview is tapped
+        _scrollToMessage(originalMessage.id);
+      },
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 8),
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: theme.grey[100],
+          borderRadius: BorderRadius.circular(6),
+          border: Border(
+            left: BorderSide(color: theme.primary[400]!, width: 2),
+          ),
         ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(
-                LucideIcons.reply,
-                size: 12,
-                color: theme.primary[600],
-              ),
-              const SizedBox(width: 4),
-              Text(
-                originalMessage.senderName,
-                style: TextStyles.caption.copyWith(
-                  color: theme.primary[700],
-                  fontWeight: FontWeight.w600,
-                  fontSize: 11,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(
+                  LucideIcons.reply,
+                  size: 12,
+                  color: theme.primary[600],
                 ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 2),
-          Text(
-            originalMessage.content,
-            style: TextStyles.small.copyWith(
-              color: theme.grey[600],
-              // fontSize: 11,
-              height: 1.3,
+                const SizedBox(width: 4),
+                Text(
+                  originalMessage.senderName,
+                  style: TextStyles.caption.copyWith(
+                    color: theme.primary[700],
+                    fontWeight: FontWeight.w600,
+                    fontSize: 11,
+                  ),
+                ),
+                const Spacer(),
+                // Add visual indicator that this is tappable
+                Icon(
+                  LucideIcons.externalLink,
+                  size: 10,
+                  color: theme.primary[500],
+                ),
+              ],
             ),
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ],
+            const SizedBox(height: 2),
+            Text(
+              originalMessage.content,
+              style: TextStyles.small.copyWith(
+                color: theme.grey[600],
+                // fontSize: 11,
+                height: 1.3,
+              ),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
+        ),
       ),
     );
   }
