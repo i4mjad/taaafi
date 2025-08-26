@@ -1,0 +1,314 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../domain/entities/group_message_entity.dart';
+import '../data/datasources/group_messages_firestore_datasource.dart';
+import '../data/repositories/group_chat_repository.dart';
+import '../../community/presentation/providers/community_providers_new.dart';
+
+part 'group_chat_providers.g.dart';
+
+// ==================== DATA SOURCE PROVIDERS ====================
+
+@riverpod
+GroupMessagesDataSource groupMessagesDataSource(Ref ref) {
+  return GroupMessagesFirestoreDataSource(FirebaseFirestore.instance);
+}
+
+// ==================== REPOSITORY PROVIDERS ====================
+
+@riverpod
+GroupChatRepository groupChatRepository(Ref ref) {
+  final dataSource = ref.watch(groupMessagesDataSourceProvider);
+  return GroupChatRepositoryFactory.create(dataSource);
+}
+
+// ==================== MESSAGE STREAM PROVIDERS ====================
+
+/// Provider for watching messages in a specific group with caching and lazy loading
+@riverpod
+Stream<List<GroupMessageEntity>> groupChatMessages(Ref ref, String groupId) {
+  final repository = ref.watch(groupChatRepositoryProvider);
+
+  // Watch the stream and handle errors gracefully
+  return repository.watchMessages(groupId).handleError((error) {
+    // Log error but don't throw to avoid breaking the UI
+    print('Error in groupChatMessages provider for group $groupId: $error');
+    return <GroupMessageEntity>[];
+  });
+}
+
+/// Provider for lazy loading older messages with pagination
+@riverpod
+class GroupChatMessagesPaginated extends _$GroupChatMessagesPaginated {
+  @override
+  FutureOr<PaginatedMessagesEntityResult> build(String groupId) async {
+    final repository = ref.watch(groupChatRepositoryProvider);
+
+    try {
+      // Load initial batch of messages
+      return await repository.loadMessages(
+        groupId,
+        const MessagePaginationEntityParams(
+          limit: 20,
+          descending: true, // Most recent first for initial load
+        ),
+      );
+    } catch (error) {
+      print('Error loading initial messages for group $groupId: $error');
+      return const PaginatedMessagesEntityResult(
+        messages: [],
+        hasMore: false,
+      );
+    }
+  }
+
+  /// Load more older messages
+  Future<void> loadMore() async {
+    final currentState = state.valueOrNull;
+    if (currentState == null || !currentState.hasMore) return;
+
+    final repository = ref.watch(groupChatRepositoryProvider);
+
+    try {
+      state = const AsyncValue.loading();
+
+      final moreMessages = await repository.loadMessages(
+        groupId,
+        MessagePaginationEntityParams(
+          limit: 20,
+          startAfterId: currentState.lastMessageId,
+          descending: true,
+        ),
+      );
+
+      // Merge with existing messages
+      final allMessages = [...currentState.messages, ...moreMessages.messages];
+
+      state = AsyncValue.data(
+        PaginatedMessagesEntityResult(
+          messages: allMessages,
+          lastMessageId: moreMessages.lastMessageId,
+          hasMore: moreMessages.hasMore,
+        ),
+      );
+    } catch (error) {
+      print('Error loading more messages for group $groupId: $error');
+      state = AsyncValue.error(error, StackTrace.current);
+    }
+  }
+
+  /// Refresh messages
+  Future<void> refresh() async {
+    final repository = ref.watch(groupChatRepositoryProvider);
+
+    try {
+      state = const AsyncValue.loading();
+
+      final newMessages = await repository.loadMessages(
+        groupId,
+        const MessagePaginationEntityParams(
+          limit: 20,
+          descending: true,
+        ),
+      );
+
+      state = AsyncValue.data(newMessages);
+    } catch (error) {
+      print('Error refreshing messages for group $groupId: $error');
+      state = AsyncValue.error(error, StackTrace.current);
+    }
+  }
+}
+
+// ==================== MESSAGE SENDING PROVIDERS ====================
+
+/// Service for sending messages (stateless)
+@riverpod
+class GroupChatService extends _$GroupChatService {
+  @override
+  bool build() {
+    // Simple state to track if operations are in progress
+    return false;
+  }
+
+  /// Send a message to a group
+  Future<void> sendMessage({
+    required String groupId,
+    required String body,
+    String? replyToMessageId,
+    String? quotedPreview,
+  }) async {
+    // Prevent concurrent sends
+    if (state) {
+      throw Exception('Message send already in progress');
+    }
+
+    try {
+      state = true; // Mark as busy
+
+      // Get current user's community profile
+      final currentProfile =
+          await ref.read(currentCommunityProfileProvider.future);
+      if (currentProfile == null) {
+        throw Exception('Community profile required to send messages');
+      }
+
+      final repository = ref.read(groupChatRepositoryProvider);
+
+      // Create message entity
+      final message = GroupMessageEntity(
+        id: '', // Will be generated by Firestore
+        groupId: groupId,
+        senderCpId: currentProfile.id,
+        body: body.trim(),
+        replyToMessageId: replyToMessageId,
+        quotedPreview: quotedPreview,
+        createdAt: DateTime.now(),
+        moderation: const ModerationStatus(
+          status: ModerationStatusType
+              .pending, // TODO: Will be handled by Cloud Function
+        ),
+      );
+
+      await repository.sendMessage(message);
+
+      // Clear cache to force refresh of message list
+      repository.clearCache(groupId);
+
+      print('Message sent successfully to group $groupId');
+    } catch (error) {
+      print('Error sending message to group $groupId: $error');
+      rethrow; // Let UI handle the error
+    } finally {
+      state = false; // Mark as not busy
+    }
+  }
+
+  /// Delete a message (soft delete)
+  Future<void> deleteMessage(String groupId, String messageId) async {
+    if (state) {
+      throw Exception('Operation already in progress');
+    }
+
+    try {
+      state = true;
+
+      final repository = ref.read(groupChatRepositoryProvider);
+      await repository.deleteMessage(groupId, messageId);
+
+      // Clear cache to force refresh
+      repository.clearCache(groupId);
+
+      print('Message deleted successfully: $messageId');
+    } catch (error) {
+      print('Error deleting message $messageId: $error');
+      rethrow;
+    } finally {
+      state = false;
+    }
+  }
+
+  /// Hide a message (moderation action)
+  Future<void> hideMessage(String groupId, String messageId) async {
+    if (state) {
+      throw Exception('Operation already in progress');
+    }
+
+    try {
+      state = true;
+
+      final repository = ref.read(groupChatRepositoryProvider);
+      await repository.hideMessage(groupId, messageId);
+
+      // Clear cache to force refresh
+      repository.clearCache(groupId);
+
+      print('Message hidden successfully: $messageId');
+    } catch (error) {
+      print('Error hiding message $messageId: $error');
+      rethrow;
+    } finally {
+      state = false;
+    }
+  }
+
+  /// Clear cache for a specific group
+  void clearCache(String groupId) {
+    final repository = ref.read(groupChatRepositoryProvider);
+    repository.clearCache(groupId);
+  }
+
+  /// Clear all message cache
+  void clearAllCache() {
+    final repository = ref.read(groupChatRepositoryProvider);
+    repository.clearAllCache();
+  }
+}
+
+// ==================== UTILITY PROVIDERS ====================
+
+/// Provider to check if user can access chat for a group
+@riverpod
+Future<bool> canAccessGroupChat(Ref ref, String groupId) async {
+  try {
+    // Check if user has community profile
+    final currentProfile =
+        await ref.watch(currentCommunityProfileProvider.future);
+    if (currentProfile == null) return false;
+
+    // TODO: Add membership check here
+    // For now, assume access if profile exists
+    // In production, should check group_memberships collection
+    return true;
+  } catch (error) {
+    print('Error checking group chat access for $groupId: $error');
+    return false;
+  }
+}
+
+/// Provider for generating quoted preview from reply target
+@riverpod
+String generateQuotedPreview(Ref ref, String messageBody) {
+  const maxLength = 100; // Match schema recommendation
+
+  if (messageBody.length <= maxLength) {
+    return messageBody;
+  }
+
+  return '${messageBody.substring(0, maxLength)}...';
+}
+
+// ==================== CACHE MANAGEMENT ====================
+
+/// Provider for managing message cache
+@riverpod
+class MessageCacheManager extends _$MessageCacheManager {
+  @override
+  Map<String, DateTime> build() {
+    return {};
+  }
+
+  /// Mark cache as dirty for a group
+  void markCacheDirty(String groupId) {
+    state = {...state, groupId: DateTime.now()};
+  }
+
+  /// Check if cache is dirty for a group
+  bool isCacheDirty(String groupId, Duration threshold) {
+    final lastUpdate = state[groupId];
+    if (lastUpdate == null) return true;
+
+    return DateTime.now().difference(lastUpdate) > threshold;
+  }
+
+  /// Clear cache tracking for a group
+  void clearCacheTracking(String groupId) {
+    final newState = Map<String, DateTime>.from(state);
+    newState.remove(groupId);
+    state = newState;
+  }
+}

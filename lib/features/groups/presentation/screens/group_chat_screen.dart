@@ -14,6 +14,13 @@ import 'package:reboot_app_3/core/shared_widgets/spinner.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:reboot_app_3/core/theming/chat_text_size_provider.dart';
 
+// Group chat backend integration
+import '../../application/group_chat_providers.dart';
+import '../../domain/entities/group_message_entity.dart';
+
+import '../../../community/presentation/providers/community_providers_new.dart';
+import '../../../../core/shared_widgets/snackbar.dart';
+
 /// Model for chat message
 class ChatMessage {
   final String id;
@@ -194,18 +201,63 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
 
   Widget _buildMessagesList(BuildContext context, CustomThemeData theme,
       AppLocalizations l10n, ChatTextSize chatTextSize) {
-    final messages = _getDemoMessages();
+    // Check if user can access chat
+    final canAccessAsync =
+        ref.watch(canAccessGroupChatProvider(widget.groupId ?? ''));
 
-    // Simple fallback to ensure messages show up
-    if (messages.isEmpty) {
-      return Center(
+    return canAccessAsync.when(
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (error, stack) => Center(
         child: Text(
-          'لا توجد رسائل',
+          'خطأ في تحميل المحادثة',
           style: TextStyles.body.copyWith(color: theme.grey[600]),
         ),
-      );
-    }
+      ),
+      data: (canAccess) {
+        if (!canAccess) {
+          return Center(
+            child: Text(
+              'يجب أن تكون عضواً في المجموعة لرؤية الرسائل',
+              style: TextStyles.body.copyWith(color: theme.grey[600]),
+            ),
+          );
+        }
 
+        // Watch real-time messages
+        final messagesAsync =
+            ref.watch(groupChatMessagesProvider(widget.groupId ?? ''));
+
+        return messagesAsync.when(
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (error, stack) => Center(
+            child: Text(
+              'خطأ في تحميل الرسائل',
+              style: TextStyles.body.copyWith(color: theme.grey[600]),
+            ),
+          ),
+          data: (messageEntities) {
+            final messages = _convertEntitiesToChatMessages(messageEntities);
+
+            // Simple fallback to ensure messages show up
+            if (messages.isEmpty) {
+              return Center(
+                child: Text(
+                  'لا توجد رسائل',
+                  style: TextStyles.body.copyWith(color: theme.grey[600]),
+                ),
+              );
+            }
+
+            return _buildMessageListView(
+                context, theme, chatTextSize, messages);
+          },
+        );
+      },
+    );
+  }
+
+  Widget _buildMessageListView(BuildContext context, CustomThemeData theme,
+      ChatTextSize chatTextSize, List<ChatMessage> messages) {
     // Simple ListView with date separators
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
@@ -224,13 +276,89 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
             // Show date separator for first message or when date changes
             if (index == 0 ||
                 !_isSameDay(message.dateTime, messages[index - 1].dateTime))
-              _buildDateSeparator(context, theme, l10n, message.dateTime),
+              _buildDateSeparator(context, theme, AppLocalizations.of(context),
+                  message.dateTime),
 
             _buildMessageItem(context, theme, message, chatTextSize),
           ],
         );
       },
     );
+  }
+
+  /// Convert GroupMessageEntity list to ChatMessage list for UI compatibility
+  List<ChatMessage> _convertEntitiesToChatMessages(
+      List<GroupMessageEntity> entities) {
+    final currentProfileAsync = ref.read(currentCommunityProfileProvider);
+    final currentCpId = currentProfileAsync.valueOrNull?.id;
+
+    // Get repository for cached profile data
+    final repository = ref.read(groupChatRepositoryProvider);
+
+    return entities.where((entity) => entity.isVisible).map((entity) {
+      final isCurrentUser = entity.senderCpId == currentCpId;
+
+      // Get sender info from repository cache (already fetched with messages)
+      final senderDisplayName =
+          repository.getSenderDisplayName(entity.senderCpId);
+      final senderAvatarColor =
+          repository.getSenderAvatarColor(entity.senderCpId);
+
+      // Find reply target if this is a reply
+      ChatMessage? replyToMessage;
+      if (entity.replyToMessageId != null) {
+        final replyTarget = entities.firstWhere(
+          (e) => e.id == entity.replyToMessageId,
+          orElse: () => GroupMessageEntity(
+            id: '',
+            groupId: '',
+            senderCpId: '',
+            body: 'رسالة محذوفة',
+            createdAt: DateTime.now(),
+          ),
+        );
+
+        if (replyTarget.id.isNotEmpty) {
+          final replyTargetDisplayName =
+              repository.getSenderDisplayName(replyTarget.senderCpId);
+          final replyTargetAvatarColor =
+              repository.getSenderAvatarColor(replyTarget.senderCpId);
+
+          replyToMessage = ChatMessage(
+            id: replyTarget.id,
+            content: replyTarget.body,
+            senderName: replyTargetDisplayName,
+            time: _formatTime(replyTarget.createdAt),
+            dateTime: replyTarget.createdAt,
+            isCurrentUser: replyTarget.senderCpId == currentCpId,
+            avatarColor: replyTargetAvatarColor,
+          );
+        }
+      }
+
+      return ChatMessage(
+        id: entity.id,
+        content: entity.body,
+        senderName: senderDisplayName,
+        time: _formatTime(entity.createdAt),
+        dateTime: entity.createdAt,
+        isCurrentUser: isCurrentUser,
+        avatarColor: senderAvatarColor,
+        replyToMessage: replyToMessage,
+        replyToMessageId: entity.replyToMessageId,
+      );
+    }).toList();
+  }
+
+  /// Format DateTime to time string
+  String _formatTime(DateTime dateTime) {
+    // TODO: Use proper localization and user's locale
+    final hour = dateTime.hour;
+    final minute = dateTime.minute.toString().padLeft(2, '0');
+    final period = hour >= 12 ? 'مساءً' : 'صباحًا';
+    final displayHour = hour > 12 ? hour - 12 : (hour == 0 ? 12 : hour);
+
+    return '$displayHour:$minute $period';
   }
 
   bool _isSameDay(DateTime date1, DateTime date2) {
@@ -502,12 +630,9 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
 
   /// Finds the index of a message in the list by its ID
   int? _findMessageIndex(String messageId) {
-    final messages = _getDemoMessages();
-    for (int i = 0; i < messages.length; i++) {
-      if (messages[i].id == messageId) {
-        return i;
-      }
-    }
+    // TODO: This would need access to current message list from provider
+    // For now, return null to disable scroll-to functionality
+    // This can be enhanced later when needed
     return null;
   }
 
@@ -1154,7 +1279,7 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
   }
 
   Future<void> _handleSubmit(String text) async {
-    if (text.trim().isEmpty || _isSubmitting) return;
+    if (text.trim().isEmpty || _isSubmitting || widget.groupId == null) return;
 
     // Show loader immediately so the user gets instant feedback
     setState(() {
@@ -1165,19 +1290,22 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
     await Future.delayed(Duration.zero);
 
     try {
-      // TODO: Implement actual message sending to group chat
-      // Include reply information if replying
-      if (_replyState.isReplying) {
-        // TODO: Send message with reply information
-        print(
-            'Sending reply to message ${_replyState.replyToMessageId}: $text');
-      } else {
-        // TODO: Send regular message
-        print('Sending message: $text');
+      final groupChatService = ref.read(groupChatServiceProvider.notifier);
+
+      // Prepare reply information if replying
+      String? quotedPreview;
+      if (_replyState.isReplying && _replyState.replyToMessage != null) {
+        quotedPreview = ref.read(
+            generateQuotedPreviewProvider(_replyState.replyToMessage!.content));
       }
 
-      await Future.delayed(
-          const Duration(seconds: 1)); // Simulate network request
+      // Send message via service
+      await groupChatService.sendMessage(
+        groupId: widget.groupId!,
+        body: text.trim(),
+        replyToMessageId: _replyState.replyToMessageId,
+        quotedPreview: quotedPreview,
+      );
 
       // Clear the input and reply state
       _messageController.clear();
@@ -1188,23 +1316,28 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
         _replyPreviewController.value = 1.0; // Reset animation for next reply
       }
 
-      // Scroll to bottom
+      // Scroll to bottom after a short delay to allow messages to load
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (_scrollController.hasClients) {
-          _scrollController.animateTo(
-            _scrollController.position.maxScrollExtent,
-            duration: const Duration(milliseconds: 300),
-            curve: Curves.easeOut,
-          );
-        }
+        Future.delayed(const Duration(milliseconds: 500), () {
+          if (_scrollController.hasClients) {
+            _scrollController.animateTo(
+              _scrollController.position.maxScrollExtent,
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeOut,
+            );
+          }
+        });
       });
     } catch (error) {
-      // Show error message if needed
+      // Show error using the proper snackbar system
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error sending message')),
-        );
+        if (error.toString().contains('already in progress')) {
+          getSystemSnackBar(context, 'يتم إرسال رسالة أخرى، يرجى الانتظار');
+        } else {
+          getSystemSnackBar(context, 'فشل في إرسال الرسالة');
+        }
       }
+      print('Error sending message: $error');
     } finally {
       if (mounted) {
         setState(() {
@@ -1214,131 +1347,7 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
     }
   }
 
-  List<ChatMessage> _getDemoMessages() {
-    final now = DateTime.now();
-    final yesterday = now.subtract(const Duration(days: 1));
-    final twoDaysAgo = now.subtract(const Duration(days: 2));
-
-    return [
-      // Messages from two days ago
-      ChatMessage(
-        id: '1',
-        content: 'مرحبًا بالجميع! كيف حالكم اليوم؟',
-        senderName: 'أحمد محمد',
-        time: '09:15 صباحًا',
-        dateTime: twoDaysAgo.copyWith(hour: 9, minute: 15),
-        isCurrentUser: false,
-        avatarColor: Colors.green,
-      ),
-      ChatMessage(
-        id: '2',
-        content: 'الحمد لله، نحن بخير. كيف كانت جلسة التمارين اليوم؟',
-        senderName: 'سيف حمد',
-        time: '09:30 صباحًا',
-        dateTime: twoDaysAgo.copyWith(hour: 9, minute: 30),
-        isCurrentUser: false,
-        avatarColor: Colors.orange,
-      ),
-
-      // Messages from yesterday
-      ChatMessage(
-        id: '3',
-        content:
-            'المجد للتعافي وكل ما يتعلق بالتعافي من كل أمور التعافي المتعافية. العقد شريعة المتعاقدين. بدون التعافي لا يوجد تشافي',
-        senderName: 'سيف حمد',
-        time: '14:23 مساءً',
-        dateTime: yesterday.copyWith(hour: 14, minute: 23),
-        isCurrentUser: false,
-        avatarColor: Colors.orange,
-      ),
-      ChatMessage(
-        id: '4',
-        content: 'شكرًا لك على هذه الكلمات المحفزة',
-        senderName: 'يوسف يعقوب',
-        time: '14:30 مساءً',
-        dateTime: yesterday.copyWith(hour: 14, minute: 30),
-        isCurrentUser: true,
-        avatarColor: Colors.blue,
-        replyToMessage: ChatMessage(
-          id: '3',
-          content:
-              'المجد للتعافي وكل ما يتعلق بالتعافي من كل أمور التعافي المتعافية.',
-          senderName: 'سيف حمد',
-          time: '14:23 مساءً',
-          dateTime: yesterday.copyWith(hour: 14, minute: 23),
-          isCurrentUser: false,
-          avatarColor: Colors.orange,
-        ),
-        replyToMessageId: '3',
-      ),
-      ChatMessage(
-        id: '5',
-        content: 'أتفق معك تمامًا. التعافي رحلة تحتاج إلى صبر ومثابرة.',
-        senderName: 'فاطمة حسن',
-        time: '15:00 مساءً',
-        dateTime: yesterday.copyWith(hour: 15, minute: 0),
-        isCurrentUser: false,
-        avatarColor: Colors.purple,
-      ),
-
-      // Messages from today
-      ChatMessage(
-        id: '6',
-        content: 'صباح الخير جميعًا! كيف بدأتم يومكم؟',
-        senderName: 'محمد علي',
-        time: '08:00 صباحًا',
-        dateTime: now.copyWith(hour: 8, minute: 0),
-        isCurrentUser: false,
-        avatarColor: Colors.teal,
-      ),
-      ChatMessage(
-        id: '7',
-        content: 'صباح النور! بدأت اليوم بتمارين التأمل',
-        senderName: 'يوسف يعقوب',
-        time: '08:15 صباحًا',
-        dateTime: now.copyWith(hour: 8, minute: 15),
-        isCurrentUser: true,
-        avatarColor: Colors.blue,
-      ),
-      ChatMessage(
-        id: '8',
-        content: 'ممتاز! التأمل يساعد كثيرًا في بداية اليوم',
-        senderName: 'أحمد محمد',
-        time: '08:20 صباحًا',
-        dateTime: now.copyWith(hour: 8, minute: 20),
-        isCurrentUser: false,
-        avatarColor: Colors.green,
-        replyToMessage: ChatMessage(
-          id: '7',
-          content: 'صباح النور! بدأت اليوم بتمارين التأمل',
-          senderName: 'يوسف يعقوب',
-          time: '08:15 صباحًا',
-          dateTime: now.copyWith(hour: 8, minute: 15),
-          isCurrentUser: true,
-          avatarColor: Colors.blue,
-        ),
-        replyToMessageId: '7',
-      ),
-      ChatMessage(
-        id: '9',
-        content: 'هل يمكن أن نتشارك تجاربنا مع التمارين اليومية؟',
-        senderName: 'سيف حمد',
-        time: '10:45 صباحًا',
-        dateTime: now.copyWith(hour: 10, minute: 45),
-        isCurrentUser: false,
-        avatarColor: Colors.orange,
-      ),
-      ChatMessage(
-        id: '10',
-        content: 'فكرة رائعة! أنا أمارس الرياضة كل صباح',
-        senderName: 'يوسف يعقوب',
-        time: '11:00 صباحًا',
-        dateTime: now.copyWith(hour: 11, minute: 0),
-        isCurrentUser: true,
-        avatarColor: Colors.blue,
-      ),
-    ];
-  }
+  // Demo messages method removed - now using real-time Firestore data
 }
 
 /// Animated swipe message widget for reply functionality
