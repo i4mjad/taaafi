@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/material.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -85,8 +84,12 @@ class GroupChatMessagesPaginated extends _$GroupChatMessagesPaginated {
         ),
       );
 
-      // Merge with existing messages
-      final allMessages = [...currentState.messages, ...moreMessages.messages];
+      // Merge with existing messages and remove duplicates
+      final existingIds = currentState.messages.map((m) => m.id).toSet();
+      final newMessages = moreMessages.messages
+          .where((m) => !existingIds.contains(m.id))
+          .toList();
+      final allMessages = [...currentState.messages, ...newMessages];
 
       state = AsyncValue.data(
         PaginatedMessagesEntityResult(

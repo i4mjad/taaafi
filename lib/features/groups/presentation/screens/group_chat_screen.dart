@@ -223,7 +223,7 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
           );
         }
 
-        // Watch real-time messages
+        // Use real-time stream for display - this ensures no duplicates
         final messagesAsync =
             ref.watch(groupChatMessagesProvider(widget.groupId ?? ''));
 
@@ -238,7 +238,6 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
           data: (messageEntities) {
             final messages = _convertEntitiesToChatMessages(messageEntities);
 
-            // Simple fallback to ensure messages show up
             if (messages.isEmpty) {
               return Center(
                 child: Text(
@@ -248,8 +247,13 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
               );
             }
 
-            return _buildMessageListView(
-                context, theme, chatTextSize, messages);
+            // Check if we can load more from paginated provider (for navigation only)
+            final paginatedAsync = ref
+                .read(groupChatMessagesPaginatedProvider(widget.groupId ?? ''));
+            final hasMore = paginatedAsync.valueOrNull?.hasMore ?? false;
+
+            return _buildMessageListViewWithPagination(
+                context, theme, chatTextSize, messages, hasMore);
           },
         );
       },
@@ -258,32 +262,150 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
 
   Widget _buildMessageListView(BuildContext context, CustomThemeData theme,
       ChatTextSize chatTextSize, List<ChatMessage> messages) {
-    // Simple ListView with date separators
+    // Reverse ListView to show latest messages at bottom (like WhatsApp)
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
 
+    // Reverse messages so latest appears at bottom
+    final reversedMessages = messages.reversed.toList();
+
+    // Auto-scroll to bottom when messages first load
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_scrollController.hasClients && messages.isNotEmpty) {
+        _scrollController
+            .jumpTo(0); // Jump to bottom (index 0 in reversed list)
+      }
+    });
+
     return ListView.builder(
       controller: _scrollController,
+      reverse: true, // This makes the list start from bottom
       padding: EdgeInsets.symmetric(
         horizontal: (screenWidth * 0.04).clamp(12.0, 20.0),
         vertical: (screenHeight * 0.01).clamp(6.0, 12.0),
       ),
-      itemCount: messages.length,
+      itemCount: reversedMessages.length,
       itemBuilder: (context, index) {
-        final message = messages[index];
+        final message = reversedMessages[index];
+        final nextMessage = index < reversedMessages.length - 1
+            ? reversedMessages[index + 1]
+            : null;
+
         return Column(
           children: [
-            // Show date separator for first message or when date changes
-            if (index == 0 ||
-                !_isSameDay(message.dateTime, messages[index - 1].dateTime))
-              _buildDateSeparator(context, theme, AppLocalizations.of(context),
-                  message.dateTime),
+            // Show date separator - fixed logic for reverse ListView
+            // We want the separator ABOVE the first message of each day (chronologically)
+            if (index ==
+                    reversedMessages.length -
+                        1 || // Last item (chronologically first)
+                (nextMessage != null &&
+                    !_isSameDay(message.dateTime, nextMessage.dateTime)))
+              _buildDateSeparator(
+                  context,
+                  theme,
+                  AppLocalizations.of(context),
+                  nextMessage != null &&
+                          !_isSameDay(message.dateTime, nextMessage.dateTime)
+                      ? nextMessage.dateTime
+                      : message.dateTime),
 
             _buildMessageItem(context, theme, message, chatTextSize),
           ],
         );
       },
     );
+  }
+
+  Widget _buildMessageListViewWithPagination(
+      BuildContext context,
+      CustomThemeData theme,
+      ChatTextSize chatTextSize,
+      List<ChatMessage> messages,
+      bool hasMore) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
+    // Sort messages by creation time (latest first for reverse ListView)
+    final sortedMessages = List<ChatMessage>.from(messages);
+    sortedMessages.sort((a, b) => b.dateTime.compareTo(a.dateTime));
+
+    // Auto-scroll to bottom when messages first load
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_scrollController.hasClients && messages.isNotEmpty) {
+        _scrollController.jumpTo(0); // Jump to bottom (latest messages)
+      }
+    });
+
+    return NotificationListener<ScrollNotification>(
+      onNotification: (ScrollNotification scrollInfo) {
+        // Load more messages when scrolling to the top (older messages)
+        if (hasMore &&
+            scrollInfo.metrics.pixels >=
+                scrollInfo.metrics.maxScrollExtent * 0.9) {
+          _loadMoreMessages();
+        }
+        return false;
+      },
+      child: ListView.builder(
+        controller: _scrollController,
+        reverse: true, // Latest messages at bottom
+        padding: EdgeInsets.symmetric(
+          horizontal: (screenWidth * 0.04).clamp(12.0, 20.0),
+          vertical: (screenHeight * 0.01).clamp(6.0, 12.0),
+        ),
+        itemCount: sortedMessages.length +
+            (hasMore ? 1 : 0), // +1 for loading indicator
+        itemBuilder: (context, index) {
+          // Show loading indicator at the top when loading more
+          if (index == sortedMessages.length) {
+            return hasMore
+                ? const Padding(
+                    padding: EdgeInsets.all(16.0),
+                    child: Center(child: CircularProgressIndicator()),
+                  )
+                : const SizedBox.shrink();
+          }
+
+          final message = sortedMessages[index];
+          final nextMessage = index < sortedMessages.length - 1
+              ? sortedMessages[index + 1]
+              : null;
+
+          return Column(
+            children: [
+              // Show date separator - fixed logic for reverse ListView
+              // We want the separator ABOVE the first message of each day (chronologically)
+              // In reverse ListView: last index = chronologically first message of the day
+              if (index ==
+                      sortedMessages.length -
+                          1 || // Last item (chronologically first)
+                  (nextMessage != null &&
+                      !_isSameDay(message.dateTime, nextMessage.dateTime)))
+                _buildDateSeparator(
+                    context,
+                    theme,
+                    AppLocalizations.of(context),
+                    nextMessage != null &&
+                            !_isSameDay(message.dateTime, nextMessage.dateTime)
+                        ? nextMessage.dateTime
+                        : message.dateTime),
+
+              _buildMessageItem(context, theme, message, chatTextSize),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  /// Load more messages (for infinite scroll)
+  void _loadMoreMessages() {
+    if (widget.groupId == null) return;
+
+    final paginatedProvider =
+        groupChatMessagesPaginatedProvider(widget.groupId!);
+    final paginatedNotifier = ref.read(paginatedProvider.notifier);
+    paginatedNotifier.loadMore();
   }
 
   /// Convert GroupMessageEntity list to ChatMessage list for UI compatibility
@@ -295,7 +417,13 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
     // Get repository for cached profile data
     final repository = ref.read(groupChatRepositoryProvider);
 
-    return entities.where((entity) => entity.isVisible).map((entity) {
+    // Remove duplicates by ID first
+    final uniqueEntities = <String, GroupMessageEntity>{};
+    for (final entity in entities.where((entity) => entity.isVisible)) {
+      uniqueEntities[entity.id] = entity;
+    }
+
+    return uniqueEntities.values.map((entity) {
       final isCurrentUser = entity.senderCpId == currentCpId;
 
       // Get sender info from repository cache (already fetched with messages)
@@ -613,10 +741,8 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
     // Animate in the reply preview
     _replyPreviewController.forward();
 
-    // Auto-focus the input field
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      FocusScope.of(context).requestFocus(FocusNode());
-    });
+    // Keep input field focused if it already was
+    // Don't auto-focus to avoid dismissing keyboard unnecessarily
   }
 
   void _cancelReply() {
@@ -628,18 +754,150 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
     });
   }
 
-  /// Finds the index of a message in the list by its ID
+  /// Finds the index of a message in the current paginated list by its ID
   int? _findMessageIndex(String messageId) {
-    // TODO: This would need access to current message list from provider
-    // For now, return null to disable scroll-to functionality
-    // This can be enhanced later when needed
-    return null;
+    if (widget.groupId == null) return null;
+
+    final paginatedAsync =
+        ref.read(groupChatMessagesPaginatedProvider(widget.groupId!));
+    return paginatedAsync.maybeWhen(
+      data: (paginatedResult) {
+        final messages =
+            _convertEntitiesToChatMessages(paginatedResult.messages);
+        // Sort messages by creation time (latest first for reverse ListView)
+        final sortedMessages = List<ChatMessage>.from(messages);
+        sortedMessages.sort((a, b) => b.dateTime.compareTo(a.dateTime));
+
+        final index =
+            sortedMessages.indexWhere((message) => message.id == messageId);
+        return index == -1 ? null : index; // Return null if not found
+      },
+      orElse: () => null,
+    );
+  }
+
+  /// Smart message navigation with pagination support
+  Future<void> _navigateToMessage(String messageId) async {
+    if (widget.groupId == null) return;
+
+    // Show loading indicator
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('جاري البحث عن الرسالة...'),
+          duration: Duration(seconds: 1),
+        ),
+      );
+    }
+
+    // First check if message is already loaded
+    final currentIndex = _findMessageIndex(messageId);
+    if (currentIndex != null) {
+      // Message is already loaded, just scroll to it
+      _scrollToMessage(messageId);
+      return;
+    }
+
+    // Message not found in current loaded messages, load more until found
+    await _loadMessagesUntilFound(messageId);
+  }
+
+  /// Load more message pages until target message is found
+  Future<void> _loadMessagesUntilFound(String messageId) async {
+    if (widget.groupId == null) return;
+
+    try {
+      // Get the paginated messages provider
+      final paginatedProvider =
+          groupChatMessagesPaginatedProvider(widget.groupId!);
+      final paginatedNotifier = ref.read(paginatedProvider.notifier);
+
+      const maxAttempts = 10; // Prevent infinite loops
+      int attempts = 0;
+
+      while (attempts < maxAttempts) {
+        attempts++;
+
+        // Check current paginated state
+        final paginatedState = ref.read(paginatedProvider);
+
+        await paginatedState.when(
+          loading: () async {
+            // Wait for loading to complete
+            await Future.delayed(const Duration(milliseconds: 500));
+          },
+          error: (error, stack) async {
+            print('Error loading paginated messages: $error');
+            return; // Exit on error
+          },
+          data: (paginatedResult) async {
+            // Check if target message is in this batch
+            final messages =
+                _convertEntitiesToChatMessages(paginatedResult.messages);
+            final found = messages.any((msg) => msg.id == messageId);
+
+            if (found) {
+              // Found the message! Now scroll to it
+              // Wait a moment for UI to update
+              await Future.delayed(const Duration(milliseconds: 200));
+              _scrollToMessage(messageId);
+              return;
+            }
+
+            // Message not found, check if we can load more
+            if (paginatedResult.hasMore) {
+              print(
+                  'Message not found in current batch, loading more... (attempt $attempts)');
+              await paginatedNotifier.loadMore();
+            } else {
+              // No more messages to load, message doesn't exist
+              print('Message $messageId not found in chat history');
+              if (mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('الرسالة المطلوبة غير موجودة أو محذوفة'),
+                    duration: Duration(seconds: 2),
+                  ),
+                );
+              }
+              return;
+            }
+          },
+        );
+
+        // Small delay between attempts to avoid overwhelming the system
+        await Future.delayed(const Duration(milliseconds: 300));
+      }
+
+      // If we reach here, we hit max attempts
+      print('Max attempts reached while searching for message $messageId');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('تعذر العثور على الرسالة'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+      }
+    } catch (error) {
+      print('Error in _loadMessagesUntilFound: $error');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('خطأ في البحث عن الرسالة'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+      }
+    }
   }
 
   /// Scrolls to a specific message by its ID with smooth animation
   void _scrollToMessage(String messageId) {
     final messageIndex = _findMessageIndex(messageId);
-    if (messageIndex == null || !_scrollController.hasClients) return;
+    if (messageIndex == null ||
+        messageIndex == -1 ||
+        !_scrollController.hasClients) return;
 
     // Set the message to be highlighted
     setState(() {
@@ -653,6 +911,7 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
     final targetPosition = messageIndex * estimatedItemHeight;
 
     // Animate to the target position
+    // For reversed list, position is calculated from top (0)
     _scrollController
         .animateTo(
       targetPosition.clamp(0.0, _scrollController.position.maxScrollExtent),
@@ -673,6 +932,126 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
         });
       });
     });
+  }
+
+  /// Show original message in a simple modal bottom sheet
+  void _showOriginalMessageModal(BuildContext context, CustomThemeData theme,
+      ChatMessage originalMessage) {
+    final screenWidth = MediaQuery.of(context).size.width;
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        decoration: BoxDecoration(
+          color: theme.backgroundColor,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Header
+              Row(
+                children: [
+                  Icon(
+                    Icons.reply,
+                    color: theme.primary[600],
+                    size: 20,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    'الرسالة الأصلية',
+                    style: TextStyles.body.copyWith(
+                      color: theme.grey[800],
+                      fontWeight: FontWeight.w600,
+                      fontSize: 16,
+                    ),
+                  ),
+                  const Spacer(),
+                  GestureDetector(
+                    onTap: () => Navigator.of(context).pop(),
+                    child: Icon(
+                      Icons.close,
+                      color: theme.grey[600],
+                      size: 20,
+                    ),
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 16),
+
+              // Original message content
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: theme.grey[50],
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: theme.grey[200]!, width: 1),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Sender info
+                    Row(
+                      children: [
+                        CircleAvatar(
+                          radius: 12,
+                          backgroundColor: originalMessage.avatarColor,
+                          child: Text(
+                            originalMessage.senderName.isNotEmpty
+                                ? originalMessage.senderName[0].toUpperCase()
+                                : '؟',
+                            style: TextStyles.caption.copyWith(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 10,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          originalMessage.senderName,
+                          style: TextStyles.caption.copyWith(
+                            color: theme.grey[700],
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        const Spacer(),
+                        Text(
+                          originalMessage.time,
+                          style: TextStyles.caption.copyWith(
+                            color: theme.grey[500],
+                            fontSize: 11,
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    const SizedBox(height: 12),
+
+                    // Message content
+                    Text(
+                      originalMessage.content,
+                      style: TextStyles.body.copyWith(
+                        color: theme.grey[800],
+                        height: 1.4,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 16),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   void _showReportModal(
@@ -1197,8 +1576,8 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
       ChatMessage originalMessage) {
     return GestureDetector(
       onTap: () {
-        // Scroll to the original message when reply preview is tapped
-        _scrollToMessage(originalMessage.id);
+        // Show original message in a simple modal
+        _showOriginalMessageModal(context, theme, originalMessage);
       },
       child: Container(
         margin: const EdgeInsets.only(bottom: 8),
@@ -1317,11 +1696,12 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
       }
 
       // Scroll to bottom after a short delay to allow messages to load
+      // For reversed list, scroll to position 0 (which is the bottom/latest)
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        Future.delayed(const Duration(milliseconds: 500), () {
+        Future.delayed(const Duration(milliseconds: 100), () {
           if (_scrollController.hasClients) {
             _scrollController.animateTo(
-              _scrollController.position.maxScrollExtent,
+              0, // For reversed list, 0 is the bottom (latest messages)
               duration: const Duration(milliseconds: 300),
               curve: Curves.easeOut,
             );
