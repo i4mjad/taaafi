@@ -65,6 +65,18 @@ abstract class GroupsRepository {
     required String cpId,
   });
 
+  /// Demote an admin to member role
+  Future<void> demoteMemberToMember({
+    required String groupId,
+    required String cpId,
+  });
+
+  /// Remove a member from the group
+  Future<void> removeMemberFromGroup({
+    required String groupId,
+    required String cpId,
+  });
+
   /// Update group admin
   Future<void> updateGroupAdmin({
     required String groupId,

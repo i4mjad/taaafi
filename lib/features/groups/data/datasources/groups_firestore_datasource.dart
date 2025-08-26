@@ -336,6 +336,50 @@ class GroupsFirestoreDataSource implements GroupsDataSource {
   }
 
   @override
+  Future<void> demoteMemberToMember({
+    required String groupId,
+    required String cpId,
+  }) async {
+    try {
+      final membershipId = '${groupId}_$cpId';
+      await _firestore
+          .collection('group_memberships')
+          .doc(membershipId)
+          .update({'role': 'member'});
+    } catch (e, stackTrace) {
+      log('Error demoting member to member: $e', stackTrace: stackTrace);
+      rethrow;
+    }
+  }
+
+  @override
+  Future<void> removeMemberFromGroup({
+    required String groupId,
+    required String cpId,
+  }) async {
+    try {
+      final membershipId = '${groupId}_$cpId';
+      final now = Timestamp.now();
+      
+      // Update membership to inactive
+      await _firestore
+          .collection('group_memberships')
+          .doc(membershipId)
+          .update({
+        'isActive': false,
+        'leftAt': now,
+      });
+
+      // Set 24-hour cooldown (same as leaving voluntarily)
+      final nextJoinAllowedAt = DateTime.now().add(const Duration(hours: 24));
+      await setCooldown(cpId, nextJoinAllowedAt);
+    } catch (e, stackTrace) {
+      log('Error removing member from group: $e', stackTrace: stackTrace);
+      rethrow;
+    }
+  }
+
+  @override
   Future<void> markGroupAsInactive(String groupId) async {
     try {
       await _firestore.collection('groups').doc(groupId).update({

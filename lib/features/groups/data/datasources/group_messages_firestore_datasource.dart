@@ -107,11 +107,17 @@ abstract class GroupMessagesDataSource {
   /// Hide a message (moderation)
   Future<void> hideMessage(String groupId, String messageId);
 
+  /// Unhide a message (moderation)
+  Future<void> unhideMessage(String groupId, String messageId);
+
   /// Clear cache for a specific group
   void clearCache(String groupId);
 
   /// Clear all cache
   void clearAllCache();
+
+  /// Get DocumentSnapshot by message ID for pagination
+  DocumentSnapshot? getDocumentSnapshot(String messageId);
 }
 
 /// Enhanced message with sender profile info
@@ -144,6 +150,9 @@ class GroupMessagesFirestoreDataSource implements GroupMessagesDataSource {
   // Cache for community profiles (with timestamp for invalidation)
   final Map<String, CommunityProfileCacheEntry> _profileCache = {};
 
+  // Cache for DocumentSnapshots by message ID for pagination
+  final Map<String, DocumentSnapshot> _documentCache = {};
+
   GroupMessagesFirestoreDataSource(this._firestore);
 
   CollectionReference get _messagesCollection =>
@@ -160,14 +169,20 @@ class GroupMessagesFirestoreDataSource implements GroupMessagesDataSource {
     final stream = _messagesCollection
         .where('groupId', isEqualTo: groupId)
         .orderBy('createdAt', descending: false) // Ascending for chat UI
-        .limit(50) // Limit real-time messages to recent ones
+        // Remove limit to get all messages in real-time stream
         .snapshots()
         .asyncMap((snapshot) async {
       try {
         final messages = snapshot.docs
             .map((doc) => GroupMessageModel.fromFirestore(doc))
-            .where((msg) => msg.isVisible) // Filter out deleted/hidden messages
+            .where((msg) => !msg
+                .isDeleted) // Only filter out deleted messages, keep hidden ones
             .toList();
+
+        // Cache document snapshots for pagination
+        for (final doc in snapshot.docs) {
+          _documentCache[doc.id] = doc;
+        }
 
         // Batch fetch profiles for all unique senders
         await _batchFetchProfiles(
@@ -242,8 +257,14 @@ class GroupMessagesFirestoreDataSource implements GroupMessagesDataSource {
 
       final messages = messageDocs
           .map((doc) => GroupMessageModel.fromFirestore(doc))
-          .where((msg) => msg.isVisible) // Filter out deleted/hidden messages
+          .where((msg) => !msg
+              .isDeleted) // Only filter out deleted messages, keep hidden ones
           .toList();
+
+      // Cache document snapshots for pagination
+      for (final doc in messageDocs) {
+        _documentCache[doc.id] = doc;
+      }
 
       // Batch fetch profiles for all unique senders
       await _batchFetchProfiles(
@@ -280,6 +301,7 @@ class GroupMessagesFirestoreDataSource implements GroupMessagesDataSource {
 
       // Invalidate cache to force refresh
       _messageCache.remove(message.groupId);
+      // Note: We don't clear _documentCache as it should be updated by the real-time stream
 
       log('Message sent successfully to group ${message.groupId}');
     } catch (e, stackTrace) {
@@ -316,8 +338,9 @@ class GroupMessagesFirestoreDataSource implements GroupMessagesDataSource {
         'isHidden': true,
       });
 
-      // Invalidate cache
+      // Invalidate cache to ensure real-time updates
       _messageCache.remove(groupId);
+      _streamCache.remove(groupId);
 
       log('Message hidden successfully');
     } catch (e, stackTrace) {
@@ -327,9 +350,31 @@ class GroupMessagesFirestoreDataSource implements GroupMessagesDataSource {
   }
 
   @override
+  Future<void> unhideMessage(String groupId, String messageId) async {
+    try {
+      log('Unhiding message $messageId in group $groupId');
+
+      await _messagesCollection.doc(messageId).update({
+        'isHidden': false,
+      });
+
+      // Invalidate cache to ensure real-time updates
+      _messageCache.remove(groupId);
+      _streamCache.remove(groupId);
+
+      log('Message unhidden successfully');
+    } catch (e, stackTrace) {
+      log('Error unhiding message: $e', stackTrace: stackTrace);
+      rethrow;
+    }
+  }
+
+  @override
   void clearCache(String groupId) {
     _messageCache.remove(groupId);
     _streamCache.remove(groupId);
+    // Note: We don't clear _documentCache or _profileCache by groupId
+    // as they are global caches
     log('Cache cleared for group $groupId');
   }
 
@@ -337,7 +382,14 @@ class GroupMessagesFirestoreDataSource implements GroupMessagesDataSource {
   void clearAllCache() {
     _messageCache.clear();
     _streamCache.clear();
-    log('All message cache cleared');
+    _documentCache.clear();
+    _profileCache.clear();
+    log('All caches cleared');
+  }
+
+  /// Get DocumentSnapshot by message ID for pagination
+  DocumentSnapshot? getDocumentSnapshot(String messageId) {
+    return _documentCache[messageId];
   }
 
   /// Helper method to cache messages
@@ -363,7 +415,7 @@ class GroupMessagesFirestoreDataSource implements GroupMessagesDataSource {
 
       if (newMessages.isNotEmpty) {
         final updatedMessages = [...existingEntry.messages, ...newMessages];
-        // Keep messages sorted by creation time
+        // Keep messages sorted by creation time (ascending order)
         updatedMessages.sort((a, b) => a.createdAt.compareTo(b.createdAt));
 
         _messageCache[groupId] = MessageCacheEntry(
@@ -373,6 +425,17 @@ class GroupMessagesFirestoreDataSource implements GroupMessagesDataSource {
           hasMore: existingEntry.hasMore,
         );
         log('Updated cache with ${newMessages.length} new messages for group $groupId');
+      }
+    } else {
+      // If no existing cache, create a new cache entry
+      if (latestMessages.isNotEmpty) {
+        _messageCache[groupId] = MessageCacheEntry(
+          messages: latestMessages,
+          timestamp: DateTime.now(),
+          lastDocument: null, // Will be set by pagination
+          hasMore: true, // Assume there might be more until proven otherwise
+        );
+        log('Created new cache with ${latestMessages.length} messages for group $groupId');
       }
     }
   }
@@ -451,7 +514,7 @@ class GroupMessagesFirestoreDataSource implements GroupMessagesDataSource {
       for (final cpId in missingCpIds) {
         if (!_profileCache.containsKey(cpId)) {
           _profileCache[cpId] = CommunityProfileCacheEntry(
-            displayName: 'عضو مجهول',
+            displayName: 'مجهول',
             isAnonymous: true,
             timestamp: now,
           );
@@ -464,31 +527,76 @@ class GroupMessagesFirestoreDataSource implements GroupMessagesDataSource {
   String getSenderDisplayName(String cpId) {
     final cached = _profileCache[cpId];
     if (cached == null) {
-      return 'عضو مجهول'; // Fallback
+      return 'مجهول'; // Fallback
     }
 
     if (cached.isAnonymous) {
-      return 'عضو مجهول';
+      return 'مجهول';
     } else {
       return cached.displayName.isEmpty ? 'مستخدم' : cached.displayName;
     }
   }
 
   /// Get sender avatar color (consistent per user)
+  /// Anonymous users get different vibrant colors based on their profile ID
   Color getSenderAvatarColor(String cpId) {
-    final colors = [
-      Colors.blue,
-      Colors.green,
-      Colors.orange,
-      Colors.purple,
-      Colors.teal,
-      Colors.pink,
-      Colors.indigo,
-      Colors.cyan,
-    ];
+    final cached = _profileCache[cpId];
+    final isAnonymous = cached?.isAnonymous ?? true;
 
-    final index = cpId.hashCode.abs() % colors.length;
-    return colors[index];
+    if (isAnonymous) {
+      // More diverse colors for anonymous users
+      final anonymousColors = [
+        const Color(0xFF6B73FF), // Vibrant Blue
+        const Color(0xFF9333EA), // Purple
+        const Color(0xFFEC4899), // Pink
+        const Color(0xFFEF4444), // Red
+        const Color(0xFFF59E0B), // Amber
+        const Color(0xFF10B981), // Emerald
+        const Color(0xFF06B6D4), // Cyan
+        const Color(0xFF8B5CF6), // Violet
+        const Color(0xFFF97316), // Orange
+        const Color(0xFF84CC16), // Lime
+        const Color(0xFF14B8A6), // Teal
+        const Color(0xFFE11D48), // Rose
+        const Color(0xFF7C3AED), // Indigo
+        const Color(0xFF059669), // Green
+        const Color(0xFFDB2777), // Hot Pink
+        const Color(0xFF0EA5E9), // Sky Blue
+      ];
+
+      final index = cpId.hashCode.abs() % anonymousColors.length;
+      return anonymousColors[index];
+    } else {
+      // Regular colors for non-anonymous users
+      final regularColors = [
+        Colors.blue,
+        Colors.green,
+        Colors.orange,
+        Colors.purple,
+        Colors.teal,
+        Colors.pink,
+        Colors.indigo,
+        Colors.cyan,
+      ];
+
+      final index = cpId.hashCode.abs() % regularColors.length;
+      return regularColors[index];
+    }
+  }
+
+  /// Get sender anonymity status
+  bool getSenderAnonymity(String cpId) {
+    final cached = _profileCache[cpId];
+    return cached?.isAnonymous ?? true;
+  }
+
+  /// Get sender avatar URL (for non-anonymous users)
+  String? getSenderAvatarUrl(String cpId) {
+    final cached = _profileCache[cpId];
+    if (cached == null || cached.isAnonymous) {
+      return null; // Anonymous users don't show real avatars
+    }
+    return cached.avatarUrl;
   }
 
   /// Clear profile cache for a specific cpId (when profile is updated)

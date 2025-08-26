@@ -8,7 +8,7 @@ const Map<String, String> kAr = {
   "welcome": "مرحبًا بك!",
   "welcome-back": "مرحباً بعودتك",
   "dashboard-subtitle": "نظرة سريعة على رحلة تعافيك",
-  "more-cards-coming-soon": "المزيد من الميزات قريباً...",
+  "more-cards-coming-soon": "المزيد من الميزات قريبًا...",
   "home": "الرئيسية",
   "daily-motivation": "التحفيز اليومي",
   "community": "المجتمع",
@@ -411,8 +411,8 @@ const Map<String, String> kAr = {
   "post_not_found": "المنشور غير موجود",
   "post_not_found_description": "المنشور الذي تبحث عنه غير موجود أو تم حذفه.",
   "error_loading_post": "خطأ في تحميل المنشور",
-  "share_coming_soon": "ميزة المشاركة قريباً",
-  "repost_coming_soon": "ميزة إعادة النشر قريباً",
+  "share_coming_soon": "ميزة المشاركة قريبًا",
+  "repost_coming_soon": "ميزة إعادة النشر قريبًا",
   "report_post": "الإبلاغ عن المنشور",
   "delete_post": "حذف المنشور",
   "report_inappropriate_content": "الإبلاغ عن محتوى غير مناسب أو ضار",
@@ -439,7 +439,7 @@ const Map<String, String> kAr = {
   "challenges_feature_community_desc": "تواصل مع آخرين في رحلات مشابهة",
   "challenges_feature_rewards": "الإنجازات والمكافآت",
   "challenges_feature_rewards_desc": "احصل على شارات واحتفل بتقدمك",
-  "challenges_working_hard_message": "نحن نعمل بجد لنقدم لك هذه الميزة قريباً!",
+  "challenges_working_hard_message": "نحن نعمل بجد لنقدم لك هذه الميزة قريبًا!",
   "whats_coming": "ما القادم:",
   "no_pinned_posts_title": "لا توجد منشورات مثبتة",
   "no_pinned_posts_message":
@@ -494,6 +494,11 @@ const Map<String, String> kAr = {
   "community-profile-update-failed": "فشل في تحديث الملف الشخصي",
   "community-profile-not-found": "الملف الشخصي للمجتمع غير موجود",
   "community-profile-error": "خطأ في تحميل الملف الشخصي",
+  "group-activity": "نشاط المجموعة",
+  "current-group-member": "عضو حالي في المجموعة",
+  "no-longer-group-member": "لم يعد عضواً في المجموعة",
+  "messages-in-group": "الرسائل في هذه المجموعة",
+  "error-loading-group-info": "خطأ في تحميل معلومات المجموعة",
   "community-no-posts": "لا توجد منشورات بعد",
   "community-no-comments": "لا توجد تعليقات بعد",
   "community-no-likes": "لا توجد إعجابات بعد",
@@ -939,7 +944,7 @@ const Map<String, String> kAr = {
   "community-feature-5-detail":
       "حافظ على خصوصيتك أثناء التواصل مع الآخرين. اختر التفاعل بهوية مجهولة عندما تفضل ذلك، مما يضمن شعورك بالأمان والراحة عند مشاركة أفكارك.",
   "got-it": "فهمت",
-  "community_coming_soon_title": "المجتمع قادم قريباً!",
+  "community_coming_soon_title": "المجتمع قادم قريبًا!",
   "community_coming_soon_description":
       "نحن نبني مجتمعاً داعماً حيث يمكنك التواصل مع الآخرين في رحلة تعافيهم. ترقبوا التحديثات!",
   "community_feature_1": "تواصل مع الآخرين في رحلة التعافي",
@@ -1593,6 +1598,7 @@ const Map<String, String> kAr = {
   "progress-sharing": "مشاركة التقدم",
   "milestone-updates": "تحديثات الرحلة",
   "encouragement-posts": "منشورات التشجيع",
+  "enter-join-code": "أدخل رمز الانضمام",
 
   // Groups main screen
   "groups-main-title": "زمالات تعافي",
@@ -1713,7 +1719,7 @@ const Map<String, String> kAr = {
       "عن تحويل الرسالة إلى عامة يمكن لأي أحد الانضمام عنواننا",
 
   // Chat Settings
-  "chat-settings-coming-soon-desc": "إعدادات المحادثة ستكون متاحة قريباً",
+  "chat-settings-coming-soon-desc": "إعدادات المحادثة ستكون متاحة قريبًا",
 
   // Leave Group Modal
   "leave-group-warning-messages":
@@ -1728,7 +1734,7 @@ const Map<String, String> kAr = {
       "لن تتمكن من الانضمام لأي زمالة خلال 24 ساعة من المغادرة",
 
   "points": "نقاط",
-  "coming-soon": "قريباً",
+  "coming-soon": "قريبًا",
 
   "default-image": "الصورة الافتراضية",
   "use-account-profile-image": "استخدم صورة ملفك الشخصي",
@@ -2179,7 +2185,7 @@ const Map<String, String> kAr = {
   "day-of-month-desc":
       "المتابعات التاريخية مجمعة حسب رقم اليوم (1-31) عبر جميع الأشهر",
   "day-of-month-history": "يوم",
-  "sorting-feature-coming": "ميزة الترتيب قريباً",
+  "sorting-feature-coming": "ميزة الترتيب قريبًا",
 
   // Plus Features Guide Screen
   "plus-features-guide-title": "ميزات تعافي + الخاصة بك",
@@ -2835,6 +2841,13 @@ const Map<String, String> kAr = {
   "not-in-group": "أنت لست في زمالة",
   "cannot-demote-group-creator": "لا يمكن تخفيض مؤسس الزمالة",
   "cannot-remove-group-creator": "لا يمكن إزالة مؤسس الزمالة",
+  "member-promoted-successfully": "تم ترقية العضو إلى مشرف بنجاح",
+  "failed-to-promote-member": "فشل في ترقية العضو إلى مشرف",
+  "member-demoted-successfully": "تم تخفيض العضو إلى عضو عادي بنجاح",
+  "failed-to-demote-member": "فشل في تخفيض رتبة العضو",
+  "member-removed-successfully": "تم إزالة العضو من الزمالة بنجاح",
+  "failed-to-remove-member": "فشل في إزالة العضو من الزمالة",
+  "inappropriate-behavior-in-group": "سلوك غير مناسب في الزمالة",
   "refresh-groups": "تحديث",
   "subscription-successful": "تم الاشتراك في المجموعة بنجاح",
   "subscription-failed": "فشل في الاشتراك في المجموعة",
@@ -3063,7 +3076,7 @@ const Map<String, String> kAr = {
       'هذه الزمالة بدعوة فقط. يمكن للمشرفين فقط دعوة أعضاء جدد.',
   'copied-to-clipboard': 'تم النسخ إلى الحافظة!',
 
-  'invitation-feature-coming-soon': 'ميزات إدارة الدعوات قادمة قريباً.',
+  'invitation-feature-coming-soon': 'ميزات إدارة الدعوات قادمة قريبًا.',
 
   // Group creation success modal
   'group-created-successfully-title': 'تم إنشاء الزمالة بنجاح!',
@@ -3126,4 +3139,16 @@ const Map<String, String> kAr = {
   'message-preview': 'معاينة الرسالة',
   'sample-message': 'هذه رسالة تجريبية لإظهار حجم النص المحدد',
   'sample-sender-name': 'المرسل التجريبي',
+
+  // Hidden messages
+  'message-hidden-by-admin': 'تم إخفاء هذه الرسالة بواسطة مشرف المجموعة',
+  'message-actions': 'إجراءات الرسالة',
+  'unhide-message': 'إظهار الرسالة',
+  'unhide-message-description': 'إظهار هذه الرسالة لجميع أعضاء المجموعة',
+  'hiding-message': 'جاري إخفاء الرسالة...',
+  'message-hidden-successfully': 'تم إخفاء الرسالة بنجاح',
+  'unhiding-message': 'جاري إظهار الرسالة...',
+  'message-unhidden-successfully': 'تم إظهار الرسالة بنجاح',
+  'failed-to-hide-message': 'فشل في إخفاء الرسالة',
+  'failed-to-unhide-message': 'فشل في إظهار الرسالة',
 };

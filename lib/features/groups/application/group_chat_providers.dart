@@ -273,6 +273,38 @@ Future<bool> canAccessGroupChat(Ref ref, String groupId) async {
   }
 }
 
+/// Provider to check if current user is admin of a specific group
+@riverpod
+Future<bool> isCurrentUserGroupAdmin(Ref ref, String groupId) async {
+  try {
+    // Get current community profile
+    final currentProfile =
+        await ref.watch(currentCommunityProfileProvider.future);
+    if (currentProfile == null) return false;
+
+    // Query group_memberships collection to check user's role
+    final firestore = FirebaseFirestore.instance;
+    final membershipDoc = await firestore
+        .collection('group_memberships')
+        .where('groupId', isEqualTo: groupId)
+        .where('cpId', isEqualTo: currentProfile.id)
+        .where('isActive', isEqualTo: true)
+        .limit(1)
+        .get();
+
+    if (membershipDoc.docs.isEmpty) return false;
+
+    // Check if user has admin role
+    final membershipData = membershipDoc.docs.first.data();
+    final role = membershipData['role'] as String?;
+
+    return role == 'admin';
+  } catch (e) {
+    print('Error checking admin status for group $groupId: $e');
+    return false;
+  }
+}
+
 /// Provider for generating quoted preview from reply target
 @riverpod
 String generateQuotedPreview(Ref ref, String messageBody) {

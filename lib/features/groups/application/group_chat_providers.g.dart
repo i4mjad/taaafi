@@ -356,6 +356,150 @@ class _CanAccessGroupChatProviderElement
   String get groupId => (origin as CanAccessGroupChatProvider).groupId;
 }
 
+String _$isCurrentUserGroupAdminHash() =>
+    r'690b4cac53c703fe018553cce7fff591df73dec3';
+
+/// Provider to check if current user is admin of a specific group
+///
+/// Copied from [isCurrentUserGroupAdmin].
+@ProviderFor(isCurrentUserGroupAdmin)
+const isCurrentUserGroupAdminProvider = IsCurrentUserGroupAdminFamily();
+
+/// Provider to check if current user is admin of a specific group
+///
+/// Copied from [isCurrentUserGroupAdmin].
+class IsCurrentUserGroupAdminFamily extends Family<AsyncValue<bool>> {
+  /// Provider to check if current user is admin of a specific group
+  ///
+  /// Copied from [isCurrentUserGroupAdmin].
+  const IsCurrentUserGroupAdminFamily();
+
+  /// Provider to check if current user is admin of a specific group
+  ///
+  /// Copied from [isCurrentUserGroupAdmin].
+  IsCurrentUserGroupAdminProvider call(
+    String groupId,
+  ) {
+    return IsCurrentUserGroupAdminProvider(
+      groupId,
+    );
+  }
+
+  @override
+  IsCurrentUserGroupAdminProvider getProviderOverride(
+    covariant IsCurrentUserGroupAdminProvider provider,
+  ) {
+    return call(
+      provider.groupId,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'isCurrentUserGroupAdminProvider';
+}
+
+/// Provider to check if current user is admin of a specific group
+///
+/// Copied from [isCurrentUserGroupAdmin].
+class IsCurrentUserGroupAdminProvider extends AutoDisposeFutureProvider<bool> {
+  /// Provider to check if current user is admin of a specific group
+  ///
+  /// Copied from [isCurrentUserGroupAdmin].
+  IsCurrentUserGroupAdminProvider(
+    String groupId,
+  ) : this._internal(
+          (ref) => isCurrentUserGroupAdmin(
+            ref as IsCurrentUserGroupAdminRef,
+            groupId,
+          ),
+          from: isCurrentUserGroupAdminProvider,
+          name: r'isCurrentUserGroupAdminProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$isCurrentUserGroupAdminHash,
+          dependencies: IsCurrentUserGroupAdminFamily._dependencies,
+          allTransitiveDependencies:
+              IsCurrentUserGroupAdminFamily._allTransitiveDependencies,
+          groupId: groupId,
+        );
+
+  IsCurrentUserGroupAdminProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.groupId,
+  }) : super.internal();
+
+  final String groupId;
+
+  @override
+  Override overrideWith(
+    FutureOr<bool> Function(IsCurrentUserGroupAdminRef provider) create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: IsCurrentUserGroupAdminProvider._internal(
+        (ref) => create(ref as IsCurrentUserGroupAdminRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        groupId: groupId,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeFutureProviderElement<bool> createElement() {
+    return _IsCurrentUserGroupAdminProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is IsCurrentUserGroupAdminProvider && other.groupId == groupId;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, groupId.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+mixin IsCurrentUserGroupAdminRef on AutoDisposeFutureProviderRef<bool> {
+  /// The parameter `groupId` of this provider.
+  String get groupId;
+}
+
+class _IsCurrentUserGroupAdminProviderElement
+    extends AutoDisposeFutureProviderElement<bool>
+    with IsCurrentUserGroupAdminRef {
+  _IsCurrentUserGroupAdminProviderElement(super.provider);
+
+  @override
+  String get groupId => (origin as IsCurrentUserGroupAdminProvider).groupId;
+}
+
 String _$generateQuotedPreviewHash() =>
     r'd0154fc853aba5b2d253406bc0370d0d13006272';
 
@@ -502,7 +646,7 @@ class _GenerateQuotedPreviewProviderElement
 }
 
 String _$groupChatMessagesPaginatedHash() =>
-    r'ccbfa1817933878f64820a8939c9a12de5174925';
+    r'9fcdd95dcdebdc1b4da7e4ac9359960b57d3e08a';
 
 abstract class _$GroupChatMessagesPaginated
     extends BuildlessAutoDisposeAsyncNotifier<PaginatedMessagesEntityResult> {

@@ -10,6 +10,7 @@ import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/core/helpers/date_display_formater.dart';
 import 'package:reboot_app_3/features/community/presentation/providers/community_providers_new.dart';
 import 'package:reboot_app_3/features/groups/domain/entities/group_membership_entity.dart';
+import 'package:reboot_app_3/features/groups/application/group_member_management_controller.dart';
 
 /// Model for group member with user details
 class GroupMemberInfo {
@@ -196,7 +197,8 @@ class GroupMemberItem extends ConsumerWidget {
               // Three dots menu (only show if not current user)
               if (!isCurrentUser)
                 GestureDetector(
-                  onTap: () => _showMemberActions(context, memberInfo, l10n),
+                  onTap: () =>
+                      _showMemberActions(context, memberInfo, l10n, ref),
                   child: Container(
                     padding: const EdgeInsets.all(8),
                     child: Icon(
@@ -330,8 +332,8 @@ class GroupMemberItem extends ConsumerWidget {
     }
   }
 
-  void _showMemberActions(
-      BuildContext context, GroupMemberInfo memberInfo, AppLocalizations l10n) {
+  void _showMemberActions(BuildContext context, GroupMemberInfo memberInfo,
+      AppLocalizations l10n, WidgetRef ref) {
     final actions = <ActionItem>[];
 
     // Report action - always available
@@ -339,7 +341,7 @@ class GroupMemberItem extends ConsumerWidget {
       icon: LucideIcons.flag,
       title: l10n.translate('report-user'),
       subtitle: l10n.translate('report-inappropriate-behavior'),
-      onTap: () => _reportUser(context, memberInfo, l10n),
+      onTap: () => _reportUser(context, memberInfo, l10n, ref),
     ));
 
     // Admin-only actions
@@ -353,14 +355,14 @@ class GroupMemberItem extends ConsumerWidget {
           title: l10n.translate('demote-to-member'),
           subtitle: l10n.translate('remove-admin-privileges'),
           onTap: () =>
-              _demoteToMember(context, memberInfo, l10n, isGroupCreator),
+              _demoteToMember(context, memberInfo, l10n, isGroupCreator, ref),
         ));
       } else {
         actions.add(ActionItem(
           icon: LucideIcons.userPlus,
           title: l10n.translate('promote-to-admin'),
           subtitle: l10n.translate('grant-admin-privileges'),
-          onTap: () => _promoteToAdmin(context, memberInfo, l10n),
+          onTap: () => _promoteToAdmin(context, memberInfo, l10n, ref),
         ));
       }
 
@@ -370,52 +372,161 @@ class GroupMemberItem extends ConsumerWidget {
         title: l10n.translate('remove-from-group'),
         subtitle: l10n.translate('permanently-remove-member'),
         isDestructive: true,
-        onTap: () => _removeMember(context, memberInfo, l10n, isGroupCreator),
+        onTap: () =>
+            _removeMember(context, memberInfo, l10n, isGroupCreator, ref),
       ));
     }
 
     ActionModal.show(context, actions: actions);
   }
 
-  void _reportUser(
-      BuildContext context, GroupMemberInfo memberInfo, AppLocalizations l10n) {
-    // TODO: Implement report user functionality
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(l10n.translate('coming-soon'))),
-    );
+  void _reportUser(BuildContext context, GroupMemberInfo memberInfo,
+      AppLocalizations l10n, WidgetRef ref) {
+    final actions = <ActionItem>[
+      ActionItem(
+        icon: LucideIcons.alertTriangle,
+        title: l10n.translate('report-inappropriate-content'),
+        onTap: () => _submitUserReport(
+            context, memberInfo, 'inappropriate-content', l10n, ref),
+        isDestructive: true,
+      ),
+      ActionItem(
+        icon: LucideIcons.userMinus,
+        title: l10n.translate('report-harassment'),
+        onTap: () =>
+            _submitUserReport(context, memberInfo, 'harassment', l10n, ref),
+        isDestructive: true,
+      ),
+      ActionItem(
+        icon: LucideIcons.shield,
+        title: l10n.translate('report-spam'),
+        onTap: () => _submitUserReport(context, memberInfo, 'spam', l10n, ref),
+        isDestructive: true,
+      ),
+      ActionItem(
+        icon: LucideIcons.frown,
+        title: l10n.translate('report-hate-speech'),
+        onTap: () =>
+            _submitUserReport(context, memberInfo, 'hate-speech', l10n, ref),
+        isDestructive: true,
+      ),
+      ActionItem(
+        icon: LucideIcons.moreHorizontal,
+        title: l10n.translate('report-other-reason'),
+        onTap: () => _submitUserReport(context, memberInfo, 'other', l10n, ref),
+        isDestructive: true,
+      ),
+    ];
+
+    ActionModal.show(context,
+        actions: actions, title: l10n.translate('report-reason'));
   }
 
-  void _promoteToAdmin(
-      BuildContext context, GroupMemberInfo memberInfo, AppLocalizations l10n) {
-    // TODO: Implement promote to admin functionality
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(l10n.translate('coming-soon'))),
-    );
+  /// Submit a user report
+  void _submitUserReport(BuildContext context, GroupMemberInfo memberInfo,
+      String reportTypeId, AppLocalizations l10n, WidgetRef ref) async {
+    // Get the context and ref for the async operation
+    if (!context.mounted) return;
+
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
+    final navigator = Navigator.of(context);
+
+    try {
+      // Close the action modal first
+      navigator.pop();
+
+      final controller =
+          ref.read(groupMemberManagementControllerProvider.notifier);
+      final result = await controller.reportUser(
+        reportedUserCpId: memberInfo.membership.cpId,
+        reportMessage: l10n.translate('inappropriate-behavior-in-group'),
+      );
+
+      if (result.success) {
+        getSuccessSnackBar(context, 'report-submitted-successfully');
+      } else {
+        getErrorSnackBar(
+            context, result.errorKey ?? 'report-submission-failed');
+      }
+    } catch (e) {
+      getErrorSnackBar(context, 'report-submission-failed');
+    }
+  }
+
+  void _promoteToAdmin(BuildContext context, GroupMemberInfo memberInfo,
+      AppLocalizations l10n, WidgetRef ref) async {
+    if (!context.mounted) return;
+
+    try {
+      final controller =
+          ref.read(groupMemberManagementControllerProvider.notifier);
+      final result = await controller.promoteMemberToAdmin(
+        groupId: memberInfo.membership.groupId,
+        memberCpId: memberInfo.membership.cpId,
+      );
+
+      if (result.success) {
+        getSuccessSnackBar(context, 'member-promoted-successfully');
+      } else {
+        getErrorSnackBar(
+            context, result.errorKey ?? 'failed-to-promote-member');
+      }
+    } catch (e) {
+      getErrorSnackBar(context, 'failed-to-promote-member');
+    }
   }
 
   void _demoteToMember(BuildContext context, GroupMemberInfo memberInfo,
-      AppLocalizations l10n, bool isGroupCreator) {
+      AppLocalizations l10n, bool isGroupCreator, WidgetRef ref) async {
     if (isGroupCreator) {
       getErrorSnackBar(context, 'cannot-demote-group-creator');
       return;
     }
 
-    // TODO: Implement demote to member functionality
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(l10n.translate('coming-soon'))),
-    );
+    if (!context.mounted) return;
+
+    try {
+      final controller =
+          ref.read(groupMemberManagementControllerProvider.notifier);
+      final result = await controller.demoteMemberToMember(
+        groupId: memberInfo.membership.groupId,
+        memberCpId: memberInfo.membership.cpId,
+      );
+
+      if (result.success) {
+        getSuccessSnackBar(context, 'member-demoted-successfully');
+      } else {
+        getErrorSnackBar(context, result.errorKey ?? 'failed-to-demote-member');
+      }
+    } catch (e) {
+      getErrorSnackBar(context, 'failed-to-demote-member');
+    }
   }
 
   void _removeMember(BuildContext context, GroupMemberInfo memberInfo,
-      AppLocalizations l10n, bool isGroupCreator) {
+      AppLocalizations l10n, bool isGroupCreator, WidgetRef ref) async {
     if (isGroupCreator) {
       getErrorSnackBar(context, 'cannot-remove-group-creator');
       return;
     }
 
-    // TODO: Implement remove member functionality
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(l10n.translate('coming-soon'))),
-    );
+    if (!context.mounted) return;
+
+    try {
+      final controller =
+          ref.read(groupMemberManagementControllerProvider.notifier);
+      final result = await controller.removeMemberFromGroup(
+        groupId: memberInfo.membership.groupId,
+        memberCpId: memberInfo.membership.cpId,
+      );
+
+      if (result.success) {
+        getSuccessSnackBar(context, 'member-removed-successfully');
+      } else {
+        getErrorSnackBar(context, result.errorKey ?? 'failed-to-remove-member');
+      }
+    } catch (e) {
+      getErrorSnackBar(context, 'failed-to-remove-member');
+    }
   }
 }

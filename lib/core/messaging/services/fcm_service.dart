@@ -418,15 +418,25 @@ class MessagingService with WidgetsBindingObserver {
 
     final data = message.data;
     final screen = data['screen'];
-
-    if (screen == null) {
-      return;
-    }
+    final route = data['route'];
+    final type = data['type'];
 
     // Add delay to ensure app is ready for navigation
     await Future.delayed(const Duration(milliseconds: 100));
 
     try {
+      // Handle route-based navigation (for group messages)
+      if (route != null && route.isNotEmpty) {
+        await _handleRouteNavigation(ctx, route, data);
+        return;
+      }
+
+      // Handle type-based navigation (fallback for notifications without screen)
+      if (screen == null && type != null) {
+        await _handleTypeBasedNavigation(ctx, type, data);
+        return;
+      }
+
       // If no screen parameter, redirect to notifications
       if (screen == null || screen.isEmpty) {
         GoRouter.of(ctx).goNamed(RouteNames.notifications.name);
@@ -463,6 +473,24 @@ class MessagingService with WidgetsBindingObserver {
               // Last fallback to notifications
               GoRouter.of(ctx).goNamed(RouteNames.notifications.name);
             }
+          }
+          return;
+        }
+      }
+
+      // Handle groups navigation for member management notifications
+      if (screen == 'groups') {
+        final notificationType = data['notificationType'];
+        if (notificationType != null &&
+            (notificationType == 'member_promoted' ||
+                notificationType == 'member_demoted' ||
+                notificationType == 'member_removed')) {
+          try {
+            // For member management notifications, navigate to groups main screen
+            GoRouter.of(ctx).goNamed(RouteNames.groups.name);
+          } catch (e) {
+            // Fallback to notifications if groups route doesn't exist
+            GoRouter.of(ctx).goNamed(RouteNames.notifications.name);
           }
           return;
         }
@@ -550,6 +578,92 @@ class MessagingService with WidgetsBindingObserver {
       }
     } catch (e) {
       // Silent error - don't clutter logs
+    }
+  }
+
+  /// Handle route-based navigation (e.g., /groups/{groupId}/chat)
+  Future<void> _handleRouteNavigation(
+      BuildContext ctx, String route, Map<String, dynamic> data) async {
+    try {
+      // Parse route for group chat navigation
+      if (route.startsWith('/groups/') && route.endsWith('/chat')) {
+        // Extract groupId from route like '/groups/{groupId}/chat'
+        final routeParts = route.split('/');
+        if (routeParts.length >= 3) {
+          final groupId = routeParts[2];
+          if (groupId.isNotEmpty) {
+            // Check if we have a specific message to scroll to
+            final messageId = data['messageId'];
+            if (messageId != null) {
+              // Navigate to group chat with message highlight
+              try {
+                GoRouter.of(ctx)
+                    .go('/groups/$groupId/chat?messageId=$messageId');
+              } catch (e) {
+                // Fallback to basic group chat navigation
+                GoRouter.of(ctx).go('/groups/$groupId/chat');
+              }
+            } else {
+              // Navigate to group chat normally
+              GoRouter.of(ctx).go('/groups/$groupId/chat');
+            }
+            return;
+          }
+        }
+      }
+
+      // If route parsing fails, fallback to groups main
+      GoRouter.of(ctx).goNamed(RouteNames.groups.name);
+    } catch (e) {
+      // Final fallback to notifications
+      GoRouter.of(ctx).goNamed(RouteNames.notifications.name);
+    }
+  }
+
+  /// Handle type-based navigation when no screen is provided
+  Future<void> _handleTypeBasedNavigation(
+      BuildContext ctx, String type, Map<String, dynamic> data) async {
+    try {
+      switch (type) {
+        case 'group_message':
+          // Try to extract groupId and navigate to group chat
+          final groupId = data['groupId'];
+          if (groupId != null) {
+            GoRouter.of(ctx).go('/groups/$groupId/chat');
+          } else {
+            GoRouter.of(ctx).goNamed(RouteNames.groups.name);
+          }
+          break;
+
+        case 'community_notification':
+          // Try to navigate to post details or community
+          final postId = data['postId'];
+          if (postId != null) {
+            try {
+              GoRouter.of(ctx).goNamed(
+                RouteNames.postDetail.name,
+                pathParameters: {'postId': postId},
+              );
+            } catch (e) {
+              GoRouter.of(ctx).goNamed(RouteNames.community.name);
+            }
+          } else {
+            GoRouter.of(ctx).goNamed(RouteNames.community.name);
+          }
+          break;
+
+        case 'smart_alert':
+          // Navigate to appropriate smart alert screen or notifications
+          GoRouter.of(ctx).goNamed(RouteNames.notifications.name);
+          break;
+
+        default:
+          // Unknown type, fallback to notifications
+          GoRouter.of(ctx).goNamed(RouteNames.notifications.name);
+      }
+    } catch (e) {
+      // Final fallback to notifications
+      GoRouter.of(ctx).goNamed(RouteNames.notifications.name);
     }
   }
 

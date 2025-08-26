@@ -581,6 +581,38 @@ class GroupsRepositoryImpl implements GroupsRepository {
   }
 
   @override
+  Future<void> demoteMemberToMember({
+    required String groupId,
+    required String cpId,
+  }) async {
+    try {
+      await _dataSource.demoteMemberToMember(
+        groupId: groupId,
+        cpId: cpId,
+      );
+    } catch (e, stackTrace) {
+      log('Error in demoteMemberToMember: $e', stackTrace: stackTrace);
+      rethrow;
+    }
+  }
+
+  @override
+  Future<void> removeMemberFromGroup({
+    required String groupId,
+    required String cpId,
+  }) async {
+    try {
+      await _dataSource.removeMemberFromGroup(
+        groupId: groupId,
+        cpId: cpId,
+      );
+    } catch (e, stackTrace) {
+      log('Error in removeMemberFromGroup: $e', stackTrace: stackTrace);
+      rethrow;
+    }
+  }
+
+  @override
   Future<void> updateGroupAdmin({
     required String groupId,
     required String newAdminCpId,

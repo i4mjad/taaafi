@@ -20,52 +20,70 @@ import '../../domain/entities/group_message_entity.dart';
 
 import '../../../community/presentation/providers/community_providers_new.dart';
 import '../../../../core/shared_widgets/snackbar.dart';
+import '../../../../core/shared_widgets/action_modal.dart';
+import '../widgets/group_chat_profile_modal.dart';
 
 /// Model for chat message
 class ChatMessage {
   final String id;
   final String content;
   final String senderName;
+  final String senderCpId; // Community profile ID for avatar clicks
   final String time;
   final DateTime dateTime;
   final bool isCurrentUser;
   final Color avatarColor;
+  final bool isAnonymous; // Whether this user is anonymous
+  final String? avatarUrl; // Community profile avatar URL
   final ChatMessage? replyToMessage; // The message being replied to
   final String? replyToMessageId; // ID of the message being replied to
+  final bool isHidden; // Whether this message was hidden by admin
 
   const ChatMessage({
     required this.id,
     required this.content,
     required this.senderName,
+    required this.senderCpId,
     required this.time,
     required this.dateTime,
     required this.isCurrentUser,
     required this.avatarColor,
+    required this.isAnonymous,
+    this.avatarUrl,
     this.replyToMessage,
     this.replyToMessageId,
+    this.isHidden = false,
   });
 
   ChatMessage copyWith({
     String? id,
     String? content,
     String? senderName,
+    String? senderCpId,
     String? time,
     DateTime? dateTime,
     bool? isCurrentUser,
     Color? avatarColor,
+    bool? isAnonymous,
+    String? avatarUrl,
     ChatMessage? replyToMessage,
     String? replyToMessageId,
+    bool? isHidden,
   }) {
     return ChatMessage(
       id: id ?? this.id,
       content: content ?? this.content,
       senderName: senderName ?? this.senderName,
+      senderCpId: senderCpId ?? this.senderCpId,
       time: time ?? this.time,
       dateTime: dateTime ?? this.dateTime,
       isCurrentUser: isCurrentUser ?? this.isCurrentUser,
       avatarColor: avatarColor ?? this.avatarColor,
+      isAnonymous: isAnonymous ?? this.isAnonymous,
+      avatarUrl: avatarUrl ?? this.avatarUrl,
       replyToMessage: replyToMessage ?? this.replyToMessage,
       replyToMessageId: replyToMessageId ?? this.replyToMessageId,
+      isHidden: isHidden ?? this.isHidden,
     );
   }
 }
@@ -417,20 +435,24 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
     // Get repository for cached profile data
     final repository = ref.read(groupChatRepositoryProvider);
 
-    // Remove duplicates by ID first
+    // Remove duplicates by ID first (keep all messages including hidden ones)
     final uniqueEntities = <String, GroupMessageEntity>{};
-    for (final entity in entities.where((entity) => entity.isVisible)) {
+    for (final entity in entities.where((entity) => !entity.isDeleted)) {
       uniqueEntities[entity.id] = entity;
     }
 
     return uniqueEntities.values.map((entity) {
-      final isCurrentUser = entity.senderCpId == currentCpId;
+      final isCurrentUser =
+          currentCpId != null && entity.senderCpId == currentCpId;
 
       // Get sender info from repository cache (already fetched with messages)
       final senderDisplayName =
           repository.getSenderDisplayName(entity.senderCpId);
       final senderAvatarColor =
           repository.getSenderAvatarColor(entity.senderCpId);
+      final senderIsAnonymous =
+          repository.getSenderAnonymity(entity.senderCpId);
+      final senderAvatarUrl = repository.getSenderAvatarUrl(entity.senderCpId);
 
       // Find reply target if this is a reply
       ChatMessage? replyToMessage;
@@ -451,15 +473,24 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
               repository.getSenderDisplayName(replyTarget.senderCpId);
           final replyTargetAvatarColor =
               repository.getSenderAvatarColor(replyTarget.senderCpId);
+          final replyTargetIsAnonymous =
+              repository.getSenderAnonymity(replyTarget.senderCpId);
+          final replyTargetAvatarUrl =
+              repository.getSenderAvatarUrl(replyTarget.senderCpId);
 
           replyToMessage = ChatMessage(
             id: replyTarget.id,
             content: replyTarget.body,
             senderName: replyTargetDisplayName,
+            senderCpId: replyTarget.senderCpId,
             time: _formatTime(replyTarget.createdAt),
             dateTime: replyTarget.createdAt,
-            isCurrentUser: replyTarget.senderCpId == currentCpId,
+            isCurrentUser:
+                currentCpId != null && replyTarget.senderCpId == currentCpId,
             avatarColor: replyTargetAvatarColor,
+            isAnonymous: replyTargetIsAnonymous,
+            avatarUrl: replyTargetAvatarUrl,
+            isHidden: replyTarget.isHidden,
           );
         }
       }
@@ -468,12 +499,16 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
         id: entity.id,
         content: entity.body,
         senderName: senderDisplayName,
+        senderCpId: entity.senderCpId,
         time: _formatTime(entity.createdAt),
         dateTime: entity.createdAt,
         isCurrentUser: isCurrentUser,
         avatarColor: senderAvatarColor,
+        isAnonymous: senderIsAnonymous,
+        avatarUrl: senderAvatarUrl,
         replyToMessage: replyToMessage,
         replyToMessageId: entity.replyToMessageId,
+        isHidden: entity.isHidden,
       );
     }).toList();
   }
@@ -544,6 +579,28 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
     );
   }
 
+  /// Build fallback avatar for when image fails to load or user is anonymous
+  Widget _buildFallbackAvatar(ChatMessage message, double size) {
+    return message.isAnonymous
+        ? Icon(
+            Icons.person,
+            color: Colors.white,
+            size: size * 0.6,
+          )
+        : Center(
+            child: Text(
+              message.senderName.isNotEmpty
+                  ? message.senderName[0].toUpperCase()
+                  : '؟',
+              style: TextStyles.body.copyWith(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: size * 0.4,
+              ),
+            ),
+          );
+  }
+
   Widget _buildMessageItem(BuildContext context, CustomThemeData theme,
       ChatMessage message, ChatTextSize chatTextSize) {
     final screenWidth = MediaQuery.of(context).size.width;
@@ -554,7 +611,7 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
     final clampedAvatarSize = avatarSize.clamp(24.0, 36.0);
 
     // Message bubble widths: current user gets 40% of screen, others get 65%
-    final currentUserMaxWidth = screenWidth * 0.65;
+    final currentUserMaxWidth = screenWidth * 0.5;
     final otherUserMaxWidth = screenWidth * 0.65;
 
     // Responsive spacing
@@ -565,7 +622,7 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
       key: Key(message.id),
       message: message,
       theme: theme,
-      onLongPress: () => _showReportModal(context, theme, message),
+      onLongPress: () => _showMessageActionsModal(context, theme, message),
       onSwipeToReply: () => _startReplyToMessage(message),
       child: Container(
         margin:
@@ -579,13 +636,29 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
 
             // Avatar - only show for other users' messages
             if (!message.isCurrentUser) ...[
-              Container(
-                width: clampedAvatarSize,
-                height: clampedAvatarSize,
-                decoration: BoxDecoration(
-                  color: message.avatarColor,
-                  shape: BoxShape.circle,
-                  border: Border.all(color: Colors.white, width: 1),
+              GestureDetector(
+                onTap: () => _showUserProfileModal(context, message),
+                child: Container(
+                  width: clampedAvatarSize,
+                  height: clampedAvatarSize,
+                  decoration: BoxDecoration(
+                    color: message.avatarColor,
+                    shape: BoxShape.circle,
+                    border: Border.all(color: Colors.white, width: 1),
+                  ),
+                  child: message.avatarUrl != null && !message.isAnonymous
+                      ? ClipOval(
+                          child: Image.network(
+                            message.avatarUrl!,
+                            width: clampedAvatarSize,
+                            height: clampedAvatarSize,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) =>
+                                _buildFallbackAvatar(
+                                    message, clampedAvatarSize),
+                          ),
+                        )
+                      : _buildFallbackAvatar(message, clampedAvatarSize),
                 ),
               ),
               SizedBox(width: clampedSpacing),
@@ -678,10 +751,8 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
                             // Time second
                             Text(
                               message.time,
-                              style: TextStyles.caption.copyWith(
-                                color: theme.grey[300],
-                                fontSize: 8,
-                                fontWeight: FontWeight.w500,
+                              style: TextStyles.small.copyWith(
+                                color: theme.grey[600],
                               ),
                             ),
                           ],
@@ -701,10 +772,18 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
 
                         // Message content with proper text wrapping and dynamic text size
                         Text(
-                          message.content,
+                          message.isHidden
+                              ? AppLocalizations.of(context)
+                                  .translate('message-hidden-by-admin')
+                              : message.content,
                           style: chatTextSize.textStyle.copyWith(
-                            color: theme.grey[800],
+                            color: message.isHidden
+                                ? theme.grey[500]
+                                : theme.grey[800],
                             height: 1.5,
+                            fontStyle: message.isHidden
+                                ? FontStyle.italic
+                                : FontStyle.normal,
                           ),
                           textAlign:
                               Directionality.of(context) == TextDirection.rtl
@@ -934,6 +1013,30 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
     });
   }
 
+  /// Show user profile modal for chat participants
+  void _showUserProfileModal(BuildContext context, ChatMessage message) {
+    final profileAsync =
+        ref.read(communityProfileByIdProvider(message.senderCpId));
+
+    // Get basic profile info for the modal
+    final profile = profileAsync.valueOrNull;
+    final isAnonymous = profile?.isAnonymous ?? false;
+    final isPlusUser = profile?.isPlusUser ?? false;
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (context) => GroupChatProfileModal(
+        communityProfileId: message.senderCpId,
+        groupId: widget.groupId ?? '',
+        displayName: message.senderName,
+        isAnonymous: isAnonymous,
+        isPlusUser: isPlusUser,
+      ),
+    );
+  }
+
   /// Show original message in a simple modal bottom sheet
   void _showOriginalMessageModal(BuildContext context, CustomThemeData theme,
       ChatMessage originalMessage) {
@@ -1002,16 +1105,30 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
                         CircleAvatar(
                           radius: 12,
                           backgroundColor: originalMessage.avatarColor,
-                          child: Text(
-                            originalMessage.senderName.isNotEmpty
-                                ? originalMessage.senderName[0].toUpperCase()
-                                : '؟',
-                            style: TextStyles.caption.copyWith(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 10,
-                            ),
-                          ),
+                          backgroundImage: originalMessage.avatarUrl != null &&
+                                  !originalMessage.isAnonymous
+                              ? NetworkImage(originalMessage.avatarUrl!)
+                              : null,
+                          child: originalMessage.avatarUrl == null ||
+                                  originalMessage.isAnonymous
+                              ? (originalMessage.isAnonymous
+                                  ? const Icon(
+                                      Icons.person,
+                                      color: Colors.white,
+                                      size: 14,
+                                    )
+                                  : Text(
+                                      originalMessage.senderName.isNotEmpty
+                                          ? originalMessage.senderName[0]
+                                              .toUpperCase()
+                                          : '؟',
+                                      style: TextStyles.caption.copyWith(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 10,
+                                      ),
+                                    ))
+                              : null,
                         ),
                         const SizedBox(width: 8),
                         Text(
@@ -1036,10 +1153,18 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
 
                     // Message content
                     Text(
-                      originalMessage.content,
+                      originalMessage.isHidden
+                          ? AppLocalizations.of(context)
+                              .translate('message-hidden-by-admin')
+                          : originalMessage.content,
                       style: TextStyles.body.copyWith(
-                        color: theme.grey[800],
+                        color: originalMessage.isHidden
+                            ? theme.grey[500]
+                            : theme.grey[800],
                         height: 1.4,
+                        fontStyle: originalMessage.isHidden
+                            ? FontStyle.italic
+                            : FontStyle.normal,
                       ),
                     ),
                   ],
@@ -1054,202 +1179,35 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
     );
   }
 
-  void _showReportModal(
+  void _showMessageActionsModal(
       BuildContext context, CustomThemeData theme, ChatMessage message) {
     final l10n = AppLocalizations.of(context);
 
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
+      useSafeArea: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => Container(
-        decoration: BoxDecoration(
-          color: theme.backgroundColor,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-        ),
-        child: SafeArea(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Handle bar
-              Container(
-                margin: const EdgeInsets.only(top: 8),
-                width: 40,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: theme.grey[300],
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
+      builder: (context) => Consumer(
+        builder: (context, ref, child) {
+          final isAdminAsyncWatch =
+              ref.watch(isCurrentUserGroupAdminProvider(widget.groupId ?? ''));
+          final isAdminFromWatch = isAdminAsyncWatch.valueOrNull ?? false;
 
-              // Header
-              Padding(
-                padding: const EdgeInsets.all(20),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        l10n.translate('report-message'),
-                        style: TextStyles.h5.copyWith(
-                          color: theme.grey[900],
-                        ),
-                      ),
-                    ),
-                    GestureDetector(
-                      onTap: () => Navigator.of(context).pop(),
-                      child: Icon(
-                        LucideIcons.x,
-                        color: theme.grey[600],
-                        size: 24,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              // Message preview
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: Container(
-                  width: double.infinity,
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-                  decoration: BoxDecoration(
-                    color: theme.grey[50],
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: theme.grey[200]!, width: 1),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        message.senderName,
-                        style: TextStyles.smallBold.copyWith(
-                          color: theme.grey[900],
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        message.content,
-                        style: TextStyles.body.copyWith(
-                          color: theme.grey[700],
-                        ),
-                        maxLines: 3,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 20),
-
-              // Report reasons
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      l10n.translate('report-reason'),
-                      style: TextStyles.body.copyWith(
-                        color: theme.grey[900],
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    _buildReportOption(
-                        context,
-                        theme,
-                        l10n,
-                        'report-inappropriate-content',
-                        LucideIcons.alertTriangle),
-                    _buildReportOption(context, theme, l10n,
-                        'report-harassment', LucideIcons.userMinus),
-                    _buildReportOption(context, theme, l10n, 'report-spam',
-                        LucideIcons.shield),
-                    _buildReportOption(context, theme, l10n,
-                        'report-hate-speech', LucideIcons.frown),
-                    _buildReportOption(context, theme, l10n,
-                        'report-other-reason', LucideIcons.moreHorizontal),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 20),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildReportOption(BuildContext context, CustomThemeData theme,
-      AppLocalizations l10n, String reasonKey, IconData icon) {
-    return GestureDetector(
-      onTap: () {
-        Navigator.of(context).pop();
-        _showReportConfirmation(context, theme, l10n, reasonKey);
-      },
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
-        margin: const EdgeInsets.only(bottom: 8),
-        decoration: BoxDecoration(
-          color: theme.backgroundColor,
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: theme.grey[200]!, width: 1),
-        ),
-        child: Row(
-          children: [
-            Icon(
-              icon,
-              color: theme.grey[600],
-              size: 20,
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Text(
-                l10n.translate(reasonKey),
-                style: TextStyles.body.copyWith(
-                  color: theme.grey[900],
-                ),
+          return Container(
+            decoration: BoxDecoration(
+              color: theme.backgroundColor,
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(16),
+                topRight: Radius.circular(16),
               ),
             ),
-            Icon(
-              Directionality.of(context) == TextDirection.rtl
-                  ? LucideIcons.chevronLeft
-                  : LucideIcons.chevronRight,
-              color: theme.grey[400],
-              size: 16,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  void _showReportConfirmation(BuildContext context, CustomThemeData theme,
-      AppLocalizations l10n, String reasonKey) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => Container(
-        decoration: BoxDecoration(
-          color: theme.backgroundColor,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-        ),
-        child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.all(20),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 // Handle bar
                 Container(
-                  margin: const EdgeInsets.only(bottom: 20),
+                  margin: const EdgeInsets.only(top: 12),
                   width: 40,
                   height: 4,
                   decoration: BoxDecoration(
@@ -1258,80 +1216,279 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
                   ),
                 ),
 
+                const SizedBox(height: 20),
+
                 // Title
                 Text(
-                  l10n.translate('confirm-report'),
-                  style: TextStyles.h5.copyWith(
+                  l10n.translate('message-actions'),
+                  style: TextStyles.h6.copyWith(
                     color: theme.grey[900],
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
 
                 const SizedBox(height: 16),
 
-                // Message
-                Text(
-                  l10n.translate('confirm-report-message'),
-                  style: TextStyles.body.copyWith(
-                    color: theme.grey[700],
+                // Message preview
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 16),
+                    decoration: BoxDecoration(
+                      color: theme.grey[50],
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: theme.grey[200]!, width: 1),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          message.senderName,
+                          style: TextStyles.smallBold.copyWith(
+                            color: theme.grey[900],
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          message.isHidden
+                              ? l10n.translate('message-hidden-by-admin')
+                              : message.content,
+                          style: TextStyles.body.copyWith(
+                            color: message.isHidden
+                                ? theme.grey[500]
+                                : theme.grey[700],
+                            fontStyle: message.isHidden
+                                ? FontStyle.italic
+                                : FontStyle.normal,
+                          ),
+                          maxLines: 3,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
                   ),
-                  textAlign: TextAlign.center,
                 ),
 
-                const SizedBox(height: 32),
+                const SizedBox(height: 20),
 
-                // Action buttons
-                Row(
-                  children: [
-                    Expanded(
-                      child: TextButton(
-                        onPressed: () => Navigator.of(context).pop(),
-                        style: TextButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                            side: BorderSide(color: theme.grey[300]!, width: 1),
+                // Actions with ActionModal styling
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Column(
+                    children: [
+                      // Admin actions (if user is admin)
+                      if (isAdminFromWatch) ...[
+                        if (message.isHidden)
+                          _buildActionItem(
+                            context,
+                            theme,
+                            icon: LucideIcons.eye,
+                            title: l10n.translate('unhide-message'),
+                            subtitle:
+                                l10n.translate('unhide-message-description'),
+                            onTap: () => _unhideMessage(context, message),
+                            isDestructive: false,
+                          )
+                        else
+                          _buildActionItem(
+                            context,
+                            theme,
+                            icon: LucideIcons.eyeOff,
+                            title: 'إخفاء الرسالة',
+                            subtitle:
+                                'إخفاء هذه الرسالة من جميع أعضاء المجموعة',
+                            onTap: () => _hideMessage(context, message),
+                            isDestructive: false,
                           ),
-                        ),
-                        child: Text(
-                          l10n.translate('cancel'),
-                          style: TextStyles.body.copyWith(
-                            color: theme.grey[600],
-                          ),
-                        ),
+                        const SizedBox(height: 8),
+                      ],
+
+                      // Report action
+                      _buildActionItem(
+                        context,
+                        theme,
+                        icon: LucideIcons.flag,
+                        title: l10n.translate('report-message'),
+                        subtitle: 'الإبلاغ عن محتوى غير مناسب',
+                        onTap: () =>
+                            _showReportOptionsModal(context, theme, message),
+                        isDestructive: true,
                       ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: ElevatedButton(
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                          _submitReport(context, l10n, reasonKey);
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: theme.primary[500],
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                        child: Text(
-                          l10n.translate('confirm-submit-report'),
-                          style: TextStyles.body.copyWith(
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
 
-                const SizedBox(height: 16),
+                const SizedBox(height: 20),
               ],
             ),
-          ),
+          );
+        },
+      ),
+    );
+  }
+
+  /// Build action item with ActionModal styling
+  Widget _buildActionItem(
+    BuildContext context,
+    CustomThemeData theme, {
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required VoidCallback onTap,
+    required bool isDestructive,
+  }) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.of(context).pop();
+        onTap();
+      },
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: isDestructive ? theme.error[50] : theme.grey[50],
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: isDestructive ? theme.error[100] : theme.grey[100],
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(
+                icon,
+                size: 20,
+                color: isDestructive ? theme.error[600] : theme.grey[700],
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyles.body.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: isDestructive ? theme.error[700] : theme.grey[900],
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    subtitle,
+                    style: TextStyles.caption.copyWith(
+                      color: isDestructive ? theme.error[600] : theme.grey[600],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );
+  }
+
+  /// Show report options modal (expandable)
+  void _showReportOptionsModal(
+      BuildContext context, CustomThemeData theme, ChatMessage message) {
+    final l10n = AppLocalizations.of(context);
+
+    final reportActions = <ActionItem>[
+      ActionItem(
+        icon: LucideIcons.alertTriangle,
+        title: l10n.translate('report-inappropriate-content'),
+        onTap: () => _submitReport(context, l10n, 'inappropriate-content'),
+        isDestructive: true,
+      ),
+      ActionItem(
+        icon: LucideIcons.userMinus,
+        title: l10n.translate('report-harassment'),
+        onTap: () => _submitReport(context, l10n, 'harassment'),
+        isDestructive: true,
+      ),
+      ActionItem(
+        icon: LucideIcons.shield,
+        title: l10n.translate('report-spam'),
+        onTap: () => _submitReport(context, l10n, 'spam'),
+        isDestructive: true,
+      ),
+      ActionItem(
+        icon: LucideIcons.frown,
+        title: l10n.translate('report-hate-speech'),
+        onTap: () => _submitReport(context, l10n, 'hate-speech'),
+        isDestructive: true,
+      ),
+      ActionItem(
+        icon: LucideIcons.moreHorizontal,
+        title: l10n.translate('report-other-reason'),
+        onTap: () => _submitReport(context, l10n, 'other'),
+        isDestructive: true,
+      ),
+    ];
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => ActionModal(
+        title: l10n.translate('report-reason'),
+        actions: reportActions,
+      ),
+    );
+  }
+
+  /// Hide message (admin only)
+  Future<void> _hideMessage(BuildContext context, ChatMessage message) async {
+    final l10n = AppLocalizations.of(context);
+
+    try {
+      // Get repository reference
+      final repository = ref.read(groupChatRepositoryProvider);
+
+      // Show loading indicator
+      getSystemSnackBar(context, l10n.translate('hiding-message'));
+
+      // Hide the message
+      await repository.hideMessage(widget.groupId ?? '', message.id);
+
+      // Show success message
+      getSystemSnackBar(context, l10n.translate('message-hidden-successfully'));
+    } catch (e) {
+      // Show error message
+      getSystemSnackBar(context, l10n.translate('failed-to-hide-message'));
+      print('Error hiding message: $e');
+    }
+  }
+
+  /// Unhide message (admin only)
+  Future<void> _unhideMessage(BuildContext context, ChatMessage message) async {
+    final l10n = AppLocalizations.of(context);
+
+    try {
+      // Get repository reference
+      final repository = ref.read(groupChatRepositoryProvider);
+
+      // Show loading indicator
+      getSystemSnackBar(context, l10n.translate('unhiding-message'));
+
+      // Unhide the message
+      await repository.unhideMessage(widget.groupId ?? '', message.id);
+
+      // Show success message
+      getSystemSnackBar(
+          context, l10n.translate('message-unhidden-successfully'));
+    } catch (e) {
+      // Show error message
+      getSystemSnackBar(context, l10n.translate('failed-to-unhide-message'));
+      print('Error unhiding message: $e');
+    }
   }
 
   void _submitReport(
@@ -1619,11 +1776,19 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
             ),
             const SizedBox(height: 2),
             Text(
-              originalMessage.content,
+              originalMessage.isHidden
+                  ? AppLocalizations.of(context)
+                      .translate('message-hidden-by-admin')
+                  : originalMessage.content,
               style: TextStyles.small.copyWith(
-                color: theme.grey[600],
+                color: originalMessage.isHidden
+                    ? theme.grey[400]
+                    : theme.grey[600],
                 // fontSize: 11,
                 height: 1.3,
+                fontStyle: originalMessage.isHidden
+                    ? FontStyle.italic
+                    : FontStyle.normal,
               ),
               maxLines: 2,
               overflow: TextOverflow.ellipsis,

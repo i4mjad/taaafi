@@ -14,7 +14,8 @@ class GroupsService {
     try {
       return await _repository.getCurrentMembership(cpId);
     } catch (error, stackTrace) {
-      log('Error in GroupsService.getCurrentMembership: $error', stackTrace: stackTrace);
+      log('Error in GroupsService.getCurrentMembership: $error',
+          stackTrace: stackTrace);
       print('GroupsService.getCurrentMembership error: $error');
       rethrow;
     }
@@ -25,7 +26,8 @@ class GroupsService {
     try {
       return _repository.getPublicGroups();
     } catch (error, stackTrace) {
-      log('Error in GroupsService.getPublicGroups: $error', stackTrace: stackTrace);
+      log('Error in GroupsService.getPublicGroups: $error',
+          stackTrace: stackTrace);
       print('GroupsService.getPublicGroups error: $error');
       rethrow;
     }
@@ -85,7 +87,8 @@ class GroupsService {
 
     try {
       // Check if user already has an active membership
-      final currentMembership = await _repository.getCurrentMembership(creatorCpId);
+      final currentMembership =
+          await _repository.getCurrentMembership(creatorCpId);
       if (currentMembership != null) {
         return const CreateGroupResultEntity.error(
           CreateGroupErrorType.alreadyInGroup,
@@ -150,7 +153,8 @@ class GroupsService {
         cpId: cpId,
       );
     } catch (error, stackTrace) {
-      log('Error in GroupsService.joinGroupDirectly: $error', stackTrace: stackTrace);
+      log('Error in GroupsService.joinGroupDirectly: $error',
+          stackTrace: stackTrace);
       print('GroupsService.joinGroupDirectly error: $error');
       return const JoinResultEntity.error(
         JoinErrorType.groupNotFound,
@@ -196,7 +200,8 @@ class GroupsService {
         cpId: cpId,
       );
     } catch (error, stackTrace) {
-      log('Error in GroupsService.joinGroupWithCode: $error', stackTrace: stackTrace);
+      log('Error in GroupsService.joinGroupWithCode: $error',
+          stackTrace: stackTrace);
       print('GroupsService.joinGroupWithCode error: $error');
       return const JoinResultEntity.error(
         JoinErrorType.invalidCode,
@@ -222,7 +227,8 @@ class GroupsService {
     } catch (error, stackTrace) {
       log('Error in GroupsService.leaveGroup: $error', stackTrace: stackTrace);
       print('GroupsService.leaveGroup error: $error');
-      return const LeaveResultEntity.error(null); // UI layer will handle translation based on error type
+      return const LeaveResultEntity.error(
+          null); // UI layer will handle translation based on error type
     }
   }
 
@@ -231,7 +237,8 @@ class GroupsService {
     try {
       return await _repository.canJoinGroup(cpId);
     } catch (error, stackTrace) {
-      log('Error in GroupsService.canJoinGroup: $error', stackTrace: stackTrace);
+      log('Error in GroupsService.canJoinGroup: $error',
+          stackTrace: stackTrace);
       print('GroupsService.canJoinGroup error: $error');
       return false; // Default to false on error for safety
     }
@@ -242,9 +249,64 @@ class GroupsService {
     try {
       return await _repository.getNextJoinAllowedAt(cpId);
     } catch (error, stackTrace) {
-      log('Error in GroupsService.getNextJoinAllowedAt: $error', stackTrace: stackTrace);
+      log('Error in GroupsService.getNextJoinAllowedAt: $error',
+          stackTrace: stackTrace);
       print('GroupsService.getNextJoinAllowedAt error: $error');
       return null; // Default to no restriction on error
+    }
+  }
+
+  /// Promote a member to admin role
+  Future<void> promoteMemberToAdmin({
+    required String groupId,
+    required String cpId,
+  }) async {
+    try {
+      await _repository.promoteMemberToAdmin(
+        groupId: groupId,
+        cpId: cpId,
+      );
+    } catch (error, stackTrace) {
+      log('Error in GroupsService.promoteMemberToAdmin: $error',
+          stackTrace: stackTrace);
+      print('GroupsService.promoteMemberToAdmin error: $error');
+      rethrow;
+    }
+  }
+
+  /// Demote an admin to member role
+  Future<void> demoteMemberToMember({
+    required String groupId,
+    required String cpId,
+  }) async {
+    try {
+      await _repository.demoteMemberToMember(
+        groupId: groupId,
+        cpId: cpId,
+      );
+    } catch (error, stackTrace) {
+      log('Error in GroupsService.demoteMemberToMember: $error',
+          stackTrace: stackTrace);
+      print('GroupsService.demoteMemberToMember error: $error');
+      rethrow;
+    }
+  }
+
+  /// Remove a member from the group
+  Future<void> removeMemberFromGroup({
+    required String groupId,
+    required String cpId,
+  }) async {
+    try {
+      await _repository.removeMemberFromGroup(
+        groupId: groupId,
+        cpId: cpId,
+      );
+    } catch (error, stackTrace) {
+      log('Error in GroupsService.removeMemberFromGroup: $error',
+          stackTrace: stackTrace);
+      print('GroupsService.removeMemberFromGroup error: $error');
+      rethrow;
     }
   }
 
@@ -253,7 +315,8 @@ class GroupsService {
     try {
       return await _repository.findGroupByJoinCode(joinCode);
     } catch (error, stackTrace) {
-      log('Error in GroupsService.findGroupByJoinCode: $error', stackTrace: stackTrace);
+      log('Error in GroupsService.findGroupByJoinCode: $error',
+          stackTrace: stackTrace);
       print('GroupsService.findGroupByJoinCode error: $error');
       return null;
     }

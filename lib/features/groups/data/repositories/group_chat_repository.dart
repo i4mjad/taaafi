@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import '../../domain/entities/group_message_entity.dart';
 import '../datasources/group_messages_firestore_datasource.dart';
@@ -27,17 +28,29 @@ abstract class GroupChatRepository {
   /// Hide a message (moderation action)
   Future<void> hideMessage(String groupId, String messageId);
 
+  /// Unhide a message (moderation action)
+  Future<void> unhideMessage(String groupId, String messageId);
+
   /// Clear cache for performance management
   void clearCache(String groupId);
 
   /// Clear all cache
   void clearAllCache();
 
+  /// Get DocumentSnapshot by message ID for pagination
+  DocumentSnapshot? getDocumentSnapshot(String messageId);
+
   /// Get sender display name respecting anonymity (from cache)
   String getSenderDisplayName(String cpId);
 
   /// Get sender avatar color (consistent per user)
   Color getSenderAvatarColor(String cpId);
+
+  /// Get sender anonymity status
+  bool getSenderAnonymity(String cpId);
+
+  /// Get sender avatar URL (for non-anonymous users)
+  String? getSenderAvatarUrl(String cpId);
 
   /// Clear profile cache for specific user (when profile is updated)
   void clearProfileCache(String cpId);
@@ -110,10 +123,14 @@ class GroupChatRepositoryImpl implements GroupChatRepository {
   ) async {
     try {
       // Convert domain params to data layer params
+      DocumentSnapshot? startAfterDoc;
+      if (params.startAfterId != null) {
+        startAfterDoc = _dataSource.getDocumentSnapshot(params.startAfterId!);
+      }
+
       final dataParams = MessagePaginationParams(
         limit: params.limit,
-        startAfter:
-            null, // TODO: Would need to store DocumentSnapshot for true pagination
+        startAfter: startAfterDoc, // Use cached DocumentSnapshot for pagination
         descending: params.descending,
       );
 
@@ -173,6 +190,17 @@ class GroupChatRepositoryImpl implements GroupChatRepository {
   }
 
   @override
+  Future<void> unhideMessage(String groupId, String messageId) async {
+    try {
+      await _dataSource.unhideMessage(groupId, messageId);
+      log('Message unhidden via repository: $messageId');
+    } catch (e, stackTrace) {
+      log('Error unhiding message via repository: $e', stackTrace: stackTrace);
+      rethrow;
+    }
+  }
+
+  @override
   void clearCache(String groupId) {
     _dataSource.clearCache(groupId);
     log('Cache cleared via repository for group $groupId');
@@ -185,12 +213,17 @@ class GroupChatRepositoryImpl implements GroupChatRepository {
   }
 
   @override
+  DocumentSnapshot? getDocumentSnapshot(String messageId) {
+    return _dataSource.getDocumentSnapshot(messageId);
+  }
+
+  @override
   String getSenderDisplayName(String cpId) {
     if (_dataSource is GroupMessagesFirestoreDataSource) {
       return (_dataSource as GroupMessagesFirestoreDataSource)
           .getSenderDisplayName(cpId);
     }
-    return 'عضو مجهول'; // Fallback
+    return 'مجهول'; // Fallback
   }
 
   @override
@@ -200,6 +233,24 @@ class GroupChatRepositoryImpl implements GroupChatRepository {
           .getSenderAvatarColor(cpId);
     }
     return Colors.blue; // Fallback
+  }
+
+  @override
+  bool getSenderAnonymity(String cpId) {
+    if (_dataSource is GroupMessagesFirestoreDataSource) {
+      return (_dataSource as GroupMessagesFirestoreDataSource)
+          .getSenderAnonymity(cpId);
+    }
+    return true; // Fallback
+  }
+
+  @override
+  String? getSenderAvatarUrl(String cpId) {
+    if (_dataSource is GroupMessagesFirestoreDataSource) {
+      return (_dataSource as GroupMessagesFirestoreDataSource)
+          .getSenderAvatarUrl(cpId);
+    }
+    return null; // Fallback
   }
 
   @override

@@ -61,9 +61,21 @@ abstract class GroupsDataSource {
     required String cpId,
   });
 
+  /// Demote an admin to member role
+  Future<void> demoteMemberToMember({
+    required String groupId,
+    required String cpId,
+  });
+
+  /// Remove a member from the group (set membership as inactive)
+  Future<void> removeMemberFromGroup({
+    required String groupId,
+    required String cpId,
+  });
+
   /// Mark a group as inactive/deleted
   Future<void> markGroupAsInactive(String groupId);
-  
+
   /// Find group by join code
   Future<GroupModel?> findGroupByJoinCode(String joinCode);
 }
