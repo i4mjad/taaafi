@@ -1207,6 +1207,18 @@ async function createDeletionAuditRecord(
   }
 }
 
+// Import group message notification functions
+import { 
+  sendGroupMessageNotification, 
+  updateNotificationSubscriptions 
+} from './groupMessageNotifications';
+
+// Export group message notification functions
+export { 
+  sendGroupMessageNotification,
+  updateNotificationSubscriptions
+};
+
 // Community Notification Triggers
 
 // Trigger when a new comment is created
