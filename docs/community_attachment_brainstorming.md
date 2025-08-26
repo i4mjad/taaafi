@@ -1,120 +1,245 @@
-### Goal
-Introduce extensible attachments for community posts with initial types: image, poll, and support group invitation. Creation is Plus-only; viewing is allowed for everyone (with type-specific actions possibly gated).
+### Community Attachments Implementation Playbook (for AI agent)
 
-### Constraints and principles
-- Extensibility first: adding new types without breaking existing ones.
-- Backward compatible: old posts unaffected.
-- Small, indexable post documents; keep heavy payloads in storage/subcollections.
-- Strong client-side UX + server-side enforcement (rules).
-- Clear Plus gating in UI and security rules.
+#### Scope and decisions
+- Attachments allowed only on posts (not comments) at launch.
+- One attachment type per post. Limits:
+  - Images: up to 4 (JPEG/PNG only, 5MB each)
+  - Poll: 1 per post (2–4 options; question and options ≤100 chars; single/multi selectable; voters can change vote; results shown immediately to voters; shown to non‑voters only after poll closes; author/admin can close early)
+  - Group invite: 1 per post; specific existing group; invite issuer must be a current member; reuse group general join code; has expiry; auto‑revoke all invites if inviter leaves the group; join logic enforces gender/capacity/cooldown at click time
+- Creation gated to Plus users. Viewing available to all. Feature‑level ban support required (ban, not feature flag).
+- Images: client‑side crop/compress; HEIC → JPEG; target max dimension 512px; client‑side thumbnail generation.
 
-### Current state (relevant)
-- Post storage: no attachments fields in `forumPosts`.
-- DTO: `PostFormData` contains `attachmentUrls` and validation hooks; not wired end-to-end.
-- Attachment model: `PostAttachment` exists with type, URL, metadata, etc., but is not integrated.
-- Composer: `NewPostScreen` builds `PostFormData` without attachments.
-- Rendering: `PostContentWidget` and `ThreadsPostCard` render title/body; no attachment surface.
-- Gating: `checkFeatureAccess` and Plus subscription services exist and are used for post creation.
+### Data model and storage
 
-### Data and schema plan
-- Post document changes:
-  - Add a compact field: attachmentsSummary (array of small objects with id, type, displayName, thumbnailUrl, minimal metadata). Bounded by a small maximum per post (e.g., 3).
-  - Add attachmentTypes (array of strings) for quick filtering/badging and indexes.
-  - Keep body/title unchanged.
-- Attachment storage:
-  - For light types (poll, group invite): store as small objects either embedded in attachmentsSummary payload or in a `forumPosts/{postId}/attachments/{attachmentId}` subcollection. Prefer subcollection to avoid bloating the post document and to support future expansion.
-  - For images: store files in Cloud Storage; attachment record stores storage path, download URL, dimensions, size, and a server-generated thumbnail URL.
-- Versioning:
-  - Each attachment carries a schemaVersion and a type. Unknown types are ignored by the client but kept in storage for forward-compat.
-- Indexing:
-  - Add Firestore index for queries on attachmentTypes if needed (e.g., listing posts with polls).
+- Post document (collection: `forumPosts`):
+  - New fields:
+    - `attachmentsSummary`: array of small objects per attachment containing: `id`, `type`, `thumbnailUrl` (if any), and minimal display metadata (e.g., `title` for poll/question, `groupName` for invite); cap to the effective limits per type.
+    - `attachmentTypes`: array of strings listing the present types (e.g., ["image"] or ["poll"]).
+    - `pendingAttachments`: boolean; `attachmentsFinalizedAt`: timestamp (for reliable multi‑step creation).
+  - Keep `title`/`body`/`category` unchanged.
 
-### Attachment types v1
-- Image:
-  - Payload: storage path, url, width/height, size, thumbnailUrl, content hash.
-  - Limits: max items per post, max file size, accepted formats.
+- Attachments subcollection per post: `forumPosts/{postId}/attachments`
+  - Common fields: `id` (attachment id), `type` ("image" | "poll" | "group_invite"), `schemaVersion`, `createdAt`, `createdByCpId`, `status` ("active"|"expired"|"revoked"|"deleted").
+  - Image attachment: `storagePath`, `downloadUrl`, `width`, `height`, `sizeBytes`, `thumbnailUrl`, `contentHash`.
+  - Poll attachment:
+    - Static: `question`, `options` (array of objects containing `id` and `text`), `selectionMode` ("single"|"multi"), `closesAt` (optional), `ownerCpId`.
+    - Aggregates: `totalVotes`, `optionCounts` (array of counts), `isClosed`.
+    - Votes subcollection: `forumPosts/{postId}/pollVotes/{cpId}` with voter’s current selections.
+  - Group invite attachment:
+    - `inviterCpId`, `groupId`, `groupSnapshot` (name, gender, capacity, memberCount, joinMethod, plusOnly), `inviteJoinCode` (group’s general code/deep link), `expiresAt`, `status`.
+
+- Storage layout
+  - Bucket path: `community_posts/{postId}/images/{timestamp}_{rand}.jpg`
+  - Client generates thumbnails and uploads them under `.../thumbnails/...`.
+
+- Identifiers
+  - `attachmentId` derived from postId + timestamp + random suffix. `attachmentsSummary[].id` must match the subdoc id.
+
+### Client architecture and providers
+
+- Providers (augment existing in `lib/features/community/presentation/providers/forum_providers.dart`):
+  - Replace or supersede `attachmentUrlsProvider` with a typed `postAttachmentsProvider` holding:
+    - attachmentType selected (one of image|poll|group_invite), and a typed payload list (images up to 4, poll definition, or group invite definition).
+  - Continue using `postCreationProvider` for submission, extended to handle multi‑step finalize.
+  - Use `hasActiveSubscriptionProvider` (from `lib/features/plus/data/notifiers/subscription_notifier.g.dart`) for Plus gating. Use `feature_access_guard` for ban checks to show the right UI feedback.
+
+- Services/repository flow
+  - `ForumService.createPost` remains the entry point; after creating the core post document (with `pendingAttachments = true` if attachments selected), perform:
+    1) For images: upload files (client‑compressed), create attachment subdocs, build `attachmentsSummary`.
+    2) For poll: create poll attachment doc; initialize aggregates.
+    3) For group invite: create invite attachment doc with group snapshot, join code, and expiry.
+  - Finalize by updating post: `attachmentsSummary`, `attachmentTypes`, `pendingAttachments = false`, `attachmentsFinalizedAt = now`.
+  - Ensure idempotency: if retrying after partial failure, re‑check existing subdocs by id and reconcile `attachmentsSummary`.
+
+- Attachment registry pattern
+  - Central registry maps `type` to:
+    - validator (limits and per‑type business rules),
+    - composer widget builder,
+    - renderer for list and detail,
+    - serializer/deserializer for subdocs and summary entries.
+  - Registry isolation allows adding new types later without touching core flows.
+
+### Composer UX (Threads‑style)
+
+- Entry surface: `NewPostScreen` tray beneath the text field (or floating bar above keyboard):
+  - Actions: Add Images, Create Poll, Invite to Group.
+  - When non‑Plus users tap any action:
+    - Use `hasActiveSubscriptionProvider` to check; if false, render a `premium_blur_overlay` over the tray and show an upsell via `premium_cta_button`.
+    - Optionally wrap tap with `FeatureAccessGuard` for ban UX and snackbars.
+  - Enforce single attachment type per post: if a type is already selected, the other actions are disabled/greyed out with tooltip text.
+  - Attachments preview:
+    - Images: 2x2 grid thumbnails (size ~72dp; 8dp spacing; rounded corners 8dp).
+    - Poll: small card with question (1 line, ellipsized), chips for options (no interaction here), a “Poll” badge.
+    - Invite: card with group avatar/initial, name (1 line), gender badge, capacity snapshot, “Invite” badge; Plus‑only group indicated with a small Plus icon/badge.
+
+- Image flow:
+  - Picker: allow selecting up to 4 images; enforce format (JPEG/PNG) and size (≤5MB).
+  - Crop & compress: present crop UI; compress to target 512px max dimension; convert HEIC to JPEG.
+  - Show thumbnails; allow removal.
+
+- Poll flow:
+  - Form: question (≤100 chars), options list (2 to 4 entries), toggle for single/multi select, optional close date/time.
+  - Real‑time validation; show character counters.
+
+- Group invite flow:
+  - Group selector shows only groups where current CP is an active member; single pick.
+  - Populate snapshot details; show computed expiry; indicate Plus‑only group if applicable.
+
+### Rendering (list + detail)
+
+- Post list (`lib/features/community/presentation/widgets/threads_post_card.dart`):
+  - Below body, render compact attachment preview based on `attachmentsSummary`:
+    - Images: thumbnail grid (lazy images).
+    - Poll: small pill/badge row with icon and question excerpt.
+    - Invite: small card row with group name and status.
+  - Keep existing layout, typography via `TextStyles` and colors via `AppTheme`.
+
+- Post detail (`lib/features/community/presentation/widgets/post_content_widget.dart`):
+  - Render attachments below the body.
+  - Full attachment widgets:
+    - Images: responsive grid with pinch‑to‑zoom on tap (open viewer).
+    - Poll: vote UI (single/multi); voters see live results; non‑voters see results only after close; allow changing vote; show close banner if closed.
+    - Invite: “Join group” button; on tap, run join checks; show bottom sheet reasons if blocked (gender, capacity, cooldown, plus‑only).
+  - If an attachment was moderated and removed, show a small “Attachment removed” placeholder.
+
+### Gating and bans
+
+- Plus creation:
+  - Gate composer actions by `hasActiveSubscriptionProvider`. For non‑Plus, blur overlay and CTA. Keep viewing accessible to all.
+- Feature‑level ban:
+  - Use `FeatureAccessGuard` helpers with distinct names (e.g., `community_post_attachments`, `community_post_poll`, `community_post_group_invite`) for ban messaging only (default allow).
+- Security enforcement (conceptual rules):
+  - Only the post author (via `authorCPId`) whose `communityProfiles/{cpId}.isPlusUser == true` can write attachments for their post.
+  - Poll votes: 1 vote doc per CP; updates allowed (overwrites selection).
+  - Group invite create: only if inviter is a current member of the target group.
+  - Everyone can read attachments.
+
+### Notifications
+
+- Push notifications only:
+  - Poll: created (contextual, if you notify followers), closed (to commenters or followers, per your policy), and to poll author when someone votes.
+  - Group invite: created (contextual) and to invite creator when a user joins via that invite’s context; attribution via attachment id or deep link params.
+  - No batching/rate‑limit per your direction.
+
+### Analytics
+
+- Instrument via analytics layer:
+  - startedAttachmentFlow, addedImage(count, sizes), createdPoll(type, optionsCount, closesAt set?), invitedToGroup(groupId, plusOnly), votePoll(postId, pollId, choiceCount), joinedGroupFromInvite(postId, inviteId), attachmentUploadFailed(type, reason), attachmentRendered(type, surface=list|detail).
+  - Include `isPlusUser`, `attachmentType`, `finalizeLatencyMs`, and join rejection reasons (gender/capacity/cooldown/plusOnly).
+
+### Admin and moderation
+
+- Admin panel capabilities (operational flows):
+  - Locate a post and list attachments; remove individual attachments; post updates its `attachmentsSummary`.
+  - Polls: force close; view aggregated results.
+  - Invites: revoke; show inviter and attribution metrics (joins).
+  - Global search across attachments by type/status/postId/cpId; bulk revoke/remove; audit trail.
+
+### Cloud Functions (ops)
+
+- Post delete: cascade delete subcollection docs and Storage files.
+- Poll votes: on write, recompute aggregates and store to poll attachment doc.
+- Invite maintenance:
+  - On CP membership change (inviter leaves a group), expire all their invites for that group.
+  - Scheduled job to expire invites past `expiresAt`.
+
+### Localization
+
+Add keys in `lib/i18n/en_translations.dart` and `lib/i18n/ar_translations.dart`:
+- Attachment composer and errors:
+  - new‑attachment, attachments‑plus‑only, attachments‑type‑already‑selected, attachments‑limit‑reached, image‑format‑not‑allowed, image‑too‑large, image‑processing‑failed
 - Poll:
-  - Payload: question, options (2–6), multipleChoice flag, closesAt (optional), results summary (redundant counters), and owner CP id.
-  - Votes are records in a `pollVotes` subcollection under the post to avoid concurrent counter issues; maintain aggregated counts in the poll doc; enforce one vote per CP (security rules).
-  - Editing: disallow edits after first vote; allow closing.
-- Support group invitation:
-  - Payload: target groupId, display snapshot (name, capacity, memberCount, gender), joinMethod, plusOnly flag, optional joinCode token or deep link.
-  - Action button opens group detail/join flow; enforce gender, capacity, cooldown, and Plus checks via existing groups services.
+  - poll, poll‑question, poll‑options, poll‑single‑select, poll‑multi‑select, poll‑close‑at, poll‑closed, poll‑vote, poll‑change‑vote, poll‑results‑hidden‑until‑vote, poll‑results‑hidden‑until‑close
+- Group invite:
+  - group‑invite, group‑invite‑expired, group‑invite‑revoked, group‑invite‑join, group‑invite‑plus‑only, group‑invite‑member‑left
+- Join rejections (bottom sheet reasons):
+  - join‑blocked‑gender, join‑blocked‑capacity, join‑blocked‑cooldown, join‑blocked‑plus‑only
+- Moderation placeholder:
+  - attachment‑removed
+- Upsell:
+  - upgrade‑to‑plus, plus‑features‑attachments
+- Generic:
+  - finalizing‑attachments, attachments‑failed‑retry, post‑creation‑restricted, feature‑access‑restricted
 
-### Client architecture
-- Attachment registry:
-  - A central registry mapping type → serializer/deserializer, validator, composer UI, and renderer widget. New types register themselves without touching core flows.
-- Composer changes (`NewPostScreen` and providers):
-  - Attachments tray: buttons for Add Image, Add Poll, Invite to Group.
-  - Show active attachments as chips/cards with remove/edit actions.
-  - Plus gating: the tray and actions are visible but gated; clicking when not Plus opens a premium CTA; if user upgrades, enable in-session.
-  - Validation: per-type validation + global constraints (max attachments, mixed-type rules such as one poll per post and one group invite per post).
-  - Submission: create post first, then upload attachments (images to storage), then create attachment docs in subcollection, finally write attachmentsSummary to post doc. Use an atomic pattern: write post with a pendingAttachments flag; once all attachments are created, write a finalize flag and summary. This avoids large single writes and allows robust retries.
-- Rendering:
-  - Post list (`ThreadsPostCard`): read attachmentsSummary to show a compact preview (e.g., image thumbnail grid, poll badge with counts, group invite card header).
-  - Post detail (`PostContentWidget` + a new attachment renderer): render full attachment components by fetching subcollection docs. Lazy-load images and poll results.
-  - Deep links: tapping a group invite navigates to the group detail/join surface. Tapping a poll opens voting UI if open, otherwise results.
-- Error handling:
-  - Resilient uploads with retry and cancellation; show per-attachment error states.
-  - If any attachment fails, allow post to publish with partial attachments or prompt to retry; ensure consistency (e.g., don’t show poll badge if poll creation failed).
+Provide Arabic equivalents consistent with your tone and existing keys.
 
-### Plus gating
-- UI gating:
-  - Guard the attachments tray via `checkFeatureAccess` with a new feature key (e.g., postAttachments).
-  - Specific sub-features can be individually gated (e.g., polls vs. group invites) via dedicated feature keys to roll out gradually.
-- Server-side gating:
-  - Firestore rules: only Plus users may write to attachments subcollections and attachmentsSummary fields. Everyone can read.
-  - Poll votes: allowed for all users; optionally restrict to authenticated CPs.
-  - Group invite acceptance: separate from attachments; groups services already enforce Plus and gender constraints as needed.
+### Theming and shared widgets
 
-### Validation and moderation
-- Client validation:
-  - Extend the existing post validation service to validate attachments per type and total counts.
-- Security:
-  - Firestore rules validate allowed attachment types, sizes (via metadata), and that the creator matches the post author.
-  - Poll votes rules ensure one vote per CP per poll.
-- Moderation:
-  - Provide admin capability to remove an attachment or entire post; removing an attachment updates attachmentsSummary.
-  - Image moderation pipeline (optional for v1): basic MIME/size checks now, image scanning later.
+- Use `AppTheme.of(context)` colors and `TextStyles` to match current visuals.
+- Shared widgets:
+  - `lib/core/shared_widgets/premium_blur_overlay.dart`: overlay the composer attachments tray when non‑Plus.
+  - `lib/core/shared_widgets/premium_cta_button.dart`: CTA in upsell modal/sheet.
+  - `lib/core/shared_widgets/action_modal.dart`: poll creation and invite selection flows.
+  - `lib/core/shared_widgets/snackbar.dart`: show errors and success toasts.
+  - `lib/core/shared_widgets/container.dart`: cards and list tiles container styling to keep consistent radii and padding.
 
-### Analytics and telemetry
-- Track: startedAttachmentFlow, addedImage, createdPoll, invitedToGroup, votePoll, joinedGroupFromInvite, attachmentUploadFailed, attachmentRendered.
-- Correlate to Plus conversion events from the CTA.
+### Testing plan
 
-### Performance and UX
-- Keep post list lean using attachmentsSummary only; load detailed attachments on demand in post detail to minimize reads.
-- Thumbnails for images; pre-generate via Cloud Function or client-side before upload.
-- Pagination unaffected; attachments are lazy.
+- Unit tests (Dart):
+  - Attachment validation per type (limits, formats, sizes).
+  - Poll rules: options bounds; single vs multi; close time handling.
+  - Attachments registry: serialization/deserialization to/from summary and subdocs.
+  - Post finalize logic: pending → finalized; idempotent retries (re‑running creation preserves consistent state).
+  - Join logic mapping: invite status derivation (active/expired/revoked) given inviter membership, expiresAt, and group snapshot.
 
-### Backward compatibility and migration
-- Existing posts: no changes required.
-- `attachmentUrls` in form data: deprecated in favor of typed attachments; continue to support reading it as image attachments for a short transition window if it’s used anywhere.
+- Integration tests (app):
+  - Composer:
+    - Non‑Plus user sees blur overlay + upsell; cannot add attachments.
+    - Plus user can add 1–4 images; over 4 blocked; >5MB blocked; HEIC converted; thumbnails visible.
+    - Poll creation validates character limits, options count; multi‑select toggle; optional close time.
+    - Invite flow lists only user’s current group; invite created; expiry honored.
+  - Post creation:
+    - With images: post creates, thumbnails in list, full images in detail; finalize completes and `attachmentsSummary` present.
+    - With poll: voters can vote; can change vote; non‑voters can’t see results until close; author can close early.
+    - With invite: join succeeds if allowed; otherwise proper bottom sheet reason shown.
+  - Moderation:
+    - Remove attachment → placeholder appears; summary updates; detail hides content.
+  - Notifications:
+    - Poll created/closed notifications received; author receives vote notifications.
+    - Invite creator receives join notifications.
+  - Analytics:
+    - Verify key events fire with expected parameters.
 
-### Admin/ops
-- Update admin schema docs to add attachments and poll subcollections.
-- Admin panel: display, remove attachments; show poll statistics and close polls.
+- Security rules tests:
+  - Only Plus post author can create attachments for their post.
+  - Everyone can read.
+  - Poll vote write: 1 doc per CP; updates allowed; others rejected.
+  - Invite creation: only when inviter is a member of target group.
 
-### Phased rollout
-- Phase 1: image attachments only (Plus-gated), with attachmentsSummary and subcollection writes; post list previews; detail renders.
-- Phase 2: support group invitations; integrate with groups join flows and constraints.
-- Phase 3: polls; voting subcollection, real-time updates, closing logic.
-- Phase 4: security-hardening, image moderation, and extended feature flags.
+- Cloud Functions tests:
+  - Post delete triggers cleanup (subdocs + Storage).
+  - Vote aggregation updates counts.
+  - Inviter leaves group → all invites to that group by inviter expire.
+  - Scheduled expiry marks overdue invites as expired.
 
-### Testing
-- Unit tests: serialization/deserialization, validators, attachment registry.
-- Integration tests: composer add/remove flows, submit with retries, rendering in list/detail, group invite join, poll voting.
-- Rules tests: Plus-only writes, poll vote constraints.
+### Delivery checklist (no code, actions sequence)
 
-### Risks and mitigations
-- Large post document size: mitigate by keeping attachmentsSummary small and moving payloads to subcollections.
-- Partial failures: finalize step and idempotent attachment creation with retries.
-- Abuse of polls or invites: rate limit attachment creation per user and per type; add admin tools to disable features rapidly via remote config.
+- Data:
+  - Add post fields: `attachmentsSummary`, `attachmentTypes`, `pendingAttachments`, `attachmentsFinalizedAt`.
+  - Create attachments subcollection and pollVotes.
+  - Define Storage paths and naming.
+- Client:
+  - Implement typed `postAttachmentsProvider`, one attachment type per post.
+  - Update composer UI (tray, previews, forms) with non‑Plus UX overlay and CTA.
+  - Submission pipeline: post → attachments → finalize, with retries and idempotency.
+  - List/detail rendering using summary previews and full renderers.
+  - Moderation placeholder UI.
+- Gating:
+  - Wire `hasActiveSubscriptionProvider` for Plus creation checks.
+  - Add ban keys and wrap relevant taps in `FeatureAccessGuard`/`SmartFeatureGuard`.
+- Ops:
+  - Implement Cloud Functions for cleanup, poll aggregation, and invite maintenance.
+- Notifications:
+  - Add triggers for poll create/close/vote and invite → join.
+- Analytics:
+  - Emit all agreed events with attachment attribution.
+- Localization:
+  - Add keys and translations in both English and Arabic.
+- Docs/admin:
+  - Update admin panel instructions for list/remove, close poll, revoke invite, and audit.
 
-- I have a clear plan for adding attachments with an attachment registry, attachments subcollection, and a compact summary on posts, with Plus gating on creation and full read access for all. I’ll apply this in the post composer, repository/service layer, rendering, rules, and analytics in phases to limit risk.
-
-- Key edits you’ll see:
-  - Add attachmentsSummary and attachmentTypes to post docs; create `forumPosts/{postId}/attachments/*` and `pollVotes` subcollections.
-  - Integrate a typed attachment registry.
-  - Wire composer to create and manage attachments; finalize writes.
-  - Enforce Plus-only creation with UI guard and security rules.
-  - Render previews in `ThreadsPostCard` and full content in post detail.
+### What you gain with `attachmentsSummary` + subcollection
+- Minimal post doc size and fast feed reads.
+- Lazy load heavy data in detail.
+- Flexible for future attachment types.
+- Easier moderation and cleanup.
