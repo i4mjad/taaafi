@@ -1213,10 +1213,20 @@ import {
   updateNotificationSubscriptions 
 } from './groupMessageNotifications';
 
+// Import group member management notification functions
+import { 
+  sendMemberManagementNotification
+} from './groupMemberManagementNotifications';
+
 // Export group message notification functions
 export { 
   sendGroupMessageNotification,
   updateNotificationSubscriptions
+};
+
+// Export group member management notification functions
+export {
+  sendMemberManagementNotification
 };
 
 // Community Notification Triggers
