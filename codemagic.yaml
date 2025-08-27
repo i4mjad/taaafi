@@ -37,7 +37,7 @@ workflows:
           shorebird release android --flutter-version=3.32.5 \
             --build-name=$VERSION \
             --build-number=$BUILD_NUMBER \
-            --target lib/main_prod.dart
+            --target lib/main.dart
       
     artifacts:
       - build/**/outputs/**/*.aab
@@ -234,7 +234,7 @@ workflows:
         script: |
           shorebird patch android \
             --release-version="$RELEASE_VERSION" \
-            --target lib/main_prod.dart
+            --target lib/main.dart
     artifacts:
       - build/**/outputs/**/*.aab
       - flutter_drive.log
@@ -317,7 +317,7 @@ workflows:
         script: |
           shorebird patch android \
             --release-version="$ANDROID_RELEASE_VERSION" \
-            --target lib/main_prod.dart
+            --target lib/main.dart
 
       - name: Shorebird Patch iOS
         script: |
@@ -417,7 +417,7 @@ workflows:
           shorebird release android --flutter-version=3.32.5 \
             --build-name=$VERSION \
             --build-number=$ANDROID_BUILD_NUMBER \
-            --target lib/main_prod.dart
+            --target lib/main.dart
 
       - name: Shorebird Release iOS
         script: |
