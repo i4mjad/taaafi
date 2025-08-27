@@ -7,6 +7,7 @@ import 'package:reboot_app_3/features/community/data/repositories/forum_reposito
 import 'package:reboot_app_3/features/community/domain/services/post_validation_service.dart';
 import 'package:reboot_app_3/features/community/data/exceptions/forum_exceptions.dart';
 import 'package:reboot_app_3/features/community/application/gender_interaction_validator.dart';
+import 'package:reboot_app_3/features/community/application/attachment_image_service.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/features/community/data/models/post_attachment_data.dart';
 import 'package:reboot_app_3/features/community/data/models/attachment.dart';
@@ -46,6 +47,7 @@ class ForumService {
   final FirebaseAuth _auth;
   final FirebaseFirestore _firestore;
   final GenderInteractionValidator _genderValidator;
+  final AttachmentImageService _imageService;
 
   /// Creates a new ForumService instance
   ///
@@ -59,6 +61,7 @@ class ForumService {
     this._auth,
     this._firestore,
     this._genderValidator,
+    this._imageService,
   );
 
   /// Helper method to get community profile ID from user mapping
@@ -171,7 +174,8 @@ class ForumService {
 
       // 8. Create attachments if provided
       if (hasAttachments && attachmentData != null) {
-        await _createAndFinalizeAttachments(postId, attachmentData, authorCPId, localizations);
+        await _createAndFinalizeAttachments(
+            postId, attachmentData, authorCPId, localizations);
       }
 
       // 9. Log the action for analytics
@@ -787,7 +791,7 @@ class ForumService {
     }
   }
 
-  /// Creates image attachments
+  /// Creates image attachments with Firebase Storage upload
   Future<void> _createImageAttachments(
     String postId,
     ImageAttachmentData imageData,
@@ -795,36 +799,52 @@ class ForumService {
     List<Map<String, dynamic>> summaryList,
     List<String> typesList,
   ) async {
-    for (final image in imageData.images) {
-      // TODO: Implement actual image upload to Firebase Storage
-      // For now, create placeholder attachment data
-      final attachmentId = '${DateTime.now().millisecondsSinceEpoch}_${image.id}';
-      
-      final imageAttachment = ImageAttachment(
-        id: attachmentId,
-        schemaVersion: '1.0',
-        createdAt: DateTime.now(),
-        createdByCpId: authorCpId,
-        status: 'active',
-        storagePath: 'community_posts/$postId/images/${image.fileName ?? 'image.jpg'}',
-        downloadUrl: image.localPath, // TODO: Replace with actual uploaded URL
-        width: image.width ?? 512,
-        height: image.height ?? 512,
-        sizeBytes: image.sizeBytes ?? 1024,
-        thumbnailUrl: image.thumbnailPath ?? image.localPath,
-        contentHash: 'placeholder_hash', // TODO: Generate actual hash
-      );
+    if (imageData.images.isEmpty) return;
 
-      await _repository.createAttachment(
+    try {
+      // Upload all images to Firebase Storage
+      final uploadedImages = await _imageService.uploadImages(
         postId: postId,
-        attachmentData: imageAttachment.toFirestore(),
+        images: imageData.images,
+        onProgress: (current, total, fileName) {
+          // Progress tracking can be handled by UI layer
+          // For now, just continue silently
+        },
       );
 
-      summaryList.add(imageAttachment.toSummary());
-    }
+      // Create attachment documents for each uploaded image
+      for (final uploadedImage in uploadedImages) {
+        final attachmentId =
+            '${DateTime.now().millisecondsSinceEpoch}_${uploadedImage.id}';
 
-    if (imageData.images.isNotEmpty) {
+        final imageAttachment = ImageAttachment(
+          id: attachmentId,
+          schemaVersion: '1.0',
+          createdAt: DateTime.now(),
+          createdByCpId: authorCpId,
+          status: 'active',
+          storagePath: uploadedImage.storagePath,
+          downloadUrl: uploadedImage.downloadUrl,
+          width: uploadedImage.width,
+          height: uploadedImage.height,
+          sizeBytes: uploadedImage.sizeBytes,
+          thumbnailUrl: uploadedImage.thumbnailUrl,
+          contentHash: uploadedImage.contentHash,
+        );
+
+        await _repository.createAttachment(
+          postId: postId,
+          attachmentData: imageAttachment.toFirestore(),
+        );
+
+        summaryList.add(imageAttachment.toSummary());
+      }
+
       typesList.add('image');
+    } catch (e) {
+      // Clean up any temporary files on failure
+      await _imageService.cleanupTempFiles(imageData.images);
+      rethrow;
     }
   }
 
@@ -837,7 +857,7 @@ class ForumService {
     List<String> typesList,
   ) async {
     final attachmentId = '${DateTime.now().millisecondsSinceEpoch}_poll';
-    
+
     final pollAttachment = PollAttachment(
       id: attachmentId,
       schemaVersion: '1.0',
@@ -845,7 +865,9 @@ class ForumService {
       createdByCpId: authorCpId,
       status: 'active',
       question: pollData.question,
-      options: pollData.options.map((opt) => PollOption(id: opt.id, text: opt.text)).toList(),
+      options: pollData.options
+          .map((opt) => PollOption(id: opt.id, text: opt.text))
+          .toList(),
       selectionMode: pollData.isMultiSelect ? 'multi' : 'single',
       closesAt: pollData.closesAt,
       ownerCpId: authorCpId,
@@ -872,7 +894,7 @@ class ForumService {
     List<String> typesList,
   ) async {
     final attachmentId = '${DateTime.now().millisecondsSinceEpoch}_invite';
-    
+
     final groupSnapshot = GroupSnapshot(
       name: inviteData.groupName,
       gender: inviteData.groupGender,
@@ -881,7 +903,7 @@ class ForumService {
       joinMethod: inviteData.joinMethod,
       plusOnly: inviteData.groupPlusOnly,
     );
-    
+
     final inviteAttachment = GroupInviteAttachment(
       id: attachmentId,
       schemaVersion: '1.0',
@@ -891,7 +913,8 @@ class ForumService {
       inviterCpId: authorCpId,
       groupId: inviteData.groupId,
       groupSnapshot: groupSnapshot,
-      inviteJoinCode: 'placeholder_join_code', // TODO: Get actual group join code
+      inviteJoinCode:
+          'placeholder_join_code', // TODO: Get actual group join code
       expiresAt: DateTime.now().add(const Duration(days: 30)), // 30 days expiry
     );
 

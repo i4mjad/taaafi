@@ -19,6 +19,7 @@ import 'package:reboot_app_3/features/community/application/gender_interaction_v
 import 'package:reboot_app_3/features/community/presentation/providers/community_providers_new.dart';
 import 'package:reboot_app_3/features/community/domain/entities/community_profile_entity.dart';
 import 'package:reboot_app_3/features/community/data/models/post_attachment_data.dart';
+import 'package:reboot_app_3/features/community/application/attachment_image_service.dart';
 import 'dart:math' as math;
 
 /// Helper method to get community profile ID from user UID
@@ -138,8 +139,9 @@ final forumServiceProvider = Provider<ForumService>((ref) {
   final auth = ref.watch(firebaseAuthProvider);
   final firestore = ref.watch(firestoreProvider);
   final genderValidator = ref.watch(genderInteractionValidatorProvider);
-  return ForumService(
-      repository, validationService, auth, firestore, genderValidator);
+  final imageService = ref.watch(attachmentImageServiceProvider);
+  return ForumService(repository, validationService, auth, firestore,
+      genderValidator, imageService);
 });
 
 // Gender Filtering Service Provider
@@ -383,7 +385,8 @@ final anonymousPostProvider = StateProvider<bool>((ref) {
 });
 
 // Post Attachments Provider - replaces attachmentUrlsProvider
-final postAttachmentsProvider = StateNotifierProvider<PostAttachmentsNotifier, PostAttachmentsState>((ref) {
+final postAttachmentsProvider =
+    StateNotifierProvider<PostAttachmentsNotifier, PostAttachmentsState>((ref) {
   return PostAttachmentsNotifier();
 });
 
@@ -1797,7 +1800,7 @@ class PostAttachmentsNotifier extends StateNotifier<PostAttachmentsState> {
   /// Sets the attachment type (enforces one type per post)
   void setAttachmentType(AttachmentType type) {
     if (state.selectedType == type) return;
-    
+
     // Clear previous attachment data when switching types
     state = PostAttachmentsState(selectedType: type);
   }
@@ -1812,7 +1815,7 @@ class PostAttachmentsNotifier extends StateNotifier<PostAttachmentsState> {
     if (state.selectedType != AttachmentType.image) {
       setAttachmentType(AttachmentType.image);
     }
-    
+
     state = state.copyWith(
       attachmentData: ImageAttachmentData(images: images),
     );
@@ -1841,7 +1844,8 @@ class PostAttachmentsNotifier extends StateNotifier<PostAttachmentsState> {
     if (state.attachmentData is! ImageAttachmentData) return;
 
     final imageData = state.attachmentData as ImageAttachmentData;
-    final updatedImages = imageData.images.where((img) => img.id != imageId).toList();
+    final updatedImages =
+        imageData.images.where((img) => img.id != imageId).toList();
 
     if (updatedImages.isEmpty) {
       clearAttachments();
@@ -1857,7 +1861,7 @@ class PostAttachmentsNotifier extends StateNotifier<PostAttachmentsState> {
     if (state.selectedType != AttachmentType.poll) {
       setAttachmentType(AttachmentType.poll);
     }
-    
+
     state = state.copyWith(attachmentData: pollData);
   }
 
@@ -1924,7 +1928,7 @@ class PostAttachmentsNotifier extends StateNotifier<PostAttachmentsState> {
     if (state.selectedType != AttachmentType.groupInvite) {
       setAttachmentType(AttachmentType.groupInvite);
     }
-    
+
     state = state.copyWith(attachmentData: inviteData);
   }
 }
