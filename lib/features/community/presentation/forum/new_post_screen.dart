@@ -295,33 +295,22 @@ class _NewPostScreenState extends ConsumerState<NewPostScreen> {
             ),
           ),
 
-          // Right side actions
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Info icon for validation guidelines
-              Container(
-                width: 36,
-                height: 36,
-                decoration: BoxDecoration(
-                  color: theme.grey[100],
-                  borderRadius: BorderRadius.circular(18),
-                ),
-                child: IconButton(
-                  onPressed: () => _showValidationInfoModal(),
-                  icon: Icon(Icons.info_outline, size: 20),
-                  style: IconButton.styleFrom(
-                    foregroundColor: theme.grey[600],
-                    padding: EdgeInsets.zero,
-                  ),
-                ),
+          // Info icon for validation guidelines
+          Container(
+            width: 36,
+            height: 36,
+            decoration: BoxDecoration(
+              color: theme.grey[100],
+              borderRadius: BorderRadius.circular(18),
+            ),
+            child: IconButton(
+              onPressed: () => _showValidationInfoModal(),
+              icon: Icon(Icons.info_outline, size: 20),
+              style: IconButton.styleFrom(
+                foregroundColor: theme.grey[600],
+                padding: EdgeInsets.zero,
               ),
-
-              const SizedBox(width: 12),
-
-              // Post button
-              _buildPostButton(theme, localizations),
-            ],
+            ),
           ),
         ],
       ),
@@ -746,16 +735,6 @@ class _NewPostScreenState extends ConsumerState<NewPostScreen> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          GestureDetector(
-            onTap: () => _showValidationInfoModal(),
-            child: Icon(
-              LucideIcons.badgeInfo,
-              size: 20,
-              color: theme.primary[600],
-            ),
-          ),
-          horizontalSpace(Spacing.points8),
-          
           // Attachment previews (if any)
           if (attachmentState.attachmentData != null) ...[
             _buildAttachmentPreviewChip(theme, localizations, attachmentState),
@@ -788,6 +767,9 @@ class _NewPostScreenState extends ConsumerState<NewPostScreen> {
                 () => _handleAttachmentTap(AttachmentType.groupInvite),
                 isSelected: attachmentState.selectedType == AttachmentType.groupInvite,
               ),
+              horizontalSpace(Spacing.points16),
+              // Post button
+              _buildPostButton(theme, localizations),
             ],
           ),
         ],
