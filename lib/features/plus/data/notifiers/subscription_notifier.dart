@@ -131,6 +131,86 @@ class SubscriptionNotifier extends _$SubscriptionNotifier {
     final repository = ref.read(subscriptionRepositoryProvider);
     await repository.debugEntitlementFetching();
   }
+
+  /// Test cross-platform subscription functionality
+  /// This helps debug scenarios where users subscribed on one platform but are using another
+  Future<void> testCrossPlatformSubscription() async {
+    print('\n🌐 === CROSS-PLATFORM SUBSCRIPTION TEST ===');
+
+    try {
+      final repository = ref.read(subscriptionRepositoryProvider);
+
+      // Step 1: Check if current platform has configuration issues
+      print('Step 1 - Platform Configuration Check:');
+      final hasPlatformIssues =
+          await repository.hasPlatformConfigurationIssues();
+      print('  - Platform has configuration issues: $hasPlatformIssues');
+
+      if (hasPlatformIssues) {
+        print(
+            '  ⚠️  This platform cannot fetch products - testing cross-platform subscription access...');
+      } else {
+        print('  ✅ Platform configuration is working normally');
+      }
+
+      // Step 2: Test subscription status fetching with cross-platform support
+      print('Step 2 - Cross-Platform Subscription Status:');
+      final subscriptionInfo = await repository.getSubscriptionStatus();
+
+      print('  - Subscription Status: ${subscriptionInfo.status}');
+      print('  - Is Active: ${subscriptionInfo.isActive}');
+      print('  - Product ID: ${subscriptionInfo.productId}');
+      print('  - Expiration: ${subscriptionInfo.expirationDate}');
+      print(
+          '  - Available Packages: ${subscriptionInfo.availablePackages?.length ?? 0}');
+
+      // Step 3: Test entitlement check
+      print('Step 3 - Entitlement Check:');
+      final hasEntitlement = subscriptionInfo.hasEntitlement('taaafi_plus');
+      final hasActiveSubscription = await repository.hasActiveSubscription();
+
+      print('  - Has taaafi_plus entitlement: $hasEntitlement');
+      print('  - hasActiveSubscription(): $hasActiveSubscription');
+
+      // Step 4: Analysis and recommendations
+      print('Step 4 - Cross-Platform Analysis:');
+
+      if (hasPlatformIssues && hasActiveSubscription) {
+        print('  ✅ SUCCESS: User has valid cross-platform subscription');
+        print(
+            '  📱 Subscription from another platform is being recognized correctly');
+      } else if (hasPlatformIssues && !hasActiveSubscription) {
+        print(
+            '  ⚠️  Platform configuration issues detected and no active subscription found');
+        print(
+            '  🔧 If user reports having a subscription, check RevenueCat dashboard');
+      } else if (!hasPlatformIssues && hasActiveSubscription) {
+        print('  ✅ SUCCESS: Normal subscription working correctly');
+      } else {
+        print('  📝 No active subscription detected (expected for free users)');
+      }
+
+      // Step 5: User action recommendations
+      print('Step 5 - User Action Recommendations:');
+      if (hasPlatformIssues && hasActiveSubscription) {
+        print(
+            '  - User can access premium features despite platform config issues');
+        print('  - New purchases may not be available on this platform');
+        print(
+            '  - Recommend using the original platform for subscription management');
+      } else if (hasPlatformIssues && !hasActiveSubscription) {
+        print(
+            '  - Recommend using "Restore Purchases" to sync cross-platform subscription');
+        print(
+            '  - If still not working, user may need to use original platform');
+      }
+    } catch (e, stackTrace) {
+      print('❌ CROSS-PLATFORM TEST ERROR: $e');
+      print('Stack trace: $stackTrace');
+    }
+
+    print('=== END CROSS-PLATFORM SUBSCRIPTION TEST ===\n');
+  }
 }
 
 // User-aware subscription status provider that invalidates when user changes

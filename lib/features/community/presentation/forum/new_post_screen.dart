@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:figma_squircle/figma_squircle.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -25,6 +26,9 @@ import 'package:reboot_app_3/features/account/data/app_features_config.dart';
 import 'package:reboot_app_3/features/community/data/models/post_attachment_data.dart';
 import 'package:reboot_app_3/features/plus/data/notifiers/subscription_notifier.dart';
 import 'package:reboot_app_3/features/plus/presentation/taaafi_plus_features_list_screen.dart';
+import 'package:reboot_app_3/features/community/application/attachment_image_service.dart';
+import 'package:reboot_app_3/features/groups/providers/filtered_public_groups_provider.dart';
+import 'package:reboot_app_3/features/groups/domain/entities/group_entity.dart';
 
 /// Screen for creating a new forum post
 ///
@@ -737,7 +741,7 @@ class _NewPostScreenState extends ConsumerState<NewPostScreen> {
         children: [
           // Attachment previews (if any)
           if (attachmentState.attachmentData != null) ...[
-            _buildAttachmentPreviewChip(theme, localizations, attachmentState),
+            _buildDetailedAttachmentPreview(theme, localizations, attachmentState),
             horizontalSpace(Spacing.points8),
           ],
           
@@ -804,64 +808,310 @@ class _NewPostScreenState extends ConsumerState<NewPostScreen> {
     );
   }
 
-  /// Builds a small attachment preview chip
-  Widget _buildAttachmentPreviewChip(
+  /// Builds detailed attachment preview
+  Widget _buildDetailedAttachmentPreview(
     CustomThemeData theme,
     AppLocalizations localizations,
     PostAttachmentsState attachmentState,
   ) {
-    String label;
-    IconData icon;
-    
     switch (attachmentState.selectedType) {
       case AttachmentType.image:
-        final imageData = attachmentState.attachmentData as ImageAttachmentData?;
-        label = '${imageData?.images.length ?? 0} images';
-        icon = LucideIcons.image;
-        break;
+        return _buildImagePreview(theme, localizations, attachmentState);
       case AttachmentType.poll:
-        label = 'Poll';
-        icon = LucideIcons.barChart3;
-        break;
+        return _buildPollPreview(theme, localizations, attachmentState);
       case AttachmentType.groupInvite:
-        label = 'Group invite';
-        icon = LucideIcons.users;
-        break;
+        return _buildGroupInvitePreview(theme, localizations, attachmentState);
       default:
         return const SizedBox.shrink();
     }
-    
+  }
+
+  /// Builds image attachment preview with thumbnails
+  Widget _buildImagePreview(
+    CustomThemeData theme,
+    AppLocalizations localizations,
+    PostAttachmentsState attachmentState,
+  ) {
+    final imageData = attachmentState.attachmentData as ImageAttachmentData?;
+    if (imageData == null || imageData.images.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      constraints: const BoxConstraints(maxWidth: 200),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header with count and clear button
+          Row(
+            children: [
+              Icon(LucideIcons.image, size: 16, color: theme.primary[600]),
+              const SizedBox(width: 6),
+              Text(
+                '${imageData.images.length} image${imageData.images.length > 1 ? 's' : ''}',
+                style: TextStyles.small.copyWith(
+                  color: theme.primary[600],
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const Spacer(),
+              GestureDetector(
+                onTap: _clearAttachments,
+                child: Container(
+                  padding: const EdgeInsets.all(2),
+                  decoration: BoxDecoration(
+                    color: theme.primary[100],
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    LucideIcons.x,
+                    size: 12,
+                    color: theme.primary[600],
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 6),
+          // Image thumbnails
+          Wrap(
+            spacing: 4,
+            runSpacing: 4,
+            children: imageData.images.take(4).map((image) {
+              return Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(6),
+                  color: theme.grey[200],
+                  image: image.thumbnailPath != null
+                      ? DecorationImage(
+                          image: FileImage(File(image.thumbnailPath!)),
+                          fit: BoxFit.cover,
+                        )
+                      : null,
+                ),
+                child: image.thumbnailPath == null
+                    ? Icon(
+                        LucideIcons.image,
+                        size: 16,
+                        color: theme.grey[500],
+                      )
+                    : null,
+              );
+            }).toList(),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Builds poll attachment preview
+  Widget _buildPollPreview(
+    CustomThemeData theme,
+    AppLocalizations localizations,
+    PostAttachmentsState attachmentState,
+  ) {
+    final pollData = attachmentState.attachmentData as PollAttachmentData?;
+    if (pollData == null) {
+      return const SizedBox.shrink();
+    }
+
+    return Container(
+      constraints: const BoxConstraints(maxWidth: 250),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: theme.primary[50],
-        borderRadius: BorderRadius.circular(6),
-        border: Border.all(color: theme.primary[200]!),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: theme.primary[100]!),
       ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(
-            icon,
-            size: 12,
-            color: theme.primary[600],
+          // Header with poll icon and clear button
+          Row(
+            children: [
+              Icon(LucideIcons.barChart3, size: 16, color: theme.primary[600]),
+              const SizedBox(width: 6),
+              Text(
+                'Poll',
+                style: TextStyles.small.copyWith(
+                  color: theme.primary[600],
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const Spacer(),
+              GestureDetector(
+                onTap: _clearAttachments,
+                child: Container(
+                  padding: const EdgeInsets.all(2),
+                  decoration: BoxDecoration(
+                    color: theme.primary[100],
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    LucideIcons.x,
+                    size: 12,
+                    color: theme.primary[600],
+                  ),
+                ),
+              ),
+            ],
           ),
-          const SizedBox(width: 4),
+          const SizedBox(height: 8),
+          // Poll question
           Text(
-            label,
-            style: TextStyles.small.copyWith(
-              color: theme.primary[600],
-              fontWeight: FontWeight.w500,
+            pollData.question.isNotEmpty ? pollData.question : 'Poll question',
+            style: TextStyles.caption.copyWith(
+              color: theme.grey[700],
+              fontWeight: FontWeight.w600,
             ),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
           ),
-          const SizedBox(width: 4),
-          GestureDetector(
-            onTap: () => _clearAttachments(),
-            child: Icon(
-              LucideIcons.x,
-              size: 12,
-              color: theme.primary[600],
+          const SizedBox(height: 6),
+          // Options preview
+          ...pollData.options.take(2).map((option) => Padding(
+                padding: const EdgeInsets.only(bottom: 2),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 4,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: theme.primary[400],
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    Expanded(
+                      child: Text(
+                        option.text,
+                        style: TextStyles.small.copyWith(
+                          color: theme.grey[600],
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
+              )),
+          if (pollData.options.length > 2)
+            Text(
+              '+${pollData.options.length - 2} more options',
+              style: TextStyles.small.copyWith(
+                color: theme.primary[600],
+                fontStyle: FontStyle.italic,
+              ),
             ),
+        ],
+      ),
+    );
+  }
+
+  /// Builds group invite attachment preview
+  Widget _buildGroupInvitePreview(
+    CustomThemeData theme,
+    AppLocalizations localizations,
+    PostAttachmentsState attachmentState,
+  ) {
+    final groupData = attachmentState.attachmentData as GroupInviteAttachmentData?;
+    if (groupData == null) {
+      return const SizedBox.shrink();
+    }
+
+    return Container(
+      constraints: const BoxConstraints(maxWidth: 200),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: theme.success[50],
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: theme.success[100]!),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header with group icon and clear button
+          Row(
+            children: [
+              Icon(LucideIcons.users, size: 16, color: theme.success[600]),
+              const SizedBox(width: 6),
+              Text(
+                'Group Invite',
+                style: TextStyles.small.copyWith(
+                  color: theme.success[600],
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const Spacer(),
+              GestureDetector(
+                onTap: _clearAttachments,
+                child: Container(
+                  padding: const EdgeInsets.all(2),
+                  decoration: BoxDecoration(
+                    color: theme.success[100],
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    LucideIcons.x,
+                    size: 12,
+                    color: theme.success[600],
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          // Group info
+          Row(
+            children: [
+              // Group avatar
+              Container(
+                width: 24,
+                height: 24,
+                decoration: BoxDecoration(
+                  color: theme.success[100],
+                  shape: BoxShape.circle,
+                ),
+                child: Center(
+                  child: Text(
+                    groupData.groupName.isNotEmpty 
+                        ? groupData.groupName[0].toUpperCase() 
+                        : 'G',
+                    style: TextStyles.small.copyWith(
+                      color: theme.success[700],
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      groupData.groupName,
+                      style: TextStyles.small.copyWith(
+                        color: theme.success[700],
+                        fontWeight: FontWeight.w600,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    Text(
+                      '${groupData.groupGender} • ${groupData.groupMemberCount}/${groupData.groupCapacity}',
+                      style: TextStyles.small.copyWith(
+                        color: theme.success[600],
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -915,43 +1165,58 @@ class _NewPostScreenState extends ConsumerState<NewPostScreen> {
   }
 
   /// Attachment action handlers (for Plus users)
-  void _handleImageAttachment() {
-    // TODO: Implement image picker modal
-    // For now, add a simple placeholder
-    ref.read(postAttachmentsProvider.notifier).setAttachmentType(AttachmentType.image);
-    getSuccessSnackBar(context, 'Image attachment selected (placeholder)');
+  void _handleImageAttachment() async {
+    try {
+      final imageService = ref.read(attachmentImageServiceProvider);
+      final images = await imageService.pickImages(maxImages: 4);
+      
+      if (images.isNotEmpty) {
+        ref.read(postAttachmentsProvider.notifier).updateImages(images);
+      }
+    } catch (e) {
+      getErrorSnackBar(context, 'Failed to select images');
+    }
   }
 
   void _handlePollAttachment() {
-    // TODO: Implement poll creation modal
-    // For now, add a simple placeholder with sample data
-    ref.read(postAttachmentsProvider.notifier).setAttachmentType(AttachmentType.poll);
-    ref.read(postAttachmentsProvider.notifier).updatePollQuestion('Sample poll question?');
-    ref.read(postAttachmentsProvider.notifier).updatePollOptions([
-      PollOptionData(id: '1', text: 'Option 1'),
-      PollOptionData(id: '2', text: 'Option 2'),
-    ]);
-    getSuccessSnackBar(context, 'Poll attachment created (placeholder)');
+    _showPollCreationModal();
   }
 
   void _handleGroupInviteAttachment() {
-    // TODO: Implement group selector modal
-    // For now, add a simple placeholder with sample data
-    ref.read(postAttachmentsProvider.notifier).setAttachmentType(AttachmentType.groupInvite);
-    final sampleGroupData = GroupInviteAttachmentData(
-      groupId: 'sample_group_id',
-      groupName: 'Sample Group',
-      groupGender: 'Mixed',
-      groupCapacity: 10,
-      groupMemberCount: 5,
-      joinMethod: 'code_only',
-      groupPlusOnly: false,
-    );
-    ref.read(postAttachmentsProvider.notifier).updateGroupInvite(sampleGroupData);
-    getSuccessSnackBar(context, 'Group invite created (placeholder)');
+    _showGroupInviteModal();
   }
 
+  /// Shows poll creation modal
+  void _showPollCreationModal() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      useSafeArea: true,
+      builder: (context) => _PollCreationModal(
+        onPollCreated: (pollData) {
+          ref.read(postAttachmentsProvider.notifier).updatePoll(pollData);
+          Navigator.of(context).pop();
+        },
+      ),
+    );
+  }
 
+  /// Shows group invite modal
+  void _showGroupInviteModal() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      useSafeArea: true,
+      builder: (context) => _GroupInviteModal(
+        onGroupSelected: (groupData) {
+          ref.read(postAttachmentsProvider.notifier).updateGroupInvite(groupData);
+          Navigator.of(context).pop();
+        },
+      ),
+    );
+  }
 
   /// Shows the category selector modal
   void _showCategorySelector(
@@ -1431,5 +1696,504 @@ class _NewPostScreenState extends ConsumerState<NewPostScreen> {
   void _toggleAnonymity() {
     final current = ref.read(anonymousPostProvider);
     ref.read(anonymousPostProvider.notifier).state = !current;
+  }
+}
+
+/// Poll Creation Modal Widget
+class _PollCreationModal extends ConsumerStatefulWidget {
+  final Function(PollAttachmentData) onPollCreated;
+  
+  const _PollCreationModal({required this.onPollCreated});
+
+  @override
+  ConsumerState<_PollCreationModal> createState() => _PollCreationModalState();
+}
+
+class _PollCreationModalState extends ConsumerState<_PollCreationModal> {
+  final _questionController = TextEditingController();
+  final List<TextEditingController> _optionControllers = [
+    TextEditingController(),
+    TextEditingController(),
+  ];
+  bool _isMultiSelect = false;
+  DateTime? _closesAt;
+
+  @override
+  void dispose() {
+    _questionController.dispose();
+    for (var controller in _optionControllers) {
+      controller.dispose();
+    }
+    super.dispose();
+  }
+
+  bool get _isValid {
+    if (_questionController.text.trim().isEmpty) return false;
+    final validOptions = _optionControllers
+        .where((controller) => controller.text.trim().isNotEmpty)
+        .length;
+    return validOptions >= 2;
+  }
+
+  void _addOption() {
+    if (_optionControllers.length < 4) {
+      setState(() {
+        _optionControllers.add(TextEditingController());
+      });
+    }
+  }
+
+  void _removeOption(int index) {
+    if (_optionControllers.length > 2) {
+      setState(() {
+        _optionControllers[index].dispose();
+        _optionControllers.removeAt(index);
+      });
+    }
+  }
+
+  void _createPoll() {
+    if (!_isValid) return;
+
+    final options = _optionControllers
+        .where((controller) => controller.text.trim().isNotEmpty)
+        .map((controller) => PollOptionData(
+              id: DateTime.now().millisecondsSinceEpoch.toString() + 
+                   _optionControllers.indexOf(controller).toString(),
+              text: controller.text.trim(),
+            ))
+        .toList();
+
+    final pollData = PollAttachmentData(
+      question: _questionController.text.trim(),
+      options: options,
+      isMultiSelect: _isMultiSelect,
+      closesAt: _closesAt,
+    );
+
+    widget.onPollCreated(pollData);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = AppTheme.of(context);
+    final localizations = AppLocalizations.of(context);
+
+    return Container(
+      height: MediaQuery.of(context).size.height * 0.85,
+      decoration: BoxDecoration(
+        color: theme.backgroundColor,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      child: Column(
+        children: [
+          // Handle bar
+          Container(
+            width: 40,
+            height: 4,
+            margin: const EdgeInsets.only(top: 12),
+            decoration: BoxDecoration(
+              color: theme.grey[300],
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+          
+          // Header
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              children: [
+                IconButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  icon: Icon(LucideIcons.x),
+                ),
+                Expanded(
+                  child: Text(
+                    'Create Poll',
+                    style: TextStyles.h6.copyWith(
+                      color: theme.grey[900],
+                      fontWeight: FontWeight.w600,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+                TextButton(
+                  onPressed: _isValid ? _createPoll : null,
+                  child: Text(
+                    'Create',
+                    style: TextStyles.footnote.copyWith(
+                      color: _isValid ? theme.primary[600] : theme.grey[400],
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Question input
+                  Text(
+                    'Poll Question',
+                    style: TextStyles.body.copyWith(
+                      color: theme.grey[700],
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  TextField(
+                    controller: _questionController,
+                    maxLength: 100,
+                    maxLines: 2,
+                    decoration: InputDecoration(
+                      hintText: 'Ask your question...',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      counterStyle: TextStyles.caption.copyWith(
+                        color: theme.grey[500],
+                      ),
+                    ),
+                    onChanged: (_) => setState(() {}),
+                  ),
+                  
+                  const SizedBox(height: 24),
+                  
+                  // Options
+                  Text(
+                    'Options',
+                    style: TextStyles.body.copyWith(
+                      color: theme.grey[700],
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  
+                  ..._optionControllers.asMap().entries.map((entry) {
+                    final index = entry.key;
+                    final controller = entry.value;
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 8),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: TextField(
+                              controller: controller,
+                              maxLength: 100,
+                              decoration: InputDecoration(
+                                hintText: 'Option ${index + 1}',
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                counterText: '',
+                                suffixIcon: _optionControllers.length > 2
+                                    ? IconButton(
+                                        icon: Icon(LucideIcons.x, size: 16),
+                                        onPressed: () => _removeOption(index),
+                                      )
+                                    : null,
+                              ),
+                              onChanged: (_) => setState(() {}),
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  }),
+                  
+                  if (_optionControllers.length < 4)
+                    GestureDetector(
+                      onTap: _addOption,
+                      child: Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        decoration: BoxDecoration(
+                          border: Border.all(color: theme.grey[300]!),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(LucideIcons.plus, size: 16, color: theme.primary[600]),
+                            const SizedBox(width: 8),
+                            Text(
+                              'Add Option',
+                              style: TextStyles.body.copyWith(
+                                color: theme.primary[600],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    
+                  const SizedBox(height: 24),
+                  
+                  // Settings
+                  SwitchListTile(
+                    title: Text('Allow multiple selections'),
+                    value: _isMultiSelect,
+                    onChanged: (value) => setState(() => _isMultiSelect = value),
+                  ),
+                  
+                  const SizedBox(height: 16),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Group Invite Modal Widget
+class _GroupInviteModal extends ConsumerWidget {
+  final Function(GroupInviteAttachmentData) onGroupSelected;
+  
+  const _GroupInviteModal({required this.onGroupSelected});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = AppTheme.of(context);
+    final localizations = AppLocalizations.of(context);
+    final groupsAsync = ref.watch(filteredPublicGroupsProvider);
+
+    return Container(
+      height: MediaQuery.of(context).size.height * 0.85,
+      decoration: BoxDecoration(
+        color: theme.backgroundColor,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      child: Column(
+        children: [
+          // Handle bar
+          Container(
+            width: 40,
+            height: 4,
+            margin: const EdgeInsets.only(top: 12),
+            decoration: BoxDecoration(
+              color: theme.grey[300],
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+          
+          // Header
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              children: [
+                IconButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  icon: Icon(LucideIcons.x),
+                ),
+                Expanded(
+                  child: Text(
+                    'Select Group to Invite',
+                    style: TextStyles.h6.copyWith(
+                      color: theme.grey[900],
+                      fontWeight: FontWeight.w600,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+                const SizedBox(width: 48), // Balance the close button
+              ],
+            ),
+          ),
+
+          Expanded(
+            child: groupsAsync.when(
+              data: (groups) {
+                if (groups.isEmpty) {
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          LucideIcons.users,
+                          size: 48,
+                          color: theme.grey[400],
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          'No groups available',
+                          style: TextStyles.body.copyWith(
+                            color: theme.grey[600],
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+
+                return ListView.builder(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  itemCount: groups.length,
+                  itemBuilder: (context, index) {
+                    final group = groups[index];
+                    return _GroupTile(
+                      group: group,
+                      onTap: () {
+                        final groupData = GroupInviteAttachmentData(
+                          groupId: group.id,
+                          groupName: group.name,
+                          groupGender: group.gender,
+                          groupCapacity: group.memberCapacity,
+                          groupMemberCount: group.memberCount,
+                          joinMethod: group.joinMethod,
+                          groupPlusOnly: false, // TODO: Implement Plus-only group logic if needed
+                        );
+                        onGroupSelected(groupData);
+                      },
+                    );
+                  },
+                );
+              },
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (error, _) => Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      LucideIcons.alertCircle,
+                      size: 48,
+                      color: theme.error[500],
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Failed to load groups',
+                      style: TextStyles.body.copyWith(
+                        color: theme.grey[600],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Group tile widget
+class _GroupTile extends StatelessWidget {
+  final GroupEntity group;
+  final VoidCallback onTap;
+  
+  const _GroupTile({required this.group, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = AppTheme.of(context);
+    
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 8),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: theme.grey[50],
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: theme.grey[200]!),
+        ),
+        child: Row(
+          children: [
+            // Group avatar
+            Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                color: theme.primary[100],
+                shape: BoxShape.circle,
+              ),
+              child: Center(
+                child: Text(
+                  group.name.isNotEmpty ? group.name[0].toUpperCase() : 'G',
+                  style: TextStyles.h6.copyWith(
+                    color: theme.primary[700],
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ),
+            
+            const SizedBox(width: 12),
+            
+            // Group info
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          group.name,
+                          style: TextStyles.body.copyWith(
+                            color: theme.grey[900],
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                      // TODO: Add Plus-only group indicator if needed
+                      // if (group.isPlusOnly)
+                      //   Container(
+                      //     padding: const EdgeInsets.symmetric(
+                      //       horizontal: 6,
+                      //       vertical: 2,
+                      //     ),
+                      //     decoration: BoxDecoration(
+                      //       color: const Color(0xFFFEBA01),
+                      //       borderRadius: BorderRadius.circular(4),
+                      //     ),
+                      //     child: Text(
+                      //       'Plus',
+                      //       style: TextStyles.small.copyWith(
+                      //         color: Colors.white,
+                      //         fontWeight: FontWeight.w600,
+                      //       ),
+                      //     ),
+                      //   ),
+                    ],
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    '${group.gender} • ${group.memberCount}/${group.memberCapacity} members',
+                    style: TextStyles.caption.copyWith(
+                      color: theme.grey[600],
+                    ),
+                  ),
+                  if (group.description.isNotEmpty) ...[
+                    const SizedBox(height: 4),
+                    Text(
+                      group.description,
+                      style: TextStyles.caption.copyWith(
+                        color: theme.grey[600],
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ],
+              ),
+            ),
+            
+            Icon(
+              LucideIcons.chevronRight,
+              size: 20,
+              color: theme.grey[500],
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

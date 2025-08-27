@@ -434,7 +434,7 @@ const Map<String, String> kEn = {
   "report_justification_too_long":
       "Report reason is too long (max 500 characters)",
   "submit_report": "Submit Report",
-  "post": "post",
+  "post": "Post",
   "comment": "comment",
   "report_content_type": "Content Type",
   "report_content_id": "Content ID",
@@ -585,16 +585,18 @@ const Map<String, String> kEn = {
   // Attachments - Composer and errors
   "new-attachment": "New Attachment",
   "attachments-plus-only": "Attachments are available for Plus users only",
-  "attachments-type-already-selected": "One attachment type is already selected",
+  "attachments-type-already-selected":
+      "One attachment type is already selected",
   "attachments-limit-reached": "Attachment limit reached",
-  "image-format-not-allowed": "Image format not supported. Please use JPEG or PNG",
+  "image-format-not-allowed":
+      "Image format not supported. Please use JPEG or PNG",
   "image-too-large": "Image is too large. Maximum size is 5MB",
   "image-processing-failed": "Failed to process image",
   "attachment-creation-failed": "Failed to create attachment",
 
   // Poll
   "poll-question": "Poll Question",
-  "poll-options": "Poll Options", 
+  "poll-options": "Poll Options",
   "poll-single-select": "Single Choice",
   "poll-multi-select": "Multiple Choice",
   "poll-close-at": "Close Poll At",
@@ -606,7 +608,7 @@ const Map<String, String> kEn = {
 
   // Group invite
   "group-invite": "Group Invite",
-  "group-invite-expired": "Invite has expired", 
+  "group-invite-expired": "Invite has expired",
   "group-invite-revoked": "Invite has been revoked",
   "group-invite-join": "Join Group",
   "group-invite-plus-only": "This is a Plus-only group",
@@ -617,12 +619,13 @@ const Map<String, String> kEn = {
   "join-blocked-capacity": "This group is at full capacity",
   "join-blocked-cooldown": "You must wait before joining another group",
   "join-blocked-plus-only": "This group requires a Plus subscription",
-  
+
   // Moderation placeholder
   "attachment-removed": "Attachment removed by moderator",
 
   // Upsell
-  "plus-features-attachments": "Add images, polls, and group invites to your posts",
+  "plus-features-attachments":
+      "Add images, polls, and group invites to your posts",
 
   // Generic
   "finalizing-attachments": "Finalizing attachments...",

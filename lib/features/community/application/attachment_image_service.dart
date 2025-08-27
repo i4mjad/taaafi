@@ -35,12 +35,32 @@ class AttachmentImageService {
         );
         if (image != null) selectedImages.add(image);
       } else {
-        final List<XFile> images = await _picker.pickMultiImage(
-          maxWidth: 2048,
-          maxHeight: 2048,
-          imageQuality: 90,
-        );
-        selectedImages = images.take(maxImages).toList();
+        try {
+          // Try multi-image picker first
+          final List<XFile> images = await _picker.pickMultiImage(
+            maxWidth: 2048,
+            maxHeight: 2048,
+            imageQuality: 90,
+          );
+          selectedImages = images.take(maxImages).toList();
+        } catch (e) {
+          // Fallback to single image picker on iOS issues
+          ref.read(errorLoggerProvider).logException(e, StackTrace.current);
+          
+          // Try single image picker as fallback
+          try {
+            final XFile? image = await _picker.pickImage(
+              source: ImageSource.gallery,
+              maxWidth: 2048,
+              maxHeight: 2048,
+              imageQuality: 90,
+            );
+            if (image != null) selectedImages.add(image);
+          } catch (fallbackError) {
+            ref.read(errorLoggerProvider).logException(fallbackError, StackTrace.current);
+            throw Exception('Failed to pick images: Both multi and single image picker failed');
+          }
+        }
       }
       
       if (selectedImages.isEmpty) return [];
