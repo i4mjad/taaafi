@@ -772,22 +772,135 @@ class _NewPostScreenState extends ConsumerState<NewPostScreen> {
   /// Builds the attachment section with tray and previews
   Widget _buildAttachmentSection(
       CustomThemeData theme, AppLocalizations localizations) {
-    final attachmentState = ref.watch(postAttachmentsProvider);
-    final hasActiveSubscription = ref.watch(hasActiveSubscriptionProvider);
+    try {
+      final attachmentState = ref.watch(postAttachmentsProvider);
+      final hasActiveSubscription = ref.watch(hasActiveSubscriptionProvider);
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Attachment previews (if any)
-        if (attachmentState.attachmentData != null)
-          _buildAttachmentPreview(theme, localizations, attachmentState),
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Attachment previews (if any)
+          if (attachmentState.attachmentData != null)
+            _buildAttachmentPreview(theme, localizations, attachmentState),
 
-        if (attachmentState.attachmentData != null)
-          verticalSpace(Spacing.points8),
+          if (attachmentState.attachmentData != null)
+            verticalSpace(Spacing.points8),
 
-        // Attachment actions tray
-        _buildAttachmentTray(theme, localizations, hasActiveSubscription, attachmentState),
-      ],
+          // Attachment actions tray
+          _buildAttachmentTray(theme, localizations, hasActiveSubscription, attachmentState),
+        ],
+      );
+    } catch (e) {
+      // Fallback: Show simple attachment tray
+      print('Attachment section error: $e');
+      return _buildSimpleAttachmentTray(theme, localizations);
+    }
+  }
+
+  /// Simple fallback attachment tray for debugging
+  Widget _buildSimpleAttachmentTray(
+      CustomThemeData theme, AppLocalizations localizations) {
+    return Container(
+      margin: const EdgeInsets.only(top: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        color: theme.grey[50],
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: theme.grey[200]!),
+      ),
+      child: Row(
+        children: [
+          Text(
+            'Attachments',
+            style: TextStyles.caption.copyWith(
+              color: theme.grey[600],
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          const Spacer(),
+          Row(
+            children: [
+              GestureDetector(
+                onTap: () => getSuccessSnackBar(context, 'Image attachment (debug)'),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: theme.primary[100],
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: theme.primary[300]!),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(LucideIcons.image, size: 16, color: theme.primary[600]),
+                      const SizedBox(width: 4),
+                      Text(
+                        'Images',
+                        style: TextStyles.caption.copyWith(
+                          color: theme.primary[600],
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              GestureDetector(
+                onTap: () => getSuccessSnackBar(context, 'Poll attachment (debug)'),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: theme.primary[100],
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: theme.primary[300]!),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(LucideIcons.barChart3, size: 16, color: theme.primary[600]),
+                      const SizedBox(width: 4),
+                      Text(
+                        'Poll',
+                        style: TextStyles.caption.copyWith(
+                          color: theme.primary[600],
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              GestureDetector(
+                onTap: () => getSuccessSnackBar(context, 'Group invite (debug)'),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: theme.primary[100],
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: theme.primary[300]!),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(LucideIcons.users, size: 16, color: theme.primary[600]),
+                      const SizedBox(width: 4),
+                      Text(
+                        'Group',
+                        style: TextStyles.caption.copyWith(
+                          color: theme.primary[600],
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 
