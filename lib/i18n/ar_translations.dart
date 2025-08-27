@@ -605,9 +605,53 @@ const Map<String, String> kAr = {
   "community-profile-visible-message": "يمكن للآخرين رؤية اسمك وملفك",
   "anyone_can_reply": "يمكن لأي شخص الرد",
   "post_created": "تم إنشاء المنشور بنجاح!",
-  "photo_coming_soon": "إرفاق الصور قريبًا",
-  "video_coming_soon": "إرفاق الفيديو قريبًا",
-  "poll_coming_soon": "إنشاء استطلاع الرأي قريبًا",
+
+  // Attachments - Composer and errors
+  "new-attachment": "مرفق جديد",
+  "attachments-plus-only": "المرفقات متاحة لمستخدمي Plus فقط",
+  "attachments-type-already-selected": "تم اختيار نوع مرفق واحد بالفعل",
+  "attachments-limit-reached": "تم الوصول للحد الأقصى للمرفقات",
+  "image-format-not-allowed": "صيغة الصورة غير مدعومة. يرجى استخدام JPEG أو PNG",
+  "image-too-large": "الصورة كبيرة جداً. الحد الأقصى هو 5 ميجابايت",
+  "image-processing-failed": "فشل في معالجة الصورة",
+  "attachment-creation-failed": "فشل في إنشاء المرفق",
+
+  // Poll
+  "poll-question": "سؤال الاستطلاع",
+  "poll-options": "خيارات الاستطلاع", 
+  "poll-single-select": "اختيار واحد",
+  "poll-multi-select": "اختيارات متعددة",
+  "poll-close-at": "إغلاق الاستطلاع في",
+  "poll-closed": "تم إغلاق الاستطلاع",
+  "poll-vote": "صوت",
+  "poll-change-vote": "تغيير التصويت",
+  "poll-results-hidden-until-vote": "صوت لرؤية النتائج",
+  "poll-results-hidden-until-close": "ستظهر النتائج عند إغلاق الاستطلاع",
+
+  // Group invite
+  "group-invite": "دعوة للمجموعة",
+  "group-invite-expired": "انتهت صلاحية الدعوة", 
+  "group-invite-revoked": "تم إلغاء الدعوة",
+  "group-invite-join": "انضم للمجموعة",
+  "group-invite-plus-only": "هذه مجموعة Plus فقط",
+  "group-invite-member-left": "الداعي لم يعد عضواً في المجموعة",
+
+  // Join rejections
+  "join-blocked-gender": "هذه المجموعة لجنس آخر",
+  "join-blocked-capacity": "وصلت المجموعة للحد الأقصى من الأعضاء",
+  "join-blocked-cooldown": "عليك الانتظار قبل الانضمام لمجموعة أخرى",
+  "join-blocked-plus-only": "تتطلب هذه المجموعة اشتراك Plus",
+  
+  // Moderation placeholder
+  "attachment-removed": "تم حذف المرفق من قبل المشرف",
+
+  // Upsell
+  "plus-features-attachments": "أضف صور واستطلاعات ودعوات مجموعات لمنشوراتك",
+
+  // Generic
+  "finalizing-attachments": "جاري إنهاء المرفقات...",
+  "attachments-failed-retry": "فشل في الإرفاق. اضغط للمحاولة مرة أخرى",
+
   "link_coming_soon": "إرفاق الرابط قريبًا",
   "post_title": "عنوان",
   "select_category": "اختر الفئة",

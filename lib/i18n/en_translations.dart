@@ -581,9 +581,53 @@ const Map<String, String> kEn = {
   "community-profile-visible-message": "Others can see your name and profile",
   "anyone_can_reply": "Anyone can reply",
   "post_created": "Post created successfully!",
-  "photo_coming_soon": "Photo attachment coming soon",
-  "video_coming_soon": "Video attachment coming soon",
-  "poll_coming_soon": "Poll creation coming soon",
+
+  // Attachments - Composer and errors
+  "new-attachment": "New Attachment",
+  "attachments-plus-only": "Attachments are available for Plus users only",
+  "attachments-type-already-selected": "One attachment type is already selected",
+  "attachments-limit-reached": "Attachment limit reached",
+  "image-format-not-allowed": "Image format not supported. Please use JPEG or PNG",
+  "image-too-large": "Image is too large. Maximum size is 5MB",
+  "image-processing-failed": "Failed to process image",
+  "attachment-creation-failed": "Failed to create attachment",
+
+  // Poll
+  "poll-question": "Poll Question",
+  "poll-options": "Poll Options", 
+  "poll-single-select": "Single Choice",
+  "poll-multi-select": "Multiple Choice",
+  "poll-close-at": "Close Poll At",
+  "poll-closed": "Poll Closed",
+  "poll-vote": "Vote",
+  "poll-change-vote": "Change Vote",
+  "poll-results-hidden-until-vote": "Vote to see results",
+  "poll-results-hidden-until-close": "Results will be shown when poll closes",
+
+  // Group invite
+  "group-invite": "Group Invite",
+  "group-invite-expired": "Invite has expired", 
+  "group-invite-revoked": "Invite has been revoked",
+  "group-invite-join": "Join Group",
+  "group-invite-plus-only": "This is a Plus-only group",
+  "group-invite-member-left": "Inviter is no longer a member",
+
+  // Join rejections
+  "join-blocked-gender": "This group is for a different gender",
+  "join-blocked-capacity": "This group is at full capacity",
+  "join-blocked-cooldown": "You must wait before joining another group",
+  "join-blocked-plus-only": "This group requires a Plus subscription",
+  
+  // Moderation placeholder
+  "attachment-removed": "Attachment removed by moderator",
+
+  // Upsell
+  "plus-features-attachments": "Add images, polls, and group invites to your posts",
+
+  // Generic
+  "finalizing-attachments": "Finalizing attachments...",
+  "attachments-failed-retry": "Failed to attach. Tap to retry",
+
   "link_coming_soon": "Link attachment coming soon",
   "post_title": "Title",
   "select_category": "Select Category",
