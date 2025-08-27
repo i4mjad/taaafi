@@ -18,6 +18,7 @@ import 'package:reboot_app_3/features/community/application/gender_filtering_ser
 import 'package:reboot_app_3/features/community/application/gender_interaction_validator.dart';
 import 'package:reboot_app_3/features/community/presentation/providers/community_providers_new.dart';
 import 'package:reboot_app_3/features/community/domain/entities/community_profile_entity.dart';
+import 'package:reboot_app_3/features/community/data/models/post_attachment_data.dart';
 import 'dart:math' as math;
 
 /// Helper method to get community profile ID from user UID
@@ -381,7 +382,13 @@ final anonymousPostProvider = StateProvider<bool>((ref) {
   return false;
 });
 
-// Attachment URLs Provider for future implementation
+// Post Attachments Provider - replaces attachmentUrlsProvider
+final postAttachmentsProvider = StateNotifierProvider<PostAttachmentsNotifier, PostAttachmentsState>((ref) {
+  return PostAttachmentsNotifier();
+});
+
+// Legacy Attachment URLs Provider - deprecated, use postAttachmentsProvider instead
+@deprecated
 final attachmentUrlsProvider = StateProvider<List<String>>((ref) {
   return [];
 });
@@ -1773,5 +1780,144 @@ class AddReplyNotifier extends StateNotifier<AsyncValue<void>> {
     } catch (error, stackTrace) {
       state = AsyncValue.error(error, stackTrace);
     }
+  }
+}
+
+/// Notifier for post attachments state management
+class PostAttachmentsNotifier extends StateNotifier<PostAttachmentsState> {
+  PostAttachmentsNotifier() : super(const PostAttachmentsState());
+
+  /// Sets the attachment type (enforces one type per post)
+  void setAttachmentType(AttachmentType type) {
+    if (state.selectedType == type) return;
+    
+    // Clear previous attachment data when switching types
+    state = PostAttachmentsState(selectedType: type);
+  }
+
+  /// Clears all attachments
+  void clearAttachments() {
+    state = const PostAttachmentsState();
+  }
+
+  /// Updates image attachments
+  void updateImages(List<ImageItem> images) {
+    if (state.selectedType != AttachmentType.image) {
+      setAttachmentType(AttachmentType.image);
+    }
+    
+    state = state.copyWith(
+      attachmentData: ImageAttachmentData(images: images),
+    );
+  }
+
+  /// Adds an image to the current images
+  void addImage(ImageItem image) {
+    if (state.selectedType != AttachmentType.image) {
+      setAttachmentType(AttachmentType.image);
+    }
+
+    final currentImages = state.attachmentData is ImageAttachmentData
+        ? (state.attachmentData as ImageAttachmentData).images
+        : <ImageItem>[];
+
+    if (currentImages.length >= 4) return; // Enforce limit of 4 images
+
+    final updatedImages = [...currentImages, image];
+    state = state.copyWith(
+      attachmentData: ImageAttachmentData(images: updatedImages),
+    );
+  }
+
+  /// Removes an image by id
+  void removeImage(String imageId) {
+    if (state.attachmentData is! ImageAttachmentData) return;
+
+    final imageData = state.attachmentData as ImageAttachmentData;
+    final updatedImages = imageData.images.where((img) => img.id != imageId).toList();
+
+    if (updatedImages.isEmpty) {
+      clearAttachments();
+    } else {
+      state = state.copyWith(
+        attachmentData: ImageAttachmentData(images: updatedImages),
+      );
+    }
+  }
+
+  /// Updates poll data
+  void updatePoll(PollAttachmentData pollData) {
+    if (state.selectedType != AttachmentType.poll) {
+      setAttachmentType(AttachmentType.poll);
+    }
+    
+    state = state.copyWith(attachmentData: pollData);
+  }
+
+  /// Updates poll question
+  void updatePollQuestion(String question) {
+    if (state.selectedType != AttachmentType.poll) {
+      setAttachmentType(AttachmentType.poll);
+    }
+
+    final currentPoll = state.attachmentData as PollAttachmentData? ??
+        const PollAttachmentData(
+          question: '',
+          options: [],
+          isMultiSelect: false,
+        );
+
+    state = state.copyWith(
+      attachmentData: currentPoll.copyWith(question: question),
+    );
+  }
+
+  /// Updates poll options
+  void updatePollOptions(List<PollOptionData> options) {
+    if (state.selectedType != AttachmentType.poll) {
+      setAttachmentType(AttachmentType.poll);
+    }
+
+    final currentPoll = state.attachmentData as PollAttachmentData? ??
+        const PollAttachmentData(
+          question: '',
+          options: [],
+          isMultiSelect: false,
+        );
+
+    state = state.copyWith(
+      attachmentData: currentPoll.copyWith(options: options),
+    );
+  }
+
+  /// Updates poll selection mode
+  void updatePollSelectionMode(bool isMultiSelect) {
+    if (state.selectedType != AttachmentType.poll) return;
+    if (state.attachmentData is! PollAttachmentData) return;
+
+    final pollData = state.attachmentData as PollAttachmentData;
+    state = state.copyWith(
+      attachmentData: pollData.copyWith(isMultiSelect: isMultiSelect),
+    );
+  }
+
+  /// Updates poll close time
+  void updatePollCloseTime(DateTime? closesAt) {
+    if (state.selectedType != AttachmentType.poll) return;
+    if (state.attachmentData is! PollAttachmentData) return;
+
+    final pollData = state.attachmentData as PollAttachmentData;
+    state = state.copyWith(
+      attachmentData: pollData.copyWith(closesAt: closesAt),
+    );
+  }
+
+  /// Updates group invite data
+  void updateGroupInvite(GroupInviteAttachmentData inviteData) {
+    if (state.selectedType != AttachmentType.groupInvite) {
+      setAttachmentType(AttachmentType.groupInvite);
+    }
+    
+    state = state.copyWith(attachmentData: inviteData);
   }
 }
