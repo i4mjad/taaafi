@@ -20,6 +20,7 @@ import 'package:reboot_app_3/features/community/presentation/providers/community
 import 'package:reboot_app_3/features/community/domain/entities/community_profile_entity.dart';
 import 'package:reboot_app_3/features/community/data/models/post_attachment_data.dart';
 import 'package:reboot_app_3/features/community/application/attachment_image_service.dart';
+import 'package:reboot_app_3/features/community/application/attachment_group_service.dart';
 import 'dart:math' as math;
 
 /// Helper method to get community profile ID from user UID
@@ -140,8 +141,9 @@ final forumServiceProvider = Provider<ForumService>((ref) {
   final firestore = ref.watch(firestoreProvider);
   final genderValidator = ref.watch(genderInteractionValidatorProvider);
   final imageService = ref.watch(attachmentImageServiceProvider);
+  final groupService = ref.watch(attachmentGroupServiceProvider);
   return ForumService(repository, validationService, auth, firestore,
-      genderValidator, imageService);
+      genderValidator, imageService, groupService);
 });
 
 // Gender Filtering Service Provider

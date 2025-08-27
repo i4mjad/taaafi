@@ -8,6 +8,7 @@ import 'package:reboot_app_3/features/community/domain/services/post_validation_
 import 'package:reboot_app_3/features/community/data/exceptions/forum_exceptions.dart';
 import 'package:reboot_app_3/features/community/application/gender_interaction_validator.dart';
 import 'package:reboot_app_3/features/community/application/attachment_image_service.dart';
+import 'package:reboot_app_3/features/community/application/attachment_group_service.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/features/community/data/models/post_attachment_data.dart';
 import 'package:reboot_app_3/features/community/data/models/attachment.dart';
@@ -48,6 +49,7 @@ class ForumService {
   final FirebaseFirestore _firestore;
   final GenderInteractionValidator _genderValidator;
   final AttachmentImageService _imageService;
+  final AttachmentGroupService _groupService;
 
   /// Creates a new ForumService instance
   ///
@@ -62,6 +64,7 @@ class ForumService {
     this._firestore,
     this._genderValidator,
     this._imageService,
+    this._groupService,
   );
 
   /// Helper method to get community profile ID from user mapping
@@ -885,7 +888,7 @@ class ForumService {
     typesList.add('poll');
   }
 
-  /// Creates group invite attachment
+  /// Creates group invite attachment using real group data
   Future<void> _createGroupInviteAttachment(
     String postId,
     GroupInviteAttachmentData inviteData,
@@ -893,38 +896,25 @@ class ForumService {
     List<Map<String, dynamic>> summaryList,
     List<String> typesList,
   ) async {
-    final attachmentId = '${DateTime.now().millisecondsSinceEpoch}_invite';
+    try {
+      // Use the group service to create a real group invite attachment
+      final groupInviteAttachment = await _groupService.createGroupInviteAttachment(
+        postId: postId,
+        inviterCpId: authorCpId,
+        groupId: inviteData.groupId,
+      );
 
-    final groupSnapshot = GroupSnapshot(
-      name: inviteData.groupName,
-      gender: inviteData.groupGender,
-      capacity: inviteData.groupCapacity,
-      memberCount: inviteData.groupMemberCount,
-      joinMethod: inviteData.joinMethod,
-      plusOnly: inviteData.groupPlusOnly,
-    );
+      await _repository.createAttachment(
+        postId: postId,
+        attachmentData: groupInviteAttachment.toFirestore(),
+      );
 
-    final inviteAttachment = GroupInviteAttachment(
-      id: attachmentId,
-      schemaVersion: '1.0',
-      createdAt: DateTime.now(),
-      createdByCpId: authorCpId,
-      status: 'active',
-      inviterCpId: authorCpId,
-      groupId: inviteData.groupId,
-      groupSnapshot: groupSnapshot,
-      inviteJoinCode:
-          'placeholder_join_code', // TODO: Get actual group join code
-      expiresAt: DateTime.now().add(const Duration(days: 30)), // 30 days expiry
-    );
-
-    await _repository.createAttachment(
-      postId: postId,
-      attachmentData: inviteAttachment.toFirestore(),
-    );
-
-    summaryList.add(inviteAttachment.toSummary());
-    typesList.add('group_invite');
+      summaryList.add(groupInviteAttachment.toSummary());
+      typesList.add('group_invite');
+    } catch (e) {
+      // Re-throw with more context
+      throw Exception('Failed to create group invite attachment: $e');
+    }
   }
 
   /// Reply to a comment
