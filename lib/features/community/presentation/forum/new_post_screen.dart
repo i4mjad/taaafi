@@ -22,6 +22,10 @@ import 'package:reboot_app_3/features/community/presentation/forum/validation_in
 import 'package:reboot_app_3/features/community/presentation/forum/validation_info_modal_preferences.dart';
 import 'package:reboot_app_3/features/account/presentation/widgets/feature_access_guard.dart';
 import 'package:reboot_app_3/features/account/data/app_features_config.dart';
+import 'package:reboot_app_3/features/community/data/models/post_attachment_data.dart';
+import 'package:reboot_app_3/core/shared_widgets/premium_blur_overlay.dart';
+
+import 'package:reboot_app_3/features/plus/data/notifiers/subscription_notifier.dart';
 
 /// Screen for creating a new forum post
 ///
@@ -582,6 +586,11 @@ class _NewPostScreenState extends ConsumerState<NewPostScreen> {
 
           // Content input field
           _buildContentInput(theme, localizations),
+
+          verticalSpace(Spacing.points4),
+
+          // Attachment tray
+          _buildAttachmentSection(theme, localizations),
         ],
       ),
     );
@@ -756,6 +765,605 @@ class _NewPostScreenState extends ConsumerState<NewPostScreen> {
             : isNearLimit
                 ? theme.warn[500]
                 : theme.grey[500],
+      ),
+    );
+  }
+
+  /// Builds the attachment section with tray and previews
+  Widget _buildAttachmentSection(
+      CustomThemeData theme, AppLocalizations localizations) {
+    final attachmentState = ref.watch(postAttachmentsProvider);
+    final hasActiveSubscription = ref.watch(hasActiveSubscriptionProvider);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Attachment previews (if any)
+        if (attachmentState.attachmentData != null)
+          _buildAttachmentPreview(theme, localizations, attachmentState),
+
+        if (attachmentState.attachmentData != null)
+          verticalSpace(Spacing.points8),
+
+        // Attachment actions tray
+        _buildAttachmentTray(theme, localizations, hasActiveSubscription, attachmentState),
+      ],
+    );
+  }
+
+  /// Builds the attachment preview section
+  Widget _buildAttachmentPreview(
+    CustomThemeData theme,
+    AppLocalizations localizations,
+    PostAttachmentsState attachmentState,
+  ) {
+    final attachmentData = attachmentState.attachmentData!;
+
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: theme.grey[50],
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: theme.grey[200]!),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header with type and remove button
+          Row(
+            children: [
+              Icon(
+                _getAttachmentIcon(attachmentState.selectedType),
+                size: 16,
+                color: theme.primary[600],
+              ),
+              const SizedBox(width: 6),
+              Text(
+                _getAttachmentTypeLabel(attachmentState.selectedType, localizations),
+                style: TextStyles.caption.copyWith(
+                  color: theme.primary[600],
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const Spacer(),
+              GestureDetector(
+                onTap: () => _clearAttachments(),
+                child: Container(
+                  padding: const EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    color: theme.grey[200],
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.close,
+                    size: 14,
+                    color: theme.grey[600],
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          // Type-specific preview
+          _buildAttachmentTypePreview(theme, localizations, attachmentData),
+        ],
+      ),
+    );
+  }
+
+  /// Builds the attachment actions tray
+  Widget _buildAttachmentTray(
+    CustomThemeData theme,
+    AppLocalizations localizations,
+    bool isPlus,
+    PostAttachmentsState attachmentState,
+  ) {
+    final hasAttachment = attachmentState.attachmentData != null;
+
+    // Build the tray content
+    Widget trayContent = Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        color: theme.grey[50],
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: theme.grey[200]!),
+      ),
+      child: Row(
+        children: [
+          Text(
+            localizations.translate('new-attachment'),
+            style: TextStyles.caption.copyWith(
+              color: theme.grey[600],
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          const Spacer(),
+          // Attachment action buttons
+          Row(
+            children: [
+              _buildAttachmentActionButton(
+                theme,
+                localizations,
+                LucideIcons.image,
+                'Images',
+                () => _handleImageAttachment(),
+                isEnabled: !hasAttachment || attachmentState.selectedType == AttachmentType.image,
+              ),
+              const SizedBox(width: 12),
+              _buildAttachmentActionButton(
+                theme,
+                localizations,
+                LucideIcons.barChart3,
+                'Poll',
+                () => _handlePollAttachment(),
+                isEnabled: !hasAttachment || attachmentState.selectedType == AttachmentType.poll,
+              ),
+              const SizedBox(width: 12),
+              _buildAttachmentActionButton(
+                theme,
+                localizations,
+                LucideIcons.users,
+                'Group',
+                () => _handleGroupInviteAttachment(),
+                isEnabled: !hasAttachment || attachmentState.selectedType == AttachmentType.groupInvite,
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+
+    // Apply Plus gating if user is not Plus
+    if (!isPlus) {
+      return Stack(
+        children: [
+          trayContent,
+          PremiumBlurOverlay(
+            content: Container(
+              width: double.infinity,
+              height: 56, // Match tray height
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Center(
+                child: TextButton(
+                  onPressed: () => _showPlusUpgradeModal(),
+                  style: TextButton.styleFrom(
+                    backgroundColor: theme.primary[500],
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  ),
+                  child: Text(
+                    localizations.translate('upgrade-to-plus'),
+                    style: TextStyles.caption.copyWith(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            isDarkTheme: MediaQuery.of(context).platformBrightness == Brightness.dark,
+          ),
+        ],
+      );
+    }
+
+    return trayContent;
+  }
+
+  /// Builds an attachment action button
+  Widget _buildAttachmentActionButton(
+    CustomThemeData theme,
+    AppLocalizations localizations,
+    IconData icon,
+    String label,
+    VoidCallback onTap,
+    {bool isEnabled = true}
+  ) {
+    return GestureDetector(
+      onTap: isEnabled ? onTap : null,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        decoration: BoxDecoration(
+          color: isEnabled ? theme.primary[100] : theme.grey[100],
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(
+            color: isEnabled ? theme.primary[300]! : theme.grey[300]!,
+          ),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              icon,
+              size: 16,
+              color: isEnabled ? theme.primary[600] : theme.grey[400],
+            ),
+            const SizedBox(width: 4),
+            Text(
+              label,
+              style: TextStyles.caption.copyWith(
+                color: isEnabled ? theme.primary[600] : theme.grey[400],
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Builds type-specific attachment preview
+  Widget _buildAttachmentTypePreview(
+    CustomThemeData theme,
+    AppLocalizations localizations,
+    AttachmentData attachmentData,
+  ) {
+    switch (attachmentData.runtimeType) {
+      case ImageAttachmentData:
+        final imageData = attachmentData as ImageAttachmentData;
+        return _buildImagePreview(theme, localizations, imageData);
+      case PollAttachmentData:
+        final pollData = attachmentData as PollAttachmentData;
+        return _buildPollPreview(theme, localizations, pollData);
+      case GroupInviteAttachmentData:
+        final groupData = attachmentData as GroupInviteAttachmentData;
+        return _buildGroupInvitePreview(theme, localizations, groupData);
+      default:
+        return const SizedBox.shrink();
+    }
+  }
+
+  /// Builds image attachment preview
+  Widget _buildImagePreview(
+    CustomThemeData theme,
+    AppLocalizations localizations,
+    ImageAttachmentData imageData,
+  ) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          '${imageData.images.length} ${imageData.images.length == 1 ? 'image' : 'images'} selected',
+          style: TextStyles.caption.copyWith(
+            color: theme.grey[700],
+          ),
+        ),
+        const SizedBox(height: 8),
+        SizedBox(
+          height: 60,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            itemCount: imageData.images.length,
+            itemBuilder: (context, index) {
+              final image = imageData.images[index];
+              return Container(
+                margin: const EdgeInsets.only(right: 8),
+                width: 60,
+                height: 60,
+                decoration: BoxDecoration(
+                  color: theme.grey[200],
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Stack(
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: Image.asset(
+                        'assets/images/placeholder.png', // Placeholder for now
+                        width: 60,
+                        height: 60,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                    Positioned(
+                      top: 4,
+                      right: 4,
+                      child: GestureDetector(
+                        onTap: () => _removeImage(index),
+                        child: Container(
+                          width: 20,
+                          height: 20,
+                          decoration: BoxDecoration(
+                            color: Colors.black.withValues(alpha: 0.6),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            Icons.close,
+                            size: 14,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// Builds poll attachment preview
+  Widget _buildPollPreview(
+    CustomThemeData theme,
+    AppLocalizations localizations,
+    PollAttachmentData pollData,
+  ) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (pollData.question.isNotEmpty)
+          Text(
+            pollData.question,
+            style: TextStyles.body.copyWith(
+              color: theme.grey[800],
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        const SizedBox(height: 8),
+        ...pollData.options.map((option) => Container(
+          margin: const EdgeInsets.only(bottom: 4),
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            color: theme.grey[100],
+            borderRadius: BorderRadius.circular(6),
+          ),
+          child: Text(
+            option.text.isEmpty ? 'Option ${pollData.options.indexOf(option) + 1}' : option.text,
+            style: TextStyles.caption.copyWith(
+              color: theme.grey[700],
+            ),
+          ),
+        )),
+        const SizedBox(height: 4),
+        Text(
+          '${pollData.isMultiSelect ? 'Multiple' : 'Single'} choice',
+          style: TextStyles.caption.copyWith(
+            color: theme.grey[600],
+            fontStyle: FontStyle.italic,
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// Builds group invite attachment preview
+  Widget _buildGroupInvitePreview(
+    CustomThemeData theme,
+    AppLocalizations localizations,
+    GroupInviteAttachmentData groupData,
+  ) {
+    return Row(
+      children: [
+        Container(
+          width: 40,
+          height: 40,
+          decoration: BoxDecoration(
+            color: theme.primary[100],
+            shape: BoxShape.circle,
+          ),
+          child: Center(
+            child: Text(
+              groupData.groupName.isNotEmpty ? groupData.groupName[0].toUpperCase() : 'G',
+              style: TextStyles.body.copyWith(
+                color: theme.primary[700],
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                groupData.groupName.isEmpty ? 'Select a group' : groupData.groupName,
+                style: TextStyles.body.copyWith(
+                  color: theme.grey[800],
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              Text(
+                '${groupData.groupGender} • ${groupData.groupMemberCount}/${groupData.groupCapacity} members',
+                style: TextStyles.caption.copyWith(
+                  color: theme.grey[600],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// Helper methods for attachment management
+  void _clearAttachments() {
+    ref.read(postAttachmentsProvider.notifier).clearAttachments();
+  }
+
+  void _removeImage(int index) {
+    ref.read(postAttachmentsProvider.notifier).removeImage(index.toString());
+  }
+
+  IconData _getAttachmentIcon(AttachmentType? type) {
+    switch (type) {
+      case AttachmentType.image:
+        return LucideIcons.image;
+      case AttachmentType.poll:
+        return LucideIcons.barChart3;
+      case AttachmentType.groupInvite:
+        return LucideIcons.users;
+      default:
+        return LucideIcons.paperclip;
+    }
+  }
+
+  String _getAttachmentTypeLabel(AttachmentType? type, AppLocalizations localizations) {
+    switch (type) {
+      case AttachmentType.image:
+        return 'Images';
+      case AttachmentType.poll:
+        return localizations.translate('poll');
+      case AttachmentType.groupInvite:
+        return localizations.translate('group-invite');
+      default:
+        return 'Attachment';
+    }
+  }
+
+  /// Attachment action handlers
+  void _handleImageAttachment() {
+    // TODO: Implement image picker modal
+    // For now, add a simple placeholder
+    ref.read(postAttachmentsProvider.notifier).setAttachmentType(AttachmentType.image);
+    getSuccessSnackBar(context, 'Image attachment selected (placeholder)');
+  }
+
+  void _handlePollAttachment() {
+    // TODO: Implement poll creation modal
+    // For now, add a simple placeholder with sample data
+    ref.read(postAttachmentsProvider.notifier).setAttachmentType(AttachmentType.poll);
+    ref.read(postAttachmentsProvider.notifier).updatePollQuestion('Sample poll question?');
+    ref.read(postAttachmentsProvider.notifier).updatePollOptions([
+      PollOptionData(id: '1', text: 'Option 1'),
+      PollOptionData(id: '2', text: 'Option 2'),
+    ]);
+    getSuccessSnackBar(context, 'Poll attachment created (placeholder)');
+  }
+
+  void _handleGroupInviteAttachment() {
+    // TODO: Implement group selector modal
+    // For now, add a simple placeholder with sample data
+    ref.read(postAttachmentsProvider.notifier).setAttachmentType(AttachmentType.groupInvite);
+    final sampleGroupData = GroupInviteAttachmentData(
+      groupId: 'sample_group_id',
+      groupName: 'Sample Group',
+      groupGender: 'Mixed',
+      groupCapacity: 10,
+      groupMemberCount: 5,
+      joinMethod: 'code_only',
+      groupPlusOnly: false,
+    );
+    ref.read(postAttachmentsProvider.notifier).updateGroupInvite(sampleGroupData);
+    getSuccessSnackBar(context, 'Group invite created (placeholder)');
+  }
+
+  void _showPlusUpgradeModal() {
+    final theme = AppTheme.of(context);
+    final localizations = AppLocalizations.of(context);
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: theme.backgroundColor,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) => Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            // Icon
+            Container(
+              width: 60,
+              height: 60,
+              decoration: BoxDecoration(
+                color: theme.primary[100],
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                LucideIcons.crown,
+                size: 30,
+                color: theme.primary[600],
+              ),
+            ),
+            const SizedBox(height: 16),
+
+            // Title
+            Text(
+              localizations.translate('upgrade-to-plus'),
+              style: TextStyles.h5.copyWith(
+                color: theme.grey[900],
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: 8),
+
+            // Description
+            Text(
+              localizations.translate('plus-features-attachments'),
+              textAlign: TextAlign.center,
+              style: TextStyles.body.copyWith(
+                color: theme.grey[700],
+              ),
+            ),
+            const SizedBox(height: 24),
+
+            // Upgrade button
+            SizedBox(
+              width: double.infinity,
+              child: TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  // TODO: Navigate to subscription screen
+                  getSuccessSnackBar(context, 'Navigate to Plus subscription');
+                },
+                style: TextButton.styleFrom(
+                  backgroundColor: theme.primary[500],
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                ),
+                child: Text(
+                  localizations.translate('upgrade-to-plus'),
+                  style: TextStyles.footnote.copyWith(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 12),
+
+            // Cancel button
+            SizedBox(
+              width: double.infinity,
+              child: TextButton(
+                onPressed: () => Navigator.pop(context),
+                style: TextButton.styleFrom(
+                  backgroundColor: theme.grey[100],
+                  foregroundColor: theme.grey[700],
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                ),
+                child: Text(
+                  localizations.translate('cancel'),
+                  style: TextStyles.footnote.copyWith(
+                    color: theme.grey[700],
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 8),
+          ],
+        ),
       ),
     );
   }
@@ -1082,11 +1690,20 @@ class _NewPostScreenState extends ConsumerState<NewPostScreen> {
           '   - Content: "${postData.content.substring(0, postData.content.length > 50 ? 50 : postData.content.length)}${postData.content.length > 50 ? '...' : ''}" (${postData.content.length} chars)');
       print('   - Category ID: ${postData.categoryId}');
 
+      // Get attachment data if any
+      final attachmentState = ref.read(postAttachmentsProvider);
+      
+      print('📎 [NewPostScreen] Attachment state: ${attachmentState.selectedType}');
+      if (attachmentState.attachmentData != null) {
+        print('   - Has attachment data: ${attachmentState.attachmentData.runtimeType}');
+      }
+
       // Submit through the provider
       print('🔄 [NewPostScreen] Calling postCreationProvider.createPost...');
       await ref.read(postCreationProvider.notifier).createPost(
             postData,
             AppLocalizations.of(context),
+            attachmentData: attachmentState,
           );
       print(
           '✅ [NewPostScreen] postCreationProvider.createPost completed successfully');
@@ -1215,6 +1832,8 @@ class _NewPostScreenState extends ConsumerState<NewPostScreen> {
     ref.read(anonymousPostProvider.notifier).state = false;
     ref.read(postContentProvider.notifier).state = '';
     ref.read(postCreationProvider.notifier).reset();
+    // Clear attachments
+    ref.read(postAttachmentsProvider.notifier).clearAttachments();
   }
 
   /// Selects a category
