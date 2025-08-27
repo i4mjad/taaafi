@@ -1171,6 +1171,7 @@ class ForumRepository {
     required String content,
     String? categoryId,
     List<String>? attachmentUrls,
+    bool hasAttachments = false,
   }) async {
     try {
       final now = DateTime.now();
@@ -1190,7 +1191,11 @@ class ForumRepository {
         'dislikeCount': 0,
         'createdAt': Timestamp.fromDate(now),
         'updatedAt': null,
-        // Note: attachmentUrls not implemented yet
+        // Attachment fields
+        'attachmentsSummary': <Map<String, dynamic>>[],
+        'attachmentTypes': <String>[],
+        'pendingAttachments': hasAttachments,
+        'attachmentsFinalizedAt': hasAttachments ? null : Timestamp.fromDate(now),
       };
 
       // Add to Firestore and get the document reference
@@ -1796,6 +1801,132 @@ class ForumRepository {
         // Permission denied - likely new profile timing issue, returning empty list
       }
       return [];
+    }
+  }
+
+  // =============================================================================
+  // ATTACHMENT METHODS
+  // =============================================================================
+
+  /// Creates an attachment in the post's subcollection
+  Future<String> createAttachment({
+    required String postId,
+    required Map<String, dynamic> attachmentData,
+  }) async {
+    try {
+      final attachmentRef = _posts
+          .doc(postId)
+          .collection('attachments')
+          .doc();
+      
+      await attachmentRef.set(attachmentData);
+      return attachmentRef.id;
+    } catch (e) {
+      throw Exception('Failed to create attachment: $e');
+    }
+  }
+
+  /// Updates post with finalized attachments
+  Future<void> finalizePostAttachments({
+    required String postId,
+    required List<Map<String, dynamic>> attachmentsSummary,
+    required List<String> attachmentTypes,
+  }) async {
+    try {
+      await _posts.doc(postId).update({
+        'attachmentsSummary': attachmentsSummary,
+        'attachmentTypes': attachmentTypes,
+        'pendingAttachments': false,
+        'attachmentsFinalizedAt': FieldValue.serverTimestamp(),
+      });
+    } catch (e) {
+      throw Exception('Failed to finalize post attachments: $e');
+    }
+  }
+
+  /// Gets attachments for a post
+  Future<List<Map<String, dynamic>>> getPostAttachments(String postId) async {
+    try {
+      final snapshot = await _posts
+          .doc(postId)
+          .collection('attachments')
+          .where('status', isEqualTo: 'active')
+          .get();
+
+      return snapshot.docs
+          .map((doc) => {'id': doc.id, ...doc.data()})
+          .toList();
+    } catch (e) {
+      throw Exception('Failed to get post attachments: $e');
+    }
+  }
+
+  /// Streams attachments for a post
+  Stream<List<Map<String, dynamic>>> watchPostAttachments(String postId) {
+    return _posts
+        .doc(postId)
+        .collection('attachments')
+        .where('status', isEqualTo: 'active')
+        .snapshots()
+        .map((snapshot) => snapshot.docs
+            .map((doc) => {'id': doc.id, ...doc.data()})
+            .toList());
+  }
+
+  /// Creates a poll vote
+  Future<void> createPollVote({
+    required String postId,
+    required String cpId,
+    required List<String> selectedOptionIds,
+  }) async {
+    try {
+      await _posts
+          .doc(postId)
+          .collection('pollVotes')
+          .doc(cpId)
+          .set({
+        'selectedOptionIds': selectedOptionIds,
+        'votedAt': FieldValue.serverTimestamp(),
+      });
+    } catch (e) {
+      throw Exception('Failed to create poll vote: $e');
+    }
+  }
+
+  /// Gets poll votes for a post
+  Future<List<Map<String, dynamic>>> getPollVotes(String postId) async {
+    try {
+      final snapshot = await _posts
+          .doc(postId)
+          .collection('pollVotes')
+          .get();
+
+      return snapshot.docs
+          .map((doc) => {'cpId': doc.id, ...doc.data()})
+          .toList();
+    } catch (e) {
+      throw Exception('Failed to get poll votes: $e');
+    }
+  }
+
+  /// Updates poll aggregates
+  Future<void> updatePollAggregates({
+    required String postId,
+    required String pollAttachmentId,
+    required int totalVotes,
+    required List<int> optionCounts,
+  }) async {
+    try {
+      await _posts
+          .doc(postId)
+          .collection('attachments')
+          .doc(pollAttachmentId)
+          .update({
+        'totalVotes': totalVotes,
+        'optionCounts': optionCounts,
+      });
+    } catch (e) {
+      throw Exception('Failed to update poll aggregates: $e');
     }
   }
 }
