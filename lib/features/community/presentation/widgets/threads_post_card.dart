@@ -14,6 +14,7 @@ import 'package:reboot_app_3/features/community/presentation/providers/community
 import 'package:reboot_app_3/features/community/presentation/providers/forum_providers.dart';
 import 'package:reboot_app_3/features/community/presentation/widgets/report_content_modal.dart';
 import 'package:reboot_app_3/features/community/presentation/widgets/community_profile_modal.dart';
+import 'package:reboot_app_3/features/community/presentation/widgets/attachment_renderers.dart';
 
 import 'package:reboot_app_3/features/community/presentation/widgets/streak_display_widget.dart';
 
@@ -376,6 +377,12 @@ class ThreadsPostCard extends ConsumerWidget {
                         ),
                         maxLines: 3,
                         overflow: TextOverflow.ellipsis,
+                      ),
+
+                      // Attachments (list view)
+                      AttachmentRenderer(
+                        post: post,
+                        isListView: true,
                       ),
 
                       const SizedBox(height: 12),
