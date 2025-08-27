@@ -334,18 +334,96 @@ class _ImageAttachmentRenderer extends StatelessWidget {
     List<Map<String, dynamic>> images,
     int initialIndex,
   ) {
-    // TODO: Implement image viewer modal
+    final theme = AppTheme.of(context);
+    
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Image Viewer'),
-        content: const Text('Image viewer not implemented yet'),
-        actions: [
-          TextButton(
+      builder: (context) => Scaffold(
+        backgroundColor: Colors.black87,
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          leading: IconButton(
+            icon: const Icon(Icons.close, color: Colors.white),
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Close'),
           ),
-        ],
+          title: Text(
+            '${initialIndex + 1} of ${images.length}',
+            style: TextStyles.body.copyWith(color: Colors.white),
+          ),
+        ),
+        body: Center(
+          child: PageView.builder(
+            itemCount: images.length,
+            controller: PageController(initialPage: initialIndex),
+            itemBuilder: (context, index) {
+              final image = images[index];
+              final imageUrl = image['downloadUrl'] ?? image['thumbnailUrl'];
+              
+              return Center(
+                child: imageUrl != null 
+                    ? InteractiveViewer(
+                        child: Image.network(
+                          imageUrl,
+                          fit: BoxFit.contain,
+                          loadingBuilder: (context, child, loadingProgress) {
+                            if (loadingProgress == null) return child;
+                            return Center(
+                              child: CircularProgressIndicator(
+                                value: loadingProgress.expectedTotalBytes != null
+                                    ? loadingProgress.cumulativeBytesLoaded / 
+                                      loadingProgress.expectedTotalBytes!
+                                    : null,
+                                color: Colors.white,
+                              ),
+                            );
+                          },
+                          errorBuilder: (context, error, stackTrace) => Container(
+                            padding: const EdgeInsets.all(16),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  LucideIcons.imageOff,
+                                  size: 48,
+                                  color: theme.grey[400],
+                                ),
+                                const SizedBox(height: 16),
+                                Text(
+                                  'Failed to load image',
+                                  style: TextStyles.body.copyWith(
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      )
+                    : Container(
+                        padding: const EdgeInsets.all(16),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              LucideIcons.image,
+                              size: 48,
+                              color: theme.grey[400],
+                            ),
+                            const SizedBox(height: 16),
+                            Text(
+                              'Image not available',
+                              style: TextStyles.body.copyWith(
+                                color: Colors.white,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+              );
+            },
+          ),
+        ),
       ),
     );
   }
@@ -435,7 +513,12 @@ class _PollAttachmentRenderer extends ConsumerWidget {
     Map<String, dynamic> pollSummary,
     WidgetRef ref,
   ) {
-    // TODO: Load full poll data from attachments subcollection
+    final pollQuestion = pollSummary['title'] ?? 'Poll';
+    final optionCount = pollSummary['optionCount'] ?? 0;
+    final isMultiSelect = pollSummary['isMultiSelect'] ?? false;
+    final isClosed = pollSummary['isClosed'] ?? false;
+    final totalVotes = pollSummary['totalVotes'] ?? 0;
+    
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -446,6 +529,7 @@ class _PollAttachmentRenderer extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Poll header
           Row(
             children: [
               Icon(
@@ -456,21 +540,102 @@ class _PollAttachmentRenderer extends ConsumerWidget {
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
-                  pollSummary['title'] ?? localizations.translate('poll'),
-                  style: TextStyles.bodyLarge.copyWith(
+                  pollQuestion,
+                  style: TextStyles.body.copyWith(
                     color: theme.primary[800],
                     fontWeight: FontWeight.w600,
                   ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              if (isClosed)
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: theme.grey[200],
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: Text(
+                    'Closed',
+                    style: TextStyles.small.copyWith(
+                      color: theme.grey[700],
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+            ],
+          ),
+          
+          const SizedBox(height: 12),
+          
+          // Poll info
+          Row(
+            children: [
+              Text(
+                '$optionCount options',
+                style: TextStyles.caption.copyWith(
+                  color: theme.grey[600],
+                ),
+              ),
+              if (isMultiSelect) ...[
+                Text(
+                  ' • ',
+                  style: TextStyles.caption.copyWith(
+                    color: theme.grey[600],
+                  ),
+                ),
+                Text(
+                  'Multiple choice',
+                  style: TextStyles.caption.copyWith(
+                    color: theme.grey[600],
+                  ),
+                ),
+              ],
+              Text(
+                ' • ',
+                style: TextStyles.caption.copyWith(
+                  color: theme.grey[600],
+                ),
+              ),
+              Text(
+                '$totalVotes votes',
+                style: TextStyles.caption.copyWith(
+                  color: theme.grey[600],
                 ),
               ),
             ],
           ),
+          
           const SizedBox(height: 12),
-          Text(
-            'Poll content will be loaded from subcollection',
-            style: TextStyles.body.copyWith(
-              color: theme.grey[600],
-              fontStyle: FontStyle.italic,
+          
+          // Vote action button
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: isClosed ? null : () {
+                // TODO: Implement poll voting
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Poll voting not yet implemented'),
+                    backgroundColor: theme.primary[600],
+                  ),
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: isClosed ? theme.grey[300] : theme.primary[600],
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              child: Text(
+                isClosed ? 'Poll Closed' : 'View Poll',
+                style: TextStyles.body.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
             ),
           ),
         ],
@@ -562,6 +727,13 @@ class _GroupInviteAttachmentRenderer extends StatelessWidget {
     AppLocalizations localizations,
     Map<String, dynamic> inviteSummary,
   ) {
+    final groupName = inviteSummary['groupName'] ?? 'Group';
+    final groupGender = inviteSummary['groupGender'] ?? 'Mixed';
+    final memberCount = inviteSummary['groupMemberCount'] ?? 0;
+    final capacity = inviteSummary['groupCapacity'] ?? 0;
+    final isPlusOnly = inviteSummary['groupPlusOnly'] ?? false;
+    final joinMethod = inviteSummary['joinMethod'] ?? 'code_only';
+    
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -572,18 +744,25 @@ class _GroupInviteAttachmentRenderer extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Group header
           Row(
             children: [
+              // Group avatar
               Container(
-                padding: const EdgeInsets.all(8),
+                width: 48,
+                height: 48,
                 decoration: BoxDecoration(
                   color: theme.success[100],
-                  borderRadius: BorderRadius.circular(8),
+                  shape: BoxShape.circle,
                 ),
-                child: Icon(
-                  LucideIcons.users,
-                  size: 20,
-                  color: theme.success[600],
+                child: Center(
+                  child: Text(
+                    groupName.isNotEmpty ? groupName[0].toUpperCase() : 'G',
+                    style: TextStyles.h6.copyWith(
+                      color: theme.success[700],
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
                 ),
               ),
               const SizedBox(width: 12),
@@ -591,18 +770,42 @@ class _GroupInviteAttachmentRenderer extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      inviteSummary['groupName'] ?? localizations.translate('group-invite'),
-                      style: TextStyles.bodyLarge.copyWith(
-                        color: theme.success[800],
-                        fontWeight: FontWeight.w600,
-                      ),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            groupName,
+                            style: TextStyles.body.copyWith(
+                              color: theme.success[800],
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                        if (isPlusOnly)
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 6,
+                              vertical: 2,
+                            ),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFFEBA01),
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: Text(
+                              'Plus',
+                              style: TextStyles.small.copyWith(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                      ],
                     ),
-                    const SizedBox(height: 2),
+                    const SizedBox(height: 4),
                     Text(
-                      'Group details will be loaded from subcollection',
-                      style: TextStyles.footnote.copyWith(
-                        color: theme.grey[600],
+                      '$groupGender • $memberCount/$capacity members',
+                      style: TextStyles.caption.copyWith(
+                        color: theme.success[600],
                       ),
                     ),
                   ],
@@ -610,12 +813,21 @@ class _GroupInviteAttachmentRenderer extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          
+          const SizedBox(height: 16),
+          
+          // Join button
           SizedBox(
             width: double.infinity,
             child: ElevatedButton(
               onPressed: () {
                 // TODO: Implement join group functionality
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Group joining not yet implemented'),
+                    backgroundColor: theme.success[600],
+                  ),
+                );
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: theme.success[600],
@@ -626,7 +838,7 @@ class _GroupInviteAttachmentRenderer extends StatelessWidget {
                 ),
               ),
               child: Text(
-                localizations.translate('join-group'),
+                'Join Group',
                 style: TextStyles.body.copyWith(
                   fontWeight: FontWeight.w600,
                 ),
