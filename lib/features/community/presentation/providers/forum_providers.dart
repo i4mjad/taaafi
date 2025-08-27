@@ -933,11 +933,18 @@ class PostCreationNotifier extends StateNotifier<AsyncValue<String?>> {
   PostCreationNotifier(this._forumService) : super(const AsyncValue.data(null));
 
   Future<void> createPost(
-      PostFormData postData, AppLocalizations localizations) async {
+    PostFormData postData,
+    AppLocalizations localizations, {
+    PostAttachmentsState? attachmentData,
+  }) async {
     state = const AsyncValue.loading();
 
     try {
-      final postId = await _forumService.createPost(postData, localizations);
+      final postId = await _forumService.createPost(
+        postData,
+        localizations,
+        attachmentData: attachmentData,
+      );
 
       if (postId != null) {
         state = AsyncValue.data(postId);
