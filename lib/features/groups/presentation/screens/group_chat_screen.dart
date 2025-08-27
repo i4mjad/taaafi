@@ -254,7 +254,8 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
             ),
           ),
           data: (messageEntities) {
-            final messages = _convertEntitiesToChatMessages(messageEntities);
+            final messages =
+                _convertEntitiesToChatMessages(messageEntities, l10n);
 
             if (messages.isEmpty) {
               return Center(
@@ -318,14 +319,8 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
                         1 || // Last item (chronologically first)
                 (nextMessage != null &&
                     !_isSameDay(message.dateTime, nextMessage.dateTime)))
-              _buildDateSeparator(
-                  context,
-                  theme,
-                  AppLocalizations.of(context),
-                  nextMessage != null &&
-                          !_isSameDay(message.dateTime, nextMessage.dateTime)
-                      ? nextMessage.dateTime
-                      : message.dateTime),
+              _buildDateSeparator(context, theme, AppLocalizations.of(context),
+                  message.dateTime),
 
             _buildMessageItem(context, theme, message, chatTextSize),
           ],
@@ -399,14 +394,8 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
                           1 || // Last item (chronologically first)
                   (nextMessage != null &&
                       !_isSameDay(message.dateTime, nextMessage.dateTime)))
-                _buildDateSeparator(
-                    context,
-                    theme,
-                    AppLocalizations.of(context),
-                    nextMessage != null &&
-                            !_isSameDay(message.dateTime, nextMessage.dateTime)
-                        ? nextMessage.dateTime
-                        : message.dateTime),
+                _buildDateSeparator(context, theme,
+                    AppLocalizations.of(context), message.dateTime),
 
               _buildMessageItem(context, theme, message, chatTextSize),
             ],
@@ -428,7 +417,7 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
 
   /// Convert GroupMessageEntity list to ChatMessage list for UI compatibility
   List<ChatMessage> _convertEntitiesToChatMessages(
-      List<GroupMessageEntity> entities) {
+      List<GroupMessageEntity> entities, AppLocalizations l10n) {
     final currentProfileAsync = ref.read(currentCommunityProfileProvider);
     final currentCpId = currentProfileAsync.valueOrNull?.id;
 
@@ -483,7 +472,7 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
             content: replyTarget.body,
             senderName: replyTargetDisplayName,
             senderCpId: replyTarget.senderCpId,
-            time: _formatTime(replyTarget.createdAt),
+            time: _formatTime(replyTarget.createdAt, l10n),
             dateTime: replyTarget.createdAt,
             isCurrentUser:
                 currentCpId != null && replyTarget.senderCpId == currentCpId,
@@ -500,7 +489,7 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
         content: entity.body,
         senderName: senderDisplayName,
         senderCpId: entity.senderCpId,
-        time: _formatTime(entity.createdAt),
+        time: _formatTime(entity.createdAt, l10n),
         dateTime: entity.createdAt,
         isCurrentUser: isCurrentUser,
         avatarColor: senderAvatarColor,
@@ -514,12 +503,14 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
   }
 
   /// Format DateTime to time string
-  String _formatTime(DateTime dateTime) {
-    // TODO: Use proper localization and user's locale
-    final hour = dateTime.hour;
-    final minute = dateTime.minute.toString().padLeft(2, '0');
-    final period = hour >= 12 ? 'مساءً' : 'صباحًا';
-    final displayHour = hour > 12 ? hour - 12 : (hour == 0 ? 12 : hour);
+  String _formatTime(DateTime dateTime, AppLocalizations l10n) {
+    final local = dateTime.toLocal();
+    final hour = local.hour;
+    final minute = local.minute.toString().padLeft(2, '0');
+    final amText = l10n.translate('am');
+    final pmText = l10n.translate('pm');
+    final displayHour = hour == 0 ? 12 : (hour > 12 ? hour - 12 : hour);
+    final period = hour >= 12 ? pmText : amText;
 
     return '$displayHour:$minute $period';
   }
@@ -535,7 +526,9 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
     final yesterday = today.subtract(const Duration(days: 1));
-    final messageDate = DateTime(date.year, date.month, date.day);
+    final localDate = date.toLocal();
+    final messageDate =
+        DateTime(localDate.year, localDate.month, localDate.day);
     final screenHeight = MediaQuery.of(context).size.height;
 
     String dateText;
@@ -546,9 +539,9 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
     } else {
       final isRTL = Directionality.of(context) == TextDirection.rtl;
       if (isRTL) {
-        dateText = '${date.day}/${date.month}/${date.year}';
+        dateText = '${localDate.day}/${localDate.month}/${localDate.year}';
       } else {
-        dateText = '${date.month}/${date.day}/${date.year}';
+        dateText = '${localDate.month}/${localDate.day}/${localDate.year}';
       }
     }
 
@@ -841,8 +834,8 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
         ref.read(groupChatMessagesPaginatedProvider(widget.groupId!));
     return paginatedAsync.maybeWhen(
       data: (paginatedResult) {
-        final messages =
-            _convertEntitiesToChatMessages(paginatedResult.messages);
+        final messages = _convertEntitiesToChatMessages(
+            paginatedResult.messages, AppLocalizations.of(context));
         // Sort messages by creation time (latest first for reverse ListView)
         final sortedMessages = List<ChatMessage>.from(messages);
         sortedMessages.sort((a, b) => b.dateTime.compareTo(a.dateTime));
@@ -911,8 +904,8 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
           },
           data: (paginatedResult) async {
             // Check if target message is in this batch
-            final messages =
-                _convertEntitiesToChatMessages(paginatedResult.messages);
+            final messages = _convertEntitiesToChatMessages(
+                paginatedResult.messages, AppLocalizations.of(context));
             final found = messages.any((msg) => msg.id == messageId);
 
             if (found) {

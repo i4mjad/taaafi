@@ -25,7 +25,7 @@ class GroupMembersList extends ConsumerWidget {
     final currentMembershipAsync = ref.watch(groupMembershipNotifierProvider);
 
     return currentMembershipAsync.when(
-      loading: () => _buildLoadingState(theme),
+      loading: () => _buildLoadingState(theme, l10n),
       error: (error, _) => _buildErrorState(theme, l10n),
       data: (currentMembership) {
         if (currentMembership == null) {
@@ -36,7 +36,7 @@ class GroupMembersList extends ConsumerWidget {
         final currentProfileAsync = ref.watch(currentCommunityProfileProvider);
 
         return currentProfileAsync.when(
-          loading: () => _buildLoadingState(theme),
+          loading: () => _buildLoadingState(theme, l10n),
           error: (error, _) => _buildErrorState(theme, l10n),
           data: (currentProfile) {
             if (currentProfile == null) {
@@ -54,7 +54,7 @@ class GroupMembersList extends ConsumerWidget {
               future: groupRepository.getGroupById(currentMembership.group.id),
               builder: (context, groupSnapshot) {
                 if (groupSnapshot.connectionState == ConnectionState.waiting) {
-                  return _buildLoadingState(theme);
+                  return _buildLoadingState(theme, l10n);
                 }
 
                 if (groupSnapshot.hasError || !groupSnapshot.hasData) {
@@ -64,7 +64,7 @@ class GroupMembersList extends ConsumerWidget {
                 final groupEntity = groupSnapshot.data!;
 
                 return groupMembersAsync.when(
-                  loading: () => _buildLoadingState(theme),
+                  loading: () => _buildLoadingState(theme, l10n),
                   error: (error, _) => _buildErrorState(theme, l10n),
                   data: (members) {
                     return _buildMembersList(
@@ -189,15 +189,16 @@ class GroupMembersList extends ConsumerWidget {
     );
   }
 
-  Widget _buildLoadingState(dynamic theme) {
+  Widget _buildLoadingState(dynamic theme, AppLocalizations l10n) {
     return WidgetsContainer(
+      width: double.infinity,
       padding: const EdgeInsets.all(24),
       child: Column(
         children: [
           const Spinner(),
           verticalSpace(Spacing.points16),
           Text(
-            'Loading group members...',
+            l10n.translate('loading-group-members'),
             style: TextStyles.body.copyWith(
               color: theme.grey[600],
             ),
