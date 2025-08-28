@@ -3,7 +3,7 @@
 
 const Map<String, String> kAr = {
   "founder": "المؤسس",
-  "poll-voted": "تم التصويت",
+  "of": "من",
   "anonymous_user": "مجهول",
   "subscribe-now": "اشترك الآن",
   "welcome": "مرحبًا بك!",

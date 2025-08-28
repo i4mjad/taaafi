@@ -89,6 +89,8 @@ class _ImageAttachmentRenderer extends StatelessWidget {
         .where((attachment) => attachment['type'] == 'image')
         .toList();
 
+    // Using 100% original quality images everywhere
+
     if (imageAttachments.isEmpty) return const SizedBox.shrink();
 
     return _buildImageGrid(context, theme, imageAttachments);
@@ -111,9 +113,70 @@ class _ImageAttachmentRenderer extends StatelessWidget {
     CustomThemeData theme,
     List<Map<String, dynamic>> images,
   ) {
-    const double imageSize = 72.0;
+    if (images.length == 1) {
+      return _buildSingleImagePreview(context, theme, images.first);
+    } else {
+      return _buildMultiImageGrid(context, theme, images);
+    }
+  }
+
+  Widget _buildSingleImagePreview(
+    BuildContext context,
+    CustomThemeData theme,
+    Map<String, dynamic> image,
+  ) {
+    return Container(
+      constraints: const BoxConstraints(
+        maxHeight: 200,
+        minHeight: 120,
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(12),
+        child: AspectRatio(
+          aspectRatio: 16 / 9, // Default aspect ratio for single images
+          child: Image.network(
+            image['downloadUrl'] ??
+                image['thumbnailUrl'], // Use full resolution for single images
+            fit: BoxFit.cover,
+            loadingBuilder: (context, child, loadingProgress) {
+              if (loadingProgress == null) return child;
+              return Container(
+                color: theme.grey[100],
+                child: Center(
+                  child: CircularProgressIndicator(
+                    value: loadingProgress.expectedTotalBytes != null
+                        ? loadingProgress.cumulativeBytesLoaded /
+                            loadingProgress.expectedTotalBytes!
+                        : null,
+                    strokeWidth: 2,
+                  ),
+                ),
+              );
+            },
+            errorBuilder: (context, error, stackTrace) => Container(
+              color: theme.grey[100],
+              child: Center(
+                child: Icon(
+                  LucideIcons.imageOff,
+                  color: theme.grey[400],
+                  size: 32,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMultiImageGrid(
+    BuildContext context,
+    CustomThemeData theme,
+    List<Map<String, dynamic>> images,
+  ) {
+    const double imageSize = 120.0; // Increased from 72
     const double spacing = 8.0;
-    const double borderRadius = 8.0;
+    const double borderRadius = 12.0; // Increased from 8
 
     return SizedBox(
       height: images.length > 2 ? imageSize * 2 + spacing : imageSize,
@@ -138,22 +201,53 @@ class _ImageAttachmentRenderer extends StatelessWidget {
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(borderRadius),
                     color: theme.grey[100],
-                    image: images[index]['thumbnailUrl'] != null
-                        ? DecorationImage(
-                            image: NetworkImage(images[index]['thumbnailUrl']),
-                            fit: BoxFit.cover,
-                          )
-                        : null,
                   ),
-                  child: images[index]['thumbnailUrl'] == null
-                      ? Center(
-                          child: Icon(
-                            LucideIcons.image,
-                            color: theme.grey[400],
-                            size: 24,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(borderRadius),
+                    child: (images[index]['downloadUrl'] ??
+                                images[index]['thumbnailUrl']) !=
+                            null
+                        ? Image.network(
+                            images[index]['downloadUrl'] ??
+                                images[index][
+                                    'thumbnailUrl'], // Use full resolution everywhere
+                            fit: BoxFit.cover,
+                            width: double.infinity,
+                            height: double.infinity,
+                            loadingBuilder: (context, child, loadingProgress) {
+                              if (loadingProgress == null) return child;
+                              return Container(
+                                color: theme.grey[100],
+                                child: Center(
+                                  child: CircularProgressIndicator(
+                                    value: loadingProgress.expectedTotalBytes !=
+                                            null
+                                        ? loadingProgress
+                                                .cumulativeBytesLoaded /
+                                            loadingProgress.expectedTotalBytes!
+                                        : null,
+                                    strokeWidth: 2,
+                                  ),
+                                ),
+                              );
+                            },
+                            errorBuilder: (context, error, stackTrace) =>
+                                Center(
+                              child: Icon(
+                                LucideIcons.imageOff,
+                                color: theme.grey[400],
+                                size: 24,
+                              ),
+                            ),
+                          )
+                        : Center(
+                            child: Icon(
+                              LucideIcons.image,
+                              color: theme.grey[400],
+                              size: 24,
+                            ),
                           ),
-                        )
-                      : null,
+                  ),
                 ),
                 if (isLastItem && remainingCount > 0)
                   Container(
@@ -222,14 +316,15 @@ class _ImageAttachmentRenderer extends StatelessWidget {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(borderRadius),
             color: AppTheme.of(context).grey[100],
-            image: image['thumbnailUrl'] != null
+            image: (image['downloadUrl'] ?? image['thumbnailUrl']) != null
                 ? DecorationImage(
-                    image: NetworkImage(image['thumbnailUrl']),
+                    image: NetworkImage(
+                        image['downloadUrl'] ?? image['thumbnailUrl']),
                     fit: BoxFit.cover,
                   )
                 : null,
           ),
-          child: image['thumbnailUrl'] == null
+          child: (image['downloadUrl'] ?? image['thumbnailUrl']) == null
               ? Center(
                   child: Icon(
                     LucideIcons.image,
@@ -333,14 +428,15 @@ class _ImageAttachmentRenderer extends StatelessWidget {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(borderRadius),
           color: AppTheme.of(context).grey[100],
-          image: image['thumbnailUrl'] != null
+          image: (image['downloadUrl'] ?? image['thumbnailUrl']) != null
               ? DecorationImage(
-                  image: NetworkImage(image['thumbnailUrl']),
+                  image: NetworkImage(
+                      image['downloadUrl'] ?? image['thumbnailUrl']),
                   fit: BoxFit.cover,
                 )
               : null,
         ),
-        child: image['thumbnailUrl'] == null
+        child: (image['downloadUrl'] ?? image['thumbnailUrl']) == null
             ? Center(
                 child: Icon(
                   LucideIcons.image,
@@ -372,7 +468,7 @@ class _ImageAttachmentRenderer extends StatelessWidget {
             onPressed: () => Navigator.of(context).pop(),
           ),
           title: Text(
-            '${initialIndex + 1} of ${images.length}',
+            '${initialIndex + 1} ${AppLocalizations.of(context)?.translate('of')} ${images.length}',
             style: TextStyles.body.copyWith(color: Colors.white),
           ),
         ),
@@ -383,6 +479,8 @@ class _ImageAttachmentRenderer extends StatelessWidget {
             itemBuilder: (context, index) {
               final image = images[index];
               final imageUrl = image['downloadUrl'] ?? image['thumbnailUrl'];
+
+              // Using 100% original quality in image viewer
 
               return Center(
                 child: imageUrl != null

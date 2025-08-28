@@ -15,7 +15,7 @@ class AttachmentImageService {
   final Ref ref;
   final ImagePicker _picker = ImagePicker();
   final FirebaseStorage _storage = FirebaseStorage.instance;
-  
+
   AttachmentImageService(this.ref);
 
   /// Pick and process multiple images for post attachments
@@ -25,55 +25,51 @@ class AttachmentImageService {
   }) async {
     try {
       List<XFile> selectedImages = [];
-      
+
       if (source == 'camera') {
         final XFile? image = await _picker.pickImage(
           source: ImageSource.camera,
-          maxWidth: 2048,
-          maxHeight: 2048,
-          imageQuality: 90,
         );
         if (image != null) selectedImages.add(image);
       } else {
         try {
           // Try multi-image picker first
           final List<XFile> images = await _picker.pickMultiImage(
-            maxWidth: 2048,
-            maxHeight: 2048,
-            imageQuality: 90,
+            requestFullMetadata: false,
           );
           selectedImages = images.take(maxImages).toList();
         } catch (e) {
           // Fallback to single image picker on iOS issues
           ref.read(errorLoggerProvider).logException(e, StackTrace.current);
-          
+
           // Try single image picker as fallback
           try {
             final XFile? image = await _picker.pickImage(
               source: ImageSource.gallery,
-              maxWidth: 2048,
-              maxHeight: 2048,
-              imageQuality: 90,
+              requestFullMetadata: false,
             );
             if (image != null) selectedImages.add(image);
           } catch (fallbackError) {
-            ref.read(errorLoggerProvider).logException(fallbackError, StackTrace.current);
-            throw Exception('Failed to pick images: Both multi and single image picker failed');
+            ref
+                .read(errorLoggerProvider)
+                .logException(fallbackError, StackTrace.current);
+            throw Exception(
+                'Failed to pick images: Both multi and single image picker failed');
           }
         }
       }
-      
+
       if (selectedImages.isEmpty) return [];
-      
+
       final List<ImageItem> processedImages = [];
-      
+
       for (int i = 0; i < selectedImages.length; i++) {
         final processedImage = await _processImage(selectedImages[i], i);
         if (processedImage != null) {
           processedImages.add(processedImage);
         }
       }
-      
+
       return processedImages;
     } catch (e, stackTrace) {
       ref.read(errorLoggerProvider).logException(e, stackTrace);
@@ -81,57 +77,47 @@ class AttachmentImageService {
     }
   }
 
-  /// Process individual image: compress, generate thumbnail, validate
+  /// Process individual image: NO compression, 100% original quality
   Future<ImageItem?> _processImage(XFile image, int index) async {
     try {
       final File imageFile = File(image.path);
       final int fileSize = await imageFile.length();
-      
-      // Validate file size (5MB max)
-      if (fileSize > 5 * 1024 * 1024) {
-        throw Exception('Image too large: ${(fileSize / 1024 / 1024).toStringAsFixed(1)}MB');
+
+      // Validate file size (increase to 20MB for high quality images)
+      if (fileSize > 20 * 1024 * 1024) {
+        throw Exception(
+            'Image too large: ${(fileSize / 1024 / 1024).toStringAsFixed(1)}MB');
       }
-      
-      // Read and decode image
+
+      // Use 100% original image - NO processing at all
       final Uint8List originalBytes = await imageFile.readAsBytes();
+
+      // Get basic metadata without processing
       final img.Image? originalImage = img.decodeImage(originalBytes);
-      
       if (originalImage == null) {
         throw Exception('Unable to decode image');
       }
-      
-      // Compress main image to max 512px dimension
-      final img.Image compressedImage = _resizeImage(originalImage, 512);
-      final Uint8List compressedBytes = Uint8List.fromList(
-        img.encodeJpg(compressedImage, quality: 85),
-      );
-      
-      // Generate thumbnail (72px for list view)
-      final img.Image thumbnailImage = _resizeImage(originalImage, 72);
-      final Uint8List thumbnailBytes = Uint8List.fromList(
-        img.encodeJpg(thumbnailImage, quality: 75),
-      );
-      
-      // Save processed files temporarily
+
+      // Save original file directly - NO thumbnail generation
       final String tempDir = imageFile.parent.path;
-      final String baseName = 'processed_${DateTime.now().millisecondsSinceEpoch}_$index';
-      
-      final File compressedFile = File('$tempDir/$baseName.jpg');
-      final File thumbnailFile = File('$tempDir/${baseName}_thumb.jpg');
-      
-      await compressedFile.writeAsBytes(compressedBytes);
-      await thumbnailFile.writeAsBytes(thumbnailBytes);
-      
+      final String baseName =
+          'original_${DateTime.now().millisecondsSinceEpoch}_$index';
+
+      // Keep original file extension
+      final String originalExtension = image.path.split('.').last.toLowerCase();
+      final File originalFile = File('$tempDir/$baseName.$originalExtension');
+
+      await originalFile.writeAsBytes(originalBytes); // 100% original quality
+
       return ImageItem(
         id: '${DateTime.now().millisecondsSinceEpoch}_$index',
-        localPath: compressedFile.path,
-        thumbnailPath: thumbnailFile.path,
-        fileName: '$baseName.jpg',
-        width: compressedImage.width,
-        height: compressedImage.height,
-        sizeBytes: compressedBytes.length,
+        localPath: originalFile.path,
+        thumbnailPath: null, // No thumbnail - use original for everything
+        fileName: '$baseName.$originalExtension',
+        width: originalImage.width,
+        height: originalImage.height,
+        sizeBytes: originalBytes.length,
       );
-      
     } catch (e) {
       // Log error but continue with other images
       ref.read(errorLoggerProvider).logException(e, StackTrace.current);
@@ -146,11 +132,11 @@ class AttachmentImageService {
     required Function(int current, int total, String fileName) onProgress,
   }) async {
     final List<UploadedImageData> uploadedImages = [];
-    
+
     for (int i = 0; i < images.length; i++) {
       final ImageItem image = images[i];
       onProgress(i + 1, images.length, image.fileName ?? 'image.jpg');
-      
+
       try {
         final uploadedImage = await _uploadSingleImage(postId, image);
         uploadedImages.add(uploadedImage);
@@ -160,42 +146,43 @@ class AttachmentImageService {
         continue;
       }
     }
-    
+
     return uploadedImages;
   }
 
   /// Upload single image and thumbnail to Firebase Storage
-  Future<UploadedImageData> _uploadSingleImage(String postId, ImageItem image) async {
+  Future<UploadedImageData> _uploadSingleImage(
+      String postId, ImageItem image) async {
     final DateTime timestamp = DateTime.now();
     final String timeStr = timestamp.millisecondsSinceEpoch.toString();
-    final String randomStr = (timestamp.microsecond % 1000).toString().padLeft(3, '0');
-    
-    // Create storage paths
-    final String imagePath = 'community_posts/$postId/images/${timeStr}_$randomStr.jpg';
-    final String thumbnailPath = 'community_posts/$postId/thumbnails/${timeStr}_$randomStr.jpg';
-    
-    // Upload main image
+    final String randomStr =
+        (timestamp.microsecond % 1000).toString().padLeft(3, '0');
+
+    // Create stable attachment ID and storage paths (new structure)
+    final String attachmentId = '${postId}-${timeStr}${randomStr}';
+
+    // Keep original file extension for 100% quality
+    final String fileExtension = image.fileName?.split('.').last ?? 'jpg';
+    final String imagePath =
+        'images/$postId/$attachmentId/original.$fileExtension';
+
+    // Upload main image (100% original quality)
     final Reference imageRef = _storage.ref().child(imagePath);
     final UploadTask imageUploadTask = imageRef.putFile(File(image.localPath));
     final TaskSnapshot imageSnapshot = await imageUploadTask;
     final String imageDownloadUrl = await imageSnapshot.ref.getDownloadURL();
-    
-    // Upload thumbnail
-    final Reference thumbnailRef = _storage.ref().child(thumbnailPath);
-    final UploadTask thumbnailUploadTask = thumbnailRef.putFile(File(image.thumbnailPath!));
-    final TaskSnapshot thumbnailSnapshot = await thumbnailUploadTask;
-    final String thumbnailDownloadUrl = await thumbnailSnapshot.ref.getDownloadURL();
-    
+
+    // Use same URL for thumbnail since we're not generating thumbnails
+    final String thumbnailDownloadUrl = imageDownloadUrl;
+
     // Clean up temporary files
     try {
       await File(image.localPath).delete();
-      if (image.thumbnailPath != null) {
-        await File(image.thumbnailPath!).delete();
-      }
+      // No separate thumbnail file to delete since we use original for everything
     } catch (e) {
       // Ignore cleanup errors
     }
-    
+
     return UploadedImageData(
       id: image.id,
       storagePath: imagePath,
@@ -212,11 +199,11 @@ class AttachmentImageService {
   img.Image _resizeImage(img.Image image, int maxDimension) {
     int width = image.width;
     int height = image.height;
-    
+
     if (width <= maxDimension && height <= maxDimension) {
       return image;
     }
-    
+
     if (width > height) {
       height = (height * maxDimension / width).round();
       width = maxDimension;
@@ -224,7 +211,7 @@ class AttachmentImageService {
       width = (width * maxDimension / height).round();
       height = maxDimension;
     }
-    
+
     return img.copyResize(image, width: width, height: height);
   }
 
@@ -240,9 +227,7 @@ class AttachmentImageService {
     for (final image in images) {
       try {
         await File(image.localPath).delete();
-        if (image.thumbnailPath != null) {
-          await File(image.thumbnailPath!).delete();
-        }
+        // No separate thumbnail files to delete since we use original for everything
       } catch (e) {
         // Ignore cleanup errors
       }
