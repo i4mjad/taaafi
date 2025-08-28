@@ -15,7 +15,7 @@ class Post {
   final int dislikeCount;
   final DateTime createdAt;
   final DateTime? updatedAt;
-  
+
   // Attachment fields
   final List<Map<String, dynamic>> attachmentsSummary;
   final List<String> attachmentTypes;
@@ -59,14 +59,13 @@ class Post {
         dislikeCount: doc.data()!["dislikeCount"] ?? 0,
         createdAt: (doc.data()!["createdAt"] as Timestamp).toDate(),
         updatedAt: (doc.data()!["updatedAt"] as Timestamp?)?.toDate(),
-        attachmentsSummary: List<Map<String, dynamic>>.from(
-          doc.data()!["attachmentsSummary"] ?? [],
-        ),
+        attachmentsSummary: _extractAttachmentsSummary(doc.data()!),
         attachmentTypes: List<String>.from(
           doc.data()!["attachmentTypes"] ?? [],
         ),
         pendingAttachments: doc.data()!["pendingAttachments"] ?? false,
-        attachmentsFinalizedAt: (doc.data()!["attachmentsFinalizedAt"] as Timestamp?)?.toDate(),
+        attachmentsFinalizedAt:
+            (doc.data()!["attachmentsFinalizedAt"] as Timestamp?)?.toDate(),
       );
 
   Map<String, dynamic> toJson() => {
@@ -109,7 +108,9 @@ class Post {
         'attachmentsSummary': attachmentsSummary,
         'attachmentTypes': attachmentTypes,
         'pendingAttachments': pendingAttachments,
-        'attachmentsFinalizedAt': attachmentsFinalizedAt != null ? Timestamp.fromDate(attachmentsFinalizedAt!) : null,
+        'attachmentsFinalizedAt': attachmentsFinalizedAt != null
+            ? Timestamp.fromDate(attachmentsFinalizedAt!)
+            : null,
       };
 
   /// Creates a copy of this post with updated values
@@ -151,7 +152,8 @@ class Post {
       attachmentsSummary: attachmentsSummary ?? this.attachmentsSummary,
       attachmentTypes: attachmentTypes ?? this.attachmentTypes,
       pendingAttachments: pendingAttachments ?? this.pendingAttachments,
-      attachmentsFinalizedAt: attachmentsFinalizedAt ?? this.attachmentsFinalizedAt,
+      attachmentsFinalizedAt:
+          attachmentsFinalizedAt ?? this.attachmentsFinalizedAt,
     );
   }
 
@@ -206,5 +208,27 @@ class Post {
   @override
   String toString() {
     return 'Post(id: $id, authorCPId: $authorCPId, title: $title, body: $body, category: $category, isPinned: $isPinned, isDeleted: $isDeleted, isCommentingAllowed: $isCommentingAllowed, isHidden: $isHidden, score: $score, likeCount: $likeCount, dislikeCount: $dislikeCount, createdAt: $createdAt, updatedAt: $updatedAt, attachmentsSummary: $attachmentsSummary, attachmentTypes: $attachmentTypes, pendingAttachments: $pendingAttachments, attachmentsFinalizedAt: $attachmentsFinalizedAt)';
+  }
+
+  /// Extract attachments summary from new or old data structure
+  static List<Map<String, dynamic>> _extractAttachmentsSummary(
+      Map<String, dynamic> data) {
+    // Try new structure first (attachmentsSummaryById + attachmentsOrder)
+    final summaryById = data["attachmentsSummaryById"] as Map<String, dynamic>?;
+    final order = data["attachmentsOrder"] as List?;
+
+    if (summaryById != null && order != null && order.isNotEmpty) {
+      // Convert map-based summary to list using order
+      final result = order.map((id) {
+        final summary = Map<String, dynamic>.from(summaryById[id] ?? {});
+        summary['id'] = id; // Ensure id is included
+        return summary;
+      }).toList();
+
+      return result;
+    }
+
+    // Fallback to old structure
+    return List<Map<String, dynamic>>.from(data["attachmentsSummary"] ?? []);
   }
 }

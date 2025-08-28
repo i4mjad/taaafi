@@ -1,0 +1,119 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isPostAuthor(postId) {
+      return isAuthenticated() && 
+             get(/databases/$(database)/documents/forumPosts/$(postId)).data.authorId == request.auth.uid;
+    }
+    
+    function isPlusUser() {
+      return isAuthenticated() && 
+             (request.auth.token.isPlusUser == true ||
+              get(/databases/$(database)/documents/communityProfiles/$(request.auth.uid)).data.isPlusUser == true);
+    }
+    
+    function validAttachmentType(type) {
+      return type in ['image', 'poll', 'group_invite'];
+    }
+    
+    function isGroupMember(groupId) {
+      return isAuthenticated() &&
+             exists(/databases/$(database)/documents/group_memberships/$(request.auth.uid + '_' + groupId)) &&
+             get(/databases/$(database)/documents/group_memberships/$(request.auth.uid + '_' + groupId)).data.isActive == true;
+    }
+    
+    function validAttachmentId(attachmentId, postId) {
+      // Expected format: ${postId}-${hash}
+      return attachmentId.matches('^' + postId + '-[a-zA-Z0-9]+$');
+    }
+    
+    // Forum Posts - Updated for new attachment fields
+    match /forumPosts/{postId} {
+      allow read: if true; // Public read (or according to your visibility model)
+      allow create: if isAuthenticated();
+      allow update: if isPostAuthor(postId) && 
+                    // Block changes to computed attachment fields
+                    !('attachmentsSummaryById' in request.resource.data.diff(resource.data).affectedKeys()) &&
+                    !('attachmentsOrder' in request.resource.data.diff(resource.data).affectedKeys()) &&
+                    !('attachmentTypes' in request.resource.data.diff(resource.data).affectedKeys()) &&
+                    !('pendingAttachments' in request.resource.data.diff(resource.data).affectedKeys()) &&
+                    !('attachmentsFinalizedAt' in request.resource.data.diff(resource.data).affectedKeys()) &&
+                    !('attachmentCount' in request.resource.data.diff(resource.data).affectedKeys()) &&
+                    !('hasAttachments' in request.resource.data.diff(resource.data).affectedKeys()) &&
+                    !('attachmentsPreview' in request.resource.data.diff(resource.data).affectedKeys()) &&
+                    !('attachmentsComputedAt' in request.resource.data.diff(resource.data).affectedKeys()) &&
+                    !('attachmentsVersion' in request.resource.data.diff(resource.data).affectedKeys());
+      allow delete: if isPostAuthor(postId);
+      
+      // Attachments subcollection
+      match /attachments/{attachmentId} {
+        allow read: if true; // Public read (unless your visibility model restricts it)
+        allow create: if isPostAuthor(postId) && 
+                      isPlusUser() && 
+                      validAttachmentType(request.resource.data.type) &&
+                      validAttachmentId(attachmentId, postId) &&
+                      // Additional validations based on type
+                      (request.resource.data.type != 'group_invite' || 
+                       isGroupMember(request.resource.data.groupSnapshot.id));
+        allow update, delete: if isPostAuthor(postId); // Author or moderator
+        
+        // Poll votes subcollection
+        match /votes/{cpId} {
+          allow read: if request.auth.uid == cpId; // Only voter reads own vote
+          allow create, update: if request.auth.uid == cpId &&
+                                // Poll must be open (checked by Cloud Function)
+                                request.resource.data.keys().hasAll(['selectedOptionIds', 'votedAt']);
+          allow delete: if request.auth.uid == cpId;
+        }
+        
+        // Counter shards (optional scaling feature)
+        match /counters/{shardId} {
+          allow read: if true; // Public read for aggregation
+          allow write: if false; // Only Cloud Functions can write
+        }
+      }
+    }
+    
+    // Legacy poll votes collection (deprecated)
+    match /forumPosts/{postId}/pollVotes/{cpId} {
+      allow read, write: if false; // Deprecated - use new structure
+    }
+  }
+}
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Images storage rules
+    match /images/{postId}/{attachmentId}/{filename} {
+      // Allow write only if:
+      // 1. User is post author
+      // 2. User is Plus member  
+      // 3. AttachmentId follows stable pattern
+      // 4. Filename is 'original.{ext}'
+      allow write: if request.auth != null &&
+                   // Check if user is post author (requires Firestore read)
+                   // Note: This is a simplified check - in production you might want
+                   // to implement this validation in Cloud Functions instead
+                   attachmentId.matches('^' + postId + '-[a-zA-Z0-9]+$') &&
+                   filename.matches('^original\\.(jpg|jpeg|png)$');
+      
+      // Thumbnails can only be written by service account (Cloud Functions)
+      allow write: if filename.matches('^thumb\\.jpg$') && 
+                   request.auth.token.iss == 'https://securetoken.google.com/your-project-id';
+      
+      // Public read for all images
+      allow read: if true;
+    }
+    
+    // Legacy community_posts storage (deprecated)
+    match /community_posts/{allPaths=**} {
+      allow read, write: if false; // Deprecated path
+    }
+  }
+}

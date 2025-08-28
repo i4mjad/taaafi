@@ -1,6 +1,8 @@
 import {onRequest} from 'firebase-functions/v2/https';
 import {onCall} from 'firebase-functions/v2/https';
-import {onDocumentCreated, onDocumentUpdated} from 'firebase-functions/v2/firestore';
+import {onDocumentCreated, onDocumentUpdated, onDocumentDeleted} from 'firebase-functions/v2/firestore';
+import { onSchedule } from 'firebase-functions/v2/scheduler';
+import { logger } from 'firebase-functions';
 import * as admin from 'firebase-admin';
 
 // Initialize Firebase Admin
@@ -1253,6 +1255,201 @@ export const onCommentCreate = onDocumentCreated(
     
     // Handle notifications
     await handleCommentNotification(commentData, commentId);
+  }
+);
+
+// ===============================
+// NEW ATTACHMENT SYSTEM - Essential Cloud Functions
+// ===============================
+
+// Poll vote aggregation (essential for vote counting)
+export const onPollVoteWriteNew = onDocumentCreated(
+  {
+    document: 'forumPosts/{postId}/attachments/{pollId}/votes/{cpId}',
+    region: 'us-central1',
+  },
+  async (event) => {
+    const db = admin.firestore();
+    const { postId, pollId } = event.params as { postId: string; pollId: string };
+    
+    try {
+      console.log(`[POLL_VOTE_NEW] Processing vote for poll ${pollId} in post ${postId}`);
+      
+      const pollRef = db.collection('forumPosts').doc(postId).collection('attachments').doc(pollId);
+      
+      await db.runTransaction(async (transaction) => {
+        const pollDoc = await transaction.get(pollRef);
+        
+        if (!pollDoc.exists || pollDoc.data()?.type !== 'poll') {
+          console.error(`[POLL_VOTE_NEW] Poll ${pollId} not found or invalid`);
+          return;
+        }
+        
+        // Get all votes for this poll
+        const votesSnap = await transaction.get(
+          pollRef.collection('votes')
+        );
+        
+        const pollData = pollDoc.data()!;
+        const options: Array<{ id: string; text: string }> = pollData.options || [];
+        const optionCounts: Record<string, number> = {};
+        
+        // Initialize counts
+        options.forEach(opt => optionCounts[opt.id] = 0);
+        
+        let totalVotes = 0;
+        votesSnap.docs.forEach((voteDoc) => {
+          const voteData = voteDoc.data();
+          const selectedOptionIds: string[] = voteData.selectedOptionIds || [];
+          
+          if (selectedOptionIds.length > 0) {
+            totalVotes += 1;
+            selectedOptionIds.forEach((optionId) => {
+              if (optionCounts[optionId] !== undefined) {
+                optionCounts[optionId] += 1;
+              }
+            });
+          }
+        });
+        
+        transaction.update(pollRef, {
+          totalVotes,
+          optionCounts,
+          updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+        });
+        
+        console.log(`[POLL_VOTE_NEW] Updated poll ${pollId} aggregates: totalVotes=${totalVotes}`);
+      });
+      
+    } catch (error) {
+      console.error(`[POLL_VOTE_NEW] Error updating poll counters:`, error);
+    }
+  }
+);
+
+// Legacy poll aggregation function (deprecated - replaced by onPollVoteWriteUpdateCounters)
+// Keeping for backward compatibility during transition
+export const onPollVoteWrite = onDocumentCreated(
+  {
+    document: 'forumPosts/{postId}/pollVotes/{cpId}',
+    region: 'us-central1',
+  },
+  async (event) => {
+    logger.warn('[DEPRECATED] onPollVoteWrite is deprecated. Use onPollVoteWriteUpdateCounters instead.');
+    // This function is now deprecated and will be removed in a future version
+    // The new vote structure uses forumPosts/{postId}/attachments/{pollId}/votes/{cpId}
+  }
+);
+
+// ===============================
+// Attachments: Invite maintenance
+// ===============================
+
+// On group membership updates: if inviter leaves group, revoke their invites
+export const onMembershipUpdateExpireInvites = onDocumentUpdated(
+  {
+    document: 'group_memberships/{membershipId}',
+    region: 'us-central1',
+  },
+  async (event) => {
+    const db = admin.firestore();
+    const before = event.data?.before.data();
+    const after = event.data?.after.data();
+    if (!before || !after) return;
+
+    // If membership became inactive, expire invites created by this cpId for that group
+    if (before.isActive === true && after.isActive === false) {
+      const inviterCpId = after.cpId as string;
+      const groupId = after.groupId as string;
+      try {
+        // Find posts with attachments from inviter to this group
+        const postsSnap = await db
+          .collection('forumPosts')
+          .where('attachmentTypes', 'array-contains', 'group_invite')
+          .get();
+
+        const batch = db.batch();
+        postsSnap.docs.forEach((postDoc) => {
+          const ref = postDoc.ref.collection('attachments');
+          // We cannot do server-side joins; we scan in memory per post
+          // In production consider an index or a top-level invites collection
+          // For now, fetch attachments for this post
+          batch; // placeholder to keep scope used
+        });
+
+        // Brute-force scan attachments for matching invites
+        for (const postDoc of postsSnap.docs) {
+          const atts = await postDoc.ref
+            .collection('attachments')
+            .where('type', '==', 'group_invite')
+            .where('inviterCpId', '==', inviterCpId)
+            .where('groupId', '==', groupId)
+            .get();
+
+          atts.docs.forEach((attDoc) => {
+            batch.update(attDoc.ref, { status: 'revoked' });
+          });
+        }
+
+        await batch.commit();
+        logger.info(`[INVITES] Revoked invites for inviter ${inviterCpId} in group ${groupId}`);
+      } catch (error) {
+        logger.error('[INVITES] Error revoking invites on membership update:', error);
+      }
+    }
+  }
+);
+
+// Scheduled job to expire invites past expiresAt
+export const scheduledExpireInvites = onSchedule('every 60 minutes', async () => {
+  const db = admin.firestore();
+  try {
+    const now = new Date();
+    // Scan posts with group_invite
+    const postsSnap = await db
+      .collection('forumPosts')
+      .where('attachmentTypes', 'array-contains', 'group_invite')
+      .get();
+
+    const batch = db.batch();
+    for (const postDoc of postsSnap.docs) {
+      const atts = await postDoc.ref
+        .collection('attachments')
+        .where('type', '==', 'group_invite')
+        .where('status', '==', 'active')
+        .get();
+
+      atts.docs.forEach((attDoc) => {
+        const d = attDoc.data();
+        const expiresAt = d.expiresAt?.toDate?.() as Date | undefined;
+        if (expiresAt && expiresAt < now) {
+          batch.update(attDoc.ref, { status: 'expired' });
+        }
+      });
+    }
+
+    await batch.commit();
+    logger.info('[INVITES] Scheduled expiry job completed');
+  } catch (error) {
+    logger.error('[INVITES] Scheduled expiry job failed:', error);
+  }
+});
+
+// ===============================
+// Post delete cascade
+// ===============================
+
+// Legacy cascade delete function (deprecated - replaced by modular onPostDeleteCascade)
+// Keeping for backward compatibility during transition
+export const onPostDeleteCascadeLegacy = onDocumentDeleted(
+  {
+    document: 'forumPosts/{postId}',
+    region: 'us-central1',
+  },
+  async (event) => {
+    logger.warn('[DEPRECATED] onPostDeleteCascadeLegacy is deprecated. Use onPostDeleteCascade instead.');
+    // This function is now deprecated and will be removed in a future version
+    // The new cascade delete handles the new attachment structure properly
   }
 );
 

@@ -778,15 +778,16 @@ class ForumService {
           break;
       }
 
-      // Finalize the post with attachment summary
-      await _repository.finalizePostAttachments(
+      // TEMPORARY: Until Cloud Functions are deployed, manually update the summary
+      // This will be replaced by automatic Cloud Function processing
+      await _repository.updatePostWithAttachmentSummary(
         postId: postId,
         attachmentsSummary: attachmentsSummary,
         attachmentTypes: attachmentTypes,
       );
     } catch (e) {
       throw PostCreationException(
-        localizations.translate('attachment_creation_failed'),
+        localizations.translate('post_creation_failed'),
         reason: 'attachment_creation_error',
         details: e.toString(),
         code: 'ATTACHMENT_CREATION_FAILED',
@@ -817,8 +818,8 @@ class ForumService {
 
       // Create attachment documents for each uploaded image
       for (final uploadedImage in uploadedImages) {
-        final attachmentId =
-            '${DateTime.now().millisecondsSinceEpoch}_${uploadedImage.id}';
+        // Use the uploaded image id as a stable suffix to ensure idempotency on retries
+        final attachmentId = 'img_${uploadedImage.id}';
 
         final imageAttachment = ImageAttachment(
           id: attachmentId,
@@ -837,6 +838,7 @@ class ForumService {
 
         await _repository.createAttachment(
           postId: postId,
+          attachmentId: attachmentId,
           attachmentData: imageAttachment.toFirestore(),
         );
 
@@ -859,32 +861,46 @@ class ForumService {
     List<Map<String, dynamic>> summaryList,
     List<String> typesList,
   ) async {
-    final attachmentId = '${DateTime.now().millisecondsSinceEpoch}_poll';
+    // Stable poll attachment id for idempotency
+    final attachmentId = 'poll_${postId}';
 
-    final pollAttachment = PollAttachment(
-      id: attachmentId,
-      schemaVersion: '1.0',
-      createdAt: DateTime.now(),
-      createdByCpId: authorCpId,
-      status: 'active',
-      question: pollData.question,
-      options: pollData.options
-          .map((opt) => PollOption(id: opt.id, text: opt.text))
+    // Create poll attachment following new spec
+    final pollAttachmentData = {
+      'type': 'poll',
+      'status': 'active',
+      'question': pollData.question,
+      'options': pollData.options
+          .map((opt) => {
+                'id': opt.id,
+                'text': opt.text,
+                'order': pollData.options.indexOf(opt),
+              })
           .toList(),
-      selectionMode: pollData.isMultiSelect ? 'multi' : 'single',
-      closesAt: pollData.closesAt,
-      ownerCpId: authorCpId,
-      totalVotes: 0,
-      optionCounts: List.filled(pollData.options.length, 0),
-      isClosed: false,
-    );
+      'selectionMode': pollData.isMultiSelect ? 'multiple' : 'single',
+      'isClosed': false,
+      'totalVotes': 0,
+      'optionCounts': <String, int>{}, // Map of optionId -> count
+      'shards': 0, // Start with 0 shards (no sharding initially)
+    };
+
+    if (pollData.closesAt != null) {
+      pollAttachmentData['closesAt'] = Timestamp.fromDate(pollData.closesAt!);
+    }
 
     await _repository.createAttachment(
       postId: postId,
-      attachmentData: pollAttachment.toFirestore(),
+      attachmentId: attachmentId,
+      attachmentData: pollAttachmentData,
     );
 
-    summaryList.add(pollAttachment.toSummary());
+    // Create proper summary for client-side handling
+    summaryList.add({
+      'id': attachmentId,
+      'type': 'poll',
+      'title': pollData.question,
+      'options': pollData.options.length,
+      'isClosed': false,
+    });
     typesList.add('poll');
   }
 
@@ -898,7 +914,8 @@ class ForumService {
   ) async {
     try {
       // Use the group service to create a real group invite attachment
-      final groupInviteAttachment = await _groupService.createGroupInviteAttachment(
+      final groupInviteAttachment =
+          await _groupService.createGroupInviteAttachment(
         postId: postId,
         inviterCpId: authorCpId,
         groupId: inviteData.groupId,
@@ -906,6 +923,7 @@ class ForumService {
 
       await _repository.createAttachment(
         postId: postId,
+        attachmentId: groupInviteAttachment.id,
         attachmentData: groupInviteAttachment.toFirestore(),
       );
 

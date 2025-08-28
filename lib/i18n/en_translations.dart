@@ -437,6 +437,7 @@ const Map<String, String> kEn = {
   "submit_report": "Submit Report",
   "post": "Post",
   "comment": "comment",
+  "poll-voted": "Voted",
   "report_content_type": "Content Type",
   "report_content_id": "Content ID",
   "report_content_preview": "Content Preview",

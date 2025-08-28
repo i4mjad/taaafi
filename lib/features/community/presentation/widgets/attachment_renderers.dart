@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/custom_theme_data.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:reboot_app_3/features/community/presentation/providers/forum_providers.dart';
+import 'package:reboot_app_3/features/community/presentation/providers/community_providers_new.dart';
+import 'package:reboot_app_3/features/community/application/attachment_group_service.dart';
 import 'package:reboot_app_3/features/community/data/models/post.dart';
+import 'package:reboot_app_3/features/community/presentation/widgets/compact_poll_widget.dart';
 
 /// Main attachment renderer that dispatches to specific renderers
 class AttachmentRenderer extends ConsumerWidget {
@@ -20,9 +24,11 @@ class AttachmentRenderer extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    if (!post.attachmentTypes.contains('image') && 
-        !post.attachmentTypes.contains('poll') && 
+    if (!post.attachmentTypes.contains('image') &&
+        !post.attachmentTypes.contains('poll') &&
         !post.attachmentTypes.contains('group_invite')) {
+      print(
+          '🎨 [ATTACHMENT_RENDERER] No supported attachment types found, returning empty');
       return const SizedBox.shrink();
     }
 
@@ -30,25 +36,37 @@ class AttachmentRenderer extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const SizedBox(height: 12),
-        
+
         // Render based on attachment type
-        if (post.attachmentTypes.contains('image'))
-          _ImageAttachmentRenderer(
-            post: post,
-            isListView: isListView,
-          ),
-        
-        if (post.attachmentTypes.contains('poll'))
-          _PollAttachmentRenderer(
-            post: post,
-            isListView: isListView,
-          ),
-        
-        if (post.attachmentTypes.contains('group_invite'))
-          _GroupInviteAttachmentRenderer(
-            post: post,
-            isListView: isListView,
-          ),
+        if (post.attachmentTypes.contains('image')) ...[
+          Builder(builder: (context) {
+            print('🖼️ [ATTACHMENT_RENDERER] Rendering image attachment');
+            return _ImageAttachmentRenderer(
+              post: post,
+              isListView: isListView,
+            );
+          }),
+        ],
+
+        if (post.attachmentTypes.contains('poll')) ...[
+          Builder(builder: (context) {
+            print('🗳️ [ATTACHMENT_RENDERER] Rendering poll attachment');
+            return _PollAttachmentRenderer(
+              post: post,
+              isListView: isListView,
+            );
+          }),
+        ],
+
+        if (post.attachmentTypes.contains('group_invite')) ...[
+          Builder(builder: (context) {
+            print('👥 [ATTACHMENT_RENDERER] Rendering group invite attachment');
+            return _GroupInviteAttachmentRenderer(
+              post: post,
+              isListView: isListView,
+            );
+          }),
+        ],
       ],
     );
   }
@@ -256,9 +274,11 @@ class _ImageAttachmentRenderer extends StatelessWidget {
         Expanded(
           child: Column(
             children: [
-              Expanded(child: _buildImageTile(context, images[1], borderRadius, 1)),
+              Expanded(
+                  child: _buildImageTile(context, images[1], borderRadius, 1)),
               SizedBox(height: spacing),
-              Expanded(child: _buildImageTile(context, images[2], borderRadius, 2)),
+              Expanded(
+                  child: _buildImageTile(context, images[2], borderRadius, 2)),
             ],
           ),
         ),
@@ -277,9 +297,11 @@ class _ImageAttachmentRenderer extends StatelessWidget {
         Expanded(
           child: Row(
             children: [
-              Expanded(child: _buildImageTile(context, images[0], borderRadius, 0)),
+              Expanded(
+                  child: _buildImageTile(context, images[0], borderRadius, 0)),
               SizedBox(width: spacing),
-              Expanded(child: _buildImageTile(context, images[1], borderRadius, 1)),
+              Expanded(
+                  child: _buildImageTile(context, images[1], borderRadius, 1)),
             ],
           ),
         ),
@@ -287,9 +309,11 @@ class _ImageAttachmentRenderer extends StatelessWidget {
         Expanded(
           child: Row(
             children: [
-              Expanded(child: _buildImageTile(context, images[2], borderRadius, 2)),
+              Expanded(
+                  child: _buildImageTile(context, images[2], borderRadius, 2)),
               SizedBox(width: spacing),
-              Expanded(child: _buildImageTile(context, images[3], borderRadius, 3)),
+              Expanded(
+                  child: _buildImageTile(context, images[3], borderRadius, 3)),
             ],
           ),
         ),
@@ -335,7 +359,7 @@ class _ImageAttachmentRenderer extends StatelessWidget {
     int initialIndex,
   ) {
     final theme = AppTheme.of(context);
-    
+
     showDialog(
       context: context,
       builder: (context) => Scaffold(
@@ -359,9 +383,9 @@ class _ImageAttachmentRenderer extends StatelessWidget {
             itemBuilder: (context, index) {
               final image = images[index];
               final imageUrl = image['downloadUrl'] ?? image['thumbnailUrl'];
-              
+
               return Center(
-                child: imageUrl != null 
+                child: imageUrl != null
                     ? InteractiveViewer(
                         child: Image.network(
                           imageUrl,
@@ -370,15 +394,17 @@ class _ImageAttachmentRenderer extends StatelessWidget {
                             if (loadingProgress == null) return child;
                             return Center(
                               child: CircularProgressIndicator(
-                                value: loadingProgress.expectedTotalBytes != null
-                                    ? loadingProgress.cumulativeBytesLoaded / 
-                                      loadingProgress.expectedTotalBytes!
+                                value: loadingProgress.expectedTotalBytes !=
+                                        null
+                                    ? loadingProgress.cumulativeBytesLoaded /
+                                        loadingProgress.expectedTotalBytes!
                                     : null,
                                 color: Colors.white,
                               ),
                             );
                           },
-                          errorBuilder: (context, error, stackTrace) => Container(
+                          errorBuilder: (context, error, stackTrace) =>
+                              Container(
                             padding: const EdgeInsets.all(16),
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
@@ -443,15 +469,18 @@ class _PollAttachmentRenderer extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = AppTheme.of(context);
     final localizations = AppLocalizations.of(context);
-    final pollSummary = post.attachmentsSummary
-        .firstWhere((a) => a['type'] == 'poll', orElse: () => <String, dynamic>{});
+    final pollSummary = post.attachmentsSummary.firstWhere(
+        (a) => a['type'] == 'poll',
+        orElse: () => <String, dynamic>{});
 
     if (pollSummary.isEmpty) return const SizedBox.shrink();
 
     if (isListView) {
-      return _buildListViewPoll(context, theme, localizations, pollSummary);
+      return _buildListViewPoll(
+          context, theme, localizations, pollSummary, ref);
     } else {
-      return _buildDetailViewPoll(context, theme, localizations, pollSummary, ref);
+      return _buildDetailViewPoll(
+          context, theme, localizations, pollSummary, ref);
     }
   }
 
@@ -460,49 +489,51 @@ class _PollAttachmentRenderer extends ConsumerWidget {
     CustomThemeData theme,
     AppLocalizations localizations,
     Map<String, dynamic> pollSummary,
+    WidgetRef ref,
   ) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: theme.primary[50],
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: theme.primary[100]!, width: 1),
-      ),
-      child: Row(
-        children: [
-          Icon(
-            LucideIcons.barChart3,
-            size: 16,
-            color: theme.primary[600],
-          ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              pollSummary['title'] ?? localizations.translate('poll'),
-              style: TextStyles.footnote.copyWith(
-                color: theme.primary[700],
-                fontWeight: FontWeight.w500,
-              ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+    final pollId = pollSummary['id'] as String?;
+    if (pollId == null) {
+      return _buildAttachmentRemoved(theme);
+    }
+
+    return FutureBuilder<List<Map<String, dynamic>>>(
+      future: ref.read(forumRepositoryProvider).getPostAttachments(post.id),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          return Container(
+            padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: theme.primary[100],
-              borderRadius: BorderRadius.circular(4),
+              color: theme.primary[50],
+              borderRadius: BorderRadius.circular(8),
             ),
-            child: Text(
-              localizations.translate('poll'),
-              style: TextStyles.tiny.copyWith(
-                color: theme.primary[700],
-                fontWeight: FontWeight.w600,
-              ),
+            child: Row(
+              children: [
+                Icon(LucideIcons.barChart3,
+                    size: 16, color: theme.primary[600]),
+                const SizedBox(width: 8),
+                Text('Loading poll...', style: TextStyles.caption),
+              ],
             ),
-          ),
-        ],
-      ),
+          );
+        }
+
+        final attachments = snapshot.data!;
+        final pollDoc = attachments.firstWhere(
+          (a) => a['id'] == pollId && a['type'] == 'poll',
+          orElse: () => <String, dynamic>{},
+        );
+
+        if (pollDoc.isEmpty) {
+          return _buildAttachmentRemoved(theme);
+        }
+
+        return CompactPollWidget(
+          post: post,
+          pollDoc: pollDoc,
+          theme: theme,
+          localizations: localizations,
+        );
+      },
     );
   }
 
@@ -513,12 +544,190 @@ class _PollAttachmentRenderer extends ConsumerWidget {
     Map<String, dynamic> pollSummary,
     WidgetRef ref,
   ) {
-    final pollQuestion = pollSummary['title'] ?? 'Poll';
-    final optionCount = pollSummary['optionCount'] ?? 0;
-    final isMultiSelect = pollSummary['isMultiSelect'] ?? false;
-    final isClosed = pollSummary['isClosed'] ?? false;
-    final totalVotes = pollSummary['totalVotes'] ?? 0;
-    
+    final pollId = pollSummary['id'] as String?;
+    if (pollId == null) {
+      return _buildAttachmentRemoved(theme);
+    }
+
+    return FutureBuilder<List<Map<String, dynamic>>>(
+      future: ref.read(forumRepositoryProvider).getPostAttachments(post.id),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: theme.primary[50],
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: theme.primary[100]!, width: 1),
+            ),
+            child: const SizedBox(height: 48),
+          );
+        }
+
+        if (!snapshot.hasData) {
+          return _buildAttachmentRemoved(theme);
+        }
+
+        final attachments = snapshot.data!;
+        final pollDoc = attachments.firstWhere(
+          (a) => a['id'] == pollId && a['type'] == 'poll',
+          orElse: () => <String, dynamic>{},
+        );
+
+        if (pollDoc.isEmpty) {
+          return _buildAttachmentRemoved(theme);
+        }
+
+        final pollQuestion =
+            pollDoc['question'] ?? pollSummary['title'] ?? 'Poll';
+        final List options = (pollDoc['options'] ?? []) as List;
+        final isMultiSelect = (pollDoc['selectionMode'] ?? 'single') == 'multi';
+        final isClosed = pollDoc['isClosed'] == true;
+        final totalVotes = (pollDoc['totalVotes'] ?? 0) as int;
+        // Handle both Map (new) and List (old) formats for optionCounts
+        final dynamic rawOptionCounts = pollDoc['optionCounts'];
+        final List<int> optionCounts;
+
+        if (rawOptionCounts is Map) {
+          // New format: Map<optionId, count>
+          optionCounts = options.map((option) {
+            final optionData = option as Map<String, dynamic>;
+            final optionId = optionData['id'] as String;
+            return (rawOptionCounts[optionId] ?? 0) as int;
+          }).toList();
+        } else if (rawOptionCounts is List) {
+          // Old format: List<int>
+          optionCounts = List<int>.from(rawOptionCounts);
+        } else {
+          // Fallback: empty counts
+          optionCounts = List.filled(options.length, 0);
+        }
+
+        return _PollDetailCard(
+          theme: theme,
+          localizations: localizations,
+          postId: post.id,
+          pollId: pollId,
+          question: pollQuestion,
+          options: options,
+          isMultiSelect: isMultiSelect,
+          isClosed: isClosed,
+          totalVotes: totalVotes,
+          optionCounts: optionCounts,
+          ref: ref, // Pass ref to check user vote
+        );
+      },
+    );
+  }
+
+  Widget _buildAttachmentRemoved(CustomThemeData theme) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: theme.grey[50],
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: theme.grey[200]!, width: 1),
+      ),
+      child: Row(
+        children: [
+          Icon(LucideIcons.alertCircle, color: theme.grey[500], size: 18),
+          const SizedBox(width: 8),
+          Text(
+            'Attachment removed',
+            style: TextStyles.caption.copyWith(color: theme.grey[700]),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _PollDetailCard extends ConsumerStatefulWidget {
+  final CustomThemeData theme;
+  final AppLocalizations localizations;
+  final String postId;
+  final String pollId;
+  final String question;
+  final List options; // List<Map<String, dynamic>> with id,text
+  final bool isMultiSelect;
+  final bool isClosed;
+  final int totalVotes;
+  final List<int> optionCounts;
+  final WidgetRef ref;
+
+  const _PollDetailCard({
+    required this.theme,
+    required this.localizations,
+    required this.postId,
+    required this.pollId,
+    required this.question,
+    required this.options,
+    required this.isMultiSelect,
+    required this.isClosed,
+    required this.totalVotes,
+    required this.optionCounts,
+    required this.ref,
+  });
+
+  @override
+  ConsumerState<_PollDetailCard> createState() => _PollDetailCardState();
+}
+
+class _PollDetailCardState extends ConsumerState<_PollDetailCard> {
+  Set<String> _selected = <String>{};
+  bool _submitting = false;
+  bool _hasVoted = false;
+  bool _loadingVote = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserVote();
+  }
+
+  Future<void> _loadUserVote() async {
+    try {
+      final profileAsync = widget.ref.read(currentCommunityProfileProvider);
+      String? cpId;
+      await profileAsync.when(
+        data: (p) async => cpId = p?.id,
+        loading: () async {},
+        error: (_, __) async {},
+      );
+
+      if (cpId != null && cpId!.isNotEmpty) {
+        final userVote = await widget.ref
+            .read(forumRepositoryProvider)
+            .getUserPollVote(widget.postId, widget.pollId, cpId!);
+
+        if (userVote != null) {
+          setState(() {
+            _selected = Set<String>.from(userVote['selectedOptionIds'] ?? []);
+            _hasVoted = _selected.isNotEmpty;
+            _loadingVote = false;
+          });
+        } else {
+          setState(() {
+            _loadingVote = false;
+          });
+        }
+      } else {
+        setState(() {
+          _loadingVote = false;
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _loadingVote = false;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = widget.theme;
+    final l10n = widget.localizations;
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -529,18 +738,13 @@ class _PollAttachmentRenderer extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Poll header
           Row(
             children: [
-              Icon(
-                LucideIcons.barChart3,
-                size: 20,
-                color: theme.primary[600],
-              ),
+              Icon(LucideIcons.barChart3, size: 20, color: theme.primary[600]),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
-                  pollQuestion,
+                  widget.question,
                   style: TextStyles.body.copyWith(
                     color: theme.primary[800],
                     fontWeight: FontWeight.w600,
@@ -549,15 +753,16 @@ class _PollAttachmentRenderer extends ConsumerWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
-              if (isClosed)
+              if (widget.isClosed)
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                   decoration: BoxDecoration(
                     color: theme.grey[200],
                     borderRadius: BorderRadius.circular(4),
                   ),
                   child: Text(
-                    'Closed',
+                    l10n.translate('poll-closed'),
                     style: TextStyles.small.copyWith(
                       color: theme.grey[700],
                       fontWeight: FontWeight.w600,
@@ -566,117 +771,210 @@ class _PollAttachmentRenderer extends ConsumerWidget {
                 ),
             ],
           ),
-          
+
           const SizedBox(height: 12),
-          
-          // Poll info
-          Row(
-            children: [
-              Text(
-                '$optionCount options',
-                style: TextStyles.caption.copyWith(
-                  color: theme.grey[600],
-                ),
-              ),
-              if (isMultiSelect) ...[
-                Text(
-                  ' • ',
-                  style: TextStyles.caption.copyWith(
-                    color: theme.grey[600],
+
+          // Options and/or results
+          ..._buildOptionsOrResults(theme, l10n),
+
+          const SizedBox(height: 12),
+
+          // Vote button
+          if (!widget.isClosed)
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: _submitting || _loadingVote || _hasVoted
+                    ? null
+                    : _submitVote,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor:
+                      _hasVoted ? theme.success[600] : theme.primary[600],
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
                   ),
                 ),
-                Text(
-                  'Multiple choice',
-                  style: TextStyles.caption.copyWith(
-                    color: theme.grey[600],
-                  ),
-                ),
-              ],
-              Text(
-                ' • ',
-                style: TextStyles.caption.copyWith(
-                  color: theme.grey[600],
-                ),
-              ),
-              Text(
-                '$totalVotes votes',
-                style: TextStyles.caption.copyWith(
-                  color: theme.grey[600],
-                ),
-              ),
-            ],
-          ),
-          
-          const SizedBox(height: 12),
-          
-          // Vote action button
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              onPressed: isClosed ? null : () {
-                // Show poll options for voting
-                _showPollVotingModal(context, ref);
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: isClosed ? theme.grey[300] : theme.primary[600],
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-              child: Text(
-                isClosed ? 'Poll Closed' : 'View Poll',
-                style: TextStyles.body.copyWith(
-                  fontWeight: FontWeight.w600,
-                ),
+                child: _submitting
+                    ? const SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(
+                            strokeWidth: 2, color: Colors.white),
+                      )
+                    : _loadingVote
+                        ? const SizedBox(
+                            width: 16,
+                            height: 16,
+                            child: CircularProgressIndicator(
+                                strokeWidth: 2, color: Colors.white),
+                          )
+                        : Text(
+                            _hasVoted
+                                ? l10n.translate('poll-voted')
+                                : l10n.translate('poll-vote'),
+                            style: TextStyles.body
+                                .copyWith(fontWeight: FontWeight.w600),
+                          ),
               ),
             ),
-          ),
         ],
       ),
     );
   }
 
-  /// Shows poll voting modal with options
-  void _showPollVotingModal(BuildContext context, WidgetRef ref) {
-    final theme = AppTheme.of(context);
-    final localizations = AppLocalizations.of(context);
-    
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      builder: (context) => Container(
-        decoration: BoxDecoration(
-          color: theme.backgroundColor,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
+  List<Widget> _buildOptionsOrResults(
+      CustomThemeData theme, AppLocalizations l10n) {
+    // Decide if we show results or options
+    final showResultsImmediately =
+        widget.totalVotes > 0; // voters see results immediately via aggregation
+    final shouldShowResults = widget.isClosed || showResultsImmediately;
+
+    if (shouldShowResults) {
+      final total = widget.totalVotes == 0 ? 1 : widget.totalVotes;
+      return List<Widget>.generate(widget.options.length, (index) {
+        final option = widget.options[index] as Map<String, dynamic>;
+        final count =
+            index < widget.optionCounts.length ? widget.optionCounts[index] : 0;
+        final percent = (count / total * 100).round();
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 8),
           child: Column(
-            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                'Poll Voting',
-                style: TextStyles.h6.copyWith(color: theme.grey[900]),
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      option['text'] ?? '',
+                      style: TextStyles.body.copyWith(color: theme.grey[800]),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Text('$percent%',
+                      style:
+                          TextStyles.caption.copyWith(color: theme.grey[700])),
+                ],
               ),
-              const SizedBox(height: 16),
-              Text(
-                'Poll voting functionality will be available soon!',
-                style: TextStyles.body.copyWith(color: theme.grey[600]),
-                textAlign: TextAlign.center,
+              const SizedBox(height: 4),
+              Container(
+                height: 8,
+                decoration: BoxDecoration(
+                  color: theme.primary[100],
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: FractionallySizedBox(
+                  alignment: Alignment.centerLeft,
+                  widthFactor: (count / total).clamp(0.0, 1.0),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: theme.primary[600],
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                  ),
+                ),
               ),
-              const SizedBox(height: 20),
+            ],
+          ),
+        );
+      });
+    }
+
+    // Show selectable options
+    return List<Widget>.generate(widget.options.length, (index) {
+      final option = widget.options[index] as Map<String, dynamic>;
+      final id = option['id'] as String? ?? index.toString();
+      final text = option['text'] as String? ?? '';
+      final selected = _selected.contains(id);
+      return InkWell(
+        onTap: () {
+          setState(() {
+            if (widget.isMultiSelect) {
+              if (selected) {
+                _selected.remove(id);
+              } else {
+                _selected.add(id);
+              }
+            } else {
+              _selected = {id};
+            }
+          });
+        },
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+          margin: const EdgeInsets.only(bottom: 8),
+          decoration: BoxDecoration(
+            color: selected ? theme.primary[50] : theme.grey[50],
+            border: Border.all(
+                color: selected ? theme.primary[300]! : theme.grey[200]!),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Row(
+            children: [
+              Icon(
+                widget.isMultiSelect
+                    ? (selected
+                        ? Icons.check_box
+                        : Icons.check_box_outline_blank)
+                    : (selected
+                        ? Icons.radio_button_checked
+                        : Icons.radio_button_off),
+                size: 18,
+                color: selected ? theme.primary[600] : theme.grey[500],
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  text,
+                  style: TextStyles.body.copyWith(color: theme.grey[800]),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
             ],
           ),
         ),
-      ),
-    );
+      );
+    });
+  }
+
+  Future<void> _submitVote() async {
+    if (_selected.isEmpty) return;
+    setState(() => _submitting = true);
+    try {
+      final profileAsync = ref.read(currentCommunityProfileProvider);
+      String? cpId;
+      await profileAsync.when(
+        data: (p) async {
+          cpId = p?.id;
+        },
+        loading: () async {},
+        error: (_, __) async {},
+      );
+      if (cpId == null || cpId!.isEmpty) {
+        setState(() => _submitting = false);
+        return;
+      }
+      await ref.read(forumRepositoryProvider).createPollVote(
+            postId: widget.postId,
+            pollId: widget.pollId,
+            cpId: cpId!,
+            selectedOptionIds: _selected.toList(),
+          );
+      if (mounted) {
+        setState(() => _submitting = false);
+      }
+    } catch (_) {
+      if (mounted) setState(() => _submitting = false);
+    }
   }
 }
 
 /// Group invite attachment renderer
-class _GroupInviteAttachmentRenderer extends StatelessWidget {
+class _GroupInviteAttachmentRenderer extends ConsumerWidget {
   final Post post;
   final bool isListView;
 
@@ -686,18 +984,20 @@ class _GroupInviteAttachmentRenderer extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = AppTheme.of(context);
     final localizations = AppLocalizations.of(context);
-    final inviteSummary = post.attachmentsSummary
-        .firstWhere((a) => a['type'] == 'group_invite', orElse: () => <String, dynamic>{});
+    final inviteSummary = post.attachmentsSummary.firstWhere(
+        (a) => a['type'] == 'group_invite',
+        orElse: () => <String, dynamic>{});
 
     if (inviteSummary.isEmpty) return const SizedBox.shrink();
 
     if (isListView) {
       return _buildListViewInvite(context, theme, localizations, inviteSummary);
     } else {
-      return _buildDetailViewInvite(context, theme, localizations, inviteSummary);
+      return _buildDetailViewInvite(
+          context, theme, localizations, inviteSummary, ref);
     }
   }
 
@@ -724,7 +1024,8 @@ class _GroupInviteAttachmentRenderer extends StatelessWidget {
           const SizedBox(width: 8),
           Expanded(
             child: Text(
-              inviteSummary['groupName'] ?? localizations.translate('group-invite'),
+              inviteSummary['groupName'] ??
+                  localizations.translate('group-invite'),
               style: TextStyles.footnote.copyWith(
                 color: theme.success[700],
                 fontWeight: FontWeight.w500,
@@ -757,6 +1058,7 @@ class _GroupInviteAttachmentRenderer extends StatelessWidget {
     CustomThemeData theme,
     AppLocalizations localizations,
     Map<String, dynamic> inviteSummary,
+    WidgetRef ref,
   ) {
     final groupName = inviteSummary['groupName'] ?? 'Group';
     final groupGender = inviteSummary['groupGender'] ?? 'Mixed';
@@ -764,7 +1066,8 @@ class _GroupInviteAttachmentRenderer extends StatelessWidget {
     final capacity = inviteSummary['groupCapacity'] ?? 0;
     final isPlusOnly = inviteSummary['groupPlusOnly'] ?? false;
     final joinMethod = inviteSummary['joinMethod'] ?? 'code_only';
-    
+    final inviteId = inviteSummary['id'];
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -844,21 +1147,128 @@ class _GroupInviteAttachmentRenderer extends StatelessWidget {
               ),
             ],
           ),
-          
+
           const SizedBox(height: 16),
-          
+
           // Join button
           SizedBox(
             width: double.infinity,
             child: ElevatedButton(
-              onPressed: () {
-                // TODO: Implement join group functionality
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('Group joining not yet implemented'),
-                    backgroundColor: theme.success[600],
-                  ),
-                );
+              onPressed: () async {
+                // Load the full invite attachment to get groupId and joinCode
+                try {
+                  final attachments = await ref
+                      .read(forumRepositoryProvider)
+                      .getPostAttachments(post.id);
+                  final inviteDoc = attachments.firstWhere(
+                    (a) => a['id'] == inviteId && a['type'] == 'group_invite',
+                    orElse: () => <String, dynamic>{},
+                  );
+
+                  if (inviteDoc.isEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content:
+                            Text(localizations.translate('attachment-removed')),
+                        backgroundColor: theme.error[600],
+                      ),
+                    );
+                    return;
+                  }
+
+                  final groupId = inviteDoc['groupId'] as String?;
+                  final joinCode = inviteDoc['inviteJoinCode'] as String?;
+                  if (groupId == null || joinCode == null) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(localizations.translate('generic_error')),
+                        backgroundColor: theme.error[600],
+                      ),
+                    );
+                    return;
+                  }
+
+                  // Get current user's CP id
+                  final profileAsync =
+                      ref.read(currentCommunityProfileProvider);
+                  String? cpId;
+                  await profileAsync.when(
+                    data: (p) async => cpId = p?.id,
+                    loading: () async {},
+                    error: (_, __) async {},
+                  );
+                  if (cpId == null || cpId!.isEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(localizations
+                            .translate('error-no-group-membership')),
+                        backgroundColor: theme.error[600],
+                      ),
+                    );
+                    return;
+                  }
+
+                  // Use group invite service via provider to attempt join
+                  final groupService = ref.read(attachmentGroupServiceProvider);
+                  final result = await groupService.joinGroupFromInvite(
+                    groupId: groupId,
+                    joinCode: joinCode,
+                    joinerCpId: cpId!,
+                    inviteId: inviteId,
+                  );
+
+                  if (result.success) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(localizations
+                            .translate('group-joined-successfully')),
+                        backgroundColor: theme.success[600],
+                      ),
+                    );
+                  } else {
+                    final errorKey = (result.error ?? GroupJoinError.unknown)
+                        .localizationKey;
+                    showModalBottomSheet(
+                      context: context,
+                      backgroundColor: theme.backgroundColor,
+                      shape: const RoundedRectangleBorder(
+                        borderRadius:
+                            BorderRadius.vertical(top: Radius.circular(16)),
+                      ),
+                      builder: (_) => Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Icon(LucideIcons.info, color: theme.grey[700]),
+                                const SizedBox(width: 8),
+                                Text(localizations.translate('group-invite'),
+                                    style: TextStyles.h6),
+                              ],
+                            ),
+                            const SizedBox(height: 12),
+                            Text(
+                              localizations.translate(errorKey),
+                              style: TextStyles.body
+                                  .copyWith(color: theme.grey[800]),
+                            ),
+                            const SizedBox(height: 8),
+                          ],
+                        ),
+                      ),
+                    );
+                  }
+                } catch (_) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(localizations.translate('generic_error')),
+                      backgroundColor: theme.error[600],
+                    ),
+                  );
+                }
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: theme.success[600],
@@ -869,7 +1279,7 @@ class _GroupInviteAttachmentRenderer extends StatelessWidget {
                 ),
               ),
               child: Text(
-                'Join Group',
+                localizations.translate('group-invite-join'),
                 style: TextStyles.body.copyWith(
                   fontWeight: FontWeight.w600,
                 ),

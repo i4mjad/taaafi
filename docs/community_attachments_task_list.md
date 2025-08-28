@@ -4,6 +4,33 @@ Scope: Add extensible attachments to community posts (images, poll, support grou
 
 ---
 
+## Status Snapshot (current implementation)
+
+- Completed
+  - Data model on `forumPosts` and `attachments` subcollection; stable `attachmentId` usage for idempotency.
+  - Submission pipeline: create → attachments (images/poll/invite) → finalize (`attachmentsSummary`, `attachmentTypes`, `pendingAttachments=false`, `attachmentsFinalizedAt`).
+  - Rendering: list previews from summary; detail fetches subdocs lazily; moderation placeholder when attachment missing.
+  - Poll: attachment creation and client voting UI; writes to `pollVotes`; basic results rendering; aggregation Cloud Function.
+  - Group invite: creation via service; client “Join group” flow with reasons; maintenance Cloud Functions (inviter leaves revoke; scheduled expiry).
+  - Post delete cascade Cloud Function (removes `attachments` subdocs and Storage files).
+  - Plus gating: non‑Plus taps show Plus subscription modal; Plus users proceed normally.
+
+- Remaining
+  - Notifications (push):
+    - Poll: author‑on‑vote, poll created/closed audiences.
+    - Invites: notify inviter when a user joins via invite.
+  - Security rules: enforce Plus‑only writes to `attachments`, one `pollVotes` doc per CP (updates allowed), and membership‑gated invite creation; update tests accordingly.
+  - Poll UX refinements:
+    - Respect visibility rule: voters see results immediately; non‑voters only after close.
+    - Load and reflect user’s current vote; allow changing vote explicitly; author/admin early close action.
+  - Image handling hardening: MIME checks (JPEG/PNG), reliable HEIC→JPEG path, clearer errors.
+  - Analytics: emit all attachment events (`startedAttachmentFlow`, `addedImage`, `createdPoll`, `invitedToGroup`, `votePoll`, `joinedGroupFromInvite`, `attachmentUploadFailed`, `attachmentRendered`) with params.
+  - Composer validations: poll char limits; options 2–4; image constraints surfaced to user; finalize idempotency tests.
+  - Localization audit: ensure all new strings used by poll voting/join reasons exist in EN/AR and match tone.
+  - Tests: unit/integration/rules/functions per plan.
+  - Doc hygiene: reflect gating approach (no blur overlay; modal upsell) in sections below.
+
+
 ## 0) Prerequisites and Alignment
 
 - Confirm Plus gating provider exists: `hasActiveSubscriptionProvider` in `lib/features/plus/data/notifiers/subscription_notifier.g.dart`.
