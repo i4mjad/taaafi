@@ -614,13 +614,8 @@ class _PollAttachmentRenderer extends ConsumerWidget {
             width: double.infinity,
             child: ElevatedButton(
               onPressed: isClosed ? null : () {
-                // TODO: Implement poll voting
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('Poll voting not yet implemented'),
-                    backgroundColor: theme.primary[600],
-                  ),
-                );
+                // Show poll options for voting
+                _showPollVotingModal(context, ref);
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: isClosed ? theme.grey[300] : theme.primary[600],
@@ -639,6 +634,42 @@ class _PollAttachmentRenderer extends ConsumerWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  /// Shows poll voting modal with options
+  void _showPollVotingModal(BuildContext context, WidgetRef ref) {
+    final theme = AppTheme.of(context);
+    final localizations = AppLocalizations.of(context);
+    
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        decoration: BoxDecoration(
+          color: theme.backgroundColor,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'Poll Voting',
+                style: TextStyles.h6.copyWith(color: theme.grey[900]),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'Poll voting functionality will be available soon!',
+                style: TextStyles.body.copyWith(color: theme.grey[600]),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 20),
+            ],
+          ),
+        ),
       ),
     );
   }

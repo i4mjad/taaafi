@@ -266,6 +266,7 @@ const Map<String, String> kAr = {
   "weekly": "أسبوعي",
   "monthly": "شهري",
   "delete": "حذف",
+  "create": "إنشاء",
   "save": "حفظ",
   "later": "لاحقاً",
   "contact-through-whatsapp": "تواصل معنا عبر واتساب",
@@ -611,16 +612,21 @@ const Map<String, String> kAr = {
   "attachments-plus-only": "المرفقات متاحة لمستخدمي Plus فقط",
   "attachments-type-already-selected": "تم اختيار نوع مرفق واحد بالفعل",
   "attachments-limit-reached": "تم الوصول للحد الأقصى للمرفقات",
-  "image-format-not-allowed": "صيغة الصورة غير مدعومة. يرجى استخدام JPEG أو PNG",
+  "image-format-not-allowed":
+      "صيغة الصورة غير مدعومة. يرجى استخدام JPEG أو PNG",
   "image-too-large": "الصورة كبيرة جداً. الحد الأقصى هو 5 ميجابايت",
   "image-processing-failed": "فشل في معالجة الصورة",
   "attachment-creation-failed": "فشل في إنشاء المرفق",
 
   // Poll
+  "poll-create": "إنشاء استطلاع",
   "poll-question": "سؤال الاستطلاع",
-  "poll-options": "خيارات الاستطلاع", 
+  "poll-question-hint": "اكتب سؤالك...",
+  "poll-option": "خيار",
+  "poll-add-option": "أضف خيار",
+  "poll-options": "خيارات الاستطلاع",
   "poll-single-select": "اختيار واحد",
-  "poll-multi-select": "اختيارات متعددة",
+  "poll-multi-select": "السماح باختيارات متعددة",
   "poll-close-at": "إغلاق الاستطلاع في",
   "poll-closed": "تم إغلاق الاستطلاع",
   "poll-vote": "صوت",
@@ -630,7 +636,8 @@ const Map<String, String> kAr = {
 
   // Group invite
   "group-invite": "دعوة للمجموعة",
-  "group-invite-expired": "انتهت صلاحية الدعوة", 
+  "group-invite-select": "اختر المجموعة للدعوة",
+  "group-invite-expired": "انتهت صلاحية الدعوة",
   "group-invite-revoked": "تم إلغاء الدعوة",
   "group-invite-join": "انضم للمجموعة",
   "group-invite-plus-only": "هذه مجموعة Plus فقط",
@@ -641,7 +648,7 @@ const Map<String, String> kAr = {
   "join-blocked-capacity": "وصلت المجموعة للحد الأقصى من الأعضاء",
   "join-blocked-cooldown": "عليك الانتظار قبل الانضمام لمجموعة أخرى",
   "join-blocked-plus-only": "تتطلب هذه المجموعة اشتراك Plus",
-  
+
   // Moderation placeholder
   "attachment-removed": "تم حذف المرفق من قبل المشرف",
 

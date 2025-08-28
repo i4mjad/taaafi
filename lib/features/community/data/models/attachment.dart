@@ -184,6 +184,10 @@ class PollAttachment extends Attachment {
         'id': id,
         'type': type,
         'title': question,
+        'optionCount': options.length,
+        'totalVotes': totalVotes,
+        'isMultiSelect': selectionMode == 'multi',
+        'isClosed': isClosed,
       };
 }
 

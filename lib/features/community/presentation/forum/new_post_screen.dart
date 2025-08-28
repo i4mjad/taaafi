@@ -29,6 +29,10 @@ import 'package:reboot_app_3/features/plus/presentation/taaafi_plus_features_lis
 import 'package:reboot_app_3/features/community/application/attachment_image_service.dart';
 import 'package:reboot_app_3/features/groups/providers/filtered_public_groups_provider.dart';
 import 'package:reboot_app_3/features/groups/domain/entities/group_entity.dart';
+import 'package:reboot_app_3/core/shared_widgets/container.dart' as shared;
+import 'package:reboot_app_3/core/shared_widgets/custom_textfield.dart';
+import 'package:reboot_app_3/core/shared_widgets/custom_textarea.dart';
+import 'package:reboot_app_3/core/shared_widgets/platform_switch.dart';
 
 /// Screen for creating a new forum post
 ///
@@ -563,6 +567,8 @@ class _NewPostScreenState extends ConsumerState<NewPostScreen> {
     AppLocalizations localizations,
     PostCategory? selectedCategory,
   ) {
+    final attachmentState = ref.watch(postAttachmentsProvider);
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -579,6 +585,13 @@ class _NewPostScreenState extends ConsumerState<NewPostScreen> {
           // Content input field
           _buildContentInput(theme, localizations),
 
+          // Attachment previews (displayed below content input as requested)
+          if (attachmentState.attachmentData != null) ...[
+            verticalSpace(Spacing.points16),
+            _buildDetailedAttachmentPreview(
+                theme, localizations, attachmentState),
+          ],
+
           verticalSpace(Spacing.points4),
         ],
       ),
@@ -592,7 +605,7 @@ class _NewPostScreenState extends ConsumerState<NewPostScreen> {
     final maxLength = PostFormValidationConstants.maxTitleLength;
     final isNearLimit = currentLength > maxLength * 0.8;
     final isOverLimit = currentLength > maxLength;
-    
+
     return TextField(
       controller: _titleController,
       focusNode: _titleFocusNode,
@@ -691,7 +704,7 @@ class _NewPostScreenState extends ConsumerState<NewPostScreen> {
     final maxLength = PostFormValidationConstants.maxContentLength;
     final isNearLimit = currentLength > maxLength * 0.8;
     final isOverLimit = currentLength > maxLength;
-    
+
     return TextField(
       controller: _contentController,
       focusNode: _contentFocusNode,
@@ -727,7 +740,7 @@ class _NewPostScreenState extends ConsumerState<NewPostScreen> {
   Widget _buildBottomSection(
       CustomThemeData theme, AppLocalizations localizations) {
     final attachmentState = ref.watch(postAttachmentsProvider);
-    
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -737,17 +750,9 @@ class _NewPostScreenState extends ConsumerState<NewPostScreen> {
         ),
       ),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          // Attachment previews (if any)
-          if (attachmentState.attachmentData != null) ...[
-            _buildDetailedAttachmentPreview(theme, localizations, attachmentState),
-            horizontalSpace(Spacing.points8),
-          ],
-          
-          const Spacer(),
-          
-          // Attachment action icons
+          // Attachment action icons (left side)
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -755,7 +760,8 @@ class _NewPostScreenState extends ConsumerState<NewPostScreen> {
                 theme,
                 LucideIcons.image,
                 () => _handleAttachmentTap(AttachmentType.image),
-                isSelected: attachmentState.selectedType == AttachmentType.image,
+                isSelected:
+                    attachmentState.selectedType == AttachmentType.image,
               ),
               horizontalSpace(Spacing.points12),
               _buildAttachmentIcon(
@@ -769,13 +775,14 @@ class _NewPostScreenState extends ConsumerState<NewPostScreen> {
                 theme,
                 LucideIcons.users,
                 () => _handleAttachmentTap(AttachmentType.groupInvite),
-                isSelected: attachmentState.selectedType == AttachmentType.groupInvite,
+                isSelected:
+                    attachmentState.selectedType == AttachmentType.groupInvite,
               ),
-              horizontalSpace(Spacing.points16),
-              // Post button
-              _buildPostButton(theme, localizations),
             ],
           ),
+
+          // Post button (right side)
+          _buildPostButton(theme, localizations),
         ],
       ),
     );
@@ -783,11 +790,8 @@ class _NewPostScreenState extends ConsumerState<NewPostScreen> {
 
   /// Builds an attachment icon button
   Widget _buildAttachmentIcon(
-    CustomThemeData theme,
-    IconData icon,
-    VoidCallback onTap,
-    {bool isSelected = false}
-  ) {
+      CustomThemeData theme, IconData icon, VoidCallback onTap,
+      {bool isSelected = false}) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -795,9 +799,7 @@ class _NewPostScreenState extends ConsumerState<NewPostScreen> {
         decoration: BoxDecoration(
           color: isSelected ? theme.primary[100] : Colors.transparent,
           borderRadius: BorderRadius.circular(8),
-          border: isSelected 
-              ? Border.all(color: theme.primary[300]!) 
-              : null,
+          border: isSelected ? Border.all(color: theme.primary[300]!) : null,
         ),
         child: Icon(
           icon,
@@ -849,9 +851,8 @@ class _NewPostScreenState extends ConsumerState<NewPostScreen> {
               const SizedBox(width: 6),
               Text(
                 '${imageData.images.length} image${imageData.images.length > 1 ? 's' : ''}',
-                style: TextStyles.small.copyWith(
+                style: TextStyles.smallBold.copyWith(
                   color: theme.primary[600],
-                  fontWeight: FontWeight.w600,
                 ),
               ),
               const Spacer(),
@@ -934,10 +935,9 @@ class _NewPostScreenState extends ConsumerState<NewPostScreen> {
               Icon(LucideIcons.barChart3, size: 16, color: theme.primary[600]),
               const SizedBox(width: 6),
               Text(
-                'Poll',
-                style: TextStyles.small.copyWith(
+                'Poll • ${pollData.options.length} option${pollData.options.length > 1 ? 's' : ''}${pollData.isMultiSelect ? ' • Multi-select' : ''}',
+                style: TextStyles.smallBold.copyWith(
                   color: theme.primary[600],
-                  fontWeight: FontWeight.w600,
                 ),
               ),
               const Spacer(),
@@ -962,9 +962,8 @@ class _NewPostScreenState extends ConsumerState<NewPostScreen> {
           // Poll question
           Text(
             pollData.question.isNotEmpty ? pollData.question : 'Poll question',
-            style: TextStyles.caption.copyWith(
-              color: theme.grey[700],
-              fontWeight: FontWeight.w600,
+            style: TextStyles.footnoteSelected.copyWith(
+              color: theme.grey[800],
             ),
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
@@ -987,8 +986,8 @@ class _NewPostScreenState extends ConsumerState<NewPostScreen> {
                     Expanded(
                       child: Text(
                         option.text,
-                        style: TextStyles.small.copyWith(
-                          color: theme.grey[600],
+                        style: TextStyles.caption.copyWith(
+                          color: theme.grey[700],
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -999,8 +998,8 @@ class _NewPostScreenState extends ConsumerState<NewPostScreen> {
               )),
           if (pollData.options.length > 2)
             Text(
-              '+${pollData.options.length - 2} more options',
-              style: TextStyles.small.copyWith(
+              '+${pollData.options.length - 2} more option${pollData.options.length - 2 > 1 ? 's' : ''}',
+              style: TextStyles.caption.copyWith(
                 color: theme.primary[600],
                 fontStyle: FontStyle.italic,
               ),
@@ -1016,7 +1015,8 @@ class _NewPostScreenState extends ConsumerState<NewPostScreen> {
     AppLocalizations localizations,
     PostAttachmentsState attachmentState,
   ) {
-    final groupData = attachmentState.attachmentData as GroupInviteAttachmentData?;
+    final groupData =
+        attachmentState.attachmentData as GroupInviteAttachmentData?;
     if (groupData == null) {
       return const SizedBox.shrink();
     }
@@ -1039,9 +1039,8 @@ class _NewPostScreenState extends ConsumerState<NewPostScreen> {
               const SizedBox(width: 6),
               Text(
                 'Group Invite',
-                style: TextStyles.small.copyWith(
+                style: TextStyles.smallBold.copyWith(
                   color: theme.success[600],
-                  fontWeight: FontWeight.w600,
                 ),
               ),
               const Spacer(),
@@ -1076,12 +1075,11 @@ class _NewPostScreenState extends ConsumerState<NewPostScreen> {
                 ),
                 child: Center(
                   child: Text(
-                    groupData.groupName.isNotEmpty 
-                        ? groupData.groupName[0].toUpperCase() 
+                    groupData.groupName.isNotEmpty
+                        ? groupData.groupName[0].toUpperCase()
                         : 'G',
-                    style: TextStyles.small.copyWith(
+                    style: TextStyles.footnoteSelected.copyWith(
                       color: theme.success[700],
-                      fontWeight: FontWeight.w600,
                     ),
                   ),
                 ),
@@ -1093,16 +1091,16 @@ class _NewPostScreenState extends ConsumerState<NewPostScreen> {
                   children: [
                     Text(
                       groupData.groupName,
-                      style: TextStyles.small.copyWith(
+                      style: TextStyles.footnoteSelected.copyWith(
                         color: theme.success[700],
-                        fontWeight: FontWeight.w600,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
+                    const SizedBox(height: 2),
                     Text(
-                      '${groupData.groupGender} • ${groupData.groupMemberCount}/${groupData.groupCapacity}',
-                      style: TextStyles.small.copyWith(
+                      '${groupData.groupGender} • ${groupData.groupMemberCount}/${groupData.groupCapacity} members',
+                      style: TextStyles.caption.copyWith(
                         color: theme.success[600],
                       ),
                       maxLines: 1,
@@ -1118,12 +1116,6 @@ class _NewPostScreenState extends ConsumerState<NewPostScreen> {
     );
   }
 
-
-
-
-
-
-
   /// Helper methods for attachment management
   void _clearAttachments() {
     ref.read(postAttachmentsProvider.notifier).clearAttachments();
@@ -1132,13 +1124,13 @@ class _NewPostScreenState extends ConsumerState<NewPostScreen> {
   /// Handle attachment icon tap with Plus eligibility check
   void _handleAttachmentTap(AttachmentType attachmentType) {
     final hasActiveSubscription = ref.read(hasActiveSubscriptionProvider);
-    
+
     if (!hasActiveSubscription) {
       // Show Plus subscription modal
       _showPlusSubscriptionModal();
       return;
     }
-    
+
     // User has Plus access - proceed with attachment functionality
     switch (attachmentType) {
       case AttachmentType.image:
@@ -1169,7 +1161,7 @@ class _NewPostScreenState extends ConsumerState<NewPostScreen> {
     try {
       final imageService = ref.read(attachmentImageServiceProvider);
       final images = await imageService.pickImages(maxImages: 4);
-      
+
       if (images.isNotEmpty) {
         ref.read(postAttachmentsProvider.notifier).updateImages(images);
       }
@@ -1211,7 +1203,9 @@ class _NewPostScreenState extends ConsumerState<NewPostScreen> {
       useSafeArea: true,
       builder: (context) => _GroupInviteModal(
         onGroupSelected: (groupData) {
-          ref.read(postAttachmentsProvider.notifier).updateGroupInvite(groupData);
+          ref
+              .read(postAttachmentsProvider.notifier)
+              .updateGroupInvite(groupData);
           Navigator.of(context).pop();
         },
       ),
@@ -1542,10 +1536,12 @@ class _NewPostScreenState extends ConsumerState<NewPostScreen> {
 
       // Get attachment data if any
       final attachmentState = ref.read(postAttachmentsProvider);
-      
-      print('📎 [NewPostScreen] Attachment state: ${attachmentState.selectedType}');
+
+      print(
+          '📎 [NewPostScreen] Attachment state: ${attachmentState.selectedType}');
       if (attachmentState.attachmentData != null) {
-        print('   - Has attachment data: ${attachmentState.attachmentData.runtimeType}');
+        print(
+            '   - Has attachment data: ${attachmentState.attachmentData.runtimeType}');
       }
 
       // Submit through the provider
@@ -1702,7 +1698,7 @@ class _NewPostScreenState extends ConsumerState<NewPostScreen> {
 /// Poll Creation Modal Widget
 class _PollCreationModal extends ConsumerStatefulWidget {
   final Function(PollAttachmentData) onPollCreated;
-  
+
   const _PollCreationModal({required this.onPollCreated});
 
   @override
@@ -1716,7 +1712,6 @@ class _PollCreationModalState extends ConsumerState<_PollCreationModal> {
     TextEditingController(),
   ];
   bool _isMultiSelect = false;
-  DateTime? _closesAt;
 
   @override
   void dispose() {
@@ -1758,8 +1753,8 @@ class _PollCreationModalState extends ConsumerState<_PollCreationModal> {
     final options = _optionControllers
         .where((controller) => controller.text.trim().isNotEmpty)
         .map((controller) => PollOptionData(
-              id: DateTime.now().millisecondsSinceEpoch.toString() + 
-                   _optionControllers.indexOf(controller).toString(),
+              id: DateTime.now().millisecondsSinceEpoch.toString() +
+                  _optionControllers.indexOf(controller).toString(),
               text: controller.text.trim(),
             ))
         .toList();
@@ -1768,7 +1763,7 @@ class _PollCreationModalState extends ConsumerState<_PollCreationModal> {
       question: _questionController.text.trim(),
       options: options,
       isMultiSelect: _isMultiSelect,
-      closesAt: _closesAt,
+      closesAt: null,
     );
 
     widget.onPollCreated(pollData);
@@ -1797,7 +1792,7 @@ class _PollCreationModalState extends ConsumerState<_PollCreationModal> {
               borderRadius: BorderRadius.circular(2),
             ),
           ),
-          
+
           // Header
           Padding(
             padding: const EdgeInsets.all(16),
@@ -1809,21 +1804,27 @@ class _PollCreationModalState extends ConsumerState<_PollCreationModal> {
                 ),
                 Expanded(
                   child: Text(
-                    'Create Poll',
+                    localizations.translate('poll-create'),
                     style: TextStyles.h6.copyWith(
                       color: theme.grey[900],
-                      fontWeight: FontWeight.w600,
                     ),
                     textAlign: TextAlign.center,
                   ),
                 ),
-                TextButton(
-                  onPressed: _isValid ? _createPoll : null,
-                  child: Text(
-                    'Create',
-                    style: TextStyles.footnote.copyWith(
-                      color: _isValid ? theme.primary[600] : theme.grey[400],
-                      fontWeight: FontWeight.w600,
+                // Create button using shared WidgetsContainer
+                shared.WidgetsContainer(
+                  backgroundColor:
+                      _isValid ? theme.primary[600] : theme.grey[400],
+                  borderSide: BorderSide.none,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  child: GestureDetector(
+                    onTap: _isValid ? _createPoll : null,
+                    child: Text(
+                      localizations.translate('create'),
+                      style: TextStyles.footnoteSelected.copyWith(
+                        color: Colors.white,
+                      ),
                     ),
                   ),
                 ),
@@ -1837,93 +1838,83 @@ class _PollCreationModalState extends ConsumerState<_PollCreationModal> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Question input
-                  Text(
-                    'Poll Question',
-                    style: TextStyles.body.copyWith(
-                      color: theme.grey[700],
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  TextField(
+                  // Question input using CustomTextArea
+                  CustomTextArea(
                     controller: _questionController,
+                    hint: localizations.translate('poll-question-hint'),
+                    prefixIcon: LucideIcons.helpCircle,
                     maxLength: 100,
                     maxLines: 2,
-                    decoration: InputDecoration(
-                      hintText: 'Ask your question...',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      counterStyle: TextStyles.caption.copyWith(
-                        color: theme.grey[500],
-                      ),
-                    ),
-                    onChanged: (_) => setState(() {}),
+                    height: 80,
+                    validator: (value) {
+                      if (value?.trim().isEmpty ?? true) {
+                        return 'Required';
+                      }
+                      return null;
+                    },
                   ),
-                  
+
                   const SizedBox(height: 24),
-                  
+
                   // Options
                   Text(
-                    'Options',
-                    style: TextStyles.body.copyWith(
-                      color: theme.grey[700],
-                      fontWeight: FontWeight.w600,
+                    localizations.translate('poll-options'),
+                    style: TextStyles.footnoteSelected.copyWith(
+                      color: theme.grey[800],
                     ),
                   ),
                   const SizedBox(height: 8),
-                  
+
+                  // Options using CustomTextField
                   ..._optionControllers.asMap().entries.map((entry) {
                     final index = entry.key;
                     final controller = entry.value;
                     return Padding(
-                      padding: const EdgeInsets.only(bottom: 8),
+                      padding: const EdgeInsets.only(bottom: 12),
                       child: Row(
                         children: [
                           Expanded(
-                            child: TextField(
+                            child: CustomTextField(
                               controller: controller,
-                              maxLength: 100,
-                              decoration: InputDecoration(
-                                hintText: 'Option ${index + 1}',
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                counterText: '',
-                                suffixIcon: _optionControllers.length > 2
-                                    ? IconButton(
-                                        icon: Icon(LucideIcons.x, size: 16),
-                                        onPressed: () => _removeOption(index),
-                                      )
-                                    : null,
-                              ),
-                              onChanged: (_) => setState(() {}),
+                              hint:
+                                  '${localizations.translate('poll-option')} ${index + 1}',
+                              prefixIcon: LucideIcons.circle,
+                              inputType: TextInputType.text,
+                              validator: (value) =>
+                                  null, // No validation for options
                             ),
                           ),
+                          if (_optionControllers.length > 2)
+                            IconButton(
+                              icon: Icon(LucideIcons.x,
+                                  size: 16, color: theme.error[600]),
+                              onPressed: () => _removeOption(index),
+                            ),
                         ],
                       ),
                     );
                   }),
-                  
+
+                  // Add option button using WidgetsContainer
                   if (_optionControllers.length < 4)
                     GestureDetector(
                       onTap: _addOption,
-                      child: Container(
+                      child: shared.WidgetsContainer(
                         width: double.infinity,
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: theme.grey[300]!),
-                          borderRadius: BorderRadius.circular(12),
+                        backgroundColor: theme.grey[50],
+                        borderSide: BorderSide(
+                          color: theme.primary[300]!,
+                          style: BorderStyle.solid,
                         ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(LucideIcons.plus, size: 16, color: theme.primary[600]),
+                            Icon(LucideIcons.plus,
+                                size: 16, color: theme.primary[600]),
                             const SizedBox(width: 8),
                             Text(
-                              'Add Option',
-                              style: TextStyles.body.copyWith(
+                              localizations.translate('poll-add-option'),
+                              style: TextStyles.footnoteSelected.copyWith(
                                 color: theme.primary[600],
                               ),
                             ),
@@ -1931,16 +1922,17 @@ class _PollCreationModalState extends ConsumerState<_PollCreationModal> {
                         ),
                       ),
                     ),
-                    
+
                   const SizedBox(height: 24),
-                  
-                  // Settings
-                  SwitchListTile(
-                    title: Text('Allow multiple selections'),
+
+                  // Multi-select switch using PlatformSwitch
+                  PlatformSwitch(
                     value: _isMultiSelect,
-                    onChanged: (value) => setState(() => _isMultiSelect = value),
+                    onChanged: (value) =>
+                        setState(() => _isMultiSelect = value),
+                    label: localizations.translate('poll-multi-select'),
                   ),
-                  
+
                   const SizedBox(height: 16),
                 ],
               ),
@@ -1955,7 +1947,7 @@ class _PollCreationModalState extends ConsumerState<_PollCreationModal> {
 /// Group Invite Modal Widget
 class _GroupInviteModal extends ConsumerWidget {
   final Function(GroupInviteAttachmentData) onGroupSelected;
-  
+
   const _GroupInviteModal({required this.onGroupSelected});
 
   @override
@@ -1982,7 +1974,7 @@ class _GroupInviteModal extends ConsumerWidget {
               borderRadius: BorderRadius.circular(2),
             ),
           ),
-          
+
           // Header
           Padding(
             padding: const EdgeInsets.all(16),
@@ -1994,10 +1986,9 @@ class _GroupInviteModal extends ConsumerWidget {
                 ),
                 Expanded(
                   child: Text(
-                    'Select Group to Invite',
+                    localizations.translate('group-invite-select'),
                     style: TextStyles.h6.copyWith(
                       color: theme.grey[900],
-                      fontWeight: FontWeight.w600,
                     ),
                     textAlign: TextAlign.center,
                   ),
@@ -2047,7 +2038,8 @@ class _GroupInviteModal extends ConsumerWidget {
                           groupCapacity: group.memberCapacity,
                           groupMemberCount: group.memberCount,
                           joinMethod: group.joinMethod,
-                          groupPlusOnly: false, // TODO: Implement Plus-only group logic if needed
+                          groupPlusOnly:
+                              false, // TODO: Implement Plus-only group logic if needed
                         );
                         onGroupSelected(groupData);
                       },
@@ -2087,13 +2079,13 @@ class _GroupInviteModal extends ConsumerWidget {
 class _GroupTile extends StatelessWidget {
   final GroupEntity group;
   final VoidCallback onTap;
-  
+
   const _GroupTile({required this.group, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
     final theme = AppTheme.of(context);
-    
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -2119,14 +2111,13 @@ class _GroupTile extends StatelessWidget {
                   group.name.isNotEmpty ? group.name[0].toUpperCase() : 'G',
                   style: TextStyles.h6.copyWith(
                     color: theme.primary[700],
-                    fontWeight: FontWeight.w600,
                   ),
                 ),
               ),
             ),
-            
+
             const SizedBox(width: 12),
-            
+
             // Group info
             Expanded(
               child: Column(
@@ -2137,9 +2128,8 @@ class _GroupTile extends StatelessWidget {
                       Expanded(
                         child: Text(
                           group.name,
-                          style: TextStyles.body.copyWith(
+                          style: TextStyles.footnoteSelected.copyWith(
                             color: theme.grey[900],
-                            fontWeight: FontWeight.w600,
                           ),
                         ),
                       ),
@@ -2185,7 +2175,7 @@ class _GroupTile extends StatelessWidget {
                 ],
               ),
             ),
-            
+
             Icon(
               LucideIcons.chevronRight,
               size: 20,

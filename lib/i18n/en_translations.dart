@@ -151,6 +151,7 @@ const Map<String, String> kEn = {
   "title": "Title",
   "body": "Body",
   "delete": "Delete",
+  "create": "Create",
   "save": "Save",
   "changes-has-been-saved": "Changes has been saved",
   "disable_commenting": "Disable Comments",
@@ -595,10 +596,14 @@ const Map<String, String> kEn = {
   "attachment-creation-failed": "Failed to create attachment",
 
   // Poll
+  "poll-create": "Create Poll",
   "poll-question": "Poll Question",
+  "poll-question-hint": "Ask your question...",
+  "poll-option": "Option",
+  "poll-add-option": "Add Option",
   "poll-options": "Poll Options",
   "poll-single-select": "Single Choice",
-  "poll-multi-select": "Multiple Choice",
+  "poll-multi-select": "Allow multiple selections",
   "poll-close-at": "Close Poll At",
   "poll-closed": "Poll Closed",
   "poll-vote": "Vote",
@@ -608,6 +613,7 @@ const Map<String, String> kEn = {
 
   // Group invite
   "group-invite": "Group Invite",
+  "group-invite-select": "Select Group to Invite",
   "group-invite-expired": "Invite has expired",
   "group-invite-revoked": "Invite has been revoked",
   "group-invite-join": "Join Group",

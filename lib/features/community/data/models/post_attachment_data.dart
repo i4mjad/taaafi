@@ -125,10 +125,10 @@ class PollAttachmentData extends AttachmentData {
 
   bool get isValid {
     return question.trim().isNotEmpty &&
-           question.length <= 100 &&
-           options.length >= 2 &&
-           options.length <= 4 &&
-           options.every((option) => option.isValid);
+        question.length <= 100 &&
+        options.length >= 2 &&
+        options.length <= 4 &&
+        options.every((option) => option.isValid);
   }
 }
 
@@ -213,8 +213,8 @@ class PostAttachmentsState {
     AttachmentData? attachmentData,
   }) {
     return PostAttachmentsState(
-      selectedType: selectedType,
-      attachmentData: attachmentData,
+      selectedType: selectedType ?? this.selectedType,
+      attachmentData: attachmentData ?? this.attachmentData,
     );
   }
 
@@ -223,10 +223,10 @@ class PostAttachmentsState {
   }
 
   bool get hasAttachments => selectedType != null && attachmentData != null;
-  
+
   bool get isValid {
     if (!hasAttachments) return true;
-    
+
     switch (selectedType!) {
       case AttachmentType.image:
         final imageData = attachmentData as ImageAttachmentData;
