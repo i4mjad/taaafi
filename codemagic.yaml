@@ -419,6 +419,11 @@ workflows:
             --build-number=$ANDROID_BUILD_NUMBER \
             --target lib/main.dart
 
+      - name: Re-apply code signing settings on Xcode project (iOS)
+        script: |
+          # Ensure correct signing accounts/profiles are in place before export
+          xcode-project use-profiles
+
       - name: Shorebird Release iOS
         script: |
           shorebird release ios --flutter-version=3.32.5 \
