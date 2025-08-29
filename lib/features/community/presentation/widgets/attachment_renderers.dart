@@ -27,8 +27,6 @@ class AttachmentRenderer extends ConsumerWidget {
     if (!post.attachmentTypes.contains('image') &&
         !post.attachmentTypes.contains('poll') &&
         !post.attachmentTypes.contains('group_invite')) {
-      print(
-          '🎨 [ATTACHMENT_RENDERER] No supported attachment types found, returning empty');
       return const SizedBox.shrink();
     }
 
@@ -40,7 +38,6 @@ class AttachmentRenderer extends ConsumerWidget {
         // Render based on attachment type
         if (post.attachmentTypes.contains('image')) ...[
           Builder(builder: (context) {
-            print('🖼️ [ATTACHMENT_RENDERER] Rendering image attachment');
             return _ImageAttachmentRenderer(
               post: post,
               isListView: isListView,
@@ -50,7 +47,6 @@ class AttachmentRenderer extends ConsumerWidget {
 
         if (post.attachmentTypes.contains('poll')) ...[
           Builder(builder: (context) {
-            print('🗳️ [ATTACHMENT_RENDERER] Rendering poll attachment');
             return _PollAttachmentRenderer(
               post: post,
               isListView: isListView,
@@ -60,7 +56,6 @@ class AttachmentRenderer extends ConsumerWidget {
 
         if (post.attachmentTypes.contains('group_invite')) ...[
           Builder(builder: (context) {
-            print('👥 [ATTACHMENT_RENDERER] Rendering group invite attachment');
             return _GroupInviteAttachmentRenderer(
               post: post,
               isListView: isListView,
@@ -468,7 +463,7 @@ class _ImageAttachmentRenderer extends StatelessWidget {
             onPressed: () => Navigator.of(context).pop(),
           ),
           title: Text(
-            '${initialIndex + 1} ${AppLocalizations.of(context)?.translate('of')} ${images.length}',
+            '${initialIndex + 1} ${AppLocalizations.of(context).translate('of')} ${images.length}',
             style: TextStyles.body.copyWith(color: Colors.white),
           ),
         ),

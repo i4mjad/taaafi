@@ -18,12 +18,12 @@ class DiscoverableGroup {
   final int memberCount;
   final int capacity;
   final String gender; // 'male' | 'female' | 'mixed'
+  final String preferredLanguage; // 'arabic' | 'english'
   final String joinMethod; // 'any' | 'code_only'
   final DateTime createdAt;
   final bool isActive;
   final String? lastActivityTime; // e.g., "2 hours ago"
   final List<String> tags; // e.g., ['Recovery', 'Support', 'Arabic']
-  final int challengesCount;
 
   const DiscoverableGroup({
     required this.id,
@@ -32,12 +32,12 @@ class DiscoverableGroup {
     required this.memberCount,
     required this.capacity,
     required this.gender,
+    required this.preferredLanguage,
     required this.joinMethod,
     required this.createdAt,
     this.isActive = true,
     this.lastActivityTime,
     this.tags = const [],
-    this.challengesCount = 0,
   });
 }
 
@@ -194,6 +194,23 @@ class PublicGroupCard extends ConsumerWidget {
               // Metadata Row
               Row(
                 children: [
+                  // Language indicator
+                  Icon(
+                    LucideIcons.languages,
+                    size: 14,
+                    color: theme.grey[500],
+                  ),
+                  horizontalSpace(Spacing.points4),
+                  Text(
+                    _getLanguageText(group.preferredLanguage, l10n),
+                    style: TextStyles.caption.copyWith(
+                      color: theme.grey[600],
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+
+                  horizontalSpace(Spacing.points16),
+
                   // Created time
                   Icon(
                     LucideIcons.clock,
@@ -203,22 +220,6 @@ class PublicGroupCard extends ConsumerWidget {
                   horizontalSpace(Spacing.points4),
                   Text(
                     _formatCreatedTime(group.createdAt, l10n),
-                    style: TextStyles.caption.copyWith(
-                      color: theme.grey[600],
-                    ),
-                  ),
-
-                  horizontalSpace(Spacing.points16),
-
-                  // Challenges count
-                  Icon(
-                    LucideIcons.trophy,
-                    size: 14,
-                    color: theme.grey[500],
-                  ),
-                  horizontalSpace(Spacing.points4),
-                  Text(
-                    '${group.challengesCount} ${l10n.translate('group-challenge-count')}',
                     style: TextStyles.caption.copyWith(
                       color: theme.grey[600],
                     ),
@@ -366,24 +367,27 @@ class PublicGroupCard extends ConsumerWidget {
     return Consumer(
       builder: (context, ref, child) {
         final profileAsync = ref.watch(currentCommunityProfileProvider);
-        
+
         return profileAsync.when(
           data: (profile) {
             if (profile == null) {
-              return _buildDisabledButton(theme, l10n, 'profile-required', LucideIcons.userX);
+              return _buildDisabledButton(
+                  theme, l10n, 'profile-required', LucideIcons.userX);
             }
-            
+
             final canJoinAsync = ref.watch(canJoinGroupProvider(profile.id));
             return canJoinAsync.when(
               data: (canJoin) {
                 if (!canJoin) {
-                  return _buildDisabledButton(theme, l10n, 'cooldown-active', LucideIcons.clock);
+                  return _buildDisabledButton(
+                      theme, l10n, 'cooldown-active', LucideIcons.clock);
                 }
-                
+
                 return GestureDetector(
                   onTap: isCapacityFull ? null : onJoin,
                   child: Container(
-                    padding: EdgeInsets.symmetric(vertical: Spacing.points12.value),
+                    padding:
+                        EdgeInsets.symmetric(vertical: Spacing.points12.value),
                     decoration: BoxDecoration(
                       color: isCapacityFull
                           ? theme.grey[200]
@@ -402,7 +406,8 @@ class PublicGroupCard extends ConsumerWidget {
                                   ? LucideIcons.key
                                   : LucideIcons.userPlus,
                           size: 16,
-                          color: isCapacityFull ? theme.grey[500] : Colors.white,
+                          color:
+                              isCapacityFull ? theme.grey[500] : Colors.white,
                         ),
                         horizontalSpace(Spacing.points8),
                         Text(
@@ -412,7 +417,8 @@ class PublicGroupCard extends ConsumerWidget {
                                   ? l10n.translate('join-with-code')
                                   : l10n.translate('join-group'),
                           style: TextStyles.footnote.copyWith(
-                            color: isCapacityFull ? theme.grey[500] : Colors.white,
+                            color:
+                                isCapacityFull ? theme.grey[500] : Colors.white,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
@@ -421,18 +427,23 @@ class PublicGroupCard extends ConsumerWidget {
                   ),
                 );
               },
-              loading: () => _buildDisabledButton(theme, l10n, 'loading', LucideIcons.loader),
-              error: (_, __) => _buildDisabledButton(theme, l10n, 'error', LucideIcons.alertCircle),
+              loading: () => _buildDisabledButton(
+                  theme, l10n, 'loading', LucideIcons.loader),
+              error: (_, __) => _buildDisabledButton(
+                  theme, l10n, 'error', LucideIcons.alertCircle),
             );
           },
-          loading: () => _buildDisabledButton(theme, l10n, 'loading', LucideIcons.loader),
-          error: (_, __) => _buildDisabledButton(theme, l10n, 'error', LucideIcons.alertCircle),
+          loading: () =>
+              _buildDisabledButton(theme, l10n, 'loading', LucideIcons.loader),
+          error: (_, __) => _buildDisabledButton(
+              theme, l10n, 'error', LucideIcons.alertCircle),
         );
       },
     );
   }
-  
-  Widget _buildDisabledButton(CustomThemeData theme, AppLocalizations l10n, String reasonKey, IconData icon) {
+
+  Widget _buildDisabledButton(CustomThemeData theme, AppLocalizations l10n,
+      String reasonKey, IconData icon) {
     return Container(
       padding: EdgeInsets.symmetric(vertical: Spacing.points12.value),
       decoration: BoxDecoration(
@@ -449,7 +460,7 @@ class PublicGroupCard extends ConsumerWidget {
           ),
           horizontalSpace(Spacing.points8),
           Text(
-            reasonKey == 'cooldown-active' 
+            reasonKey == 'cooldown-active'
                 ? l10n.translate('wait-to-join')
                 : reasonKey == 'loading'
                     ? l10n.translate('loading')
@@ -505,6 +516,18 @@ class PublicGroupCard extends ConsumerWidget {
           .replaceAll('{hours}', difference.inHours.toString());
     } else {
       return l10n.translate('just-created');
+    }
+  }
+
+  String _getLanguageText(String? language, AppLocalizations l10n) {
+    switch (language?.toLowerCase()) {
+      case 'arabic':
+        return l10n.translate('arabic');
+      case 'english':
+        return l10n.translate('english');
+      default:
+        // Fallback to Arabic if language is null, empty, or unrecognized
+        return l10n.translate('arabic');
     }
   }
 }

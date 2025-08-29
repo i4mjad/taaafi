@@ -48,14 +48,21 @@ class GroupPrivacyService {
     int? joinCodeMaxUses,
   }) async {
     try {
-      // Validate admin permissions by fetching the group
-      final group = await _groupsRepository.getGroupById(groupId);
-      if (group == null) {
-        throw Exception('Group not found');
+      // Validate admin permissions by checking membership role
+      final membership =
+          await _groupsRepository.getCurrentMembership(adminCpId);
+      if (membership == null || membership.groupId != groupId) {
+        throw Exception('error-group-membership-not-found');
       }
 
-      if (group.adminCpId != adminCpId) {
-        throw Exception('Only group admin can update privacy settings');
+      if (membership.role != 'admin') {
+        throw Exception('error-only-admin-can-update');
+      }
+
+      // Validate group exists
+      final group = await _groupsRepository.getGroupById(groupId);
+      if (group == null) {
+        throw Exception('error-group-not-found');
       }
 
       // Validate business rules
@@ -85,7 +92,12 @@ class GroupPrivacyService {
 
       return updatedGroup;
     } catch (e) {
-      throw Exception('Failed to update group privacy settings: $e');
+      // If it's already a localization key, rethrow as is
+      if (e.toString().startsWith('Exception: error-')) {
+        rethrow;
+      }
+      // Otherwise, wrap with localized error message
+      throw Exception('error-failed-update-privacy');
     }
   }
 
@@ -107,10 +119,7 @@ class GroupPrivacyService {
       final membership = await _groupsRepository.getCurrentMembership(cpId);
       if (membership == null) return false;
 
-      final group = await _groupsRepository.getGroupById(membership.groupId);
-      if (group == null) return false;
-
-      return group.adminCpId == cpId;
+      return membership.role == 'admin';
     } catch (e) {
       return false;
     }
@@ -137,12 +146,12 @@ class GroupPrivacyService {
 
     // Rule: Groups with 'any' join method must be public
     if (finalJoinMethod == 'any' && finalVisibility != 'public') {
-      throw Exception('Groups with "any" join method must be public');
+      throw Exception('error-groups-any-must-public');
     }
 
     // Rule: Private groups cannot have 'any' join method
     if (finalVisibility == 'private' && finalJoinMethod == 'any') {
-      throw Exception('Private groups cannot have "any" join method');
+      throw Exception('error-private-groups-no-any');
     }
   }
 }

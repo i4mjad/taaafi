@@ -52,6 +52,7 @@ class GroupsRepositoryImpl implements GroupsRepository {
               name: group.name,
               description: group.description,
               gender: group.gender,
+              preferredLanguage: group.preferredLanguage,
               memberCapacity: group.memberCapacity,
               memberCount: memberCount,
               adminCpId: group.adminCpId,
@@ -93,6 +94,7 @@ class GroupsRepositoryImpl implements GroupsRepository {
     required String visibility,
     required String joinMethod,
     required String creatorCpId,
+    required String preferredLanguage,
     String? joinCode,
     DateTime? joinCodeExpiresAt,
     int? joinCodeMaxUses,
@@ -153,6 +155,7 @@ class GroupsRepositoryImpl implements GroupsRepository {
         name: name.trim(),
         description: description.trim(),
         gender: userGender,
+        preferredLanguage: preferredLanguage,
         memberCapacity: memberCapacity,
         memberCount: 1, // Creator is the first member
         adminCpId: creatorCpId,
@@ -674,12 +677,15 @@ class GroupsRepositoryImpl implements GroupsRepository {
       // Get the current group
       final currentGroup = await _dataSource.getGroupById(groupId);
       if (currentGroup == null) {
-        throw Exception('Group not found: $groupId');
+        throw Exception('error-group-not-found');
       }
 
-      // Verify admin permissions
-      if (currentGroup.adminCpId != adminCpId) {
-        throw Exception('Only group admin can update privacy settings');
+      // Verify admin permissions by checking membership role
+      final membership = await _dataSource.getCurrentMembership(adminCpId);
+      if (membership == null ||
+          membership.groupId != groupId ||
+          membership.role != 'admin') {
+        throw Exception('error-only-admin-can-update');
       }
 
       // Prepare updates
@@ -694,12 +700,12 @@ class GroupsRepositoryImpl implements GroupsRepository {
       // Validate visibility and join method combination
       if (visibility != null && joinMethod != null) {
         if (joinMethod == 'any' && visibility != 'public') {
-          throw Exception('Groups with "any" join method must be public');
+          throw Exception('error-groups-any-must-public');
         }
       } else if (joinMethod == 'any' && currentGroup.visibility != 'public') {
-        throw Exception('Groups with "any" join method must be public');
+        throw Exception('error-groups-any-must-public');
       } else if (visibility == 'private' && currentGroup.joinMethod == 'any') {
-        throw Exception('Private groups cannot have "any" join method');
+        throw Exception('error-private-groups-no-any');
       }
 
       // Create updated group model

@@ -277,9 +277,8 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen>
   }
 
   Widget _buildForumTab() {
-    // Disable refresh for challenges and categories tabs
-    final shouldEnableRefresh =
-        !['challenges', 'categories'].contains(_selectedFilter);
+    // Disable refresh for categories tab
+    final shouldEnableRefresh = _selectedFilter != 'categories';
 
     Widget scrollView = CustomScrollView(
       controller: _scrollController,
@@ -314,13 +313,6 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen>
                     'posts',
                     LucideIcons.messageSquare,
                     const Color(0xFF3B82F6),
-                  ),
-                  const SizedBox(width: 8),
-                  _buildFilterChip(
-                    AppLocalizations.of(context).translate('challenges'),
-                    'challenges',
-                    LucideIcons.star,
-                    const Color(0xFFEF4444),
                   ),
                   const SizedBox(width: 8),
                   _buildFilterChip(
@@ -381,8 +373,7 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen>
         return _buildPinnedView();
       case 'posts':
         return _buildPostsView();
-      case 'challenges':
-        return _buildChallengesView();
+
       case 'news':
         return _buildNewsView();
       case 'categories':
@@ -467,170 +458,6 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen>
           ),
         ),
         _buildPaginatedPostsContent(postsState, localizations, theme),
-      ],
-    );
-  }
-
-  Widget _buildChallengesView() {
-    final theme = AppTheme.of(context);
-    final localizations = AppLocalizations.of(context);
-
-    return Container(
-      margin: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Description for challenges section
-          Text(
-            localizations.translate('challenges_section_description'),
-            style: TextStyles.body.copyWith(
-              color: theme.grey[700],
-              height: 1.4,
-            ),
-          ),
-
-          const SizedBox(height: 32),
-
-          // Coming Soon Section
-          Container(
-            width: double.infinity,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                // Challenge Icon
-                Icon(
-                  LucideIcons.target,
-                  size: 60,
-                  color: theme.grey[600],
-                ),
-                const SizedBox(height: 24),
-
-                // Title
-                Text(
-                  localizations.translate('challenges_coming_soon_title'),
-                  style: TextStyles.h4.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: theme.grey[900],
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 12),
-
-                // Description
-                Text(
-                  localizations.translate('challenges_coming_soon_description'),
-                  style: TextStyles.body.copyWith(
-                    color: theme.grey[600],
-                    height: 1.5,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 24),
-
-                // Features List
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: theme.grey[50],
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: theme.grey[200]!),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildChallengeFeatureItem(
-                        icon: LucideIcons.calendar,
-                        title: localizations
-                            .translate('challenges_feature_daily_goals'),
-                        description: localizations
-                            .translate('challenges_feature_daily_goals_desc'),
-                        theme: theme,
-                      ),
-                      const SizedBox(height: 12),
-                      _buildChallengeFeatureItem(
-                        icon: LucideIcons.users,
-                        title: localizations
-                            .translate('challenges_feature_community'),
-                        description: localizations
-                            .translate('challenges_feature_community_desc'),
-                        theme: theme,
-                      ),
-                      const SizedBox(height: 12),
-                      _buildChallengeFeatureItem(
-                        icon: LucideIcons.trophy,
-                        title: localizations
-                            .translate('challenges_feature_rewards'),
-                        description: localizations
-                            .translate('challenges_feature_rewards_desc'),
-                        theme: theme,
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 20),
-
-                // Footer note
-                Text(
-                  localizations.translate('challenges_working_hard_message'),
-                  style: TextStyles.caption.copyWith(
-                    color: theme.grey[500],
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildChallengeFeatureItem({
-    required IconData icon,
-    required String title,
-    required String description,
-    required dynamic theme,
-  }) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-          padding: const EdgeInsets.all(6),
-          decoration: BoxDecoration(
-            color: theme.error[100],
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Icon(
-            icon,
-            size: 18,
-            color: theme.error[600],
-          ),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: TextStyles.body.copyWith(
-                  fontWeight: FontWeight.w600,
-                  color: theme.grey[900],
-                ),
-              ),
-              const SizedBox(height: 2),
-              Text(
-                description,
-                style: TextStyles.caption.copyWith(
-                  color: theme.grey[600],
-                  height: 1.3,
-                ),
-              ),
-            ],
-          ),
-        ),
       ],
     );
   }
@@ -1168,9 +995,8 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen>
           case 'posts':
             ref.read(postsPaginationProvider.notifier).refresh();
             break;
-          case 'challenges':
           case 'categories':
-            // No additional loading needed for these tabs
+            // No additional loading needed for this tab
             break;
         }
       },

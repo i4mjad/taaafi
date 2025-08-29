@@ -13,6 +13,7 @@ import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/core/theming/custom_theme_data.dart';
 import 'package:reboot_app_3/features/groups/presentation/widgets/public_group_card.dart';
 import 'package:reboot_app_3/features/groups/presentation/screens/modals/simple_join_code_modal.dart';
+import 'package:reboot_app_3/features/groups/presentation/screens/modals/group_details_modal.dart';
 
 import 'package:reboot_app_3/features/groups/providers/filtered_public_groups_provider.dart';
 import 'package:reboot_app_3/features/groups/domain/entities/group_entity.dart';
@@ -455,9 +456,37 @@ class _GroupsExplorationScreenState
   }
 
   void _showGroupDetails(BuildContext context, DiscoverableGroup group) {
-    // TODO: Navigate to group detail screen
-    getSystemSnackBar(
-        context, 'Feature coming soon: View details for ${group.name}');
+    // Convert DiscoverableGroup to GroupEntity for the modal
+    final groupEntity = GroupEntity(
+      id: group.id,
+      name: group.name,
+      description: group.description ?? '',
+      gender: group.gender,
+      preferredLanguage: _validateLanguage(group.preferredLanguage),
+      memberCapacity: group.capacity,
+      memberCount: group.memberCount,
+      adminCpId: '', // Not needed for details display
+      createdByCpId: '', // Not needed for details display
+      visibility: 'public', // All discoverable groups are public
+      joinMethod: group.joinMethod,
+      createdAt: group.createdAt,
+      updatedAt: group.createdAt,
+    );
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      backgroundColor: Colors.transparent,
+      isDismissible: true,
+      builder: (context) => GroupDetailsModal(
+        group: groupEntity,
+        onJoin: () {
+          Navigator.of(context).pop();
+          _joinGroup(context, group);
+        },
+      ),
+    );
   }
 
   Future<void> _joinGroup(BuildContext context, DiscoverableGroup group) async {
@@ -643,12 +672,12 @@ class _GroupsExplorationScreenState
       memberCount: group.memberCount, // Real member count from backend
       capacity: group.memberCapacity,
       gender: group.gender,
+      preferredLanguage: group.preferredLanguage,
       joinMethod: group.joinMethod,
       createdAt: group.createdAt,
       lastActivityTime:
           _formatLastActivity(group.updatedAt, AppLocalizations.of(context)),
       tags: [], // Only show real tags when available from backend
-      challengesCount: 0, // Will be loaded separately to avoid blocking UI
     );
   }
 
@@ -706,5 +735,17 @@ class _GroupsExplorationScreenState
       default:
         return result.errorMessage ?? l10n.translate('join-group-failed');
     }
+  }
+
+  /// Helper method to validate and provide fallback for group language
+  String _validateLanguage(String? language) {
+    if (language != null && language.isNotEmpty) {
+      final validLanguages = ['arabic', 'english'];
+      if (validLanguages.contains(language.toLowerCase())) {
+        return language.toLowerCase();
+      }
+    }
+    // Default to Arabic for missing or invalid values
+    return 'arabic';
   }
 }

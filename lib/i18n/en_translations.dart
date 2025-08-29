@@ -174,6 +174,25 @@ const Map<String, String> kEn = {
   "taaafi-groups": "Ta'aafi Groups",
   "group": "Group",
   "group-updates": "Group Updates",
+  "group-details": "Group Details",
+  "description": "Description",
+  "members": "members",
+  "visibility": "Visibility",
+  "join-method": "Join Method",
+  "preferred-language": "Preferred Language",
+  "gender-restriction": "Gender Restriction",
+  "male-only": "Male Only",
+  "female-only": "Female Only",
+  "mixed-gender": "Mixed Gender",
+  "public": "Public",
+  "private": "Private",
+  "anyone-can-join": "Anyone Can Join",
+  "admin-approval-required": "Admin Approval Required",
+  "join-code-required": "Join Code Required",
+  "created": "Created",
+  "group-join-disclaimer":
+      "By joining, you agree to follow group guidelines and community standards.",
+  "join-group": "Join Group",
   "not-alone": "You Are Not Alone",
   "not-alone-description":
       "Learn about different experiences and share your own with a group of recovering individuals to exchange knowledge and discover challenges in the recovery journey.",
@@ -436,6 +455,7 @@ const Map<String, String> kEn = {
       "Report reason is too long (max 500 characters)",
   "submit_report": "Submit Report",
   "post": "Post",
+  "loading-group-members": "Loading group members...",
   "comment": "comment",
   "poll-voted": "Voted",
   "of": "of",
@@ -710,7 +730,6 @@ const Map<String, String> kEn = {
   "warning-details": "Warning Details",
   "ban-details": "Ban Details",
   "reason": "Reason",
-  "description": "Description",
   "warning-information": "Warning Information",
   "ban-information": "Ban Information",
   "warning-type": "Warning Type",
@@ -1133,7 +1152,7 @@ const Map<String, String> kEn = {
   "female": "Female",
   "date-of-birth": "Date of Birth",
   "gender": "Gender",
-  "preferred-language": "Preferred Language",
+
   "activate": "Activate",
   "data-are-secured": "We keep your information secure and private.",
   "no-follow-ups": "No Follow Up for this day",
@@ -2919,7 +2938,6 @@ const Map<String, String> kEn = {
   "group-gender": "Group Gender",
   "total-points": "Total Points",
   "joined": "Joined",
-  "created": "Created",
   "group-admin": "Admin",
   "group-member": "Member",
 
@@ -3164,12 +3182,9 @@ const Map<String, String> kEn = {
   "group-challenge-count": "challenges",
   "group-active": "Active",
   "group-inactive": "Inactive",
-  "male-only": "Male Only",
-  "female-only": "Female Only",
   "mixed": "Mixed",
   "group-full": "Group Full",
   "join-with-code": "Join with Code",
-  "join-group": "Join Group",
   "just-created": "Just created",
   "group-months-ago": "{months} months ago",
   "group-days-ago": "{days} days ago",
@@ -3236,6 +3251,16 @@ const Map<String, String> kEn = {
   "join-group-with-code": "Join Group with Code",
   "join-code-placeholder": "Enter 5-character code",
   "group-weeks-ago": "{weeks} weeks ago",
+
+  // Group Privacy Error Messages
+  "error-group-not-found": "Group not found",
+  "error-group-membership-not-found": "Group membership not found",
+  "error-only-admin-can-update": "Only group admin can update privacy settings",
+  "error-groups-any-must-public":
+      "Groups with \"any\" join method must be public",
+  "error-private-groups-no-any":
+      "Private groups cannot have \"any\" join method",
+  "error-failed-update-privacy": "Failed to update group privacy settings",
 
   // Join cooldown timer
   "join-cooldown-active": "Join Cooldown Active",

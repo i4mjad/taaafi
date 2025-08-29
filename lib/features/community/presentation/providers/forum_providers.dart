@@ -475,9 +475,6 @@ final commentRepliesProvider =
   (ref, commentId) {
     final repository = ref.watch(forumRepositoryProvider);
 
-    // For now, use the fallback query until indexes are created
-    // TODO: Switch back to repository.watchCommentReplies(commentId) after creating index
-    print('Using fallback query for comment replies (index not ready)');
     return repository.watchCommentRepliesWithoutOrder(commentId);
   },
 );

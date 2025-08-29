@@ -3,6 +3,7 @@ class GroupEntity {
   final String name;
   final String description;
   final String gender; // 'male' | 'female'
+  final String preferredLanguage; // 'arabic' | 'english'
   final int memberCapacity;
   final int memberCount; // Current number of active members
   final String adminCpId;
@@ -24,6 +25,7 @@ class GroupEntity {
     required this.name,
     required this.description,
     required this.gender,
+    required this.preferredLanguage,
     required this.memberCapacity,
     required this.memberCount,
     required this.adminCpId,
@@ -46,6 +48,7 @@ class GroupEntity {
     String? name,
     String? description,
     String? gender,
+    String? preferredLanguage,
     int? memberCapacity,
     int? memberCount,
     String? adminCpId,
@@ -67,6 +70,7 @@ class GroupEntity {
       name: name ?? this.name,
       description: description ?? this.description,
       gender: gender ?? this.gender,
+      preferredLanguage: preferredLanguage ?? this.preferredLanguage,
       memberCapacity: memberCapacity ?? this.memberCapacity,
       memberCount: memberCount ?? this.memberCount,
       adminCpId: adminCpId ?? this.adminCpId,

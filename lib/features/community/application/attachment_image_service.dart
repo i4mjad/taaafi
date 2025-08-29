@@ -195,26 +195,6 @@ class AttachmentImageService {
     );
   }
 
-  /// Resize image maintaining aspect ratio
-  img.Image _resizeImage(img.Image image, int maxDimension) {
-    int width = image.width;
-    int height = image.height;
-
-    if (width <= maxDimension && height <= maxDimension) {
-      return image;
-    }
-
-    if (width > height) {
-      height = (height * maxDimension / width).round();
-      width = maxDimension;
-    } else {
-      width = (width * maxDimension / height).round();
-      height = maxDimension;
-    }
-
-    return img.copyResize(image, width: width, height: height);
-  }
-
   /// Generate simple content hash for image
   String _generateContentHash(String url) {
     // Simple hash based on URL and timestamp

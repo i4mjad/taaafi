@@ -7,6 +7,7 @@ class GroupModel extends GroupEntity {
     required super.name,
     required super.description,
     required super.gender,
+    required super.preferredLanguage,
     required super.memberCapacity,
     required super.memberCount,
     required super.adminCpId,
@@ -32,6 +33,7 @@ class GroupModel extends GroupEntity {
       name: data['name'] as String,
       description: data['description'] as String,
       gender: data['gender'] as String,
+      preferredLanguage: _getDefaultLanguage(data['preferredLanguage']),
       memberCapacity: data['memberCapacity'] as int,
       memberCount: 0, // Will be calculated separately by repository
       adminCpId: data['adminCpId'] as String,
@@ -58,6 +60,7 @@ class GroupModel extends GroupEntity {
       'name': name,
       'description': description,
       'gender': gender,
+      'preferredLanguage': preferredLanguage,
       'memberCapacity': memberCapacity,
       'adminCpId': adminCpId,
       'createdByCpId': createdByCpId,
@@ -84,6 +87,7 @@ class GroupModel extends GroupEntity {
       name: entity.name,
       description: entity.description,
       gender: entity.gender,
+      preferredLanguage: entity.preferredLanguage,
       memberCapacity: entity.memberCapacity,
       memberCount: entity.memberCount,
       adminCpId: entity.adminCpId,
@@ -109,6 +113,7 @@ class GroupModel extends GroupEntity {
       name: name,
       description: description,
       gender: gender,
+      preferredLanguage: preferredLanguage,
       memberCapacity: memberCapacity,
       memberCount: memberCount,
       adminCpId: adminCpId,
@@ -125,5 +130,20 @@ class GroupModel extends GroupEntity {
       createdAt: createdAt,
       updatedAt: updatedAt,
     );
+  }
+
+  /// Helper method to get default language for groups missing this field
+  static String _getDefaultLanguage(dynamic preferredLanguage) {
+    if (preferredLanguage != null &&
+        preferredLanguage is String &&
+        preferredLanguage.isNotEmpty) {
+      // Validate that it's a supported language
+      final validLanguages = ['arabic', 'english'];
+      if (validLanguages.contains(preferredLanguage.toLowerCase())) {
+        return preferredLanguage.toLowerCase();
+      }
+    }
+    // Default to Arabic for existing groups or invalid values
+    return 'arabic';
   }
 }

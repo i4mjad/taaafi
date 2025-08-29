@@ -4,6 +4,7 @@
 const Map<String, String> kAr = {
   "founder": "المؤسس",
   "of": "من",
+  "loading-group-members": "جاري عرض أعضاء الزمالة...",
   "anonymous_user": "مجهول",
   "subscribe-now": "اشترك الآن",
   "welcome": "مرحبًا بك!",
@@ -78,6 +79,23 @@ const Map<String, String> kAr = {
   "upgrade-now": "ترقية الآن",
   "group": "الزمالة",
   "group-updates": "تحديثات الزمالة",
+  "group-details": "تفاصيل الزمالة",
+  "members": "أعضاء",
+  "visibility": "الرؤية",
+  "join-method": "طريقة الانضمام",
+  "preferred-language": "اللغة المفضلة",
+  "gender-restriction": "القيد الجنسي",
+  "male-only": "للذكور فقط",
+  "female-only": "للإناث فقط",
+  "mixed-gender": "مختلط",
+  "public": "عام",
+  "private": "خاص",
+  "anyone-can-join": "يمكن للجميع الانضمام",
+  "admin-approval-required": "يتطلب موافقة المشرف",
+  "join-code-required": "يتطلب رمز الانضمام",
+  "group-join-disclaimer":
+      "بانضمامك، أنت توافق على اتباع إرشادات المجموعة ومعايير المجتمع.",
+  "join-group": "انضم للمجموعة",
   "not-alone": "لست وحدك",
   "not-alone-description":
       "تعرف على التجارب المختلفة وشارك تجربتك مع مجموعة من المتعافين لتبادل الخبرات واكتشاف التحديات في رحلة التعافي.",
@@ -1211,7 +1229,6 @@ const Map<String, String> kAr = {
   "female": "أنثى",
   "date-of-birth": "تاريخ الميلاد",
   "gender": "الجنس",
-  "preferred-language": "اللغة المفضلة",
   "activate": "تفعيل",
   "data-are-secured": "نحتفظ بمعلوماتك آمنة وخاصة.",
   "no-follow-ups": "لا توجد متابعة لهذا اليوم",
@@ -3068,12 +3085,11 @@ const Map<String, String> kAr = {
   "group-challenge-count": "تحديات",
   "group-active": "نشط",
   "group-inactive": "غير نشط",
-  "male-only": "ذكور فقط",
-  "female-only": "إناث فقط",
+
   "mixed": "مختلط",
   "group-full": "المجموعة ممتلئة",
   "join-with-code": "انضم بالرمز",
-  "join-group": "انضم للمجموعة",
+
   "just-created": "تم إنشاؤها للتو",
   "group-months-ago": "منذ {months} أشهر",
   "group-days-ago": "منذ {days} أيام",
@@ -3160,6 +3176,16 @@ const Map<String, String> kAr = {
   'join-group-with-code': 'انضم للزمالة برمز',
   'join-code-placeholder': 'أدخل الرمز المكون من 5 أحرف',
   'group-weeks-ago': 'منذ {weeks} أسابيع',
+
+  // Group Privacy Error Messages
+  'error-group-not-found': 'الزمالة غير موجودة',
+  'error-group-membership-not-found': 'عضوية الزمالة غير موجودة',
+  'error-only-admin-can-update': 'المشرف فقط يمكنه تحديث إعدادات الخصوصية',
+  'error-groups-any-must-public':
+      'الزمالات التي تسمح لأي شخص بالانضمام يجب أن تكون عامة',
+  'error-private-groups-no-any':
+      'الزمالات الخاصة لا يمكن أن تسمح لأي شخص بالانضمام',
+  'error-failed-update-privacy': 'فشل في تحديث إعدادات خصوصية الزمالة',
 
   // Join cooldown timer
   'join-cooldown-active': 'فترة انتظار الانضمام نشطة',

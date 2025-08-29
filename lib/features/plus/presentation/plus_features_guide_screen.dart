@@ -352,23 +352,6 @@ class PlusFeaturesGuideScreen extends ConsumerWidget {
     );
   }
 
-  void _showRemindersInfo(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(AppLocalizations.of(context).translate('custom-reminders')),
-        content: Text(
-            AppLocalizations.of(context).translate('reminders-info-dialog')),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text(AppLocalizations.of(context).translate('got-it')),
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget _buildThankYouMessage(BuildContext context, dynamic theme) {
     return Container(
       width: double.infinity,

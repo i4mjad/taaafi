@@ -14,6 +14,7 @@ import 'package:reboot_app_3/features/groups/presentation/screens/modals/group_c
 import 'package:reboot_app_3/features/groups/application/groups_controller.dart';
 import 'package:reboot_app_3/features/community/presentation/providers/community_providers_new.dart';
 import 'package:reboot_app_3/features/groups/domain/entities/join_result_entity.dart';
+import 'package:reboot_app_3/features/account/data/user_profile_notifier.dart';
 
 enum GroupType { public, private }
 
@@ -352,6 +353,15 @@ class _CreateGroupModalState extends ConsumerState<CreateGroupModal> {
       // Check if user is Plus (for capacity > 6)
       final isPlus = profile.isPlusUser ?? false;
 
+      // Get user's preferred language from their profile
+      final userProfileAsync = ref.read(userProfileNotifierProvider);
+      final userProfile = await userProfileAsync.when(
+        data: (userProfile) async => userProfile,
+        loading: () async => null,
+        error: (_, __) async => null,
+      );
+      final userLanguage = _validateUserLanguage(userProfile?.locale);
+
       // Map joining method to domain value
       String joinMethod;
       switch (_joiningMethod!) {
@@ -377,13 +387,14 @@ class _CreateGroupModalState extends ConsumerState<CreateGroupModal> {
             joinMethod: joinMethod,
             creatorCpId: profile.id,
             isCreatorPlusUser: isPlus,
+            preferredLanguage: userLanguage,
           );
 
       if (!mounted) return;
 
       if (result.success) {
         Navigator.of(context).pop();
-        
+
         // Show success modal with join code if generated
         showModalBottomSheet(
           context: context,
@@ -471,5 +482,17 @@ class _CreateGroupModalState extends ConsumerState<CreateGroupModal> {
       case GroupJoiningMethod.groupCodeOnly:
         return l10n.translate('joining-method-code-only-description');
     }
+  }
+
+  /// Helper method to validate user language and provide fallback
+  String _validateUserLanguage(String? locale) {
+    if (locale != null && locale.isNotEmpty) {
+      final validLanguages = ['arabic', 'english'];
+      if (validLanguages.contains(locale.toLowerCase())) {
+        return locale.toLowerCase();
+      }
+    }
+    // Default to Arabic for null, empty, or invalid locales
+    return 'arabic';
   }
 }

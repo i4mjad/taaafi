@@ -132,7 +132,7 @@ class GroupMembersList extends ConsumerWidget {
       children: [
         // Section title
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 4),
+          padding: const EdgeInsets.symmetric(horizontal: 8),
           child: Row(
             children: [
               Text(
@@ -164,7 +164,7 @@ class GroupMembersList extends ConsumerWidget {
 
         // Members list in container
         WidgetsContainer(
-          padding: EdgeInsets.zero,
+          padding: const EdgeInsets.symmetric(horizontal: 8),
           child: Column(
             children: [
               for (int i = 0; i < members.length; i++) ...[

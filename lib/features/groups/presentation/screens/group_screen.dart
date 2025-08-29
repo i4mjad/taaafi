@@ -279,37 +279,7 @@ class GroupScreen extends ConsumerWidget {
           // Coming soon cards section
           Row(
             children: [
-              // Shared Challenges card
-              Expanded(
-                child: _buildComingSoonCard(
-                  context: context,
-                  theme: theme,
-                  l10n: l10n,
-                  title: l10n.translate('shared-challenges'),
-                  subtitle: l10n.translate('join-exciting-challenges'),
-                  icon: LucideIcons.target,
-                  features: [
-                    ComingSoonFeature(
-                      icon: LucideIcons.calendar,
-                      title: l10n.translate('daily-goals'),
-                    ),
-                    ComingSoonFeature(
-                      icon: LucideIcons.users,
-                      title: l10n.translate('community-support'),
-                    ),
-                    ComingSoonFeature(
-                      icon: LucideIcons.trophy,
-                      title: l10n.translate('achievements-rewards'),
-                    ),
-                  ],
-                  cardColor: theme.secondary[50]!,
-                  borderColor: theme.secondary[200]!,
-                ),
-              ),
-
-              const SizedBox(width: 16),
-
-              // Shared Updates card
+              // Shared Updates card (centered)
               Expanded(
                 child: _buildComingSoonCard(
                   context: context,
@@ -544,26 +514,9 @@ class GroupScreen extends ConsumerWidget {
       padding: const EdgeInsets.all(16),
       child: Column(
         children: [
-          // Top row: Chat only (Challenges commented for later use)
+          // Top row: Chat section only
           Row(
             children: [
-              // Challenges section (commented for later use)
-              // Expanded(
-              //   child: _buildBottomSection(
-              //     context: context,
-              //     theme: theme,
-              //     l10n: l10n,
-              //     icon: LucideIcons.trophy,
-              //     label: l10n.translate('challenges'),
-              //     backgroundColor: theme.secondary[50]!,
-              //     borderColor: theme.secondary[200]!,
-              //     textColor: theme.secondary[900]!,
-              //     onTap: () => _navigateToChallenges(context, groupId),
-              //   ),
-              // ),
-              //
-              // const SizedBox(width: 8),
-
               // Chat section
               Expanded(
                 child: _buildBottomSection(
@@ -748,19 +701,13 @@ class GroupScreen extends ConsumerWidget {
     final shareMessage =
         l10n.translate('group-share-message').replaceAll('{code}', joinCode);
 
-    Share.share(
-      shareMessage,
-      subject: l10n.translate('share-group'),
+    SharePlus.instance.share(
+      ShareParams(
+        text: shareMessage,
+        subject: l10n.translate('share-group'),
+      ),
     );
   }
-
-  // Commented for later use
-  // void _navigateToChallenges(BuildContext context, String groupId) {
-  //   context.goNamed(
-  //     RouteNames.groupChallenge.name,
-  //     pathParameters: {'groupId': groupId},
-  //   );
-  // }
 
   // Commented for later use
   // List<GroupUpdateItem> _getDemoUpdates() {

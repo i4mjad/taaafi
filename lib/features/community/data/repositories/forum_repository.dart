@@ -970,8 +970,7 @@ class ForumRepository {
       final QuerySnapshot snapshot = await _comments
           .where('parentFor', isEqualTo: 'comment')
           .where('parentId', isEqualTo: commentId)
-          .orderBy(
-              'createdAt') // TODO: Index required - see firestore_indexes_required.md
+          .orderBy('createdAt')
           .get();
 
       final comments = snapshot.docs

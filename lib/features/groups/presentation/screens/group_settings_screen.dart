@@ -54,71 +54,72 @@ class _GroupSettingsScreenState extends ConsumerState<GroupSettingsScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              verticalSpace(Spacing.points16),
-
               // Group Overview Card (combines details and join code)
               const GroupOverviewCard(),
 
               verticalSpace(Spacing.points16),
 
               // Settings actions row
-              Row(
-                children: [
-                  // Notifications
-                  Expanded(
-                    child: _buildActionCard(
-                      context: context,
-                      theme: theme,
-                      l10n: l10n,
-                      icon: LucideIcons.bell,
-                      title: l10n.translate('notifications'),
-                      onTap: () => _navigateToNotificationSettings(context),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                child: Row(
+                  children: [
+                    // Notifications
+                    Expanded(
+                      child: _buildActionCard(
+                        context: context,
+                        theme: theme,
+                        l10n: l10n,
+                        icon: LucideIcons.bell,
+                        title: l10n.translate('notifications'),
+                        onTap: () => _navigateToNotificationSettings(context),
+                      ),
                     ),
-                  ),
 
-                  horizontalSpace(Spacing.points8),
+                    horizontalSpace(Spacing.points8),
 
-                  // Chat
-                  Expanded(
-                    child: _buildActionCard(
-                      context: context,
-                      theme: theme,
-                      l10n: l10n,
-                      icon: LucideIcons.messageCircle,
-                      title: l10n.translate('chat'),
-                      onTap: () => _navigateToChatSettings(context),
+                    // Chat
+                    Expanded(
+                      child: _buildActionCard(
+                        context: context,
+                        theme: theme,
+                        l10n: l10n,
+                        icon: LucideIcons.messageCircle,
+                        title: l10n.translate('chat'),
+                        onTap: () => _navigateToChatSettings(context),
+                      ),
                     ),
-                  ),
 
-                  horizontalSpace(Spacing.points8),
+                    horizontalSpace(Spacing.points8),
 
-                  // Privacy
-                  Expanded(
-                    child: _buildActionCard(
-                      context: context,
-                      theme: theme,
-                      l10n: l10n,
-                      icon: LucideIcons.shield,
-                      title: l10n.translate('privacy'),
-                      onTap: () => _navigateToPrivacySettings(context),
+                    // Privacy
+                    Expanded(
+                      child: _buildActionCard(
+                        context: context,
+                        theme: theme,
+                        l10n: l10n,
+                        icon: LucideIcons.shield,
+                        title: l10n.translate('privacy'),
+                        onTap: () => _navigateToPrivacySettings(context),
+                      ),
                     ),
-                  ),
 
-                  horizontalSpace(Spacing.points8),
+                    horizontalSpace(Spacing.points8),
 
-                  // Leave
-                  Expanded(
-                    child: _buildActionCard(
-                      context: context,
-                      theme: theme,
-                      l10n: l10n,
-                      icon: LucideIcons.logOut,
-                      title: l10n.translate('leave'),
-                      onTap: () => _showLeaveGroupDialog(context, l10n),
-                      isDestructive: true,
+                    // Leave
+                    Expanded(
+                      child: _buildActionCard(
+                        context: context,
+                        theme: theme,
+                        l10n: l10n,
+                        icon: LucideIcons.logOut,
+                        title: l10n.translate('leave'),
+                        onTap: () => _showLeaveGroupDialog(context, l10n),
+                        isDestructive: true,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
 
               verticalSpace(Spacing.points24),

@@ -231,7 +231,7 @@ class _OpalGemVisualization extends StatelessWidget {
                   fontWeight: FontWeight.bold,
                   shadows: [
                     Shadow(
-                      color: Colors.black.withOpacity(0.3),
+                      color: Colors.black.withValues(alpha: 0.3),
                       offset: const Offset(0, 1),
                       blurRadius: 2,
                     ),
@@ -241,11 +241,11 @@ class _OpalGemVisualization extends StatelessWidget {
               Text(
                 '%',
                 style: TextStyles.caption.copyWith(
-                  color: Colors.white.withOpacity(0.9),
+                  color: Colors.white.withValues(alpha: 0.9),
                   fontWeight: FontWeight.w600,
                   shadows: [
                     Shadow(
-                      color: Colors.black.withOpacity(0.3),
+                      color: Colors.black.withValues(alpha: 0.3),
                       offset: const Offset(0, 1),
                       blurRadius: 2,
                     ),
@@ -293,7 +293,7 @@ class _OpalGemPainter extends CustomPainter {
 
     // Add shimmer effect
     final shimmerPaint = Paint()
-      ..color = Colors.white.withOpacity(0.3)
+      ..color = Colors.white.withValues(alpha: 0.3)
       ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 10);
 
     canvas.drawCircle(
@@ -301,7 +301,7 @@ class _OpalGemPainter extends CustomPainter {
 
     // Add border glow
     final borderPaint = Paint()
-      ..color = colors.first.withOpacity(0.4)
+      ..color = colors.first.withValues(alpha: 0.4)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 2
       ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4);

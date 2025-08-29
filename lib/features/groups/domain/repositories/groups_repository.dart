@@ -20,6 +20,7 @@ abstract class GroupsRepository {
     required String visibility,
     required String joinMethod,
     required String creatorCpId,
+    required String preferredLanguage,
     String? joinCode,
     DateTime? joinCodeExpiresAt,
     int? joinCodeMaxUses,
