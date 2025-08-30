@@ -65,7 +65,7 @@ workflows:
       flutter: 3.32.5
       groups:
         - SHOREBIRD
-        - asc  # Use App Store Connect API for automatic signing
+        - app_store_connect  # Use App Store Connect API for automatic signing
       vars:
         APP_STORE_APPLE_ID: 1531562469
         # XCODE_WORKSPACE: "Runner.xcworkspace"
@@ -138,7 +138,7 @@ workflows:
       flutter: 3.32.5
       groups:
         - SHOREBIRD
-        - asc
+        - app_store_connect
       vars:
         APP_STORE_APPLE_ID: 1531562469
         # XCODE_WORKSPACE: "Runner.xcworkspace"
@@ -261,7 +261,7 @@ workflows:
       groups:
         - google_credentials
         - SHOREBIRD
-        - asc
+        - app_store_connect
       vars:
         APP_STORE_APPLE_ID: 1531562469
         PACKAGE_NAME: "com.amjadkhalfan.reboot_app_3"
@@ -352,7 +352,7 @@ workflows:
       groups:
         - google_credentials
         - SHOREBIRD
-        - asc
+        - app_store_connect
       vars:
         APP_STORE_APPLE_ID: 1531562469
         PACKAGE_NAME: "com.amjadkhalfan.reboot_app_3"
