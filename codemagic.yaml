@@ -75,8 +75,12 @@ workflows:
           curl --proto '=https' --tlsv1.2 https://raw.githubusercontent.com/shorebirdtech/install/main/install.sh -sSf | bash
           echo PATH="$HOME/.shorebird/bin:$PATH" >> $CM_ENV
 
-      - name: Set up code signing settings on Xcode project
+      - name: Prepare signing (fetch/create profiles + install certs)
         script: |
+          set -euo pipefail
+          keychain initialize
+          app-store-connect fetch-signing-files "com.amjadkhalfan.RebootApp" --type IOS_APP_STORE --create
+          keychain add-certificates
           xcode-project use-profiles
 
       - name: Get Flutter packages
@@ -110,7 +114,7 @@ workflows:
         script: |
           VERSION=$(cat pubspec.yaml | grep 'version:' | head -1 | awk '{print $2}' | cut -d '+' -f 1)
           BUILD_NUMBER=$(app-store-connect get-latest-testflight-build-number "$APP_STORE_APPLE_ID")
-          shorebird release ios --flutter-version=3.32.5 --export-options-plist=ios/buildInfo.plist
+          shorebird release ios --flavor prod --flutter-version=3.32.5 --export-options-plist=ios/buildInfo.plist
     artifacts:
       - build/ios/ipa/*.ipa
       - /tmp/xcodebuild_logs/*.log
@@ -147,8 +151,12 @@ workflows:
           curl --proto '=https' --tlsv1.2 https://raw.githubusercontent.com/shorebirdtech/install/main/install.sh -sSf | bash
           echo PATH="$HOME/.shorebird/bin:$PATH" >> $CM_ENV
 
-      - name: Set up code signing settings on Xcode project
+      - name: Prepare signing (fetch/create profiles + install certs)
         script: |
+          set -euo pipefail
+          keychain initialize
+          app-store-connect fetch-signing-files "com.amjadkhalfan.RebootApp" --type IOS_APP_STORE --create
+          keychain add-certificates
           xcode-project use-profiles
 
       - name: Get Flutter packages
@@ -179,7 +187,7 @@ workflows:
 
       - name: Shorebird Patch
         script: |
-          shorebird patch ios \
+          shorebird patch ios --flavor prod \
             --release-version="$RELEASE_VERSION" \
             --export-options-plist=ios/buildInfo.plist
     artifacts:
@@ -271,8 +279,12 @@ workflows:
           curl --proto '=https' --tlsv1.2 https://raw.githubusercontent.com/shorebirdtech/install/main/install.sh -sSf | bash
           echo PATH="$HOME/.shorebird/bin:$PATH" >> $CM_ENV
 
-      - name: Set up code signing settings on Xcode project
+      - name: Prepare signing (fetch/create profiles + install certs)
         script: |
+          set -euo pipefail
+          keychain initialize
+          app-store-connect fetch-signing-files "com.amjadkhalfan.RebootApp" --type IOS_APP_STORE --create
+          keychain add-certificates
           xcode-project use-profiles
 
       - name: Set up local.properties
@@ -320,7 +332,7 @@ workflows:
 
       - name: Shorebird Patch iOS
         script: |
-          shorebird patch ios \
+          shorebird patch ios --flavor prod \
             --release-version="$IOS_RELEASE_VERSION" \
             --export-options-plist=ios/buildInfo.plist
     artifacts:
@@ -363,8 +375,12 @@ workflows:
           curl --proto '=https' --tlsv1.2 https://raw.githubusercontent.com/shorebirdtech/install/main/install.sh -sSf | bash
           echo PATH="$HOME/.shorebird/bin:$PATH" >> $CM_ENV
 
-      - name: Set up code signing settings on Xcode project
+      - name: Prepare signing (fetch/create profiles + install certs)
         script: |
+          set -euo pipefail
+          keychain initialize
+          app-store-connect fetch-signing-files "com.amjadkhalfan.RebootApp" --type IOS_APP_STORE --create
+          keychain add-certificates
           xcode-project use-profiles
 
       - name: Set up local.properties
@@ -419,7 +435,7 @@ workflows:
 
       - name: Shorebird Release iOS
         script: |
-          shorebird release ios --flutter-version=3.32.5 \
+          shorebird release ios --flavor prod --flutter-version=3.32.5 \
             --export-options-plist=ios/buildInfo.plist
     artifacts:
       - build/**/outputs/**/*.aab
