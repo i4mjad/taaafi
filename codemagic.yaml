@@ -79,8 +79,9 @@ workflows:
         script: |
           set -euo pipefail
           keychain initialize
-          app-store-connect fetch-signing-files "com.amjadkhalfan.RebootApp" --type IOS_APP_STORE --create
+          # Import any uploaded P12s (with private keys) before fetching signing files
           keychain add-certificates
+          app-store-connect fetch-signing-files "com.amjadkhalfan.RebootApp" --type IOS_APP_STORE --create
           xcode-project use-profiles
 
       - name: Get Flutter packages
@@ -155,8 +156,8 @@ workflows:
         script: |
           set -euo pipefail
           keychain initialize
-          app-store-connect fetch-signing-files "com.amjadkhalfan.RebootApp" --type IOS_APP_STORE --create
           keychain add-certificates
+          app-store-connect fetch-signing-files "com.amjadkhalfan.RebootApp" --type IOS_APP_STORE --create
           xcode-project use-profiles
 
       - name: Get Flutter packages
@@ -283,8 +284,8 @@ workflows:
         script: |
           set -euo pipefail
           keychain initialize
-          app-store-connect fetch-signing-files "com.amjadkhalfan.RebootApp" --type IOS_APP_STORE --create
           keychain add-certificates
+          app-store-connect fetch-signing-files "com.amjadkhalfan.RebootApp" --type IOS_APP_STORE --create
           xcode-project use-profiles
 
       - name: Set up local.properties
@@ -379,8 +380,8 @@ workflows:
         script: |
           set -euo pipefail
           keychain initialize
-          app-store-connect fetch-signing-files "com.amjadkhalfan.RebootApp" --type IOS_APP_STORE --create
           keychain add-certificates
+          app-store-connect fetch-signing-files "com.amjadkhalfan.RebootApp" --type IOS_APP_STORE --create
           xcode-project use-profiles
 
       - name: Set up local.properties
